@@ -2,11 +2,7 @@ require('dotenv').config()
 const bearerToken = require('express-bearer-token');
 const express = require('express')
 const helmet = require('helmet');
-
-
-
 const app = express()
-const port = 3000
 
 /*
 “Helmet” is a collection of nine smaller middleware functions that are used to set security-relevant HTTP headers.
