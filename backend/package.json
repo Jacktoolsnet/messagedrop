@@ -1,0 +1,28 @@
+{
+  "name": "messagedropbackend",
+  "version": "1.0.0",
+  "description": "Backend for messagedrop network",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jacktoolsnet/messagedrop.git"
+  },
+  "keywords": [
+    "messagedrop",
+    "network",
+    "api",
+    "backend"
+  ],
+  "author": "JackTools.Net",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jacktoolsnet/messagedrop/issues"
+  },
+  "homepage": "https://github.com/Jacktoolsnet/messagedrop#readme",
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
