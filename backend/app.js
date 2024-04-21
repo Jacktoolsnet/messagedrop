@@ -1,6 +1,6 @@
 require('dotenv').config()
 const bearerToken = require('express-bearer-token');
-const express = require('express')
+const express = require('express');
 const helmet = require('helmet');
 const app = express()
 
@@ -31,6 +31,7 @@ app.use(bearerToken());
 
 // ROUTES
 require('./routes/root')(app);
+require('./routes/echo')(app);
 require('./routes/token')(app);
 // The las route
 require('./routes/notfound')(app);
