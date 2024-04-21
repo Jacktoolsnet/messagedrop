@@ -32,6 +32,8 @@ app.use(bearerToken());
 // ROUTES
 require('./routes/root')(app);
 require('./routes/token')(app);
+// The las route
+require('./routes/notfound')(app);
 
 // Start app
 app.listen(process.env.PORT, () => {
