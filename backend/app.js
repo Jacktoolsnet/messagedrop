@@ -34,7 +34,7 @@ require('./routes/root')(app);
 require('./routes/echo')(app);
 require('./routes/token')(app);
 // The las route
-require('./routes/notfound')(app);
+// require('./routes/notfound')(app);
 
 // Start app
 app.listen(process.env.PORT, () => {
