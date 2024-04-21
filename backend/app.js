@@ -1,5 +1,7 @@
 require('dotenv').config()
 const bearerToken = require('express-bearer-token');
+const Database = require('./database/database');
+const database = new Database();
 const express = require('express');
 const helmet = require('helmet');
 const app = express()
@@ -38,5 +40,6 @@ require('./routes/notfound')(app);
 
 // Start app
 app.listen(process.env.PORT, () => {
-  console.log(`Example app listening on port ${process.env.PORT}`)
+  console.log(`Example app listening on port ${process.env.PORT}`);
+  database.init();
 })
