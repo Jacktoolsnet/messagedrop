@@ -1,4 +1,5 @@
 const sqlite3 = require('sqlite3').verbose();
+const path = require('path');
 
 class Database {
 
@@ -7,7 +8,7 @@ class Database {
       }
 
     init() {
-        this.db = new sqlite3.Database('./backend/messagedrop.db', sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+        this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
             if (err) {
               return console.error(err.message);
             }
