@@ -8,7 +8,7 @@ class Database {
       }
 
     init() {
-        this.db = new sqlite3.Database(path.join(__dirname, 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+        this.db = new sqlite3.Database(path.join('::memory::'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
             if (err) {
               return console.error(err.message);
             }

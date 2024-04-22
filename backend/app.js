@@ -43,9 +43,5 @@ require('./routes/notfound')(app);
 // Start app
 app.listen(process.env.PORT, () => {
   console.log(`Example app listening on port ${process.env.PORT}`);
-  try {
-    database.init();
-  } catch (err) {
-    console.error(err);
-  }
+  database.init();
 })
