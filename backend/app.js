@@ -1,7 +1,7 @@
 require('dotenv').config()
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
-const Database = require('./database/database');
+const Database = require('./db/database');
 // const database = new Database();
 const express = require('express');
 const helmet = require('helmet');
