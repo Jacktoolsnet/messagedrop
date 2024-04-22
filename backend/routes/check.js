@@ -7,13 +7,17 @@ module.exports = function(app) {
       res.status(200);
       let database_open
       if (undefined === req.database) {
-        database_open = false
+        database_connection = 'not established'
       } else {
-        database_open = req.database.db.open
+        if (req.database.db.open) {
+          database_connection = 'established'
+        } else {
+          database_connection = 'not established'
+        } 
       }
       let response = {
         'token' : 'ok',
-        database_open,
+        database_connection,
         'reqBody' : req.body
        };
       res.send(JSON.stringify(response, null, 2))

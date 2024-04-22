@@ -14,7 +14,7 @@ module.exports = function(app) {
       }
       let response = {
         'status' : 'Service is up and running.',
-        'database_connection' : database_connection
+        database_connection
       };
       res.send(JSON.stringify(response, null, 2))
     });
