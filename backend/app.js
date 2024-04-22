@@ -2,7 +2,7 @@ require('dotenv').config()
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const Database = require('./db/database');
-// const database = new Database();
+const database = new Database();
 const express = require('express');
 const helmet = require('helmet');
 const app = express()
@@ -32,7 +32,7 @@ If a token is found, it will be stored on req.token. If one has been provided in
 */
 app.use(bearerToken());
 
-// app.use(databaseMw(database));
+app.use(databaseMw(database));
 
 // ROUTES
 require('./routes/root')(app);
@@ -43,5 +43,5 @@ require('./routes/notfound')(app);
 // Start app
 app.listen(process.env.PORT, () => {
   console.log(`Example app listening on port ${process.env.PORT}`);
-  // database.init();
+  database.init();
 })
