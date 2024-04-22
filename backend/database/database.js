@@ -1,4 +1,4 @@
-const path = require('path');
+// const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 class Database {
@@ -15,7 +15,7 @@ class Database {
             }
             console.log('Connected to the messagedrop SQlite database.');
           });
-          */
+          *///
     };
 
     close () {
