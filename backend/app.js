@@ -1,6 +1,6 @@
 require('dotenv').config()
 const bearerToken = require('express-bearer-token');
-//const databaseMw = require('./middleware/database');
+const databaseMw = require('./middleware/database');
 const Database = require('./database/database');
 const database = new Database();
 const express = require('express');
@@ -32,7 +32,7 @@ If a token is found, it will be stored on req.token. If one has been provided in
 */
 app.use(bearerToken());
 
-// app.use(databaseMw(database));
+app.use(databaseMw(database));
 
 // ROUTES
 require('./routes/root')(app);
