@@ -1,3 +1,4 @@
+const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 
 class Database {
@@ -7,11 +8,11 @@ class Database {
       }
 
     init() {
-        this.db = new sqlite3.Database(':memory:', (err) => {
+        this.db = new sqlite3.Database(path.join(__dirname, '../../database/messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
             if (err) {
               return console.error(err.message);
             }
-            console.log('Connected to the in-memory SQlite database.');
+            console.log('Connected to the messagedrop SQlite database.');
           });
     };
 
