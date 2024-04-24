@@ -1,5 +1,6 @@
-const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
+const sqlite3 = require('sqlite3').verbose();
+const tableUser = require('./tableUser')
 
 class Database {
 
@@ -12,6 +13,7 @@ class Database {
             if (err) {
               return console.error(err.message);
             }
+            tableUser.init(this.db)
             console.log('Connected to the messagedrop SQlite database.');
           });
     };

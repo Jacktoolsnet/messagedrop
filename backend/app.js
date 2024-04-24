@@ -3,9 +3,13 @@ const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const Database = require('./db/database');
 const database = new Database();
+const check = require('./routes/check');
+const user = require('./routes/user');
+const root = require('./routes/root');
+const notfound = require('./routes/notfound');
 const express = require('express');
 const helmet = require('helmet');
-const app = express()
+const app = express();
 
 /*
 “Helmet” is a collection of nine smaller middleware functions that are used to set security-relevant HTTP headers.
@@ -35,10 +39,11 @@ app.use(bearerToken());
 app.use(databaseMw(database));
 
 // ROUTES
-require('./routes/root')(app);
-require('./routes/check')(app);
+app.use('/', root);
+app.use('/check', check);
+app.use('/user', user);
 // The las route
-require('./routes/notfound')(app);
+app.use('*', notfound);
 
 // Start app
 app.listen(process.env.PORT, () => {
