@@ -7,18 +7,26 @@ lastSignOfLife: The timestamp of the last sign of life. User where the last sign
 const userStatus = {
     ENABLED: 'enabled',
     DISABLED: 'disabled',
-  };
+};
+
+const tableName = 'tableUser';
+const columnUserId = 'userId';
+const columnPublicKey = 'publicKey'; 
+const columnNumberOfMessages = 'numberOfMessages';
+const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
+const columnUserStatus = 'userStatus';
+const columnLastSignOfLife = 'lastSignOfLife';
 
 const init = function (db) {
     try {
         const sql = `
-        CREATE TABLE IF NOT EXISTS tableUser (
-            userId TEXT PRIMARY KEY NOT NULL, 
-            publicKey TEXT NOT NULL, 
-            numberOfMessages INTEGER DEFAULT 0,
-            numberOfBlockedMessages INTEGER DEFAULT 0,
-            userStatus TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
-            lastSignOfLife INTEGER NOT NULL
+        CREATE TABLE IF NOT EXISTS ${tableName} (
+            ${columnUserId} TEXT PRIMARY KEY NOT NULL, 
+            ${columnPublicKey} TEXT NOT NULL, 
+            ${columnNumberOfMessages} INTEGER DEFAULT 0,
+            ${columnNumberOfBlockedMessages} INTEGER DEFAULT 0,
+            ${columnUserStatus} TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
+            ${columnLastSignOfLife} INTEGER NOT NULL
         );`;
 
         db.run(sql, (err) => {
@@ -34,7 +42,7 @@ const init = function (db) {
 const create = function (db, userId, publicKey, callback) {
     try {
         let sql = `
-        INSERT INTO tableUser (userId, publicKey, lastSignOfLife) 
+        INSERT INTO ${tableName} (${columnUserId}, ${columnPublicKey}, ${columnLastSignOfLife}) 
         VALUES ('${userId}', '${publicKey}', datetime('now'));`;
 
         db.run(sql, (err) => {
@@ -47,7 +55,7 @@ const create = function (db, userId, publicKey, callback) {
 
 const getAll = function (db, callback) {
     try{
-        let sql = `SELECT * FROM tableUser;`;
+        let sql = `SELECT * FROM ${tableName};`;
 
         db.all(sql, (err, rows) => {
             callback(err, rows);
@@ -60,8 +68,8 @@ const getAll = function (db, callback) {
 const getById = function (db, params, callback) {
     try{
         let sql = `
-        SELECT * FROM tableUser
-        WHERE userId = ?;`;
+        SELECT * FROM ${tableName}
+        WHERE ${columnUserId} = ?;`;
 
         db.get(sql, [params.userId], (err, row) => {
             callback(err, row);
@@ -74,8 +82,8 @@ const getById = function (db, params, callback) {
 const deleteById = function (db, params, callback) {
     try {
         let sql = `
-        DELETE FROM tableUser
-        WHERE userId = ?;`;
+        DELETE FROM ${tableName}
+        WHERE ${columnUserId} = ?;`;
 
         db.run(sql, [params.userId], (err) => {
             callback(err)
@@ -88,8 +96,8 @@ const deleteById = function (db, params, callback) {
 const clean = function (db, callback) {
     try {
         let sql = `
-        DELETE FROM tableUser
-        WHERE lastSignOfLife < datetime('now','-90 days');`;
+        DELETE FROM ${tableName}
+        WHERE ${columnLastSignOfLife} < datetime('now','-90 days');`;
 
         db.run(sql, (err) => {
             callback(err)

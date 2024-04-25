@@ -6,6 +6,7 @@ const database = new Database();
 const check = require('./routes/check');
 const user = require('./routes/user');
 const root = require('./routes/root');
+const statistic = require('./routes/statistic');
 const notfound = require('./routes/notfound');
 const express = require('express');
 const helmet = require('helmet');
@@ -42,6 +43,7 @@ app.use(databaseMw(database));
 app.use('/', root);
 app.use('/check', check);
 app.use('/user', user);
+app.use('/statistic', statistic);
 // The las route
 app.use('*', notfound);
 
