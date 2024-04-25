@@ -29,6 +29,36 @@ const init = function (db) {
     }
 };
 
+const countVisitor = function (db, callback) {
+    try {
+        let sql = `
+        INSERT INTO ${tableName} (${columnStatisticDate}, ${columnVisitors}) 
+        VALUES (date('now'), 1)
+        ON CONFLICT(${columnStatisticDate}) DO UPDATE SET ${columnVisitors} = ${columnVisitors} + 1;`;
+
+        db.run(sql, (err) => {
+            callback(err)
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const countMessage = function (db, callback) {
+    try {
+        let sql = `
+        INSERT INTO ${tableName} (${columnStatisticDate}, ${columnMessages}) 
+        VALUES (date('now'), 1)
+        ON CONFLICT(${columnStatisticDate}) DO UPDATE SET ${columnMessages} = ${columnMessages} + 1;`;
+
+        db.run(sql, (err) => {
+            callback(err)
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const clean = function (db, callback) {
     try {
         let sql = `
@@ -58,5 +88,7 @@ const getAll = function (db, callback) {
 module.exports = {
     init,
     clean,
+    countVisitor,
+    countMessage,
     getAll
 }
