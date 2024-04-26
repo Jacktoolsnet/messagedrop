@@ -5,8 +5,8 @@ lastSignOfLife: The timestamp of the last sign of life. User where the last sign
 */
 
 const userStatus = {
-    ENABLED: 'enabled',
-    DISABLED: 'disabled',
+    ENABLED : 'enabled',
+    DISABLED : 'disabled'
 };
 
 const tableName = 'tableUser';
