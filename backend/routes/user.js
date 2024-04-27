@@ -12,10 +12,14 @@ router.get('/get', [security.checkToken], function(req, res) {
       response.status = 500;
       response.error = err;
     } else {
-      rows.forEach((row) => {
-        response.rows.push(row);
-      });
-      response.status = 200;
+      if (rows.length == 0) {
+        response.status = 404;
+      } else {
+        rows.forEach((row) => {
+          response.rows.push(row);
+        });
+        response.status = 200;
+      }
     }
     res.setHeader('Content-Type', 'application/json');      
     res.status(response.status);
@@ -25,7 +29,7 @@ router.get('/get', [security.checkToken], function(req, res) {
 
 router.get('/get/:userId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tableUser.getById(req.database.db, req.params, function(err, row) {
+  tableUser.getById(req.database.db, req.params.userId, function(err, row) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -79,7 +83,7 @@ router.get('/clean', [security.checkToken], function(req, res) {
 
 router.delete('/delete/:userId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tableUser.deleteById(req.database.db, req.params, function(err) {
+  tableUser.deleteById(req.database.db, req.params.userId, function(err) {
     if (err) {
       response.status = 500;
       response.error = err;

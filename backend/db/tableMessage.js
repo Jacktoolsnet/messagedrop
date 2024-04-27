@@ -82,24 +82,10 @@ const create = function (db, messageTyp, latitude, longitude, plusCode, message,
             date('now', '+30 days'),
             ${latitude},
             ${longitude},
-            '9F4G5G76+RF',
+            '${plusCode}',
             '${message}',
             '${userId}'
         );`;
-
-        db.run(sql, (err) => {
-            callback(err)
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const clean = function (db, callback) {
-    try {
-        let sql = `
-        DELETE FROM ${tableName}
-        WHERE ${columnMessageDeleteDateTime} < date('now');`;
 
         db.run(sql, (err) => {
             callback(err)
@@ -121,9 +107,102 @@ const getAll = function (db, callback) {
     }
 };
 
+const getById = function (db, messageId, callback) {
+    try{
+        let sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnMessageId} = ?;`;
+
+        db.get(sql, [messageId], (err, row) => {
+            callback(err, row);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getByPlusCode = function (db, plusCode, callback) {
+    try{
+        let sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnPlusCode} LIKE ?
+        AND ${columnMessageStatus} = '${messageStatus.ENABLED}'      
+        ORDER BY ${columnMessageCreateDateTime} DESC;`;
+
+        db.all(sql, [plusCode], (err, rows) => {
+            callback(err, rows);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const disableMessage = function (db, messageId, callback) {
+    try{
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnMessageStatus} = '${messageStatus.DISABLED}' 
+        WHERE ${columnMessageId} = ?;`;
+
+        db.run(sql, [messageId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const enableMessage = function (db, messageId, callback) {
+    try{
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnMessageStatus} = '${messageStatus.ENABLED}' 
+        WHERE ${columnMessageId} = ?;`;
+
+        db.run(sql, [messageId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const deleteById = function (db, messageId, callback) {
+    try {
+        let sql = `
+        DELETE FROM ${tableName}
+        WHERE ${columnMessageId} = ?;`;
+
+        db.run(sql, [messageId], (err) => {
+            callback(err)
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const clean = function (db, callback) {
+    try {
+        let sql = `
+        DELETE FROM ${tableName}
+        WHERE ${columnMessageDeleteDateTime} < date('now');`;
+
+        db.run(sql, (err) => {
+            callback(err)
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = {
     init,
     create,
-    clean,
-    getAll
+    disableMessage,
+    enableMessage,   
+    getAll,
+    getById,
+    getByPlusCode,
+    deleteById,
+    clean
 }

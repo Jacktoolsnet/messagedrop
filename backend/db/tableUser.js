@@ -73,13 +73,13 @@ const getAll = function (db, callback) {
     }
 };
 
-const getById = function (db, params, callback) {
+const getById = function (db, userId, callback) {
     try{
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnUserId} = ?;`;
 
-        db.get(sql, [params.userId], (err, row) => {
+        db.get(sql, [userId], (err, row) => {
             callback(err, row);
         });
     } catch (error) {
@@ -87,13 +87,13 @@ const getById = function (db, params, callback) {
     }
 };
 
-const deleteById = function (db, params, callback) {
+const deleteById = function (db, userId, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
         WHERE ${columnUserId} = ?;`;
 
-        db.run(sql, [params.userId], (err) => {
+        db.run(sql, [userId], (err) => {
             callback(err)
         });
     } catch (error) {
