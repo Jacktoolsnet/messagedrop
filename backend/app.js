@@ -3,10 +3,11 @@ const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const Database = require('./db/database');
 const database = new Database();
-const check = require('./routes/check');
-const user = require('./routes/user');
 const root = require('./routes/root');
+const check = require('./routes/check');
 const statistic = require('./routes/statistic');
+const user = require('./routes/user');
+const message = require('./routes/message');
 const notfound = require('./routes/notfound');
 const express = require('express');
 const helmet = require('helmet');
@@ -42,8 +43,9 @@ app.use(databaseMw(database));
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
-app.use('/user', user);
 app.use('/statistic', statistic);
+app.use('/user', user);
+app.use('/message', message);
 // The las route
 app.use('*', notfound);
 

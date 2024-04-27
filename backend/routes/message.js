@@ -1,13 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
-const tableUser = require('../db/tableUser');
+const tableMessage = require('../db/tableMessage');
 
 router.get('/get', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
-  tableUser.getAll(req.database.db, function(err, rows) {
+  tableMessage.getAll(req.database.db, function(err, rows) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -23,9 +22,10 @@ router.get('/get', [security.checkToken], function(req, res) {
   });
 });
 
+/*
 router.get('/get/:userId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tableUser.getById(req.database.db, req.params, function(err, row) {
+  tableMessage.getById(req.database.db, req.params, function(err, row) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -43,17 +43,16 @@ router.get('/get/:userId', [security.checkToken], function(req, res) {
     res.json(response);
   });
 });
+*/
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  let userId = uuid.v4();
-    tableUser.create(req.database.db, userId, req.body.publicKey, function (err) {
+    tableMessage.create(req.database.db, req.body.messageTyp, req.body.latitude, req.body.longitude, req.body.plusCode, req.body.message, req.body.messageUserId, function (err) {
       if (err) {
         response.status = 500;
         response.error = err;
       } else {
         response.status = 200;
-        response.userId = userId;
       }
       res.setHeader('Content-Type', 'application/json');
       res.status(response.status);
@@ -64,7 +63,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 router.get('/clean', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
   console.log('clean');
-  tableUser.clean(req.database.db, function(err) {
+  tableMessage.clean(req.database.db, function(err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -77,9 +76,10 @@ router.get('/clean', [security.checkToken], function(req, res) {
   });
 });
 
+/*
 router.delete('/delete/:userId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tableUser.deleteById(req.database.db, req.params, function(err) {
+  tableMessage.deleteById(req.database.db, req.params, function(err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -91,5 +91,6 @@ router.delete('/delete/:userId', [security.checkToken], function(req, res) {
     res.json(response);
   });
 });
+*/
 
 module.exports = router

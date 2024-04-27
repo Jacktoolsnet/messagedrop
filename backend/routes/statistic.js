@@ -3,7 +3,7 @@ const router = express.Router();
 const security = require('../middleware/security');
 const tableStatistic = require('../db/tableStatistic');
 
-router.get('/get/', [security.checkToken], function(req, res) {
+router.get('/get', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
   tableStatistic.getAll(req.database.db, function(err, rows) {
     if (err) {

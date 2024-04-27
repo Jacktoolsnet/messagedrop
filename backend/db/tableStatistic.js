@@ -63,7 +63,7 @@ const clean = function (db, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnStatisticDate} < datetime('now','-90 days');`;
+        WHERE ${columnStatisticDate} < date('now','-90 days');`;
 
         db.run(sql, (err) => {
             callback(err)

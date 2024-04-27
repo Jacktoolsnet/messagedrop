@@ -44,10 +44,10 @@ const init = function (db) {
             ${columnLongitude} REAL NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
             ${columnMessage} TEXT NOT NULL,
-            ${columnMessageViews} INTEGER NOT NULL,
-            ${columnMessageLikes} INTEGER NOT NULL,
-            ${columnMessageDislikes} INTEGER NOT NULL,
-            ${columnMessageStatus} TEXT NOT NULL,
+            ${columnMessageViews} INTEGER NOT NULL DEFAULT 0,
+            ${columnMessageLikes} INTEGER NOT NULL DEFAULT 0,
+            ${columnMessageDislikes} INTEGER NOT NULL DEFAULT 0,
+            ${columnMessageStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnMessageUserId} TEXT NOT NULL,
             FOREIGN KEY (${columnMessageUserId}) 
             REFERENCES tableUser (userId) 
@@ -64,27 +64,28 @@ const init = function (db) {
     }
 };
 
-const countVisitor = function (db, callback) {
+const create = function (db, messageTyp, latitude, longitude, plusCode, message, userId, callback) {
     try {
         let sql = `
-        INSERT INTO ${tableName} (${columnStatisticDate}, ${columnVisitors}) 
-        VALUES (date('now'), 1)
-        ON CONFLICT(${columnStatisticDate}) DO UPDATE SET ${columnVisitors} = ${columnVisitors} + 1;`;
-
-        db.run(sql, (err) => {
-            callback(err)
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const countMessage = function (db, callback) {
-    try {
-        let sql = `
-        INSERT INTO ${tableName} (${columnStatisticDate}, ${columnMessages}) 
-        VALUES (date('now'), 1)
-        ON CONFLICT(${columnStatisticDate}) DO UPDATE SET ${columnMessages} = ${columnMessages} + 1;`;
+        INSERT INTO ${tableName} (
+            ${columnMessageType}, 
+            ${columnMessageCreateDateTime},
+            ${columnMessageDeleteDateTime},
+            ${columnLatitude},
+            ${columnLongitude},
+            ${columnPlusCode},
+            ${columnMessage},
+            ${columnMessageUserId}
+        ) VALUES (
+            '${messageTyp}', 
+            date('now'),
+            date('now', '+30 days'),
+            ${latitude},
+            ${longitude},
+            '9F4G5G76+RF',
+            '${message}',
+            '${userId}'
+        );`;
 
         db.run(sql, (err) => {
             callback(err)
@@ -98,7 +99,7 @@ const clean = function (db, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnStatisticDate} < datetime('now','-90 days');`;
+        WHERE ${columnMessageDeleteDateTime} < date('now');`;
 
         db.run(sql, (err) => {
             callback(err)
@@ -122,8 +123,7 @@ const getAll = function (db, callback) {
 
 module.exports = {
     init,
+    create,
     clean,
-    countVisitor,
-    countMessage,
     getAll
 }

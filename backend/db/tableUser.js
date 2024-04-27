@@ -42,8 +42,16 @@ const init = function (db) {
 const create = function (db, userId, publicKey, callback) {
     try {
         let sql = `
-        INSERT INTO ${tableName} (${columnUserId}, ${columnPublicKey}, ${columnLastSignOfLife}) 
-        VALUES ('${userId}', '${publicKey}', datetime('now'));`;
+        INSERT INTO ${tableName} (
+            ${columnUserId}, 
+            ${columnPublicKey}, 
+            ${columnLastSignOfLife}
+        ) 
+        VALUES (
+            '${userId}', 
+            '${publicKey}', 
+            datetime('now')
+        );`;
 
         db.run(sql, (err) => {
             callback(err)
