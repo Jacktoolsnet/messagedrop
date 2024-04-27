@@ -49,6 +49,28 @@ router.get('/get/id/:messageId', [security.checkToken], function(req, res) {
   });
 });
 
+router.get('/get/comment/:parentMessageId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0, 'rows' : []};
+  tableMessage.getByParentId(req.database.db, req.params.parentMessageId, function(err, rows) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      if (rows.length == 0) {
+        response.status = 404;
+      } else {
+        rows.forEach((row) => {
+          response.rows.push(row);
+        });
+        response.status = 200;
+      }
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 router.get('/get/pluscode/:plusCode', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
   // It is not allowed to get all messages with this route.
@@ -87,7 +109,10 @@ router.get('/get/pluscode/:plusCode', [security.checkToken], function(req, res) 
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tableMessage.create(req.database.db, req.body.messageTyp, req.body.plusCode, req.body.message, req.body.messageUserId, function (err) {
+  if (undefined == req.body.parentMessageId) {
+    req.body.parentMessageId = 0;
+  }
+  tableMessage.create(req.database.db, req.body.parentMessageId, req.body.messageTyp, req.body.plusCode, req.body.message, req.body.messageUserId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
