@@ -22,9 +22,7 @@ const columnMessageId = 'messageId';
 const columnMessageType = 'messageTyp';
 const columnMessageCreateDateTime = 'messageCreateDateTime';
 const columnMessageDeleteDateTime = 'messageDeleteDateTime'; // On creation the message has a lifetime of 30 Days
-const columnLatitude = 'latitude';
-const columnLongitude = 'longitude';
-const columnPlusCode = 'plusCode';
+const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
 const columnMessage = 'message'; // Max. 256 charachters.
 const columnMessageViews = 'messageViews'; 
 const columnMessageLikes = 'messageLikes'; // Each like add on day to the lifetime of the message.
@@ -40,8 +38,6 @@ const init = function (db) {
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
-            ${columnLatitude} REAL NOT NULL,
-            ${columnLongitude} REAL NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
             ${columnMessage} TEXT NOT NULL,
             ${columnMessageViews} INTEGER NOT NULL DEFAULT 0,
@@ -64,15 +60,13 @@ const init = function (db) {
     }
 };
 
-const create = function (db, messageTyp, latitude, longitude, plusCode, message, userId, callback) {
+const create = function (db, messageTyp, plusCode, message, userId, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnMessageType}, 
             ${columnMessageCreateDateTime},
             ${columnMessageDeleteDateTime},
-            ${columnLatitude},
-            ${columnLongitude},
             ${columnPlusCode},
             ${columnMessage},
             ${columnMessageUserId}
@@ -80,8 +74,6 @@ const create = function (db, messageTyp, latitude, longitude, plusCode, message,
             '${messageTyp}', 
             date('now'),
             date('now', '+30 days'),
-            ${latitude},
-            ${longitude},
             '${plusCode}',
             '${message}',
             '${userId}'
@@ -181,11 +173,12 @@ const deleteById = function (db, messageId, callback) {
     }
 };
 
-const clean = function (db, callback) {
+const cleanPublic = function (db, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnMessageDeleteDateTime} < date('now');`;
+        WHERE ${columnMessageType} = '${messageType.PUBLIC}'
+        AND ${columnMessageDeleteDateTime} < date('now');`;
 
         db.run(sql, (err) => {
             callback(err)
@@ -204,5 +197,5 @@ module.exports = {
     getById,
     getByPlusCode,
     deleteById,
-    clean
+    cleanPublic
 }
