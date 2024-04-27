@@ -3,6 +3,8 @@ const router = express.Router();
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableMessage = require('../db/tableMessage');
+const tableLike = require('../db/tableLike');
+const tableDislike = require('../db/tableDislike');
 
 router.get('/get', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
@@ -151,6 +153,74 @@ router.delete('/delete/:messageId', [security.checkToken], function(req, res) {
       response.status = 500;
       response.error = err;
     } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/like/:messageId/by/:userId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tableLike.like(req.database.db, req.params.messageId, req.params.userId, function(err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      // Updat the Likes
+      response.message = row;
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/unlike/:messageId/by/:userId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tableLike.unlike(req.database.db, req.params.messageId, req.params.userId, function(err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      // Updat the Likes
+      response.message = row;
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/dislike/:messageId/by/:userId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tableDislike.dislike(req.database.db, req.params.messageId, req.params.userId, function(err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      // Updat the Likes
+      response.message = row;
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/undislike/:messageId/by/:userId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tableDislike.undislike(req.database.db, req.params.messageId, req.params.userId, function(err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      // Updat the Likes
+      response.message = row;
       response.status = 200;
     }
     res.setHeader('Content-Type', 'application/json');      

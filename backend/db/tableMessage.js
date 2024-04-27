@@ -1,9 +1,3 @@
-/*
-statisticDate: One record per date.
-visitors: Visitors per day.
-messages: Messages per day.
-*/
-
 const messageType = {
     PUBLIC : 'public', // For Version 1.0 only public messages are possible 
     PRIVATE : 'private', // A private message is decrypted and only readable for the user who created the message.
@@ -122,6 +116,17 @@ const getByPlusCode = function (db, plusCode, callback) {
         ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
         db.all(sql, [plusCode], (err, rows) => {
+            // Update views
+            sql = `
+            UPDATE ${tableName}
+            SET ${columnMessageViews} = ${columnMessageViews} + 1
+            WHERE ${columnMessageId} = ?;`
+            
+            rows.forEach((row) => {
+                db.run(sql, [row.messageId], (err) => {
+                    console.log(err);
+                });
+            });
             callback(err, rows);
         });
     } catch (error) {

@@ -3,6 +3,8 @@ const sqlite3 = require('sqlite3').verbose();
 const tableUser = require('./tableUser');
 const tableStatistic = require('./tableStatistic');
 const tableMessage = require('./tableMessage');
+const tableLike = require('./tableLike');
+const tableDislike = require('./tableDislike');
 
 class Database {
 
@@ -18,6 +20,8 @@ class Database {
             tableUser.init(this.db);
             tableStatistic.init(this.db);
             tableMessage.init(this.db);
+            tableLike.init(this.db);
+            tableDislike.init(this.db);
             console.log('Connected to the messagedrop SQlite database.');
           });
     };

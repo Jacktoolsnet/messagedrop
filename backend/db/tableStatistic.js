@@ -1,9 +1,3 @@
-/*
-statisticDate: One record per date.
-visitors: Visitors per day.
-messages: Messages per day.
-*/
-
 const tableName = 'tableStatistic';
 
 const columnStatisticDate = 'statisticDate';
