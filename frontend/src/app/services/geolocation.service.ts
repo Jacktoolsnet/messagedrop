@@ -37,6 +37,7 @@ export class GeolocationService {
             observer.complete();
           },
           (error) => {
+            navigator.geolocation.clearWatch(this.watchID);
             observer.error(error);
           }
         );
