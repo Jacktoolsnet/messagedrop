@@ -48,6 +48,5 @@ export class AppComponent implements OnInit {
 
   handleZoomEvent(event: number) {
     this.zoom = event;
-    console.log(event);
   }
 }
