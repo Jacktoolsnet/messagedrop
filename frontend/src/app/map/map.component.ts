@@ -31,8 +31,8 @@ export class MapComponent implements AfterViewInit, OnChanges {
   private marker: any;
 
   ngOnChanges(changes: SimpleChanges) {
-    this.map.setView(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
-    this.marker.setLatLng([this.latitude, this.longitude]).update();
+    this.map?.setView(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
+    this.marker?.setLatLng([this.latitude, this.longitude]).update();
   }
 
   private initMap(): void {
