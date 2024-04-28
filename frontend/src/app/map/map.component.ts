@@ -1,4 +1,4 @@
-import { Component, AfterViewInit , Input, OnChanges, SimpleChanges} from '@angular/core';
+import { Component, AfterViewInit , Input, Output, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
 import * as leaflet from 'leaflet';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
@@ -27,6 +27,8 @@ export class MapComponent implements AfterViewInit, OnChanges {
   @Input() latitude: number = 0;
   @Input() longitude: number = 0;
   @Input() zoom: number = 18;
+  @Output() zoomEvent = new EventEmitter<number>();
+
   private map: any;
   private marker: any;
 
@@ -39,6 +41,11 @@ export class MapComponent implements AfterViewInit, OnChanges {
     this.map = leaflet.map('map', {
       center: [ this.latitude, this.longitude ],
       zoom: this.zoom
+    });
+
+    this.map.on('zoomend', (ev: any) => {
+      this.zoom = this.map.getZoom();
+      this.zoomEvent.emit(this.zoom);
     });
 
     const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -59,3 +66,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
     this.initMap();
   }
 }
+function emitEvent() {
+  throw new Error('Function not implemented.');
+}
+

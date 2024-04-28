@@ -16,15 +16,16 @@ export class AppComponent implements OnInit {
   private apiUrl: String = environment.apiUrl;
   public latitude: number = 0;
   public longitude: number = 0;
+  public zoom: number = 18;
 
   constructor(private geolocationService: GeolocationService) { }
 
   ngOnInit(): void {
-    this.getGeoLocation();
+    this.watchPosition();
   }
 
-  getGeoLocation() {
-    this.geolocationService.getCurrentPosition().subscribe({
+  watchPosition() {
+    this.geolocationService.watchPosition().subscribe({
       next: (position) => {
         this.latitude = position.coords.latitude;
         this.longitude = position.coords.longitude;
@@ -33,5 +34,10 @@ export class AppComponent implements OnInit {
         console.error('Error getting geolocation:', error);
       },
     });
+  }
+
+  handleZoomEvent(event: number) {
+    this.zoom = event;
+    console.log(event);
   }
 }
