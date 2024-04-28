@@ -26,9 +26,15 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "node_modules/leaflet/dist/images/",
+                "output": "./assets"
+              }
             ],
             "styles": [
+              "./node_modules/leaflet/dist/leaflet.css",
               "@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.css"
             ],
@@ -94,9 +100,15 @@
             "assets": [
               "src/favicon.ico",
               "src/assets",
-              "src/manifest.webmanifest"
+              "src/manifest.webmanifest",
+              {
+                "glob": "**/*",
+                "input": "node_modules/leaflet/dist/images/",
+                "output": "./assets"
+              }
             ],
             "styles": [
+              "./node_modules/leaflet/dist/leaflet.css",
               "@angular/material/prebuilt-themes/pink-bluegrey.css",
               "src/styles.css"
             ],
