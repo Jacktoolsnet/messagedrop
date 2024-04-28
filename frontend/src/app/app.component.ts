@@ -3,13 +3,7 @@ import { RouterOutlet } from '@angular/router';
 import { environment } from './../environments/environment';
 import { MapComponent } from './map/map.component';
 import { GeolocationService } from './services/geolocation.service';
-import {
-  MatSnackBar,
-  MatSnackBarAction,
-  MatSnackBarActions,
-  MatSnackBarLabel,
-  MatSnackBarRef,
-} from '@angular/material/snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-root',
