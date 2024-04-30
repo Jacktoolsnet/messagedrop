@@ -3,7 +3,9 @@ import { RouterOutlet } from '@angular/router';
 import { environment } from './../environments/environment';
 import { MapComponent } from './map/map.component';
 import { GeolocationService } from './services/geolocation.service';
+import { UserService } from './services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { User } from './interfaces/user';
 
 @Component({
   selector: 'app-root',
@@ -15,15 +17,24 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class AppComponent implements OnInit {
   private title: String = 'frontend';
   private apiUrl: String = environment.apiUrl;
+  private user: User = {userId: ''};
   public latitude: number = 0;
   public longitude: number = 0;
   public zoom: number = 18;
   private snackBarRef: any;
 
-  constructor(private geolocationService: GeolocationService, private snackBar: MatSnackBar) { }
+  constructor(private geolocationService: GeolocationService, private userService: UserService, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
+    this.createUser();
     this.watchPosition();
+  }
+
+  createUser() {
+    this.userService.createUser()
+    .subscribe(createUserResponse => this.user = {
+      userId: createUserResponse.userId
+    });
   }
 
   watchPosition() {

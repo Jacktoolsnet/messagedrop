@@ -9,6 +9,7 @@ const statistic = require('./routes/statistic');
 const user = require('./routes/user');
 const message = require('./routes/message');
 const notfound = require('./routes/notfound');
+const cors = require('cors')
 const express = require('express');
 const helmet = require('helmet');
 const app = express();
@@ -37,6 +38,11 @@ The value from the header Authorization: Bearer <token>.
 If a token is found, it will be stored on req.token. If one has been provided in more than one location, this will abort the request immediately by sending code 400 (per RFC6750).
 */
 app.use(bearerToken());
+
+/*
+Enable cors for all routes.
+*/
+app.use(cors())
 
 app.use(databaseMw(database));
 
