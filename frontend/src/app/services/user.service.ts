@@ -32,13 +32,19 @@ export class UserService {
     return throwError(() => new Error('Something bad happened; please try again later.'));
   }
 
+  getUser() {
+    return localStorage.getItem('userId');
+  }
+
+  setUserId(userId: string) {
+    localStorage.setItem('userId', userId)
+  }
+
   createUser() {
-    console.log(`${environment.apiUrl}/user/create`);
-   
     let body = {
       'publicKey': '12345'
     };
-    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.ShttpOptions)
+    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

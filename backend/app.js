@@ -42,6 +42,10 @@ app.use(bearerToken());
 /*
 Enable cors for all routes.
 */
+var corsOptions = {
+  origin: process.env.ORIGIN,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
 app.use(cors())
 
 app.use(databaseMw(database));

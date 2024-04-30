@@ -3,14 +3,17 @@ import { RouterOutlet } from '@angular/router';
 import { environment } from './../environments/environment';
 import { MapComponent } from './map/map.component';
 import { GeolocationService } from './services/geolocation.service';
+import { User } from './interfaces/user';
 import { UserService } from './services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { User } from './interfaces/user';
+import {MatIconModule} from '@angular/material/icon';
+import {MatTooltipModule} from '@angular/material/tooltip';
+import {MatButtonModule} from '@angular/material/button';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MapComponent],
+  imports: [RouterOutlet, MapComponent, MatButtonModule, MatTooltipModule, MatIconModule],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -26,15 +29,19 @@ export class AppComponent implements OnInit {
   constructor(private geolocationService: GeolocationService, private userService: UserService, private snackBar: MatSnackBar) { }
 
   ngOnInit(): void {
-    this.createUser();
+    this.getUser();
     this.watchPosition();
   }
 
-  createUser() {
-    this.userService.createUser()
-    .subscribe(createUserResponse => this.user = {
-      userId: createUserResponse.userId
-    });
+  getUser() {
+    let userId = this.userService.getUser();
+    if (null === userId) {
+      this.userService.createUser()
+      .subscribe(createUserResponse => {
+        this.user.userId = createUserResponse.userId;
+        this.userService.setUserId(this.user.userId);
+      });
+    }
   }
 
   watchPosition() {
