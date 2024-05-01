@@ -7,15 +7,26 @@ import { User } from './interfaces/user';
 import { Location } from './interfaces/location';
 import { UserService } from './services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import {MatIconModule} from '@angular/material/icon';
-import {MatTooltipModule} from '@angular/material/tooltip';
-import {MatButtonModule} from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
+import { DropmessageComponent } from './dropmessage/dropmessage.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, MapComponent, MatButtonModule, MatTooltipModule, MatIconModule],
+  imports: [
+    RouterOutlet, 
+    MapComponent, 
+    MatButtonModule, 
+    MatTooltipModule, 
+    MatIconModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -26,7 +37,11 @@ export class AppComponent implements OnInit {
   public location: Location = { latitude: 0, longitude: 0, zoom: 18, plusCode: ''};
   private snackBarRef: any;
 
-  constructor(private geolocationService: GeolocationService, private userService: UserService, private snackBar: MatSnackBar) { }
+  constructor(
+    private geolocationService: GeolocationService, 
+    private userService: UserService, 
+    private snackBar: MatSnackBar, 
+    public messageDropDialog: MatDialog) { }
 
   ngOnInit(): void {
     this.getUser();
@@ -75,5 +90,19 @@ export class AppComponent implements OnInit {
 
   handleZoomEvent(event: number) {
     this.location.zoom = event;
+  }
+
+  openMessagDropDialog(): void {
+    const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
+      width: '80%',
+      height:  '80%',
+      maxWidth: '400px',
+      maxHeight: '400px',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+    });
   }
 }
