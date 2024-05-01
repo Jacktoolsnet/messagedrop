@@ -1,5 +1,5 @@
 <app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" (zoomEvent)="handleZoomEvent($event)"></app-map>
-<button mat-fab color="primary" aria-label="Drop a new message">
+<button mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
     <mat-icon>water_drop</mat-icon>
 </button>
 <router-outlet />
