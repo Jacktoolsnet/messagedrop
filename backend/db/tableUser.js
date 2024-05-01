@@ -5,7 +5,8 @@ const userStatus = {
 
 const tableName = 'tableUser';
 const columnUserId = 'userId';
-const columnPublicKey = 'publicKey'; 
+const columnEncryptionPublicKey = 'encryptionPublicKey';
+const columnSigningPublicKey = 'signingPublicKey'; 
 const columnNumberOfMessages = 'numberOfMessages';
 const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
 const columnUserStatus = 'userStatus';
@@ -16,7 +17,8 @@ const init = function (db) {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnUserId} TEXT PRIMARY KEY NOT NULL, 
-            ${columnPublicKey} TEXT NOT NULL, 
+            ${columnEncryptionPublicKey} TEXT NOT NULL,
+            ${columnSigningPublicKey} TEXT NOT NULL, 
             ${columnNumberOfMessages} INTEGER DEFAULT 0,
             ${columnNumberOfBlockedMessages} INTEGER DEFAULT 0,
             ${columnUserStatus} TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
@@ -33,17 +35,19 @@ const init = function (db) {
     }
 };
 
-const create = function (db, userId, publicKey, callback) {
+const create = function (db, userId, encryptionPublicKey, signingPublicKey, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnUserId}, 
-            ${columnPublicKey}, 
+            ${columnEncryptionPublicKey},
+            ${columnSigningPublicKey}, 
             ${columnLastSignOfLife}
         ) 
         VALUES (
             '${userId}', 
-            '${publicKey}', 
+            '${encryptionPublicKey}',
+            '${signingPublicKey}', 
             datetime('now')
         );`;
 

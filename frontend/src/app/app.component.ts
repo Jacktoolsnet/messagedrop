@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatIconModule} from '@angular/material/icon';
 import {MatTooltipModule} from '@angular/material/tooltip';
 import {MatButtonModule} from '@angular/material/button';
+import { Keypair } from './interfaces/keypair';
 
 @Component({
   selector: 'app-root',
@@ -21,7 +22,7 @@ import {MatButtonModule} from '@angular/material/button';
 export class AppComponent implements OnInit {
   private title: String = 'frontend';
   private apiUrl: String = environment.apiUrl;
-  private user: User = { userId: '' };
+  private user: User = { userId: ''};
   public location: Location = { latitude: 0, longitude: 0, zoom: 18, plusCode: ''};
   private snackBarRef: any;
 
@@ -33,12 +34,20 @@ export class AppComponent implements OnInit {
   }
 
   getUser() {
-    let userId = this.userService.getUser();
-    if (null === userId) {
-      this.userService.createUser()
-      .subscribe(createUserResponse => {
-        this.user.userId = createUserResponse.userId;
-        this.userService.setUserId(this.user.userId);
+    this.user = this.userService.getUser();
+    if (JSON.stringify(this.user) === '{}') {
+      this.userService.createEncryptionKey()
+      .then((encryptionKeyPair : Keypair ) => {
+        this.user.encryptionKeyPair = encryptionKeyPair;
+        this.userService.createSigningKey()
+        .then((signingKeyPair : Keypair ) => {
+          this.user.signingKeyPair = signingKeyPair;
+          this.userService.createUser(this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
+          .subscribe(createUserResponse => {
+            this.user.userId = createUserResponse.userId;
+            this.userService.setUserId(this.user);
+          });
+        });
       });
     }
   }

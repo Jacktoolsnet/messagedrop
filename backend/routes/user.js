@@ -51,7 +51,7 @@ router.get('/get/:userId', [security.checkToken], function(req, res) {
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
   let userId = uuid.v4();
-    tableUser.create(req.database.db, userId, req.body.publicKey, function (err) {
+    tableUser.create(req.database.db, userId, req.body.encryptionPublicKey, req.body.signingPublicKey, function (err) {
       if (err) {
         response.status = 500;
         response.error = err;
