@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -7,11 +7,15 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { Message } from '../interfaces/message';
+import {MatCardModule} from '@angular/material/card';
+
 
 @Component({
-  selector: 'app-dropmessage',
+  selector: 'app-messagelist',
   standalone: true,
   imports: [
+    MatCardModule,
     MatDialogContainer,
     CommonModule, 
     FormsModule, 
@@ -24,18 +28,16 @@ import { MatFormFieldModule } from '@angular/material/form-field';
     FormsModule, 
     MatFormFieldModule, 
     MatInputModule],
-  templateUrl: './dropmessage.component.html',
-  styleUrl: './dropmessage.component.css'
+  templateUrl: './messagelist.component.html',
+  styleUrl: './messagelist.component.css'
 })
-export class DropmessageComponent {
-
-  public message: string = 'Messagedrop rocks!';
+export class MessagelistComponent {
+  public messages!: Message[]; 
 
   constructor(
-    public dialogRef: MatDialogRef<DropmessageComponent>
-  ) {}
-
-  onNoClick(): void {
-    this.dialogRef.close(this.message);
+    public dialogRef: MatDialogRef<MessagelistComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: Message[]
+  ) {
+    this.messages = [...data];
   }
 }

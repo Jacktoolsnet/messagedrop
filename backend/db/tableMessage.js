@@ -18,6 +18,8 @@ const columnParentMessageId = 'parentMessageId';
 const columnMessageType = 'messageTyp';
 const columnMessageCreateDateTime = 'messageCreateDateTime';
 const columnMessageDeleteDateTime = 'messageDeleteDateTime'; // On creation the message has a lifetime of 30 Days
+const columnLatitude = 'latitude';
+const columnLongtitude = 'longitude';
 const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
 const columnMessage = 'message'; // Max. 256 charachters.
 const columnMessageViews = 'messageViews'; 
@@ -35,6 +37,8 @@ const init = function (db) {
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
+            ${columnLatitude} NUMBER NOT NULL,
+            ${columnLongtitude} NUMBER NOT NULL,
             ${columnPlusCode} TEXT NOT NULL DEFAULT 'undefined',
             ${columnMessage} TEXT NOT NULL,
             ${columnMessageViews} INTEGER NOT NULL DEFAULT 0,
@@ -57,7 +61,7 @@ const init = function (db) {
     }
 };
 
-const create = function (db, parentMessageId, messageTyp, plusCode, message, userId, callback) {
+const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, userId, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
@@ -65,6 +69,8 @@ const create = function (db, parentMessageId, messageTyp, plusCode, message, use
             ${columnMessageType}, 
             ${columnMessageCreateDateTime},
             ${columnMessageDeleteDateTime},
+            ${columnLatitude},
+            ${columnLongtitude},
             ${columnPlusCode},
             ${columnMessage},
             ${columnMessageUserId}
@@ -73,6 +79,8 @@ const create = function (db, parentMessageId, messageTyp, plusCode, message, use
             '${messageTyp}', 
             date('now'),
             date('now', '+30 days'),
+            ${latitude},
+            ${longtitude},
             '${plusCode}',
             '${message}',
             '${userId}'

@@ -1,4 +1,12 @@
-button {
+.button_messages {
+    position: absolute;
+    left:    0;
+    bottom:   0;
+    z-index: 100;
+    margin: 2rem;
+}
+
+.button_drop {
     position: absolute;
     right:    0;
     bottom:   0;

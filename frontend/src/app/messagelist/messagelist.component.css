@@ -1,0 +1,15 @@
+.dialog {
+    display: inherit;
+    border-radius: 0.5rem;
+}
+
+.list {
+    border-radius: 0.25rem;
+}
+
+.item {
+    padding: 0.25rem;
+    margin: 1rem;
+    border-radius: 0.25rem;
+    background-color: #f8f8f8e9;
+}

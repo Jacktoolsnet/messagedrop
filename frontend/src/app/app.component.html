@@ -1,6 +1,8 @@
 <app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" (zoomEvent)="handleZoomEvent($event)"></app-map>
-<button mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
-    <mat-icon>water_drop</mat-icon>
+<button class="button_messages" *ngIf="userReady" mat-fab color="accent" aria-label="Avaliable Messages" (click)="openMessagListDialog()">
+    <mat-icon [matBadge]="messageBatchText" matBadgeColor="primary"  class="material-symbols-outlined" >inbox</mat-icon>
+</button>
+<button class="button_drop" *ngIf="userReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
+    <mat-icon class="material-symbols-outlined">water_drop</mat-icon>
 </button>
 <router-outlet />
-

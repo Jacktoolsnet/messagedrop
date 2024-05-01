@@ -1,4 +1,5 @@
 import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { environment } from './../environments/environment';
 import { MapComponent } from './map/map.component';
@@ -13,11 +14,17 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
 import { DropmessageComponent } from './dropmessage/dropmessage.component';
+import { MessageService } from './services/message.service';
+import { MatBadgeModule } from '@angular/material/badge';
+import { Message } from './interfaces/message';
+import { MessagelistComponent } from './messagelist/messagelist.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
   imports: [
+    MatBadgeModule,
+    CommonModule,
     RouterOutlet, 
     MapComponent, 
     MatButtonModule, 
@@ -33,15 +40,20 @@ import { DropmessageComponent } from './dropmessage/dropmessage.component';
 export class AppComponent implements OnInit {
   private title: String = 'frontend';
   private apiUrl: String = environment.apiUrl;
+  public userReady: boolean = false;
   private user: User = { userId: ''};
   public location: Location = { latitude: 0, longitude: 0, zoom: 18, plusCode: ''};
+  private messages!: Message[];
+  public messageBatchText: string = '0';
   private snackBarRef: any;
 
   constructor(
     private geolocationService: GeolocationService, 
-    private userService: UserService, 
+    private userService: UserService,
+    private messageService: MessageService, 
     private snackBar: MatSnackBar, 
-    public messageDropDialog: MatDialog) { }
+    public messageDropDialog: MatDialog,
+    public messageListDialog: MatDialog) { }
 
   ngOnInit(): void {
     this.getUser();
@@ -61,9 +73,12 @@ export class AppComponent implements OnInit {
           .subscribe(createUserResponse => {
             this.user.userId = createUserResponse.userId;
             this.userService.setUserId(this.user);
+            this.userReady = true;
           });
         });
       });
+    } else {
+      this.userReady = true;
     }
   }
 
@@ -73,6 +88,7 @@ export class AppComponent implements OnInit {
         this.location.latitude = position.coords.latitude;
         this.location.longitude = position.coords.longitude;
         this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        this.getMessages();
       },
       error: (error) => {
         console.log(error);
@@ -88,6 +104,20 @@ export class AppComponent implements OnInit {
     });
   }
 
+  getMessages() {
+    this.messageService.getByPlusCode(this.location)
+            .subscribe(getMessageResponse => {
+              if (200 === getMessageResponse.status) {
+                this.messages = [...getMessageResponse.rows];  
+              }
+              if (this.messages.length < 100) {
+                this.messageBatchText = `${this.messages.length}`;
+              } else {
+                this.messageBatchText = '99+'
+              }
+            });
+  }
+
   handleZoomEvent(event: number) {
     this.location.zoom = event;
   }
@@ -101,8 +131,26 @@ export class AppComponent implements OnInit {
       hasBackdrop: true
     });
 
-    dialogRef.afterClosed().subscribe(result => {
-      console.log(result);
+    dialogRef.afterClosed().subscribe(message => {
+      if (undefined !== message) {
+        this.messageService.createPublicMessage(message, this.location, this.user)
+            .subscribe(createMessageResponse => {
+              if (200 === createMessageResponse.status) {
+                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+                this.getMessages();
+              }
+            });
+      }
+    });
+  }
+
+  openMessagListDialog(): void {
+    const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+      data: this.messages,
+      width: '95%',
+      height:  '95%',
+      hasBackdrop: true,
+      panelClass: 'dialog'
     });
   }
 }
