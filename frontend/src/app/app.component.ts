@@ -4,6 +4,7 @@ import { environment } from './../environments/environment';
 import { MapComponent } from './map/map.component';
 import { GeolocationService } from './services/geolocation.service';
 import { User } from './interfaces/user';
+import { Location } from './interfaces/location';
 import { UserService } from './services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import {MatIconModule} from '@angular/material/icon';
@@ -20,10 +21,8 @@ import {MatButtonModule} from '@angular/material/button';
 export class AppComponent implements OnInit {
   private title: String = 'frontend';
   private apiUrl: String = environment.apiUrl;
-  private user: User = {userId: ''};
-  public latitude: number = 0;
-  public longitude: number = 0;
-  public zoom: number = 18;
+  private user: User = { userId: '' };
+  public location: Location = { latitude: 0, longitude: 0, zoom: 18, plusCode: ''};
   private snackBarRef: any;
 
   constructor(private geolocationService: GeolocationService, private userService: UserService, private snackBar: MatSnackBar) { }
@@ -47,8 +46,9 @@ export class AppComponent implements OnInit {
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
-        this.latitude = position.coords.latitude;
-        this.longitude = position.coords.longitude;
+        this.location.latitude = position.coords.latitude;
+        this.location.longitude = position.coords.longitude;
+        this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
       },
       error: (error) => {
         console.log(error);
@@ -65,6 +65,6 @@ export class AppComponent implements OnInit {
   }
 
   handleZoomEvent(event: number) {
-    this.zoom = event;
+    this.location.zoom = event;
   }
 }

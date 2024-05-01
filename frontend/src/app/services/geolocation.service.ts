@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import * as plusCodes from 'pluscodes';
 
 @Injectable({
   providedIn: 'root'
@@ -9,6 +10,15 @@ export class GeolocationService {
   private watchID: number = 0;
 
   constructor() { }
+
+  getPlusCode(latitude: number, longitude: number): string {
+    let plusCode = plusCodes.encode({latitude, longitude});
+    if (null === plusCode) {
+      return '';
+    } else {
+      return plusCode;
+    }
+  }
 
   getCurrentPosition(): Observable<any> {
     return new Observable((observer) => {
