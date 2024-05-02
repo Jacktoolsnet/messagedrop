@@ -15,6 +15,7 @@ import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialo
 import { Keypair } from './interfaces/keypair';
 import { DropmessageComponent } from './dropmessage/dropmessage.component';
 import { MessageService } from './services/message.service';
+import { StatisticService } from './services/statistic.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Message } from './interfaces/message';
 import { MessagelistComponent } from './messagelist/messagelist.component';
@@ -52,7 +53,8 @@ export class AppComponent implements OnInit {
   constructor(
     private geolocationService: GeolocationService, 
     private userService: UserService,
-    private messageService: MessageService, 
+    private messageService: MessageService,
+    private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDropDialog: MatDialog,
     public messageListDialog: MatDialog) { }
@@ -80,7 +82,6 @@ export class AppComponent implements OnInit {
         });
       });
     } else {
-      try {
       // Check if the user exist. It could be that the database was deleted.  
       this.userService.checkUserById(this.user)
           .subscribe({
@@ -100,10 +101,14 @@ export class AppComponent implements OnInit {
               this.userReady = true;
             }
           });
-      } catch (err) {
-        console.log('ttt');
-      }
     }
+    // Count
+    this.statisticService.countVisitor()
+          .subscribe({
+            next: (data) => {},
+            error: (err) => {},
+            complete:() => {}
+          });
   }
 
   watchPosition() {
@@ -175,12 +180,20 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(message => {
       if (undefined !== message) {
         this.messageService.createPublicMessage(message, this.location, this.user)
-            .subscribe(createMessageResponse => {
-              if (200 === createMessageResponse.status) {
+            .subscribe({
+              next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
                 this.getMessages();
-              }
-            });
+                this.statisticService.countMessage()
+                .subscribe({
+                  next: (data) => {},
+                  error: (err) => {},
+                  complete:() => {}
+                });
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {}
+            });          
       }
     });
   }
