@@ -1,6 +1,8 @@
 import { Component, AfterViewInit , Input, Output, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../interfaces/location';
+import { Message } from '../interfaces/message';
+
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -17,6 +19,14 @@ const iconDefault = leaflet.icon({
 });
 leaflet.Marker.prototype.options.icon = iconDefault;
 
+const messageDropMarker = leaflet.icon({
+  iconUrl: 'assets/message-marker.png',
+
+  iconSize:     [48, 58], // size of the icon
+  iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
+  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+});
+
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -30,15 +40,31 @@ export class MapComponent implements AfterViewInit, OnChanges {
   }
   @Input() latitude: number = 0;
   @Input() longitude: number = 0;
+  @Input() oldLatitude: number = 0;
+  @Input() oldLongitude: number = 0;
   @Input() zoom: number = 19;
+  @Input() messages: Message[] = [];
   @Output() zoomEvent = new EventEmitter<number>();
 
   private map: any;
   private marker: any;
 
+  private messageMarkers: leaflet.Marker[] = [];
+
   ngOnChanges(changes: SimpleChanges) {
-    this.map?.flyTo(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
-    this.marker?.setLatLng([this.latitude, this.longitude]).update();
+    if (this.oldLatitude !== this.latitude && this.oldLatitude !== this.longitude){
+      this.map?.flyTo(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
+      this.marker?.setLatLng([this.latitude, this.longitude]).update();
+      this.oldLatitude = this.latitude;
+      this.oldLongitude = this.longitude;
+    }
+    // remove pins
+    this.messageMarkers.forEach((marker) => marker.removeFrom(this.map));
+    // clear marker array
+    this.messageMarkers.length = 0
+    this.messages.forEach((message) => this.messageMarkers.push(leaflet.marker([message.latitude, message.longitude], {icon: messageDropMarker})));
+    // add to map
+    this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
   }
 
   private initMap(): void {

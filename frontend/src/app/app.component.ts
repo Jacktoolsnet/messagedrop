@@ -46,7 +46,7 @@ export class AppComponent implements OnInit {
   private user: User = { userId: ''};
   public location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   private lastPlusCode: string = ''
-  private messages: Message[] = [];
+  public messages: Message[] = [];
   public messageBatchText: string = '0';
   private snackBarRef: any;
 

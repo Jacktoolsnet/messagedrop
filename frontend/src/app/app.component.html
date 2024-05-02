@@ -1,4 +1,4 @@
-<app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" (zoomEvent)="handleZoomEvent($event)"></app-map>
+<app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [messages]="messages" (zoomEvent)="handleZoomEvent($event)"></app-map>
 <button class="button_messages" *ngIf="userReady && locationReady" mat-fab color="accent" aria-label="Avaliable Messages" (click)="openMessagListDialog()">
     <mat-icon [matBadge]="messageBatchText" matBadgeColor="primary"  class="material-symbols-outlined" >inbox</mat-icon>
 </button>

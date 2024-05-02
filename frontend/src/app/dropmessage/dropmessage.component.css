@@ -1,10 +1,11 @@
 textarea {    
     height: 80%;
-    width: 90%;
+    width: 85%;
     margin: auto;
     padding: 1rem 1rem;
     border-radius: 1rem;
-    background-color: #f8f8f8;
+    border: 0rem;
+    background-color: #b9b6b6;
     font-size: 16px;
     font-family: "Lucida Console", "Courier New", monospace;
     resize: none;
