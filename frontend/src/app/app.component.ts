@@ -91,7 +91,12 @@ export class AppComponent implements OnInit {
         this.location.longitude = position.coords.longitude;
         this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
         this.locationReady = true;
-        this.getMessages();
+        // Only search if the plusCode chagnes.
+        if (this.lastPlusCode != this.location.plusCode) {
+          this.getMessages();
+          // Save the last plusCode.
+          this.lastPlusCode != this.location.plusCode
+        }
       },
       error: (error) => {
         if (error.code == 1) {
@@ -108,29 +113,26 @@ export class AppComponent implements OnInit {
   }
 
   getMessages() {
-    // Only search if the plusCode chagnes.
-    if (this.lastPlusCode != this.location.plusCode) {}
-      this.messageService.getByPlusCode(this.location)
-              .subscribe(getMessageResponse => {
-                if (200 === getMessageResponse.status) {
-                  this.messages = [...getMessageResponse.rows];                  
-                } else {
-                  this.messages.length = 0;
-                }
-                if (this.messages.length < 100) {
-                  this.messageBatchText = `${this.messages.length}`;
-                } else {
-                  this.messageBatchText = '99+'
-                }
-                // Save the last plusCode.
-                this.lastPlusCode != this.location.plusCode
-              });
-    }
+    this.messageService.getByPlusCode(this.location)
+            .subscribe(getMessageResponse => {
+              if (200 === getMessageResponse.status) {
+                this.messages = [...getMessageResponse.rows];                  
+              } else {
+                this.messages.length = 0;
+              }
+              if (this.messages.length < 100) {
+                this.messageBatchText = `${this.messages.length}`;
+              } else {
+                this.messageBatchText = '99+'
+              }
+            });
   }
 
   handleZoomEvent(event: number) {
-    this.location.zoom = event;
-    this.getMessages();
+    if (this.location.zoom !== event) {
+      this.location.zoom = event;
+      this.getMessages();
+    }
   }
 
   openMessagDropDialog(): void {
