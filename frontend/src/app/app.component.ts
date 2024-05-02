@@ -45,7 +45,7 @@ export class AppComponent implements OnInit {
   private user: User = { userId: ''};
   public location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   private lastPlusCode: string = ''
-  private messages!: Message[];
+  private messages: Message[] = [];
   public messageBatchText: string = '0';
   private snackBarRef: any;
 
@@ -109,7 +109,6 @@ export class AppComponent implements OnInit {
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
-        console.log(position);
         this.location.latitude = position.coords.latitude;
         this.location.longitude = position.coords.longitude;
         this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
@@ -139,7 +138,6 @@ export class AppComponent implements OnInit {
     this.messageService.getByPlusCode(this.location)
             .subscribe({
               next: (getMessageResponse) => {
-                console.log('NEXT');
                 if (200 === getMessageResponse.status) {
                   this.messages = [...getMessageResponse.rows];                  
                 }
