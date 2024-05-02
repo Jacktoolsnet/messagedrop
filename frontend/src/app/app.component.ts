@@ -44,6 +44,7 @@ export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   private user: User = { userId: ''};
   public location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
+  private lastPlusCode: string = ''
   private messages!: Message[];
   public messageBatchText: string = '0';
   private snackBarRef: any;
@@ -107,17 +108,24 @@ export class AppComponent implements OnInit {
   }
 
   getMessages() {
-    this.messageService.getByPlusCode(this.location)
-            .subscribe(getMessageResponse => {
-              if (200 === getMessageResponse.status) {
-                this.messages = [...getMessageResponse.rows];  
-              }
-              if (this.messages.length < 100) {
-                this.messageBatchText = `${this.messages.length}`;
-              } else {
-                this.messageBatchText = '99+'
-              }
-            });
+    // Only search if the plusCode chagnes.
+    if (this.lastPlusCode != this.location.plusCode) {}
+      this.messageService.getByPlusCode(this.location)
+              .subscribe(getMessageResponse => {
+                if (200 === getMessageResponse.status) {
+                  this.messages = [...getMessageResponse.rows];                  
+                } else {
+                  this.messages.length = 0;
+                }
+                if (this.messages.length < 100) {
+                  this.messageBatchText = `${this.messages.length}`;
+                } else {
+                  this.messageBatchText = '99+'
+                }
+                // Save the last plusCode.
+                this.lastPlusCode != this.location.plusCode
+              });
+    }
   }
 
   handleZoomEvent(event: number) {
