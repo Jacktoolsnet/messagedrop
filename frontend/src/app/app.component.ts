@@ -159,12 +159,14 @@ export class AppComponent implements OnInit {
   }
 
   openMessagListDialog(): void {
-    const dialogRef = this.messageListDialog.open(MessagelistComponent, {
-      panelClass: 'MessageListDialog',
-      data: this.messages,
-      width: '95%',
-      height:  '95%',
-      hasBackdrop: true      
-    });
+    if (this.messages.length !== 0) {
+      const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+        panelClass: 'MessageListDialog',
+        data: this.messages,
+        width: '95%',
+        height:  '95%',
+        hasBackdrop: true      
+      });
+    }
   }
 }
