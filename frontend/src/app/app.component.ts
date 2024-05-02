@@ -1,4 +1,4 @@
-import { Component, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { environment } from './../environments/environment';
@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
 import { DropmessageComponent } from './dropmessage/dropmessage.component';
 import { MessageService } from './services/message.service';
@@ -80,13 +80,36 @@ export class AppComponent implements OnInit {
         });
       });
     } else {
-      this.userReady = true;
+      try {
+      // Check if the user exist. It could be that the database was deleted.  
+      this.userService.checkUserById(this.user)
+          .subscribe({
+            next: (data) => {
+              this.userReady = true;
+            },
+            error: (err) => {
+              // Create the user when it does not exist in the database.
+              if (err.status === 404) {
+                this.userService.restoreUser(this.user.userId, this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
+                .subscribe(createUserResponse => {
+                  this.userReady = true;
+                });
+              }
+            },
+            complete:() => {
+              this.userReady = true;
+            }
+          });
+      } catch (err) {
+        console.log('ttt');
+      }
     }
   }
 
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
+        console.log(position);
         this.location.latitude = position.coords.latitude;
         this.location.longitude = position.coords.longitude;
         this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
@@ -95,14 +118,14 @@ export class AppComponent implements OnInit {
         if (this.lastPlusCode != this.location.plusCode) {
           this.getMessages();
           // Save the last plusCode.
-          this.lastPlusCode != this.location.plusCode
+          this.lastPlusCode = this.location.plusCode;
         }
       },
       error: (error) => {
         if (error.code == 1) {
           this.snackBarRef = this.snackBar.open(`Location is required for message drop to work correctly. Please authorize.` , 'OK');
         } else {
-          this.snackBarRef = this.snackBar.open(error.message , 'OK');
+          this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later." , 'OK');
         }
         this.locationReady = false;
         this.snackBarRef.afterDismissed().subscribe(() => {
@@ -114,17 +137,23 @@ export class AppComponent implements OnInit {
 
   getMessages() {
     this.messageService.getByPlusCode(this.location)
-            .subscribe(getMessageResponse => {
-              if (200 === getMessageResponse.status) {
-                this.messages = [...getMessageResponse.rows];                  
-              } else {
+            .subscribe({
+              next: (getMessageResponse) => {
+                console.log('NEXT');
+                if (200 === getMessageResponse.status) {
+                  this.messages = [...getMessageResponse.rows];                  
+                }
+                if (this.messages.length < 100) {
+                  this.messageBatchText = `${this.messages.length}`;
+                } else {
+                  this.messageBatchText = '99+'
+                }
+              },
+              error: (err) => {
                 this.messages.length = 0;
-              }
-              if (this.messages.length < 100) {
                 this.messageBatchText = `${this.messages.length}`;
-              } else {
-                this.messageBatchText = '99+'
-              }
+              },
+              complete:() => {}
             });
   }
 

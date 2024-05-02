@@ -1,5 +1,6 @@
 import { Component, AfterViewInit , Input, Output, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
 import * as leaflet from 'leaflet';
+import { Location } from '../interfaces/location';
 
 const iconRetinaUrl = 'assets/marker-icon-2x.png';
 const iconUrl = 'assets/marker-icon.png';
@@ -24,6 +25,9 @@ leaflet.Marker.prototype.options.icon = iconDefault;
   styleUrl: './map.component.css'
 })
 export class MapComponent implements AfterViewInit, OnChanges {
+  static updateMap(location: Location) {
+    throw new Error('Method not implemented.');
+  }
   @Input() latitude: number = 0;
   @Input() longitude: number = 0;
   @Input() zoom: number = 19;

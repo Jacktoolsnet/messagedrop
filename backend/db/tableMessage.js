@@ -77,8 +77,8 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
         ) VALUES (
             ${parentMessageId},
             '${messageTyp}', 
-            date('now'),
-            date('now', '+30 days'),
+            datetime('now'),
+            datetime('now', '+30 days'),
             ${latitude},
             ${longtitude},
             '${plusCode}',
@@ -87,7 +87,6 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
         );`;
 
         db.run(sql, (err) => {
-            console.log(err)
             callback(err)
         });
     } catch (error) {
@@ -138,7 +137,6 @@ const getByPlusCode = function (db, plusCode, callback) {
             
             rows.forEach((row) => {
                 db.run(sql, [row.messageId], (err) => {
-                    console.log(err);
                 });
             });
             callback(err, rows);

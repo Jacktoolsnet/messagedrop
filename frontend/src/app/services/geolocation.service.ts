@@ -44,7 +44,6 @@ export class GeolocationService {
         this.watchID = navigator.geolocation.watchPosition(
           (position) => {
             observer.next(position);
-            observer.complete();
           },
           (error) => {
             navigator.geolocation.clearWatch(this.watchID);

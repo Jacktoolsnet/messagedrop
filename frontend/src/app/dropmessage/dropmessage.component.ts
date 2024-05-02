@@ -29,7 +29,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 })
 export class DropmessageComponent {
 
-  public message: string = 'Messagedrop rocks!';
+  public message: string = '';
 
   constructor(
     public dialogRef: MatDialogRef<DropmessageComponent>
