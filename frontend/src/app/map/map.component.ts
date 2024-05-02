@@ -40,8 +40,6 @@ export class MapComponent implements AfterViewInit, OnChanges {
   }
   @Input() latitude: number = 0;
   @Input() longitude: number = 0;
-  @Input() oldLatitude: number = 0;
-  @Input() oldLongitude: number = 0;
   @Input() zoom: number = 19;
   @Input() messages: Message[] = [];
   @Output() zoomEvent = new EventEmitter<number>();
@@ -52,12 +50,8 @@ export class MapComponent implements AfterViewInit, OnChanges {
   private messageMarkers: leaflet.Marker[] = [];
 
   ngOnChanges(changes: SimpleChanges) {
-    if (this.oldLatitude !== this.latitude && this.oldLatitude !== this.longitude){
-      this.map?.flyTo(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
-      this.marker?.setLatLng([this.latitude, this.longitude]).update();
-      this.oldLatitude = this.latitude;
-      this.oldLongitude = this.longitude;
-    }
+    this.map?.flyTo(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
+    this.marker?.setLatLng([this.latitude, this.longitude]).update();
     // remove pins
     this.messageMarkers.forEach((marker) => marker.removeFrom(this.map));
     // clear marker array

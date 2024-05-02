@@ -47,22 +47,21 @@ export class MessageService {
     switch (location.zoom) {
       case 19:
       case 18:
+      case 17:
         plusCode = location.plusCode.substring(0, 8);
         break;
-      case 17:
       case 16:
       case 15:
+      case 14:
         plusCode = location.plusCode.substring(0, 6);
         break;
-      case 14:
       case 13:
       case 12:
       case 11:
-      case 10:
         plusCode = location.plusCode.substring(0, 4);
         break;
       default:
-        plusCode = location.plusCode
+        plusCode = location.plusCode.substring(0, 2);
         break;
     }
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)
