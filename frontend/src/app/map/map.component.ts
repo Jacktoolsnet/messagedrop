@@ -26,21 +26,21 @@ leaflet.Marker.prototype.options.icon = iconDefault;
 export class MapComponent implements AfterViewInit, OnChanges {
   @Input() latitude: number = 0;
   @Input() longitude: number = 0;
-  @Input() zoom: number = 18;
+  @Input() zoom: number = 19;
   @Output() zoomEvent = new EventEmitter<number>();
 
   private map: any;
   private marker: any;
 
   ngOnChanges(changes: SimpleChanges) {
-    this.map?.setView(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
+    this.map?.flyTo(new leaflet.LatLng(this.latitude, this.longitude), this.zoom);
     this.marker?.setLatLng([this.latitude, this.longitude]).update();
   }
 
   private initMap(): void {
     this.map = leaflet.map('map', {
       center: [ this.latitude, this.longitude ],
-      zoom: this.zoom
+      zoom: 10
     });
 
     this.map.on('zoomend', (ev: any) => {
@@ -49,8 +49,8 @@ export class MapComponent implements AfterViewInit, OnChanges {
     });
 
     const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 18,
-      minZoom: 3,
+      maxZoom: 19,
+      minZoom: 10,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
 

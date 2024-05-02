@@ -53,7 +53,29 @@ export class MessageService {
   }
 
   getByPlusCode(location: Location) {
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${location.plusCode}`, this.httpOptions)
+    let plusCode: string = '';
+    switch (location.zoom) {
+      case 19:
+      case 18:
+        plusCode = location.plusCode.substring(0, 8);
+        break;
+      case 17:
+      case 16:
+      case 15:
+        plusCode = location.plusCode.substring(0, 6);
+        break;
+      case 14:
+      case 13:
+      case 12:
+      case 11:
+      case 10:
+        plusCode = location.plusCode.substring(0, 4);
+        break;
+      default:
+        plusCode = location.plusCode
+        break;
+    }
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

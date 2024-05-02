@@ -11,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
 import { DropmessageComponent } from './dropmessage/dropmessage.component';
 import { MessageService } from './services/message.service';
@@ -41,8 +41,9 @@ export class AppComponent implements OnInit {
   private title: String = 'frontend';
   private apiUrl: String = environment.apiUrl;
   public userReady: boolean = false;
+  public locationReady: boolean = false;
   private user: User = { userId: ''};
-  public location: Location = { latitude: 0, longitude: 0, zoom: 18, plusCode: ''};
+  public location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   private messages!: Message[];
   public messageBatchText: string = '0';
   private snackBarRef: any;
@@ -88,15 +89,16 @@ export class AppComponent implements OnInit {
         this.location.latitude = position.coords.latitude;
         this.location.longitude = position.coords.longitude;
         this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        this.locationReady = true;
         this.getMessages();
       },
       error: (error) => {
-        console.log(error);
         if (error.code == 1) {
           this.snackBarRef = this.snackBar.open(`Location is required for message drop to work correctly. Please authorize.` , 'OK');
         } else {
           this.snackBarRef = this.snackBar.open(error.message , 'OK');
         }
+        this.locationReady = false;
         this.snackBarRef.afterDismissed().subscribe(() => {
           this.watchPosition();
         });
@@ -120,15 +122,17 @@ export class AppComponent implements OnInit {
 
   handleZoomEvent(event: number) {
     this.location.zoom = event;
+    this.getMessages();
   }
 
   openMessagDropDialog(): void {
     const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
+      panelClass: 'MessageDropDialog',
       width: '80%',
       height:  '80%',
       maxWidth: '400px',
       maxHeight: '400px',
-      hasBackdrop: true
+      hasBackdrop: true      
     });
 
     dialogRef.afterClosed().subscribe(message => {
@@ -146,11 +150,11 @@ export class AppComponent implements OnInit {
 
   openMessagListDialog(): void {
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+      panelClass: 'MessageListDialog',
       data: this.messages,
       width: '95%',
       height:  '95%',
-      hasBackdrop: true,
-      panelClass: 'dialog'
+      hasBackdrop: true      
     });
   }
 }

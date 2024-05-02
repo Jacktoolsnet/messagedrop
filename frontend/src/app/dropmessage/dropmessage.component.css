@@ -1,6 +1,7 @@
-textarea {
-    height: calc(100% - 1rem);
-    width: calc(100% - 2rem);
+textarea {    
+    height: 85%;
+    width: 90%;
+    margin: auto;
     padding: 1rem 1rem;
     border-radius: 1rem;
     background-color: #f8f8f8;
@@ -16,6 +17,6 @@ textarea {
 
 button {
     margin: auto;
-    width: calc(100% - 2rem);
+    width: 85%;
     border-radius: 1rem;
   }
