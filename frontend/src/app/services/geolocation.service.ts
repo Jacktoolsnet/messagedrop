@@ -22,10 +22,10 @@ export class GeolocationService {
   }
 
   public getLocationFromPlusCode(plusCode: string, plusCodeLength: number): Location{
-    plusCode = plusCodeLength === 11 ? `${plusCode.substring(0, plusCodeLength)}` : `${plusCode.substring(0, plusCodeLength)}+`;
+    let plusCodeComplete: string = plusCodeLength === 11 ? `${plusCode.substring(0, plusCodeLength)}` : `${plusCode.substring(0, plusCodeLength)}+`;
     let location: Location = {
-      'latitude' : plusCodes.decode(plusCode)?.latitude || 0,
-      'longitude': plusCodes.decode(plusCode)?.longitude  || 0,
+      'latitude' : plusCodes.decode(plusCodeComplete)?.latitude || 0,
+      'longitude': plusCodes.decode(plusCodeComplete)?.longitude  || 0,
       'zoom': 19,
       'plusCode': plusCode
     };
@@ -58,22 +58,22 @@ export class GeolocationService {
   }
 
   public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location): number {
-    let plusCodeLengt: number = 11;
+    let plusCodeLength: number = 11;
     switch (location.zoom) {
       case 19:
       case 18:
-        plusCodeLengt = 11;
+        plusCodeLength = 11;
         break;       
       case 17:        
       case 16:        
       case 15:
-        plusCodeLengt = 8;
+        plusCodeLength = 8;
         break;
       default:
-        plusCodeLengt = 6;
+        plusCodeLength = 6;
         break;            
     }
-    return plusCodeLengt;
+    return plusCodeLength;
   }
 
   public getCurrentPosition(): Observable<any> {

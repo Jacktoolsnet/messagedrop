@@ -105,7 +105,7 @@ export class MapService {
         if (!markerExist) {
           let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
           marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-            this.showMessagesFromMarker($event.target);
+            this.showMessagesFromMarker($event.target, messageLocation);
           });
           this.messageMarkers.push(marker)
         }
@@ -115,21 +115,7 @@ export class MapService {
     this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
     }
 
-    private showMessagesFromMarker(marker: leaflet.Marker) {
-      let plusCode: string = '';
-      if (this.geolocationService.getPlusCodeBasedOnMapZoom(this.location).length === 8) {
-        // Max zoomed in. Use complete pluscode for search.
-        plusCode = this.geolocationService.getPlusCode(marker.getLatLng().lat, marker.getLatLng().lng)
-      } else {
-        // Use 8 digits from pluscode for search.
-        plusCode = this.geolocationService.getPlusCode(marker.getLatLng().lat, marker.getLatLng().lng).substring(0, 8);
-      }
-      let location: Location = {
-        'latitude': marker.getLatLng().lat,
-        'longitude': marker.getLatLng().lng,
-        'plusCode': plusCode,
-        'zoom': this.location.zoom
-      }
+    private showMessagesFromMarker(marker: leaflet.Marker, location: Location) {
       this.markerClickEvent.emit(location);
     }
   
