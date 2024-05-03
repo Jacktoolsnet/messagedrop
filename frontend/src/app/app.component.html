@@ -1,8 +1,8 @@
 <!-- The members of location are used for change detection.-->
 <app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [plusCode]="location.plusCode" [messages]="messages" [messages]="messages" (zoomEvent)="handleZoomEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
-<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_messages" *ngIf="userReady && locationReady && geolocationService.getPlusCodeBasedOnMapZoom(location).length == 8" mat-fab color="accent" aria-label="Avaliable Messages" (click)="openMessagListDialog()">
-    <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" [matBadge]="messageBatchText" matBadgeColor="primary"  class="material-symbols-outlined" >inbox</mat-icon>
-</button>
+<!--button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
+    <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
+</button-->
 <button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">water_drop</mat-icon>
 </button>

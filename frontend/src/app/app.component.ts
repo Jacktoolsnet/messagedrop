@@ -1,8 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { environment } from './../environments/environment';
-import { MapComponent } from './map/map.component';
+import { MapComponent } from './components/map/map.component';
 import { GeolocationService } from './services/geolocation.service';
 import { User } from './interfaces/user';
 import { Location } from './interfaces/location';
@@ -13,12 +12,12 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
-import { DropmessageComponent } from './dropmessage/dropmessage.component';
+import { DropmessageComponent } from './components/dropmessage/dropmessage.component';
 import { MessageService } from './services/message.service';
 import { StatisticService } from './services/statistic.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Message } from './interfaces/message';
-import { MessagelistComponent } from './messagelist/messagelist.component';
+import { MessagelistComponent } from './components/messagelist/messagelist.component';
 
 @Component({
   selector: 'app-root',
@@ -45,11 +44,10 @@ export class AppComponent implements OnInit {
   public location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   private lastPlusCode: string = ''
   public messages: Message[] = [];
-  public messageBatchText: string = '0';
   private snackBarRef: any;
 
   constructor(
-    public geolocationService: GeolocationService, 
+    private geolocationService: GeolocationService, 
     private userService: UserService,
     private messageService: MessageService,
     private statisticService: StatisticService, 
@@ -142,15 +140,9 @@ export class AppComponent implements OnInit {
             .subscribe({
               next: (getMessageResponse) => {
                 this.messages = [...getMessageResponse.rows];
-                if (this.messages.length < 100) {
-                  this.messageBatchText = `${this.messages.length}`;
-                } else {
-                  this.messageBatchText = '99+'
-                }
               },
               error: (err) => {
                 this.messages.length = 0;
-                this.messageBatchText = `${this.messages.length}`;
               },
               complete:() => {}
             });

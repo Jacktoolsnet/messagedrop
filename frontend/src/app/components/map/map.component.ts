@@ -1,7 +1,7 @@
 import { Component, AfterViewInit , Input, Output, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
-import { MapService } from '../services/map.service';
-import { Location } from '../interfaces/location';
-import { Message } from '../interfaces/message';
+import { MapService } from '../../services/map.service';
+import { Location } from '../../interfaces/location';
+import { Message } from '../../interfaces/message';
 
 
 @Component({

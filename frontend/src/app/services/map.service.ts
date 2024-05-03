@@ -9,15 +9,13 @@ const messageDropMarker = leaflet.icon({
 
   iconSize:     [48, 58], // size of the icon
   iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
-  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
 const userMarker = leaflet.icon({
   iconUrl: 'assets/user-marker.png',
 
-  iconSize:     [48, 58], // size of the icon
-  iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
-  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
+  iconSize:     [24, 29], // size of the icon
+  iconAnchor:   [12, 58], // point of the icon which will correspond to marker's location
 });
 
 @Injectable({
@@ -87,19 +85,33 @@ export class MapService {
     if (plusCode !== '') {
         if (plusCode.length === 8) {
           // Max zoomed in. Show one marker for each Massage.
+          let markerExist: boolean;
           messages.forEach((message) => {
-            let marker: leaflet.Marker = leaflet.marker([message.latitude, message.longitude], {icon: messageDropMarker, zIndexOffset: 0})
-            marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-              this.showMessagesFromMarker($event.target);
-            });
-            this.messageMarkers.push(marker)
+            markerExist = false;
+            let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(this.location);
+            let messageLocation: Location = this.geolocationService.getLocationFromPlusCode(message.plusCode, plusCodeLength);
+            // Search if a marker for the location exist already
+            this.messageMarkers.forEach((marker) => {
+              if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {
+                markerExist = true;
+              }
+            })
+            // Add if needed.
+            if (!markerExist) {
+              let marker: leaflet.Marker = leaflet.marker([message.latitude, message.longitude], {icon: messageDropMarker, zIndexOffset: 0})
+              marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+                this.showMessagesFromMarker($event.target);
+              });
+              this.messageMarkers.push(marker)
+            }
           });
         } else {
           // Show one marker for on plusCode
           let markerExist: boolean;
           messages.forEach((message) => {
             markerExist = false;
-            let messageLocation: Location = this.geolocationService.getLocationFromPlusCode(message.plusCode);
+            let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(this.location);
+            let messageLocation: Location = this.geolocationService.getLocationFromPlusCode(message.plusCode, plusCodeLength);
             // Search if a marker for the location exist already
             this.messageMarkers.forEach((marker) => {
               if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {

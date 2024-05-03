@@ -21,8 +21,8 @@ export class GeolocationService {
     }
   }
 
-  public getLocationFromPlusCode(plusCode: string): Location{
-    plusCode = `${plusCode.substring(0, 8)}+`;
+  public getLocationFromPlusCode(plusCode: string, plusCodeLength: number): Location{
+    plusCode = `${plusCode.substring(0, plusCodeLength)}+`;
     let location: Location = {
       'latitude' : plusCodes.decode(plusCode)?.latitude || 0,
       'longitude': plusCodes.decode(plusCode)?.longitude  || 0,
@@ -53,6 +53,23 @@ export class GeolocationService {
       default:
         plusCode = location.plusCode.substring(0, 2);
         break;
+    }
+    return plusCode;
+  }
+
+  public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location): number {
+    let plusCode: number = 11;
+    switch (location.zoom) {
+      case 19:
+      case 18:       
+      case 17:        
+      case 16:        
+      case 15:
+        plusCode = 8;
+        break;
+      default:
+        plusCode = 6;
+        break;            
     }
     return plusCode;
   }

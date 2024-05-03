@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { Message } from '../interfaces/message';
+import { Message } from '../../interfaces/message';
 import {MatCardModule} from '@angular/material/card';
 
 
