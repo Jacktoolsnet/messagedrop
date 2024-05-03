@@ -1,5 +1,5 @@
 <!-- The members of location are used for change detection.-->
-<app-map [location]="location" [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [plusCode]="location.plusCode" [messages]="messages" [messages]="messages" (zoomEvent)="handleZoomEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [plusCode]="location.plusCode" [messages]="messages" [messages]="messages" (zoomEvent)="handleZoomEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
 <button [attr.aria-hidden]="!(userReady && locationReady)" class="button_messages" *ngIf="userReady && locationReady && geolocationService.getPlusCodeBasedOnMapZoom(location).length == 8" mat-fab color="accent" aria-label="Avaliable Messages" (click)="openMessagListDialog()">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" [matBadge]="messageBatchText" matBadgeColor="primary"  class="material-symbols-outlined" >inbox</mat-icon>
 </button>
