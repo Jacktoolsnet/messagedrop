@@ -23,6 +23,7 @@ export class GeolocationService {
 
   public getLocationFromPlusCode(plusCode: string, plusCodeLength: number): Location{
     let plusCodeComplete: string = plusCodeLength === 11 ? `${plusCode.substring(0, plusCodeLength)}` : `${plusCode.substring(0, plusCodeLength)}+`;
+    plusCode = plusCode.substring(0, plusCodeLength);
     let location: Location = {
       'latitude' : plusCodes.decode(plusCodeComplete)?.latitude || 0,
       'longitude': plusCodes.decode(plusCodeComplete)?.longitude  || 0,
