@@ -39,8 +39,6 @@ import { MessagelistComponent } from './messagelist/messagelist.component';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  private title: String = 'frontend';
-  private apiUrl: String = environment.apiUrl;
   public userReady: boolean = false;
   public locationReady: boolean = false;
   private user: User = { userId: ''};
@@ -51,7 +49,7 @@ export class AppComponent implements OnInit {
   private snackBarRef: any;
 
   constructor(
-    private geolocationService: GeolocationService, 
+    public geolocationService: GeolocationService, 
     private userService: UserService,
     private messageService: MessageService,
     private statisticService: StatisticService, 
@@ -143,7 +141,7 @@ export class AppComponent implements OnInit {
     this.messageService.getByPlusCode(this.location)
             .subscribe({
               next: (getMessageResponse) => {
-                this.messages =[...getMessageResponse.rows];
+                this.messages = [...getMessageResponse.rows];
                 if (this.messages.length < 100) {
                   this.messageBatchText = `${this.messages.length}`;
                 } else {
@@ -163,6 +161,10 @@ export class AppComponent implements OnInit {
       this.location.zoom = event;
       this.getMessages();
     }
+  }
+
+  handleMarkerClickEvent(event: Location) {
+    this.openMarkerMessageListDialog(event);
   }
 
   openMessagDropDialog(): void {
@@ -207,4 +209,22 @@ export class AppComponent implements OnInit {
       });
     }
   }
+
+  openMarkerMessageListDialog(location: Location) {
+    this.messageService.getByPlusForMarker(location)
+            .subscribe({
+              next: (getMessageResponse) => {
+                const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+                  panelClass: 'MessageListDialog',
+                  data: [...getMessageResponse.rows],
+                  width: '95%',
+                  height:  '95%',
+                  hasBackdrop: true      
+                });
+              },
+              error: (err) => {},
+              complete:() => {}
+            });
+  }
+
 }

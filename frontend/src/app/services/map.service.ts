@@ -30,11 +30,14 @@ export class MapService {
   private location!: Location;
 
   private messageMarkers: leaflet.Marker[] = [];
+  private markerClickEvent!: EventEmitter<Location>;
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(location: Location, zoomEvent:EventEmitter<number>): void {
+  public initMap(location: Location, zoomEvent:EventEmitter<number>, markerClickEvent: EventEmitter<Location>): void {
     this.location = location;
+    this.markerClickEvent = markerClickEvent;
+
     this.map = leaflet.map('map', {
       center: [ location.latitude, location.longitude ],
       zoom: 10
@@ -84,7 +87,13 @@ export class MapService {
     if (plusCode !== '') {
         if (plusCode.length === 8) {
         // Max zoomed in. Show one marker for each Massage.
-        messages.forEach((message) => this.messageMarkers.push(leaflet.marker([message.latitude, message.longitude], {icon: messageDropMarker, zIndexOffset: 0})));
+        messages.forEach((message) => {
+          let marker: leaflet.Marker = leaflet.marker([message.latitude, message.longitude], {icon: messageDropMarker, zIndexOffset: 0})
+          marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+            this.showMessagesFromMarker($event.target);
+          });
+          this.messageMarkers.push(marker)
+        });
         } else {
         // Show one marker for on plusCode
         let markerExist: boolean;
@@ -99,13 +108,35 @@ export class MapService {
           })
           // Add if needed.
           if (!markerExist) {
-            this.messageMarkers.push(leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0}))
+            let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
+            marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+              this.showMessagesFromMarker($event.target);
+            });
+            this.messageMarkers.push(marker)
           }
         });
         }
     }
     // add to map
     this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
+    }
+
+    private showMessagesFromMarker(marker: leaflet.Marker) {
+      let plusCode: string = '';
+      if (this.geolocationService.getPlusCodeBasedOnMapZoom(this.location).length === 8) {
+        // Max zoomed in. Use complete pluscode for search.
+        plusCode = this.geolocationService.getPlusCode(marker.getLatLng().lat, marker.getLatLng().lng)
+      } else {
+        // Use 8 digits from pluscode for search.
+        plusCode = this.geolocationService.getPlusCode(marker.getLatLng().lat, marker.getLatLng().lng).substring(0, 8);
+      }
+      let location: Location = {
+        'latitude': marker.getLatLng().lat,
+        'longitude': marker.getLatLng().lng,
+        'plusCode': plusCode,
+        'zoom': this.location.zoom
+      }
+      this.markerClickEvent.emit(location);
     }
   
 }

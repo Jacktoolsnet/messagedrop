@@ -51,4 +51,12 @@ export class MessageService {
       );
   }
 
+  getByPlusForMarker(location: Location) {
+    let plusCode: String = location.plusCode;
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
 }

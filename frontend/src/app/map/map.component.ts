@@ -20,6 +20,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   @Input() plusCode: string = '';
   @Input() messages: Message[] = [];
   @Output() zoomEvent = new EventEmitter<number>();
+  @Output() markerClickEvent = new EventEmitter<Location>();
 
   ngOnChanges(changes: SimpleChanges) {
     this.mapService.setLocation(this.location);
@@ -29,7 +30,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   constructor(private mapService: MapService) { }
 
   ngAfterViewInit(): void { 
-    this.mapService.initMap(this.location, this.zoomEvent);
+    this.mapService.initMap(this.location, this.zoomEvent, this.markerClickEvent);
   }
 }
 
