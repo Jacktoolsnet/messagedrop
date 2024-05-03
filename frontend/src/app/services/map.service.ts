@@ -83,51 +83,33 @@ export class MapService {
     // Get plusCode based on map zoom.
     let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(this.location);
     if (plusCode !== '') {
-        if (plusCode.length === 8) {
-          // Max zoomed in. Show one marker for each Massage.
-          let markerExist: boolean;
-          messages.forEach((message) => {
-            markerExist = false;
-            let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(this.location);
-            let messageLocation: Location = this.geolocationService.getLocationFromPlusCode(message.plusCode, plusCodeLength);
-            // Search if a marker for the location exist already
-            this.messageMarkers.forEach((marker) => {
-              if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {
-                markerExist = true;
-              }
-            })
-            // Add if needed.
-            if (!markerExist) {
-              let marker: leaflet.Marker = leaflet.marker([message.latitude, message.longitude], {icon: messageDropMarker, zIndexOffset: 0})
-              marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-                this.showMessagesFromMarker($event.target);
-              });
-              this.messageMarkers.push(marker)
-            }
+      // Max zoomed in. Show one marker for each Massage.
+      let markerExist: boolean;
+      messages.forEach((message) => {
+        markerExist = false;
+        let messageLocation: Location = {
+          'latitude': message.latitude,
+          'longitude': message.longitude,
+          'plusCode': message.plusCode,
+          'zoom': this.location.zoom
+        };
+        let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(messageLocation);
+        messageLocation = this.geolocationService.getLocationFromPlusCode(message.plusCode, plusCodeLength);
+        // Search if a marker for the location exist already
+        this.messageMarkers.forEach((marker) => {
+          if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {                
+            markerExist = true;
+          }
+        })
+        // Add if needed.
+        if (!markerExist) {
+          let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
+          marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+            this.showMessagesFromMarker($event.target);
           });
-        } else {
-          // Show one marker for on plusCode
-          let markerExist: boolean;
-          messages.forEach((message) => {
-            markerExist = false;
-            let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(this.location);
-            let messageLocation: Location = this.geolocationService.getLocationFromPlusCode(message.plusCode, plusCodeLength);
-            // Search if a marker for the location exist already
-            this.messageMarkers.forEach((marker) => {
-              if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {
-                markerExist = true;
-              }
-            })
-            // Add if needed.
-            if (!markerExist) {
-              let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
-              marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-                this.showMessagesFromMarker($event.target);
-              });
-              this.messageMarkers.push(marker)
-            }
-          });
+          this.messageMarkers.push(marker)
         }
+      });
     }
     // add to map
     this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
