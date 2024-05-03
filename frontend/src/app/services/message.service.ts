@@ -6,6 +6,7 @@ import { catchError, retry, throwError } from 'rxjs';
 import { Location } from '../interfaces/location';
 import { User } from '../interfaces/user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
+import { GeolocationService } from './geolocation.service';
 
 
 @Injectable({
@@ -20,7 +21,7 @@ export class MessageService {
     })
   };
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private geolocationService: GeolocationService) { }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -43,27 +44,7 @@ export class MessageService {
   }
 
   getByPlusCode(location: Location) {
-    let plusCode: string = '';
-    switch (location.zoom) {
-      case 19:
-      case 18:
-      case 17:
-        plusCode = location.plusCode.substring(0, 8);
-        break;
-      case 16:
-      case 15:
-      case 14:
-        plusCode = location.plusCode.substring(0, 6);
-        break;
-      case 13:
-      case 12:
-      case 11:
-        plusCode = location.plusCode.substring(0, 4);
-        break;
-      default:
-        plusCode = location.plusCode.substring(0, 2);
-        break;
-    }
+    let plusCode: String = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)

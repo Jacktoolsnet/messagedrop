@@ -1,8 +1,9 @@
-<app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [messages]="messages" (zoomEvent)="handleZoomEvent($event)"></app-map>
-<button class="button_messages" *ngIf="userReady && locationReady" mat-fab color="accent" aria-label="Avaliable Messages" (click)="openMessagListDialog()">
-    <mat-icon [matBadge]="messageBatchText" matBadgeColor="primary"  class="material-symbols-outlined" >inbox</mat-icon>
+<!-- The members of location are used for change detection.-->
+<app-map [location]="location" [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [plusCode]="location.plusCode" [messages]="messages" [messages]="messages" (zoomEvent)="handleZoomEvent($event)"></app-map>
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_messages" *ngIf="userReady && locationReady" mat-fab color="accent" aria-label="Avaliable Messages" (click)="openMessagListDialog()">
+    <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" [matBadge]="messageBatchText" matBadgeColor="primary"  class="material-symbols-outlined" >inbox</mat-icon>
 </button>
-<button class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
-    <mat-icon class="material-symbols-outlined">water_drop</mat-icon>
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
+    <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">water_drop</mat-icon>
 </button>
 <router-outlet />

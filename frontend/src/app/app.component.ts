@@ -143,9 +143,7 @@ export class AppComponent implements OnInit {
     this.messageService.getByPlusCode(this.location)
             .subscribe({
               next: (getMessageResponse) => {
-                if (200 === getMessageResponse.status) {
-                  this.messages = [...getMessageResponse.rows];                  
-                }
+                this.messages =[...getMessageResponse.rows];
                 if (this.messages.length < 100) {
                   this.messageBatchText = `${this.messages.length}`;
                 } else {
