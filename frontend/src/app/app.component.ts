@@ -162,14 +162,12 @@ export class AppComponent implements OnInit {
   openMessagDropDialog(): void {
     const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
       panelClass: 'MessageDropDialog',
-      width: '80%',
-      height:  '80%',
-      maxWidth: '400px',
-      maxHeight: '400px',
+      width: '90%',
+      height:  '90%',
       hasBackdrop: true      
     });
 
-    dialogRef.afterClosed().subscribe(message => {
+    dialogRef.afterClosed().subscribe((message: Message) => {
       if (undefined !== message) {
         this.messageService.createPublicMessage(message, this.location, this.user)
             .subscribe({

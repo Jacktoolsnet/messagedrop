@@ -112,7 +112,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   if (undefined == req.body.parentMessageId) {
     req.body.parentMessageId = 0;
   }
-  tableMessage.create(req.database.db, req.body.parentMessageId, req.body.messageTyp, req.body.latitude, req.body.longtitude, req.body.plusCode, req.body.message, req.body.messageUserId, function (err) {
+  tableMessage.create(req.database.db, req.body.parentMessageId, req.body.messageTyp, req.body.latitude, req.body.longtitude, req.body.plusCode, req.body.message, req.body.style, req.body.messageUserId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

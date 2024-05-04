@@ -7,6 +7,7 @@ import { Location } from '../interfaces/location';
 import { User } from '../interfaces/user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GeolocationService } from './geolocation.service';
+import { Message } from '../interfaces/message';
 
 
 @Injectable({
@@ -27,14 +28,15 @@ export class MessageService {
     return throwError(() => error);
   }
 
-  createPublicMessage(message: string, location: Location, user:User) {
+  createPublicMessage(message: Message, location: Location, user:User) {
     let body = {
       'parentMessageId': 0,
       'messageTyp': 'public',
       'latitude': location.latitude,
       'longtitude': location.longitude,
       'plusCode': location.plusCode,
-      'message': message,
+      'message': message.message,
+      'style': message.style,
       'messageUserId': user.userId
     };
     return this.http.post<CreateMessageResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)

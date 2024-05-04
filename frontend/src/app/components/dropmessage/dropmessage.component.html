@@ -1,6 +1,7 @@
 <h2 mat-dialog-title>Your message</h2>
-<mat-dialog-content class="example-full-width">
+<mat-dialog-content class="full-width">
     <textarea
+        [style]="messageStyle"
         maxlength="512"
         type="text" 
         [(ngModel)]="message"

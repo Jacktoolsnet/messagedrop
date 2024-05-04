@@ -4,9 +4,124 @@ html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .MessageDropDialog .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: transparent;
-  }
+  --mdc-dialog-container-color: transparent;
+}
 
 .MessageListDialog .mat-mdc-dialog-container {
-    --mdc-dialog-container-color: transparent;
-  }
+  --mdc-dialog-container-color: transparent;
+}
+
+@font-face {
+  font-family: 'DancingScript';
+  src: url('./assets/fonts/DancingScript.ttf');
+}
+
+@font-face {
+  font-family: 'Pacifico';
+  src: url('./assets/fonts/Pacifico.ttf');
+}
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('./assets/fonts/Caveat.ttf');
+}
+
+@font-face {
+  font-family: 'HachiMaruPop';
+  src: url('./assets/fonts/HachiMaruPop.ttf');
+}
+
+@font-face {
+  font-family: 'Miniver';
+  src: url('./assets/fonts/Miniver.ttf');
+}
+
+@font-face {
+  font-family: 'CraftyGirls';
+  src: url('./assets/fonts/CraftyGirls.ttf');
+}
+
+@font-face {
+  font-family: 'SedgwickAveDisplay';
+  src: url('./assets/fonts/SedgwickAveDisplay.ttf');
+}
+
+@font-face {
+  font-family: 'OvertheRainbow';
+  src: url('./assets/fonts/OvertheRainbow.ttf');
+}
+
+@font-face {
+  font-family: 'LoveYaLikeASister';
+  src: url('./assets/fonts/LoveYaLikeASister.ttf');
+}
+
+@font-face {
+  font-family: 'SedgwickAve';
+  src: url('./assets/fonts/SedgwickAve.ttf');
+}
+
+@font-face {
+  font-family: 'MrDafoe';
+  src: url('./assets/fonts/MrDafoe.ttf');
+}
+
+@font-face {
+  font-family: 'GochiHand';
+  src: url('./assets/fonts/GochiHand.ttf');
+}
+
+@font-face {
+  font-family: 'RockSalt';
+  src: url('./assets/fonts/RockSalt.ttf');
+}
+
+@font-face {
+  font-family: 'GloriaHallelujah';
+  src: url('./assets/fonts/GloriaHallelujah.ttf');
+}
+
+@font-face {
+  font-family: 'KaushanScript';
+  src: url('./assets/fonts/KaushanScript.ttf');
+}
+
+@font-face {
+  font-family: 'LuckiestGuy';
+  src: url('./assets/fonts/LuckiestGuy.ttf');
+}
+
+@font-face {
+  font-family: 'Zeyada';
+  src: url('./assets/fonts/Zeyada.ttf');
+}
+
+@font-face {
+  font-family: 'Kalam';
+  src: url('./assets/fonts/Kalam.ttf');
+}
+
+@font-face {
+  font-family: 'Yellowtail';
+  src: url('./assets/fonts/Yellowtail.ttf');
+}
+
+@font-face {
+  font-family: 'IndieFlower';
+  src: url('./assets/fonts/IndieFlower.ttf');
+}
+
+@font-face {
+  font-family: 'PermanentMarker';
+  src: url('./assets/fonts/PermanentMarker.ttf');
+}
+
+@font-face {
+  font-family: 'Satisfy';
+  src: url('./assets/fonts/Satisfy.ttf');
+}
+
+@font-face {
+  font-family: 'ShadowsIntoLight';
+  src: url('./assets/fonts/ShadowsIntoLight.ttf');
+}

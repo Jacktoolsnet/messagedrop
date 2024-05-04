@@ -22,11 +22,12 @@ const columnLatitude = 'latitude';
 const columnLongtitude = 'longitude';
 const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
 const columnMessage = 'message'; // Max. 256 charachters.
-const columnMessageViews = 'messageViews'; 
-const columnMessageLikes = 'messageLikes'; // Each like add on day to the lifetime of the message.
-const columnMessageDislikes = 'messageDislikes'; // Each dislike reduce the liftime of the message by one day.
-const columnMessageStatus = 'messageStatus';
-const columnMessageUserId = 'messageUserId';
+const columnStyle = 'style'; 
+const columnViews = 'views'; 
+const columnLikes = 'likes'; // Each like add on day to the lifetime of the message.
+const columnDislikes = 'dislikes'; // Each dislike reduce the liftime of the message by one day.
+const columnStatus = 'status';
+const columnUserId = 'userId';
 
 const init = function (db) {
     try {
@@ -41,12 +42,13 @@ const init = function (db) {
             ${columnLongtitude} NUMBER NOT NULL,
             ${columnPlusCode} TEXT NOT NULL DEFAULT 'undefined',
             ${columnMessage} TEXT NOT NULL,
-            ${columnMessageViews} INTEGER NOT NULL DEFAULT 0,
-            ${columnMessageLikes} INTEGER NOT NULL DEFAULT 0,
-            ${columnMessageDislikes} INTEGER NOT NULL DEFAULT 0,
-            ${columnMessageStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
-            ${columnMessageUserId} TEXT NOT NULL,
-            FOREIGN KEY (${columnMessageUserId}) 
+            ${columnStyle} TEXT NOT NULL DEFAULT '',
+            ${columnViews} INTEGER NOT NULL DEFAULT 0,
+            ${columnLikes} INTEGER NOT NULL DEFAULT 0,
+            ${columnDislikes} INTEGER NOT NULL DEFAULT 0,
+            ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
+            ${columnUserId} TEXT NOT NULL,
+            FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (userId) 
             ON UPDATE CASCADE ON DELETE CASCADE
         );`;
@@ -61,7 +63,7 @@ const init = function (db) {
     }
 };
 
-const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, userId, callback) {
+const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, style, userId, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
@@ -73,7 +75,8 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             ${columnLongtitude},
             ${columnPlusCode},
             ${columnMessage},
-            ${columnMessageUserId}
+            ${columnStyle},
+            ${columnUserId}
         ) VALUES (
             ${parentMessageId},
             '${messageTyp}', 
@@ -83,9 +86,10 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             ${longtitude},
             '${plusCode}',
             '${message}',
+            '${style}',
             '${userId}'
         );`;
-
+        
         db.run(sql, (err) => {
             callback(err)
         });
@@ -125,14 +129,14 @@ const getByPlusCode = function (db, plusCode, callback) {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} LIKE ?
-        AND ${columnMessageStatus} = '${messageStatus.ENABLED}'      
+        AND ${columnStatus} = '${messageStatus.ENABLED}'      
         ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
         db.all(sql, [plusCode], (err, rows) => {
             // Update views
             sql = `
             UPDATE ${tableName}
-            SET ${columnMessageViews} = ${columnMessageViews} + 1
+            SET ${columnViews} = ${columnViews} + 1
             WHERE ${columnMessageId} = ?;`
             
             rows.forEach((row) => {
@@ -164,7 +168,7 @@ const disableMessage = function (db, messageId, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
-        SET ${columnMessageStatus} = '${messageStatus.DISABLED}' 
+        SET ${columnStatus} = '${messageStatus.DISABLED}' 
         WHERE ${columnMessageId} = ?;`;
 
         db.run(sql, [messageId], (err) => {
@@ -179,7 +183,7 @@ const enableMessage = function (db, messageId, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
-        SET ${columnMessageStatus} = '${messageStatus.ENABLED}' 
+        SET ${columnStatus} = '${messageStatus.ENABLED}' 
         WHERE ${columnMessageId} = ?;`;
 
         db.run(sql, [messageId], (err) => {

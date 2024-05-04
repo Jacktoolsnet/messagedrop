@@ -88,13 +88,13 @@ export class MapService {
       messages.forEach((message) => {
         markerExist = false;
         let messageLocation: Location = {
-          'latitude': message.latitude,
-          'longitude': message.longitude,
-          'plusCode': message.plusCode,
+          'latitude': message.latitude || 0,
+          'longitude': message.longitude || 0,
+          'plusCode': message.plusCode || '',
           'zoom': this.location.zoom
         };
         let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(messageLocation);
-        messageLocation = this.geolocationService.getLocationFromPlusCode(message.plusCode, plusCodeLength);
+        messageLocation = this.geolocationService.getLocationFromPlusCode(message.plusCode || '', plusCodeLength);
         // Search if a marker for the location exist already
         this.messageMarkers.forEach((marker) => {
           if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {                
