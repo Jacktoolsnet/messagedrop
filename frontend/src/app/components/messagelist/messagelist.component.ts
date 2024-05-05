@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Message } from '../../interfaces/message';
 import {MatCardModule} from '@angular/material/card';
+import { StyleService } from '../../services/style.service';
 
 
 @Component({
@@ -32,10 +33,11 @@ import {MatCardModule} from '@angular/material/card';
   styleUrl: './messagelist.component.css'
 })
 export class MessagelistComponent {
-  public messages!: Message[]; 
+  public messages!: Message[];
 
   constructor(
     public dialogRef: MatDialogRef<MessagelistComponent>,
+    public style:StyleService,
     @Inject(MAT_DIALOG_DATA) public data: Message[]
   ) {
     this.messages = [...data];

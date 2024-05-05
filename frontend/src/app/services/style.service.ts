@@ -12,6 +12,22 @@ export class StyleService {
     return Math.floor(Math.random() * (to + 1)) + from;
   }
 
+  getGradiantColorAnimation(): string {
+    return `
+    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+    background-size: 400% 400%;
+    animation-name: gradient;
+    animation-duration: 15s;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease;`;
+  }
+
+  getRandomColorAnimation(): string {
+    switch (this.getRandomNumber(1, 10)) {
+      default: return this.getGradiantColorAnimation();
+    }
+  }
+
   getRandomFontFamily(): string {
     switch (this.getRandomNumber(1, 10)) {
       case 1: return `font-family: "DancingScript";`;
@@ -39,72 +55,6 @@ export class StyleService {
       case 23: return `font-family: "ShadowsIntoLight";`;
       default: return `font-family: "LuckiestGuy";`;
     }
-  }
-
-  getRandomFontSize(): string {
-    switch (this.getRandomNumber(1, 5)) {
-      case 1: return `font-size: 1rem;`;
-      case 2: return `font-size: 1.25rem;`;
-      case 3: return `font-size: 1.5rem;`;
-      case 4: return `font-size: 1.75rem;`;
-      case 5: return `font-size: 2rem;`;
-      default: return `font-size: 1.5rem;`;
-    }
-  }
-
-  getRandomColorCombination(): string {
-    let beackGroundColor: string = random().toHex();
-    let color: string = colord(beackGroundColor).invert().toHex();
-    return `background-color: ${beackGroundColor}; color: ${color};`;
-  }
-
-  getRandomBorder(): string {
-    let borderSize: string = '1rem';
-    switch (this.getRandomNumber(1, 5)) {
-      case 1:
-         borderSize = `1rem`;
-         break;
-      case 2:
-        borderSize = `1.25rem`;
-        break;
-      case 3:
-        borderSize = `1.5rem`;
-        break;
-      case 4:
-        borderSize = `1.75rem`;
-        break;
-      case 5:
-        borderSize = `2rem`;
-        break;  
-    }
-    let borderStyle: string = 'solid';
-    switch (this.getRandomNumber(1, 8)) {
-      case 1:
-        borderStyle = `dotted`;
-         break;
-      case 2:
-        borderStyle = `dashed`;
-        break;
-      case 3:
-        borderStyle = `solid`;
-        break;
-      case 4:
-        borderStyle = `double`;
-        break;
-      case 5:
-        borderStyle = `groove`;
-        break;
-      case 6:
-        borderStyle = `ridge`;
-        break;
-      case 7:
-        borderStyle = `inset`;
-        break;
-      case 8:
-        borderStyle = `outset`;
-        break;  
-    }
-    return `border: ${borderSize} ${borderStyle} ${random().toHex()};`;
   }
 
 }

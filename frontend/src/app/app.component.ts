@@ -162,8 +162,10 @@ export class AppComponent implements OnInit {
   openMessagDropDialog(): void {
     const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
       panelClass: 'MessageDropDialog',
-      width: '90%',
-      height:  '90%',
+      width: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      maxWidth:'90vw',
       hasBackdrop: true      
     });
 
@@ -193,8 +195,10 @@ export class AppComponent implements OnInit {
       const dialogRef = this.messageListDialog.open(MessagelistComponent, {
         panelClass: 'MessageListDialog',
         data: this.messages,
-        width: '95%',
-        height:  '95%',
+        width: 'auto',
+        height: 'auto',
+        maxHeight: '90vh',
+        maxWidth:'90vw',
         hasBackdrop: true      
       });
     }
@@ -207,8 +211,10 @@ export class AppComponent implements OnInit {
                 const dialogRef = this.messageListDialog.open(MessagelistComponent, {
                   panelClass: 'MessageListDialog',
                   data: [...getMessageResponse.rows],
-                  width: '95%',
-                  height:  '95%',
+                  width: 'auto',
+                  height: 'auto',
+                  maxHeight: '90vh',
+                  maxWidth:'90vw',
                   hasBackdrop: true      
                 });
               },

@@ -47,8 +47,7 @@ export class DropmessageComponent implements OnInit {
   ngOnInit(): void {
     this.messageStyle = `
     ${this.style.getRandomFontFamily()}
-    ${this.style.getRandomFontSize()}
-    ${this.style.getRandomColorCombination()}`;
+    font-size: 2rem;`;
   }
 
   onNoClick(): void {
