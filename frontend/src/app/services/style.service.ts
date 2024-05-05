@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { colord, random } from "colord";
+import { Animation } from '../interfaces/animation';
 
 @Injectable({
   providedIn: 'root'
@@ -8,23 +9,59 @@ export class StyleService {
 
   constructor() { }
 
-  getRandomNumber(from: number, to: number): number {
+  private getRandomNumber(from: number, to: number): number {
     return Math.floor(Math.random() * (to + 1)) + from;
   }
 
-  getGradiantColorAnimation(): string {
-    return `
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-    background-size: 400% 400%;
-    animation-name: gradient;
-    animation-duration: 15s;
-    animation-iteration-count: infinite;
-    animation-timing-function: ease;`;
+  private getGradiantColorAnimation(): Animation {
+    let animation: Animation = {
+      'cssclass' : 'gradientAnimation',
+      'style': `
+      background-color: ${random().toHex()};
+      background-image: linear-gradient(${this.getRandomNumber(0, 365)}deg, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()});
+      background-size: 400% 400%;
+      animation-duration: ${this.getRandomNumber(5, 15)}s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease;`
+    };
+    return animation;
   }
 
-  getRandomColorAnimation(): string {
-    switch (this.getRandomNumber(1, 10)) {
-      default: return this.getGradiantColorAnimation();
+  private getRadialColorAnimation(): Animation {
+    let animation: Animation = {
+      'cssclass' : 'radialAnimation',
+      'style': `
+      background-color: ${random().toHex()};
+      background-image: radial-gradient(ellipse farthest-corner at ${this.getRandomNumber(25, 75)}% ${this.getRandomNumber(25, 75)}%, ${random().toHex()} 0%, ${random().toHex()} 8%, ${random().toHex()} 25%, ${random().toHex()} 62.5%, ${random().toHex()} 100%);
+      background-size: 400% 400%;
+      animation-duration: ${this.getRandomNumber(5, 15)}s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease;`
+    };
+    return animation;
+  }
+  
+
+  private getConicColorAnimation(): Animation {
+    let animation: Animation = {
+      'cssclass' : 'conicAnimation',
+      'style': `
+      background-color: ${random().toHex()};
+      background-image: conic-gradient(at ${this.getRandomNumber(25, 75)}% ${this.getRandomNumber(25, 75)}%, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()});
+      background-size: 400% 400%;
+      animation-duration: ${this.getRandomNumber(5, 15)}s;
+      animation-iteration-count: infinite;
+      animation-timing-function: ease;`
+    };
+    return animation;
+  }
+
+  getRandomColorAnimation(): Animation {
+    switch (this.getRandomNumber(1, 3)) {
+      case 1: return this.getRadialColorAnimation();
+      case 2: return this.getGradiantColorAnimation();
+      case 3: return this.getConicColorAnimation();
+      default: return this.getRadialColorAnimation();
     }
   }
 

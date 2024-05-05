@@ -1,5 +1,5 @@
-import { Component, Inject } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -8,9 +8,9 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Message } from '../../interfaces/message';
-import {MatCardModule} from '@angular/material/card';
+import { MatCardModule}  from '@angular/material/card';
 import { StyleService } from '../../services/style.service';
-
+import { Animation } from '../../interfaces/animation';
 
 @Component({
   selector: 'app-messagelist',
@@ -32,14 +32,20 @@ import { StyleService } from '../../services/style.service';
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
 })
-export class MessagelistComponent {
+export class MessagelistComponent implements OnInit{
   public messages!: Message[];
+  public animation!: Animation;
 
   constructor(
     public dialogRef: MatDialogRef<MessagelistComponent>,
-    public style:StyleService,
+    private style:StyleService,
     @Inject(MAT_DIALOG_DATA) public data: Message[]
   ) {
     this.messages = [...data];
   }
+
+  ngOnInit(): void {
+    this.animation = this.style.getRandomColorAnimation();
+  }
+
 }

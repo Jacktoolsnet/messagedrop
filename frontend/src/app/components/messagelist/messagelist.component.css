@@ -10,12 +10,30 @@
 }
 
 .gradientAnimation {
-    background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-	background-size: 400% 400%;
-	animation: gradient 15s ease infinite;
+	animation-name: move;
 }
 
-@keyframes gradient {
+.radialAnimation {
+	animation-name: move;
+}
+
+.conicAnimation {
+	animation-name: move;
+}
+
+@property --x {
+	syntax: '<percentage>';
+	inherits: false;
+	initial-value: 0%;
+  }
+
+@property --y {
+	syntax: '<percentage>';
+	inherits: false;
+	initial-value: 0%;
+  }
+
+@keyframes move {
 	0% {
 		background-position: 0% 50%;
 	}

@@ -1,5 +1,9 @@
 <mat-dialog-content class="dialog">
-    <div class="list" [style]="style.getRandomColorAnimation()">
+    <div [ngClass]="{
+        'list': true, 
+        'gradientAnimation': animation.cssclass === 'gradientAnimation',
+        'radialAnimation': animation.cssclass === 'radialAnimation',
+        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
         <div class="item" *ngFor="let message of messages; index as i">
             <mat-card>
                 <!--mat-card-header>
