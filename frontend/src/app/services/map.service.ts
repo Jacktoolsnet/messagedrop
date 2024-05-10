@@ -32,7 +32,7 @@ export class MapService {
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(location: Location, zoomEvent:EventEmitter<number>, markerClickEvent: EventEmitter<Location>): void {
+  public initMap(location: Location, mapEvent:EventEmitter<Location>, markerClickEvent: EventEmitter<Location>): void {
     this.location = location;
     this.markerClickEvent = markerClickEvent;
 
@@ -42,8 +42,19 @@ export class MapService {
     });
 
     this.map.on('zoomend', (ev: any) => {
+      this.location.latitude = this.map.getCenter().lat;
+      this.location.longitude = this.map.getCenter().lng;
       this.location.zoom = this.map.getZoom();
-      zoomEvent.emit(this.location.zoom);
+      this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
+      mapEvent.emit(this.location);
+    });
+
+    this.map.on('moveend', (ev: any) => {
+      this.location.latitude = this.map.getCenter().lat;
+      this.location.longitude = this.map.getCenter().lng;
+      this.location.zoom = this.map.getZoom();
+      this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
+      mapEvent.emit(this.location);
     });
 
     const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -53,8 +64,10 @@ export class MapService {
     });
 
     tiles.addTo(this.map);
+  }
 
-    this.userMarker = leaflet.marker([this.location.latitude, this.location.longitude], {icon: userMarker, zIndexOffset: 100}).addTo(this.map);
+  public flyToWatchedPosition():void {
+    this.map?.moveTo(new leaflet.LatLng(this.location.latitude, this.location.longitude), this.location.zoom);    
   }
 
   public flyTo(location: Location): void {
@@ -71,8 +84,14 @@ export class MapService {
 
   public setLocation (location: Location) {
     this.location = location;
-    this.map?.flyTo(new leaflet.LatLng(this.location.latitude, this.location.longitude), this.location.zoom);
-    this.userMarker?.setLatLng([this.location.latitude, this.location.longitude]).update();
+  }
+
+  public setUserMarker (location: Location) {
+    if (undefined === this.userMarker) {
+      this.userMarker = leaflet.marker([this.location.latitude, this.location.longitude], {icon: userMarker, zIndexOffset: 100}).addTo(this.map);
+    } else {
+      this.userMarker?.setLatLng([location.latitude, location.longitude]).update();
+    }
   }
 
   public setMessagesPin(messages: Message[]) {    
@@ -118,5 +137,6 @@ export class MapService {
     private showMessagesFromMarker(marker: leaflet.Marker, location: Location) {
       this.markerClickEvent.emit(location);
     }
+    
   
 }

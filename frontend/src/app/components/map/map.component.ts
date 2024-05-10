@@ -13,20 +13,12 @@ import { Message } from '../../interfaces/message';
 })
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection
-  @Input() latitude: number = 0;
-  @Input() longitude: number = 0;
-  @Input() zoom: number = 19;
-  @Input() plusCode: string = '';
+  @Input() location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   @Input() messages: Message[] = [];
-  @Output() zoomEvent = new EventEmitter<number>();
+  @Output() mapEvent = new EventEmitter<Location>();
   @Output() markerClickEvent = new EventEmitter<Location>();
-  private location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
 
   ngOnChanges(changes: SimpleChanges) {
-    this.location.latitude = this.latitude;
-    this.location.longitude = this.longitude;
-    this.location.zoom = this.zoom;
-    this.location.plusCode = this.plusCode;    
     this.mapService.setLocation(this.location);
     this.mapService.setMessagesPin(this.messages);
   }
@@ -34,7 +26,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   constructor(private mapService: MapService) { }
 
   ngAfterViewInit(): void { 
-    this.mapService.initMap(this.location, this.zoomEvent, this.markerClickEvent);
+    this.mapService.initMap(this.location, this.mapEvent, this.markerClickEvent);
   }
 }
 

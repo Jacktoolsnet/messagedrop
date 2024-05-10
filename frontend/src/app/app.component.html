@@ -1,5 +1,5 @@
 <!-- The members of location are used for change detection.-->
-<app-map [latitude]="location.latitude" [longitude]="location.longitude" [zoom]="location.zoom" [plusCode]="location.plusCode" [messages]="messages" [messages]="messages" (zoomEvent)="handleZoomEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<app-map [location]="location" [messages]="messages" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
 <!--button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
 </button-->

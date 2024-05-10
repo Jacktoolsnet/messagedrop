@@ -18,6 +18,7 @@ import { StatisticService } from './services/statistic.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Message } from './interfaces/message';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
+import { MapService } from './services/map.service';
 
 @Component({
   selector: 'app-root',
@@ -41,12 +42,15 @@ export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
   private user: User = { userId: ''};
-  public location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
+  public location: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
+  public mapLocation: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
+  public userLocation: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   private lastPlusCode: string = ''
   public messages: Message[] = [];
   private snackBarRef: any;
 
   constructor(
+    private mapService: MapService,
     private geolocationService: GeolocationService, 
     private userService: UserService,
     private messageService: MessageService,
@@ -110,16 +114,26 @@ export class AppComponent implements OnInit {
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
-        this.location.latitude = position.coords.latitude;
-        this.location.longitude = position.coords.longitude;
-        this.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        this.locationReady = true;
-        // Only search if the plusCode chagnes.
-        if (this.lastPlusCode != this.location.plusCode) {
-          this.getMessages();
-          // Save the last plusCode.
-          this.lastPlusCode = this.location.plusCode;
+        this.userLocation.latitude = position.coords.latitude;
+        this.userLocation.longitude = position.coords.longitude;
+        this.userLocation.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        if (this.mapLocation.zoom === -1) {
+          this.mapLocation.latitude = this.userLocation.latitude;
+          this.mapLocation.longitude = this.userLocation.longitude;
+          this.mapLocation.zoom = this.userLocation.zoom;
+          this.mapLocation.plusCode = this.userLocation.plusCode;
         }
+        if (this.location.zoom === -1) {
+          this.location.latitude = this.userLocation.latitude;
+          this.location.longitude = this.userLocation.longitude;
+          this.location.zoom = this.userLocation.zoom;
+          this.location.plusCode = this.userLocation.plusCode;
+        }
+        if (this.mapLocation.plusCode === this.userLocation.plusCode) {
+          this.mapService.setUserMarker(this.userLocation);
+          this.mapService.flyTo(this.userLocation);
+        }
+        this.locationReady = true;
       },
       error: (error) => {
         if (error.code == 1) {
@@ -135,8 +149,8 @@ export class AppComponent implements OnInit {
     });
   }
 
-  getMessages() {
-    this.messageService.getByPlusCode(this.location)
+  getMessages(location: Location) {
+    this.messageService.getByPlusCode(location)
             .subscribe({
               next: (getMessageResponse) => {
                 this.messages = [...getMessageResponse.rows];
@@ -148,10 +162,16 @@ export class AppComponent implements OnInit {
             });
   }
 
-  handleZoomEvent(event: number) {
-    if (this.location.zoom !== event) {
-      this.location.zoom = event;
-      this.getMessages();
+  handleMapEvent(event: Location) {
+    console.log('mapEvent');
+    this.mapLocation.latitude = event.latitude;
+    this.mapLocation.longitude = event.longitude;
+    this.mapLocation.zoom = event.zoom;
+    this.mapLocation.plusCode = event.plusCode;
+    if (this.lastPlusCode != this.mapLocation.plusCode) {
+      this.lastPlusCode = this.mapLocation.plusCode;
+      console.log('mapEvent search');
+      this.getMessages(this.mapLocation);
     }
   }
 
@@ -160,6 +180,7 @@ export class AppComponent implements OnInit {
   }
 
   openMessagDropDialog(): void {
+    this.mapService.flyTo(this.userLocation);
     const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
       panelClass: 'MessageDropDialog',
       width: '90vh',
@@ -171,11 +192,11 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((message: Message) => {
       if (undefined !== message) {
-        this.messageService.createPublicMessage(message, this.location, this.user)
+        this.messageService.createPublicMessage(message, this.userLocation, this.user)
             .subscribe({
               next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.getMessages();
+                this.getMessages(this.userLocation);
                 this.statisticService.countMessage()
                 .subscribe({
                   next: (data) => {},
