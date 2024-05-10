@@ -20,7 +20,6 @@ export class MapComponent implements AfterViewInit, OnChanges {
   @Output() markerClickEvent = new EventEmitter<Location>();
 
   ngOnChanges(changes: SimpleChanges) {
-    this.mapService.setLocation(this.location);
     this.mapService.setMessagesPin(this.messages);
   }
 

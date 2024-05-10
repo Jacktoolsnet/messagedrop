@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Location } from '../interfaces/location';
 import * as plusCodes from 'pluscodes';
+import { Message } from '../interfaces/message';
 
 @Injectable({
   providedIn: 'root'
@@ -21,14 +22,24 @@ export class GeolocationService {
     }
   }
 
+  public getLocationFromMessage(message: Message): Location {
+    let location: Location = {
+      latitude : message.latitude || 0,
+      longitude: message.longitude  || 0,
+      zoom: 19,
+      plusCode: message.plusCode || ''
+    };
+    return location;
+  }
+
   public getLocationFromPlusCode(plusCode: string, plusCodeLength: number): Location{
     let plusCodeComplete: string = plusCodeLength === 11 ? `${plusCode.substring(0, plusCodeLength)}` : `${plusCode.substring(0, plusCodeLength)}+`;
     plusCode = plusCode.substring(0, plusCodeLength);
     let location: Location = {
-      'latitude' : plusCodes.decode(plusCodeComplete)?.latitude || 0,
-      'longitude': plusCodes.decode(plusCodeComplete)?.longitude  || 0,
-      'zoom': 19,
-      'plusCode': plusCode
+      latitude : plusCodes.decode(plusCodeComplete)?.latitude || 0,
+      longitude: plusCodes.decode(plusCodeComplete)?.longitude  || 0,
+      zoom: 19,
+      plusCode: plusCode
     };
     return location;
   }

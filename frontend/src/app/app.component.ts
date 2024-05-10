@@ -47,6 +47,7 @@ export class AppComponent implements OnInit {
   private lastPlusCode: string = ''
   public messages: Message[] = [];
   private snackBarRef: any;
+  public isUserLocation: boolean = true;
 
   constructor(
     private mapService: MapService,
@@ -61,6 +62,14 @@ export class AppComponent implements OnInit {
   ngOnInit(): void {
     this.getUser();
     this.watchPosition();
+  }
+
+  setIsUserLocation(): void {
+    if (this.userLocation.plusCode === this.mapLocation.plusCode) {
+      this.isUserLocation = true;
+    } else {
+      this.isUserLocation = false;
+    }
   }
 
   getUser() {
@@ -121,6 +130,7 @@ export class AppComponent implements OnInit {
           this.mapLocation.longitude = this.userLocation.longitude;
           this.mapLocation.zoom = this.userLocation.zoom;
           this.mapLocation.plusCode = this.userLocation.plusCode;
+          this.setIsUserLocation();
         }
         if (this.mapLocation.plusCode === this.userLocation.plusCode) {
           this.mapService.setUserMarker(this.userLocation);
@@ -160,10 +170,9 @@ export class AppComponent implements OnInit {
     this.mapLocation.longitude = event.longitude;
     this.mapLocation.zoom = event.zoom;
     this.mapLocation.plusCode = event.plusCode;
-    if (this.lastPlusCode != this.mapLocation.plusCode) {
-      this.lastPlusCode = this.mapLocation.plusCode;
-      this.getMessages(this.mapLocation);
-    }
+    this.lastPlusCode = this.mapLocation.plusCode;
+    this.getMessages(this.mapLocation);
+    this.setIsUserLocation()
   }
 
   handleMarkerClickEvent(event: Location) {
@@ -175,39 +184,43 @@ export class AppComponent implements OnInit {
     this.mapLocation.longitude = event.longitude;
     this.mapLocation.zoom = event.zoom;
     this.mapLocation.plusCode = event.plusCode;
-    this.openMessagDropDialog(this.mapLocation);
+    this.mapService.flyTo(this.mapLocation);
+    this.openMessagDropDialog(this.mapLocation, true);
   }
 
-  openMessagDropDialog(location: Location): void {
-    this.mapService.flyTo(location);
-    const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
-      panelClass: 'MessageDropDialog',
-      width: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
-      maxWidth:'90vw',
-      hasBackdrop: true      
-    });
+  openMessagDropDialog(location: Location, click: boolean): void {
+    if (!click && !this.isUserLocation) {
+      this.mapService.flyTo(this.userLocation);
+    } else {
+      const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
+        panelClass: 'MessageDropDialog',
+        width: '90vh',
+        height: '90vh',
+        maxHeight: '90vh',
+        maxWidth:'90vw',
+        hasBackdrop: true      
+      });
 
-    dialogRef.afterClosed().subscribe((message: Message) => {
-      if (undefined !== message) {
-        this.messageService.createPublicMessage(message, location, this.user)
-            .subscribe({
-              next: createMessageResponse => {
-                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.getMessages(location);
-                this.statisticService.countMessage()
-                .subscribe({
-                  next: (data) => {},
-                  error: (err) => {},
-                  complete:() => {}
-                });
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-              complete:() => {}
-            });          
-      }
-    });
+      dialogRef.afterClosed().subscribe((message: Message) => {
+        if (undefined !== message) {
+          this.messageService.createPublicMessage(message, location, this.user)
+              .subscribe({
+                next: createMessageResponse => {
+                  this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+                  this.getMessages(location);
+                  this.statisticService.countMessage()
+                  .subscribe({
+                    next: (data) => {},
+                    error: (err) => {},
+                    complete:() => {}
+                  });
+                },
+                error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+                complete:() => {}
+              });          
+        }
+      });
+    }
   }
 
   openMessagListDialog(): void {
