@@ -42,7 +42,6 @@ export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
   private user: User = { userId: ''};
-  public location: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
   public mapLocation: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
   public userLocation: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   private lastPlusCode: string = ''
@@ -123,12 +122,6 @@ export class AppComponent implements OnInit {
           this.mapLocation.zoom = this.userLocation.zoom;
           this.mapLocation.plusCode = this.userLocation.plusCode;
         }
-        if (this.location.zoom === -1) {
-          this.location.latitude = this.userLocation.latitude;
-          this.location.longitude = this.userLocation.longitude;
-          this.location.zoom = this.userLocation.zoom;
-          this.location.plusCode = this.userLocation.plusCode;
-        }
         if (this.mapLocation.plusCode === this.userLocation.plusCode) {
           this.mapService.setUserMarker(this.userLocation);
           this.mapService.flyTo(this.userLocation);
@@ -179,8 +172,17 @@ export class AppComponent implements OnInit {
     this.openMarkerMessageListDialog(event);
   }
 
-  openMessagDropDialog(): void {
-    this.mapService.flyTo(this.userLocation);
+  handleClickEvent(event: Location) {
+    console.log('mapEvent');
+    this.mapLocation.latitude = event.latitude;
+    this.mapLocation.longitude = event.longitude;
+    this.mapLocation.zoom = event.zoom;
+    this.mapLocation.plusCode = event.plusCode;
+    this.openMessagDropDialog(this.mapLocation);
+  }
+
+  openMessagDropDialog(location: Location): void {
+    this.mapService.flyTo(location);
     const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
       panelClass: 'MessageDropDialog',
       width: '90vh',
@@ -192,7 +194,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((message: Message) => {
       if (undefined !== message) {
-        this.messageService.createPublicMessage(message, this.userLocation, this.user)
+        this.messageService.createPublicMessage(message, location, this.user)
             .subscribe({
               next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});

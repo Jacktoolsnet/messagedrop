@@ -32,13 +32,21 @@ export class MapService {
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(location: Location, mapEvent:EventEmitter<Location>, markerClickEvent: EventEmitter<Location>): void {
+  public initMap(location: Location, clickEvent:EventEmitter<Location>, mapEvent:EventEmitter<Location>, markerClickEvent: EventEmitter<Location>): void {
     this.location = location;
     this.markerClickEvent = markerClickEvent;
 
     this.map = leaflet.map('map', {
       center: [ location.latitude, location.longitude ],
       zoom: 10
+    });
+
+    this.map.on('click', (ev: any) => {
+      this.location.latitude = this.map.getCenter().lat;
+      this.location.longitude = this.map.getCenter().lng;
+      this.location.zoom = this.map.getZoom();
+      this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
+      clickEvent.emit(this.location);
     });
 
     this.map.on('zoomend', (ev: any) => {

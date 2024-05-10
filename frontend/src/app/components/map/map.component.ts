@@ -15,6 +15,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection
   @Input() location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
   @Input() messages: Message[] = [];
+  @Output() clickEvent = new EventEmitter<Location>();
   @Output() mapEvent = new EventEmitter<Location>();
   @Output() markerClickEvent = new EventEmitter<Location>();
 
@@ -26,7 +27,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   constructor(private mapService: MapService) { }
 
   ngAfterViewInit(): void { 
-    this.mapService.initMap(this.location, this.mapEvent, this.markerClickEvent);
+    this.mapService.initMap(this.location, this.clickEvent, this.mapEvent, this.markerClickEvent);
   }
 }
 

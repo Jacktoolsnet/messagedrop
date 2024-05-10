@@ -1,9 +1,9 @@
 <!-- The members of location are used for change detection.-->
-<app-map [location]="location" [messages]="messages" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<app-map [location]="mapLocation" [messages]="messages" (clickEvent)="handleClickEvent($event)" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
 <!--button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
 </button-->
-<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog()">
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog(userLocation)">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">water_drop</mat-icon>
 </button>
 <router-outlet />
