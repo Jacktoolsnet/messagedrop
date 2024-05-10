@@ -156,14 +156,12 @@ export class AppComponent implements OnInit {
   }
 
   handleMapEvent(event: Location) {
-    console.log('mapEvent');
     this.mapLocation.latitude = event.latitude;
     this.mapLocation.longitude = event.longitude;
     this.mapLocation.zoom = event.zoom;
     this.mapLocation.plusCode = event.plusCode;
     if (this.lastPlusCode != this.mapLocation.plusCode) {
       this.lastPlusCode = this.mapLocation.plusCode;
-      console.log('mapEvent search');
       this.getMessages(this.mapLocation);
     }
   }
@@ -173,7 +171,6 @@ export class AppComponent implements OnInit {
   }
 
   handleClickEvent(event: Location) {
-    console.log('mapEvent');
     this.mapLocation.latitude = event.latitude;
     this.mapLocation.longitude = event.longitude;
     this.mapLocation.zoom = event.zoom;
@@ -198,7 +195,7 @@ export class AppComponent implements OnInit {
             .subscribe({
               next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.getMessages(this.userLocation);
+                this.getMessages(location);
                 this.statisticService.countMessage()
                 .subscribe({
                   next: (data) => {},
