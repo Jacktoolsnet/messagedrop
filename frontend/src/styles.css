@@ -5,6 +5,7 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
 .MessageDropDialog .mat-mdc-dialog-container {
   --mdc-dialog-container-color: transparent;
+  --mdc-dialog-container-height: auto !important;
 }
 
 .MessageListDialog .mat-mdc-dialog-container {

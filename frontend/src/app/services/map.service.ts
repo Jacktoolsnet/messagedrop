@@ -87,7 +87,8 @@ export class MapService {
   }
 
   public moveTo(location: Location): void {
-    this.map?.moveTo(new leaflet.LatLng(location.latitude, location.longitude), location.zoom);    
+    this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude), location.zoom);
+    this.map?.setZoom(location.zoom);    
   }
 
   public setUserMarker (location: Location) {
