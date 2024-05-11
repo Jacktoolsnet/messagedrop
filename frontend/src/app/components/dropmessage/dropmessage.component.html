@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>Your message</h2>
+<h2 mat-dialog-title>Your public message</h2>
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" cdkFocusInitial (click)="onNewFontClick()">
-    <mat-icon class="material-symbols-outlined">loop</mat-icon>
+    <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
 <mat-dialog-content class="full-width">
     <textarea
@@ -12,8 +12,8 @@
     </textarea>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button class="button_drop" mat-flat-button color="primary" aria-label="Drop a new message" cdkFocusInitial (click)="onDropClick()">
+    <button mat-flat-button class="button_drop" color="primary" aria-label="Drop a new message" cdkFocusInitial (click)="onDropClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
-        Drop message
+        Drop it!
     </button>
 </mat-dialog-actions>
