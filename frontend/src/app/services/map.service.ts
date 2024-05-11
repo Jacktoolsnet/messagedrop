@@ -78,6 +78,10 @@ export class MapService {
     tiles.addTo(this.map);
   }
 
+  public getMapZoom(): any {
+    this.map.getZoom();
+  }
+
   public flyTo(location: Location): void {
     this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), location.zoom);    
   }

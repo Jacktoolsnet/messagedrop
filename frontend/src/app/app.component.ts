@@ -125,14 +125,7 @@ export class AppComponent implements OnInit {
         this.userLocation.latitude = position.coords.latitude;
         this.userLocation.longitude = position.coords.longitude;
         this.userLocation.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        if (this.mapLocation.zoom === -1) {
-          this.mapLocation.latitude = this.userLocation.latitude;
-          this.mapLocation.longitude = this.userLocation.longitude;
-          this.mapLocation.zoom = this.userLocation.zoom;
-          this.mapLocation.plusCode = this.userLocation.plusCode;
-          this.setIsUserLocation();
-        }
-        if (this.mapLocation.plusCode === this.userLocation.plusCode) {
+        if (this.isUserLocation) {
           this.mapService.setUserMarker(this.userLocation);
           this.mapService.flyTo(this.userLocation);
         }

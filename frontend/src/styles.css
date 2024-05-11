@@ -125,3 +125,133 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-family: 'ShadowsIntoLight';
   src: url('./assets/fonts/ShadowsIntoLight.ttf');
 }
+
+@font-face {
+  font-family: 'AbrilFatface';
+  src: url('./assets/fonts/AbrilFatface.ttf');
+}
+
+@font-face {
+  font-family: 'Almendra';
+  src: url('./assets/fonts/Almendra.ttf');
+}
+
+@font-face {
+  font-family: 'AmaticSC';
+  src: url('./assets/fonts/AmaticSC.ttf');
+}
+
+@font-face {
+  font-family: 'Anton';
+  src: url('./assets/fonts/Anton.ttf');
+}
+
+@font-face {
+  font-family: 'Audiowide';
+  src: url('./assets/fonts/Audiowide.ttf');
+}
+
+@font-face {
+  font-family: 'Bangers';
+  src: url('./assets/fonts/Bangers.ttf');
+}
+
+@font-face {
+  font-family: 'BebasNeue';
+  src: url('./assets/fonts/BebasNeue.ttf');
+}
+
+@font-face {
+  font-family: 'BlackOpsOne';
+  src: url('./assets/fonts/BlackOpsOne.ttf');
+}
+
+@font-face {
+  font-family: 'BriemHand.ttf';
+  src: url('./assets/fonts/BriemHand.ttf');
+}
+
+@font-face {
+  font-family: 'BungeeShade';
+  src: url('./assets/fonts/BungeeShade.ttf');
+}
+
+@font-face {
+  font-family: 'BungeeSpice';
+  src: url('./assets/fonts/BungeeSpice.ttf');
+}
+
+@font-face {
+  font-family: 'Cinzel';
+  src: url('./assets/fonts/Cinzel.ttf');
+}
+
+@font-face {
+  font-family: 'Creepster';
+  src: url('./assets/fonts/Creepster.ttf');
+}
+
+@font-face {
+  font-family: 'FjallaOne';
+  src: url('./assets/fonts/FjallaOne.ttf');
+}
+
+@font-face {
+  font-family: 'FrederickatheGreat';
+  src: url('./assets/fonts/FrederickatheGreat.ttf');
+}
+
+@font-face {
+  font-family: 'Jaro';
+  src: url('./assets/fonts/Jaro.ttf');
+}
+
+@font-face {
+  font-family: 'Jersey10';
+  src: url('./assets/fonts/Jersey10.ttf');
+}
+
+@font-face {
+  font-family: 'Jersey15';
+  src: url('./assets/fonts/Jersey15.ttf');
+}
+
+@font-face {
+  font-family: 'Jersey25';
+  src: url('./assets/fonts/Jersey25.ttf');
+}
+
+@font-face {
+  font-family: 'JosefinSans';
+  src: url('./assets/fonts/JosefinSans.ttf');
+}
+
+@font-face {
+  font-family: 'Knewave';
+  src: url('./assets/fonts/Knewave.ttf');
+}
+
+@font-face {
+  font-family: 'Lemon';
+  src: url('./assets/fonts/Lemon.ttf');
+}
+
+@font-face {
+  font-family: 'LilitaOne';
+  src: url('./assets/fonts/LilitaOne.ttf');
+}
+
+@font-face {
+  font-family: 'MadimiOne';
+  src: url('./assets/fonts/MadimiOne.ttf');
+}
+
+@font-face {
+  font-family: 'Micro5Charted';
+  src: url('./assets/fonts/Micro5Charted.ttf');
+}
+
+@font-face {
+  font-family: 'Micro5';
+  src: url('./assets/fonts/Micro5.ttf');
+}
