@@ -186,7 +186,7 @@ export class AppComponent implements OnInit {
       this.mapService.flyTo(this.userLocation);
     } else {
       const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
-        panelClass: 'MessageDropDialog',
+        panelClass: 'messageDropDialog',
         width: '90vh',
         height: '90vh',
         maxHeight: '90vh',

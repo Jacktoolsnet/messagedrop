@@ -45,13 +45,22 @@ export class DropmessageComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.getRandomFont();
+  }
+
+  onDropClick(): void {
+    let message: Message = {'message': this.message, 'style': this.messageStyle};
+    this.dialogRef.close(message);
+  }
+
+  onNewFontClick(): void {
+    this.getRandomFont();
+  }
+
+  private getRandomFont(): void {
     this.messageStyle = `
     ${this.style.getRandomFontFamily()}
     font-size: 2rem;`;
   }
 
-  onNoClick(): void {
-    let message: Message = {'message': this.message, 'style': this.messageStyle};
-    this.dialogRef.close(message);
-  }
 }
