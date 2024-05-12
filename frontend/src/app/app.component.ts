@@ -41,7 +41,7 @@ import { MapService } from './services/map.service';
 export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
-  public user: User = { id: '', name: '', location: { latitude: 0, longitude: 0, zoom: 19, plusCode: ''}};
+  public user!: User;
   public messages: Message[] = [];
   private snackBarRef: any;
   public isUserLocation: boolean = true;
@@ -57,7 +57,7 @@ export class AppComponent implements OnInit {
     public messageListDialog: MatDialog) { }
 
   ngOnInit(): void {
-    this.getUser();
+    this.loadUser();
     this.watchPosition();
   }
 
@@ -69,8 +69,8 @@ export class AppComponent implements OnInit {
     }
   }
 
-  getUser() {
-    this.user = this.userService.getUser();
+  loadUser() {
+    this.user = this.userService.loadUser();
     if (this.user.id === 'undefined') {
       this.userService.createEncryptionKey()
       .then((encryptionKeyPair : Keypair ) => {

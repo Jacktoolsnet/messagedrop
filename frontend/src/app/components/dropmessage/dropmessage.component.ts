@@ -75,7 +75,8 @@ export class DropmessageComponent implements OnInit {
   private getRandomFont(): void {
     this.messageStyle = `
     ${this.style.getRandomFontFamily()}
-    font-size: 2rem;`;
+    font-size: 2rem;
+    line-height: 1.6;`;
   }
 
 }

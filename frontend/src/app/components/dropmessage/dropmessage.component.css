@@ -22,6 +22,7 @@ textarea {
     width: 90%;
     height: 90%;
     resize: none;
+    line-height: 1.6;
 }
 
 .buttonarea {

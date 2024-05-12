@@ -3,9 +3,9 @@ import { Location } from "./location";
 
 export interface User {
     id: string,
+    location: Location,
     encryptionKeyPair?: Keypair,
     signingKeyPair?: Keypair,
-    name: string,
-    base64Avatar?: string,
-    location: Location
+    name?: string,
+    base64Avatar?: string
 }

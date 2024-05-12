@@ -28,12 +28,26 @@ export class UserService {
     return throwError(() => error);
   }
 
-  getUser(): User {
-    let user: User = JSON.parse(localStorage.getItem('user') || '{}');
-    if (JSON.stringify(user) === '{}') {
-      user.id = 'undefined'
-      user.location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''}
+  loadUser(): User {
+    let userFromLocalStorage: any = JSON.parse(localStorage.getItem('user') || '{}');
+    let user!: User;
+    if (JSON.stringify(userFromLocalStorage) === '{}') {
+      user = {
+        id : 'undefined',
+        location : { latitude: 0, longitude: 0, zoom: 19, plusCode: ''},
+        name : 'unknown user'
+      }
+    } else {
+      user = {
+        id : undefined != userFromLocalStorage.id ? userFromLocalStorage.id : 'undefined',
+        location : undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: ''},
+        encryptionKeyPair : undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
+        signingKeyPair : undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
+        name : undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'unknown user',
+        base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
+      }
     }
+    console.log(user);
     return user;
   }
 
