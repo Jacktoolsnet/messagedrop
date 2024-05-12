@@ -66,7 +66,7 @@ export class StyleService {
   }
 
   getRandomFontFamily(): string {
-    switch (this.getRandomNumber(1, 49)) {
+    switch (this.getRandomNumber(1, 65)) {
       case 1: return `font-family: "DancingScript";`;
       case 2: return `font-family: "Pacifico";`;
       case 3: return `font-family: "Caveat";`;
@@ -116,6 +116,22 @@ export class StyleService {
       case 47: return `font-family: "MadimiOne";`;
       case 48: return `font-family: "Micro5Charted";`;
       case 49: return `font-family: "Micro5";`;
+      case 50: return `font-family: "Monoton";`;
+      case 51: return `font-family: "Montserrat";`;
+      case 52: return `font-family: "Nosifer";`;
+      case 53: return `font-family: "Orbitron";`;
+      case 54: return `font-family: "Oswald";`;
+      case 55: return `font-family: "PlayfairDisplay";`;
+      case 56: return `font-family: "PoetsenOne";`;
+      case 57: return `font-family: "RubikMonoOne";`;
+      case 58: return `font-family: "RubikMoonrocks";`;
+      case 59: return `font-family: "RubikScribble";`;
+      case 60: return `font-family: "SedanSC";`;
+      case 61: return `font-family: "Sixtyfour";`;
+      case 62: return `font-family: "SpecialElite";`;
+      case 63: return `font-family: "UbuntuSansMono";`;
+      case 64: return `font-family: "Allura";`;
+      case 65: return `font-family: "Cookie";`;
       default: return `font-family: "LuckiestGuy";`;
     }
   }

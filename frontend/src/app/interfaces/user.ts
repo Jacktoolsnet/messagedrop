@@ -1,9 +1,11 @@
 import { Keypair } from "./keypair";
+import { Location } from "./location";
 
 export interface User {
-    userId: string,
+    id: string,
     encryptionKeyPair?: Keypair,
     signingKeyPair?: Keypair,
-    userName?: string,
-    base64Avatar?: string
+    name: string,
+    base64Avatar?: string,
+    location: Location
 }

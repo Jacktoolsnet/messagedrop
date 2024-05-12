@@ -41,12 +41,11 @@ import { MapService } from './services/map.service';
 export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
-  private user: User = { userId: ''};
+  public user: User = { id: '', name: '', location: { latitude: 0, longitude: 0, zoom: 19, plusCode: ''}};
   public mapLocation: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
-  public userLocation: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
-  private lastPlusCode: string = ''
   public messages: Message[] = [];
   private snackBarRef: any;
+  private lastPlusCode: string = '';
   public isUserLocation: boolean = true;
 
   constructor(
@@ -65,7 +64,7 @@ export class AppComponent implements OnInit {
   }
 
   setIsUserLocation(): void {
-    if (this.userLocation.plusCode === this.mapLocation.plusCode) {
+    if (this.user.location.plusCode === this.mapLocation.plusCode) {
       this.isUserLocation = true;
     } else {
       this.isUserLocation = false;
@@ -74,7 +73,7 @@ export class AppComponent implements OnInit {
 
   getUser() {
     this.user = this.userService.getUser();
-    if (JSON.stringify(this.user) === '{}') {
+    if (this.user.id === 'undefined') {
       this.userService.createEncryptionKey()
       .then((encryptionKeyPair : Keypair ) => {
         this.user.encryptionKeyPair = encryptionKeyPair;
@@ -83,8 +82,8 @@ export class AppComponent implements OnInit {
           this.user.signingKeyPair = signingKeyPair;
           this.userService.createUser(this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
           .subscribe(createUserResponse => {
-            this.user.userId = createUserResponse.userId;
-            this.userService.setUserId(this.user);
+            this.user.id = createUserResponse.userId;
+            this.userService.saveUser(this.user);
             this.userReady = true;
           });
         });
@@ -99,7 +98,7 @@ export class AppComponent implements OnInit {
             error: (err) => {
               // Create the user when it does not exist in the database.
               if (err.status === 404) {
-                this.userService.restoreUser(this.user.userId, this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
+                this.userService.restoreUser(this.user.id, this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
                 .subscribe(createUserResponse => {
                   this.userReady = true;
                 });
@@ -122,13 +121,14 @@ export class AppComponent implements OnInit {
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
-        this.userLocation.latitude = position.coords.latitude;
-        this.userLocation.longitude = position.coords.longitude;
-        this.userLocation.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        this.user.location.latitude = position.coords.latitude;
+        this.user.location.longitude = position.coords.longitude;
+        this.user.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
         if (this.isUserLocation) {
-          this.mapService.setUserMarker(this.userLocation);
-          this.mapService.moveTo(this.userLocation);
+          this.mapService.setUserMarker(this.user.location);
+          this.mapService.moveTo(this.user.location);
         }
+        this.userService.saveUser(this.user);
         this.locationReady = true;
       },
       error: (error) => {
@@ -183,7 +183,7 @@ export class AppComponent implements OnInit {
 
   openMessagDropDialog(location: Location, click: boolean): void {
     if (!click && !this.isUserLocation) {
-      this.mapService.flyTo(this.userLocation);
+      this.mapService.flyTo(this.user.location);
     } else {
       const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
         panelClass: 'messageDropDialog',
@@ -236,7 +236,7 @@ export class AppComponent implements OnInit {
               next: (getMessageResponse) => {
                 const dialogRef = this.messageListDialog.open(MessagelistComponent, {
                   panelClass: 'MessageListDialog',
-                  data: [...getMessageResponse.rows],
+                  data: {user: this.user, messages: [...getMessageResponse.rows]},
                   width: 'auto',
                   height: 'auto',
                   maxHeight: '90vh',

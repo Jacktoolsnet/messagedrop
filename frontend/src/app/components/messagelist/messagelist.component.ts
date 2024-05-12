@@ -11,6 +11,8 @@ import { Message } from '../../interfaces/message';
 import { MatCardModule}  from '@angular/material/card';
 import { StyleService } from '../../services/style.service';
 import { Animation } from '../../interfaces/animation';
+import { User } from '../../interfaces/user';
+import { MessageService } from '../../services/message.service';
 
 @Component({
   selector: 'app-messagelist',
@@ -34,18 +36,25 @@ import { Animation } from '../../interfaces/animation';
 })
 export class MessagelistComponent implements OnInit{
   public messages!: Message[];
+  public user!: User;
   public animation!: Animation;
 
   constructor(
+    private messageService: MessageService,
     public dialogRef: MatDialogRef<MessagelistComponent>,
     private style:StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: Message[]
+    @Inject(MAT_DIALOG_DATA) public data: {user: User, messages: Message[]}
   ) {
-    this.messages = [...data];
+    this.user = data.user;
+    this.messages = [...data.messages];
   }
 
   ngOnInit(): void {
     this.animation = this.style.getRandomColorAnimation();
+  }
+
+  public navigateToMessageLocation(message: Message){
+    this.messageService.navigateToMessageLocation(this.user, message)
   }
 
 }

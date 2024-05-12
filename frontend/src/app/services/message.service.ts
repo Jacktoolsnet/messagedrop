@@ -37,7 +37,7 @@ export class MessageService {
       'plusCode': location.plusCode,
       'message': message.message,
       'style': message.style,
-      'messageUserId': user.userId
+      'messageUserId': user.id
     };
     return this.http.post<CreateMessageResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
       .pipe(
@@ -59,6 +59,11 @@ export class MessageService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  navigateToMessageLocation(user: User, message: Message) {
+    let url: string = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(message.plusCode)}`
+    window.open(url, '_blank');
   }
 
 }

@@ -49,7 +49,22 @@ export class DropmessageComponent implements OnInit {
   }
 
   onDropClick(): void {
-    let message: Message = {'message': this.message, 'style': this.messageStyle};
+    let message: Message = {
+      messageId: 0,
+      parentMessageId: 0,
+      messageTyp: 'public',
+      messageCreateDateTime: '',
+      messageDeleteDateTime: '',
+      latitude: 0,
+      longitude: 0,
+      plusCode: '',
+      message: this.message,
+      style: this.messageStyle,
+      views: 0,
+      likes: 0,
+      dislikes: 0,
+      status: 'enabled',
+      userId: ''};
     this.dialogRef.close(message);
   }
 

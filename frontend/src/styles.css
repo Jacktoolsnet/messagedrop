@@ -247,3 +247,84 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-family: 'Micro5';
   src: url('./assets/fonts/Micro5.ttf');
 }
+
+@font-face {
+  font-family: 'Monoton';
+  src: url('./assets/fonts/Monoton.ttf');
+}
+
+@font-face {
+  font-family: 'Montserrat';
+  src: url('./assets/fonts/Montserrat.ttf');
+}
+
+@font-face {
+  font-family: 'Nosifer';
+  src: url('./assets/fonts/Nosifer.ttf');
+}
+
+@font-face {
+  font-family: 'Orbitron';
+  src: url('./assets/fonts/Orbitron.ttf');
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('./assets/fonts/Oswald.ttf');
+}
+
+@font-face {
+  font-family: 'PlayfairDisplay';
+  src: url('./assets/fonts/PlayfairDisplay.ttf');
+}
+
+@font-face {
+  font-family: 'PoetsenOne';
+  src: url('./assets/fonts/PoetsenOne.ttf');
+}
+
+@font-face {
+  font-family: 'RubikMonoOne';
+  src: url('./assets/fonts/RubikMonoOne.ttf');
+}
+
+@font-face {
+  font-family: 'RubikMoonrocks';
+  src: url('./assets/fonts/RubikMoonrocks.ttf');
+}
+
+@font-face {
+  font-family: 'RubikScribble';
+  src: url('./assets/fonts/RubikScribble.ttf');
+}
+
+@font-face {
+  font-family: 'SedanSC';
+  src: url('./assets/fonts/SedanSC.ttf');
+}
+
+@font-face {
+  font-family: 'Sixtyfour';
+  src: url('./assets/fonts/Sixtyfour.ttf');
+}
+
+@font-face {
+  font-family: 'SpecialElite';
+  src: url('./assets/fonts/SpecialElite.ttf');
+}
+
+@font-face {
+  font-family: 'UbuntuSansMono';
+  src: url('./assets/fonts/UbuntuSansMono.ttf');
+}
+
+@font-face {
+  font-family: 'Allura';
+  src: url('./assets/fonts/Allura.ttf');
+}
+
+@font-face {
+  font-family: 'Cookie';
+  src: url('./assets/fonts/Cookie.ttf');
+}
+

@@ -30,10 +30,14 @@ export class UserService {
 
   getUser(): User {
     let user: User = JSON.parse(localStorage.getItem('user') || '{}');
+    if (JSON.stringify(user) === '{}') {
+      user.id = 'undefined'
+      user.location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''}
+    }
     return user;
   }
 
-  setUserId(user: User) {
+  saveUser(user: User) {
     localStorage.setItem('user', JSON.stringify(user))
   }
 
@@ -93,7 +97,7 @@ export class UserService {
   }
 
   checkUserById(user: User) {
-    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${user.userId}`, this.httpOptions)
+    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

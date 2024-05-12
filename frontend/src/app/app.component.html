@@ -1,9 +1,9 @@
 <!-- The members of location are used for change detection.-->
 <app-map [location]="mapLocation" [messages]="messages" (clickEvent)="handleClickEvent($event)" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
-<!--button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
+<!--button *ngIf="userReady" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
 </button-->
-<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog(userLocation, false)">
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog(user.location, false)">
     <mat-icon *ngIf="isUserLocation" [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">send</mat-icon>
     <mat-icon *ngIf="!isUserLocation" [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">adjustS</mat-icon>
 </button>

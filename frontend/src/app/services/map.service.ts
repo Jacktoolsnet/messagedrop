@@ -5,14 +5,14 @@ import { Message } from '../interfaces/message';
 import { GeolocationService } from './geolocation.service';
 
 const messageDropMarker = leaflet.icon({
-  iconUrl: 'assets/message-marker.png',
+  iconUrl: 'assets/markers/message-marker.png',
 
   iconSize:     [48, 58], // size of the icon
   iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
 });
 
 const userMarker = leaflet.icon({
-  iconUrl: 'assets/user-marker.png',
+  iconUrl: 'assets/markers/user-marker.png',
 
   iconSize:     [24, 29], // size of the icon
   iconAnchor:   [12, 29], // point of the icon which will correspond to marker's location
