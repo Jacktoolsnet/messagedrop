@@ -42,14 +42,12 @@ export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
   public user: User = { id: '', name: '', location: { latitude: 0, longitude: 0, zoom: 19, plusCode: ''}};
-  public mapLocation: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
   public messages: Message[] = [];
   private snackBarRef: any;
-  private lastPlusCode: string = '';
   public isUserLocation: boolean = true;
 
   constructor(
-    private mapService: MapService,
+    public mapService: MapService,
     private geolocationService: GeolocationService, 
     private userService: UserService,
     private messageService: MessageService,
@@ -64,7 +62,7 @@ export class AppComponent implements OnInit {
   }
 
   setIsUserLocation(): void {
-    if (this.user.location.plusCode === this.mapLocation.plusCode) {
+    if (this.user.location.plusCode === this.mapService.getMapLocation().plusCode) {
       this.isUserLocation = true;
     } else {
       this.isUserLocation = false;
@@ -159,12 +157,7 @@ export class AppComponent implements OnInit {
   }
 
   handleMapEvent(event: Location) {
-    this.mapLocation.latitude = event.latitude;
-    this.mapLocation.longitude = event.longitude;
-    this.mapLocation.zoom = event.zoom;
-    this.mapLocation.plusCode = event.plusCode;
-    this.lastPlusCode = this.mapLocation.plusCode;
-    this.getMessages(this.mapLocation);
+    this.getMessages(this.mapService.getMapLocation());
     this.setIsUserLocation()
   }
 
@@ -173,12 +166,8 @@ export class AppComponent implements OnInit {
   }
 
   handleClickEvent(event: Location) {
-    this.mapLocation.latitude = event.latitude;
-    this.mapLocation.longitude = event.longitude;
-    this.mapLocation.zoom = event.zoom;
-    this.mapLocation.plusCode = event.plusCode;
-    this.mapService.flyTo(this.mapLocation);
-    this.openMessagDropDialog(this.mapLocation, true);
+    this.mapService.flyTo(this.mapService.getMapLocation());
+    this.openMessagDropDialog(this.mapService.getMapLocation(), true);
   }
 
   openMessagDropDialog(location: Location, click: boolean): void {

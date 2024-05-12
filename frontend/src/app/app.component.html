@@ -1,5 +1,5 @@
 <!-- The members of location are used for change detection.-->
-<app-map [location]="mapLocation" [messages]="messages" (clickEvent)="handleClickEvent($event)" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<app-map [location]="mapService.getMapLocation()" [messages]="messages" (clickEvent)="handleClickEvent($event)" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
 <!--button *ngIf="userReady" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
 </button-->

@@ -25,6 +25,7 @@ export class MapService {
 
   private map: any;
   private userMarker: any;
+  private location: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
 
   private messageMarkers: leaflet.Marker[] = [];
   private markerClickEvent!: EventEmitter<Location>;
@@ -40,33 +41,27 @@ export class MapService {
     });
 
     this.map.on('click', (ev: any) => {
-      let location: Location = {
-        latitude: ev.latlng?.lat,
-        longitude: ev.latlng?.lng,
-        zoom: this.map.getZoom(),
-        plusCode: this.geolocationService.getPlusCode(ev.latlng?.lat, ev.latlng?.lng)
-      };
-      clickEvent.emit(location);
+      this.location.latitude = ev.latlng?.lat;
+      this.location.longitude = ev.latlng?.lng;
+      this.location.zoom = this.map.getZoom();
+      this.location.plusCode = this.geolocationService.getPlusCode(ev.latlng?.lat, ev.latlng?.lng);
+      clickEvent.emit(this.location);
     });
 
     this.map.on('zoomend', (ev: any) => {
-      let location: Location = {
-      latitude: this.map.getCenter().lat,
-      longitude: this.map.getCenter().lng,
-      zoom: this.map.getZoom(),
-      plusCode: this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng)
-      };
-      mapEvent.emit(location);
+      this.location.latitude = this.map.getCenter().lat;
+      this.location.longitude = this.map.getCenter().lng;
+      this.location.zoom = this.map.getZoom();
+      this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
+      mapEvent.emit(this.location);
     });
 
     this.map.on('moveend', (ev: any) => {
-      let location: Location = {
-      latitude: this.map.getCenter().lat,
-      longitude: this.map.getCenter().lng,
-      zoom: this.map.getZoom(),
-      plusCode: this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng)
-      };
-      mapEvent.emit(location);
+      this.location.latitude = this.map.getCenter().lat;
+      this.location.longitude = this.map.getCenter().lng;
+      this.location.zoom = this.map.getZoom();
+      this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
+      mapEvent.emit(this.location);
     });
 
     const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -80,6 +75,10 @@ export class MapService {
 
   public getMapZoom(): any {
     this.map.getZoom();
+  }
+
+  public getMapLocation(): Location {
+    return this.location;
   }
 
   public flyTo(location: Location): void {
