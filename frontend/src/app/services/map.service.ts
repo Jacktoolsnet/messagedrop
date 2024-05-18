@@ -25,7 +25,7 @@ export class MapService {
 
   private map: any;
   private userMarker: any;
-  private location: Location = { latitude: 0, longitude: 0, zoom: -1, plusCode: ''};
+  private location: Location = { latitude: 0, longitude: 0, zoom: 10, plusCode: ''};
 
   private messageMarkers: leaflet.Marker[] = [];
   private markerClickEvent!: EventEmitter<Location>;
@@ -37,7 +37,7 @@ export class MapService {
 
     this.map = leaflet.map('map', {
       center: [ location.latitude, location.longitude ],
-      zoom: 10
+      zoom: 0
     });
 
     this.map.on('click', (ev: any) => {
@@ -54,6 +54,7 @@ export class MapService {
       this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
       mapEvent.emit(this.location);
+      console.log(this.map.getBounds());
     });
 
     this.map.on('moveend', (ev: any) => {
@@ -66,11 +67,15 @@ export class MapService {
 
     const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      minZoom: 6,
+      minZoom: 3,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
 
     tiles.addTo(this.map);
+
+    // Fire event to load first messagens
+    this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
+    mapEvent.emit(this.location);
   }
 
   public getMapZoom(): any {

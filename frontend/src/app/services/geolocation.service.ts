@@ -73,16 +73,30 @@ export class GeolocationService {
     let plusCodeLength: number = 11;
     switch (location.zoom) {
       case 19:
-      case 18:
+      case 18:     
+      case 17:
         plusCodeLength = 11;
-        break;       
-      case 17:        
+        break;          
       case 16:        
       case 15:
+      case 14:
         plusCodeLength = 8;
         break;
-      default:
+      case 13:
+      case 12:
+      case 11:
+      case 10:
+      case 9:
+      case 8:
         plusCodeLength = 6;
+        break;
+      case 7:
+      case 6:
+      case 5:
+          plusCodeLength = 4;
+        break;
+      default:
+        plusCodeLength = 2;
         break;            
     }
     return plusCodeLength;

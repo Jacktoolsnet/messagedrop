@@ -58,7 +58,7 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
-    this.watchPosition();
+    // this.watchPosition();
   }
 
   setIsUserLocation(): void {
@@ -116,18 +116,27 @@ export class AppComponent implements OnInit {
           });
   }
 
+  startWatchingPosition() {
+    this.isUserLocation = true;
+    this.watchPosition();
+  }
+
+  goToUserLocation() {
+    this.mapService.flyTo(this.user.location);
+  }
+
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
         this.user.location.latitude = position.coords.latitude;
         this.user.location.longitude = position.coords.longitude;
         this.user.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        if (this.isUserLocation) {
-          this.mapService.setUserMarker(this.user.location);
-          this.mapService.moveTo(this.user.location);
-        }
         this.userService.saveUser(this.user);
         this.locationReady = true;
+        if (this.isUserLocation) {
+          this.mapService.setUserMarker(this.user.location);
+          this.mapService.flyTo(this.user.location);
+        }
       },
       error: (error) => {
         if (error.code == 1) {
@@ -171,38 +180,34 @@ export class AppComponent implements OnInit {
   }
 
   openMessagDropDialog(location: Location, click: boolean): void {
-    if (!click && !this.isUserLocation) {
-      this.mapService.flyTo(this.user.location);
-    } else {
-      const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
-        panelClass: 'messageDropDialog',
-        width: '90vh',
-        height: '90vh',
-        maxHeight: '90vh',
-        maxWidth:'90vw',
-        hasBackdrop: true      
-      });
+    const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
+      panelClass: 'messageDropDialog',
+      width: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      maxWidth:'90vw',
+      hasBackdrop: true      
+    });
 
-      dialogRef.afterClosed().subscribe((message: Message) => {
-        if (undefined !== message) {
-          this.messageService.createPublicMessage(message, location, this.user)
-              .subscribe({
-                next: createMessageResponse => {
-                  this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                  this.getMessages(location);
-                  this.statisticService.countMessage()
-                  .subscribe({
-                    next: (data) => {},
-                    error: (err) => {},
-                    complete:() => {}
-                  });
-                },
-                error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-                complete:() => {}
-              });          
-        }
-      });
-    }
+    dialogRef.afterClosed().subscribe((message: Message) => {
+      if (undefined !== message) {
+        this.messageService.createPublicMessage(message, location, this.user)
+            .subscribe({
+              next: createMessageResponse => {
+                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+                this.getMessages(location);
+                this.statisticService.countMessage()
+                .subscribe({
+                  next: (data) => {},
+                  error: (err) => {},
+                  complete:() => {}
+                });
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {}
+            });          
+      }
+    });
   }
 
   openMessagListDialog(): void {
