@@ -67,7 +67,6 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 
 router.get('/clean', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  console.log('clean');
   tableUser.clean(req.database.db, function(err) {
     if (err) {
       response.status = 500;

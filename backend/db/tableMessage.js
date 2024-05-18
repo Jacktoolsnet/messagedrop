@@ -251,7 +251,6 @@ const cleanPublic = function (db, callback) {
                     SELECT ${columnMessageId} FROM ${tableName}
                 );`
                 db.run(sql, (err) => {
-                    console.log(err);
                     callback(err);
                 });
             }

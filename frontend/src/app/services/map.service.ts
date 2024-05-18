@@ -54,7 +54,7 @@ export class MapService {
       this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
       mapEvent.emit(this.location);
-      console.log(this.map.getBounds());
+      //console.log(this.map.getBounds());
     });
 
     this.map.on('moveend', (ev: any) => {

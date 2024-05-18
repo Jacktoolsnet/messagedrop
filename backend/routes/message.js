@@ -127,7 +127,6 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 
 router.get('/clean/public', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  console.log('clean');
   tableMessage.cleanPublic(req.database.db, function(err) {
     if (err) {
       response.status = 500;

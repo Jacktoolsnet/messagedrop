@@ -47,7 +47,6 @@ export class UserService {
         base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
       }
     }
-    console.log(user);
     return user;
   }
 

@@ -53,7 +53,6 @@ router.get('/count/message', [security.checkToken], function(req, res) {
 
 router.get('/clean', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  console.log('clean');
   tableStatistic.clean(req.database.db, function(err) {
     if (err) {
       response.status = 500;
