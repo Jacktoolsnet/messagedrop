@@ -59,6 +59,7 @@ export class DropmessageComponent implements OnInit {
       longitude: 0,
       plusCode: '',
       message: this.message,
+      markerType: 'default',
       style: this.messageStyle,
       views: 0,
       likes: 0,

@@ -58,7 +58,6 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadUser();
-    // this.watchPosition();
   }
 
   setIsUserLocation(): void {
@@ -71,6 +70,7 @@ export class AppComponent implements OnInit {
 
   loadUser() {
     this.user = this.userService.loadUser();
+    this.goToUserLocation();
     if (this.user.id === 'undefined') {
       this.userService.createEncryptionKey()
       .then((encryptionKeyPair : Keypair ) => {
@@ -153,6 +153,7 @@ export class AppComponent implements OnInit {
   }
 
   getMessages(location: Location) {
+    console.log(location);
     this.messageService.getByPlusCode(location)
             .subscribe({
               next: (getMessageResponse) => {
@@ -160,12 +161,15 @@ export class AppComponent implements OnInit {
               },
               error: (err) => {
                 this.messages.length = 0;
+                this.snackBarRef = this.snackBar.open("No message at this place. Be the first to leave a message.", undefined , {
+                  duration: 3000
+                });
               },
               complete:() => {}
             });
   }
 
-  handleMapEvent(event: Location) {
+  handleMoveEndEvent(event: Location) {
     this.getMessages(this.mapService.getMapLocation());
     this.setIsUserLocation()
   }
@@ -175,11 +179,10 @@ export class AppComponent implements OnInit {
   }
 
   handleClickEvent(event: Location) {
-    this.mapService.flyTo(this.mapService.getMapLocation());
-    this.openMessagDropDialog(this.mapService.getMapLocation(), true);
+    this.mapService.flyTo(event);
   }
 
-  openMessagDropDialog(location: Location, click: boolean): void {
+  openMessagDropDialog(location: Location): void {
     const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
       panelClass: 'messageDropDialog',
       width: '90vh',
@@ -191,11 +194,11 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((message: Message) => {
       if (undefined !== message) {
-        this.messageService.createPublicMessage(message, location, this.user)
+        this.messageService.createPublicMessage(message, this.mapService.getMapLocation(), this.user)
             .subscribe({
               next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.getMessages(location);
+                this.getMessages(this.mapService.getMapLocation());
                 this.statisticService.countMessage()
                 .subscribe({
                   next: (data) => {},

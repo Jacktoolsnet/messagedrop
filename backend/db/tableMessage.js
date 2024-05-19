@@ -15,13 +15,14 @@ const tableName = 'tableMessage';
 
 const columnMessageId = 'messageId';
 const columnParentMessageId = 'parentMessageId';
-const columnMessageType = 'messageTyp';
+const columnMessageType = 'messageTyp'; // Public, private, friend, comment
 const columnMessageCreateDateTime = 'messageCreateDateTime';
 const columnMessageDeleteDateTime = 'messageDeleteDateTime'; // On creation the message has a lifetime of 30 Days
 const columnLatitude = 'latitude';
 const columnLongtitude = 'longitude';
 const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
 const columnMessage = 'message'; // Max. 256 charachters.
+const columnMarkerType = 'markerType'; // Default, Food, Funny...
 const columnStyle = 'style'; 
 const columnViews = 'views'; 
 const columnLikes = 'likes'; // Each like add on day to the lifetime of the message.
@@ -42,6 +43,7 @@ const init = function (db) {
             ${columnLongtitude} NUMBER NOT NULL,
             ${columnPlusCode} TEXT NOT NULL DEFAULT 'undefined',
             ${columnMessage} TEXT NOT NULL,
+            ${columnMarkerType} TEXT NOT NULL DEFAULT 'default',
             ${columnStyle} TEXT NOT NULL DEFAULT '',
             ${columnViews} INTEGER NOT NULL DEFAULT 0,
             ${columnLikes} INTEGER NOT NULL DEFAULT 0,
@@ -63,7 +65,7 @@ const init = function (db) {
     }
 };
 
-const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, style, userId, callback) {
+const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, markerType, style, userId, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
@@ -75,6 +77,7 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             ${columnLongtitude},
             ${columnPlusCode},
             ${columnMessage},
+            ${columnMarkerType},
             ${columnStyle},
             ${columnUserId}
         ) VALUES (
@@ -86,6 +89,7 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             ${longtitude},
             '${plusCode}',
             '${message}',
+            '${markerType}',
             '${style}',
             '${userId}'
         );`;

@@ -36,6 +36,7 @@ export class MessageService {
       'longtitude': location.longitude,
       'plusCode': location.plusCode,
       'message': message.message,
+      'markerType': message.markerType,
       'style': message.style,
       'messageUserId': user.id
     };

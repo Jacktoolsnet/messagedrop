@@ -1,4 +1,4 @@
-<app-map [location]="mapService.getMapLocation()" [messages]="messages" (clickEvent)="handleClickEvent($event)" (mapEvent)="handleMapEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<app-map [location]="mapService.getMapLocation()" [messages]="messages" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
 <!--button *ngIf="userReady" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
 </button-->
@@ -6,10 +6,10 @@
 <button [attr.aria-hidden]="locationReady" class="button_drop" *ngIf="!locationReady" mat-fab color="primary" aria-label="Watch user location" (click)="startWatchingPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady && !isUserLocation" mat-fab color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_goToLocation" *ngIf="!isUserLocation" mat-fab color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">adjust</mat-icon>
 </button>
-<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady && locationReady && isUserLocation" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog(user.location, false)">
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog(user.location)">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">send</mat-icon>
 </button>
 <router-outlet />

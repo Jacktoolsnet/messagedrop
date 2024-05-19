@@ -32,7 +32,7 @@ export class MapService {
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(location: Location, clickEvent:EventEmitter<Location>, mapEvent:EventEmitter<Location>, markerClickEvent: EventEmitter<Location>): void {
+  public initMap(location: Location, clickEvent:EventEmitter<Location>, moveEndEvent:EventEmitter<Location>, markerClickEvent: EventEmitter<Location>): void {
     this.markerClickEvent = markerClickEvent;
 
     this.map = leaflet.map('map', {
@@ -53,16 +53,15 @@ export class MapService {
       this.location.longitude = this.map.getCenter().lng;
       this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
-      mapEvent.emit(this.location);
-      //console.log(this.map.getBounds());
     });
 
+    // MoveEnd fires after click (only if flyto is used) and after zoomeend (always).
     this.map.on('moveend', (ev: any) => {
       this.location.latitude = this.map.getCenter().lat;
       this.location.longitude = this.map.getCenter().lng;
       this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
-      mapEvent.emit(this.location);
+      moveEndEvent.emit(this.location);
     });
 
     const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -75,7 +74,6 @@ export class MapService {
 
     // Fire event to load first messagens
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
-    mapEvent.emit(this.location);
   }
 
   public getMapZoom(): any {

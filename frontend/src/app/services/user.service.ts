@@ -34,7 +34,7 @@ export class UserService {
     if (JSON.stringify(userFromLocalStorage) === '{}') {
       user = {
         id : 'undefined',
-        location : { latitude: 0, longitude: 0, zoom: 19, plusCode: ''},
+        location : { latitude: 0, longitude: 0, zoom: 0, plusCode: ''},
         name : 'unknown user'
       }
     } else {
