@@ -3,6 +3,7 @@ import * as leaflet from 'leaflet';
 import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
 import { GeolocationService } from './geolocation.service';
+import { PlusCodeArea } from '../interfaces/plus-code-area';
 
 const messageDropMarker = leaflet.icon({
   iconUrl: 'assets/markers/message-marker.png',
@@ -25,6 +26,7 @@ export class MapService {
 
   private map: any;
   private userMarker: any;
+  private searchRectangle: any;
   private location: Location = { latitude: 0, longitude: 0, zoom: 10, plusCode: ''};
 
   private messageMarkers: leaflet.Marker[] = [];
@@ -74,6 +76,8 @@ export class MapService {
 
     // Fire event to load first messagens
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
+    this.searchRectangle = leaflet.rectangle([[0, 0],[0, 0]], {color: "#ff7800", weight: 1}).addTo(this.map);
+    this.drawSearchRectange(this.location);
   }
 
   public getMapZoom(): any {
@@ -99,6 +103,12 @@ export class MapService {
     } else {
       this.userMarker?.setLatLng([location.latitude, location.longitude]).update();
     }
+  }
+
+  public drawSearchRectange(location: Location) {
+    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location));
+    let bounds = [[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo],[plusCodeArea.latitudeHi,plusCodeArea.longitudeHi]];
+    this.searchRectangle.setBounds(bounds);
   }
 
   public setMessagesPin(messages: Message[]) {    

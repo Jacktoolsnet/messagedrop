@@ -44,7 +44,7 @@ export class AppComponent implements OnInit {
   public user!: User;
   public messages: Message[] = [];
   private snackBarRef: any;
-  public isUserLocation: boolean = true;
+  public isUserLocation: boolean = false;
 
   constructor(
     public mapService: MapService,
@@ -153,7 +153,6 @@ export class AppComponent implements OnInit {
   }
 
   getMessages(location: Location) {
-    console.log(location);
     this.messageService.getByPlusCode(location)
             .subscribe({
               next: (getMessageResponse) => {
@@ -172,6 +171,7 @@ export class AppComponent implements OnInit {
   handleMoveEndEvent(event: Location) {
     this.getMessages(this.mapService.getMapLocation());
     this.setIsUserLocation()
+    this.mapService.drawSearchRectange(event);
   }
 
   handleMarkerClickEvent(event: Location) {
