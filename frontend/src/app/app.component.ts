@@ -185,16 +185,16 @@ export class AppComponent implements OnInit {
     this.getMessages(this.mapService.getMapLocation());
     this.setIsUserLocation()
     this.mapService.drawSearchRectange(event);
+    this.mapService.setCircleMarker(event);
+    this.mapService.setDrawCircleMarker(false);
   }
 
   handleMarkerClickEvent(event: Location) {
     this.openMarkerMessageListDialog(event);
-    this.mapService.setCircleMarker(event);
   }
 
   handleClickEvent(event: Location) {
     this.mapService.flyTo(event);
-    this.mapService.setCircleMarker(event);
   }
 
   openMessagDropDialog(location: Location): void {

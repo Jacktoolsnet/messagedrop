@@ -28,6 +28,7 @@ export class MapService {
   private userMarker: any;
   private searchRectangle: any;
   private circleMarker: any;
+  private drawCircleMarker: boolean = false;
   private location: Location = { latitude: 0, longitude: 0, zoom: 10, plusCode: ''};
 
   private messageMarkers: leaflet.Marker[] = [];
@@ -44,6 +45,7 @@ export class MapService {
     });
 
     this.map.on('click', (ev: any) => {
+      this.drawCircleMarker = false;
       this.location.latitude = ev.latlng?.lat;
       this.location.longitude = ev.latlng?.lng;
       this.location.zoom = this.map.getZoom();
@@ -51,7 +53,11 @@ export class MapService {
       clickEvent.emit(this.location);
     });
 
-    this.map.on('zoomend', (ev: any) => {
+    this.map.on('zoomstart', (ev: any) => {      
+      this.circleMarker?.removeFrom(this.map);
+    });
+
+    this.map.on('zoomend', (ev: any) => {      
       this.location.latitude = this.map.getCenter().lat;
       this.location.longitude = this.map.getCenter().lng;
       this.location.zoom = this.map.getZoom();
@@ -106,9 +112,15 @@ export class MapService {
     }
   }
 
+  public setDrawCircleMarker(value: boolean) {
+    this.drawCircleMarker = value;
+  }
+
   public setCircleMarker (location: Location) {
     this.circleMarker?.removeFrom(this.map);
-    this.circleMarker = leaflet.circleMarker([location.latitude, location.longitude]).addTo(this.map);    
+    if (this.drawCircleMarker) {
+      this.circleMarker = leaflet.circleMarker([location.latitude, location.longitude]).addTo(this.map);    
+    }
   }
 
   public drawSearchRectange(location: Location) {
@@ -144,6 +156,9 @@ export class MapService {
         if (this.map.getZoom() > 16) {
           let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
           marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+            this.drawCircleMarker = true;
+            this.setCircleMarker(messageLocation);
+            this.drawCircleMarker = false
             this.showMessagesFromMarker($event.target, messageLocation);
           });
           this.messageMarkers.push(marker)
@@ -160,6 +175,9 @@ export class MapService {
           if (!markerExist) {
             let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
             marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+              this.drawCircleMarker = true;
+              this.setCircleMarker(messageLocation);
+              this.drawCircleMarker = false;
               this.showMessagesFromMarker($event.target, messageLocation);
             });
             this.messageMarkers.push(marker)
