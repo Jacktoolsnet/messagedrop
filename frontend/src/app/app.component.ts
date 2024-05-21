@@ -185,6 +185,7 @@ export class AppComponent implements OnInit {
     this.getMessages(this.mapService.getMapLocation());
     this.setIsUserLocation()
     this.mapService.drawSearchRectange(event);
+    this.mapService.setDrawCircleMarker(true);
     this.mapService.setCircleMarker(event);
     this.mapService.setDrawCircleMarker(false);
   }
