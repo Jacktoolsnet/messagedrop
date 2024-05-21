@@ -13,6 +13,9 @@ import { StyleService } from '../../services/style.service';
 import { Animation } from '../../interfaces/animation';
 import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
+import { MapService } from '../../services/map.service';
+import { Location } from '../../interfaces/location';
+import { GeolocationService } from '../../services/geolocation.service';
 
 @Component({
   selector: 'app-messagelist',
@@ -41,6 +44,8 @@ export class MessagelistComponent implements OnInit{
 
   constructor(
     private messageService: MessageService,
+    private mapService: MapService,
+    private geolocationService: GeolocationService,
     public dialogRef: MatDialogRef<MessagelistComponent>,
     private style:StyleService,
     @Inject(MAT_DIALOG_DATA) public data: {user: User, messages: Message[]}
@@ -51,6 +56,18 @@ export class MessagelistComponent implements OnInit{
 
   ngOnInit(): void {
     this.animation = this.style.getRandomColorAnimation();
+  }
+
+  public flyTo(message: Message){
+    let location: Location = {
+      latitude: message.latitude,
+      longitude: message.longitude,
+      zoom: 17,
+      plusCode: this.geolocationService.getPlusCode(message.latitude, message.longitude)
+    }
+    this.mapService.setCircleMarker(location);
+    this.mapService.flyTo(location);
+    this.dialogRef.close();
   }
 
   public navigateToMessageLocation(message: Message){

@@ -27,6 +27,7 @@ export class MapService {
   private map: any;
   private userMarker: any;
   private searchRectangle: any;
+  private circleMarker: any;
   private location: Location = { latitude: 0, longitude: 0, zoom: 10, plusCode: ''};
 
   private messageMarkers: leaflet.Marker[] = [];
@@ -103,6 +104,11 @@ export class MapService {
     } else {
       this.userMarker?.setLatLng([location.latitude, location.longitude]).update();
     }
+  }
+
+  public setCircleMarker (location: Location) {
+    this.circleMarker?.removeFrom(this.map);
+    this.circleMarker = leaflet.circleMarker([location.latitude, location.longitude]).addTo(this.map);    
   }
 
   public drawSearchRectange(location: Location) {

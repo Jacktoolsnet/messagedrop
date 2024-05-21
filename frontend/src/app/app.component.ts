@@ -189,10 +189,12 @@ export class AppComponent implements OnInit {
 
   handleMarkerClickEvent(event: Location) {
     this.openMarkerMessageListDialog(event);
+    this.mapService.setCircleMarker(event);
   }
 
   handleClickEvent(event: Location) {
     this.mapService.flyTo(event);
+    this.mapService.setCircleMarker(event);
   }
 
   openMessagDropDialog(location: Location): void {

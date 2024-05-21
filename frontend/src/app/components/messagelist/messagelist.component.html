@@ -12,19 +12,22 @@
                 </mat-card-header-->
                 <mat-card-content [style]="message.style">{{message.message}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
-                    <button mat-mini-fab color="secondary" aria-label="Drop a new message">
+                    <button mat-mini-fab color="secondary" aria-label="Like message">
                         <mat-icon class="material-symbols-outlined">thumb_up</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Drop a new message">
+                    <button mat-mini-fab color="secondary" aria-label="Dislike message">
                         <mat-icon class="material-symbols-outlined">thumb_down</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Drop a new message">
+                    <button mat-mini-fab color="secondary" aria-label="Drop a comment">
                         <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Drop a new message">
+                    <button mat-mini-fab color="secondary" aria-label="More information">
                         <mat-icon class="material-symbols-outlined">read_more</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Drop a new message" (click)="navigateToMessageLocation(message)">
+                    <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
+                        <mat-icon class="material-symbols-outlined">place</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="secondary" aria-label="Navigate to message location." (click)="navigateToMessageLocation(message)">
                         <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
                     </button>
                 </mat-card-actions>
