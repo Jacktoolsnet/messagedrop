@@ -49,8 +49,6 @@ export class GeolocationService {
     let plusCode: string = '';
     switch (location.zoom) {
       case 19:
-        plusCode = location.plusCode;
-        break;
       case 18:
       case 17:        
       case 16:
@@ -67,10 +65,8 @@ export class GeolocationService {
       case 9:
       case 8:
       case 7:
-      case 6:
-      case 5:
         plusCode = location.plusCode.substring(0, 4);
-        break;
+        break;        
       default:
         plusCode = location.plusCode.substring(0, 2);
         break;
@@ -81,9 +77,7 @@ export class GeolocationService {
   public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location): number {
     let plusCodeLength: number = 11;
     switch (location.zoom) {
-      case 19:
-        plusCodeLength = 11;
-        break;          
+      case 19:    
       case 18:     
       case 17:
       case 16:        
@@ -100,8 +94,6 @@ export class GeolocationService {
       case 9:
       case 8:
       case 7:
-      case 6:
-      case 5:
           plusCodeLength = 4;
         break;
       default:

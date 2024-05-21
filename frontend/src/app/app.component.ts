@@ -140,9 +140,19 @@ export class AppComponent implements OnInit {
       },
       error: (error) => {
         if (error.code == 1) {
-          this.snackBarRef = this.snackBar.open(`Location is required for message drop to work correctly. Please authorize.` , 'OK');
+          this.snackBarRef = this.snackBar.open(`Please authorize location.` , 'OK',  {
+            panelClass: ['snack-info'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 1000
+          });
         } else {
-          this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later." , 'OK');
+          this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later." , 'OK',  {
+            panelClass: ['snack-info'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 1000
+          });
         }
         this.locationReady = false;
         this.snackBarRef.afterDismissed().subscribe(() => {
@@ -159,9 +169,12 @@ export class AppComponent implements OnInit {
                 this.messages = [...getMessageResponse.rows];
               },
               error: (err) => {
-                this.messages.length = 0;
-                this.snackBarRef = this.snackBar.open("No message at this place. Be the first to leave a message.", undefined , {
-                  duration: 3000
+                this.messages = [];
+                this.snackBarRef = this.snackBar.open("No message found", undefined , {
+                  panelClass: ['snack-warning'],
+                  horizontalPosition: 'center',
+                  verticalPosition: 'top',
+                  duration: 1000
                 });
               },
               complete:() => {}

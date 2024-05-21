@@ -135,7 +135,7 @@ export class MapService {
           'plusCode': message.plusCode || '',
           'zoom': this.map.getZoom()
         };
-        if (this.map.getZoom() >= 19) {
+        if (this.map.getZoom() > 16) {
           let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageDropMarker, zIndexOffset: 0})
           marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.showMessagesFromMarker($event.target, messageLocation);
