@@ -16,11 +16,15 @@ import { MessageService } from '../../services/message.service';
 import { MapService } from '../../services/map.service';
 import { Location } from '../../interfaces/location';
 import { GeolocationService } from '../../services/geolocation.service';
+import { MatBadgeModule } from '@angular/material/badge';
+import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 
 @Component({
   selector: 'app-messagelist',
   standalone: true,
   imports: [
+    ShortNumberPipe,
+    MatBadgeModule,
     MatCardModule,
     MatDialogContainer,
     CommonModule, 
@@ -39,6 +43,7 @@ import { GeolocationService } from '../../services/geolocation.service';
 })
 export class MessagelistComponent implements OnInit{
   public messages!: Message[];
+  public selectedMessages: Message[] = [];
   public user!: User;
   public animation!: Animation;
 
@@ -75,6 +80,14 @@ export class MessagelistComponent implements OnInit{
     this.messageService.navigateToMessageLocation(this.user, message)
   }
 
+  public goBack() {
+    this.selectedMessages.pop();
+  }
+
+  public goToMessageDetails(message: Message) {
+    this.selectedMessages.push(message);
+  }
+
   public likeMessage(message: Message) {
     this.messageService.likeMessage(message, this.user)
             .subscribe({
@@ -89,12 +102,12 @@ export class MessagelistComponent implements OnInit{
             });
   }
 
-  public unlikeMessage(message: Message) {
+  public dislikeMessage(message: Message) {
     this.messageService.unlikeMessage(message, this.user)
             .subscribe({
               next: (simpleStatusResponse) => {
                 if (simpleStatusResponse.status === 200) {
-                  message.likes = message.likes + 1;
+                  message.dislikes = message.dislikes + 1;
                 }
               },
               error: (err) => {
