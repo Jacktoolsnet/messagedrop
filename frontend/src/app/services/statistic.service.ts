@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { environment } from '../../environments/environment';
 import { catchError, retry, throwError } from 'rxjs';
 import { User } from '../interfaces/user';
-import { GetStatisticCountResponse } from '../interfaces/get-statistic-count-response';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 @Injectable({
   providedIn: 'root'
@@ -25,14 +25,14 @@ export class StatisticService {
   }
 
   countVisitor() {
-    return this.http.get<GetStatisticCountResponse>(`${environment.apiUrl}/statistic/count/visitor`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/statistic/count/visitor`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   countMessage() {
-    return this.http.get<GetStatisticCountResponse>(`${environment.apiUrl}/statistic/count/message`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/statistic/count/message`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

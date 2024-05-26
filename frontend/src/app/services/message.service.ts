@@ -8,6 +8,7 @@ import { User } from '../interfaces/user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GeolocationService } from './geolocation.service';
 import { Message } from '../interfaces/message';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 
 @Injectable({
@@ -47,7 +48,14 @@ export class MessageService {
   }
 
   likeMessage(message: Message, user: User) {
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/like/${message.id}/by/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  unlikeMessage(message: Message, user: User) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

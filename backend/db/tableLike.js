@@ -12,10 +12,10 @@ const init = function (db) {
             ${columnLikeUserId} TEXT NOT NULL,
             PRIMARY KEY (${columnLikeMessageId}, ${columnLikeUserId}),
             FOREIGN KEY (${columnLikeMessageId}) 
-            REFERENCES tableMessage (messageId) 
+            REFERENCES tableMessage (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
             FOREIGN KEY (${columnLikeUserId}) 
-            REFERENCES tableUser (userId) 
+            REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE
         );`;
 
@@ -39,17 +39,16 @@ const like = function (db, messageId, userId, callback) {
             ${messageId},
             '${userId}'
         );`;
-
         db.run(sql, (err) => {
             if (err) {
                 callback(err)
             } else {
                 sql = `
                 UPDATE tableMessage 
-                SET messageLikes = (
+                SET likes = (
                     SELECT COUNT(ALL) FROM tableLike
                     WHERE ${columnLikeMessageId} = ${messageId}
-                ) WHERE messageId = ${messageId};`
+                ) WHERE id = ${messageId};`
                 db.run(sql, (err) => {
                     callback(err);
                 });
@@ -65,17 +64,16 @@ const unlike = function (db, messageId, userId, callback) {
         let sql = `
         DELETE FROM ${tableName}
         WHERE ${columnLikeMessageId} = ${messageId} AND ${columnLikeUserId} = '${userId}';`;
-
         db.run(sql, (err) => {
             if (err) {
                 callback(err)
             } else {
                 sql = `
                 UPDATE tableMessage 
-                SET messageLikes = (
+                SET likes = (
                     SELECT COUNT(ALL) FROM tableLike
                     WHERE ${columnLikeMessageId} = ${messageId}
-                ) WHERE messageId = ${messageId};`
+                ) WHERE id = ${messageId};`
                 db.run(sql, (err) => {
                     callback(err);
                 });

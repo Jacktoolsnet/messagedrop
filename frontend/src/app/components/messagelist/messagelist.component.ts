@@ -76,7 +76,31 @@ export class MessagelistComponent implements OnInit{
   }
 
   public likeMessage(message: Message) {
-    console.log(message);
+    this.messageService.likeMessage(message, this.user)
+            .subscribe({
+              next: (simpleStatusResponse) => {
+                if (simpleStatusResponse.status === 200) {
+                  message.likes = message.likes + 1;
+                }
+              },
+              error: (err) => {
+              },
+              complete:() => {}
+            });
+  }
+
+  public unlikeMessage(message: Message) {
+    this.messageService.unlikeMessage(message, this.user)
+            .subscribe({
+              next: (simpleStatusResponse) => {
+                if (simpleStatusResponse.status === 200) {
+                  message.likes = message.likes + 1;
+                }
+              },
+              error: (err) => {
+              },
+              complete:() => {}
+            });
   }
 
 }

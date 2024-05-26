@@ -4,7 +4,7 @@ const userStatus = {
 };
 
 const tableName = 'tableUser';
-const columnUserId = 'userId';
+const columnUserId = 'id';
 const columnEncryptionPublicKey = 'encryptionPublicKey';
 const columnSigningPublicKey = 'signingPublicKey'; 
 const columnNumberOfMessages = 'numberOfMessages';

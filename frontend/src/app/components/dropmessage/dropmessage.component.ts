@@ -50,11 +50,11 @@ export class DropmessageComponent implements OnInit {
 
   onDropClick(): void {
     let message: Message = {
-      messageId: 0,
-      parentMessageId: 0,
-      messageTyp: 'public',
-      messageCreateDateTime: '',
-      messageDeleteDateTime: '',
+      id: 0,
+      parentId: 0,
+      typ: 'public',
+      createDateTime: '',
+      deleteDateTime: '',
       latitude: 0,
       longitude: 0,
       plusCode: '',

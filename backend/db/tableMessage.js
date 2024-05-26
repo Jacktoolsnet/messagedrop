@@ -13,11 +13,11 @@ const messageStatus = {
 
 const tableName = 'tableMessage';
 
-const columnMessageId = 'messageId';
-const columnParentMessageId = 'parentMessageId';
-const columnMessageType = 'messageTyp'; // Public, private, friend, comment
-const columnMessageCreateDateTime = 'messageCreateDateTime';
-const columnMessageDeleteDateTime = 'messageDeleteDateTime'; // On creation the message has a lifetime of 30 Days
+const columnMessageId = 'id';
+const columnParentMessageId = 'parentId';
+const columnMessageType = 'typ'; // Public, private, friend, comment
+const columnMessageCreateDateTime = 'createDateTime';
+const columnMessageDeleteDateTime = 'deleteDateTime'; // On creation the message has a lifetime of 30 Days
 const columnLatitude = 'latitude';
 const columnLongtitude = 'longitude';
 const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
