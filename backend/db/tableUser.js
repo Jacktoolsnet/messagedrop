@@ -50,7 +50,6 @@ const create = function (db, userId, encryptionPublicKey, signingPublicKey, call
             '${signingPublicKey}', 
             datetime('now')
         );`;
-
         db.run(sql, (err) => {
             callback(err)
         });

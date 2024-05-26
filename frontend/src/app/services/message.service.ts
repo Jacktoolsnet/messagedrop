@@ -46,6 +46,13 @@ export class MessageService {
       );
   }
 
+  likeMessage(message: Message, user: User) {
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   getByPlusCode(location: Location) {
     let plusCode: String = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)

@@ -75,4 +75,8 @@ export class MessagelistComponent implements OnInit{
     this.messageService.navigateToMessageLocation(this.user, message)
   }
 
+  public likeMessage(message: Message) {
+    console.log(message);
+  }
+
 }

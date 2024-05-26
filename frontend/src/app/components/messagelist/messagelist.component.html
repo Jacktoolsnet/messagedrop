@@ -12,7 +12,7 @@
                 </mat-card-header-->
                 <mat-card-content [style]="message.style">{{message.message}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
-                    <button mat-mini-fab color="secondary" aria-label="Like message">
+                    <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                         <mat-icon class="material-symbols-outlined">thumb_up</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Dislike message">

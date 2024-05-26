@@ -50,19 +50,24 @@ router.get('/get/:userId', [security.checkToken], function(req, res) {
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  let userId = uuid.v4();
-    tableUser.create(req.database.db, userId, req.body.encryptionPublicKey, req.body.signingPublicKey, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-        response.userId = userId;
-      }
-      res.setHeader('Content-Type', 'application/json');
-      res.status(response.status);
-      res.json(response);
-    });
+  let userId;
+  if (undefined === req.body.userId || req.body.userId === '') {
+    userId = uuid.v4();
+  } else {
+    userId = req.body.userId;
+  }
+  tableUser.create(req.database.db, userId, req.body.encryptionPublicKey, req.body.signingPublicKey, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+      response.userId = userId;
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.status(response.status);
+    res.json(response);
+  });
 });
 
 router.get('/clean', [security.checkToken], function(req, res) {
