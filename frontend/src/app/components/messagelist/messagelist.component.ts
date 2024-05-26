@@ -103,7 +103,7 @@ export class MessagelistComponent implements OnInit{
   }
 
   public dislikeMessage(message: Message) {
-    this.messageService.unlikeMessage(message, this.user)
+    this.messageService.dislikeMessage(message, this.user)
             .subscribe({
               next: (simpleStatusResponse) => {
                 if (simpleStatusResponse.status === 200) {

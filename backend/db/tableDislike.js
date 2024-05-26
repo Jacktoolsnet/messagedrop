@@ -12,10 +12,10 @@ const init = function (db) {
             ${columnDislikeUserId} TEXT NOT NULL,
             PRIMARY KEY (${columnDislikeMessageId}, ${columnDislikeUserId}),
             FOREIGN KEY (${columnDislikeMessageId}) 
-            REFERENCES tableMessage (messageId) 
+            REFERENCES tableMessage (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
             FOREIGN KEY (${columnDislikeUserId}) 
-            REFERENCES tableUser (userId) 
+            REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE
         );`;
 
@@ -46,14 +46,29 @@ const dislike = function (db, messageId, userId, callback) {
             } else {
                 sql = `
                 UPDATE tableMessage 
-                SET messageDislikes = (
+                SET dislikes = (
                     SELECT COUNT(ALL) FROM tableDislike
                     WHERE ${columnDislikeMessageId} = ${messageId}
-                ) WHERE messageId = ${messageId};`
+                ) WHERE id = ${messageId};`
                 db.run(sql, (err) => {
                     callback(err);
                 });
             }            
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const dislikedByUser = function (db, messageId, userId, callback) {
+    try {
+        let sql = `
+        SELECT COUNT(ALL) AS dislikedByUser FROM ${tableName} 
+        WHERE ${columnDislikeMessageId} = ?
+        AND  ${columnDislikeUserId} = ?;`;
+
+        db.get(sql, [messageId, userId], (err, row) => {
+            callback(err, row);
         });
     } catch (error) {
         throw error;
@@ -65,17 +80,16 @@ const undislike = function (db, messageId, userId, callback) {
         let sql = `
         DELETE FROM ${tableName}
         WHERE ${columnDislikeMessageId} = ${messageId} AND ${columnDislikeUserId} = '${userId}';`;
-
         db.run(sql, (err) => {
             if (err) {
                 callback(err)
             } else {
                 sql = `
                 UPDATE tableMessage 
-                SET messageDislikes = (
+                SET dislikes = (
                     SELECT COUNT(ALL) FROM tableDislike
                     WHERE ${columnDislikeMessageId} = ${messageId}
-                ) WHERE messageId = ${messageId};`
+                ) WHERE id = ${messageId};`
                 db.run(sql, (err) => {
                     callback(err);
                 });
@@ -89,5 +103,6 @@ const undislike = function (db, messageId, userId, callback) {
 module.exports = {
     init,
     dislike,
+    dislikedByUser,
     undislike
 }

@@ -54,8 +54,8 @@ export class MessageService {
       );
   }
 
-  unlikeMessage(message: Message, user: User) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`, this.httpOptions)
+  dislikeMessage(message: Message, user: User) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

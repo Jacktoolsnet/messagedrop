@@ -59,6 +59,21 @@ const like = function (db, messageId, userId, callback) {
     }
 };
 
+const likedByUser = function (db, messageId, userId, callback) {
+    try {
+        let sql = `
+        SELECT COUNT(ALL) AS likedByUser FROM ${tableName} 
+        WHERE ${columnLikeMessageId} = ?
+        AND  ${columnLikeUserId} = ?;`;
+
+        db.get(sql, [messageId, userId], (err, row) => {
+            callback(err, row);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const unlike = function (db, messageId, userId, callback) {
     try {
         let sql = `
@@ -87,5 +102,6 @@ const unlike = function (db, messageId, userId, callback) {
 module.exports = {
     init,
     like,
+    likedByUser,
     unlike
 }

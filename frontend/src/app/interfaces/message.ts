@@ -14,6 +14,8 @@ export interface Message {
     likes: number,
     dislikes: number,
     status: string,
-    userId: string
+    userId: string,
+    likedByUser?: boolean,
+    dislikedByUser?: boolean
 }
 
