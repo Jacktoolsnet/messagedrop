@@ -9,6 +9,8 @@ import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GeolocationService } from './geolocation.service';
 import { Message } from '../interfaces/message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { LikedByUserResponse } from '../interfaces/liked-by-user-respons';
+import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
 
 
 @Injectable({
@@ -54,8 +56,36 @@ export class MessageService {
       );
   }
 
+  unlikeMessage(message: Message, user: User) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  messageLikedByUser(message: Message, user: User) {
+    return this.http.get<LikedByUserResponse>(`${environment.apiUrl}/message/id/${message.id}/likedby/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   dislikeMessage(message: Message, user: User) {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  undislikeMessage(message: Message, user: User) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  messageDislikedByUser(message: Message, user: User) {
+    return this.http.get<DislikedByUserResponse>(`${environment.apiUrl}/message/id/${message.id}/dislikedby/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

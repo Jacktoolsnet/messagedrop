@@ -46,6 +46,8 @@ export class MessagelistComponent implements OnInit{
   public selectedMessages: Message[] = [];
   public user!: User;
   public animation!: Animation;
+  public likeButtonColor: string = 'secondary';
+  public dislikeButtonColor: string = 'secondary';
 
   constructor(
     private messageService: MessageService,
@@ -86,14 +88,49 @@ export class MessagelistComponent implements OnInit{
 
   public goToMessageDetails(message: Message) {
     this.selectedMessages.push(message);
+    this.messageLikedByUser(message);
+    this.messageDislikedByUser(message);
   }
 
   public likeMessage(message: Message) {
-    this.messageService.likeMessage(message, this.user)
+    if (!message.likedByUser) {
+      this.messageService.likeMessage(message, this.user)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    message.likes = message.likes + 1;
+                    this.likeButtonColor = 'primary';
+                    message.likedByUser = true;
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+    } else {
+      this.messageService.unlikeMessage(message, this.user)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    message.likes = message.likes - 1;
+                    this.likeButtonColor = 'secondary';
+                    message.likedByUser = false;
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+    }
+  }
+
+  public messageLikedByUser(message: Message) {
+    this.messageService.messageLikedByUser(message, this.user)
             .subscribe({
-              next: (simpleStatusResponse) => {
-                if (simpleStatusResponse.status === 200) {
-                  message.likes = message.likes + 1;
+              next: (likedByUserResponse) => {
+                if (likedByUserResponse.status === 200 && likedByUserResponse.likedByUser) {
+                  this.likeButtonColor = 'primary';
+                  message.likedByUser = true;
                 }
               },
               error: (err) => {
@@ -103,11 +140,44 @@ export class MessagelistComponent implements OnInit{
   }
 
   public dislikeMessage(message: Message) {
-    this.messageService.dislikeMessage(message, this.user)
+    if (!message.dislikedByUser) {
+      this.messageService.dislikeMessage(message, this.user)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    message.dislikes = message.dislikes + 1;
+                    this.dislikeButtonColor = 'primary';
+                    message.dislikedByUser = true;
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+    } else {
+      this.messageService.undislikeMessage(message, this.user)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    message.dislikes = message.dislikes - 1;
+                    this.dislikeButtonColor = 'secondary';
+                    message.dislikedByUser = false;
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+    }
+  }
+
+  public messageDislikedByUser(message: Message) {
+    this.messageService.messageDislikedByUser(message, this.user)
             .subscribe({
-              next: (simpleStatusResponse) => {
-                if (simpleStatusResponse.status === 200) {
-                  message.dislikes = message.dislikes + 1;
+              next: (dislikedByUserResponse) => {
+                if (dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser) {
+                  this.dislikeButtonColor = 'primary';
+                  message.dislikedByUser = true;
                 }
               },
               error: (err) => {

@@ -32,11 +32,11 @@
                 </mat-card-header>
                 <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
-                    <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon class="material-symbols-outlined">thumb_up</mat-icon>
+                    <button mat-mini-fab [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon class="material-symbols-outlined">thumb_down</mat-icon>
+                    <button mat-mini-fab [color]="dislikeButtonColor" aria-label="Dislike message" (click)="dislikeMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined"matBadge="{{selectedMessages[selectedMessages.length - 1].dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true" >thumb_down</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Drop a comment">
                         <mat-icon class="material-symbols-outlined">add_comment</mat-icon>

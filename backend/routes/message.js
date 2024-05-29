@@ -266,7 +266,7 @@ router.get('/id/:messageId/dislikedby/:userId', [security.checkToken], function(
         response.dislikedByUser = false;
         response.status = 404;
       } else {
-        response.likedByUser = row.dislikedByUser === 0 ? false : true;
+        response.dislikedByUser = row.dislikedByUser === 0 ? false : true;
         response.status = 200;
       }
     }
