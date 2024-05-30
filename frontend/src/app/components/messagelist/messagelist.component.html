@@ -12,6 +12,7 @@
                 </mat-card-header-->
                 <mat-card-content [style]="message.style">{{message.message}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>    
                 </mat-card-actions>

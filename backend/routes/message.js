@@ -291,4 +291,19 @@ router.get('/undislike/:messageId/by/:userId', [security.checkToken], function(r
   });
 });
 
+router.get('/countview/:messageId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tableMessage.countView(req.database.db, req.params.messageId, function(err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 module.exports = router

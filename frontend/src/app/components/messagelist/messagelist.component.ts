@@ -88,6 +88,7 @@ export class MessagelistComponent implements OnInit{
 
   public goToMessageDetails(message: Message) {
     this.selectedMessages.push(message);
+    this.messageCountView(message);
     this.messageLikedByUser(message);
     this.messageDislikedByUser(message);
   }
@@ -178,6 +179,20 @@ export class MessagelistComponent implements OnInit{
                 if (dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser) {
                   this.dislikeButtonColor = 'primary';
                   message.dislikedByUser = true;
+                }
+              },
+              error: (err) => {
+              },
+              complete:() => {}
+            });
+  }
+
+  private messageCountView(message: Message) {
+    this.messageService.countView(message)
+            .subscribe({
+              next: (likedByUserResponse) => {
+                if (likedByUserResponse.status === 200) {
+                  message.views = message.views + 1;
                 }
               },
               error: (err) => {

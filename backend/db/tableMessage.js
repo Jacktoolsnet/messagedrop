@@ -137,16 +137,6 @@ const getByPlusCode = function (db, plusCode, callback) {
         ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
         db.all(sql, [plusCode], (err, rows) => {
-            // Update views
-            sql = `
-            UPDATE ${tableName}
-            SET ${columnViews} = ${columnViews} + 1
-            WHERE ${columnMessageId} = ?;`
-            
-            rows.forEach((row) => {
-                db.run(sql, [row.messageId], (err) => {
-                });
-            });
             callback(err, rows);
         });
     } catch (error) {
@@ -162,6 +152,21 @@ const getByParentId = function (db, parentMessageId, callback) {
 
         db.all(sql, [parentMessageId], (err, rows) => {
             callback(err, rows);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const countView = function (db, messageId, callback) {
+    try{
+        sql = `
+        UPDATE ${tableName}
+        SET ${columnViews} = ${columnViews} + 1
+        WHERE ${columnMessageId} = ?;`
+
+        db.run(sql, [messageId], (err) => {
+            callback(err);
         });
     } catch (error) {
         throw error;
@@ -273,6 +278,7 @@ module.exports = {
     getById,
     getByPlusCode,
     getByParentId,
+    countView,
     deleteById,
     cleanPublic
 }

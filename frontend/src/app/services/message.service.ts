@@ -112,4 +112,10 @@ export class MessageService {
     window.open(url, '_blank');
   }
 
+  countView(message: Message) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countview/${message.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }
