@@ -140,7 +140,7 @@ router.get('/clean/public', [security.checkToken], function(req, res) {
   });
 });
 
-router.put('/disable/:messageId', [security.checkToken], function(req, res) {
+router.get('/disable/:messageId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
   tableMessage.disableMessage(req.database.db, req.params.messageId, function(err) {
     if (err) {
@@ -155,7 +155,7 @@ router.put('/disable/:messageId', [security.checkToken], function(req, res) {
   });
 });
 
-router.put('/enable/:messageId', [security.checkToken], function(req, res) {
+router.get('/enable/:messageId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
   tableMessage.enableMessage(req.database.db, req.params.messageId, function(err) {
     if (err) {
@@ -170,7 +170,7 @@ router.put('/enable/:messageId', [security.checkToken], function(req, res) {
   });
 });
 
-router.delete('/delete/:messageId', [security.checkToken], function(req, res) {
+router.get('/delete/:messageId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
   tableMessage.deleteById(req.database.db, req.params.messageId, function(err) {
     if (err) {

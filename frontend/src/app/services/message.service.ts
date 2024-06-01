@@ -118,4 +118,18 @@ export class MessageService {
         catchError(this.handleError)
       );
   }
+
+  disableMessage(message: Message) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/disable/${message.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  deleteMessage(message: Message) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/delete/${message.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }

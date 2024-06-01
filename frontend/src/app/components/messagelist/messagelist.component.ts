@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -18,6 +18,8 @@ import { Location } from '../../interfaces/location';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
+import { BlockmessageComponent } from './blockmessage/blockmessage.component';
+import { DeletemessageComponent } from './deletemessage/deletemessage.component';
 
 @Component({
   selector: 'app-messagelist',
@@ -54,6 +56,7 @@ export class MessagelistComponent implements OnInit{
     private mapService: MapService,
     private geolocationService: GeolocationService,
     public dialogRef: MatDialogRef<MessagelistComponent>,
+    public dialog: MatDialog,
     private style:StyleService,
     @Inject(MAT_DIALOG_DATA) public data: {user: User, messages: Message[]}
   ) {
@@ -132,6 +135,9 @@ export class MessagelistComponent implements OnInit{
                 if (likedByUserResponse.status === 200 && likedByUserResponse.likedByUser) {
                   this.likeButtonColor = 'primary';
                   message.likedByUser = true;
+                } else {
+                  this.likeButtonColor = 'secondary';
+                  message.likedByUser = false;
                 }
               },
               error: (err) => {
@@ -179,6 +185,9 @@ export class MessagelistComponent implements OnInit{
                 if (dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser) {
                   this.dislikeButtonColor = 'primary';
                   message.dislikedByUser = true;
+                } else {
+                  this.dislikeButtonColor = 'secondary';
+                  message.dislikedByUser = false;
                 }
               },
               error: (err) => {
@@ -201,4 +210,52 @@ export class MessagelistComponent implements OnInit{
             });
   }
 
+  public disableMessage(message: Message) {
+    const dialogRef = this.dialog.open(BlockmessageComponent, {
+      hasBackdrop: true 
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.messageService.disableMessage(message)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    this.messages = this.messages.filter( element => element.id !== message.id );
+                    this.selectedMessages.pop();
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+      }
+    });
+  }
+
+  public deleteMessage(message: Message) {
+    const dialogRef = this.dialog.open(DeletemessageComponent, {
+      hasBackdrop: true 
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.messageService.deleteMessage(message)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    this.messages = this.messages.filter( element => element.id !== message.id );
+                    this.selectedMessages.pop();
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+      }
+    });
+  }
+
+  public editMessage(message: Message) {
+  }
 }

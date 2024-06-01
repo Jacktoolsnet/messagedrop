@@ -14,7 +14,8 @@
                 <mat-card-actions class="buttonbar">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>    
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{0 | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>    
                 </mat-card-actions>
             </mat-card>
         </div>
@@ -28,19 +29,28 @@
         <div class="item">
             <mat-card>
                 <mat-card-header>
-                    <mat-card-title>Name</mat-card-title>
+                    <mat-card-title>Unnamed user</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
-                    <button mat-mini-fab [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
+                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
                     </button>
-                    <button mat-mini-fab [color]="dislikeButtonColor" aria-label="Dislike message" (click)="dislikeMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined"matBadge="{{selectedMessages[selectedMessages.length - 1].dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true" >thumb_down</mat-icon>
+                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="dislikeButtonColor" aria-label="Dislike message" (click)="dislikeMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true" >thumb_down</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Drop a comment">
+                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >visibility_off</mat-icon>
+                    </button>
+                    <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Drop a comment">
                         <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
+                    </button>
+                    <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
+                    </button>
+                    <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon class="material-symbols-outlined">place</mat-icon>
