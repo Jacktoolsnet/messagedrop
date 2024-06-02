@@ -266,7 +266,7 @@ export class MessagelistComponent implements OnInit{
 
   public editMessage(message: Message) {
     // For developement == else !=
-    if (message.userId == this.user.id) {
+    if (message.userId != this.user.id) {
       // Edit user of this message
       if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
         this.selectedMessageUser.id = message.userId;
@@ -283,7 +283,7 @@ export class MessagelistComponent implements OnInit{
       });
     } else {
       // Edit Message
-      console.log('edit message');
+      // console.log('edit message');
     }
   }
 }
