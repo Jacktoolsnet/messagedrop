@@ -87,6 +87,8 @@ export class MessagelistComponent implements OnInit{
 
   public goBack() {
     this.selectedMessages.pop();
+    this.likeButtonColor = 'secondary';
+    this.dislikeButtonColor = 'secondary';
   }
 
   public goToMessageDetails(message: Message) {
