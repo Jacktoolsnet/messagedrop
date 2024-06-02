@@ -20,6 +20,9 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { BlockmessageComponent } from './blockmessage/blockmessage.component';
 import { DeletemessageComponent } from './deletemessage/deletemessage.component';
+import { EditUserComponent } from './edit-user/edit-user.component';
+import { RelatedUserService } from '../../services/related-user.service';
+import { RelatedUser } from '../../interfaces/related-user';
 
 @Component({
   selector: 'app-messagelist',
@@ -46,6 +49,7 @@ import { DeletemessageComponent } from './deletemessage/deletemessage.component'
 export class MessagelistComponent implements OnInit{
   public messages!: Message[];
   public selectedMessages: Message[] = [];
+  public selectedMessageUser!: RelatedUser;
   public user!: User;
   public animation!: Animation;
   public likeButtonColor: string = 'secondary';
@@ -55,6 +59,7 @@ export class MessagelistComponent implements OnInit{
     private messageService: MessageService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
+    private relatedUserService: RelatedUserService,
     public dialogRef: MatDialogRef<MessagelistComponent>,
     public dialog: MatDialog,
     private style:StyleService,
@@ -93,6 +98,7 @@ export class MessagelistComponent implements OnInit{
 
   public goToMessageDetails(message: Message) {
     this.selectedMessages.push(message);
+    this.selectedMessageUser = this.relatedUserService.loadUser(message.userId);
     this.messageCountView(message);
     this.messageLikedByUser(message);
     this.messageDislikedByUser(message);
@@ -259,5 +265,25 @@ export class MessagelistComponent implements OnInit{
   }
 
   public editMessage(message: Message) {
+    // For developement == else !=
+    if (message.userId == this.user.id) {
+      // Edit user of this message
+      if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
+        this.selectedMessageUser.id = message.userId;
+      }
+      const dialogRef = this.dialog.open(EditUserComponent, {
+        data: {relatedUser: this.selectedMessageUser},
+        hasBackdrop: true 
+      });
+  
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.relatedUserService.saveUser(result);
+        }
+      });
+    } else {
+      // Edit Message
+      console.log('edit message');
+    }
   }
 }

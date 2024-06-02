@@ -29,7 +29,7 @@
         <div class="item">
             <mat-card>
                 <mat-card-header>
-                    <mat-card-title>Unnamed user</mat-card-title>
+                    <mat-card-title>{{selectedMessageUser.name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
@@ -49,7 +49,7 @@
                     <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
                     </button>
-                    <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">
+                    <button *ngIf="true" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(selectedMessages[selectedMessages.length - 1])">

@@ -35,7 +35,10 @@ export class UserService {
       user = {
         id : 'undefined',
         location : { latitude: 0, longitude: 0, zoom: 0, plusCode: ''},
-        name : 'unknown user'
+        encryptionKeyPair: undefined,
+        signingKeyPair: undefined,
+        name : 'Unnamed user',
+        base64Avatar: ''
       }
     } else {
       user = {
@@ -43,7 +46,7 @@ export class UserService {
         location : undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: ''},
         encryptionKeyPair : undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
         signingKeyPair : undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
-        name : undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'unknown user',
+        name : undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
         base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
       }
     }
