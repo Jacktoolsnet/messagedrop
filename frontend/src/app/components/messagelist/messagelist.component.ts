@@ -104,6 +104,10 @@ export class MessagelistComponent implements OnInit{
     this.messageDislikedByUser(message);
   }
 
+  public getMessageUserName(message: Message): RelatedUser {
+    return this.relatedUserService.loadUser(message.userId);
+  }
+
   public likeMessage(message: Message) {
     if (!message.likedByUser) {
       this.messageService.likeMessage(message, this.user)

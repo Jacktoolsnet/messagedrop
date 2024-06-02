@@ -6,10 +6,10 @@
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
         <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">
             <mat-card>
-                <!--mat-card-header>
-                    <mat-card-title>Name</mat-card-title>
-                    <mat-card-subtitle>Views: {{message.messageViews}} | Likes: Views: {{message.messageLikes}} | Dislikes: {{message.messageDislikes}}</mat-card-subtitle>
-                </mat-card-header-->
+                <mat-card-header>
+                    <mat-card-title>{{getMessageUserName(message).name}}</mat-card-title>
+                    <mat-card-subtitle></mat-card-subtitle>
+                </mat-card-header>
                 <mat-card-content [style]="message.style">{{message.message}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
@@ -29,7 +29,7 @@
         <div class="item">
             <mat-card>
                 <mat-card-header>
-                    <mat-card-title>{{selectedMessageUser.name}}</mat-card-title>
+                    <mat-card-title (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
