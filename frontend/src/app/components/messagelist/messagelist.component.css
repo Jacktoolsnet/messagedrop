@@ -25,11 +25,11 @@ button {
 
 .button_back {
     position: absolute;
-	top: 0;
+	  top: 0;
     right:    0;
     z-index: 100;
-    margin-top: 0.5rem;
-    margin-right: 0.5rem;
+    margin-top: -1rem;
+    margin-right: -1rem;
 }
 
 .gradientAnimation {
@@ -74,3 +74,28 @@ button {
     border-radius: 0.75rem;
     background-color: #f8f8f8e9;
 }
+
+.center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
+
+.avatar {
+    position: absolute;
+    top: 0;
+    left:    0;
+    z-index: 100;
+    margin-top: -1rem;
+    margin-left: -1rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 1.25rem;
+  }
+
+  .header {
+    overflow: hidden;
+    margin-right: 1rem;
+  }

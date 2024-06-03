@@ -1,8 +1,23 @@
-<h2 mat-dialog-title>Edit user</h2>
+<h2 mat-dialog-title>Edit the user</h2>
 <mat-dialog-content>
     Give the user a name
-    <input matInput type="text" placeholder="User name.." [(ngModel)]="relatedUser.name">
-    <h5>This information is stored on your device and is only visible to you.</h5>
+    <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="relatedUser.name">
+    <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input" (change)="onFileSelected($event)" #fileUpload>
+    <div class="center-left" *ngIf="relatedUser.base64Avatar == ''">
+        Give the user an avatar: 
+        <button mat-mini-fab color="primary"  class="upload-button" (click)="fileUpload.click()">
+            <mat-icon>attach_file</mat-icon>
+        </button>
+   </div>   
+   <div class="center">
+    <img *ngIf="relatedUser.base64Avatar != ''" class="avatar" src="{{relatedUser.base64Avatar}}" /><br>    
+  </div>
+  <div class="center" *ngIf="relatedUser.base64Avatar != ''">      
+    <button *ngIf="relatedUser.base64Avatar != ''" mat-mini-fab color="primary"  class="upload-button" (click)="deleteAvatar()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+  <h5>This information is stored on your device and is only visible to you.</h5>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>

@@ -6,6 +6,8 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { RelatedUser } from '../../../interfaces/related-user';
+import { MatIcon } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-edit-user',
@@ -18,7 +20,9 @@ import { RelatedUser } from '../../../interfaces/related-user';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    MatIcon,
+    CommonModule
   ],
   templateUrl: './edit-user.component.html',
   styleUrl: './edit-user.component.css'
@@ -34,4 +38,28 @@ export class EditUserComponent {
     onAbortClick(): void {
       this.dialogRef.close();
     }
+
+    onFileSelected(event: any) {
+      const file : File = event.target.files[0];
+
+      if (file) {
+        let reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = this.handleFile.bind(this);
+        reader.onerror = this.handleFileError.bind(this);
+      }
+    }
+
+    handleFile(event: any) {
+      this.relatedUser.base64Avatar = event.target.result;
+    }
+
+    handleFileError(event: any) {
+    
+    }
+
+    deleteAvatar(){
+      this.relatedUser.base64Avatar = '';
+    }
+
 }

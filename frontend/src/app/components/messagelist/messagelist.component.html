@@ -3,10 +3,11 @@
         'list': true, 
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
-        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
-        <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">
+        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
+        <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">            
             <mat-card>
-                <mat-card-header>
+                <img *ngIf="getMessageUserName(message).base64Avatar != ''" class="avatar" src="{{getMessageUserName(message).base64Avatar}}" />
+                <mat-card-header class="header">
                     <mat-card-title>{{getMessageUserName(message).name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
@@ -25,10 +26,11 @@
         'list': true, 
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
-        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
-        <div class="item">
+        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
+        <div class="item">            
             <mat-card>
-                <mat-card-header>
+                <img *ngIf="selectedMessageUser.base64Avatar != ''" class="avatar" src="{{selectedMessageUser.base64Avatar}}" />
+                <mat-card-header class="header">
                     <mat-card-title (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
