@@ -6,9 +6,11 @@
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
         <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">            
             <mat-card>
-                <img *ngIf="getMessageUserName(message).base64Avatar != ''" class="avatar" src="{{getMessageUserName(message).base64Avatar}}" />
+                <img *ngIf="user.base64Avatar != '' && user.id == message.userId" class="avatar" src="{{user.base64Avatar}}" />
+                <img *ngIf="getMessageUserName(message).base64Avatar != '' && user.id != message.userId" class="avatar" src="{{getMessageUserName(message).base64Avatar}}" />
                 <mat-card-header class="header">
-                    <mat-card-title>{{getMessageUserName(message).name}}</mat-card-title>
+                    <mat-card-title *ngIf="user.id == message.userId">{{user.name}}</mat-card-title>
+                    <mat-card-title *ngIf="user.id != message.userId">{{getMessageUserName(message).name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content [style]="message.style">{{message.message}}</mat-card-content>
@@ -29,9 +31,11 @@
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
         <div class="item">            
             <mat-card>
-                <img *ngIf="selectedMessageUser.base64Avatar != ''" class="avatar" src="{{selectedMessageUser.base64Avatar}}" />
+                <img *ngIf="user.base64Avatar != '' && user.id == selectedMessages[selectedMessages.length - 1].userId" class="avatar" src="{{user.base64Avatar}}" />
+                <img *ngIf="selectedMessageUser.base64Avatar != '' && user.id != selectedMessages[selectedMessages.length - 1].userId" class="avatar" src="{{selectedMessageUser.base64Avatar}}" />
                 <mat-card-header class="header">
-                    <mat-card-title (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
+                    <mat-card-title *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{user.name}}</mat-card-title>
+                    <mat-card-title *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>

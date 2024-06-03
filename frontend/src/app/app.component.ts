@@ -9,6 +9,7 @@ import { UserService } from './services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
@@ -19,6 +20,8 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { Message } from './interfaces/message';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { MapService } from './services/map.service';
+import { ShortNumberPipe } from './pipes/short-number.pipe';
+import { ProfileComponent } from './components/user/profile/profile.component';
 
 @Component({
   selector: 'app-root',
@@ -34,7 +37,11 @@ import { MapService } from './services/map.service';
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
-    MatDialogClose],
+    MatDialogClose,
+    ShortNumberPipe,
+    MatMenuModule,
+    MatButtonModule
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
@@ -54,7 +61,8 @@ export class AppComponent implements OnInit {
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDropDialog: MatDialog,
-    public messageListDialog: MatDialog) { }
+    public messageListDialog: MatDialog,
+    public userProfileDialog: MatDialog) { }
 
   ngOnInit(): void {
     this.loadUser();
@@ -261,6 +269,19 @@ export class AppComponent implements OnInit {
               error: (err) => {},
               complete:() => {}
             });
+  }
+
+  editUserProfile() {
+    const dialogRef = this.userProfileDialog.open(ProfileComponent, {
+      data: {user: this.user},
+      hasBackdrop: true 
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.saveUser(result);
+      }
+    });
   }
 
 }

@@ -1,7 +1,7 @@
 <app-map [location]="mapService.getMapLocation()" [messages]="messages" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
-<!--button *ngIf="userReady" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
-    <mat-icon aria-hidden="false" [matBadge]="'0'" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
-</button-->
+<button *ngIf="userReady" [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
+    <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
+</button>
 
 <button [attr.aria-hidden]="locationReady" class="button_watchLocation" *ngIf="!locationReady" mat-fab color="primary" aria-label="Watch user location" (click)="startWatchingPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
@@ -12,4 +12,15 @@
 <button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDropDialog(user.location)">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">send</mat-icon>
 </button>
+
+<mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="editUserProfile()">
+        <mat-icon>edit</mat-icon>
+        <span>Edit your profile</span>
+    </button>
+    <!--button mat-menu-item>
+        <mat-icon>speaker_notes</mat-icon>
+        <span>Your messages</span>
+    </button-->
+  </mat-menu>
 <router-outlet />
