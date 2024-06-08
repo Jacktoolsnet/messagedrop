@@ -27,6 +27,7 @@ const columnStyle = 'style';
 const columnViews = 'views'; 
 const columnLikes = 'likes'; // Each like add on day to the lifetime of the message.
 const columnDislikes = 'dislikes'; // Each dislike reduce the liftime of the message by one day.
+const columnComments = 'comments';
 const columnStatus = 'status';
 const columnUserId = 'userId';
 
@@ -48,6 +49,7 @@ const init = function (db) {
             ${columnViews} INTEGER NOT NULL DEFAULT 0,
             ${columnLikes} INTEGER NOT NULL DEFAULT 0,
             ${columnDislikes} INTEGER NOT NULL DEFAULT 0,
+            ${columnComments} INTEGER NOT NULL DEFAULT 0,
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnUserId} TEXT NOT NULL,
             FOREIGN KEY (${columnUserId}) 
@@ -122,6 +124,20 @@ const getById = function (db, messageId, callback) {
 
         db.get(sql, [messageId], (err, row) => {
             callback(err, row);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getByUserId = function (db, userId, callback) {
+    try{
+        let sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnUserId} = ?;`;
+
+        db.all(sql, [userId], (err, rows) => {
+            callback(err, rows);
         });
     } catch (error) {
         throw error;
@@ -276,6 +292,7 @@ module.exports = {
     enableMessage,   
     getAll,
     getById,
+    getByUserId,
     getByPlusCode,
     getByParentId,
     countView,

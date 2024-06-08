@@ -16,11 +16,11 @@
 <mat-menu #userMenu="matMenu">
     <button mat-menu-item (click)="editUserProfile()">
         <mat-icon>edit</mat-icon>
-        <span>Edit your profile</span>
+        <span>My profile</span>
     </button>
-    <!--button mat-menu-item>
+    <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon>speaker_notes</mat-icon>
-        <span>Your messages</span>
-    </button-->
+        <span>My messages</span>
+    </button>
   </mat-menu>
 <router-outlet />

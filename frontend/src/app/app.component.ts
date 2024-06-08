@@ -238,18 +238,31 @@ export class AppComponent implements OnInit {
     });
   }
 
-  openMessagListDialog(): void {
-    if (this.messages.length !== 0) {
-      const dialogRef = this.messageListDialog.open(MessagelistComponent, {
-        panelClass: 'MessageListDialog',
-        data: this.messages,
-        width: 'auto',
-        height: 'auto',
-        maxHeight: '90vh',
-        maxWidth:'90vw',
-        hasBackdrop: true      
-      });
-    }
+  openUserMessagListDialog(): void {
+    this.userService.getUserMessages(this.user)
+            .subscribe({
+              next: (getMessageResponse) => {
+                const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+                  panelClass: 'MessageListDialog',
+                  data: {user: this.user, messages: [...getMessageResponse.rows]},
+                  width: 'auto',
+                  height: 'auto',
+                  maxHeight: '90vh',
+                  maxWidth:'90vw',
+                  hasBackdrop: true      
+                });
+              },
+              error: (err) => {
+                this.messages = [];
+                this.snackBarRef = this.snackBar.open("You have not written any messages yet", undefined , {
+                  panelClass: ['snack-warning'],
+                  horizontalPosition: 'center',
+                  verticalPosition: 'top',
+                  duration: 1000
+                });
+              },
+              complete:() => {}
+            });
   }
 
   openMarkerMessageListDialog(location: Location) {

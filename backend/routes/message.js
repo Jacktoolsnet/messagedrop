@@ -49,6 +49,28 @@ router.get('/get/id/:messageId', [security.checkToken], function(req, res) {
   });
 });
 
+router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0, 'rows' : []};
+  tableMessage.getByUserId(req.database.db, req.params.userId, function(err, rows) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      if (rows.length == 0) {
+        response.status = 404;
+      } else {
+        rows.forEach((row) => {
+          response.rows.push(row);
+        });
+        response.status = 200;
+      }
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 router.get('/get/comment/:parentMessageId', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
   tableMessage.getByParentId(req.database.db, req.params.parentMessageId, function(err, rows) {

@@ -6,6 +6,9 @@ import { catchError, retry, throwError } from 'rxjs';
 import { User } from '../interfaces/user';
 import { Keypair } from '../interfaces/keypair';
 import { GetUserResponse } from '../interfaces/get-user-response';
+import { MessageService } from './message.service';
+import { Message } from '../interfaces/message';
+import { GetMessageResponse } from '../interfaces/get-message-response';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +24,7 @@ export class UserService {
     })
   };
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private messageService: MessageService) { }
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -114,6 +117,13 @@ export class UserService {
 
   checkUserById(user: User) {
     return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getUserMessages(user: User) {
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/userId/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

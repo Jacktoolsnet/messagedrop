@@ -99,7 +99,9 @@ export class MessagelistComponent implements OnInit{
   public goToMessageDetails(message: Message) {
     this.selectedMessages.push(message);
     this.selectedMessageUser = this.relatedUserService.loadUser(message.userId);
-    this.messageCountView(message);
+    if (this.user.id !== message.userId) {
+      this.messageCountView(message);
+    }
     this.messageLikedByUser(message);
     this.messageDislikedByUser(message);
   }
