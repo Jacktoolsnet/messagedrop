@@ -13,7 +13,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { Keypair } from './interfaces/keypair';
-import { DropmessageComponent } from './components/dropmessage/dropmessage.component';
+import { MessageComponent } from './components/message/message.component';
 import { MessageService } from './services/message.service';
 import { StatisticService } from './services/statistic.service';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -22,6 +22,7 @@ import { MessagelistComponent } from './components/messagelist/messagelist.compo
 import { MapService } from './services/map.service';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { ProfileComponent } from './components/user/profile/profile.component';
+import { MessageMode } from './interfaces/message-mode';
 
 @Component({
   selector: 'app-root',
@@ -52,6 +53,7 @@ export class AppComponent implements OnInit {
   public messages: Message[] = [];
   private snackBarRef: any;
   public isUserLocation: boolean = false;
+  public messageMode: typeof MessageMode = MessageMode;
 
   constructor(
     public mapService: MapService,
@@ -60,7 +62,7 @@ export class AppComponent implements OnInit {
     private messageService: MessageService,
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
-    public messageDropDialog: MatDialog,
+    public messageDialog: MatDialog,
     public messageListDialog: MatDialog,
     public userProfileDialog: MatDialog) { }
 
@@ -207,9 +209,10 @@ export class AppComponent implements OnInit {
     this.mapService.flyTo(event);
   }
 
-  openMessagDropDialog(location: Location): void {
-    const dialogRef = this.messageDropDialog.open(DropmessageComponent, {
-      panelClass: 'messageDropDialog',
+  openMessagDialog(location: Location): void {
+    const dialogRef = this.messageDialog.open(MessageComponent, {
+      panelClass: 'messageDialog',
+      data: {mode: this.messageMode.ADD, user: this.user},
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',

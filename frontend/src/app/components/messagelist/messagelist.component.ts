@@ -23,6 +23,9 @@ import { DeletemessageComponent } from './deletemessage/deletemessage.component'
 import { EditUserComponent } from './edit-user/edit-user.component';
 import { RelatedUserService } from '../../services/related-user.service';
 import { RelatedUser } from '../../interfaces/related-user';
+import { MessageMode } from '../../interfaces/message-mode';
+import { MessageComponent } from '../message/message.component';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-messagelist',
@@ -54,6 +57,8 @@ export class MessagelistComponent implements OnInit{
   public animation!: Animation;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
+  public messageMode: typeof MessageMode = MessageMode;
+  private snackBarRef: any;
 
   constructor(
     private messageService: MessageService,
@@ -61,8 +66,10 @@ export class MessagelistComponent implements OnInit{
     private geolocationService: GeolocationService,
     private relatedUserService: RelatedUserService,
     public dialogRef: MatDialogRef<MessagelistComponent>,
+    public messageDialog: MatDialog,
     public dialog: MatDialog,
     private style:StyleService,
+    private snackBar: MatSnackBar, 
     @Inject(MAT_DIALOG_DATA) public data: {user: User, messages: Message[]}
   ) {
     this.user = data.user;
@@ -288,8 +295,21 @@ export class MessagelistComponent implements OnInit{
         }
       });
     } else {
-      // Edit Message
-      // console.log('edit message');
+      const dialogRef = this.messageDialog.open(MessageComponent, {
+        panelClass: 'messageDialog',
+        data: {mode: this.messageMode.EDIT, user: this.user, message: message},
+        width: '90vh',
+        height: '90vh',
+        maxHeight: '90vh',
+        maxWidth:'90vw',
+        hasBackdrop: true      
+      });
+  
+      dialogRef.afterClosed().subscribe((message: Message) => {
+        if (undefined !== message) {
+          console.log(message);        
+        }
+      });
     }
   }
 }

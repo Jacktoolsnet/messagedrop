@@ -26,10 +26,10 @@ import { Message } from '../../interfaces/message';
     FormsModule, 
     MatFormFieldModule, 
     MatInputModule],
-  templateUrl: './dropmessage.component.html',
-  styleUrl: './dropmessage.component.css'
+  templateUrl: './message.component.html',
+  styleUrl: './message.component.css'
 })
-export class DropmessageComponent implements OnInit {
+export class MessageComponent implements OnInit {
 
   public message: string = '';
   
@@ -40,7 +40,7 @@ export class DropmessageComponent implements OnInit {
   background-color: #b9b6b6;`;
 
   constructor(
-    public dialogRef: MatDialogRef<DropmessageComponent>,
+    public dialogRef: MatDialogRef<MessageComponent>,
     private style: StyleService
   ) {}
 

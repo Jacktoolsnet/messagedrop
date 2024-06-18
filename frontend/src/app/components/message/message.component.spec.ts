@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DropmessageComponent } from './dropmessage.component';
+import { MessageComponent } from './message.component';
 
 describe('DropmessageComponent', () => {
-  let component: DropmessageComponent;
-  let fixture: ComponentFixture<DropmessageComponent>;
+  let component: MessageComponent;
+  let fixture: ComponentFixture<MessageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DropmessageComponent]
+      imports: [MessageComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(DropmessageComponent);
+    fixture = TestBed.createComponent(MessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
