@@ -165,6 +165,7 @@ const getByPlusCode = function (db, plusCode, callback) {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} LIKE ?
+        AND ${columnParentMessageId} = 0
         AND ${columnStatus} = '${messageStatus.ENABLED}'      
         ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
@@ -180,7 +181,9 @@ const getByParentId = function (db, parentMessageId, callback) {
     try{
         let sql = `
         SELECT * FROM ${tableName}
-        WHERE ${columnParentMessageId} = ?;`;
+        WHERE ${columnParentMessageId} = ?
+        AND ${columnStatus} = '${messageStatus.ENABLED}'
+        ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
         db.all(sql, [parentMessageId], (err, rows) => {
             callback(err, rows);
@@ -190,11 +193,26 @@ const getByParentId = function (db, parentMessageId, callback) {
     }
 };
 
-const countView = function (db, messageId, callback) {
+const countView = function (db, parentMessageId, callback) {
     try{
         sql = `
         UPDATE ${tableName}
         SET ${columnViews} = ${columnViews} + 1
+        WHERE ${columnMessageId} = ?;`
+
+        db.run(sql, [parentMessageId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const countComment = function (db, messageId, callback) {
+    try{
+        sql = `
+        UPDATE ${tableName}
+        SET ${columnComments} = ${columnViews} + 1
         WHERE ${columnMessageId} = ?;`
 
         db.run(sql, [messageId], (err) => {
@@ -313,6 +331,7 @@ module.exports = {
     getByPlusCode,
     getByParentId,
     countView,
+    countComment,
     deleteById,
     cleanPublic
 }

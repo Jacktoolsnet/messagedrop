@@ -225,6 +225,7 @@ export class AppComponent implements OnInit {
       views: 0,
       likes: 0,
       dislikes: 0,
+      comments: 0,
       status: 'enabled',
       userId: ''};
     const dialogRef = this.messageDialog.open(MessageComponent, {
@@ -238,7 +239,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data.message) {
+      if (undefined !== data?.message) {
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
             .subscribe({
               next: createMessageResponse => {

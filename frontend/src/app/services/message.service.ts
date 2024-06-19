@@ -33,7 +33,7 @@ export class MessageService {
 
   createMessage(message: Message, location: Location, user:User) {
     let body = {
-      'parentMessageId': 0,
+      'parentMessageId': message.parentId,
       'messageTyp': message.typ,
       'latitude': location.latitude,
       'longtitude': location.longitude,
@@ -104,16 +104,14 @@ export class MessageService {
   }
 
   getByPlusCode(location: Location) {
-    let plusCode: String = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location)}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getByPlusForMarker(location: Location) {
-    let plusCode: String = location.plusCode;
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${plusCode}`, this.httpOptions)
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${location.plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -131,6 +129,13 @@ export class MessageService {
       );
   }
 
+  countComment(message: Message) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countcomment/${message.parentId}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   disableMessage(message: Message) {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/disable/${message.id}`, this.httpOptions)
       .pipe(
@@ -140,6 +145,13 @@ export class MessageService {
 
   deleteMessage(message: Message) {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/delete/${message.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getCommentsForParentMessage(parentMessage: Message) {
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${parentMessage.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

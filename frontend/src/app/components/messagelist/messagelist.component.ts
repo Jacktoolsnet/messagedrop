@@ -59,6 +59,7 @@ export class MessagelistComponent implements OnInit{
   public dislikeButtonColor: string = 'secondary';
   public messageMode: typeof MessageMode = MessageMode;
   private snackBarRef: any;
+  public comments: Message[] = [];
 
   constructor(
     private messageService: MessageService,
@@ -101,6 +102,11 @@ export class MessagelistComponent implements OnInit{
     this.selectedMessages.pop();
     this.likeButtonColor = 'secondary';
     this.dislikeButtonColor = 'secondary';
+    if (this.selectedMessages.length > 0) {
+      this.getComments(this.selectedMessages[this.selectedMessages.length - 1])
+    } else {
+      this.comments = [];
+    }
   }
 
   public goToMessageDetails(message: Message) {
@@ -111,6 +117,7 @@ export class MessagelistComponent implements OnInit{
     }
     this.messageLikedByUser(message);
     this.messageDislikedByUser(message);
+    this.getComments(this.selectedMessages[this.selectedMessages.length - 1])
   }
 
   public getMessageUserName(message: Message): RelatedUser {
@@ -231,6 +238,20 @@ export class MessagelistComponent implements OnInit{
             });
   }
 
+  private countComment(message: Message) {
+    this.messageService.countComment(message)
+            .subscribe({
+              next: (likedByUserResponse) => {
+                if (likedByUserResponse.status === 200) {
+                  message.views = message.views + 1;
+                }
+              },
+              error: (err) => {
+              },
+              complete:() => {}
+            });
+  }
+
   public disableMessage(message: Message) {
     const dialogRef = this.dialog.open(BlockmessageComponent, {
       hasBackdrop: true 
@@ -306,7 +327,7 @@ export class MessagelistComponent implements OnInit{
       });
   
       dialogRef.afterClosed().subscribe((data: any) => {
-        if (undefined !== data.message) {
+        if (undefined !== data?.message) {
           this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user)
               .subscribe({
                 next: createMessageResponse => {
@@ -318,5 +339,63 @@ export class MessagelistComponent implements OnInit{
         }
       });
     }
+  }
+
+  public addComment(parentMessage: Message) {
+    let message: Message = {
+      id: 0,
+      parentId: parentMessage.id,
+      typ: 'public',
+      createDateTime: '',
+      deleteDateTime: '',
+      latitude: parentMessage.latitude,
+      longitude: parentMessage.longitude,
+      plusCode: parentMessage.plusCode,
+      message: '',
+      markerType: 'none',
+      style: '',
+      views: 0,
+      likes: 0,
+      dislikes: 0,
+      comments: 0,
+      status: 'enabled',
+      userId: ''};
+
+    const dialogRef = this.messageDialog.open(MessageComponent, {
+      panelClass: 'messageDialog',
+      data: {mode: this.messageMode.ADD, user: this.user, message: message},
+      width: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      maxWidth:'90vw',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data.message) {
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
+            .subscribe({
+              next: createMessageResponse => {
+                this.countComment(data.message);
+                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {this.comments.push(data.message);}
+            });          
+      }
+    });
+  }
+
+  getComments(parentMessage: Message) {
+    this.messageService.getCommentsForParentMessage(parentMessage)
+            .subscribe({
+              next: (getMessageResponse) => {
+                this.comments = [...getMessageResponse.rows];
+              },
+              error: (err) => {
+                this.comments = [];
+              },
+              complete:() => {}
+            });
   }
 }

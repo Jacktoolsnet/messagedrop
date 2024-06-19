@@ -13,6 +13,7 @@ export interface Message {
     views: number,
     likes: number,
     dislikes: number,
+    comments: number,
     status: string,
     userId: string,
     likedByUser?: boolean,
