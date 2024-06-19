@@ -147,6 +147,21 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
+router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
+  let response = {'status' : 0};
+  tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g,"''"), req.body.style, function(err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 router.get('/clean/public', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
   tableMessage.cleanPublic(req.database.db, function(err) {

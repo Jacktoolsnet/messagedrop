@@ -31,10 +31,10 @@ export class MessageService {
     return throwError(() => error);
   }
 
-  createPublicMessage(message: Message, location: Location, user:User) {
+  createMessage(message: Message, location: Location, user:User) {
     let body = {
       'parentMessageId': 0,
-      'messageTyp': 'public',
+      'messageTyp': message.typ,
       'latitude': location.latitude,
       'longtitude': location.longitude,
       'plusCode': location.plusCode,
@@ -44,6 +44,18 @@ export class MessageService {
       'messageUserId': user.id
     };
     return this.http.post<CreateMessageResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updateMessage(message: Message, location: Location, user:User) {
+    let body = {
+      'id': message.id,
+      'message': message.message,
+      'style': message.style
+    };
+    return this.http.post<CreateMessageResponse>(`${environment.apiUrl}/message/update`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

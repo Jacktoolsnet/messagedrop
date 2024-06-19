@@ -104,6 +104,22 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
     }
 };
 
+const update = function (db, messageId, message, style, callback) {
+    try{
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnMessage} = '${message}', 
+            ${columnStyle} = '${style}' 
+        WHERE ${columnMessageId} = ?;`;
+
+        db.run(sql, [messageId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const getAll = function (db, callback) {
     try{
         let sql = `SELECT * FROM ${tableName};`;
@@ -288,6 +304,7 @@ const cleanPublic = function (db, callback) {
 module.exports = {
     init,
     create,
+    update,
     disableMessage,
     enableMessage,   
     getAll,

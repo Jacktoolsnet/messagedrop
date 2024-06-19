@@ -1,5 +1,5 @@
-import { Component, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -9,6 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { StyleService } from '../../services/style.service';
 import { Message } from '../../interfaces/message';
+import { User } from '../../interfaces/user';
+import { MessageMode } from '../../interfaces/message-mode';
 
 @Component({
   selector: 'app-dropmessage',
@@ -30,43 +32,21 @@ import { Message } from '../../interfaces/message';
   styleUrl: './message.component.css'
 })
 export class MessageComponent implements OnInit {
-
-  public message: string = '';
   
-  public messageStyle: string =`
-  font-family: 'Caveat'; 
-  font-size: 1rem;
-  border: 1rem solid #ccc; 
-  background-color: #b9b6b6;`;
-
   constructor(
     public dialogRef: MatDialogRef<MessageComponent>,
-    private style: StyleService
+    private style: StyleService,
+    @Inject(MAT_DIALOG_DATA) public data: {mode: MessageMode, user: User, message: Message}
   ) {}
 
   ngOnInit(): void {
-    this.getRandomFont();
+    if (this.data.message.style === '') {
+      this.getRandomFont();
+    }
   }
 
-  onDropClick(): void {
-    let message: Message = {
-      id: 0,
-      parentId: 0,
-      typ: 'public',
-      createDateTime: '',
-      deleteDateTime: '',
-      latitude: 0,
-      longitude: 0,
-      plusCode: '',
-      message: this.message,
-      markerType: 'default',
-      style: this.messageStyle,
-      views: 0,
-      likes: 0,
-      dislikes: 0,
-      status: 'enabled',
-      userId: ''};
-    this.dialogRef.close(message);
+  onApplyClick(): void {
+    this.dialogRef.close(this.data);
   }
 
   onNewFontClick(): void {
@@ -74,7 +54,7 @@ export class MessageComponent implements OnInit {
   }
 
   private getRandomFont(): void {
-    this.messageStyle = `
+    this.data.message.style = `
     ${this.style.getRandomFontFamily()}
     font-size: 2rem;
     line-height: 1.6;`;

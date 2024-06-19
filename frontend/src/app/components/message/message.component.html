@@ -1,20 +1,25 @@
-<h2 mat-dialog-title>Your public message</h2>
+<h2 *ngIf="data.mode == 'add'" mat-dialog-title>Add your public message</h2>
+<h2 *ngIf="data.mode == 'edit'" mat-dialog-title>Edit your public message</h2>
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
     <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
 <mat-dialog-content class="full-width">
     <textarea
         cdkFocusInitial
-        [style]="messageStyle"
+        [style]="data.message.style"
         maxlength="512"
         type="text" 
-        [(ngModel)]="message"
+        [(ngModel)]="data.message.message"
         matInput>
     </textarea>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-flat-button class="button_drop" color="primary" aria-label="Drop a new message" (click)="onDropClick()">
+    <button *ngIf="data.mode == 'add'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         Drop it!
+    </button>
+    <button *ngIf="data.mode == 'edit'" mat-flat-button class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
+        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        Apply changes!
     </button>
 </mat-dialog-actions>

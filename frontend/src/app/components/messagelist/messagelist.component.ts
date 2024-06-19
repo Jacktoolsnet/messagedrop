@@ -68,8 +68,8 @@ export class MessagelistComponent implements OnInit{
     public dialogRef: MatDialogRef<MessagelistComponent>,
     public messageDialog: MatDialog,
     public dialog: MatDialog,
+    private snackBar: MatSnackBar,
     private style:StyleService,
-    private snackBar: MatSnackBar, 
     @Inject(MAT_DIALOG_DATA) public data: {user: User, messages: Message[]}
   ) {
     this.user = data.user;
@@ -305,9 +305,16 @@ export class MessagelistComponent implements OnInit{
         hasBackdrop: true      
       });
   
-      dialogRef.afterClosed().subscribe((message: Message) => {
-        if (undefined !== message) {
-          console.log(message);        
+      dialogRef.afterClosed().subscribe((data: any) => {
+        if (undefined !== data.message) {
+          this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user)
+              .subscribe({
+                next: createMessageResponse => {
+                  this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+                },
+                error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+                complete:() => {}
+              });          
         }
       });
     }
