@@ -275,7 +275,7 @@ const deleteById = function (db, messageId, callback) {
 const deleteComments = function (db, parentMessageId) {
     try {
         let sql = `
-        SELECT ${columnMessageId} FROM ${tableName}
+        SELECT ${columnMessageId}, ${columnParentMessageId} FROM ${tableName}
         WHERE ${columnParentMessageId} = ?`; 
 
         db.each(sql, [parentMessageId], (err, row) => {
@@ -283,8 +283,8 @@ const deleteComments = function (db, parentMessageId) {
             DELETE FROM ${tableName}
             WHERE ${columnMessageId} = ?;`;
 
-            db.run(sql, [row.messageId], (err) => {
-                deleteComments(db, row.messageId);
+            db.run(sql, [row.id], (err) => {
+                deleteComments(db, row.parentId);
             });
         });
     } catch (error) {
