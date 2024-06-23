@@ -227,8 +227,8 @@ export class MessagelistComponent implements OnInit{
   private messageCountView(message: Message) {
     this.messageService.countView(message)
             .subscribe({
-              next: (likedByUserResponse) => {
-                if (likedByUserResponse.status === 200) {
+              next: (SimpleStatusResponse) => {
+                if (SimpleStatusResponse.status === 200) {
                   message.views = message.views + 1;
                 }
               },
@@ -238,12 +238,12 @@ export class MessagelistComponent implements OnInit{
             });
   }
 
-  private countComment(message: Message) {
-    this.messageService.countComment(message)
+  private countComment(parentMessage: Message) {
+    this.messageService.countComment(parentMessage)
             .subscribe({
-              next: (likedByUserResponse) => {
-                if (likedByUserResponse.status === 200) {
-                  message.views = message.views + 1;
+              next: (SimpleStatusResponse) => {
+                if (SimpleStatusResponse.status === 200) {
+                  parentMessage.comments = parentMessage.comments + 1;
                 }
               },
               error: (err) => {
@@ -376,7 +376,7 @@ export class MessagelistComponent implements OnInit{
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
             .subscribe({
               next: createMessageResponse => {
-                this.countComment(data.message);
+                this.countComment(parentMessage);
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
               },
               error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},

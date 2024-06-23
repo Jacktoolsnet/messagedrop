@@ -130,7 +130,7 @@ export class MessageService {
   }
 
   countComment(message: Message) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countcomment/${message.parentId}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countcomment/${message.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

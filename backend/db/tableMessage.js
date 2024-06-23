@@ -212,7 +212,7 @@ const countComment = function (db, messageId, callback) {
     try{
         sql = `
         UPDATE ${tableName}
-        SET ${columnComments} = ${columnViews} + 1
+        SET ${columnComments} = ${columnComments} + 1
         WHERE ${columnMessageId} = ?;`
 
         db.run(sql, [messageId], (err) => {
