@@ -109,6 +109,10 @@ export class MessagelistComponent implements OnInit{
     }
   }
 
+  public close() {
+    this.dialogRef.close();
+  }
+
   public goToMessageDetails(message: Message) {
     this.selectedMessages.push(message);
     this.selectedMessageUser = this.relatedUserService.loadUser(message.userId);

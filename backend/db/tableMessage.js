@@ -183,7 +183,7 @@ const getByParentId = function (db, parentMessageId, callback) {
         SELECT * FROM ${tableName}
         WHERE ${columnParentMessageId} = ?
         AND ${columnStatus} = '${messageStatus.ENABLED}'
-        ORDER BY ${columnMessageCreateDateTime} DESC;`;
+        ORDER BY ${columnMessageCreateDateTime} ASC;`;
 
         db.all(sql, [parentMessageId], (err, rows) => {
             callback(err, rows);

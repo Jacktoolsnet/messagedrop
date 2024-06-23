@@ -46,6 +46,7 @@ export class MessageComponent implements OnInit {
   }
 
   onApplyClick(): void {
+    this.data.message.userId = this.data.user.id;
     this.dialogRef.close(this.data);
   }
 

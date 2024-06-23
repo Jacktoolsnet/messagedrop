@@ -174,8 +174,8 @@ export class AppComponent implements OnInit {
     });
   }
 
-  getMessages(location: Location) {
-    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation) {
+  getMessages(location: Location, forceSearch: boolean) {
+    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {
       this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
       this.messageService.getByPlusCode(location)
               .subscribe({
@@ -197,7 +197,7 @@ export class AppComponent implements OnInit {
   }
 
   handleMoveEndEvent(event: Location) {
-    this.getMessages(this.mapService.getMapLocation());
+    this.getMessages(this.mapService.getMapLocation(), false);
     this.setIsUserLocation()
     this.mapService.drawSearchRectange(event);
     this.mapService.setDrawCircleMarker(true);
@@ -248,7 +248,7 @@ export class AppComponent implements OnInit {
             .subscribe({
               next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.getMessages(this.mapService.getMapLocation());
+                this.getMessages(this.mapService.getMapLocation(), true);
                 this.statisticService.countMessage()
                 .subscribe({
                   next: (data) => {},
