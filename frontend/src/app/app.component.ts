@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
   private snackBarRef: any;
   public isUserLocation: boolean = false;
   public messageMode: typeof MessageMode = MessageMode;
+  private lastSearchedLocation: string = '';
 
   constructor(
     public mapService: MapService,
@@ -174,22 +175,25 @@ export class AppComponent implements OnInit {
   }
 
   getMessages(location: Location) {
-    this.messageService.getByPlusCode(location)
-            .subscribe({
-              next: (getMessageResponse) => {
-                this.messages = [...getMessageResponse.rows];
-              },
-              error: (err) => {
-                this.messages = [];
-                this.snackBarRef = this.snackBar.open("No message found", undefined , {
-                  panelClass: ['snack-warning'],
-                  horizontalPosition: 'center',
-                  verticalPosition: 'top',
-                  duration: 1000
-                });
-              },
-              complete:() => {}
-            });
+    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation) {
+      this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
+      this.messageService.getByPlusCode(location)
+              .subscribe({
+                next: (getMessageResponse) => {
+                  this.messages = [...getMessageResponse.rows];
+                },
+                error: (err) => {
+                  this.messages = [];
+                  this.snackBarRef = this.snackBar.open("No message found", undefined , {
+                    panelClass: ['snack-warning'],
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top',
+                    duration: 1000
+                  });
+                },
+                complete:() => {}
+              });
+    } 
   }
 
   handleMoveEndEvent(event: Location) {
