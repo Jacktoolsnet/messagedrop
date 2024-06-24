@@ -26,6 +26,7 @@ import { RelatedUser } from '../../interfaces/related-user';
 import { MessageMode } from '../../interfaces/message-mode';
 import { MessageComponent } from '../message/message.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatMenuModule } from '@angular/material/menu';
 
 @Component({
   selector: 'app-messagelist',
@@ -45,6 +46,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
     MatIcon, 
     FormsModule, 
     MatFormFieldModule, 
+    MatMenuModule,
     MatInputModule],
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
@@ -99,18 +101,18 @@ export class MessagelistComponent implements OnInit{
   }
 
   public goBack() {
-    this.selectedMessages.pop();
-    this.likeButtonColor = 'secondary';
-    this.dislikeButtonColor = 'secondary';
-    if (this.selectedMessages.length > 0) {
-      this.getComments(this.selectedMessages[this.selectedMessages.length - 1])
+    if (this.selectedMessages.length == 0) {
+      this.dialogRef.close();
     } else {
-      this.comments = [];
+      this.selectedMessages.pop();
+      this.likeButtonColor = 'secondary';
+      this.dislikeButtonColor = 'secondary';
+      if (this.selectedMessages.length > 0) {
+        this.getComments(this.selectedMessages[this.selectedMessages.length - 1])
+      } else {
+        this.comments = [];
+      }
     }
-  }
-
-  public close() {
-    this.dialogRef.close();
   }
 
   public goToMessageDetails(message: Message) {
@@ -292,6 +294,9 @@ export class MessagelistComponent implements OnInit{
                   if (simpleStatusResponse.status === 200) {
                     this.messages = this.messages.filter( element => element.id !== message.id );
                     this.selectedMessages.pop();
+                    if (this.selectedMessages.length == 0) {
+                      this.dialogRef.close();
+                    }
                   }
                 },
                 error: (err) => {
@@ -322,7 +327,7 @@ export class MessagelistComponent implements OnInit{
     } else {
       const dialogRef = this.messageDialog.open(MessageComponent, {
         panelClass: 'messageDialog',
-        data: {mode: this.messageMode.EDIT, user: this.user, message: message},
+        data: {mode: message.parentId == 0 ? this.messageMode.EDIT_PUBLIC_MESSAGE : this.messageMode.EDIT_COMMENT, user: this.user, message: message},
         width: '90vh',
         height: '90vh',
         maxHeight: '90vh',
@@ -367,7 +372,7 @@ export class MessagelistComponent implements OnInit{
 
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: 'messageDialog',
-      data: {mode: this.messageMode.ADD, user: this.user, message: message},
+      data: {mode: this.messageMode.ADD_COMMENT, user: this.user, message: message},
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',

@@ -150,7 +150,8 @@ const getByUserId = function (db, userId, callback) {
     try{
         let sql = `
         SELECT * FROM ${tableName}
-        WHERE ${columnUserId} = ?;`;
+        WHERE ${columnUserId} = ?
+        ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
         db.all(sql, [userId], (err, rows) => {
             callback(err, rows);

@@ -234,7 +234,7 @@ export class AppComponent implements OnInit {
       userId: ''};
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: 'messageDialog',
-      data: {mode: this.messageMode.ADD, user: this.user, message: message},
+      data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',
@@ -276,6 +276,10 @@ export class AppComponent implements OnInit {
                   maxWidth:'90vw',
                   hasBackdrop: true      
                 });
+
+                dialogRef.afterClosed().subscribe((data: any) => {
+                  this.getMessages(this.mapService.getMapLocation(), true);
+                });
               },
               error: (err) => {
                 this.messages = [];
@@ -302,6 +306,10 @@ export class AppComponent implements OnInit {
                   maxHeight: '90vh',
                   maxWidth:'90vw',
                   hasBackdrop: true      
+                });
+
+                dialogRef.afterClosed().subscribe((data: any) => {
+                  this.getMessages(this.mapService.getMapLocation(), true);
                 });
               },
               error: (err) => {},

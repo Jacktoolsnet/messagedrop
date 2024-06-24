@@ -1,5 +1,7 @@
-<h2 *ngIf="data.mode == 'add'" mat-dialog-title>Add your message</h2>
-<h2 *ngIf="data.mode == 'edit'" mat-dialog-title>Edit your message message</h2>
+<h2 *ngIf="data.mode == 'add_public_message'" mat-dialog-title>Add your message</h2>
+<h2 *ngIf="data.mode == 'add_comment'" mat-dialog-title>Add your comment</h2>
+<h2 *ngIf="data.mode == 'edit_public_message'" mat-dialog-title>Edit your message</h2>
+<h2 *ngIf="data.mode == 'edit_comment'" mat-dialog-title>Edit your comment</h2>
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
     <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
@@ -14,11 +16,11 @@
     </textarea>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button *ngIf="data.mode == 'add'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
+    <button *ngIf="data.mode == 'add_public_message' || data.mode == 'add_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         Drop it!
     </button>
-    <button *ngIf="data.mode == 'edit'" mat-flat-button class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
+    <button *ngIf="data.mode == 'edit_public_message' || data.mode == 'edit_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">edit</mat-icon>
         Apply changes!
     </button>

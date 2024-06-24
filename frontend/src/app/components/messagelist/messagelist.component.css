@@ -28,8 +28,17 @@ button {
 	  top: 0;
     right:    0;
     z-index: 100;
-    margin-top: -1rem;
-    margin-right: -1rem;
+    margin-top: 0.25rem;
+    margin-right: 0.25rem;
+}
+
+.button_messagemenu {
+  position: absolute;
+  bottom: 0;
+  right:    0;
+  z-index: 100;
+  margin-bottom: -1rem;
+  margin-right: -1rem;
 }
 
 .gradientAnimation {
