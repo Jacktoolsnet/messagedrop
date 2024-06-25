@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, PlatformLocation } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MapComponent } from './components/map/map.component';
 import { GeolocationService } from './services/geolocation.service';
@@ -51,6 +51,7 @@ export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   public user!: User;
   public messages: Message[] = [];
+  public myHistory: string[] = [];
   private snackBarRef: any;
   public isUserLocation: boolean = false;
   public messageMode: typeof MessageMode = MessageMode;
@@ -65,9 +66,19 @@ export class AppComponent implements OnInit {
     private snackBar: MatSnackBar, 
     public messageDialog: MatDialog,
     public messageListDialog: MatDialog,
-    public userProfileDialog: MatDialog) { }
+    public userProfileDialog: MatDialog,
+    private platformLocation: PlatformLocation) { }
 
   ngOnInit(): void {
+    this.platformLocation.onPopState((event) => {
+      if (this.myHistory.length > 0) {
+        this.myHistory.pop();
+        window.history.pushState(this.myHistory, '', '');
+      } else {
+        //No "history" - let them exit or keep them in the app.
+      }
+    });
+    window.history.pushState(this.myHistory, '', '');
     this.loadUser();
   }
 
@@ -234,12 +245,18 @@ export class AppComponent implements OnInit {
       userId: ''};
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: 'messageDialog',
+      closeOnNavigation: true,
       data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',
       maxWidth:'90vw',
       hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("messageDialog");
+      window.history.replaceState(this.myHistory, '', '');
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
@@ -269,12 +286,18 @@ export class AppComponent implements OnInit {
               next: (getMessageResponse) => {
                 const dialogRef = this.messageListDialog.open(MessagelistComponent, {
                   panelClass: 'MessageListDialog',
+                  closeOnNavigation: true,
                   data: {user: this.user, messages: [...getMessageResponse.rows]},
                   width: 'auto',
                   height: 'auto',
                   maxHeight: '90vh',
                   maxWidth:'90vw',
                   hasBackdrop: true      
+                });
+
+                dialogRef.afterOpened().subscribe(e => {
+                  this.myHistory.push("userMessageList");
+                 window.history.replaceState(this.myHistory, '', '');
                 });
 
                 dialogRef.afterClosed().subscribe((data: any) => {
@@ -300,12 +323,18 @@ export class AppComponent implements OnInit {
               next: (getMessageResponse) => {
                 const dialogRef = this.messageListDialog.open(MessagelistComponent, {
                   panelClass: 'MessageListDialog',
+                  closeOnNavigation: true,
                   data: {user: this.user, messages: [...getMessageResponse.rows]},
                   width: 'auto',
                   height: 'auto',
                   maxHeight: '90vh',
                   maxWidth:'90vw',
                   hasBackdrop: true      
+                });
+
+                dialogRef.afterOpened().subscribe(e => {
+                  this.myHistory.push("messageList");
+                  window.history.replaceState(this.myHistory, '', '');
                 });
 
                 dialogRef.afterClosed().subscribe((data: any) => {
@@ -320,7 +349,11 @@ export class AppComponent implements OnInit {
   editUserProfile() {
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
       data: {user: this.user},
+      closeOnNavigation: true,
       hasBackdrop: true 
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {

@@ -260,7 +260,11 @@ export class MessagelistComponent implements OnInit{
 
   public disableMessage(message: Message) {
     const dialogRef = this.dialog.open(BlockmessageComponent, {
-      hasBackdrop: true 
+      closeOnNavigation: true,
+      hasBackdrop: false 
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -283,7 +287,11 @@ export class MessagelistComponent implements OnInit{
 
   public deleteMessage(message: Message) {
     const dialogRef = this.dialog.open(DeletemessageComponent, {
-      hasBackdrop: true 
+      closeOnNavigation: true,
+      hasBackdrop: false 
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -316,7 +324,11 @@ export class MessagelistComponent implements OnInit{
       }
       const dialogRef = this.dialog.open(EditUserComponent, {
         data: {relatedUser: this.selectedMessageUser},
-        hasBackdrop: true 
+        closeOnNavigation: true,
+        hasBackdrop: false 
+      });
+
+      dialogRef.afterOpened().subscribe(e => {
       });
   
       dialogRef.afterClosed().subscribe(result => {
@@ -328,11 +340,15 @@ export class MessagelistComponent implements OnInit{
       const dialogRef = this.messageDialog.open(MessageComponent, {
         panelClass: 'messageDialog',
         data: {mode: message.parentId == 0 ? this.messageMode.EDIT_PUBLIC_MESSAGE : this.messageMode.EDIT_COMMENT, user: this.user, message: message},
+        closeOnNavigation: true,
         width: '90vh',
         height: '90vh',
         maxHeight: '90vh',
         maxWidth:'90vw',
-        hasBackdrop: true      
+        hasBackdrop: false      
+      });
+
+      dialogRef.afterOpened().subscribe(e => {
       });
   
       dialogRef.afterClosed().subscribe((data: any) => {
@@ -373,11 +389,15 @@ export class MessagelistComponent implements OnInit{
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: 'messageDialog',
       data: {mode: this.messageMode.ADD_COMMENT, user: this.user, message: message},
+      closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',
       maxWidth:'90vw',
-      hasBackdrop: true      
+      hasBackdrop: false      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
