@@ -261,7 +261,7 @@ export class MessagelistComponent implements OnInit{
   public disableMessage(message: Message) {
     const dialogRef = this.dialog.open(BlockmessageComponent, {
       closeOnNavigation: true,
-      hasBackdrop: false 
+      hasBackdrop: true 
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -288,7 +288,7 @@ export class MessagelistComponent implements OnInit{
   public deleteMessage(message: Message) {
     const dialogRef = this.dialog.open(DeletemessageComponent, {
       closeOnNavigation: true,
-      hasBackdrop: false 
+      hasBackdrop: true 
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -316,54 +316,52 @@ export class MessagelistComponent implements OnInit{
   }
 
   public editMessage(message: Message) {
-    // For developement == else !=
-    if (message.userId != this.user.id) {
-      // Edit user of this message
-      if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
-        this.selectedMessageUser.id = message.userId;
+    const dialogRef = this.messageDialog.open(MessageComponent, {
+      panelClass: 'messageDialog',
+      data: {mode: message.parentId == 0 ? this.messageMode.EDIT_PUBLIC_MESSAGE : this.messageMode.EDIT_COMMENT, user: this.user, message: message},
+      closeOnNavigation: true,
+      width: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      maxWidth:'90vw',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.message) {
+        this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user)
+            .subscribe({
+              next: createMessageResponse => {
+                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {}
+            });          
       }
-      const dialogRef = this.dialog.open(EditUserComponent, {
-        data: {relatedUser: this.selectedMessageUser},
-        closeOnNavigation: true,
-        hasBackdrop: false 
-      });
+    });
+  }
 
-      dialogRef.afterOpened().subscribe(e => {
-      });
-  
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.relatedUserService.saveUser(result);
-        }
-      });
-    } else {
-      const dialogRef = this.messageDialog.open(MessageComponent, {
-        panelClass: 'messageDialog',
-        data: {mode: message.parentId == 0 ? this.messageMode.EDIT_PUBLIC_MESSAGE : this.messageMode.EDIT_COMMENT, user: this.user, message: message},
-        closeOnNavigation: true,
-        width: '90vh',
-        height: '90vh',
-        maxHeight: '90vh',
-        maxWidth:'90vw',
-        hasBackdrop: false      
-      });
-
-      dialogRef.afterOpened().subscribe(e => {
-      });
-  
-      dialogRef.afterClosed().subscribe((data: any) => {
-        if (undefined !== data?.message) {
-          this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user)
-              .subscribe({
-                next: createMessageResponse => {
-                  this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                },
-                error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-                complete:() => {}
-              });          
-        }
-      });
+  public editMessageUserProfile(message: Message){
+    if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
+      this.selectedMessageUser.id = message.userId;
     }
+    const dialogRef = this.dialog.open(EditUserComponent, {
+      data: {relatedUser: this.selectedMessageUser},
+      closeOnNavigation: true,
+      hasBackdrop: true 
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.relatedUserService.saveUser(result);
+      }
+    });
   }
 
   public addComment(parentMessage: Message) {
@@ -394,7 +392,7 @@ export class MessagelistComponent implements OnInit{
       height: '90vh',
       maxHeight: '90vh',
       maxWidth:'90vw',
-      hasBackdrop: false      
+      hasBackdrop: true      
     });
 
     dialogRef.afterOpened().subscribe(e => {

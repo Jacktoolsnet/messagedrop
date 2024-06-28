@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { colord, random } from "colord";
+import { random } from "colord";
 import { Animation } from '../interfaces/animation';
 
 @Injectable({
