@@ -36,7 +36,7 @@ const init = function (db) {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnMessageId} INTEGER PRIMARY KEY NOT NULL, 
-            ${columnParentMessageId} INTEGER NOT NULL DEFAULT 0,
+            ${columnParentMessageId} INTEGER DEFAULT NULL,
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
@@ -52,9 +52,12 @@ const init = function (db) {
             ${columnComments} INTEGER NOT NULL DEFAULT 0,
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnUserId} TEXT NOT NULL,
-            FOREIGN KEY (${columnUserId}) 
+            CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
-            ON UPDATE CASCADE ON DELETE CASCADE
+            ON UPDATE CASCADE ON DELETE CASCADE,
+            CONSTRAINT FK_PARENT FOREIGN KEY (${columnParentMessageId})
+            REFERENCES ${tableName} (${columnMessageId})
+            ON UPDATE CASCADE ON DELETE CASCADE 
         );`;
 
         db.run(sql, (err) => {
@@ -69,6 +72,9 @@ const init = function (db) {
 
 const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, markerType, style, userId, callback) {
     try {
+        if (parentMessageId == 0) {
+            parentMessageId = null;
+        }
         let sql = `
         INSERT INTO ${tableName} (
             ${columnParentMessageId},
@@ -95,7 +101,6 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             '${style}',
             '${userId}'
         );`;
-        
         db.run(sql, (err) => {
             callback(err)
         });
@@ -166,7 +171,7 @@ const getByPlusCode = function (db, plusCode, callback) {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} LIKE ?
-        AND ${columnParentMessageId} = 0
+        AND ${columnParentMessageId} IS NULL
         AND ${columnStatus} = '${messageStatus.ENABLED}'      
         ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
@@ -264,29 +269,8 @@ const deleteById = function (db, messageId, callback) {
             if (err) {
                 callback(err);
             } else {
-                deleteComments(db, messageId);
                 callback(err);
             }
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const deleteComments = function (db, parentMessageId) {
-    try {
-        let sql = `
-        SELECT ${columnMessageId}, ${columnParentMessageId} FROM ${tableName}
-        WHERE ${columnParentMessageId} = ?`; 
-
-        db.each(sql, [parentMessageId], (err, row) => {
-            sql = `
-            DELETE FROM ${tableName}
-            WHERE ${columnMessageId} = ?;`;
-
-            db.run(sql, [row.id], (err) => {
-                deleteComments(db, row.parentId);
-            });
         });
     } catch (error) {
         throw error;
