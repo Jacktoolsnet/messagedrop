@@ -248,10 +248,12 @@ export class AppComponent implements OnInit {
       panelClass: 'messageDialog',
       closeOnNavigation: true,
       data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
-      width: '90vh',
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth:'90vw',
+      minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      maxWidth:'90vw',
       hasBackdrop: true      
     });
 
@@ -290,9 +292,11 @@ export class AppComponent implements OnInit {
                   closeOnNavigation: true,
                   data: {user: this.user, messages: [...getMessageResponse.rows]},
                   width: 'auto',
-                  height: 'auto',
-                  maxHeight: '90vh',
+                  minWidth: '60vw',
                   maxWidth:'90vw',
+                  height: 'auto',
+                  minHeight: 'auto',
+                  maxHeight: '90vh',
                   hasBackdrop: true      
                 });
 
@@ -327,9 +331,11 @@ export class AppComponent implements OnInit {
                   closeOnNavigation: true,
                   data: {user: this.user, messages: [...getMessageResponse.rows]},
                   width: 'auto',
-                  height: 'auto',
-                  maxHeight: '90vh',
+                  minWidth: '60vw',
                   maxWidth:'90vw',
+                  height: 'auto',
+                  minHeight: 'auto',
+                  maxHeight: '90vh',
                   hasBackdrop: true      
                 });
 
