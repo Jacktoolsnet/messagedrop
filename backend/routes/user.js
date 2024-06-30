@@ -85,7 +85,7 @@ router.get('/clean', [security.checkToken], function(req, res) {
   });
 });
 
-router.delete('/delete/:userId', [security.checkToken], function(req, res) {
+router.get('/delete/:userId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
   tableUser.deleteById(req.database.db, req.params.userId, function(err) {
     if (err) {

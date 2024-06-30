@@ -16,13 +16,19 @@ class Database {
         this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
             if (err) {
               return console.error(err.message);
+            } else {
+              this.db.run('PRAGMA foreign_keys = ON;', [], function(err) {
+                if (err) {
+                  console.error(err.message);
+                }
+              });
+              tableUser.init(this.db);
+              tableStatistic.init(this.db);
+              tableMessage.init(this.db);
+              tableLike.init(this.db);
+              tableDislike.init(this.db);
+              console.log('Connected to the messagedrop SQlite database.');
             }
-            tableUser.init(this.db);
-            tableStatistic.init(this.db);
-            tableMessage.init(this.db);
-            tableLike.init(this.db);
-            tableDislike.init(this.db);
-            console.log('Connected to the messagedrop SQlite database.');
           });
     };
 

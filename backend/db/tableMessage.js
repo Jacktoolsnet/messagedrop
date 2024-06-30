@@ -53,7 +53,7 @@ const init = function (db) {
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnUserId} TEXT NOT NULL,
             FOREIGN KEY (${columnUserId}) 
-            REFERENCES tableUser (userId) 
+            REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE
         );`;
 
