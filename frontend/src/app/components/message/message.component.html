@@ -18,10 +18,10 @@
 <mat-dialog-actions>
     <button *ngIf="data.mode == 'add_public_message' || data.mode == 'add_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
-        Drop it!
+        Drop message
     </button>
     <button *ngIf="data.mode == 'edit_public_message' || data.mode == 'edit_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">edit</mat-icon>
-        Apply changes!
+        Apply changes
     </button>
 </mat-dialog-actions>
