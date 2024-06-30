@@ -154,6 +154,7 @@ export class AppComponent implements OnInit {
         this.user.location.latitude = position.coords.latitude;
         this.user.location.longitude = position.coords.longitude;
         this.user.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        //this.user.location.zoom = this.mapService.getMapZoom();
         this.userService.saveUser(this.user);
         this.locationReady = true;
         this.mapService.setUserMarker(this.user.location);

@@ -56,7 +56,7 @@ app.use('/check', check);
 app.use('/statistic', statistic);
 app.use('/user', user);
 app.use('/message', message);
-// The las route
+// The last route
 app.use('*', notfound);
 
 // Start app

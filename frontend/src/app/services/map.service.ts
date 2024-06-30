@@ -96,6 +96,7 @@ export class MapService {
   }
 
   public flyTo(location: Location): void {
+    this.location.zoom = location.zoom
     this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), location.zoom);    
   }
 
