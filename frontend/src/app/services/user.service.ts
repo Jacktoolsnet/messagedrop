@@ -7,7 +7,6 @@ import { User } from '../interfaces/user';
 import { Keypair } from '../interfaces/keypair';
 import { GetUserResponse } from '../interfaces/get-user-response';
 import { MessageService } from './message.service';
-import { Message } from '../interfaces/message';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 
 @Injectable({
@@ -40,7 +39,6 @@ export class UserService {
         location : { latitude: 0, longitude: 0, zoom: 0, plusCode: ''},
         local: navigator.language,
         language: navigator.language.split('-')[0],
-        deeplApiKey: undefined,
         encryptionKeyPair: undefined,
         signingKeyPair: undefined,
         name : 'Unnamed user',
@@ -52,7 +50,6 @@ export class UserService {
         location : undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: ''},
         local: undefined != userFromLocalStorage.local ? userFromLocalStorage.local : navigator.language,
         language: undefined != userFromLocalStorage.language ? userFromLocalStorage.language : navigator.language.split('-')[0],
-        deeplApiKey: undefined != userFromLocalStorage.language ? userFromLocalStorage.deeplApiKey : undefined,
         encryptionKeyPair : undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
         signingKeyPair : undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
         name : undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',

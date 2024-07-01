@@ -8,6 +8,7 @@ const check = require('./routes/check');
 const statistic = require('./routes/statistic');
 const user = require('./routes/user');
 const message = require('./routes/message');
+const translate = require('./routes/translate');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
 const express = require('express');
@@ -56,6 +57,8 @@ app.use('/check', check);
 app.use('/statistic', statistic);
 app.use('/user', user);
 app.use('/message', message);
+app.use('/translate', translate);
+
 // The last route
 app.use('*', notfound);
 

@@ -6,7 +6,6 @@ export interface User {
     location: Location,
     local: string,
     language: string,
-    deeplApiKey?: string,
     encryptionKeyPair?: Keypair,
     signingKeyPair?: Keypair,
     name?: string,

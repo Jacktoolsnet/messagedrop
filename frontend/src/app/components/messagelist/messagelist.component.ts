@@ -27,6 +27,7 @@ import { MessageMode } from '../../interfaces/message-mode';
 import { MessageComponent } from '../message/message.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslateService } from '../../services/translate.service';
 
 @Component({
   selector: 'app-messagelist',
@@ -65,6 +66,7 @@ export class MessagelistComponent implements OnInit{
 
   constructor(
     private messageService: MessageService,
+    private translateService: TranslateService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
     private relatedUserService: RelatedUserService,
@@ -424,5 +426,19 @@ export class MessagelistComponent implements OnInit{
               },
               complete:() => {}
             });
+  }
+
+  public translateMessage(message: Message) {
+    this.translateService.translate(message.message, this.user.language)
+              .subscribe({
+                next: (translateResponse) => {
+                  if (translateResponse.status === 200) {
+                    message.message = translateResponse.result?.text || message.message;
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
   }
 }

@@ -52,6 +52,9 @@
                     <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Drop a comment" (click)="addComment(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
                     </button>
+                    <button *ngIf="true" mat-mini-fab color="secondary" aria-label="Translate message" (click)="translateMessage(selectedMessages[selectedMessages.length - 1])">
+                        <mat-icon class="material-symbols-outlined">translate</mat-icon>
+                    </button>
                     <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessageUserProfile(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined" >person</mat-icon>
                     </button>
