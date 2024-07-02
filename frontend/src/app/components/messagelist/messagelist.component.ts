@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, Component, Inject, OnInit } from '@angular/core';
 import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
@@ -48,7 +48,8 @@ import { TranslateService } from '../../services/translate.service';
     FormsModule, 
     MatFormFieldModule, 
     MatMenuModule,
-    MatInputModule],
+    MatInputModule
+  ],
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
 })
