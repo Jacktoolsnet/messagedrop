@@ -8,6 +8,7 @@ export interface Message {
     longitude: number,
     plusCode: string,
     message: string,
+    translatedMessage?: string,
     markerType: string,
     style: string,
     views: number,

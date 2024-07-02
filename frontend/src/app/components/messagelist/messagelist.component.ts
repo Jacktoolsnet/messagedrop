@@ -433,10 +433,11 @@ export class MessagelistComponent implements OnInit{
               .subscribe({
                 next: (translateResponse) => {
                   if (translateResponse.status === 200) {
-                    message.message = translateResponse.result?.text || message.message;
+                    message.translatedMessage = translateResponse.result?.text;
                   }
                 },
-                error: (err) => {
+                error: (translateResponse) => {
+                  this.snackBarRef = this.snackBar.open(translateResponse.error.error, '', {duration: 3000});
                 },
                 complete:() => {}
               });

@@ -16,7 +16,8 @@
                     <mat-card-title *ngIf="user.id != message.userId">{{getMessageUserName(message).name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
-                <mat-card-content [style]="message.style">{{message.message}}</mat-card-content>
+                <mat-card-content *ngIf="undefined == message.translatedMessage" [style]="message.style">{{message.message}}</mat-card-content>
+                <mat-card-content *ngIf="undefined != message.translatedMessage" [style]="message.style">{{message.translatedMessage}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
                     <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
@@ -41,7 +42,8 @@
                     <mat-card-title *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
-                <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
+                <mat-card-content *ngIf="undefined == selectedMessages[selectedMessages.length - 1].translatedMessage" [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
+                <mat-card-content *ngIf="undefined != selectedMessages[selectedMessages.length - 1].translatedMessage" [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].translatedMessage}}</mat-card-content>
                 <mat-card-actions class="buttonbar">
                     <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
@@ -52,7 +54,7 @@
                     <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Drop a comment" (click)="addComment(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
                     </button>
-                    <button *ngIf="true" mat-mini-fab color="secondary" aria-label="Translate message" (click)="translateMessage(selectedMessages[selectedMessages.length - 1])">
+                    <button *ngIf="undefined == selectedMessages[selectedMessages.length - 1].translatedMessage" mat-mini-fab color="secondary" aria-label="Translate message" (click)="translateMessage(selectedMessages[selectedMessages.length - 1])">
                         <mat-icon class="material-symbols-outlined">translate</mat-icon>
                     </button>
                     <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessageUserProfile(selectedMessages[selectedMessages.length - 1])">
