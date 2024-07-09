@@ -9,11 +9,15 @@
 <button [attr.aria-hidden]="!(userReady && locationReady)" class="button_goToLocation" *ngIf="locationReady && !isUserLocation" mat-fab color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">adjust</mat-icon>
 </button>
-<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDialog(user.location)">
+<button [attr.aria-hidden]="!(userReady && locationReady)" class="button_drop" *ngIf="userReady" mat-fab color="primary" aria-label="Drop a new message" (click)="openMessagDialog(user!.location)">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">send</mat-icon>
 </button>
 
 <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="deleteUser()">
+    <mat-icon>delete_forever</mat-icon>
+        <span>Delete user</span>
+    </button>
     <button mat-menu-item (click)="editUserProfile()">
         <mat-icon>edit</mat-icon>
         <span>My profile</span>

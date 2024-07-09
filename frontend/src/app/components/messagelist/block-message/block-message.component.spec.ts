@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { BlockmessageComponent } from './blockmessage.component';
+import { BlockMessageComponent } from './block-message.component';
 
 describe('BlockmessageComponent', () => {
-  let component: BlockmessageComponent;
-  let fixture: ComponentFixture<BlockmessageComponent>;
+  let component: BlockMessageComponent;
+  let fixture: ComponentFixture<BlockMessageComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [BlockmessageComponent]
+      imports: [BlockMessageComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(BlockmessageComponent);
+    fixture = TestBed.createComponent(BlockMessageComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

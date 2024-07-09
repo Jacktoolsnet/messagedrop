@@ -6,9 +6,9 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDi
   selector: 'app-blockmessage',
   standalone: true,
   imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
-  templateUrl: './blockmessage.component.html',
-  styleUrl: './blockmessage.component.css'
+  templateUrl: './block-message.component.html',
+  styleUrl: './block-message.component.css'
 })
-export class BlockmessageComponent {
-  constructor(public dialogRef: MatDialogRef<BlockmessageComponent>) {}
+export class BlockMessageComponent {
+  constructor(public dialogRef: MatDialogRef<BlockMessageComponent>) {}
 }

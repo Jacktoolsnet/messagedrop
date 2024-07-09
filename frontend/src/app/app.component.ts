@@ -23,6 +23,7 @@ import { MapService } from './services/map.service';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { MessageMode } from './interfaces/message-mode';
+import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 
 @Component({
   selector: 'app-root',
@@ -49,7 +50,7 @@ import { MessageMode } from './interfaces/message-mode';
 export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
-  public user!: User;
+  public user!: User|undefined;
   public messages: Message[] = [];
   public myHistory: string[] = [];
   private snackBarRef: any;
@@ -67,6 +68,7 @@ export class AppComponent implements OnInit {
     public messageDialog: MatDialog,
     public messageListDialog: MatDialog,
     public userProfileDialog: MatDialog,
+    public dialog: MatDialog,
     private platformLocation: PlatformLocation) { }
 
   ngOnInit(): void {
@@ -83,7 +85,7 @@ export class AppComponent implements OnInit {
   }
 
   setIsUserLocation(): void {
-    if (this.user.location.plusCode === this.mapService.getMapLocation().plusCode) {
+    if (this.user?.location.plusCode === this.mapService.getMapLocation().plusCode) {
       this.isUserLocation = true;
     } else {
       this.isUserLocation = false;
@@ -96,14 +98,14 @@ export class AppComponent implements OnInit {
     if (this.user.id === 'undefined') {
       this.userService.createEncryptionKey()
       .then((encryptionKeyPair : Keypair ) => {
-        this.user.encryptionKeyPair = encryptionKeyPair;
+        this.user!.encryptionKeyPair = encryptionKeyPair;
         this.userService.createSigningKey()
         .then((signingKeyPair : Keypair ) => {
-          this.user.signingKeyPair = signingKeyPair;
-          this.userService.createUser(this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
+          this.user!.signingKeyPair = signingKeyPair;
+          this.userService.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
           .subscribe(createUserResponse => {
-            this.user.id = createUserResponse.userId;
-            this.userService.saveUser(this.user);
+            this.user!.id = createUserResponse.userId;
+            this.userService.saveUser(this.user!);
             this.userReady = true;
           });
         });
@@ -118,7 +120,7 @@ export class AppComponent implements OnInit {
             error: (err) => {
               // Create the user when it does not exist in the database.
               if (err.status === 404) {
-                this.userService.restoreUser(this.user.id, this.user.encryptionKeyPair?.publicKey, this.user.signingKeyPair?.publicKey)
+                this.userService.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
                 .subscribe(createUserResponse => {
                   console.log(createUserResponse)
                   this.userReady = true;
@@ -145,21 +147,21 @@ export class AppComponent implements OnInit {
   }
 
   goToUserLocation() {
-    this.mapService.flyTo(this.user.location);
+    this.mapService.flyTo(this.user!.location);
   }
 
   watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
-        this.user.location.latitude = position.coords.latitude;
-        this.user.location.longitude = position.coords.longitude;
-        this.user.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        this.user!.location.latitude = position.coords.latitude;
+        this.user!.location.longitude = position.coords.longitude;
+        this.user!.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
         //this.user.location.zoom = this.mapService.getMapZoom();
-        this.userService.saveUser(this.user);
+        this.userService.saveUser(this.user!);
         this.locationReady = true;
-        this.mapService.setUserMarker(this.user.location);
+        this.mapService.setUserMarker(this.user!.location);
         if (this.isUserLocation) {
-          this.mapService.flyTo(this.user.location);
+          this.mapService.flyTo(this.user!.location);
         }
       },
       error: (error) => {
@@ -284,7 +286,7 @@ export class AppComponent implements OnInit {
   }
 
   openUserMessagListDialog(): void {
-    this.userService.getUserMessages(this.user)
+    this.userService.getUserMessages(this.user!)
             .subscribe({
               next: (getMessageResponse) => {
                 const dialogRef = this.messageListDialog.open(MessagelistComponent, {
@@ -366,6 +368,40 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.userService.saveUser(result);
+      }
+    });
+  }
+
+  deleteUser() {
+    const dialogRef = this.dialog.open(DeleteUserComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true 
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.deleteUser(this.user!)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    this.user = this.userService.deleteUserFromStorage();     
+                    this.userReady = false;
+                    this.getMessages(this.mapService.getMapLocation(), true);               
+                  }
+                },
+                error: (err) => {
+                  this.snackBarRef = this.snackBar.open("Oops, something went wrong. Please try again later.", undefined , {
+                    panelClass: ['snack-warning'],
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top',
+                    duration: 1000
+                  });
+                },
+                complete:() => {}
+              });
       }
     });
   }

@@ -8,6 +8,7 @@ import { Keypair } from '../interfaces/keypair';
 import { GetUserResponse } from '../interfaces/get-user-response';
 import { MessageService } from './message.service';
 import { GetMessageResponse } from '../interfaces/get-message-response';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 @Injectable({
   providedIn: 'root'
@@ -130,6 +131,18 @@ export class UserService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  deleteUser(user: User) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/delete/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  deleteUserFromStorage(): undefined {
+    localStorage.removeItem('user')
+    return undefined
   }
 
 }

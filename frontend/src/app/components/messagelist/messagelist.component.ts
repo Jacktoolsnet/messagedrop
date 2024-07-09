@@ -18,8 +18,8 @@ import { Location } from '../../interfaces/location';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
-import { BlockmessageComponent } from './blockmessage/blockmessage.component';
-import { DeletemessageComponent } from './deletemessage/deletemessage.component';
+import { BlockMessageComponent } from './block-message/block-message.component';
+import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { EditUserComponent } from './edit-user/edit-user.component';
 import { RelatedUserService } from '../../services/related-user.service';
 import { RelatedUser } from '../../interfaces/related-user';
@@ -262,7 +262,7 @@ export class MessagelistComponent implements OnInit{
   }
 
   public disableMessage(message: Message) {
-    const dialogRef = this.dialog.open(BlockmessageComponent, {
+    const dialogRef = this.dialog.open(BlockMessageComponent, {
       closeOnNavigation: true,
       hasBackdrop: true 
     });
@@ -289,7 +289,7 @@ export class MessagelistComponent implements OnInit{
   }
 
   public deleteMessage(message: Message) {
-    const dialogRef = this.dialog.open(DeletemessageComponent, {
+    const dialogRef = this.dialog.open(DeleteMessageComponent, {
       closeOnNavigation: true,
       hasBackdrop: true 
     });
