@@ -287,16 +287,6 @@ const cleanPublic = function (db, callback) {
         db.run(sql, (err) => {
             if (err) {
                 callback(err);
-            } else {
-                sql = `
-                DELETE FROM ${tableName}
-                WHERE ${columnParentMessageId} <> 0 
-                AND ${columnParentMessageId} NOT IN (
-                    SELECT ${columnMessageId} FROM ${tableName}
-                );`
-                db.run(sql, (err) => {
-                    callback(err);
-                });
             }
         });
     } catch (error) {

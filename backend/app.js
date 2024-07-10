@@ -14,6 +14,7 @@ const cors = require('cors')
 const express = require('express');
 const helmet = require('helmet');
 const app = express();
+const cron = require('node-cron');
 
 /*
 “Helmet” is a collection of nine smaller middleware functions that are used to set security-relevant HTTP headers.
@@ -67,3 +68,30 @@ app.listen(process.env.PORT, () => {
   console.log(`Example app listening on port ${process.env.PORT}`);
   database.init();
 })
+
+// Cron
+// ┌────────────── second (optional)
+// │ ┌──────────── minute
+// │ │ ┌────────── hour
+// │ │ │ ┌──────── day of month
+// │ │ │ │ ┌────── month
+// │ │ │ │ │ ┌──── day of week
+// │ │ │ │ │ │
+// │ │ │ │ │ │
+// * * * * * *
+
+// Clean users every hour at minute 0
+cron.schedule('0 * * * *', () => {
+  tableUser.clean(database.db, function(err) {
+    if (err) {}
+  });
+});
+
+// Clean messages every 5 minutes
+cron.schedule('*/5 * * * *', () => {
+  tableMessage.cleanPublic(database.db, function(err) {
+    if (err) {
+      console.log(err);
+    }
+  });
+});
