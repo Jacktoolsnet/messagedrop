@@ -1,6 +1,7 @@
 {
-  "name": "messagedrop",
-  "short_name": "messagedrop",
+  "id": "/",
+  "name": "Messagedrop",
+  "short_name": "Messagedrop",
   "theme_color": "#1976d2",
   "background_color": "#fafafa",
   "display": "standalone",

@@ -18,12 +18,15 @@ import { MessageService } from './services/message.service';
 import { StatisticService } from './services/statistic.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { Message } from './interfaces/message';
+import { Note } from './interfaces/note';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { MapService } from './services/map.service';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { MessageMode } from './interfaces/message-mode';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
+import { NoteComponent } from './components/note/note.component';
+import { NoteService } from './services/note.service';
 
 @Component({
   selector: 'app-root',
@@ -53,6 +56,8 @@ export class AppComponent implements OnInit {
   public user!: User|undefined;
   public messages: Message[] = [];
   public myHistory: string[] = [];
+  public notes: Note[] = [];
+  public notesByPlusCode: Note[] = [];
   private snackBarRef: any;
   public isUserLocation: boolean = false;
   public messageMode: typeof MessageMode = MessageMode;
@@ -63,9 +68,11 @@ export class AppComponent implements OnInit {
     private geolocationService: GeolocationService, 
     private userService: UserService,
     private messageService: MessageService,
+    private noteService: NoteService,
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDialog: MatDialog,
+    public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
@@ -81,6 +88,7 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
+    this.notes = [...this.noteService.loadNotesFromStorage()];
     this.loadUser();
   }
 
@@ -287,6 +295,44 @@ export class AppComponent implements OnInit {
     });
   }
 
+  openNoteDialog(location: Location): void {
+    let note: Note = {
+     latitude: 0,
+      longitude: 0,
+      plusCode: '',
+      note: '',
+      markerType: 'note',
+      style: '',
+      };
+    const dialogRef = this.noteDialog.open(NoteComponent, {
+      panelClass: 'messageDialog',
+      closeOnNavigation: true,
+      data: {mode: this.messageMode.ADD_NOTE, note: note},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth:'90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("noteDialog");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.note) {        
+        data.note.latitude = this.mapService.getMapLocation().latitude;
+        data.note.longitude = this.mapService.getMapLocation().longitude;
+        data.note.plusCode = this.mapService.getMapLocation().plusCode;
+        this.notes.push(data.note)
+        this.noteService.saveNotesToStorage(this.notes);
+      }
+    });
+  }
+
   openUserMessagListDialog(): void {
     this.userService.getUserMessages(this.user!)
             .subscribe({
@@ -389,6 +435,7 @@ export class AppComponent implements OnInit {
               .subscribe({
                 next: (simpleStatusResponse) => {
                   if (simpleStatusResponse.status === 200) {
+                    this.noteService.deleteNotesFromStorage();
                     this.user = this.userService.deleteUserFromStorage();     
                     this.userReady = false;
                     this.getMessages(this.mapService.getMapLocation(), true);               

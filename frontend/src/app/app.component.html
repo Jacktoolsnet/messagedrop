@@ -24,7 +24,11 @@
     </button>
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon class="material-symbols-outlined">speaker_notes</mat-icon>
-        <span>My messages</span>
+        <span>My public messages</span>
+    </button>
+    <button *ngIf="notes.length != 0" mat-menu-item (click)="openUserMessagListDialog()">
+        <mat-icon class="material-symbols-outlined">clinical_notes</mat-icon>
+        <span>My private notes</span>
     </button>
 </mat-menu>
 
@@ -33,7 +37,7 @@
     <mat-icon class="material-symbols-outlined">send</mat-icon>
         <span>Public message</span>
     </button>
-    <button *ngIf="userReady" mat-menu-item (click)="openMessagDialog(user!.location)">
+    <button *ngIf="userReady" mat-menu-item (click)="openNoteDialog(user!.location)">
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
         <span>Private note</span>
     </button>

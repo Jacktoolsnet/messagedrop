@@ -11,9 +11,10 @@ import { StyleService } from '../../services/style.service';
 import { Message } from '../../interfaces/message';
 import { User } from '../../interfaces/user';
 import { MessageMode } from '../../interfaces/message-mode';
+import { Note } from '../../interfaces/note';
 
 @Component({
-  selector: 'app-message',
+  selector: 'app-note',
   standalone: true,
   imports: [
     MatDialogContainer,
@@ -28,25 +29,24 @@ import { MessageMode } from '../../interfaces/message-mode';
     FormsModule, 
     MatFormFieldModule, 
     MatInputModule],
-  templateUrl: './message.component.html',
-  styleUrl: './message.component.css'
+  templateUrl: './note.component.html',
+  styleUrl: './note.component.css'
 })
-export class MessageComponent implements OnInit {
+export class NoteComponent implements OnInit {
   
   constructor(
-    public dialogRef: MatDialogRef<MessageComponent>,
+    public dialogRef: MatDialogRef<NoteComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {mode: MessageMode, user: User, message: Message}
+    @Inject(MAT_DIALOG_DATA) public data: {mode: MessageMode, note: Note}
   ) {}
 
   ngOnInit(): void {
-    if (this.data.message.style === '') {
+    if (this.data.note.style === '') {
       this.getRandomFont();
     }
   }
 
   onApplyClick(): void {
-    this.data.message.userId = this.data.user.id;
     this.dialogRef.close(this.data);
   }
 
@@ -55,7 +55,7 @@ export class MessageComponent implements OnInit {
   }
 
   private getRandomFont(): void {
-    this.data.message.style = `
+    this.data.note.style = `
     ${this.style.getRandomFontFamily()}
     font-size: 2rem;
     line-height: 1.6;`;
