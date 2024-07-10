@@ -27,6 +27,7 @@ import { MessageMode } from './interfaces/message-mode';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { NoteComponent } from './components/note/note.component';
 import { NoteService } from './services/note.service';
+import { NotelistComponent } from './components/notelist/notelist.component';
 
 @Component({
   selector: 'app-root',
@@ -257,7 +258,7 @@ export class AppComponent implements OnInit {
       status: 'enabled',
       userId: ''};
     const dialogRef = this.messageDialog.open(MessageComponent, {
-      panelClass: 'messageDialog',
+      panelClass: '',
       closeOnNavigation: true,
       data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
       width: '90vw',
@@ -305,7 +306,7 @@ export class AppComponent implements OnInit {
       style: '',
       };
     const dialogRef = this.noteDialog.open(NoteComponent, {
-      panelClass: 'messageDialog',
+      panelClass: '',
       closeOnNavigation: true,
       data: {mode: this.messageMode.ADD_NOTE, note: note},
       width: '90vw',
@@ -370,6 +371,30 @@ export class AppComponent implements OnInit {
               },
               complete:() => {}
             });
+  }
+
+  openUserNoteListDialog(): void {
+    const dialogRef = this.messageListDialog.open(NotelistComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: {user: this.user, notes: [...this.noteService.loadNotesFromStorage()]},
+      width: 'auto',
+      minWidth: '60vw',
+      maxWidth:'90vw',
+      height: 'auto',
+      minHeight: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("userNoteList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      console.log(data);
+    });
   }
 
   openMarkerMessageListDialog(location: Location) {

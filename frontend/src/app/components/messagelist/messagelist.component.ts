@@ -320,7 +320,7 @@ export class MessagelistComponent implements OnInit{
 
   public editMessage(message: Message) {
     const dialogRef = this.messageDialog.open(MessageComponent, {
-      panelClass: 'messageDialog',
+      panelClass: '',
       data: {mode: message.parentId == 0 ? this.messageMode.EDIT_PUBLIC_MESSAGE : this.messageMode.EDIT_COMMENT, user: this.user, message: message},
       closeOnNavigation: true,
       width: '90vh',
@@ -388,7 +388,7 @@ export class MessagelistComponent implements OnInit{
       userId: ''};
 
     const dialogRef = this.messageDialog.open(MessageComponent, {
-      panelClass: 'messageDialog',
+      panelClass: '',
       data: {mode: this.messageMode.ADD_COMMENT, user: this.user, message: message},
       closeOnNavigation: true,
       width: '90vh',

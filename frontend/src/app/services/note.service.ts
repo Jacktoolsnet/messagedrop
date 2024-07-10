@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Note } from '../interfaces/note';
 import { Location } from '../interfaces/location';
+import { User } from '../interfaces/user';
 
 @Injectable({
   providedIn: 'root'
@@ -20,5 +21,10 @@ export class NoteService {
 
   deleteNotesFromStorage() {
     localStorage.removeItem('notes');
+  }
+
+  navigateToNoteLocation(user: User, note: Note) {
+    let url: string = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(note.plusCode)}`
+    window.open(url, '_blank');
   }
 }
