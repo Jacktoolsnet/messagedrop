@@ -3,7 +3,7 @@
 <h2 *ngIf="data.mode == 'edit_public_message'" mat-dialog-title>Edit your message</h2>
 <h2 *ngIf="data.mode == 'edit_comment'" mat-dialog-title>Edit your comment</h2>
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
-    <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+    <mat-icon class="material-symbols-outlined" class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
 <mat-dialog-content class="full-width">
     <textarea
@@ -17,11 +17,11 @@
 </mat-dialog-content>
 <mat-dialog-actions>
     <button *ngIf="data.mode == 'add_public_message' || data.mode == 'add_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">send</mat-icon>
+        <mat-icon class="material-symbols-outlined" class="material-symbols-outlined">send</mat-icon>
         Drop message
     </button>
     <button *ngIf="data.mode == 'edit_public_message' || data.mode == 'edit_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <mat-icon class="material-symbols-outlined" class="material-symbols-outlined">check</mat-icon>
         Apply changes
     </button>
 </mat-dialog-actions>

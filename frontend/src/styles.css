@@ -3,6 +3,14 @@
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 
+.material-symbols-outlined {
+  font-variation-settings:
+  'FILL' 0,
+  'wght' 400,
+  'GRAD' 0,
+  'opsz' 24
+}
+
 .snack-error {
   --mdc-snackbar-container-color: rgb(233, 64, 64, 0.5);
   --mat-mdc-snack-bar-button-color: #fff;
@@ -355,4 +363,3 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
   font-family: 'Cookie';
   src: url('./assets/fonts/Cookie.ttf');
 }
-
