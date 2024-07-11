@@ -221,8 +221,16 @@ export class AppComponent implements OnInit {
     } 
   }
 
+  getNotes(location: Location, forceSearch: boolean) {
+    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);    
+    this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
+    this.notesByPlusCode = [];
+    this.notesByPlusCode = this.notes.filter((note) => note.plusCode.startsWith(plusCode)); 
+  }
+
   handleMoveEndEvent(event: Location) {
     this.getMessages(this.mapService.getMapLocation(), false);
+    this.getNotes(this.mapService.getMapLocation(), false);
     this.setIsUserLocation()
     this.mapService.drawSearchRectange(event);
     this.mapService.setDrawCircleMarker(true);
@@ -230,8 +238,13 @@ export class AppComponent implements OnInit {
     this.mapService.setDrawCircleMarker(false);
   }
 
-  handleMarkerClickEvent(event: Location) {
+  handleMessageMarkerClickEvent(event: any) {
     this.openMarkerMessageListDialog(event);
+  }
+
+  handleNoteMarkerClickEvent(event: any) {
+    console.log(event);
+    // this.openMarkerMessageListDialog(event);
   }
 
   handleClickEvent(event: Location) {
