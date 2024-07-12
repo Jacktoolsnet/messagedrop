@@ -30,6 +30,7 @@ import { NoteService } from './services/note.service';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
+import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 
 @Component({
   selector: 'app-root',
@@ -260,16 +261,25 @@ export class AppComponent implements OnInit {
   }
 
   handleMarkerClickEvent(event: any) {
-    console.log(event);
-  }
-
-  handleMessageMarkerClickEvent(event: any) {
-    this.openMarkerMessageListDialog(event);
-  }
-
-  handleNoteMarkerClickEvent(event: any) {
-    console.log(event);
-    // this.openMarkerMessageListDialog(event);
+    this.mapService.flyTo({
+      latitude: event.latitude,
+      longitude: event.longitude,
+      zoom: this.mapService.getMapZoom(),
+      plusCode: event.plusCode
+    });
+    switch (event.type) {
+      case MarkerType.PUBLIC_MESSAGE:
+        var messages: Message[] = this.messages.filter((message) => message.plusCode === event.plusCode);
+        this.openMarkerMessageListDialog(messages);
+        break;
+      case MarkerType.PRIVATE_NOTE:
+        var notes: Note[] = this.notes.filter((note) => note.plusCode === event.plusCode);
+        this.openMarkerNoteListDialog(notes);
+        break; 
+      case MarkerType.MULTI:
+        this.openMarkerMultiDialog(this.messages, this.notes);
+      break;
+    }
   }
 
   handleClickEvent(event: Location) {
@@ -436,35 +446,77 @@ export class AppComponent implements OnInit {
     });
   }
 
-  openMarkerMessageListDialog(location: Location) {
-    this.messageService.getByPlusForMarker(location)
-            .subscribe({
-              next: (getMessageResponse) => {
-                const dialogRef = this.messageListDialog.open(MessagelistComponent, {
-                  panelClass: 'MessageListDialog',
-                  closeOnNavigation: true,
-                  data: {user: this.user, messages: [...getMessageResponse.rows]},
-                  width: 'auto',
-                  minWidth: '60vw',
-                  maxWidth:'90vw',
-                  height: 'auto',
-                  minHeight: 'auto',
-                  maxHeight: '90vh',
-                  hasBackdrop: true      
-                });
+  openMarkerMultiDialog(messages: Message[], notes: Note[]) {
+    const dialogRef = this.dialog.open(MultiMarkerComponent, {
+      data: {messages: messages, notes: notes},
+      closeOnNavigation: true,
+      hasBackdrop: true 
+    });
 
-                dialogRef.afterOpened().subscribe(e => {
-                  this.myHistory.push("messageList");
-                  window.history.replaceState(this.myHistory, '', '');
-                });
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("multiMarker");
+      window.history.replaceState(this.myHistory, '', '');
+    });
 
-                dialogRef.afterClosed().subscribe((data: any) => {
-                  this.getMessages(this.mapService.getMapLocation(), true);
-                });
-              },
-              error: (err) => {},
-              complete:() => {}
-            });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        switch (result.type) {
+          case 'public_message':
+            this.openMarkerMessageListDialog(result.messages);
+            break
+          case 'private_note':
+            this.openMarkerNoteListDialog(result.notes);
+            break
+        }
+      }
+    });
+  }
+
+  openMarkerMessageListDialog(messages: Message[]) {
+    const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: {user: this.user, messages: messages},
+      width: 'auto',
+      minWidth: '60vw',
+      maxWidth:'90vw',
+      height: 'auto',
+      minHeight: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("messageList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      this.getMessages(this.mapService.getMapLocation(), true);
+    });
+  }
+
+  openMarkerNoteListDialog(notes: Note[]){
+    const dialogRef = this.messageListDialog.open(NotelistComponent, {
+      panelClass: 'MessageListDialog',
+      closeOnNavigation: true,
+      data: {user: this.user, notes: notes},
+      width: 'auto',
+      minWidth: '60vw',
+      maxWidth:'90vw',
+      height: 'auto',
+      minHeight: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("userNoteList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+    });
   }
 
   editUserProfile() {
@@ -528,7 +580,7 @@ export class AppComponent implements OnInit {
       let location = {
         latitude: message.latitude,
         longitude: message.longitude,
-        zoom: 0,
+        zoom: this.mapService.getMapZoom(),
         plusCode: message.plusCode
       };
       key = this.createMarkerKey(location);
@@ -551,7 +603,7 @@ export class AppComponent implements OnInit {
       let location = {
         latitude: note.latitude,
         longitude: note.longitude,
-        zoom: 0,
+        zoom: this.mapService.getMapZoom(),
         plusCode: note.plusCode
       };
       key = this.createMarkerKey(location);
@@ -582,7 +634,7 @@ export class AppComponent implements OnInit {
 
   private createMarkerKey(location: Location): string {
     if (this.mapService.getMapZoom() > 16) {
-      return location.latitude + " @" + location.longitude;
+      return location.plusCode;
     } else {
       return this.geolocationService.getPlusCodeBasedOnMapZoom(location);
     }

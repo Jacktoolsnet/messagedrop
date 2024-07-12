@@ -50,7 +50,7 @@ export class GeolocationService {
     switch (location.zoom) {
       case 19:
       case 18:
-      case 17:        
+      case 17:
       case 16:
       case 15:
       case 14:
