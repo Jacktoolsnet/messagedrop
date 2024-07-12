@@ -3,6 +3,8 @@ import { MapService } from '../../services/map.service';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Note } from '../../interfaces/note';
+import { MarkerLocation } from '../../interfaces/marker-location';
+import { MarkerType } from '../../interfaces/marker-type';
 
 
 @Component({
@@ -14,37 +16,23 @@ import { Note } from '../../interfaces/note';
 })
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection
+  @Input() size: number = 0;
   @Input() location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
-  @Input() messages: Message[] = [];
-  @Input() notes: Note[] = [];
+  @Input() markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   @Output() clickEvent = new EventEmitter<Location>();
   @Output() moveEndEvent = new EventEmitter<Location>();
-  @Output() messageMarkerClickEvent = new EventEmitter<Location>();
-  @Output() noteMarkerClickEvent = new EventEmitter<Location>();
-
-  private initFinished: boolean = false;
+  @Output() markerClickEvent = new EventEmitter<MarkerLocation>();
 
   ngOnChanges(changes: SimpleChanges) {
-    if (undefined !== this.messages && this.initFinished) {
-      this.mapService.setMessagesPin(this.messages);
-    }
-    if (undefined !== this.notes  && this.initFinished) {
-      this.mapService.setNotesPin(this.notes);
-    }
+    this.mapService.createMarkers(this.markerLocations);
   }
 
   constructor(private mapService: MapService) { }
 
   ngAfterViewInit(): void { 
-    this.mapService.initMap(this.location, this.clickEvent, this.moveEndEvent, this.messageMarkerClickEvent, this.noteMarkerClickEvent);
-    if (undefined !== this.messages) {
-      this.mapService.setMessagesPin(this.messages);
-    }
-    if (undefined !== this.notes) {
-      this.mapService.setNotesPin(this.notes);
-    }
-    this.initFinished = true;
+    this.mapService.initMap(this.location, this.clickEvent, this.moveEndEvent, this.markerClickEvent);
   }
+
 }
 
 

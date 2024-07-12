@@ -5,6 +5,8 @@ import { Message } from '../interfaces/message';
 import { GeolocationService } from './geolocation.service';
 import { PlusCodeArea } from '../interfaces/plus-code-area';
 import { Note } from '../interfaces/note';
+import { MarkerLocation } from '../interfaces/marker-location';
+import { MarkerType } from '../interfaces/marker-type';
 
 const messageMarker = leaflet.icon({
   iconUrl: 'assets/markers/message-marker.png',
@@ -15,6 +17,13 @@ const messageMarker = leaflet.icon({
 
 const noteMarker = leaflet.icon({
   iconUrl: 'assets/markers/note-marker.png',
+
+  iconSize:     [48, 58], // size of the icon
+  iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
+});
+
+const multiMarker = leaflet.icon({
+  iconUrl: 'assets/markers/multi-marker.png',
 
   iconSize:     [48, 58], // size of the icon
   iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
@@ -34,23 +43,20 @@ export class MapService {
 
   private map: any;
   private userMarker: any;
-  private searchRectangle: any;
+  private searchRectangle!: any;
   private circleMarker: any;
   private drawCircleMarker: boolean = false;
   private location: Location = { latitude: 0, longitude: 0, zoom: 10, plusCode: ''};
 
-  private messageMarkerClickEvent!: EventEmitter<Location>;
-  private noteMarkerClickEvent!: EventEmitter<Location>;
+  private markerClickEvent!: EventEmitter<MarkerLocation>;
 
   private messageMarkers: leaflet.Marker[] = [];  
-  private noteMarkers: leaflet.Marker[] = [];
   
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(location: Location, clickEvent:EventEmitter<Location>, moveEndEvent:EventEmitter<Location>, messageMarkerClickEvent:EventEmitter<Location>, noteMarkerClickEvent: EventEmitter<Location>): void {
-    this.messageMarkerClickEvent = messageMarkerClickEvent;
-    this.noteMarkerClickEvent = noteMarkerClickEvent;
+  public initMap(location: Location, clickEvent:EventEmitter<Location>, moveEndEvent:EventEmitter<Location>, markerClickEvent:EventEmitter<MarkerLocation>): void {
+    this.markerClickEvent = markerClickEvent;
 
     this.map = leaflet.map('map', {
       center: [ location.latitude, location.longitude ],
@@ -100,8 +106,8 @@ export class MapService {
     this.drawSearchRectange(this.location);
   }
 
-  public getMapZoom(): any {
-    this.map.getZoom();
+  public getMapZoom(): number {
+    return this.location.zoom;
   }
 
   public getMapLocation(): Location {
@@ -143,134 +149,74 @@ export class MapService {
     this.searchRectangle.setBounds(bounds);
   }
 
-  public setMessagesPin(messages: Message[]) {    
+  public getSearchRectangeCenter(location: Location): number[] {
+    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location));
+    let center: number[] = [(plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2, (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2];
+    return center;
+  }
+
+  public createMarkers(markerLocations: Map<string, MarkerLocation>) {
     // remove pins
-    this.messageMarkers.forEach((marker) => marker.removeFrom(this.map));
-    // clear marker array
-    this.messageMarkers.length = 0
-    // Get plusCode based on map zoom.
-    let location: Location = {
-      latitude: this.map?.getCenter().lat,
-      longitude: this.map?.getCenter().lng,
-      zoom: this.map?.getZoom(),
-      plusCode: this.geolocationService.getPlusCode(this.map?.getCenter().lat, this.map?.getCenter().lng)
-      };
-    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
-    if (plusCode !== '') {
-      // Max zoomed in. Show one marker for each Massage.
-      let markerExist: boolean;
-      messages.forEach((message) => {
-        markerExist = false;
-        let messageLocation: Location = {
-          'latitude': message.latitude || 0,
-          'longitude': message.longitude || 0,
-          'plusCode': message.plusCode || '',
-          'zoom': this.map.getZoom()
-        };
-        if (this.map.getZoom() > 16) {
-          let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageMarker, zIndexOffset: 0})
-          marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+    this.messageMarkers.forEach((marker) => {
+      marker.removeFrom(this.map)
+    });
+    this.messageMarkers.length = 0;
+    // create new markers
+    markerLocations.forEach((markerLocation) => {
+      switch (markerLocation.type) {
+        case MarkerType.PUBLIC_MESSAGE:
+          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: messageMarker, zIndexOffset: 0})
+          markerForPublicMessage.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
-            this.setCircleMarker(messageLocation);
-            this.drawCircleMarker = false
-            this.showMessagesFromMarker($event.target, messageLocation);
-          });
-          this.messageMarkers.push(marker)
-        } else {
-          let plusCodeLength: number = this.geolocationService.getGroupedPlusCodeLengthBasedOnMapZoom(messageLocation);
-          messageLocation = this.geolocationService.getLocationFromPlusCode(message.plusCode || '', plusCodeLength);
-          // Search if a marker for the location exist already
-          this.messageMarkers.forEach((marker) => {
-            if (marker.getLatLng().lat === messageLocation.latitude && marker.getLatLng().lng === messageLocation.longitude) {                
-              markerExist = true;
-            }
-          })
-          // Add if needed.
-          if (!markerExist) {
-            let marker: leaflet.Marker = leaflet.marker([messageLocation.latitude, messageLocation.longitude], {icon: messageMarker, zIndexOffset: 0})
-            marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-              this.drawCircleMarker = true;
-              this.setCircleMarker(messageLocation);
-              this.drawCircleMarker = false;
-              this.showMessagesFromMarker($event.target, messageLocation);
+            this.setCircleMarker({
+              latitude: markerLocation.latitude,
+              longitude: markerLocation.longitude,
+              zoom: this.getMapZoom(),
+              plusCode: markerLocation.plusCode
             });
-            this.messageMarkers.push(marker)
-          }
-        }
-      });
-    }
+            this.drawCircleMarker = false;
+            this.showDataFromMarker(markerLocation);
+          });
+          this.messageMarkers.push(markerForPublicMessage)
+          break;
+        case MarkerType.PRIVATE_NOTE:
+          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: noteMarker, zIndexOffset: 5})
+          markerForPrivateNote.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+            this.drawCircleMarker = true;
+            this.setCircleMarker({
+              latitude: markerLocation.latitude,
+              longitude: markerLocation.longitude,
+              zoom: this.getMapZoom(),
+              plusCode: markerLocation.plusCode
+            });
+            this.drawCircleMarker = false;
+            this.showDataFromMarker(markerLocation);
+          });
+          this.messageMarkers.push(markerForPrivateNote)
+          break;
+        case MarkerType.MULTI:
+          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: multiMarker, zIndexOffset: 10})
+          markerMulti.on('click', ($event: leaflet.LeafletMouseEvent)  => {
+            this.drawCircleMarker = true;
+            this.setCircleMarker({
+              latitude: markerLocation.latitude,
+              longitude: markerLocation.longitude,
+              zoom: this.getMapZoom(),
+              plusCode: markerLocation.plusCode
+            });
+            this.drawCircleMarker = false;
+            this.showDataFromMarker(markerLocation);
+          });
+          this.messageMarkers.push(markerMulti)
+          break;
+      }
+    })
     // add to map
     this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
-    }
+  }
 
-    public setNotesPin(notes: Note[]) {    
-      // remove pins
-      this.noteMarkers.forEach((marker) => marker.removeFrom(this.map));
-      // clear marker array
-      this.noteMarkers.length = 0
-      // Get plusCode based on map zoom.      
-      let location: Location = {
-        latitude: this.map?.getCenter().lat,
-        longitude: this.map?.getCenter().lng,
-        zoom: this.map?.getZoom(),
-        plusCode: this.geolocationService.getPlusCode(this.map?.getCenter().lat, this.map?.getCenter().lng)
-        };
-      let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);      
-      if (plusCode !== '') {
-        // Max zoomed in. Show one marker for each Massage.
-        let markerExist: boolean;
-        notes.forEach((note) => {
-          markerExist = false;
-          let noteLocation: Location = {
-            'latitude': note.latitude || 0,
-            'longitude': note.longitude || 0,
-            'plusCode': note.plusCode || '',
-            'zoom': this.map.getZoom()
-          };
-          if (this.map.getZoom() > 16) {
-            let marker: leaflet.Marker = leaflet.marker([noteLocation.latitude, noteLocation.longitude], {icon: noteMarker, zIndexOffset: 0})
-            marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-              this.drawCircleMarker = true;
-              this.setCircleMarker(noteLocation);
-              this.drawCircleMarker = false
-              this.showNotesFromMarker($event.target, noteLocation);
-            });
-            this.noteMarkers.push(marker)
-          } else {
-            // Left upper corner for notes.
-            let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(noteLocation));
-            noteLocation.latitude = plusCodeArea.latitudeHi
-            noteLocation.longitude = plusCodeArea.longitudeLo
-            // Search if a marker for the location exist already
-            this.noteMarkers.forEach((marker) => {
-              if (marker.getLatLng().lat === noteLocation.latitude && marker.getLatLng().lng === noteLocation.longitude) {                
-                markerExist = true;
-              }
-            })
-            // Add if needed.
-            if (!markerExist) {
-              let marker: leaflet.Marker = leaflet.marker([noteLocation.latitude, noteLocation.longitude], {icon: noteMarker, zIndexOffset: 0})
-              marker.on('click', ($event: leaflet.LeafletMouseEvent)  => {
-                this.drawCircleMarker = true;
-                this.setCircleMarker(noteLocation);
-                this.drawCircleMarker = false;
-                this.showNotesFromMarker($event.target, noteLocation);
-              });
-              this.noteMarkers.push(marker)
-            }
-          }
-        });
-      }
-      // add to map
-      this.noteMarkers?.forEach((marker) => marker.addTo(this.map));
-    }
-
-    private showMessagesFromMarker(marker: leaflet.Marker, location: Location) {
-      this.messageMarkerClickEvent.emit(location);
-    }
-
-    private showNotesFromMarker(marker: leaflet.Marker, location: Location) {
-      this.noteMarkerClickEvent.emit(location);
-    }
+  private showDataFromMarker(markerLocation: MarkerLocation) {
+    this.markerClickEvent.emit(markerLocation);
+  }
     
 }

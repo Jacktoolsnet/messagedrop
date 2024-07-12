@@ -28,6 +28,8 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { NoteComponent } from './components/note/note.component';
 import { NoteService } from './services/note.service';
 import { NotelistComponent } from './components/notelist/notelist.component';
+import { MarkerLocation } from './interfaces/marker-location';
+import { MarkerType } from './interfaces/marker-type';
 
 @Component({
   selector: 'app-root',
@@ -58,11 +60,12 @@ export class AppComponent implements OnInit {
   public messages: Message[] = [];
   public myHistory: string[] = [];
   public notes: Note[] = [];
-  public notesByPlusCode: Note[] = [];
+  public allUserNotes: Note[] = [];
+  public markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   private snackBarRef: any;
   public isUserLocation: boolean = false;
   public messageMode: typeof MessageMode = MessageMode;
-  private lastSearchedLocation: string = '';
+  public lastSearchedLocation: string = '';
 
   constructor(
     public mapService: MapService,
@@ -89,7 +92,7 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
-    this.notes = [...this.noteService.loadNotesFromStorage()];
+    this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
     this.loadUser();
   }
 
@@ -200,42 +203,64 @@ export class AppComponent implements OnInit {
   }
 
   getMessages(location: Location, forceSearch: boolean) {
-    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {
-      this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
-      this.messageService.getByPlusCode(location)
-              .subscribe({
-                next: (getMessageResponse) => {
-                  this.messages = [...getMessageResponse.rows];
-                },
-                error: (err) => {
-                  this.messages = [];
-                  this.snackBarRef = this.snackBar.open("No message found", undefined , {
-                    panelClass: ['snack-warning'],
-                    horizontalPosition: 'center',
-                    verticalPosition: 'top',
-                    duration: 1000
-                  });
-                },
-                complete:() => {}
-              });
-    } 
+    this.messageService.getByPlusCode(location)
+            .subscribe({
+              next: (getMessageResponse) => {
+                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);                
+                this.messages = [...getMessageResponse.rows];
+                // At the moment build the marekrLocation map here:
+                this.createMarkerLocations()                
+              },
+              error: (err) => {
+                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);                
+                this.messages = [];
+                // At the moment build the marekrLocation map here:
+                this.createMarkerLocations()
+                this.snackBarRef = this.snackBar.open("No message found", undefined , {
+                  panelClass: ['snack-warning'],
+                  horizontalPosition: 'center',
+                  verticalPosition: 'top',
+                  duration: 1000
+                });
+              },
+              complete:() => {        
+                // Is excecutet before the result is here.
+                // In the future for example get private or bussiness messages and build the marekrLocation map there.
+              }
+            });
   }
 
-  getNotes(location: Location, forceSearch: boolean) {
-    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);    
-    this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);
-    this.notesByPlusCode = [];
-    this.notesByPlusCode = this.notes.filter((note) => note.plusCode.startsWith(plusCode)); 
+  getNotesByPlusCode(location: Location, forceSearch: boolean) {
+    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);   
+    this.notes = [];
+    this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
+  }
+
+  updateDataForLocation(location: Location, forceSearch: boolean) {
+    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {      
+      // 0. Clear markerLocations
+      this.markerLocations.clear()      
+      // 1. notes from local device
+      this.getNotesByPlusCode(this.mapService.getMapLocation(), false);
+      // 2. Messages
+      this.getMessages(this.mapService.getMapLocation(), false);
+      // 3. in the complete event of getMessages
+    } else {
+      this.createMarkerLocations();
+    }
   }
 
   handleMoveEndEvent(event: Location) {
-    this.getMessages(this.mapService.getMapLocation(), false);
-    this.getNotes(this.mapService.getMapLocation(), false);
+    this.updateDataForLocation(this.mapService.getMapLocation(), false)
     this.setIsUserLocation()
     this.mapService.drawSearchRectange(event);
     this.mapService.setDrawCircleMarker(true);
     this.mapService.setCircleMarker(event);
     this.mapService.setDrawCircleMarker(false);
+  }
+
+  handleMarkerClickEvent(event: any) {
+    console.log(event);
   }
 
   handleMessageMarkerClickEvent(event: any) {
@@ -294,7 +319,7 @@ export class AppComponent implements OnInit {
             .subscribe({
               next: createMessageResponse => {
                 this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.getMessages(this.mapService.getMapLocation(), true);
+                this.updateDataForLocation(this.mapService.getMapLocation(), true);
                 this.statisticService.countMessage()
                 .subscribe({
                   next: (data) => {},
@@ -341,8 +366,10 @@ export class AppComponent implements OnInit {
         data.note.latitude = this.mapService.getMapLocation().latitude;
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
-        this.notes.push(data.note)
-        this.noteService.saveNotesToStorage(this.notes);
+        this.allUserNotes.push(data.note);
+        this.notes.push(data.note);
+        this.noteService.saveNotesToStorage(this.allUserNotes);
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
   }
@@ -406,7 +433,6 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      console.log(data);
     });
   }
 
@@ -491,6 +517,75 @@ export class AppComponent implements OnInit {
               });
       }
     });
+  }
+
+  private createMarkerLocations() {
+    let key: string = "";
+    this.markerLocations.clear();
+    let center: number[] = [];
+    // Process messages
+    this.messages.forEach((message) => {
+      let location = {
+        latitude: message.latitude,
+        longitude: message.longitude,
+        zoom: 0,
+        plusCode: message.plusCode
+      };
+      key = this.createMarkerKey(location);
+      if (this.mapService.getMapZoom() > 16) {
+        center = [message.latitude, message.longitude]        
+      } else {
+        center = this.mapService.getSearchRectangeCenter(location);
+      }
+      if (!this.markerLocations.has(key)){
+        this.markerLocations.set(key, {
+          latitude: center[0],
+          longitude: center[1],
+          plusCode: message.plusCode,
+          type: MarkerType.PUBLIC_MESSAGE
+        });
+      }
+    });
+    // Process notes
+    this.notes.forEach((note) => {
+      let location = {
+        latitude: note.latitude,
+        longitude: note.longitude,
+        zoom: 0,
+        plusCode: note.plusCode
+      };
+      key = this.createMarkerKey(location);
+      if (this.mapService.getMapZoom() > 16) {
+        center = [note.latitude, note.longitude]        
+      } else {
+        center = this.mapService.getSearchRectangeCenter(location);
+      }
+      if (this.markerLocations.has(key)){        
+        if (this.markerLocations.get(key)?.type != MarkerType.PRIVATE_NOTE) {
+          this.markerLocations.set(key, {
+          latitude: center[0],
+          longitude: center[1],
+          plusCode: note.plusCode,
+          type: MarkerType.MULTI
+        });
+        }
+      } else {
+        this.markerLocations.set(key, {
+          latitude: center[0],
+          longitude: center[1],
+          plusCode: note.plusCode,
+          type: MarkerType.PRIVATE_NOTE
+        });
+      }      
+    });
+  }
+
+  private createMarkerKey(location: Location): string {
+    if (this.mapService.getMapZoom() > 16) {
+      return location.latitude + " @" + location.longitude;
+    } else {
+      return this.geolocationService.getPlusCodeBasedOnMapZoom(location);
+    }
   }
 
 }
