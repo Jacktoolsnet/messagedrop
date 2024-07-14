@@ -11,29 +11,29 @@ import { MarkerType } from '../interfaces/marker-type';
 const messageMarker = leaflet.icon({
   iconUrl: 'assets/markers/message-marker.png',
 
-  iconSize:     [48, 58], // size of the icon
-  iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
+  iconSize:     [32, 40], // size of the icon
+  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
 });
 
 const noteMarker = leaflet.icon({
   iconUrl: 'assets/markers/note-marker.png',
 
-  iconSize:     [48, 58], // size of the icon
-  iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
+  iconSize:     [32, 40], // size of the icon
+  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
 });
 
 const multiMarker = leaflet.icon({
   iconUrl: 'assets/markers/multi-marker.png',
 
-  iconSize:     [48, 58], // size of the icon
-  iconAnchor:   [24, 58], // point of the icon which will correspond to marker's location
+  iconSize:     [32, 40], // size of the icon
+  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
 });
 
 const userMarker = leaflet.icon({
   iconUrl: 'assets/markers/user-marker.png',
 
-  iconSize:     [24, 29], // size of the icon
-  iconAnchor:   [12, 29], // point of the icon which will correspond to marker's location
+  iconSize:     [32, 40], // size of the icon
+  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
 });
 
 @Injectable({
