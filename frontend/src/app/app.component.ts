@@ -254,6 +254,7 @@ export class AppComponent implements OnInit {
   handleMoveEndEvent(event: Location) {
     this.updateDataForLocation(this.mapService.getMapLocation(), false)
     this.setIsUserLocation()
+    this.user!.location.zoom = event.zoom;
     this.mapService.drawSearchRectange(event);
     this.mapService.setDrawCircleMarker(true);
     this.mapService.setCircleMarker(event);
@@ -271,17 +272,30 @@ export class AppComponent implements OnInit {
     let notes: Note[] = [];
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
-        messages = this.messages.filter((message) => message.plusCode === event.plusCode);
-        this.openMarkerMessageListDialog(messages);
+        if (this.mapService.getMapZoom() > 16) {
+          messages = this.messages.filter((message) => message.plusCode === event.plusCode);
+          this.openMarkerMessageListDialog(messages);
+        } else {
+          this.openMarkerMessageListDialog(this.messages);
+        }
+        
         break;
       case MarkerType.PRIVATE_NOTE:
-        notes = this.notes.filter((note) => note.plusCode === event.plusCode);
-        this.openMarkerNoteListDialog(notes);
+        if (this.mapService.getMapZoom() > 16) {
+          notes = this.notes.filter((note) => note.plusCode === event.plusCode);
+          this.openMarkerNoteListDialog(notes);
+        } else {
+          this.openMarkerNoteListDialog(this.notes);
+        }
         break; 
       case MarkerType.MULTI:
-        messages = this.messages.filter((message) => message.plusCode === event.plusCode);
-        notes = this.notes.filter((note) => note.plusCode === event.plusCode);
-        this.openMarkerMultiDialog(messages, notes);
+        if (this.mapService.getMapZoom() > 16) {
+          messages = this.messages.filter((message) => message.plusCode === event.plusCode);
+          notes = this.notes.filter((note) => note.plusCode === event.plusCode);
+          this.openMarkerMultiDialog(messages, notes);
+        } else {
+          this.openMarkerMultiDialog(this.messages, this.notes);
+        }
       break;
     }
   }
