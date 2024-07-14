@@ -157,10 +157,12 @@ export class AppComponent implements OnInit {
 
   startWatchingPosition() {
     this.isUserLocation = true;
+    this.user!.location.zoom = 16;
     this.watchPosition();
   }
 
   goToUserLocation() {
+    this.user!.location.zoom = this.mapService.getMapZoom();
     this.mapService.flyTo(this.user!.location);
   }
 
@@ -170,9 +172,6 @@ export class AppComponent implements OnInit {
         this.user!.location.latitude = position.coords.latitude;
         this.user!.location.longitude = position.coords.longitude;
         this.user!.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        if (undefined  == this.mapService.getMapZoom()) {
-          this.user!.location.zoom = 17;
-        }        
         this.userService.saveUser(this.user!);
         this.locationReady = true;
         this.mapService.setUserMarker(this.user!.location);
