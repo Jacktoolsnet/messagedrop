@@ -67,6 +67,7 @@ export class AppComponent implements OnInit {
   public isUserLocation: boolean = false;
   public messageMode: typeof MessageMode = MessageMode;
   public lastSearchedLocation: string = '';
+  public lastMarkerUpdate: number = 0;
 
   constructor(
     public mapService: MapService,
@@ -231,7 +232,7 @@ export class AppComponent implements OnInit {
             });
   }
 
-  getNotesByPlusCode(location: Location, forceSearch: boolean) {
+  getNotesByPlusCode(location: Location) {
     let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);   
     this.notes = [];
     this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
@@ -242,7 +243,7 @@ export class AppComponent implements OnInit {
       // 0. Clear markerLocations
       this.markerLocations.clear()      
       // 1. notes from local device
-      this.getNotesByPlusCode(this.mapService.getMapLocation(), false);
+      this.getNotesByPlusCode(this.mapService.getMapLocation());
       // 2. Messages
       this.getMessages(this.mapService.getMapLocation(), false);
       // 3. in the complete event of getMessages
@@ -267,17 +268,21 @@ export class AppComponent implements OnInit {
       zoom: this.mapService.getMapZoom(),
       plusCode: event.plusCode
     });
+    let messages: Message[] = [];
+    let notes: Note[] = [];
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
-        var messages: Message[] = this.messages.filter((message) => message.plusCode === event.plusCode);
+        messages = this.messages.filter((message) => message.plusCode === event.plusCode);
         this.openMarkerMessageListDialog(messages);
         break;
       case MarkerType.PRIVATE_NOTE:
-        var notes: Note[] = this.notes.filter((note) => note.plusCode === event.plusCode);
+        notes = this.notes.filter((note) => note.plusCode === event.plusCode);
         this.openMarkerNoteListDialog(notes);
         break; 
       case MarkerType.MULTI:
-        this.openMarkerMultiDialog(this.messages, this.notes);
+        messages = this.messages.filter((message) => message.plusCode === event.plusCode);
+        notes = this.notes.filter((note) => note.plusCode === event.plusCode);
+        this.openMarkerMultiDialog(messages, notes);
       break;
     }
   }
@@ -443,6 +448,9 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
+      this.getNotesByPlusCode(this.mapService.getMapLocation());
+      this.createMarkerLocations();
     });
   }
 
@@ -612,7 +620,7 @@ export class AppComponent implements OnInit {
       } else {
         center = this.mapService.getSearchRectangeCenter(location);
       }
-      if (this.markerLocations.has(key)){        
+      if (this.markerLocations.has(key)){
         if (this.markerLocations.get(key)?.type != MarkerType.PRIVATE_NOTE) {
           this.markerLocations.set(key, {
           latitude: center[0],
@@ -630,6 +638,8 @@ export class AppComponent implements OnInit {
         });
       }      
     });
+    // Save last markerupdet to fire the angular change listener
+    this.lastMarkerUpdate = new Date().getMilliseconds();
   }
 
   private createMarkerKey(location: Location): string {

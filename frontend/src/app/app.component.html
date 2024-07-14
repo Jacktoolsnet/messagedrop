@@ -1,4 +1,4 @@
-<app-map [size]="markerLocations.size" [location]="mapService.getMapLocation()" [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()" [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
 <button *ngIf="userReady" [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
 </button>
