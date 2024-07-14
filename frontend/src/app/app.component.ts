@@ -501,6 +501,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.getMessages(this.mapService.getMapLocation(), true);
+      this.createMarkerLocations();
     });
   }
 
@@ -524,6 +525,9 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
+      this.getNotesByPlusCode(this.mapService.getMapLocation());
+      this.createMarkerLocations();
     });
   }
 

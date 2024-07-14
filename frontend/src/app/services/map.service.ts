@@ -165,7 +165,7 @@ export class MapService {
     markerLocations.forEach((markerLocation) => {
       switch (markerLocation.type) {
         case MarkerType.PUBLIC_MESSAGE:
-          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: messageMarker, zIndexOffset: 0})
+          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: messageMarker, zIndexOffset: 5})
           markerForPublicMessage.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
@@ -180,7 +180,7 @@ export class MapService {
           this.messageMarkers.push(markerForPublicMessage)
           break;
         case MarkerType.PRIVATE_NOTE:
-          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: noteMarker, zIndexOffset: 5})
+          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: noteMarker, zIndexOffset: 10})
           markerForPrivateNote.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
@@ -195,7 +195,7 @@ export class MapService {
           this.messageMarkers.push(markerForPrivateNote)
           break;
         case MarkerType.MULTI:
-          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: multiMarker, zIndexOffset: 10})
+          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: multiMarker, zIndexOffset: 0})
           markerMulti.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
             this.setCircleMarker({

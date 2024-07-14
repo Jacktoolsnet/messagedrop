@@ -109,6 +109,9 @@ export class NotelistComponent implements OnInit{
           this.notes.splice(index, 1);
         }
         this.noteService.saveNotesToStorage(this.notes);
+        if (this.notes.length == 0) {
+          this.dialogRef.close();
+        }
       }
     });
   }
