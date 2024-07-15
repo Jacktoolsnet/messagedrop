@@ -686,7 +686,7 @@ export class AppComponent implements OnInit {
         next: simpleStatusResponse => {
           if(simpleStatusResponse.status === 200){
             this.userIsSusbscribedToLocation = true;
-            this.snackBarRef = this.snackBar.open(`Subscription for location added.`, '', {duration: 1000});          
+            this.snackBarRef = this.snackBar.open(`Subscription for location added.`, '', {duration: 3000});          
           }          
         },
         error: (err) => {
@@ -725,6 +725,7 @@ export class AppComponent implements OnInit {
       next: simpleStatusResponse => {
         if(simpleStatusResponse.status === 200){
           this.userIsSusbscribedToLocation = false;
+          this.snackBarRef = this.snackBar.open(`Subscription for location removed.`, '', {duration: 3000});
         }
       },
       error: (err) => {},
