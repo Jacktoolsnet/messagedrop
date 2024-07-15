@@ -2,11 +2,9 @@
 const tableName = 'tableLocationPushSubscription';
 
 const columnUserId = 'userId';
-const columnName = 'name';
 const columnPlusCode = 'plusCode';
-const columnEndpoint = 'endpoint';
-const columnExpirationTime = 'expirationTime';
-const columnApplicationServerKey = 'applicationServerKey';
+const columnName = 'name';
+const columnSubscription = 'subscription';
 
 const init = function (db) {
     try {
@@ -15,9 +13,7 @@ const init = function (db) {
             ${columnUserId} TEXT NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
             ${columnName} TEXT NOT NULL,
-            ${columnEndpoint} TEXT NOT NULL,
-            ${columnExpirationTime} TEXT,
-            ${columnApplicationServerKey} TEXT NOT NULL,
+            ${columnSubscription} TEXT NOT NULL,
             PRIMARY KEY (${columnUserId}, ${columnPlusCode}),
             FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -34,23 +30,19 @@ const init = function (db) {
     }
 };
 
-const subscribe = function (db, userId, plusCode, name, endpoint, expirationTime, applicationServerKey, callback) {
+const subscribe = function (db, userId, plusCode, name, subscription, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnUserId}, 
             ${columnPlusCode},
             ${columnName},
-            ${columnEndpoint},
-            ${columnExpirationTime},
-            ${columnApplicationServerKey},
+            ${columnSubscription}
         ) VALUES (
             '${userId}',
             '${plusCode}',
             '${name}',
-            '${endpoint}',
-            '${expirationTime}',
-            '${applicationServerKey}'
+            '${subscription}'
         );`;
         db.run(sql, (err) => {
             callback(err)     

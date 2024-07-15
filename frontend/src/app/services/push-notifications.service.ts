@@ -24,16 +24,15 @@ export class PushNotificationsService {
     return throwError(() => error);
   }
 
-  subscribeToLocation(subscrition: any, plusCode: string, user: User, name: string) {
+  subscribeToLocation(plusCode: string, user: User, name: string, subscrition: any) {
+    console.log(subscrition);
     let body = {
       'userId': user.id,
       'plusCode': plusCode,
       'name': name,
-      'endpoint': subscrition.endpoint,
-      'expirationTime': subscrition.expirationTime,
-      'applicationServerKey': subscrition.options.applicationServerKey
+      'subscription': JSON.stringify(subscrition)
     };
-    
+    console.log(body);
     return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/locationPushSubscription/subscribe`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
