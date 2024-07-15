@@ -685,6 +685,7 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: simpleStatusResponse => {
           if(simpleStatusResponse.status === 200){
+            this.userIsSusbscribedToLocation = true;
             this.snackBarRef = this.snackBar.open(`Subscription for location added.`, '', {duration: 1000});          
           }          
         },
