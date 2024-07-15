@@ -2,11 +2,11 @@
 const tableName = 'tableLocationPushSubscription';
 
 const columnUserId = 'userId';
+const columnName = 'name';
 const columnPlusCode = 'plusCode';
 const columnEndpoint = 'endpoint';
 const columnExpirationTime = 'expirationTime';
-const columnP256dhs = 'p256dh';
-const columnAuth = 'auth';
+const columnApplicationServerKey = 'applicationServerKey';
 
 const init = function (db) {
     try {
@@ -14,10 +14,10 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnUserId} TEXT NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
+            ${columnName} TEXT NOT NULL,
             ${columnEndpoint} TEXT NOT NULL,
             ${columnExpirationTime} TEXT,
-            ${columnP256dhs} TEXT NOT NULL,
-            ${columnAuth} TEXT NOT NULL,
+            ${columnApplicationServerKey} TEXT NOT NULL,
             PRIMARY KEY (${columnUserId}, ${columnPlusCode}),
             FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -34,23 +34,23 @@ const init = function (db) {
     }
 };
 
-const subscribe = function (db, userId, plusCode, endpoint, expirationTime, p256dh, auth, callback) {
+const subscribe = function (db, userId, plusCode, name, endpoint, expirationTime, applicationServerKey, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnUserId}, 
             ${columnPlusCode},
+            ${columnName},
             ${columnEndpoint},
             ${columnExpirationTime},
-            ${columnP256dhs},
-            ${columnAuth}
+            ${columnApplicationServerKey},
         ) VALUES (
             '${userId}',
             '${plusCode}',
+            '${name}',
             '${endpoint}',
             '${expirationTime}',
-            '${p256dh}',
-            '${auth}'
+            '${applicationServerKey}'
         );`;
         db.run(sql, (err) => {
             callback(err)     

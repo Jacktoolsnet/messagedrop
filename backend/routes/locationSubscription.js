@@ -6,7 +6,7 @@ const tableLocationPushSubscription = require('../db/tableLocationPushSubscripti
 
 router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tableLocationPushSubscription.subscribe(req.database.db, req.body.userId, req.body.plusCode, req.body.endpoint, req.body.expirationTime, req.body.p256dh, req.body.auth, function (err) {
+  tableLocationPushSubscription.subscribe(req.database.db, req.body.userId, req.body.plusCode, req.body.name, req.body.endpoint, req.body.expirationTime, req.body.applicationServerKey, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

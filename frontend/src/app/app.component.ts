@@ -681,7 +681,8 @@ export class AppComponent implements OnInit {
       serverPublicKey: environment.vapid_public_key
     })
     .then(subscription => {
-      this.pushNotifications.subscribeToLocation(subscription, "", this.user!)
+      console.log(subscription);
+      this.pushNotifications.subscribeToLocation(subscription, this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!, "")
       .subscribe({
         next: simpleStatusResponse => {
           if(simpleStatusResponse.status === 200){
