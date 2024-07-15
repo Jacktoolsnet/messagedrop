@@ -138,4 +138,8 @@ export class NotelistComponent implements OnInit{
     });
   }
 
+  public goBack() {
+    this.dialogRef.close();
+  }
+
 }

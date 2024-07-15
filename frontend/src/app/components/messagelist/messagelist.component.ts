@@ -39,7 +39,7 @@ import { TranslateService } from '../../services/translate.service';
     MatDialogContainer,
     CommonModule, 
     FormsModule, 
-    MatButtonModule, 
+    MatButtonModule,
     MatDialogActions, 
     MatDialogClose, 
     MatDialogTitle, 
@@ -305,7 +305,7 @@ export class MessagelistComponent implements OnInit{
                   if (simpleStatusResponse.status === 200) {
                     this.messages = this.messages.filter( element => element.id !== message.id );
                     this.selectedMessages.pop();
-                    if (this.selectedMessages.length == 0) {
+                    if (this.messages.length === 0) {
                       this.dialogRef.close();
                     }
                   }

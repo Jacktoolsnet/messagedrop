@@ -50,8 +50,10 @@ export class GeolocationService {
     switch (location.zoom) {
       case 19:
       case 18:
-      case 17:
-      case 16:
+        plusCode = location.plusCode;
+        break;
+      case 17:        
+      case 16:        
       case 15:
       case 14:
         plusCode = location.plusCode.substring(0, 8);

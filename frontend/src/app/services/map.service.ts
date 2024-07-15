@@ -9,31 +9,31 @@ import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
 
 const messageMarker = leaflet.icon({
-  iconUrl: 'assets/markers/message-marker.png',
+  iconUrl: 'assets/markers/message-marker.svg',
 
   iconSize:     [32, 40], // size of the icon
-  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
+  iconAnchor:   [16, 40], // point of the icon which will correspond to marker's location
 });
 
 const noteMarker = leaflet.icon({
-  iconUrl: 'assets/markers/note-marker.png',
+  iconUrl: 'assets/markers/note-marker.svg',
 
   iconSize:     [32, 40], // size of the icon
-  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
+  iconAnchor:   [16, 40], // point of the icon which will correspond to marker's location
 });
 
 const multiMarker = leaflet.icon({
-  iconUrl: 'assets/markers/multi-marker.png',
+  iconUrl: 'assets/markers/multi-marker.svg',
 
   iconSize:     [32, 40], // size of the icon
-  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
+  iconAnchor:   [16, 40], // point of the icon which will correspond to marker's location
 });
 
 const userMarker = leaflet.icon({
-  iconUrl: 'assets/markers/user-marker.png',
+  iconUrl: 'assets/markers/user-marker.svg',
 
   iconSize:     [32, 40], // size of the icon
-  iconAnchor:   [16, 20], // point of the icon which will correspond to marker's location
+  iconAnchor:   [16, 40], // point of the icon which will correspond to marker's location
 });
 
 @Injectable({
@@ -126,7 +126,7 @@ export class MapService {
 
   public setUserMarker (location: Location) {
     if (undefined === this.userMarker) {
-      this.userMarker = leaflet.marker([location.latitude, location.longitude], {icon: userMarker, zIndexOffset: 100}).addTo(this.map);
+      this.userMarker = leaflet.marker([location.latitude, location.longitude], {icon: userMarker, zIndexOffset: 0}).addTo(this.map);
     } else {
       this.userMarker?.setLatLng([location.latitude, location.longitude]).update();
     }
@@ -165,7 +165,7 @@ export class MapService {
     markerLocations.forEach((markerLocation) => {
       switch (markerLocation.type) {
         case MarkerType.PUBLIC_MESSAGE:
-          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: messageMarker, zIndexOffset: 5})
+          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: messageMarker, zIndexOffset: 20})
           markerForPublicMessage.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
@@ -180,7 +180,7 @@ export class MapService {
           this.messageMarkers.push(markerForPublicMessage)
           break;
         case MarkerType.PRIVATE_NOTE:
-          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: noteMarker, zIndexOffset: 10})
+          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: noteMarker, zIndexOffset: 15})
           markerForPrivateNote.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
@@ -195,7 +195,7 @@ export class MapService {
           this.messageMarkers.push(markerForPrivateNote)
           break;
         case MarkerType.MULTI:
-          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: multiMarker, zIndexOffset: 0})
+          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], {icon: multiMarker, zIndexOffset: 5})
           markerMulti.on('click', ($event: leaflet.LeafletMouseEvent)  => {
             this.drawCircleMarker = true;
             this.setCircleMarker({

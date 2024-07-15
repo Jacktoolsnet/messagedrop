@@ -1,4 +1,7 @@
 <mat-dialog-content class="dialog">
+    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
+    </button>
     <div [ngClass]="{
         'list': true, 
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
