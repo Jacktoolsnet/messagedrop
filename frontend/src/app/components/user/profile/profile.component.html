@@ -16,10 +16,10 @@
     <button *ngIf="user.base64Avatar != ''" mat-mini-fab color="primary"  class="upload-button" (click)="deleteAvatar()">
       <mat-icon>delete</mat-icon>
     </button>
-  </div>
-  <h5>This user profile is stored on your device and is only visible to you.</h5>
+  </div>  
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
   <button mat-button mat-dialog-close [mat-dialog-close]="user">Apply</button>
 </mat-dialog-actions>
+<h4>The information is stored on your device and is only visible to you.</h4>

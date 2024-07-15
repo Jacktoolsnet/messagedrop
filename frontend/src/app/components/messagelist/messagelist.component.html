@@ -2,101 +2,109 @@
     <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
-    <div *ngIf="this.selectedMessages?.length === 0" [ngClass]="{
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
+    </button>
+    <div class="content" [ngClass]="{
         'list': true, 
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
-        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
-        <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">            
-            <mat-card>
-                <img *ngIf="user.base64Avatar != '' && user.id == message.userId" class="avatar" src="{{user.base64Avatar}}" />
-                <img *ngIf="getMessageUserName(message).base64Avatar != '' && user.id != message.userId" class="avatar" src="{{getMessageUserName(message).base64Avatar}}" />
-                <mat-card-header class="header">
-                    <mat-card-title *ngIf="user.id == message.userId">{{user.name}}</mat-card-title>
-                    <mat-card-title *ngIf="user.id != message.userId">{{getMessageUserName(message).name}}</mat-card-title>
-                    <mat-card-subtitle></mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content *ngIf="undefined == message.translatedMessage" [style]="message.style">{{message.message}}</mat-card-content>
-                <mat-card-content *ngIf="undefined != message.translatedMessage" [style]="message.style">{{message.translatedMessage}}</mat-card-content>
-                <mat-card-actions class="buttonbar">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.comments | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
-                </mat-card-actions>
-            </mat-card>
+        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
+        <div *ngIf="this.selectedMessages?.length === 0">        
+            <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">            
+                <mat-card>
+                    <img *ngIf="user.base64Avatar != '' && user.id == message.userId" class="avatar" src="{{user.base64Avatar}}" />
+                    <img *ngIf="getMessageUserName(message).base64Avatar != '' && user.id != message.userId" class="avatar" src="{{getMessageUserName(message).base64Avatar}}" />
+                    <mat-card-header class="header">
+                        <mat-card-title *ngIf="user.id == message.userId">{{user.name}}</mat-card-title>
+                        <mat-card-title *ngIf="user.id != message.userId">{{getMessageUserName(message).name}}</mat-card-title>
+                        <mat-card-subtitle></mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content *ngIf="undefined == message.translatedMessage" [style]="message.style">{{message.message}}</mat-card-content>
+                    <mat-card-content *ngIf="undefined != message.translatedMessage" [style]="message.style">{{message.translatedMessage}}</mat-card-content>
+                    <mat-card-actions class="buttonbar">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.comments | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
         </div>
-    </div>
-    <!-- Message Detail view-->
-    <div *ngIf="selectedMessages?.length != 0" [ngClass]="{
-        'list': true, 
-        'gradientAnimation': animation.cssclass === 'gradientAnimation',
-        'radialAnimation': animation.cssclass === 'radialAnimation',
-        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
-        <div class="item">            
-            <mat-card>
-                <img *ngIf="user.base64Avatar != '' && user.id == selectedMessages[selectedMessages.length - 1].userId" class="avatar" src="{{user.base64Avatar}}" />
-                <img *ngIf="selectedMessageUser.base64Avatar != '' && user.id != selectedMessages[selectedMessages.length - 1].userId" class="avatar" src="{{selectedMessageUser.base64Avatar}}" />
-                <mat-card-header class="header">
-                    <mat-card-title *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{user.name}}</mat-card-title>
-                    <mat-card-title *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
-                    <mat-card-subtitle></mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content *ngIf="undefined == selectedMessages[selectedMessages.length - 1].translatedMessage" [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
-                <mat-card-content *ngIf="undefined != selectedMessages[selectedMessages.length - 1].translatedMessage" [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].translatedMessage}}</mat-card-content>
-                <mat-card-actions class="buttonbar">
-                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
-                    </button>
-                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="dislikeButtonColor" aria-label="Dislike message" (click)="dislikeMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true" >thumb_down</mat-icon>
-                    </button>
-                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Drop a comment" (click)="addComment(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon>add_comment</mat-icon>
-                    </button>
-                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId && undefined == selectedMessages[selectedMessages.length - 1].translatedMessage" mat-mini-fab color="secondary" aria-label="Translate message" (click)="translateMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon>translate</mat-icon>
-                    </button>
-                    <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessageUserProfile(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >person</mat-icon>
-                    </button>
-                    <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
-                    </button>
-                    <button class="button_messagemenu" [matMenuTriggerFor]="messageMenu" [matMenuTriggerData]="{user: user, message: selectedMessages[selectedMessages.length - 1]}" aria-hidden="false" mat-mini-fab color="secondary" aria-label="Message menu" (click)="{}">
-                        <mat-icon aria-hidden="false"  class="material-symbols-outlined" >more_vert</mat-icon>
-                    </button>
-                </mat-card-actions>
-            </mat-card>
-        </div>        
-        <div class="item" *ngFor="let comment of comments; index as i" (click)="goToMessageDetails(comment)">            
-            <mat-card>
-                <img *ngIf="user.base64Avatar != '' && user.id == comment.userId" class="avatar" src="{{user.base64Avatar}}" />
-                <img *ngIf="getMessageUserName(comment).base64Avatar != '' && user.id != comment.userId" class="avatar" src="{{getMessageUserName(comment).base64Avatar}}" />
-                <mat-card-header class="header">
-                    <mat-card-title *ngIf="user.id == comment.userId">{{user.name}}</mat-card-title>
-                    <mat-card-title *ngIf="user.id != comment.userId">{{getMessageUserName(comment).name}}</mat-card-title>
-                    <mat-card-subtitle></mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content [style]="comment.style">{{comment.message}}</mat-card-content>
-                <mat-card-actions class="buttonbar">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.comments | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
-                </mat-card-actions>
-            </mat-card>
+        <!-- Message Detail view-->
+        <div *ngIf="selectedMessages?.length != 0" [ngClass]="{
+            'list': true, 
+            'gradientAnimation': animation.cssclass === 'gradientAnimation',
+            'radialAnimation': animation.cssclass === 'radialAnimation',
+            'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
+            <div class="item">            
+                <mat-card>
+                    <img *ngIf="user.base64Avatar != '' && user.id == selectedMessages[selectedMessages.length - 1].userId" class="avatar" src="{{user.base64Avatar}}" />
+                    <img *ngIf="selectedMessageUser.base64Avatar != '' && user.id != selectedMessages[selectedMessages.length - 1].userId" class="avatar" src="{{selectedMessageUser.base64Avatar}}" />
+                    <mat-card-header class="header">
+                        <mat-card-title *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{user.name}}</mat-card-title>
+                        <mat-card-title *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">{{selectedMessageUser.name}}</mat-card-title>
+                        <mat-card-subtitle></mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content *ngIf="undefined == selectedMessages[selectedMessages.length - 1].translatedMessage" [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].message}}</mat-card-content>
+                    <mat-card-content *ngIf="undefined != selectedMessages[selectedMessages.length - 1].translatedMessage" [style]="selectedMessages[selectedMessages.length - 1].style">{{selectedMessages[selectedMessages.length - 1].translatedMessage}}</mat-card-content>
+                    <mat-card-actions class="buttonbar">
+                        <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
+                        </button>
+                        <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab [color]="dislikeButtonColor" aria-label="Dislike message" (click)="dislikeMessage(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" matBadge="{{selectedMessages[selectedMessages.length - 1].dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true" >thumb_down</mat-icon>
+                        </button>
+                        <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Drop a comment" (click)="addComment(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon>add_comment</mat-icon>
+                        </button>
+                        <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId && undefined == selectedMessages[selectedMessages.length - 1].translatedMessage" mat-mini-fab color="secondary" aria-label="Translate message" (click)="translateMessage(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon>translate</mat-icon>
+                        </button>
+                        <button *ngIf="user.id != selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessageUserProfile(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >person</mat-icon>
+                        </button>
+                        <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
+                        </button>
+                        <button *ngIf="user.id ==  selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(selectedMessages[selectedMessages.length - 1])">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
+                        </button>
+                        <button class="button_messagemenu" [matMenuTriggerFor]="messageMenu" [matMenuTriggerData]="{user: user, message: selectedMessages[selectedMessages.length - 1]}" aria-hidden="false" mat-mini-fab color="secondary" aria-label="Message menu" (click)="{}">
+                            <mat-icon aria-hidden="false"  class="material-symbols-outlined" >more_vert</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>        
+            <div class="item" *ngFor="let comment of comments; index as i" (click)="goToMessageDetails(comment)">            
+                <mat-card>
+                    <img *ngIf="user.base64Avatar != '' && user.id == comment.userId" class="avatar" src="{{user.base64Avatar}}" />
+                    <img *ngIf="getMessageUserName(comment).base64Avatar != '' && user.id != comment.userId" class="avatar" src="{{getMessageUserName(comment).base64Avatar}}" />
+                    <mat-card-header class="header">
+                        <mat-card-title *ngIf="user.id == comment.userId">{{user.name}}</mat-card-title>
+                        <mat-card-title *ngIf="user.id != comment.userId">{{getMessageUserName(comment).name}}</mat-card-title>
+                        <mat-card-subtitle></mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content [style]="comment.style">{{comment.message}}</mat-card-content>
+                    <mat-card-actions class="buttonbar">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{comment.comments | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+            <!--div class="item" *ngIf="comments?.length == 0">
+                <mat-card>
+                    <mat-card-header class="header"></mat-card-header>                   
+                    <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">                
+                    <a class="center" target="_blank" rel="sponsored" href="https://www.awin1.com/cread.php?s=3662388&v=10868&q=476838&r=393321">
+                        <img src="https://www.awin1.com/cshow.php?s=3662388&v=10868&q=476838&r=393321" border="0">
+                    </a>
+                    </mat-card-content>                
+                </mat-card>       
+            </div-->
         </div>
-        <!--div class="item" *ngIf="comments?.length == 0">
-            <mat-card>
-                <mat-card-header class="header"></mat-card-header>                   
-                <mat-card-content [style]="selectedMessages[selectedMessages.length - 1].style">                
-                <a class="center" target="_blank" rel="sponsored" href="https://www.awin1.com/cread.php?s=3662388&v=10868&q=476838&r=393321">
-                    <img src="https://www.awin1.com/cshow.php?s=3662388&v=10868&q=476838&r=393321" border="0">
-                </a>
-                </mat-card-content>                
-            </mat-card>       
-        </div-->
     </div>
 </mat-dialog-content>
 
@@ -110,9 +118,6 @@
         </button>
         <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
             <mat-icon aria-hidden="false" class="material-symbols-outlined" >visibility_off</mat-icon>
-        </button>
-        <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(message)">
-            <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
-        </button>
+        </button>        
     </ng-template>
 </mat-menu>

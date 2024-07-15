@@ -2,34 +2,39 @@
     <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
-    <div [ngClass]="{
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
+    </button>
+    <div class="content" [ngClass]="{
         'list': true, 
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
-        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">        
-        <div class="item" *ngFor="let note of notes; index as i">            
-            <mat-card>
-                <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" />
-                <mat-card-header class="header">
-                    <mat-card-title>{{user.name}}</mat-card-title>
-                    <mat-card-subtitle></mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content [style]="note.style">{{note.note}}</mat-card-content>
-                <mat-card-actions class="buttonbar">
-                    <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
-                        <mat-icon>place</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" aria-label="Navigate to note location." (click)="navigateToNoteLocation(note)">
-                        <mat-icon>assistant_direction</mat-icon>
-                    </button>
-                </mat-card-actions>
-            </mat-card>
+        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
+        <div>        
+            <div class="item" *ngFor="let note of notes; index as i">            
+                <mat-card>
+                    <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" />
+                    <mat-card-header class="header">
+                        <mat-card-title>{{user.name}}</mat-card-title>
+                        <mat-card-subtitle></mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content [style]="note.style">{{note.note}}</mat-card-content>
+                    <mat-card-actions class="buttonbar">
+                        <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
+                            <mat-icon>place</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" aria-label="Navigate to note location." (click)="navigateToNoteLocation(note)">
+                            <mat-icon>assistant_direction</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
         </div>
-    </div>    
+    </div>
 </mat-dialog-content>

@@ -1,8 +1,12 @@
 .dialog {
     display: inherit;
     border-radius: 0.5rem;
-    overflow-y: scroll;
     max-height: 100%;
+}
+
+.content {
+  overflow-y: scroll;
+  background-color: transparent;
 }
 
 .list {
@@ -30,6 +34,15 @@ button {
     z-index: 100;
     margin-top: 0.25rem;
     margin-right: 0.25rem;
+}
+
+.button_add {
+  position: absolute;
+  bottom: 0;
+  right:    0;
+  z-index: 100;
+  margin-top: 0.25rem;
+  margin-right: 0.25rem;
 }
 
 .button_messagemenu {

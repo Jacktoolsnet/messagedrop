@@ -11,7 +11,7 @@
         type="text" 
         [(ngModel)]="data.note.note"
         matInput>
-    </textarea>
+    </textarea>    
 </mat-dialog-content>
 <mat-dialog-actions>
     <button *ngIf="data.mode == 'add_note'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
@@ -23,3 +23,4 @@
         Apply changes
     </button>
 </mat-dialog-actions>
+<h4>This information is stored on your device and is only visible to you.</h4>

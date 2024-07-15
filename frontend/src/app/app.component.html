@@ -22,7 +22,7 @@
         <mat-icon class="material-symbols-outlined">edit</mat-icon>
         <span>My profile</span>
     </button>
-    <button mat-menu-item (click)="openUserMessagListDialog()">
+    <button *ngIf="messages.length != 0" mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon class="material-symbols-outlined">speaker_notes</mat-icon>
         <span>My public messages</span>
     </button>
