@@ -8,6 +8,7 @@ const check = require('./routes/check');
 const statistic = require('./routes/statistic');
 const user = require('./routes/user');
 const message = require('./routes/message');
+const locationPushSubscription = require('./routes/locationSubscription');
 const translate = require('./routes/translate');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
@@ -59,6 +60,7 @@ app.use('/statistic', statistic);
 app.use('/user', user);
 app.use('/message', message);
 app.use('/translate', translate);
+app.use('/locationPushSubscription', locationPushSubscription);
 
 // The last route
 app.use('*', notfound);
@@ -93,5 +95,12 @@ cron.schedule('*/5 * * * *', () => {
     if (err) {
       console.log(err);
     }
+  });
+});
+
+// Clean location subscription every hour at minute 0
+cron.schedule('0 * * * *', () => {
+  tableLocationPushSubscription.clean(database.db, function(err) {
+    if (err) {}
   });
 });

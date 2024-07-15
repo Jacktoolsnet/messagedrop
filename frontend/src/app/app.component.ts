@@ -31,6 +31,9 @@ import { NotelistComponent } from './components/notelist/notelist.component';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
+import { SwPush } from '@angular/service-worker';
+import { PushNotificationsService } from './services/push-notifications.service';
+import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -68,6 +71,8 @@ export class AppComponent implements OnInit {
   public messageMode: typeof MessageMode = MessageMode;
   public lastSearchedLocation: string = '';
   public lastMarkerUpdate: number = 0;
+  public locationSubscriptionError: boolean = false;
+  public userIsSusbscribedToLocation: boolean = false;
 
   constructor(
     public mapService: MapService,
@@ -75,6 +80,7 @@ export class AppComponent implements OnInit {
     private userService: UserService,
     private messageService: MessageService,
     private noteService: NoteService,
+    private pushNotifications: PushNotificationsService,
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDialog: MatDialog,
@@ -82,7 +88,8 @@ export class AppComponent implements OnInit {
     public messageListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
-    private platformLocation: PlatformLocation) { }
+    private platformLocation: PlatformLocation,
+    private swPush: SwPush) { }
 
   ngOnInit(): void {
     this.platformLocation.onPopState((event) => {
@@ -239,13 +246,15 @@ export class AppComponent implements OnInit {
 
   updateDataForLocation(location: Location, forceSearch: boolean) {
     if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {      
-      // 0. Clear markerLocations
+      // Check subscription for location
+      this.isUserSubscribedToLocation();
+      // Clear markerLocations
       this.markerLocations.clear()      
-      // 1. notes from local device
+      // notes from local device
       this.getNotesByPlusCode(this.mapService.getMapLocation());
-      // 2. Messages
+      // Messages
       this.getMessages(this.mapService.getMapLocation(), false);
-      // 3. in the complete event of getMessages
+      // in the complete event of getMessages
     } else {
       this.createMarkerLocations();
     }
@@ -665,6 +674,59 @@ export class AppComponent implements OnInit {
     } else {
       return this.geolocationService.getPlusCodeBasedOnMapZoom(location);
     }
+  }
+
+  public subscribeToLocation() {
+    this.swPush.requestSubscription({
+      serverPublicKey: environment.vapid_public_key
+    })
+    .then(subscription => {
+      this.pushNotifications.subscribeToLocation(subscription, "", this.user!)
+      .subscribe({
+        next: simpleStatusResponse => {
+          if(simpleStatusResponse.status === 200){
+            this.snackBarRef = this.snackBar.open(`Subscription for location added.`, this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), {duration: 1000});          
+          }          
+        },
+        error: (err) => {
+          this.locationSubscriptionError = true;
+          this.snackBarRef = this.snackBar.open('Oops, something went wrong. Error code:' + err.error.error.errno, 'OK');
+        },
+        complete:() => {}
+      });
+    })
+    .catch(err => {
+      this.locationSubscriptionError = true;
+      this.snackBarRef = this.snackBar.open(err, '', {duration: 3000});
+    });
+  }
+
+  public isUserSubscribedToLocation() {
+    this.pushNotifications.isUserSubscribedToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!)
+    .subscribe({
+      next: simpleStatusResponse => {
+        if(simpleStatusResponse.status === 200){
+          this.userIsSusbscribedToLocation = true;
+        } else {
+          this.userIsSusbscribedToLocation = false;
+        }
+      },
+      error: (err) => { },
+      complete:() => {}
+    });
+  }
+
+  public unsubscribedToLocation() {
+    this.pushNotifications.unsubscribedToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!)
+    .subscribe({
+      next: simpleStatusResponse => {
+        if(simpleStatusResponse.status === 200){
+          this.userIsSusbscribedToLocation = false;
+        }
+      },
+      error: (err) => { },
+      complete:() => {}
+    });
   }
 
 }
