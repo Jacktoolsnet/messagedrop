@@ -142,4 +142,40 @@ export class NotelistComponent implements OnInit{
     this.dialogRef.close();
   }
 
+  openNoteDialog(): void {
+    let note: Note = {
+     latitude: 0,
+      longitude: 0,
+      plusCode: '',
+      note: '',
+      markerType: 'note',
+      style: '',
+      };
+    const dialogRef = this.noteDialog.open(NoteComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {mode: this.messageMode.ADD_NOTE, note: note},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth:'90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.note) {        
+        data.note.latitude = this.mapService.getMapLocation().latitude;
+        data.note.longitude = this.mapService.getMapLocation().longitude;
+        data.note.plusCode = this.mapService.getMapLocation().plusCode;
+        this.notes = [data?.note, ...this.notes];
+        this.noteService.saveNotesToStorage(this.notes);
+      }
+    });
+  }
+
 }

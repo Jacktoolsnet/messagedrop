@@ -2,7 +2,7 @@
     <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="openMessagDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div class="content" [ngClass]="{
@@ -26,7 +26,7 @@
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">visibility</mat-icon>
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.comments | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon" matBadge="{{message.comments | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>                       
                     </mat-card-actions>
                 </mat-card>
             </div>
@@ -67,7 +67,7 @@
                         <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(selectedMessages[selectedMessages.length - 1])">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
                         </button>
-                        <button *ngIf="user.id ==  selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(selectedMessages[selectedMessages.length - 1])">
+                        <button *ngIf="user.id == selectedMessages[selectedMessages.length - 1].userId" mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(selectedMessages[selectedMessages.length - 1])">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
                         </button>
                         <button class="button_messagemenu" [matMenuTriggerFor]="messageMenu" [matMenuTriggerData]="{user: user, message: selectedMessages[selectedMessages.length - 1]}" aria-hidden="false" mat-mini-fab color="secondary" aria-label="Message menu" (click)="{}">

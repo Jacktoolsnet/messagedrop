@@ -394,8 +394,8 @@ export class AppComponent implements OnInit {
         data.note.latitude = this.mapService.getMapLocation().latitude;
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
-        this.allUserNotes.push(data.note);
-        this.notes.push(data.note);
+        this.allUserNotes = [data?.note, ...this.allUserNotes];
+        this.notes = [data?.note, ...this.notes];
         this.noteService.saveNotesToStorage(this.allUserNotes);
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }

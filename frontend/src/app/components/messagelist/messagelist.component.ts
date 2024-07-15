@@ -443,4 +443,54 @@ export class MessagelistComponent implements OnInit{
                 complete:() => {}
               });
   }
+
+  openMessagDialog(): void {
+    let message: Message = {
+      id: 0,
+      parentId: 0,
+      typ: 'public',
+      createDateTime: '',
+      deleteDateTime: '',
+      latitude: 0,
+      longitude: 0,
+      plusCode: '',
+      message: '',
+      markerType: 'default',
+      style: '',
+      views: 0,
+      likes: 0,
+      dislikes: 0,
+      comments: 0,
+      status: 'enabled',
+      userId: ''};
+    const dialogRef = this.messageDialog.open(MessageComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth:'90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.message) {
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
+            .subscribe({
+              next: createMessageResponse => {
+                this.messages = [data?.message, ...this.messages];
+                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {}
+            });          
+      }
+    });
+  }
 }
