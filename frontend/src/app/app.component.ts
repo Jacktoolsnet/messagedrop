@@ -681,11 +681,11 @@ export class AppComponent implements OnInit {
       serverPublicKey: environment.vapid_public_key
     })
     .then(subscription => {
-      this.pushNotifications.subscribeToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!, this.mapService.getMapLocation().plusCode, subscription)
+      this.pushNotifications.subscribeToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!, 'name', subscription)
       .subscribe({
         next: simpleStatusResponse => {
           if(simpleStatusResponse.status === 200){
-            this.snackBarRef = this.snackBar.open(`Subscription for location added.`, this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), {duration: 1000});          
+            this.snackBarRef = this.snackBar.open(`Subscription for location added.`, '', {duration: 1000});          
           }          
         },
         error: (err) => {
@@ -711,7 +711,9 @@ export class AppComponent implements OnInit {
           this.userIsSusbscribedToLocation = false;
         }
       },
-      error: (err) => { },
+      error: (err) => {
+        this.userIsSusbscribedToLocation = false;
+      },
       complete:() => {}
     });
   }
@@ -724,7 +726,7 @@ export class AppComponent implements OnInit {
           this.userIsSusbscribedToLocation = false;
         }
       },
-      error: (err) => { },
+      error: (err) => {},
       complete:() => {}
     });
   }
