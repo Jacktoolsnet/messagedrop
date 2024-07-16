@@ -61,4 +61,22 @@ export class PlaceService {
         catchError(this.handleError)
       );
   }
+
+  subscribe(place: Place) {
+    let body = {
+      'placeId': place.id,
+      'subscription': place.subscription,
+    };
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/subscribe`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  unsubscribe(place: Place) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/unsubscribe/${place.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }

@@ -6,12 +6,12 @@
 <button [attr.aria-hidden]="locationReady" class="button_watchLocation" *ngIf="!locationReady" mat-fab color="primary" aria-label="Watch user location" (click)="startWatchingPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button [attr.aria-hidden]="userReady" class="button_followLocation" *ngIf="userReady && !locationSubscriptionError && !userIsSusbscribedToLocation" mat-fab color="secondary" aria-label="Follow_location" (click)="subscribeToLocation()">
+<!--button [attr.aria-hidden]="userReady" class="button_followLocation" *ngIf="userReady && !locationSubscriptionError && !userIsSusbscribedToLocation" mat-fab color="secondary" aria-label="Follow_location" (click)="subscribeToLocation()">
     <mat-icon [attr.aria-hidden]="userReady" class="material-symbols-outlined">add_location_alt</mat-icon>
 </button>
 <button [attr.aria-hidden]="userReady" class="button_followLocation" *ngIf="userReady && !locationSubscriptionError && userIsSusbscribedToLocation" mat-fab color="primary" aria-label="Follow_location" (click)="unsubscribedFromLocation()">
     <mat-icon [attr.aria-hidden]="userReady" class="material-symbols-outlined">wrong_location</mat-icon>
-</button>
+</button-->
 <button [attr.aria-hidden]="!(userReady && locationReady)" class="button_goToLocation" *ngIf="locationReady && !isUserLocation" mat-fab color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
     <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">adjust</mat-icon>
 </button>

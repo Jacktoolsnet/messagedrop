@@ -31,9 +31,6 @@ import { NotelistComponent } from './components/notelist/notelist.component';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
-import { SwPush } from '@angular/service-worker';
-import { PushNotificationsService } from './services/push-notifications.service';
-import { environment } from '../environments/environment';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { PlaceService } from './services/place.service';
 import { Place } from './interfaces/place';
@@ -85,7 +82,6 @@ export class AppComponent implements OnInit {
     private messageService: MessageService,
     private noteService: NoteService,
     private placeService: PlaceService,
-    private pushNotifications: PushNotificationsService,
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDialog: MatDialog,
@@ -94,8 +90,8 @@ export class AppComponent implements OnInit {
     public placeListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
-    private platformLocation: PlatformLocation,
-    private swPush: SwPush) { }
+    private platformLocation: PlatformLocation
+  ) { }
 
   ngOnInit(): void {
     this.platformLocation.onPopState((event) => {
@@ -266,9 +262,7 @@ export class AppComponent implements OnInit {
   }
 
   updateDataForLocation(location: Location, forceSearch: boolean) {
-    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {      
-      // Check subscription for location
-      this.isUserSubscribedToLocation();
+    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {            
       // Clear markerLocations
       this.markerLocations.clear()      
       // notes from local device
@@ -721,61 +715,5 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public subscribeToLocation() {
-    this.swPush.requestSubscription({
-      serverPublicKey: environment.vapid_public_key
-    })
-    .then(subscription => {
-      this.pushNotifications.subscribeToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!, 'name', subscription)
-      .subscribe({
-        next: simpleStatusResponse => {
-          if(simpleStatusResponse.status === 200){
-            this.userIsSusbscribedToLocation = true;
-            this.snackBarRef = this.snackBar.open(`Subscription for location added.`, '', {duration: 3000});          
-          }          
-        },
-        error: (err) => {
-          this.locationSubscriptionError = true;
-          this.snackBarRef = this.snackBar.open('Oops, something went wrong. Error code:' + err.error.error.errno, 'OK');
-        },
-        complete:() => {}
-      });
-    })
-    .catch(err => {
-      this.locationSubscriptionError = true;
-      this.snackBarRef = this.snackBar.open(err, '', {duration: 3000});
-    });
-  }
-
-  public isUserSubscribedToLocation() {
-    this.pushNotifications.isUserSubscribedToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!)
-    .subscribe({
-      next: simpleStatusResponse => {
-        if(simpleStatusResponse.status === 200){
-          this.userIsSusbscribedToLocation = true;
-        } else {
-          this.userIsSusbscribedToLocation = false;
-        }
-      },
-      error: (err) => {
-        this.userIsSusbscribedToLocation = false;
-      },
-      complete:() => {}
-    });
-  }
-
-  public unsubscribedFromLocation() {
-    this.pushNotifications.unsubscribedToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!)
-    .subscribe({
-      next: simpleStatusResponse => {
-        if(simpleStatusResponse.status === 200){
-          this.userIsSusbscribedToLocation = false;
-          this.snackBarRef = this.snackBar.open(`Subscription for location removed.`, '', {duration: 3000});
-        }
-      },
-      error: (err) => {},
-      complete:() => {}
-    });
-  }
-
+  
 }

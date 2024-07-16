@@ -1,4 +1,5 @@
 export interface SimpleStatusResponse {
-    status: number
+    status: number,
+    err?: string
 }
 

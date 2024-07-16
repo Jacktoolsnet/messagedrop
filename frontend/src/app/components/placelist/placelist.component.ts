@@ -26,6 +26,8 @@ import { NoteComponent } from '../note/note.component';
 import { Place } from '../../interfaces/place';
 import { PlaceService } from '../../services/place.service';
 import { PlaceComponent } from '../place/place.component';
+import { SwPush } from '@angular/service-worker';
+import { environment } from '../../../environments/environment';
 
 @Component({
   selector: 'app-placelist',
@@ -58,6 +60,7 @@ export class PlacelistComponent implements OnInit{
   public animation!: Animation;
   public mode: typeof Mode = Mode;
   private snackBarRef: any;
+  public subscriptionError: boolean = false;
 
   constructor(
     private placeService: PlaceService,
@@ -65,7 +68,8 @@ export class PlacelistComponent implements OnInit{
     public placeDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private style: StyleService,        
+    private style: StyleService,
+    private swPush: SwPush,   
     @Inject(MAT_DIALOG_DATA) public data: {user: User, places: Place[]}
   ) {
     this.user = data.user;
@@ -134,6 +138,45 @@ export class PlacelistComponent implements OnInit{
             });
       }
     });
+  }
+
+  public subscribe(place: Place) {
+    if (place.subscription == null) {
+      this.swPush.requestSubscription({
+        serverPublicKey: environment.vapid_public_key
+      })
+      .then(subscription => {
+        place.subscription = JSON.stringify(subscription);
+        this.placeService.subscribe(place)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status !== 200) {
+                    place.subscription = undefined;                    
+                  }
+                },
+                error: (err) => {
+                  place.subscription = undefined;
+                },
+                complete:() => {}
+              });
+      })
+      .catch(err => {
+        this.subscriptionError = true;
+        this.snackBarRef = this.snackBar.open(err, '', {duration: 3000});
+      });
+    } else {
+      this.placeService.unsubscribe(place)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    place.subscription = undefined;                    
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
+    }
   }
 
   public goBack() {
