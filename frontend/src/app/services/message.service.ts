@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
-import { CreateMessageResponse } from '../interfaces/create-message-response';
-import { catchError, retry, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { Location } from '../interfaces/location';
 import { User } from '../interfaces/user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
@@ -43,7 +42,7 @@ export class MessageService {
       'style': message.style,
       'messageUserId': user.id
     };
-    return this.http.post<CreateMessageResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -55,7 +54,7 @@ export class MessageService {
       'message': message.message,
       'style': message.style
     };
-    return this.http.post<CreateMessageResponse>(`${environment.apiUrl}/message/update`, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/update`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

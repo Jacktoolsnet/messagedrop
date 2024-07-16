@@ -23,7 +23,7 @@ import { DeleteMessageComponent } from './delete-message/delete-message.componen
 import { EditUserComponent } from './edit-user/edit-user.component';
 import { RelatedUserService } from '../../services/related-user.service';
 import { RelatedUser } from '../../interfaces/related-user';
-import { MessageMode } from '../../interfaces/message-mode';
+import { Mode } from '../../interfaces/mode';
 import { MessageComponent } from '../message/message.component';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
@@ -61,7 +61,7 @@ export class MessagelistComponent implements OnInit{
   public animation!: Animation;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
-  public messageMode: typeof MessageMode = MessageMode;
+  public mode: typeof Mode = Mode;
   private snackBarRef: any;
   public comments: Message[] = [];
 
@@ -321,7 +321,7 @@ export class MessagelistComponent implements OnInit{
   public editMessage(message: Message) {
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
-      data: {mode: message.parentId == 0 ? this.messageMode.EDIT_PUBLIC_MESSAGE : this.messageMode.EDIT_COMMENT, user: this.user, message: message},
+      data: {mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, user: this.user, message: message},
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
@@ -389,7 +389,7 @@ export class MessagelistComponent implements OnInit{
 
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
-      data: {mode: this.messageMode.ADD_COMMENT, user: this.user, message: message},
+      data: {mode: this.mode.ADD_COMMENT, user: this.user, message: message},
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
@@ -466,7 +466,7 @@ export class MessagelistComponent implements OnInit{
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
+      data: {mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
       width: '90vw',
       minWidth: '20vw',
       maxWidth:'90vw',

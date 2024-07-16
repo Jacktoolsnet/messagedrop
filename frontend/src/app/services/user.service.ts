@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { CreateUserResponse } from '../interfaces/create-user-response';
-import { catchError, retry, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { User } from '../interfaces/user';
 import { Keypair } from '../interfaces/keypair';
 import { GetUserResponse } from '../interfaces/get-user-response';

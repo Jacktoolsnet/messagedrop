@@ -23,7 +23,7 @@ import { MessagelistComponent } from './components/messagelist/messagelist.compo
 import { MapService } from './services/map.service';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { ProfileComponent } from './components/user/profile/profile.component';
-import { MessageMode } from './interfaces/message-mode';
+import { Mode } from './interfaces/mode';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { NoteComponent } from './components/note/note.component';
 import { NoteService } from './services/note.service';
@@ -34,6 +34,9 @@ import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker
 import { SwPush } from '@angular/service-worker';
 import { PushNotificationsService } from './services/push-notifications.service';
 import { environment } from '../environments/environment';
+import { PlacelistComponent } from './components/placelist/placelist.component';
+import { PlaceService } from './services/place.service';
+import { Place } from './interfaces/place';
 
 @Component({
   selector: 'app-root',
@@ -62,13 +65,14 @@ export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   public user!: User|undefined;
   public messages: Message[] = [];
+  public places: Place[] = [];
   public myHistory: string[] = [];
   public notes: Note[] = [];
   public allUserNotes: Note[] = [];
   public markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   private snackBarRef: any;
   public isUserLocation: boolean = false;
-  public messageMode: typeof MessageMode = MessageMode;
+  public mode: typeof Mode = Mode;
   public lastSearchedLocation: string = '';
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
@@ -80,12 +84,14 @@ export class AppComponent implements OnInit {
     private userService: UserService,
     private messageService: MessageService,
     private noteService: NoteService,
+    private placeService: PlaceService,
     private pushNotifications: PushNotificationsService,
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDialog: MatDialog,
     public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
+    public placeListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
@@ -128,6 +134,7 @@ export class AppComponent implements OnInit {
             this.user!.id = createUserResponse.userId;
             this.userService.saveUser(this.user!);
             this.userReady = true;
+            this.getPlaces();
           });
         });
       });
@@ -137,6 +144,7 @@ export class AppComponent implements OnInit {
           .subscribe({
             next: (data) => {
               this.userReady = true;
+              this.getPlaces();
             },
             error: (err) => {
               // Create the user when it does not exist in the database.
@@ -144,11 +152,11 @@ export class AppComponent implements OnInit {
                 this.userService.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
                 .subscribe(createUserResponse => {
                   this.userReady = true;
+                  this.getPlaces();
                 });
               }
             },
             complete:() => {
-              this.userReady = true;
             }
           });
     }
@@ -230,6 +238,20 @@ export class AppComponent implements OnInit {
                   duration: 1000
                 });
               },
+              complete:() => {        
+                // Is excecutet before the result is here.
+                // In the future for example get private or bussiness messages and build the marekrLocation map there.
+              }
+            });
+  }
+
+  getPlaces() {
+    this.placeService.getByUserId(this.user!.id)
+            .subscribe({
+              next: (getPlacesResponse) => {
+                this.places = [ ...getPlacesResponse.rows];
+              },
+              error: (err) => { },
               complete:() => {        
                 // Is excecutet before the result is here.
                 // In the future for example get private or bussiness messages and build the marekrLocation map there.
@@ -334,7 +356,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.messageMode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
+      data: {mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
       width: '90vw',
       minWidth: '20vw',
       maxWidth:'90vw',
@@ -382,7 +404,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.messageMode.ADD_NOTE, note: note},
+      data: {mode: this.mode.ADD_NOTE, note: note},
       width: '90vw',
       minWidth: '20vw',
       maxWidth:'90vw',
@@ -451,7 +473,7 @@ export class AppComponent implements OnInit {
 
   openUserNoteListDialog(): void {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
-      panelClass: 'MessageListDialog',
+      panelClass: 'NoteListDialog',
       closeOnNavigation: true,
       data: {user: this.user, notes: [...this.noteService.loadNotesFromStorage()]},
       width: 'auto',
@@ -472,6 +494,30 @@ export class AppComponent implements OnInit {
       this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
       this.getNotesByPlusCode(this.mapService.getMapLocation());
       this.createMarkerLocations();
+    });
+  }
+
+  openPlaceListDialog(): void {
+    const dialogRef = this.placeListDialog.open(PlacelistComponent, {
+      panelClass: 'PalceListDialog',
+      closeOnNavigation: true,
+      data: {user: this.user, places: this.places},
+      width: 'auto',
+      minWidth: '60vw',
+      maxWidth:'90vw',
+      height: 'auto',
+      minHeight: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("placeList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      console.log(data);
     });
   }
 

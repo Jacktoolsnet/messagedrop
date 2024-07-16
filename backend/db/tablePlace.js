@@ -46,14 +46,14 @@ const create = function (db, userId, name, callback) {
     }
 };
 
-const update = function (db, locationId, name, callback) {
+const update = function (db, placeId, name, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
         SET ${columnName} = '${name}'
         WHERE ${columnPlaceId} = ?;`;
 
-        db.run(sql, [locationId], (err) => {
+        db.run(sql, [placeId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -61,14 +61,14 @@ const update = function (db, locationId, name, callback) {
     }
 };
 
-const subscribe = function (db, locationId, subscription, callback) {
+const subscribe = function (db, placeId, subscription, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = '${subscription}'
         WHERE ${columnPlaceId} = ?;`;
 
-        db.run(sql, [locationId], (err) => {
+        db.run(sql, [placeId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -76,14 +76,14 @@ const subscribe = function (db, locationId, subscription, callback) {
     }
 };
 
-const unsubscribe = function (db, locationId, callback) {
+const unsubscribe = function (db, placeId, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = NULL
         WHERE ${columnPlaceId} = ?;`;
 
-        db.run(sql, [locationId], (err) => {
+        db.run(sql, [placeId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -91,13 +91,13 @@ const unsubscribe = function (db, locationId, callback) {
     }
 };
 
-const getById = function (db, locationId, callback) {
+const getById = function (db, placeId, callback) {
     try{
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlaceId} = ?;`;
 
-        db.get(sql, [locationId], (err, row) => {
+        db.get(sql, [placeId], (err, row) => {
             callback(err, row);
         });
     } catch (error) {
@@ -120,13 +120,13 @@ const getByUserId = function (db, userId, callback) {
     }
 };
 
-const deleteById = function (db, locationId, callback) {
+const deleteById = function (db, placeId, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
         WHERE ${columnPlaceId} = ?;`;
 
-        db.run(sql, [locationId], (err) => {
+        db.run(sql, [placeId], (err) => {
             if (err) {
                 callback(err);
             } else {

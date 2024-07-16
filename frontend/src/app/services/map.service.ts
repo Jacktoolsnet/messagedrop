@@ -1,10 +1,8 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../interfaces/location';
-import { Message } from '../interfaces/message';
 import { GeolocationService } from './geolocation.service';
 import { PlusCodeArea } from '../interfaces/plus-code-area';
-import { Note } from '../interfaces/note';
 import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
 

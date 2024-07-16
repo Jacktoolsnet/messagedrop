@@ -6,7 +6,7 @@ const tablePlace = require('../db/tablePlace');
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlace.create(req.database.db, req.body.userId, req.body.name, function (err) {
+  tablePlace.create(req.database.db, req.body.userId, req.body.name.replace(/\'/g,"''"), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -19,9 +19,24 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.get('/get/:locationId', [security.checkToken], function(req, res) {
+router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlace.getById(req.database.db, req.params.locationId, function(err, row) {
+  tablePlace.update(req.database.db, req.body.id, req.body.name.replace(/\'/g,"''"), function(err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/get/:placeId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tablePlace.getById(req.database.db, req.params.placeId, function(err, row) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -63,7 +78,7 @@ router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
 
 router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlace.subscribe(req.database.db, req.body.locationId, req.body.subscription, function (err) {
+  tablePlace.subscribe(req.database.db, req.body.placeId, req.body.subscription, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -76,9 +91,24 @@ router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'applica
   });
 });
 
-router.get('/unsubscribe/:locationId', [security.checkToken], function(req, res) {
+router.get('/unsubscribe/:placeId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tablePlace.unsubscribe(req.database.db, req.params.locationId, function(err) {
+  tablePlace.unsubscribe(req.database.db, req.params.placeId, function(err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/delete/:placeId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tablePlace.deleteById(req.database.db, req.params.placeId, function(err) {
     if (err) {
       response.status = 500;
       response.error = err;

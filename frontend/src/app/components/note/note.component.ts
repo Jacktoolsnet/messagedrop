@@ -10,7 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { StyleService } from '../../services/style.service';
 import { Message } from '../../interfaces/message';
 import { User } from '../../interfaces/user';
-import { MessageMode } from '../../interfaces/message-mode';
+import { Mode } from '../../interfaces/mode';
 import { Note } from '../../interfaces/note';
 
 @Component({
@@ -37,7 +37,7 @@ export class NoteComponent implements OnInit {
   constructor(
     public dialogRef: MatDialogRef<NoteComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {mode: MessageMode, note: Note}
+    @Inject(MAT_DIALOG_DATA) public data: {mode: Mode, note: Note}
   ) {}
 
   ngOnInit(): void {

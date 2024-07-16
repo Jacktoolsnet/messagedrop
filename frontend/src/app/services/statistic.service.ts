@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { catchError, retry, throwError } from 'rxjs';
-import { User } from '../interfaces/user';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 @Injectable({

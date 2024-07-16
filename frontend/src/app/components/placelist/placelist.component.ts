@@ -16,13 +16,16 @@ import { Location } from '../../interfaces/location';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
-import { MessageMode } from '../../interfaces/message-mode';
+import { Mode } from '../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { Note } from '../../interfaces/note';
 import { NoteService } from '../../services/note.service';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
 import { NoteComponent } from '../note/note.component';
+import { Place } from '../../interfaces/place';
+import { PlaceService } from '../../services/place.service';
+import { PlaceComponent } from '../place/place.component';
 
 @Component({
   selector: 'app-placelist',
@@ -49,51 +52,32 @@ import { NoteComponent } from '../note/note.component';
   styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent implements OnInit{
-  public notes!: Note[];
-  private noteToDelete!: Note
+  public places!: Place[];
+  private placeToDelete!: Place
   public user!: User;
   public animation!: Animation;
-  public messageMode: typeof MessageMode = MessageMode;
+  public mode: typeof Mode = Mode;
   private snackBarRef: any;
 
   constructor(
-    private noteService: NoteService,
-    private mapService: MapService,
-    private geolocationService: GeolocationService,
+    private placeService: PlaceService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
-    public noteDialog: MatDialog,
+    public placeDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private style:StyleService,    
-    @Inject(MAT_DIALOG_DATA) public data: {user: User, notes: Note[]}
+    private style: StyleService,        
+    @Inject(MAT_DIALOG_DATA) public data: {user: User, places: Place[]}
   ) {
     this.user = data.user;
-    this.notes = [...data.notes];
+    this.places = [...data.places];
   }
 
   ngOnInit(): void {
     this.animation = this.style.getRandomColorAnimation();
   }
 
-  public flyTo(note: Note){
-    let location: Location = {
-      latitude: note.latitude,
-      longitude: note.longitude,
-      zoom: 17,
-      plusCode: this.geolocationService.getPlusCode(note.latitude, note.longitude)
-    }
-    this.mapService.setCircleMarker(location);
-    this.mapService.setDrawCircleMarker(true);
-    this.mapService.flyTo(location);
-    this.dialogRef.close();
-  }
-
-  public navigateToNoteLocation(note: Note){
-    this.noteService.navigateToNoteLocation(this.user, note)
-  }
-
-  public deleteNote(note: Note) {
-    this.noteToDelete = note;
+  public deletePlace(place: Place) {
+    this.placeToDelete = place;
     const dialogRef = this.dialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
       hasBackdrop: true 
@@ -103,28 +87,33 @@ export class PlacelistComponent implements OnInit{
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result && undefined != this.noteToDelete) {
-        let index: number = this.notes.indexOf(this.noteToDelete, 0);
-        if (index > -1) {
-          this.notes.splice(index, 1);
-        }
-        this.noteService.saveNotesToStorage(this.notes);
-        if (this.notes.length == 0) {
-          this.dialogRef.close();
-        }
+      if (result && undefined != this.placeToDelete) {
+        this.placeService.deletePlace(this.placeToDelete)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    this.places = this.places.filter( element => element.id !== this.placeToDelete.id );                    
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
       }
     });
   }
 
-  public editNote(note: Note) {
-    const dialogRef = this.noteDialog.open(NoteComponent, {
+  public editPlace(place: Place) {
+    const dialogRef = this.placeDialog.open(PlaceComponent, {
       panelClass: '',
-      data: {mode: this.messageMode.EDIT_NOTE, user: this.user, note: note},
+      data: {mode: this.mode.EDIT_PLACE, user: this.user, place: place},
       closeOnNavigation: true,
-      width: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
+      width: '90vw',
+      minWidth: '20vw',
       maxWidth:'90vw',
+      minHeight: 'auto',
+      height: 'auto',
+      maxHeight: '90vh',
       hasBackdrop: true      
     });
 
@@ -132,8 +121,17 @@ export class PlacelistComponent implements OnInit{
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.note) {
-        this.noteService.saveNotesToStorage(this.notes);
+      if (undefined !== data?.place) {
+        this.placeService.updatePlace(data.place)
+            .subscribe({
+              next: simpleResponse => {
+                if (simpleResponse.status === 200) {
+                  this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', {duration: 1000});
+                }
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {}
+            });
       }
     });
   }
@@ -142,24 +140,21 @@ export class PlacelistComponent implements OnInit{
     this.dialogRef.close();
   }
 
-  openNoteDialog(): void {
-    let note: Note = {
-     latitude: 0,
-      longitude: 0,
-      plusCode: '',
-      note: '',
-      markerType: 'note',
-      style: '',
-      };
-    const dialogRef = this.noteDialog.open(NoteComponent, {
+  openPlaceDialog(): void {
+    let place: Place = {
+      id: 0,
+      userId: this.user.id,
+      name: ''
+    };
+    const dialogRef = this.placeDialog.open(PlaceComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.messageMode.ADD_NOTE, note: note},
+      data: {mode: this.mode.ADD_PLACE, place: place},
       width: '90vw',
       minWidth: '20vw',
       maxWidth:'90vw',
-      minHeight: '90vh',
-      height: '90vh',
+      minHeight: 'auto',
+      height: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true      
     });
@@ -168,12 +163,18 @@ export class PlacelistComponent implements OnInit{
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.note) {        
-        data.note.latitude = this.mapService.getMapLocation().latitude;
-        data.note.longitude = this.mapService.getMapLocation().longitude;
-        data.note.plusCode = this.mapService.getMapLocation().plusCode;
-        this.notes = [data?.note, ...this.notes];
-        this.noteService.saveNotesToStorage(this.notes);
+      if (undefined !== data?.place) {
+        this.placeService.createPlace(data.place)
+            .subscribe({
+              next: simpleResponse => {
+                if (simpleResponse.status === 200) {
+                  this.places = [data?.place, ...this.places];
+                  this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', {duration: 1000});
+                }
+              },
+              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              complete:() => {}
+            });   
       }
     });
   }

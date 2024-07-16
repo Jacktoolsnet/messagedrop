@@ -16,7 +16,7 @@ import { Location } from '../../interfaces/location';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
-import { MessageMode } from '../../interfaces/message-mode';
+import { Mode } from '../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { Note } from '../../interfaces/note';
@@ -53,7 +53,7 @@ export class NotelistComponent implements OnInit{
   private noteToDelete!: Note
   public user!: User;
   public animation!: Animation;
-  public messageMode: typeof MessageMode = MessageMode;
+  public mode: typeof Mode = Mode;
   private snackBarRef: any;
 
   constructor(
@@ -119,7 +119,7 @@ export class NotelistComponent implements OnInit{
   public editNote(note: Note) {
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
-      data: {mode: this.messageMode.EDIT_NOTE, user: this.user, note: note},
+      data: {mode: this.mode.EDIT_NOTE, user: this.user, note: note},
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
@@ -154,7 +154,7 @@ export class NotelistComponent implements OnInit{
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.messageMode.ADD_NOTE, note: note},
+      data: {mode: this.mode.ADD_NOTE, note: note},
       width: '90vw',
       minWidth: '20vw',
       maxWidth:'90vw',
