@@ -36,6 +36,10 @@
         <mat-icon class="material-symbols-outlined">clinical_notes</mat-icon>
         <span>My private notes</span>
     </button>
+    <button mat-menu-item (click)="openUserNoteListDialog()">
+        <mat-icon class="material-symbols-outlined">personal_places</mat-icon>
+        <span>My locations</span>
+    </button>
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
