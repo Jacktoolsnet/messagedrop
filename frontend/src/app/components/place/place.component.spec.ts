@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeleteLocationComponent } from './delete-location.component';
+import { PlaceComponent } from './place.component';
 
-describe('DeletemessageComponent', () => {
-  let component: DeleteLocationComponent;
-  let fixture: ComponentFixture<DeleteLocationComponent>;
+describe('DropmessageComponent', () => {
+  let component: PlaceComponent;
+  let fixture: ComponentFixture<PlaceComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [DeleteLocationComponent]
+      imports: [PlaceComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(DeleteLocationComponent);
+    fixture = TestBed.createComponent(PlaceComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

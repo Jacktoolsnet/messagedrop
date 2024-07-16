@@ -1,6 +1,6 @@
-const tableName = 'tableLocation';
+const tableName = 'tablePlace';
 
-const columnLocationId = 'id';
+const columnPlaceId = 'id';
 const columnUserId = 'userId';
 const columnName = 'name'; // Max. 64 charachters.
 const columnSubscription = 'subscription';
@@ -9,7 +9,7 @@ const init = function (db) {
     try {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnLocationId} INTEGER PRIMARY KEY NOT NULL, 
+            ${columnPlaceId} INTEGER PRIMARY KEY NOT NULL, 
             ${columnUserId} INTEGER DEFAULT NULL,
             ${columnName} TEXT NOT NULL,
             ${columnSubscription} TEXT DEFAULT NULL,
@@ -51,7 +51,7 @@ const update = function (db, locationId, name, callback) {
         let sql = `
         UPDATE ${tableName}
         SET ${columnName} = '${name}'
-        WHERE ${columnLocationId} = ?;`;
+        WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [locationId], (err) => {
             callback(err);
@@ -66,7 +66,7 @@ const subscribe = function (db, locationId, subscription, callback) {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = '${subscription}'
-        WHERE ${columnLocationId} = ?;`;
+        WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [locationId], (err) => {
             callback(err);
@@ -81,7 +81,7 @@ const unsubscribe = function (db, locationId, callback) {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = NULL
-        WHERE ${columnLocationId} = ?;`;
+        WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [locationId], (err) => {
             callback(err);
@@ -95,7 +95,7 @@ const getById = function (db, locationId, callback) {
     try{
         let sql = `
         SELECT * FROM ${tableName}
-        WHERE ${columnLocationId} = ?;`;
+        WHERE ${columnPlaceId} = ?;`;
 
         db.get(sql, [locationId], (err, row) => {
             callback(err, row);
@@ -124,7 +124,7 @@ const deleteById = function (db, locationId, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLocationId} = ?;`;
+        WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [locationId], (err) => {
             if (err) {

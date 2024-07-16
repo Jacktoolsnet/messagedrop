@@ -16,7 +16,7 @@ import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
 @Injectable({
   providedIn: 'root'
 })
-export class LocationService {
+export class PlaceService {
 
   httpOptions = {
     headers: new HttpHeaders({

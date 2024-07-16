@@ -14,7 +14,7 @@ import { MessageMode } from '../../interfaces/message-mode';
 import { Note } from '../../interfaces/note';
 
 @Component({
-  selector: 'app-note',
+  selector: 'app-place',
   standalone: true,
   imports: [
     MatDialogContainer,
@@ -29,13 +29,13 @@ import { Note } from '../../interfaces/note';
     FormsModule, 
     MatFormFieldModule, 
     MatInputModule],
-  templateUrl: './location.component.html',
-  styleUrl: './location.component.css'
+  templateUrl: './place.component.html',
+  styleUrl: './place.component.css'
 })
-export class LocationComponent implements OnInit {
+export class PlaceComponent implements OnInit {
   
   constructor(
-    public dialogRef: MatDialogRef<LocationComponent>,
+    public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: {mode: MessageMode, note: Note}
   ) {}

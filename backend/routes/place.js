@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
-const tableLocation = require('../db/tableLocation');
+const tablePlace = require('../db/tablePlace');
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tableLocation.create(req.database.db, req.body.userId, req.body.name, function (err) {
+  tablePlace.create(req.database.db, req.body.userId, req.body.name, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -21,7 +21,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 
 router.get('/get/:locationId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tableLocation.getById(req.database.db, req.params.locationId, function(err, row) {
+  tablePlace.getById(req.database.db, req.params.locationId, function(err, row) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -41,7 +41,7 @@ router.get('/get/:locationId', [security.checkToken], function(req, res) {
 
 router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
-  tableLocation.getByUserId(req.database.db, req.params.userId, function(err, rows) {
+  tablePlace.getByUserId(req.database.db, req.params.userId, function(err, rows) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -63,7 +63,7 @@ router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
 
 router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tableLocation.subscribe(req.database.db, req.body.locationId, req.body.subscription, function (err) {
+  tablePlace.subscribe(req.database.db, req.body.locationId, req.body.subscription, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -78,7 +78,7 @@ router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'applica
 
 router.get('/unsubscribe/:locationId', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tableLocation.unsubscribe(req.database.db, req.params.locationId, function(err) {
+  tablePlace.unsubscribe(req.database.db, req.params.locationId, function(err) {
     if (err) {
       response.status = 500;
       response.error = err;

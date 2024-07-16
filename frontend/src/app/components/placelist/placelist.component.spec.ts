@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { LocationlistComponent } from './locationlist.component';
+import { PlacelistComponent } from './placelist.component';
 
 describe('MessagelistComponent', () => {
-  let component: LocationlistComponent;
-  let fixture: ComponentFixture<LocationlistComponent>;
+  let component: PlacelistComponent;
+  let fixture: ComponentFixture<PlacelistComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [LocationlistComponent]
+      imports: [PlacelistComponent]
     })
     .compileComponents();
     
-    fixture = TestBed.createComponent(LocationlistComponent);
+    fixture = TestBed.createComponent(PlacelistComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -21,11 +21,11 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
 import { Note } from '../../interfaces/note';
 import { NoteService } from '../../services/note.service';
-import { DeleteLocationComponent } from './delete-location/delete-location.component';
+import { DeletePlaceComponent } from './delete-place/delete-place.component';
 import { NoteComponent } from '../note/note.component';
 
 @Component({
-  selector: 'app-notelist',
+  selector: 'app-placelist',
   standalone: true,
   imports: [
     ShortNumberPipe,
@@ -45,10 +45,10 @@ import { NoteComponent } from '../note/note.component';
     MatMenuModule,
     MatInputModule
   ],
-  templateUrl: './locationlist.component.html',
-  styleUrl: './locationlist.component.css'
+  templateUrl: './placelist.component.html',
+  styleUrl: './placelist.component.css'
 })
-export class LocationlistComponent implements OnInit{
+export class PlacelistComponent implements OnInit{
   public notes!: Note[];
   private noteToDelete!: Note
   public user!: User;
@@ -60,7 +60,7 @@ export class LocationlistComponent implements OnInit{
     private noteService: NoteService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
-    public dialogRef: MatDialogRef<LocationlistComponent>,
+    public dialogRef: MatDialogRef<PlacelistComponent>,
     public noteDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -94,7 +94,7 @@ export class LocationlistComponent implements OnInit{
 
   public deleteNote(note: Note) {
     this.noteToDelete = note;
-    const dialogRef = this.dialog.open(DeleteLocationComponent, {
+    const dialogRef = this.dialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
       hasBackdrop: true 
     });

@@ -8,8 +8,8 @@ const check = require('./routes/check');
 const statistic = require('./routes/statistic');
 const user = require('./routes/user');
 const message = require('./routes/message');
-const location = require('./routes/location');
-const locationPlusCode = require('./routes/locationPlusCode');
+const place = require('./routes/place');
+const placePlusCode = require('./routes/placepluscode');
 const translate = require('./routes/translate');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
@@ -61,8 +61,8 @@ app.use('/statistic', statistic);
 app.use('/user', user);
 app.use('/message', message);
 app.use('/translate', translate);
-app.use('/location', location);
-app.use('/locationPlusCode', locationPlusCode);
+app.use('/place', place);
+app.use('/placepluscode', placePlusCode);
 
 // The last route
 app.use('*', notfound);

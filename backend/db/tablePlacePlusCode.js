@@ -1,16 +1,16 @@
-const tableName = 'tableLocationPlusCode';
+const tableName = 'tablePlacePlusCode';
 
-const columnLocationId = 'locationId';
+const columnPlaceId = 'placeId';
 const columnPlusCode = 'plusCode';
 
 const init = function (db) {
     try {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnLocationId} TEXT NOT NULL,
+            ${columnPlaceId} TEXT NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
-            PRIMARY KEY (${columnLocationId}, ${columnPlusCode}),
-            FOREIGN KEY (${columnLocationId}) 
+            PRIMARY KEY (${columnPlaceId}, ${columnPlusCode}),
+            FOREIGN KEY (${columnPlaceId}) 
             REFERENCES tableLocation (id) 
             ON UPDATE CASCADE ON DELETE CASCADE
         );`;
@@ -29,7 +29,7 @@ const create = function (db, locationId, plusCode, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
-            ${columnLocationId},
+            ${columnPlaceId},
             ${columnPlusCode}
         ) VALUES (
             '${locationId}',
@@ -61,7 +61,7 @@ const remove = function (db, locationId, plusCode, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLocationId} = ?
+        WHERE ${columnPlaceId} = ?
         AND ${columnPlusCode} = ?;`;
 
         db.run(sql, [locationId, plusCode], (err) => {

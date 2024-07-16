@@ -3,12 +3,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-deletenote',
+  selector: 'app-deleteplace',
   standalone: true,
   imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
-  templateUrl: './delete-location.component.html',
-  styleUrl: './delete-location.component.css'
+  templateUrl: './delete-place.component.html',
+  styleUrl: './delete-place.component.css'
 })
-export class DeleteLocationComponent {
-  constructor(public dialogRef: MatDialogRef<DeleteLocationComponent>) {}
+export class DeletePlaceComponent {
+  constructor(public dialogRef: MatDialogRef<DeletePlaceComponent>) {}
 }

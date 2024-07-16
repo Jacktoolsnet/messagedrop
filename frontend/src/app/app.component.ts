@@ -143,7 +143,6 @@ export class AppComponent implements OnInit {
               if (err.status === 404) {
                 this.userService.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
                 .subscribe(createUserResponse => {
-                  console.log(createUserResponse)
                   this.userReady = true;
                 });
               }
