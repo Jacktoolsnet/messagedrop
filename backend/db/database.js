@@ -5,7 +5,8 @@ const tableStatistic = require('./tableStatistic');
 const tableMessage = require('./tableMessage');
 const tableLike = require('./tableLike');
 const tableDislike = require('./tableDislike');
-const tableLocationPushSubscription = require('./tableLocationPushSubscription');
+const tableLocation = require('./tableLocation');
+const tableLocationPlusCode = require('./tableLocationPlusCode');
 
 class Database {
 
@@ -28,7 +29,8 @@ class Database {
               tableMessage.init(this.db);
               tableLike.init(this.db);
               tableDislike.init(this.db);
-              tableLocationPushSubscription.init(this.db);
+              tableLocation.init(this.db);
+              tableLocationPlusCode.init(this.db);
               console.log('Connected to the messagedrop SQlite database.');
             }
           });

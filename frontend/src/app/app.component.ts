@@ -719,7 +719,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public unsubscribedToLocation() {
+  public unsubscribedFromLocation() {
     this.pushNotifications.unsubscribedToLocation(this.geolocationService.getPlusCodeBasedOnMapZoom(this.mapService.getMapLocation()), this.user!)
     .subscribe({
       next: simpleStatusResponse => {

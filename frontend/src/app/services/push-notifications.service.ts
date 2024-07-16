@@ -25,14 +25,12 @@ export class PushNotificationsService {
   }
 
   subscribeToLocation(plusCode: string, user: User, name: string, subscrition: any) {
-    console.log(subscrition);
     let body = {
       'userId': user.id,
       'plusCode': plusCode,
       'name': name,
       'subscription': JSON.stringify(subscrition)
     };
-    console.log(body);
     return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/locationPushSubscription/subscribe`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
