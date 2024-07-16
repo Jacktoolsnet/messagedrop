@@ -9,7 +9,7 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnLocationId} TEXT NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
-            PRIMARY KEY (${columnUserId}, ${columnPlusCode}),
+            PRIMARY KEY (${columnLocationId}, ${columnPlusCode}),
             FOREIGN KEY (${columnLocationId}) 
             REFERENCES tableLocation (id) 
             ON UPDATE CASCADE ON DELETE CASCADE
