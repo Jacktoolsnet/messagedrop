@@ -4,9 +4,9 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlacePlusCode = require('../db/tablePlacePlusCode');
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
+router.get('/create/:locationId/:plusCode', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlacePlusCode.create(req.database.db, req.body.locationId, req.body.plusCode, function (err) {
+  tablePlacePlusCode.create(req.database.db, req.params.locationId, req.params.plusCode, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

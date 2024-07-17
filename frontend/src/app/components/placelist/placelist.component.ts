@@ -11,18 +11,12 @@ import { MatCardModule}  from '@angular/material/card';
 import { StyleService } from '../../services/style.service';
 import { Animation } from '../../interfaces/animation';
 import { User } from '../../interfaces/user';
-import { MapService } from '../../services/map.service';
-import { Location } from '../../interfaces/location';
-import { GeolocationService } from '../../services/geolocation.service';
 import { MatBadgeModule } from '@angular/material/badge';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { Mode } from '../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
-import { Note } from '../../interfaces/note';
-import { NoteService } from '../../services/note.service';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
-import { NoteComponent } from '../note/note.component';
 import { Place } from '../../interfaces/place';
 import { PlaceService } from '../../services/place.service';
 import { PlaceComponent } from '../place/place.component';
@@ -179,6 +173,10 @@ export class PlacelistComponent implements OnInit{
     }
   }
 
+  public editLocation(place:Place) {
+    this.dialogRef.close(place);
+  }
+
   public goBack() {
     this.dialogRef.close();
   }
@@ -187,7 +185,8 @@ export class PlacelistComponent implements OnInit{
     let place: Place = {
       id: 0,
       userId: this.user.id,
-      name: ''
+      name: '',
+      plusCodes: []
     };
     const dialogRef = this.placeDialog.open(PlaceComponent, {
       panelClass: '',

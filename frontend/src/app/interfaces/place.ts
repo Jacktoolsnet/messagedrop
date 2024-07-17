@@ -3,5 +3,6 @@ export interface Place {
     userId: string,    
     name: string,
     subscription?: string,
+    plusCodes: string[]
 }
 

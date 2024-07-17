@@ -6,7 +6,7 @@ import { GeolocationService } from './geolocation.service';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { Place } from '../interfaces/place';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
-
+import { Location } from '../interfaces/location';
 
 @Injectable({
   providedIn: 'root'
@@ -75,6 +75,20 @@ export class PlaceService {
 
   unsubscribe(place: Place) {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/unsubscribe/${place.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  addPlusCodeToPlace(place: Place, location: Location) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/create/${place.id}/${location.plusCode}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  removePlusCodeFromPlace(place: Place, location: Location) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/unsubscribe/${place.id}/${location.plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

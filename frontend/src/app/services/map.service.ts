@@ -90,7 +90,7 @@ export class MapService {
       moveEndEvent.emit(this.location);
     });
 
-    const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    let tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -102,6 +102,16 @@ export class MapService {
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
     this.searchRectangle = leaflet.rectangle([[0, 0],[0, 0]], {color: "#ff7800", weight: 1}).addTo(this.map);
     this.drawSearchRectange(this.location);
+  }
+
+  public setMapMinMaxZoom(minZoom: number, maxZoom: number) {
+    this.map?.setMinZoom(minZoom);
+    this.map?.setMaxZoom(maxZoom);    
+  }
+
+  public setMapZoom(zoom: number) {
+    this.location.zoom = zoom;
+    this.map?.setZoom(this.location.zoom);
   }
 
   public getMapZoom(): number {

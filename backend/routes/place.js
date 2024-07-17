@@ -61,18 +61,24 @@ router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
       response.status = 500;
       response.error = err;
     } else {
+      response.status = 200;
       if (rows.length == 0) {
         response.status = 404;
       } else {
         rows.forEach((row) => {
-          response.rows.push(row);
-        });
-        response.status = 200;
+          response.rows.push({
+            'id': row.id,
+            'userId': row.userId,    
+            'name': row.name,
+            'subscription': row.subscription,
+            'plusCodes': []
+          });          
+        });        
       }
     }
     res.setHeader('Content-Type', 'application/json');      
     res.status(response.status);
-    res.json(response);
+    res.json(response);    
   });
 });
 

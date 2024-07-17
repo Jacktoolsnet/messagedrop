@@ -7,11 +7,11 @@ const init = function (db) {
     try {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnPlaceId} TEXT NOT NULL,
+            ${columnPlaceId} INTEGER NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
             PRIMARY KEY (${columnPlaceId}, ${columnPlusCode}),
             FOREIGN KEY (${columnPlaceId}) 
-            REFERENCES tableLocation (id) 
+            REFERENCES tablePlace (id) 
             ON UPDATE CASCADE ON DELETE CASCADE
         );`;
 
@@ -36,6 +36,7 @@ const create = function (db, locationId, plusCode, callback) {
             '${plusCode}'
         );`;
         db.run(sql, (err) => {
+            console.log(err);
             callback(err)     
         });
     } catch (error) {
@@ -50,6 +51,20 @@ const getByPlusCode = function (db, plusCode, callback) {
         WHERE ${columnPlusCode} = ?;`;
 
         db.all(sql, [plusCode], (err, rows) => {
+            callback(err, rows);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const getByPlaceId = function (db, placeId, callback) {
+    try{
+        let sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnPlaceId} = ?;`;
+
+        db.all(sql, [placeId], (err, rows) => {
             callback(err, rows);
         });
     } catch (error) {
@@ -80,5 +95,6 @@ module.exports = {
     init,
     create,
     getByPlusCode,
+    getByPlaceId,
     remove
 }
