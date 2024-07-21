@@ -90,7 +90,6 @@ export class MessagelistComponent implements OnInit{
     let location: Location = {
       latitude: message.latitude,
       longitude: message.longitude,
-      zoom: 17,
       plusCode: this.geolocationService.getPlusCode(message.latitude, message.longitude)
     }
     this.mapService.setCircleMarker(location);

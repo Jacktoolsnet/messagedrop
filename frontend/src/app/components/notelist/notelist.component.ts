@@ -79,7 +79,6 @@ export class NotelistComponent implements OnInit{
     let location: Location = {
       latitude: note.latitude,
       longitude: note.longitude,
-      zoom: 17,
       plusCode: this.geolocationService.getPlusCode(note.latitude, note.longitude)
     }
     this.mapService.setCircleMarker(location);

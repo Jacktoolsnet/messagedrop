@@ -10,6 +10,7 @@ import { Message } from '../interfaces/message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { LikedByUserResponse } from '../interfaces/liked-by-user-respons';
 import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
+import { MapService } from './map.service';
 
 
 @Injectable({
@@ -24,7 +25,7 @@ export class MessageService {
     })
   };
 
-  constructor(private http: HttpClient, private geolocationService: GeolocationService) { }
+  constructor(private http: HttpClient, private mapService: MapService, private geolocationService: GeolocationService) { }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -103,7 +104,7 @@ export class MessageService {
   }
 
   getByPlusCode(location: Location) {
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location)}`, this.httpOptions)
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

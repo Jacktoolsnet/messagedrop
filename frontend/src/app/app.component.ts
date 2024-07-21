@@ -170,12 +170,10 @@ export class AppComponent implements OnInit {
 
   public startWatchingPosition() {
     this.isUserLocation = true;
-    this.user!.location.zoom = 16;
     this.watchPosition();
   }
 
   public goToUserLocation() {
-    this.user!.location.zoom = this.mapService.getMapZoom();
     this.mapService.flyTo(this.user!.location);
   }
 
@@ -220,13 +218,13 @@ export class AppComponent implements OnInit {
     this.messageService.getByPlusCode(location)
             .subscribe({
               next: (getMessageResponse) => {
-                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);                
+                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());                
                 this.messages = [...getMessageResponse.rows];
                 // At the moment build the marekrLocation map here:
                 this.createMarkerLocations()                
               },
               error: (err) => {
-                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location);                
+                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());                
                 this.messages = [];
                 // At the moment build the marekrLocation map here:
                 this.createMarkerLocations()
@@ -298,7 +296,7 @@ export class AppComponent implements OnInit {
   }
 
   private getNotesByPlusCode(location: Location) {
-    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location);   
+    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());   
     this.notes = [];
     this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
   }
@@ -307,7 +305,7 @@ export class AppComponent implements OnInit {
     if (undefined != this.selectedPlace) {
       this.isLocationPartOfPlace(this.mapService.getMapLocation());
     } else {
-      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location) !== this.lastSearchedLocation || forceSearch) {            
+      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {            
         // Clear markerLocations
         this.markerLocations.clear()      
         // notes from local device
@@ -324,7 +322,6 @@ export class AppComponent implements OnInit {
   public handleMoveEndEvent(event: Location) {
     this.updateDataForLocation(this.mapService.getMapLocation(), false)
     this.setIsUserLocation()
-    this.user!.location.zoom = event.zoom;
     this.mapService.drawSearchRectange(event);
     this.mapService.setDrawCircleMarker(true);
     this.mapService.setCircleMarker(event);
@@ -335,7 +332,6 @@ export class AppComponent implements OnInit {
     this.mapService.flyTo({
       latitude: event.latitude,
       longitude: event.longitude,
-      zoom: this.mapService.getMapZoom(),
       plusCode: event.plusCode
     });
     let messages: Message[] = [];
@@ -557,12 +553,14 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: Place) => {
-      this.messages = [];
-      this.markerLocations.clear()
-      this.createMarkerLocations()
-      this.mapService.setMapMinMaxZoom(18, 19);
-      this.mapService.setMapZoom(18);
-      this.selectedPlace = data;
+      if (undefined != data) {
+        this.messages = [];
+        this.markerLocations.clear()
+        this.createMarkerLocations()
+        this.mapService.setMapMinMaxZoom(18, 19);
+        this.mapService.setMapZoom(18);
+        this.selectedPlace = data;
+      }      
     });
   }
 
@@ -701,10 +699,9 @@ export class AppComponent implements OnInit {
     let center: number[] = [];
     // Process messages
     this.messages.forEach((message) => {
-      let location = {
+      let location: Location = {
         latitude: message.latitude,
         longitude: message.longitude,
-        zoom: this.mapService.getMapZoom(),
         plusCode: message.plusCode
       };
       key = this.createMarkerKey(location);
@@ -724,10 +721,9 @@ export class AppComponent implements OnInit {
     });
     // Process notes
     this.notes.forEach((note) => {
-      let location = {
+      let location: Location = {
         latitude: note.latitude,
         longitude: note.longitude,
-        zoom: this.mapService.getMapZoom(),
         plusCode: note.plusCode
       };
       key = this.createMarkerKey(location);
@@ -762,7 +758,7 @@ export class AppComponent implements OnInit {
     if (this.mapService.getMapZoom() > 16) {
       return location.plusCode;
     } else {
-      return this.geolocationService.getPlusCodeBasedOnMapZoom(location);
+      return this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
     }
   }
 

@@ -44,7 +44,7 @@ export class MapService {
   private searchRectangle!: any;
   private circleMarker: any;
   private drawCircleMarker: boolean = false;
-  private location: Location = { latitude: 0, longitude: 0, zoom: 10, plusCode: ''};
+  private location: Location = { latitude: 0, longitude: 0, plusCode: ''};
 
   private markerClickEvent!: EventEmitter<MarkerLocation>;
 
@@ -65,7 +65,6 @@ export class MapService {
       this.drawCircleMarker = false;
       this.location.latitude = ev.latlng?.lat;
       this.location.longitude = ev.latlng?.lng;
-      this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(ev.latlng?.lat, ev.latlng?.lng);
       clickEvent.emit(this.location);
     });
@@ -77,7 +76,6 @@ export class MapService {
     this.map.on('zoomend', (ev: any) => {      
       this.location.latitude = this.map.getCenter().lat;
       this.location.longitude = this.map.getCenter().lng;
-      this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
     });
 
@@ -85,7 +83,6 @@ export class MapService {
     this.map.on('moveend', (ev: any) => {
       this.location.latitude = this.map.getCenter().lat;
       this.location.longitude = this.map.getCenter().lng;
-      this.location.zoom = this.map.getZoom();
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
       moveEndEvent.emit(this.location);
     });
@@ -110,12 +107,11 @@ export class MapService {
   }
 
   public setMapZoom(zoom: number) {
-    this.location.zoom = zoom;
-    this.map?.setZoom(this.location.zoom);
+    this.map?.setZoom(zoom);
   }
 
   public getMapZoom(): number {
-    return this.location.zoom;
+    return this.map.getZoom()
   }
 
   public getMapLocation(): Location {
@@ -123,13 +119,11 @@ export class MapService {
   }
 
   public flyTo(location: Location): void {
-    this.location.zoom = location.zoom
-    this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), location.zoom);    
+    this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());    
   }
 
   public moveTo(location: Location): void {
-    this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude), location.zoom);
-    this.map?.setZoom(location.zoom);    
+    this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }
 
   public setUserMarker (location: Location) {
@@ -152,13 +146,13 @@ export class MapService {
   }
 
   public drawSearchRectange(location: Location) {
-    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location));
+    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
     let bounds = [[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo],[plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]];
     this.searchRectangle.setBounds(bounds);
   }
 
   public getSearchRectangeCenter(location: Location): number[] {
-    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location));
+    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
     let center: number[] = [(plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2, (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2];
     return center;
   }
@@ -179,7 +173,6 @@ export class MapService {
             this.setCircleMarker({
               latitude: markerLocation.latitude,
               longitude: markerLocation.longitude,
-              zoom: this.getMapZoom(),
               plusCode: markerLocation.plusCode
             });
             this.drawCircleMarker = false;
@@ -194,7 +187,6 @@ export class MapService {
             this.setCircleMarker({
               latitude: markerLocation.latitude,
               longitude: markerLocation.longitude,
-              zoom: this.getMapZoom(),
               plusCode: markerLocation.plusCode
             });
             this.drawCircleMarker = false;
@@ -209,7 +201,6 @@ export class MapService {
             this.setCircleMarker({
               latitude: markerLocation.latitude,
               longitude: markerLocation.longitude,
-              zoom: this.getMapZoom(),
               plusCode: markerLocation.plusCode
             });
             this.drawCircleMarker = false;

@@ -4,6 +4,7 @@ import { Location } from '../interfaces/location';
 import * as plusCodes from 'pluscodes';
 import { Message } from '../interfaces/message';
 import { PlusCodeArea } from '../interfaces/plus-code-area';
+import { MapService } from './map.service';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +28,6 @@ export class GeolocationService {
     let location: Location = {
       latitude : message.latitude || 0,
       longitude: message.longitude  || 0,
-      zoom: 19,
       plusCode: message.plusCode || ''
     };
     return location;
@@ -39,15 +39,14 @@ export class GeolocationService {
     let location: Location = {
       latitude : plusCodes.decode(plusCodeComplete)?.latitude || 0,
       longitude: plusCodes.decode(plusCodeComplete)?.longitude  || 0,
-      zoom: 19,
       plusCode: plusCode
     };
     return location;
   }
 
-  public getPlusCodeBasedOnMapZoom(location: Location): string {
+  public getPlusCodeBasedOnMapZoom(location: Location, zoom: number): string {
     let plusCode: string = '';
-    switch (location.zoom) {
+    switch (zoom) {
       case 19:
       case 18:
         plusCode = location.plusCode;
@@ -76,9 +75,9 @@ export class GeolocationService {
     return plusCode;
   }
 
-  public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location): number {
+  public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location, zoom: number): number {
     let plusCodeLength: number = 11;
-    switch (location.zoom) {
+    switch (zoom) {
       case 19:    
       case 18:     
       case 17:

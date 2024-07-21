@@ -17,7 +17,7 @@ import { MarkerType } from '../../interfaces/marker-type';
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection
   @Input() lastMarkerUpdate: number = 0;
-  @Input() location: Location = { latitude: 0, longitude: 0, zoom: 19, plusCode: ''};
+  @Input() location: Location = { latitude: 0, longitude: 0, plusCode: ''};
   @Input() markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   @Output() clickEvent = new EventEmitter<Location>();
   @Output() moveEndEvent = new EventEmitter<Location>();
