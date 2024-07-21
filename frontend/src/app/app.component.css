@@ -17,23 +17,14 @@
 
 .button_goToLocation {
     position: absolute;
-    left:    0;
+    right:    0;
     bottom:   0;
     z-index: 100;
-    margin-left: 6rem;
+    margin-right: 6rem;
     margin-bottom: 2rem;
 }
 
 .button_watchLocation {
-    position: absolute;
-    left:    0;
-    bottom:   0;
-    z-index: 100;
-    margin-left: 6rem;
-    margin-bottom: 2rem;
-}
-
-.button_followLocation {
     position: absolute;
     right:    0;
     bottom:   0;
@@ -42,7 +33,16 @@
     margin-bottom: 2rem;
 }
 
-.button_unfollowLocation {
+.button_addLocationToPlace {
+    position: absolute;
+    right:    0;
+    bottom:   0;
+    z-index: 100;
+    margin-right: 6rem;
+    margin-bottom: 2rem;
+}
+
+.button_removeLocationFromPlace {
     position: absolute;
     right:    0;
     bottom:   0;

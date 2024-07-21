@@ -58,8 +58,11 @@ export class MapService {
 
     this.map = leaflet.map('map', {
       center: [ location.latitude, location.longitude ],
-      zoom: 0
+      zoom: 3
     });
+
+    this.map.setMinZoom(3);
+    this.map.setMaxZoom(19);
 
     this.map.on('click', (ev: any) => {
       this.drawCircleMarker = false;

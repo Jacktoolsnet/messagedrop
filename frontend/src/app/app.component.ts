@@ -76,7 +76,7 @@ export class AppComponent implements OnInit {
   public lastSearchedLocation: string = '';
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
-  public userIsSusbscribedToLocation: boolean = false;
+  public isPartOfPlace: boolean = false;
 
   constructor(
     public mapService: MapService,
@@ -187,6 +187,7 @@ export class AppComponent implements OnInit {
         this.locationReady = true;
         this.mapService.setUserMarker(this.user!.location);
         if (this.isUserLocation) {
+          this.mapService.setMapZoom(this.mapService.getMapZoom());
           this.mapService.flyTo(this.user!.location);
         }
       },
@@ -282,11 +283,7 @@ export class AppComponent implements OnInit {
   }
 
   public removeLocationFromPlace() {
-
-  }
-
-  public isLocationPartOfPlace(location: Location) {
-    console.log("isLocationPartOfPlace");
+    console.log('Remove Locations from place');
   }
 
   public finishEditingPlace() {
@@ -303,7 +300,8 @@ export class AppComponent implements OnInit {
 
   private updateDataForLocation(location: Location, forceSearch: boolean) {
     if (undefined != this.selectedPlace) {
-      this.isLocationPartOfPlace(this.mapService.getMapLocation());
+      console.log('Paint Locations');
+      this.isPartOfPlace = this.selectedPlace?.plusCodes.some(element => element.plusCode === this.mapService.getMapLocation().plusCode);
     } else {
       if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {            
         // Clear markerLocations
@@ -560,6 +558,7 @@ export class AppComponent implements OnInit {
         this.mapService.setMapMinMaxZoom(18, 19);
         this.mapService.setMapZoom(18);
         this.selectedPlace = data;
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }      
     });
   }
