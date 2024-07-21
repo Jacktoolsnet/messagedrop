@@ -7,6 +7,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { Place } from '../interfaces/place';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { Location } from '../interfaces/location';
+import { GetPlacePlusCodeResponse } from '../interfaces/get-place-plus-code-response copy';
 
 @Injectable({
   providedIn: 'root'
@@ -89,6 +90,13 @@ export class PlaceService {
 
   removePlusCodeFromPlace(place: Place, location: Location) {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/unsubscribe/${place.id}/${location.plusCode}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getPlacePlusCodes(place: Place) {
+    return this.http.get<GetPlacePlusCodeResponse>(`${environment.apiUrl}/placepluscode/byPlaceId/${place.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

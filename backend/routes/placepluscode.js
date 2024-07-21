@@ -19,9 +19,9 @@ router.get('/create/:locationId/:plusCode', [security.checkToken, bodyParser.jso
   });
 });
 
-router.get('/get/:plusCode', [security.checkToken], function(req, res) {
+router.get('/byPlaceId/:placeId', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
-  tablePlacePlusCode.getByPlusCode(req.database.db, req.params.plusCode, function(err, rows) {
+  tablePlacePlusCode.getByPlaceId(req.database.db, req.params.placeId, function(err, rows) {
     if (err) {
       response.status = 500;
       response.error = err;

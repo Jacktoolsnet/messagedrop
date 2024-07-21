@@ -34,6 +34,8 @@ import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { PlaceService } from './services/place.service';
 import { Place } from './interfaces/place';
+import { GetPlacePlusCodeResponse } from './interfaces/get-place-plus-code-response copy';
+import { GetPlaceResponse } from './interfaces/get-place-response';
 
 @Component({
   selector: 'app-root',
@@ -245,9 +247,18 @@ export class AppComponent implements OnInit {
   private getPlaces() {
     this.placeService.getByUserId(this.user!.id)
             .subscribe({
-              next: (getPlacesResponse) => {
-                console.log(getPlacesResponse);
+              next: (getPlacesResponse: GetPlaceResponse) => {
                 this.places = [ ...getPlacesResponse.rows];
+                this.places.forEach(place => {
+                  this.placeService.getPlacePlusCodes(place)
+                  .subscribe({
+                    next: (getPlacesPluscodeResponse: GetPlacePlusCodeResponse) => {
+                      place.plusCodes = [ ...getPlacesPluscodeResponse.rows];
+                    },
+                    error: (err) => { },
+                    complete:() => { }
+                  });
+                });
               },
               error: (err) => { },
               complete:() => { }
@@ -260,8 +271,10 @@ export class AppComponent implements OnInit {
               .subscribe({
                 next: (simpleStatusResponse) => {
                   if (simpleStatusResponse.status === 200) {
-                    this.selectedPlace?.plusCodes.push(location.plusCode);
-                    console.log(this.selectedPlace);
+                    this.selectedPlace?.plusCodes.push({
+                      placeId: this.selectedPlace?.id,
+                      plusCode: location.plusCode
+                    });
                   }
                 },
                 error: (err) => {
