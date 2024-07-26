@@ -11,6 +11,7 @@ const columnNumberOfMessages = 'numberOfMessages';
 const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
 const columnUserStatus = 'userStatus';
 const columnLastSignOfLife = 'lastSignOfLife';
+const columnSubscription = 'subscription';
 
 const init = function (db) {
     try {
@@ -22,7 +23,8 @@ const init = function (db) {
             ${columnNumberOfMessages} INTEGER DEFAULT 0,
             ${columnNumberOfBlockedMessages} INTEGER DEFAULT 0,
             ${columnUserStatus} TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
-            ${columnLastSignOfLife} INTEGER NOT NULL
+            ${columnLastSignOfLife} INTEGER NOT NULL,
+            ${columnSubscription} TEXT DEFAULT NULL
         );`;
 
         db.run(sql, (err) => {

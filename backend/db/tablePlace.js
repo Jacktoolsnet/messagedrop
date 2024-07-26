@@ -12,7 +12,7 @@ const init = function (db) {
             ${columnPlaceId} INTEGER PRIMARY KEY NOT NULL, 
             ${columnUserId} INTEGER DEFAULT NULL,
             ${columnName} TEXT NOT NULL,
-            ${columnSubscription} TEXT DEFAULT NULL,
+            ${columnSubscription} BOOLEAN NOT NULL DEFAULT false,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE 
@@ -65,7 +65,7 @@ const subscribe = function (db, placeId, subscription, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
-        SET ${columnSubscription} = '${subscription}'
+        SET ${columnSubscription} = true
         WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [placeId], (err) => {
@@ -80,7 +80,7 @@ const unsubscribe = function (db, placeId, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
-        SET ${columnSubscription} = NULL
+        SET ${columnSubscription} = false
         WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [placeId], (err) => {

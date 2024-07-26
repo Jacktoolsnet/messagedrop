@@ -67,7 +67,7 @@ export class PlacelistComponent implements OnInit{
     @Inject(MAT_DIALOG_DATA) public data: {user: User, places: Place[]}
   ) {
     this.user = data.user;
-    this.places = [...data.places];
+    this.places = data.places;
   }
 
   ngOnInit(): void {
@@ -90,7 +90,7 @@ export class PlacelistComponent implements OnInit{
               .subscribe({
                 next: (simpleStatusResponse) => {
                   if (simpleStatusResponse.status === 200) {
-                    this.places = this.places.filter( element => element.id !== this.placeToDelete.id );                    
+                    this.places.splice(this.places.findIndex(place => place.id !== this.placeToDelete.id), 1);                    
                   }
                 },
                 error: (err) => {
@@ -210,7 +210,7 @@ export class PlacelistComponent implements OnInit{
             .subscribe({
               next: simpleResponse => {
                 if (simpleResponse.status === 200) {
-                  this.places = [data?.place, ...this.places];
+                  this.places.unshift(data?.place);
                   this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', {duration: 1000});
                 }
               },
