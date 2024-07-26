@@ -114,6 +114,36 @@ const clean = function (db, callback) {
     }
 };
 
+const subscribe = function (db, userId, subscription, callback) {
+    try{
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnSubscription} = '${subscription}'
+        WHERE ${columnUserId} = ?;`;
+
+        db.run(sql, [userId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const unsubscribe = function (db, placeId, callback) {
+    try{
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnSubscription} = ''
+        WHERE ${columnUserId} = ?;`;
+
+        db.run(sql, [userId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = {
     userStatus,
     init,
@@ -121,5 +151,7 @@ module.exports = {
     getAll,
     getById,
     deleteById,
-    clean
+    clean,
+    subscribe,
+    unsubscribe
 }

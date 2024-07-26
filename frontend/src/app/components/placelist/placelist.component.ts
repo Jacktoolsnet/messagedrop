@@ -22,6 +22,7 @@ import { PlaceService } from '../../services/place.service';
 import { PlaceComponent } from '../place/place.component';
 import { SwPush } from '@angular/service-worker';
 import { environment } from '../../../environments/environment';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-placelist',
@@ -58,6 +59,7 @@ export class PlacelistComponent implements OnInit{
 
   constructor(
     private placeService: PlaceService,
+    private userService: UserService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public placeDialog: MatDialog,
     public dialog: MatDialog,
@@ -135,41 +137,55 @@ export class PlacelistComponent implements OnInit{
   }
 
   public subscribe(place: Place) {
-    if (place.subscription == null) {
+    if (this.user.subscription === '') {
+      // Subscrbe user if needed.
       this.swPush.requestSubscription({
         serverPublicKey: environment.vapid_public_key
       })
       .then(subscription => {
-        place.subscription = JSON.stringify(subscription);
-        this.placeService.subscribe(place)
+        let subscriptionJson = JSON.stringify(subscription);
+        // Save subscription to user.
+        this.userService.subscribe(this.user, subscriptionJson)
               .subscribe({
                 next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status !== 200) {
-                    place.subscription = undefined;                    
+                  if (simpleStatusResponse.status === 200) {
+                    this.user.subscription = subscriptionJson;
+                    this.userService.saveUser(this.user);                
                   }
                 },
                 error: (err) => {
-                  place.subscription = undefined;
+                  place.subscribed = false;
                 },
                 complete:() => {}
               });
       })
-      .catch(err => {
-        this.subscriptionError = true;
-        this.snackBarRef = this.snackBar.open(err, '', {duration: 3000});
+      .catch(err => {});
+    }
+    if (!place.subscribed) {
+      // subscribe to place
+      this.placeService.subscribe(place)
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            place.subscribed = true;                    
+          }
+        },
+        error: (err) => { },
+        complete:() => {}
       });
     } else {
+      // Unsubscribe from place.
       this.placeService.unsubscribe(place)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    place.subscription = undefined;                    
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+            .subscribe({
+              next: (simpleStatusResponse) => {
+                if (simpleStatusResponse.status === 200) {
+                  place.subscribed = false;                    
+                }
+              },
+              error: (err) => {
+              },
+              complete:() => {}
+            });
     }
   }
 
@@ -186,6 +202,7 @@ export class PlacelistComponent implements OnInit{
       id: 0,
       userId: this.user.id,
       name: '',
+      subscribed: false,
       plusCodes: []
     };
     const dialogRef = this.placeDialog.open(PlaceComponent, {

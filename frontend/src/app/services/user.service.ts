@@ -43,7 +43,8 @@ export class UserService {
         encryptionKeyPair: undefined,
         signingKeyPair: undefined,
         name : 'Unnamed user',
-        base64Avatar: ''
+        base64Avatar: '',
+        subscription: ''
       }
     } else {
       user = {
@@ -54,7 +55,8 @@ export class UserService {
         encryptionKeyPair : undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
         signingKeyPair : undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
         name : undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
-        base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
+        base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : '',
+        subscription : undefined != userFromLocalStorage.subscribe ? userFromLocalStorage.subscription : ''
       }
     }
     return user;
@@ -143,6 +145,24 @@ export class UserService {
   deleteUserFromStorage(): undefined {
     localStorage.removeItem('user')
     return undefined
+  }
+
+  subscribe(user: User, subscription: string) {
+    let body = {
+      'userId': user.id,
+      'subscription': subscription,
+    };
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/user/subscribe`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  unsubscribe(user: User) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/unsubscribe/${user.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
 }

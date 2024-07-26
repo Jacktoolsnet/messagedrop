@@ -70,9 +70,9 @@ router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
             'id': row.id,
             'userId': row.userId,    
             'name': row.name,
-            'subscription': row.subscription,
+            'subscribed': row.subscribed === 0 ? false : true,
             'plusCodes': []
-          });          
+          });   
         });        
       }
     }
@@ -82,9 +82,9 @@ router.get('/get/userId/:userId', [security.checkToken], function(req, res) {
   });
 });
 
-router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
+router.get('/subscribe/:placeId', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlace.subscribe(req.database.db, req.body.placeId, req.body.subscription, function (err) {
+  tablePlace.subscribe(req.database.db, req.params.placeId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

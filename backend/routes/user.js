@@ -100,4 +100,34 @@ router.get('/delete/:userId', [security.checkToken], function(req, res) {
   });
 });
 
+router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
+  let response = {'status' : 0};
+  tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/unsubscribe/:userId', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tableUser.unsubscribe(req.database.db, req.params.userId, function(err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 module.exports = router

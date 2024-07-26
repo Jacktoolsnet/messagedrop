@@ -25,18 +25,17 @@ const init = function (db) {
     }
 };
 
-const create = function (db, locationId, plusCode, callback) {
+const create = function (db, placeId, plusCode, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnPlaceId},
             ${columnPlusCode}
         ) VALUES (
-            '${locationId}',
+            ${placeId},
             '${plusCode}'
         );`;
         db.run(sql, (err) => {
-            console.log(err);
             callback(err)     
         });
     } catch (error) {

@@ -266,6 +266,7 @@ export class AppComponent implements OnInit {
 
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
+    console.log(this.selectedPlace);
     this.placeService.addPlusCodeToPlace(this.selectedPlace!, location)
               .subscribe({
                 next: (simpleStatusResponse) => {

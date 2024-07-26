@@ -3,7 +3,7 @@ const tableName = 'tablePlace';
 const columnPlaceId = 'id';
 const columnUserId = 'userId';
 const columnName = 'name'; // Max. 64 charachters.
-const columnSubscription = 'subscription';
+const columnSubscribed = 'subscribed';
 
 const init = function (db) {
     try {
@@ -12,7 +12,8 @@ const init = function (db) {
             ${columnPlaceId} INTEGER PRIMARY KEY NOT NULL, 
             ${columnUserId} INTEGER DEFAULT NULL,
             ${columnName} TEXT NOT NULL,
-            ${columnSubscription} BOOLEAN NOT NULL DEFAULT false,
+            ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
+            CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnName}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE 
@@ -61,13 +62,12 @@ const update = function (db, placeId, name, callback) {
     }
 };
 
-const subscribe = function (db, placeId, subscription, callback) {
+const subscribe = function (db, placeId, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
-        SET ${columnSubscription} = true
+        SET ${columnSubscribed} = true
         WHERE ${columnPlaceId} = ?;`;
-
         db.run(sql, [placeId], (err) => {
             callback(err);
         });
@@ -80,7 +80,7 @@ const unsubscribe = function (db, placeId, callback) {
     try{
         let sql = `
         UPDATE ${tableName}
-        SET ${columnSubscription} = false
+        SET ${columnSubscribed} = false
         WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [placeId], (err) => {

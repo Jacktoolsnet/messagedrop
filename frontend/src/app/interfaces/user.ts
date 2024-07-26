@@ -9,5 +9,6 @@ export interface User {
     encryptionKeyPair?: Keypair,
     signingKeyPair?: Keypair,
     name?: string,
-    base64Avatar?: string
+    base64Avatar?: string,
+    subscription: string,
 }

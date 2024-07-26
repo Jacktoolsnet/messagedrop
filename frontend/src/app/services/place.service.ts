@@ -64,11 +64,7 @@ export class PlaceService {
   }
 
   subscribe(place: Place) {
-    let body = {
-      'placeId': place.id,
-      'subscription': place.subscription,
-    };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/subscribe`, body, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/subscribe/${place.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

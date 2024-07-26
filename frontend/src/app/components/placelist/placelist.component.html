@@ -34,7 +34,7 @@
                         <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deletePlace(place)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
                         </button>
-                        <button *ngIf="!subscriptionError" mat-mini-fab color="{{place.subscription == null || place.subscription == undefined ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(place)">
+                        <button *ngIf="!subscriptionError" mat-mini-fab color="{{!place.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(place)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >bookmark_flag</mat-icon>
                         </button>
                         <button mat-mini-fab color="secondary" aria-label="Edit locations for this place" (click)="editLocation(place)">
