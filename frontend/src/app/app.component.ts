@@ -274,6 +274,8 @@ export class AppComponent implements OnInit {
                       placeId: this.selectedPlace?.id,
                       plusCode: location.plusCode
                     });
+                    this.mapService.addPlaceLocationRectange(location);
+                    this.isPartOfPlace = true;
                   }
                 },
                 error: (err) => {
@@ -283,12 +285,26 @@ export class AppComponent implements OnInit {
   }
 
   public removeLocationFromPlace() {
-    console.log('Remove Locations from place');
+    let location: Location = this.mapService.getMapLocation();
+    this.placeService.removePlusCodeFromPlace(this.selectedPlace!, location)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    this.selectedPlace?.plusCodes.splice(this.selectedPlace?.plusCodes.findIndex(item => item.plusCode === location.plusCode), 1)
+                    this.isPartOfPlace = false;
+                    this.mapService.removePlaceLocationRectange(location);
+                  }
+                },
+                error: (err) => {
+                },
+                complete:() => {}
+              });
   }
 
   public finishEditingPlace() {
     this.mapService.setMapMinMaxZoom(3, 19);
     this.selectedPlace = undefined;
+    this.mapService.removeAllPlaceLocationRectange();
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
@@ -558,6 +574,9 @@ export class AppComponent implements OnInit {
         this.mapService.setMapMinMaxZoom(18, 19);
         this.mapService.setMapZoom(18);
         this.selectedPlace = data;
+        this.selectedPlace.plusCodes.forEach(plusCode => {
+          this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode.plusCode));
+        });
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }      
     });

@@ -4,9 +4,9 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlacePlusCode = require('../db/tablePlacePlusCode');
 
-router.get('/create/:locationId/:plusCode', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
+router.get('/create/:placeId/:plusCode', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlacePlusCode.create(req.database.db, req.params.locationId, req.params.plusCode, function (err) {
+  tablePlacePlusCode.create(req.database.db, req.params.placeId, req.params.plusCode, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -41,9 +41,9 @@ router.get('/byPlaceId/:placeId', [security.checkToken], function(req, res) {
   });
 });
 
-router.get('/remove/:locationId/:plusCode', [security.checkToken], function(req, res) {
+router.get('/remove/:placeId/:plusCode', [security.checkToken], function(req, res) {
   let response = {'status' : 0};
-  tablePlacePlusCode.remove(req.database.db, req.params.locationId, req.params.plusCode, function(err) {
+  tablePlacePlusCode.remove(req.database.db, req.params.placeId, req.params.plusCode, function(err) {
     if (err) {
       response.status = 500;
       response.error = err;

@@ -103,10 +103,11 @@ export class NotelistComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && undefined != this.noteToDelete) {
-        let index: number = this.notes.indexOf(this.noteToDelete, 0);
+        /*let index: number = this.notes.indexOf(this.noteToDelete, 0);
         if (index > -1) {
           this.notes.splice(index, 1);
-        }
+        }*/
+        this.notes.splice(this.notes.findIndex(note => note === this.noteToDelete), 1)
         this.noteService.saveNotesToStorage(this.notes);
         if (this.notes.length == 0) {
           this.dialogRef.close();

@@ -33,12 +33,10 @@ export class GeolocationService {
     return location;
   }
 
-  public getLocationFromPlusCode(plusCode: string, plusCodeLength: number): Location{
-    let plusCodeComplete: string = plusCodeLength === 11 ? `${plusCode.substring(0, plusCodeLength)}` : `${plusCode.substring(0, plusCodeLength)}+`;
-    plusCode = plusCode.substring(0, plusCodeLength);
+  public getLocationFromPlusCode(plusCode: string): Location{
     let location: Location = {
-      latitude : plusCodes.decode(plusCodeComplete)?.latitude || 0,
-      longitude: plusCodes.decode(plusCodeComplete)?.longitude  || 0,
+      latitude : plusCodes.decode(plusCode)?.latitude || 0,
+      longitude: plusCodes.decode(plusCode)?.longitude  || 0,
       plusCode: plusCode
     };
     return location;

@@ -89,7 +89,7 @@ export class PlaceService {
   }
 
   removePlusCodeFromPlace(place: Place, location: Location) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/unsubscribe/${place.id}/${location.plusCode}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/remove/${place.id}/${location.plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

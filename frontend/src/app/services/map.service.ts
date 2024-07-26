@@ -48,9 +48,9 @@ export class MapService {
 
   private markerClickEvent!: EventEmitter<MarkerLocation>;
 
-  private messageMarkers: leaflet.Marker[] = [];  
+  private messageMarkers: leaflet.Marker[] = [];
+  private placeLocationRectangels = new Map<string, leaflet.Rectangle>();
   
-
   constructor(private geolocationService: GeolocationService) { }
 
   public initMap(location: Location, clickEvent:EventEmitter<Location>, moveEndEvent:EventEmitter<Location>, markerClickEvent:EventEmitter<MarkerLocation>): void {
@@ -100,7 +100,7 @@ export class MapService {
 
     // Fire event to load first messagens
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
-    this.searchRectangle = leaflet.rectangle([[0, 0],[0, 0]], {color: "#ff7800", weight: 1}).addTo(this.map);
+    this.searchRectangle = leaflet.rectangle([[0, 0],[0, 0]], {color: "#ff7800", weight: 3}).addTo(this.map);
     this.drawSearchRectange(this.location);
   }
 
@@ -146,6 +146,26 @@ export class MapService {
     if (this.drawCircleMarker) {
       this.circleMarker = leaflet.circleMarker([location.latitude, location.longitude]).addTo(this.map);    
     }
+  }
+
+  //this.searchRectangle = leaflet.rectangle([[0, 0],[0, 0]], {color: "#ff7800", weight: 1}).addTo(this.map);
+  //placeLocationRectangels
+  public addPlaceLocationRectange(location: Location) {
+    let plusCodeArea : PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.map?.getZoom()));
+    let newRectangle = leaflet.rectangle([[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo],[plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]], {color: "#02bd2a", weight: 1}).addTo(this.map);
+    this.placeLocationRectangels.set(location.plusCode, newRectangle);
+  }
+
+  public removePlaceLocationRectange(location: Location) {
+    this.placeLocationRectangels.get(location.plusCode)?.removeFrom(this.map);
+    this.placeLocationRectangels.delete(location.plusCode);
+  }
+
+  public removeAllPlaceLocationRectange() {
+    this.placeLocationRectangels.forEach(placeLocationRectangle => {
+      placeLocationRectangle.removeFrom(this.map);
+    })
+    this.placeLocationRectangels.clear();
   }
 
   public drawSearchRectange(location: Location) {
