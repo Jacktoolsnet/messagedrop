@@ -45,7 +45,27 @@ router.get('/get/:placeId', [security.checkToken], function(req, res) {
         response.status = 404;
       } else {
         response.status = 200;
-        response.location = row;
+        response.place = row;
+      }
+    }
+    res.setHeader('Content-Type', 'application/json');      
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
+router.get('/get/userId/:userId/name/:name', [security.checkToken], function(req, res) {
+  let response = {'status' : 0};
+  tablePlace.getByUserIdAndName(req.database.db, req.params.userId, req.params.name, function(err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      if (!row) {
+        response.status = 404;
+      } else {
+        response.status = 200;
+        response.place = row;
       }
     }
     res.setHeader('Content-Type', 'application/json');      

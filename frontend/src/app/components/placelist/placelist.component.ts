@@ -227,7 +227,8 @@ export class PlacelistComponent implements OnInit{
             .subscribe({
               next: simpleResponse => {
                 if (simpleResponse.status === 200) {
-                  this.places.unshift(data?.place);
+                  this.placeService.updateIdAfterCreation(this.user.id, data.place)
+                  this.places.unshift(data.place);
                   this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', {duration: 1000});
                 }
               },

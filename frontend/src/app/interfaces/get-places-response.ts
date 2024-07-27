@@ -1,7 +1,7 @@
 import { Place } from "./place";
 
-export interface GetPlaceResponse {
+export interface GetPlacesResponse {
     status: number,
-    place: Place
+    rows: Place[]
 }
 

@@ -105,6 +105,21 @@ const getById = function (db, placeId, callback) {
     }
 };
 
+const getByUserIdAndName = function (db, userId, name, callback) {
+    try{
+        let sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnUserId} = ?
+        AND ${columnName} = ?;`;
+
+        db.get(sql, [userId, name], (err, row) => {
+            callback(err, row);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const getByUserId = function (db, userId, callback) {
     try{
         let sql = `
@@ -146,5 +161,6 @@ module.exports = {
     unsubscribe,
     getById,
     getByUserId,
+    getByUserIdAndName,
     deleteById
 }

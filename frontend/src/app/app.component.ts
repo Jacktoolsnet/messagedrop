@@ -35,7 +35,7 @@ import { PlacelistComponent } from './components/placelist/placelist.component';
 import { PlaceService } from './services/place.service';
 import { Place } from './interfaces/place';
 import { GetPlacePlusCodeResponse } from './interfaces/get-place-plus-code-response copy';
-import { GetPlaceResponse } from './interfaces/get-place-response';
+import { GetPlacesResponse } from './interfaces/get-places-response';
 
 @Component({
   selector: 'app-root',
@@ -246,7 +246,7 @@ export class AppComponent implements OnInit {
   private getPlaces() {
     this.placeService.getByUserId(this.user!.id)
             .subscribe({
-              next: (getPlacesResponse: GetPlaceResponse) => {
+              next: (getPlacesResponse: GetPlacesResponse) => {
                 this.places = [ ...getPlacesResponse.rows];
                 this.places.forEach(place => {
                   this.placeService.getPlacePlusCodes(place)

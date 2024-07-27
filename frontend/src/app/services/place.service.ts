@@ -5,9 +5,10 @@ import { catchError, throwError } from 'rxjs';
 import { GeolocationService } from './geolocation.service';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { Place } from '../interfaces/place';
-import { GetPlaceResponse } from '../interfaces/get-place-response';
+import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
 import { GetPlacePlusCodeResponse } from '../interfaces/get-place-plus-code-response copy';
+import { GetPlaceResponse } from '../interfaces/get-place-response';
 
 @Injectable({
   providedIn: 'root'
@@ -50,10 +51,37 @@ export class PlaceService {
   }
 
   getByUserId(userId: string) {
-    return this.http.get<GetPlaceResponse>(`${environment.apiUrl}/place/get/userId/${userId}`, this.httpOptions)
+    return this.http.get<GetPlacesResponse>(`${environment.apiUrl}/place/get/userId/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  getById(placeId: string) {
+    return this.http.get<GetPlaceResponse>(`${environment.apiUrl}/place/get/${placeId}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getByUserIdAndName(userId: string, name: string) {
+    return this.http.get<GetPlaceResponse>(`${environment.apiUrl}/place/get/userId/${userId}/name/${name}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updateIdAfterCreation(userId: string, place: Place) {
+    this.getByUserIdAndName(userId, place.name)
+            .subscribe({
+              next: (placeResponse: GetPlaceResponse) => {
+                if (placeResponse.status === 200) {
+                  place.id = placeResponse.place.id;  
+                }
+              },
+              error: (err) => {},
+              complete:() => {}
+            });
   }
 
   deletePlace(place: Place) {
