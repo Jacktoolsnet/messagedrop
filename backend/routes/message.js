@@ -5,6 +5,7 @@ const bodyParser = require('body-parser');
 const tableMessage = require('../db/tableMessage');
 const tableLike = require('../db/tableLike');
 const tableDislike = require('../db/tableDislike');
+const notify = require('../utils/notify');
 
 router.get('/get', [security.checkToken], function(req, res) {
   let response = {'status' : 0, 'rows' : []};
@@ -139,6 +140,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 500;
       response.error = err;
     } else {
+      notify.placeSubscriptions(req.database.db, req.body.plusCode, req.body.messageUserId);
       response.status = 200;
     }
     res.setHeader('Content-Type', 'application/json');
