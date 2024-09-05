@@ -137,7 +137,7 @@ export class PlacelistComponent implements OnInit{
   }
 
   public subscribe(place: Place) {
-    if (this.user.subscription === '') {
+    if (this.user.subscription === '' && !place.subscribed) {
       // Subscrbe user if needed.
       this.swPush.requestSubscription({
         serverPublicKey: environment.vapid_public_key

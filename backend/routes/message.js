@@ -140,7 +140,8 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 500;
       response.error = err;
     } else {
-      notify.placeSubscriptions(req.database.db, req.body.plusCode, req.body.messageUserId);
+      console.log('notify');
+      notify.placeSubscriptions(req.database.db, req.body.plusCode, req.body.messageUserId, req.body.message.replace(/\'/g,"''"));
       response.status = 200;
     }
     res.setHeader('Content-Type', 'application/json');

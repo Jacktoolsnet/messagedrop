@@ -1,6 +1,6 @@
 const webpush = require('web-push');
 
-const placeSubscriptions = function (db, plusCode, userId) {
+const placeSubscriptions = function (db, plusCode, userId, message) {
     try{
         let sql = `
         SELECT placeId, subscribed, tablePlace.userId, tableUser.subscription
@@ -9,14 +9,14 @@ const placeSubscriptions = function (db, plusCode, userId) {
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
         WHERE plusCode = '${plusCode}'
         AND subscribed = 1
-        AND tablePlace.userID = '${userId}';`;
+        AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {
                 const payload = {
                     "notification": {
                         "title": "New message dropped",
-                        "body": "Newsletter Available!",
-                        "icon": "assets/marker/messages-marker.svg",
+                        "body": message,
+                        "icon": "assets/markers/messages-marker.svg",
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
@@ -28,25 +28,28 @@ const placeSubscriptions = function (db, plusCode, userId) {
                         }]
                     }
                 };
-                sendNotification(JSON.parse(row.subscription), payload)
+                sendNotification(JSON.parse(row.subscription), payload);
               });
         });
     } catch (error) {
-        throw error;
+        console.log(error);
     }
 }
 
 function sendNotification(subscription, payload) {
-    webpush.setVapidDetails(
-        'https://messagedrop.de',
-        process.env.VAPID_PUBLIC_KEY,
-        process.env.VAPID_PRIVATE_KEY
-    );
-    webPush
-        .sendNotification(subscription, payload)
-        .then(() => {})
-        .catch((error) => {
-        });
+    try{
+        webpush.setVapidDetails(
+            'https://messagedrop.de',
+            process.env.VAPID_PUBLIC_KEY,
+            process.env.VAPID_PRIVATE_KEY
+        );
+        webpush
+            .sendNotification(subscription, JSON.stringify(payload))
+            .then((result) => {})
+            .catch((error) => {});
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 module.exports = {
