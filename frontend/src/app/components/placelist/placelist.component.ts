@@ -143,6 +143,7 @@ export class PlacelistComponent implements OnInit{
         serverPublicKey: environment.vapid_public_key
       })
       .then(subscription => {
+        console.log("subscription start");
         let subscriptionJson = JSON.stringify(subscription);
         // Save subscription to user.
         this.userService.subscribe(this.user, subscriptionJson)
@@ -150,7 +151,8 @@ export class PlacelistComponent implements OnInit{
                 next: (simpleStatusResponse) => {
                   if (simpleStatusResponse.status === 200) {
                     this.user.subscription = subscriptionJson;
-                    this.userService.saveUser(this.user);                
+                    this.userService.saveUser(this.user);  
+                    console.log("subscription saved");              
                   }
                 },
                 error: (err) => {
@@ -159,7 +161,7 @@ export class PlacelistComponent implements OnInit{
                 complete:() => {}
               });
       })
-      .catch(err => {});
+      .catch(err => {console.log(err)});
     }
     if (!place.subscribed) {
       // subscribe to place
