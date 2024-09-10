@@ -36,6 +36,7 @@ import { PlaceService } from './services/place.service';
 import { Place } from './interfaces/place';
 import { GetPlacePlusCodeResponse } from './interfaces/get-place-plus-code-response copy';
 import { GetPlacesResponse } from './interfaces/get-places-response';
+import { SwPush } from '@angular/service-worker';
 
 @Component({
   selector: 'app-root',
@@ -93,10 +94,14 @@ export class AppComponent implements OnInit {
     public placeListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
-    private platformLocation: PlatformLocation
+    private platformLocation: PlatformLocation,
+    private swPush: SwPush
   ) { }
 
   public ngOnInit(): void {
+    this.swPush.notificationClicks.subscribe((result) => {
+      console.log('clicked', result);
+    });
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
         this.myHistory.pop();

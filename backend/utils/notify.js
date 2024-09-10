@@ -16,7 +16,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                     "notification": {
                         "title": "New message dropped",
                         "body": message,
-                        "icon": "assets/markers/messages-marker.svg",
+                        "icon": "assets/icons/icon-72x72.png",
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
