@@ -32,7 +32,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
               });
         });
     } catch (error) {
-        logger.error(error);
+        logger.error(`placeSubscriptions: ${error}`);
     }
 }
 
@@ -48,7 +48,7 @@ function sendNotification(logger, subscription, payload) {
             .then((result) => {})
             .catch((error) => {});
     } catch (error) {
-        logger.error(error);
+        logger.error(`sendNotification: ${error}`);
     }
 }
 
