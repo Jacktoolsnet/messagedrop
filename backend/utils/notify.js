@@ -14,7 +14,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
             rows.forEach((row) => {
                 const payload = {
                     "notification": {
-                        "title": "New message dropped",
+                        "title": "Messagedrop",
                         "body": message,
                         "icon": "assets/icons/notify-icon.png",
                         "vibrate": [100, 50, 100],
@@ -22,18 +22,12 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                             "dateOfArrival": Date.now(),
                             "primaryKey": plusCode,
                             "onActionClick": {
-                                "default": { "operation": "openWindow" },
-                                "OpenLocation": {
-                                    "operation": 'navigateLastFocusedOrOpen',
-                                    "url": '/',
-                                },
+                                "default": { 
+                                    "operation": "openWindow",
+                                    "url": '/'
+                                }
                             },
-                        },
-                        "actions": [{
-                            "action": "OpenLocation",
-                            "icon": "assets/icons/notify-icon.png",
-                            "title": "Open location"
-                        }]
+                        }
                     }
                 };
                 sendNotification(logger, JSON.parse(row.subscription), payload);
