@@ -1,6 +1,6 @@
 const webpush = require('web-push');
 
-const placeSubscriptions = function (db, plusCode, userId, message) {
+const placeSubscriptions = function (logger, db, plusCode, userId, message) {
     try{
         let sql = `
         SELECT placeId, subscribed, tablePlace.userId, tableUser.subscription
@@ -28,15 +28,15 @@ const placeSubscriptions = function (db, plusCode, userId, message) {
                         }]
                     }
                 };
-                sendNotification(JSON.parse(row.subscription), payload);
+                sendNotification(logger, JSON.parse(row.subscription), payload);
               });
         });
     } catch (error) {
-        console.log(error);
+        logger.error(error);
     }
 }
 
-function sendNotification(subscription, payload) {
+function sendNotification(logger, subscription, payload) {
     try{
         webpush.setVapidDetails(
             'https://messagedrop.de',
@@ -48,7 +48,7 @@ function sendNotification(subscription, payload) {
             .then((result) => {})
             .catch((error) => {});
     } catch (error) {
-        console.log(error);
+        logger.error(error);
     }
 }
 

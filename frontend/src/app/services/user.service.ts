@@ -43,8 +43,7 @@ export class UserService {
         encryptionKeyPair: undefined,
         signingKeyPair: undefined,
         name : 'Unnamed user',
-        base64Avatar: '',
-        subscription: ''
+        base64Avatar: ''
       }
     } else {
       user = {
@@ -55,8 +54,7 @@ export class UserService {
         encryptionKeyPair : undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
         signingKeyPair : undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
         name : undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
-        base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : '',
-        subscription : undefined != userFromLocalStorage.subscribe ? userFromLocalStorage.subscription : ''
+        base64Avatar : undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
       }
     }
     return user;

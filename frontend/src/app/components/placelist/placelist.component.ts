@@ -137,7 +137,7 @@ export class PlacelistComponent implements OnInit{
   }
 
   public subscribe(place: Place) {
-    if (this.user.subscription === '' && !place.subscribed) {
+    if (!place.subscribed) {
       // Subscrbe user if needed.
       this.swPush.requestSubscription({
         serverPublicKey: environment.vapid_public_key
@@ -150,7 +150,6 @@ export class PlacelistComponent implements OnInit{
               .subscribe({
                 next: (simpleStatusResponse) => {
                   if (simpleStatusResponse.status === 200) {
-                    this.user.subscription = subscriptionJson;
                     this.userService.saveUser(this.user);  
                     console.log("subscription saved");              
                   }

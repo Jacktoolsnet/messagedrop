@@ -1,6 +1,7 @@
 require('dotenv').config()
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
+const loggerMw = require('./middleware/logger');
 const Database = require('./db/database');
 const database = new Database();
 const root = require('./routes/root');
@@ -17,6 +18,17 @@ const express = require('express');
 const helmet = require('helmet');
 const app = express();
 const cron = require('node-cron');
+const winston = require('winston');
+
+// Logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'info.log' }),
+  ],
+});
 
 /*
 “Helmet” is a collection of nine smaller middleware functions that are used to set security-relevant HTTP headers.
@@ -53,6 +65,7 @@ var corsOptions = {
 app.use(cors())
 
 app.use(databaseMw(database));
+app.use(loggerMw(logger));
 
 // ROUTES
 app.use('/', root);
@@ -69,8 +82,8 @@ app.use('*', notfound);
 
 // Start app
 app.listen(process.env.PORT, () => {
-  console.log(`Example app listening on port ${process.env.PORT}`);
-  database.init();
+  logger.info(`Example app listening on port ${process.env.PORT}`);
+  database.init(logger);
 })
 
 // Cron

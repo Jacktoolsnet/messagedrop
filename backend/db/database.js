@@ -14,14 +14,14 @@ class Database {
         this.db;
       }
 
-    init() {
+    init(logger) {
         this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
             if (err) {
               return console.error(err.message);
             } else {
               this.db.run('PRAGMA foreign_keys = ON;', [], function(err) {
                 if (err) {
-                  console.error(err.message);
+                  logger.error(err.message);
                 }
               });
               tableUser.init(this.db);
@@ -31,7 +31,7 @@ class Database {
               tableDislike.init(this.db);
               tablePlace.init(this.db);
               tablePlacePlusCode.init(this.db);
-              console.log('Connected to the messagedrop SQlite database.');
+              logger.info('Connected to the messagedrop SQlite database.');
             }
           });
     };

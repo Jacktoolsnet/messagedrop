@@ -353,7 +353,7 @@ export class AppComponent implements OnInit {
     let notes: Note[] = [];
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
-        if (this.mapService.getMapZoom() > 16) {
+        if (this.mapService.getMapZoom() > 19) {
           messages = this.messages.filter((message) => message.plusCode === event.plusCode);
           this.openMarkerMessageListDialog(messages);
         } else {
@@ -362,7 +362,7 @@ export class AppComponent implements OnInit {
         
         break;
       case MarkerType.PRIVATE_NOTE:
-        if (this.mapService.getMapZoom() > 16) {
+        if (this.mapService.getMapZoom() > 19) {
           notes = this.notes.filter((note) => note.plusCode === event.plusCode);
           this.openMarkerNoteListDialog(notes);
         } else {
@@ -370,7 +370,7 @@ export class AppComponent implements OnInit {
         }
         break; 
       case MarkerType.MULTI:
-        if (this.mapService.getMapZoom() > 16) {
+        if (this.mapService.getMapZoom() > 19) {
           messages = this.messages.filter((message) => message.plusCode === event.plusCode);
           notes = this.notes.filter((note) => note.plusCode === event.plusCode);
           this.openMarkerMultiDialog(messages, notes);
@@ -724,7 +724,7 @@ export class AppComponent implements OnInit {
         plusCode: message.plusCode
       };
       key = this.createMarkerKey(location);
-      if (this.mapService.getMapZoom() > 16) {
+      if (this.mapService.getMapZoom() > 19) {
         center = [message.latitude, message.longitude]        
       } else {
         center = this.mapService.getSearchRectangeCenter(location);
@@ -746,7 +746,7 @@ export class AppComponent implements OnInit {
         plusCode: note.plusCode
       };
       key = this.createMarkerKey(location);
-      if (this.mapService.getMapZoom() > 16) {
+      if (this.mapService.getMapZoom() > 19) {
         center = [note.latitude, note.longitude]        
       } else {
         center = this.mapService.getSearchRectangeCenter(location);
@@ -774,7 +774,7 @@ export class AppComponent implements OnInit {
   }
 
   private createMarkerKey(location: Location): string {
-    if (this.mapService.getMapZoom() > 16) {
+    if (this.mapService.getMapZoom() > 19) {
       return location.plusCode;
     } else {
       return this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
