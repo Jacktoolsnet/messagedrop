@@ -20,7 +20,14 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
-                            "primaryKey": plusCode
+                            "primaryKey": plusCode,
+                            "onActionClick": {
+                                "default": { "operation": "openWindow" },
+                                "OpenLocation": {
+                                    "operation": 'navigateLastFocusedOrOpen',
+                                    "url": '/',
+                                },
+                            },
                         },
                         "actions": [{
                             "action": "OpenLocation",
