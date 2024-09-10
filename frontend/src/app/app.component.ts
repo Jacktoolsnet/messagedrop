@@ -100,7 +100,7 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
-      this.snackBarRef = this.snackBar.open("Notification click" , 'OK',  {
+      this.snackBarRef = this.snackBar.open("Notification click " + JSON.stringify(result.notification.data.primaryKey) , 'OK',  {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
