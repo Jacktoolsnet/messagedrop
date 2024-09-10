@@ -16,14 +16,15 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                     "notification": {
                         "title": "New message dropped",
                         "body": message,
-                        "icon": "assets/icons/icon-72x72.png",
+                        "icon": "assets/icons/notify-icon.png",
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
                             "primaryKey": row.plusCode
                         },
                         "actions": [{
-                            "action": "explore",
+                            "action": plusCode,
+                            "icon": "assets/icons/notify-icon.png",
                             "title": "Go to the location"
                         }]
                     }
@@ -46,7 +47,7 @@ function sendNotification(logger, subscription, payload) {
         webpush
             .sendNotification(subscription, JSON.stringify(payload))
             .then((result) => {})
-            .catch((error) => {});
+            .catch((error) => {logger.error(`webpush.sendNotification: ${error}`);});
     } catch (error) {
         logger.error(`sendNotification: ${error}`);
     }
