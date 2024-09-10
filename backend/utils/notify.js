@@ -20,12 +20,12 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
-                            "primaryKey": row.plusCode
+                            "primaryKey": plusCode
                         },
                         "actions": [{
-                            "action": plusCode,
+                            "action": "OpenLocation",
                             "icon": "assets/icons/notify-icon.png",
-                            "title": "Go to the location"
+                            "title": "Open location"
                         }]
                     }
                 };
