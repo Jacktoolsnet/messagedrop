@@ -23,7 +23,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                             "primaryKey": plusCode,
                             "onActionClick": {
                                 "default": { 
-                                    "operation": "openWindow",
+                                    "operation": "focusLastFocusedOrOpen",
                                     "url": '/'
                                 }
                             },

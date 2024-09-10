@@ -100,7 +100,12 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
-      console.log('clicked', result);
+      this.snackBarRef = this.snackBar.open("Notification click" , 'OK',  {
+        panelClass: ['snack-info'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
     });
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
