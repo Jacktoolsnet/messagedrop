@@ -15,7 +15,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                 logger.info(row);
                 const payload = {
                     "notification": {
-                        "title": "Messagedrop",
+                        "title": `Messagedrop @${row.name}`,
                         "body": message,
                         "icon": "assets/icons/notify-icon.png",
                         "vibrate": [100, 50, 100],
