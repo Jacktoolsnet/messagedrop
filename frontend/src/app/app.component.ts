@@ -100,12 +100,14 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
-      this.snackBarRef = this.snackBar.open("Notification click " + JSON.stringify(result.notification.data.primaryKey) , 'OK',  {
-        panelClass: ['snack-info'],
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-        duration: 1000
-      });
+      let location: Location = this.geolocationService.getLocationFromPlusCode(result.notification.data.primaryKey);
+      this.getMessages(location, true);
+      if (!this.locationReady) {
+        this.mapService.flyToWithZoom(location, 19);
+      } else {
+        this.mapService.flyTo(location);
+      }
+      this.openMessagDialog(location);
     });
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
@@ -194,12 +196,16 @@ export class AppComponent implements OnInit {
         this.user!.location.longitude = position.coords.longitude;
         this.user!.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
         this.userService.saveUser(this.user!);
+        if (this.isUserLocation) {
+          //this.mapService.setMapZoom(this.mapService.getMapZoom());
+          if (this.locationReady) {
+            this.mapService.flyTo(this.user!.location); 
+          } else {
+            this.mapService.flyToWithZoom(this.user!.location, 19)
+          }
+        }
         this.locationReady = true;
         this.mapService.setUserMarker(this.user!.location);
-        if (this.isUserLocation) {
-          this.mapService.setMapZoom(this.mapService.getMapZoom());
-          this.mapService.flyTo(this.user!.location);
-        }
       },
       error: (error) => {
         if (error.code == 1) {
@@ -276,7 +282,6 @@ export class AppComponent implements OnInit {
 
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
-    console.log(this.selectedPlace);
     this.placeService.addPlusCodeToPlace(this.selectedPlace!, location)
               .subscribe({
                 next: (simpleStatusResponse) => {
@@ -327,7 +332,6 @@ export class AppComponent implements OnInit {
 
   private updateDataForLocation(location: Location, forceSearch: boolean) {
     if (undefined != this.selectedPlace) {
-      console.log('Paint Locations');
       this.isPartOfPlace = this.selectedPlace?.plusCodes.some(element => element.plusCode === this.mapService.getMapLocation().plusCode);
     } else {
       if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {            
@@ -583,12 +587,13 @@ export class AppComponent implements OnInit {
         this.markerLocations.clear()
         this.createMarkerLocations()
         this.mapService.setMapMinMaxZoom(18, 19);
-        this.mapService.setMapZoom(18);
         this.selectedPlace = data;
         this.selectedPlace.plusCodes.forEach(plusCode => {
           this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode.plusCode));
         });
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0].plusCode);
+        this.mapService.flyToWithZoom(location, 18);
       }      
     });
   }

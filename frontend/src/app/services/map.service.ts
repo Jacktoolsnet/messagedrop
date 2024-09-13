@@ -125,6 +125,11 @@ export class MapService {
     this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());    
   }
 
+  public flyToWithZoom(location: Location, zoom: number): void {
+    this.map?.setZoom(zoom);
+    this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());    
+  }
+
   public moveTo(location: Location): void {
     this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }

@@ -3,7 +3,7 @@ const webpush = require('web-push');
 const placeSubscriptions = function (logger, db, plusCode, userId, message) {
     try{
         let sql = `
-        SELECT placeId, subscribed, tablePlace.userId, tableUser.subscription
+        SELECT placeId, subscribed, tablePlace.userId, tablePlace.name, tableUser.subscription
         FROM tablePlacePlusCode
         INNER JOIN tablePlace ON tablePlace.id = tablePlacePlusCode.placeId
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
@@ -12,6 +12,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
         AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {
+                logger.info(row);
                 const payload = {
                     "notification": {
                         "title": "Messagedrop",
