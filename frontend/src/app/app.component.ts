@@ -107,7 +107,7 @@ export class AppComponent implements OnInit {
       } else {
         this.mapService.flyTo(location);
       }
-      this.openMessagDialog(location);
+      this.openMarkerMessageListDialog(this.messages);
     });
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
