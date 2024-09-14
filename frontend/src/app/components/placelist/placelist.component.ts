@@ -23,6 +23,9 @@ import { PlaceComponent } from '../place/place.component';
 import { SwPush } from '@angular/service-worker';
 import { environment } from '../../../environments/environment';
 import { UserService } from '../../services/user.service';
+import { GeolocationService } from '../../services/geolocation.service';
+import { MapService } from '../../services/map.service';
+import { Location } from '../../interfaces/location';
 
 @Component({
   selector: 'app-placelist',
@@ -58,6 +61,8 @@ export class PlacelistComponent implements OnInit{
   public subscriptionError: boolean = false;
 
   constructor(
+    private mapService: MapService,
+    private geolocationService: GeolocationService,
     private placeService: PlaceService,
     private userService: UserService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
@@ -240,4 +245,10 @@ export class PlacelistComponent implements OnInit{
     });
   }
 
+  public flyTo(place: Place) {
+    let location: Location = this.geolocationService.getLocationFromPlusCode(place.plusCodes[0].plusCode);
+    this.mapService.flyToWithZoom(location, 18);
+    this.dialogRef.close();
+  }
+  
 }

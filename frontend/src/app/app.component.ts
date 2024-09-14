@@ -101,13 +101,12 @@ export class AppComponent implements OnInit {
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
       let location: Location = this.geolocationService.getLocationFromPlusCode(result.notification.data.primaryKey);
-      this.getMessages(location, true);
+      this.getMessages(location, true, true);
       if (!this.locationReady) {
         this.mapService.flyToWithZoom(location, 19);
       } else {
         this.mapService.flyTo(location);
       }
-      this.openMarkerMessageListDialog(this.messages);
     });
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
@@ -231,14 +230,17 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private getMessages(location: Location, forceSearch: boolean) {
+  private getMessages(location: Location, forceSearch: boolean, showMessageList: boolean) {
     this.messageService.getByPlusCode(location)
             .subscribe({
               next: (getMessageResponse) => {
                 this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());                
                 this.messages = [...getMessageResponse.rows];
                 // At the moment build the marekrLocation map here:
-                this.createMarkerLocations()                
+                this.createMarkerLocations()
+                if (showMessageList){
+                  this.openMarkerMessageListDialog(this.messages);
+                }           
               },
               error: (err) => {
                 this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());                
@@ -340,7 +342,7 @@ export class AppComponent implements OnInit {
         // notes from local device
         this.getNotesByPlusCode(this.mapService.getMapLocation());
         // Messages
-        this.getMessages(this.mapService.getMapLocation(), false);
+        this.getMessages(this.mapService.getMapLocation(), false, false);
         // in the complete event of getMessages
       } else {
         this.createMarkerLocations();
@@ -520,7 +522,7 @@ export class AppComponent implements OnInit {
                 });
 
                 dialogRef.afterClosed().subscribe((data: any) => {
-                  this.getMessages(this.mapService.getMapLocation(), true);
+                  this.getMessages(this.mapService.getMapLocation(), true, false);
                 });
               },
               error: (err) => {
@@ -644,7 +646,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      this.getMessages(this.mapService.getMapLocation(), true);
+      this.getMessages(this.mapService.getMapLocation(), true, false);
       this.createMarkerLocations();
     });
   }
@@ -710,7 +712,7 @@ export class AppComponent implements OnInit {
                     this.noteService.deleteNotesFromStorage();
                     this.user = this.userService.deleteUserFromStorage();     
                     this.userReady = false;
-                    this.getMessages(this.mapService.getMapLocation(), true);               
+                    this.getMessages(this.mapService.getMapLocation(), true, false);               
                   }
                 },
                 error: (err) => {

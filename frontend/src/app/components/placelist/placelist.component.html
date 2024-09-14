@@ -40,6 +40,9 @@
                         <button mat-mini-fab color="secondary" aria-label="Edit locations for this place" (click)="editLocation(place)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit_location_alt</mat-icon>
                         </button>
+                        <button *ngIf="place.plusCodes.length != 0" mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(place)">
+                            <mat-icon>place</mat-icon>
+                        </button>
                     </mat-card-actions>
                 </mat-card>
             </div>
