@@ -7,7 +7,7 @@ const init = function (db) {
     try {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnPlaceId} INTEGER NOT NULL,
+            ${columnPlaceId} TEXT NOT NULL,
             ${columnPlusCode} TEXT NOT NULL,
             PRIMARY KEY (${columnPlaceId}, ${columnPlusCode}),
             FOREIGN KEY (${columnPlaceId}) 
@@ -32,7 +32,7 @@ const create = function (db, placeId, plusCode, callback) {
             ${columnPlaceId},
             ${columnPlusCode}
         ) VALUES (
-            ${placeId},
+            '${placeId}',
             '${plusCode}'
         );`;
         db.run(sql, (err) => {

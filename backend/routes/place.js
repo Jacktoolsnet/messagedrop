@@ -1,17 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
   let response = {'status' : 0};
-  tablePlace.create(req.database.db, req.body.userId, req.body.name.replace(/\'/g,"''"), function (err) {
+  let placeId = uuid.v4()
+  tablePlace.create(req.database.db, placeId, req.body.userId, req.body.name.replace(/\'/g,"''"), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
     } else {
       response.status = 200;
+      response.placeId = placeId;
     }
     res.setHeader('Content-Type', 'application/json');
     res.status(response.status);

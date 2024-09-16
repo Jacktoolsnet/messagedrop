@@ -108,7 +108,7 @@ cron.schedule('0 * * * *', () => {
 cron.schedule('*/5 * * * *', () => {
   tableMessage.cleanPublic(database.db, function(err) {
     if (err) {
-      console.log(err);
+      logger.error(err);
     }
   });
 });

@@ -9,6 +9,7 @@ import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
 import { GetPlacePlusCodeResponse } from '../interfaces/get-place-plus-code-response copy';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
+import { CreatePlaceResponse } from '../interfaces/create-place-response';
 
 @Injectable({
   providedIn: 'root'
@@ -33,7 +34,7 @@ export class PlaceService {
       'userId': place.userId,
       'name': place.name,
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/create`, body, this.httpOptions)
+    return this.http.post<CreatePlaceResponse>(`${environment.apiUrl}/place/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -69,19 +70,6 @@ export class PlaceService {
       .pipe(
         catchError(this.handleError)
       );
-  }
-
-  updateIdAfterCreation(userId: string, place: Place) {
-    this.getByUserIdAndName(userId, place.name)
-            .subscribe({
-              next: (placeResponse: GetPlaceResponse) => {
-                if (placeResponse.status === 200) {
-                  place.id = placeResponse.place.id;  
-                }
-              },
-              error: (err) => {},
-              complete:() => {}
-            });
   }
 
   deletePlace(place: Place) {

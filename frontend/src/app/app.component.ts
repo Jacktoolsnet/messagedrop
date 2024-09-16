@@ -594,8 +594,10 @@ export class AppComponent implements OnInit {
           this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode.plusCode));
         });
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
-        let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0].plusCode);
-        this.mapService.flyToWithZoom(location, 18);
+        if (this.selectedPlace.plusCodes.length != 0) {
+          let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0].plusCode);
+          this.mapService.flyToWithZoom(location, 18);
+        }
       }      
     });
   }

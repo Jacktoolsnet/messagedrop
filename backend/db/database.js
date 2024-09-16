@@ -41,7 +41,7 @@ class Database {
             if (err) {
               return console.error(err.message);
             }
-            console.log('Close the database connection.');
+            logger.info('Close the database connection.');
           });
     };
 

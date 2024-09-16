@@ -9,8 +9,8 @@ const init = function (db) {
     try {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnPlaceId} INTEGER PRIMARY KEY NOT NULL, 
-            ${columnUserId} INTEGER DEFAULT NULL,
+            ${columnPlaceId} TEXT PRIMARY KEY NOT NULL, 
+            ${columnUserId} TEXT DEFAULT NULL,
             ${columnName} TEXT NOT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnName}),
@@ -29,13 +29,15 @@ const init = function (db) {
     }
 };
 
-const create = function (db, userId, name, callback) {
+const create = function (db, placeId, userId, name, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
+            ${columnPlaceId},
             ${columnUserId},
             ${columnName}
         ) VALUES (
+            '${placeId}',
             '${userId}',
             '${name}'
         );`;
