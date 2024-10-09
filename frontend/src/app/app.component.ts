@@ -79,7 +79,7 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
-
+  
   constructor(
     public mapService: MapService,
     private geolocationService: GeolocationService, 
@@ -120,10 +120,7 @@ export class AppComponent implements OnInit {
     });
     window.history.pushState(this.myHistory, '', '');
     this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-    this.loadUser();
-    if (!this.socketioService.isConnected()){
-      this.socketioService.connect();
-    }
+    this.loadUser();    
   }
 
   private setIsUserLocation(): void {
@@ -150,6 +147,9 @@ export class AppComponent implements OnInit {
             this.userService.saveUser(this.user!);
             this.userReady = true;
             this.getPlaces();
+            if (!this.socketioService.isConnected() && this.user){
+              this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+            }
           });
         });
       });
@@ -160,6 +160,9 @@ export class AppComponent implements OnInit {
             next: (data) => {
               this.userReady = true;
               this.getPlaces();
+              if (!this.socketioService.isConnected() && this.user){
+                this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+              }
             },
             error: (err) => {
               // Create the user when it does not exist in the database.
@@ -168,6 +171,9 @@ export class AppComponent implements OnInit {
                 .subscribe(createUserResponse => {
                   this.userReady = true;
                   this.getPlaces();
+                  if (!this.socketioService.isConnected() && this.user){
+                    this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+                  }
                 });
               }
             },
@@ -182,6 +188,10 @@ export class AppComponent implements OnInit {
             error: (err) => {},
             complete:() => {}
           });
+  }
+
+  private joinUserRoomCallback = (response: any) : void => {
+    console.log(`joinUserRoomCallback: ${response.status}`);
   }
 
   public startWatchingPosition() {

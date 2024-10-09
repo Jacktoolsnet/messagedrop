@@ -37,4 +37,9 @@ export class SocketioService {
     return this.connected;
   }
 
+  public joinRoom(room: String, callback: (response: String) => any) {    
+    this.socket.on(`user:${room}`, callback)
+    this.socket.emit('user:joinUserRoom', room)
+  }
+
 }
