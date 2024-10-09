@@ -12,7 +12,6 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
         AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {
-                logger.info(row);
                 const payload = {
                     "notification": {
                         "title": `Messagedrop @${row.name}`,
