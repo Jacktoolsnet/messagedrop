@@ -758,9 +758,16 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      console.log(result);
-      if (result) {
-        this.deleteUser();
+      switch (result?.action) {
+        case "shareUserId":
+          if (this.user) {
+            navigator.clipboard.writeText(this.user.id);
+            this.snackBarRef = this.snackBar.open(`Your user ID has been copied to the clipboard. Please share it only with people you trust.` , 'OK',  {});
+          }          
+          break
+        case "deleteUserId":
+          this.deleteUser();
+          break
       }
     });
   }

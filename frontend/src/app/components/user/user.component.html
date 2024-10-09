@@ -1,18 +1,18 @@
-<h2 mat-dialog-title>Your user id is</h2>
+<h2 mat-dialog-title>My user</h2>
 <mat-dialog-content class="full-width">
-  <p>{{user?.id}}</p>
+  <h2>{{user?.id}}</h2>
   <div class="buttonarea">
-    <button mat-flat-button class color="primary"  class="button" (click)="copyToClipboard()" [mat-dialog-close]="false">
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button" [mat-dialog-close]="{'action': 'shareUserId'}">
       <mat-icon class="material-symbols-outlined">share</mat-icon>
       <span>Share your user id</span>
     </button>       
     <p></p>
-    <button mat-flat-button class color="primary"  class="button" [mat-dialog-close]="true">
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false"  class="button" [mat-dialog-close]="{'action': 'deleteUserId'}">
       <mat-icon class="material-symbols-outlined">delete</mat-icon>
       <span>Delete your user id</span>
     </button>  
   </div>  
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Back</button>
+  <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial [mat-dialog-close]="{'action': 'back'}">Back</button>
 </mat-dialog-actions>

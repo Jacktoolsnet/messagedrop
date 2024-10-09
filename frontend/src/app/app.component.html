@@ -25,10 +25,10 @@
 
 <mat-menu #userMenu="matMenu">
     <button mat-menu-item (click)="showUser()">
-    <mat-icon class="material-symbols-outlined">account_circle</mat-icon>
-        <span>Show user</span>
+    <mat-icon *ngIf="user" class="material-symbols-outlined">account_circle</mat-icon>
+        <span>My user</span>
     </button>
-    <button mat-menu-item (click)="editUserProfile()">
+    <button *ngIf="user" mat-menu-item (click)="editUserProfile()">
         <mat-icon class="material-symbols-outlined">badge</mat-icon>
         <span>My profile</span>
     </button>
