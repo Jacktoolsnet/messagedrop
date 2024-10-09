@@ -14,11 +14,24 @@ const placePlusCode = require('./routes/placepluscode');
 const translate = require('./routes/translate');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
-const express = require('express');
 const helmet = require('helmet');
-const app = express();
 const cron = require('node-cron');
 const winston = require('winston');
+
+// ExpressJs
+const { createServer } = require('node:http');
+const express = require('express');
+const app = express();
+
+// Socket.io
+const friendshipHandlers = require("./socketIo/friendshipHandlers");
+const { Server } = require('socket.io');
+const server = createServer(app);
+const io = new Server(server);
+const onConnection = (socket) => {
+  friendshipHandlers(io, socket);
+}
+io.on("connection", onConnection);
 
 // Logger
 const logger = winston.createLogger({
@@ -81,7 +94,7 @@ app.use('/placepluscode', placePlusCode);
 app.use('*', notfound);
 
 // Start app
-app.listen(process.env.PORT, () => {
+server.listen(process.env.PORT, () => {
   logger.info(`Example app listening on port ${process.env.PORT}`);
   database.init(logger);
 })

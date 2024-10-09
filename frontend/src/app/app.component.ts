@@ -37,6 +37,7 @@ import { Place } from './interfaces/place';
 import { GetPlacePlusCodeResponse } from './interfaces/get-place-plus-code-response copy';
 import { GetPlacesResponse } from './interfaces/get-places-response';
 import { SwPush } from '@angular/service-worker';
+import { SocketioService } from './services/socketio.service';
 
 @Component({
   selector: 'app-root',
@@ -95,7 +96,8 @@ export class AppComponent implements OnInit {
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
-    private swPush: SwPush
+    private swPush: SwPush,
+    private socketioService: SocketioService
   ) { }
 
   public ngOnInit(): void {
@@ -119,6 +121,9 @@ export class AppComponent implements OnInit {
     window.history.pushState(this.myHistory, '', '');
     this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
     this.loadUser();
+    if (!this.socketioService.isConnected()){
+      this.socketioService.connect();
+    }
   }
 
   private setIsUserLocation(): void {
