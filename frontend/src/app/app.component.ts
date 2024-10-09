@@ -762,7 +762,7 @@ export class AppComponent implements OnInit {
         case "shareUserId":
           if (this.user) {
             navigator.clipboard.writeText(this.user.id);
-            this.snackBarRef = this.snackBar.open(`Your user ID has been copied to the clipboard. Please share it only with people you trust.` , 'OK',  {});
+            this.snackBarRef = this.snackBar.open(`Your user ID has been copied to the clipboard. Please only share your user ID via services and with people you trust.` , 'OK',  {});
           }          
           break
         case "deleteUserId":

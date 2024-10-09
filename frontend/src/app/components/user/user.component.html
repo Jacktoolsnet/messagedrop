@@ -4,15 +4,16 @@
   <div class="buttonarea">
     <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button" [mat-dialog-close]="{'action': 'shareUserId'}">
       <mat-icon class="material-symbols-outlined">share</mat-icon>
-      <span>Share your user id</span>
+      <span>Share my user id</span>
     </button>       
     <p></p>
     <button mat-flat-button class color="primary" [attr.aria-hidden]="false"  class="button" [mat-dialog-close]="{'action': 'deleteUserId'}">
       <mat-icon class="material-symbols-outlined">delete</mat-icon>
-      <span>Delete your user id</span>
+      <span>Delete my user id</span>
     </button>  
   </div>  
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial [mat-dialog-close]="{'action': 'back'}">Back</button>
 </mat-dialog-actions>
+<h4>Please only share your user ID via services and with people you trust.</h4>

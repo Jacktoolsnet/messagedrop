@@ -1,10 +1,10 @@
 <h2 mat-dialog-title>My profile</h2>
 <mat-dialog-content>
-    Set your profile name
+    Set my profile name
     <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="user.name">
     <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input" (change)="onFileSelected($event)" #fileUpload>
     <div class="center-left" *ngIf="user.base64Avatar == ''">
-        Set your profile avatar: 
+        Set my profile avatar: 
         <button mat-mini-fab color="primary"  class="upload-button" (click)="fileUpload.click()">
             <mat-icon>attach_file</mat-icon>
         </button>
@@ -22,4 +22,4 @@
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
   <button mat-button mat-dialog-close [mat-dialog-close]="user">Apply</button>
 </mat-dialog-actions>
-<h4>The information is stored on your device and is only visible to you.</h4>
+<h4>The information is stored on my device and is only visible to me.</h4>
