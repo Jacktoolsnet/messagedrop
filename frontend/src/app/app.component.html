@@ -24,12 +24,12 @@
 </button>
 
 <mat-menu #userMenu="matMenu">
-    <button mat-menu-item (click)="deleteUser()">
-    <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
-        <span>Delete user</span>
+    <button mat-menu-item (click)="showUser()">
+    <mat-icon class="material-symbols-outlined">account_circle</mat-icon>
+        <span>Show user</span>
     </button>
     <button mat-menu-item (click)="editUserProfile()">
-        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+        <mat-icon class="material-symbols-outlined">badge</mat-icon>
         <span>My profile</span>
     </button>
     <button mat-menu-item (click)="openUserMessagListDialog()">

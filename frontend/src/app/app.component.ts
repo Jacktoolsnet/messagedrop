@@ -38,6 +38,7 @@ import { GetPlacePlusCodeResponse } from './interfaces/get-place-plus-code-respo
 import { GetPlacesResponse } from './interfaces/get-places-response';
 import { SwPush } from '@angular/service-worker';
 import { SocketioService } from './services/socketio.service';
+import { UserComponent } from './components/user/user.component';
 
 @Component({
   selector: 'app-root',
@@ -742,6 +743,24 @@ export class AppComponent implements OnInit {
                 },
                 complete:() => {}
               });
+      }
+    });
+  }
+
+  public showUser() {
+    const dialogRef = this.dialog.open(UserComponent, {
+      data: {user: this.user},
+      closeOnNavigation: true,
+      hasBackdrop: true 
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      console.log(result);
+      if (result) {
+        this.deleteUser();
       }
     });
   }

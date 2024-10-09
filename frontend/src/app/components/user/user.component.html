@@ -1,0 +1,18 @@
+<h2 mat-dialog-title>Your user id is</h2>
+<mat-dialog-content class="full-width">
+  <p>{{user?.id}}</p>
+  <div class="buttonarea">
+    <button mat-flat-button class color="primary"  class="button" (click)="copyToClipboard()" [mat-dialog-close]="false">
+      <mat-icon class="material-symbols-outlined">share</mat-icon>
+      <span>Share your user id</span>
+    </button>       
+    <p></p>
+    <button mat-flat-button class color="primary"  class="button" [mat-dialog-close]="true">
+      <mat-icon class="material-symbols-outlined">delete</mat-icon>
+      <span>Delete your user id</span>
+    </button>  
+  </div>  
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Back</button>
+</mat-dialog-actions>
