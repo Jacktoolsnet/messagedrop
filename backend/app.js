@@ -8,6 +8,7 @@ const root = require('./routes/root');
 const check = require('./routes/check');
 const statistic = require('./routes/statistic');
 const user = require('./routes/user');
+const connect = require('./routes/connect');
 const message = require('./routes/message');
 const place = require('./routes/place');
 const placePlusCode = require('./routes/placepluscode');
@@ -87,6 +88,7 @@ app.use('/', root);
 app.use('/check', check);
 app.use('/statistic', statistic);
 app.use('/user', user);
+app.use('/connect', connect);
 app.use('/message', message);
 app.use('/translate', translate);
 app.use('/place', place);
@@ -115,7 +117,18 @@ server.listen(process.env.PORT, () => {
 // Clean users every hour at minute 0
 cron.schedule('0 * * * *', () => {
   tableUser.clean(database.db, function(err) {
-    if (err) {}
+    if (err) {
+      logger.error(err);
+    }
+  });
+});
+
+// Clean connect every hour at minute 0
+cron.schedule('0 * * * *', () => {
+  tableConnect.clean(database.db, function(err) {
+    if (err) {
+      logger.error(err);
+    }
   });
 });
 

@@ -1,6 +1,7 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
 const tableUser = require('./tableUser');
+const tableConnect = require('./tableConnect');
 const tableStatistic = require('./tableStatistic');
 const tableMessage = require('./tableMessage');
 const tableLike = require('./tableLike');
@@ -25,6 +26,7 @@ class Database {
                 }
               });
               tableUser.init(this.db);
+              tableConnect.init(this.db);
               tableStatistic.init(this.db);
               tableMessage.init(this.db);
               tableLike.init(this.db);
