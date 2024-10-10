@@ -1,0 +1,42 @@
+<mat-dialog-content class="dialog">
+    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
+    </button>
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="openContactDialog()">
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
+    </button>
+    <div class="content" [ngClass]="{
+        'list': true, 
+        'gradientAnimation': animation.cssclass === 'gradientAnimation',
+        'radialAnimation': animation.cssclass === 'radialAnimation',
+        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
+        <div *ngIf="contacts.length == 0" class="item">        
+            <mat-card>                    
+                <mat-card-header class="header">
+                    <mat-card-title>Contacts</mat-card-title>
+                    <mat-card-subtitle></mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>I can tap on the plus button to add a contact.<br><br>The contact is saved on my device and only visible to me.<br></mat-card-content>                
+            </mat-card>
+        </div>
+        <div *ngIf="contacts.length != 0">        
+            <div class="item" *ngFor="let contact of contacts; index as i">            
+                <mat-card>                    
+                    <mat-card-header class="header">
+                        <mat-card-title>{{contact.name}}</mat-card-title>
+                        <mat-card-subtitle></mat-card-subtitle>
+                    </mat-card-header>
+                    <mat-card-content></mat-card-content>
+                    <mat-card-actions class="buttonbar">
+                        <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editContact(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteContact(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </div>
+        </div>
+    </div>
+</mat-dialog-content>

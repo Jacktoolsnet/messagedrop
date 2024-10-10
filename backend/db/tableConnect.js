@@ -3,6 +3,8 @@ const tableName = 'tableConnect';
 const columnConnectId = 'id';
 const columnUserId = 'userId';
 const columnSignature = 'signature';
+const columnEncryptionPublicKey = 'encryptionPublicKey';
+const columnSigningPublicKey = "signingPublicKey";
 const columnTimeOfCreation = 'timeOfCreation'; // Max. 64 charachters.
 
 const init = function (db) {
@@ -11,8 +13,10 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnConnectId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
+            ${columnEncryptionPublicKey} TEXT NOT NULL,
+            ${columnSigningPublicKey} TEXT NOT NULL, 
+            ${columnSignature} TEXT NOT NULL,
             ${columnTimeOfCreation} INTEGER NOT NULL,
-            ${columnSignature} BOOLEAN NOT NULL DEFAULT false,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE 
@@ -28,18 +32,22 @@ const init = function (db) {
     }
 };
 
-const create = function (db, connectId, userId, signature, callback) {
+const create = function (db, connectId, userId, encryptionPublicKey, signingPublicKey, signature, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnConnectId},
             ${columnUserId},
             ${columnSignature},
+            ${columnEncryptionPublicKey},
+            ${columnSigningPublicKey},
             ${columnTimeOfCreation}
         ) VALUES (
             '${connectId}',
             '${userId}',
             '${signature}',
+            '${encryptionPublicKey}',
+            '${signingPublicKey}',
             datetime('now')
         );`;
         db.run(sql, (err) => {

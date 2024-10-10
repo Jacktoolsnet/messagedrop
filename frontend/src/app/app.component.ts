@@ -41,6 +41,9 @@ import { SocketioService } from './services/socketio.service';
 import { UserComponent } from './components/user/user.component';
 import { ConnectService } from './services/connect.service';
 import { Connect } from './interfaces/connect';
+import { ContactlistComponent } from './components/contactlist/contactlist.component';
+import { Contact } from './interfaces/contact';
+import { Buffer } from 'buffer';
 
 @Component({
   selector: 'app-root',
@@ -71,6 +74,7 @@ export class AppComponent implements OnInit {
   public messages: Message[] = [];
   public places: Place[] = [];
   public selectedPlace: Place|undefined = undefined;
+  public contacts: Contact[] = [];
   public myHistory: string[] = [];
   public notes: Note[] = [];
   public allUserNotes: Note[] = [];
@@ -96,6 +100,7 @@ export class AppComponent implements OnInit {
     public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
     public placeListDialog: MatDialog,
+    public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
@@ -621,6 +626,32 @@ export class AppComponent implements OnInit {
     });
   }
 
+  public openContactListDialog(): void {
+    const dialogRef = this.contactListDialog.open(ContactlistComponent, {
+      panelClass: 'ContactListDialog',
+      closeOnNavigation: true,
+      data: {user: this.user, contacts: this.contacts},
+      width: 'auto',
+      minWidth: '60vw',
+      maxWidth:'90vw',
+      height: 'auto',
+      minHeight: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true      
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("contactList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: Place) => {
+      if (undefined != data) {
+        
+      }      
+    });
+  }
+
   public openMarkerMultiDialog(messages: Message[], notes: Note[]) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
       data: {messages: messages, notes: notes},
@@ -769,7 +800,9 @@ export class AppComponent implements OnInit {
                 let connect: Connect = {
                   id: '',
                   userId: this.user!.id,
-                  signature: signature
+                  signature: JSON.stringify(Buffer.from(signature).toJSON()),
+                  encryptionPublicKey: JSON.stringify(this.user!.encryptionKeyPair?.publicKey!),
+                  signingPublicKey: JSON.stringify(this.user!.signingKeyPair?.publicKey!)
                 };
                 this.connectService.createConnect(connect)
                 .subscribe({

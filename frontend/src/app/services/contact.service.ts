@@ -1,17 +1,17 @@
-import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { Contact } from '../interfaces/contact';
+import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { throwError, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { catchError, throwError } from 'rxjs';
-import { Connect } from '../interfaces/connect';
 import { CreateConnectResponse } from '../interfaces/create-connect-response';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { GetConnectResponse } from '../interfaces/get-connect-response';
-import { Buffer } from 'buffer';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ConnectService {
+export class ContactService {
+
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type':  'application/json',
@@ -25,30 +25,30 @@ export class ConnectService {
     return throwError(() => error);
   }
 
-  createConnect(connect: Connect) {    
-    let body = {
+  createContact(contact: Contact) {
+    /* let body = {
       'userId': connect.userId,
-      'signature': Buffer.from(connect.signature).toJSON(),
+      'signature': connect.signature,
       'encryptionPublicKey': connect.encryptionPublicKey,
       'signingPublicKey': connect.signingPublicKey
     };
     return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/connect/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      );*/
   }
 
-  getById(connectId: string) {
-    return this.http.get<GetConnectResponse>(`${environment.apiUrl}/connect/get/${connectId}`, this.httpOptions)
+  getById(contactId: string) {
+    /*return this.http.get<GetConnectResponse>(`${environment.apiUrl}/connect/get/${connectId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      );*/
   }
 
-  deleteConnect(connect: Connect) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/connect/delete/${connect.id}`, this.httpOptions)
+  deleteContact(contact: Contact) {
+    /*return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/connect/delete/${connect.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      );*/
   }
 }

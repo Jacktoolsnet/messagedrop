@@ -9,6 +9,7 @@ import { GetUserResponse } from '../interfaces/get-user-response';
 import { MessageService } from './message.service';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { Buffer } from 'buffer';
 
 @Injectable({
   providedIn: 'root'
@@ -96,15 +97,15 @@ export class UserService {
     return keypair;
   }
 
-  async createSignature(signingUser: User): Promise<ArrayBuffer> {    
+  async createSignature(signingUser: User): Promise<ArrayBuffer> {
     let signature: ArrayBuffer = new ArrayBuffer(0);
     if (signingUser.signingKeyPair!.privateKey) {
-      let payload = new TextEncoder().encode(signingUser.id);
+      let payload = Buffer.from(signingUser.id);
       let ecKeyImportParams: EcKeyImportParams = {
         name: "ECDSA",
         namedCurve: "P-384",
       };
-      const privateKey = await crypto.subtle.importKey("jwk", signingUser.signingKeyPair!.privateKey, ecKeyImportParams, true, ["sign"]);
+      let privateKey = await crypto.subtle.importKey("jwk", signingUser.signingKeyPair!.privateKey, ecKeyImportParams, true, ["sign"]);
       signature = await window.crypto.subtle.sign(
         {
           name: "ECDSA",
@@ -117,24 +118,22 @@ export class UserService {
     return signature;
   }
 
-  async verifySignature(signingUser: User, signature: ArrayBuffer): Promise<Boolean> {
+  async verifySignature(signingUserId: string, signingPublicKey: JsonWebKey, signature: ArrayBuffer): Promise<Boolean> {
     let verified: Boolean = false
-    if (signingUser.signingKeyPair!.publicKey) {
-      let payload = new TextEncoder().encode(signingUser.id);
-      let ecKeyImportParams: EcKeyImportParams = {
+    let payload = Buffer.from(signingUserId);
+    let ecKeyImportParams: EcKeyImportParams = {
+      name: "ECDSA",
+      namedCurve: "P-384",
+    };     
+    let publicKey = await crypto.subtle.importKey("jwk", signingPublicKey, ecKeyImportParams, true, ["verify"]);     
+    verified = await crypto.subtle.verify({
         name: "ECDSA",
-        namedCurve: "P-384",
-      };     
-      let publicKey = await crypto.subtle.importKey("jwk", signingUser.signingKeyPair!.publicKey, ecKeyImportParams, true, ["verify"]);      
-      verified = await crypto.subtle.verify({
-          name: "ECDSA",
-          hash: { name: "SHA-384" },
-        },
-        publicKey,
-        signature, 
-        payload
-      );
-    }
+        hash: { name: "SHA-384" },
+      },
+      publicKey,
+      signature, 
+      payload
+    );
     return verified
   }
 

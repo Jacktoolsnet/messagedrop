@@ -1,18 +1,18 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
-
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogContainer, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { StyleService } from '../../services/style.service';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { Mode } from '../../interfaces/mode';
-import { Place } from '../../interfaces/place';
+import { StyleService } from '../../services/style.service';
+import { PlaceComponent } from '../place/place.component';
+import { Contact } from '../../interfaces/contact';
 
 @Component({
-  selector: 'app-place',
+  selector: 'app-contact',
   standalone: true,
   imports: [
     MatDialogContainer,
@@ -28,15 +28,15 @@ import { Place } from '../../interfaces/place';
     MatFormFieldModule, 
     MatInputModule
   ],
-  templateUrl: './place.component.html',
-  styleUrl: './place.component.css'
+  templateUrl: './contact.component.html',
+  styleUrl: './contact.component.css'
 })
-export class PlaceComponent implements OnInit {
+export class ContactComponent implements OnInit {
   
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {mode: Mode, place: Place}
+    @Inject(MAT_DIALOG_DATA) public data: {mode: Mode, contact: Contact}
   ) {}
 
   ngOnInit(): void {
@@ -49,5 +49,5 @@ export class PlaceComponent implements OnInit {
   onAbortClick(): void {
     this.dialogRef.close();
   }
-
+  
 }

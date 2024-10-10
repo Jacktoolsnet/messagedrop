@@ -1,0 +1,38 @@
+h4 {
+    padding: 0.5rem;
+    color:floralwhite;
+  }
+  
+button {
+    margin-right: 8px;
+  }
+  
+input[type=text], select {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .file-input {
+    display: none;
+  }
+
+  .center-left{
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
+
+  .center{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    padding-bottom: 0.5rem;
+  }
