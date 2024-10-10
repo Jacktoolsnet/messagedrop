@@ -96,15 +96,15 @@ export class UserService {
     return keypair;
   }
 
-  async createSignature(user: User): Promise<ArrayBuffer> {    
+  async createSignature(signingUser: User): Promise<ArrayBuffer> {    
     let signature: ArrayBuffer = new ArrayBuffer(0);
-    if (user.signingKeyPair!.privateKey) {
-      let payload = new TextEncoder().encode(user.id);
+    if (signingUser.signingKeyPair!.privateKey) {
+      let payload = new TextEncoder().encode(signingUser.id);
       let ecKeyImportParams: EcKeyImportParams = {
         name: "ECDSA",
         namedCurve: "P-384",
       };
-      const privateKey = await crypto.subtle.importKey("jwk", user.signingKeyPair!.privateKey, ecKeyImportParams, true, ["sign"]);
+      const privateKey = await crypto.subtle.importKey("jwk", signingUser.signingKeyPair!.privateKey, ecKeyImportParams, true, ["sign"]);
       signature = await window.crypto.subtle.sign(
         {
           name: "ECDSA",
@@ -117,20 +117,25 @@ export class UserService {
     return signature;
   }
 
-  async verifySignature(signatureBase64: String, publicKey: JsonWebKey) {
-    /*  # String to ArrayBuffer Conversion #
-        Uint8Array (short) => *1 => each char. 1 byte
-        Uint16Array (medium) => *2 => each char. 2 bytes
-        Uint32Array (long) => *4 => each char. 4 bytes
-	      JSON => JSON.stringify({data: 'Hello World!'});
-    */        
-    var signature = Buffer.from("signatureBase64", 'base64').toString('binary');
-    var buffer = new ArrayBuffer(signature.length*2);
-    var signatureBuffer = new Uint16Array(buffer);
-    for (var i = 0; i < signature.length; i++) {
-      signatureBuffer[i] = signature.charCodeAt(i);
+  async verifySignature(signingUser: User, signature: ArrayBuffer): Promise<Boolean> {
+    let verified: Boolean = false
+    if (signingUser.signingKeyPair!.publicKey) {
+      let payload = new TextEncoder().encode(signingUser.id);
+      let ecKeyImportParams: EcKeyImportParams = {
+        name: "ECDSA",
+        namedCurve: "P-384",
+      };     
+      let publicKey = await crypto.subtle.importKey("jwk", signingUser.signingKeyPair!.publicKey, ecKeyImportParams, true, ["verify"]);      
+      verified = await crypto.subtle.verify({
+          name: "ECDSA",
+          hash: { name: "SHA-384" },
+        },
+        publicKey,
+        signature, 
+        payload
+      );
     }
-    console.log(signatureBuffer);
+    return verified
   }
 
   createUser(encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey) {
