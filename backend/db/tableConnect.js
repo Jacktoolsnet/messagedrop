@@ -39,7 +39,7 @@ const create = function (db, connectId, userId, signature, callback) {
         ) VALUES (
             '${connectId}',
             '${userId}',
-            '${signature}' 
+            '${signature}',
             datetime('now')
         );`;
         db.run(sql, (err) => {

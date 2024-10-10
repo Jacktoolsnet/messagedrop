@@ -39,6 +39,8 @@ import { GetPlacesResponse } from './interfaces/get-places-response';
 import { SwPush } from '@angular/service-worker';
 import { SocketioService } from './services/socketio.service';
 import { UserComponent } from './components/user/user.component';
+import { ConnectService } from './services/connect.service';
+import { Connect } from './interfaces/connect';
 
 @Component({
   selector: 'app-root',
@@ -98,7 +100,8 @@ export class AppComponent implements OnInit {
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
     private swPush: SwPush,
-    private socketioService: SocketioService
+    private socketioService: SocketioService,
+    private connectService: ConnectService
   ) { }
 
   public ngOnInit(): void {
@@ -761,8 +764,26 @@ export class AppComponent implements OnInit {
       switch (result?.action) {
         case "shareUserId":
           if (this.user) {
-            navigator.clipboard.writeText(this.user.id);
-            this.snackBarRef = this.snackBar.open(`My user ID has been copied to the clipboard. I share my user ID only via services and with people I trust.` , 'OK',  {});
+            this.userService.createSignature(this.user)
+              .then((signature : ArrayBuffer ) => {
+                let connect: Connect = {
+                  id: '',
+                  userId: this.user!.id,
+                  signature: signature
+                };
+                this.connectService.createConnect(connect)
+                .subscribe({
+                  next: createConnectResponse => {
+                    if (createConnectResponse.status === 200) {
+                      connect.id = createConnectResponse.connectId;
+                      navigator.clipboard.writeText(connect.id);
+                      this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.` , 'OK',  {});   
+                    }
+                  },
+                  error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+                  complete:() => {}
+                });       
+              });                 
           }          
           break
         case "deleteUserId":
