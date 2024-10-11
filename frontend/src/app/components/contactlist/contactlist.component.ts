@@ -18,6 +18,7 @@ import { ConnectService } from '../../services/connect.service';
 import { Buffer } from 'buffer';
 import { CryptoService } from '../../services/crypto.service';
 import { ContactService } from '../../services/contact.service';
+import { ProfileComponent } from '../contact/profile/profile.component';
 
 @Component({
   selector: 'app-contactlist',
@@ -193,39 +194,21 @@ export class ContactlistComponent implements OnInit {
     */
   }
 
-  public editContact(contact: Contact) {
-    /*
-    const dialogRef = this.placeDialog.open(PlaceComponent, {
-      panelClass: '',
-      data: {mode: this.mode.EDIT_PLACE, user: this.user, place: place},
+  public editContact(contact: Contact){
+    const dialogRef = this.dialog.open(ProfileComponent, {
+      data: {contact: contact},
       closeOnNavigation: true,
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth:'90vw',
-      minHeight: 'auto',
-      height: 'auto',
-      maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true 
     });
 
     dialogRef.afterOpened().subscribe(e => {
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.place) {
-        this.contactService.updateContact(data.place)
-            .subscribe({
-              next: simpleResponse => {
-                if (simpleResponse.status === 200) {
-                  this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', {duration: 1000});
-                }
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-              complete:() => {}
-            });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.contactService.saveContact(result);
       }
     });
-    */
   }
 
   public goBack() {

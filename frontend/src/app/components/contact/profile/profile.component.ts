@@ -7,8 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { User } from '../../../interfaces/user';
 import { EditUserComponent } from '../../messagelist/edit-user/edit-user.component';
+import { Contact } from '../../../interfaces/contact';
 
 @Component({
   selector: 'app-profile',
@@ -30,13 +30,13 @@ import { EditUserComponent } from '../../messagelist/edit-user/edit-user.compone
 })
 export class ProfileComponent {
   private snackBarRef: any;
-  public user!: User;
+  public contact!: Contact;
 
   constructor(
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<EditUserComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
-    this.user = data.user;
+    @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }) {
+    this.contact = data.contact;
   }
 
   onAbortClick(): void {
@@ -55,7 +55,7 @@ export class ProfileComponent {
   }
 
   handleFile(event: any) {
-    this.user.base64Avatar = event.target.result;
+    this.contact.base64Avatar = event.target.result;
   }
 
   handleFileError(event: any) {
@@ -63,7 +63,7 @@ export class ProfileComponent {
   }
 
   deleteAvatar() {
-    this.user.base64Avatar = '';
+    this.contact.base64Avatar = '';
   }
 
   public showPolicy() {

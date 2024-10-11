@@ -3,26 +3,26 @@
   <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
   </button>
-  Set my profile name
-  <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="user.name">
+  Set contact name
+  <input matInput type="text" maxlength="64" placeholder="Contact name.." [(ngModel)]="contact.name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload>
-  <div class="center-left" *ngIf="user.base64Avatar == ''">
-    Set my profile avatar:
+  <div class="center-left" *ngIf="contact.base64Avatar == undefined">
+    Set contact avatar:
     <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
       <mat-icon>attach_file</mat-icon>
     </button>
   </div>
   <div class="center">
-    <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" /><br>
+    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar" src="{{contact.base64Avatar}}" /><br>
   </div>
-  <div class="center" *ngIf="user.base64Avatar != ''">
-    <button *ngIf="user.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
+  <div class="center" *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''">
+    <button *ngIf="contact.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
       <mat-icon>delete</mat-icon>
     </button>
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="user">Apply</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="contact">Apply</button>
 </mat-dialog-actions>

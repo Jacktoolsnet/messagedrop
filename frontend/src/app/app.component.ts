@@ -54,10 +54,10 @@ import { GetContactsResponse } from './interfaces/get-contacts-response';
   imports: [
     MatBadgeModule,
     CommonModule,
-    RouterOutlet, 
-    MapComponent, 
-    MatButtonModule, 
-    MatTooltipModule, 
+    RouterOutlet,
+    MapComponent,
+    MatButtonModule,
+    MatTooltipModule,
     MatIconModule,
     MatDialogTitle,
     MatDialogContent,
@@ -73,10 +73,10 @@ import { GetContactsResponse } from './interfaces/get-contacts-response';
 export class AppComponent implements OnInit {
   public userReady: boolean = false;
   public locationReady: boolean = false;
-  public user!: User|undefined;
+  public user!: User | undefined;
   public messages: Message[] = [];
   public places: Place[] = [];
-  public selectedPlace: Place|undefined = undefined;
+  public selectedPlace: Place | undefined = undefined;
   public contacts: Contact[] = [];
   public myHistory: string[] = [];
   public notes: Note[] = [];
@@ -89,18 +89,18 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
-  
+
   constructor(
     public mapService: MapService,
-    private geolocationService: GeolocationService, 
+    private geolocationService: GeolocationService,
     private userService: UserService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
     private noteService: NoteService,
     private placeService: PlaceService,
     private contactService: ContactService,
-    private statisticService: StatisticService, 
-    private snackBar: MatSnackBar, 
+    private statisticService: StatisticService,
+    private snackBar: MatSnackBar,
     public messageDialog: MatDialog,
     public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
@@ -134,7 +134,7 @@ export class AppComponent implements OnInit {
     });
     window.history.pushState(this.myHistory, '', '');
     this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-    this.loadUser();    
+    this.loadUser();
   }
 
   private setIsUserLocation(): void {
@@ -150,64 +150,64 @@ export class AppComponent implements OnInit {
     this.goToUserLocation();
     if (this.user.id === 'undefined') {
       this.cryptoService.createEncryptionKey()
-      .then((encryptionKeyPair : Keypair ) => {
-        this.user!.encryptionKeyPair = encryptionKeyPair;
-        this.cryptoService.createSigningKey()
-        .then((signingKeyPair : Keypair ) => {
-          this.user!.signingKeyPair = signingKeyPair;
-          this.userService.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
-          .subscribe(createUserResponse => {
-            this.user!.id = createUserResponse.userId;
-            this.userService.saveUser(this.user!);
-            this.userReady = true;
-            this.getPlaces();
-            this.getContacts();
-            if (!this.socketioService.isConnected() && this.user){
-              this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
-            }
-          });
+        .then((encryptionKeyPair: Keypair) => {
+          this.user!.encryptionKeyPair = encryptionKeyPair;
+          this.cryptoService.createSigningKey()
+            .then((signingKeyPair: Keypair) => {
+              this.user!.signingKeyPair = signingKeyPair;
+              this.userService.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
+                .subscribe(createUserResponse => {
+                  this.user!.id = createUserResponse.userId;
+                  this.userService.saveUser(this.user!);
+                  this.userReady = true;
+                  this.getPlaces();
+                  this.getContacts();
+                  if (!this.socketioService.isConnected() && this.user) {
+                    this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+                  }
+                });
+            });
         });
-      });
     } else {
       // Check if the user exist. It could be that the database was deleted.  
       this.userService.checkUserById(this.user)
-          .subscribe({
-            next: (data) => {
-              this.userReady = true;
-              this.getPlaces();
-              this.getContacts();
-              if (!this.socketioService.isConnected() && this.user){
-                this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
-              }
-            },
-            error: (err) => {
-              // Create the user when it does not exist in the database.
-              if (err.status === 404) {
-                this.userService.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
+        .subscribe({
+          next: (data) => {
+            this.userReady = true;
+            this.getPlaces();
+            this.getContacts();
+            if (!this.socketioService.isConnected() && this.user) {
+              this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+            }
+          },
+          error: (err) => {
+            // Create the user when it does not exist in the database.
+            if (err.status === 404) {
+              this.userService.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
                 .subscribe(createUserResponse => {
                   this.userReady = true;
                   this.getPlaces();
                   this.getContacts();
-                  if (!this.socketioService.isConnected() && this.user){
+                  if (!this.socketioService.isConnected() && this.user) {
                     this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
                   }
                 });
-              }
-            },
-            complete:() => {
             }
-          });
+          },
+          complete: () => {
+          }
+        });
     }
     // Count
     this.statisticService.countVisitor()
-          .subscribe({
-            next: (data) => {},
-            error: (err) => {},
-            complete:() => {}
-          });
+      .subscribe({
+        next: (data) => { },
+        error: (err) => { },
+        complete: () => { }
+      });
   }
 
-  private joinUserRoomCallback = (response: any) : void => {
+  private joinUserRoomCallback = (response: any): void => {
     console.log(`joinUserRoomCallback: ${response.status}`);
   }
 
@@ -230,7 +230,7 @@ export class AppComponent implements OnInit {
         if (this.isUserLocation) {
           //this.mapService.setMapZoom(this.mapService.getMapZoom());
           if (this.locationReady) {
-            this.mapService.flyTo(this.user!.location); 
+            this.mapService.flyTo(this.user!.location);
           } else {
             this.mapService.flyToWithZoom(this.user!.location, 19)
           }
@@ -240,14 +240,14 @@ export class AppComponent implements OnInit {
       },
       error: (error) => {
         if (error.code == 1) {
-          this.snackBarRef = this.snackBar.open(`Please authorize location.` , 'OK',  {
+          this.snackBarRef = this.snackBar.open(`Please authorize location.`, 'OK', {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 1000
           });
         } else {
-          this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later." , 'OK',  {
+          this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later.", 'OK', {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
@@ -264,105 +264,110 @@ export class AppComponent implements OnInit {
 
   private getMessages(location: Location, forceSearch: boolean, showMessageList: boolean) {
     this.messageService.getByPlusCode(location)
-            .subscribe({
-              next: (getMessageResponse) => {
-                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());                
-                this.messages = [...getMessageResponse.rows];
-                // At the moment build the marekrLocation map here:
-                this.createMarkerLocations()
-                if (showMessageList){
-                  this.openMarkerMessageListDialog(this.messages);
-                }           
-              },
-              error: (err) => {
-                this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());                
-                this.messages = [];
-                // At the moment build the marekrLocation map here:
-                this.createMarkerLocations()
-                this.snackBarRef = this.snackBar.open("No message found", undefined , {
-                  panelClass: ['snack-warning'],
-                  horizontalPosition: 'center',
-                  verticalPosition: 'top',
-                  duration: 1000
-                });
-              },
-              complete:() => {        
-                // Is excecutet before the result is here.
-                // In the future for example get private or bussiness messages and build the marekrLocation map there.
-              }
-            });
+      .subscribe({
+        next: (getMessageResponse) => {
+          this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
+          this.messages = [...getMessageResponse.rows];
+          // At the moment build the marekrLocation map here:
+          this.createMarkerLocations()
+          if (showMessageList) {
+            this.openMarkerMessageListDialog(this.messages);
+          }
+        },
+        error: (err) => {
+          this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
+          this.messages = [];
+          // At the moment build the marekrLocation map here:
+          this.createMarkerLocations()
+          this.snackBarRef = this.snackBar.open("No message found", undefined, {
+            panelClass: ['snack-warning'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 1000
+          });
+        },
+        complete: () => {
+          // Is excecutet before the result is here.
+          // In the future for example get private or bussiness messages and build the marekrLocation map there.
+        }
+      });
   }
 
   private getPlaces() {
     this.placeService.getByUserId(this.user!.id)
-            .subscribe({
-              next: (getPlacesResponse: GetPlacesResponse) => {
-                this.places = [ ...getPlacesResponse.rows];
-                this.places.forEach(place => {
-                  this.placeService.getPlacePlusCodes(place)
-                  .subscribe({
-                    next: (getPlacesPluscodeResponse: GetPlacePlusCodeResponse) => {
-                      place.plusCodes = [ ...getPlacesPluscodeResponse.rows];
-                    },
-                    error: (err) => { },
-                    complete:() => { }
-                  });
-                });
-              },
-              error: (err) => { },
-              complete:() => { }
-            });
+      .subscribe({
+        next: (getPlacesResponse: GetPlacesResponse) => {
+          this.places = [...getPlacesResponse.rows];
+          this.places.forEach(place => {
+            this.placeService.getPlacePlusCodes(place)
+              .subscribe({
+                next: (getPlacesPluscodeResponse: GetPlacePlusCodeResponse) => {
+                  place.plusCodes = [...getPlacesPluscodeResponse.rows];
+                },
+                error: (err) => { },
+                complete: () => { }
+              });
+          });
+        },
+        error: (err) => { },
+        complete: () => { }
+      });
   }
 
   private getContacts() {
     this.contactService.getByUserId(this.user!.id)
-            .subscribe({
-              next: (getContactsResponse: GetContactsResponse) => {
-                this.contacts = [ ...getContactsResponse.rows];
-                this.contacts.forEach(contact => {
-                  // Get informations from locale storage
-                });
-              },
-              error: (err) => { },
-              complete:() => { }
-            });
+      .subscribe({
+        next: (getContactsResponse: GetContactsResponse) => {
+          this.contacts = [...getContactsResponse.rows];
+          this.contacts.forEach(contact => {
+            // Get informations from locale storage
+            let contactFromLocalStorage = this.contactService.loadContact(contact.id);
+            if (contactFromLocalStorage) {
+              contact.name = contactFromLocalStorage.name
+              contact.base64Avatar = contactFromLocalStorage.base64Avatar;
+            }
+          });
+        },
+        error: (err) => { },
+        complete: () => { }
+      });
   }
 
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
     this.placeService.addPlusCodeToPlace(this.selectedPlace!, location)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.selectedPlace?.plusCodes.push({
-                      placeId: this.selectedPlace?.id,
-                      plusCode: location.plusCode
-                    });
-                    this.mapService.addPlaceLocationRectange(location);
-                    this.isPartOfPlace = true;
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            this.selectedPlace?.plusCodes.push({
+              placeId: this.selectedPlace?.id,
+              plusCode: location.plusCode
+            });
+            this.mapService.addPlaceLocationRectange(location);
+            this.isPartOfPlace = true;
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 
   public removeLocationFromPlace() {
     let location: Location = this.mapService.getMapLocation();
     this.placeService.removePlusCodeFromPlace(this.selectedPlace!, location)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.selectedPlace?.plusCodes.splice(this.selectedPlace?.plusCodes.findIndex(item => item.plusCode === location.plusCode), 1)
-                    this.isPartOfPlace = false;
-                    this.mapService.removePlaceLocationRectange(location);
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            this.selectedPlace?.plusCodes.splice(this.selectedPlace?.plusCodes.findIndex(item => item.plusCode === location.plusCode), 1)
+            this.isPartOfPlace = false;
+            this.mapService.removePlaceLocationRectange(location);
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 
   public finishEditingPlace() {
@@ -373,7 +378,7 @@ export class AppComponent implements OnInit {
   }
 
   private getNotesByPlusCode(location: Location) {
-    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());   
+    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
     this.notes = [];
     this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
   }
@@ -382,9 +387,9 @@ export class AppComponent implements OnInit {
     if (undefined != this.selectedPlace) {
       this.isPartOfPlace = this.selectedPlace?.plusCodes.some(element => element.plusCode === this.mapService.getMapLocation().plusCode);
     } else {
-      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {            
+      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {
         // Clear markerLocations
-        this.markerLocations.clear()      
+        this.markerLocations.clear()
         // notes from local device
         this.getNotesByPlusCode(this.mapService.getMapLocation());
         // Messages
@@ -421,7 +426,7 @@ export class AppComponent implements OnInit {
         } else {
           this.openMarkerMessageListDialog(this.messages);
         }
-        
+
         break;
       case MarkerType.PRIVATE_NOTE:
         if (this.mapService.getMapZoom() > 19) {
@@ -430,7 +435,7 @@ export class AppComponent implements OnInit {
         } else {
           this.openMarkerNoteListDialog(this.notes);
         }
-        break; 
+        break;
       case MarkerType.MULTI:
         if (this.mapService.getMapZoom() > 19) {
           messages = this.messages.filter((message) => message.plusCode === event.plusCode);
@@ -439,7 +444,7 @@ export class AppComponent implements OnInit {
         } else {
           this.openMarkerMultiDialog(this.messages, this.notes);
         }
-      break;
+        break;
     }
   }
 
@@ -465,18 +470,19 @@ export class AppComponent implements OnInit {
       dislikes: 0,
       comments: 0,
       status: 'enabled',
-      userId: ''};
+      userId: ''
+    };
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message },
       width: '90vw',
       minWidth: '20vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -487,44 +493,44 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
-            .subscribe({
-              next: createMessageResponse => {
-                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-                this.updateDataForLocation(this.mapService.getMapLocation(), true);
-                this.statisticService.countMessage()
+          .subscribe({
+            next: createMessageResponse => {
+              this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
+              this.updateDataForLocation(this.mapService.getMapLocation(), true);
+              this.statisticService.countMessage()
                 .subscribe({
-                  next: (data) => {},
-                  error: (err) => {},
-                  complete:() => {}
+                  next: (data) => { },
+                  error: (err) => { },
+                  complete: () => { }
                 });
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-              complete:() => {}
-            });          
+            },
+            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+            complete: () => { }
+          });
       }
     });
   }
 
   public openNoteDialog(location: Location): void {
     let note: Note = {
-     latitude: 0,
+      latitude: 0,
       longitude: 0,
       plusCode: '',
       note: '',
       markerType: 'note',
       style: '',
-      };
+    };
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.mode.ADD_NOTE, note: note},
+      data: { mode: this.mode.ADD_NOTE, note: note },
       width: '90vw',
       minWidth: '20vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -533,7 +539,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.note) {        
+      if (undefined !== data?.note) {
         data.note.latitude = this.mapService.getMapLocation().latitude;
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
@@ -547,55 +553,55 @@ export class AppComponent implements OnInit {
 
   public openUserMessagListDialog(): void {
     this.userService.getUserMessages(this.user!)
-            .subscribe({
-              next: (getMessageResponse) => {
-                const dialogRef = this.messageListDialog.open(MessagelistComponent, {
-                  panelClass: 'MessageListDialog',
-                  closeOnNavigation: true,
-                  data: {user: this.user, messages: [...getMessageResponse.rows]},
-                  width: 'auto',
-                  minWidth: '60vw',
-                  maxWidth:'90vw',
-                  height: 'auto',
-                  minHeight: 'auto',
-                  maxHeight: '90vh',
-                  hasBackdrop: true      
-                });
+      .subscribe({
+        next: (getMessageResponse) => {
+          const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+            panelClass: 'MessageListDialog',
+            closeOnNavigation: true,
+            data: { user: this.user, messages: [...getMessageResponse.rows] },
+            width: 'auto',
+            minWidth: '60vw',
+            maxWidth: '90vw',
+            height: 'auto',
+            minHeight: 'auto',
+            maxHeight: '90vh',
+            hasBackdrop: true
+          });
 
-                dialogRef.afterOpened().subscribe(e => {
-                  this.myHistory.push("userMessageList");
-                 window.history.replaceState(this.myHistory, '', '');
-                });
+          dialogRef.afterOpened().subscribe(e => {
+            this.myHistory.push("userMessageList");
+            window.history.replaceState(this.myHistory, '', '');
+          });
 
-                dialogRef.afterClosed().subscribe((data: any) => {
-                  this.getMessages(this.mapService.getMapLocation(), true, false);
-                });
-              },
-              error: (err) => {
-                this.messages = [];
-                this.snackBarRef = this.snackBar.open("You have not written any messages yet", undefined , {
-                  panelClass: ['snack-warning'],
-                  horizontalPosition: 'center',
-                  verticalPosition: 'top',
-                  duration: 1000
-                });
-              },
-              complete:() => {}
-            });
+          dialogRef.afterClosed().subscribe((data: any) => {
+            this.getMessages(this.mapService.getMapLocation(), true, false);
+          });
+        },
+        error: (err) => {
+          this.messages = [];
+          this.snackBarRef = this.snackBar.open("You have not written any messages yet", undefined, {
+            panelClass: ['snack-warning'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 1000
+          });
+        },
+        complete: () => { }
+      });
   }
 
   public openUserNoteListDialog(): void {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
-      data: {user: this.user, notes: [...this.noteService.loadNotesFromStorage()]},
+      data: { user: this.user, notes: [...this.noteService.loadNotesFromStorage()] },
       width: 'auto',
       minWidth: '60vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       height: 'auto',
       minHeight: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -614,14 +620,14 @@ export class AppComponent implements OnInit {
     const dialogRef = this.placeListDialog.open(PlacelistComponent, {
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
-      data: {user: this.user, places: this.places},
+      data: { user: this.user, places: this.places },
       width: 'auto',
       minWidth: '60vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       height: 'auto',
       minHeight: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -644,7 +650,7 @@ export class AppComponent implements OnInit {
           let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0].plusCode);
           this.mapService.flyToWithZoom(location, 18);
         }
-      }      
+      }
     });
   }
 
@@ -652,14 +658,14 @@ export class AppComponent implements OnInit {
     const dialogRef = this.contactListDialog.open(ContactlistComponent, {
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
-      data: {user: this.user, contacts: this.contacts},
+      data: { user: this.user, contacts: this.contacts },
       width: 'auto',
       minWidth: '60vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       height: 'auto',
       minHeight: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -669,16 +675,16 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: Place) => {
       if (undefined != data) {
-        
-      }      
+
+      }
     });
   }
 
   public openMarkerMultiDialog(messages: Message[], notes: Note[]) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: {messages: messages, notes: notes},
+      data: { messages: messages, notes: notes },
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -704,14 +710,14 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: {user: this.user, messages: messages},
+      data: { user: this.user, messages: messages },
       width: 'auto',
       minWidth: '60vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       height: 'auto',
       minHeight: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -725,18 +731,18 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openMarkerNoteListDialog(notes: Note[]){
+  public openMarkerNoteListDialog(notes: Note[]) {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: {user: this.user, notes: notes},
+      data: { user: this.user, notes: notes },
       width: 'auto',
       minWidth: '60vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       height: 'auto',
       minHeight: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -753,9 +759,9 @@ export class AppComponent implements OnInit {
 
   public editUserProfile() {
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
-      data: {user: this.user},
+      data: { user: this.user },
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -771,7 +777,7 @@ export class AppComponent implements OnInit {
   public deleteUser() {
     const dialogRef = this.dialog.open(DeleteUserComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -780,34 +786,34 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.userService.deleteUser(this.user!)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.noteService.deleteNotesFromStorage();
-                    this.user = this.userService.deleteUserFromStorage();     
-                    this.userReady = false;
-                    this.getMessages(this.mapService.getMapLocation(), true, false);               
-                  }
-                },
-                error: (err) => {
-                  this.snackBarRef = this.snackBar.open("Oops, something went wrong. Please try again later.", undefined , {
-                    panelClass: ['snack-warning'],
-                    horizontalPosition: 'center',
-                    verticalPosition: 'top',
-                    duration: 1000
-                  });
-                },
-                complete:() => {}
+          .subscribe({
+            next: (simpleStatusResponse) => {
+              if (simpleStatusResponse.status === 200) {
+                this.noteService.deleteNotesFromStorage();
+                this.user = this.userService.deleteUserFromStorage();
+                this.userReady = false;
+                this.getMessages(this.mapService.getMapLocation(), true, false);
+              }
+            },
+            error: (err) => {
+              this.snackBarRef = this.snackBar.open("Oops, something went wrong. Please try again later.", undefined, {
+                panelClass: ['snack-warning'],
+                horizontalPosition: 'center',
+                verticalPosition: 'top',
+                duration: 1000
               });
+            },
+            complete: () => { }
+          });
       }
     });
   }
 
   public showUser() {
     const dialogRef = this.dialog.open(UserComponent, {
-      data: {user: this.user},
+      data: { user: this.user },
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -818,7 +824,7 @@ export class AppComponent implements OnInit {
         case "shareUserId":
           if (this.user) {
             this.cryptoService.createSignature(this.user)
-              .then((signature : ArrayBuffer ) => {
+              .then((signature: ArrayBuffer) => {
                 let connect: Connect = {
                   id: '',
                   userId: this.user!.id,
@@ -827,19 +833,19 @@ export class AppComponent implements OnInit {
                   signingPublicKey: JSON.stringify(this.user!.signingKeyPair?.publicKey!)
                 };
                 this.connectService.createConnect(connect)
-                .subscribe({
-                  next: createConnectResponse => {
-                    if (createConnectResponse.status === 200) {
-                      connect.id = createConnectResponse.connectId;
-                      navigator.clipboard.writeText(connect.id);
-                      this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.` , 'OK',  {});   
-                    }
-                  },
-                  error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-                  complete:() => {}
-                });       
-              });                 
-          }          
+                  .subscribe({
+                    next: createConnectResponse => {
+                      if (createConnectResponse.status === 200) {
+                        connect.id = createConnectResponse.connectId;
+                        navigator.clipboard.writeText(connect.id);
+                        this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
+                      }
+                    },
+                    error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                    complete: () => { }
+                  });
+              });
+          }
           break
         case "deleteUserId":
           this.deleteUser();
@@ -861,11 +867,11 @@ export class AppComponent implements OnInit {
       };
       key = this.createMarkerKey(location);
       if (this.mapService.getMapZoom() > 19) {
-        center = [message.latitude, message.longitude]        
+        center = [message.latitude, message.longitude]
       } else {
         center = this.mapService.getSearchRectangeCenter(location);
       }
-      if (!this.markerLocations.has(key)){
+      if (!this.markerLocations.has(key)) {
         this.markerLocations.set(key, {
           latitude: center[0],
           longitude: center[1],
@@ -883,18 +889,18 @@ export class AppComponent implements OnInit {
       };
       key = this.createMarkerKey(location);
       if (this.mapService.getMapZoom() > 19) {
-        center = [note.latitude, note.longitude]        
+        center = [note.latitude, note.longitude]
       } else {
         center = this.mapService.getSearchRectangeCenter(location);
       }
-      if (this.markerLocations.has(key)){
+      if (this.markerLocations.has(key)) {
         if (this.markerLocations.get(key)?.type != MarkerType.PRIVATE_NOTE) {
           this.markerLocations.set(key, {
-          latitude: center[0],
-          longitude: center[1],
-          plusCode: note.plusCode,
-          type: MarkerType.MULTI
-        });
+            latitude: center[0],
+            longitude: center[1],
+            plusCode: note.plusCode,
+            type: MarkerType.MULTI
+          });
         }
       } else {
         this.markerLocations.set(key, {
@@ -903,7 +909,7 @@ export class AppComponent implements OnInit {
           plusCode: note.plusCode,
           type: MarkerType.PRIVATE_NOTE
         });
-      }      
+      }
     });
     // Save last markerupdet to fire the angular change listener
     this.lastMarkerUpdate = new Date().getMilliseconds();
@@ -917,5 +923,5 @@ export class AppComponent implements OnInit {
     }
   }
 
-  
+
 }

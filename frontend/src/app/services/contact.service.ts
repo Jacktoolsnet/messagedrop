@@ -26,6 +26,32 @@ export class ContactService {
     return throwError(() => error);
   }
 
+  loadContact(contactId: string): Contact|undefined {
+    let contactFromLocalStorage: any = JSON.parse(localStorage.getItem(contactId) || '{}');
+    let contact!: Contact;
+    if (JSON.stringify(contactFromLocalStorage) === '{}') {
+      return undefined;
+    } else {
+      contact = {
+        id : undefined != contactFromLocalStorage.id ? contactFromLocalStorage.id : 'undefined',
+        userId: undefined != contactFromLocalStorage.userId ? contactFromLocalStorage.userId : 'undefined',
+        contactUserId: undefined != contactFromLocalStorage.contactUserId ? contactFromLocalStorage.contactUserId : 'undefined',
+        name : undefined != contactFromLocalStorage.name ? contactFromLocalStorage.name : 'Unnamed user',
+        base64Avatar : undefined != contactFromLocalStorage.base64Avatar ? contactFromLocalStorage.base64Avatar : '',
+        subscribed : undefined != contactFromLocalStorage.subscribed ? contactFromLocalStorage.subscribed : false,
+      }
+    }
+    return contact;
+  }
+
+  saveContact(contact: Contact) {
+    localStorage.setItem(contact.id, JSON.stringify(contact))
+  }
+
+  removeContact(contact: Contact) {
+    localStorage.removeItem(contact.id)
+  }
+
   createContact(contact: Contact) {
     let body = {
       'userId': contact.userId,
