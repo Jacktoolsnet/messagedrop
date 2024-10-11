@@ -15,8 +15,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { ConnectComponent } from '../contact/connect.component';
 import { ConnectService } from '../../services/connect.service';
-import { UserService } from '../../services/user.service';
 import { Buffer } from 'buffer';
+import { CryptoService } from '../../services/crypto.service';
 
 @Component({
   selector: 'app-contactlist',
@@ -48,7 +48,7 @@ export class ContactlistComponent implements OnInit {
 
   constructor(
     private connectService: ConnectService,
-    private userService: UserService,
+    private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public connectDialog: MatDialog,
     public dialog: MatDialog,
@@ -103,7 +103,7 @@ export class ContactlistComponent implements OnInit {
                   data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
                   data.contact.signature =  signature;
                   // Verify data
-                  this.userService.verifySignature(data.contact.userId, data.contact.signingPublicKey, data.contact.signature)
+                  this.cryptoService.verifySignature(data.contact.userId, data.contact.signingPublicKey, data.contact.signature)
                   .then((valid: Boolean) => {
                     console.log("valid:" + valid);
                     if (valid) {

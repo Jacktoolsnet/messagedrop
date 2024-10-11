@@ -44,6 +44,7 @@ import { Connect } from './interfaces/connect';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { Contact } from './interfaces/contact';
 import { Buffer } from 'buffer';
+import { CryptoService } from './services/crypto.service';
 
 @Component({
   selector: 'app-root',
@@ -91,6 +92,7 @@ export class AppComponent implements OnInit {
     public mapService: MapService,
     private geolocationService: GeolocationService, 
     private userService: UserService,
+    private cryptoService: CryptoService,
     private messageService: MessageService,
     private noteService: NoteService,
     private placeService: PlaceService,
@@ -144,10 +146,10 @@ export class AppComponent implements OnInit {
     this.user = this.userService.loadUser();
     this.goToUserLocation();
     if (this.user.id === 'undefined') {
-      this.userService.createEncryptionKey()
+      this.cryptoService.createEncryptionKey()
       .then((encryptionKeyPair : Keypair ) => {
         this.user!.encryptionKeyPair = encryptionKeyPair;
-        this.userService.createSigningKey()
+        this.cryptoService.createSigningKey()
         .then((signingKeyPair : Keypair ) => {
           this.user!.signingKeyPair = signingKeyPair;
           this.userService.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
@@ -795,7 +797,7 @@ export class AppComponent implements OnInit {
       switch (result?.action) {
         case "shareUserId":
           if (this.user) {
-            this.userService.createSignature(this.user)
+            this.cryptoService.createSignature(this.user)
               .then((signature : ArrayBuffer ) => {
                 let connect: Connect = {
                   id: '',
