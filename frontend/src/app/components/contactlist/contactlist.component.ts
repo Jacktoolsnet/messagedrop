@@ -105,7 +105,6 @@ export class ContactlistComponent implements OnInit {
                   // Verify data
                   this.cryptoService.verifySignature(data.contact.userId, data.contact.signingPublicKey, data.contact.signature)
                   .then((valid: Boolean) => {
-                    console.log("valid:" + valid);
                     if (valid) {
                       this.snackBarRef = this.snackBar.open(`Connect data is valid.`, 'OK');
                       // Generate Id
@@ -120,7 +119,7 @@ export class ContactlistComponent implements OnInit {
                   });
                 }
               },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+              error: (err) => {this.snackBarRef = this.snackBar.open(`Connect id not found.`, 'OK');},
               complete:() => {}
             });   
       }
