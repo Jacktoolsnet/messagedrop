@@ -2,12 +2,13 @@ import { Keypair } from "./keypair";
 import { Location } from "./location";
 
 export interface Contact {
-    id: String,    
-    connectId: String,
-    userId: String,    
+    id: string,    
+    connectId: string,
+    userId: string,    
+    contactUserId: string,
     encryptionPublicKey?: JsonWebKey,
     signingPublicKey?: JsonWebKey,
     signature?: ArrayBuffer,
-    name?: String,
-    base64Avatar?: String
+    name?: string,
+    base64Avatar?: string
 }

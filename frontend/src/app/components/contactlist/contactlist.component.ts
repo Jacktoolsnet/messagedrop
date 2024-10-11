@@ -69,7 +69,8 @@ export class ContactlistComponent implements OnInit {
       id: "",
       connectId: "",
       userId: this.user.id,
-      name: ''
+      contactUserId: '',
+      name: '',      
     };
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
@@ -97,8 +98,8 @@ export class ContactlistComponent implements OnInit {
                   var signature = buffer.buffer.slice(
                     buffer.byteOffset, buffer.byteOffset + buffer.byteLength
                   )
-                  data.contact.id = "??? Not implemented yet";
-                  data.contact.userId = getConnectResponse.connect.userId;
+                  // Informations from connect record.
+                  data.contact.contactUserId = getConnectResponse.connect.userId;
                   data.contact.encryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
                   data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
                   data.contact.signature =  signature;

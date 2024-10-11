@@ -4,8 +4,8 @@ import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http
 import { throwError, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreateConnectResponse } from '../interfaces/create-connect-response';
-import { GetConnectResponse } from '../interfaces/get-connect-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { GetContactResponse } from '../interfaces/get-contact-response';
 
 @Injectable({
   providedIn: 'root'
@@ -26,29 +26,48 @@ export class ContactService {
   }
 
   createContact(contact: Contact) {
-    /* let body = {
-      'userId': connect.userId,
-      'signature': connect.signature,
-      'encryptionPublicKey': connect.encryptionPublicKey,
-      'signingPublicKey': connect.signingPublicKey
+    let body = {
+      'userId': contact.userId,
+      'contactUserId': contact.contactUserId,
     };
-    return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/connect/create`, body, this.httpOptions)
+    return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/place/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );*/
+      );
+  }
+
+  getByUserId(userId: string) {
+    return this.http.get<GetContactResponse>(`${environment.apiUrl}/place/get/userId/${userId}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   getById(contactId: string) {
-    /*return this.http.get<GetConnectResponse>(`${environment.apiUrl}/connect/get/${connectId}`, this.httpOptions)
+    return this.http.get<GetContactResponse>(`${environment.apiUrl}/place/get/${contactId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );*/
+      );
   }
 
   deleteContact(contact: Contact) {
-    /*return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/connect/delete/${connect.id}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/delete/${contact.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );*/
+      );
+  }
+
+  subscribe(contact: Contact) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/subscribe/${contact.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  unsubscribe(contact: Contact) {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/unsubscribe/${contact.id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 }
