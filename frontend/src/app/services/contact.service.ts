@@ -30,42 +30,42 @@ export class ContactService {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
     };
-    return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/place/create`, body, this.httpOptions)
+    return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getByUserId(userId: string) {
-    return this.http.get<GetContactResponse>(`${environment.apiUrl}/place/get/userId/${userId}`, this.httpOptions)
+    return this.http.get<GetContactResponse>(`${environment.apiUrl}/contact/get/userId/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getById(contactId: string) {
-    return this.http.get<GetContactResponse>(`${environment.apiUrl}/place/get/${contactId}`, this.httpOptions)
+    return this.http.get<GetContactResponse>(`${environment.apiUrl}/contact/get/${contactId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   deleteContact(contact: Contact) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/delete/${contact.id}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/delete/${contact.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   subscribe(contact: Contact) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/subscribe/${contact.id}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/subscribe/${contact.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   unsubscribe(contact: Contact) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/unsubscribe/${contact.id}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/unsubscribe/${contact.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

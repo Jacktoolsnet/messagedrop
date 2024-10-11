@@ -17,6 +17,7 @@ import { ConnectComponent } from '../contact/connect.component';
 import { ConnectService } from '../../services/connect.service';
 import { Buffer } from 'buffer';
 import { CryptoService } from '../../services/crypto.service';
+import { ContactService } from '../../services/contact.service';
 
 @Component({
   selector: 'app-contactlist',
@@ -48,6 +49,7 @@ export class ContactlistComponent implements OnInit {
 
   constructor(
     private connectService: ConnectService,
+    private contactService: ContactService,
     private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public connectDialog: MatDialog,
@@ -109,9 +111,31 @@ export class ContactlistComponent implements OnInit {
                     if (valid) {
                       this.snackBarRef = this.snackBar.open(`Connect data is valid.`, 'OK');
                       // Generate Id
-                      
+                      this.contactService.createContact(data.contact)
+                        .subscribe({
+                          next: createContactResponse => {
+                            if (createContactResponse.status === 200) {
+                              console.log(createContactResponse.connectId);
+                              data.contact.id = createContactResponse.connectId;
+                              this.contacts.unshift(data.contact);
+                              this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
+                            }
+                          },
+                          error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+                          complete:() => {}
+                        });   
                       // Delete connect record
-
+                      this.connectService.deleteConnect(getConnectResponse.connect)
+                        .subscribe({
+                          next: (simpleStatusResponse) => {
+                            if (simpleStatusResponse.status === 200) {
+                              console.log('deleteConnect ok');
+                            }
+                          },
+                          error: (err) => {
+                          },
+                          complete:() => {}
+                        });
                       this.contacts.unshift(data.contact);
                       this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
                     } else {
