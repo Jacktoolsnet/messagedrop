@@ -28,10 +28,10 @@ import { Contact } from '../../interfaces/contact';
     MatFormFieldModule, 
     MatInputModule
   ],
-  templateUrl: './contact.component.html',
-  styleUrl: './contact.component.css'
+  templateUrl: './connect.component.html',
+  styleUrl: './connect.component.css'
 })
-export class ContactComponent implements OnInit {
+export class ConnectComponent implements OnInit {
   
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,

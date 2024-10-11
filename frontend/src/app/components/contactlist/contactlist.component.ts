@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { ContactComponent } from '../contact/contact.component';
+import { ConnectComponent } from '../contact/connect.component';
 import { ConnectService } from '../../services/connect.service';
 import { UserService } from '../../services/user.service';
 import { Buffer } from 'buffer';
@@ -50,7 +50,7 @@ export class ContactlistComponent implements OnInit {
     private connectService: ConnectService,
     private userService: UserService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
-    public contactDialog: MatDialog,
+    public connectDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
@@ -71,7 +71,7 @@ export class ContactlistComponent implements OnInit {
       userId: this.user.id,
       name: ''
     };
-    const dialogRef = this.contactDialog.open(ContactComponent, {
+    const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {mode: this.mode.ADD_PLACE, contact: contact},

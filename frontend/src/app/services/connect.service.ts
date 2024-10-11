@@ -6,7 +6,6 @@ import { Connect } from '../interfaces/connect';
 import { CreateConnectResponse } from '../interfaces/create-connect-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { GetConnectResponse } from '../interfaces/get-connect-response';
-import { Buffer } from 'buffer';
 
 @Injectable({
   providedIn: 'root'
@@ -28,7 +27,7 @@ export class ConnectService {
   createConnect(connect: Connect) {    
     let body = {
       'userId': connect.userId,
-      'signature': Buffer.from(connect.signature).toJSON(),
+      'signature': connect.signature,
       'encryptionPublicKey': connect.encryptionPublicKey,
       'signingPublicKey': connect.signingPublicKey
     };

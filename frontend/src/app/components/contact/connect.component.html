@@ -5,7 +5,7 @@
     <input matInput type="text" maxlength="64" placeholder="The connect id.." [(ngModel)]="data.contact.connectId">
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button *ngIf="data.contact.connectId != ''" mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
+  <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial (click)="onAbortClick()">Abort</button>
+  <button *ngIf="data.contact.connectId != ''" [attr.aria-hidden]="false" mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
 </mat-dialog-actions>
 <h4>The contact is saved on my device and only visible to me.</h4>
