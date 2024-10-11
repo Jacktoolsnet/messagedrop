@@ -137,7 +137,6 @@ export class ContactlistComponent implements OnInit {
                             },
                             complete: () => { }
                           });
-                        this.contacts.unshift(data.contact);
                         this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
                       } else {
                         this.snackBarRef = this.snackBar.open(`Connect data is invalid.`, 'OK');
