@@ -105,43 +105,56 @@ export class ContactlistComponent implements OnInit {
                   data.contact.encryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
                   data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
                   data.contact.signature =  signature;
-                  // Verify data
-                  this.cryptoService.verifySignature(data.contact.userId, data.contact.signingPublicKey, data.contact.signature)
-                  .then((valid: Boolean) => {
-                    if (valid) {
-                      this.snackBarRef = this.snackBar.open(`Connect data is valid.`, 'OK');
-                      // Generate Id
-                      this.contactService.createContact(data.contact)
-                        .subscribe({
-                          next: createContactResponse => {
-                            if (createContactResponse.status === 200) {
-                              console.log(createContactResponse.connectId);
-                              data.contact.id = createContactResponse.connectId;
-                              this.contacts.unshift(data.contact);
-                              this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
-                            }
-                          },
-                          error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-                          complete:() => {}
-                        });   
-                      // Delete connect record
-                      this.connectService.deleteConnect(getConnectResponse.connect)
-                        .subscribe({
-                          next: (simpleStatusResponse) => {
-                            if (simpleStatusResponse.status === 200) {
-                              console.log('deleteConnect ok');
-                            }
-                          },
-                          error: (err) => {
-                          },
-                          complete:() => {}
-                        });
-                      this.contacts.unshift(data.contact);
-                      this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
-                    } else {
-                      this.snackBarRef = this.snackBar.open(`Connect data is invalid.`, 'OK');
-                    }
-                  });
+                  // For Development check equal. Change to not equal for production.
+                  if (data.contact.contactUserId == data.contact.userId) {
+                    // Verify data
+                    this.cryptoService.verifySignature(data.contact.contactUserId, data.contact.signingPublicKey, data.contact.signature)
+                    .then((valid: Boolean) => {
+                      if (valid) {
+                        this.snackBarRef = this.snackBar.open(`Connect data is valid.`, 'OK');
+                        // Generate Id
+                        this.contactService.createContact(data.contact)
+                          .subscribe({
+                            next: createContactResponse => {
+                              if (createContactResponse.status === 200) {
+                                console.log(createContactResponse.connectId);
+                                data.contact.id = createContactResponse.connectId;
+                                this.contacts.unshift(data.contact);
+                                this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
+                              }
+                            },
+                            error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
+                            complete:() => {}
+                          });   
+                        // Delete connect record
+                        this.connectService.deleteConnect(getConnectResponse.connect)
+                          .subscribe({
+                            next: (simpleStatusResponse) => {
+                              if (simpleStatusResponse.status === 200) {}
+                            },
+                            error: (err) => {
+                            },
+                            complete:() => {}
+                          });
+                        this.contacts.unshift(data.contact);
+                        this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
+                      } else {
+                        this.snackBarRef = this.snackBar.open(`Connect data is invalid.`, 'OK');
+                      }
+                    });
+                  } else {
+                    // Delete connect record
+                    this.connectService.deleteConnect(getConnectResponse.connect)
+                      .subscribe({
+                        next: (simpleStatusResponse) => {
+                          if (simpleStatusResponse.status === 200) {}
+                        },
+                        error: (err) => {
+                        },
+                        complete:() => {}
+                      });
+                    this.snackBarRef = this.snackBar.open(`It is not possible to add my user to the contact list`, 'OK');
+                  }                  
                 }
               },
               error: (err) => {this.snackBarRef = this.snackBar.open(`Connect id not found.`, 'OK');},
