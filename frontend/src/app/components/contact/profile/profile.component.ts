@@ -28,13 +28,13 @@ import { Contact } from '../../../interfaces/contact';
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
-export class ProfileComponent {
+export class ContactProfileComponent {
   private snackBarRef: any;
   public contact!: Contact;
 
   constructor(
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<EditUserComponent>,
+    public dialogRef: MatDialogRef<ContactProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }) {
     this.contact = data.contact;
   }

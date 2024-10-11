@@ -65,8 +65,8 @@ export class UserService {
 
   createUser(encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey) {
     let body = {
-      encryptionPublicKey,
-      signingPublicKey
+      encryptionPublicKey: JSON.stringify(encryptionPublicKey),
+      signingPublicKey: JSON.stringify(signingPublicKey)
     };
     return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
       .pipe(
@@ -77,8 +77,8 @@ export class UserService {
   restoreUser(userId: string, encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey) {
     let body = {
       userId,
-      encryptionPublicKey,
-      signingPublicKey
+      encryptionPublicKey: JSON.stringify(encryptionPublicKey),
+      signingPublicKey: JSON.stringify(signingPublicKey)
     };
     return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
       .pipe(

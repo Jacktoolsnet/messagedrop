@@ -1,14 +1,13 @@
-<h2 *ngIf="data.mode == 'add_place'" mat-dialog-title>Add a contact</h2>
-<h2 *ngIf="data.mode == 'edit_place'" mat-dialog-title>Edit the contact</h2>
+<h2 *ngIf="data.mode == 'add_connect'" mat-dialog-title>Add a connection</h2>
 <mat-dialog-content>
   <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
   </button>
   The connect id I like to import
-  <input matInput type="text" maxlength="64" placeholder="The connect id.." [(ngModel)]="connectId">
+  <input matInput type="text" maxlength="64" placeholder="The connect id.." [(ngModel)]="data.connectId">
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button *ngIf="connectId != ''" [attr.aria-hidden]="false" mat-button mat-dialog-close
+  <button *ngIf="data.connectId != ''" [attr.aria-hidden]="false" mat-button mat-dialog-close
     (click)="onApplyClick()">Apply</button>
 </mat-dialog-actions>

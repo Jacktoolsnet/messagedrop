@@ -41,7 +41,7 @@ export class ConnectComponent implements OnInit {
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact, connectId: string }
   ) { }
 
   ngOnInit(): void {

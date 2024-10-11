@@ -18,7 +18,8 @@ import { ConnectService } from '../../services/connect.service';
 import { Buffer } from 'buffer';
 import { CryptoService } from '../../services/crypto.service';
 import { ContactService } from '../../services/contact.service';
-import { ProfileComponent } from '../contact/profile/profile.component';
+import { ContactProfileComponent } from '../contact/profile/profile.component';
+import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 
 @Component({
   selector: 'app-contactlist',
@@ -28,12 +29,12 @@ import { ProfileComponent } from '../contact/profile/profile.component';
     MatCardModule,
     MatDialogContainer,
     CommonModule,
-    MatButtonModule, 
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent, 
-    MatIcon, 
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
     MatMenuModule,
   ],
   templateUrl: './contactlist.component.html',
@@ -57,36 +58,35 @@ export class ContactlistComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {user: User, contacts: Contact[]}
+    @Inject(MAT_DIALOG_DATA) public data: { user: User, contacts: Contact[] }
   ) {
     this.user = data.user;
     this.contacts = data.contacts;
-    console.log(this.contacts);
   }
 
   ngOnInit(): void {
     this.animation = this.style.getRandomColorAnimation();
   }
 
-  openContactDialog(): void {
+  openConnectDialog(): void {
     let contact: Contact = {
       id: "",
       userId: this.user.id,
       contactUserId: '',
-      name: '',      
+      name: '',
       subscribed: false
     };
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.mode.ADD_PLACE, contact: contact},
+      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: "" },
       width: '90vw',
       minWidth: '20vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       minHeight: 'auto',
       height: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -94,23 +94,23 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.contact) {
-        this.connectService.getById(data.contact.connectId)
-            .subscribe({
-              next: getConnectResponse => {
-                if (getConnectResponse.status === 200) {
-                  let buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature))
-                  var signature = buffer.buffer.slice(
-                    buffer.byteOffset, buffer.byteOffset + buffer.byteLength
-                  )
-                  // Informations from connect record.
-                  data.contact.contactUserId = getConnectResponse.connect.userId;
-                  data.contact.encryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
-                  data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
-                  data.contact.signature =  signature;
-                  // For Development check equal. Change to not equal for production.
-                  if (data.contact.contactUserId != data.contact.userId) {
-                    // Verify data
-                    this.cryptoService.verifySignature(data.contact.contactUserId, data.contact.signingPublicKey, data.contact.signature)
+        this.connectService.getById(data.connectId)
+          .subscribe({
+            next: getConnectResponse => {
+              if (getConnectResponse.status === 200) {
+                let buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature))
+                var signature = buffer.buffer.slice(
+                  buffer.byteOffset, buffer.byteOffset + buffer.byteLength
+                )
+                // Informations from connect record.
+                data.contact.contactUserId = getConnectResponse.connect.userId;
+                data.contact.encryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
+                data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
+                data.contact.signature = signature;
+                // For Development check equal. Change to not equal for production.
+                if (data.contact.contactUserId != data.contact.userId) {
+                  // Verify data
+                  this.cryptoService.verifySignature(data.contact.contactUserId, data.contact.signingPublicKey, data.contact.signature)
                     .then((valid: Boolean) => {
                       if (valid) {
                         this.snackBarRef = this.snackBar.open(`Connect data is valid.`, 'OK');
@@ -121,84 +121,83 @@ export class ContactlistComponent implements OnInit {
                               if (createContactResponse.status === 200) {
                                 data.contact.id = createContactResponse.connectId;
                                 this.contacts.unshift(data.contact);
-                                this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
+                                this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
                               }
                             },
-                            error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-                            complete:() => {}
-                          });   
+                            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                            complete: () => { }
+                          });
                         // Delete connect record
                         this.connectService.deleteConnect(getConnectResponse.connect)
                           .subscribe({
                             next: (simpleStatusResponse) => {
-                              if (simpleStatusResponse.status === 200) {}
+                              if (simpleStatusResponse.status === 200) { }
                             },
                             error: (err) => {
                             },
-                            complete:() => {}
+                            complete: () => { }
                           });
                         this.contacts.unshift(data.contact);
-                        this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});
+                        this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
                       } else {
                         this.snackBarRef = this.snackBar.open(`Connect data is invalid.`, 'OK');
                       }
                     });
-                  } else {
-                    // Delete connect record
-                    this.connectService.deleteConnect(getConnectResponse.connect)
-                      .subscribe({
-                        next: (simpleStatusResponse) => {
-                          if (simpleStatusResponse.status === 200) {}
-                        },
-                        error: (err) => {
-                        },
-                        complete:() => {}
-                      });
-                    this.snackBarRef = this.snackBar.open(`It is not possible to add my user to the contact list`, 'OK');
-                  }                  
+                } else {
+                  // Delete connect record
+                  this.connectService.deleteConnect(getConnectResponse.connect)
+                    .subscribe({
+                      next: (simpleStatusResponse) => {
+                        if (simpleStatusResponse.status === 200) { }
+                      },
+                      error: (err) => {
+                      },
+                      complete: () => { }
+                    });
+                  this.snackBarRef = this.snackBar.open(`It is not possible to add my user to the contact list`, 'OK');
                 }
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(`Connect id not found.`, 'OK');},
-              complete:() => {}
-            });   
+              }
+            },
+            error: (err) => { this.snackBarRef = this.snackBar.open(`Connect id not found.`, 'OK'); },
+            complete: () => { }
+          });
       }
     });
   }
 
   public deleteContact(contact: Contact) {
-    /*
     this.contactToDelete = contact;
-    const dialogRef = this.dialog.open(DeletePlaceComponent, {
+    const dialogRef = this.dialog.open(DeleteContactComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {      
+    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && undefined != this.contactToDelete) {
-        this.contactService.deletePlace(this.contactToDelete)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.contacts.splice(this.contacts.findIndex(contact => contact.id !== this.contactToDelete.id), 1);                    
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+        this.contactService.deleteContact(this.contactToDelete)
+          .subscribe({
+            next: (simpleStatusResponse) => {
+              if (simpleStatusResponse.status === 200) {
+                this.contactService.removeContact(this.contactToDelete)
+                this.contacts.splice(this.contacts.findIndex(contact => contact.id !== this.contactToDelete.id), 1);
+              }
+            },
+            error: (err) => {
+            },
+            complete: () => { }
+          });
       }
     });
-    */
   }
 
-  public editContact(contact: Contact){
-    const dialogRef = this.dialog.open(ProfileComponent, {
-      data: {contact: contact},
+  public editContact(contact: Contact) {
+    const dialogRef = this.dialog.open(ContactProfileComponent, {
+      data: { contact: contact },
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
