@@ -8,6 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { EditUserComponent } from '../../messagelist/edit-user/edit-user.component';
 import { User } from '../../../interfaces/user';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-profile',
@@ -28,37 +29,44 @@ import { User } from '../../../interfaces/user';
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
+  private snackBarRef: any;
   public user!: User;
 
-  constructor(public dialogRef: MatDialogRef<EditUserComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {user: User}) {
-      this.user = data.user;
-    }
+  constructor(
+    private snackBar: MatSnackBar,
+    public dialogRef: MatDialogRef<EditUserComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
+    this.user = data.user;
+  }
 
-    onAbortClick(): void {
-      this.dialogRef.close();
-    }
+  onAbortClick(): void {
+    this.dialogRef.close();
+  }
 
-    onFileSelected(event: any) {
-      const file : File = event.target.files[0];
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
 
-      if (file) {
-        let reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = this.handleFile.bind(this);
-        reader.onerror = this.handleFileError.bind(this);
-      }
+    if (file) {
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = this.handleFile.bind(this);
+      reader.onerror = this.handleFileError.bind(this);
     }
+  }
 
-    handleFile(event: any) {
-      this.user.base64Avatar = event.target.result;
-    }
+  handleFile(event: any) {
+    this.user.base64Avatar = event.target.result;
+  }
 
-    handleFileError(event: any) {
-    
-    }
+  handleFileError(event: any) {
 
-    deleteAvatar(){
-      this.user.base64Avatar = '';
-    }
+  }
+
+  deleteAvatar() {
+    this.user.base64Avatar = '';
+  }
+
+  public showPolicy() {
+    this.snackBarRef = this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
+  }
 }

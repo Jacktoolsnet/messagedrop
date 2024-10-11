@@ -20,7 +20,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -50,7 +50,7 @@ const create = function (db, contactId, userId, contactUserId, callback) {
 };
 
 const subscribe = function (db, contactId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscribed} = true
@@ -64,7 +64,7 @@ const subscribe = function (db, contactId, callback) {
 };
 
 const unsubscribe = function (db, contactId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscribed} = false
@@ -79,7 +79,7 @@ const unsubscribe = function (db, contactId, callback) {
 };
 
 const getById = function (db, contactId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnContactId} = ?;`;
@@ -93,12 +93,11 @@ const getById = function (db, contactId, callback) {
 };
 
 const getByUserId = function (db, userId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnUserId} = ?
         ORDER BY ${columnContactId} ASC;`;
-
         db.all(sql, [userId], (err, rows) => {
             callback(err, rows);
         });

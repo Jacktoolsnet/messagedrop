@@ -16,7 +16,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -36,7 +36,7 @@ const create = function (db, placeId, plusCode, callback) {
             '${plusCode}'
         );`;
         db.run(sql, (err) => {
-            callback(err)     
+            callback(err)
         });
     } catch (error) {
         throw error;
@@ -44,7 +44,7 @@ const create = function (db, placeId, plusCode, callback) {
 };
 
 const getByPlusCode = function (db, plusCode, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} = ?;`;
@@ -58,7 +58,7 @@ const getByPlusCode = function (db, plusCode, callback) {
 };
 
 const getByPlaceId = function (db, placeId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlaceId} = ?;`;

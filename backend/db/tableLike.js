@@ -20,7 +20,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -52,7 +52,7 @@ const like = function (db, messageId, userId, callback) {
                 db.run(sql, (err) => {
                     callback(err);
                 });
-            }            
+            }
         });
     } catch (error) {
         throw error;
@@ -92,7 +92,7 @@ const unlike = function (db, messageId, userId, callback) {
                 db.run(sql, (err) => {
                     callback(err);
                 });
-            }            
+            }
         });
     } catch (error) {
         throw error;

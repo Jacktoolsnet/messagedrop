@@ -21,9 +21,11 @@
         </div>
         <div *ngIf="contacts.length != 0">        
             <div class="item" *ngFor="let contact of contacts; index as i">            
-                <mat-card>                    
+                <mat-card>
+                    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar" src="{{contact.base64Avatar}}" />                    
                     <mat-card-header class="header">
-                        <mat-card-title>{{contact.name}}</mat-card-title>
+                        <mat-card-title *ngIf="contact.name == undefined || contact.name === ''">{{contact.contactUserId}}</mat-card-title>
+                        <mat-card-title *ngIf="contact.name != undefined || contact.name !== ''">{{contact.name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
                     <mat-card-content></mat-card-content>

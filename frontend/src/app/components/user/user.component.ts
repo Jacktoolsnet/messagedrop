@@ -7,6 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { User } from '../../interfaces/user';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-user',
@@ -27,11 +28,17 @@ import { User } from '../../interfaces/user';
   styleUrl: './user.component.css'
 })
 export class UserComponent {
+  private snackBarRef: any;
   public user?: User;
   
   constructor(
+    private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: {user: User}) {
       this.user = data.user;
     }
+
+  public showPolicy() {
+    this.snackBarRef = this.snackBar.open(`User id, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life and subscription information is saved on our server. This informations are essential for the functionality of the application.` , 'OK',  {});   
+  }
 
 }

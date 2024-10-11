@@ -118,7 +118,7 @@ server.listen(process.env.PORT, () => {
 
 // Clean users every hour at minute 0
 cron.schedule('0 * * * *', () => {
-  tableUser.clean(database.db, function(err) {
+  tableUser.clean(database.db, function (err) {
     if (err) {
       logger.error(err);
     }
@@ -127,7 +127,7 @@ cron.schedule('0 * * * *', () => {
 
 // Clean connect every hour at minute 0
 cron.schedule('0 * * * *', () => {
-  tableConnect.clean(database.db, function(err) {
+  tableConnect.clean(database.db, function (err) {
     if (err) {
       logger.error(err);
     }
@@ -136,7 +136,7 @@ cron.schedule('0 * * * *', () => {
 
 // Clean messages every 5 minutes
 cron.schedule('*/5 * * * *', () => {
-  tableMessage.cleanPublic(database.db, function(err) {
+  tableMessage.cleanPublic(database.db, function (err) {
     if (err) {
       logger.error(err);
     }

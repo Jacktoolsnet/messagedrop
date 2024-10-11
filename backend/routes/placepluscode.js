@@ -4,8 +4,8 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlacePlusCode = require('../db/tablePlacePlusCode');
 
-router.get('/create/:placeId/:plusCode', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
-  let response = {'status' : 0};
+router.get('/create/:placeId/:plusCode', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
   tablePlacePlusCode.create(req.database.db, req.params.placeId, req.params.plusCode, function (err) {
     if (err) {
       response.status = 500;
@@ -19,9 +19,9 @@ router.get('/create/:placeId/:plusCode', [security.checkToken, bodyParser.json({
   });
 });
 
-router.get('/byPlaceId/:placeId', [security.checkToken], function(req, res) {
-  let response = {'status' : 0, 'rows' : []};
-  tablePlacePlusCode.getByPlaceId(req.database.db, req.params.placeId, function(err, rows) {
+router.get('/byPlaceId/:placeId', [security.checkToken], function (req, res) {
+  let response = { 'status': 0, 'rows': [] };
+  tablePlacePlusCode.getByPlaceId(req.database.db, req.params.placeId, function (err, rows) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -35,22 +35,22 @@ router.get('/byPlaceId/:placeId', [security.checkToken], function(req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });
 });
 
-router.get('/remove/:placeId/:plusCode', [security.checkToken], function(req, res) {
-  let response = {'status' : 0};
-  tablePlacePlusCode.remove(req.database.db, req.params.placeId, req.params.plusCode, function(err) {
+router.get('/remove/:placeId/:plusCode', [security.checkToken], function (req, res) {
+  let response = { 'status': 0 };
+  tablePlacePlusCode.remove(req.database.db, req.params.placeId, req.params.plusCode, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });

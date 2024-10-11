@@ -5,9 +5,9 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
 
-router.get('/get', [security.checkToken], function(req, res) {
-  let response = {'status' : 0, 'rows' : []};
-  tableUser.getAll(req.database.db, function(err, rows) {
+router.get('/get', [security.checkToken], function (req, res) {
+  let response = { 'status': 0, 'rows': [] };
+  tableUser.getAll(req.database.db, function (err, rows) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -21,15 +21,15 @@ router.get('/get', [security.checkToken], function(req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });
 });
 
-router.get('/get/:userId', [security.checkToken], function(req, res) {
-  let response = {'status' : 0};
-  tableUser.getById(req.database.db, req.params.userId, function(err, row) {
+router.get('/get/:userId', [security.checkToken], function (req, res) {
+  let response = { 'status': 0 };
+  tableUser.getById(req.database.db, req.params.userId, function (err, row) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -42,14 +42,14 @@ router.get('/get/:userId', [security.checkToken], function(req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });
 });
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
-  let response = {'status' : 0};
+router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
   let userId;
   if (undefined === req.body.userId || req.body.userId === '') {
     userId = uuid.v4();
@@ -70,38 +70,38 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.get('/clean', [security.checkToken], function(req, res) {
-  let response = {'status' : 0};
-  tableUser.clean(req.database.db, function(err) {
+router.get('/clean', [security.checkToken], function (req, res) {
+  let response = { 'status': 0 };
+  tableUser.clean(req.database.db, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });
 });
 
-router.get('/delete/:userId', [security.checkToken], function(req, res) {
-  let response = {'status' : 0};
-  tableUser.deleteById(req.database.db, req.params.userId, function(err) {
+router.get('/delete/:userId', [security.checkToken], function (req, res) {
+  let response = { 'status': 0 };
+  tableUser.deleteById(req.database.db, req.params.userId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });
 });
 
-router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
-  let response = {'status' : 0};
+router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
   tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
     if (err) {
       response.status = 500;
@@ -115,16 +115,16 @@ router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'applica
   });
 });
 
-router.get('/unsubscribe/:userId', [security.checkToken], function(req, res) {
-  let response = {'status' : 0};
-  tableUser.unsubscribe(req.database.db, req.params.userId, function(err) {
+router.get('/unsubscribe/:userId', [security.checkToken], function (req, res) {
+  let response = { 'status': 0 };
+  tableUser.unsubscribe(req.database.db, req.params.userId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');      
+    res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
   });

@@ -60,6 +60,7 @@ export class ContactlistComponent implements OnInit {
   ) {
     this.user = data.user;
     this.contacts = data.contacts;
+    console.log(this.contacts);
   }
 
   ngOnInit(): void {
@@ -69,10 +70,10 @@ export class ContactlistComponent implements OnInit {
   openContactDialog(): void {
     let contact: Contact = {
       id: "",
-      connectId: "",
       userId: this.user.id,
       contactUserId: '',
       name: '',      
+      subscribed: false
     };
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
@@ -106,7 +107,7 @@ export class ContactlistComponent implements OnInit {
                   data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
                   data.contact.signature =  signature;
                   // For Development check equal. Change to not equal for production.
-                  if (data.contact.contactUserId == data.contact.userId) {
+                  if (data.contact.contactUserId != data.contact.userId) {
                     // Verify data
                     this.cryptoService.verifySignature(data.contact.contactUserId, data.contact.signingPublicKey, data.contact.signature)
                     .then((valid: Boolean) => {
@@ -117,7 +118,6 @@ export class ContactlistComponent implements OnInit {
                           .subscribe({
                             next: createContactResponse => {
                               if (createContactResponse.status === 200) {
-                                console.log(createContactResponse.connectId);
                                 data.contact.id = createContactResponse.connectId;
                                 this.contacts.unshift(data.contact);
                                 this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', {duration: 1000});

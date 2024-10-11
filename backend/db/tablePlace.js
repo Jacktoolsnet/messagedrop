@@ -20,7 +20,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -50,7 +50,7 @@ const create = function (db, placeId, userId, name, callback) {
 };
 
 const update = function (db, placeId, name, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnName} = '${name}'
@@ -65,7 +65,7 @@ const update = function (db, placeId, name, callback) {
 };
 
 const subscribe = function (db, placeId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscribed} = true
@@ -79,7 +79,7 @@ const subscribe = function (db, placeId, callback) {
 };
 
 const unsubscribe = function (db, placeId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscribed} = false
@@ -94,7 +94,7 @@ const unsubscribe = function (db, placeId, callback) {
 };
 
 const getById = function (db, placeId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlaceId} = ?;`;
@@ -108,7 +108,7 @@ const getById = function (db, placeId, callback) {
 };
 
 const getByUserIdAndName = function (db, userId, name, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnUserId} = ?
@@ -123,7 +123,7 @@ const getByUserIdAndName = function (db, userId, name, callback) {
 };
 
 const getByUserId = function (db, userId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnUserId} = ?

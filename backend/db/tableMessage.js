@@ -1,14 +1,14 @@
 const messageType = {
-    PUBLIC : 'public', // For Version 1.0 only public messages are possible 
+    PUBLIC: 'public', // For Version 1.0 only public messages are possible 
     COMMENT: 'comment',
-    PRIVATE : 'private', // A private message is decrypted and only readable for the user who created the message.
-    FRIENDS : "friends", // A friends message is decrypted with the friends key and signed the the user key.
+    PRIVATE: 'private', // A private message is decrypted and only readable for the user who created the message.
+    FRIENDS: "friends", // A friends message is decrypted with the friends key and signed the the user key.
     BUSINESS: "business" // A business message is created by a company. There will be a messagedropBusiness App in the future.
 };
 
 const messageStatus = {
-    ENABLED : 'enabled',
-    DISABLED : 'disabled'
+    ENABLED: 'enabled',
+    DISABLED: 'disabled'
 };
 
 const tableName = 'tableMessage';
@@ -23,8 +23,8 @@ const columnLongtitude = 'longitude';
 const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
 const columnMessage = 'message'; // Max. 256 charachters.
 const columnMarkerType = 'markerType'; // Default, Food, Funny...
-const columnStyle = 'style'; 
-const columnViews = 'views'; 
+const columnStyle = 'style';
+const columnViews = 'views';
 const columnLikes = 'likes'; // Each like add on day to the lifetime of the message.
 const columnDislikes = 'dislikes'; // Each dislike reduce the liftime of the message by one day.
 const columnComments = 'comments';
@@ -61,7 +61,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -110,7 +110,7 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
 };
 
 const update = function (db, messageId, message, style, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnMessage} = '${message}', 
@@ -126,7 +126,7 @@ const update = function (db, messageId, message, style, callback) {
 };
 
 const getAll = function (db, callback) {
-    try{
+    try {
         let sql = `SELECT * FROM ${tableName};`;
 
         db.all(sql, (err, rows) => {
@@ -138,7 +138,7 @@ const getAll = function (db, callback) {
 };
 
 const getById = function (db, messageId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnMessageId} = ?;`;
@@ -152,7 +152,7 @@ const getById = function (db, messageId, callback) {
 };
 
 const getByUserId = function (db, userId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnUserId} = ?
@@ -167,7 +167,7 @@ const getByUserId = function (db, userId, callback) {
 };
 
 const getByPlusCode = function (db, plusCode, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} LIKE ?
@@ -184,7 +184,7 @@ const getByPlusCode = function (db, plusCode, callback) {
 };
 
 const getByParentId = function (db, parentMessageId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnParentMessageId} = ?
@@ -200,7 +200,7 @@ const getByParentId = function (db, parentMessageId, callback) {
 };
 
 const countView = function (db, parentMessageId, callback) {
-    try{
+    try {
         sql = `
         UPDATE ${tableName}
         SET ${columnViews} = ${columnViews} + 1
@@ -215,7 +215,7 @@ const countView = function (db, parentMessageId, callback) {
 };
 
 const countComment = function (db, messageId, callback) {
-    try{
+    try {
         sql = `
         UPDATE ${tableName}
         SET ${columnComments} = ${columnComments} + 1
@@ -230,7 +230,7 @@ const countComment = function (db, messageId, callback) {
 };
 
 const disableMessage = function (db, messageId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnStatus} = '${messageStatus.DISABLED}' 
@@ -245,7 +245,7 @@ const disableMessage = function (db, messageId, callback) {
 };
 
 const enableMessage = function (db, messageId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnStatus} = '${messageStatus.ENABLED}' 
@@ -299,7 +299,7 @@ module.exports = {
     create,
     update,
     disableMessage,
-    enableMessage,   
+    enableMessage,
     getAll,
     getById,
     getByUserId,

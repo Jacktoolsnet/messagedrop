@@ -3,7 +3,7 @@ const router = express.Router();
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 
-router.post('/', [security.checkToken, bodyParser.json({ type: 'application/json' })], function(req, res) {
+router.post('/', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   res.setHeader('Content-Type', 'application/json');
   res.status(200);
   let database_open
@@ -14,13 +14,13 @@ router.post('/', [security.checkToken, bodyParser.json({ type: 'application/json
       database_connection = 'established'
     } else {
       database_connection = 'not established'
-    } 
+    }
   }
   let response = {
-    'token' : 'ok',
+    'token': 'ok',
     database_connection,
-    'reqBody' : req.body
-   };
+    'reqBody': req.body
+  };
   res.json(response);
 });
 

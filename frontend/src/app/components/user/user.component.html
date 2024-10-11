@@ -1,19 +1,24 @@
 <h2 mat-dialog-title>My user</h2>
-<mat-dialog-content class="full-width">
+<mat-dialog-content class="dialog">
+  <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+  </button>
   <h2>{{user?.id}}</h2>
   <div class="buttonarea">
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button" [mat-dialog-close]="{'action': 'shareUserId'}">
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
+      [mat-dialog-close]="{'action': 'shareUserId'}">
       <mat-icon class="material-symbols-outlined">share</mat-icon>
       <span>Share connect id</span>
-    </button>       
+    </button>
     <p></p>
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false"  class="button" [mat-dialog-close]="{'action': 'deleteUserId'}">
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
+      [mat-dialog-close]="{'action': 'deleteUserId'}">
       <mat-icon class="material-symbols-outlined">delete</mat-icon>
-      <span>Delete my user id</span>
-    </button>  
-  </div>  
+      <span>Delete my user</span>
+    </button>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial [mat-dialog-close]="{'action': 'back'}">Back</button>
+  <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial
+    [mat-dialog-close]="{'action': 'back'}">Back</button>
 </mat-dialog-actions>
-<h4>I only share my user ID via services and with people I trust.</h4>

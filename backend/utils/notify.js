@@ -1,7 +1,7 @@
 const webpush = require('web-push');
 
 const placeSubscriptions = function (logger, db, plusCode, userId, message) {
-    try{
+    try {
         let sql = `
         SELECT placeId, subscribed, tablePlace.userId, tablePlace.name, tableUser.subscription
         FROM tablePlacePlusCode
@@ -22,7 +22,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                             "dateOfArrival": Date.now(),
                             "primaryKey": plusCode,
                             "onActionClick": {
-                                "default": { 
+                                "default": {
                                     "operation": "focusLastFocusedOrOpen",
                                     "url": '/'
                                 }
@@ -31,7 +31,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                     }
                 };
                 sendNotification(logger, JSON.parse(row.subscription), payload);
-              });
+            });
         });
     } catch (error) {
         logger.error(`placeSubscriptions: ${error}`);
@@ -39,7 +39,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
 }
 
 function sendNotification(logger, subscription, payload) {
-    try{
+    try {
         webpush.setVapidDetails(
             'https://messagedrop.de',
             process.env.VAPID_PUBLIC_KEY,
@@ -47,8 +47,8 @@ function sendNotification(logger, subscription, payload) {
         );
         webpush
             .sendNotification(subscription, JSON.stringify(payload))
-            .then((result) => {})
-            .catch((error) => {logger.error(`webpush.sendNotification: ${error}`);});
+            .then((result) => { })
+            .catch((error) => { logger.error(`webpush.sendNotification: ${error}`); });
     } catch (error) {
         logger.error(`sendNotification: ${error}`);
     }

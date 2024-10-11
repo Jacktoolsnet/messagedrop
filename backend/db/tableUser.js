@@ -1,12 +1,12 @@
 const userStatus = {
-    ENABLED : 'enabled',
-    DISABLED : 'disabled'
+    ENABLED: 'enabled',
+    DISABLED: 'disabled'
 };
 
 const tableName = 'tableUser';
 const columnUserId = 'id';
 const columnEncryptionPublicKey = 'encryptionPublicKey';
-const columnSigningPublicKey = 'signingPublicKey'; 
+const columnSigningPublicKey = 'signingPublicKey';
 const columnNumberOfMessages = 'numberOfMessages';
 const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
 const columnUserStatus = 'userStatus';
@@ -28,7 +28,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -61,7 +61,7 @@ const create = function (db, userId, encryptionPublicKey, signingPublicKey, call
 };
 
 const getAll = function (db, callback) {
-    try{
+    try {
         let sql = `SELECT * FROM ${tableName};`;
 
         db.all(sql, (err, rows) => {
@@ -73,7 +73,7 @@ const getAll = function (db, callback) {
 };
 
 const getById = function (db, userId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnUserId} = ?;`;
@@ -115,7 +115,7 @@ const clean = function (db, callback) {
 };
 
 const subscribe = function (db, userId, subscription, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = '${subscription}'
@@ -130,7 +130,7 @@ const subscribe = function (db, userId, subscription, callback) {
 };
 
 const unsubscribe = function (db, placeId, callback) {
-    try{
+    try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = ''

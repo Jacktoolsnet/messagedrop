@@ -6,6 +6,7 @@ import { environment } from '../../environments/environment';
 import { CreateConnectResponse } from '../interfaces/create-connect-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { GetContactResponse } from '../interfaces/get-contact-response';
+import { GetContactsResponse } from '../interfaces/get-contacts-response';
 
 @Injectable({
   providedIn: 'root'
@@ -37,7 +38,7 @@ export class ContactService {
   }
 
   getByUserId(userId: string) {
-    return this.http.get<GetContactResponse>(`${environment.apiUrl}/contact/get/userId/${userId}`, this.httpOptions)
+    return this.http.get<GetContactsResponse>(`${environment.apiUrl}/contact/get/userId/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

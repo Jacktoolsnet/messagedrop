@@ -23,7 +23,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -59,7 +59,7 @@ const create = function (db, connectId, userId, encryptionPublicKey, signingPubl
 };
 
 const getById = function (db, connectId, callback) {
-    try{
+    try {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnConnectId} = ?;`;

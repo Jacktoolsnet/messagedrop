@@ -14,7 +14,7 @@ const init = function (db) {
         );`;
 
         db.run(sql, (err) => {
-            if (err){
+            if (err) {
                 throw err;
             }
         });
@@ -68,7 +68,7 @@ const clean = function (db, callback) {
 };
 
 const getAll = function (db, callback) {
-    try{
+    try {
         let sql = `SELECT * FROM ${tableName};`;
 
         db.all(sql, (err, rows) => {

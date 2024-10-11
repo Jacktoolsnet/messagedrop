@@ -26,4 +26,11 @@ h4 {
   width: 90%;
 }
 
-  
+.button_legal {
+  position: absolute;
+  bottom: 0;
+  right:    0;
+  z-index: 100;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+}

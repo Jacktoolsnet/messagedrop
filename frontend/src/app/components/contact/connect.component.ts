@@ -10,6 +10,7 @@ import { Mode } from '../../interfaces/mode';
 import { StyleService } from '../../services/style.service';
 import { PlaceComponent } from '../place/place.component';
 import { Contact } from '../../interfaces/contact';
+import { Connect } from '../../interfaces/connect';
 
 @Component({
   selector: 'app-contact',
@@ -33,6 +34,8 @@ import { Contact } from '../../interfaces/contact';
 })
 export class ConnectComponent implements OnInit {
   
+  public connectId: String = '';
+
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,

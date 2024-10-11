@@ -12,42 +12,42 @@ const tablePlacePlusCode = require('./tablePlacePlusCode');
 
 class Database {
 
-    constructor() {
-        this.db;
+  constructor() {
+    this.db;
+  }
+
+  init(logger) {
+    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+      if (err) {
+        return console.error(err.message);
+      } else {
+        this.db.run('PRAGMA foreign_keys = ON;', [], function (err) {
+          if (err) {
+            logger.error(err.message);
+          }
+        });
+        tableUser.init(this.db);
+        tableConnect.init(this.db);
+        tableContact.init(this.db);
+        tableStatistic.init(this.db);
+        tableMessage.init(this.db);
+        tableLike.init(this.db);
+        tableDislike.init(this.db);
+        tablePlace.init(this.db);
+        tablePlacePlusCode.init(this.db);
+        logger.info('Connected to the messagedrop SQlite database.');
       }
+    });
+  };
 
-    init(logger) {
-        this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-            if (err) {
-              return console.error(err.message);
-            } else {
-              this.db.run('PRAGMA foreign_keys = ON;', [], function(err) {
-                if (err) {
-                  logger.error(err.message);
-                }
-              });
-              tableUser.init(this.db);
-              tableConnect.init(this.db);
-              tableContact.init(this.db);
-              tableStatistic.init(this.db);
-              tableMessage.init(this.db);
-              tableLike.init(this.db);
-              tableDislike.init(this.db);
-              tablePlace.init(this.db);
-              tablePlacePlusCode.init(this.db);
-              logger.info('Connected to the messagedrop SQlite database.');
-            }
-          });
-    };
-
-    close () {
-        this.db.close((err) => {
-            if (err) {
-              return console.error(err.message);
-            }
-            logger.info('Close the database connection.');
-          });
-    };
+  close() {
+    this.db.close((err) => {
+      if (err) {
+        return console.error(err.message);
+      }
+      logger.info('Close the database connection.');
+    });
+  };
 
 }
 

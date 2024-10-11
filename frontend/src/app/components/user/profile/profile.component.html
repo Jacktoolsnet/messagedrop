@@ -1,25 +1,28 @@
 <h2 mat-dialog-title>My profile</h2>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+  <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+</button>
 <mat-dialog-content>
-    Set my profile name
-    <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="user.name">
-    <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input" (change)="onFileSelected($event)" #fileUpload>
-    <div class="center-left" *ngIf="user.base64Avatar == ''">
-        Set my profile avatar: 
-        <button mat-mini-fab color="primary"  class="upload-button" (click)="fileUpload.click()">
-            <mat-icon>attach_file</mat-icon>
-        </button>
-   </div>   
-   <div class="center">
-    <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" /><br>    
+  Set my profile name
+  <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="user.name">
+  <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
+    (change)="onFileSelected($event)" #fileUpload>
+  <div class="center-left" *ngIf="user.base64Avatar == ''">
+    Set my profile avatar:
+    <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
   </div>
-  <div class="center" *ngIf="user.base64Avatar != ''">      
-    <button *ngIf="user.base64Avatar != ''" mat-mini-fab color="primary"  class="upload-button" (click)="deleteAvatar()">
+  <div class="center">
+    <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" /><br>
+  </div>
+  <div class="center" *ngIf="user.base64Avatar != ''">
+    <button *ngIf="user.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
       <mat-icon>delete</mat-icon>
     </button>
-  </div>  
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
   <button mat-button mat-dialog-close [mat-dialog-close]="user">Apply</button>
 </mat-dialog-actions>
-<h4>The information is stored on my device and is only visible to me.</h4>

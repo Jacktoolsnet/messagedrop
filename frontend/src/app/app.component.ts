@@ -45,6 +45,8 @@ import { ContactlistComponent } from './components/contactlist/contactlist.compo
 import { Contact } from './interfaces/contact';
 import { Buffer } from 'buffer';
 import { CryptoService } from './services/crypto.service';
+import { ContactService } from './services/contact.service';
+import { GetContactsResponse } from './interfaces/get-contacts-response';
 
 @Component({
   selector: 'app-root',
@@ -96,6 +98,7 @@ export class AppComponent implements OnInit {
     private messageService: MessageService,
     private noteService: NoteService,
     private placeService: PlaceService,
+    private contactService: ContactService,
     private statisticService: StatisticService, 
     private snackBar: MatSnackBar, 
     public messageDialog: MatDialog,
@@ -158,6 +161,7 @@ export class AppComponent implements OnInit {
             this.userService.saveUser(this.user!);
             this.userReady = true;
             this.getPlaces();
+            this.getContacts();
             if (!this.socketioService.isConnected() && this.user){
               this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
             }
@@ -171,6 +175,7 @@ export class AppComponent implements OnInit {
             next: (data) => {
               this.userReady = true;
               this.getPlaces();
+              this.getContacts();
               if (!this.socketioService.isConnected() && this.user){
                 this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
               }
@@ -182,6 +187,7 @@ export class AppComponent implements OnInit {
                 .subscribe(createUserResponse => {
                   this.userReady = true;
                   this.getPlaces();
+                  this.getContacts();
                   if (!this.socketioService.isConnected() && this.user){
                     this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
                   }
@@ -301,6 +307,20 @@ export class AppComponent implements OnInit {
                     error: (err) => { },
                     complete:() => { }
                   });
+                });
+              },
+              error: (err) => { },
+              complete:() => { }
+            });
+  }
+
+  private getContacts() {
+    this.contactService.getByUserId(this.user!.id)
+            .subscribe({
+              next: (getContactsResponse: GetContactsResponse) => {
+                this.contacts = [ ...getContactsResponse.rows];
+                this.contacts.forEach(contact => {
+                  // Get informations from locale storage
                 });
               },
               error: (err) => { },
