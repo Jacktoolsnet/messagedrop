@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { User } from '../../../interfaces/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { User } from '../../../interfaces/user';
+import { EditUserComponent } from '../../messagelist/edit-user/edit-user.component';
 
 @Component({
   selector: 'app-profile',
@@ -33,7 +34,7 @@ export class ProfileComponent {
 
   constructor(
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ProfileComponent>,
+    public dialogRef: MatDialogRef<EditUserComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
     this.user = data.user;
   }

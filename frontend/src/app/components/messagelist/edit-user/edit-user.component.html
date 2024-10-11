@@ -1,5 +1,8 @@
 <h2 mat-dialog-title>Edit the user</h2>
 <mat-dialog-content>
+  <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+  </button>
     Give the user a name
     <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="relatedUser.name">
     <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input" (change)="onFileSelected($event)" #fileUpload>

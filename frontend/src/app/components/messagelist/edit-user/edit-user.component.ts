@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { RelatedUser } from '../../../interfaces/related-user';
 import { MatIcon } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-edit-user',
@@ -27,9 +28,12 @@ import { CommonModule } from '@angular/common';
   styleUrl: './edit-user.component.css'
 })
 export class EditUserComponent {
+  private snackBarRef: any;
   public relatedUser!: RelatedUser;
 
-  constructor(public dialogRef: MatDialogRef<EditUserComponent>,
+  constructor(
+    private snackBar: MatSnackBar,
+    public dialogRef: MatDialogRef<EditUserComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {relatedUser: RelatedUser}) {
       this.relatedUser = data.relatedUser;
     }
@@ -61,4 +65,7 @@ export class EditUserComponent {
       this.relatedUser.base64Avatar = '';
     }
 
+    public showPolicy() {
+      this.snackBarRef = this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
+    }
 }

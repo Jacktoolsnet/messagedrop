@@ -13,7 +13,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { ConnectComponent } from '../contact/connect.component';
+import { ConnectComponent } from '../contact/connect/connect.component';
 import { ConnectService } from '../../services/connect.service';
 import { Buffer } from 'buffer';
 import { CryptoService } from '../../services/crypto.service';

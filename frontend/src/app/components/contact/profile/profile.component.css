@@ -1,13 +1,14 @@
 h4 {
     padding: 0.5rem;
-    color:floralwhite;
+    color: floralwhite;
   }
   
-button {
+  button {
     margin-right: 8px;
   }
   
-input[type=text], select {
+  input[type=text],
+  select {
     width: 100%;
     padding: 12px 20px;
     margin: 8px 0;
@@ -16,23 +17,42 @@ input[type=text], select {
     border-radius: 4px;
     box-sizing: border-box;
   }
-
+  
   .file-input {
     display: none;
   }
-
-  .center-left{
+  
+  .center-left {
     display: flex;
     justify-content: left;
     align-items: center;
     width: 100%;
     padding-bottom: 0.5rem;
   }
-
-  .center{
+  
+  .center {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     padding-bottom: 0.5rem;
+  }
+  
+  .upload-button {
+    margin-left: 0.5rem;
+  }
+  
+  .avatar {
+    width: 8rem;
+    height: 8rem;
+    border-radius: 4rem;
+  }
+  
+  .button_legal {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
   }
