@@ -63,7 +63,7 @@ export class ContactProfileComponent {
   }
 
   deleteAvatar() {
-    this.contact.base64Avatar = '';
+    this.contact.base64Avatar = undefined;
   }
 
   public showPolicy() {
