@@ -14,7 +14,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.error = err;
     } else {
       response.status = 200;
-      response.placeId = contactId;
+      response.contactId = contactId;
     }
     res.setHeader('Content-Type', 'application/json');
     res.status(response.status);

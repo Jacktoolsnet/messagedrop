@@ -119,8 +119,9 @@ export class ContactlistComponent implements OnInit {
                           .subscribe({
                             next: createContactResponse => {
                               if (createContactResponse.status === 200) {
-                                data.contact.id = createContactResponse.connectId;
+                                data.contact.id = createContactResponse.contactId;
                                 this.contacts.unshift(data.contact);
+                                this.contactService.saveContact(data.contact);
                                 this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
                               }
                             },

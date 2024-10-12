@@ -3,10 +3,10 @@ import { Contact } from '../interfaces/contact';
 import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { throwError, catchError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { CreateConnectResponse } from '../interfaces/create-connect-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
+import { CreateContactResponse } from '../interfaces/create-contact-response';
 
 @Injectable({
   providedIn: 'root'
@@ -57,7 +57,7 @@ export class ContactService {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
     };
-    return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
+    return this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
