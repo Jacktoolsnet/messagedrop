@@ -1,10 +1,13 @@
 module.exports = (io, socket) => {
-  const joinUserRoom = (room) => {
-    socket.join(room);
-    socket.emit(`user:${room}`, {
-      "status": 200,
-      "type": "info",
-      "message": "ok"
+
+  const joinUserRoom = (userId) => {
+    socket.join(userId);
+    io.to(userId).emit(`${userId}`, {
+      status: 200,
+      type: "joined",
+      content: {
+        message: `Joined room ${userId}`
+      }
     });
   }
 

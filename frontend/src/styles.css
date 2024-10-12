@@ -12,28 +12,28 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
 }
 
 .snack-error {
-  --mdc-snackbar-container-color: rgb(233, 64, 64, 0.5);
+  --mdc-snackbar-container-color: rgb(233, 64, 64, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
 .snack-warning {
-  --mdc-snackbar-container-color: rgb(255, 120, 0, 0.5);
+  --mdc-snackbar-container-color: rgb(255, 120, 0, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
 .snack-success {
-  --mdc-snackbar-container-color: rgb(96, 201, 93, 0.5);
+  --mdc-snackbar-container-color: rgb(96, 201, 93, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
 .snack-info {
-  --mdc-snackbar-container-color: rgb(75, 212, 253, 0.5);
+  --mdc-snackbar-container-color: rgb(75, 212, 253, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;

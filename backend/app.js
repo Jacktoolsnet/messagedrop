@@ -27,13 +27,13 @@ const app = express();
 
 // Socket.io
 const { Server } = require('socket.io');
-const friendshipHandlers = require("./socketIo/friendshipHandlers");
+const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
 const io = new Server(server);
 const onConnection = (socket) => {
   userHandlers(io, socket)
-  friendshipHandlers(io, socket);
+  contactHandlers(io, socket);
 }
 io.on("connection", onConnection);
 

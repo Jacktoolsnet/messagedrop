@@ -14,11 +14,20 @@
     </button>
   </div>
   <div class="center">
-    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar" src="{{contact.base64Avatar}}" /><br>
+    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar"
+      src="{{contact.base64Avatar}}" /><br>
   </div>
   <div class="center" *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''">
-    <button *ngIf="contact.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
+    <button *ngIf="contact.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button"
+      (click)="deleteAvatar()">
       <mat-icon>delete</mat-icon>
+    </button>
+  </div>
+  <div class="buttonarea">
+    <h4>Or ask the contact to provide his profile information.</h4>
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button" (click)="getProfileFromContact(contact)">
+      <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
+      <span>Ask contact</span>
     </button>
   </div>
 </mat-dialog-content>

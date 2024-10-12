@@ -163,7 +163,7 @@ export class AppComponent implements OnInit {
                   this.getPlaces();
                   this.getContacts();
                   if (!this.socketioService.isConnected() && this.user) {
-                    this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+                    this.socketioService.initSocketEvents(this.user)
                   }
                 });
             });
@@ -177,7 +177,7 @@ export class AppComponent implements OnInit {
             this.getPlaces();
             this.getContacts();
             if (!this.socketioService.isConnected() && this.user) {
-              this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+              this.socketioService.initSocketEvents(this.user)
             }
           },
           error: (err) => {
@@ -189,7 +189,7 @@ export class AppComponent implements OnInit {
                   this.getPlaces();
                   this.getContacts();
                   if (!this.socketioService.isConnected() && this.user) {
-                    this.socketioService.joinRoom(this.user.id, this.joinUserRoomCallback)
+                    this.socketioService.initSocketEvents(this.user)
                   }
                 });
             }
@@ -205,10 +205,6 @@ export class AppComponent implements OnInit {
         error: (err) => { },
         complete: () => { }
       });
-  }
-
-  private joinUserRoomCallback = (response: any): void => {
-    console.log(`joinUserRoomCallback: ${response.status}`);
   }
 
   public startWatchingPosition() {

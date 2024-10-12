@@ -7,8 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { EditUserComponent } from '../../messagelist/edit-user/edit-user.component';
 import { Contact } from '../../../interfaces/contact';
+import { SocketioService } from '../../../services/socketio.service';
 
 @Component({
   selector: 'app-profile',
@@ -33,6 +33,7 @@ export class ContactProfileComponent {
   public contact!: Contact;
 
   constructor(
+    private socketioService: SocketioService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ContactProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }) {
@@ -68,5 +69,10 @@ export class ContactProfileComponent {
 
   public showPolicy() {
     this.snackBarRef = this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
+  }
+
+  public getProfileFromContact(contact: Contact) {
+    this.socketioService.receiveProfileForContactEvent(contact);
+    this.socketioService.getSocket().emit('contact:requestProfile', contact);
   }
 }
