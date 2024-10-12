@@ -36,6 +36,12 @@ const onConnection = (socket) => {
   contactHandlers(io, socket);
 }
 io.on("connection", onConnection);
+io.engine.on("connection_error", (err) => {
+  logger.error(err.req);      // the request object
+  logger.error(err.code);     // the error code, for example 1
+  logger.error(err.message);  // the error message, for example "Session ID unknown"
+  logger.error(err.context);  // some additional error context
+});
 
 // Logger
 const logger = winston.createLogger({
