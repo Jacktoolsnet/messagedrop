@@ -64,7 +64,6 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           console.log(payload);
-          console.log(this.user);
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
@@ -75,7 +74,7 @@ export class SocketioService {
   public requestProfileForContact() {
     console.log('requestProfileForContact init')
     this.socket.on(`requestProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
-      console.log('requestProfileForContact event')
+      // console.log('requestProfileForContact event')
       payload.contact.name = this.user.name;
       payload.contact.base64Avatar = this.user.base64Avatar
       this.socket.emit('contact:provideUserProfile', payload.contact);
@@ -84,7 +83,7 @@ export class SocketioService {
   }
 
   public receiveProfileForContactEvent(contact: Contact) {
-    console.log('receiveProfileForContactEvent init')
+    // console.log('receiveProfileForContactEvent init')
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
       console.log("receiveProfileForContactEvent event")
       if (payload.status == 200) {
