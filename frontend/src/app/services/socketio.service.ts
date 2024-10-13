@@ -64,6 +64,12 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           console.log(payload);
+          this.snackBar.open(`Joined user room. (${payload.status})`, "", {
+            panelClass: ['snack-info'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
+            duration: 1000
+          });
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
