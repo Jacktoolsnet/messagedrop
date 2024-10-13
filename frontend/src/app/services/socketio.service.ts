@@ -5,6 +5,8 @@ import { Contact } from '../interfaces/contact';
 import { ContactService } from './contact.service';
 import { User } from '../interfaces/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
+import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +20,7 @@ export class SocketioService {
   private user!: User;
 
   constructor(
+    public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private contactService: ContactService
   ) {
@@ -56,10 +59,10 @@ export class SocketioService {
     this.socket.on("connect_error", (err: any) => {
       // the reason of the error, for example "xhr poll error"
       console.log(err.message);
-    
+
       // some additional description, for example the status code of the initial HTTP response
       console.log(err.description);
-    
+
       // some additional context, for example the XMLHttpRequest object
       console.log(err.context);
     });
@@ -80,17 +83,31 @@ export class SocketioService {
           this.requestProfileForContact();
           break;
       }
-    });    
+    });
   }
 
   public requestProfileForContact() {
     console.log('requestProfileForContact init')
     this.socket.on(`requestProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
       // console.log('requestProfileForContact event')
-      payload.contact.name = this.user.name;
-      payload.contact.base64Avatar = this.user.base64Avatar
-      this.socket.emit('contact:provideUserProfile', payload.contact);
-      //this.socket.emit('contact:sendUserProfile', undefined);
+      const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
+        data: { contact: payload.contact },
+        closeOnNavigation: true,
+        hasBackdrop: true
+      });
+
+      dialogRef.afterOpened().subscribe(e => {
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          payload.contact.name = this.user.name;
+          payload.contact.base64Avatar = this.user.base64Avatar
+          this.socket.emit('contact:provideUserProfile', payload.contact);
+        } else {
+          this.socket.emit('contact:sendUserProfile', undefined);
+        }
+      });
     });
   }
 
