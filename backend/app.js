@@ -42,6 +42,7 @@ const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
 const io = new Server(server);
 const onConnection = (socket) => {
+  socket.logger = logger;
   userHandlers(io, socket)
   contactHandlers(io, socket);
 }

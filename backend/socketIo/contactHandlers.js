@@ -3,6 +3,7 @@ const { response } = require("express");
 module.exports = (io, socket) => {
 
   const requestProfile = (contact) => {
+    socket.logger.info("requestProfile");
     io.to(contact.contactUserId).emit(`requesrProfileForContact:${contact.contactUserId}`, {
       status: 200,
       contact: contact
@@ -10,6 +11,7 @@ module.exports = (io, socket) => {
   }
 
   const provideUserProfile = (contact) => {
+    socket.logger.info("provideUserProfile");
     if (contact == undefined) {
       io.to(contact.userId).emit(`receiveProfileForContact:${contact.userId}`, {
         status: 500,
