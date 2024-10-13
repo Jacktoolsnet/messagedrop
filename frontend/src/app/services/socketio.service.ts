@@ -68,12 +68,13 @@ export class SocketioService {
       }
     });
     // Request to provide profile information.
-    this.requesrProfileForContact();
+    this.requestProfileForContact();
   }
 
-  public requesrProfileForContact() {
-    this.socket.on(`requesrProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
-      console.log('requesrProfileForContact')
+  public requestProfileForContact() {
+    console.log('requestProfileForContact init')
+    this.socket.on(`requestProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
+      console.log('requestProfileForContact event')
       payload.contact.name = this.user.name;
       payload.contact.base64Avatar = this.user.base64Avatar
       this.socket.emit('contact:provideUserProfile', payload.contact);
@@ -82,8 +83,9 @@ export class SocketioService {
   }
 
   public receiveProfileForContactEvent(contact: Contact) {
+    console.log('receiveProfileForContactEvent init')
     this.socket.once(`receiveProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
-      console.log("receiveProfileForContactEvent")
+      console.log("receiveProfileForContactEvent event")
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
