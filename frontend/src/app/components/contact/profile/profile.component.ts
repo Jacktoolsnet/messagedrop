@@ -72,6 +72,7 @@ export class ContactProfileComponent {
   }
 
   public getProfileFromContact(contact: Contact) {
+    console.log("getProfileFromContact")
     this.socketioService.receiveProfileForContactEvent(contact);
     this.socketioService.getSocket().emit('contact:requestProfile', contact);
   }

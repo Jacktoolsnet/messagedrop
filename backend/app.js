@@ -25,6 +25,16 @@ const { createServer } = require('node:http');
 const express = require('express');
 const app = express();
 
+// Logger
+const logger = winston.createLogger({
+  level: 'info',
+  format: winston.format.json(),
+  transports: [
+    new winston.transports.File({ filename: 'error.log', level: 'error' }),
+    new winston.transports.File({ filename: 'info.log' }),
+  ],
+});
+
 // Socket.io
 const { Server } = require('socket.io');
 const contactHandlers = require("./socketIo/contactHandlers");
@@ -41,16 +51,6 @@ io.engine.on("connection_error", (err) => {
   logger.error(err.code);     // the error code, for example 1
   logger.error(err.message);  // the error message, for example "Session ID unknown"
   logger.error(err.context);  // some additional error context
-});
-
-// Logger
-const logger = winston.createLogger({
-  level: 'info',
-  format: winston.format.json(),
-  transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'info.log' }),
-  ],
 });
 
 /*

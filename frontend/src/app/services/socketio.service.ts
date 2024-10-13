@@ -73,6 +73,7 @@ export class SocketioService {
 
   public requesrProfileForContact() {
     this.socket.on(`requesrProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
+      console.log('requesrProfileForContact')
       payload.contact.name = this.user.name;
       payload.contact.base64Avatar = this.user.base64Avatar
       this.socket.emit('contact:provideUserProfile', payload.contact);
@@ -82,6 +83,7 @@ export class SocketioService {
 
   public receiveProfileForContactEvent(contact: Contact) {
     this.socket.once(`receiveProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
+      console.log("receiveProfileForContactEvent")
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
