@@ -64,11 +64,12 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           console.log(payload);
+          console.log(this.user);
+          // Request to provide profile information.
+          this.requestProfileForContact();
           break;
       }
-    });
-    // Request to provide profile information.
-    this.requestProfileForContact();
+    });    
   }
 
   public requestProfileForContact() {
@@ -84,7 +85,7 @@ export class SocketioService {
 
   public receiveProfileForContactEvent(contact: Contact) {
     console.log('receiveProfileForContactEvent init')
-    this.socket.once(`receiveProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
+    this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
       console.log("receiveProfileForContactEvent event")
       if (payload.status == 200) {
         contact.name = payload.contact.name;
