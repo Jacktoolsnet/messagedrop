@@ -14,6 +14,7 @@ export class SocketioService {
   private socket: Socket;
   private ioConfig: SocketIoConfig = { url: `${environment.apiUrl}`, options: { transports: ['websocket'] } };
   private connected: boolean = false;
+  private joinedUserRoom: boolean = false;
   private user!: User;
 
   constructor(
@@ -45,6 +46,10 @@ export class SocketioService {
     return this.connected;
   }
 
+  public hasJoinedUserRoom(): boolean {
+    return this.joinedUserRoom;
+  }
+
   public initSocketEvents(user: User) {
     this.user = user;
     // Error handling
@@ -63,12 +68,13 @@ export class SocketioService {
     this.socket.on(`${user.id}`, (payload: { status: number, type: String, content: any }) => {
       switch (payload.type) {
         case 'joined':
+          this.joinedUserRoom = true;
           console.log(payload);
           this.snackBar.open(`Joined user room. (${payload.status})`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
-            duration: 1000
+            duration: 2000
           });
           // Request to provide profile information.
           this.requestProfileForContact();

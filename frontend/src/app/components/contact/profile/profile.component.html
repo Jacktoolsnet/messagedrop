@@ -23,7 +23,7 @@
       <mat-icon>delete</mat-icon>
     </button>
   </div>
-  <div class="buttonarea">
+  <div class="buttonarea" *ngIf="joinedUserRoom === true">
     <h4>Or ask the contact to provide his profile information.</h4>
     <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button" (click)="getProfileFromContact(contact)">
       <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>

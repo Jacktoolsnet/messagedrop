@@ -162,7 +162,7 @@ export class AppComponent implements OnInit {
                   this.userReady = true;
                   this.getPlaces();
                   this.getContacts();
-                  if (!this.socketioService.isConnected() && this.user) {
+                  if (this.user) {
                     this.socketioService.initSocketEvents(this.user)
                   }
                 });
@@ -176,7 +176,7 @@ export class AppComponent implements OnInit {
             this.userReady = true;
             this.getPlaces();
             this.getContacts();
-            if (!this.socketioService.isConnected() && this.user) {
+            if (this.user) {
               this.socketioService.initSocketEvents(this.user)
             }
           },
@@ -188,7 +188,7 @@ export class AppComponent implements OnInit {
                   this.userReady = true;
                   this.getPlaces();
                   this.getContacts();
-                  if (!this.socketioService.isConnected() && this.user) {
+                  if (this.user) {
                     this.socketioService.initSocketEvents(this.user)
                   }
                 });

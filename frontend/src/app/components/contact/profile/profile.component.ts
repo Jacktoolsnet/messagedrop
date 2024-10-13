@@ -31,6 +31,7 @@ import { SocketioService } from '../../../services/socketio.service';
 export class ContactProfileComponent {
   private snackBarRef: any;
   public contact!: Contact;
+  public joinedUserRoom: boolean = false;
 
   constructor(
     private socketioService: SocketioService,
@@ -38,6 +39,7 @@ export class ContactProfileComponent {
     public dialogRef: MatDialogRef<ContactProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }) {
     this.contact = data.contact;
+    this.joinedUserRoom = this.socketioService.hasJoinedUserRoom();
   }
 
   onAbortClick(): void {
@@ -72,7 +74,12 @@ export class ContactProfileComponent {
   }
 
   public getProfileFromContact(contact: Contact) {
-    console.log("getProfileFromContact")
+    console.log("getProfileFromContact start")
+    if (!this.joinedUserRoom){
+      console.log("getProfileFromContact joining")
+      this.socketioService.getSocket().emit('user:joinUserRoom', contact.userId);
+    }
+    console.log("getProfileFromContact requesting")
     this.socketioService.receiveProfileForContactEvent(contact);
     this.socketioService.getSocket().emit('contact:requestProfile', contact);
   }
