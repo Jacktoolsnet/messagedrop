@@ -110,7 +110,7 @@ export class ContactlistComponent implements OnInit {
                 // For Development check equal. Change to not equal for production.
                 if (data.contact.contactUserId != data.contact.userId) {
                   // Verify data
-                  this.cryptoService.verifySignature(data.contact.contactUserId, data.contact.signingPublicKey, data.contact.signature)
+                  this.cryptoService.verifySignature(data.contact.signingPublicKey, data.contact.contactUserId, data.contact.signature)
                     .then((valid: Boolean) => {
                       if (valid) {
                         this.snackBarRef = this.snackBar.open(`Connect data is valid.`, 'OK');

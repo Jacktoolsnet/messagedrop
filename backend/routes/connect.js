@@ -8,7 +8,7 @@ const tableConnect = require('../db/tableConnect');
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   let connectId = uuid.v4();
-  tableConnect.create(req.database.db, connectId, req.body.userId, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.signature, function (err) {
+  tableConnect.create(req.database.db, connectId, req.body.userId, req.body.hint, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.signature, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

@@ -4,12 +4,17 @@
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
   </button>
   <div class="buttonarea">
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
-      [mat-dialog-close]="{'action': 'shareUserId'}">
+    <mat-dialog-content>
+      Enter a connect hint to create a connect id:
+      <input matInput type="text" maxlength="64" placeholder="The connect hint.." [(ngModel)]="connectHint">
+    </mat-dialog-content>
+    <button *ngIf="connectHint" mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
+      [mat-dialog-close]="{'action': 'shareUserId', connectHint: connectHint}">
       <mat-icon class="material-symbols-outlined">share</mat-icon>
       <span>Share connect id</span>
     </button>
     <p></p>
+    <p>Deleting my user cannot be undone.</p>
     <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
       [mat-dialog-close]="{'action': 'deleteUserId'}">
       <mat-icon class="material-symbols-outlined">delete</mat-icon>

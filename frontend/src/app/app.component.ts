@@ -818,13 +818,14 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       switch (result?.action) {
         case "shareUserId":
-          if (this.user) {
-            this.cryptoService.createSignature(this.user)
-              .then((signature: ArrayBuffer) => {
+          if (this.user?.signingKeyPair?.privateKey) {
+            this.cryptoService.createSignature(this.user.signingKeyPair.privateKey, this.user!.id)
+              .then((signature: string) => {
                 let connect: Connect = {
                   id: '',
                   userId: this.user!.id,
-                  signature: JSON.stringify(Buffer.from(signature).toJSON()),
+                  hint: result?.connectHint,
+                  signature: signature,
                   encryptionPublicKey: JSON.stringify(this.user!.encryptionKeyPair?.publicKey!),
                   signingPublicKey: JSON.stringify(this.user!.signingKeyPair?.publicKey!)
                 };

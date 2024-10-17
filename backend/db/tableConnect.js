@@ -2,6 +2,7 @@ const tableName = 'tableConnect';
 
 const columnConnectId = 'id';
 const columnUserId = 'userId';
+const columnUserHint = 'hint';
 const columnSignature = 'signature';
 const columnEncryptionPublicKey = 'encryptionPublicKey';
 const columnSigningPublicKey = "signingPublicKey";
@@ -13,6 +14,7 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnConnectId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
+            ${columnUserHint} TEXT NOT NULL,
             ${columnEncryptionPublicKey} TEXT NOT NULL,
             ${columnSigningPublicKey} TEXT NOT NULL, 
             ${columnSignature} TEXT NOT NULL,
@@ -32,12 +34,13 @@ const init = function (db) {
     }
 };
 
-const create = function (db, connectId, userId, encryptionPublicKey, signingPublicKey, signature, callback) {
+const create = function (db, connectId, userId, hint, encryptionPublicKey, signingPublicKey, signature, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnConnectId},
             ${columnUserId},
+            ${columnUserHint},
             ${columnSignature},
             ${columnEncryptionPublicKey},
             ${columnSigningPublicKey},
@@ -45,6 +48,7 @@ const create = function (db, connectId, userId, encryptionPublicKey, signingPubl
         ) VALUES (
             '${connectId}',
             '${userId}',
+            '${hint}',
             '${signature}',
             '${encryptionPublicKey}',
             '${signingPublicKey}',

@@ -42,30 +42,28 @@ export class CryptoService {
     return keypair;
   }
 
-  async createSignature(signingUser: User): Promise<ArrayBuffer> {
+  async createSignature(privateSigningKey: JsonWebKey, payload: any): Promise<string> {
     let signature: ArrayBuffer = new ArrayBuffer(0);
-    if (signingUser.signingKeyPair!.privateKey) {
-      let payload = Buffer.from(signingUser.id);
-      let ecKeyImportParams: EcKeyImportParams = {
+    let payloadBuffer = Buffer.from(payload);
+    let ecKeyImportParams: EcKeyImportParams = {
+      name: "ECDSA",
+      namedCurve: "P-384",
+    };
+    let privateKey = await crypto.subtle.importKey("jwk", privateSigningKey, ecKeyImportParams, true, ["sign"]);
+    signature = await window.crypto.subtle.sign(
+      {
         name: "ECDSA",
-        namedCurve: "P-384",
-      };
-      let privateKey = await crypto.subtle.importKey("jwk", signingUser.signingKeyPair!.privateKey, ecKeyImportParams, true, ["sign"]);
-      signature = await window.crypto.subtle.sign(
-        {
-          name: "ECDSA",
-          hash: { name: "SHA-384" },
-        },
-        privateKey,
-        payload
-      );  
-    }
-    return signature;
+        hash: { name: "SHA-384" },
+      },
+      privateKey,
+      payloadBuffer
+    );
+    return JSON.stringify(Buffer.from(signature).toJSON());
   }
 
-  async verifySignature(signingUserId: string, signingPublicKey: JsonWebKey, signature: ArrayBuffer): Promise<Boolean> {
+  async verifySignature(signingPublicKey: JsonWebKey, payload: any, signature: ArrayBuffer): Promise<Boolean> {
     let verified: Boolean = false
-    let payload = Buffer.from(signingUserId);
+    let payloadBuffer = Buffer.from(payload);
     let ecKeyImportParams: EcKeyImportParams = {
       name: "ECDSA",
       namedCurve: "P-384",
@@ -77,7 +75,7 @@ export class CryptoService {
       },
       publicKey,
       signature, 
-      payload
+      payloadBuffer
     );
     return verified
   }

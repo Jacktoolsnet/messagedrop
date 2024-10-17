@@ -27,6 +27,7 @@ export class ConnectService {
   createConnect(connect: Connect) {    
     let body = {
       'userId': connect.userId,
+      'hint': connect.hint,
       'signature': connect.signature,
       'encryptionPublicKey': connect.encryptionPublicKey,
       'signingPublicKey': connect.signingPublicKey

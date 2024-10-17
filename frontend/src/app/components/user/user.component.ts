@@ -30,6 +30,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 export class UserComponent {
   private snackBarRef: any;
   public user?: User;
+  public connectHint: string = ``;
   
   constructor(
     private snackBar: MatSnackBar,
@@ -38,7 +39,7 @@ export class UserComponent {
     }
 
   public showPolicy() {
-    this.snackBarRef = this.snackBar.open(`User id, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life and subscription information is saved on our server. This informations are essential for the functionality of the application.` , 'OK',  {});   
+    this.snackBarRef = this.snackBar.open(`User id, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life and subscription information is saved on our server. This informations are essential for the functionality of the application. The connection hint is intended to help me remember who I shared the connect ID with.` , 'OK',  {});   
   }
 
 }
