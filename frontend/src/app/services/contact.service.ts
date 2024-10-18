@@ -35,10 +35,12 @@ export class ContactService {
       contact = {
         id : undefined != contactFromLocalStorage.id ? contactFromLocalStorage.id : 'undefined',
         userId: undefined != contactFromLocalStorage.userId ? contactFromLocalStorage.userId : 'undefined',
+        hint: undefined != contactFromLocalStorage.hint ? contactFromLocalStorage.hinte : 'undefined',
         contactUserId: undefined != contactFromLocalStorage.contactUserId ? contactFromLocalStorage.contactUserId : 'undefined',
         name : undefined != contactFromLocalStorage.name ? contactFromLocalStorage.name : 'Unnamed user',
         base64Avatar : undefined != contactFromLocalStorage.base64Avatar ? contactFromLocalStorage.base64Avatar : '',
         subscribed : undefined != contactFromLocalStorage.subscribed ? contactFromLocalStorage.subscribed : false,
+        provided: undefined != contactFromLocalStorage.provided ? contactFromLocalStorage.provided : false,
       }
     }
     return contact;
@@ -56,6 +58,7 @@ export class ContactService {
     let body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
+      'hint': contact.hint
     };
     return this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
       .pipe(

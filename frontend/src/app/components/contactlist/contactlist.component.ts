@@ -74,7 +74,8 @@ export class ContactlistComponent implements OnInit {
       userId: this.user.id,
       contactUserId: '',
       name: '',
-      subscribed: false
+      subscribed: false,
+      provided: false
     };
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
@@ -104,6 +105,7 @@ export class ContactlistComponent implements OnInit {
                 )
                 // Informations from connect record.
                 data.contact.contactUserId = getConnectResponse.connect.userId;
+                data.contact.hint = getConnectResponse.connect.hint;
                 data.contact.encryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
                 data.contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
                 data.contact.signature = signature;
@@ -204,8 +206,8 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.contactService.saveContact(result);
+      if (true) {
+        this.contactService.saveContact(contact);
       }
     });
   }

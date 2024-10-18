@@ -4,6 +4,7 @@ const columnContactId = 'id';
 const columnUserId = 'userId';
 const columnContactUserId = 'contactUserId';
 const columnSubscribed = 'subscribed';
+const columnHint = 'hint';
 
 const init = function (db) {
     try {
@@ -13,6 +14,7 @@ const init = function (db) {
             ${columnUserId} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
+            ${columnHint} TEXT DEFAULT NULL,
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -29,17 +31,19 @@ const init = function (db) {
     }
 };
 
-const create = function (db, contactId, userId, contactUserId, callback) {
+const create = function (db, contactId, userId, contactUserId, hint, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnContactId},
             ${columnUserId},
-            ${columnContactUserId}
+            ${columnContactUserId},
+            ${columnHint}
         ) VALUES (
             '${contactId}',
             '${userId}',
-            '${contactUserId}'
+            '${contactUserId}',
+            '${hint}'
         );`;
         db.run(sql, (err) => {
             callback(err)

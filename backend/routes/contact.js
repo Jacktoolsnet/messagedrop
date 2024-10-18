@@ -8,7 +8,7 @@ const tableContact = require('../db/tableContact');
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   let contactId = uuid.v4()
-  tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, function (err) {
+  tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -58,7 +58,8 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'id': row.id,
             'userId': row.userId,
             'contactUserId': row.contactUserId,
-            'subscribed': row.subscribed === 0 ? false : true
+            'subscribed': row.subscribed === 0 ? false : true,
+            'hint': row.hint
           });
         });
       }

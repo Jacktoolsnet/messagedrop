@@ -42,10 +42,6 @@ export class ContactProfileComponent {
     this.joinedUserRoom = this.socketioService.hasJoinedUserRoom();
   }
 
-  onAbortClick(): void {
-    this.dialogRef.close();
-  }
-
   onFileSelected(event: any) {
     const file: File = event.target.files[0];
 
@@ -74,13 +70,20 @@ export class ContactProfileComponent {
   }
 
   public getProfileFromContact(contact: Contact) {
-    console.log("getProfileFromContact start")
+    // console.log("getProfileFromContact start")
     if (!this.joinedUserRoom){
-      console.log("getProfileFromContact joining")
+      // console.log("getProfileFromContact joining")
       this.socketioService.getSocket().emit('user:joinUserRoom', contact.userId);
     }
-    console.log("getProfileFromContact requesting")
+    // console.log("getProfileFromContact requesting")
     this.socketioService.receiveProfileForContactEvent(contact);
     this.socketioService.getSocket().emit('contact:requestProfile', contact);
+    this.dialogRef.close();
+    this.snackBar.open("Request sent.", "", {
+      panelClass: ['snack-info'],
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      duration: 1000
+    });
   }
 }

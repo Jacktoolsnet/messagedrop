@@ -12,7 +12,7 @@ module.exports = (io, socket) => {
 
   const provideUserProfile = (contact) => {
     // socket.logger.info("provideUserProfile");
-    if (contact == undefined) {
+    if (contact.provided == false) {
       io.to(contact.userId).emit(`receiveProfileForContact:${contact.id}`, {
         status: 500,
         contact: contact

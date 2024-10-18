@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>My profile</h2>
+<h2 mat-dialog-title>Contact profile</h2>
 <mat-dialog-content>
   <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
@@ -7,7 +7,7 @@
   <input matInput type="text" maxlength="64" placeholder="Contact name.." [(ngModel)]="contact.name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload>
-  <div class="center-left" *ngIf="contact.base64Avatar == undefined">
+  <div class="center-left" *ngIf="contact.base64Avatar == undefined || contact.base64Avatar == ''">
     Set contact avatar:
     <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
       <mat-icon>attach_file</mat-icon>
@@ -32,6 +32,6 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="contact">Apply</button>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="true">Apply</button>
 </mat-dialog-actions>

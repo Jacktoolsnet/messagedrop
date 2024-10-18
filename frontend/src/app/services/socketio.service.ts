@@ -87,7 +87,7 @@ export class SocketioService {
   }
 
   public requestProfileForContact() {
-    console.log('requestProfileForContact init')
+    // console.log('requestProfileForContact init')
     this.socket.on(`requestProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
       // console.log('requestProfileForContact event')
       const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
@@ -102,10 +102,14 @@ export class SocketioService {
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
           payload.contact.name = this.user.name;
-          payload.contact.base64Avatar = this.user.base64Avatar
+          payload.contact.base64Avatar = this.user.base64Avatar;
+          payload.contact.provided = true;
           this.socket.emit('contact:provideUserProfile', payload.contact);
         } else {
-          this.socket.emit('contact:sendUserProfile', undefined);
+          payload.contact.name = '';
+          payload.contact.base64Avatar = '';
+          payload.contact.provided = false;
+          this.socket.emit('contact:provideUserProfile', payload.contact);
         }
       });
     });
@@ -118,9 +122,9 @@ export class SocketioService {
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
-        // this.contactService.saveContact(contact);
+        this.contactService.saveContact(contact);
       } else {
-        this.snackBar.open("The contact does not want to provide his profile information.", "Ok", {
+        this.snackBar.open("The contact declined the profile information request.", "Ok", {
           panelClass: ['snack-warning'],
           horizontalPosition: 'center',
           verticalPosition: 'top',

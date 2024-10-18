@@ -2,7 +2,7 @@ const tableName = 'tableConnect';
 
 const columnConnectId = 'id';
 const columnUserId = 'userId';
-const columnUserHint = 'hint';
+const columnHint = 'hint';
 const columnSignature = 'signature';
 const columnEncryptionPublicKey = 'encryptionPublicKey';
 const columnSigningPublicKey = "signingPublicKey";
@@ -14,7 +14,7 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnConnectId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
-            ${columnUserHint} TEXT NOT NULL,
+            ${columnHint} TEXT DEFAULT NULL,
             ${columnEncryptionPublicKey} TEXT NOT NULL,
             ${columnSigningPublicKey} TEXT NOT NULL, 
             ${columnSignature} TEXT NOT NULL,
@@ -40,7 +40,7 @@ const create = function (db, connectId, userId, hint, encryptionPublicKey, signi
         INSERT INTO ${tableName} (
             ${columnConnectId},
             ${columnUserId},
-            ${columnUserHint},
+            ${columnHint},
             ${columnSignature},
             ${columnEncryptionPublicKey},
             ${columnSigningPublicKey},
