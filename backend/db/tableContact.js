@@ -18,6 +18,9 @@ const init = function (db) {
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
+            ON UPDATE CASCADE ON DELETE CASCADE,
+            CONSTRAINT FK_CONTACT_USER_ID FOREIGN KEY (${columnUserId}) 
+            REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE 
         );`;
 

@@ -324,7 +324,11 @@ export class AppComponent implements OnInit {
             }
           });
         },
-        error: (err) => { },
+        error: (err) => {
+          if (err.status === 404) {
+            this.contactService.clearContacts();
+          }
+        },
         complete: () => { }
       });
   }

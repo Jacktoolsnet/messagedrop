@@ -75,8 +75,11 @@ export class ContactService {
     let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
     if (JSON.stringify(contactsFromLocalStorage.length) !== '0') {
       contactsFromLocalStorage.splice(contactsFromLocalStorage.findIndex(element => element.id === contact.id), 1)
-    }
-    localStorage.setItem('contacts', JSON.stringify(contactsFromLocalStorage))
+    }    
+  }
+
+  clearContacts() {
+    localStorage.removeItem('contacts')
   }
 
   createContact(contact: Contact) {
