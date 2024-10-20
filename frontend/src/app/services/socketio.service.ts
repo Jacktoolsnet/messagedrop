@@ -122,7 +122,12 @@ export class SocketioService {
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
-        this.contactService.saveContact(contact);
+        this.contactService.updateContact(contact)
+          .subscribe({
+            next: simpleStatusResponse => { },
+            error: (err) => { },
+            complete: () => { }
+          });
       } else {
         this.snackBar.open("The contact declined the profile information request.", "Ok", {
           panelClass: ['snack-warning'],

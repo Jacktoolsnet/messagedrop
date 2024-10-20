@@ -50,38 +50,6 @@ export class ContactService {
     return contact;
   }
 
-  saveContact(contact: Contact) {
-    let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
-    if (JSON.stringify(contactsFromLocalStorage.length) === '0') {
-      // New Item
-      contactsFromLocalStorage.push(contact);
-    } else {
-      // Update item.
-      let updateContact: Contact = contactsFromLocalStorage[contactsFromLocalStorage.findIndex(element => element.id === contact.id)];
-      updateContact.id = contact.id;
-      updateContact.userId = contact.userId;
-      updateContact.hint = contact.hint;
-      updateContact.contactUserId = contact.contactUserId;
-      updateContact.name = contact.name;
-      updateContact.base64Avatar = contact.base64Avatar;
-      updateContact.subscribed = contact.subscribed;
-      updateContact.provided = contact.provided;
-
-    }
-    localStorage.setItem('contacts', JSON.stringify(contactsFromLocalStorage))
-  }
-
-  removeContact(contact: Contact) {
-    let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
-    if (JSON.stringify(contactsFromLocalStorage.length) !== '0') {
-      contactsFromLocalStorage.splice(contactsFromLocalStorage.findIndex(element => element.id === contact.id), 1)
-    }    
-  }
-
-  clearContacts() {
-    localStorage.removeItem('contacts')
-  }
-
   createContact(contact: Contact) {
     let body = {
       'userId': contact.userId,
@@ -89,6 +57,18 @@ export class ContactService {
       'hint': contact.hint
     };
     return this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updateContact(contact: Contact) {
+    let body = {
+      'contactId': contact.id,
+      'name': contact.name,
+      'base64Avatar': contact.base64Avatar
+    };
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

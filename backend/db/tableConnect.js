@@ -15,9 +15,9 @@ const init = function (db) {
             ${columnConnectId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
             ${columnHint} TEXT DEFAULT NULL,
+            ${columnSignature} TEXT NOT NULL,
             ${columnEncryptionPublicKey} TEXT NOT NULL,
             ${columnSigningPublicKey} TEXT NOT NULL, 
-            ${columnSignature} TEXT NOT NULL,
             ${columnTimeOfCreation} INTEGER NOT NULL,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 

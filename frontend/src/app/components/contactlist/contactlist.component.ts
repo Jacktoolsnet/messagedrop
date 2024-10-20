@@ -85,7 +85,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: ""},
+      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: "" },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -128,7 +128,12 @@ export class ContactlistComponent implements OnInit {
                               if (createContactResponse.status === 200) {
                                 data.contact.id = createContactResponse.contactId;
                                 this.contacts.unshift(data.contact);
-                                this.contactService.saveContact(data.contact);
+                                this.contactService.updateContact(data.contact)
+                                  .subscribe({
+                                    next: simpleStatusResponse => { },
+                                    error: (err) => { },
+                                    complete: () => { }
+                                  });
                                 this.snackBarRef = this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
                               }
                             },
@@ -187,10 +192,7 @@ export class ContactlistComponent implements OnInit {
         this.contactService.deleteContact(this.contactToDelete)
           .subscribe({
             next: (simpleStatusResponse) => {
-              if (simpleStatusResponse.status === 200) {
-                this.contactService.removeContact(this.contactToDelete)
-                this.contacts.splice(this.contacts.findIndex(contact => contact.id !== this.contactToDelete.id), 1);
-              }
+              if (simpleStatusResponse.status === 200) {}
             },
             error: (err) => {
             },
@@ -212,7 +214,12 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (true) {
-        this.contactService.saveContact(contact);
+        this.contactService.updateContact(contact)
+          .subscribe({
+            next: simpleStatusResponse => { },
+            error: (err) => { },
+            complete: () => { }
+          });
       }
     });
   }
@@ -227,49 +234,49 @@ export class ContactlistComponent implements OnInit {
       this.swPush.requestSubscription({
         serverPublicKey: environment.vapid_public_key
       })
-      .then(subscription => {
-        let subscriptionJson = JSON.stringify(subscription);
-        // Save subscription to user.
-        this.userService.subscribe(this.user, subscriptionJson)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.userService.saveUser(this.user);              
-                  }
-                },
-                error: (err) => {
-                  contact.subscribed = false;
-                },
-                complete:() => {}
-              });
-      })
-      .catch(err => {});
+        .then(subscription => {
+          let subscriptionJson = JSON.stringify(subscription);
+          // Save subscription to user.
+          this.userService.subscribe(this.user, subscriptionJson)
+            .subscribe({
+              next: (simpleStatusResponse) => {
+                if (simpleStatusResponse.status === 200) {
+                  this.userService.saveUser(this.user);
+                }
+              },
+              error: (err) => {
+                contact.subscribed = false;
+              },
+              complete: () => { }
+            });
+        })
+        .catch(err => { });
     }
     if (!contact.subscribed) {
       // subscribe to place
       this.contactService.subscribe(contact)
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            contact.subscribed = true;                    
-          }
-        },
-        error: (err) => { },
-        complete:() => {}
-      });
+        .subscribe({
+          next: (simpleStatusResponse) => {
+            if (simpleStatusResponse.status === 200) {
+              contact.subscribed = true;
+            }
+          },
+          error: (err) => { },
+          complete: () => { }
+        });
     } else {
       // Unsubscribe from place.
       this.contactService.unsubscribe(contact)
-            .subscribe({
-              next: (simpleStatusResponse) => {
-                if (simpleStatusResponse.status === 200) {
-                  contact.subscribed = false;                    
-                }
-              },
-              error: (err) => {
-              },
-              complete:() => {}
-            });
+        .subscribe({
+          next: (simpleStatusResponse) => {
+            if (simpleStatusResponse.status === 200) {
+              contact.subscribed = false;
+            }
+          },
+          error: (err) => {
+          },
+          complete: () => { }
+        });
     }
   }
 }

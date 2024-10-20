@@ -5,6 +5,8 @@ const columnUserId = 'userId';
 const columnContactUserId = 'contactUserId';
 const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
+const columnName = 'name';
+const columnBase64Avatar = 'base64Avatar';
 
 const init = function (db) {
     try {
@@ -15,6 +17,8 @@ const init = function (db) {
             ${columnContactUserId} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
+            ${columnName} TEXT DEFAULT NULL,
+            ${columnBase64Avatar} TEXT DEFAULT NULL,
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -50,6 +54,22 @@ const create = function (db, contactId, userId, contactUserId, hint, callback) {
         );`;
         db.run(sql, (err) => {
             callback(err)
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const update = function (db, contactId, name, base64Avatar, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnName} = '${name}', 
+        ${columnBase64Avatar} = '${base64Avatar}'
+        WHERE ${columnContactId} = ?;`;
+        
+        db.run(sql, [contactId], (err) => {
+            callback(err);
         });
     } catch (error) {
         throw error;
@@ -134,6 +154,7 @@ const deleteById = function (db, contactId, callback) {
 module.exports = {
     init,
     create,
+    update,
     subscribe,
     unsubscribe,
     getById,

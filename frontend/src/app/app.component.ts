@@ -116,12 +116,16 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
-      let location: Location = this.geolocationService.getLocationFromPlusCode(result.notification.data.primaryKey);
-      this.getMessages(location, true, true);
-      if (!this.locationReady) {
-        this.mapService.flyToWithZoom(location, 19);
-      } else {
-        this.mapService.flyTo(location);
+      if (result.notification.data.primaryKey.type = 'place') {
+        let location: Location = this.geolocationService.getLocationFromPlusCode(result.notification.data.primaryKey.id);
+        this.getMessages(location, true, true);
+        if (!this.locationReady) {
+          this.mapService.flyToWithZoom(location, 19);
+        } else {
+          this.mapService.flyTo(location);
+        }
+      }
+      if (result.notification.data.primaryKey.type = 'contace') {
       }
     });
     this.platformLocation.onPopState((event) => {
@@ -315,19 +319,9 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           this.contacts = [...getContactsResponse.rows];
-          this.contacts.forEach(contact => {
-            // Get informations from locale storage
-            let contactFromLocalStorage = this.contactService.loadContact(contact.id);
-            if (contactFromLocalStorage) {
-              contact.name = contactFromLocalStorage.name
-              contact.base64Avatar = contactFromLocalStorage.base64Avatar;
-            }
-          });
         },
         error: (err) => {
-          if (err.status === 404) {
-            this.contactService.clearContacts();
-          }
+          if (err.status === 404) {}
         },
         complete: () => { }
       });

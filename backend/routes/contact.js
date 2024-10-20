@@ -22,6 +22,21 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
+router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
+  tableContact.update(req.database.db, req.body.contactId, req.body.name, req.body.base64Avatar, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 router.get('/get/:contactId', [security.checkToken], function (req, res) {
   let response = { 'status': 0 };
   tableContact.getById(req.database.db, req.params.contactId, function (err, row) {
@@ -59,7 +74,9 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'userId': row.userId,
             'contactUserId': row.contactUserId,
             'subscribed': row.subscribed === 0 ? false : true,
-            'hint': row.hint
+            'hint': row.hint,
+            'name': row.name,
+            'base64Avatar': row.base64Avatar
           });
         });
       }

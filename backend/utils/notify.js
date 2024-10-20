@@ -20,7 +20,43 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
-                            "primaryKey": plusCode,
+                            "primaryKey": {"type": "place", "id": plusCode},
+                            "onActionClick": {
+                                "default": {
+                                    "operation": "focusLastFocusedOrOpen",
+                                    "url": '/'
+                                }
+                            },
+                        }
+                    }
+                };
+                sendNotification(logger, JSON.parse(row.subscription), payload);
+            });
+        });
+    } catch (error) {
+        logger.error(`placeSubscriptions: ${error}`);
+    }
+}
+
+const contactSubscriptions = function (logger, db, contactUserId, message) {
+    try {
+        let sql = `
+        SELECT id, userId, contactUserId, subscribed, tableUser.subscription
+        FROM tableContact
+        INNER JOIN tableUser ON userId = tableUser.id
+        WHERE contactUserId = '${contactUserId}'
+        AND subscribed = 1;`;
+        db.all(sql, (err, rows) => {
+            rows.forEach((row) => {
+                const payload = {
+                    "notification": {
+                        "title": `New message from @ProfileName???`,
+                        "body": message,
+                        "icon": "assets/icons/notify-icon.png",
+                        "vibrate": [100, 50, 100],
+                        "data": {
+                            "dateOfArrival": Date.now(),
+                            "primaryKey": {"type": "contact", "id": row.id},
                             "onActionClick": {
                                 "default": {
                                     "operation": "focusLastFocusedOrOpen",
@@ -55,5 +91,6 @@ function sendNotification(logger, subscription, payload) {
 }
 
 module.exports = {
-    placeSubscriptions
+    placeSubscriptions,
+    contactSubscriptions
 }
