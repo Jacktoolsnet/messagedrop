@@ -785,8 +785,7 @@ export class AppComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.noteService.deleteNotesFromStorage();
-                this.user = this.userService.deleteUserFromStorage();
+                this.user = this.userService.clearStorage();
                 this.userReady = false;
                 this.getMessages(this.mapService.getMapLocation(), true, false);
               }

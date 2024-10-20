@@ -107,9 +107,9 @@ export class UserService {
       );
   }
 
-  deleteUserFromStorage(): undefined {
-    localStorage.removeItem('user')
-    return undefined
+  clearStorage(): undefined {
+    localStorage.clear();
+    return undefined;
   }
 
   subscribe(user: User, subscription: string) {

@@ -27,31 +27,56 @@ export class ContactService {
   }
 
   loadContact(contactId: string): Contact|undefined {
-    let contactFromLocalStorage: any = JSON.parse(localStorage.getItem(contactId) || '{}');
+    let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
     let contact!: Contact;
-    if (JSON.stringify(contactFromLocalStorage) === '{}') {
+    if (JSON.stringify(contactsFromLocalStorage.length) === '0') {
       return undefined;
     } else {
-      contact = {
-        id : undefined != contactFromLocalStorage.id ? contactFromLocalStorage.id : 'undefined',
-        userId: undefined != contactFromLocalStorage.userId ? contactFromLocalStorage.userId : 'undefined',
-        hint: undefined != contactFromLocalStorage.hint ? contactFromLocalStorage.hinte : 'undefined',
-        contactUserId: undefined != contactFromLocalStorage.contactUserId ? contactFromLocalStorage.contactUserId : 'undefined',
-        name : undefined != contactFromLocalStorage.name ? contactFromLocalStorage.name : 'Unnamed user',
-        base64Avatar : undefined != contactFromLocalStorage.base64Avatar ? contactFromLocalStorage.base64Avatar : '',
-        subscribed : undefined != contactFromLocalStorage.subscribed ? contactFromLocalStorage.subscribed : false,
-        provided: undefined != contactFromLocalStorage.provided ? contactFromLocalStorage.provided : false,
-      }
+      contactsFromLocalStorage.forEach((element: Contact) => {
+        if (element.id === contactId) {
+          contact = {
+            id : undefined != element.id ? element.id : 'undefined',
+            userId: undefined != element.userId ? element.userId : 'undefined',
+            hint: undefined != element.hint ? element.hint : 'undefined',
+            contactUserId: undefined != element.contactUserId ? element.contactUserId : 'undefined',
+            name : undefined != element.name ? element.name : 'Unnamed user',
+            base64Avatar : undefined != element.base64Avatar ? element.base64Avatar : '',
+            subscribed : undefined != element.subscribed ? element.subscribed : false,
+            provided: undefined != element.provided ? element.provided : false,
+          }
+        }
+      });      
     }
     return contact;
   }
 
   saveContact(contact: Contact) {
-    localStorage.setItem(contact.id, JSON.stringify(contact))
+    let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
+    if (JSON.stringify(contactsFromLocalStorage.length) === '0') {
+      // New Item
+      contactsFromLocalStorage.push(contact);
+    } else {
+      // Update item.
+      let updateContact: Contact = contactsFromLocalStorage[contactsFromLocalStorage.findIndex(element => element.id === contact.id)];
+      updateContact.id = contact.id;
+      updateContact.userId = contact.userId;
+      updateContact.hint = contact.hint;
+      updateContact.contactUserId = contact.contactUserId;
+      updateContact.name = contact.name;
+      updateContact.base64Avatar = contact.base64Avatar;
+      updateContact.subscribed = contact.subscribed;
+      updateContact.provided = contact.provided;
+
+    }
+    localStorage.setItem('contacts', JSON.stringify(contactsFromLocalStorage))
   }
 
   removeContact(contact: Contact) {
-    localStorage.removeItem(contact.id)
+    let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
+    if (JSON.stringify(contactsFromLocalStorage.length) !== '0') {
+      contactsFromLocalStorage.splice(contactsFromLocalStorage.findIndex(element => element.id === contact.id), 1)
+    }
+    localStorage.setItem('contacts', JSON.stringify(contactsFromLocalStorage))
   }
 
   createContact(contact: Contact) {
