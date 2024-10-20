@@ -20,6 +20,9 @@ import { CryptoService } from '../../services/crypto.service';
 import { ContactService } from '../../services/contact.service';
 import { ContactProfileComponent } from '../contact/profile/profile.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
+import { environment } from '../../../environments/environment';
+import { UserService } from '../../services/user.service';
+import { SwPush } from '@angular/service-worker';
 
 @Component({
   selector: 'app-contactlist',
@@ -50,6 +53,7 @@ export class ContactlistComponent implements OnInit {
   public subscriptionError: boolean = false;
 
   constructor(
+    private userService: UserService,
     private connectService: ConnectService,
     private contactService: ContactService,
     private cryptoService: CryptoService,
@@ -58,6 +62,7 @@ export class ContactlistComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
+    private swPush: SwPush,
     @Inject(MAT_DIALOG_DATA) public data: { user: User, contacts: Contact[] }
   ) {
     this.user = data.user;
@@ -80,7 +85,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: "" },
+      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: ""},
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -214,5 +219,57 @@ export class ContactlistComponent implements OnInit {
 
   public goBack() {
     this.dialogRef.close();
+  }
+
+  public subscribe(contact: Contact) {
+    if (!contact.subscribed) {
+      // Subscrbe user if needed.
+      this.swPush.requestSubscription({
+        serverPublicKey: environment.vapid_public_key
+      })
+      .then(subscription => {
+        let subscriptionJson = JSON.stringify(subscription);
+        // Save subscription to user.
+        this.userService.subscribe(this.user, subscriptionJson)
+              .subscribe({
+                next: (simpleStatusResponse) => {
+                  if (simpleStatusResponse.status === 200) {
+                    this.userService.saveUser(this.user);              
+                  }
+                },
+                error: (err) => {
+                  contact.subscribed = false;
+                },
+                complete:() => {}
+              });
+      })
+      .catch(err => {});
+    }
+    if (!contact.subscribed) {
+      // subscribe to place
+      this.contactService.subscribe(contact)
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            contact.subscribed = true;                    
+          }
+        },
+        error: (err) => { },
+        complete:() => {}
+      });
+    } else {
+      // Unsubscribe from place.
+      this.contactService.unsubscribe(contact)
+            .subscribe({
+              next: (simpleStatusResponse) => {
+                if (simpleStatusResponse.status === 200) {
+                  contact.subscribed = false;                    
+                }
+              },
+              error: (err) => {
+              },
+              complete:() => {}
+            });
+    }
   }
 }
