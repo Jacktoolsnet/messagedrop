@@ -62,13 +62,26 @@ export class ContactService {
       );
   }
 
-  updateContact(contact: Contact) {
+  updateContactProfile(contact: Contact) {
     let body = {
       'contactId': contact.id,
       'name': contact.name,
       'base64Avatar': contact.base64Avatar
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update`, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updateContactMessage(contact: Contact, message: String) {
+    let body = {
+      'contactId': contact.id,
+      'userId': contact.userId,
+      'contactUserId': contact.contactUserId,
+      'message': contact.name
+    };
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

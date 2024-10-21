@@ -128,7 +128,7 @@ export class ContactlistComponent implements OnInit {
                               if (createContactResponse.status === 200) {
                                 data.contact.id = createContactResponse.contactId;
                                 this.contacts.unshift(data.contact);
-                                this.contactService.updateContact(data.contact)
+                                this.contactService.updateContactProfile(data.contact)
                                   .subscribe({
                                     next: simpleStatusResponse => { },
                                     error: (err) => { },
@@ -214,7 +214,7 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (true) {
-        this.contactService.updateContact(contact)
+        this.contactService.updateContactProfile(contact)
           .subscribe({
             next: simpleStatusResponse => { },
             error: (err) => { },

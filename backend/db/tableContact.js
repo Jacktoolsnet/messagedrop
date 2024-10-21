@@ -7,6 +7,8 @@ const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
 const columnName = 'name';
 const columnBase64Avatar = 'base64Avatar';
+const columnUserMessage = 'userMessage';
+const columnContactUserMessage = 'contactUserMessage';
 
 const init = function (db) {
     try {
@@ -19,6 +21,8 @@ const init = function (db) {
             ${columnHint} TEXT DEFAULT NULL,
             ${columnName} TEXT DEFAULT NULL,
             ${columnBase64Avatar} TEXT DEFAULT NULL,
+            ${columnUserMessage} TEXT DEFAULT NULL,
+            ${columnContactUserMessage} TEXT DEFAULT NULL,
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -69,6 +73,37 @@ const update = function (db, contactId, name, base64Avatar, callback) {
         WHERE ${columnContactId} = ?;`;
         
         db.run(sql, [contactId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const updateUserMessage = function (db, contactId, message, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnUserMessage} = '${message}'
+        WHERE ${columnContactId} = ?;`;
+        
+        db.run(sql, [contactId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const updateContactUserMessage = function (db, userId, contactUserId, message, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnContactUserMessage} = '${message}'
+        WHERE ${columnUserId} = ?
+        AND ${columnContactUserId} = ?;`;
+        
+        db.run(sql, [userId, contactUserId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -155,6 +190,8 @@ module.exports = {
     init,
     create,
     update,
+    updateUserMessage,
+    updateContactUserMessage,
     subscribe,
     unsubscribe,
     getById,

@@ -4,6 +4,7 @@ const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableContact = require('../db/tableContact');
+const notify = require('../utils/notify');
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
@@ -22,9 +23,9 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/update/profile', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableContact.update(req.database.db, req.body.contactId, req.body.name, req.body.base64Avatar, function (err) {
+  tableContact.update(req.database.db, req.body.contactId, req.body.name.replace(/\'/g, "''"), req.body.base64Avatar, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -34,6 +35,37 @@ router.post('/update', [security.checkToken, bodyParser.json({ type: 'applicatio
     res.setHeader('Content-Type', 'application/json');
     res.status(response.status);
     res.json(response);
+  });
+});
+
+/**
+ * Update my message in my contact.
+ * Find the other contact (userID = contactUserId and contactUserID = userID) and set the contact message
+ * Notify other User
+ */
+router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
+  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.message.replace(/\'/g, "''"), function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+      res.setHeader('Content-Type', 'application/json');
+      res.status(response.status);
+      res.json(response);
+    } else {
+      tableContact.updateUserMessage(req.database.db, req.body.contactUserId, req.body.userId, req.body.message.replace(/\'/g, "''"), function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+          notify.contactSubscriptions(req.logger, req.database.db, req.body.contactUserId, req.body.message.replace(/\'/g, "''"));
+        }
+        res.setHeader('Content-Type', 'application/json');
+        res.status(response.status);
+        res.json(response);
+      });
+    }
   });
 });
 

@@ -122,7 +122,7 @@ export class SocketioService {
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
-        this.contactService.updateContact(contact)
+        this.contactService.updateContactProfile(contact)
           .subscribe({
             next: simpleStatusResponse => { },
             error: (err) => { },

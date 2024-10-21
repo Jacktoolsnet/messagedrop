@@ -41,7 +41,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
 const contactSubscriptions = function (logger, db, contactUserId, message) {
     try {
         let sql = `
-        SELECT id, userId, contactUserId, subscribed, tableUser.subscription
+        SELECT id, userId, contactUserId, subscribed, name, base64Avatar, tableUser.subscription
         FROM tableContact
         INNER JOIN tableUser ON userId = tableUser.id
         WHERE contactUserId = '${contactUserId}'
@@ -50,9 +50,9 @@ const contactSubscriptions = function (logger, db, contactUserId, message) {
             rows.forEach((row) => {
                 const payload = {
                     "notification": {
-                        "title": `New message from @ProfileName???`,
+                        "title": `New message from @${row.name}`,
                         "body": message,
-                        "icon": "assets/icons/notify-icon.png",
+                        "icon": row.base64Avatar,
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
