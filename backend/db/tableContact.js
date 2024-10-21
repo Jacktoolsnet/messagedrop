@@ -2,13 +2,13 @@ const tableName = 'tableContact';
 
 const columnContactId = 'id';
 const columnUserId = 'userId';
+const columnUserMessage = 'userMessage';
 const columnContactUserId = 'contactUserId';
+const columnContactUserMessage = 'contactUserMessage';
 const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
 const columnName = 'name';
 const columnBase64Avatar = 'base64Avatar';
-const columnUserMessage = 'userMessage';
-const columnContactUserMessage = 'contactUserMessage';
 
 const init = function (db) {
     try {
@@ -16,13 +16,13 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
+            ${columnUserMessage} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
+            ${columnContactUserMessage} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
             ${columnName} TEXT DEFAULT NULL,
             ${columnBase64Avatar} TEXT DEFAULT NULL,
-            ${columnUserMessage} TEXT DEFAULT NULL,
-            ${columnContactUserMessage} TEXT DEFAULT NULL,
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 

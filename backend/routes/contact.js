@@ -104,7 +104,9 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
           response.rows.push({
             'id': row.id,
             'userId': row.userId,
+            'userMessage': row.userMessage,
             'contactUserId': row.contactUserId,
+            'contactUserMessage': row.contactUserMessage,
             'subscribed': row.subscribed === 0 ? false : true,
             'hint': row.hint,
             'name': row.name,

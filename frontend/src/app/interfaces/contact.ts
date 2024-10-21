@@ -4,7 +4,9 @@ import { Location } from "./location";
 export interface Contact {
     id: string,
     userId: string,    
+    userMessage?: string,
     contactUserId: string,
+    contactUserMessage?: string,
     hint?: string,
     encryptionPublicKey?: JsonWebKey,
     signingPublicKey?: JsonWebKey,
