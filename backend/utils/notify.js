@@ -3,7 +3,7 @@ const webpush = require('web-push');
 const placeSubscriptions = function (logger, db, plusCode, userId, message) {
     try {
         let sql = `
-        SELECT placeId, subscribed, tablePlace.userId, tablePlace.name, tableUser.subscription
+        SELECT tablePlacePlusCode.placeId, tablePlace.subscribed, tablePlace.userId, tablePlace.name, tableUser.subscription
         FROM tablePlacePlusCode
         INNER JOIN tablePlace ON tablePlace.id = tablePlacePlusCode.placeId
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
@@ -41,9 +41,9 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
 const contactSubscriptions = function (logger, db, contactUserId, message) {
     try {
         let sql = `
-        SELECT id, userId, contactUserId, subscribed, name, base64Avatar, tableUser.subscription
+        SELECT tableContact.id, tableContact.userId, tableContact.contactUserId, tableContact.subscribed, tableContact.name, tableContact.base64Avatar, tableUser.subscription
         FROM tableContact
-        INNER JOIN tableUser ON userId = tableUser.id
+        INNER JOIN tableUser ON tableContact.userId = tableUser.id
         WHERE contactUserId = '${contactUserId}'
         AND subscribed = 1;`;
         db.all(sql, (err, rows) => {
