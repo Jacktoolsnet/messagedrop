@@ -53,7 +53,7 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
       res.status(response.status);
       res.json(response);
     } else {
-      tableContact.updateUserMessage(req.database.db, req.body.contactUserId, req.body.userId, req.body.message.replace(/\'/g, "''"), function (err) {
+      tableContact.updateContactUserMessage(req.database.db, req.body.contactUserId, req.body.userId, req.body.message.replace(/\'/g, "''"), function (err) {
         if (err) {
           response.status = 500;
           response.error = err;

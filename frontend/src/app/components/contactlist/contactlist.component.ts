@@ -279,4 +279,14 @@ export class ContactlistComponent implements OnInit {
         });
     }
   }
+
+  public sendShortMessage(contact: Contact){
+    console.log('send short message');
+    this.contactService.updateContactMessage(contact, 'Testmessage')
+          .subscribe({
+            next: simpleStatusResponse => { console.log(simpleStatusResponse) },
+            error: (err) => { console.log(err) },
+            complete: () => { }
+          });
+  }
 }

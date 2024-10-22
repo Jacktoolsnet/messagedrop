@@ -39,6 +39,9 @@
                         <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(contact)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >bookmark_flag</mat-icon>
                         </button>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Send a short message" (click)="sendShortMessage(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >quick_phrases</mat-icon>
+                        </button>
                     </mat-card-actions>
                 </mat-card>
             </div>

@@ -79,9 +79,9 @@ export class ContactService {
       'contactId': contact.id,
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
-      'message': contact.name
+      'message': message
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
