@@ -6,6 +6,7 @@ export interface User {
     location: Location,
     local: string,
     language: string,
+    subscribed: boolean,
     encryptionKeyPair?: Keypair,
     signingKeyPair?: Keypair,
     name?: string,

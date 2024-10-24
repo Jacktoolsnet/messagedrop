@@ -20,8 +20,6 @@ import { DeletePlaceComponent } from './delete-place/delete-place.component';
 import { Place } from '../../interfaces/place';
 import { PlaceService } from '../../services/place.service';
 import { PlaceComponent } from '../place/place.component';
-import { SwPush } from '@angular/service-worker';
-import { environment } from '../../../environments/environment';
 import { UserService } from '../../services/user.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
@@ -70,7 +68,6 @@ export class PlacelistComponent implements OnInit{
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    private swPush: SwPush,   
     @Inject(MAT_DIALOG_DATA) public data: {user: User, places: Place[]}
   ) {
     this.user = data.user;
@@ -142,30 +139,10 @@ export class PlacelistComponent implements OnInit{
   }
 
   public subscribe(place: Place) {
-    if (!place.subscribed) {
-      // Subscrbe user if needed.
-      this.swPush.requestSubscription({
-        serverPublicKey: environment.vapid_public_key
-      })
-      .then(subscription => {
-        let subscriptionJson = JSON.stringify(subscription);
-        // Save subscription to user.
-        this.userService.subscribe(this.user, subscriptionJson)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.userService.saveUser(this.user);              
-                  }
-                },
-                error: (err) => {
-                  place.subscribed = false;
-                },
-                complete:() => {}
-              });
-      })
-      .catch(err => {});
+    if (!this.user.subscribed) {
+      this.userService.registerSubscription(this.user);
     }
-    if (!place.subscribed) {
+    if (!place.subscribed && this.user.subscribed) {
       // subscribe to place
       this.placeService.subscribe(place)
       .subscribe({
