@@ -38,13 +38,14 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
     }
 }
 
-const contactSubscriptions = function (logger, db, contactUserId, message) {
+const contactSubscriptions = function (logger, db, userId, contactUserId, message) {
     try {
         let sql = `
         SELECT tableContact.id, tableContact.userId, tableContact.contactUserId, tableContact.subscribed, tableContact.name, tableContact.base64Avatar, tableUser.subscription
         FROM tableContact
         INNER JOIN tableUser ON tableContact.userId = tableUser.id
-        WHERE contactUserId = '${contactUserId}'
+        WHERE contactUserId = '${userId}'
+        AND userId = '${contactUserId}'
         AND subscribed = 1;`;
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {

@@ -103,7 +103,7 @@ const updateContactUserMessage = function (db, userId, contactUserId, message, c
         WHERE ${columnUserId} = ?
         AND ${columnContactUserId} = ?;`;
         
-        db.run(sql, [userId, contactUserId], (err) => {
+        db.run(sql, [contactUserId, userId], (err) => {
             callback(err);
         });
     } catch (error) {

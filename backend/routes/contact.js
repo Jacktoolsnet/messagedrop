@@ -53,13 +53,13 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
       res.status(response.status);
       res.json(response);
     } else {
-      tableContact.updateContactUserMessage(req.database.db, req.body.contactUserId, req.body.userId, req.body.message.replace(/\'/g, "''"), function (err) {
+      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.message.replace(/\'/g, "''"), function (err) {
         if (err) {
           response.status = 500;
           response.error = err;
         } else {
           response.status = 200;
-          notify.contactSubscriptions(req.logger, req.database.db, req.body.contactUserId, req.body.message.replace(/\'/g, "''"));
+          notify.contactSubscriptions(req.logger, req.database.db, req.body.userId, req.body.contactUserId, req.body.message.replace(/\'/g, "''"));
         }
         res.setHeader('Content-Type', 'application/json');
         res.status(response.status);
