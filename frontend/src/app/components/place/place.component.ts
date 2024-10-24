@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -10,34 +10,37 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { StyleService } from '../../services/style.service';
 import { Mode } from '../../interfaces/mode';
 import { Place } from '../../interfaces/place';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-place',
   standalone: true,
   imports: [
     MatDialogContainer,
-    CommonModule, 
-    FormsModule, 
-    MatButtonModule, 
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent, 
-    MatIcon, 
-    FormsModule, 
-    MatFormFieldModule, 
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
     MatInputModule
   ],
   templateUrl: './place.component.html',
   styleUrl: './place.component.css'
 })
 export class PlaceComponent implements OnInit {
-  
+  private snackBarRef: any;
+
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {mode: Mode, place: Place}
-  ) {}
+    private snackBar: MatSnackBar,
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, place: Place }
+  ) { }
 
   ngOnInit(): void {
   }
@@ -48,6 +51,10 @@ export class PlaceComponent implements OnInit {
 
   onAbortClick(): void {
     this.dialogRef.close();
+  }
+
+  public showPolicy() {
+    this.snackBarRef = this.snackBar.open(`Place id, place name, the added locations and the subscribed flag is saved on our server.`, 'OK', {});
   }
 
 }

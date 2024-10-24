@@ -1,11 +1,13 @@
 <h2 *ngIf="data.mode == 'add_place'" mat-dialog-title>Add a place</h2>
 <h2 *ngIf="data.mode == 'edit_place'" mat-dialog-title>Edit the place</h2>
 <mat-dialog-content>
-    Set the place name
-    <input matInput type="text" maxlength="64" placeholder="The place name.." [(ngModel)]="data.place.name">
+  <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+  </button>
+  Set the place name
+  <input matInput type="text" maxlength="64" placeholder="The place name.." [(ngModel)]="data.place.name">
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
   <button *ngIf="data.place.name != ''" mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
 </mat-dialog-actions>
-<h4>Place id, place name, the added locations and the subscribed flag is saved on our server.</h4>
