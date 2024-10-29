@@ -8,6 +8,8 @@
 
 .mat-mdc-dialog-content{
     padding: 0px !important;
+    max-height: none;
+    height: 90%;
 }
 
 .mat-mdc-dialog-actions{
@@ -22,18 +24,16 @@ h4 {
 textarea {    
     padding: 0.5rem;
     display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 90%;
-    height: 90%;
+    margin: auto;
+    width: 95%;
+    height: 95%;
     resize: none;
     line-height: 1.6;
 }
 
 .buttonarea {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    margin: auto;
     width: 80%;
     height: auto;
 }
@@ -45,7 +45,7 @@ textarea {
 
 .button_drop {
     margin: auto;
-    width: 90%;
+    width: 70%;
 }
 
 .button_random {
@@ -55,3 +55,12 @@ textarea {
     z-index: 100;
     margin: 1rem;
 }
+
+.button_legal {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
+  }

@@ -29,7 +29,6 @@ import { SocketioService } from '../../../services/socketio.service';
   styleUrl: './profile.component.css'
 })
 export class ContactProfileComponent {
-  private snackBarRef: any;
   public contact!: Contact;
   public joinedUserRoom: boolean = false;
 
@@ -66,7 +65,7 @@ export class ContactProfileComponent {
   }
 
   public showPolicy() {
-    this.snackBarRef = this.snackBar.open(`Contactprofile name, avatar, and the subscription flag is stored our the server.`, 'OK', {});
+    this.snackBar.open(`Contactprofile name, avatar, and the subscription flag is stored our the server.`, 'OK', {});
   }
 
   public getProfileFromContact(contact: Contact) {

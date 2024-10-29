@@ -1,6 +1,8 @@
 export enum Mode {
     ADD_PUBLIC_MESSAGE = 'add_public_message',
     EDIT_PUBLIC_MESSAGE = 'edit_public_message',
+    ADD_SHORT_MESSAGE = 'add_short_message',
+    EDIT_SHORT_MESSAGE = 'edit_short_message',
     ADD_COMMENT = 'add_comment',
     EDIT_COMMENT = 'edit_comment',
     ADD_NOTE = 'add_note',

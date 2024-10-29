@@ -28,7 +28,13 @@
                         <mat-card-title *ngIf="contact.name != undefined || contact.name !== ''">{{contact.name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
-                    <mat-card-content></mat-card-content>
+                    <mat-card-content>
+                        <div class="message">
+                            <p *ngIf="contact.contactUserMessage != ''" class="from-them">{{contact.contactUserMessage}}</p>
+                            <p *ngIf="contact.userMessage != ''"class="from-me">{{contact.userMessage}}</p>
+                        </div>
+                            
+                    </mat-card-content>
                     <mat-card-actions class="buttonbar">
                         <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note" (click)="editContact(contact)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
@@ -39,7 +45,7 @@
                         <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(contact)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >bookmark_flag</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Send a short message" (click)="sendShortMessage(contact)">
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Send a short message" (click)="openShortMessagDialog(contact)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >quick_phrases</mat-icon>
                         </button>
                     </mat-card-actions>

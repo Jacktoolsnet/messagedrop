@@ -21,6 +21,7 @@ import { ContactService } from '../../services/contact.service';
 import { ContactProfileComponent } from '../contact/profile/profile.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 import { UserService } from '../../services/user.service';
+import { MessageComponent } from '../message/message.component';
 
 @Component({
   selector: 'app-contactlist',
@@ -56,6 +57,7 @@ export class ContactlistComponent implements OnInit {
     private contactService: ContactService,
     private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
+    public messageDialog: MatDialog,
     public connectDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -226,9 +228,7 @@ export class ContactlistComponent implements OnInit {
   }
 
   public subscribe(contact: Contact) {
-    if (!this.user.subscribed) {
-      this.userService.registerSubscription(this.user);
-    }
+    this.userService.registerSubscription(this.user);
     if (!contact.subscribed && this.user.subscribed) {
       // subscribe to place
       this.contactService.subscribe(contact)
@@ -257,13 +257,35 @@ export class ContactlistComponent implements OnInit {
     }
   }
 
-  public sendShortMessage(contact: Contact) {
-    console.log('send short message');
-    this.contactService.updateContactMessage(contact, 'Testmessage')
-      .subscribe({
-        next: simpleStatusResponse => { console.log(simpleStatusResponse) },
-        error: (err) => { console.log(err) },
-        complete: () => { }
-      });
+  public openShortMessagDialog(contact: Contact): void {
+    let message: String = '';
+    const dialogRef = this.messageDialog.open(MessageComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, message: message},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.message) {
+        console.log('send short message');
+        this.contactService.updateContactMessage(data?.contact, data?.message)
+          .subscribe({
+            next: simpleStatusResponse => { console.log(simpleStatusResponse) },
+            error: (err) => { console.log(err) },
+            complete: () => { }
+          });
+      }
+    });
   }
+
 }

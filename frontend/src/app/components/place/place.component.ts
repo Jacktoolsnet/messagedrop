@@ -33,7 +33,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './place.component.css'
 })
 export class PlaceComponent implements OnInit {
-  private snackBarRef: any;
 
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
@@ -54,7 +53,7 @@ export class PlaceComponent implements OnInit {
   }
 
   public showPolicy() {
-    this.snackBarRef = this.snackBar.open(`Place id, place name, the added locations and the subscribed flag is saved on our server.`, 'OK', {});
+    this.snackBar.open(`Place id, place name, the added locations and the subscribed flag is saved on our server.`, 'OK', {});
   }
 
 }

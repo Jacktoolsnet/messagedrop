@@ -34,7 +34,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './connect.component.css'
 })
 export class ConnectComponent implements OnInit {
-  private snackBarRef: any;
   public connectId: String = '';
 
   constructor(
@@ -56,6 +55,6 @@ export class ConnectComponent implements OnInit {
   }
 
   public showPolicy() {
-    this.snackBarRef = this.snackBar.open(`Contact id, user id, contact user id and the subscribed flag is saved on our server. This informations are essential for the functionality of the application.`, 'OK', {});
+    this.snackBar.open(`Contact id, user id, contact user id and the subscribed flag is saved on our server. This informations are essential for the functionality of the application.`, 'OK', {});
   }
 }

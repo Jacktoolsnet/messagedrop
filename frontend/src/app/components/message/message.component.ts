@@ -11,33 +11,35 @@ import { StyleService } from '../../services/style.service';
 import { Message } from '../../interfaces/message';
 import { User } from '../../interfaces/user';
 import { Mode } from '../../interfaces/mode';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-message',
   standalone: true,
   imports: [
     MatDialogContainer,
-    CommonModule, 
-    FormsModule, 
-    MatButtonModule, 
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent, 
-    MatIcon, 
-    FormsModule, 
-    MatFormFieldModule, 
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
     MatInputModule],
   templateUrl: './message.component.html',
   styleUrl: './message.component.css'
 })
 export class MessageComponent implements OnInit {
-  
+
   constructor(
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<MessageComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {mode: Mode, user: User, message: Message}
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, message: Message }
+  ) { }
 
   ngOnInit(): void {
     if (this.data.message.style === '') {
@@ -59,6 +61,10 @@ export class MessageComponent implements OnInit {
     ${this.style.getRandomFontFamily()}
     font-size: 2rem;
     line-height: 1.6;`;
+  }
+
+  public showPolicy() {
+    this.snackBar.open(`This information is stored on our server and is visible to everyone.`, 'OK', {});
   }
 
 }

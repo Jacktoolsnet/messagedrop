@@ -28,7 +28,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrl: './edit-user.component.css'
 })
 export class EditUserComponent {
-  private snackBarRef: any;
   public relatedUser!: RelatedUser;
 
   constructor(
@@ -66,6 +65,6 @@ export class EditUserComponent {
     }
 
     public showPolicy() {
-      this.snackBarRef = this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
+      this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
     }
 }

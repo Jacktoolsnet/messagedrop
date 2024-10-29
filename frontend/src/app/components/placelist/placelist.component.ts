@@ -139,9 +139,7 @@ export class PlacelistComponent implements OnInit{
   }
 
   public subscribe(place: Place) {
-    if (!this.user.subscribed) {
-      this.userService.registerSubscription(this.user);
-    }
+    this.userService.registerSubscription(this.user);
     if (!place.subscribed && this.user.subscribed) {
       // subscribe to place
       this.placeService.subscribe(place)

@@ -5,28 +5,33 @@
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
     <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+</button>
 <mat-dialog-content class="full-width">
-    <textarea
-        cdkFocusInitial
-        [style]="data.message.style"
-        maxlength="512"
-        type="text" 
-        [(ngModel)]="data.message.message"
-        matInput>
+    <textarea cdkFocusInitial [style]="data.message.style" maxlength="512" type="text"
+        [(ngModel)]="data.message.message" matInput>
     </textarea>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button *ngIf="data.mode == 'add_public_message'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
+    <button *ngIf="data.mode == 'add_public_message'" mat-flat-button class="button_drop" color="primary"
+        aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         Drop public message
     </button>
-    <button *ngIf="data.mode == 'add_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
+    <button *ngIf="data.mode == 'add_short_message'" mat-flat-button class="button_drop" color="primary"
+        aria-label="Send your message" (click)="onApplyClick()">
+        <mat-icon class="material-symbols-outlined">send</mat-icon>
+        Send your message
+    </button>
+    <button *ngIf="data.mode == 'add_comment'" mat-flat-button class="button_drop" color="primary"
+        aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
         Drop public comment
     </button>
-    <button *ngIf="data.mode == 'edit_public_message' || data.mode == 'edit_comment'" mat-flat-button class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
+    <button *ngIf="data.mode == 'edit_public_message' || data.mode == 'edit_comment'" mat-flat-button
+        class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">check</mat-icon>
         Apply changes
     </button>
 </mat-dialog-actions>
-<h4>This information is stored on our server and is visible to everyone.</h4>

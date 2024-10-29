@@ -3,6 +3,9 @@
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
     <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+</button>
 <mat-dialog-content class="full-width">
     <textarea
         cdkFocusInitial
@@ -23,4 +26,3 @@
         Apply changes
     </button>
 </mat-dialog-actions>
-<h4>This information is stored on your device and is only visible to you.</h4>

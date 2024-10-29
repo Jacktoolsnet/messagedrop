@@ -12,33 +12,35 @@ import { Message } from '../../interfaces/message';
 import { User } from '../../interfaces/user';
 import { Mode } from '../../interfaces/mode';
 import { Note } from '../../interfaces/note';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-note',
   standalone: true,
   imports: [
     MatDialogContainer,
-    CommonModule, 
-    FormsModule, 
-    MatButtonModule, 
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent, 
-    MatIcon, 
-    FormsModule, 
-    MatFormFieldModule, 
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
     MatInputModule],
   templateUrl: './note.component.html',
   styleUrl: './note.component.css'
 })
 export class NoteComponent implements OnInit {
-  
+
   constructor(
+    private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<NoteComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {mode: Mode, note: Note}
-  ) {}
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, note: Note }
+  ) { }
 
   ngOnInit(): void {
     if (this.data.note.style === '') {
@@ -59,6 +61,10 @@ export class NoteComponent implements OnInit {
     ${this.style.getRandomFontFamily()}
     font-size: 2rem;
     line-height: 1.6;`;
+  }
+
+  public showPolicy() {
+    this.snackBar.open(`This information is stored on your device and is only visible to you.`, 'OK', {});
   }
 
 }
