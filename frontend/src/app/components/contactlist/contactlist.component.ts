@@ -22,6 +22,8 @@ import { ContactProfileComponent } from '../contact/profile/profile.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 import { UserService } from '../../services/user.service';
 import { MessageComponent } from '../message/message.component';
+import { ContactMessageComponent } from '../contact/message/message.component';
+import { ShortMessage } from '../../interfaces/short-message';
 
 @Component({
   selector: 'app-contactlist',
@@ -57,7 +59,7 @@ export class ContactlistComponent implements OnInit {
     private contactService: ContactService,
     private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
-    public messageDialog: MatDialog,
+    public contactMessageDialog: MatDialog,
     public connectDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
@@ -257,12 +259,15 @@ export class ContactlistComponent implements OnInit {
     }
   }
 
-  public openShortMessagDialog(contact: Contact): void {
-    let message: String = '';
-    const dialogRef = this.messageDialog.open(MessageComponent, {
+  public openContactMessagDialog(contact: Contact): void {
+    let shortMessage: ShortMessage = {
+      message: '',
+      style: ''
+    };
+    const dialogRef = this.contactMessageDialog.open(ContactMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, message: message},
+      data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, shortMessage: shortMessage},
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -276,9 +281,9 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.message) {
+      if (undefined !== data?.shortMessage) {
         console.log('send short message');
-        this.contactService.updateContactMessage(data?.contact, data?.message)
+        this.contactService.updateContactMessage(data?.contact, data?.shortMessage)
           .subscribe({
             next: simpleStatusResponse => { console.log(simpleStatusResponse) },
             error: (err) => { console.log(err) },

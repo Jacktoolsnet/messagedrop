@@ -3,8 +3,10 @@ const tableName = 'tableContact';
 const columnContactId = 'id';
 const columnUserId = 'userId';
 const columnUserMessage = 'userMessage';
+const columnUserMessageStyle = 'userMessageStyle';
 const columnContactUserId = 'contactUserId';
 const columnContactUserMessage = 'contactUserMessage';
+const columnContactUserMessageStyle = 'contactUserMessageStyle';
 const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
 const columnName = 'name';
@@ -17,8 +19,10 @@ const init = function (db) {
             ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
             ${columnUserMessage} TEXT DEFAULT NULL,
+            ${columnUserMessageStyle} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
             ${columnContactUserMessage} TEXT DEFAULT NULL,
+            ${columnContactUserMessageStyle} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
             ${columnName} TEXT DEFAULT NULL,
@@ -80,11 +84,12 @@ const update = function (db, contactId, name, base64Avatar, callback) {
     }
 };
 
-const updateUserMessage = function (db, contactId, message, callback) {
+const updateUserMessage = function (db, contactId, message, style, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
-        SET ${columnUserMessage} = '${message}'
+        SET ${columnUserMessage} = '${message}',
+        ${columnUserMessageStyle} = '${style}'
         WHERE ${columnContactId} = ?;`;
         
         db.run(sql, [contactId], (err) => {
@@ -95,11 +100,12 @@ const updateUserMessage = function (db, contactId, message, callback) {
     }
 };
 
-const updateContactUserMessage = function (db, userId, contactUserId, message, callback) {
+const updateContactUserMessage = function (db, userId, contactUserId, message, style, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
-        SET ${columnContactUserMessage} = '${message}'
+        SET ${columnContactUserMessage} = '${message}',
+        ${columnContactUserMessageStyle} = '${style}'
         WHERE ${columnUserId} = ?
         AND ${columnContactUserId} = ?;`;
         

@@ -1,0 +1,19 @@
+<h2 *ngIf="data.mode == 'add_short_message'" mat-dialog-title>Send a short message</h2>
+<button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
+    <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+</button>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+</button>
+<mat-dialog-content class="full-width">
+    <textarea cdkFocusInitial [style]="data.shortMessage.style" maxlength="512" type="text"
+        [(ngModel)]="data.shortMessage.message" matInput>
+    </textarea>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button *ngIf="data.mode == 'add_short_message'" mat-flat-button class="button_drop" color="primary"
+        aria-label="Drop your message" (click)="onApplyClick()">
+        <mat-icon class="material-symbols-outlined">send</mat-icon>
+        Send message
+    </button>
+</mat-dialog-actions>

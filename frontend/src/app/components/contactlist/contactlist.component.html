@@ -30,8 +30,8 @@
                     </mat-card-header>
                     <mat-card-content>
                         <div class="message">
-                            <p *ngIf="contact.contactUserMessage != ''" class="from-them">{{contact.contactUserMessage}}</p>
-                            <p *ngIf="contact.userMessage != ''"class="from-me">{{contact.userMessage}}</p>
+                            <p *ngIf="contact.contactUserMessage != undefined && contact.contactUserMessage != ''" [style]="contact.contactUserMessageStyle" class="from-them">{{contact.contactUserMessage}}</p>
+                            <p *ngIf="contact.userMessage != undefined && contact.userMessage != ''" [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
                         </div>
                             
                     </mat-card-content>
@@ -45,7 +45,7 @@
                         <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(contact)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >bookmark_flag</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Send a short message" (click)="openShortMessagDialog(contact)">
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined" >quick_phrases</mat-icon>
                         </button>
                     </mat-card-actions>

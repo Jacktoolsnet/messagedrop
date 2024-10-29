@@ -7,6 +7,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
+import { ShortMessage } from '../interfaces/short-message';
 
 @Injectable({
   providedIn: 'root'
@@ -74,12 +75,13 @@ export class ContactService {
       );
   }
 
-  updateContactMessage(contact: Contact, message: String) {
+  updateContactMessage(contact: Contact, shortMessage: ShortMessage) {
     let body = {
       'contactId': contact.id,
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
-      'message': message
+      'message': shortMessage.message,
+      'style': shortMessage.style
     };
     return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
       .pipe(

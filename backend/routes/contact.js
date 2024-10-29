@@ -45,7 +45,7 @@ router.post('/update/profile', [security.checkToken, bodyParser.json({ type: 'ap
  */
 router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.message.replace(/\'/g, "''"), function (err) {
+  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.message.replace(/\'/g, "''"), req.body.style, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -53,7 +53,7 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
       res.status(response.status);
       res.json(response);
     } else {
-      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.message.replace(/\'/g, "''"), function (err) {
+      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.message.replace(/\'/g, "''"), req.body.style, function (err) {
         if (err) {
           response.status = 500;
           response.error = err;
@@ -105,8 +105,10 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'id': row.id,
             'userId': row.userId,
             'userMessage': row.userMessage,
+            'userMessageStyle': row.userMessageStyle,
             'contactUserId': row.contactUserId,
             'contactUserMessage': row.contactUserMessage,
+            'contactUserMessageStyle': row.contactUserMessageStyle,
             'subscribed': row.subscribed === 0 ? false : true,
             'hint': row.hint,
             'name': row.name,
