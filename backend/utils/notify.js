@@ -49,6 +49,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         AND subscribed = 1;`;
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {
+                logger.error(`contactSubscriptions: ${row}`);
                 const payload = {
                     "notification": {
                         "title": `New message from @${row.name}`,
@@ -71,7 +72,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
             });
         });
     } catch (error) {
-        logger.error(`placeSubscriptions: ${error}`);
+        logger.error(`contactSubscriptions: ${error}`);
     }
 }
 

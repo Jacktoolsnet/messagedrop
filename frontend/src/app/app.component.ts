@@ -319,9 +319,14 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           this.contacts = [...getContactsResponse.rows];
+          this.contacts.forEach((contact: Contact) => {
+            this.socketioService.receiveShorMessage(contact);
+          });
         },
         error: (err) => {
-          if (err.status === 404) {}
+          if (err.status === 404) {
+            this.contacts = [];
+          }
         },
         complete: () => { }
       });

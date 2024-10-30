@@ -25,6 +25,15 @@ module.exports = (io, socket) => {
     }
   }
 
+  const newShortMessage = (contact) => {
+    // socket.logger.info("newShortMessage");
+    io.to(contact.contactUserId).emit(`receiveShorMessage:${contact.userId}`, {
+      status: 200,
+      contact: contact
+    });
+  }
+
   socket.on("contact:requestProfile", requestProfile);
   socket.on("contact:provideUserProfile", provideUserProfile);
+  socket.on("contact:newShortMessage", newShortMessage);
 }

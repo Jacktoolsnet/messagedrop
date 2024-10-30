@@ -27,30 +27,6 @@ export class ContactService {
     return throwError(() => error);
   }
 
-  loadContact(contactId: string): Contact|undefined {
-    let contactsFromLocalStorage: Contact[] = JSON.parse(localStorage.getItem('contacts') || '[]');
-    let contact!: Contact;
-    if (JSON.stringify(contactsFromLocalStorage.length) === '0') {
-      return undefined;
-    } else {
-      contactsFromLocalStorage.forEach((element: Contact) => {
-        if (element.id === contactId) {
-          contact = {
-            id : undefined != element.id ? element.id : 'undefined',
-            userId: undefined != element.userId ? element.userId : 'undefined',
-            hint: undefined != element.hint ? element.hint : 'undefined',
-            contactUserId: undefined != element.contactUserId ? element.contactUserId : 'undefined',
-            name : undefined != element.name ? element.name : 'Unnamed user',
-            base64Avatar : undefined != element.base64Avatar ? element.base64Avatar : '',
-            subscribed : undefined != element.subscribed ? element.subscribed : false,
-            provided: undefined != element.provided ? element.provided : false,
-          }
-        }
-      });      
-    }
-    return contact;
-  }
-
   createContact(contact: Contact) {
     let body = {
       'userId': contact.userId,

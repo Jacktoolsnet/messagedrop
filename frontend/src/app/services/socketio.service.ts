@@ -118,7 +118,7 @@ export class SocketioService {
   public receiveProfileForContactEvent(contact: Contact) {
     // console.log('receiveProfileForContactEvent init')
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
-      console.log("receiveProfileForContactEvent event")
+      // console.log("receiveProfileForContactEvent event")
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
@@ -134,6 +134,22 @@ export class SocketioService {
           horizontalPosition: 'center',
           verticalPosition: 'top',
         });
+      }
+    });
+  }
+
+  public sendShortMessageToContact(contact: Contact) {
+    // console.log('sendShortMessageToContact')
+    this.socket.emit('contact:newShortMessage', contact);
+  }
+
+  public receiveShorMessage(contact: Contact){
+    // console.log('receiveShorMessage init')
+    this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, contact: Contact }) => {
+      // console.log("receiveShorMessage event")
+      if (payload.status == 200) {
+        contact.contactUserMessage = payload.contact.userMessage;
+        contact.contactUserMessageStyle = payload.contact.userMessageStyle;
       }
     });
   }

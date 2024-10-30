@@ -24,6 +24,7 @@ import { UserService } from '../../services/user.service';
 import { MessageComponent } from '../message/message.component';
 import { ContactMessageComponent } from '../contact/message/message.component';
 import { ShortMessage } from '../../interfaces/short-message';
+import { SocketioService } from '../../services/socketio.service';
 
 @Component({
   selector: 'app-contactlist',
@@ -55,6 +56,7 @@ export class ContactlistComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private socketioService: SocketioService,
     private connectService: ConnectService,
     private contactService: ContactService,
     private cryptoService: CryptoService,
@@ -267,7 +269,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.contactMessageDialog.open(ContactMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_SHORT_MESSAGE, user: this.user, contact: contact, shortMessage: shortMessage},
+      data: { mode: this.mode.ADD_SHORT_MESSAGE, user: this.user, contact: contact, shortMessage: shortMessage },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -285,8 +287,12 @@ export class ContactlistComponent implements OnInit {
         console.log('send short message');
         this.contactService.updateContactMessage(data?.contact, data?.shortMessage)
           .subscribe({
-            next: simpleStatusResponse => { console.log(simpleStatusResponse) },
-            error: (err) => { console.log(err) },
+            next: simpleStatusResponse => {
+              data.contact.userMessage = data.shortMessage.message;
+              data.contact.userMessageStyle = data.shortMessage.style;
+              this.socketioService.sendShortMessageToContact(data.contact);
+            },
+            error: (err) => { },
             complete: () => { }
           });
       }

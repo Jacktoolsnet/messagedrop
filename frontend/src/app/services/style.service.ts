@@ -137,7 +137,7 @@ export class StyleService {
   }
 
   getRandomStyle(): string {
-    return `${this.getRandomFontFamily()} font-size: 1rem;`;
+    return `${this.getRandomFontFamily()} font-size: 1.75rem;`;
   }
 
 }
