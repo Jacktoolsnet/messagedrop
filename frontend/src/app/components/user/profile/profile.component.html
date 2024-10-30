@@ -21,6 +21,12 @@
       <mat-icon>delete</mat-icon>
     </button>
   </div>
+  <div class="buttonarea">
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="full-button" (click)="changeDefaultStyle()">
+      <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+      <span [style]="user.defaultStyle">Change default style</span>
+    </button>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>

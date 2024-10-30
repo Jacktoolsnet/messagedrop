@@ -8,6 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { User } from '../../../interfaces/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { StyleService } from '../../../services/style.service';
 
 @Component({
   selector: 'app-profile',
@@ -31,6 +32,7 @@ export class ProfileComponent {
   public user!: User;
 
   constructor(
+    private style: StyleService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
@@ -66,5 +68,9 @@ export class ProfileComponent {
 
   public showPolicy() {
     this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
+  }
+
+  public changeDefaultStyle(){
+    this.user.defaultStyle = this.style.getRandomStyle();
   }
 }

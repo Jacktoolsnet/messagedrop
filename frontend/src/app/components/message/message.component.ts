@@ -42,9 +42,7 @@ export class MessageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    if (this.data.message.style === '') {
-      this.getRandomFont();
-    }
+    this.data.message.style = this.data.user.defaultStyle;
   }
 
   onApplyClick(): void {
@@ -57,10 +55,7 @@ export class MessageComponent implements OnInit {
   }
 
   private getRandomFont(): void {
-    this.data.message.style = `
-    ${this.style.getRandomFontFamily()}
-    font-size: 2rem;
-    line-height: 1.6;`;
+    this.data.message.style = this.style.getRandomStyle();
   }
 
   public showPolicy() {

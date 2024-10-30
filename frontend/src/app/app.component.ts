@@ -517,7 +517,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_NOTE, note: note },
+      data: { mode: this.mode.ADD_NOTE, user: this.user, note: note },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',

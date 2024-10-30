@@ -267,7 +267,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.contactMessageDialog.open(ContactMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, shortMessage: shortMessage},
+      data: { mode: this.mode.ADD_SHORT_MESSAGE, user: this.user, contact: contact, shortMessage: shortMessage},
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',

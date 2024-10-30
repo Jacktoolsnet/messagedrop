@@ -39,13 +39,11 @@ export class NoteComponent implements OnInit {
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<NoteComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, note: Note }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, note: Note }
   ) { }
 
   ngOnInit(): void {
-    if (this.data.note.style === '') {
-      this.getRandomFont();
-    }
+    this.data.note.style = this.data.user.defaultStyle
   }
 
   onApplyClick(): void {
@@ -57,10 +55,7 @@ export class NoteComponent implements OnInit {
   }
 
   private getRandomFont(): void {
-    this.data.note.style = `
-    ${this.style.getRandomFontFamily()}
-    font-size: 2rem;
-    line-height: 1.6;`;
+    this.data.note.style = this.style.getRandomStyle();
   }
 
   public showPolicy() {

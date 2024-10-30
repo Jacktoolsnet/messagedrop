@@ -12,6 +12,7 @@ import { User } from '../../../interfaces/user';
 import { Mode } from '../../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ShortMessage } from '../../../interfaces/short-message';
+import { Contact } from '../../../interfaces/contact';
 
 @Component({
   selector: 'app-message',
@@ -38,13 +39,11 @@ export class ContactMessageComponent implements OnInit {
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ContactMessageComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, shortMessage: ShortMessage }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, contact: Contact, shortMessage: ShortMessage }
   ) { }
 
   ngOnInit(): void {
-    if (this.data.shortMessage.style === '') {
-      this.getRandomFont();
-    }
+    this.data.shortMessage.style = this.data.user.defaultStyle;
   }
 
   onApplyClick(): void {
@@ -56,10 +55,7 @@ export class ContactMessageComponent implements OnInit {
   }
 
   private getRandomFont(): void {
-    this.data.shortMessage.style = `
-    ${this.style.getRandomFontFamily()}
-    font-size: 2rem;
-    line-height: 1.6;`;
+    this.data.shortMessage.style = this.style.getRandomStyle()
   }
 
   public showPolicy() {

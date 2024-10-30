@@ -8,6 +8,7 @@ import { GetUserResponse } from '../interfaces/get-user-response';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { SwPush } from '@angular/service-worker';
+import { StyleService } from './style.service';
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,8 @@ export class UserService {
 
   constructor(
     private http: HttpClient,
-    private swPush: SwPush
+    private swPush: SwPush,
+    private style: StyleService,
   ) { }
 
   private handleError(error: HttpErrorResponse) {
@@ -43,6 +45,7 @@ export class UserService {
         local: navigator.language,
         language: navigator.language.split('-')[0],
         subscribed: false,
+        defaultStyle: this.style.getRandomStyle(),
         encryptionKeyPair: undefined,
         signingKeyPair: undefined,
         name: 'Unnamed user',
@@ -55,6 +58,7 @@ export class UserService {
         local: undefined != userFromLocalStorage.local ? userFromLocalStorage.local : navigator.language,
         language: undefined != userFromLocalStorage.language ? userFromLocalStorage.language : navigator.language.split('-')[0],
         subscribed: undefined != userFromLocalStorage.subscribed ? userFromLocalStorage.subscribed : false,
+        defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
         encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
         signingKeyPair: undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
         name: undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
