@@ -114,7 +114,7 @@ export class AppComponent implements OnInit {
 
   private initApp() {
     this.getPlaces();
-    this.getContacts();
+    this.getContacts(false);
     this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
     // Count
     this.statisticService.countVisitor()
@@ -137,7 +137,7 @@ export class AppComponent implements OnInit {
         }
       }
       if (result.notification.data.primaryKey.type = 'contact') {
-        this.openContactListDialog();
+        this.getContacts(true);
       }
     });
     this.platformLocation.onPopState((event) => {
@@ -258,7 +258,7 @@ export class AppComponent implements OnInit {
       });
   }
 
-  private getContacts() {
+  private getContacts(openContactListDialog: boolean) {
     this.contactService.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
@@ -266,6 +266,9 @@ export class AppComponent implements OnInit {
           this.contacts.forEach((contact: Contact) => {
             this.socketioService.receiveShorMessage(contact);
           });
+          if (openContactListDialog) {
+            this.openContactListDialog();
+          }
         },
         error: (err) => {
           if (err.status === 404) {

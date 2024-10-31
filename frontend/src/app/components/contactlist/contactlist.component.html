@@ -25,8 +25,8 @@
         <div *ngIf="contacts.length != 0">
             <div class="item" *ngFor="let contact of contacts; index as i">
                 <mat-card>
-                    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar"
-                        src="{{contact.base64Avatar}}" />
+                    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != '' && contact.base64Avatar != 'undefined'"
+                        class="avatar" src="{{contact.base64Avatar}}" />
                     <mat-card-header class="header">
                         <mat-card-title
                             *ngIf="contact.name == undefined || contact.name === ''">{{contact.contactUserId}}</mat-card-title>
@@ -36,17 +36,17 @@
                     </mat-card-header>
                     <mat-card-content>
                         <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
-                            <p *ngIf="contact.userMessage != undefined && contact.userMessage != ''"
+                            <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage != ''"
                                 [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
-                            <p *ngIf="contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
+                            <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
                                 [style]="contact.contactUserMessageStyle" class="from-them">
                                 {{contact.contactUserMessage}}</p>
                         </div>
                         <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
-                            <p *ngIf="contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
+                            <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
                                 [style]="contact.contactUserMessageStyle" class="from-them">
                                 {{contact.contactUserMessage}}</p>
-                            <p *ngIf="contact.userMessage != undefined && contact.userMessage != ''"
+                            <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage != ''"
                                 [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
                         </div>
 

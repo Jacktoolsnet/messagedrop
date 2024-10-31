@@ -200,7 +200,9 @@ export class ContactlistComponent implements OnInit {
         this.contactService.deleteContact(this.contactToDelete)
           .subscribe({
             next: (simpleStatusResponse) => {
-              if (simpleStatusResponse.status === 200) { }
+              if (simpleStatusResponse.status === 200) {
+                this.contacts.splice(this.contacts.findIndex(contact => contact.id !== this.contactToDelete.id), 1);
+              }
             },
             error: (err) => {
             },
