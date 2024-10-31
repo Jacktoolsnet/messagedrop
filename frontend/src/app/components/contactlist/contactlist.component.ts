@@ -21,7 +21,6 @@ import { ContactService } from '../../services/contact.service';
 import { ContactProfileComponent } from '../contact/profile/profile.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 import { UserService } from '../../services/user.service';
-import { MessageComponent } from '../message/message.component';
 import { ContactMessageComponent } from '../contact/message/message.component';
 import { ShortMessage } from '../../interfaces/short-message';
 import { SocketioService } from '../../services/socketio.service';

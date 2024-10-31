@@ -113,8 +113,6 @@ export class AppComponent implements OnInit {
   }
 
   private initApp() {
-    this.getPlaces();
-    this.getContacts(false);
     this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
     // Count
     this.statisticService.countVisitor()
@@ -137,7 +135,7 @@ export class AppComponent implements OnInit {
         }
       }
       if (result.notification.data.primaryKey.type = 'contact') {
-        this.getContacts(true);
+        this.showContacts();
       }
     });
     this.platformLocation.onPopState((event) => {
@@ -237,7 +235,7 @@ export class AppComponent implements OnInit {
       });
   }
 
-  private getPlaces() {
+  public showPlaces() {
     this.placeService.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
@@ -252,13 +250,17 @@ export class AppComponent implements OnInit {
                 complete: () => { }
               });
           });
+          this.openPlaceListDialog();
         },
-        error: (err) => { },
+        error: (err) => {
+          this.places = [];
+          this.openPlaceListDialog();
+        },
         complete: () => { }
       });
   }
 
-  private getContacts(openContactListDialog: boolean) {
+  public showContacts() {
     this.contactService.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
@@ -266,13 +268,12 @@ export class AppComponent implements OnInit {
           this.contacts.forEach((contact: Contact) => {
             this.socketioService.receiveShorMessage(contact);
           });
-          if (openContactListDialog) {
-            this.openContactListDialog();
-          }
+          this.openContactListDialog();
         },
         error: (err) => {
           if (err.status === 404) {
             this.contacts = [];
+            this.openContactListDialog();
           }
         },
         complete: () => { }
@@ -562,7 +563,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openPlaceListDialog(): void {
+  private openPlaceListDialog(): void {
     const dialogRef = this.placeListDialog.open(PlacelistComponent, {
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
@@ -600,7 +601,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openContactListDialog(): void {
+  private openContactListDialog(): void {
     const dialogRef = this.contactListDialog.open(ContactlistComponent, {
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
