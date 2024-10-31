@@ -80,6 +80,7 @@ export class AppComponent implements OnInit {
   public markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   private snackBarRef: any;
   public isUserLocation: boolean = false;
+  public initWatchingPosition: boolean = false;
   public mode: typeof Mode = Mode;
   public lastSearchedLocation: string = '';
   public lastMarkerUpdate: number = 0;
@@ -160,7 +161,7 @@ export class AppComponent implements OnInit {
   }
 
   public startWatchingPosition() {
-    this.isUserLocation = true;
+    this.initWatchingPosition = true;
     this.watchPosition();
   }
 
@@ -171,22 +172,19 @@ export class AppComponent implements OnInit {
   private watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
+        this.locationReady = true;
         this.userService.getUser().location.latitude = position.coords.latitude;
         this.userService.getUser().location.longitude = position.coords.longitude;
         this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
         this.userService.saveUser(this.userService.getUser());
-        if (this.isUserLocation) {
-          //this.mapService.setMapZoom(this.mapService.getMapZoom());
-          if (this.locationReady) {
-            this.mapService.flyTo(this.userService.getUser().location);
-          } else {
-            this.mapService.flyToWithZoom(this.userService.getUser().location, 19)
-          }
-        }
-        this.locationReady = true;
         this.mapService.setUserMarker(this.userService.getUser().location);
+        if (this.initWatchingPosition) {
+          this.mapService.flyToWithZoom(this.userService.getUser().location, 19);
+          this.initWatchingPosition = false;
+        }
       },
       error: (error) => {
+        this.locationReady = false;
         if (error.code == 1) {
           this.snackBarRef = this.snackBar.open(`Please authorize location.`, 'OK', {
             panelClass: ['snack-info'],
@@ -202,7 +200,6 @@ export class AppComponent implements OnInit {
             duration: 1000
           });
         }
-        this.locationReady = false;
         this.snackBarRef.afterDismissed().subscribe(() => {
           this.watchPosition();
         });
@@ -227,12 +224,12 @@ export class AppComponent implements OnInit {
           this.messages = [];
           // At the moment build the marekrLocation map here:
           this.createMarkerLocations()
-          this.snackBarRef = this.snackBar.open("No message found", undefined, {
+          /**this.snackBarRef = this.snackBar.open("No message found", undefined, {
             panelClass: ['snack-warning'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 1000
-          });
+          });**/
         },
         complete: () => {
           // Is excecutet before the result is here.

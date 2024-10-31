@@ -73,12 +73,12 @@ export class SocketioService {
         case 'joined':
           this.joinedUserRoom = true;
           console.log(payload);
-          this.snackBar.open(`Joined user room. (${payload.status})`, "", {
+          /**this.snackBar.open(`Joined user room. (${payload.status})`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 2000
-          });
+          });**/
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
