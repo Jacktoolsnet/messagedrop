@@ -55,7 +55,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                     "notification": {
                         "title": `New message from @${row.name}`,
                         "body": message,
-                        "icon": row.base64Avatar,
+                        "icon": "assets/icons/notify-icon.png",
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
