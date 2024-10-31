@@ -140,25 +140,21 @@ export class UserService {
   }
 
   registerSubscription(user: User) {
-    console.log('registerSubscription');
     this.swPush.requestSubscription({
       serverPublicKey: environment.vapid_public_key
     })
       .then(subscription => {
         let subscriptionJson = JSON.stringify(subscription);
         // Save subscription to user.
-        console.log('registerSubscription save');
         this.subscribe(user, subscriptionJson)
           .subscribe({
             next: (simpleStatusResponse) => {
-              console.log(simpleStatusResponse);
               if (simpleStatusResponse.status === 200) {
                 user.subscribed = true;
                 this.saveUser(user);
               }
             },
             error: (err) => {
-              console.log(err);
               user.subscribed = false;
               this.saveUser(user);
             },
@@ -166,7 +162,6 @@ export class UserService {
           });
       })
       .catch(err => {
-        console.log(err);
         user.subscribed = false;
         this.saveUser(user);
       });

@@ -20,7 +20,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
-                            "primaryKey": {"type": "place", "id": plusCode},
+                            "primaryKey": { "type": "place", "id": plusCode },
                             "onActionClick": {
                                 "default": {
                                     "operation": "focusLastFocusedOrOpen",
@@ -47,8 +47,11 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         WHERE contactUserId = '${userId}'
         AND userId = '${contactUserId}'
         AND subscribed = 1;`;
+        logger.error(`sql: ${sql}`);
         db.all(sql, (err, rows) => {
+            logger.error(`sql-err: ${err}`);
             rows.forEach((row) => {
+                logger.error(`sql-row: ${sql}`);
                 logger.error(`contactSubscriptions: ${row}`);
                 const payload = {
                     "notification": {
@@ -58,7 +61,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         "vibrate": [100, 50, 100],
                         "data": {
                             "dateOfArrival": Date.now(),
-                            "primaryKey": {"type": "contact", "id": row.id},
+                            "primaryKey": { "type": "contact", "id": row.id },
                             "onActionClick": {
                                 "default": {
                                     "operation": "focusLastFocusedOrOpen",
@@ -68,6 +71,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         }
                     }
                 };
+                logger.error(`payload: ${payload}`);
                 sendNotification(logger, JSON.parse(row.subscription), payload);
             });
         });
