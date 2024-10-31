@@ -12,7 +12,6 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
-import { Keypair } from './interfaces/keypair';
 import { MessageComponent } from './components/message/message.component';
 import { MessageService } from './services/message.service';
 import { StatisticService } from './services/statistic.service';
@@ -43,7 +42,6 @@ import { ConnectService } from './services/connect.service';
 import { Connect } from './interfaces/connect';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { Contact } from './interfaces/contact';
-import { Buffer } from 'buffer';
 import { CryptoService } from './services/crypto.service';
 import { ContactService } from './services/contact.service';
 import { GetContactsResponse } from './interfaces/get-contacts-response';
@@ -71,9 +69,7 @@ import { GetContactsResponse } from './interfaces/get-contacts-response';
   styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
-  public userReady: boolean = false;
   public locationReady: boolean = false;
-  public user!: User | undefined;
   public messages: Message[] = [];
   public places: Place[] = [];
   public selectedPlace: Place | undefined = undefined;
@@ -93,7 +89,7 @@ export class AppComponent implements OnInit {
   constructor(
     public mapService: MapService,
     private geolocationService: GeolocationService,
-    private userService: UserService,
+    public userService: UserService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
     private noteService: NoteService,
@@ -112,7 +108,22 @@ export class AppComponent implements OnInit {
     private swPush: SwPush,
     private socketioService: SocketioService,
     private connectService: ConnectService
-  ) { }
+  ) {
+    this.initApp();
+  }
+
+  private initApp() {
+    this.getPlaces();
+    this.getContacts();
+    this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
+    // Count
+    this.statisticService.countVisitor()
+      .subscribe({
+        next: (data) => { },
+        error: (err) => { },
+        complete: () => { }
+      });
+  }
 
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
@@ -138,78 +149,14 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
-    this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-    this.loadUser();
   }
 
   private setIsUserLocation(): void {
-    if (this.user?.location.plusCode === this.mapService.getMapLocation().plusCode) {
+    if (this.userService.getUser().location.plusCode === this.mapService.getMapLocation().plusCode) {
       this.isUserLocation = true;
     } else {
       this.isUserLocation = false;
     }
-  }
-
-  private loadUser() {
-    this.user = this.userService.loadUser();
-    this.goToUserLocation();
-    if (this.user.id === 'undefined') {
-      this.cryptoService.createEncryptionKey()
-        .then((encryptionKeyPair: Keypair) => {
-          this.user!.encryptionKeyPair = encryptionKeyPair;
-          this.cryptoService.createSigningKey()
-            .then((signingKeyPair: Keypair) => {
-              this.user!.signingKeyPair = signingKeyPair;
-              this.userService.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
-                .subscribe(createUserResponse => {
-                  this.user!.id = createUserResponse.userId;
-                  this.userService.saveUser(this.user!);
-                  this.userReady = true;
-                  this.getPlaces();
-                  this.getContacts();
-                  if (this.user) {
-                    this.socketioService.initSocketEvents(this.user)
-                  }
-                });
-            });
-        });
-    } else {
-      // Check if the user exist. It could be that the database was deleted.  
-      this.userService.checkUserById(this.user)
-        .subscribe({
-          next: (data) => {
-            this.userReady = true;
-            this.getPlaces();
-            this.getContacts();
-            if (this.user) {
-              this.socketioService.initSocketEvents(this.user)
-            }
-          },
-          error: (err) => {
-            // Create the user when it does not exist in the database.
-            if (err.status === 404) {
-              this.userService.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
-                .subscribe(createUserResponse => {
-                  this.userReady = true;
-                  this.getPlaces();
-                  this.getContacts();
-                  if (this.user) {
-                    this.socketioService.initSocketEvents(this.user)
-                  }
-                });
-            }
-          },
-          complete: () => {
-          }
-        });
-    }
-    // Count
-    this.statisticService.countVisitor()
-      .subscribe({
-        next: (data) => { },
-        error: (err) => { },
-        complete: () => { }
-      });
   }
 
   public startWatchingPosition() {
@@ -218,26 +165,26 @@ export class AppComponent implements OnInit {
   }
 
   public goToUserLocation() {
-    this.mapService.flyTo(this.user!.location);
+    this.mapService.flyTo(this.userService.getUser().location);
   }
 
   private watchPosition() {
     this.geolocationService.watchPosition().subscribe({
       next: (position) => {
-        this.user!.location.latitude = position.coords.latitude;
-        this.user!.location.longitude = position.coords.longitude;
-        this.user!.location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        this.userService.saveUser(this.user!);
+        this.userService.getUser().location.latitude = position.coords.latitude;
+        this.userService.getUser().location.longitude = position.coords.longitude;
+        this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+        this.userService.saveUser(this.userService.getUser());
         if (this.isUserLocation) {
           //this.mapService.setMapZoom(this.mapService.getMapZoom());
           if (this.locationReady) {
-            this.mapService.flyTo(this.user!.location);
+            this.mapService.flyTo(this.userService.getUser().location);
           } else {
-            this.mapService.flyToWithZoom(this.user!.location, 19)
+            this.mapService.flyToWithZoom(this.userService.getUser().location, 19)
           }
         }
         this.locationReady = true;
-        this.mapService.setUserMarker(this.user!.location);
+        this.mapService.setUserMarker(this.userService.getUser().location);
       },
       error: (error) => {
         if (error.code == 1) {
@@ -295,7 +242,7 @@ export class AppComponent implements OnInit {
   }
 
   private getPlaces() {
-    this.placeService.getByUserId(this.user!.id)
+    this.placeService.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
           this.places = [...getPlacesResponse.rows];
@@ -316,7 +263,7 @@ export class AppComponent implements OnInit {
   }
 
   private getContacts() {
-    this.contactService.getByUserId(this.user!.id)
+    this.contactService.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           this.contacts = [...getContactsResponse.rows];
@@ -475,7 +422,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message },
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.userService.getUser(), message: message },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -523,7 +470,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_NOTE, user: this.user, note: note },
+      data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -552,13 +499,13 @@ export class AppComponent implements OnInit {
   }
 
   public openUserMessagListDialog(): void {
-    this.userService.getUserMessages(this.user!)
+    this.userService.getUserMessages(this.userService.getUser())
       .subscribe({
         next: (getMessageResponse) => {
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { user: this.user, messages: [...getMessageResponse.rows] },
+            data: { user: this.userService.getUser(), messages: [...getMessageResponse.rows] },
             width: 'auto',
             minWidth: '60vw',
             maxWidth: '90vw',
@@ -594,7 +541,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
-      data: { user: this.user, notes: [...this.noteService.loadNotesFromStorage()] },
+      data: { user: this.userService.getUser(), notes: [...this.noteService.loadNotesFromStorage()] },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
@@ -620,7 +567,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.placeListDialog.open(PlacelistComponent, {
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
-      data: { user: this.user, places: this.places },
+      data: { user: this.userService.getUser(), places: this.places },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
@@ -658,7 +605,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.contactListDialog.open(ContactlistComponent, {
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
-      data: { user: this.user, contacts: this.contacts },
+      data: { user: this.userService.getUser(), contacts: this.contacts },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
@@ -710,7 +657,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { user: this.user, messages: messages },
+      data: { user: this.userService.getUser(), messages: messages },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
@@ -735,7 +682,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { user: this.user, notes: notes },
+      data: { user: this.userService.getUser(), notes: notes },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
@@ -759,7 +706,7 @@ export class AppComponent implements OnInit {
 
   public editUserProfile() {
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
-      data: { user: this.user },
+      data: { user: this.userService.getUser() },
       closeOnNavigation: true,
       hasBackdrop: true
     });
@@ -785,12 +732,11 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.userService.deleteUser(this.user!)
+        this.userService.deleteUser(this.userService.getUser())
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.user = this.userService.clearStorage();
-                this.userReady = false;
+                this.userService.clearStorage();
                 this.getMessages(this.mapService.getMapLocation(), true, false);
               }
             },
@@ -810,7 +756,7 @@ export class AppComponent implements OnInit {
 
   public showUser() {
     const dialogRef = this.dialog.open(UserComponent, {
-      data: { user: this.user },
+      data: { user: this.userService.getUser() },
       closeOnNavigation: true,
       hasBackdrop: true
     });
@@ -821,31 +767,29 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       switch (result?.action) {
         case "shareUserId":
-          if (this.user?.signingKeyPair?.privateKey) {
-            this.cryptoService.createSignature(this.user.signingKeyPair.privateKey, this.user!.id)
-              .then((signature: string) => {
-                let connect: Connect = {
-                  id: '',
-                  userId: this.user!.id,
-                  hint: result?.connectHint,
-                  signature: signature,
-                  encryptionPublicKey: JSON.stringify(this.user!.encryptionKeyPair?.publicKey!),
-                  signingPublicKey: JSON.stringify(this.user!.signingKeyPair?.publicKey!)
-                };
-                this.connectService.createConnect(connect)
-                  .subscribe({
-                    next: createConnectResponse => {
-                      if (createConnectResponse.status === 200) {
-                        connect.id = createConnectResponse.connectId;
-                        navigator.clipboard.writeText(connect.id);
-                        this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
-                      }
-                    },
-                    error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                    complete: () => { }
-                  });
-              });
-          }
+          this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+            .then((signature: string) => {
+              let connect: Connect = {
+                id: '',
+                userId: this.userService.getUser().id,
+                hint: result?.connectHint,
+                signature: signature,
+                encryptionPublicKey: JSON.stringify(this.userService.getUser().encryptionKeyPair?.publicKey!),
+                signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
+              };
+              this.connectService.createConnect(connect)
+                .subscribe({
+                  next: createConnectResponse => {
+                    if (createConnectResponse.status === 200) {
+                      connect.id = createConnectResponse.connectId;
+                      navigator.clipboard.writeText(connect.id);
+                      this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
+                    }
+                  },
+                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                  complete: () => { }
+                });
+            });
           break
         case "deleteUserId":
           this.deleteUser();

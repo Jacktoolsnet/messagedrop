@@ -1,34 +1,53 @@
-<app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()" [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
-<button *ngIf="userReady && undefined === selectedPlace" [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
-    <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"  class="material-symbols-outlined" >person</mat-icon>
+<app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()"
+    [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)"
+    (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<button *ngIf="this.userService.getUser().id != '' && undefined === selectedPlace" [matMenuTriggerFor]="userMenu"
+    aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
+    <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
+        class="material-symbols-outlined">person</mat-icon>
 </button>
 
-<button *ngIf="userReady && undefined !== selectedPlace" aria-hidden="userReady && undefined === selectedPlace" class="button_profile" mat-fab extended color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
-    <mat-icon aria-hidden="false" class="material-symbols-outlined" >where_to_vote</mat-icon>{{selectedPlace.name}}
+<button *ngIf="this.userService.getUser().id != '' && undefined !== selectedPlace"
+    aria-hidden="this.userService.getUser().id != '' && undefined === selectedPlace" class="button_profile" mat-fab
+    extended color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
+    <mat-icon aria-hidden="false" class="material-symbols-outlined">where_to_vote</mat-icon>{{selectedPlace.name}}
 </button>
 
-<button *ngIf="!locationReady" [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary" aria-label="Watch user location" (click)="startWatchingPosition()">
+<button *ngIf="!locationReady" [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary"
+    aria-label="Watch user location" (click)="startWatchingPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button *ngIf="locationReady && !isUserLocation" [attr.aria-hidden]="!(userReady && locationReady)" class="button_goToLocation" mat-fab color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
-    <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">adjust</mat-icon>
+<button *ngIf="locationReady && !isUserLocation"
+    [attr.aria-hidden]="!(this.userService.getUser().id != '' && locationReady)" class="button_goToLocation" mat-fab
+    color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
+    <mat-icon [attr.aria-hidden]="!(this.userService.getUser().id != '' && locationReady)"
+        class="material-symbols-outlined">adjust</mat-icon>
 </button>
-<button *ngIf="userReady && undefined !== selectedPlace && !isPartOfPlace" [attr.aria-hidden]="userReady" class="button_drop" mat-fab color="secondary" aria-label="Add_location_to_place" (click)="addLocationToPlace()">
-    <mat-icon [attr.aria-hidden]="userReady" class="material-symbols-outlined">add_location_alt</mat-icon>
+<button *ngIf="this.userService.getUser().id != '' && undefined !== selectedPlace && !isPartOfPlace"
+    [attr.aria-hidden]="this.userService.getUser().id != ''" class="button_drop" mat-fab color="secondary"
+    aria-label="Add_location_to_place" (click)="addLocationToPlace()">
+    <mat-icon [attr.aria-hidden]="this.userService.getUser().id != ''"
+        class="material-symbols-outlined">add_location_alt</mat-icon>
 </button>
-<button *ngIf="userReady && undefined !== selectedPlace && isPartOfPlace" [attr.aria-hidden]="userReady" class="button_drop" mat-fab color="primary" aria-label="Add_location_to_place" (click)="removeLocationFromPlace()">
-    <mat-icon [attr.aria-hidden]="userReady" class="material-symbols-outlined">wrong_location</mat-icon>
+<button *ngIf="this.userService.getUser().id != '' && undefined !== selectedPlace && isPartOfPlace"
+    [attr.aria-hidden]="this.userService.getUser().id != ''" class="button_drop" mat-fab color="primary"
+    aria-label="Add_location_to_place" (click)="removeLocationFromPlace()">
+    <mat-icon [attr.aria-hidden]="this.userService.getUser().id != ''"
+        class="material-symbols-outlined">wrong_location</mat-icon>
 </button>
-<button *ngIf="userReady && undefined === selectedPlace" [attr.aria-hidden]="!(userReady && locationReady)" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
-    <mat-icon [attr.aria-hidden]="!(userReady && locationReady)" class="material-symbols-outlined">send</mat-icon>
+<button *ngIf="this.userService.getUser().id != '' && undefined === selectedPlace"
+    [attr.aria-hidden]="!(this.userService.getUser().id != '' && locationReady)" [matMenuTriggerFor]="messageMenu"
+    class="button_drop" mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
+    <mat-icon [attr.aria-hidden]="!(this.userService.getUser().id != '' && locationReady)"
+        class="material-symbols-outlined">send</mat-icon>
 </button>
 
 <mat-menu #userMenu="matMenu">
     <button mat-menu-item (click)="showUser()">
-    <mat-icon *ngIf="user" class="material-symbols-outlined">account_circle</mat-icon>
+        <mat-icon *ngIf="this.userService.getUser()" class="material-symbols-outlined">account_circle</mat-icon>
         <span>My user</span>
     </button>
-    <button *ngIf="user" mat-menu-item (click)="editUserProfile()">
+    <button *ngIf="this.userService.getUser()" mat-menu-item (click)="editUserProfile()">
         <mat-icon class="material-symbols-outlined">badge</mat-icon>
         <span>My profile</span>
     </button>
@@ -51,11 +70,12 @@
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
-    <button mat-menu-item (click)="openMessagDialog(user!.location)">
-    <mat-icon class="material-symbols-outlined">send</mat-icon>
+    <button mat-menu-item (click)="openMessagDialog(this.userService.getUser().location)">
+        <mat-icon class="material-symbols-outlined">send</mat-icon>
         <span>Public message</span>
     </button>
-    <button *ngIf="userReady" mat-menu-item (click)="openNoteDialog(user!.location)">
+    <button *ngIf="this.userService.getUser().id != ''" mat-menu-item
+        (click)="openNoteDialog(this.userService.getUser().location)">
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
         <span>Private note</span>
     </button>

@@ -9,12 +9,37 @@ import { GetMessageResponse } from '../interfaces/get-message-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { SwPush } from '@angular/service-worker';
 import { StyleService } from './style.service';
+import { CryptoService } from './crypto.service';
+import { Keypair } from '../interfaces/keypair';
+import { SocketioService } from './socketio.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
+  private user: User = {
+    id: '',
+    location: {
+      latitude: 0,
+      longitude: 0,
+      plusCode: ''
+    },
+    local: '',
+    language: '',
+    subscribed: false,
+    defaultStyle: '',
+    encryptionKeyPair: {
+      publicKey: {},
+      privateKey: {}
+    },
+    signingKeyPair: {
+      publicKey: {},
+      privateKey: {}
+    },
+    name: '',
+    base64Avatar: ''
+  };
   private keyEncryptionDecryption!: CryptoKey;
 
   httpOptions = {
@@ -28,44 +53,95 @@ export class UserService {
     private http: HttpClient,
     private swPush: SwPush,
     private style: StyleService,
-  ) { }
+    private cryptoService: CryptoService,
+    private socketioService: SocketioService
+  ) {
+    this.loadUserFromLocalStorage();
+    this.initUser();
+  }
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
     return throwError(() => error);
   }
 
-  loadUser(): User {
+  loadUserFromLocalStorage() {
     let userFromLocalStorage: any = JSON.parse(localStorage.getItem('user') || '{}');
-    let user!: User;
     if (JSON.stringify(userFromLocalStorage) === '{}') {
-      user = {
-        id: 'undefined',
+      this.user = {
+        id: '',
         location: { latitude: 0, longitude: 0, plusCode: '' },
         local: navigator.language,
         language: navigator.language.split('-')[0],
         subscribed: false,
         defaultStyle: this.style.getRandomStyle(),
-        encryptionKeyPair: undefined,
-        signingKeyPair: undefined,
+        encryptionKeyPair: {
+          publicKey: {},
+          privateKey: {}
+        },
+        signingKeyPair: {
+          publicKey: {},
+          privateKey: {}
+        },
         name: 'Unnamed user',
         base64Avatar: ''
       }
     } else {
-      user = {
-        id: undefined != userFromLocalStorage.id ? userFromLocalStorage.id : 'undefined',
+      this.user = {
+        id: undefined != userFromLocalStorage.id ? userFromLocalStorage.id : '',
         location: undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: '' },
         local: undefined != userFromLocalStorage.local ? userFromLocalStorage.local : navigator.language,
         language: undefined != userFromLocalStorage.language ? userFromLocalStorage.language : navigator.language.split('-')[0],
         subscribed: undefined != userFromLocalStorage.subscribed ? userFromLocalStorage.subscribed : false,
         defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
-        encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : undefined,
-        signingKeyPair: undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : undefined,
+        encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : {},
+        signingKeyPair: undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : {},
         name: undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
         base64Avatar: undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
       }
     }
-    return user;
+  }
+
+  initUser() {
+    if (this.user.id === '') {
+      this.cryptoService.createEncryptionKey()
+        .then((encryptionKeyPair: Keypair) => {
+          this.user!.encryptionKeyPair = encryptionKeyPair;
+          this.cryptoService.createSigningKey()
+            .then((signingKeyPair: Keypair) => {
+              this.user!.signingKeyPair = signingKeyPair;
+              this.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
+                .subscribe(createUserResponse => {
+                  this.user!.id = createUserResponse.userId;
+                  this.saveUser(this.user!);
+                  this.socketioService.initSocketEvents(this.user);
+                });
+            });
+        });
+    } else {
+      // Check if the user exist. It could be that the database was deleted.  
+      this.checkUserById(this.user)
+        .subscribe({
+          next: (data) => {
+            this.socketioService.initSocketEvents(this.user);
+          },
+          error: (err) => {
+            // Create the user when it does not exist in the database.
+            if (err.status === 404) {
+              this.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
+                .subscribe(createUserResponse => {
+                  this.socketioService.initSocketEvents(this.user);
+                });
+            }
+          },
+          complete: () => {
+          }
+        });
+    }
+  }
+
+  getUser(): User {
+    return this.user;
   }
 
   saveUser(user: User) {
@@ -116,9 +192,26 @@ export class UserService {
       );
   }
 
-  clearStorage(): undefined {
+  clearStorage() {
     localStorage.clear();
-    return undefined;
+    this.user = {
+      id: '',
+      location: { latitude: 0, longitude: 0, plusCode: '' },
+      local: navigator.language,
+      language: navigator.language.split('-')[0],
+      subscribed: false,
+      defaultStyle: this.style.getRandomStyle(),
+      encryptionKeyPair: {
+        publicKey: {},
+        privateKey: {}
+      },
+      signingKeyPair: {
+        publicKey: {},
+        privateKey: {}
+      },
+      name: 'Unnamed user',
+      base64Avatar: ''
+    }
   }
 
   subscribe(user: User, subscription: string) {

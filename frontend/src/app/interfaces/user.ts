@@ -8,8 +8,8 @@ export interface User {
     language: string,
     subscribed: boolean,
     defaultStyle: string,
-    encryptionKeyPair?: Keypair,
-    signingKeyPair?: Keypair,
-    name?: string,
-    base64Avatar?: string
+    encryptionKeyPair: Keypair,
+    signingKeyPair: Keypair,
+    name: string,
+    base64Avatar: string
 }
