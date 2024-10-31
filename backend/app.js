@@ -30,8 +30,8 @@ const logger = winston.createLogger({
   level: 'info',
   format: winston.format.json(),
   transports: [
-    new winston.transports.File({ filename: 'error.log', level: 'error' }),
-    new winston.transports.File({ filename: 'info.log' }),
+    new winston.transports.File({ filename: 'error.txt', level: 'error' }),
+    new winston.transports.File({ filename: 'info.txt' }),
   ],
 });
 
@@ -40,7 +40,7 @@ const { Server } = require('socket.io');
 const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
-const io = new Server(server, {'force new connection': true });
+const io = new Server(server, { 'force new connection': true });
 const onConnection = (socket) => {
   socket.logger = logger;
   userHandlers(io, socket)
