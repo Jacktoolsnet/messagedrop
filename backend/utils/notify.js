@@ -68,7 +68,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         }
                     }
                 };
-                logger.error(`payload: ${JSON.stringify(payload)}`);
                 sendNotification(logger, JSON.parse(row.subscription), payload);
             });
         });
