@@ -50,7 +50,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         logger.error(`sql: ${sql}`);
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {
-                logger.error(`sql-row: ${JSON.stringify(row)}`);
                 const payload = {
                     "notification": {
                         "title": `New message from @${row.name}`,
