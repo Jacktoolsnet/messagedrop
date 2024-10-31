@@ -100,7 +100,7 @@ export class MapService {
 
     // Fire event to load first messagens
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
-    this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ff7800", weight: 1 }).addTo(this.map);
+    this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ffdbb5", weight: 1 }).addTo(this.map);
     this.drawSearchRectange(this.location);
   }
 

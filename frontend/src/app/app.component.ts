@@ -3,7 +3,6 @@ import { CommonModule, PlatformLocation } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { MapComponent } from './components/map/map.component';
 import { GeolocationService } from './services/geolocation.service';
-import { User } from './interfaces/user';
 import { Location } from './interfaces/location';
 import { UserService } from './services/user.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
