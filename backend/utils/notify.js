@@ -47,7 +47,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         WHERE contactUserId = '${userId}'
         AND userId = '${contactUserId}'
         AND subscribed = 1;`;
-        logger.error(`sql: ${sql}`);
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {
                 const payload = {
