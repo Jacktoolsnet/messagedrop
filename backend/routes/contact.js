@@ -112,7 +112,8 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'subscribed': row.subscribed === 0 ? false : true,
             'hint': row.hint,
             'name': row.name,
-            'base64Avatar': row.base64Avatar
+            'base64Avatar': row.base64Avatar,
+            'lastMessageFrom': row.lastMessageFrom
           });
         });
       }

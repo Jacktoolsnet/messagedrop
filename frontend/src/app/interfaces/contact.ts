@@ -3,12 +3,12 @@ import { Location } from "./location";
 
 export interface Contact {
     id: string,
-    userId: string,    
-    userMessage?: string,
-    userMessageStyle?: string,
+    userId: string,
+    userMessage: string,
+    userMessageStyle: string,
     contactUserId: string,
-    contactUserMessage?: string,
-    contactUserMessageStyle?: string,
+    contactUserMessage: string,
+    contactUserMessageStyle: string,
     hint?: string,
     encryptionPublicKey?: JsonWebKey,
     signingPublicKey?: JsonWebKey,
@@ -16,5 +16,6 @@ export interface Contact {
     name?: string,
     base64Avatar?: string,
     subscribed: boolean,
-    provided: boolean
+    provided: boolean,
+    lastMessageFrom: string
 }

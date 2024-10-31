@@ -22,9 +22,9 @@
     </button>
   </div>
   <div class="buttonarea">
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="full-button" (click)="changeDefaultStyle()">
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" [style]="user.defaultStyle" class="button_style" (click)="changeDefaultStyle()">
       <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
-      <span [style]="user.defaultStyle">Change default style</span>
+      <span>Change style</span>
     </button>
   </div>
 </mat-dialog-content>

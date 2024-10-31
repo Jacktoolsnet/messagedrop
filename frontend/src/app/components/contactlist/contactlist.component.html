@@ -1,8 +1,10 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back"
+        (click)="goBack()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="openConnectDialog()">
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back"
+        (click)="openConnectDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div class="content" [ngClass]="{
@@ -10,43 +12,62 @@
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
-        <div *ngIf="contacts.length == 0" class="item">        
-            <mat-card>                    
+        <div *ngIf="contacts.length == 0" class="item">
+            <mat-card>
                 <mat-card-header class="header">
                     <mat-card-title>Contacts</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
-                <mat-card-content>I can tap on the plus button to add a contact.<br><br>The contact is saved on my device and only visible to me.<br></mat-card-content>                
+                <mat-card-content>I can tap on the plus button to add a contact.<br><br>The contact is saved on my
+                    device and only visible to me.<br></mat-card-content>
             </mat-card>
         </div>
-        <div *ngIf="contacts.length != 0">        
-            <div class="item" *ngFor="let contact of contacts; index as i">            
+        <div *ngIf="contacts.length != 0">
+            <div class="item" *ngFor="let contact of contacts; index as i">
                 <mat-card>
-                    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar" src="{{contact.base64Avatar}}" />                    
+                    <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != ''" class="avatar"
+                        src="{{contact.base64Avatar}}" />
                     <mat-card-header class="header">
-                        <mat-card-title *ngIf="contact.name == undefined || contact.name === ''">{{contact.contactUserId}}</mat-card-title>
-                        <mat-card-title *ngIf="contact.name != undefined || contact.name !== ''">{{contact.name}}</mat-card-title>
+                        <mat-card-title
+                            *ngIf="contact.name == undefined || contact.name === ''">{{contact.contactUserId}}</mat-card-title>
+                        <mat-card-title
+                            *ngIf="contact.name != undefined || contact.name !== ''">{{contact.name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
                     <mat-card-content>
-                        <div class="message">
-                            <p *ngIf="contact.contactUserMessage != undefined && contact.contactUserMessage != ''" [style]="contact.contactUserMessageStyle" class="from-them">{{contact.contactUserMessage}}</p>
-                            <p *ngIf="contact.userMessage != undefined && contact.userMessage != ''" [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
+                        <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
+                            <p *ngIf="contact.userMessage != undefined && contact.userMessage != ''"
+                                [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
+                            <p *ngIf="contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
+                                [style]="contact.contactUserMessageStyle" class="from-them">
+                                {{contact.contactUserMessage}}</p>
                         </div>
-                            
+                        <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
+                            <p *ngIf="contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
+                                [style]="contact.contactUserMessageStyle" class="from-them">
+                                {{contact.contactUserMessage}}</p>
+                            <p *ngIf="contact.userMessage != undefined && contact.userMessage != ''"
+                                [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
+                        </div>
+
                     </mat-card-content>
                     <mat-card-actions class="buttonbar">
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note" (click)="editContact(contact)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
+                            (click)="editContact(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteContact(contact)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Delete note"
+                            (click)="deleteContact(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(contact)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >bookmark_flag</mat-icon>
+                        <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab
+                            color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place"
+                            (click)="subscribe(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">bookmark_flag</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >quick_phrases</mat-icon>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+                            aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
                         </button>
                     </mat-card-actions>
                 </mat-card>

@@ -83,7 +83,12 @@ export class ContactlistComponent implements OnInit {
       contactUserId: '',
       name: '',
       subscribed: false,
-      provided: false
+      provided: false,
+      userMessage: '',
+      userMessageStyle: '',
+      contactUserMessage: '',
+      contactUserMessageStyle: '',
+      lastMessageFrom: ''
     };
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
@@ -290,6 +295,7 @@ export class ContactlistComponent implements OnInit {
             next: simpleStatusResponse => {
               data.contact.userMessage = data.shortMessage.message;
               data.contact.userMessageStyle = data.shortMessage.style;
+              data.contact.lastMessageFrom = 'user';
               this.socketioService.sendShortMessageToContact(data.contact);
             },
             error: (err) => { },

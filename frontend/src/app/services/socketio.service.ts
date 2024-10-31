@@ -143,13 +143,14 @@ export class SocketioService {
     this.socket.emit('contact:newShortMessage', contact);
   }
 
-  public receiveShorMessage(contact: Contact){
+  public receiveShorMessage(contact: Contact) {
     // console.log('receiveShorMessage init')
     this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, contact: Contact }) => {
       // console.log("receiveShorMessage event")
       if (payload.status == 200) {
         contact.contactUserMessage = payload.contact.userMessage;
         contact.contactUserMessageStyle = payload.contact.userMessageStyle;
+        contact.lastMessageFrom = 'contactUser';
       }
     });
   }

@@ -65,7 +65,11 @@ select {
   height: auto;
 }
 
-.full-button {
+.button_style {
   margin: auto;
   width: 100%;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }

@@ -11,6 +11,7 @@ const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
 const columnName = 'name';
 const columnBase64Avatar = 'base64Avatar';
+const columnLastMessageFrom = 'lastMessageFrom';
 
 const init = function (db) {
     try {
@@ -27,6 +28,7 @@ const init = function (db) {
             ${columnHint} TEXT DEFAULT NULL,
             ${columnName} TEXT DEFAULT NULL,
             ${columnBase64Avatar} TEXT DEFAULT NULL,
+            ${columnLastMessageFrom} TEXT DEFAULT '',
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -89,7 +91,8 @@ const updateUserMessage = function (db, contactId, message, style, callback) {
         let sql = `
         UPDATE ${tableName}
         SET ${columnUserMessage} = '${message}',
-        ${columnUserMessageStyle} = '${style}'
+        ${columnUserMessageStyle} = '${style}',
+        ${columnLastMessageFrom} = 'user'
         WHERE ${columnContactId} = ?;`;
         
         db.run(sql, [contactId], (err) => {
@@ -105,7 +108,8 @@ const updateContactUserMessage = function (db, userId, contactUserId, message, s
         let sql = `
         UPDATE ${tableName}
         SET ${columnContactUserMessage} = '${message}',
-        ${columnContactUserMessageStyle} = '${style}'
+        ${columnContactUserMessageStyle} = '${style}',
+        ${columnLastMessageFrom} = 'contactUser'
         WHERE ${columnUserId} = ?
         AND ${columnContactUserId} = ?;`;
         
