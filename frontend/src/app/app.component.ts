@@ -125,7 +125,8 @@ export class AppComponent implements OnInit {
           this.mapService.flyTo(location);
         }
       }
-      if (result.notification.data.primaryKey.type = 'contace') {
+      if (result.notification.data.primaryKey.type = 'contact') {
+        this.openContactListDialog();
       }
     });
     this.platformLocation.onPopState((event) => {
