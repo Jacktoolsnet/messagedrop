@@ -37,18 +37,17 @@ export class SocketioService {
   }
 
   async initUser() {
-    while (!this.userService.isReady) {
+    while (!this.userService.isReady()) {
       await new Promise(f => setTimeout(f, 500));
     }
     this.initUserSocketEvents();
   }
 
   async initContacts() {
-    while (!this.contactService.isReady) {
+    while (!this.contactService.isReady()) {
       await new Promise(f => setTimeout(f, 500));
     }
     this.contactService.getContacts().forEach((contact: Contact) => {
-      console.log('register contact');
       this.receiveShorMessage(contact);
     });
   }
