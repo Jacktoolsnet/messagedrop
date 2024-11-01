@@ -7,6 +7,7 @@ import { User } from '../interfaces/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,21 +16,40 @@ import { ProfileConfirmRequestComponent } from '../components/user/profile-confi
 export class SocketioService {
   private socket: Socket;
   private ioConfig: SocketIoConfig = { url: `${environment.apiUrl}`, options: { transports: ['websocket'] } };
-  private connected: boolean = false;
+  private ready: boolean = false;
   private joinedUserRoom: boolean = false;
-  private user!: User;
 
   constructor(
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private userService: UserService,
     private contactService: ContactService
   ) {
     this.socket = new Socket(this.ioConfig);
     this.socket.on("connect", () => {
-      this.connected = this.socket.ioSocket.connected;
+      this.ready = this.socket.ioSocket.connected;
     });
     this.socket.on("disconnect", () => {
-      this.connected = false;
+      this.ready = false;
+    });
+    this.initUser()
+    this.initContacts();
+  }
+
+  async initUser() {
+    while (!this.userService.isReady) {
+      await new Promise(f => setTimeout(f, 500));
+    }
+    this.initUserSocketEvents();
+  }
+
+  async initContacts() {
+    while (!this.contactService.isReady) {
+      await new Promise(f => setTimeout(f, 500));
+    }
+    this.contactService.getContacts().forEach((contact: Contact) => {
+      console.log('register contact');
+      this.receiveShorMessage(contact);
     });
   }
 
@@ -45,16 +65,15 @@ export class SocketioService {
     this.socket.disconnect();
   }
 
-  public isConnected(): boolean {
-    return this.connected;
+  public isReady(): boolean {
+    return this.ready;
   }
 
   public hasJoinedUserRoom(): boolean {
     return this.joinedUserRoom;
   }
 
-  public initSocketEvents(user: User) {
-    this.user = user;
+  public initUserSocketEvents() {
     // Error handling
     this.socket.on("connect_error", (err: any) => {
       // the reason of the error, for example "xhr poll error"
@@ -67,8 +86,8 @@ export class SocketioService {
       console.log(err.context);
     });
     // User room.
-    this.socket.emit('user:joinUserRoom', user.id);
-    this.socket.on(`${user.id}`, (payload: { status: number, type: String, content: any }) => {
+    this.socket.emit('user:joinUserRoom', this.userService.getUser().id);
+    this.socket.on(`${this.userService.getUser().id}`, (payload: { status: number, type: String, content: any }) => {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
@@ -88,7 +107,7 @@ export class SocketioService {
 
   public requestProfileForContact() {
     // console.log('requestProfileForContact init')
-    this.socket.on(`requestProfileForContact:${this.user.id}`, (payload: { status: number, contact: Contact }) => {
+    this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: { status: number, contact: Contact }) => {
       // console.log('requestProfileForContact event')
       const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
         data: { contact: payload.contact },
@@ -101,8 +120,8 @@ export class SocketioService {
 
       dialogRef.afterClosed().subscribe(result => {
         if (result) {
-          payload.contact.name = this.user.name;
-          payload.contact.base64Avatar = this.user.base64Avatar;
+          payload.contact.name = this.userService.getUser().name;
+          payload.contact.base64Avatar = this.userService.getUser().base64Avatar;
           payload.contact.provided = true;
           this.socket.emit('contact:provideUserProfile', payload.contact);
         } else {

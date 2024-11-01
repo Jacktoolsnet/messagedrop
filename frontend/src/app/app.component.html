@@ -63,7 +63,7 @@
         <mat-icon class="material-symbols-outlined">personal_places</mat-icon>
         <span>My places</span>
     </button>
-    <button mat-menu-item (click)="showContacts()">
+    <button mat-menu-item *ngIf="contactService.isReady()" (click)="openContactListDialog()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>My contacts</span>
     </button>

@@ -40,10 +40,8 @@ import { UserComponent } from './components/user/user.component';
 import { ConnectService } from './services/connect.service';
 import { Connect } from './interfaces/connect';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
-import { Contact } from './interfaces/contact';
 import { CryptoService } from './services/crypto.service';
 import { ContactService } from './services/contact.service';
-import { GetContactsResponse } from './interfaces/get-contacts-response';
 
 @Component({
   selector: 'app-root',
@@ -72,7 +70,6 @@ export class AppComponent implements OnInit {
   public messages: Message[] = [];
   public places: Place[] = [];
   public selectedPlace: Place | undefined = undefined;
-  public contacts: Contact[] = [];
   public myHistory: string[] = [];
   public notes: Note[] = [];
   public allUserNotes: Note[] = [];
@@ -90,11 +87,13 @@ export class AppComponent implements OnInit {
     public mapService: MapService,
     private geolocationService: GeolocationService,
     public userService: UserService,
+    private socketioService: SocketioService,
+    private connectService: ConnectService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
     private noteService: NoteService,
     private placeService: PlaceService,
-    private contactService: ContactService,
+    public contactService: ContactService,
     private statisticService: StatisticService,
     private snackBar: MatSnackBar,
     public messageDialog: MatDialog,
@@ -105,9 +104,7 @@ export class AppComponent implements OnInit {
     public userProfileDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
-    private swPush: SwPush,
-    private socketioService: SocketioService,
-    private connectService: ConnectService
+    private swPush: SwPush
   ) {
     this.initApp();
   }
@@ -135,7 +132,7 @@ export class AppComponent implements OnInit {
         }
       }
       if (result.notification.data.primaryKey.type = 'contact') {
-        this.showContacts();
+        this.openContactListDialog();
       }
     });
     this.platformLocation.onPopState((event) => {
@@ -255,26 +252,6 @@ export class AppComponent implements OnInit {
         error: (err) => {
           this.places = [];
           this.openPlaceListDialog();
-        },
-        complete: () => { }
-      });
-  }
-
-  public showContacts() {
-    this.contactService.getByUserId(this.userService.getUser().id)
-      .subscribe({
-        next: (getContactsResponse: GetContactsResponse) => {
-          this.contacts = [...getContactsResponse.rows];
-          this.contacts.forEach((contact: Contact) => {
-            this.socketioService.receiveShorMessage(contact);
-          });
-          this.openContactListDialog();
-        },
-        error: (err) => {
-          if (err.status === 404) {
-            this.contacts = [];
-            this.openContactListDialog();
-          }
         },
         complete: () => { }
       });
@@ -601,11 +578,11 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private openContactListDialog(): void {
+  public openContactListDialog(): void {
     const dialogRef = this.contactListDialog.open(ContactlistComponent, {
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), contacts: this.contacts },
+      data: { user: this.userService.getUser(), contacts: this.contactService.getContacts() },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',

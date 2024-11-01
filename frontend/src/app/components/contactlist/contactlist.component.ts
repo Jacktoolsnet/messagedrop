@@ -45,7 +45,6 @@ import { SocketioService } from '../../services/socketio.service';
   styleUrl: './contactlist.component.css'
 })
 export class ContactlistComponent implements OnInit {
-  public contacts!: Contact[];
   private contactToDelete!: Contact
   public user!: User;
   public animation!: Animation;
@@ -57,7 +56,7 @@ export class ContactlistComponent implements OnInit {
     private userService: UserService,
     private socketioService: SocketioService,
     private connectService: ConnectService,
-    private contactService: ContactService,
+    public contactService: ContactService,
     private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public contactMessageDialog: MatDialog,
@@ -68,7 +67,6 @@ export class ContactlistComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { user: User, contacts: Contact[] }
   ) {
     this.user = data.user;
-    this.contacts = data.contacts;
   }
 
   ngOnInit(): void {
@@ -134,7 +132,8 @@ export class ContactlistComponent implements OnInit {
                             next: createContactResponse => {
                               if (createContactResponse.status === 200) {
                                 data.contact.id = createContactResponse.contactId;
-                                this.contacts.unshift(data.contact);
+                                this.contactService.getContacts().unshift(data.contact);
+                                this.socketioService.receiveShorMessage(data.contact)
                                 this.contactService.updateContactProfile(data.contact)
                                   .subscribe({
                                     next: simpleStatusResponse => { },
@@ -200,7 +199,7 @@ export class ContactlistComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.contacts.splice(this.contacts.findIndex(contact => contact.id !== this.contactToDelete.id), 1);
+                this.contactService.getContacts().splice(this.contactService.getContacts().findIndex(contact => contact.id !== this.contactToDelete.id), 1);
               }
             },
             error: (err) => {

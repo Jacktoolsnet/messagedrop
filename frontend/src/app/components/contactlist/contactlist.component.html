@@ -12,7 +12,7 @@
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
-        <div *ngIf="contacts.length == 0" class="item">
+        <div *ngIf="contactService.getContacts().length == 0" class="item">
             <mat-card>
                 <mat-card-header class="header">
                     <mat-card-title>Contacts</mat-card-title>
@@ -22,8 +22,8 @@
                     device and only visible to me.<br></mat-card-content>
             </mat-card>
         </div>
-        <div *ngIf="contacts.length != 0">
-            <div class="item" *ngFor="let contact of contacts; index as i">
+        <div *ngIf="contactService.getContacts().length != 0">
+            <div class="item" *ngFor="let contact of contactService.getContacts(); index as i">
                 <mat-card>
                     <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != '' && contact.base64Avatar != 'undefined'"
                         class="avatar" src="{{contact.base64Avatar}}" />

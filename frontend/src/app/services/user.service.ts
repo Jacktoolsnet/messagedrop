@@ -40,7 +40,8 @@ export class UserService {
     name: '',
     base64Avatar: ''
   };
-  private keyEncryptionDecryption!: CryptoKey;
+
+  private ready: boolean = false;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -53,8 +54,7 @@ export class UserService {
     private http: HttpClient,
     private swPush: SwPush,
     private style: StyleService,
-    private cryptoService: CryptoService,
-    private socketioService: SocketioService
+    private cryptoService: CryptoService
   ) {
     this.loadUserFromLocalStorage();
     this.initUser();
@@ -114,7 +114,7 @@ export class UserService {
                 .subscribe(createUserResponse => {
                   this.user!.id = createUserResponse.userId;
                   this.saveUser(this.user!);
-                  this.socketioService.initSocketEvents(this.user);
+                  this.ready = true;
                 });
             });
         });
@@ -123,21 +123,25 @@ export class UserService {
       this.checkUserById(this.user)
         .subscribe({
           next: (data) => {
-            this.socketioService.initSocketEvents(this.user);
           },
           error: (err) => {
             // Create the user when it does not exist in the database.
             if (err.status === 404) {
               this.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
                 .subscribe(createUserResponse => {
-                  this.socketioService.initSocketEvents(this.user);
+                  this.ready = true;
                 });
             }
           },
           complete: () => {
+            this.ready = true;
           }
         });
     }
+  }
+
+  isReady(): boolean {
+    return this.ready;
   }
 
   getUser(): User {

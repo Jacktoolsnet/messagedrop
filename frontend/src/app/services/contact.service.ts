@@ -8,23 +8,62 @@ import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { ShortMessage } from '../interfaces/short-message';
+import { UserService } from './user.service';
+import { SocketioService } from './socketio.service';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class ContactService {
+
+  private contacts: Contact[] = [];
+  private ready: boolean = false;
 
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type':  'application/json',
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${environment.apiToken}`
     })
   };
 
-  constructor(private http: HttpClient) { }
+  constructor(
+    private http: HttpClient,
+    private userService: UserService
+  ) {
+    this.initContacts();
+  }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
+  }
+
+  async initContacts() {
+    while (!this.userService.isReady) {
+      await new Promise(f => setTimeout(f, 500));
+    }
+    this.getByUserId(this.userService.getUser().id)
+      .subscribe({
+        next: (getContactsResponse: GetContactsResponse) => {
+          this.contacts = [...getContactsResponse.rows];
+        },
+        error: (err) => {
+          if (err.status === 404) {
+            this.contacts = [];
+          }
+        },
+        complete: () => {
+          this.ready = true;
+        }
+      });
+  }
+
+  getContacts(): Contact[] {
+    return this.contacts;
+  }
+
+  isReady(): boolean {
+    return this.ready;
   }
 
   createContact(contact: Contact) {
