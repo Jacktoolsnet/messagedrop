@@ -10,6 +10,7 @@ import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { ShortMessage } from '../interfaces/short-message';
 import { UserService } from './user.service';
 import { SocketioService } from './socketio.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +30,8 @@ export class ContactService {
 
   constructor(
     private http: HttpClient,
-    private userService: UserService
+    private userService: UserService,
+    private snackBar: MatSnackBar
   ) {
     this.initContacts();
   }
@@ -46,15 +48,17 @@ export class ContactService {
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           this.contacts = [...getContactsResponse.rows];
+          this.ready = true;
         },
         error: (err) => {
           if (err.status === 404) {
             this.contacts = [];
+            this.ready = true;
+          } else {
+            this.ready = false;
           }
         },
-        complete: () => {
-          this.ready = true;
-        }
+        complete: () => { }
       });
   }
 
@@ -66,16 +70,29 @@ export class ContactService {
     return this.ready;
   }
 
-  createContact(contact: Contact) {
+  createContact(contact: Contact, socketioService: SocketioService) {
     let body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
       'hint': contact.hint
     };
-    return this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
+    this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: createContactResponse => {
+          if (createContactResponse.status === 200) {
+            contact.id = createContactResponse.contactId;
+            this.getContacts().unshift(contact);
+            socketioService.receiveShorMessage(contact)
+            this.updateContactProfile(contact);
+            this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
+          }
+        },
+        error: (err) => { this.snackBar.open(err.message, 'OK'); },
+        complete: () => { }
+      });
   }
 
   updateContactProfile(contact: Contact) {
@@ -84,13 +101,18 @@ export class ContactService {
       'name': contact.name,
       'base64Avatar': contact.base64Avatar
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
+    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: simpleStatusResponse => { },
+        error: (err) => { },
+        complete: () => { }
+      });
   }
 
-  updateContactMessage(contact: Contact, shortMessage: ShortMessage) {
+  updateContactMessage(contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
     let body = {
       'contactId': contact.id,
       'userId': contact.userId,
@@ -98,10 +120,20 @@ export class ContactService {
       'message': shortMessage.message,
       'style': shortMessage.style
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
+    this.http.post<boolean>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: simpleStatusResponse => {
+          contact.userMessage = shortMessage.message;
+          contact.userMessageStyle = shortMessage.style;
+          contact.lastMessageFrom = 'user';
+          socketioService.sendShortMessageToContact(contact);
+        },
+        error: (err) => { },
+        complete: () => { }
+      });
   }
 
   getByUserId(userId: string) {
@@ -118,24 +150,53 @@ export class ContactService {
       );
   }
 
-  deleteContact(contact: Contact) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/delete/${contact.id}`, this.httpOptions)
+  deleteContact(contactToDelete: Contact) {
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/delete/${contactToDelete.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            this.getContacts().splice(this.getContacts().findIndex(contact => contact.id !== contactToDelete.id), 1);
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 
   subscribe(contact: Contact) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/subscribe/${contact.id}`, this.httpOptions)
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/subscribe/${contact.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            contact.subscribed = true;
+          }
+        },
+        error: (err) => { },
+        complete: () => { }
+      });
   }
 
   unsubscribe(contact: Contact) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/unsubscribe/${contact.id}`, this.httpOptions)
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/unsubscribe/${contact.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            contact.subscribed = false;
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 }

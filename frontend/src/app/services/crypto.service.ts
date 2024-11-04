@@ -23,7 +23,7 @@ export class CryptoService {
     );
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    const keypair: Keypair = {publicKey, privateKey};
+    const keypair: Keypair = { publicKey, privateKey };
     return keypair;
   }
 
@@ -38,7 +38,7 @@ export class CryptoService {
     );
     const publicKey = await crypto.subtle.exportKey("jwk", keyPair.publicKey);
     const privateKey = await crypto.subtle.exportKey("jwk", keyPair.privateKey);
-    const keypair: Keypair = {publicKey, privateKey};
+    const keypair: Keypair = { publicKey, privateKey };
     return keypair;
   }
 
@@ -67,17 +67,17 @@ export class CryptoService {
     let ecKeyImportParams: EcKeyImportParams = {
       name: "ECDSA",
       namedCurve: "P-384",
-    };     
-    let publicKey = await crypto.subtle.importKey("jwk", signingPublicKey, ecKeyImportParams, true, ["verify"]);     
+    };
+    let publicKey = await crypto.subtle.importKey("jwk", signingPublicKey, ecKeyImportParams, true, ["verify"]);
     verified = await crypto.subtle.verify({
-        name: "ECDSA",
-        hash: { name: "SHA-384" },
-      },
+      name: "ECDSA",
+      hash: { name: "SHA-384" },
+    },
       publicKey,
-      signature, 
+      signature,
       payloadBuffer
     );
     return verified
   }
-  
+
 }
