@@ -7,10 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { Mode } from '../../../interfaces/mode';
-import { StyleService } from '../../../services/style.service';
-import { PlaceComponent } from '../../place/place.component';
 import { Contact } from '../../../interfaces/contact';
-import { Connect } from '../../../interfaces/connect';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
@@ -38,8 +35,7 @@ export class ConnectComponent implements OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<PlaceComponent>,
-    private style: StyleService,
+    public dialogRef: MatDialogRef<ConnectComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact, connectId: string }
   ) { }
 

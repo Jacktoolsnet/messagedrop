@@ -21,6 +21,7 @@ import { UserService } from '../../services/user.service';
 import { ContactMessageComponent } from '../contact/message/message.component';
 import { ShortMessage } from '../../interfaces/short-message';
 import { SocketioService } from '../../services/socketio.service';
+import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({
   selector: 'app-contactlist',
@@ -56,6 +57,7 @@ export class ContactlistComponent implements OnInit {
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public contactMessageDialog: MatDialog,
     public connectDialog: MatDialog,
+    public scannerDialog: MatDialog,
     public dialog: MatDialog,
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: { user: User, contacts: Contact[] }
@@ -100,6 +102,43 @@ export class ContactlistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.contact) {
         this.connectService.getById(data.connectId, data.contact, this.socketioService);
+      }
+    });
+  }
+
+  openScannerDialog(): void {
+    let contact: Contact = {
+      id: "",
+      userId: this.user.id,
+      contactUserId: '',
+      name: '',
+      subscribed: false,
+      provided: false,
+      userMessage: '',
+      userMessageStyle: '',
+      contactUserMessage: '',
+      contactUserMessageStyle: '',
+      lastMessageFrom: ''
+    };
+    const dialogRef = this.scannerDialog.open(ScannerComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: "" },
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      minHeight: 'auto',
+      height: 'auto',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.contact) {
+        console.log(data.contact);
       }
     });
   }

@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "^18.2.10",
     "@angular/router": "^18.2.10",
     "@angular/service-worker": "^18.2.10",
+    "@zxing/ngx-scanner": "^18.0.1",
     "angularx-qrcode": "^18.0.2",
     "buffer": "^6.0.3",
     "colord": "^2.9.3",
