@@ -33,7 +33,7 @@ const init = function (db) {
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
-            CONSTRAINT FK_CONTACT_USER_ID FOREIGN KEY (${columnUserId}) 
+            CONSTRAINT FK_CONTACT_USER_ID FOREIGN KEY (${columnContactUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE 
         );`;
@@ -77,7 +77,7 @@ const update = function (db, contactId, name, base64Avatar, callback) {
         SET ${columnName} = '${name}', 
         ${columnBase64Avatar} = '${base64Avatar}'
         WHERE ${columnContactId} = ?;`;
-        
+
         db.run(sql, [contactId], (err) => {
             callback(err);
         });
@@ -94,7 +94,7 @@ const updateUserMessage = function (db, contactId, message, style, callback) {
         ${columnUserMessageStyle} = '${style}',
         ${columnLastMessageFrom} = 'user'
         WHERE ${columnContactId} = ?;`;
-        
+
         db.run(sql, [contactId], (err) => {
             callback(err);
         });
@@ -112,7 +112,7 @@ const updateContactUserMessage = function (db, userId, contactUserId, message, s
         ${columnLastMessageFrom} = 'contactUser'
         WHERE ${columnUserId} = ?
         AND ${columnContactUserId} = ?;`;
-        
+
         db.run(sql, [contactUserId, userId], (err) => {
             callback(err);
         });

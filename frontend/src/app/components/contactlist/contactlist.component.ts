@@ -111,6 +111,7 @@ export class ContactlistComponent implements OnInit {
       id: "",
       userId: this.user.id,
       contactUserId: '',
+      hint: 'QR-Code',
       name: '',
       subscribed: false,
       provided: false,
@@ -120,6 +121,7 @@ export class ContactlistComponent implements OnInit {
       contactUserMessageStyle: '',
       lastMessageFrom: ''
     };
+
     const dialogRef = this.scannerDialog.open(ScannerComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -138,7 +140,7 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.contact) {
-        console.log(data.contact);
+        this.contactService.createContact(data?.contact, this.socketioService);
       }
     });
   }
