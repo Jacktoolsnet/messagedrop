@@ -221,7 +221,7 @@ export class PlacelistComponent implements OnInit {
   }
 
   public flyTo(place: Place) {
-    let location: Location = this.geolocationService.getLocationFromPlusCode(place.plusCodes[0].plusCode);
+    let location: Location = this.geolocationService.getLocationFromPlusCode(place.plusCodes[0]);
     this.mapService.flyToWithZoom(location, 18);
     this.dialogRef.close();
   }

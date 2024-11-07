@@ -37,6 +37,21 @@ router.post('/update', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
+router.post('/updatepluscodes', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
+  tablePlace.updatePlusCodes(req.database.db, req.body.id, req.body.pluscodes, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.setHeader('Content-Type', 'application/json');
+    res.status(response.status);
+    res.json(response);
+  });
+});
+
 router.get('/get/:placeId', [security.checkToken], function (req, res) {
   let response = { 'status': 0 };
   tablePlace.getById(req.database.db, req.params.placeId, function (err, row) {
@@ -94,7 +109,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'userId': row.userId,
             'name': row.name,
             'subscribed': row.subscribed === 0 ? false : true,
-            'plusCodes': []
+            'plusCodes': row.plusCodes
           });
         });
       }

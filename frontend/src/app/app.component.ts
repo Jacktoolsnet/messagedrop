@@ -253,7 +253,7 @@ export class AppComponent implements OnInit {
 
   private updateDataForLocation(location: Location, forceSearch: boolean) {
     if (undefined != this.selectedPlace) {
-      this.isPartOfPlace = this.selectedPlace?.plusCodes.some(element => element.plusCode === this.mapService.getMapLocation().plusCode);
+      this.isPartOfPlace = this.selectedPlace?.plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
     } else {
       if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {
         // Clear markerLocations
@@ -511,11 +511,11 @@ export class AppComponent implements OnInit {
         this.mapService.setMapMinMaxZoom(18, 19);
         this.selectedPlace = data;
         this.selectedPlace.plusCodes.forEach(plusCode => {
-          this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode.plusCode));
+          this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode));
         });
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         if (this.selectedPlace.plusCodes.length != 0) {
-          let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0].plusCode);
+          let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0]);
           this.mapService.flyToWithZoom(location, 18);
         }
       }

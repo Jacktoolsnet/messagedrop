@@ -44,18 +44,16 @@ export class PlaceService {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
-          this.places = [...getPlacesResponse.rows];
-          this.ready = true;
-          this.places.forEach(place => {
-            this.getPlacePlusCodes(place)
-              .subscribe({
-                next: (getPlacesPluscodeResponse: GetPlacePlusCodeResponse) => {
-                  place.plusCodes = [...getPlacesPluscodeResponse.rows];
-                },
-                error: (err) => { },
-                complete: () => { }
-              });
+          getPlacesResponse.rows.forEach(row => {
+            this.places.push({
+              id: row.id,
+              userId: row.userId,
+              name: row.name,
+              subscribed: row.subscribed,
+              plusCodes: null === row.plusCodes ? [] : JSON.parse(row.plusCodes)
+            });
           });
+          this.ready = true;
         },
         error: (err) => {
           if (err.status === 404) {
@@ -142,22 +140,25 @@ export class PlaceService {
   }
 
   addPlusCodeToPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/create/${place.id}/${location.plusCode}`, this.httpOptions)
+    place.plusCodes.push(location.plusCode);
+    let body = {
+      'id': place.id,
+      'pluscodes': JSON.stringify(location.plusCode)
+    };
+    console.log(body);
+    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/updatepluscodes`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            place.plusCodes.push({
-              placeId: place.id,
-              plusCode: location.plusCode
-            });
             mapService.addPlaceLocationRectange(location);
             isPartOfPlace = true;
           }
         },
         error: (err) => {
+          place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
           isPartOfPlace = false;
         },
         complete: () => { }
@@ -165,19 +166,24 @@ export class PlaceService {
   }
 
   removePlusCodeFromPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/remove/${place.id}/${location.plusCode}`, this.httpOptions)
+    place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
+    let body = {
+      'id': place.id,
+      'pluscodes': JSON.stringify(location.plusCode)
+    };
+    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/updatepluscodes`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            place.plusCodes.splice(place.plusCodes.findIndex(item => item.plusCode === location.plusCode), 1)
             isPartOfPlace = false;
             mapService.removePlaceLocationRectange(location);
           }
         },
         error: (err) => {
+          place.plusCodes.push(location.plusCode);
           isPartOfPlace = true;
         },
         complete: () => { }
