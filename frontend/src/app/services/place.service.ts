@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 import { catchError, throwError } from 'rxjs';
-import { GeolocationService } from './geolocation.service';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { Place } from '../interfaces/place';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
@@ -10,23 +9,72 @@ import { Location } from '../interfaces/location';
 import { GetPlacePlusCodeResponse } from '../interfaces/get-place-plus-code-response copy';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { CreatePlaceResponse } from '../interfaces/create-place-response';
+import { UserService } from './user.service';
+import { MapService } from './map.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PlaceService {
 
+  public places: Place[] = [];
+  private ready: boolean = false;
+
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type':  'application/json',
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${environment.apiToken}`
     })
   };
 
-  constructor(private http: HttpClient, private geolocationService: GeolocationService) { }
+  constructor(
+    private userService: UserService,
+    private http: HttpClient) {
+    this.initPlaces();
+  }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
+  }
+
+  async initPlaces() {
+    while (!this.userService.isReady) {
+      await new Promise(f => setTimeout(f, 500));
+    }
+    this.getByUserId(this.userService.getUser().id)
+      .subscribe({
+        next: (getPlacesResponse: GetPlacesResponse) => {
+          this.places = [...getPlacesResponse.rows];
+          this.ready = true;
+          this.places.forEach(place => {
+            this.getPlacePlusCodes(place)
+              .subscribe({
+                next: (getPlacesPluscodeResponse: GetPlacePlusCodeResponse) => {
+                  place.plusCodes = [...getPlacesPluscodeResponse.rows];
+                },
+                error: (err) => { },
+                complete: () => { }
+              });
+          });
+        },
+        error: (err) => {
+          if (err.status === 404) {
+            this.places = [];
+            this.ready = true;
+          } else {
+            this.ready = false;
+          }
+        },
+        complete: () => { }
+      });
+  }
+
+  getPlaces(): Place[] {
+    return this.places;
+  }
+
+  isReady(): boolean {
+    return this.ready;
   }
 
   createPlace(place: Place) {
@@ -93,18 +141,47 @@ export class PlaceService {
       );
   }
 
-  addPlusCodeToPlace(place: Place, location: Location) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/create/${place.id}/${location.plusCode}`, this.httpOptions)
+  addPlusCodeToPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/create/${place.id}/${location.plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            place.plusCodes.push({
+              placeId: place.id,
+              plusCode: location.plusCode
+            });
+            mapService.addPlaceLocationRectange(location);
+            isPartOfPlace = true;
+          }
+        },
+        error: (err) => {
+          isPartOfPlace = false;
+        },
+        complete: () => { }
+      });;
   }
 
-  removePlusCodeFromPlace(place: Place, location: Location) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/remove/${place.id}/${location.plusCode}`, this.httpOptions)
+  removePlusCodeFromPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/placepluscode/remove/${place.id}/${location.plusCode}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            place.plusCodes.splice(place.plusCodes.findIndex(item => item.plusCode === location.plusCode), 1)
+            isPartOfPlace = false;
+            mapService.removePlaceLocationRectange(location);
+          }
+        },
+        error: (err) => {
+          isPartOfPlace = true;
+        },
+        complete: () => { }
+      });
   }
 
   getPlacePlusCodes(place: Place) {

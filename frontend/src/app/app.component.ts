@@ -32,8 +32,6 @@ import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { PlaceService } from './services/place.service';
 import { Place } from './interfaces/place';
-import { GetPlacePlusCodeResponse } from './interfaces/get-place-plus-code-response copy';
-import { GetPlacesResponse } from './interfaces/get-places-response';
 import { SwPush } from '@angular/service-worker';
 import { SocketioService } from './services/socketio.service';
 import { UserComponent } from './components/user/user.component';
@@ -68,7 +66,6 @@ import { ContactService } from './services/contact.service';
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   public messages: Message[] = [];
-  public places: Place[] = [];
   public selectedPlace: Place | undefined = undefined;
   public myHistory: string[] = [];
   public notes: Note[] = [];
@@ -87,12 +84,11 @@ export class AppComponent implements OnInit {
     public mapService: MapService,
     private geolocationService: GeolocationService,
     public userService: UserService,
-    private socketioService: SocketioService,
     private connectService: ConnectService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
     private noteService: NoteService,
-    private placeService: PlaceService,
+    public placeService: PlaceService,
     public contactService: ContactService,
     private statisticService: StatisticService,
     private snackBar: MatSnackBar,
@@ -232,66 +228,14 @@ export class AppComponent implements OnInit {
       });
   }
 
-  public showPlaces() {
-    this.placeService.getByUserId(this.userService.getUser().id)
-      .subscribe({
-        next: (getPlacesResponse: GetPlacesResponse) => {
-          this.places = [...getPlacesResponse.rows];
-          this.places.forEach(place => {
-            this.placeService.getPlacePlusCodes(place)
-              .subscribe({
-                next: (getPlacesPluscodeResponse: GetPlacePlusCodeResponse) => {
-                  place.plusCodes = [...getPlacesPluscodeResponse.rows];
-                },
-                error: (err) => { },
-                complete: () => { }
-              });
-          });
-          this.openPlaceListDialog();
-        },
-        error: (err) => {
-          this.places = [];
-          this.openPlaceListDialog();
-        },
-        complete: () => { }
-      });
-  }
-
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
-    this.placeService.addPlusCodeToPlace(this.selectedPlace!, location)
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.selectedPlace?.plusCodes.push({
-              placeId: this.selectedPlace?.id,
-              plusCode: location.plusCode
-            });
-            this.mapService.addPlaceLocationRectange(location);
-            this.isPartOfPlace = true;
-          }
-        },
-        error: (err) => {
-        },
-        complete: () => { }
-      });
+    this.placeService.addPlusCodeToPlace(this.selectedPlace!, location, this.isPartOfPlace, this.mapService);
   }
 
   public removeLocationFromPlace() {
     let location: Location = this.mapService.getMapLocation();
-    this.placeService.removePlusCodeFromPlace(this.selectedPlace!, location)
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.selectedPlace?.plusCodes.splice(this.selectedPlace?.plusCodes.findIndex(item => item.plusCode === location.plusCode), 1)
-            this.isPartOfPlace = false;
-            this.mapService.removePlaceLocationRectange(location);
-          }
-        },
-        error: (err) => {
-        },
-        complete: () => { }
-      });
+    this.placeService.removePlusCodeFromPlace(this.selectedPlace!, location, this.isPartOfPlace, this.mapService);
   }
 
   public finishEditingPlace() {
@@ -540,11 +484,11 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private openPlaceListDialog(): void {
+  public openPlaceListDialog(): void {
     const dialogRef = this.placeListDialog.open(PlacelistComponent, {
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), places: this.places },
+      data: { user: this.userService.getUser(), places: this.placeService.getPlaces() },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
