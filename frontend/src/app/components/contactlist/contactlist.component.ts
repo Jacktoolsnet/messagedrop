@@ -5,7 +5,6 @@ import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
 import { User } from '../../interfaces/user';
 import { StyleService } from '../../services/style.service';
-import { PlacelistComponent } from '../placelist/placelist.component';
 import { CommonModule } from '@angular/common';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -54,7 +53,7 @@ export class ContactlistComponent implements OnInit {
     public socketioService: SocketioService,
     private connectService: ConnectService,
     public contactService: ContactService,
-    public dialogRef: MatDialogRef<PlacelistComponent>,
+    public dialogRef: MatDialogRef<any>,
     public contactMessageDialog: MatDialog,
     public connectDialog: MatDialog,
     public scannerDialog: MatDialog,

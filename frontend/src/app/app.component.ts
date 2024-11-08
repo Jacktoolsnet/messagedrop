@@ -238,7 +238,7 @@ export class AppComponent implements OnInit {
 
   public finishEditingPlace() {
     this.mapService.setMapMinMaxZoom(3, 19);
-    this.placeService.getSelectedPlace().id = 0;
+    this.placeService.getSelectedPlace().id = '';
     this.placeService.getSelectedPlace().userId = '';
     this.placeService.getSelectedPlace().name = '';
     this.placeService.getSelectedPlace().subscribed = false;

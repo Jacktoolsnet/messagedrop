@@ -1,5 +1,5 @@
 export interface Place {
-    id: number,
+    id: string,
     userId: string,
     name: string,
     subscribed: boolean,

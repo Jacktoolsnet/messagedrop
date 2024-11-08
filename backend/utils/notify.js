@@ -3,12 +3,11 @@ const webpush = require('web-push');
 const placeSubscriptions = function (logger, db, plusCode, userId, message) {
     try {
         let sql = `
-        SELECT tablePlacePlusCode.placeId, tablePlace.subscribed, tablePlace.userId, tablePlace.name, tableUser.subscription
-        FROM tablePlacePlusCode
-        INNER JOIN tablePlace ON tablePlace.id = tablePlacePlusCode.placeId
+        SELECT tablePlace.id, tablePlace.userId, tablePlace.subscribed, tablePlace.name, tablePlace.plusCodes, tableUser.subscription
+        FROM tablePlace
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
-        WHERE plusCode = '${plusCode}'
-        AND subscribed = 1
+        WHERE tablePlace.plusCodes LIKE '%${plusCode}%'
+        AND tablePlace.subscribed = 1
         AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
             rows.forEach((row) => {

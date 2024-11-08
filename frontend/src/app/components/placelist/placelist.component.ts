@@ -180,7 +180,7 @@ export class PlacelistComponent implements OnInit {
 
   openPlaceDialog(): void {
     let place: Place = {
-      id: 0,
+      id: '',
       userId: this.user.id,
       name: '',
       subscribed: false,

@@ -8,7 +8,6 @@ const tableMessage = require('./tableMessage');
 const tableLike = require('./tableLike');
 const tableDislike = require('./tableDislike');
 const tablePlace = require('./tablePlace');
-const tablePlacePlusCode = require('./tablePlacePlusCode');
 
 class Database {
 
@@ -34,7 +33,6 @@ class Database {
         tableLike.init(this.db);
         tableDislike.init(this.db);
         tablePlace.init(this.db);
-        tablePlacePlusCode.init(this.db);
         logger.info('Connected to the messagedrop SQlite database.');
       }
     });

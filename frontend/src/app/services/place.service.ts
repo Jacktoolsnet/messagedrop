@@ -18,7 +18,7 @@ export class PlaceService {
 
   private places: Place[] = [];
   private selectedPlace: Place = {
-    id: 0,
+    id: '',
     userId: '',
     name: '',
     subscribed: false,
