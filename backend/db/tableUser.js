@@ -37,19 +37,21 @@ const init = function (db) {
     }
 };
 
-const create = function (db, userId, encryptionPublicKey, signingPublicKey, callback) {
+const create = function (db, userId, encryptionPublicKey, signingPublicKey, subscription, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnUserId}, 
             ${columnEncryptionPublicKey},
-            ${columnSigningPublicKey}, 
+            ${columnSigningPublicKey},
+            ${columnSubscription}, 
             ${columnLastSignOfLife}
         ) 
         VALUES (
             '${userId}', 
             '${encryptionPublicKey}',
             '${signingPublicKey}', 
+            '${subscription}',
             datetime('now')
         );`;
         db.run(sql, (err) => {

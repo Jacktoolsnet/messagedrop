@@ -27,7 +27,7 @@ export class UserService {
     },
     local: '',
     language: '',
-    subscribed: false,
+    subscription: '',
     defaultStyle: '',
     encryptionKeyPair: {
       publicKey: {},
@@ -73,7 +73,7 @@ export class UserService {
         location: { latitude: 0, longitude: 0, plusCode: '' },
         local: navigator.language,
         language: navigator.language.split('-')[0],
-        subscribed: false,
+        subscription: '',
         defaultStyle: this.style.getRandomStyle(),
         encryptionKeyPair: {
           publicKey: {},
@@ -92,7 +92,7 @@ export class UserService {
         location: undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: '' },
         local: undefined != userFromLocalStorage.local ? userFromLocalStorage.local : navigator.language,
         language: undefined != userFromLocalStorage.language ? userFromLocalStorage.language : navigator.language.split('-')[0],
-        subscribed: undefined != userFromLocalStorage.subscribed ? userFromLocalStorage.subscribed : false,
+        subscription: undefined != userFromLocalStorage.subscription ? userFromLocalStorage.subscription : '',
         defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
         encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : {},
         signingKeyPair: undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : {},
@@ -127,7 +127,7 @@ export class UserService {
           error: (err) => {
             // Create the user when it does not exist in the database.
             if (err.status === 404) {
-              this.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
+              this.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey, this.user!.subscription)
                 .subscribe(createUserResponse => {
                   this.ready = true;
                 });
@@ -163,11 +163,12 @@ export class UserService {
       );
   }
 
-  restoreUser(userId: string, encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey) {
+  restoreUser(userId: string, encryptionPublicKey: JsonWebKey, signingPublicKey: JsonWebKey, subscription: string) {
     let body = {
       userId,
       encryptionPublicKey: JSON.stringify(encryptionPublicKey),
-      signingPublicKey: JSON.stringify(signingPublicKey)
+      signingPublicKey: JSON.stringify(signingPublicKey),
+      subscription: subscription
     };
     return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
       .pipe(
@@ -203,7 +204,7 @@ export class UserService {
       location: { latitude: 0, longitude: 0, plusCode: '' },
       local: navigator.language,
       language: navigator.language.split('-')[0],
-      subscribed: false,
+      subscription: '',
       defaultStyle: this.style.getRandomStyle(),
       encryptionKeyPair: {
         publicKey: {},
@@ -247,19 +248,19 @@ export class UserService {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                user.subscribed = true;
+                user.subscription = JSON.stringify(subscription);
                 this.saveUser(user);
               }
             },
             error: (err) => {
-              user.subscribed = false;
+              user.subscription = '';
               this.saveUser(user);
             },
             complete: () => { }
           });
       })
       .catch(err => {
-        user.subscribed = false;
+        user.subscription = '';
         this.saveUser(user);
       });
   }

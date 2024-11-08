@@ -142,7 +142,7 @@ export class PlacelistComponent implements OnInit {
     if (Notification.permission !== "granted") {
       this.userService.registerSubscription(this.user);
     }
-    if (!place.subscribed && this.user.subscribed) {
+    if (!place.subscribed && this.user.subscription !== '') {
       // subscribe to place
       this.placeService.subscribe(place)
         .subscribe({

@@ -186,7 +186,7 @@ export class ContactlistComponent implements OnInit {
     if (Notification.permission !== "granted") {
       this.userService.registerSubscription(this.user);
     }
-    if (!contact.subscribed && this.user.subscribed) {
+    if (!contact.subscribed && this.user.subscription !== '') {
       // subscribe to place
       this.contactService.subscribe(contact);
     } else {

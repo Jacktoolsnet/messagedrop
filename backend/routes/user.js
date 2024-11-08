@@ -56,7 +56,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   } else {
     userId = req.body.userId;
   }
-  tableUser.create(req.database.db, userId, req.body.encryptionPublicKey, req.body.signingPublicKey, function (err) {
+  tableUser.create(req.database.db, userId, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.subscription, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
