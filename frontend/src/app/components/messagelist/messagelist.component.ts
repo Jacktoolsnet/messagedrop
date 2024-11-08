@@ -157,31 +157,11 @@ export class MessagelistComponent implements OnInit {
   }
 
   private messageCountView(message: Message) {
-    this.messageService.countView(message)
-      .subscribe({
-        next: (SimpleStatusResponse) => {
-          if (SimpleStatusResponse.status === 200) {
-            message.views = message.views + 1;
-          }
-        },
-        error: (err: any) => {
-        },
-        complete: () => { }
-      });
+    this.messageService.countView(message);
   }
 
   private countComment(parentMessage: Message) {
-    this.messageService.countComment(parentMessage)
-      .subscribe({
-        next: (SimpleStatusResponse) => {
-          if (SimpleStatusResponse.status === 200) {
-            parentMessage.comments = parentMessage.comments + 1;
-          }
-        },
-        error: (err) => {
-        },
-        complete: () => { }
-      });
+    this.messageService.countComment(parentMessage);
   }
 
   public disableMessage(message: Message) {
@@ -195,18 +175,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.disableMessage(message)
-          .subscribe({
-            next: (simpleStatusResponse) => {
-              if (simpleStatusResponse.status === 200) {
-                this.messages = this.messages.filter(element => element.id !== message.id);
-                this.selectedMessages.pop();
-              }
-            },
-            error: (err) => {
-            },
-            complete: () => { }
-          });
+        this.messageService.disableMessage(message, this.selectedMessages);
       }
     });
   }
@@ -312,16 +281,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   getComments(parentMessage: Message) {
-    this.messageService.getCommentsForParentMessage(parentMessage)
-      .subscribe({
-        next: (getMessageResponse) => {
-          this.comments = [...getMessageResponse.rows];
-        },
-        error: (err) => {
-          this.comments = [];
-        },
-        complete: () => { }
-      });
+    this.messageService.getCommentsForParentMessage(parentMessage, this.comments);
   }
 
   public translateMessage(message: Message) {

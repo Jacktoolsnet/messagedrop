@@ -255,24 +255,55 @@ export class MessageService {
   }
 
   countView(message: Message) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countview/${message.id}`, this.httpOptions)
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countview/${message.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (SimpleStatusResponse) => {
+          if (SimpleStatusResponse.status === 200) {
+            message.views = message.views + 1;
+          }
+        },
+        error: (err: any) => {
+        },
+        complete: () => { }
+      });
   }
 
   countComment(message: Message) {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countcomment/${message.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (SimpleStatusResponse) => {
+          if (SimpleStatusResponse.status === 200) {
+            message.comments = message.comments + 1;
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 
-  disableMessage(message: Message) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/disable/${message.id}`, this.httpOptions)
+  disableMessage(message: Message, selectedMessages: Message[]) {
+    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/disable/${message.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            this.messages = this.messages.filter(element => element.id !== message.id);
+            selectedMessages.pop();
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 
   deleteMessage(message: Message, selectedMessages: Message[], dialogRef: MatDialogRef<any>) {
@@ -296,10 +327,19 @@ export class MessageService {
       });
   }
 
-  getCommentsForParentMessage(parentMessage: Message) {
+  getCommentsForParentMessage(parentMessage: Message, comments: Message[]) {
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${parentMessage.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      );
+      )
+      .subscribe({
+        next: (getMessageResponse) => {
+          comments = [...getMessageResponse.rows];
+        },
+        error: (err) => {
+          comments = [];
+        },
+        complete: () => { }
+      });
   }
 }
