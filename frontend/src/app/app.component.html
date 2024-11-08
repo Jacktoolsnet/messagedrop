@@ -1,16 +1,18 @@
 <app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()"
     [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)"
     (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
-<button *ngIf="this.userService.isReady() && undefined === selectedPlace" [matMenuTriggerFor]="userMenu"
-    aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="{}">
+<button *ngIf="this.userService.isReady() && this.placeService.getSelectedPlace().plusCodes.length === 0"
+    [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent"
+    aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
         class="material-symbols-outlined">person</mat-icon>
 </button>
 
-<button *ngIf="this.userService.isReady() && undefined !== selectedPlace"
-    aria-hidden="this.userService.isReady() && undefined === selectedPlace" class="button_profile" mat-fab extended
-    color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
-    <mat-icon aria-hidden="false" class="material-symbols-outlined">where_to_vote</mat-icon>{{selectedPlace.name}}
+<button *ngIf="this.userService.isReady() && this.placeService.getSelectedPlace().plusCodes.length > 0"
+    aria-hidden="this.userService.isReady() && this.placeService.getSelectedPlace().plusCodes.length > 0"
+    class="button_profile" mat-fab extended color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
+    <mat-icon aria-hidden="false"
+        class="material-symbols-outlined">where_to_vote</mat-icon>{{this.placeService.getSelectedPlace().name}}
 </button>
 
 <button *ngIf="!locationReady" [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary"
@@ -22,19 +24,20 @@
     <mat-icon [attr.aria-hidden]="!(this.userService.isReady() && locationReady)"
         class="material-symbols-outlined">adjust</mat-icon>
 </button>
-<button *ngIf="this.userService.isReady() && undefined !== selectedPlace && !isPartOfPlace"
+<button
+    *ngIf="this.userService.isReady() && this.placeService.getSelectedPlace().plusCodes.length > 0 && !isPartOfPlace"
     [attr.aria-hidden]="this.userService.isReady()" class="button_drop" mat-fab color="secondary"
     aria-label="Add_location_to_place" (click)="addLocationToPlace()">
     <mat-icon [attr.aria-hidden]="this.userService.isReady()"
         class="material-symbols-outlined">add_location_alt</mat-icon>
 </button>
-<button *ngIf="this.userService.isReady() && undefined !== selectedPlace && isPartOfPlace"
+<button *ngIf="this.userService.isReady() && this.placeService.getSelectedPlace().plusCodes.length > 0 && isPartOfPlace"
     [attr.aria-hidden]="this.userService.isReady()" class="button_drop" mat-fab color="primary"
     aria-label="Add_location_to_place" (click)="removeLocationFromPlace()">
     <mat-icon [attr.aria-hidden]="this.userService.isReady()"
         class="material-symbols-outlined">wrong_location</mat-icon>
 </button>
-<button *ngIf="this.userService.isReady() && undefined === selectedPlace"
+<button *ngIf="this.userService.isReady() && this.placeService.getSelectedPlace().plusCodes.length === 0"
     [attr.aria-hidden]="!(this.userService.isReady() && locationReady)" [matMenuTriggerFor]="messageMenu"
     class="button_drop" mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
     <mat-icon [attr.aria-hidden]="!(this.userService.isReady() && locationReady)"

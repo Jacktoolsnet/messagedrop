@@ -6,7 +6,6 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { Place } from '../interfaces/place';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
-import { GetPlacePlusCodeResponse } from '../interfaces/get-place-plus-code-response copy';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { CreatePlaceResponse } from '../interfaces/create-place-response';
 import { UserService } from './user.service';
@@ -17,7 +16,14 @@ import { MapService } from './map.service';
 })
 export class PlaceService {
 
-  public places: Place[] = [];
+  private places: Place[] = [];
+  private selectedPlace: Place = {
+    id: 0,
+    userId: '',
+    name: '',
+    subscribed: false,
+    plusCodes: []
+  };
   private ready: boolean = false;
 
   httpOptions = {
@@ -45,12 +51,20 @@ export class PlaceService {
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
           getPlacesResponse.rows.forEach(row => {
+            let plusCodes: string[] = [];
+            if (null !== row.plusCodes && row.plusCodes !== '') {
+              if (JSON.parse(row.plusCodes) instanceof Array) {
+                plusCodes = [...JSON.parse(row.plusCodes)];
+              } else {
+                plusCodes.push(JSON.parse(row.plusCodes));
+              }
+            }
             this.places.push({
               id: row.id,
               userId: row.userId,
               name: row.name,
               subscribed: row.subscribed,
-              plusCodes: null === row.plusCodes ? [] : JSON.parse(row.plusCodes)
+              plusCodes: plusCodes
             });
           });
           this.ready = true;
@@ -69,6 +83,10 @@ export class PlaceService {
 
   getPlaces(): Place[] {
     return this.places;
+  }
+
+  getSelectedPlace(): Place {
+    return this.selectedPlace;
   }
 
   isReady(): boolean {
@@ -143,9 +161,8 @@ export class PlaceService {
     place.plusCodes.push(location.plusCode);
     let body = {
       'id': place.id,
-      'pluscodes': JSON.stringify(location.plusCode)
+      'pluscodes': JSON.stringify(place.plusCodes)
     };
-    console.log(body);
     this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/updatepluscodes`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -169,7 +186,7 @@ export class PlaceService {
     place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
     let body = {
       'id': place.id,
-      'pluscodes': JSON.stringify(location.plusCode)
+      'pluscodes': JSON.stringify(place.plusCodes)
     };
     this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/updatepluscodes`, body, this.httpOptions)
       .pipe(
@@ -190,10 +207,4 @@ export class PlaceService {
       });
   }
 
-  getPlacePlusCodes(place: Place) {
-    return this.http.get<GetPlacePlusCodeResponse>(`${environment.apiUrl}/placepluscode/byPlaceId/${place.id}`, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
 }

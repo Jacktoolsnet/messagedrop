@@ -33,7 +33,6 @@ import { PlacelistComponent } from './components/placelist/placelist.component';
 import { PlaceService } from './services/place.service';
 import { Place } from './interfaces/place';
 import { SwPush } from '@angular/service-worker';
-import { SocketioService } from './services/socketio.service';
 import { UserComponent } from './components/user/user.component';
 import { ConnectService } from './services/connect.service';
 import { Connect } from './interfaces/connect';
@@ -66,7 +65,6 @@ import { ContactService } from './services/contact.service';
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   public messages: Message[] = [];
-  public selectedPlace: Place | undefined = undefined;
   public myHistory: string[] = [];
   public notes: Note[] = [];
   public allUserNotes: Note[] = [];
@@ -230,17 +228,21 @@ export class AppComponent implements OnInit {
 
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
-    this.placeService.addPlusCodeToPlace(this.selectedPlace!, location, this.isPartOfPlace, this.mapService);
+    this.placeService.addPlusCodeToPlace(this.placeService.getSelectedPlace(), location, this.isPartOfPlace, this.mapService);
   }
 
   public removeLocationFromPlace() {
     let location: Location = this.mapService.getMapLocation();
-    this.placeService.removePlusCodeFromPlace(this.selectedPlace!, location, this.isPartOfPlace, this.mapService);
+    this.placeService.removePlusCodeFromPlace(this.placeService.getSelectedPlace()!, location, this.isPartOfPlace, this.mapService);
   }
 
   public finishEditingPlace() {
     this.mapService.setMapMinMaxZoom(3, 19);
-    this.selectedPlace = undefined;
+    this.placeService.getSelectedPlace().id = 0;
+    this.placeService.getSelectedPlace().userId = '';
+    this.placeService.getSelectedPlace().name = '';
+    this.placeService.getSelectedPlace().subscribed = false;
+    this.placeService.getSelectedPlace().plusCodes = [];
     this.mapService.removeAllPlaceLocationRectange();
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
@@ -252,8 +254,8 @@ export class AppComponent implements OnInit {
   }
 
   private updateDataForLocation(location: Location, forceSearch: boolean) {
-    if (undefined != this.selectedPlace) {
-      this.isPartOfPlace = this.selectedPlace?.plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
+    if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
+      this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
     } else {
       if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {
         // Clear markerLocations
@@ -509,13 +511,17 @@ export class AppComponent implements OnInit {
         this.markerLocations.clear()
         this.createMarkerLocations()
         this.mapService.setMapMinMaxZoom(18, 19);
-        this.selectedPlace = data;
-        this.selectedPlace.plusCodes.forEach(plusCode => {
+        this.placeService.getSelectedPlace().id = data.id;
+        this.placeService.getSelectedPlace().userId = data.userId;
+        this.placeService.getSelectedPlace().name = data.name;
+        this.placeService.getSelectedPlace().subscribed = data.subscribed;
+        this.placeService.getSelectedPlace().plusCodes = data.plusCodes;
+        this.placeService.getSelectedPlace().plusCodes?.forEach(plusCode => {
           this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode));
         });
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
-        if (this.selectedPlace.plusCodes.length != 0) {
-          let location: Location = this.geolocationService.getLocationFromPlusCode(this.selectedPlace.plusCodes[0]);
+        if (this.placeService.getSelectedPlace().plusCodes.length != 0) {
+          let location: Location = this.geolocationService.getLocationFromPlusCode(this.placeService.getSelectedPlace().plusCodes[0]);
           this.mapService.flyToWithZoom(location, 18);
         }
       }
