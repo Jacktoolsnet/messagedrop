@@ -39,6 +39,7 @@ import { Connect } from './interfaces/connect';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { CryptoService } from './services/crypto.service';
 import { ContactService } from './services/contact.service';
+import { Subject } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -64,7 +65,6 @@ import { ContactService } from './services/contact.service';
 })
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;
-  public messages: Message[] = [];
   public myHistory: string[] = [];
   public notes: Note[] = [];
   public allUserNotes: Note[] = [];
@@ -73,10 +73,11 @@ export class AppComponent implements OnInit {
   public isUserLocation: boolean = false;
   public initWatchingPosition: boolean = false;
   public mode: typeof Mode = Mode;
-  public lastSearchedLocation: string = '';
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
+  private messageSubject = new Subject<boolean>();
+  private notesSubject = new Subject<boolean>();
 
   constructor(
     public mapService: MapService,
@@ -101,6 +102,12 @@ export class AppComponent implements OnInit {
     private swPush: SwPush
   ) {
     this.initApp();
+    this.messageSubject.subscribe({
+      next: (v) => this.createMarkerLocations(),
+    });
+    this.notesSubject.subscribe({
+      next: (v) => this.createMarkerLocations(),
+    });
   }
 
   private initApp() {
@@ -196,34 +203,10 @@ export class AppComponent implements OnInit {
   }
 
   private getMessages(location: Location, forceSearch: boolean, showMessageList: boolean) {
-    this.messageService.getByPlusCode(location)
-      .subscribe({
-        next: (getMessageResponse) => {
-          this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-          this.messages = [...getMessageResponse.rows];
-          // At the moment build the marekrLocation map here:
-          this.createMarkerLocations()
-          if (showMessageList) {
-            this.openMarkerMessageListDialog(this.messages);
-          }
-        },
-        error: (err) => {
-          this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-          this.messages = [];
-          // At the moment build the marekrLocation map here:
-          this.createMarkerLocations()
-          /**this.snackBarRef = this.snackBar.open("No message found", undefined, {
-            panelClass: ['snack-warning'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            duration: 1000
-          });**/
-        },
-        complete: () => {
-          // Is excecutet before the result is here.
-          // In the future for example get private or bussiness messages and build the marekrLocation map there.
-        }
-      });
+    this.messageService.getByPlusCode(location, this.messageSubject);
+    if (showMessageList) {
+      this.openMarkerMessageListDialog(this.messageService.getMessages());
+    }
   }
 
   public addLocationToPlace() {
@@ -247,26 +230,27 @@ export class AppComponent implements OnInit {
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
-  private getNotesByPlusCode(location: Location) {
+  private getNotesByPlusCode(location: Location, notesSubject: Subject<boolean>) {
     let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
     this.notes = [];
     this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
+    notesSubject.next(true);
   }
 
   private updateDataForLocation(location: Location, forceSearch: boolean) {
     if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
       this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
     } else {
-      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.lastSearchedLocation || forceSearch) {
+      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.messageService.getLastSearchedLocation() || forceSearch) {
         // Clear markerLocations
         this.markerLocations.clear()
         // notes from local device
-        this.getNotesByPlusCode(this.mapService.getMapLocation());
+        this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
         // Messages
         this.getMessages(this.mapService.getMapLocation(), false, false);
         // in the complete event of getMessages
       } else {
-        this.createMarkerLocations();
+        //this.createMarkerLocations();
       }
     }
   }
@@ -291,10 +275,10 @@ export class AppComponent implements OnInit {
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
         if (this.mapService.getMapZoom() > 19) {
-          messages = this.messages.filter((message) => message.plusCode === event.plusCode);
+          messages = this.messageService.getMessages().filter((message) => message.plusCode === event.plusCode);
           this.openMarkerMessageListDialog(messages);
         } else {
-          this.openMarkerMessageListDialog(this.messages);
+          this.openMarkerMessageListDialog(this.messageService.getMessages());
         }
 
         break;
@@ -308,11 +292,11 @@ export class AppComponent implements OnInit {
         break;
       case MarkerType.MULTI:
         if (this.mapService.getMapZoom() > 19) {
-          messages = this.messages.filter((message) => message.plusCode === event.plusCode);
+          messages = this.messageService.getMessages().filter((message) => message.plusCode === event.plusCode);
           notes = this.notes.filter((note) => note.plusCode === event.plusCode);
           this.openMarkerMultiDialog(messages, notes);
         } else {
-          this.openMarkerMultiDialog(this.messages, this.notes);
+          this.openMarkerMultiDialog(this.messageService.getMessages(), this.notes);
         }
         break;
     }
@@ -362,21 +346,8 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
-          .subscribe({
-            next: createMessageResponse => {
-              this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
-              this.updateDataForLocation(this.mapService.getMapLocation(), true);
-              this.statisticService.countMessage()
-                .subscribe({
-                  next: (data) => { },
-                  error: (err) => { },
-                  complete: () => { }
-                });
-            },
-            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-            complete: () => { }
-          });
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
   }
@@ -448,7 +419,7 @@ export class AppComponent implements OnInit {
           });
         },
         error: (err) => {
-          this.messages = [];
+          this.messageService.clearMessages();
           this.snackBarRef = this.snackBar.open("You have not written any messages yet", undefined, {
             panelClass: ['snack-warning'],
             horizontalPosition: 'center',
@@ -481,8 +452,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-      this.getNotesByPlusCode(this.mapService.getMapLocation());
-      this.createMarkerLocations();
+      this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
     });
   }
 
@@ -507,7 +477,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: Place) => {
       if (undefined != data) {
-        this.messages = [];
+        this.messageService.clearMessages();
         this.markerLocations.clear()
         this.createMarkerLocations()
         this.mapService.setMapMinMaxZoom(18, 19);
@@ -601,7 +571,6 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.getMessages(this.mapService.getMapLocation(), true, false);
-      this.createMarkerLocations();
     });
   }
 
@@ -626,8 +595,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-      this.getNotesByPlusCode(this.mapService.getMapLocation());
-      this.createMarkerLocations();
+      this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
     });
   }
 
@@ -730,7 +698,7 @@ export class AppComponent implements OnInit {
     this.markerLocations.clear();
     let center: number[] = [];
     // Process messages
-    this.messages.forEach((message) => {
+    this.messageService.getMessages().forEach((message) => {
       let location: Location = {
         latitude: message.latitude,
         longitude: message.longitude,

@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { Message } from '../../interfaces/message';
-import { MatCardModule}  from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { StyleService } from '../../services/style.service';
 import { Animation } from '../../interfaces/animation';
 import { User } from '../../interfaces/user';
@@ -37,23 +37,23 @@ import { TranslateService } from '../../services/translate.service';
     MatBadgeModule,
     MatCardModule,
     MatDialogContainer,
-    CommonModule, 
-    FormsModule, 
+    CommonModule,
+    FormsModule,
     MatButtonModule,
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent, 
-    MatIcon, 
-    FormsModule, 
-    MatFormFieldModule, 
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
     MatMenuModule,
     MatInputModule
   ],
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
 })
-export class MessagelistComponent implements OnInit{
+export class MessagelistComponent implements OnInit {
   public messages!: Message[];
   public selectedMessages: Message[] = [];
   public selectedMessageUser!: RelatedUser;
@@ -71,12 +71,12 @@ export class MessagelistComponent implements OnInit{
     private mapService: MapService,
     private geolocationService: GeolocationService,
     private relatedUserService: RelatedUserService,
-    public dialogRef: MatDialogRef<MessagelistComponent>,
+    public dialogRef: MatDialogRef<any>,
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private style:StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {user: User, messages: Message[]}
+    private style: StyleService,
+    @Inject(MAT_DIALOG_DATA) public data: { user: User, messages: Message[] }
   ) {
     this.user = data.user;
     this.messages = [...data.messages];
@@ -86,7 +86,7 @@ export class MessagelistComponent implements OnInit{
     this.animation = this.style.getRandomColorAnimation();
   }
 
-  public flyTo(message: Message){
+  public flyTo(message: Message) {
     let location: Location = {
       latitude: message.latitude,
       longitude: message.longitude,
@@ -98,7 +98,7 @@ export class MessagelistComponent implements OnInit{
     this.dialogRef.close();
   }
 
-  public navigateToMessageLocation(message: Message){
+  public navigateToMessageLocation(message: Message) {
     this.messageService.navigateToMessageLocation(this.user, message)
   }
 
@@ -134,136 +134,60 @@ export class MessagelistComponent implements OnInit{
 
   public likeMessage(message: Message) {
     if (!message.likedByUser) {
-      this.messageService.likeMessage(message, this.user)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    message.likes = message.likes + 1;
-                    this.likeButtonColor = 'primary';
-                    message.likedByUser = true;
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+      this.messageService.likeMessage(message, this.user, this.likeButtonColor);
     } else {
-      this.messageService.unlikeMessage(message, this.user)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    message.likes = message.likes - 1;
-                    this.likeButtonColor = 'secondary';
-                    message.likedByUser = false;
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+      this.messageService.unlikeMessage(message, this.user, this.likeButtonColor);
     }
   }
 
   public messageLikedByUser(message: Message) {
-    this.messageService.messageLikedByUser(message, this.user)
-            .subscribe({
-              next: (likedByUserResponse) => {
-                if (likedByUserResponse.status === 200 && likedByUserResponse.likedByUser) {
-                  this.likeButtonColor = 'primary';
-                  message.likedByUser = true;
-                } else {
-                  this.likeButtonColor = 'secondary';
-                  message.likedByUser = false;
-                }
-              },
-              error: (err) => {
-              },
-              complete:() => {}
-            });
+    this.messageService.messageLikedByUser(message, this.user, this.likeButtonColor);
   }
 
   public dislikeMessage(message: Message) {
     if (!message.dislikedByUser) {
-      this.messageService.dislikeMessage(message, this.user)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    message.dislikes = message.dislikes + 1;
-                    this.dislikeButtonColor = 'primary';
-                    message.dislikedByUser = true;
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+      this.messageService.dislikeMessage(message, this.user, this.dislikeButtonColor);
     } else {
-      this.messageService.undislikeMessage(message, this.user)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    message.dislikes = message.dislikes - 1;
-                    this.dislikeButtonColor = 'secondary';
-                    message.dislikedByUser = false;
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+      this.messageService.undislikeMessage(message, this.user, this.dislikeButtonColor);
     }
   }
 
   public messageDislikedByUser(message: Message) {
-    this.messageService.messageDislikedByUser(message, this.user)
-            .subscribe({
-              next: (dislikedByUserResponse) => {
-                if (dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser) {
-                  this.dislikeButtonColor = 'primary';
-                  message.dislikedByUser = true;
-                } else {
-                  this.dislikeButtonColor = 'secondary';
-                  message.dislikedByUser = false;
-                }
-              },
-              error: (err) => {
-              },
-              complete:() => {}
-            });
+    this.messageService.messageDislikedByUser(message, this.user, this.dislikeButtonColor);
   }
 
   private messageCountView(message: Message) {
     this.messageService.countView(message)
-            .subscribe({
-              next: (SimpleStatusResponse) => {
-                if (SimpleStatusResponse.status === 200) {
-                  message.views = message.views + 1;
-                }
-              },
-              error: (err) => {
-              },
-              complete:() => {}
-            });
+      .subscribe({
+        next: (SimpleStatusResponse) => {
+          if (SimpleStatusResponse.status === 200) {
+            message.views = message.views + 1;
+          }
+        },
+        error: (err: any) => {
+        },
+        complete: () => { }
+      });
   }
 
   private countComment(parentMessage: Message) {
     this.messageService.countComment(parentMessage)
-            .subscribe({
-              next: (SimpleStatusResponse) => {
-                if (SimpleStatusResponse.status === 200) {
-                  parentMessage.comments = parentMessage.comments + 1;
-                }
-              },
-              error: (err) => {
-              },
-              complete:() => {}
-            });
+      .subscribe({
+        next: (SimpleStatusResponse) => {
+          if (SimpleStatusResponse.status === 200) {
+            parentMessage.comments = parentMessage.comments + 1;
+          }
+        },
+        error: (err) => {
+        },
+        complete: () => { }
+      });
   }
 
   public disableMessage(message: Message) {
     const dialogRef = this.dialog.open(BlockMessageComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -272,17 +196,17 @@ export class MessagelistComponent implements OnInit{
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.messageService.disableMessage(message)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.messages = this.messages.filter( element => element.id !== message.id );
-                    this.selectedMessages.pop();
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+          .subscribe({
+            next: (simpleStatusResponse) => {
+              if (simpleStatusResponse.status === 200) {
+                this.messages = this.messages.filter(element => element.id !== message.id);
+                this.selectedMessages.pop();
+              }
+            },
+            error: (err) => {
+            },
+            complete: () => { }
+          });
       }
     });
   }
@@ -290,7 +214,7 @@ export class MessagelistComponent implements OnInit{
   public deleteMessage(message: Message) {
     const dialogRef = this.dialog.open(DeleteMessageComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -298,21 +222,7 @@ export class MessagelistComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.deleteMessage(message)
-              .subscribe({
-                next: (simpleStatusResponse) => {
-                  if (simpleStatusResponse.status === 200) {
-                    this.messages = this.messages.filter( element => element.id !== message.id );
-                    this.selectedMessages.pop();
-                    if (this.messages.length === 0) {
-                      this.dialogRef.close();
-                    }
-                  }
-                },
-                error: (err) => {
-                },
-                complete:() => {}
-              });
+        this.messageService.deleteMessage(message, this.selectedMessages, this.dialogRef);
       }
     });
   }
@@ -320,13 +230,13 @@ export class MessagelistComponent implements OnInit{
   public editMessage(message: Message) {
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
-      data: {mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, user: this.user, message: message},
+      data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, user: this.user, message: message },
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      maxWidth:'90vw',
-      hasBackdrop: true      
+      maxWidth: '90vw',
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -334,26 +244,19 @@ export class MessagelistComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user)
-            .subscribe({
-              next: createMessageResponse => {
-                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-              complete:() => {}
-            });          
+        this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user);
       }
     });
   }
 
-  public editMessageUserProfile(message: Message){
+  public editMessageUserProfile(message: Message) {
     if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
       this.selectedMessageUser.id = message.userId;
     }
     const dialogRef = this.dialog.open(EditUserComponent, {
-      data: {relatedUser: this.selectedMessageUser},
+      data: { relatedUser: this.selectedMessageUser },
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -384,17 +287,18 @@ export class MessagelistComponent implements OnInit{
       dislikes: 0,
       comments: 0,
       status: 'enabled',
-      userId: ''};
+      userId: ''
+    };
 
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
-      data: {mode: this.mode.ADD_COMMENT, user: this.user, message: message},
+      data: { mode: this.mode.ADD_COMMENT, user: this.user, message: message },
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      maxWidth:'90vw',
-      hasBackdrop: true      
+      maxWidth: '90vw',
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -402,45 +306,37 @@ export class MessagelistComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
-            .subscribe({
-              next: createMessageResponse => {
-                this.countComment(parentMessage);
-                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-              complete:() => {this.comments.push(data.message);}
-            });          
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
       }
     });
   }
 
   getComments(parentMessage: Message) {
     this.messageService.getCommentsForParentMessage(parentMessage)
-            .subscribe({
-              next: (getMessageResponse) => {
-                this.comments = [...getMessageResponse.rows];
-              },
-              error: (err) => {
-                this.comments = [];
-              },
-              complete:() => {}
-            });
+      .subscribe({
+        next: (getMessageResponse) => {
+          this.comments = [...getMessageResponse.rows];
+        },
+        error: (err) => {
+          this.comments = [];
+        },
+        complete: () => { }
+      });
   }
 
   public translateMessage(message: Message) {
     this.translateService.translate(message.message, this.user.language)
-              .subscribe({
-                next: (translateResponse) => {
-                  if (translateResponse.status === 200) {
-                    message.translatedMessage = translateResponse.result?.text;
-                  }
-                },
-                error: (translateResponse) => {
-                  this.snackBarRef = this.snackBar.open(translateResponse.error.error, '', {duration: 3000});
-                },
-                complete:() => {}
-              });
+      .subscribe({
+        next: (translateResponse) => {
+          if (translateResponse.status === 200) {
+            message.translatedMessage = translateResponse.result?.text;
+          }
+        },
+        error: (translateResponse) => {
+          this.snackBarRef = this.snackBar.open(translateResponse.error.error, '', { duration: 3000 });
+        },
+        complete: () => { }
+      });
   }
 
   openMessagDialog(): void {
@@ -461,18 +357,19 @@ export class MessagelistComponent implements OnInit{
       dislikes: 0,
       comments: 0,
       status: 'enabled',
-      userId: ''};
+      userId: ''
+    };
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message},
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message },
       width: '90vw',
       minWidth: '20vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -480,15 +377,7 @@ export class MessagelistComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user)
-            .subscribe({
-              next: createMessageResponse => {
-                this.messages = [data?.message, ...this.messages];
-                this.snackBarRef = this.snackBar.open(`Message succesfully dropped.`, '', {duration: 1000});
-              },
-              error: (err) => {this.snackBarRef = this.snackBar.open(err.message, 'OK');},
-              complete:() => {}
-            });          
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
       }
     });
   }
