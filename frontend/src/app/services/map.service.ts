@@ -51,6 +51,8 @@ export class MapService {
   private messageMarkers: leaflet.Marker[] = [];
   private placeLocationRectangels = new Map<string, leaflet.Rectangle>();
 
+  private ready: boolean = false;
+
   constructor(private geolocationService: GeolocationService) { }
 
   public initMap(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
@@ -102,6 +104,12 @@ export class MapService {
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
     this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ffdbb5", weight: 1 }).addTo(this.map);
     this.drawSearchRectange(this.location);
+
+    this.ready = true;
+  }
+
+  isReady(): boolean {
+    return this.ready;
   }
 
   public setMapMinMaxZoom(minZoom: number, maxZoom: number) {
@@ -114,7 +122,7 @@ export class MapService {
   }
 
   public getMapZoom(): number {
-    return this.map.getZoom()
+    return undefined == this.map ? 3 : this.map.getZoom()
   }
 
   public getMapLocation(): Location {
@@ -239,7 +247,9 @@ export class MapService {
       }
     })
     // add to map
-    this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
+    if (undefined != this.map) {
+      this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
+    }
   }
 
   private showDataFromMarker(markerLocation: MarkerLocation) {

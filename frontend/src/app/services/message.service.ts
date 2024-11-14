@@ -222,7 +222,7 @@ export class MessageService {
       });
   }
 
-  getByPlusCode(location: Location, messageSubject: Subject<boolean>) {
+  getByPlusCode(location: Location, messageSubject: Subject<void>) {
     this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -231,12 +231,12 @@ export class MessageService {
         next: (getMessageResponse) => {
           this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
           this.messages = [...getMessageResponse.rows];
-          messageSubject.next(true);
+          messageSubject.next();
         },
         error: (err) => {
           this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
           this.messages = [];
-          messageSubject.next(true);
+          messageSubject.next();
         },
         complete: () => { }
       });
@@ -314,7 +314,9 @@ export class MessageService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
+            console.log(this.messages)
             this.messages = this.messages.filter(element => element.id !== message.id);
+            console.log(this.messages)
             selectedMessages.pop();
             if (this.messages.length === 0) {
               dialogRef.close();

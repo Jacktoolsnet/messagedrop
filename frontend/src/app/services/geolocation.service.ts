@@ -16,7 +16,7 @@ export class GeolocationService {
   constructor() { }
 
   public getPlusCode(latitude: number, longitude: number): string {
-    let plusCode = plusCodes.encode({latitude, longitude});
+    let plusCode = plusCodes.encode({ latitude, longitude });
     if (null === plusCode) {
       return '';
     } else {
@@ -26,17 +26,17 @@ export class GeolocationService {
 
   public getLocationFromMessage(message: Message): Location {
     let location: Location = {
-      latitude : message.latitude || 0,
-      longitude: message.longitude  || 0,
+      latitude: message.latitude || 0,
+      longitude: message.longitude || 0,
       plusCode: message.plusCode || ''
     };
     return location;
   }
 
-  public getLocationFromPlusCode(plusCode: string): Location{
+  public getLocationFromPlusCode(plusCode: string): Location {
     let location: Location = {
-      latitude : plusCodes.decode(plusCode)?.latitude || 0,
-      longitude: plusCodes.decode(plusCode)?.longitude  || 0,
+      latitude: plusCodes.decode(plusCode)?.latitude || 0,
+      longitude: plusCodes.decode(plusCode)?.longitude || 0,
       plusCode: plusCode
     };
     return location;
@@ -49,8 +49,8 @@ export class GeolocationService {
       case 18:
         plusCode = location.plusCode;
         break;
-      case 17:        
-      case 16:        
+      case 17:
+      case 16:
       case 15:
       case 14:
         plusCode = location.plusCode.substring(0, 8);
@@ -65,7 +65,7 @@ export class GeolocationService {
       case 8:
       case 7:
         plusCode = location.plusCode.substring(0, 4);
-        break;        
+        break;
       default:
         plusCode = location.plusCode.substring(0, 2);
         break;
@@ -76,10 +76,10 @@ export class GeolocationService {
   public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location, zoom: number): number {
     let plusCodeLength: number = 11;
     switch (zoom) {
-      case 19:    
-      case 18:     
+      case 19:
+      case 18:
       case 17:
-      case 16:        
+      case 16:
       case 15:
       case 14:
         plusCodeLength = 8;
@@ -93,11 +93,11 @@ export class GeolocationService {
       case 9:
       case 8:
       case 7:
-          plusCodeLength = 4;
+        plusCodeLength = 4;
         break;
       default:
         plusCodeLength = 2;
-        break;            
+        break;
     }
     return plusCodeLength;
   }
@@ -189,11 +189,11 @@ export class GeolocationService {
           gridColumns = 20;
           break;
         case 6:
-        case 7: 
+        case 7:
           gridSizeDegrees = pairResolutions[3];
           gridRows = 20;
           gridColumns = 20;
-          break; 
+          break;
         case 8:
         case 9:
         case 10:

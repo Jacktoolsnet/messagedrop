@@ -1,10 +1,7 @@
-import { Component, AfterViewInit , Input, Output, OnChanges, SimpleChanges, EventEmitter} from '@angular/core';
+import { Component, AfterViewInit, Input, Output, OnChanges, SimpleChanges, EventEmitter } from '@angular/core';
 import { MapService } from '../../services/map.service';
 import { Location } from '../../interfaces/location';
-import { Message } from '../../interfaces/message';
-import { Note } from '../../interfaces/note';
 import { MarkerLocation } from '../../interfaces/marker-location';
-import { MarkerType } from '../../interfaces/marker-type';
 
 
 @Component({
@@ -17,7 +14,7 @@ import { MarkerType } from '../../interfaces/marker-type';
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection
   @Input() lastMarkerUpdate: number = 0;
-  @Input() location: Location = { latitude: 0, longitude: 0, plusCode: ''};
+  @Input() location: Location = { latitude: 0, longitude: 0, plusCode: '' };
   @Input() markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   @Output() clickEvent = new EventEmitter<Location>();
   @Output() moveEndEvent = new EventEmitter<Location>();
@@ -29,7 +26,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
 
   constructor(private mapService: MapService) { }
 
-  ngAfterViewInit(): void { 
+  ngAfterViewInit(): void {
     this.mapService.initMap(this.location, this.clickEvent, this.moveEndEvent, this.markerClickEvent);
   }
 

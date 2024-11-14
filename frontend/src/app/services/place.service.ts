@@ -44,7 +44,7 @@ export class PlaceService {
   }
 
   async initPlaces() {
-    while (!this.userService.isReady) {
+    while (!this.userService.isReady()) {
       await new Promise(f => setTimeout(f, 500));
     }
     this.getByUserId(this.userService.getUser().id)

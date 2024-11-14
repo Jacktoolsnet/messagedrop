@@ -11,7 +11,6 @@ import { SwPush } from '@angular/service-worker';
 import { StyleService } from './style.service';
 import { CryptoService } from './crypto.service';
 import { Keypair } from '../interfaces/keypair';
-import { SocketioService } from './socketio.service';
 
 @Injectable({
   providedIn: 'root'

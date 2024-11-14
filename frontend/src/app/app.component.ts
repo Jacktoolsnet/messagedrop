@@ -76,8 +76,8 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
-  private messageSubject = new Subject<boolean>();
-  private notesSubject = new Subject<boolean>();
+  private messageSubject: Subject<void>;
+  private notesSubject: Subject<void>;
 
   constructor(
     public mapService: MapService,
@@ -101,16 +101,22 @@ export class AppComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private swPush: SwPush
   ) {
-    this.initApp();
+    this.messageSubject = new Subject<void>();
     this.messageSubject.subscribe({
       next: (v) => this.createMarkerLocations(),
     });
+    this.notesSubject = new Subject<void>();
     this.notesSubject.subscribe({
       next: (v) => this.createMarkerLocations(),
     });
+    this.initApp();
   }
 
-  private initApp() {
+  private async initApp() {
+    while (!this.mapService.isReady()) {
+      await new Promise(f => setTimeout(f, 500));
+    }
+    this.updateDataForLocation(this.mapService.getMapLocation(), true)
     this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
     // Count
     this.statisticService.countVisitor()
@@ -230,11 +236,11 @@ export class AppComponent implements OnInit {
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
-  private getNotesByPlusCode(location: Location, notesSubject: Subject<boolean>) {
+  private getNotesByPlusCode(location: Location, notesSubject: Subject<void>) {
     let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
     this.notes = [];
     this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
-    notesSubject.next(true);
+    notesSubject.next();
   }
 
   private updateDataForLocation(location: Location, forceSearch: boolean) {
@@ -247,7 +253,7 @@ export class AppComponent implements OnInit {
         // notes from local device
         this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
         // Messages
-        this.getMessages(this.mapService.getMapLocation(), false, false);
+        this.getMessages(this.mapService.getMapLocation(), forceSearch, false);
         // in the complete event of getMessages
       } else {
         //this.createMarkerLocations();
