@@ -20,8 +20,10 @@ import { StatisticService } from './statistic.service';
 })
 export class MessageService {
 
-  public messages: Message[] = [];
-  public lastSearchedLocation: string = '';
+  private messages: Message[] = [];
+  public selectedMessages: Message[] = [];
+  private comments: Message[] = [];
+  private lastSearchedLocation: string = '';
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -46,8 +48,20 @@ export class MessageService {
     return this.messages;
   }
 
+  getSelectedMessages(): Message[] {
+    return this.selectedMessages;
+  }
+
+  getComments(): Message[] {
+    return this.comments;
+  }
+
   clearMessages() {
     this.messages = [];
+  }
+
+  clearComments() {
+    this.comments = [];
   }
 
   getLastSearchedLocation(): string {
@@ -72,6 +86,14 @@ export class MessageService {
       )
       .subscribe({
         next: createMessageResponse => {
+          console.log(message)
+          console.log(this.messages)
+          if (message.parentId === 0) {
+            this.messages.unshift(message);
+          } else {
+            this.comments.unshift(message);
+          }
+          console.log(this.messages)
           this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
           this.statisticService.countMessage()
             .subscribe({
@@ -306,7 +328,7 @@ export class MessageService {
       });
   }
 
-  deleteMessage(message: Message, selectedMessages: Message[], dialogRef: MatDialogRef<any>) {
+  deleteMessage(message: Message, dialogRef: MatDialogRef<any>) {
     this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/delete/${message.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -314,13 +336,13 @@ export class MessageService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            console.log(this.messages)
-            this.messages = this.messages.filter(element => element.id !== message.id);
-            console.log(this.messages)
-            selectedMessages.pop();
-            if (this.messages.length === 0) {
-              dialogRef.close();
+            if (this.messages.map(e => e.id).indexOf(message.id) !== -1) {
+              this.messages.splice(this.messages.map(e => e.id).indexOf(message.id), 1);
+            } else if (this.messages.map(e => e.id).indexOf(message.parentId) !== -1) {
+              this.messages.splice(this.messages.map(e => e.id).indexOf(message.parentId), 1);
             }
+            this.selectedMessages.pop();
+            this.getCommentsForParentMessage();
           }
         },
         error: (err) => {
@@ -329,17 +351,18 @@ export class MessageService {
       });
   }
 
-  getCommentsForParentMessage(parentMessage: Message, comments: Message[]) {
+  getCommentsForParentMessage() {
+    let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${parentMessage.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
       .subscribe({
         next: (getMessageResponse) => {
-          comments = [...getMessageResponse.rows];
+          this.comments = [...getMessageResponse.rows];
         },
         error: (err) => {
-          comments = [];
+          this.comments = [];
         },
         complete: () => { }
       });

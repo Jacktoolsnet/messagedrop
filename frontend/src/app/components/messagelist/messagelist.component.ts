@@ -55,18 +55,15 @@ import { TranslateService } from '../../services/translate.service';
 })
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];
-  public selectedMessages: Message[] = [];
   public selectedMessageUser!: RelatedUser;
   public user!: User;
   public animation!: Animation;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
   public mode: typeof Mode = Mode;
-  private snackBarRef: any;
-  public comments: Message[] = [];
 
   constructor(
-    private messageService: MessageService,
+    public messageService: MessageService,
     private translateService: TranslateService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
@@ -79,7 +76,7 @@ export class MessagelistComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { user: User, messages: Message[] }
   ) {
     this.user = data.user;
-    this.messages = [...data.messages];
+    this.messages = data.messages;
   }
 
   ngOnInit(): void {
@@ -103,29 +100,29 @@ export class MessagelistComponent implements OnInit {
   }
 
   public goBack() {
-    if (this.selectedMessages.length == 0) {
+    if (this.messageService.getSelectedMessages().length == 0) {
       this.dialogRef.close();
     } else {
-      this.selectedMessages.pop();
+      this.messageService.getSelectedMessages().pop();
       this.likeButtonColor = 'secondary';
       this.dislikeButtonColor = 'secondary';
-      if (this.selectedMessages.length > 0) {
-        this.getComments(this.selectedMessages[this.selectedMessages.length - 1])
+      if (this.messageService.getSelectedMessages().length > 0) {
+        this.messageService.getCommentsForParentMessage();
       } else {
-        this.comments = [];
+        this.messageService.clearComments();
       }
     }
   }
 
   public goToMessageDetails(message: Message) {
-    this.selectedMessages.push(message);
+    this.messageService.getSelectedMessages().push(message);
     this.selectedMessageUser = this.relatedUserService.loadUser(message.userId);
     if (this.user.id !== message.userId) {
       this.messageCountView(message);
     }
     this.messageLikedByUser(message);
     this.messageDislikedByUser(message);
-    this.getComments(this.selectedMessages[this.selectedMessages.length - 1])
+    this.messageService.getCommentsForParentMessage();
   }
 
   public getMessageUserName(message: Message): RelatedUser {
@@ -175,7 +172,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.disableMessage(message, this.selectedMessages);
+        this.messageService.disableMessage(message, this.messageService.getSelectedMessages());
       }
     });
   }
@@ -191,7 +188,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.deleteMessage(message, this.selectedMessages, this.dialogRef);
+        this.messageService.deleteMessage(message, this.dialogRef);
       }
     });
   }
@@ -280,10 +277,6 @@ export class MessagelistComponent implements OnInit {
     });
   }
 
-  getComments(parentMessage: Message) {
-    this.messageService.getCommentsForParentMessage(parentMessage, this.comments);
-  }
-
   public translateMessage(message: Message) {
     this.translateService.translate(message.message, this.user.language)
       .subscribe({
@@ -293,7 +286,7 @@ export class MessagelistComponent implements OnInit {
           }
         },
         error: (translateResponse) => {
-          this.snackBarRef = this.snackBar.open(translateResponse.error.error, '', { duration: 3000 });
+          this.snackBar.open(translateResponse.error.error, '', { duration: 3000 });
         },
         complete: () => { }
       });

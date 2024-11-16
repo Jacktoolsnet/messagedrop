@@ -71,7 +71,7 @@ export class UserService {
         id: '',
         location: { latitude: 0, longitude: 0, plusCode: '' },
         local: navigator.language,
-        language: navigator.language.split('-')[0],
+        language: navigator.language,
         subscription: '',
         defaultStyle: this.style.getRandomStyle(),
         encryptionKeyPair: {
@@ -89,8 +89,8 @@ export class UserService {
       this.user = {
         id: undefined != userFromLocalStorage.id ? userFromLocalStorage.id : '',
         location: undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: '' },
-        local: undefined != userFromLocalStorage.local ? userFromLocalStorage.local : navigator.language,
-        language: undefined != userFromLocalStorage.language ? userFromLocalStorage.language : navigator.language.split('-')[0],
+        local: navigator.language,
+        language: navigator.language,
         subscription: undefined != userFromLocalStorage.subscription ? userFromLocalStorage.subscription : '',
         defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
         encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : {},
