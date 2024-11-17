@@ -48,6 +48,10 @@ export class MessageService {
     return this.messages;
   }
 
+  setMessages(messages: Message[]) {
+    this.messages = [...messages];
+  }
+
   getSelectedMessages(): Message[] {
     return this.selectedMessages;
   }

@@ -403,10 +403,11 @@ export class AppComponent implements OnInit {
     this.userService.getUserMessages(this.userService.getUser())
       .subscribe({
         next: (getMessageResponse) => {
+          this.messageService.setMessages(getMessageResponse.rows)
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { user: this.userService.getUser(), messages: [...getMessageResponse.rows] },
+            data: { user: this.userService.getUser(), messages: this.messageService.getMessages() },
             width: 'auto',
             minWidth: '60vw',
             maxWidth: '90vw',
