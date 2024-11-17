@@ -11,6 +11,7 @@ import { SwPush } from '@angular/service-worker';
 import { StyleService } from './style.service';
 import { CryptoService } from './crypto.service';
 import { Keypair } from '../interfaces/keypair';
+import { layerGroup } from 'leaflet';
 
 @Injectable({
   providedIn: 'root'
@@ -71,7 +72,7 @@ export class UserService {
         id: '',
         location: { latitude: 0, longitude: 0, plusCode: '' },
         local: navigator.language,
-        language: navigator.language,
+        language: this.getLanguageForLocation(navigator.language),
         subscription: '',
         defaultStyle: this.style.getRandomStyle(),
         encryptionKeyPair: {
@@ -90,7 +91,7 @@ export class UserService {
         id: undefined != userFromLocalStorage.id ? userFromLocalStorage.id : '',
         location: undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: '' },
         local: navigator.language,
-        language: navigator.language,
+        language: this.getLanguageForLocation(navigator.language),
         subscription: undefined != userFromLocalStorage.subscription ? userFromLocalStorage.subscription : '',
         defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
         encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : {},
@@ -262,6 +263,115 @@ export class UserService {
         user.subscription = '';
         this.saveUser(user);
       });
+  }
+
+  getLanguageForLocation(location: string): string {
+    let language: string = '';
+    switch (location.split('-')[1].toUpperCase()) {
+      case 'AR':
+        language = 'AR';
+        break;
+      case 'BG':
+        language = 'BG';
+        break;
+      case 'CS':
+        language = 'CS';
+        break;
+      case 'DE':
+        language = 'DE';
+        break;
+      case 'EL':
+        language = 'EL';
+        break;
+      case 'GB':
+        language = location.toUpperCase();
+        break;
+      case 'US':
+        language = location.toUpperCase();
+        break;
+      case 'ES':
+        language = 'ES';
+        break;
+      case 'ET':
+        language = 'ET';
+        break;
+      case 'FI':
+        language = 'FI';
+        break;
+      case 'FR':
+        language = 'FR';
+        break;
+      case 'HU':
+        language = 'HU';
+        break;
+      case 'ID':
+        language = 'ID';
+        break;
+      case 'IT':
+        language = 'IT';
+        break;
+      case 'JA':
+        language = 'JA';
+        break;
+      case 'KO':
+        language = 'KO';
+        break;
+      case 'LT':
+        language = 'LT';
+        break;
+      case 'LV':
+        language = 'LV';
+        break;
+      case 'NB':
+        language = 'NB';
+        break;
+      case 'NL':
+        language = 'NL';
+        break;
+      case 'PL':
+        language = 'PL';
+        break;
+      case 'BR':
+        language = 'PT-BR';
+        break;
+      case 'PT':
+        language = 'PT-PT';
+        break;
+      case 'RO':
+        language = 'RO';
+        break;
+      case 'RU':
+        language = 'RU';
+        break;
+      case 'SK':
+        language = 'SK';
+        break;
+      case 'SL':
+        language = 'SL';
+        break;
+      case 'SV':
+        language = 'SV';
+        break;
+      case 'TR':
+        language = 'TR';
+        break;
+      case 'UK':
+        language = 'UK';
+        break;
+      case 'ZH':
+        language = 'ZH';
+        break;
+      case 'HANS':
+        language = 'HANS';
+        break;
+      case 'HANT':
+        language = 'HANT';
+        break;
+      default:
+        language = "EN-US";
+        break;
+    }
+    return language;
   }
 
 }

@@ -68,6 +68,9 @@ export class MessageService {
     this.comments = [];
   }
 
+  clearSelectedMessages() {
+    this.selectedMessages = [];
+  }
   getLastSearchedLocation(): string {
     return this.lastSearchedLocation;
   }
@@ -282,6 +285,7 @@ export class MessageService {
       .subscribe({
         next: (getMessageResponse) => {
           this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
+          this.clearMessages();
           getMessageResponse.rows.forEach((row: Message) => {
             let message: Message = {
               id: row.id,

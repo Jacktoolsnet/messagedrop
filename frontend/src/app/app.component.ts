@@ -559,6 +559,7 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerMessageListDialog(messages: Message[]) {
+    console.log(messages);
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
@@ -578,6 +579,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      this.messageService.clearSelectedMessages();
       this.getMessages(this.mapService.getMapLocation(), true, false);
     });
   }
