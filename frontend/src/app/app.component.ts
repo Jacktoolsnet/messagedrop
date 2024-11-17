@@ -328,7 +328,8 @@ export class AppComponent implements OnInit {
       views: 0,
       likes: 0,
       dislikes: 0,
-      comments: 0,
+      comments: [],
+      commentsNumber: 0,
       status: 'enabled',
       userId: ''
     };

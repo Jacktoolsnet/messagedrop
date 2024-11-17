@@ -27,7 +27,7 @@ const columnStyle = 'style';
 const columnViews = 'views';
 const columnLikes = 'likes'; // Each like add on day to the lifetime of the message.
 const columnDislikes = 'dislikes'; // Each dislike reduce the liftime of the message by one day.
-const columnComments = 'comments';
+const columnCommentsNumber = 'commentsNumber';
 const columnStatus = 'status';
 const columnUserId = 'userId';
 
@@ -49,7 +49,7 @@ const init = function (db) {
             ${columnViews} INTEGER NOT NULL DEFAULT 0,
             ${columnLikes} INTEGER NOT NULL DEFAULT 0,
             ${columnDislikes} INTEGER NOT NULL DEFAULT 0,
-            ${columnComments} INTEGER NOT NULL DEFAULT 0,
+            ${columnCommentsNumber} INTEGER NOT NULL DEFAULT 0,
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnUserId} TEXT NOT NULL,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
@@ -218,7 +218,7 @@ const countComment = function (db, messageId, callback) {
     try {
         sql = `
         UPDATE ${tableName}
-        SET ${columnComments} = ${columnComments} + 1
+        SET ${columnCommentsNumber} = ${columnCommentsNumber} + 1
         WHERE ${columnMessageId} = ?;`
 
         db.run(sql, [messageId], (err) => {

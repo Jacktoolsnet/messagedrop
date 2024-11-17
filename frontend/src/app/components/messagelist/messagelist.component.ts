@@ -106,11 +106,6 @@ export class MessagelistComponent implements OnInit {
       this.messageService.getSelectedMessages().pop();
       this.likeButtonColor = 'secondary';
       this.dislikeButtonColor = 'secondary';
-      if (this.messageService.getSelectedMessages().length > 0) {
-        this.messageService.getCommentsForParentMessage();
-      } else {
-        this.messageService.clearComments();
-      }
     }
   }
 
@@ -122,7 +117,7 @@ export class MessagelistComponent implements OnInit {
     }
     this.messageLikedByUser(message);
     this.messageDislikedByUser(message);
-    this.messageService.getCommentsForParentMessage();
+    this.messageService.getCommentsForParentMessage(message);
   }
 
   public getMessageUserName(message: Message): RelatedUser {
@@ -251,7 +246,8 @@ export class MessagelistComponent implements OnInit {
       views: 0,
       likes: 0,
       dislikes: 0,
-      comments: 0,
+      comments: [],
+      commentsNumber: 0,
       status: 'enabled',
       userId: ''
     };
@@ -272,7 +268,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
+        this.messageService.createComment(data.message, this.mapService.getMapLocation(), data.user);
       }
     });
   }
@@ -292,7 +288,7 @@ export class MessagelistComponent implements OnInit {
       });
   }
 
-  openMessagDialog(): void {
+  addMessagDialog(): void {
     let message: Message = {
       id: 0,
       parentId: 0,
@@ -308,7 +304,8 @@ export class MessagelistComponent implements OnInit {
       views: 0,
       likes: 0,
       dislikes: 0,
-      comments: 0,
+      comments: [],
+      commentsNumber: 0,
       status: 'enabled',
       userId: ''
     };

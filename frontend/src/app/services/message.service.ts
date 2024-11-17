@@ -86,15 +86,41 @@ export class MessageService {
       )
       .subscribe({
         next: createMessageResponse => {
-          console.log(message)
-          console.log(this.messages)
-          if (message.parentId === 0) {
-            this.messages.unshift(message);
-          } else {
-            this.comments.unshift(message);
-          }
-          console.log(this.messages)
+          this.messages.unshift(message);
           this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
+          this.statisticService.countMessage()
+            .subscribe({
+              next: (data) => { },
+              error: (err) => { },
+              complete: () => { }
+            });
+        },
+        error: (err) => { this.snackBar.open(err.message, 'OK'); },
+        complete: () => { }
+      })
+  }
+
+  createComment(message: Message, location: Location, user: User) {
+    let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
+    let body = {
+      'parentMessageId': message.parentId,
+      'messageTyp': message.typ,
+      'latitude': location.latitude,
+      'longtitude': location.longitude,
+      'plusCode': location.plusCode,
+      'message': message.message,
+      'markerType': message.markerType,
+      'style': message.style,
+      'messageUserId': user.id
+    };
+    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      )
+      .subscribe({
+        next: createMessageResponse => {
+          parentMessage.comments.push(message);
+          this.snackBar.open(`Comment succesfully dropped.`, '', { duration: 1000 });
           this.statisticService.countMessage()
             .subscribe({
               next: (data) => { },
@@ -119,7 +145,7 @@ export class MessageService {
       )
       .subscribe({
         next: createMessageResponse => {
-          this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
+          this.snackBar.open(`Succesfully updated.`, '', { duration: 1000 });
         },
         error: (err: any) => { this.snackBar.open(err.message, 'OK'); },
         complete: () => { }
@@ -252,7 +278,29 @@ export class MessageService {
       .subscribe({
         next: (getMessageResponse) => {
           this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-          this.messages = [...getMessageResponse.rows];
+          getMessageResponse.rows.forEach((row: Message) => {
+            let message: Message = {
+              id: row.id,
+              parentId: row.parentId,
+              typ: row.typ,
+              createDateTime: row.createDateTime,
+              deleteDateTime: row.deleteDateTime,
+              latitude: row.latitude,
+              longitude: row.longitude,
+              plusCode: row.plusCode,
+              message: row.message,
+              markerType: row.markerType,
+              style: row.style,
+              views: row.views,
+              likes: row.likes,
+              dislikes: row.dislikes,
+              comments: [],
+              commentsNumber: row.commentsNumber,
+              status: row.status,
+              userId: row.userId
+            };
+            this.messages.push(message);
+          });
           messageSubject.next();
         },
         error: (err) => {
@@ -301,7 +349,7 @@ export class MessageService {
       .subscribe({
         next: (SimpleStatusResponse) => {
           if (SimpleStatusResponse.status === 200) {
-            message.comments = message.comments + 1;
+            message.commentsNumber = message.commentsNumber + 1;
           }
         },
         error: (err) => {
@@ -339,10 +387,10 @@ export class MessageService {
             if (this.messages.map(e => e.id).indexOf(message.id) !== -1) {
               this.messages.splice(this.messages.map(e => e.id).indexOf(message.id), 1);
             } else if (this.messages.map(e => e.id).indexOf(message.parentId) !== -1) {
-              this.messages.splice(this.messages.map(e => e.id).indexOf(message.parentId), 1);
+              let parentMessageIndex = this.messages.map(e => e.id).indexOf(message.parentId)
+              this.messages[parentMessageIndex].comments.splice(this.messages[parentMessageIndex].comments.map(e => e.id).indexOf(message.parentId), 1);
             }
             this.selectedMessages.pop();
-            this.getCommentsForParentMessage();
           }
         },
         error: (err) => {
@@ -351,7 +399,7 @@ export class MessageService {
       });
   }
 
-  getCommentsForParentMessage() {
+  getCommentsForParentMessage(message: Message) {
     let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${parentMessage.id}`, this.httpOptions)
       .pipe(
@@ -359,10 +407,10 @@ export class MessageService {
       )
       .subscribe({
         next: (getMessageResponse) => {
-          this.comments = [...getMessageResponse.rows];
+          message.comments = [...getMessageResponse.rows];
         },
         error: (err) => {
-          this.comments = [];
+          message.comments = [];
         },
         complete: () => { }
       });
