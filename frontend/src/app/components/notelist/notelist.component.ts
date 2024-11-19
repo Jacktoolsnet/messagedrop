@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule}  from '@angular/material/card';
+import { MatCardModule } from '@angular/material/card';
 import { StyleService } from '../../services/style.service';
 import { Animation } from '../../interfaces/animation';
 import { User } from '../../interfaces/user';
@@ -32,26 +32,26 @@ import { NoteComponent } from '../note/note.component';
     MatBadgeModule,
     MatCardModule,
     MatDialogContainer,
-    CommonModule, 
-    FormsModule, 
-    MatButtonModule, 
-    MatDialogActions, 
-    MatDialogClose, 
-    MatDialogTitle, 
-    MatDialogContent, 
-    MatIcon, 
-    FormsModule, 
-    MatFormFieldModule, 
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
     MatMenuModule,
     MatInputModule
   ],
   templateUrl: './notelist.component.html',
   styleUrl: './notelist.component.css'
 })
-export class NotelistComponent implements OnInit{
-  public notes!: Note[];
+export class NotelistComponent implements OnInit {
+  public notes: Note[];
   private noteToDelete!: Note
-  public user!: User;
+  public user: User;
   public animation!: Animation;
   public mode: typeof Mode = Mode;
   private snackBarRef: any;
@@ -64,18 +64,18 @@ export class NotelistComponent implements OnInit{
     public noteDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private style:StyleService,    
-    @Inject(MAT_DIALOG_DATA) public data: {user: User, notes: Note[]}
+    private style: StyleService,
+    @Inject(MAT_DIALOG_DATA) public data: { user: User, notes: Note[] }
   ) {
     this.user = data.user;
-    this.notes = [...data.notes];
+    this.notes = data.notes;
   }
 
   ngOnInit(): void {
     this.animation = this.style.getRandomColorAnimation();
   }
 
-  public flyTo(note: Note){
+  public flyTo(note: Note) {
     let location: Location = {
       latitude: note.latitude,
       longitude: note.longitude,
@@ -87,7 +87,7 @@ export class NotelistComponent implements OnInit{
     this.dialogRef.close();
   }
 
-  public navigateToNoteLocation(note: Note){
+  public navigateToNoteLocation(note: Note) {
     this.noteService.navigateToNoteLocation(this.user, note)
   }
 
@@ -95,20 +95,16 @@ export class NotelistComponent implements OnInit{
     this.noteToDelete = note;
     const dialogRef = this.dialog.open(DeleteNoteComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true 
+      hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {      
+    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && undefined != this.noteToDelete) {
-        /*let index: number = this.notes.indexOf(this.noteToDelete, 0);
-        if (index > -1) {
-          this.notes.splice(index, 1);
-        }*/
         this.notes.splice(this.notes.findIndex(note => note === this.noteToDelete), 1)
-        this.noteService.saveNotesToStorage(this.notes);
+        this.noteService.saveNotes();
         if (this.notes.length == 0) {
           this.dialogRef.close();
         }
@@ -119,13 +115,13 @@ export class NotelistComponent implements OnInit{
   public editNote(note: Note) {
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
-      data: {mode: this.mode.EDIT_NOTE, user: this.user, note: note},
+      data: { mode: this.mode.EDIT_NOTE, user: this.user, note: note },
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      maxWidth:'90vw',
-      hasBackdrop: true      
+      maxWidth: '90vw',
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -133,7 +129,7 @@ export class NotelistComponent implements OnInit{
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.note) {
-        this.noteService.saveNotesToStorage(this.notes);
+        this.noteService.saveNotes();
       }
     });
   }
@@ -144,36 +140,36 @@ export class NotelistComponent implements OnInit{
 
   openNoteDialog(): void {
     let note: Note = {
-     latitude: 0,
+      latitude: 0,
       longitude: 0,
       plusCode: '',
       note: '',
       markerType: 'note',
       style: '',
-      };
+    };
     const dialogRef = this.noteDialog.open(NoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {mode: this.mode.ADD_NOTE, note: note},
+      data: { mode: this.mode.ADD_NOTE, note: note },
       width: '90vw',
       minWidth: '20vw',
-      maxWidth:'90vw',
+      maxWidth: '90vw',
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true      
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.note) {        
+      if (undefined !== data?.note) {
         data.note.latitude = this.mapService.getMapLocation().latitude;
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
-        this.notes = [data?.note, ...this.notes];
-        this.noteService.saveNotesToStorage(this.notes);
+        this.noteService.addNote(data.note);
+        this.noteService.saveNotes();
       }
     });
   }

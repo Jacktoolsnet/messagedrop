@@ -7,15 +7,31 @@ import { User } from '../interfaces/user';
 })
 export class NoteService {
 
+  private notes: Note[] = [];
+
   constructor() { }
 
-  loadNotesFromStorage(): Note[] {
-    let notesFromLocalStorage: Note[] = JSON.parse(localStorage.getItem('notes') || '[]');
-    return notesFromLocalStorage;
+  getNotes(): Note[] {
+    return this.notes
   }
 
-  saveNotesToStorage(notes: Note[]) {    
-    localStorage.setItem('notes', JSON.stringify(notes))
+  addNote(note: Note) {
+    this.notes.unshift(note);
+  }
+
+  filter(plusCode: string): Note[] {
+    this.notes = JSON.parse(localStorage.getItem('notes') || '[]');
+    this.notes = this.notes.filter((note) => note.plusCode.startsWith(plusCode));
+    return this.notes;
+  }
+
+  loadNotes(): Note[] {
+    this.notes = JSON.parse(localStorage.getItem('notes') || '[]');
+    return this.notes;
+  }
+
+  saveNotes() {
+    localStorage.setItem('notes', JSON.stringify(this.notes))
   }
 
   deleteNotesFromStorage() {

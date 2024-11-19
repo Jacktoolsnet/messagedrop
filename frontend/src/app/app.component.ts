@@ -66,8 +66,6 @@ import { Subject } from 'rxjs';
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   public myHistory: string[] = [];
-  public notes: Note[] = [];
-  public allUserNotes: Note[] = [];
   public markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   private snackBarRef: any;
   public isUserLocation: boolean = false;
@@ -77,18 +75,17 @@ export class AppComponent implements OnInit {
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
   private messageSubject: Subject<void>;
-  private notesSubject: Subject<void>;
 
   constructor(
-    public mapService: MapService,
-    private geolocationService: GeolocationService,
     public userService: UserService,
+    public mapService: MapService,
+    public noteService: NoteService,
+    public placeService: PlaceService,
+    public contactService: ContactService,
+    private geolocationService: GeolocationService,
     private connectService: ConnectService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
-    private noteService: NoteService,
-    public placeService: PlaceService,
-    public contactService: ContactService,
     private statisticService: StatisticService,
     private snackBar: MatSnackBar,
     public messageDialog: MatDialog,
@@ -105,10 +102,6 @@ export class AppComponent implements OnInit {
     this.messageSubject.subscribe({
       next: (v) => this.createMarkerLocations(),
     });
-    this.notesSubject = new Subject<void>();
-    this.notesSubject.subscribe({
-      next: (v) => this.createMarkerLocations(),
-    });
     this.initApp();
   }
 
@@ -117,7 +110,6 @@ export class AppComponent implements OnInit {
       await new Promise(f => setTimeout(f, 500));
     }
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
-    this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
     // Count
     this.statisticService.countVisitor()
       .subscribe({
@@ -236,13 +228,6 @@ export class AppComponent implements OnInit {
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
-  private getNotesByPlusCode(location: Location, notesSubject: Subject<void>) {
-    let plusCode: string = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-    this.notes = [];
-    this.notes = this.allUserNotes.filter((note) => note.plusCode.startsWith(plusCode));
-    notesSubject.next();
-  }
-
   private updateDataForLocation(location: Location, forceSearch: boolean) {
     if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
       this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
@@ -251,10 +236,11 @@ export class AppComponent implements OnInit {
         // Clear markerLocations
         this.markerLocations.clear()
         // notes from local device
-        this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
+        this.noteService.filter(location.plusCode);
         // Messages
         this.getMessages(this.mapService.getMapLocation(), forceSearch, false);
-        // in the complete event of getMessages
+        // MarkerLocations
+        this.createMarkerLocations();
       } else {
         //this.createMarkerLocations();
       }
@@ -276,34 +262,17 @@ export class AppComponent implements OnInit {
       longitude: event.longitude,
       plusCode: event.plusCode
     });
-    let messages: Message[] = [];
-    let notes: Note[] = [];
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
-        if (this.mapService.getMapZoom() > 19) {
-          messages = this.messageService.getMessages().filter((message) => message.plusCode === event.plusCode);
-          this.openMarkerMessageListDialog(messages);
-        } else {
-          this.openMarkerMessageListDialog(this.messageService.getMessages());
-        }
-
+        this.openMarkerMessageListDialog(this.messageService.getMessages());
         break;
       case MarkerType.PRIVATE_NOTE:
-        if (this.mapService.getMapZoom() > 19) {
-          notes = this.notes.filter((note) => note.plusCode === event.plusCode);
-          this.openMarkerNoteListDialog(notes);
-        } else {
-          this.openMarkerNoteListDialog(this.notes);
-        }
+        this.openMarkerNoteListDialog(this.noteService.filter(event.plusCode));
         break;
       case MarkerType.MULTI:
-        if (this.mapService.getMapZoom() > 19) {
-          messages = this.messageService.getMessages().filter((message) => message.plusCode === event.plusCode);
-          notes = this.notes.filter((note) => note.plusCode === event.plusCode);
-          this.openMarkerMultiDialog(messages, notes);
-        } else {
-          this.openMarkerMultiDialog(this.messageService.getMessages(), this.notes);
-        }
+        let messages: Message[] = this.messageService.getMessages().filter((message) => message.plusCode === event.plusCode);
+        let notes: Note[] = this.noteService.filter(event.plusCode);
+        this.openMarkerMultiDialog(this.messageService.getMessages(), this.noteService.getNotes());
         break;
     }
   }
@@ -391,9 +360,8 @@ export class AppComponent implements OnInit {
         data.note.latitude = this.mapService.getMapLocation().latitude;
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
-        this.allUserNotes = [data?.note, ...this.allUserNotes];
-        this.notes = [data?.note, ...this.notes];
-        this.noteService.saveNotesToStorage(this.allUserNotes);
+        this.noteService.addNote(data.note);
+        this.noteService.saveNotes();
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
@@ -444,7 +412,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), notes: [...this.noteService.loadNotesFromStorage()] },
+      data: { user: this.userService.getUser(), notes: this.noteService.loadNotes() },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
@@ -460,8 +428,6 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-      this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
     });
   }
 
@@ -604,8 +570,6 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      this.allUserNotes = [...this.noteService.loadNotesFromStorage()];
-      this.getNotesByPlusCode(this.mapService.getMapLocation(), this.notesSubject);
     });
   }
 
@@ -730,7 +694,7 @@ export class AppComponent implements OnInit {
       }
     });
     // Process notes
-    this.notes.forEach((note) => {
+    this.noteService.getNotes().forEach((note) => {
       let location: Location = {
         latitude: note.latitude,
         longitude: note.longitude,
