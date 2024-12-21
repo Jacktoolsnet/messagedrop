@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogModule, MatDialogContainer, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -15,23 +15,21 @@ import { ShortMessage } from '../../../interfaces/short-message';
 import { Contact } from '../../../interfaces/contact';
 
 @Component({
-    selector: 'app-message',
-    imports: [
-        MatDialogContainer,
-        CommonModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-        MatIcon,
-        FormsModule,
-        MatFormFieldModule,
-        MatInputModule
-    ],
-    templateUrl: './message.component.html',
-    styleUrl: './message.component.css'
+  selector: 'app-message',
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
+  templateUrl: './message.component.html',
+  styleUrl: './message.component.css'
 })
 export class ContactMessageComponent implements OnInit {
 

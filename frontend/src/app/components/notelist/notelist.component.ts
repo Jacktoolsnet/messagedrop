@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MatDialogContent, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -15,7 +15,6 @@ import { MapService } from '../../services/map.service';
 import { Location } from '../../interfaces/location';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MatBadgeModule } from '@angular/material/badge';
-import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { Mode } from '../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
@@ -25,27 +24,22 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
 import { NoteComponent } from '../note/note.component';
 
 @Component({
-    selector: 'app-notelist',
-    imports: [
-        ShortNumberPipe,
-        MatBadgeModule,
-        MatCardModule,
-        MatDialogContainer,
-        CommonModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-        MatIcon,
-        FormsModule,
-        MatFormFieldModule,
-        MatMenuModule,
-        MatInputModule
-    ],
-    templateUrl: './notelist.component.html',
-    styleUrl: './notelist.component.css'
+  selector: 'app-notelist',
+  imports: [
+    MatBadgeModule,
+    MatCardModule,
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
+    MatMenuModule,
+    MatInputModule
+  ],
+  templateUrl: './notelist.component.html',
+  styleUrl: './notelist.component.css'
 })
 export class NotelistComponent implements OnInit {
   public notes: Note[];

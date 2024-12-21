@@ -1,5 +1,5 @@
-import { CUSTOM_ELEMENTS_SCHEMA, Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { Component, Inject, OnInit } from '@angular/core';
+import { MatDialogRef, MatDialogContent, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -30,27 +30,23 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TranslateService } from '../../services/translate.service';
 
 @Component({
-    selector: 'app-messagelist',
-    imports: [
-        ShortNumberPipe,
-        MatBadgeModule,
-        MatCardModule,
-        MatDialogContainer,
-        CommonModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-        MatIcon,
-        FormsModule,
-        MatFormFieldModule,
-        MatMenuModule,
-        MatInputModule
-    ],
-    templateUrl: './messagelist.component.html',
-    styleUrl: './messagelist.component.css'
+  selector: 'app-messagelist',
+  imports: [
+    ShortNumberPipe,
+    MatBadgeModule,
+    MatCardModule,
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
+    MatMenuModule,
+    MatInputModule
+  ],
+  templateUrl: './messagelist.component.html',
+  styleUrl: './messagelist.component.css'
 })
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];

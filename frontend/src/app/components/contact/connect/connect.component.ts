@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogContainer, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,23 +11,22 @@ import { Contact } from '../../../interfaces/contact';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-    selector: 'app-contact',
-    imports: [
-        MatDialogContainer,
-        CommonModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-        MatIcon,
-        FormsModule,
-        MatFormFieldModule,
-        MatInputModule
-    ],
-    templateUrl: './connect.component.html',
-    styleUrl: './connect.component.css'
+  selector: 'app-contact',
+  imports: [
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
+    MatDialogTitle,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
+  templateUrl: './connect.component.html',
+  styleUrl: './connect.component.css'
 })
 export class ConnectComponent implements OnInit {
   public connectId: String = '';

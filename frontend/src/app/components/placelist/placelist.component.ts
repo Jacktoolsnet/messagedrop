@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MatDialogContainer, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MatDialogRef, MatDialogContent, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
 
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
@@ -12,7 +12,6 @@ import { StyleService } from '../../services/style.service';
 import { Animation } from '../../interfaces/animation';
 import { User } from '../../interfaces/user';
 import { MatBadgeModule } from '@angular/material/badge';
-import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { Mode } from '../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatMenuModule } from '@angular/material/menu';
@@ -26,27 +25,22 @@ import { MapService } from '../../services/map.service';
 import { Location } from '../../interfaces/location';
 
 @Component({
-    selector: 'app-placelist',
-    imports: [
-        ShortNumberPipe,
-        MatBadgeModule,
-        MatCardModule,
-        MatDialogContainer,
-        CommonModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-        MatIcon,
-        FormsModule,
-        MatFormFieldModule,
-        MatMenuModule,
-        MatInputModule
-    ],
-    templateUrl: './placelist.component.html',
-    styleUrl: './placelist.component.css'
+  selector: 'app-placelist',
+  imports: [
+    MatBadgeModule,
+    MatCardModule,
+    CommonModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogContent,
+    MatIcon,
+    FormsModule,
+    MatFormFieldModule,
+    MatMenuModule,
+    MatInputModule
+  ],
+  templateUrl: './placelist.component.html',
+  styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent implements OnInit {
   public places!: Place[];

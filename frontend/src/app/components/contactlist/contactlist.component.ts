@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContainer, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialogRef, MatDialog, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
 import { Animation } from '../../interfaces/animation';
 import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
@@ -23,22 +23,18 @@ import { SocketioService } from '../../services/socketio.service';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({
-    selector: 'app-contactlist',
-    imports: [
-        MatBadgeModule,
-        MatCardModule,
-        MatDialogContainer,
-        CommonModule,
-        MatButtonModule,
-        MatDialogActions,
-        MatDialogClose,
-        MatDialogTitle,
-        MatDialogContent,
-        MatIcon,
-        MatMenuModule,
-    ],
-    templateUrl: './contactlist.component.html',
-    styleUrl: './contactlist.component.css'
+  selector: 'app-contactlist',
+  imports: [
+    MatBadgeModule,
+    MatCardModule,
+    CommonModule,
+    MatButtonModule,
+    MatDialogContent,
+    MatIcon,
+    MatMenuModule,
+  ],
+  templateUrl: './contactlist.component.html',
+  styleUrl: './contactlist.component.css'
 })
 export class ContactlistComponent implements OnInit {
   private contactToDelete!: Contact

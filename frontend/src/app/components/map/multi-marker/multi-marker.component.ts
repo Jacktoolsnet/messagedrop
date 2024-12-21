@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogClose, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -20,9 +20,7 @@ import { Note } from '../../../interfaces/note';
         MatInputModule,
         FormsModule,
         MatButtonModule,
-        MatDialogTitle,
         MatDialogContent,
-        MatDialogActions,
         MatDialogClose,
         MatIcon,
         CommonModule
@@ -31,7 +29,7 @@ import { Note } from '../../../interfaces/note';
     styleUrl: './multi-marker.component.css'
 })
 export class MultiMarkerComponent {
-  constructor(public dialogRef: MatDialogRef<MultiMarkerComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {messages: Message[], notes: Note[]}) {
+    constructor(public dialogRef: MatDialogRef<MultiMarkerComponent>,
+        @Inject(MAT_DIALOG_DATA) public data: { messages: Message[], notes: Note[] }) {
     }
 }

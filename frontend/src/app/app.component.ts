@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MessageComponent } from './components/message/message.component';
 import { MessageService } from './services/message.service';
 import { StatisticService } from './services/statistic.service';
@@ -42,25 +42,21 @@ import { ContactService } from './services/contact.service';
 import { Subject } from 'rxjs';
 
 @Component({
-    selector: 'app-root',
-    imports: [
-        MatBadgeModule,
-        CommonModule,
-        RouterOutlet,
-        MapComponent,
-        MatButtonModule,
-        MatTooltipModule,
-        MatIconModule,
-        MatDialogTitle,
-        MatDialogContent,
-        MatDialogActions,
-        MatDialogClose,
-        ShortNumberPipe,
-        MatMenuModule,
-        MatButtonModule
-    ],
-    templateUrl: './app.component.html',
-    styleUrl: './app.component.css'
+  selector: 'app-root',
+  imports: [
+    MatBadgeModule,
+    CommonModule,
+    RouterOutlet,
+    MapComponent,
+    MatButtonModule,
+    MatTooltipModule,
+    MatIconModule,
+    ShortNumberPipe,
+    MatMenuModule,
+    MatButtonModule
+  ],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;
