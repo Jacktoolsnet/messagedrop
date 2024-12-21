@@ -1,25 +1,25 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialog, MAT_DIALOG_DATA, MatDialogContent } from '@angular/material/dialog';
-import { Animation } from '../../interfaces/animation';
-import { Contact } from '../../interfaces/contact';
-import { Mode } from '../../interfaces/mode';
-import { User } from '../../interfaces/user';
-import { StyleService } from '../../services/style.service';
 import { CommonModule } from '@angular/common';
+import { Component, Inject, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { ConnectComponent } from '../contact/connect/connect.component';
+import { Animation } from '../../interfaces/animation';
+import { Contact } from '../../interfaces/contact';
+import { Mode } from '../../interfaces/mode';
+import { ShortMessage } from '../../interfaces/short-message';
+import { User } from '../../interfaces/user';
 import { ConnectService } from '../../services/connect.service';
 import { ContactService } from '../../services/contact.service';
-import { ContactProfileComponent } from '../contact/profile/profile.component';
-import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
-import { UserService } from '../../services/user.service';
-import { ContactMessageComponent } from '../contact/message/message.component';
-import { ShortMessage } from '../../interfaces/short-message';
 import { SocketioService } from '../../services/socketio.service';
+import { StyleService } from '../../services/style.service';
+import { UserService } from '../../services/user.service';
+import { ConnectComponent } from '../contact/connect/connect.component';
+import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
+import { ContactMessageComponent } from '../contact/message/message.component';
+import { ContactProfileComponent } from '../contact/profile/profile.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({

@@ -15,7 +15,7 @@ export class StyleService {
 
   private getGradiantColorAnimation(): Animation {
     let animation: Animation = {
-      'cssclass' : 'gradientAnimation',
+      'cssclass': 'gradientAnimation',
       'style': `
       background-color: ${random().toHex()};
       background-image: linear-gradient(${this.getRandomNumber(0, 365)}deg, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()});
@@ -29,7 +29,7 @@ export class StyleService {
 
   private getRadialColorAnimation(): Animation {
     let animation: Animation = {
-      'cssclass' : 'radialAnimation',
+      'cssclass': 'radialAnimation',
       'style': `
       background-color: ${random().toHex()};
       background-image: radial-gradient(ellipse farthest-corner at ${this.getRandomNumber(25, 75)}% ${this.getRandomNumber(25, 75)}%, ${random().toHex()} 0%, ${random().toHex()} 8%, ${random().toHex()} 25%, ${random().toHex()} 62.5%, ${random().toHex()} 100%);
@@ -40,11 +40,11 @@ export class StyleService {
     };
     return animation;
   }
-  
+
 
   private getConicColorAnimation(): Animation {
     let animation: Animation = {
-      'cssclass' : 'conicAnimation',
+      'cssclass': 'conicAnimation',
       'style': `
       background-color: ${random().toHex()};
       background-image: conic-gradient(at ${this.getRandomNumber(25, 75)}% ${this.getRandomNumber(25, 75)}%, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()});

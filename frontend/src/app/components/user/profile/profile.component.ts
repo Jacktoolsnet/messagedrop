@@ -2,30 +2,30 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { User } from '../../../interfaces/user';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { User } from '../../../interfaces/user';
 import { StyleService } from '../../../services/style.service';
 
 @Component({
-    selector: 'app-profile',
-    imports: [
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogTitle,
-        MatDialogContent,
-        MatDialogActions,
-        MatDialogClose,
-        MatIcon,
-        CommonModule
-    ],
-    templateUrl: './profile.component.html',
-    styleUrl: './profile.component.css'
+  selector: 'app-profile',
+  imports: [
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
+    MatIcon,
+    CommonModule
+  ],
+  templateUrl: './profile.component.html',
+  styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
   public user!: User;
@@ -69,7 +69,7 @@ export class ProfileComponent {
     this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
   }
 
-  public changeDefaultStyle(){
+  public changeDefaultStyle() {
     this.user.defaultStyle = this.style.getRandomStyle();
   }
 }

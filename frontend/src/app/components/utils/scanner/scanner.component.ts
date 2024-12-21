@@ -1,17 +1,17 @@
 import { Component, Inject } from '@angular/core';
-import { ZXingScannerModule } from '@zxing/ngx-scanner';
-import { BarcodeFormat } from '@zxing/library';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { BarcodeFormat } from '@zxing/library';
+import { ZXingScannerModule } from '@zxing/ngx-scanner';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
 
 @Component({
-    selector: 'app-scanner',
-    imports: [
-        ZXingScannerModule
-    ],
-    templateUrl: './scanner.component.html',
-    styleUrl: './scanner.component.css'
+  selector: 'app-scanner',
+  imports: [
+    ZXingScannerModule
+  ],
+  templateUrl: './scanner.component.html',
+  styleUrl: './scanner.component.css'
 })
 export class ScannerComponent {
 

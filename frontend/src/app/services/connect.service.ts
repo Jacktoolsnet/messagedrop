@@ -1,17 +1,17 @@
-import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from '../../environments/environment';
-import { catchError, throwError } from 'rxjs';
-import { Connect } from '../interfaces/connect';
-import { CreateConnectResponse } from '../interfaces/create-connect-response';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { GetConnectResponse } from '../interfaces/get-connect-response';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { SocketioService } from './socketio.service';
-import { Contact } from '../interfaces/contact';
-import { CryptoService } from './crypto.service';
-import { ContactService } from './contact.service';
 import { Buffer } from 'buffer';
+import { catchError, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { Connect } from '../interfaces/connect';
+import { Contact } from '../interfaces/contact';
+import { CreateConnectResponse } from '../interfaces/create-connect-response';
+import { GetConnectResponse } from '../interfaces/get-connect-response';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { ContactService } from './contact.service';
+import { CryptoService } from './crypto.service';
+import { SocketioService } from './socketio.service';
 
 @Injectable({
   providedIn: 'root'
@@ -70,7 +70,7 @@ export class ConnectService {
             // For Development check equal. Change to not equal for production.
             if (contact.contactUserId != contact.userId && contact.signingPublicKey) {
               // Verify data
-              this.cryptoService.verifySignature(contact.signingPublicKey, contact.contactUserId, contact.signature)
+              this.cryptoService.verifySignature(contact.signingPublicKey, contact.contactUserId, contact.signature!)
                 .then((valid: Boolean) => {
                   if (valid) {
                     this.snackBar.open(`Connect data is valid.`, 'OK');

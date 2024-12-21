@@ -1,18 +1,18 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogTitle, MatDialogContent, MatDialogActions, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
+import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { StyleService } from '../../../services/style.service';
-import { User } from '../../../interfaces/user';
-import { Mode } from '../../../interfaces/mode';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ShortMessage } from '../../../interfaces/short-message';
 import { Contact } from '../../../interfaces/contact';
+import { Mode } from '../../../interfaces/mode';
+import { ShortMessage } from '../../../interfaces/short-message';
+import { User } from '../../../interfaces/user';
+import { StyleService } from '../../../services/style.service';
 
 @Component({
   selector: 'app-message',

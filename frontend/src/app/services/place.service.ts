@@ -1,15 +1,15 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { Injectable } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { Place } from '../interfaces/place';
+import { environment } from '../../environments/environment';
+import { CreatePlaceResponse } from '../interfaces/create-place-response';
+import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
-import { GetPlaceResponse } from '../interfaces/get-place-response';
-import { CreatePlaceResponse } from '../interfaces/create-place-response';
-import { UserService } from './user.service';
+import { Place } from '../interfaces/place';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { MapService } from './map.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'

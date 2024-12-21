@@ -1,7 +1,7 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { catchError, retry, throwError } from 'rxjs';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 @Injectable({
@@ -11,7 +11,7 @@ export class StatisticService {
 
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type':  'application/json',
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${environment.apiToken}`
     })
   };

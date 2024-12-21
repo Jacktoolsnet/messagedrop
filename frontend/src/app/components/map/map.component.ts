@@ -1,14 +1,14 @@
-import { Component, AfterViewInit, Input, Output, OnChanges, SimpleChanges, EventEmitter } from '@angular/core';
-import { MapService } from '../../services/map.service';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
+import { MapService } from '../../services/map.service';
 
 
 @Component({
-    selector: 'app-map',
-    imports: [],
-    templateUrl: './map.component.html',
-    styleUrl: './map.component.css'
+  selector: 'app-map',
+  imports: [],
+  templateUrl: './map.component.html',
+  styleUrl: './map.component.css'
 })
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Keypair } from '../interfaces/keypair';
-import { User } from '../interfaces/user';
 import { Buffer } from 'buffer';
+import { Keypair } from '../interfaces/keypair';
 
 @Injectable({
   providedIn: 'root'

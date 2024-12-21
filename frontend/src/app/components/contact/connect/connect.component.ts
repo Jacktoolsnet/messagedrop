@@ -2,13 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { Mode } from '../../../interfaces/mode';
-import { Contact } from '../../../interfaces/contact';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Contact } from '../../../interfaces/contact';
+import { Mode } from '../../../interfaces/mode';
 
 @Component({
   selector: 'app-contact',

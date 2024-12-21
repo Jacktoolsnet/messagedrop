@@ -1,10 +1,9 @@
 import { Injectable } from '@angular/core';
+import * as plusCodes from 'pluscodes';
 import { Observable } from 'rxjs';
 import { Location } from '../interfaces/location';
-import * as plusCodes from 'pluscodes';
 import { Message } from '../interfaces/message';
 import { PlusCodeArea } from '../interfaces/plus-code-area';
-import { MapService } from './map.service';
 
 @Injectable({
   providedIn: 'root'

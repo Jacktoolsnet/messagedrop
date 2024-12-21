@@ -1,12 +1,11 @@
-import { environment } from '../../environments/environment';
 import { Injectable } from '@angular/core';
-import { SocketIoConfig, Socket } from 'ngx-socket-io';
+import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Socket, SocketIoConfig } from 'ngx-socket-io';
+import { environment } from '../../environments/environment';
+import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
 import { Contact } from '../interfaces/contact';
 import { ContactService } from './contact.service';
-import { User } from '../interfaces/user';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { MatDialog } from '@angular/material/dialog';
-import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
 import { UserService } from './user.service';
 
 @Injectable({

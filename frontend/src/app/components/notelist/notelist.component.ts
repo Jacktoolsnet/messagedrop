@@ -1,27 +1,27 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MatDialogRef, MatDialogContent, MAT_DIALOG_DATA, MatDialog } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { MatInputModule } from '@angular/material/input';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatCardModule } from '@angular/material/card';
-import { StyleService } from '../../services/style.service';
-import { Animation } from '../../interfaces/animation';
-import { User } from '../../interfaces/user';
-import { MapService } from '../../services/map.service';
-import { Location } from '../../interfaces/location';
-import { GeolocationService } from '../../services/geolocation.service';
+import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
-import { Mode } from '../../interfaces/mode';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { Animation } from '../../interfaces/animation';
+import { Location } from '../../interfaces/location';
+import { Mode } from '../../interfaces/mode';
 import { Note } from '../../interfaces/note';
+import { User } from '../../interfaces/user';
+import { GeolocationService } from '../../services/geolocation.service';
+import { MapService } from '../../services/map.service';
 import { NoteService } from '../../services/note.service';
-import { DeleteNoteComponent } from './delete-note/delete-note.component';
+import { StyleService } from '../../services/style.service';
 import { NoteComponent } from '../note/note.component';
+import { DeleteNoteComponent } from './delete-note/delete-note.component';
 
 @Component({
   selector: 'app-notelist',

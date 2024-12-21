@@ -1,16 +1,16 @@
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Contact } from '../interfaces/contact';
-import { HttpHeaders, HttpClient, HttpErrorResponse } from '@angular/common/http';
-import { throwError, catchError } from 'rxjs';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { Contact } from '../interfaces/contact';
+import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
-import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { ShortMessage } from '../interfaces/short-message';
-import { UserService } from './user.service';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { SocketioService } from './socketio.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'

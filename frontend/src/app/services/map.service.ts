@@ -1,10 +1,10 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../interfaces/location';
-import { GeolocationService } from './geolocation.service';
-import { PlusCodeArea } from '../interfaces/plus-code-area';
 import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
+import { PlusCodeArea } from '../interfaces/plus-code-area';
+import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
   iconUrl: 'assets/markers/message-marker.svg',

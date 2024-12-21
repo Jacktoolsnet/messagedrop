@@ -1,18 +1,18 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { environment } from '../../environments/environment';
-import { catchError, Subject, throwError } from 'rxjs';
-import { Location } from '../interfaces/location';
-import { User } from '../interfaces/user';
-import { GetMessageResponse } from '../interfaces/get-message-response';
-import { GeolocationService } from './geolocation.service';
-import { Message } from '../interfaces/message';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { LikedByUserResponse } from '../interfaces/liked-by-user-respons';
-import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
-import { MapService } from './map.service';
+import { Injectable } from '@angular/core';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, Subject, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
+import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
+import { GetMessageResponse } from '../interfaces/get-message-response';
+import { LikedByUserResponse } from '../interfaces/liked-by-user-respons';
+import { Location } from '../interfaces/location';
+import { Message } from '../interfaces/message';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { User } from '../interfaces/user';
+import { GeolocationService } from './geolocation.service';
+import { MapService } from './map.service';
 import { StatisticService } from './statistic.service';
 
 @Injectable({

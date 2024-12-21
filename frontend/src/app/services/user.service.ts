@@ -1,17 +1,16 @@
-import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { SwPush } from '@angular/service-worker';
+import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreateUserResponse } from '../interfaces/create-user-response';
-import { catchError, throwError } from 'rxjs';
-import { User } from '../interfaces/user';
-import { GetUserResponse } from '../interfaces/get-user-response';
 import { GetMessageResponse } from '../interfaces/get-message-response';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { SwPush } from '@angular/service-worker';
-import { StyleService } from './style.service';
-import { CryptoService } from './crypto.service';
+import { GetUserResponse } from '../interfaces/get-user-response';
 import { Keypair } from '../interfaces/keypair';
-import { layerGroup } from 'leaflet';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { User } from '../interfaces/user';
+import { CryptoService } from './crypto.service';
+import { StyleService } from './style.service';
 
 @Injectable({
   providedIn: 'root'
