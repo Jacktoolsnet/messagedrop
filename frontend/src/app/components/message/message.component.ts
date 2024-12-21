@@ -14,23 +14,23 @@ import { Mode } from '../../interfaces/mode';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-message',
-  standalone: true,
-  imports: [
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule],
-  templateUrl: './message.component.html',
-  styleUrl: './message.component.css'
+    selector: 'app-message',
+    imports: [
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule
+    ],
+    templateUrl: './message.component.html',
+    styleUrl: './message.component.css'
 })
 export class MessageComponent implements OnInit {
 

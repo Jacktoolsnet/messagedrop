@@ -12,24 +12,23 @@ import { Message } from '../../../interfaces/message';
 import { Note } from '../../../interfaces/note';
 
 @Component({
-  selector: 'app-edit-user',
-  standalone: true,
-  imports: [
-    ShortNumberPipe,
-    MatBadgeModule,
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-    MatIcon,
-    CommonModule
-  ],
-  templateUrl: './multi-marker.component.html',
-  styleUrl: './multi-marker.component.css'
+    selector: 'app-edit-user',
+    imports: [
+        ShortNumberPipe,
+        MatBadgeModule,
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogClose,
+        MatIcon,
+        CommonModule
+    ],
+    templateUrl: './multi-marker.component.html',
+    styleUrl: './multi-marker.component.css'
 })
 export class MultiMarkerComponent {
   constructor(public dialogRef: MatDialogRef<MultiMarkerComponent>,

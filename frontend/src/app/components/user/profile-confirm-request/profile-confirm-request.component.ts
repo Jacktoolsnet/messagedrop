@@ -4,11 +4,10 @@ import { MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, Mat
 import { Contact } from '../../../interfaces/contact';
 
 @Component({
-  selector: 'app-deleteuser',
-  standalone: true,
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
-  templateUrl: './profile-confirm-request.component.html',
-  styleUrl: './profile-confirm-request.component.css'
+    selector: 'app-deleteuser',
+    imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+    templateUrl: './profile-confirm-request.component.html',
+    styleUrl: './profile-confirm-request.component.css'
 })
 export class ProfileConfirmRequestComponent {
   public contact: Contact;

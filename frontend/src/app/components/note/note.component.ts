@@ -15,23 +15,23 @@ import { Note } from '../../interfaces/note';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-note',
-  standalone: true,
-  imports: [
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule],
-  templateUrl: './note.component.html',
-  styleUrl: './note.component.css'
+    selector: 'app-note',
+    imports: [
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule
+    ],
+    templateUrl: './note.component.html',
+    styleUrl: './note.component.css'
 })
 export class NoteComponent implements OnInit {
 

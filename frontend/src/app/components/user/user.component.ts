@@ -13,23 +13,22 @@ import { Connect } from '../../interfaces/connect';
 import { UserService } from '../../services/user.service';
 
 @Component({
-  selector: 'app-user',
-  standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-    MatIcon,
-    CommonModule,
-    QRCodeModule
-  ],
-  templateUrl: './user.component.html',
-  styleUrl: './user.component.css'
+    selector: 'app-user',
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogClose,
+        MatIcon,
+        CommonModule,
+        QRCodeModule
+    ],
+    templateUrl: './user.component.html',
+    styleUrl: './user.component.css'
 })
 export class UserComponent {
   private snackBarRef: any;

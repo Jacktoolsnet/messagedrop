@@ -42,26 +42,25 @@ import { ContactService } from './services/contact.service';
 import { Subject } from 'rxjs';
 
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    MatBadgeModule,
-    CommonModule,
-    RouterOutlet,
-    MapComponent,
-    MatButtonModule,
-    MatTooltipModule,
-    MatIconModule,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-    ShortNumberPipe,
-    MatMenuModule,
-    MatButtonModule
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+    selector: 'app-root',
+    imports: [
+        MatBadgeModule,
+        CommonModule,
+        RouterOutlet,
+        MapComponent,
+        MatButtonModule,
+        MatTooltipModule,
+        MatIconModule,
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogClose,
+        ShortNumberPipe,
+        MatMenuModule,
+        MatButtonModule
+    ],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.css'
 })
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;

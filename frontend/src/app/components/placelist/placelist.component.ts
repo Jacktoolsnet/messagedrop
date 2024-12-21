@@ -26,28 +26,27 @@ import { MapService } from '../../services/map.service';
 import { Location } from '../../interfaces/location';
 
 @Component({
-  selector: 'app-placelist',
-  standalone: true,
-  imports: [
-    ShortNumberPipe,
-    MatBadgeModule,
-    MatCardModule,
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatMenuModule,
-    MatInputModule
-  ],
-  templateUrl: './placelist.component.html',
-  styleUrl: './placelist.component.css'
+    selector: 'app-placelist',
+    imports: [
+        ShortNumberPipe,
+        MatBadgeModule,
+        MatCardModule,
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatMenuModule,
+        MatInputModule
+    ],
+    templateUrl: './placelist.component.html',
+    styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent implements OnInit {
   public places!: Place[];

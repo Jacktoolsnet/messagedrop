@@ -25,28 +25,27 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
 import { NoteComponent } from '../note/note.component';
 
 @Component({
-  selector: 'app-notelist',
-  standalone: true,
-  imports: [
-    ShortNumberPipe,
-    MatBadgeModule,
-    MatCardModule,
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatMenuModule,
-    MatInputModule
-  ],
-  templateUrl: './notelist.component.html',
-  styleUrl: './notelist.component.css'
+    selector: 'app-notelist',
+    imports: [
+        ShortNumberPipe,
+        MatBadgeModule,
+        MatCardModule,
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatMenuModule,
+        MatInputModule
+    ],
+    templateUrl: './notelist.component.html',
+    styleUrl: './notelist.component.css'
 })
 export class NotelistComponent implements OnInit {
   public notes: Note[];

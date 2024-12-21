@@ -23,23 +23,22 @@ import { SocketioService } from '../../services/socketio.service';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({
-  selector: 'app-contactlist',
-  standalone: true,
-  imports: [
-    MatBadgeModule,
-    MatCardModule,
-    MatDialogContainer,
-    CommonModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    MatMenuModule,
-  ],
-  templateUrl: './contactlist.component.html',
-  styleUrl: './contactlist.component.css'
+    selector: 'app-contactlist',
+    imports: [
+        MatBadgeModule,
+        MatCardModule,
+        MatDialogContainer,
+        CommonModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        MatMenuModule,
+    ],
+    templateUrl: './contactlist.component.html',
+    styleUrl: './contactlist.component.css'
 })
 export class ContactlistComponent implements OnInit {
   private contactToDelete!: Contact

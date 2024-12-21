@@ -30,28 +30,27 @@ import { MatMenuModule } from '@angular/material/menu';
 import { TranslateService } from '../../services/translate.service';
 
 @Component({
-  selector: 'app-messagelist',
-  standalone: true,
-  imports: [
-    ShortNumberPipe,
-    MatBadgeModule,
-    MatCardModule,
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatMenuModule,
-    MatInputModule
-  ],
-  templateUrl: './messagelist.component.html',
-  styleUrl: './messagelist.component.css'
+    selector: 'app-messagelist',
+    imports: [
+        ShortNumberPipe,
+        MatBadgeModule,
+        MatCardModule,
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatMenuModule,
+        MatInputModule
+    ],
+    templateUrl: './messagelist.component.html',
+    styleUrl: './messagelist.component.css'
 })
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];

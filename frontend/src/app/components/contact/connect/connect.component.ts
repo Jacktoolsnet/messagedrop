@@ -11,24 +11,23 @@ import { Contact } from '../../../interfaces/contact';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-contact',
-  standalone: true,
-  imports: [
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule
-  ],
-  templateUrl: './connect.component.html',
-  styleUrl: './connect.component.css'
+    selector: 'app-contact',
+    imports: [
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule
+    ],
+    templateUrl: './connect.component.html',
+    styleUrl: './connect.component.css'
 })
 export class ConnectComponent implements OnInit {
   public connectId: String = '';

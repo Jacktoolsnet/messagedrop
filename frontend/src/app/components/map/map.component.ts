@@ -5,11 +5,10 @@ import { MarkerLocation } from '../../interfaces/marker-location';
 
 
 @Component({
-  selector: 'app-map',
-  standalone: true,
-  imports: [],
-  templateUrl: './map.component.html',
-  styleUrl: './map.component.css'
+    selector: 'app-map',
+    imports: [],
+    templateUrl: './map.component.html',
+    styleUrl: './map.component.css'
 })
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection

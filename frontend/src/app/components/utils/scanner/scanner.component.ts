@@ -6,13 +6,12 @@ import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
 
 @Component({
-  selector: 'app-scanner',
-  standalone: true,
-  imports: [
-    ZXingScannerModule
-  ],
-  templateUrl: './scanner.component.html',
-  styleUrl: './scanner.component.css'
+    selector: 'app-scanner',
+    imports: [
+        ZXingScannerModule
+    ],
+    templateUrl: './scanner.component.html',
+    styleUrl: './scanner.component.css'
 })
 export class ScannerComponent {
 

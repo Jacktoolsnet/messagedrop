@@ -10,22 +10,21 @@ import { CommonModule } from '@angular/common';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-edit-user',
-  standalone: true,
-  imports: [
-    MatFormFieldModule,
-    MatInputModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogTitle,
-    MatDialogContent,
-    MatDialogActions,
-    MatDialogClose,
-    MatIcon,
-    CommonModule
-  ],
-  templateUrl: './edit-user.component.html',
-  styleUrl: './edit-user.component.css'
+    selector: 'app-edit-user',
+    imports: [
+        MatFormFieldModule,
+        MatInputModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogTitle,
+        MatDialogContent,
+        MatDialogActions,
+        MatDialogClose,
+        MatIcon,
+        CommonModule
+    ],
+    templateUrl: './edit-user.component.html',
+    styleUrl: './edit-user.component.css'
 })
 export class EditUserComponent {
   public relatedUser!: RelatedUser;

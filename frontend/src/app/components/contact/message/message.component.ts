@@ -15,23 +15,23 @@ import { ShortMessage } from '../../../interfaces/short-message';
 import { Contact } from '../../../interfaces/contact';
 
 @Component({
-  selector: 'app-message',
-  standalone: true,
-  imports: [
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule],
-  templateUrl: './message.component.html',
-  styleUrl: './message.component.css'
+    selector: 'app-message',
+    imports: [
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule
+    ],
+    templateUrl: './message.component.html',
+    styleUrl: './message.component.css'
 })
 export class ContactMessageComponent implements OnInit {
 

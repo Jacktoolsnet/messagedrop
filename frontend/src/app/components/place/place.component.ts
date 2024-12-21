@@ -13,24 +13,23 @@ import { Place } from '../../interfaces/place';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
-  selector: 'app-place',
-  standalone: true,
-  imports: [
-    MatDialogContainer,
-    CommonModule,
-    FormsModule,
-    MatButtonModule,
-    MatDialogActions,
-    MatDialogClose,
-    MatDialogTitle,
-    MatDialogContent,
-    MatIcon,
-    FormsModule,
-    MatFormFieldModule,
-    MatInputModule
-  ],
-  templateUrl: './place.component.html',
-  styleUrl: './place.component.css'
+    selector: 'app-place',
+    imports: [
+        MatDialogContainer,
+        CommonModule,
+        FormsModule,
+        MatButtonModule,
+        MatDialogActions,
+        MatDialogClose,
+        MatDialogTitle,
+        MatDialogContent,
+        MatIcon,
+        FormsModule,
+        MatFormFieldModule,
+        MatInputModule
+    ],
+    templateUrl: './place.component.html',
+    styleUrl: './place.component.css'
 })
 export class PlaceComponent implements OnInit {
 
