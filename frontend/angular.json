@@ -18,7 +18,9 @@
           "options": {
             "allowedCommonJsDependencies": [
               "pluscodes",
-              "leaflet"
+              "leaflet",
+              "qrcode",
+              "buffer"
             ],
             "outputPath": "dist/frontend",
             "index": "src/index.html",
@@ -50,13 +52,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "1mb",
-                  "maximumError": "1.5mb"
+                  "maximumWarning": "5mb",
+                  "maximumError": "5.5mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kb",
-                  "maximumError": "4kb"
+                  "maximumWarning": "4kb",
+                  "maximumError": "6kb"
                 }
               ],
               "outputHashing": "all",
