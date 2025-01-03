@@ -401,7 +401,7 @@ export class AppComponent implements OnInit {
             panelClass: ['snack-warning'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
-            duration: 1000
+            duration: 2000
           });
         },
         complete: () => { }
@@ -409,26 +409,35 @@ export class AppComponent implements OnInit {
   }
 
   public openUserNoteListDialog(): void {
-    const dialogRef = this.messageListDialog.open(NotelistComponent, {
-      panelClass: 'NoteListDialog',
-      closeOnNavigation: true,
-      data: { user: this.userService.getUser(), notes: this.noteService.loadNotes() },
-      width: 'auto',
-      minWidth: '60vw',
-      maxWidth: '90vw',
-      height: 'auto',
-      minHeight: 'auto',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
+    if (this.noteService.loadNotes().length === 0) {
+      this.snackBarRef = this.snackBar.open("You have not written any note yet", undefined, {
+        panelClass: ['snack-warning'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 2000
+      });
+    } else {
+      const dialogRef = this.messageListDialog.open(NotelistComponent, {
+        panelClass: 'NoteListDialog',
+        closeOnNavigation: true,
+        data: { user: this.userService.getUser(), notes: this.noteService.loadNotes() },
+        width: 'auto',
+        minWidth: '60vw',
+        maxWidth: '90vw',
+        height: 'auto',
+        minHeight: 'auto',
+        maxHeight: '90vh',
+        hasBackdrop: true
+      });
 
-    dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("userNoteList");
-      window.history.replaceState(this.myHistory, '', '');
-    });
+      dialogRef.afterOpened().subscribe(e => {
+        this.myHistory.push("userNoteList");
+        window.history.replaceState(this.myHistory, '', '');
+      });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
-    });
+      dialogRef.afterClosed().subscribe((data: any) => {
+      });
+    }
   }
 
   public openPlaceListDialog(): void {
