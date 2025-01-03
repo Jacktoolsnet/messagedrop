@@ -38,6 +38,7 @@ import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NoteService } from './services/note.service';
 import { PlaceService } from './services/place.service';
+import { SocketioService } from './services/socketio.service';
 import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
 
@@ -82,6 +83,7 @@ export class AppComponent implements OnInit {
     private cryptoService: CryptoService,
     private messageService: MessageService,
     private statisticService: StatisticService,
+    private socketioService: SocketioService,
     private snackBar: MatSnackBar,
     public messageDialog: MatDialog,
     public noteDialog: MatDialog,
@@ -102,9 +104,12 @@ export class AppComponent implements OnInit {
 
   private async initApp() {
     while (!this.mapService.isReady()) {
-      await new Promise(f => setTimeout(f, 500));
+      await new Promise(f => setTimeout(f, 100));
     }
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
+    while (!this.socketioService.isReady()) {
+      await new Promise(f => setTimeout(f, 100));
+    }
     // Count
     this.statisticService.countVisitor()
       .subscribe({

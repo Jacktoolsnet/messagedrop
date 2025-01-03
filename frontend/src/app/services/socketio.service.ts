@@ -87,7 +87,6 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
-          console.log(payload);
           /**this.snackBar.open(`Joined user room. (${payload.status})`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
