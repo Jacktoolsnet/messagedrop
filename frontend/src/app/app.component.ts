@@ -103,6 +103,12 @@ export class AppComponent implements OnInit {
   }
 
   private async initApp() {
+    this.userService.initUser();
+    while (!this.userService.isReady()) {
+      await new Promise(f => setTimeout(f, 100));
+    }
+    this.contactService.initContacts()
+    this.placeService.initPlaces()
     while (!this.mapService.isReady()) {
       await new Promise(f => setTimeout(f, 100));
     }

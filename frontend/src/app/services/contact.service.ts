@@ -32,18 +32,13 @@ export class ContactService {
     private http: HttpClient,
     private userService: UserService,
     private snackBar: MatSnackBar
-  ) {
-    this.initContacts();
-  }
+  ) { }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
   }
 
-  async initContacts() {
-    while (!this.userService.isReady) {
-      await new Promise(f => setTimeout(f, 500));
-    }
+  initContacts() {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {

@@ -54,10 +54,7 @@ export class UserService {
     private swPush: SwPush,
     private style: StyleService,
     private cryptoService: CryptoService
-  ) {
-    this.loadUserFromLocalStorage();
-    this.initUser();
-  }
+  ) { }
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -102,6 +99,7 @@ export class UserService {
   }
 
   initUser() {
+    this.loadUserFromLocalStorage();
     if (this.user.id === '') {
       this.cryptoService.createEncryptionKey()
         .then((encryptionKeyPair: Keypair) => {

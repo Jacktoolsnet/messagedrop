@@ -36,17 +36,13 @@ export class PlaceService {
   constructor(
     private userService: UserService,
     private http: HttpClient) {
-    this.initPlaces();
   }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
   }
 
-  async initPlaces() {
-    while (!this.userService.isReady()) {
-      await new Promise(f => setTimeout(f, 500));
-    }
+  initPlaces() {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {

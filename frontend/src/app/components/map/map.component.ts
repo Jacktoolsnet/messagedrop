@@ -2,6 +2,7 @@ import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, Simpl
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
 import { MapService } from '../../services/map.service';
+import { UserService } from '../../services/user.service';
 
 
 @Component({
@@ -23,9 +24,16 @@ export class MapComponent implements AfterViewInit, OnChanges {
     this.mapService.createMarkers(this.markerLocations);
   }
 
-  constructor(private mapService: MapService) { }
+  constructor(private mapService: MapService, public userService: UserService) { }
 
   ngAfterViewInit(): void {
+    this.initComponent();
+  }
+
+  private async initComponent() {
+    while (!this.userService.isReady()) {
+      await new Promise(f => setTimeout(f, 100));
+    }
     this.mapService.initMap(this.location, this.clickEvent, this.moveEndEvent, this.markerClickEvent);
   }
 
