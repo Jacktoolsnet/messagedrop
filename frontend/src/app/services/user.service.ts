@@ -267,7 +267,8 @@ export class UserService {
 
   getLanguageForLocation(location: string): string {
     let language: string = '';
-    switch (location.split('-')[1].toUpperCase()) {
+    let switchLocation: string = location.split('-').length === 2 ? location.split('-')[1].toUpperCase() : location.split('-')[0].toUpperCase();
+    switch (switchLocation) {
       case 'AR':
         language = 'AR';
         break;
