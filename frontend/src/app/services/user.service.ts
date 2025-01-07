@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
-import { catchError, throwError } from 'rxjs';
+import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { GetMessageResponse } from '../interfaces/get-message-response';
@@ -98,7 +98,7 @@ export class UserService {
     }
   }
 
-  initUser() {
+  initUser(userSubject: Subject<void>) {
     this.loadUserFromLocalStorage();
     if (this.user.id === '') {
       this.cryptoService.createEncryptionKey()
@@ -112,6 +112,7 @@ export class UserService {
                   this.user!.id = createUserResponse.userId;
                   this.saveUser(this.user!);
                   this.ready = true;
+                  userSubject.next();
                 });
             });
         });
@@ -127,11 +128,13 @@ export class UserService {
               this.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey, this.user!.subscription)
                 .subscribe(createUserResponse => {
                   this.ready = true;
+                  userSubject.next();
                 });
             }
           },
           complete: () => {
             this.ready = true;
+            userSubject.next();
           }
         });
     }

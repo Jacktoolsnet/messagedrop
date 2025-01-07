@@ -31,6 +31,9 @@ export class SocketioService {
     this.socket.on("disconnect", () => {
       this.ready = false;
     });
+  }
+
+  initSocket() {
     this.initUser()
     this.initContacts();
   }

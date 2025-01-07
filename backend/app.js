@@ -34,7 +34,10 @@ const logger = winston.createLogger({
   ],
 });
 
-// Socket.io
+/**
+ * Socket.io
+ * Disable Apache proxymode in Plesk to avoid socket.io connection errors.
+ */
 const { Server } = require('socket.io');
 const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');

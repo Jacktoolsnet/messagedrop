@@ -70,7 +70,9 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
+  private userSubject: Subject<void>;
   private messageSubject: Subject<void>;
+  private mapSubject: Subject<void>;
 
   constructor(
     public userService: UserService,
@@ -95,27 +97,32 @@ export class AppComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private swPush: SwPush
   ) {
+    this.userSubject = new Subject<void>();
+    this.userSubject.subscribe({
+      next: (v) => {
+        this.socketioService.initSocket();
+        this.contactService.initContacts();
+        this.placeService.initPlaces();
+        this.mapService.initMap(this.mapSubject);
+      },
+    });
+    this.mapSubject = new Subject<void>();
+    this.mapSubject.subscribe({
+      next: (v) => {
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      },
+    });
     this.messageSubject = new Subject<void>();
     this.messageSubject.subscribe({
-      next: (v) => this.createMarkerLocations(),
+      next: (v) => {
+        this.createMarkerLocations()
+      },
     });
     this.initApp();
   }
 
-  private async initApp() {
-    this.userService.initUser();
-    while (!this.userService.isReady()) {
-      await new Promise(f => setTimeout(f, 100));
-    }
-    this.contactService.initContacts()
-    this.placeService.initPlaces()
-    while (!this.mapService.isReady()) {
-      await new Promise(f => setTimeout(f, 100));
-    }
-    this.updateDataForLocation(this.mapService.getMapLocation(), true)
-    while (!this.socketioService.isReady()) {
-      await new Promise(f => setTimeout(f, 100));
-    }
+  private initApp() {
+    this.userService.initUser(this.userSubject);
     // Count
     this.statisticService.countVisitor()
       .subscribe({

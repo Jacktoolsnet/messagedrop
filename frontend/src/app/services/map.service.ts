@@ -1,5 +1,6 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import * as leaflet from 'leaflet';
+import { Subject } from 'rxjs';
 import { Location } from '../interfaces/location';
 import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
@@ -52,10 +53,15 @@ export class MapService {
   private placeLocationRectangels = new Map<string, leaflet.Rectangle>();
 
   private ready: boolean = false;
+  private mapSubject: Subject<void> | undefined;
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
+  public initMap(mapSubject: Subject<void>) {
+    this.mapSubject = mapSubject;
+  }
+
+  public initMapEvents(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
     this.markerClickEvent = markerClickEvent;
 
     this.map = leaflet.map('map', {
@@ -106,6 +112,9 @@ export class MapService {
     this.drawSearchRectange(this.location);
 
     this.ready = true;
+    if (undefined !== this.mapSubject) {
+      this.mapSubject.next();
+    }
   }
 
   isReady(): boolean {
