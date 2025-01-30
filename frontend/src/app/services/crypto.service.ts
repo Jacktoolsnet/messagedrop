@@ -7,6 +7,8 @@ import { Keypair } from '../interfaces/keypair';
 })
 export class CryptoService {
 
+  // https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
+
   constructor() { }
 
   async createEncryptionKey(): Promise<Keypair> {
