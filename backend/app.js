@@ -114,7 +114,7 @@ app.use('/translate', translateLimit, translate);
 app.use('/place', place);
 
 // The last route
-app.use('*', notfound);
+app.use('{*notFound}', notfound);
 
 // Start app
 server.listen(process.env.PORT, () => {
