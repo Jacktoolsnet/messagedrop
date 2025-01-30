@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { QRCodeModule } from 'angularx-qrcode';
+import { QRCodeComponent } from 'angularx-qrcode';
 import { User } from '../../interfaces/user';
 import { UserService } from '../../services/user.service';
 
@@ -24,7 +24,7 @@ import { UserService } from '../../services/user.service';
     MatDialogClose,
     MatIcon,
     CommonModule,
-    QRCodeModule
+    QRCodeComponent
   ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
