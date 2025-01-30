@@ -79,4 +79,23 @@ export class CryptoService {
     return verified
   }
 
+  async encrypt(encryptionPublicKey: JsonWebKey, payload: any): Promise<string> {
+    let encryptedPayload: ArrayBuffer = new ArrayBuffer(0);
+    let payloadBuffer = Buffer.from(payload);
+    let ecKeyImportParams: EcKeyImportParams = {
+      name: "RSA-OAEP",
+      namedCurve: "P-384",
+    };
+    let publicKey = await crypto.subtle.importKey("jwk", encryptionPublicKey, ecKeyImportParams, true, ["sign"]);
+
+    encryptedPayload = await crypto.subtle.encrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      publicKey,
+      payloadBuffer,
+    );
+    return JSON.stringify(Buffer.from(encryptedPayload).toJSON());
+  }
+
 }
