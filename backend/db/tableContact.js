@@ -5,6 +5,8 @@ const columnUserId = 'userId';
 const columnUserMessage = 'userMessage';
 const columnUserMessageStyle = 'userMessageStyle';
 const columnContactUserId = 'contactUserId';
+const columnContactEncryptionPublicKey = 'contactEncryptionPublicKey';
+const columnContactSigningPublicKey = "contactSigningPublicKey";
 const columnContactUserMessage = 'contactUserMessage';
 const columnContactUserMessageStyle = 'contactUserMessageStyle';
 const columnSubscribed = 'subscribed';
@@ -22,6 +24,8 @@ const init = function (db) {
             ${columnUserMessage} TEXT DEFAULT NULL,
             ${columnUserMessageStyle} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
+            ${columnContactEncryptionPublicKey} TEXT NOT NULL,
+            ${columnContactSigningPublicKey} TEXT NOT NULL,
             ${columnContactUserMessage} TEXT DEFAULT NULL,
             ${columnContactUserMessageStyle} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
@@ -48,18 +52,22 @@ const init = function (db) {
     }
 };
 
-const create = function (db, contactId, userId, contactUserId, hint, callback) {
+const create = function (db, contactId, userId, contactUserId, hint, contactEncryptionPublicKey, contactSigningPublicKey, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnContactId},
             ${columnUserId},
             ${columnContactUserId},
+            ${columnContactEncryptionPublicKey},
+            ${columnContactSigningPublicKey},
             ${columnHint}
         ) VALUES (
             '${contactId}',
             '${userId}',
             '${contactUserId}',
+            '${contactEncryptionPublicKey}',
+            '${contactSigningPublicKey}',
             '${hint}'
         );`;
         db.run(sql, (err) => {

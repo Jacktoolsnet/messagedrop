@@ -9,7 +9,7 @@ const notify = require('../utils/notify');
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   let contactId = uuid.v4()
-  tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, function (err) {
+  tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, req.body.contactEncryptionPublicKey, req.body.contactSigningPublicKey, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
