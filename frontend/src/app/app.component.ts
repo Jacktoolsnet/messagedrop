@@ -71,6 +71,7 @@ export class AppComponent implements OnInit {
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
   private userSubject: Subject<void>;
+  private contactSubject: Subject<void>;
   private messageSubject: Subject<void>;
   private mapSubject: Subject<void>;
 
@@ -98,15 +99,20 @@ export class AppComponent implements OnInit {
     private swPush: SwPush
   ) {
     this.userSubject = new Subject<void>();
+    this.contactSubject = new Subject<void>();
+    this.mapSubject = new Subject<void>();
     this.userSubject.subscribe({
       next: (v) => {
+        this.contactService.initContacts(this.contactSubject);
+      },
+    });
+    this.contactSubject.subscribe({
+      next: (v) => {
         this.socketioService.initSocket();
-        this.contactService.initContacts();
         this.placeService.initPlaces();
         this.mapService.initMap(this.mapSubject);
       },
     });
-    this.mapSubject = new Subject<void>();
     this.mapSubject.subscribe({
       next: (v) => {
         this.updateDataForLocation(this.mapService.getMapLocation(), true);

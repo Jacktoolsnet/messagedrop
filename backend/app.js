@@ -44,7 +44,6 @@ const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
 const io = new Server(server, {
-  path: '/{*socketIo}',
   'force new connection': true
 });
 const onConnection = (socket) => {
@@ -104,6 +103,7 @@ const translateLimit = rateLimit({
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
+
 
 // ROUTES
 app.use('/', root);

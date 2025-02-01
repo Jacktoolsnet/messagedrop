@@ -34,21 +34,11 @@ export class SocketioService {
   }
 
   initSocket() {
-    this.initUser()
+    this.initUserSocketEvents();
     this.initContacts();
   }
 
-  async initUser() {
-    while (!this.userService.isReady()) {
-      await new Promise(f => setTimeout(f, 500));
-    }
-    this.initUserSocketEvents();
-  }
-
   async initContacts() {
-    while (!this.contactService.isReady()) {
-      await new Promise(f => setTimeout(f, 500));
-    }
     this.contactService.getContacts().forEach((contact: Contact) => {
       this.receiveShorMessage(contact);
     });
@@ -90,12 +80,12 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
-          /**this.snackBar.open(`Joined user room. (${payload.status})`, "", {
+          /*this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
-            duration: 2000
-          });**/
+            duration: 1000
+          })*/;
           // Request to provide profile information.
           this.requestProfileForContact();
           break;

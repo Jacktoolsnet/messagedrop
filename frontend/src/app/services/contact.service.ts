@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, throwError } from 'rxjs';
+import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
@@ -38,12 +38,13 @@ export class ContactService {
     return throwError(() => error);
   }
 
-  initContacts() {
+  initContacts(contactSubject: Subject<void>) {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           this.contacts = [...getContactsResponse.rows];
           this.ready = true;
+          contactSubject.next();
         },
         error: (err) => {
           if (err.status === 404) {
@@ -52,6 +53,7 @@ export class ContactService {
           } else {
             this.ready = false;
           }
+          contactSubject.next();
         },
         complete: () => { }
       });
