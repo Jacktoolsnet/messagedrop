@@ -71,8 +71,8 @@ export class ContactService {
     let body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
-      'contactEncryptionPublicKey': JSON.stringify(contact.encryptionPublicKey),
-      'contactSigningPublicKey': JSON.stringify(contact.signingPublicKey),
+      'contactUserEncryptionPublicKey': JSON.stringify(contact.encryptionPublicKey),
+      'userSigningPublicKey': JSON.stringify(this.userService.getUser().signingKeyPair.publicKey),
       'hint': contact.hint
     };
     this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)

@@ -2,11 +2,11 @@ const tableName = 'tableContact';
 
 const columnContactId = 'id';
 const columnUserId = 'userId';
+const columnUserSigningPublicKey = "userSigningPublicKey";
 const columnUserMessage = 'userMessage';
 const columnUserMessageStyle = 'userMessageStyle';
 const columnContactUserId = 'contactUserId';
-const columnContactEncryptionPublicKey = 'contactEncryptionPublicKey';
-const columnContactSigningPublicKey = "contactSigningPublicKey";
+const columnContactUserEncryptionPublicKey = 'contactUserEncryptionPublicKey';
 const columnContactUserMessage = 'contactUserMessage';
 const columnContactUserMessageStyle = 'contactUserMessageStyle';
 const columnSubscribed = 'subscribed';
@@ -21,11 +21,11 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
+            ${columnUserSigningPublicKey} TEXT NOT NULL,
             ${columnUserMessage} TEXT DEFAULT NULL,
             ${columnUserMessageStyle} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
-            ${columnContactEncryptionPublicKey} TEXT NOT NULL,
-            ${columnContactSigningPublicKey} TEXT NOT NULL,
+            ${columnContactUserEncryptionPublicKey} TEXT NOT NULL,
             ${columnContactUserMessage} TEXT DEFAULT NULL,
             ${columnContactUserMessageStyle} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
@@ -52,22 +52,22 @@ const init = function (db) {
     }
 };
 
-const create = function (db, contactId, userId, contactUserId, hint, contactEncryptionPublicKey, contactSigningPublicKey, callback) {
+const create = function (db, contactId, userId, contactUserId, hint, contactUserEncryptionPublicKey, userSigningPublicKey, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnContactId},
             ${columnUserId},
             ${columnContactUserId},
-            ${columnContactEncryptionPublicKey},
-            ${columnContactSigningPublicKey},
+            ${columnContactUserEncryptionPublicKey},
+            ${columnUserSigningPublicKey},
             ${columnHint}
         ) VALUES (
             '${contactId}',
             '${userId}',
             '${contactUserId}',
-            '${contactEncryptionPublicKey}',
-            '${contactSigningPublicKey}',
+            '${contactUserEncryptionPublicKey}',
+            '${userSigningPublicKey}',
             '${hint}'
         );`;
         db.run(sql, (err) => {
