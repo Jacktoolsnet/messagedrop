@@ -66,11 +66,11 @@ export class ConnectService {
             contact.hint = getConnectResponse.connect.hint;
             contact.encryptionPublicKey = JSON.parse(getConnectResponse.connect.encryptionPublicKey);
             contact.signingPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
-            contact.signature = signature;
+            contact.contactSignature = signature;
             // For Development check equal. Change to not equal for production.
             if (contact.contactUserId != contact.userId && contact.signingPublicKey) {
               // Verify data
-              this.cryptoService.verifySignature(contact.signingPublicKey, contact.contactUserId, contact.signature!)
+              this.cryptoService.verifySignature(contact.signingPublicKey, contact.contactUserId, contact.contactSignature!)
                 .then((valid: Boolean) => {
                   if (valid) {
                     this.snackBar.open(`Connect data is valid.`, 'OK');

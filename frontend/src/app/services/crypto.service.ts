@@ -84,12 +84,11 @@ export class CryptoService {
   async encrypt(encryptionPublicKey: JsonWebKey, payload: any): Promise<string> {
     let encryptedPayload: ArrayBuffer = new ArrayBuffer(0);
     let payloadBuffer = Buffer.from(payload);
-    let ecKeyImportParams: EcKeyImportParams = {
+    let rsaHashedImportParams: RsaHashedImportParams = {
       name: "RSA-OAEP",
-      namedCurve: "P-384",
+      hash: "SHA-256"
     };
-    let publicKey = await crypto.subtle.importKey("jwk", encryptionPublicKey, ecKeyImportParams, true, ["sign"]);
-
+    let publicKey = await crypto.subtle.importKey("jwk", encryptionPublicKey, rsaHashedImportParams, true, ["encrypt"]);
     encryptedPayload = await crypto.subtle.encrypt(
       {
         name: "RSA-OAEP",

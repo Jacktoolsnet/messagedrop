@@ -8,11 +8,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { Animation } from '../../interfaces/animation';
 import { Contact } from '../../interfaces/contact';
+import { Envelope } from '../../interfaces/envelope';
 import { Mode } from '../../interfaces/mode';
 import { ShortMessage } from '../../interfaces/short-message';
 import { User } from '../../interfaces/user';
 import { ConnectService } from '../../services/connect.service';
 import { ContactService } from '../../services/contact.service';
+import { CryptoService } from '../../services/crypto.service';
 import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
@@ -48,6 +50,7 @@ export class ContactlistComponent implements OnInit {
     public socketioService: SocketioService,
     private connectService: ConnectService,
     public contactService: ContactService,
+    private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<any>,
     public contactMessageDialog: MatDialog,
     public connectDialog: MatDialog,
@@ -213,7 +216,25 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.shortMessage) {
-        this.contactService.updateContactMessage(data?.contact, data?.shortMessage, this.socketioService)
+        // Create the enveolope
+        let envelope: Envelope = {
+          contactId: data?.contact.id,
+          userId: data?.contact.userId,
+          contactUserId: data?.contact.contactUserId,
+          messageSignature: '',
+          encryptedMessage: '',
+          Style: data?.shortMessage.style
+        };
+        this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+          .then((signature: string) => {
+            envelope.messageSignature = signature;
+            this.cryptoService.encrypt(JSON.parse(data?.contact.encryptionPublicKey!), data?.shortMessage.message)
+              .then((encryptedMessage: string) => {
+                envelope.encryptedMessage = encryptedMessage;
+                // Envelope is ready
+                this.contactService.updateContactMessage(data?.contact, data?.shortMessage, this.socketioService)
+              });
+          });
       }
     });
   }

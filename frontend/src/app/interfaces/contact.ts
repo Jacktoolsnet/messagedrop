@@ -1,5 +1,4 @@
-import { Keypair } from "./keypair";
-import { Location } from "./location";
+import { Envelope } from "./envelope";
 
 export interface Contact {
     id: string,
@@ -12,10 +11,11 @@ export interface Contact {
     hint?: string,
     encryptionPublicKey?: JsonWebKey,
     signingPublicKey?: JsonWebKey,
-    signature?: ArrayBuffer,
+    contactSignature?: ArrayBuffer,
     name?: string,
     base64Avatar?: string,
     subscribed: boolean,
     provided: boolean,
-    lastMessageFrom: string
+    lastMessageFrom: string,
+    envelope?: Envelope
 }
