@@ -4,5 +4,5 @@ export interface Envelope {
     contactUserId: string,
     messageSignature: string,
     encryptedMessage: string,
-    Style: string
+    messageStyle: string
 }

@@ -45,7 +45,7 @@ router.post('/update/profile', [security.checkToken, bodyParser.json({ type: 'ap
  */
 router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.message.replace(/\'/g, "''"), req.body.style, function (err) {
+  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.encryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -53,13 +53,13 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
       res.status(response.status);
       res.json(response);
     } else {
-      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.message.replace(/\'/g, "''"), req.body.style, function (err) {
+      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.encryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
         if (err) {
           response.status = 500;
           response.error = err;
         } else {
           response.status = 200;
-          notify.contactSubscriptions(req.logger, req.database.db, req.body.userId, req.body.contactUserId, req.body.message.replace(/\'/g, "''"));
+          notify.contactSubscriptions(req.logger, req.database.db, req.body.userId, req.body.contactUserId, "New private message");
         }
         res.setHeader('Content-Type', 'application/json');
         res.status(response.status);
@@ -105,12 +105,14 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'id': row.id,
             'userId': row.userId,
             'signingPublicKey': row.userSigningPublicKey,
-            'userMessage': row.userMessage,
+            'userEncryptedMessage': row.userEncryptedMessage,
             'userMessageStyle': row.userMessageStyle,
+            'userSignature': row.userSignature,
             'contactUserId': row.contactUserId,
             'encryptionPublicKey': row.contactUserEncryptionPublicKey,
-            'contactUserMessage': row.contactUserMessage,
+            'contactUserEncryptedMessage': row.contactUserEncryptedMessage,
             'contactUserMessageStyle': row.contactUserMessageStyle,
+            'contactUserSignature': row.contactUserSignature,
             'subscribed': row.subscribed === 0 ? false : true,
             'hint': row.hint,
             'name': row.name,

@@ -3,11 +3,13 @@ const tableName = 'tableContact';
 const columnContactId = 'id';
 const columnUserId = 'userId';
 const columnUserSigningPublicKey = "userSigningPublicKey";
-const columnUserMessage = 'userMessage';
+const columnUserEncryptedMessage = 'userEncryptedMessage';
+const columnUserSignature = 'userSignature';
 const columnUserMessageStyle = 'userMessageStyle';
 const columnContactUserId = 'contactUserId';
 const columnContactUserEncryptionPublicKey = 'contactUserEncryptionPublicKey';
-const columnContactUserMessage = 'contactUserMessage';
+const columnContactUserEncryptedMessage = 'contactUserEncryptedMessage';
+const columnContactUserSignature = 'contactUserSignature';
 const columnContactUserMessageStyle = 'contactUserMessageStyle';
 const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
@@ -22,11 +24,13 @@ const init = function (db) {
             ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
             ${columnUserSigningPublicKey} TEXT NOT NULL,
-            ${columnUserMessage} TEXT DEFAULT NULL,
+            ${columnUserEncryptedMessage} TEXT DEFAULT NULL,
+            ${columnUserSignature} TEXT DEFAULT NULL,
             ${columnUserMessageStyle} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
             ${columnContactUserEncryptionPublicKey} TEXT NOT NULL,
-            ${columnContactUserMessage} TEXT DEFAULT NULL,
+            ${columnContactUserEncryptedMessage} TEXT DEFAULT NULL,
+            ${columnContactUserSignature} TEXT DEFAULT NULL,
             ${columnContactUserMessageStyle} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
@@ -94,12 +98,13 @@ const update = function (db, contactId, name, base64Avatar, callback) {
     }
 };
 
-const updateUserMessage = function (db, contactId, message, style, callback) {
+const updateUserMessage = function (db, contactId, encryptedMessage, messageStyle, messageSignature, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
-        SET ${columnUserMessage} = '${message}',
-        ${columnUserMessageStyle} = '${style}',
+        SET ${columnUserEncryptedMessage} = '${encryptedMessage}',
+        ${columnUserMessageStyle} = '${messageStyle}',
+        ${columnUserSignature} = '${messageSignature}',
         ${columnLastMessageFrom} = 'user'
         WHERE ${columnContactId} = ?;`;
 
@@ -111,12 +116,13 @@ const updateUserMessage = function (db, contactId, message, style, callback) {
     }
 };
 
-const updateContactUserMessage = function (db, userId, contactUserId, message, style, callback) {
+const updateContactUserMessage = function (db, userId, contactUserId, encryptedMessage, messageStyle, messageSignature, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
-        SET ${columnContactUserMessage} = '${message}',
-        ${columnContactUserMessageStyle} = '${style}',
+        SET ${columnContactUserEncryptedMessage} = '${encryptedMessage}',
+        ${columnContactUserMessageStyle} = '${messageStyle}',
+        ${columnContactUserSignature} = '${messageSignature}',
         ${columnLastMessageFrom} = 'contactUser'
         WHERE ${columnUserId} = ?
         AND ${columnContactUserId} = ?;`;

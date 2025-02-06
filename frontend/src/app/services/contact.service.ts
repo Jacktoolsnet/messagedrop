@@ -5,6 +5,7 @@ import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
+import { Envelope } from '../interfaces/envelope';
 import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { ShortMessage } from '../interfaces/short-message';
@@ -42,7 +43,23 @@ export class ContactService {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
-          this.contacts = [...getContactsResponse.rows];
+          getContactsResponse.rows.forEach((contact: Contact) => {
+            // continue with encrpytion and Verification
+            if (null != contact.userSignature) {
+              contact.userMessage = 'Not verifyed yet!';
+            }
+            if (null != contact.userEncryptedMessage) {
+              contact.userMessage = contact.userMessage + ' Not decrypted yet!';
+            }
+            if (null != contact.contactUserSignature) {
+              contact.contactUserMessage = 'Not verifyed yet!';
+            }
+            if (null != contact.contactUserEncryptedMessage) {
+              contact.contactUserMessage = contact.contactUserMessage + ' Not decrypted yet!'
+            }
+            console.log(contact);
+            this.contacts.push(contact);
+          })
           this.ready = true;
           contactSubject.next();
         },
@@ -111,13 +128,14 @@ export class ContactService {
       });
   }
 
-  updateContactMessage(contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
+  updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
     let body = {
-      'contactId': contact.id,
-      'userId': contact.userId,
-      'contactUserId': contact.contactUserId,
-      'message': shortMessage.message,
-      'style': shortMessage.style
+      'contactId': envelope.contactId,
+      'userId': envelope.userId,
+      'contactUserId': envelope.contactUserId,
+      'encryptedMessage': envelope.encryptedMessage,
+      'messageSignature': envelope.messageSignature,
+      'messageStyle': envelope.messageStyle
     };
     this.http.post<boolean>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
       .pipe(

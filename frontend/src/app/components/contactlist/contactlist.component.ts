@@ -223,7 +223,7 @@ export class ContactlistComponent implements OnInit {
           contactUserId: data?.contact.contactUserId,
           messageSignature: '',
           encryptedMessage: '',
-          Style: data?.shortMessage.style
+          messageStyle: data?.shortMessage.style
         };
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
@@ -232,7 +232,7 @@ export class ContactlistComponent implements OnInit {
               .then((encryptedMessage: string) => {
                 envelope.encryptedMessage = encryptedMessage;
                 // Envelope is ready
-                this.contactService.updateContactMessage(data?.contact, data?.shortMessage, this.socketioService)
+                this.contactService.updateContactMessage(envelope, data?.contact, data?.shortMessage, this.socketioService)
               });
           });
       }
