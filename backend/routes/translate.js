@@ -12,16 +12,12 @@ router.get('/:language/:value', [security.checkToken], function (req, res) {
         .then((result) => {
             response.status = 200;
             response.result = result;
-            res.setHeader('Content-Type', 'application/json');
-            res.status(response.status);
-            res.json(response);
+            res.status(response.status).json(response);
         })
         .catch((error) => {
             response.status = 500;
             response.error = error.message;
-            res.setHeader('Content-Type', 'application/json');
-            res.status(response.status);
-            res.json(response);
+            res.status(response.status).json(response);
         });
 });
 

@@ -21,9 +21,7 @@ router.get('/get', [security.checkToken], function (req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -42,9 +40,7 @@ router.get('/get/:userId', [security.checkToken], function (req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -64,9 +60,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 200;
       response.userId = userId;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -79,9 +73,7 @@ router.get('/clean', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -94,9 +86,7 @@ router.get('/delete/:userId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -109,9 +99,7 @@ router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'applica
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -124,9 +112,7 @@ router.get('/unsubscribe/:userId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 

@@ -15,9 +15,7 @@ router.get('/get', [security.checkToken], function (req, res) {
       });
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -30,9 +28,7 @@ router.get('/count/visitor', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -45,9 +41,7 @@ router.get('/count/message', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -60,9 +54,7 @@ router.get('/clean', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 

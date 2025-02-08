@@ -17,9 +17,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 200;
       response.contactId = contactId;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -32,9 +30,7 @@ router.post('/update/profile', [security.checkToken, bodyParser.json({ type: 'ap
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -49,7 +45,6 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
     if (err) {
       response.status = 500;
       response.error = err;
-      res.setHeader('Content-Type', 'application/json');
       res.status(response.status);
       res.json(response);
     } else {
@@ -61,9 +56,7 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
           response.status = 200;
           notify.contactSubscriptions(req.logger, req.database.db, req.body.userId, req.body.contactUserId, "New private message");
         }
-        res.setHeader('Content-Type', 'application/json');
-        res.status(response.status);
-        res.json(response);
+        res.status(response.status).json(response);
       });
     }
   });
@@ -83,9 +76,7 @@ router.get('/get/:contactId', [security.checkToken], function (req, res) {
         response.place = row;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -122,9 +113,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
         });
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -137,9 +126,7 @@ router.get('/subscribe/:contactId', [security.checkToken, bodyParser.json({ type
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -152,9 +139,7 @@ router.get('/unsubscribe/:contactId', [security.checkToken], function (req, res)
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -168,8 +153,7 @@ router.get('/delete/:contactId', [security.checkToken], function (req, res) {
       response.status = 200;
     }
     res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 

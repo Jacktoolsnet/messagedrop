@@ -16,9 +16,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 200;
       response.placeId = placeId;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -31,9 +29,7 @@ router.post('/update', [security.checkToken, bodyParser.json({ type: 'applicatio
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -46,9 +42,7 @@ router.post('/updatepluscodes', [security.checkToken, bodyParser.json({ type: 'a
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -66,9 +60,7 @@ router.get('/get/:placeId', [security.checkToken], function (req, res) {
         response.place = row;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -86,9 +78,7 @@ router.get('/get/userId/:userId/name/:name', [security.checkToken], function (re
         response.place = row;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -114,9 +104,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
         });
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -129,9 +117,7 @@ router.get('/subscribe/:placeId', [security.checkToken, bodyParser.json({ type: 
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -144,9 +130,7 @@ router.get('/unsubscribe/:placeId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -159,9 +143,7 @@ router.get('/delete/:placeId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 

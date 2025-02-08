@@ -4,9 +4,6 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 
 router.post('/', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
-  res.setHeader('Content-Type', 'application/json');
-  res.status(200);
-  let database_open
   if (undefined === req.database) {
     database_connection = 'not established'
   } else {
@@ -21,7 +18,7 @@ router.post('/', [security.checkToken, bodyParser.json({ type: 'application/json
     database_connection,
     'reqBody': req.body
   };
-  res.json(response);
+  res.status(200).json(response);
 });
 
 module.exports = router

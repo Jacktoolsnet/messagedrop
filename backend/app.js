@@ -2,6 +2,7 @@ require('dotenv').config()
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
+const headerMW = require('./middleware/header')
 const Database = require('./db/database');
 const database = new Database();
 const root = require('./routes/root');
@@ -95,6 +96,7 @@ app.use(cors())
 
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
+app.use(headerMW())
 
 // Route ratelimit
 const translateLimit = rateLimit({

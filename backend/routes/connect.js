@@ -16,9 +16,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 200;
       response.connectId = connectId;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -36,9 +34,7 @@ router.get('/get/:connectId', [security.checkToken], function (req, res) {
         response.connect = row;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -51,9 +47,7 @@ router.get('/delete/:connectId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 

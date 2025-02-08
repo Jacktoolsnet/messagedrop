@@ -23,9 +23,7 @@ router.get('/get', [security.checkToken], function (req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -44,9 +42,7 @@ router.get('/get/id/:messageId', [security.checkToken], function (req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -66,9 +62,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -88,9 +82,7 @@ router.get('/get/comment/:parentMessageId', [security.checkToken], function (req
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -123,9 +115,7 @@ router.get('/get/pluscode/:plusCode', [security.checkToken], function (req, res)
           }
         }
       }
-      res.setHeader('Content-Type', 'application/json');
-      res.status(response.status);
-      res.json(response);
+      res.status(response.status).json(response);
     });
   }
 });
@@ -143,9 +133,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       notify.placeSubscriptions(req.logger, req.database.db, req.body.plusCode, req.body.messageUserId, req.body.message.replace(/\'/g, "''"));
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -158,9 +146,7 @@ router.post('/update', [security.checkToken, bodyParser.json({ type: 'applicatio
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -173,9 +159,7 @@ router.get('/clean/public', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -188,9 +172,7 @@ router.get('/disable/:messageId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -203,9 +185,7 @@ router.get('/enable/:messageId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -218,9 +198,7 @@ router.get('/delete/:messageId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -235,9 +213,7 @@ router.get('/like/:messageId/by/:userId', [security.checkToken], function (req, 
       response.message = row;
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -256,9 +232,7 @@ router.get('/id/:messageId/likedby/:userId', [security.checkToken], function (re
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -273,9 +247,7 @@ router.get('/unlike/:messageId/by/:userId', [security.checkToken], function (req
       response.message = row;
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -288,9 +260,7 @@ router.get('/dislike/:messageId/by/:userId', [security.checkToken], function (re
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -309,9 +279,7 @@ router.get('/id/:messageId/dislikedby/:userId', [security.checkToken], function 
         response.status = 200;
       }
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -324,9 +292,7 @@ router.get('/undislike/:messageId/by/:userId', [security.checkToken], function (
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -339,9 +305,7 @@ router.get('/countview/:messageId', [security.checkToken], function (req, res) {
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
@@ -354,9 +318,7 @@ router.get('/countcomment/:parentMessageId', [security.checkToken], function (re
     } else {
       response.status = 200;
     }
-    res.setHeader('Content-Type', 'application/json');
-    res.status(response.status);
-    res.json(response);
+    res.status(response.status).json(response);
   });
 });
 
