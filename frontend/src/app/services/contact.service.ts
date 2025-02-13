@@ -1,6 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Buffer } from 'buffer';
 import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
@@ -8,8 +9,10 @@ import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { Envelope } from '../interfaces/envelope';
 import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
+import { RawContact } from '../interfaces/raw-contact';
 import { ShortMessage } from '../interfaces/short-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { CryptoService } from './crypto.service';
 import { SocketioService } from './socketio.service';
 import { UserService } from './user.service';
 
@@ -32,6 +35,7 @@ export class ContactService {
   constructor(
     private http: HttpClient,
     private userService: UserService,
+    private cryptoService: CryptoService,
     private snackBar: MatSnackBar
   ) { }
 
@@ -43,16 +47,61 @@ export class ContactService {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
-          getContactsResponse.rows.forEach((contact: Contact) => {
+          getContactsResponse.rows.forEach((rawContact: RawContact) => {
+            let userSignatureBuffer = Buffer.from(JSON.parse(rawContact.userSignature))
+            var userSignature = userSignatureBuffer.buffer.slice(
+              userSignatureBuffer.byteOffset, userSignatureBuffer.byteOffset + userSignatureBuffer.byteLength
+            )
+            let contactUserSignatureBuffer = Buffer.from(JSON.parse(rawContact.contactUserSignature))
+            var contactUserSignature = contactUserSignatureBuffer.buffer.slice(
+              contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
+            )
+            let contact: Contact = {
+              id: rawContact.id,
+              userId: rawContact.userId,
+              signingPublicKey: JSON.parse(rawContact.signingPublicKey),
+              userEncryptedMessage: rawContact.userEncryptedMessage,
+              userMessageStyle: rawContact.userMessageStyle,
+              userSignature: userSignature,
+              contactUserId: rawContact.contactUserId,
+              encryptionPublicKey: JSON.parse(rawContact.encryptionPublicKey),
+              contactUserEncryptedMessage: rawContact.contactUserEncryptedMessage,
+              contactUserMessageStyle: rawContact.contactUserMessageStyle,
+              contactUserSignature: contactUserSignature,
+              subscribed: rawContact.subscribed,
+              hint: rawContact.hint,
+              name: rawContact.name,
+              base64Avatar: rawContact.base64Avatar,
+              lastMessageFrom: rawContact.lastMessageFrom,
+              userMessage: '',
+              contactUserMessage: '',
+              provided: false
+            };
             // continue with encrpytion and Verification
             if (null != contact.userSignature) {
-              contact.userMessage = 'Not verifyed yet!';
+              this.cryptoService.verifySignature(contact.signingPublicKey!, contact.userId, contact.userSignature!)
+                .then((valid: Boolean) => {
+                  console.log(valid);
+                  if (valid) {
+                    contact.userMessage = 'Verifyed!';
+                  } else {
+                    contact.userMessage = 'Not Verifyed!';
+                  }
+                });
             }
             if (null != contact.userEncryptedMessage) {
               contact.userMessage = contact.userMessage + ' Not decrypted yet!';
             }
             if (null != contact.contactUserSignature) {
-              contact.contactUserMessage = 'Not verifyed yet!';
+              this.cryptoService.verifySignature(contact.signingPublicKey!, contact.contactUserId, contact.contactUserSignature!)
+                .then((valid: Boolean) => {
+                  console.log(valid);
+                  if (valid) {
+                    contact.contactUserMessage = 'Verifyed!';
+                  } else {
+                    contact.contactUserMessage = 'Not Verifyed!';
+                  }
+                });
             }
             if (null != contact.contactUserEncryptedMessage) {
               contact.contactUserMessage = contact.contactUserMessage + ' Not decrypted yet!'

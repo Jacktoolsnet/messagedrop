@@ -1,7 +1,7 @@
-import { Contact } from "./contact";
+import { RawContact } from "./raw-contact";
 
 export interface GetContactsResponse {
     status: number,
-    rows: Contact[]
+    rows: RawContact[]
 }
 
