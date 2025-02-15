@@ -48,23 +48,31 @@ export class ContactService {
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           getContactsResponse.rows.forEach((rawContact: RawContact) => {
-            let userSignatureBuffer = Buffer.from(JSON.parse(rawContact.userSignature))
-            var userSignature = userSignatureBuffer.buffer.slice(
-              userSignatureBuffer.byteOffset, userSignatureBuffer.byteOffset + userSignatureBuffer.byteLength
-            )
-            let contactUserSignatureBuffer = Buffer.from(JSON.parse(rawContact.contactUserSignature))
-            var contactUserSignature = contactUserSignatureBuffer.buffer.slice(
-              contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
-            )
+            let userSignatureBuffer = undefined
+            let userSignature = undefined
+            if (rawContact.userSignature) {
+              userSignatureBuffer = Buffer.from(JSON.parse(rawContact.userSignature))
+              userSignature = userSignatureBuffer.buffer.slice(
+                userSignatureBuffer.byteOffset, userSignatureBuffer.byteOffset + userSignatureBuffer.byteLength
+              )
+            }
+            let contactUserSignatureBuffer = undefined;
+            let contactUserSignature = undefined;
+            if (rawContact.contactUserSignature) {
+              contactUserSignatureBuffer = Buffer.from(JSON.parse(rawContact.contactUserSignature))
+              contactUserSignature = contactUserSignatureBuffer.buffer.slice(
+                contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
+              )
+            }
             let contact: Contact = {
               id: rawContact.id,
               userId: rawContact.userId,
-              signingPublicKey: JSON.parse(rawContact.signingPublicKey),
               userEncryptedMessage: rawContact.userEncryptedMessage,
               userMessageStyle: rawContact.userMessageStyle,
               userSignature: userSignature,
               contactUserId: rawContact.contactUserId,
-              encryptionPublicKey: JSON.parse(rawContact.encryptionPublicKey),
+              contactUserSigningPublicKey: JSON.parse(rawContact.contactUserSigningPublicKey),
+              contactUserEncryptionPublicKey: JSON.parse(rawContact.contactUserEncryptionPublicKey),
               contactUserEncryptedMessage: rawContact.contactUserEncryptedMessage,
               contactUserMessageStyle: rawContact.contactUserMessageStyle,
               contactUserSignature: contactUserSignature,
@@ -75,38 +83,37 @@ export class ContactService {
               lastMessageFrom: rawContact.lastMessageFrom,
               userMessage: '',
               contactUserMessage: '',
-              provided: false
+              provided: false,
+              userMessageVerified: false,
+              contactUserMessageVerified: false
             };
             // continue with encrpytion and Verification
-            if (null != contact.userSignature) {
-              this.cryptoService.verifySignature(contact.signingPublicKey!, contact.userId, contact.userSignature!)
+            if (contact.userSignature) {
+              this.cryptoService.verifySignature(this.userService.getUser().signingKeyPair.publicKey, contact.userId, contact.userSignature!)
                 .then((valid: Boolean) => {
-                  console.log(valid);
                   if (valid) {
-                    contact.userMessage = 'Verifyed!';
+                    contact.userMessageVerified = true;
                   } else {
-                    contact.userMessage = 'Not Verifyed!';
+                    contact.userMessageVerified = false;
                   }
                 });
             }
             if (null != contact.userEncryptedMessage) {
               contact.userMessage = contact.userMessage + ' Not decrypted yet!';
             }
-            if (null != contact.contactUserSignature) {
-              this.cryptoService.verifySignature(contact.signingPublicKey!, contact.contactUserId, contact.contactUserSignature!)
+            if (contact.contactUserSignature) {
+              this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, contact.contactUserId, contact.contactUserSignature!)
                 .then((valid: Boolean) => {
-                  console.log(valid);
                   if (valid) {
-                    contact.contactUserMessage = 'Verifyed!';
+                    contact.contactUserMessageVerified = true;
                   } else {
-                    contact.contactUserMessage = 'Not Verifyed!';
+                    contact.contactUserMessageVerified = false;
                   }
                 });
             }
             if (null != contact.contactUserEncryptedMessage) {
               contact.contactUserMessage = contact.contactUserMessage + ' Not decrypted yet!'
             }
-            console.log(contact);
             this.contacts.push(contact);
           })
           this.ready = true;
@@ -137,8 +144,8 @@ export class ContactService {
     let body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
-      'contactUserEncryptionPublicKey': JSON.stringify(contact.encryptionPublicKey),
-      'userSigningPublicKey': JSON.stringify(this.userService.getUser().signingKeyPair.publicKey),
+      'contactUserSigningPublicKey': JSON.stringify(contact.contactUserSigningPublicKey),
+      'contactUserEncryptionPublicKey': JSON.stringify(contact.contactUserEncryptionPublicKey),
       'hint': contact.hint
     };
     this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)

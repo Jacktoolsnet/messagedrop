@@ -9,7 +9,7 @@ const notify = require('../utils/notify');
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   let contactId = uuid.v4()
-  tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, req.body.contactUserEncryptionPublicKey, req.body.userSigningPublicKey, function (err) {
+  tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, req.body.contactUserSigningPublicKey, req.body.contactUserEncryptionPublicKey, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -95,12 +95,12 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
           response.rows.push({
             'id': row.id,
             'userId': row.userId,
-            'signingPublicKey': row.userSigningPublicKey,
             'userEncryptedMessage': row.userEncryptedMessage,
             'userMessageStyle': row.userMessageStyle,
             'userSignature': row.userSignature,
             'contactUserId': row.contactUserId,
-            'encryptionPublicKey': row.contactUserEncryptionPublicKey,
+            'contactUserSigningPublicKey': row.contactUserSigningPublicKey,
+            'contactUserEncryptionPublicKey': row.contactUserEncryptionPublicKey,
             'contactUserEncryptedMessage': row.contactUserEncryptedMessage,
             'contactUserMessageStyle': row.contactUserMessageStyle,
             'contactUserSignature': row.contactUserSignature,

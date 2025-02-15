@@ -78,7 +78,9 @@ export class ContactlistComponent implements OnInit {
       userMessageStyle: '',
       contactUserMessage: '',
       contactUserMessageStyle: '',
-      lastMessageFrom: ''
+      lastMessageFrom: '',
+      userMessageVerified: false,
+      contactUserMessageVerified: false
     };
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
@@ -116,7 +118,9 @@ export class ContactlistComponent implements OnInit {
       userMessageStyle: '',
       contactUserMessage: '',
       contactUserMessageStyle: '',
-      lastMessageFrom: ''
+      lastMessageFrom: '',
+      userMessageVerified: false,
+      contactUserMessageVerified: false
     };
 
     const dialogRef = this.scannerDialog.open(ScannerComponent, {
@@ -228,7 +232,7 @@ export class ContactlistComponent implements OnInit {
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
             envelope.messageSignature = signature;
-            this.cryptoService.encrypt(JSON.parse(data?.contact.encryptionPublicKey!), data?.shortMessage.message)
+            this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, data?.shortMessage.message)
               .then((encryptedMessage: string) => {
                 envelope.encryptedMessage = encryptedMessage;
                 // Envelope is ready

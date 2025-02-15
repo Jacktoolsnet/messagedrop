@@ -2,11 +2,11 @@ const tableName = 'tableContact';
 
 const columnContactId = 'id';
 const columnUserId = 'userId';
-const columnUserSigningPublicKey = "userSigningPublicKey";
 const columnUserEncryptedMessage = 'userEncryptedMessage';
 const columnUserSignature = 'userSignature';
 const columnUserMessageStyle = 'userMessageStyle';
 const columnContactUserId = 'contactUserId';
+const columnContactUserSigningPublicKey = "contactUserSigningPublicKey";
 const columnContactUserEncryptionPublicKey = 'contactUserEncryptionPublicKey';
 const columnContactUserEncryptedMessage = 'contactUserEncryptedMessage';
 const columnContactUserSignature = 'contactUserSignature';
@@ -23,11 +23,11 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
-            ${columnUserSigningPublicKey} TEXT NOT NULL,
             ${columnUserEncryptedMessage} TEXT DEFAULT NULL,
             ${columnUserSignature} TEXT DEFAULT NULL,
             ${columnUserMessageStyle} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
+            ${columnContactUserSigningPublicKey} TEXT NOT NULL,
             ${columnContactUserEncryptionPublicKey} TEXT NOT NULL,
             ${columnContactUserEncryptedMessage} TEXT DEFAULT NULL,
             ${columnContactUserSignature} TEXT DEFAULT NULL,
@@ -56,22 +56,22 @@ const init = function (db) {
     }
 };
 
-const create = function (db, contactId, userId, contactUserId, hint, contactUserEncryptionPublicKey, userSigningPublicKey, callback) {
+const create = function (db, contactId, userId, contactUserId, hint, contactUserSigningPublicKey, contactUserEncryptionPublicKey, callback) {
     try {
         let sql = `
         INSERT INTO ${tableName} (
             ${columnContactId},
             ${columnUserId},
             ${columnContactUserId},
+            ${columnContactUserSigningPublicKey},
             ${columnContactUserEncryptionPublicKey},
-            ${columnUserSigningPublicKey},
             ${columnHint}
         ) VALUES (
             '${contactId}',
             '${userId}',
             '${contactUserId}',
+            '${contactUserSigningPublicKey}',
             '${contactUserEncryptionPublicKey}',
-            '${userSigningPublicKey}',
             '${hint}'
         );`;
         db.run(sql, (err) => {
