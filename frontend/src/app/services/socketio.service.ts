@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Buffer } from 'buffer';
 import { Socket, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from '../../environments/environment';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
 import { Contact } from '../interfaces/contact';
+import { Envelope } from '../interfaces/envelope';
 import { ContactService } from './contact.service';
+import { CryptoService } from './crypto.service';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -22,7 +25,8 @@ export class SocketioService {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private userService: UserService,
-    private contactService: ContactService
+    private contactService: ContactService,
+    private cryptoService: CryptoService
   ) {
     this.socket = new Socket(this.ioConfig);
     this.socket.on("connect", () => {
@@ -40,7 +44,7 @@ export class SocketioService {
 
   async initContacts() {
     this.contactService.getContacts().forEach((contact: Contact) => {
-      this.receiveShorMessage(contact);
+      this.receiveShortMessage(contact);
     });
   }
 
@@ -140,19 +144,47 @@ export class SocketioService {
     });
   }
 
-  public sendShortMessageToContact(contact: Contact) {
+  public sendShortMessageToContact(envelope: Envelope) {
     // console.log('sendShortMessageToContact')
-    this.socket.emit('contact:newShortMessage', contact);
+    this.socket.emit('contact:newShortMessage', envelope);
   }
 
-  public receiveShorMessage(contact: Contact) {
+  public receiveShortMessage(contact: Contact) {
     // console.log('receiveShorMessage init')
-    this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, contact: Contact }) => {
-      // console.log("receiveShorMessage event")
+    this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, envelope: Envelope }) => {
+      console.log("receiveShorMessage event")
       if (payload.status == 200) {
-        contact.contactUserMessage = payload.contact.userMessage;
-        contact.contactUserMessageStyle = payload.contact.userMessageStyle;
-        contact.lastMessageFrom = 'contactUser';
+        let messageSignatureBuffer = undefined;
+        let messageSignature = undefined;
+        messageSignatureBuffer = Buffer.from(JSON.parse(payload.envelope.messageSignature))
+        messageSignature = messageSignatureBuffer.buffer.slice(
+          messageSignatureBuffer.byteOffset, messageSignatureBuffer.byteOffset + messageSignatureBuffer.byteLength
+        )
+        this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, payload.envelope.userId, messageSignature)
+          .then((valid: Boolean) => {
+            if (valid) {
+              contact.contactUserMessageVerified = true;
+              if (payload.envelope.contactUserEncryptedMessage) {
+                this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
+                  .then((message: string) => {
+                    if (message !== '') {
+                      contact.contactUserMessage = message;
+                      contact.contactUserMessageStyle = payload.envelope.messageStyle;
+                      contact.lastMessageFrom = 'contactUser';
+                    } else {
+                      contact.contactUserMessage = 'Message cannot be decrypted!';
+                      contact.contactUserMessageStyle = payload.envelope.messageStyle;
+                      contact.lastMessageFrom = 'contactUser';
+                    }
+                  });
+              }
+            } else {
+              contact.contactUserMessageVerified = false;
+              contact.contactUserMessage = 'Signature could not be verified!'
+              contact.contactUserMessageStyle = payload.envelope.messageStyle;
+              contact.lastMessageFrom = 'contactUser';
+            }
+          });
       }
     });
   }

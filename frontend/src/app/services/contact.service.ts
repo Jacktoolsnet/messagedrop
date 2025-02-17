@@ -87,7 +87,6 @@ export class ContactService {
               userMessageVerified: false,
               contactUserMessageVerified: false
             };
-            // continue with encrpytion and Verification
             if (contact.userSignature) {
               this.cryptoService.verifySignature(this.userService.getUser().signingKeyPair.publicKey, contact.userId, contact.userSignature!)
                 .then((valid: Boolean) => {
@@ -173,7 +172,7 @@ export class ContactService {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
             this.getContacts().unshift(contact);
-            socketioService.receiveShorMessage(contact)
+            socketioService.receiveShortMessage(contact)
             this.updateContactProfile(contact);
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
           }
@@ -217,9 +216,10 @@ export class ContactService {
       .subscribe({
         next: simpleStatusResponse => {
           contact.userMessage = shortMessage.message;
+          contact.userEncryptedMessage = JSON.parse(envelope.userEncryptedMessage);
           contact.userMessageStyle = shortMessage.style;
           contact.lastMessageFrom = 'user';
-          socketioService.sendShortMessageToContact(contact);
+          socketioService.sendShortMessageToContact(envelope);
         },
         error: (err) => { },
         complete: () => { }
