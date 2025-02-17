@@ -226,17 +226,22 @@ export class ContactlistComponent implements OnInit {
           userId: data?.contact.userId,
           contactUserId: data?.contact.contactUserId,
           messageSignature: '',
-          encryptedMessage: '',
+          userEncryptedMessage: '',
+          contactUserEncryptedMessage: '',
           messageStyle: data?.shortMessage.style
         };
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
             envelope.messageSignature = signature;
-            this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, data?.shortMessage.message)
+            this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data?.shortMessage.message)
               .then((encryptedMessage: string) => {
-                envelope.encryptedMessage = encryptedMessage;
-                // Envelope is ready
-                this.contactService.updateContactMessage(envelope, data?.contact, data?.shortMessage, this.socketioService)
+                envelope.userEncryptedMessage = encryptedMessage;
+                this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, data?.shortMessage.message)
+                  .then((encryptedMessage: string) => {
+                    envelope.contactUserEncryptedMessage = encryptedMessage;
+                    // Envelope is ready
+                    this.contactService.updateContactMessage(envelope, data?.contact, data?.shortMessage, this.socketioService)
+                  });
               });
           });
       }

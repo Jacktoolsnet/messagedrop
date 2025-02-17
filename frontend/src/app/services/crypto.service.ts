@@ -99,4 +99,28 @@ export class CryptoService {
     return JSON.stringify(Buffer.from(encryptedPayload).toJSON());
   }
 
+  async decrypt(encryptionPrivateKey: JsonWebKey, payload: ArrayBuffer): Promise<string> {
+    let payloadBuffer = Buffer.from(payload);
+    let decryptedPayload: ArrayBuffer = new ArrayBuffer(0);
+    let rsaHashedImportParams: RsaHashedImportParams = {
+      name: "RSA-OAEP",
+      hash: "SHA-256"
+    };
+    let privateKey = await crypto.subtle.importKey("jwk", encryptionPrivateKey, rsaHashedImportParams, true, ["decrypt"]);
+    try {
+      decryptedPayload = await crypto.subtle.decrypt(
+        {
+          name: "RSA-OAEP",
+        },
+        privateKey,
+        payloadBuffer,
+      );
+      let decoder = new TextDecoder('utf-8');
+      return decoder.decode(decryptedPayload);
+    } catch (err) {
+      return "";
+    }
+
+  }
+
 }

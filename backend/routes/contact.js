@@ -41,14 +41,14 @@ router.post('/update/profile', [security.checkToken, bodyParser.json({ type: 'ap
  */
 router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.encryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
+  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.userEncryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
       res.status(response.status);
       res.json(response);
     } else {
-      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.encryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
+      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.contactUserEncryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
         if (err) {
           response.status = 500;
           response.error = err;

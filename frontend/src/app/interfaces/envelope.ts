@@ -3,6 +3,7 @@ export interface Envelope {
     userId: string,
     contactUserId: string,
     messageSignature: string,
-    encryptedMessage: string,
+    userEncryptedMessage: string,
+    contactUserEncryptedMessage: string,
     messageStyle: string
 }

@@ -67,13 +67,13 @@ export class ContactService {
             let contact: Contact = {
               id: rawContact.id,
               userId: rawContact.userId,
-              userEncryptedMessage: rawContact.userEncryptedMessage,
+              userEncryptedMessage: JSON.parse(rawContact.userEncryptedMessage),
               userMessageStyle: rawContact.userMessageStyle,
               userSignature: userSignature,
               contactUserId: rawContact.contactUserId,
               contactUserSigningPublicKey: JSON.parse(rawContact.contactUserSigningPublicKey),
               contactUserEncryptionPublicKey: JSON.parse(rawContact.contactUserEncryptionPublicKey),
-              contactUserEncryptedMessage: rawContact.contactUserEncryptedMessage,
+              contactUserEncryptedMessage: JSON.parse(rawContact.contactUserEncryptedMessage),
               contactUserMessageStyle: rawContact.contactUserMessageStyle,
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
@@ -93,26 +93,42 @@ export class ContactService {
                 .then((valid: Boolean) => {
                   if (valid) {
                     contact.userMessageVerified = true;
+                    if (contact.userEncryptedMessage) {
+                      this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.userEncryptedMessage!)
+                        .then((message: string) => {
+                          if (message !== '') {
+                            contact.userMessage = message;
+                          } else {
+                            contact.userMessage = 'Message cannot be decrypted!';
+                          }
+                        });
+                    }
                   } else {
                     contact.userMessageVerified = false;
+                    contact.contactUserMessage = 'Signature could not be verified!'
                   }
                 });
-            }
-            if (null != contact.userEncryptedMessage) {
-              contact.userMessage = contact.userMessage + ' Not decrypted yet!';
             }
             if (contact.contactUserSignature) {
               this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, contact.contactUserId, contact.contactUserSignature!)
                 .then((valid: Boolean) => {
                   if (valid) {
                     contact.contactUserMessageVerified = true;
+                    if (contact.contactUserEncryptedMessage) {
+                      this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.contactUserEncryptedMessage!)
+                        .then((message: string) => {
+                          if (message !== '') {
+                            contact.contactUserMessage = message;
+                          } else {
+                            contact.contactUserMessage = 'Message cannot be decrypted!';
+                          }
+                        });
+                    }
                   } else {
                     contact.contactUserMessageVerified = false;
+                    contact.contactUserMessage = 'Signature could not be verified!'
                   }
                 });
-            }
-            if (null != contact.contactUserEncryptedMessage) {
-              contact.contactUserMessage = contact.contactUserMessage + ' Not decrypted yet!'
             }
             this.contacts.push(contact);
           })
@@ -189,7 +205,8 @@ export class ContactService {
       'contactId': envelope.contactId,
       'userId': envelope.userId,
       'contactUserId': envelope.contactUserId,
-      'encryptedMessage': envelope.encryptedMessage,
+      'userEncryptedMessage': envelope.userEncryptedMessage,
+      'contactUserEncryptedMessage': envelope.contactUserEncryptedMessage,
       'messageSignature': envelope.messageSignature,
       'messageStyle': envelope.messageStyle
     };
