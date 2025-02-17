@@ -6,9 +6,11 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Animation } from '../../interfaces/animation';
 import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
+import { GetUserResponse } from '../../interfaces/get-user-response';
 import { Mode } from '../../interfaces/mode';
 import { ShortMessage } from '../../interfaces/short-message';
 import { User } from '../../interfaces/user';
@@ -39,6 +41,7 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
   styleUrl: './contactlist.component.css'
 })
 export class ContactlistComponent implements OnInit {
+  private snackBarRef: any;
   private contactToDelete!: Contact
   public user!: User;
   public animation!: Animation;
@@ -57,6 +60,7 @@ export class ContactlistComponent implements OnInit {
     public scannerDialog: MatDialog,
     public dialog: MatDialog,
     private style: StyleService,
+    private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { user: User, contacts: Contact[] }
   ) {
     this.user = data.user;
@@ -126,7 +130,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.scannerDialog.open(ScannerComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: "" },
+      data: { mode: this.mode.ADD_CONNECT, contact: contact },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -140,8 +144,25 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.contact) {
-        this.contactService.createContact(data?.contact, this.socketioService);
+      if (data?.contact) {
+        this.userService.getkUserById(data.contact.contactUserId)
+          .subscribe({
+            next: (userResponse: GetUserResponse) => {
+              this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+                .then((signature: string) => {
+                  data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
+                  data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.encryptionPublicKey);
+                  data.contact.signature = signature;
+                  this.contactService.createContact(data?.contact, this.socketioService);
+                });
+            },
+            error: (err) => {
+              if (err.status === 404) {
+                this.snackBarRef = this.snackBar.open(`The contact cannot be created because the user ID was not found.`, 'OK', {});
+              }
+            },
+            complete: () => { }
+          });
       }
     });
   }

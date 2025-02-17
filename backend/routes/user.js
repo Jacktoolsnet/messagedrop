@@ -33,10 +33,10 @@ router.get('/get/:userId', [security.checkToken], function (req, res) {
       response.error = err;
     } else {
       if (!row) {
-        response.user = {};
+        response.rawUser = {};
         response.status = 404;
       } else {
-        response.user = row;
+        response.rawUser = row;
         response.status = 200;
       }
     }

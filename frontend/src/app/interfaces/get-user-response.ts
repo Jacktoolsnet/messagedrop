@@ -1,5 +1,6 @@
+
 export interface GetUserResponse {
     status: number,
-    userId: string
+    rawUser: any
 }
 

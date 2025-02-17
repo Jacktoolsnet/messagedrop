@@ -155,6 +155,7 @@ export class ContactService {
     return this.ready;
   }
 
+  // We need a function from qrcode
   createContact(contact: Contact, socketioService: SocketioService) {
     let body = {
       'userId': contact.userId,
@@ -163,6 +164,7 @@ export class ContactService {
       'contactUserEncryptionPublicKey': JSON.stringify(contact.contactUserEncryptionPublicKey),
       'hint': contact.hint
     };
+    console.log(body);
     this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)

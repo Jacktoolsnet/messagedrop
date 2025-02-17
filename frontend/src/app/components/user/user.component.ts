@@ -9,7 +9,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QRCodeComponent } from 'angularx-qrcode';
 import { User } from '../../interfaces/user';
-import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user',
@@ -35,7 +34,6 @@ export class UserComponent {
   public connectHint: string = ``;
 
   constructor(
-    private userService: UserService,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
     this.user = data.user;

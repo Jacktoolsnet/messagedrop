@@ -21,7 +21,7 @@ export class ScannerComponent {
 
   constructor(
     public dialogRef: MatDialogRef<ScannerComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact, connectId: string }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact }
   ) { }
 
   onCodeResult(resultString: string) {

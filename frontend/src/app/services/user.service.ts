@@ -118,7 +118,7 @@ export class UserService {
         });
     } else {
       // Check if the user exist. It could be that the database was deleted.  
-      this.checkUserById(this.user)
+      this.getkUserById(this.user.id)
         .subscribe({
           next: (data) => {
           },
@@ -176,8 +176,8 @@ export class UserService {
       );
   }
 
-  checkUserById(user: User) {
-    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${user.id}`, this.httpOptions)
+  getkUserById(userId: string) {
+    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
