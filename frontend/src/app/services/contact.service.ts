@@ -164,7 +164,6 @@ export class ContactService {
       'contactUserEncryptionPublicKey': JSON.stringify(contact.contactUserEncryptionPublicKey),
       'hint': contact.hint
     };
-    console.log(body);
     this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
