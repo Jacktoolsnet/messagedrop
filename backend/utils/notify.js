@@ -1,3 +1,4 @@
+// https://angular.dev/ecosystem/service-workers/push-notifications
 const webpush = require('web-push');
 
 const placeSubscriptions = function (logger, db, plusCode, userId, message) {
@@ -22,8 +23,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                             "primaryKey": { "type": "place", "id": plusCode },
                             "onActionClick": {
                                 "default": {
-                                    "operation": "focusLastFocusedOrOpen",
-                                    "url": '/'
+                                    "operation": "focusLastFocusedOrOpen"
                                 }
                             },
                         }
@@ -60,7 +60,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                             "onActionClick": {
                                 "default": {
                                     "operation": "focusLastFocusedOrOpen",
-                                    "url": '/'
                                 }
                             },
                         }
