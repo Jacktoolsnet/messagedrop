@@ -140,7 +140,7 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     this.swPush.notificationClicks.subscribe((result) => {
-      if (result.notification.data.primaryKey.type = 'place') {
+      if (result.notification.data.primaryKey.type === 'place') {
         let location: Location = this.geolocationService.getLocationFromPlusCode(result.notification.data.primaryKey.id);
         this.getMessages(location, true, true);
         if (!this.locationReady) {
@@ -149,7 +149,7 @@ export class AppComponent implements OnInit {
           this.mapService.flyTo(location);
         }
       }
-      if (result.notification.data.primaryKey.type = 'contact') {
+      if (result.notification.data.primaryKey.type === 'contact') {
         this.openContactListDialog();
       }
     });
