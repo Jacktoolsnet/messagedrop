@@ -668,25 +668,28 @@ export class AppComponent implements OnInit {
         case "shareUserId":
           this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
             .then((signature: string) => {
-              let connect: Connect = {
-                id: '',
-                userId: this.userService.getUser().id,
-                hint: result?.connectHint,
-                signature: signature,
-                encryptionPublicKey: JSON.stringify(this.userService.getUser().encryptionKeyPair?.publicKey!),
-                signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
-              };
-              this.connectService.createConnect(connect)
-                .subscribe({
-                  next: createConnectResponse => {
-                    if (createConnectResponse.status === 200) {
-                      connect.id = createConnectResponse.connectId;
-                      navigator.clipboard.writeText(connect.id);
-                      this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
-                    }
-                  },
-                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                  complete: () => { }
+              this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, result?.connectHint)
+                .then((encryptedHint: string) => {
+                  let connect: Connect = {
+                    id: '',
+                    userId: this.userService.getUser().id,
+                    hint: encryptedHint,
+                    signature: signature,
+                    encryptionPublicKey: JSON.stringify(this.userService.getUser().encryptionKeyPair?.publicKey!),
+                    signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
+                  };
+                  this.connectService.createConnect(connect)
+                    .subscribe({
+                      next: createConnectResponse => {
+                        if (createConnectResponse.status === 200) {
+                          connect.id = createConnectResponse.connectId;
+                          navigator.clipboard.writeText(connect.id);
+                          this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
+                        }
+                      },
+                      error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                      complete: () => { }
+                    });
                 });
             });
           break

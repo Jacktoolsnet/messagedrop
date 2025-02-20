@@ -74,7 +74,9 @@ export class ContactProfileComponent {
       this.socketioService.getSocket().emit('user:joinUserRoom', contact.userId);
     }
     // console.log("getProfileFromContact requesting")
+    // Register for answer
     this.socketioService.receiveProfileForContactEvent(contact);
+    // Start process
     this.socketioService.getSocket().emit('contact:requestProfile', contact);
     this.dialogRef.close();
     this.snackBar.open("Request sent.", "", {

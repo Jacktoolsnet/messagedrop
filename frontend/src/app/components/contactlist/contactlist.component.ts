@@ -114,7 +114,7 @@ export class ContactlistComponent implements OnInit {
       id: "",
       userId: this.user.id,
       contactUserId: '',
-      hint: 'QR-Code',
+      hint: '',
       name: '',
       subscribed: false,
       provided: false,
@@ -150,10 +150,14 @@ export class ContactlistComponent implements OnInit {
             next: (userResponse: GetUserResponse) => {
               this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
                 .then((signature: string) => {
-                  data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
-                  data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.encryptionPublicKey);
-                  data.contact.signature = signature;
-                  this.contactService.createContact(data?.contact, this.socketioService);
+                  this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, 'QR-Code')
+                    .then((encryptedHint: string) => {
+                      data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
+                      data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.encryptionPublicKey);
+                      data.contact.signature = signature;
+                      data.contact.hint = encryptedHint;
+                      this.contactService.createContact(data?.contact, this.socketioService);
+                    });
                 });
             },
             error: (err) => {
