@@ -100,29 +100,37 @@ export class SocketioService {
   public requestProfileForContact() {
     // console.log('requestProfileForContact init')
     this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: { status: number, contact: Contact }) => {
-      // console.log('requestProfileForContact event')
-      const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
-        data: { contact: payload.contact },
-        closeOnNavigation: true,
-        hasBackdrop: true
-      });
+      // console.log('requestProfileForContact event ')
+      this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(payload.contact.hint!))
+        .then((hint: string) => {
+          if (hint !== '') {
+            payload.contact.hint = hint;
+          } else {
+            payload.contact.hint = 'Hint cannot be decrypted!';
+          }
+          const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
+            data: { contact: payload.contact },
+            closeOnNavigation: true,
+            hasBackdrop: true
+          });
 
-      dialogRef.afterOpened().subscribe(e => {
-      });
+          dialogRef.afterOpened().subscribe(e => {
+          });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          payload.contact.name = this.userService.getUser().name;
-          payload.contact.base64Avatar = this.userService.getUser().base64Avatar;
-          payload.contact.provided = true;
-          this.socket.emit('contact:provideUserProfile', payload.contact);
-        } else {
-          payload.contact.name = '';
-          payload.contact.base64Avatar = '';
-          payload.contact.provided = false;
-          this.socket.emit('contact:provideUserProfile', payload.contact);
-        }
-      });
+          dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+              payload.contact.name = this.userService.getUser().name;
+              payload.contact.base64Avatar = this.userService.getUser().base64Avatar;
+              payload.contact.provided = true;
+              this.socket.emit('contact:provideUserProfile', payload.contact);
+            } else {
+              payload.contact.name = '';
+              payload.contact.base64Avatar = '';
+              payload.contact.provided = false;
+              this.socket.emit('contact:provideUserProfile', payload.contact);
+            }
+          });
+        });
     });
   }
 
