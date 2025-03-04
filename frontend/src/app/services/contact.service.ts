@@ -78,8 +78,8 @@ export class ContactService {
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
               hint: rawContact.hint,
-              name: rawContact.name,
-              base64Avatar: rawContact.base64Avatar,
+              name: '',
+              base64Avatar: '',
               lastMessageFrom: rawContact.lastMessageFrom,
               userMessage: '',
               contactUserMessage: '',
@@ -87,6 +87,22 @@ export class ContactService {
               userMessageVerified: false,
               contactUserMessageVerified: false
             };
+            if (rawContact.name) {
+              this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(rawContact.name))
+                .then((name: string) => {
+                  if (name !== '') {
+                    contact.name = name;
+                  }
+                });
+            }
+            if (rawContact.base64Avatar) {
+              this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(rawContact.base64Avatar))
+                .then((base64Avatar: string) => {
+                  if (base64Avatar !== '') {
+                    contact.base64Avatar = base64Avatar;
+                  }
+                });
+            }
             if (contact.userSignature) {
               this.cryptoService.verifySignature(this.userService.getUser().signingKeyPair.publicKey, contact.userId, contact.userSignature!)
                 .then((valid: Boolean) => {
@@ -186,17 +202,37 @@ export class ContactService {
   updateContactProfile(contact: Contact) {
     let body = {
       'contactId': contact.id,
-      'name': contact.name,
-      'base64Avatar': contact.base64Avatar
+      'name': '',
+      'base64Avatar': ''
     };
-    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: simpleStatusResponse => { },
-        error: (err) => { },
-        complete: () => { }
+    this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.name)
+      .then((contactName: string) => {
+        body.name = contactName;
+        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.base64Avatar)
+          .then((base64Avatar: string) => {
+            console.log('TTT')
+            body.base64Avatar = base64Avatar;
+            this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
+              .pipe(
+                catchError(this.handleError)
+              )
+              .subscribe({
+                next: simpleStatusResponse => { },
+                error: (err) => { console.log(err); },
+                complete: () => { }
+              });
+          }).catch(err => {
+            console.log('RRR');
+            this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
+              .pipe(
+                catchError(this.handleError)
+              )
+              .subscribe({
+                next: simpleStatusResponse => { },
+                error: (err) => { console.log(err); },
+                complete: () => { }
+              });
+          });
       });
   }
 
