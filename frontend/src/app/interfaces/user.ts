@@ -8,6 +8,7 @@ export interface User {
     language: string,
     subscription: string,
     defaultStyle: string,
+    symmetricalKey: JsonWebKey,
     encryptionKeyPair: Keypair,
     signingKeyPair: Keypair,
     name: string,

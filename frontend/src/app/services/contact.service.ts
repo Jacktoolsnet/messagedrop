@@ -205,10 +205,10 @@ export class ContactService {
       'name': '',
       'base64Avatar': ''
     };
-    this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.name)
+    this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, contact.name)
       .then((contactName: string) => {
         body.name = contactName;
-        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.base64Avatar)
+        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, contact.base64Avatar)
           .then((base64Avatar: string) => {
             console.log('TTT')
             body.base64Avatar = base64Avatar;

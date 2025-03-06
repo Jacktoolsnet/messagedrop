@@ -150,7 +150,7 @@ export class ContactlistComponent implements OnInit {
             next: (userResponse: GetUserResponse) => {
               this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
                 .then((signature: string) => {
-                  this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, 'QR-Code')
+                  this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, 'QR-Code')
                     .then((encryptedHint: string) => {
                       data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
                       data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.encryptionPublicKey);
@@ -258,10 +258,10 @@ export class ContactlistComponent implements OnInit {
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
             envelope.messageSignature = signature;
-            this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data?.shortMessage.message)
+            this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, data?.shortMessage.message)
               .then((encryptedMessage: string) => {
                 envelope.userEncryptedMessage = encryptedMessage;
-                this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, data?.shortMessage.message)
+                this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, this.userService.getUser().symmetricalKey, data?.shortMessage.message)
                   .then((encryptedMessage: string) => {
                     envelope.contactUserEncryptedMessage = encryptedMessage;
                     // Envelope is ready
