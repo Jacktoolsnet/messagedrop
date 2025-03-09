@@ -217,7 +217,7 @@ export class ContactService {
               )
               .subscribe({
                 next: simpleStatusResponse => { },
-                error: (err) => { console.log(err); },
+                error: (err) => { },
                 complete: () => { }
               });
           }).catch(err => {
@@ -227,7 +227,7 @@ export class ContactService {
               )
               .subscribe({
                 next: simpleStatusResponse => { },
-                error: (err) => { console.log(err); },
+                error: (err) => { },
                 complete: () => { }
               });
           });

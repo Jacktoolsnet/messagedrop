@@ -157,7 +157,6 @@ export class CryptoService {
 
     // Encrypt the symmetrical key
     const encryptedKey = await this.encryptKey(encryptionPublicKey, symmetricalKey).catch((err) => {
-      console.log(err);
       return new ArrayBuffer(0);
     });
 
@@ -171,10 +170,7 @@ export class CryptoService {
   }
 
   async decrypt(encryptionPrivateKey: JsonWebKey, cryptoData: CryptoData): Promise<string> {
-    console.log(cryptoData);
-    console.log(JSON.parse(cryptoData.encryptedData))
     const payloadBuffer = Buffer.from(JSON.parse(cryptoData.encryptedData));
-    console.log(payloadBuffer)
     // Decrypt the symmetrical Key.
     const decryptKey = await this.decryptKey(encryptionPrivateKey, JSON.parse(cryptoData.encryptedKey))
 
@@ -191,7 +187,6 @@ export class CryptoService {
       let decoder = new TextDecoder('utf-8');
       return decoder.decode(decryptedPayload);
     } catch (err) {
-      console.log(err)
       return "";
     }
 

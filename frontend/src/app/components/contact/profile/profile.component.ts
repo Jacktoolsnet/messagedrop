@@ -68,12 +68,9 @@ export class ContactProfileComponent {
   }
 
   public getProfileFromContact(contact: Contact) {
-    // console.log("getProfileFromContact start")
     if (!this.joinedUserRoom) {
-      // console.log("getProfileFromContact joining")
       this.socketioService.getSocket().emit('user:joinUserRoom', contact.userId);
     }
-    // console.log("getProfileFromContact requesting")
     // Register for answer
     this.socketioService.receiveProfileForContactEvent(contact);
     // Start process

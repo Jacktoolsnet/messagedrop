@@ -72,11 +72,11 @@ export class SocketioService {
     // Error handling
     this.socket.on("connect_error", (err: any) => {
       // the reason of the error, for example "xhr poll error"
-      console.log(err.message);
+      // console.log(err.message);
       // some additional description, for example the status code of the initial HTTP response
-      console.log(err.description);
+      // console.log(err.description);
       // some additional context, for example the XMLHttpRequest object
-      console.log(err.context);
+      // console.log(err.context);
     });
     // User room.
     this.socket.emit('user:joinUserRoom', this.userService.getUser().id);
@@ -98,9 +98,7 @@ export class SocketioService {
   }
 
   public requestProfileForContact() {
-    // console.log('requestProfileForContact init')
     this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: { status: number, contact: Contact }) => {
-      // console.log('requestProfileForContact event ')
       this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(payload.contact.hint!))
         .then((hint: string) => {
           if (hint !== '') {
@@ -135,9 +133,7 @@ export class SocketioService {
   }
 
   public receiveProfileForContactEvent(contact: Contact) {
-    // console.log('receiveProfileForContactEvent init')
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
-      // console.log("receiveProfileForContactEvent event")
       if (payload.status == 200) {
         contact.name = payload.contact.name;
         contact.base64Avatar = payload.contact.base64Avatar;
@@ -153,14 +149,11 @@ export class SocketioService {
   }
 
   public sendShortMessageToContact(envelope: Envelope) {
-    // console.log('sendShortMessageToContact')
     this.socket.emit('contact:newShortMessage', envelope);
   }
 
   public receiveShortMessage(contact: Contact) {
-    // console.log('receiveShorMessage init')
     this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, envelope: Envelope }) => {
-      console.log("receiveShorMessage event")
       if (payload.status == 200) {
         let messageSignatureBuffer = undefined;
         let messageSignature = undefined;

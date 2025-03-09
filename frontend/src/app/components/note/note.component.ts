@@ -40,7 +40,6 @@ export class NoteComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    console.log(this.data.user);
     this.data.note.style = this.data.user.defaultStyle
   }
 
