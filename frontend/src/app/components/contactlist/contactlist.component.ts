@@ -200,7 +200,7 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (true) {
-        this.contactService.updateContactProfile(contact);
+        this.contactService.saveAditionalContactInfos();
       }
     });
   }

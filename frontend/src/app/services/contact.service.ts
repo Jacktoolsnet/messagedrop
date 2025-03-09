@@ -23,6 +23,7 @@ import { UserService } from './user.service';
 export class ContactService {
 
   private contacts: Contact[] = [];
+  private additionalContactInfos: { id: string, name: string, base64Avatar: string }[] = [];
   private ready: boolean = false;
 
   httpOptions = {
@@ -47,6 +48,7 @@ export class ContactService {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
+          this.loadAdditionalContactInfos();
           getContactsResponse.rows.forEach((rawContact: RawContact) => {
             let userSignatureBuffer = undefined
             let userSignature = undefined
@@ -78,8 +80,8 @@ export class ContactService {
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
               hint: rawContact.hint,
-              name: '',
-              base64Avatar: '',
+              name: this.findAditionalContactInfo(rawContact.id).name,
+              base64Avatar: this.findAditionalContactInfo(rawContact.id).base64Avatar,
               lastMessageFrom: rawContact.lastMessageFrom,
               userMessage: '',
               contactUserMessage: '',
@@ -87,22 +89,6 @@ export class ContactService {
               userMessageVerified: false,
               contactUserMessageVerified: false
             };
-            if (rawContact.name) {
-              this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(rawContact.name))
-                .then((name: string) => {
-                  if (name !== '') {
-                    contact.name = name;
-                  }
-                });
-            }
-            if (rawContact.base64Avatar) {
-              this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(rawContact.base64Avatar))
-                .then((base64Avatar: string) => {
-                  if (base64Avatar !== '') {
-                    contact.base64Avatar = base64Avatar;
-                  }
-                });
-            }
             if (contact.userSignature) {
               this.cryptoService.verifySignature(this.userService.getUser().signingKeyPair.publicKey, contact.userId, contact.userSignature!)
                 .then((valid: Boolean) => {
@@ -163,6 +149,23 @@ export class ContactService {
       });
   }
 
+  loadAdditionalContactInfos() {
+    this.additionalContactInfos = JSON.parse(localStorage.getItem('contacts') || '[]');
+  }
+
+  findAditionalContactInfo(contactId: string): { id: string, name: string, base64Avatar: string } {
+    const additionalContactInfo = this.additionalContactInfos.find((additionalContactInfo) => additionalContactInfo.id === contactId);
+    return undefined != additionalContactInfo ? additionalContactInfo : { id: contactId, name: '', base64Avatar: '' };
+  }
+
+  saveAditionalContactInfos() {
+    this.additionalContactInfos = [];
+    this.contacts.forEach((contact: Contact) => {
+      this.additionalContactInfos.push({ id: contact.id, name: contact.name!, base64Avatar: contact.base64Avatar! });
+    })
+    localStorage.setItem('contacts', JSON.stringify(this.additionalContactInfos))
+  }
+
   getContacts(): Contact[] {
     return this.contacts;
   }
@@ -190,47 +193,12 @@ export class ContactService {
             contact.id = createContactResponse.contactId;
             this.getContacts().unshift(contact);
             socketioService.receiveShortMessage(contact)
-            this.updateContactProfile(contact);
+            this.saveAditionalContactInfos();
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
           }
         },
         error: (err) => { this.snackBar.open(err.message, 'OK'); },
         complete: () => { }
-      });
-  }
-
-  updateContactProfile(contact: Contact) {
-    let body = {
-      'contactId': contact.id,
-      'name': '',
-      'base64Avatar': ''
-    };
-    this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.name)
-      .then((contactName: string) => {
-        body.name = contactName;
-        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.base64Avatar)
-          .then((base64Avatar: string) => {
-            body.base64Avatar = base64Avatar;
-            this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
-              .pipe(
-                catchError(this.handleError)
-              )
-              .subscribe({
-                next: simpleStatusResponse => { },
-                error: (err) => { },
-                complete: () => { }
-              });
-          }).catch(err => {
-            this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
-              .pipe(
-                catchError(this.handleError)
-              )
-              .subscribe({
-                next: simpleStatusResponse => { },
-                error: (err) => { },
-                complete: () => { }
-              });
-          });
       });
   }
 

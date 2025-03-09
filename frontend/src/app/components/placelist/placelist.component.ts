@@ -90,7 +90,7 @@ export class PlacelistComponent implements OnInit {
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
                 this.places.splice(this.places.findIndex(place => place.id === this.placeToDelete.id), 1);
-                this.placeService.savePlacesAvatar();
+                this.placeService.saveAdditionalPlaceInfos();
               }
             },
             error: (err) => {
@@ -134,7 +134,7 @@ export class PlacelistComponent implements OnInit {
               .subscribe({
                 next: simpleResponse => {
                   if (simpleResponse.status === 200) {
-                    this.placeService.savePlacesAvatar();
+                    this.placeService.saveAdditionalPlaceInfos();
                     this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
                   }
                 },
@@ -229,7 +229,7 @@ export class PlacelistComponent implements OnInit {
                   if (createPlaceResponse.status === 200) {
                     data.place.id = createPlaceResponse.placeId;
                     this.places.unshift(data.place);
-                    this.placeService.savePlacesAvatar();
+                    this.placeService.saveAdditionalPlaceInfos();
                     this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
                   }
                 },

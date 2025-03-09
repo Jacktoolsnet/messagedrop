@@ -13,8 +13,6 @@ const columnContactUserSignature = 'contactUserSignature';
 const columnContactUserMessageStyle = 'contactUserMessageStyle';
 const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
-const columnName = 'name';
-const columnBase64Avatar = 'base64Avatar';
 const columnLastMessageFrom = 'lastMessageFrom';
 
 const init = function (db) {
@@ -34,8 +32,6 @@ const init = function (db) {
             ${columnContactUserMessageStyle} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
-            ${columnName} TEXT DEFAULT NULL,
-            ${columnBase64Avatar} TEXT DEFAULT NULL,
             ${columnLastMessageFrom} TEXT DEFAULT '',
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
@@ -76,22 +72,6 @@ const create = function (db, contactId, userId, contactUserId, hint, contactUser
         );`;
         db.run(sql, (err) => {
             callback(err)
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const update = function (db, contactId, name, base64Avatar, callback) {
-    try {
-        let sql = `
-        UPDATE ${tableName}
-        SET ${columnName} = '${name}', 
-        ${columnBase64Avatar} = '${base64Avatar}'
-        WHERE ${columnContactId} = ?;`;
-
-        db.run(sql, [contactId], (err) => {
-            callback(err);
         });
     } catch (error) {
         throw error;
@@ -213,7 +193,6 @@ const deleteById = function (db, contactId, callback) {
 module.exports = {
     init,
     create,
-    update,
     updateUserMessage,
     updateContactUserMessage,
     subscribe,
