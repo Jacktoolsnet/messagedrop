@@ -205,12 +205,11 @@ export class ContactService {
       'name': '',
       'base64Avatar': ''
     };
-    this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, contact.name)
+    this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.name)
       .then((contactName: string) => {
         body.name = contactName;
-        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, contact.base64Avatar)
+        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, contact.base64Avatar)
           .then((base64Avatar: string) => {
-            console.log('TTT')
             body.base64Avatar = base64Avatar;
             this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
               .pipe(
@@ -222,7 +221,6 @@ export class ContactService {
                 complete: () => { }
               });
           }).catch(err => {
-            console.log('RRR');
             this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/contact/update/profile`, body, this.httpOptions)
               .pipe(
                 catchError(this.handleError)

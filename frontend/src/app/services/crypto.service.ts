@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Buffer } from 'buffer';
+import { CryptoData } from '../interfaces/crypto-data';
 import { Keypair } from '../interfaces/keypair';
 
 @Injectable({
@@ -93,7 +94,7 @@ export class CryptoService {
     return verified
   }
 
-  async encryptKey(encryptionPublicKey: JsonWebKey, symmetricalKey: JsonWebKey): Promise<string> {
+  async encryptKey(encryptionPublicKey: JsonWebKey, symmetricalKey: JsonWebKey): Promise<ArrayBuffer> {
     const payloadString = JSON.stringify(symmetricalKey);
     const payloadBuffer = new TextEncoder().encode(payloadString);
     let rsaHashedImportParams: RsaHashedImportParams = {
@@ -101,77 +102,96 @@ export class CryptoService {
       hash: "SHA-256"
     };
     let publicKey = await crypto.subtle.importKey("jwk", encryptionPublicKey, rsaHashedImportParams, true, ["encrypt"]);
-    const encryptedPayload = await crypto.subtle.encrypt(
+    return await crypto.subtle.encrypt(
       {
         name: "RSA-OAEP",
       },
       publicKey,
       payloadBuffer,
     );
-    return JSON.stringify(Buffer.from(encryptedPayload).toJSON());
   }
 
-  async decryptKey(encryptionPrivateKey: JsonWebKey, payload: ArrayBuffer): Promise<string> {
+  async decryptKey(encryptionPrivateKey: JsonWebKey, payload: ArrayBuffer): Promise<CryptoKey> {
     let payloadBuffer = Buffer.from(payload);
-    let decryptedPayload: ArrayBuffer = new ArrayBuffer(0);
+    // Decrypt the paylaod
     let rsaHashedImportParams: RsaHashedImportParams = {
       name: "RSA-OAEP",
       hash: "SHA-256"
     };
     let privateKey = await crypto.subtle.importKey("jwk", encryptionPrivateKey, rsaHashedImportParams, true, ["decrypt"]);
-    try {
-      decryptedPayload = await crypto.subtle.decrypt(
-        {
-          name: "RSA-OAEP",
-        },
-        privateKey,
-        payloadBuffer,
-      );
-      let decoder = new TextDecoder('utf-8');
-      return decoder.decode(decryptedPayload);
-    } catch (err) {
-      return "";
-    }
-
-  }
-
-  async encrypt(encryptionPublicKey: JsonWebKey, symmetricalKey: JsonWebKey, payload: any): Promise<string> {
-    let encryptedPayload: ArrayBuffer = new ArrayBuffer(0);
-    let payloadBuffer = Buffer.from(payload);
+    const decryptedPayload = await crypto.subtle.decrypt(
+      {
+        name: "RSA-OAEP",
+      },
+      privateKey,
+      payloadBuffer,
+    );
+    // Convert to CryptoKey
+    const decryptKeyAsString = new TextDecoder().decode(decryptedPayload);
     let algorithmIdentifier: AlgorithmIdentifier = {
       name: "AES-GCM"
     };
-    let aesGcmKey = await crypto.subtle.importKey("jwk", encryptionPublicKey, algorithmIdentifier, true, ["encrypt"]);
-
-    const iv = window.crypto.getRandomValues(new Uint8Array(12));
-    const encryptedData = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: iv },
-      aesGcmKey,
-      payload
-    );
-    console.log({ iv: iv, encryptedData: encryptedData });
-    return JSON.stringify({ iv: iv, encryptedData: encryptedData });
+    return await window.crypto.subtle.importKey('jwk', JSON.parse(decryptKeyAsString), algorithmIdentifier, true, ['encrypt', 'decrypt']);
   }
 
-  async decrypt(encryptionPrivateKey: JsonWebKey, payload: ArrayBuffer): Promise<string> {
+  async encrypt(encryptionPublicKey: JsonWebKey, payload: any): Promise<string> {
     let payloadBuffer = Buffer.from(payload);
-    let decryptedPayload: ArrayBuffer = new ArrayBuffer(0);
-    let rsaHashedImportParams: RsaHashedImportParams = {
-      name: "RSA-OAEP",
-      hash: "SHA-256"
+    // Create the symmetrical key
+    let algorithmIdentifier: AlgorithmIdentifier = {
+      name: "AES-GCM"
     };
-    let privateKey = await crypto.subtle.importKey("jwk", encryptionPrivateKey, rsaHashedImportParams, true, ["decrypt"]);
+    const symmetricalKey = await this.createSymmetricalKey()
+    let cryptoKey = await crypto.subtle.importKey("jwk", symmetricalKey, algorithmIdentifier, true, ["encrypt"]);
+    const iv = window.crypto.getRandomValues(new Uint8Array(12));
+    // Encrpyt data with symetrical key
+    const encryptedData = await window.crypto.subtle.encrypt(
+      {
+        name: 'AES-GCM',
+        iv: iv
+      },
+      cryptoKey,
+      payloadBuffer
+    ).catch((err) => {
+      return new ArrayBuffer(0);
+    });
+
+    // Encrypt the symmetrical key
+    const encryptedKey = await this.encryptKey(encryptionPublicKey, symmetricalKey).catch((err) => {
+      console.log(err);
+      return new ArrayBuffer(0);
+    });
+
+    // Put everything together
+    let cryptoData: CryptoData = {
+      iv: JSON.stringify(Buffer.from(iv).toJSON()),
+      encryptedData: JSON.stringify(Buffer.from(encryptedData).toJSON()),
+      encryptedKey: JSON.stringify(Buffer.from(encryptedKey).toJSON())
+    };
+    return JSON.stringify(cryptoData);
+  }
+
+  async decrypt(encryptionPrivateKey: JsonWebKey, cryptoData: CryptoData): Promise<string> {
+    console.log(cryptoData);
+    console.log(JSON.parse(cryptoData.encryptedData))
+    const payloadBuffer = Buffer.from(JSON.parse(cryptoData.encryptedData));
+    console.log(payloadBuffer)
+    // Decrypt the symmetrical Key.
+    const decryptKey = await this.decryptKey(encryptionPrivateKey, JSON.parse(cryptoData.encryptedKey))
+
+    // Decrypt the data.
     try {
-      decryptedPayload = await crypto.subtle.decrypt(
+      const decryptedPayload = await crypto.subtle.decrypt(
         {
-          name: "RSA-OAEP",
+          name: 'AES-GCM',
+          iv: Buffer.from(JSON.parse(cryptoData.iv))
         },
-        privateKey,
+        decryptKey,
         payloadBuffer,
       );
       let decoder = new TextDecoder('utf-8');
       return decoder.decode(decryptedPayload);
     } catch (err) {
+      console.log(err)
       return "";
     }
 

@@ -668,7 +668,7 @@ export class AppComponent implements OnInit {
         case "shareUserId":
           this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
             .then((signature: string) => {
-              this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, this.userService.getUser().symmetricalKey, result?.connectHint)
+              this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, result?.connectHint)
                 .then((encryptedHint: string) => {
                   let connect: Connect = {
                     id: '',

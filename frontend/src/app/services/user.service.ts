@@ -28,7 +28,6 @@ export class UserService {
     language: '',
     subscription: '',
     defaultStyle: '',
-    symmetricalKey: {},
     encryptionKeyPair: {
       publicKey: {},
       privateKey: {}
@@ -72,7 +71,6 @@ export class UserService {
         language: this.getLanguageForLocation(navigator.language),
         subscription: '',
         defaultStyle: this.style.getRandomStyle(),
-        symmetricalKey: {},
         encryptionKeyPair: {
           publicKey: {},
           privateKey: {}
@@ -92,7 +90,6 @@ export class UserService {
         language: this.getLanguageForLocation(navigator.language),
         subscription: undefined != userFromLocalStorage.subscription ? userFromLocalStorage.subscription : '',
         defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
-        symmetricalKey: undefined != userFromLocalStorage.symmetricalKey ? userFromLocalStorage.symmetricalKey : {},
         encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : {},
         signingKeyPair: undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : {},
         name: undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
@@ -106,7 +103,6 @@ export class UserService {
     if (this.user.id === '') {
       this.cryptoService.createSymmetricalKey()
         .then((symmetricalKey: JsonWebKey) => {
-          this.user.symmetricalKey = symmetricalKey;
           this.cryptoService.createEncryptionKey()
             .then((encryptionKeyPair: Keypair) => {
               this.user!.encryptionKeyPair = encryptionKeyPair;
@@ -213,7 +209,6 @@ export class UserService {
       language: navigator.language.split('-')[0],
       subscription: '',
       defaultStyle: this.style.getRandomStyle(),
-      symmetricalKey: {},
       encryptionKeyPair: {
         publicKey: {},
         privateKey: {}

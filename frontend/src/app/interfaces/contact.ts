@@ -1,3 +1,4 @@
+import { CryptoData } from "./crypto-data";
 import { Envelope } from "./envelope";
 
 export interface Contact {
@@ -6,13 +7,13 @@ export interface Contact {
     userSignature?: ArrayBuffer,
     userMessage: string,
     userMessageVerified: boolean,
-    userEncryptedMessage?: ArrayBuffer,
+    userEncryptedMessage?: CryptoData,
     userMessageStyle: string,
     contactUserId: string,
     contactSignature?: ArrayBuffer,
     contactUserMessage: string,
     contactUserMessageVerified: boolean,
-    contactUserEncryptedMessage?: ArrayBuffer,
+    contactUserEncryptedMessage?: CryptoData,
     contactUserMessageStyle: string,
     contactUserSignature?: ArrayBuffer,
     contactUserSigningPublicKey?: JsonWebKey,

@@ -21,7 +21,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.post('/update/profile', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/update/profile', [security.checkToken, bodyParser.json({ limit: '5mb', type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   tableContact.update(req.database.db, req.body.contactId, req.body.name.replace(/\'/g, "''"), req.body.base64Avatar, function (err) {
     if (err) {
