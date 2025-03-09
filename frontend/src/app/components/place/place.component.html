@@ -6,6 +6,23 @@
   </button>
   Set the place name
   <input matInput type="text" maxlength="64" placeholder="The place name.." [(ngModel)]="data.place.name">
+  <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
+    (change)="onFileSelected($event)" #fileUpload>
+  <div class="center-left" *ngIf="data.place.base64Avatar == ''">
+    Set the place avatar:
+    <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
+      <mat-icon>attach_file</mat-icon>
+    </button>
+  </div>
+  <div class="center">
+    <img *ngIf="data.place.base64Avatar != ''" class="avatar" src="{{data.place.base64Avatar}}" /><br>
+  </div>
+  <div class="center" *ngIf="data.place.base64Avatar != ''">
+    <button *ngIf="data.place.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button"
+      (click)="deleteAvatar()">
+      <mat-icon>delete</mat-icon>
+    </button>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>

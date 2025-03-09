@@ -8,6 +8,7 @@ import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { CryptoService } from './crypto.service';
 import { MapService } from './map.service';
 import { UserService } from './user.service';
 
@@ -17,10 +18,12 @@ import { UserService } from './user.service';
 export class PlaceService {
 
   private places: Place[] = [];
+  private placesAvatar: { id: string, base64Avatar: string }[] = [];
   private selectedPlace: Place = {
     id: '',
     userId: '',
     name: '',
+    base64Avatar: '',
     subscribed: false,
     plusCodes: []
   };
@@ -35,6 +38,7 @@ export class PlaceService {
 
   constructor(
     private userService: UserService,
+    private cryptoService: CryptoService,
     private http: HttpClient) {
   }
 
@@ -43,6 +47,7 @@ export class PlaceService {
   }
 
   initPlaces() {
+    this.loadPlacesAvatar();
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
@@ -55,13 +60,17 @@ export class PlaceService {
                 plusCodes.push(JSON.parse(row.plusCodes));
               }
             }
-            this.places.push({
-              id: row.id,
-              userId: row.userId,
-              name: row.name,
-              subscribed: row.subscribed,
-              plusCodes: plusCodes
-            });
+            this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(row.name))
+              .then((name: string) => {
+                this.places.push({
+                  id: row.id,
+                  userId: row.userId,
+                  name: name,
+                  base64Avatar: this.findPlaceAvatar(row.id),
+                  subscribed: row.subscribed,
+                  plusCodes: plusCodes
+                });
+              });
           });
           this.ready = true;
         },
@@ -75,6 +84,23 @@ export class PlaceService {
         },
         complete: () => { }
       });
+  }
+
+  loadPlacesAvatar() {
+    this.placesAvatar = JSON.parse(localStorage.getItem('places') || '[]');
+  }
+
+  findPlaceAvatar(placeId: string): string {
+    const foundAvatar = this.placesAvatar.find((placeAvatar) => placeAvatar.id === placeId);
+    return undefined != foundAvatar ? foundAvatar.base64Avatar : '';
+  }
+
+  savePlacesAvatar() {
+    this.placesAvatar = [];
+    this.places.forEach((place: Place) => {
+      this.placesAvatar.push({ id: place.id, base64Avatar: place.base64Avatar });
+    })
+    localStorage.setItem('places', JSON.stringify(this.placesAvatar))
   }
 
   getPlaces(): Place[] {

@@ -1,8 +1,10 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back" (click)="goBack()">
+    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back"
+        (click)="goBack()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back" (click)="openPlaceDialog()">
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back"
+        (click)="openPlaceDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div class="content" [ngClass]="{
@@ -10,37 +12,46 @@
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
-        <div *ngIf="places.length == 0" class="item">        
-            <mat-card>                    
+        <div *ngIf="places.length == 0" class="item">
+            <mat-card>
                 <mat-card-header class="header">
                     <mat-card-title>Places</mat-card-title>
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
-                <mat-card-content>I can tap on the plus button to create a place.<br><br>I can add multiple location to a place.<br><br>I can gat a notifications when a message is droped at the location, if I like.</mat-card-content>                
+                <mat-card-content>I can tap on the plus button to create a place.<br><br>I can add multiple location to
+                    a place.<br><br>I can gat a notifications when a message is droped at the location, if I
+                    like.</mat-card-content>
             </mat-card>
         </div>
-        <div *ngIf="places.length != 0">        
-            <div class="item" *ngFor="let place of places; index as i">            
-                <mat-card>                    
+        <div *ngIf="places.length != 0">
+            <div class="item" *ngFor="let place of places; index as i">
+                <mat-card>
+                    <img *ngIf="place.base64Avatar != ''" class="avatar" src="{{place.base64Avatar}}" />
                     <mat-card-header class="header">
                         <mat-card-title>{{place.name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
                     <mat-card-content></mat-card-content>
                     <mat-card-actions class="buttonbar">
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note" (click)="editPlace(place)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit</mat-icon>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
+                            (click)="editPlace(place)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Delete note" (click)="deletePlace(place)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >delete_forever</mat-icon>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Delete note"
+                            (click)="deletePlace(place)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab color="{{!place.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place" (click)="subscribe(place)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >bookmark_flag</mat-icon>
+                        <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab
+                            color="{{!place.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place"
+                            (click)="subscribe(place)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">bookmark_flag</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit locations for this place" (click)="editLocation(place)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined" >edit_location_alt</mat-icon>
+                        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+                            aria-label="Edit locations for this place" (click)="editLocation(place)">
+                            <mat-icon aria-hidden="false" class="material-symbols-outlined">edit_location_alt</mat-icon>
                         </button>
-                        <button [attr.aria-hidden]="false" *ngIf="place.plusCodes.length != 0" mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(place)">
+                        <button [attr.aria-hidden]="false" *ngIf="place.plusCodes.length != 0" mat-mini-fab
+                            color="secondary" aria-label="Fly to message" (click)="flyTo(place)">
                             <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">place</mat-icon>
                         </button>
                     </mat-card-actions>

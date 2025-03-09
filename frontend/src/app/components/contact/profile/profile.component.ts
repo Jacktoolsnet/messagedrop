@@ -64,7 +64,7 @@ export class ContactProfileComponent {
   }
 
   public showPolicy() {
-    this.snackBar.open(`Contactprofile name, avatar, and the subscription flag is stored our the server.`, 'OK', {});
+    this.snackBar.open(`Contactprofile name (encrypted), avatar (encrypted), and the subscription flag is saved on our server.`, 'OK', {});
   }
 
   public getProfileFromContact(contact: Contact) {

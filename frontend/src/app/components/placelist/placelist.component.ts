@@ -16,6 +16,7 @@ import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { Place } from '../../interfaces/place';
 import { User } from '../../interfaces/user';
+import { CryptoService } from '../../services/crypto.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { PlaceService } from '../../services/place.service';
@@ -56,6 +57,7 @@ export class PlacelistComponent implements OnInit {
     private geolocationService: GeolocationService,
     private placeService: PlaceService,
     private userService: UserService,
+    private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public placeDialog: MatDialog,
     public dialog: MatDialog,
@@ -87,7 +89,8 @@ export class PlacelistComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.places.splice(this.places.findIndex(place => place.id !== this.placeToDelete.id), 1);
+                this.places.splice(this.places.findIndex(place => place.id === this.placeToDelete.id), 1);
+                this.placeService.savePlacesAvatar();
               }
             },
             error: (err) => {
@@ -117,15 +120,27 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        this.placeService.updatePlace(data.place)
-          .subscribe({
-            next: simpleResponse => {
-              if (simpleResponse.status === 200) {
-                this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
-              }
-            },
-            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-            complete: () => { }
+        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data.place.name)
+          .then((encryptedName: string) => {
+            let updatePlace: Place = {
+              id: data.place.id,
+              userId: data.place.userId,
+              name: encryptedName,
+              base64Avatar: data.place.base64Avatar,
+              subscribed: data.place.subscribe,
+              plusCodes: [...data.place.plusCodes]
+            };
+            this.placeService.updatePlace(updatePlace)
+              .subscribe({
+                next: simpleResponse => {
+                  if (simpleResponse.status === 200) {
+                    this.placeService.savePlacesAvatar();
+                    this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
+                  }
+                },
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                complete: () => { }
+              });
           });
       }
     });
@@ -176,6 +191,7 @@ export class PlacelistComponent implements OnInit {
       id: '',
       userId: this.user.id,
       name: '',
+      base64Avatar: '',
       subscribed: false,
       plusCodes: []
     };
@@ -197,17 +213,29 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        this.placeService.createPlace(data.place)
-          .subscribe({
-            next: createPlaceResponse => {
-              if (createPlaceResponse.status === 200) {
-                data.place.id = createPlaceResponse.placeId;
-                this.places.unshift(data.place);
-                this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-              }
-            },
-            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-            complete: () => { }
+        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data.place.name)
+          .then((encryptedName: string) => {
+            let updatePlace: Place = {
+              id: data.place.id,
+              userId: data.place.userId,
+              name: encryptedName,
+              base64Avatar: data.place.base64Avatar,
+              subscribed: data.place.subscribe,
+              plusCodes: [...data.place.plusCodes]
+            };
+            this.placeService.createPlace(updatePlace)
+              .subscribe({
+                next: createPlaceResponse => {
+                  if (createPlaceResponse.status === 200) {
+                    data.place.id = createPlaceResponse.placeId;
+                    this.places.unshift(data.place);
+                    this.placeService.savePlacesAvatar();
+                    this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                  }
+                },
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                complete: () => { }
+              });
           });
       }
     });

@@ -38,6 +38,16 @@ select {
   padding-bottom: 0.5rem;
 }
 
+.upload-button {
+  margin-left: 0.5rem;
+}
+
+.avatar {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 4rem;
+}
+
 .button_legal {
   position: absolute;
   bottom: 0;

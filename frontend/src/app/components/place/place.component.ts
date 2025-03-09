@@ -50,8 +50,31 @@ export class PlaceComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  onFileSelected(event: any) {
+    const file: File = event.target.files[0];
+
+    if (file) {
+      let reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = this.handleFile.bind(this);
+      reader.onerror = this.handleFileError.bind(this);
+    }
+  }
+
+  handleFile(event: any) {
+    this.data.place.base64Avatar = event.target.result;
+  }
+
+  handleFileError(event: any) {
+
+  }
+
+  deleteAvatar() {
+    this.data.place.base64Avatar = '';
+  }
+
   public showPolicy() {
-    this.snackBar.open(`Place id, place name, the added locations and the subscribed flag is saved on our server.`, 'OK', {});
+    this.snackBar.open(`Place id, place name (encrypted), the added locations and the subscribed flag is saved on our server. The avatar is saved on your device.`, 'OK', {});
   }
 
 }
