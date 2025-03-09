@@ -7,6 +7,7 @@ const Database = require('./db/database');
 const database = new Database();
 const root = require('./routes/root');
 const check = require('./routes/check');
+const openAi = require('./routes/openAi');
 const statistic = require('./routes/statistic');
 const user = require('./routes/user');
 const connect = require('./routes/connect');
@@ -111,6 +112,7 @@ const translateLimit = rateLimit({
 app.use('/', root);
 app.use('/check', check);
 app.use('/statistic', statistic);
+app.use('/openai', openAi)
 app.use('/user', user);
 app.use('/connect', connect);
 app.use('/contact', contact);
