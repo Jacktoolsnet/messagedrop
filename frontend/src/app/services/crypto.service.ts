@@ -12,6 +12,16 @@ export class CryptoService {
 
   constructor() { }
 
+  async createHash(payload: any) {
+    const payloadUint8 = new TextEncoder().encode(payload);
+    const hashBuffer = await crypto.subtle.digest('SHA-256', payloadUint8);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    const hash = hashArray
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join(''); // Array zu Hex-String
+    return hash;
+  }
+
   async createSymmetricalKey(): Promise<JsonWebKey> {
     const symmetricalKey = await crypto.subtle.generateKey(
       {

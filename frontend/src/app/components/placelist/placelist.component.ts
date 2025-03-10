@@ -120,12 +120,12 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data.place.name)
-          .then((encryptedName: string) => {
+        this.cryptoService.createHash(data.place.name)
+          .then((hashedName: string) => {
             let updatePlace: Place = {
               id: data.place.id,
               userId: data.place.userId,
-              name: encryptedName,
+              name: hashedName,
               base64Avatar: data.place.base64Avatar,
               subscribed: data.place.subscribe,
               plusCodes: [...data.place.plusCodes]
@@ -213,12 +213,12 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data.place.name)
-          .then((encryptedName: string) => {
+        this.cryptoService.createHash(data.place.name)
+          .then((hasedName: string) => {
             let updatePlace: Place = {
               id: data.place.id,
               userId: data.place.userId,
-              name: encryptedName,
+              name: hasedName,
               base64Avatar: data.place.base64Avatar,
               subscribed: data.place.subscribe,
               plusCodes: [...data.place.plusCodes]

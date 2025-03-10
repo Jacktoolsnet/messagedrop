@@ -74,7 +74,7 @@ export class PlaceComponent implements OnInit {
   }
 
   public showPolicy() {
-    this.snackBar.open(`Place id, place name (encrypted), the added locations and the subscribed flag is saved on our server. The avatar is saved on your device.`, 'OK', {});
+    this.snackBar.open(`Place id, place name (hashed), the added locations and the subscribed flag is saved on our server. The readable name and the avatar is saved on your device.`, 'OK', {});
   }
 
 }

@@ -18,7 +18,7 @@ import { UserService } from './user.service';
 export class PlaceService {
 
   private places: Place[] = [];
-  private additionalPlaceInfos: { id: string, base64Avatar: string }[] = [];
+  private additionalPlaceInfos: { id: string, name: string, base64Avatar: string }[] = [];
   private selectedPlace: Place = {
     id: '',
     userId: '',
@@ -60,17 +60,14 @@ export class PlaceService {
                 plusCodes.push(JSON.parse(row.plusCodes));
               }
             }
-            this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(row.name))
-              .then((name: string) => {
-                this.places.push({
-                  id: row.id,
-                  userId: row.userId,
-                  name: name,
-                  base64Avatar: this.findAdditionalPlaceInfo(row.id),
-                  subscribed: row.subscribed,
-                  plusCodes: plusCodes
-                });
-              });
+            this.places.push({
+              id: row.id,
+              userId: row.userId,
+              name: this.findAdditionalPlaceInfo(row.id).name,
+              base64Avatar: this.findAdditionalPlaceInfo(row.id).base64Avatar,
+              subscribed: row.subscribed,
+              plusCodes: plusCodes
+            });
           });
           this.ready = true;
         },
@@ -90,15 +87,15 @@ export class PlaceService {
     this.additionalPlaceInfos = JSON.parse(localStorage.getItem('places') || '[]');
   }
 
-  findAdditionalPlaceInfo(placeId: string): string {
+  findAdditionalPlaceInfo(placeId: string): { id: string, name: string, base64Avatar: string } {
     const additonalPlaceInfo = this.additionalPlaceInfos.find((additonalPlaceInfo) => additonalPlaceInfo.id === placeId);
-    return undefined != additonalPlaceInfo ? additonalPlaceInfo.base64Avatar : '';
+    return undefined != additonalPlaceInfo ? additonalPlaceInfo : { id: '', name: '', base64Avatar: '' };
   }
 
   saveAdditionalPlaceInfos() {
     this.additionalPlaceInfos = [];
     this.places.forEach((place: Place) => {
-      this.additionalPlaceInfos.push({ id: place.id, base64Avatar: place.base64Avatar });
+      this.additionalPlaceInfos.push({ id: place.id, name: place.name, base64Avatar: place.base64Avatar });
     })
     localStorage.setItem('places', JSON.stringify(this.additionalPlaceInfos))
   }

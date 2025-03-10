@@ -50,8 +50,12 @@ export class MessageComponent implements OnInit {
       .subscribe({
         next: openAiModerateResponse => {
           console.log(openAiModerateResponse)
-          this.data.message.userId = this.data.user.id;
-          this.dialogRef.close(this.data);
+          if (!openAiModerateResponse.results[0].flagged) {
+            this.data.message.userId = this.data.user.id;
+            this.dialogRef.close(this.data);
+          } else {
+            // abgelehnt
+          }
         },
         error: (err) => {
           console.log(err);
