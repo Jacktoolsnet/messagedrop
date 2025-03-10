@@ -10,6 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { User } from '../../interfaces/user';
+import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
 import { WaitComponent } from '../utils/wait/wait.component';
@@ -35,6 +36,7 @@ export class MessageComponent implements OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
+    private messageService: MessageService,
     private openAiService: OpenAiService,
     public dialogRef: MatDialogRef<MessageComponent>,
     private style: StyleService,
@@ -52,27 +54,34 @@ export class MessageComponent implements OnInit {
       case 'edit_public_message':
       case 'add_comment':
       case 'edit_comment':
-        const waitDialogRef = this.waitDialog.open(WaitComponent, {
-          closeOnNavigation: false,
-          hasBackdrop: false
-        });
-        this.openAiService.moderateMessage(this.data.message)
-          .subscribe({
-            next: openAiModerateResponse => {
-              console.log(openAiModerateResponse)
-              if (!openAiModerateResponse.results[0].flagged) {
-                this.data.message.userId = this.data.user.id;
-                waitDialogRef.close();
-                this.dialogRef.close(this.data);
-              } else {
-                // abgelehnt
-              }
-            },
-            error: (err) => {
-              console.log(err);
-            },
-            complete: () => { }
+        if (this.messageService.detectPersonalInformation(this.data.message.message)) {
+          this.snackBar.open(`My message will not be published because it appears to contain personal information.`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
+        } else {
+          const waitDialogRef = this.waitDialog.open(WaitComponent, {
+            data: { title: 'AI Moderation', message: `My message is currently being reviewed by OpenAi's moderation AI.` },
+            closeOnNavigation: false,
+            hasBackdrop: false
           });
+          this.openAiService.moderateMessage(this.data.message)
+            .subscribe({
+              next: openAiModerateResponse => {
+                console.log(openAiModerateResponse)
+                if (!openAiModerateResponse.results[0].flagged) {
+                  this.data.message.userId = this.data.user.id;
+                  waitDialogRef.close();
+                  this.dialogRef.close(this.data);
+                } else {
+                  // abgelehnt
+                  waitDialogRef.close();
+                  this.snackBar.open(`My message will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
+                }
+              },
+              error: (err) => {
+                console.log(err);
+              },
+              complete: () => { }
+            });
+        }
         break;
       default:
         this.data.message.userId = this.data.user.id;
