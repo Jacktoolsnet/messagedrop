@@ -1,10 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Message } from '../interfaces/message';
-import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +17,6 @@ export class OpenAiService {
   };
 
   constructor(
-    private snackBar: MatSnackBar,
     private http: HttpClient
   ) { }
 
@@ -31,7 +28,7 @@ export class OpenAiService {
     let body = {
       'message': message.message
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/openai/moderate`, body, this.httpOptions)
+    return this.http.post<any>(`${environment.apiUrl}/openai/moderate`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )

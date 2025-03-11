@@ -13,6 +13,7 @@ import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
+import { TenorService } from '../../services/tenor.service';
 import { WaitComponent } from '../utils/wait/wait.component';
 
 @Component({
@@ -40,12 +41,22 @@ export class MessageComponent implements OnInit {
     private openAiService: OpenAiService,
     public dialogRef: MatDialogRef<MessageComponent>,
     private style: StyleService,
-    public waitDialog: MatDialog,
+    private waitDialog: MatDialog,
+    private tensorService: TenorService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, message: Message }
   ) { }
 
   ngOnInit(): void {
     this.data.message.style = this.data.user.defaultStyle;
+    this.tensorService.getFeatured().subscribe({
+      next: tensorResponse => {
+        console.log(tensorResponse);
+      },
+      error: (err) => {
+        console.log(err);
+      },
+      complete: () => { }
+    });
   }
 
   onApplyClick(): void {
@@ -65,7 +76,6 @@ export class MessageComponent implements OnInit {
           this.openAiService.moderateMessage(this.data.message)
             .subscribe({
               next: openAiModerateResponse => {
-                console.log(openAiModerateResponse)
                 if (!openAiModerateResponse.results[0].flagged) {
                   this.data.message.userId = this.data.user.id;
                   waitDialogRef.close();
