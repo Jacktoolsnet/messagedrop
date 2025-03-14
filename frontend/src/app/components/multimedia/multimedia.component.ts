@@ -36,6 +36,8 @@ import { MessageComponent } from '../message/message.component';
 })
 export class MultimediaComponent {
 
+  public searchTermTenor: string = '';
+
   constructor(
     private snackBar: MatSnackBar,
     private messageService: MessageService,
@@ -57,6 +59,10 @@ export class MultimediaComponent {
       },
       complete: () => { }
     });
+  }
+
+  searchTenor(): void {
+
   }
 
   onApplyClick(): void {

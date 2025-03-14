@@ -7,8 +7,16 @@
         <mat-tab label="Mentor">
             <ng-template mat-tab-label>
                 <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
-                Mentor
+                Tenor
             </ng-template>
+            <div class="search-container">
+                <mat-form-field class="search-input">
+                    <input matInput placeholder="Serach in Tenor" [(ngModel)]="searchTermTenor">
+                </mat-form-field>
+                <button mat-icon-button (click)="searchTenor()">
+                    <mat-icon>search</mat-icon>
+                </button>
+            </div>
             <div class="gallery">
                 <div class="column">
                     <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 1">
