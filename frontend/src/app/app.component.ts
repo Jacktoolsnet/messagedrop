@@ -15,6 +15,7 @@ import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessageComponent } from './components/message/message.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
+import { MultimediaComponent } from './components/multimedia/multimedia.component';
 import { NoteComponent } from './components/note/note.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
@@ -90,6 +91,7 @@ export class AppComponent implements OnInit {
     private socketioService: SocketioService,
     private snackBar: MatSnackBar,
     public messageDialog: MatDialog,
+    public multimediaDialog: MatDialog,
     public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
     public placeListDialog: MatDialog,
@@ -302,7 +304,7 @@ export class AppComponent implements OnInit {
     this.mapService.flyTo(event);
   }
 
-  public openMessagDialog(location: Location): void {
+  public openMessagDialog(): void {
     let message: Message = {
       id: 0,
       parentId: 0,
@@ -349,7 +351,54 @@ export class AppComponent implements OnInit {
     });
   }
 
-  public openNoteDialog(location: Location): void {
+  public openMultimediaDialog(): void {
+    let message: Message = {
+      id: 0,
+      parentId: 0,
+      typ: 'public',
+      createDateTime: '',
+      deleteDateTime: '',
+      latitude: 0,
+      longitude: 0,
+      plusCode: '',
+      message: '',
+      markerType: 'default',
+      style: '',
+      views: 0,
+      likes: 0,
+      dislikes: 0,
+      comments: [],
+      commentsNumber: 0,
+      status: 'enabled',
+      userId: ''
+    };
+    const dialogRef = this.multimediaDialog.open(MultimediaComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.userService.getUser(), message: message },
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("multimediaDialog");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data?.message) {
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      }
+    });
+  }
+
+  public openNoteDialog(): void {
     let note: Note = {
       latitude: 0,
       longitude: 0,

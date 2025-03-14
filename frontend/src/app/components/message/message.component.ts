@@ -13,7 +13,6 @@ import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
-import { TenorService } from '../../services/tenor.service';
 import { WaitComponent } from '../utils/wait/wait.component';
 
 @Component({
@@ -42,21 +41,11 @@ export class MessageComponent implements OnInit {
     public dialogRef: MatDialogRef<MessageComponent>,
     private style: StyleService,
     private waitDialog: MatDialog,
-    private tensorService: TenorService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, message: Message }
   ) { }
 
   ngOnInit(): void {
     this.data.message.style = this.data.user.defaultStyle;
-    this.tensorService.getFeatured().subscribe({
-      next: tensorResponse => {
-        console.log(tensorResponse);
-      },
-      error: (err) => {
-        console.log(err);
-      },
-      complete: () => { }
-    });
   }
 
   onApplyClick(): void {

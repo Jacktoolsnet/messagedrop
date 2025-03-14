@@ -1,0 +1,84 @@
+.messageDropDialog .mat-dialog-container {
+    padding: 0rem;
+}
+
+.mat-mdc-dialog-title {
+    padding-bottom: 0px !important;
+}
+
+.mat-mdc-dialog-content {
+    padding: 0px !important;
+    max-height: none;
+    height: 90%;
+}
+
+.mat-mdc-dialog-actions {
+    padding: 0px !important;
+}
+
+h4 {
+    padding: 0.5rem;
+    color: floralwhite;
+}
+
+textarea {
+    padding: 0.5rem;
+    display: block;
+    margin: auto;
+    width: 90%;
+    height: 95%;
+    resize: none;
+    line-height: 1.6;
+}
+
+.buttonarea {
+    display: block;
+    margin: auto;
+    width: 80%;
+    height: auto;
+}
+
+.full-width {
+    width: 100%;
+    height: 100%;
+}
+
+.button_drop {
+    margin: auto;
+    width: 70%;
+}
+
+.button_random {
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 100;
+    margin: 1rem;
+}
+
+.button_legal {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    z-index: 100;
+    margin-bottom: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.gallery {
+    display: flex;
+    width: 90%;
+    margin: 20px auto;
+}
+
+.column {
+    flex: 50%;
+    padding: 0 10px;
+}
+
+.column img {
+    margin-top: 10px;
+    vertical-align: middle;
+    width: 100%;
+    border-radius: 8px;
+}

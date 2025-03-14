@@ -1,0 +1,37 @@
+<h2 *ngIf="data.mode == 'add_public_message'" mat-dialog-title>Add a public media message</h2>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+</button>
+<mat-dialog-content class="full-width">
+    <mat-tab-group>
+        <mat-tab label="Mentor">
+            <ng-template mat-tab-label>
+                <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
+                Mentor
+            </ng-template>
+            <div class="gallery">
+                <div class="column">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 1">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 2">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 3">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 4">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 5">
+                </div>
+                <div class="column">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 4">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 5">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 6">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 4">
+                    <img src="https://media.tenor.com/fx5k1TBjhNMAAAAM/happy-purim.gif" alt="Bild 5">
+                </div>
+            </div>
+        </mat-tab>
+        <!-- Add more tabs here if needed -->
+    </mat-tab-group>
+</mat-dialog-content>
+<mat-dialog-actions>
+    <button mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
+        <mat-icon class="material-symbols-outlined">send</mat-icon>
+        Drop public message
+    </button>
+</mat-dialog-actions>

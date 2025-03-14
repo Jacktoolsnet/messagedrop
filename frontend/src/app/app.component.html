@@ -71,12 +71,16 @@
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
-    <button mat-menu-item (click)="openMessagDialog(this.userService.getUser().location)">
+
+    <button mat-menu-item (click)="openMultimediaDialog()">
+        <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
+        <span>Public multimedia</span>
+    </button>
+    <button mat-menu-item (click)="openMessagDialog()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         <span>Public message</span>
     </button>
-    <button *ngIf="this.userService.isReady()" mat-menu-item
-        (click)="openNoteDialog(this.userService.getUser().location)">
+    <button *ngIf="this.userService.isReady()" mat-menu-item (click)="openNoteDialog()">
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
         <span>Private note</span>
     </button>
