@@ -32,15 +32,19 @@ export class TenorService {
     return result.slice(0, -1);
   }
 
-  getFeatured(): Observable<any> {
+  getFeatured(next: string): Observable<any> {
     let parameters: Map<string, string> = new Map();
     parameters.set('key', environment.tenor_api_key);
     parameters.set('client_key', environment.tenor_client_key);
     parameters.set('country', this.userService.getUser().language);
     parameters.set('locale', this.userService.getUser().local.replace('-', '_'));
-    parameters.set('media_filter', 'gif,tinygif')
+    parameters.set('media_filter', 'gif')
     parameters.set('ar_range', 'standard');
     parameters.set('contentfilter', 'low');
+    parameters.set('limit', '30');
+    if (next != '') {
+      parameters.set('pos', next);
+    }
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/featured`, parameters);
     console.log(url);

@@ -2,40 +2,10 @@
     padding: 0rem;
 }
 
-.mat-mdc-dialog-title {
-    padding-bottom: 0px !important;
-}
-
 .mat-mdc-dialog-content {
     padding: 0px !important;
     max-height: none;
     height: 90%;
-}
-
-.mat-mdc-dialog-actions {
-    padding: 0px !important;
-}
-
-h4 {
-    padding: 0.5rem;
-    color: floralwhite;
-}
-
-textarea {
-    padding: 0.5rem;
-    display: block;
-    margin: auto;
-    width: 90%;
-    height: 95%;
-    resize: none;
-    line-height: 1.6;
-}
-
-.buttonarea {
-    display: block;
-    margin: auto;
-    width: 80%;
-    height: auto;
 }
 
 .full-width {
@@ -43,44 +13,41 @@ textarea {
     height: 100%;
 }
 
-.button_drop {
-    margin: auto;
-    width: 70%;
-}
-
-.button_random {
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 100;
-    margin: 1rem;
-}
-
-.button_legal {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    margin-bottom: 0.5rem;
-    margin-right: 0.5rem;
-}
-
 .gallery {
-    display: flex;
-    width: 90%;
-    margin: 2rem auto;
+    padding: 1rem;
+    column-count: 2;
+    /* Anzahl der Spalten */
+    column-gap: 10px;
+    /* Abstand zwischen den Spalten */
 }
 
-.column {
-    flex: 50%;
-    padding: 0 1rem;
-}
-
-.column img {
-    margin-top: 10px;
-    vertical-align: middle;
+.gallery img {
     width: 100%;
-    border-radius: 0.75rem;
+    margin-bottom: 10px;
+    display: block;
+    border-radius: 1rem;
+    /* Wichtig, um Abstände zu vermeiden */
+}
+
+
+@media (min-width: 768px) {
+    .gallery {
+        padding: 1rem;
+        column-count: 4;
+        /* Anzahl der Spalten */
+        column-gap: 10px;
+        /* Abstand zwischen den Spalten */
+    }
+}
+
+@media (min-width: 1200px) {
+    .gallery {
+        padding: 1rem;
+        column-count: 8;
+        /* Anzahl der Spalten */
+        column-gap: 10px;
+        /* Abstand zwischen den Spalten */
+    }
 }
 
 .search-container {

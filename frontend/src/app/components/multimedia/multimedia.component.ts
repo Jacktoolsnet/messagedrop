@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -22,8 +22,6 @@ import { MessageComponent } from '../message/message.component';
     CommonModule,
     FormsModule,
     MatButtonModule,
-    MatDialogActions,
-    MatDialogTitle,
     MatDialogContent,
     MatIcon,
     FormsModule,
@@ -35,8 +33,9 @@ import { MessageComponent } from '../message/message.component';
   styleUrl: './multimedia.component.css'
 })
 export class MultimediaComponent {
-
   public searchTermTenor: string = '';
+  private next: string = '';
+  public tensorResults: any[] = [];
 
   constructor(
     private snackBar: MatSnackBar,
@@ -50,9 +49,15 @@ export class MultimediaComponent {
 
   ngOnInit(): void {
     this.data.message.style = this.data.user.defaultStyle;
-    this.tensorService.getFeatured().subscribe({
+    this.tensorGetFeatured();
+  }
+
+  tensorGetFeatured(): void {
+    this.tensorService.getFeatured(this.next).subscribe({
       next: tensorResponse => {
         console.log(tensorResponse);
+        this.tensorResults.push(...tensorResponse.results);
+        this.next = tensorResponse.next;
       },
       error: (err) => {
         console.log(err);
@@ -62,7 +67,7 @@ export class MultimediaComponent {
   }
 
   searchTenor(): void {
-
+    this.tensorGetFeatured();
   }
 
   onApplyClick(): void {
