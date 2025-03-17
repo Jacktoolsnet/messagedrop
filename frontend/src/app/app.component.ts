@@ -15,7 +15,7 @@ import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessageComponent } from './components/message/message.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
-import { MultimediaComponent } from './components/multimedia/multimedia.component';
+import { TenorComponent } from './components/multimedia/tenor/tenor.component';
 import { NoteComponent } from './components/note/note.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
@@ -372,7 +372,7 @@ export class AppComponent implements OnInit {
       status: 'enabled',
       userId: ''
     };
-    const dialogRef = this.multimediaDialog.open(MultimediaComponent, {
+    const dialogRef = this.multimediaDialog.open(TenorComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.userService.getUser(), message: message },

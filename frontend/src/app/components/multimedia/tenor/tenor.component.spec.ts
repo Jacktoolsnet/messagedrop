@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { MultimediaComponent } from './multimedia.component';
+import { TenorComponent } from './tenor.component';
 
 describe('MultimediaComponent', () => {
-  let component: MultimediaComponent;
-  let fixture: ComponentFixture<MultimediaComponent>;
+  let component: TenorComponent;
+  let fixture: ComponentFixture<TenorComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [MultimediaComponent]
+      imports: [TenorComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(MultimediaComponent);
+    fixture = TestBed.createComponent(TenorComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
