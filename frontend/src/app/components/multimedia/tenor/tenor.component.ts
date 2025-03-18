@@ -28,7 +28,9 @@ import { MessageComponent } from '../../message/message.component';
 })
 export class TenorComponent {
   public searchterm: string = '';
-  private next: string = '';
+  public lastSearchterm: string = '';
+  public nextFeatured: string = '';
+  public nextSearch: string = '';
   public results: any[] = [];
 
   constructor(
@@ -38,15 +40,29 @@ export class TenorComponent {
   ) { }
 
   ngOnInit(): void {
-    this.tensorGetFeatured();
+    this.tensorGetFeaturedGifs();
   }
 
-  tensorGetFeatured(): void {
-    this.tensorService.getFeatured(this.next).subscribe({
+  tensorGetFeaturedGifs(): void {
+    this.tensorService.getFeaturedGifs(this.nextFeatured).subscribe({
       next: tensorResponse => {
         this.results = [];
         this.results.push(...tensorResponse.results);
-        this.next = tensorResponse.next;
+        this.nextFeatured = tensorResponse.next;
+        this.nextSearch = '';
+      },
+      error: (err) => { },
+      complete: () => { }
+    });
+  }
+
+  tensorSearchGifs(): void {
+    this.tensorService.searchGifs(this.searchterm, this.nextSearch).subscribe({
+      next: tensorResponse => {
+        this.results = [];
+        this.results.push(...tensorResponse.results);
+        this.nextSearch = tensorResponse.next;
+        this.nextFeatured = '';
       },
       error: (err) => {
         console.log(err);
@@ -56,11 +72,19 @@ export class TenorComponent {
   }
 
   search(): void {
-    this.tensorGetFeatured();
+    if (this.searchterm === '') {
+      this.tensorGetFeaturedGifs();
+    } else {
+      if (this.searchterm !== this.lastSearchterm) {
+        this.lastSearchterm = this.searchterm;
+        this.nextSearch = '';
+      }
+      this.tensorSearchGifs();
+    }
   }
 
-  onApplyClick(): void {
-    this.dialogRef.close(this.data);
+  onApplyClick(result: any): void {
+    this.dialogRef.close(result);
   }
 
 }

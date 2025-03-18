@@ -20,10 +20,23 @@ export class TenorService {
     private userService: UserService
   ) { }
 
+  /**
+   * Handles HTTP errors by wrapping the error in an observable.
+   * 
+   * @param error - The HTTP error response received from the API.
+   * @returns An observable that throws the error for further handling.
+   */
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
   }
 
+  /**
+   * Constructs a URL with query parameters.
+   * 
+   * @param baseUrl - The base URL to which query parameters will be appended.
+   * @param map - A map containing key-value pairs of query parameters.
+   * @returns A string representing the complete URL with encoded query parameters.
+   */
   private createUrl(baseUrl: string, map: Map<string, string>): string {
     let result = baseUrl + "?";
     map.forEach((value, key) => {
@@ -32,7 +45,18 @@ export class TenorService {
     return result.slice(0, -1);
   }
 
-  getFeatured(next: string): Observable<any> {
+  /**
+   * Fetches a list of featured GIFs from the Tenor API.
+   * 
+   * @param next - A string representing the pagination token for the next set of results. 
+   *               If empty, the first page of results is fetched.
+   * @returns An Observable containing the API response with the list of featured GIFs.
+   * 
+   * The method constructs the API URL dynamically using the `createUrl` helper method,
+   * passing query parameters such as API keys, user locale, and content filters.
+   * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
+   */
+  getFeaturedGifs(next: string): Observable<any> {
     let parameters: Map<string, string> = new Map();
     parameters.set('key', environment.tenor_api_key);
     parameters.set('client_key', environment.tenor_client_key);
@@ -47,7 +71,40 @@ export class TenorService {
     }
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/featured`, parameters);
-    console.log(url);
+    return this.http.get<any>(url, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      )
+  }
+
+  /**
+   * Searches for GIFs on the Tenor API based on a search term.
+   * 
+   * @param searchTerm - The term to search for GIFs.
+   * @param next - A string representing the pagination token for the next set of results. 
+   *               If empty, the first page of results is fetched.
+   * @returns An Observable containing the API response with the list of GIFs matching the search term.
+   * 
+   * The method constructs the API URL dynamically using the `createUrl` helper method,
+   * passing query parameters such as API keys, user locale, and content filters.
+   * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
+   */
+  searchGifs(searchTerm: string, next: string): Observable<any> {
+    let parameters: Map<string, string> = new Map();
+    parameters.set('key', environment.tenor_api_key);
+    parameters.set('client_key', environment.tenor_client_key);
+    parameters.set('q', searchTerm);
+    parameters.set('country', this.userService.getUser().language);
+    parameters.set('locale', this.userService.getUser().local.replace('-', '_'));
+    parameters.set('media_filter', 'gif')
+    parameters.set('ar_range', 'standard');
+    parameters.set('contentfilter', 'low');
+    parameters.set('limit', '30');
+    if (next != '') {
+      parameters.set('pos', next);
+    }
+
+    let url: string = this.createUrl(`${environment.tenor_base_url}/search`, parameters);
     return this.http.get<any>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)

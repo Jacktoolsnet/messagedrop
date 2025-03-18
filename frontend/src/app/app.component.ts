@@ -391,9 +391,8 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      if (undefined !== data) {
+        console.log(data);
       }
     });
   }

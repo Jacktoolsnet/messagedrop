@@ -1,13 +1,16 @@
 <div class="search-container">
     <input type="text" [(ngModel)]="searchterm" placeholder="Search in Tenor">
     <button mat-icon-button (click)="search()">
-        <mat-icon>search</mat-icon>
+        <mat-icon
+            *ngIf="(nextSearch === '' && searchterm !== '' || searchterm != lastSearchterm) || searchterm === ''">search</mat-icon>
+        <mat-icon
+            *ngIf="nextSearch !== '' && searchterm !== '' && searchterm === lastSearchterm">arrow_circle_right</mat-icon>
     </button>
 </div>
 <mat-dialog-content class="full-width">
     <div *ngIf="results" class="gallery">
         <div *ngFor="let result of results">
-            <img [src]="result.media_formats.gif.url" alt="Gif">
+            <img [src]="result.media_formats.gif.url" alt="Gif" (click)="onApplyClick(result)">
         </div>
     </div>
 </mat-dialog-content>
