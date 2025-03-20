@@ -1,3 +1,5 @@
+import { Multimedia } from "./multimedia"
+
 export interface Message {
     id: number,
     parentId: number,
@@ -20,5 +22,6 @@ export interface Message {
     userId: string,
     likedByUser?: boolean,
     dislikedByUser?: boolean
+    multimedia: Multimedia
 }
 

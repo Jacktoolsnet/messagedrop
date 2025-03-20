@@ -15,6 +15,7 @@ import { Animation } from '../../interfaces/animation';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { RelatedUser } from '../../interfaces/related-user';
 import { User } from '../../interfaces/user';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
@@ -244,7 +245,15 @@ export class MessagelistComponent implements OnInit {
       comments: [],
       commentsNumber: 0,
       status: 'enabled',
-      userId: ''
+      userId: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: ''
+      }
     };
 
     const dialogRef = this.messageDialog.open(MessageComponent, {
@@ -302,7 +311,15 @@ export class MessagelistComponent implements OnInit {
       comments: [],
       commentsNumber: 0,
       status: 'enabled',
-      userId: ''
+      userId: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: ''
+      }
     };
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',

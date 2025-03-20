@@ -305,7 +305,8 @@ export class MessageService {
               comments: [],
               commentsNumber: row.commentsNumber,
               status: row.status,
-              userId: row.userId
+              userId: row.userId,
+              multimedia: row.multimedia
             };
             this.messages.push(message);
           });

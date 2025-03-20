@@ -6,13 +6,16 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
+import { TenorComponent } from '../multimedia/tenor/tenor.component';
 import { WaitComponent } from '../utils/wait/wait.component';
 
 @Component({
@@ -27,7 +30,8 @@ import { WaitComponent } from '../utils/wait/wait.component';
     MatIcon,
     FormsModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    MatMenuModule
   ],
   templateUrl: './message.component.html',
   styleUrl: './message.component.css'
@@ -36,6 +40,7 @@ export class MessageComponent implements OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
+    public tenorDialog: MatDialog,
     private messageService: MessageService,
     private openAiService: OpenAiService,
     public dialogRef: MatDialogRef<MessageComponent>,
@@ -99,6 +104,35 @@ export class MessageComponent implements OnInit {
 
   public showPolicy() {
     this.snackBar.open(`This information is stored on our server and is visible to everyone.`, 'OK', {});
+  }
+
+  public openTenorDialog(): void {
+    const dialogRef = this.tenorDialog.open(TenorComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (undefined !== data) {
+        this.data.message.multimedia.type = MultimediaType.TENOR
+        this.data.message.multimedia.attribution = 'Powered by Tenor';
+        this.data.message.multimedia.title = data.title;
+        this.data.message.multimedia.description = data.content_description;
+        this.data.message.multimedia.url = data.media_formats.gif.url;
+        this.data.message.multimedia.sourceUrl = data.itemurl
+      }
+      console.log(this.data.message);
+    });
   }
 
 }

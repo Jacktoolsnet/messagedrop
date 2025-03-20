@@ -5,13 +5,22 @@
 <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
     <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
 </button>
-<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal"
+    [matMenuTriggerFor]="messageMenu" (click)="{}">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">more_vert</mat-icon>
 </button>
-<mat-dialog-content class="full-width">
-    <textarea cdkFocusInitial [style]="data.message.style" maxlength="512" type="text"
-        [(ngModel)]="data.message.message" matInput>
-    </textarea>
+<mat-dialog-content>
+    <div *ngIf="data.message.multimedia.url !== ''" class="multimedia_container">
+        <img class="multimedia_image" [src]="data.message.multimedia.url">
+    </div>
+    <a class="attribution_link" href="{{data.message.multimedia.sourceUrl}}"
+        target="_blank">{{data.message.multimedia.attribution}}</a>
+    <div class="textarea_container">
+        <textarea cdkFocusInitial [style]="data.message.style" maxlength="512" type="text"
+            [(ngModel)]="data.message.message" matInput>
+        </textarea>
+    </div>
 </mat-dialog-content>
 <mat-dialog-actions>
     <button *ngIf="data.mode == 'add_public_message'" mat-flat-button class="button_drop" color="primary"
@@ -35,3 +44,14 @@
         Apply changes
     </button>
 </mat-dialog-actions>
+
+<mat-menu #messageMenu="matMenu">
+    <button mat-menu-item (click)="openTenorDialog()">
+        <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
+        <span>Add a GIF powerd by Tenor</span>
+    </button>
+    <button mat-menu-item (click)="showPolicy()">
+        <mat-icon class="material-symbols-outlined">policy</mat-icon>
+        <span>Policy</span>
+    </button>
+</mat-menu>

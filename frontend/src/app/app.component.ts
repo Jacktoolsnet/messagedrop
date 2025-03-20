@@ -15,7 +15,6 @@ import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessageComponent } from './components/message/message.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
-import { TenorComponent } from './components/multimedia/tenor/tenor.component';
 import { NoteComponent } from './components/note/note.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
@@ -28,6 +27,7 @@ import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
 import { Message } from './interfaces/message';
 import { Mode } from './interfaces/mode';
+import { MultimediaType } from './interfaces/multimedia-type';
 import { Note } from './interfaces/note';
 import { Place } from './interfaces/place';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
@@ -54,8 +54,7 @@ import { UserService } from './services/user.service';
     MatTooltipModule,
     MatIconModule,
     ShortNumberPipe,
-    MatMenuModule,
-    MatButtonModule
+    MatMenuModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
@@ -91,7 +90,6 @@ export class AppComponent implements OnInit {
     private socketioService: SocketioService,
     private snackBar: MatSnackBar,
     public messageDialog: MatDialog,
-    public multimediaDialog: MatDialog,
     public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
     public placeListDialog: MatDialog,
@@ -323,8 +321,17 @@ export class AppComponent implements OnInit {
       comments: [],
       commentsNumber: 0,
       status: 'enabled',
-      userId: ''
+      userId: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: ''
+      }
     };
+
     const dialogRef = this.messageDialog.open(MessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -347,52 +354,6 @@ export class AppComponent implements OnInit {
       if (undefined !== data?.message) {
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
-      }
-    });
-  }
-
-  public openMultimediaDialog(): void {
-    let message: Message = {
-      id: 0,
-      parentId: 0,
-      typ: 'public',
-      createDateTime: '',
-      deleteDateTime: '',
-      latitude: 0,
-      longitude: 0,
-      plusCode: '',
-      message: '',
-      markerType: 'default',
-      style: '',
-      views: 0,
-      likes: 0,
-      dislikes: 0,
-      comments: [],
-      commentsNumber: 0,
-      status: 'enabled',
-      userId: ''
-    };
-    const dialogRef = this.multimediaDialog.open(TenorComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.userService.getUser(), message: message },
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("multimediaDialog");
-      window.history.replaceState(this.myHistory, '', '');
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data) {
-        console.log(data);
       }
     });
   }
