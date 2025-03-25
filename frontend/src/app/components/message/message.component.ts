@@ -129,10 +129,20 @@ export class MessageComponent implements OnInit {
         this.data.message.multimedia.title = data.title;
         this.data.message.multimedia.description = data.content_description;
         this.data.message.multimedia.url = data.media_formats.gif.url;
-        this.data.message.multimedia.sourceUrl = data.itemurl
+        this.data.message.multimedia.sourceUrl = data.itemurl;
       }
       console.log(this.data.message);
     });
   }
+
+  public removeMultimedia(): void {
+    this.data.message.multimedia.type = MultimediaType.UNDEFINED
+    this.data.message.multimedia.attribution = '';
+    this.data.message.multimedia.title = '';
+    this.data.message.multimedia.description = '';
+    this.data.message.multimedia.url = '';
+    this.data.message.multimedia.sourceUrl = '';
+  }
+
 
 }

@@ -12,9 +12,12 @@
 </button>
 <mat-dialog-content>
     <div *ngIf="data.message.multimedia.url !== ''" class="multimedia_container">
-        <img class="multimedia_image" [src]="data.message.multimedia.url">
+        <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+            <mat-icon>delete</mat-icon>
+        </button>
+        <img class="multimedia_image" [src]="data.message.multimedia.url" (click)="openTenorDialog()">
     </div>
-    <a class="attribution_link" href="{{data.message.multimedia.sourceUrl}}"
+    <a class=" attribution_link" href="{{data.message.multimedia.sourceUrl}}"
         target="_blank">{{data.message.multimedia.attribution}}</a>
     <div class="textarea_container">
         <textarea cdkFocusInitial [style]="data.message.style" maxlength="512" type="text"

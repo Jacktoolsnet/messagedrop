@@ -27,6 +27,7 @@ h4 {
     flex-direction: column;
     align-items: center;
     height: -webkit-fill-available;
+    max-height: 95%;
 }
 
 textarea {
@@ -35,7 +36,7 @@ textarea {
     margin: auto;
     width: 90%;
     flex-grow: 1;
-    resize: none;
+    resize: block;
     line-height: 1.6;
     border-radius: 1rem;
     min-height: 200px;
@@ -71,19 +72,30 @@ textarea {
     margin-right: 0.5rem;
 }
 
+.button_remove_multimedia {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    margin-bottom: 1rem;
+    margin-right: 1rem;
+}
+
 .multimedia_container {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
+    margin-bottom: 0.25rem;
 }
 
 .multimedia_image {
     max-height: 50%;
     max-width: 50%;
     object-fit: contain;
-    margin: 1rem;
     border-radius: 1rem;
-    padding: 0%;
+    margin-left: 1rem;
+    margin-right: 1rem;
 }
 
 .attribution_link {
@@ -92,5 +104,6 @@ textarea {
     display: block;
     width: 100%;
     text-decoration: none;
-    padding: 0%;
+    margin-bottom: 0.25rem;
+    font-size: 0.75rem;
 }
