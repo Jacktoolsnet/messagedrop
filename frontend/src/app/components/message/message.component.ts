@@ -133,7 +133,6 @@ export class MessageComponent implements OnInit {
         this.data.message.multimedia.url = data.media_formats.gif.url;
         this.data.message.multimedia.sourceUrl = data.itemurl;
       }
-      console.log(this.data.message);
     });
   }
 

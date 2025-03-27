@@ -9,7 +9,7 @@
 <mat-dialog-content>
     <div class="content">
         <div *ngIf="data.message.multimedia.url === ''" class="multimedia_container">
-            <button (click)="openTenorDialog()" mat-flat-button class="button_drop" color="primary">
+            <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
                 <span>Add a GIF from Tenor</span>
             </button>
@@ -23,7 +23,7 @@
         <a class=" attribution_link" href="{{data.message.multimedia.sourceUrl}}"
             target="_blank">{{data.message.multimedia.attribution}}</a>
         <div *ngIf="data.message.message === ''" class="multimedia_container">
-            <button (click)="openTextDialog()" mat-flat-button class="button_drop" color="primary">
+            <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>
                 <span>Add a text</span>
             </button>
@@ -33,14 +33,14 @@
                 aria-label="Drop a new message" (click)="onNewFontClick()">
                 <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
             </button>
-            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeText()">
+            <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
                 <mat-icon>delete</mat-icon>
             </button>
             <p class="text" (click)="openTextDialog()" [style]="data.message.style">{{data.message.message}}</p>
         </div>
     </div>
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions *ngIf="data.message.message !== '' || data.message.multimedia.type !== 'undefined'">
     <button *ngIf="data.mode == 'add_public_message'" mat-flat-button class="button_drop" color="primary"
         aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>

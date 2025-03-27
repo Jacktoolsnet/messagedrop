@@ -31,13 +31,19 @@ h4 {
 .button_drop {
     margin: auto;
     width: 70%;
+    border-radius: 0.5rem;
+}
+
+.button_default {
+    margin: 1rem;
+    width: 95%;
+    border-radius: 0.5rem;
 }
 
 .button_random {
     position: absolute;
-    right: 0;
+    right: -1rem;
     top: 2rem;
-    margin: 1rem;
 }
 
 .button_legal {
@@ -51,11 +57,16 @@ h4 {
 
 .button_remove_multimedia {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: -1rem;
+    right: -1rem;
     z-index: 100;
-    margin-bottom: 1rem;
-    margin-right: 1rem;
+}
+
+.button_remove_text {
+    position: absolute;
+    top: -1rem;
+    right: -1rem;
+    z-index: 100;
 }
 
 .content {
@@ -67,21 +78,28 @@ h4 {
 }
 
 .multimedia_container {
-    width: 100%;
+    width: 75%;
+    margin-top: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
+    background-color: rgb(142, 141, 141);
+    color: white;
+    border-radius: 1rem;
 }
 
 .text_container {
-    width: 100%;
+    width: 75%;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     margin: 0.5rem;
     height: 100%;
+    background-color: rgb(142, 141, 141);
+    color: white;
+    border-radius: 1rem;
 }
 
 .text {
