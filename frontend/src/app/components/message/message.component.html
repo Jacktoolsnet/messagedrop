@@ -2,27 +2,42 @@
 <h2 *ngIf="data.mode == 'add_comment'" mat-dialog-title>Add a public comment</h2>
 <h2 *ngIf="data.mode == 'edit_public_message'" mat-dialog-title>Edit my public message</h2>
 <h2 *ngIf="data.mode == 'edit_comment'" mat-dialog-title>Edit my public comment</h2>
-<button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message" (click)="onNewFontClick()">
-    <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
-</button>
 
-<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal"
-    [matMenuTriggerFor]="messageMenu" (click)="{}">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">more_vert</mat-icon>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
 </button>
 <mat-dialog-content>
-    <div *ngIf="data.message.multimedia.url !== ''" class="multimedia_container">
-        <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-            <mat-icon>delete</mat-icon>
-        </button>
-        <img class="multimedia_image" [src]="data.message.multimedia.url" (click)="openTenorDialog()">
-    </div>
-    <a class=" attribution_link" href="{{data.message.multimedia.sourceUrl}}"
-        target="_blank">{{data.message.multimedia.attribution}}</a>
-    <div class="textarea_container">
-        <textarea cdkFocusInitial [style]="data.message.style" maxlength="512" type="text"
-            [(ngModel)]="data.message.message" matInput>
-        </textarea>
+    <div class="content">
+        <div *ngIf="data.message.multimedia.url === ''" class="multimedia_container">
+            <button (click)="openTenorDialog()" mat-flat-button class="button_drop" color="primary">
+                <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
+                <span>Add a GIF from Tenor</span>
+            </button>
+        </div>
+        <div *ngIf="data.message.multimedia.url !== ''" class="multimedia_container">
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <img class="multimedia_image" [src]="data.message.multimedia.url" (click)="openTenorDialog()">
+        </div>
+        <a class=" attribution_link" href="{{data.message.multimedia.sourceUrl}}"
+            target="_blank">{{data.message.multimedia.attribution}}</a>
+        <div *ngIf="data.message.message === ''" class="multimedia_container">
+            <button (click)="openTextDialog()" mat-flat-button class="button_drop" color="primary">
+                <mat-icon class="material-symbols-outlined">post_add</mat-icon>
+                <span>Add a text</span>
+            </button>
+        </div>
+        <div *ngIf="data.message.message !== ''" class="text_container">
+            <button *ngIf="data.message.message !== ''" mat-mini-fab class="button_random" color="secondary"
+                aria-label="Drop a new message" (click)="onNewFontClick()">
+                <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeText()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <p class="text" (click)="openTextDialog()" [style]="data.message.style">{{data.message.message}}</p>
+        </div>
     </div>
 </mat-dialog-content>
 <mat-dialog-actions>
@@ -47,14 +62,3 @@
         Apply changes
     </button>
 </mat-dialog-actions>
-
-<mat-menu #messageMenu="matMenu">
-    <button mat-menu-item (click)="openTenorDialog()">
-        <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
-        <span>Add a GIF powerd by Tenor</span>
-    </button>
-    <button mat-menu-item (click)="showPolicy()">
-        <mat-icon class="material-symbols-outlined">policy</mat-icon>
-        <span>Policy</span>
-    </button>
-</mat-menu>

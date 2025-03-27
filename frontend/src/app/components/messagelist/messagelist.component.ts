@@ -325,12 +325,6 @@ export class MessagelistComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message },
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
       hasBackdrop: true
     });
 

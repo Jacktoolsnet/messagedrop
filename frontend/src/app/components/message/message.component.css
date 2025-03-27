@@ -21,28 +21,6 @@ h4 {
     color: floralwhite;
 }
 
-.textarea_container {
-    display: flex;
-    justify-content: center;
-    flex-direction: column;
-    align-items: center;
-    height: -webkit-fill-available;
-    max-height: 95%;
-}
-
-textarea {
-    padding: 0.5rem;
-    display: block;
-    margin: auto;
-    width: 90%;
-    flex-grow: 1;
-    resize: block;
-    line-height: 1.6;
-    border-radius: 1rem;
-    min-height: 200px;
-    min-width: 300px;
-}
-
 .buttonarea {
     display: block;
     margin: auto;
@@ -58,8 +36,7 @@ textarea {
 .button_random {
     position: absolute;
     right: 0;
-    top: 0;
-    z-index: 100;
+    top: 2rem;
     margin: 1rem;
 }
 
@@ -81,21 +58,42 @@ textarea {
     margin-right: 1rem;
 }
 
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 .multimedia_container {
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
-    margin-bottom: 0.25rem;
+}
+
+.text_container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    margin: 0.5rem;
+    height: 100%;
+}
+
+.text {
+    max-width: 75%;
+    margin: 1rem;
 }
 
 .multimedia_image {
-    max-height: 50%;
-    max-width: 50%;
+    max-width: 75%;
     object-fit: contain;
-    border-radius: 1rem;
-    margin-left: 1rem;
-    margin-right: 1rem;
+    border-radius: 0.5rem;
+    margin: 1rem;
 }
 
 .attribution_link {

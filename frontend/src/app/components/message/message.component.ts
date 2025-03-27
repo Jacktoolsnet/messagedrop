@@ -15,7 +15,8 @@ import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
-import { TenorComponent } from '../multimedia/tenor/tenor.component';
+import { TenorComponent } from '../utils/tenor/tenor.component';
+import { TextComponent } from '../utils/text/text.component';
 import { WaitComponent } from '../utils/wait/wait.component';
 
 @Component({
@@ -40,7 +41,8 @@ export class MessageComponent implements OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
-    public tenorDialog: MatDialog,
+    private tenorDialog: MatDialog,
+    private textDialog: MatDialog,
     private messageService: MessageService,
     private openAiService: OpenAiService,
     public dialogRef: MatDialogRef<MessageComponent>,
@@ -142,6 +144,24 @@ export class MessageComponent implements OnInit {
     this.data.message.multimedia.description = '';
     this.data.message.multimedia.url = '';
     this.data.message.multimedia.sourceUrl = '';
+  }
+
+  public openTextDialog(): void {
+    const dialogRef = this.textDialog.open(TextComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { message: this.data.message },
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+    });
+  }
+
+  public removeText(): void {
+    this.data.message.message = '';
   }
 
 
