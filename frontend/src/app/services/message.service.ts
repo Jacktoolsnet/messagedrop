@@ -9,6 +9,7 @@ import { GetMessageResponse } from '../interfaces/get-message-response';
 import { LikedByUserResponse } from '../interfaces/liked-by-user-respons';
 import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
+import { RawMessage } from '../interfaces/raw-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { GeolocationService } from './geolocation.service';
@@ -48,8 +49,32 @@ export class MessageService {
     return this.messages;
   }
 
-  setMessages(messages: Message[]) {
-    this.messages = [...messages];
+  setMessages(rawMessages: RawMessage[]) {
+    this.messages = [];
+    rawMessages.forEach((rowMessage: RawMessage) => {
+      let message: Message = {
+        id: rowMessage.id,
+        parentId: rowMessage.parentId,
+        typ: rowMessage.typ,
+        createDateTime: rowMessage.createDateTime,
+        deleteDateTime: rowMessage.deleteDateTime,
+        latitude: rowMessage.latitude,
+        longitude: rowMessage.longitude,
+        plusCode: rowMessage.plusCode,
+        message: rowMessage.message,
+        markerType: rowMessage.markerType,
+        style: rowMessage.style,
+        views: rowMessage.views,
+        likes: rowMessage.likes,
+        dislikes: rowMessage.dislikes,
+        comments: [],
+        commentsNumber: rowMessage.commentsNumber,
+        status: rowMessage.status,
+        userId: rowMessage.userId,
+        multimedia: JSON.parse(rowMessage.multimedia)
+      };
+      this.messages.push(message);
+    });
   }
 
   getSelectedMessages(): Message[] {
@@ -85,7 +110,8 @@ export class MessageService {
       'message': message.message,
       'markerType': message.markerType,
       'style': message.style,
-      'messageUserId': user.id
+      'messageUserId': user.id,
+      'multimedia': JSON.stringify(message.multimedia)
     };
     this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
       .pipe(
@@ -286,27 +312,27 @@ export class MessageService {
         next: (getMessageResponse) => {
           this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
           this.clearMessages();
-          getMessageResponse.rows.forEach((row: Message) => {
+          getMessageResponse.rows.forEach((rowMessage: RawMessage) => {
             let message: Message = {
-              id: row.id,
-              parentId: row.parentId,
-              typ: row.typ,
-              createDateTime: row.createDateTime,
-              deleteDateTime: row.deleteDateTime,
-              latitude: row.latitude,
-              longitude: row.longitude,
-              plusCode: row.plusCode,
-              message: row.message,
-              markerType: row.markerType,
-              style: row.style,
-              views: row.views,
-              likes: row.likes,
-              dislikes: row.dislikes,
+              id: rowMessage.id,
+              parentId: rowMessage.parentId,
+              typ: rowMessage.typ,
+              createDateTime: rowMessage.createDateTime,
+              deleteDateTime: rowMessage.deleteDateTime,
+              latitude: rowMessage.latitude,
+              longitude: rowMessage.longitude,
+              plusCode: rowMessage.plusCode,
+              message: rowMessage.message,
+              markerType: rowMessage.markerType,
+              style: rowMessage.style,
+              views: rowMessage.views,
+              likes: rowMessage.likes,
+              dislikes: rowMessage.dislikes,
               comments: [],
-              commentsNumber: row.commentsNumber,
-              status: row.status,
-              userId: row.userId,
-              multimedia: row.multimedia
+              commentsNumber: rowMessage.commentsNumber,
+              status: rowMessage.status,
+              userId: rowMessage.userId,
+              multimedia: JSON.parse(rowMessage.multimedia)
             };
             this.messages.push(message);
           });
@@ -416,7 +442,31 @@ export class MessageService {
       )
       .subscribe({
         next: (getMessageResponse) => {
-          message.comments = [...getMessageResponse.rows];
+          message.comments = [];
+          getMessageResponse.rows.forEach((rowMessage: RawMessage) => {
+            let message: Message = {
+              id: rowMessage.id,
+              parentId: rowMessage.parentId,
+              typ: rowMessage.typ,
+              createDateTime: rowMessage.createDateTime,
+              deleteDateTime: rowMessage.deleteDateTime,
+              latitude: rowMessage.latitude,
+              longitude: rowMessage.longitude,
+              plusCode: rowMessage.plusCode,
+              message: rowMessage.message,
+              markerType: rowMessage.markerType,
+              style: rowMessage.style,
+              views: rowMessage.views,
+              likes: rowMessage.likes,
+              dislikes: rowMessage.dislikes,
+              comments: [],
+              commentsNumber: rowMessage.commentsNumber,
+              status: rowMessage.status,
+              userId: rowMessage.userId,
+              multimedia: JSON.parse(rowMessage.multimedia)
+            };
+            message.comments.push(message);
+          });
         },
         error: (err) => {
           message.comments = [];

@@ -30,6 +30,7 @@ const columnDislikes = 'dislikes'; // Each dislike reduce the liftime of the mes
 const columnCommentsNumber = 'commentsNumber';
 const columnStatus = 'status';
 const columnUserId = 'userId';
+const columnMultimedia = 'multimedia';
 
 const init = function (db) {
     try {
@@ -52,6 +53,7 @@ const init = function (db) {
             ${columnCommentsNumber} INTEGER NOT NULL DEFAULT 0,
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnUserId} TEXT NOT NULL,
+            ${columnMultimedia} TEXT DEFAULT NULL,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
@@ -70,7 +72,7 @@ const init = function (db) {
     }
 };
 
-const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, markerType, style, userId, callback) {
+const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
         if (parentMessageId == 0) {
             parentMessageId = null;
@@ -87,7 +89,8 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             ${columnMessage},
             ${columnMarkerType},
             ${columnStyle},
-            ${columnUserId}
+            ${columnUserId},
+            ${columnMultimedia}
         ) VALUES (
             ${parentMessageId},
             '${messageTyp}', 
@@ -99,7 +102,8 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             '${message}',
             '${markerType}',
             '${style}',
-            '${userId}'
+            '${userId}',
+            '${multimedia}'
         );`;
         db.run(sql, (err) => {
             callback(err)

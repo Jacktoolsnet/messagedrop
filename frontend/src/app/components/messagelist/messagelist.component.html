@@ -31,10 +31,26 @@
                             *ngIf="user.id != message.userId">{{getMessageUserName(message).name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
-                    <mat-card-content *ngIf="undefined == message.translatedMessage"
-                        [style]="message.style">{{message.message}}</mat-card-content>
-                    <mat-card-content *ngIf="undefined != message.translatedMessage"
-                        [style]="message.style">{{message.translatedMessage}}</mat-card-content>
+                    <mat-card-content *ngIf="undefined == message.translatedMessage" [style]="message.style">
+                        <a class=" attribution_link" href="{{message.multimedia.sourceUrl}}"
+                            target="_blank">{{message.multimedia.attribution}}</a>
+                        <div *ngIf="message.multimedia.url !== ''" class="multimedia_container">
+                            <img class="multimedia_image" [src]="message.multimedia.url">
+                        </div>
+                        <div *ngIf="message.message !== ''" class="text_container">
+                            <p>{{message.message}}</p>
+                        </div>
+                    </mat-card-content>
+                    <mat-card-content *ngIf="undefined != message.translatedMessage" [style]="message.style">
+                        <a class=" attribution_link" href="{{message.multimedia.sourceUrl}}"
+                            target="_blank">{{message.multimedia.attribution}}</a>
+                        <div *ngIf="message.multimedia.url !== ''" class="multimedia_container">
+                            <img class="multimedia_image" [src]="message.multimedia.url">
+                        </div>
+                        <div *ngIf="message.message !== ''" class="text_container">
+                            <p>{{message.translatedMessage}}</p>
+                        </div>
+                    </mat-card-content>
                     <mat-card-actions class="buttonbar">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
                             matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
@@ -75,8 +91,10 @@
                     </mat-card-header>
                     <mat-card-content
                         *ngIf="undefined == messageService.getSelectedMessages()[messageService.getSelectedMessages().length - 1].translatedMessage"
-                        [style]="messageService.getSelectedMessages()[messageService.getSelectedMessages().length - 1].style">{{messageService.getSelectedMessages()[messageService.getSelectedMessages().length
-                        - 1].message}}</mat-card-content>
+                        [style]="messageService.getSelectedMessages()[messageService.getSelectedMessages().length - 1].style">
+                        {{messageService.getSelectedMessages()[messageService.getSelectedMessages().length
+                        - 1].message}}
+                    </mat-card-content>
                     <mat-card-content
                         *ngIf="undefined != messageService.getSelectedMessages()[messageService.getSelectedMessages().length - 1].translatedMessage"
                         [style]="messageService.getSelectedMessages()[messageService.getSelectedMessages().length - 1].style">{{messageService.getSelectedMessages()[messageService.getSelectedMessages().length

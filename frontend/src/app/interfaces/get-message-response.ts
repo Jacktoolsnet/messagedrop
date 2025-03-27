@@ -1,7 +1,7 @@
-import { Message } from "./message";
+import { RawMessage } from "./raw-message";
 
 export interface GetMessageResponse {
     status: number,
-    rows: Message[]
+    rows: RawMessage[]
 }
 
