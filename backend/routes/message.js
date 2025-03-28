@@ -139,7 +139,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 
 router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, function (err) {
+  tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

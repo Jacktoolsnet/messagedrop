@@ -51,27 +51,27 @@ export class MessageService {
 
   setMessages(rawMessages: RawMessage[]) {
     this.messages = [];
-    rawMessages.forEach((rowMessage: RawMessage) => {
+    rawMessages.forEach((rawMessage: RawMessage) => {
       let message: Message = {
-        id: rowMessage.id,
-        parentId: rowMessage.parentId,
-        typ: rowMessage.typ,
-        createDateTime: rowMessage.createDateTime,
-        deleteDateTime: rowMessage.deleteDateTime,
-        latitude: rowMessage.latitude,
-        longitude: rowMessage.longitude,
-        plusCode: rowMessage.plusCode,
-        message: rowMessage.message,
-        markerType: rowMessage.markerType,
-        style: rowMessage.style,
-        views: rowMessage.views,
-        likes: rowMessage.likes,
-        dislikes: rowMessage.dislikes,
+        id: rawMessage.id,
+        parentId: rawMessage.parentId,
+        typ: rawMessage.typ,
+        createDateTime: rawMessage.createDateTime,
+        deleteDateTime: rawMessage.deleteDateTime,
+        latitude: rawMessage.latitude,
+        longitude: rawMessage.longitude,
+        plusCode: rawMessage.plusCode,
+        message: rawMessage.message,
+        markerType: rawMessage.markerType,
+        style: rawMessage.style,
+        views: rawMessage.views,
+        likes: rawMessage.likes,
+        dislikes: rawMessage.dislikes,
         comments: [],
-        commentsNumber: rowMessage.commentsNumber,
-        status: rowMessage.status,
-        userId: rowMessage.userId,
-        multimedia: JSON.parse(rowMessage.multimedia)
+        commentsNumber: rawMessage.commentsNumber,
+        status: rawMessage.status,
+        userId: rawMessage.userId,
+        multimedia: JSON.parse(rawMessage.multimedia)
       };
       this.messages.push(message);
     });
@@ -144,7 +144,8 @@ export class MessageService {
       'message': message.message,
       'markerType': message.markerType,
       'style': message.style,
-      'messageUserId': user.id
+      'messageUserId': user.id,
+      'multimedia': JSON.stringify(message.multimedia)
     };
     this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
       .pipe(
@@ -170,7 +171,8 @@ export class MessageService {
     let body = {
       'id': message.id,
       'message': message.message,
-      'style': message.style
+      'style': message.style,
+      'multimedia': JSON.stringify(message.multimedia)
     };
     this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/update`, body, this.httpOptions)
       .pipe(
@@ -312,27 +314,27 @@ export class MessageService {
         next: (getMessageResponse) => {
           this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
           this.clearMessages();
-          getMessageResponse.rows.forEach((rowMessage: RawMessage) => {
+          getMessageResponse.rows.forEach((rawMessage: RawMessage) => {
             let message: Message = {
-              id: rowMessage.id,
-              parentId: rowMessage.parentId,
-              typ: rowMessage.typ,
-              createDateTime: rowMessage.createDateTime,
-              deleteDateTime: rowMessage.deleteDateTime,
-              latitude: rowMessage.latitude,
-              longitude: rowMessage.longitude,
-              plusCode: rowMessage.plusCode,
-              message: rowMessage.message,
-              markerType: rowMessage.markerType,
-              style: rowMessage.style,
-              views: rowMessage.views,
-              likes: rowMessage.likes,
-              dislikes: rowMessage.dislikes,
+              id: rawMessage.id,
+              parentId: rawMessage.parentId,
+              typ: rawMessage.typ,
+              createDateTime: rawMessage.createDateTime,
+              deleteDateTime: rawMessage.deleteDateTime,
+              latitude: rawMessage.latitude,
+              longitude: rawMessage.longitude,
+              plusCode: rawMessage.plusCode,
+              message: rawMessage.message,
+              markerType: rawMessage.markerType,
+              style: rawMessage.style,
+              views: rawMessage.views,
+              likes: rawMessage.likes,
+              dislikes: rawMessage.dislikes,
               comments: [],
-              commentsNumber: rowMessage.commentsNumber,
-              status: rowMessage.status,
-              userId: rowMessage.userId,
-              multimedia: JSON.parse(rowMessage.multimedia)
+              commentsNumber: rawMessage.commentsNumber,
+              status: rawMessage.status,
+              userId: rawMessage.userId,
+              multimedia: JSON.parse(rawMessage.multimedia)
             };
             this.messages.push(message);
           });
@@ -435,37 +437,36 @@ export class MessageService {
   }
 
   getCommentsForParentMessage(message: Message) {
-    let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${parentMessage.id}`, this.httpOptions)
+    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${message.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
       .subscribe({
         next: (getMessageResponse) => {
           message.comments = [];
-          getMessageResponse.rows.forEach((rowMessage: RawMessage) => {
-            let message: Message = {
-              id: rowMessage.id,
-              parentId: rowMessage.parentId,
-              typ: rowMessage.typ,
-              createDateTime: rowMessage.createDateTime,
-              deleteDateTime: rowMessage.deleteDateTime,
-              latitude: rowMessage.latitude,
-              longitude: rowMessage.longitude,
-              plusCode: rowMessage.plusCode,
-              message: rowMessage.message,
-              markerType: rowMessage.markerType,
-              style: rowMessage.style,
-              views: rowMessage.views,
-              likes: rowMessage.likes,
-              dislikes: rowMessage.dislikes,
+          getMessageResponse.rows.forEach((rawMessage: RawMessage) => {
+            let comment: Message = {
+              id: rawMessage.id,
+              parentId: rawMessage.parentId,
+              typ: rawMessage.typ,
+              createDateTime: rawMessage.createDateTime,
+              deleteDateTime: rawMessage.deleteDateTime,
+              latitude: rawMessage.latitude,
+              longitude: rawMessage.longitude,
+              plusCode: rawMessage.plusCode,
+              message: rawMessage.message,
+              markerType: rawMessage.markerType,
+              style: rawMessage.style,
+              views: rawMessage.views,
+              likes: rawMessage.likes,
+              dislikes: rawMessage.dislikes,
               comments: [],
-              commentsNumber: rowMessage.commentsNumber,
-              status: rowMessage.status,
-              userId: rowMessage.userId,
-              multimedia: JSON.parse(rowMessage.multimedia)
+              commentsNumber: rawMessage.commentsNumber,
+              status: rawMessage.status,
+              userId: rawMessage.userId,
+              multimedia: JSON.parse(rawMessage.multimedia)
             };
-            message.comments.push(message);
+            message.comments.push(comment);
           });
         },
         error: (err) => {

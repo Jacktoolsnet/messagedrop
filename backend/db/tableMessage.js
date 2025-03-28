@@ -113,12 +113,13 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
     }
 };
 
-const update = function (db, messageId, message, style, callback) {
+const update = function (db, messageId, message, style, multimedia, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnMessage} = '${message}', 
-            ${columnStyle} = '${style}' 
+            ${columnStyle} = '${style}',
+            ${columnMultimedia} = '${multimedia}' 
         WHERE ${columnMessageId} = ?;`;
 
         db.run(sql, [messageId], (err) => {

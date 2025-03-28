@@ -165,7 +165,7 @@
                     </mat-card-actions>
                 </mat-card>
             </div>
-            <div *ngIf="messageService.getSelectedMessages().at(-1)?.comments?.length != 0">
+            <div *ngIf="messageService.getSelectedMessages().at(-1)!.comments.length != 0">
                 <div class="item"
                     *ngFor="let comment of messageService.getSelectedMessages().at(-1)?.comments; index as i"
                     (click)="goToMessageDetails(comment)">
@@ -180,7 +180,16 @@
                                 *ngIf="user.id != comment.userId">{{getMessageUserName(comment).name}}</mat-card-title>
                             <mat-card-subtitle></mat-card-subtitle>
                         </mat-card-header>
-                        <mat-card-content [style]="comment.style">{{comment.message}}</mat-card-content>
+                        <mat-card-content [style]="comment.style">
+                            <a class=" attribution_link" href="{{comment.multimedia.sourceUrl}}"
+                                target="_blank">{{comment.multimedia.attribution}}</a>
+                            <div *ngIf="comment.multimedia.url !== ''" class="multimedia_container">
+                                <img class="multimedia_image" [src]="comment.multimedia.url">
+                            </div>
+                            <div *ngIf="comment.message !== ''" class="text_container">
+                                <p>{{comment.message}}</p>
+                            </div>
+                        </mat-card-content>
                         <mat-card-actions class="buttonbar">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
                                 matBadge="{{comment.views | shortNumber}}" matBadgePosition="after"
