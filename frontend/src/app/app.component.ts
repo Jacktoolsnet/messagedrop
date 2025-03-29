@@ -11,9 +11,9 @@ import { RouterOutlet } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
 import { Subject } from 'rxjs';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
+import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
-import { MessageComponent } from './components/message/message.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { NoteComponent } from './components/note/note.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
@@ -332,7 +332,7 @@ export class AppComponent implements OnInit {
       }
     };
 
-    const dialogRef = this.messageDialog.open(MessageComponent, {
+    const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.userService.getUser(), message: message },

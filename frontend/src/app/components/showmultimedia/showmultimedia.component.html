@@ -1,0 +1,4 @@
+<div *ngIf="multimedia?.url !== ''" class="multimedia_container">
+    <img class="multimedia_image" [src]="multimedia!.url">
+</div>
+<a class=" attribution_link" href="{{multimedia?.sourceUrl}}" target="_blank">{{multimedia?.attribution}}</a>

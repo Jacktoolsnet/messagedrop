@@ -8,7 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TenorService } from '../../../services/tenor.service';
-import { MessageComponent } from '../../message/message.component';
+import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
   selector: 'app-multimedia',
@@ -34,7 +34,7 @@ export class TenorComponent {
   public results: any[] = [];
 
   constructor(
-    public dialogRef: MatDialogRef<MessageComponent>,
+    public dialogRef: MatDialogRef<EditMessageComponent>,
     private tensorService: TenorService,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) { }

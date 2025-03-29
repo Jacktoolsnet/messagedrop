@@ -8,7 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { Message } from '../../../interfaces/message';
-import { MessageComponent } from '../../message/message.component';
+import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
   selector: 'app-message',
@@ -30,7 +30,7 @@ import { MessageComponent } from '../../message/message.component';
 export class TextComponent implements OnInit {
 
   constructor(
-    public dialogRef: MatDialogRef<MessageComponent>,
+    public dialogRef: MatDialogRef<EditMessageComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { message: Message }
   ) { }
 

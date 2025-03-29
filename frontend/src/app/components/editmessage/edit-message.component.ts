@@ -34,10 +34,10 @@ import { WaitComponent } from '../utils/wait/wait.component';
     MatInputModule,
     MatMenuModule
   ],
-  templateUrl: './message.component.html',
-  styleUrl: './message.component.css'
+  templateUrl: './edit-message.component.html',
+  styleUrl: './edit-message.component.css'
 })
-export class MessageComponent implements OnInit {
+export class EditMessageComponent implements OnInit {
 
   constructor(
     private snackBar: MatSnackBar,
@@ -45,7 +45,7 @@ export class MessageComponent implements OnInit {
     private textDialog: MatDialog,
     private messageService: MessageService,
     private openAiService: OpenAiService,
-    public dialogRef: MatDialogRef<MessageComponent>,
+    public dialogRef: MatDialogRef<EditMessageComponent>,
     private style: StyleService,
     private waitDialog: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, message: Message }

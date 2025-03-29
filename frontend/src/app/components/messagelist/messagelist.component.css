@@ -123,39 +123,3 @@ button {
   overflow: hidden;
   margin-right: 1rem;
 }
-
-.multimedia_container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.text_container {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-}
-
-.text {
-  margin: 1rem;
-}
-
-.multimedia_image {
-  max-width: 95%;
-  object-fit: contain;
-  border-radius: 0.5rem;
-  margin-bottom: 1rem;
-}
-
-.attribution_link {
-  color: white;
-  text-align: center;
-  display: block;
-  width: 100%;
-  text-decoration: none;
-  font-size: 0.75rem;
-}

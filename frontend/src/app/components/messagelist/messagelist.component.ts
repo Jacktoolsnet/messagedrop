@@ -25,7 +25,9 @@ import { MessageService } from '../../services/message.service';
 import { RelatedUserService } from '../../services/related-user.service';
 import { StyleService } from '../../services/style.service';
 import { TranslateService } from '../../services/translate.service';
-import { MessageComponent } from '../message/message.component';
+import { EditMessageComponent } from '../editmessage/edit-message.component';
+import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { ShowmultimediaComponent } from '../showmultimedia/showmultimedia.component';
 import { BlockMessageComponent } from './block-message/block-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { EditUserComponent } from './edit-user/edit-user.component';
@@ -33,6 +35,8 @@ import { EditUserComponent } from './edit-user/edit-user.component';
 @Component({
   selector: 'app-messagelist',
   imports: [
+    ShowmessageComponent,
+    ShowmultimediaComponent,
     ShortNumberPipe,
     MatBadgeModule,
     MatCardModule,
@@ -185,7 +189,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessage(message: Message) {
-    const dialogRef = this.messageDialog.open(MessageComponent, {
+    const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, user: this.user, message: message },
       closeOnNavigation: true,
@@ -256,7 +260,7 @@ export class MessagelistComponent implements OnInit {
       }
     };
 
-    const dialogRef = this.messageDialog.open(MessageComponent, {
+    const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       data: { mode: this.mode.ADD_COMMENT, user: this.user, message: message },
       closeOnNavigation: true,
@@ -321,7 +325,7 @@ export class MessagelistComponent implements OnInit {
         description: ''
       }
     };
-    const dialogRef = this.messageDialog.open(MessageComponent, {
+    const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message },

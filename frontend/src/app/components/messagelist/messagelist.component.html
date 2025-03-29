@@ -31,25 +31,11 @@
                             *ngIf="user.id != message.userId">{{getMessageUserName(message).name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
-                    <mat-card-content *ngIf="undefined == message.translatedMessage" [style]="message.style">
-                        <a class=" attribution_link" href="{{message.multimedia.sourceUrl}}"
-                            target="_blank">{{message.multimedia.attribution}}</a>
-                        <div *ngIf="message.multimedia.url !== ''" class="multimedia_container">
-                            <img class="multimedia_image" [src]="message.multimedia.url">
-                        </div>
-                        <div *ngIf="message.message !== ''" class="text_container">
-                            <p>{{message.message}}</p>
-                        </div>
-                    </mat-card-content>
-                    <mat-card-content *ngIf="undefined != message.translatedMessage" [style]="message.style">
-                        <a class=" attribution_link" href="{{message.multimedia.sourceUrl}}"
-                            target="_blank">{{message.multimedia.attribution}}</a>
-                        <div *ngIf="message.multimedia.url !== ''" class="multimedia_container">
-                            <img class="multimedia_image" [src]="message.multimedia.url">
-                        </div>
-                        <div *ngIf="message.message !== ''" class="text_container">
-                            <p>{{message.translatedMessage}}</p>
-                        </div>
+                    <mat-card-content *ngIf="undefined == message.translatedMessage">
+                        <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
+                        <app-showmessage
+                            [message]="undefined != message.translatedMessage ? message.translatedMessage : message.message"
+                            [style]="message.style"></app-showmessage>
                     </mat-card-content>
                     <mat-card-actions class="buttonbar">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
@@ -62,7 +48,7 @@
                             matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after"
                             matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                            matBadge="{{message.commentsNumber | shortNumber}}" matBadgePosition="after"
+                            matBadge="{{message.comments.length | shortNumber}}" matBadgePosition="after"
                             matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
                     </mat-card-actions>
                 </mat-card>
@@ -88,36 +74,12 @@
                             (click)="editMessageUserProfile(messageService.getSelectedMessages().at(-1)!)">{{selectedMessageUser.name}}</mat-card-title>
                         <mat-card-subtitle></mat-card-subtitle>
                     </mat-card-header>
-                    <mat-card-content
-                        *ngIf="undefined == messageService.getSelectedMessages().at(-1)?.translatedMessage"
-                        [style]="messageService.getSelectedMessages().at(-1)?.style">
-                        <a class=" attribution_link"
-                            href="{{messageService.getSelectedMessages().at(-1)!.multimedia.sourceUrl}}"
-                            target="_blank">{{messageService.getSelectedMessages().at(-1)!.multimedia.attribution}}</a>
-                        <div *ngIf="messageService.getSelectedMessages().at(-1)!.multimedia.url !== ''"
-                            class="multimedia_container">
-                            <img class="multimedia_image"
-                                [src]="messageService.getSelectedMessages().at(-1)!.multimedia.url">
-                        </div>
-                        <div *ngIf="messageService.getSelectedMessages().at(-1)!.message !== ''" class="text_container">
-                            <p>{{messageService.getSelectedMessages().at(-1)?.message}}</p>
-                        </div>
-                    </mat-card-content>
-                    <mat-card-content
-                        *ngIf="undefined != messageService.getSelectedMessages().at(-1)?.translatedMessage"
-                        [style]="messageService.getSelectedMessages().at(-1)?.style">
-                        <a class=" attribution_link"
-                            href="{{messageService.getSelectedMessages().at(-1)!.multimedia.sourceUrl}}"
-                            target="_blank">{{messageService.getSelectedMessages().at(-1)!.multimedia.attribution}}</a>
-                        <div *ngIf="messageService.getSelectedMessages().at(-1)!.multimedia.url !== ''"
-                            class="multimedia_container">
-                            <img class="multimedia_image"
-                                [src]="messageService.getSelectedMessages().at(-1)!.multimedia.url">
-                        </div>
-                        <div *ngIf="messageService.getSelectedMessages().at(-1)!.translatedMessage !== ''"
-                            class="text_container">
-                            <p>{{messageService.getSelectedMessages().at(-1)?.translatedMessage}}</p>
-                        </div>
+                    <mat-card-content>
+                        <app-showmultimedia
+                            [multimedia]="messageService.getSelectedMessages().at(-1)!.multimedia"></app-showmultimedia>
+                        <app-showmessage
+                            [message]="undefined != messageService.getSelectedMessages().at(-1)!.translatedMessage ? messageService.getSelectedMessages().at(-1)!.translatedMessage : messageService.getSelectedMessages().at(-1)!.message"
+                            [style]="messageService.getSelectedMessages().at(-1)!.style"></app-showmessage>
                     </mat-card-content>
                     <mat-card-actions class="buttonbar">
                         <button *ngIf="user.id != messageService.getSelectedMessages().at(-1)?.userId" mat-mini-fab
@@ -180,15 +142,11 @@
                                 *ngIf="user.id != comment.userId">{{getMessageUserName(comment).name}}</mat-card-title>
                             <mat-card-subtitle></mat-card-subtitle>
                         </mat-card-header>
-                        <mat-card-content [style]="comment.style">
-                            <a class=" attribution_link" href="{{comment.multimedia.sourceUrl}}"
-                                target="_blank">{{comment.multimedia.attribution}}</a>
-                            <div *ngIf="comment.multimedia.url !== ''" class="multimedia_container">
-                                <img class="multimedia_image" [src]="comment.multimedia.url">
-                            </div>
-                            <div *ngIf="comment.message !== ''" class="text_container">
-                                <p>{{comment.message}}</p>
-                            </div>
+                        <mat-card-content>
+                            <app-showmultimedia [multimedia]="comment.multimedia"></app-showmultimedia>
+                            <app-showmessage
+                                [message]="undefined != comment.translatedMessage ? comment.translatedMessage : comment.message"
+                                [style]="comment.style"></app-showmessage>
                         </mat-card-content>
                         <mat-card-actions class="buttonbar">
                             <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
