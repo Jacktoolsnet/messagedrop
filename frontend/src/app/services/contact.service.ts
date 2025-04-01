@@ -9,6 +9,7 @@ import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { Envelope } from '../interfaces/envelope';
 import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
+import { MultimediaType } from '../interfaces/multimedia-type';
 import { RawContact } from '../interfaces/raw-contact';
 import { ShortMessage } from '../interfaces/short-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
@@ -70,21 +71,41 @@ export class ContactService {
               id: rawContact.id,
               userId: rawContact.userId,
               userEncryptedMessage: 'undefined' !== rawContact.userEncryptedMessage ? JSON.parse(rawContact.userEncryptedMessage) : undefined,
-              userMessageStyle: rawContact.userMessageStyle,
               userSignature: userSignature,
               contactUserId: rawContact.contactUserId,
               contactUserSigningPublicKey: 'undefined' !== rawContact.contactUserSigningPublicKey ? JSON.parse(rawContact.contactUserSigningPublicKey) : undefined,
               contactUserEncryptionPublicKey: 'undefined' !== rawContact.contactUserEncryptionPublicKey ? JSON.parse(rawContact.contactUserEncryptionPublicKey) : undefined,
               contactUserEncryptedMessage: 'undefined' !== rawContact.contactUserEncryptedMessage ? JSON.parse(rawContact.contactUserEncryptedMessage) : undefined,
-              contactUserMessageStyle: rawContact.contactUserMessageStyle,
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
               hint: rawContact.hint,
               name: this.findAditionalContactInfo(rawContact.id).name,
               base64Avatar: this.findAditionalContactInfo(rawContact.id).base64Avatar,
               lastMessageFrom: rawContact.lastMessageFrom,
-              userMessage: '',
-              contactUserMessage: '',
+              userMessage: {
+                message: '',
+                multimedia: {
+                  type: MultimediaType.UNDEFINED,
+                  attribution: '',
+                  title: '',
+                  description: '',
+                  url: '',
+                  sourceUrl: ''
+                },
+                style: ''
+              },
+              contactUserMessage: {
+                message: '',
+                multimedia: {
+                  type: MultimediaType.UNDEFINED,
+                  attribution: '',
+                  title: '',
+                  description: '',
+                  url: '',
+                  sourceUrl: ''
+                },
+                style: ''
+              },
               provided: false,
               userMessageVerified: false,
               contactUserMessageVerified: false
@@ -98,15 +119,40 @@ export class ContactService {
                       this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.userEncryptedMessage!)
                         .then((message: string) => {
                           if (message !== '') {
-                            contact.userMessage = message;
+                            console.log(JSON.parse(message));
+                            contact.userMessage = JSON.parse(message);
                           } else {
-                            contact.userMessage = 'Message cannot be decrypted!';
+                            let errorMessage: ShortMessage = {
+                              message: 'Message cannot be decrypted!',
+                              multimedia: {
+                                type: MultimediaType.UNDEFINED,
+                                attribution: '',
+                                title: '',
+                                description: '',
+                                url: '',
+                                sourceUrl: ''
+                              },
+                              style: ''
+                            }
+                            contact.userMessage = errorMessage;
                           }
                         });
                     }
                   } else {
                     contact.userMessageVerified = false;
-                    contact.contactUserMessage = 'Signature could not be verified!'
+                    let errorMessage: ShortMessage = {
+                      message: 'Signature could not be verified!',
+                      multimedia: {
+                        type: MultimediaType.UNDEFINED,
+                        attribution: '',
+                        title: '',
+                        description: '',
+                        url: '',
+                        sourceUrl: ''
+                      },
+                      style: ''
+                    }
+                    contact.contactUserMessage = errorMessage;
                   }
                 });
             }
@@ -119,15 +165,39 @@ export class ContactService {
                       this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.contactUserEncryptedMessage!)
                         .then((message: string) => {
                           if (message !== '') {
-                            contact.contactUserMessage = message;
+                            contact.contactUserMessage = JSON.parse(message);
                           } else {
-                            contact.contactUserMessage = 'Message cannot be decrypted!';
+                            let errorMessage: ShortMessage = {
+                              message: 'Message cannot be decrypted!',
+                              multimedia: {
+                                type: MultimediaType.UNDEFINED,
+                                attribution: '',
+                                title: '',
+                                description: '',
+                                url: '',
+                                sourceUrl: ''
+                              },
+                              style: ''
+                            }
+                            contact.contactUserMessage = errorMessage;
                           }
                         });
                     }
                   } else {
                     contact.contactUserMessageVerified = false;
-                    contact.contactUserMessage = 'Signature could not be verified!'
+                    let errorMessage: ShortMessage = {
+                      message: 'Signature could not be verified!',
+                      multimedia: {
+                        type: MultimediaType.UNDEFINED,
+                        attribution: '',
+                        title: '',
+                        description: '',
+                        url: '',
+                        sourceUrl: ''
+                      },
+                      style: ''
+                    }
+                    contact.contactUserMessage = errorMessage;
                   }
                 });
             }
@@ -209,8 +279,7 @@ export class ContactService {
       'contactUserId': envelope.contactUserId,
       'userEncryptedMessage': envelope.userEncryptedMessage,
       'contactUserEncryptedMessage': envelope.contactUserEncryptedMessage,
-      'messageSignature': envelope.messageSignature,
-      'messageStyle': envelope.messageStyle
+      'messageSignature': envelope.messageSignature
     };
     this.http.post<boolean>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
       .pipe(
@@ -218,9 +287,8 @@ export class ContactService {
       )
       .subscribe({
         next: simpleStatusResponse => {
-          contact.userMessage = shortMessage.message;
+          contact.userMessage = shortMessage;
           contact.userEncryptedMessage = JSON.parse(envelope.userEncryptedMessage);
-          contact.userMessageStyle = shortMessage.style;
           contact.lastMessageFrom = 'user';
           socketioService.sendShortMessageToContact(envelope);
         },

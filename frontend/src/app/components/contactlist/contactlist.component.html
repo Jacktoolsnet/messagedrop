@@ -36,18 +36,34 @@
                     </mat-card-header>
                     <mat-card-content>
                         <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
-                            <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage != ''"
-                                [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
-                            <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
-                                [style]="contact.contactUserMessageStyle" class="from-them">
-                                {{contact.contactUserMessage}}</p>
+                            <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != ''"
+                                class="from-me">
+                                <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                                <app-showmessage [message]="contact.userMessage.message"
+                                    [style]="contact.userMessage.style"></app-showmessage>
+                            </p>
+                            <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != ''"
+                                class="from-them">
+                                <app-showmultimedia
+                                    [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                                <app-showmessage [message]="contact.contactUserMessage.message"
+                                    [style]="contact.contactUserMessage.style"></app-showmessage>
+                            </p>
                         </div>
                         <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
-                            <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage != ''"
-                                [style]="contact.contactUserMessageStyle" class="from-them">
-                                {{contact.contactUserMessage}}</p>
-                            <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage != ''"
-                                [style]="contact.userMessageStyle" class="from-me">{{contact.userMessage}}</p>
+                            <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != ''"
+                                class="from-them">
+                                <app-showmultimedia
+                                    [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                                <app-showmessage [message]="contact.contactUserMessage.message"
+                                    [style]="contact.contactUserMessage.style"></app-showmessage>
+                            </p>
+                            <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != ''"
+                                class="from-me">
+                                <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                                <app-showmessage [message]="contact.userMessage.message"
+                                    [style]="contact.userMessage.style"></app-showmessage>
+                            </p>
                         </div>
 
                     </mat-card-content>

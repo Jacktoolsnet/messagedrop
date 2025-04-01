@@ -28,14 +28,14 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
  */
 router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.userEncryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
+  tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.userEncryptedMessage, req.body.messageSignature, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
       res.status(response.status);
       res.json(response);
     } else {
-      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.contactUserEncryptedMessage, req.body.messageStyle, req.body.messageSignature, function (err) {
+      tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.contactUserEncryptedMessage, req.body.messageSignature, function (err) {
         if (err) {
           response.status = 500;
           response.error = err;
@@ -89,7 +89,6 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'contactUserSigningPublicKey': row.contactUserSigningPublicKey,
             'contactUserEncryptionPublicKey': row.contactUserEncryptionPublicKey,
             'contactUserEncryptedMessage': row.contactUserEncryptedMessage,
-            'contactUserMessageStyle': row.contactUserMessageStyle,
             'contactUserSignature': row.contactUserSignature,
             'subscribed': row.subscribed === 0 ? false : true,
             'hint': row.hint,

@@ -7,6 +7,8 @@ import { environment } from '../../environments/environment';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
 import { Contact } from '../interfaces/contact';
 import { Envelope } from '../interfaces/envelope';
+import { MultimediaType } from '../interfaces/multimedia-type';
+import { ShortMessage } from '../interfaces/short-message';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { UserService } from './user.service';
@@ -169,20 +171,44 @@ export class SocketioService {
                 this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
                   .then((message: string) => {
                     if (message !== '') {
-                      contact.contactUserMessage = message;
-                      contact.contactUserMessageStyle = payload.envelope.messageStyle;
+                      contact.contactUserMessage = JSON.parse(message);
+                      // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
                     } else {
-                      contact.contactUserMessage = 'Message cannot be decrypted!';
-                      contact.contactUserMessageStyle = payload.envelope.messageStyle;
+                      let errorMessage: ShortMessage = {
+                        message: 'Message cannot be decrypted!',
+                        multimedia: {
+                          type: MultimediaType.UNDEFINED,
+                          attribution: '',
+                          title: '',
+                          description: '',
+                          url: '',
+                          sourceUrl: ''
+                        },
+                        style: ''
+                      }
+                      contact.contactUserMessage = errorMessage;
+                      // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
                     }
                   });
               }
             } else {
               contact.contactUserMessageVerified = false;
-              contact.contactUserMessage = 'Signature could not be verified!'
-              contact.contactUserMessageStyle = payload.envelope.messageStyle;
+              let errorMessage: ShortMessage = {
+                message: 'ignature could not be verified!',
+                multimedia: {
+                  type: MultimediaType.UNDEFINED,
+                  attribution: '',
+                  title: '',
+                  description: '',
+                  url: '',
+                  sourceUrl: ''
+                },
+                style: ''
+              }
+              contact.contactUserMessage = errorMessage;
+              // contact.contactUserMessageStyle = payload.envelope.messageStyle;
               contact.lastMessageFrom = 'contactUser';
             }
           });

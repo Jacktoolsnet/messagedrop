@@ -12,6 +12,7 @@ import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
 import { GetUserResponse } from '../../interfaces/get-user-response';
 import { Mode } from '../../interfaces/mode';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { User } from '../../interfaces/user';
 import { ConnectService } from '../../services/connect.service';
@@ -22,13 +23,17 @@ import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { ConnectComponent } from '../contact/connect/connect.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
-import { ContactMessageComponent } from '../contact/message/message.component';
+import { ContactEditMessageComponent } from '../contact/message/contact-edit-message.component';
 import { ContactProfileComponent } from '../contact/profile/profile.component';
+import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { ShowmultimediaComponent } from '../showmultimedia/showmultimedia.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({
   selector: 'app-contactlist',
   imports: [
+    ShowmessageComponent,
+    ShowmultimediaComponent,
     MatBadgeModule,
     MatCardModule,
     CommonModule,
@@ -78,10 +83,30 @@ export class ContactlistComponent implements OnInit {
       name: '',
       subscribed: false,
       provided: false,
-      userMessage: '',
-      userMessageStyle: '',
-      contactUserMessage: '',
-      contactUserMessageStyle: '',
+      userMessage: {
+        message: '',
+        style: '',
+        multimedia: {
+          type: MultimediaType.UNDEFINED,
+          url: '',
+          sourceUrl: '',
+          attribution: '',
+          title: '',
+          description: ''
+        }
+      },
+      contactUserMessage: {
+        message: '',
+        style: '',
+        multimedia: {
+          type: MultimediaType.UNDEFINED,
+          url: '',
+          sourceUrl: '',
+          attribution: '',
+          title: '',
+          description: ''
+        }
+      },
       lastMessageFrom: '',
       userMessageVerified: false,
       contactUserMessageVerified: false
@@ -118,10 +143,30 @@ export class ContactlistComponent implements OnInit {
       name: '',
       subscribed: false,
       provided: false,
-      userMessage: '',
-      userMessageStyle: '',
-      contactUserMessage: '',
-      contactUserMessageStyle: '',
+      userMessage: {
+        message: '',
+        style: '',
+        multimedia: {
+          type: MultimediaType.UNDEFINED,
+          url: '',
+          sourceUrl: '',
+          attribution: '',
+          title: '',
+          description: ''
+        }
+      },
+      contactUserMessage: {
+        message: '',
+        style: '',
+        multimedia: {
+          type: MultimediaType.UNDEFINED,
+          url: '',
+          sourceUrl: '',
+          attribution: '',
+          title: '',
+          description: ''
+        }
+      },
       lastMessageFrom: '',
       userMessageVerified: false,
       contactUserMessageVerified: false
@@ -225,9 +270,17 @@ export class ContactlistComponent implements OnInit {
   public openContactMessagDialog(contact: Contact): void {
     let shortMessage: ShortMessage = {
       message: '',
-      style: ''
+      style: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: ''
+      }
     };
-    const dialogRef = this.contactMessageDialog.open(ContactMessageComponent, {
+    const dialogRef = this.contactMessageDialog.open(ContactEditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_SHORT_MESSAGE, user: this.user, contact: contact, shortMessage: shortMessage },
@@ -252,16 +305,15 @@ export class ContactlistComponent implements OnInit {
           contactUserId: data?.contact.contactUserId,
           messageSignature: '',
           userEncryptedMessage: '',
-          contactUserEncryptedMessage: '',
-          messageStyle: data?.shortMessage.style
+          contactUserEncryptedMessage: ''
         };
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
             envelope.messageSignature = signature;
-            this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, data?.shortMessage.message)
+            this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, JSON.stringify(data?.shortMessage))
               .then((encryptedMessage: string) => {
                 envelope.userEncryptedMessage = encryptedMessage;
-                this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, data?.shortMessage.message)
+                this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, JSON.stringify(data?.shortMessage))
                   .then((encryptedMessage: string) => {
                     envelope.contactUserEncryptedMessage = encryptedMessage;
                     // Envelope is ready

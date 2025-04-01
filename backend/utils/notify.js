@@ -11,26 +11,28 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
         AND tablePlace.subscribed = 1
         AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
-            rows.forEach((row) => {
-                const payload = {
-                    "notification": {
-                        "title": `Messagedrop @${row.name}`,
-                        "body": message,
-                        "icon": "assets/icons/notify-icon.png",
-                        "vibrate": [100, 50, 100],
-                        "data": {
-                            "dateOfArrival": Date.now(),
-                            "primaryKey": { "type": "place", "id": plusCode },
-                            "onActionClick": {
-                                "default": {
-                                    "operation": "focusLastFocusedOrOpen"
-                                }
-                            },
+            if (undefined != rows) {
+                rows.forEach((row) => {
+                    const payload = {
+                        "notification": {
+                            "title": `Messagedrop @${row.name}`,
+                            "body": message,
+                            "icon": "assets/icons/notify-icon.png",
+                            "vibrate": [100, 50, 100],
+                            "data": {
+                                "dateOfArrival": Date.now(),
+                                "primaryKey": { "type": "place", "id": plusCode },
+                                "onActionClick": {
+                                    "default": {
+                                        "operation": "focusLastFocusedOrOpen"
+                                    }
+                                },
+                            }
                         }
-                    }
-                };
-                sendNotification(logger, JSON.parse(row.subscription), payload);
-            });
+                    };
+                    sendNotification(logger, JSON.parse(row.subscription), payload);
+                });
+            }
         });
     } catch (error) {
         logger.error(`placeSubscriptions: ${error}`);
@@ -47,26 +49,28 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         AND userId = '${contactUserId}'
         AND subscribed = 1;`;
         db.all(sql, (err, rows) => {
-            rows.forEach((row) => {
-                const payload = {
-                    "notification": {
-                        "title": `New message from @${row.name}`,
-                        "body": message,
-                        "icon": "assets/icons/notify-icon.png",
-                        "vibrate": [100, 50, 100],
-                        "data": {
-                            "dateOfArrival": Date.now(),
-                            "primaryKey": { "type": "contact", "id": row.id },
-                            "onActionClick": {
-                                "default": {
-                                    "operation": "focusLastFocusedOrOpen",
-                                }
-                            },
+            if (undefined != rows) {
+                rows.forEach((row) => {
+                    const payload = {
+                        "notification": {
+                            "title": `New message from @${row.name}`,
+                            "body": message,
+                            "icon": "assets/icons/notify-icon.png",
+                            "vibrate": [100, 50, 100],
+                            "data": {
+                                "dateOfArrival": Date.now(),
+                                "primaryKey": { "type": "contact", "id": row.id },
+                                "onActionClick": {
+                                    "default": {
+                                        "operation": "focusLastFocusedOrOpen",
+                                    }
+                                },
+                            }
                         }
-                    }
-                };
-                sendNotification(logger, JSON.parse(row.subscription), payload);
-            });
+                    };
+                    sendNotification(logger, JSON.parse(row.subscription), payload);
+                });
+            }
         });
     } catch (error) {
         logger.error(`contactSubscriptions: ${error}`);

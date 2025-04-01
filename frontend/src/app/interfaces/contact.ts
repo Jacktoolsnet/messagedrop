@@ -1,20 +1,19 @@
 import { CryptoData } from "./crypto-data";
 import { Envelope } from "./envelope";
+import { ShortMessage } from "./short-message";
 
 export interface Contact {
     id: string,
     userId: string,
     userSignature?: ArrayBuffer,
-    userMessage: string,
+    userMessage: ShortMessage,
     userMessageVerified: boolean,
     userEncryptedMessage?: CryptoData,
-    userMessageStyle: string,
     contactUserId: string,
     contactSignature?: ArrayBuffer,
-    contactUserMessage: string,
+    contactUserMessage: ShortMessage,
     contactUserMessageVerified: boolean,
     contactUserEncryptedMessage?: CryptoData,
-    contactUserMessageStyle: string,
     contactUserSignature?: ArrayBuffer,
     contactUserSigningPublicKey?: JsonWebKey,
     contactUserEncryptionPublicKey?: JsonWebKey,
