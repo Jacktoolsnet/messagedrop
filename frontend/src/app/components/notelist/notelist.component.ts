@@ -14,18 +14,23 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Animation } from '../../interfaces/animation';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { User } from '../../interfaces/user';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { NoteService } from '../../services/note.service';
 import { StyleService } from '../../services/style.service';
-import { NoteComponent } from '../note/note.component';
+import { EditNoteComponent } from '../editnote/edit-note.component';
+import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { ShowmultimediaComponent } from '../showmultimedia/showmultimedia.component';
 import { DeleteNoteComponent } from './delete-note/delete-note.component';
 
 @Component({
   selector: 'app-notelist',
   imports: [
+    ShowmessageComponent,
+    ShowmultimediaComponent,
     MatBadgeModule,
     MatCardModule,
     CommonModule,
@@ -106,7 +111,7 @@ export class NotelistComponent implements OnInit {
   }
 
   public editNote(note: Note) {
-    const dialogRef = this.noteDialog.open(NoteComponent, {
+    const dialogRef = this.noteDialog.open(EditNoteComponent, {
       panelClass: '',
       data: { mode: this.mode.EDIT_NOTE, user: this.user, note: note },
       closeOnNavigation: true,
@@ -139,8 +144,16 @@ export class NotelistComponent implements OnInit {
       note: '',
       markerType: 'note',
       style: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: ''
+      }
     };
-    const dialogRef = this.noteDialog.open(NoteComponent, {
+    const dialogRef = this.noteDialog.open(EditNoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_NOTE, note: note },

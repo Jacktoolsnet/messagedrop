@@ -1,3 +1,5 @@
+import { Multimedia } from "./multimedia";
+
 export interface Note {
     latitude: number,
     longitude: number,
@@ -5,5 +7,6 @@ export interface Note {
     note: string,
     markerType: string,
     style: string,
+    multimedia: Multimedia
 }
 

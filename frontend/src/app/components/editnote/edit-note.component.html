@@ -1,0 +1,51 @@
+<h2 *ngIf="data.mode == 'add_note'" mat-dialog-title>Add a private note</h2>
+<h2 *ngIf="data.mode == 'edit_note'" mat-dialog-title>Edit my private note</h2>
+<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
+</button>
+<mat-dialog-content>
+    <div class="content">
+        <div *ngIf="data.note.multimedia.url === ''" class="multimedia_container">
+            <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary">
+                <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
+                <span>Add a GIF from Tenor</span>
+            </button>
+        </div>
+        <div *ngIf="data.note.multimedia.url !== ''" class="multimedia_container">
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <img class="multimedia_image" [src]="data.note.multimedia.url" (click)="openTenorDialog()">
+        </div>
+        <a class=" attribution_link" href="{{data.note.multimedia.sourceUrl}}"
+            target="_blank">{{data.note.multimedia.attribution}}</a>
+        <div *ngIf="data.note.note === ''" class="multimedia_container">
+            <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
+                <mat-icon class="material-symbols-outlined">post_add</mat-icon>
+                <span>Add a text</span>
+            </button>
+        </div>
+        <div *ngIf="data.note.note !== ''" class="text_container">
+            <button *ngIf="data.note.note !== ''" mat-mini-fab class="button_random" color="secondary"
+                aria-label="Drop a new message" (click)="onNewFontClick()">
+                <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <p class="text" (click)="openTextDialog()" [style]="data.note.style">{{data.note.note}}</p>
+        </div>
+    </div>
+</mat-dialog-content>
+<mat-dialog-actions *ngIf="data.note.note !== '' || data.note.multimedia.type !== 'undefined'">
+    <button *ngIf="data.mode == 'add_note'" mat-flat-button class="button_drop" color="primary"
+        aria-label="Drop your message" (click)="onApplyClick()">
+        <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
+        Drop private note
+    </button>
+    <button *ngIf="data.mode == 'edit_note'" mat-flat-button class="button_drop" color="primary"
+        aria-label="Update your message" (click)="onApplyClick()">
+        <mat-icon class="material-symbols-outlined">check</mat-icon>
+        Apply changes
+    </button>
+</mat-dialog-actions>

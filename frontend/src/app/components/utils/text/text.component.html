@@ -1,12 +1,12 @@
 <mat-dialog-content>
     <div class="textarea_container">
-        <textarea cdkFocusInitial maxlength="512" type="text" [(ngModel)]="data.message.message" matInput>
+        <textarea cdkFocusInitial maxlength="512" type="text" [(ngModel)]="data.text" matInput>
         </textarea>
     </div>
 </mat-dialog-content>
 <mat-dialog-actions>
     <button mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">post_add</mat-icon>
-        Add text to message
+        Add text
     </button>
 </mat-dialog-actions>

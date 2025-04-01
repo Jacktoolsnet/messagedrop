@@ -149,13 +149,14 @@ export class EditMessageComponent implements OnInit {
     const dialogRef = this.textDialog.open(TextComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { message: this.data.message },
+      data: { text: this.data.message.message },
       hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => { });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      this.data.message.message = data.text;
     });
   }
 

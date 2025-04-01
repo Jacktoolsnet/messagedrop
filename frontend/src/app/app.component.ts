@@ -12,10 +12,10 @@ import { SwPush } from '@angular/service-worker';
 import { Subject } from 'rxjs';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
+import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
-import { NoteComponent } from './components/note/note.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
@@ -366,8 +366,16 @@ export class AppComponent implements OnInit {
       note: '',
       markerType: 'note',
       style: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: ''
+      }
     };
-    const dialogRef = this.noteDialog.open(NoteComponent, {
+    const dialogRef = this.noteDialog.open(EditNoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
