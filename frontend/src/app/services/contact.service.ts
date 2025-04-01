@@ -119,7 +119,6 @@ export class ContactService {
                       this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.userEncryptedMessage!)
                         .then((message: string) => {
                           if (message !== '') {
-                            console.log(JSON.parse(message));
                             contact.userMessage = JSON.parse(message);
                           } else {
                             let errorMessage: ShortMessage = {
@@ -286,7 +285,7 @@ export class ContactService {
         catchError(this.handleError)
       )
       .subscribe({
-        next: simpleStatusResponse => {
+        next: () => {
           contact.userMessage = shortMessage;
           contact.userEncryptedMessage = JSON.parse(envelope.userEncryptedMessage);
           contact.lastMessageFrom = 'user';
