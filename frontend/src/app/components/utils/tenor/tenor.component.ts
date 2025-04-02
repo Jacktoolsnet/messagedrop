@@ -6,7 +6,8 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatTabsModule } from '@angular/material/tabs';
+import { Multimedia } from '../../../interfaces/multimedia';
+import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { TenorService } from '../../../services/tenor.service';
 import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
@@ -14,14 +15,12 @@ import { EditMessageComponent } from '../../editmessage/edit-message.component';
   selector: 'app-multimedia',
   imports: [
     CommonModule,
-    FormsModule,
     MatButtonModule,
     MatDialogContent,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
-    MatInputModule,
-    MatTabsModule
+    MatInputModule
   ],
   templateUrl: './tenor.component.html',
   styleUrl: './tenor.component.css'
@@ -84,7 +83,16 @@ export class TenorComponent {
   }
 
   onApplyClick(result: any): void {
-    this.dialogRef.close(result);
+    let multimedia: Multimedia = {
+      type: MultimediaType.TENOR,
+      url: result.media_formats.gif.url,
+      sourceUrl: result.itemurl,
+      attribution: 'Powered by Tenor',
+      title: result.title,
+      description: result.content_description,
+      videoId: ''
+    };
+    this.dialogRef.close(multimedia);
   }
 
 }

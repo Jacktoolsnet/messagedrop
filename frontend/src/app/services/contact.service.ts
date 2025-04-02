@@ -90,7 +90,8 @@ export class ContactService {
                   title: '',
                   description: '',
                   url: '',
-                  sourceUrl: ''
+                  sourceUrl: '',
+                  videoId: ''
                 },
                 style: ''
               },
@@ -102,7 +103,8 @@ export class ContactService {
                   title: '',
                   description: '',
                   url: '',
-                  sourceUrl: ''
+                  sourceUrl: '',
+                  videoId: ''
                 },
                 style: ''
               },
@@ -129,7 +131,8 @@ export class ContactService {
                                 title: '',
                                 description: '',
                                 url: '',
-                                sourceUrl: ''
+                                sourceUrl: '',
+                                videoId: ''
                               },
                               style: ''
                             }
@@ -147,7 +150,8 @@ export class ContactService {
                         title: '',
                         description: '',
                         url: '',
-                        sourceUrl: ''
+                        sourceUrl: '',
+                        videoId: ''
                       },
                       style: ''
                     }
@@ -174,7 +178,8 @@ export class ContactService {
                                 title: '',
                                 description: '',
                                 url: '',
-                                sourceUrl: ''
+                                sourceUrl: '',
+                                videoId: ''
                               },
                               style: ''
                             }
@@ -192,7 +197,8 @@ export class ContactService {
                         title: '',
                         description: '',
                         url: '',
-                        sourceUrl: ''
+                        sourceUrl: '',
+                        videoId: ''
                       },
                       style: ''
                     }

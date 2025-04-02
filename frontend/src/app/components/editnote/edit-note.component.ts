@@ -8,17 +8,20 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Mode } from '../../interfaces/mode';
+import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { User } from '../../interfaces/user';
 import { StyleService } from '../../services/style.service';
-import { TenorComponent } from '../utils/tenor/tenor.component';
+import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 
 @Component({
   selector: 'app-note',
   imports: [
+    SelectMultimediaComponent,
     CommonModule,
     FormsModule,
     MatButtonModule,
@@ -34,9 +37,10 @@ import { TextComponent } from '../utils/text/text.component';
   styleUrl: './edit-note.component.css'
 })
 export class EditNoteComponent implements OnInit {
+  safeUrl: SafeResourceUrl | undefined;
 
   constructor(
-    private tenorDialog: MatDialog,
+    private sanitizer: DomSanitizer,
     private textDialog: MatDialog,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<EditNoteComponent>,
@@ -64,32 +68,13 @@ export class EditNoteComponent implements OnInit {
     this.snackBar.open(`This information is stored on your device and is only visible to you.`, 'OK', {});
   }
 
-  public openTenorDialog(): void {
-    const dialogRef = this.tenorDialog.open(TenorComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data) {
-        this.data.note.multimedia.type = MultimediaType.TENOR
-        this.data.note.multimedia.attribution = 'Powered by Tenor';
-        this.data.note.multimedia.title = data.title;
-        this.data.note.multimedia.description = data.content_description;
-        this.data.note.multimedia.url = data.media_formats.gif.url;
-        this.data.note.multimedia.sourceUrl = data.itemurl;
-      }
-    });
+  applyNewMultimedia(newMultimedia: Multimedia) {
+    this.data.note.multimedia = newMultimedia;
+    if (this.data.note.multimedia.type === MultimediaType.YOUTUBE) {
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://www.youtube.com/embed/${this.data.note.multimedia.videoId}`
+      );
+    }
   }
 
   public removeMultimedia(): void {

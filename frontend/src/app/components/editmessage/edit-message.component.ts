@@ -8,20 +8,23 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
+import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
-import { TenorComponent } from '../utils/tenor/tenor.component';
+import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 import { WaitComponent } from '../utils/wait/wait.component';
 
 @Component({
   selector: 'app-message',
   imports: [
+    SelectMultimediaComponent,
     CommonModule,
     FormsModule,
     MatButtonModule,
@@ -38,10 +41,11 @@ import { WaitComponent } from '../utils/wait/wait.component';
   styleUrl: './edit-message.component.css'
 })
 export class EditMessageComponent implements OnInit {
+  safeUrl: SafeResourceUrl | undefined;
 
   constructor(
+    private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
-    private tenorDialog: MatDialog,
     private textDialog: MatDialog,
     private messageService: MessageService,
     private openAiService: OpenAiService,
@@ -64,29 +68,35 @@ export class EditMessageComponent implements OnInit {
         if (this.messageService.detectPersonalInformation(this.data.message.message)) {
           this.snackBar.open(`My message will not be published because it appears to contain personal information.`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
         } else {
-          const waitDialogRef = this.waitDialog.open(WaitComponent, {
-            data: { title: 'AI Moderation', message: `My message is currently being reviewed by OpenAi's moderation AI.` },
-            closeOnNavigation: false,
-            hasBackdrop: false
-          });
-          this.openAiService.moderateMessage(this.data.message)
-            .subscribe({
-              next: openAiModerateResponse => {
-                if (!openAiModerateResponse.results[0].flagged) {
-                  this.data.message.userId = this.data.user.id;
-                  waitDialogRef.close();
-                  this.dialogRef.close(this.data);
-                } else {
-                  // abgelehnt
-                  waitDialogRef.close();
-                  this.snackBar.open(`My message will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
-                }
-              },
-              error: (err) => {
-                console.log(err);
-              },
-              complete: () => { }
+          if (this.data.message.message !== '') {
+            const waitDialogRef = this.waitDialog.open(WaitComponent, {
+              data: { title: 'AI Moderation', message: `My message is currently being reviewed by OpenAi's moderation AI.` },
+              closeOnNavigation: false,
+              hasBackdrop: false
             });
+            this.openAiService.moderateMessage(this.data.message)
+              .subscribe({
+                next: openAiModerateResponse => {
+                  if (!openAiModerateResponse.results[0].flagged) {
+                    this.data.message.userId = this.data.user.id;
+                    waitDialogRef.close();
+                    this.dialogRef.close(this.data);
+                  } else {
+                    // abgelehnt
+                    waitDialogRef.close();
+                    this.snackBar.open(`My message will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
+                  }
+                },
+                error: (err) => {
+                  console.log(err);
+                },
+                complete: () => { }
+              });
+          } else {
+            this.data.message.userId = this.data.user.id;
+            this.data.message.message = ''
+            this.dialogRef.close(this.data);
+          }
         }
         break;
       default:
@@ -108,32 +118,13 @@ export class EditMessageComponent implements OnInit {
     this.snackBar.open(`This information is stored on our server and is visible to everyone.`, 'OK', {});
   }
 
-  public openTenorDialog(): void {
-    const dialogRef = this.tenorDialog.open(TenorComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data) {
-        this.data.message.multimedia.type = MultimediaType.TENOR
-        this.data.message.multimedia.attribution = 'Powered by Tenor';
-        this.data.message.multimedia.title = data.title;
-        this.data.message.multimedia.description = data.content_description;
-        this.data.message.multimedia.url = data.media_formats.gif.url;
-        this.data.message.multimedia.sourceUrl = data.itemurl;
-      }
-    });
+  applyNewMultimedia(newMultimedia: Multimedia) {
+    this.data.message.multimedia = newMultimedia;
+    if (this.data.message.multimedia.type === MultimediaType.YOUTUBE) {
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://www.youtube.com/embed/${this.data.message.multimedia.videoId}`
+      );
+    }
   }
 
   public removeMultimedia(): void {

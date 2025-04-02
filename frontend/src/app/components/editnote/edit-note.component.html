@@ -5,17 +5,13 @@
 </button>
 <mat-dialog-content>
     <div class="content">
-        <div *ngIf="data.note.multimedia.url === ''" class="multimedia_container">
-            <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary">
-                <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
-                <span>Add a GIF from Tenor</span>
-            </button>
-        </div>
+        <app-select-multimedia *ngIf="data.note.multimedia.url === ''" class="multimedia_container"
+            (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
         <div *ngIf="data.note.multimedia.url !== ''" class="multimedia_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <img class="multimedia_image" [src]="data.note.multimedia.url" (click)="openTenorDialog()">
+            <img class="multimedia_image" [src]="data.note.multimedia.url">
         </div>
         <a class=" attribution_link" href="{{data.note.multimedia.sourceUrl}}"
             target="_blank">{{data.note.multimedia.attribution}}</a>

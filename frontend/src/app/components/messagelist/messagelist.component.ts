@@ -26,8 +26,8 @@ import { RelatedUserService } from '../../services/related-user.service';
 import { StyleService } from '../../services/style.service';
 import { TranslateService } from '../../services/translate.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
+import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { ShowmultimediaComponent } from '../showmultimedia/showmultimedia.component';
 import { BlockMessageComponent } from './block-message/block-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { EditUserComponent } from './edit-user/edit-user.component';
@@ -256,7 +256,8 @@ export class MessagelistComponent implements OnInit {
         sourceUrl: '',
         attribution: '',
         title: '',
-        description: ''
+        description: '',
+        videoId: ''
       }
     };
 
@@ -322,7 +323,8 @@ export class MessagelistComponent implements OnInit {
         sourceUrl: '',
         attribution: '',
         title: '',
-        description: ''
+        description: '',
+        videoId: ''
       }
     };
     const dialogRef = this.messageDialog.open(EditMessageComponent, {

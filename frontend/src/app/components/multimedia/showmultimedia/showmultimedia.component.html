@@ -1,0 +1,17 @@
+<div *ngIf="multimedia?.type === 'tenor'" class="multimedia_container">
+    <img class="multimedia_image" [src]="multimedia!.url">
+</div>
+<div *ngIf="multimedia?.type === 'youtube'" class="multimedia_container">
+    <div *ngIf="!multimedia?.sourceUrl?.includes('shorts/')" class="video_container">
+        <iframe [src]="safeUrl!" title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <div *ngIf="multimedia?.sourceUrl?.includes('shorts/')" class="shorts_container">
+        <iframe [src]="safeUrl!" title="YouTube video player" frameborder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+</div>
+<a *ngIf="multimedia?.attribution !== ''" class="attribution_link" href="{{multimedia?.sourceUrl}}"
+    target="_blank">{{multimedia?.attribution}}</a>

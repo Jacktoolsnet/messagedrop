@@ -1,0 +1,20 @@
+<div class="url-container">
+    <input type="text" [(ngModel)]="youtubeUrl" (input)="validateUrl()" placeholder="Enter YouTube embed URL" />
+    <button *ngIf="!urlInvalid" mat-icon-button (click)="onApplyClick()">
+        <mat-icon>check</mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="full-width">
+    <div *ngIf="videoId" class="content">
+        <div *ngIf="!youtubeUrl.includes('shorts/')" class="multimedia_container">
+            <iframe width="560" height="315" [src]="safeUrl" title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+        <div *ngIf="youtubeUrl.includes('shorts/')" class="multimedia_container">
+            <iframe width="315" height="560" [src]="safeUrl" title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        </div>
+    </div>
+</mat-dialog-content>

@@ -1,0 +1,14 @@
+.button_container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.button_default {
+    margin-top: 0.5rem;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 0.5rem;
+    width: 95%;
+    border-radius: 0.5rem;
+}

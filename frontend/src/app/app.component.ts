@@ -328,7 +328,8 @@ export class AppComponent implements OnInit {
         sourceUrl: '',
         attribution: '',
         title: '',
-        description: ''
+        description: '',
+        videoId: ''
       }
     };
 
@@ -372,7 +373,8 @@ export class AppComponent implements OnInit {
         sourceUrl: '',
         attribution: '',
         title: '',
-        description: ''
+        description: '',
+        videoId: ''
       }
     };
     const dialogRef = this.noteDialog.open(EditNoteComponent, {

@@ -183,7 +183,8 @@ export class SocketioService {
                           title: '',
                           description: '',
                           url: '',
-                          sourceUrl: ''
+                          sourceUrl: '',
+                          videoId: ''
                         },
                         style: ''
                       }
@@ -203,7 +204,8 @@ export class SocketioService {
                   title: '',
                   description: '',
                   url: '',
-                  sourceUrl: ''
+                  sourceUrl: '',
+                  videoId: ''
                 },
                 style: ''
               }

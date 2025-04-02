@@ -22,8 +22,8 @@ import { MapService } from '../../services/map.service';
 import { NoteService } from '../../services/note.service';
 import { StyleService } from '../../services/style.service';
 import { EditNoteComponent } from '../editnote/edit-note.component';
+import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { ShowmultimediaComponent } from '../showmultimedia/showmultimedia.component';
 import { DeleteNoteComponent } from './delete-note/delete-note.component';
 
 @Component({
@@ -150,7 +150,8 @@ export class NotelistComponent implements OnInit {
         sourceUrl: '',
         attribution: '',
         title: '',
-        description: ''
+        description: '',
+        videoId: ''
       }
     };
     const dialogRef = this.noteDialog.open(EditNoteComponent, {

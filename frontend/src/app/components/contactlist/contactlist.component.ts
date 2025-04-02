@@ -25,8 +25,8 @@ import { ConnectComponent } from '../contact/connect/connect.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 import { ContactEditMessageComponent } from '../contact/message/contact-edit-message.component';
 import { ContactProfileComponent } from '../contact/profile/profile.component';
+import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { ShowmultimediaComponent } from '../showmultimedia/showmultimedia.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({
@@ -92,7 +92,8 @@ export class ContactlistComponent implements OnInit {
           sourceUrl: '',
           attribution: '',
           title: '',
-          description: ''
+          description: '',
+          videoId: ''
         }
       },
       contactUserMessage: {
@@ -104,7 +105,8 @@ export class ContactlistComponent implements OnInit {
           sourceUrl: '',
           attribution: '',
           title: '',
-          description: ''
+          description: '',
+          videoId: ''
         }
       },
       lastMessageFrom: '',
@@ -152,7 +154,8 @@ export class ContactlistComponent implements OnInit {
           sourceUrl: '',
           attribution: '',
           title: '',
-          description: ''
+          description: '',
+          videoId: ''
         }
       },
       contactUserMessage: {
@@ -164,7 +167,8 @@ export class ContactlistComponent implements OnInit {
           sourceUrl: '',
           attribution: '',
           title: '',
-          description: ''
+          description: '',
+          videoId: ''
         }
       },
       lastMessageFrom: '',
@@ -277,7 +281,8 @@ export class ContactlistComponent implements OnInit {
         sourceUrl: '',
         attribution: '',
         title: '',
-        description: ''
+        description: '',
+        videoId: ''
       }
     };
     const dialogRef = this.contactMessageDialog.open(ContactEditMessageComponent, {
