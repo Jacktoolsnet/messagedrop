@@ -13,12 +13,12 @@
         (click)="addComment(messageService.getSelectedMessages().at(-1)!)">
         <mat-icon>add_comment</mat-icon>
     </button>
-    <div class="content" [ngClass]="{
+    <div [ngClass]="{
         'list': true, 
         'gradientAnimation': animation.cssclass === 'gradientAnimation',
         'radialAnimation': animation.cssclass === 'radialAnimation',
         'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
-        <div *ngIf="this.messageService.getSelectedMessages()?.length === 0">
+        <div *ngIf="this.messageService.getSelectedMessages()?.length === 0" class="content">
             <div class="item" *ngFor="let message of messages; index as i" (click)="goToMessageDetails(message)">
                 <mat-card>
                     <img *ngIf="user.base64Avatar != '' && user.id == message.userId" class="avatar"

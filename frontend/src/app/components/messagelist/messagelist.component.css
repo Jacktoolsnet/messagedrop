@@ -5,8 +5,40 @@
 }
 
 .content {
+  width: 100%;
+  column-count: 1;
+  column-gap: 10px;
   overflow-y: scroll;
   background-color: transparent;
+}
+
+.content div {
+  width: 90%;
+  display: inline-block;
+}
+
+@media (min-width: 1200px) {
+  .content {
+    padding: 1rem;
+    column-count: 2;
+    column-gap: 10px;
+  }
+}
+
+@media (min-width: 1600px) {
+  .content {
+    padding: 1rem;
+    column-count: 3;
+    column-gap: 10px;
+  }
+}
+
+@media (min-width: 1900px) {
+  .content {
+    padding: 1rem;
+    column-count: 4;
+    column-gap: 10px;
+  }
 }
 
 .list {
