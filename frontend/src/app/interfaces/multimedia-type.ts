@@ -3,7 +3,7 @@ export enum MultimediaType {
     TENOR = 'tenor',
     GIPHY = 'giphy',
     YOUTUBE = 'youtube',
-    VIMEO = 'vimeo',
+    INSTAGRAM = 'instagram',
     SOUNDCLOUD = 'soundcloud',
     SPOTIFY = 'spotify',
     TIKTOK = 'tiktok',

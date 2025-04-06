@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, SimpleChanges } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Multimedia } from '../../../interfaces/multimedia';
+import { MultimediaType } from '../../../interfaces/multimedia-type';
 
 @Component({
   selector: 'app-showmultimedia',
@@ -18,9 +19,17 @@ export class ShowmultimediaComponent {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['multimedia']) {
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.multimedia?.contentId}`
-      );
+      if (this.multimedia?.type === MultimediaType.YOUTUBE) {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.youtube.com/embed/${this.multimedia?.contentId}`
+        );
+      }
+      if (this.multimedia?.type === MultimediaType.INSTAGRAM) {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/p/${this.multimedia?.contentId}/embed`
+        );
+      }
     }
+    console.log(this.safeUrl);
   }
 }

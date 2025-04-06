@@ -40,7 +40,6 @@ export class InstagramComponent {
     const match = this.instagramUrl.match(regex);
     if (match) {
       this.instagramId = match[3];
-      console.log('Instagram ID:', this.instagramId);
       this.urlInvalid = false;
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
         `https://www.instagram.com/p/${this.instagramId}/embed`
@@ -54,7 +53,7 @@ export class InstagramComponent {
 
   onApplyClick(): void {
     let multimedia: Multimedia = {
-      type: MultimediaType.YOUTUBE,
+      type: MultimediaType.INSTAGRAM,
       url: '',
       contentId: null != this.instagramId ? this.instagramId : '',
       sourceUrl: this.instagramUrl,

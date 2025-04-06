@@ -125,6 +125,11 @@ export class EditMessageComponent implements OnInit {
         `https://www.youtube.com/embed/${this.data.message.multimedia.contentId}`
       );
     }
+    if (this.data.message.multimedia.type === MultimediaType.INSTAGRAM) {
+      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        `https://www.instagram.com/p/${this.data.message.multimedia?.contentId}/embed`
+      );
+    }
   }
 
   public removeMultimedia(): void {

@@ -53,6 +53,26 @@
     aspect-ratio: 9 / 16;
 }
 
+.instagram_container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    background-color: transparent;
+    aspect-ratio: 4 / 5;
+}
+
+.instagram_container iframe {
+    width: 95%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    aspect-ratio: 4 / 5;
+}
+
 .attribution_link {
     color: white;
     text-align: center;

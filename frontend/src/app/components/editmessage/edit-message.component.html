@@ -31,11 +31,13 @@
                     referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
         </div>
+        <div *ngIf="data.message.multimedia?.type === 'instagram'" class="multimedia_container">
+            <iframe [src]="safeUrl!" width="320" height="400" frameborder="0" allowtransparency="true"></iframe>
+        </div>
         <a *ngIf="data.message.multimedia.attribution !== ''" class=" attribution_link"
             href="{{data.message.multimedia.sourceUrl}}" target="_blank">{{data.message.multimedia.attribution}}</a>
         <div *ngIf="data.message.message === ''" class="multimedia_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
-                <mat-icon class="material-symbols-outlined">post_add</mat-icon>
                 <span>Add a text</span>
             </button>
         </div>

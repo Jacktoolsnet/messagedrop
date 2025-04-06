@@ -13,5 +13,8 @@
             referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
     </div>
 </div>
+<div *ngIf="multimedia?.type === 'instagram'" class="instagram_container">
+    <iframe [src]="safeUrl!" frameborder="0" allowtransparency="true"></iframe>
+</div>
 <a *ngIf="multimedia?.attribution !== ''" class="attribution_link" href="{{multimedia?.sourceUrl}}"
     target="_blank">{{multimedia?.attribution}}</a>
