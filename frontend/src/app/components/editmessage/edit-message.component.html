@@ -32,6 +32,9 @@
             </div>
         </div>
         <div *ngIf="data.message.multimedia?.type === 'instagram'" class="multimedia_container">
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                <mat-icon>delete</mat-icon>
+            </button>
             <iframe [src]="safeUrl!" width="320" height="400" frameborder="0" allowtransparency="true"></iframe>
         </div>
         <a *ngIf="data.message.multimedia.attribution !== ''" class=" attribution_link"

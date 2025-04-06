@@ -50,6 +50,7 @@ export class EditNoteComponent implements OnInit {
 
   ngOnInit(): void {
     this.data.note.style = this.data.user.defaultStyle
+    this.applyNewMultimedia(this.data.note.multimedia);
   }
 
   onApplyClick(): void {
@@ -74,6 +75,17 @@ export class EditNoteComponent implements OnInit {
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
         `https://www.youtube.com/embed/${this.data.note.multimedia.contentId}`
       );
+    }
+    if (this.data.note.multimedia.type === MultimediaType.INSTAGRAM) {
+      if (this.data.note.multimedia.sourceUrl.includes('/reel/')) {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/reel/${this.data.note.multimedia?.contentId}/embed`
+        );
+      } else {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/p/${this.data.note.multimedia?.contentId}/embed`
+        );
+      }
     }
   }
 

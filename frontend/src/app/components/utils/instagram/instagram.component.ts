@@ -36,14 +36,20 @@ export class InstagramComponent {
   ) { }
 
   validateUrl() {
-    const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([a-zA-Z0-9_-]+)(\/.*)?$/;
+    const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/(p|reel)\/([a-zA-Z0-9_-]+)(\/.*)?$/;
     const match = this.instagramUrl.match(regex);
     if (match) {
-      this.instagramId = match[3];
+      this.instagramId = match[4];
       this.urlInvalid = false;
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.instagram.com/p/${this.instagramId}/embed`
-      );
+      if (this.instagramUrl.includes('/reel/')) {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/reel/${this.instagramId}/embed`
+        );
+      } else {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/p/${this.instagramId}/embed`
+        );
+      }
     } else {
       this.instagramId = null;
       this.safeUrl = null;

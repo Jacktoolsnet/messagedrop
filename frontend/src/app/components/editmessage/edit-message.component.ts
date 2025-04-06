@@ -57,6 +57,7 @@ export class EditMessageComponent implements OnInit {
 
   ngOnInit(): void {
     this.data.message.style = this.data.user.defaultStyle;
+    this.applyNewMultimedia(this.data.message.multimedia);
   }
 
   onApplyClick(): void {
@@ -126,9 +127,15 @@ export class EditMessageComponent implements OnInit {
       );
     }
     if (this.data.message.multimedia.type === MultimediaType.INSTAGRAM) {
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.instagram.com/p/${this.data.message.multimedia?.contentId}/embed`
-      );
+      if (this.data.message.multimedia.sourceUrl.includes('/reel/')) {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/reel/${this.data.message.multimedia?.contentId}/embed`
+        );
+      } else {
+        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `https://www.instagram.com/p/${this.data.message.multimedia?.contentId}/embed`
+        );
+      }
     }
   }
 

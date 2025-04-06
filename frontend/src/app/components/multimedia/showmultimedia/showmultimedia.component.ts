@@ -25,9 +25,15 @@ export class ShowmultimediaComponent {
         );
       }
       if (this.multimedia?.type === MultimediaType.INSTAGRAM) {
-        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://www.instagram.com/p/${this.multimedia?.contentId}/embed`
-        );
+        if (this.multimedia.sourceUrl.includes('/reel/')) {
+          this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `https://www.instagram.com/reel/${this.multimedia?.contentId}/embed`
+          );
+        } else {
+          this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+            `https://www.instagram.com/p/${this.multimedia?.contentId}/embed`
+          );
+        }
       }
     }
     console.log(this.safeUrl);
