@@ -19,7 +19,7 @@ export class ShowmultimediaComponent {
   ngOnChanges(changes: SimpleChanges) {
     if (changes['multimedia']) {
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.multimedia?.videoId}`
+        `https://www.youtube.com/embed/${this.multimedia?.contentId}`
       );
     }
   }

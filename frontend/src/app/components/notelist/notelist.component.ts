@@ -151,7 +151,7 @@ export class NotelistComponent implements OnInit {
         attribution: '',
         title: '',
         description: '',
-        videoId: ''
+        contentId: ''
       }
     };
     const dialogRef = this.noteDialog.open(EditNoteComponent, {

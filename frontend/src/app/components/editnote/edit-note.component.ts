@@ -72,7 +72,7 @@ export class EditNoteComponent implements OnInit {
     this.data.note.multimedia = newMultimedia;
     if (this.data.note.multimedia.type === MultimediaType.YOUTUBE) {
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.data.note.multimedia.videoId}`
+        `https://www.youtube.com/embed/${this.data.note.multimedia.contentId}`
       );
     }
   }

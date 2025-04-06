@@ -11,7 +11,7 @@ import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
-  selector: 'app-youtube',
+  selector: 'app-instagram',
   imports: [
     CommonModule,
     MatDialogContent,
@@ -20,12 +20,12 @@ import { EditMessageComponent } from '../../editmessage/edit-message.component';
     MatFormFieldModule,
     MatInputModule
   ],
-  templateUrl: './youtube.component.html',
-  styleUrl: './youtube.component.css'
+  templateUrl: './instagram.component.html',
+  styleUrl: './instagram.component.css'
 })
-export class YoutubeComponent {
-  youtubeUrl: string = '';
-  videoId: string | null = null;
+export class InstagramComponent {
+  instagramUrl: string = '';
+  instagramId: string | null = null;
   safeUrl: SafeResourceUrl | null = null;
   urlInvalid: boolean = true;
 
@@ -36,16 +36,17 @@ export class YoutubeComponent {
   ) { }
 
   validateUrl() {
-    const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const match = this.youtubeUrl.match(regex);
+    const regex = /^(https?:\/\/)?(www\.)?instagram\.com\/p\/([a-zA-Z0-9_-]+)(\/.*)?$/;
+    const match = this.instagramUrl.match(regex);
     if (match) {
-      this.videoId = match[5];
+      this.instagramId = match[3];
+      console.log('Instagram ID:', this.instagramId);
       this.urlInvalid = false;
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.videoId}`
+        `https://www.instagram.com/p/${this.instagramId}/embed`
       );
     } else {
-      this.videoId = null;
+      this.instagramId = null;
       this.safeUrl = null;
       this.urlInvalid = true;
     }
@@ -55,12 +56,13 @@ export class YoutubeComponent {
     let multimedia: Multimedia = {
       type: MultimediaType.YOUTUBE,
       url: '',
-      contentId: null != this.videoId ? this.videoId : '',
-      sourceUrl: this.youtubeUrl,
-      attribution: 'Powered by YouTube',
+      contentId: null != this.instagramId ? this.instagramId : '',
+      sourceUrl: this.instagramUrl,
+      attribution: 'Powered by Instagram',
       title: '',
       description: ''
     }
     this.dialogRef.close(multimedia);
   }
+
 }

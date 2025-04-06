@@ -122,7 +122,7 @@ export class EditMessageComponent implements OnInit {
     this.data.message.multimedia = newMultimedia;
     if (this.data.message.multimedia.type === MultimediaType.YOUTUBE) {
       this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.data.message.multimedia.videoId}`
+        `https://www.youtube.com/embed/${this.data.message.multimedia.contentId}`
       );
     }
   }

@@ -91,7 +91,7 @@ export class ContactService {
                   description: '',
                   url: '',
                   sourceUrl: '',
-                  videoId: ''
+                  contentId: ''
                 },
                 style: ''
               },
@@ -104,7 +104,7 @@ export class ContactService {
                   description: '',
                   url: '',
                   sourceUrl: '',
-                  videoId: ''
+                  contentId: ''
                 },
                 style: ''
               },
@@ -132,7 +132,7 @@ export class ContactService {
                                 description: '',
                                 url: '',
                                 sourceUrl: '',
-                                videoId: ''
+                                contentId: ''
                               },
                               style: ''
                             }
@@ -151,7 +151,7 @@ export class ContactService {
                         description: '',
                         url: '',
                         sourceUrl: '',
-                        videoId: ''
+                        contentId: ''
                       },
                       style: ''
                     }
@@ -179,7 +179,7 @@ export class ContactService {
                                 description: '',
                                 url: '',
                                 sourceUrl: '',
-                                videoId: ''
+                                contentId: ''
                               },
                               style: ''
                             }
@@ -198,7 +198,7 @@ export class ContactService {
                         description: '',
                         url: '',
                         sourceUrl: '',
-                        videoId: ''
+                        contentId: ''
                       },
                       style: ''
                     }

@@ -257,7 +257,7 @@ export class MessagelistComponent implements OnInit {
         attribution: '',
         title: '',
         description: '',
-        videoId: ''
+        contentId: ''
       }
     };
 
@@ -324,7 +324,7 @@ export class MessagelistComponent implements OnInit {
         attribution: '',
         title: '',
         description: '',
-        videoId: ''
+        contentId: ''
       }
     };
     const dialogRef = this.messageDialog.open(EditMessageComponent, {

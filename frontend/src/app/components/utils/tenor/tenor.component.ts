@@ -90,7 +90,7 @@ export class TenorComponent {
       attribution: 'Powered by Tenor',
       title: result.title,
       description: result.content_description,
-      videoId: ''
+      contentId: ''
     };
     this.dialogRef.close(multimedia);
   }

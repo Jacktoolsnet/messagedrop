@@ -93,7 +93,7 @@ export class ContactlistComponent implements OnInit {
           attribution: '',
           title: '',
           description: '',
-          videoId: ''
+          contentId: ''
         }
       },
       contactUserMessage: {
@@ -106,7 +106,7 @@ export class ContactlistComponent implements OnInit {
           attribution: '',
           title: '',
           description: '',
-          videoId: ''
+          contentId: ''
         }
       },
       lastMessageFrom: '',
@@ -155,7 +155,7 @@ export class ContactlistComponent implements OnInit {
           attribution: '',
           title: '',
           description: '',
-          videoId: ''
+          contentId: ''
         }
       },
       contactUserMessage: {
@@ -168,7 +168,7 @@ export class ContactlistComponent implements OnInit {
           attribution: '',
           title: '',
           description: '',
-          videoId: ''
+          contentId: ''
         }
       },
       lastMessageFrom: '',
@@ -282,7 +282,7 @@ export class ContactlistComponent implements OnInit {
         attribution: '',
         title: '',
         description: '',
-        videoId: ''
+        contentId: ''
       }
     };
     const dialogRef = this.contactMessageDialog.open(ContactEditMessageComponent, {
