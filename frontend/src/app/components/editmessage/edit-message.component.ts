@@ -8,7 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
@@ -42,6 +42,7 @@ import { WaitComponent } from '../utils/wait/wait.component';
 })
 export class EditMessageComponent implements OnInit {
   safeUrl: SafeResourceUrl | undefined;
+  safeHtml: SafeHtml | undefined;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -122,9 +123,7 @@ export class EditMessageComponent implements OnInit {
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.message.multimedia = newMultimedia;
     if (this.data.message.multimedia.type === MultimediaType.YOUTUBE) {
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.data.message.multimedia.contentId}`
-      );
+      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.message.multimedia?.oembed?.html ? this.data.message.multimedia?.oembed.html : '');
     }
     if (this.data.message.multimedia.type === MultimediaType.INSTAGRAM) {
       if (this.data.message.multimedia.sourceUrl.includes('/reel/')) {

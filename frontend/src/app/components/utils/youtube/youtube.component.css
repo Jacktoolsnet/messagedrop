@@ -38,16 +38,8 @@
     height: 100%;
 }
 
-.content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-}
-
 .multimedia_container {
-    width: 95%;
+    margin: 1rem;
     padding: 1rem;
     display: flex;
     justify-content: center;
@@ -55,5 +47,14 @@
     position: relative;
     background-color: gray;
     color: white;
-    border-radius: 1rem;
+    border-radius: 0.5rem;
+}
+
+.multimedia_container_iframe {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    aspect-ratio: 16 / 9;
 }

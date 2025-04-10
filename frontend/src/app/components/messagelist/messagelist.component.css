@@ -9,6 +9,7 @@
   column-gap: 10px;
   overflow-y: scroll;
   background-color: transparent;
+  padding: 0.5rem;
 }
 
 .content div {
@@ -124,10 +125,11 @@ button {
 }
 
 .item {
-  padding: 0.25rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
   margin: 1rem;
   border-radius: 0.75rem;
-  background-color: #f8f8f8e9;
+  border-color: #f8f8f8e9;
 }
 
 .center {

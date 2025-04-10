@@ -1,4 +1,5 @@
 import { MultimediaType } from "./multimedia-type";
+import { Oembed } from "./oembed";
 
 export interface Multimedia {
     type: MultimediaType,
@@ -8,4 +9,5 @@ export interface Multimedia {
     attribution: string,
     title: string,
     description: string,
+    oembed?: Oembed
 }

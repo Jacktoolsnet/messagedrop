@@ -1,18 +1,16 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
-import { environment } from '../../environments/environment';
-import { Message } from '../interfaces/message';
+import { Oembed } from '../interfaces/oembed';
 
 @Injectable({
   providedIn: 'root'
 })
-export class OpenAiService {
+export class OembedService {
 
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      Authorization: `Bearer ${environment.apiToken}`
+      'Content-Type': 'application/json'
     })
   };
 
@@ -24,13 +22,11 @@ export class OpenAiService {
     return throwError(() => error);
   }
 
-  public moderateMessage(message: Message): Observable<any> {
-    let body = {
-      'message': message.message
-    };
-    return this.http.post<any>(`${environment.apiUrl}/openai/moderate`, body, this.httpOptions)
+  public getEmbedCode(provider_url: string, sourceUrl: string): Observable<Oembed> {
+    return this.http.get<Oembed>(`${provider_url}?url=${sourceUrl}&format=json`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
   }
+
 }

@@ -5,9 +5,11 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
+import { Oembed } from '../../../interfaces/oembed';
+import { OembedService } from '../../../services/oembed.service';
 import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
@@ -26,11 +28,13 @@ import { EditMessageComponent } from '../../editmessage/edit-message.component';
 export class YoutubeComponent {
   youtubeUrl: string = '';
   videoId: string | null = null;
-  safeUrl: SafeResourceUrl | null = null;
+  oembed: Oembed | undefined;
+  safeHtml: SafeHtml | undefined;
   urlInvalid: boolean = true;
 
   constructor(
     public dialogRef: MatDialogRef<EditMessageComponent>,
+    private oembedService: OembedService,
     private sanitizer: DomSanitizer,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) { }
@@ -39,14 +43,23 @@ export class YoutubeComponent {
     const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
     const match = this.youtubeUrl.match(regex);
     if (match) {
+      this.oembedService.getEmbedCode('https://www.youtube.com/oembed', this.youtubeUrl)
+        .subscribe({
+          next: oembedCode => {
+            this.oembed = oembedCode;
+            this.oembed.html = this.oembed.html?.replace(/width="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');
+            this.oembed.html = this.oembed.html?.replace(/height="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');
+            this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed.html ? this.oembed.html : '');
+          },
+          error: (err) => {
+          },
+          complete: () => { }
+        });
       this.videoId = match[5];
       this.urlInvalid = false;
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.videoId}`
-      );
     } else {
       this.videoId = null;
-      this.safeUrl = null;
+      this.safeHtml = undefined;
       this.urlInvalid = true;
     }
   }
@@ -59,7 +72,8 @@ export class YoutubeComponent {
       sourceUrl: this.youtubeUrl,
       attribution: 'Powered by YouTube',
       title: '',
-      description: ''
+      description: '',
+      oembed: this.oembed
     }
     this.dialogRef.close(multimedia);
   }
