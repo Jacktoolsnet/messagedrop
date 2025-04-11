@@ -16,8 +16,9 @@
             </button>
             <img class="multimedia_image" [src]="data.message.multimedia.url">
         </div>
-        <div *ngIf="data.message.multimedia.type === 'youtube' && safeHtml != ''" class="multimedia_container"
-            [innerHTML]="safeHtml">
+        <div class="multimedia_container">
+            <div *ngIf="data.message.multimedia.type === 'youtube' && safeHtml != ''" [innerHTML]="safeHtml"
+                class="multimedia_container_iframe"></div>
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>

@@ -40,22 +40,38 @@ export class YoutubeComponent {
   ) { }
 
   validateUrl() {
-    const regex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const match = this.youtubeUrl.match(regex);
-    if (match) {
-      this.oembedService.getEmbedCode('https://www.youtube.com/oembed', this.youtubeUrl)
+    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
+    const youtubeMatch = this.youtubeUrl.match(youtubeRegex);
+    const tiktokRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
+    const tiktokMatch = this.youtubeUrl.match(tiktokRegex);
+    if (youtubeMatch) {
+      this.oembedService.getYoutubeEmbedCode(this.youtubeUrl)
         .subscribe({
           next: oembedCode => {
             this.oembed = oembedCode;
-            this.oembed.html = this.oembed.html?.replace(/width="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');
-            this.oembed.html = this.oembed.html?.replace(/height="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');
             this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed.html ? this.oembed.html : '');
           },
           error: (err) => {
           },
           complete: () => { }
         });
-      this.videoId = match[5];
+      this.videoId = youtubeMatch[5];
+      this.urlInvalid = false;
+    } else if (tiktokMatch) {
+      this.oembedService.getTikTokEmbedCode(this.youtubeUrl)
+      this.videoId = tiktokMatch[3];
+      let oembedHtml = this.oembedService.getTikTokEmbedCode(this.videoId);
+      this.oembed = {
+        html: oembedHtml,
+        width: 0,
+        height: 0,
+        provider_name: 'TikTok',
+        provider_url: 'https://www.tiktok.com/',
+        type: 'rich',
+        version: '1.0'
+      };
+      console.log(this.oembed)
+      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed.html ? this.oembed.html : '');
       this.urlInvalid = false;
     } else {
       this.videoId = null;
