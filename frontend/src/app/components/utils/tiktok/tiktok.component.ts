@@ -13,7 +13,7 @@ import { OembedService } from '../../../services/oembed.service';
 import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
-  selector: 'app-youtube',
+  selector: 'app-instagram',
   imports: [
     CommonModule,
     MatDialogContent,
@@ -22,11 +22,11 @@ import { EditMessageComponent } from '../../editmessage/edit-message.component';
     MatFormFieldModule,
     MatInputModule
   ],
-  templateUrl: './youtube.component.html',
-  styleUrl: './youtube.component.css'
+  templateUrl: './tiktok.component.html',
+  styleUrl: './tiktok.component.css'
 })
-export class YoutubeComponent {
-  youtubeUrl: string = '';
+export class TiktokComponent {
+  tiktokUrl: string = '';
   videoId: string | null = null;
   oembed: Oembed | undefined;
   safeHtml: SafeHtml | undefined;
@@ -40,20 +40,22 @@ export class YoutubeComponent {
   ) { }
 
   validateUrl() {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const youtubeMatch = this.youtubeUrl.match(youtubeRegex);
-    if (youtubeMatch) {
-      this.oembedService.getYoutubeEmbedCode(this.youtubeUrl)
-        .subscribe({
-          next: oembedCode => {
-            this.oembed = oembedCode;
-            this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed.html ? this.oembed.html : '');
-          },
-          error: (err) => {
-          },
-          complete: () => { }
-        });
-      this.videoId = youtubeMatch[5];
+    const tiktokRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
+    const tiktokMatch = this.tiktokUrl.match(tiktokRegex);
+    if (tiktokMatch) {
+      this.oembedService.getTikTokEmbedCode(this.tiktokUrl)
+      this.videoId = tiktokMatch[3];
+      let oembedHtml = this.oembedService.getTikTokEmbedCode(this.videoId);
+      this.oembed = {
+        html: oembedHtml,
+        width: 0,
+        height: 0,
+        provider_name: 'TikTok',
+        provider_url: 'https://www.tiktok.com/',
+        type: 'rich',
+        version: '1.0'
+      };
+      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed.html ? this.oembed.html : '');
       this.urlInvalid = false;
     } else {
       this.videoId = null;
@@ -64,15 +66,16 @@ export class YoutubeComponent {
 
   onApplyClick(): void {
     let multimedia: Multimedia = {
-      type: MultimediaType.YOUTUBE,
+      type: MultimediaType.TIKTOK,
       url: '',
       contentId: null != this.videoId ? this.videoId : '',
-      sourceUrl: this.youtubeUrl,
-      attribution: 'Powered by YouTube',
+      sourceUrl: this.tiktokUrl,
+      attribution: 'Powered by TikTok',
       title: '',
       description: '',
       oembed: this.oembed
     }
     this.dialogRef.close(multimedia);
   }
+
 }

@@ -23,16 +23,8 @@ export class ShowmultimediaComponent {
       if (this.multimedia?.type === MultimediaType.YOUTUBE) {
         this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ? this.multimedia?.oembed.html : '');
       }
-      if (this.multimedia?.type === MultimediaType.INSTAGRAM) {
-        if (this.multimedia.sourceUrl.includes('/reel/')) {
-          this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-            `https://www.instagram.com/reel/${this.multimedia?.contentId}/embed`
-          );
-        } else {
-          this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-            `https://www.instagram.com/p/${this.multimedia?.contentId}/embed`
-          );
-        }
+      if (this.multimedia?.type === MultimediaType.TIKTOK) {
+        this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ? this.multimedia?.oembed.html : '');
       }
     }
   }

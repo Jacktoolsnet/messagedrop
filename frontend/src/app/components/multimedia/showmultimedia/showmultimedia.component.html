@@ -1,10 +1,7 @@
 <div *ngIf="multimedia?.type === 'tenor'" class="multimedia_container">
     <img class="multimedia_image" [src]="multimedia!.url">
 </div>
-<div *ngIf="multimedia?.type === 'youtube' && safeHtml != ''" class="video_container" [innerHTML]="safeHtml">
-</div>
-<div *ngIf="multimedia?.type === 'instagram'" class="instagram_container">
-    <iframe [src]="safeUrl!" frameborder="0" allowtransparency="true"></iframe>
-</div>
+<div *ngIf="multimedia?.type === 'youtube' && safeHtml != ''" class="video_container" [innerHTML]="safeHtml"></div>
+<div *ngIf="multimedia?.type === 'tiktok' && safeHtml != ''" class="video_container" [innerHTML]="safeHtml"></div>
 <a *ngIf="multimedia?.attribution !== ''" class="attribution_link" href="{{multimedia?.sourceUrl}}"
     target="_blank">{{multimedia?.attribution}}</a>

@@ -1,0 +1,11 @@
+<div class="url-container">
+    <input type="text" [(ngModel)]="tiktokUrl" (input)="validateUrl()" placeholder="Enter YouTube embed URL" />
+    <button *ngIf="!urlInvalid" mat-icon-button (click)="onApplyClick()">
+        <mat-icon>check</mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="full-width">
+    <div *ngIf="safeHtml != undefined" class="multimedia_container">
+        <div class="multimedia_container_iframe" [innerHTML]="safeHtml"></div>
+    </div>
+</mat-dialog-content>

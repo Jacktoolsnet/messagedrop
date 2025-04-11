@@ -2,8 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Multimedia } from '../../../interfaces/multimedia';
-import { InstagramComponent } from '../../utils/instagram/instagram.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
+import { TiktokComponent } from '../../utils/tiktok/tiktok.component';
 import { YoutubeComponent } from '../../utils/youtube/youtube.component';
 
 @Component({
@@ -20,7 +20,7 @@ export class SelectMultimediaComponent {
   constructor(
     private tenorDialog: MatDialog,
     private youtubeDialog: MatDialog,
-    private instagramDialog: MatDialog,
+    private tiktokDialog: MatDialog,
     public dialogRef: MatDialogRef<SelectMultimediaComponent>,
   ) { }
 
@@ -70,8 +70,8 @@ export class SelectMultimediaComponent {
     });
   }
 
-  public openInstagramDialog(): void {
-    const dialogRef = this.instagramDialog.open(InstagramComponent, {
+  public openTikTokDialog(): void {
+    const dialogRef = this.tiktokDialog.open(TiktokComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
