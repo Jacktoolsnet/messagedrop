@@ -76,7 +76,7 @@ h4 {
     align-items: center;
 }
 
-.multimedia_container {
+.oembed_container {
     width: 75%;
     margin: 1rem;
     padding: 1rem;
@@ -89,7 +89,7 @@ h4 {
     border-radius: 0.25rem;
 }
 
-.multimedia_container_iframe {
+.oembed_container_iframe {
     width: 100%;
     display: flex;
     justify-content: center;

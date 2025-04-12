@@ -8,7 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
@@ -41,8 +41,8 @@ import { WaitComponent } from '../utils/wait/wait.component';
   styleUrl: './edit-message.component.css'
 })
 export class EditMessageComponent implements OnInit {
-  safeUrl: SafeResourceUrl | undefined;
-  safeHtml: SafeHtml | undefined;
+  safeHtml: SafeHtml | undefined = undefined;
+  showSaveHtml: boolean = false;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -122,12 +122,8 @@ export class EditMessageComponent implements OnInit {
 
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.message.multimedia = newMultimedia;
-    if (this.data.message.multimedia.type === MultimediaType.YOUTUBE) {
-      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.message.multimedia?.oembed?.html ? this.data.message.multimedia?.oembed.html : '');
-    }
-    if (this.data.message.multimedia.type === MultimediaType.TIKTOK) {
-      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.message.multimedia?.oembed?.html ? this.data.message.multimedia?.oembed.html : '');
-    }
+    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.message.multimedia?.oembed?.html ? this.data.message.multimedia?.oembed.html : '');
+    this.showSaveHtml = true;
   }
 
   public removeMultimedia(): void {
@@ -137,6 +133,8 @@ export class EditMessageComponent implements OnInit {
     this.data.message.multimedia.description = '';
     this.data.message.multimedia.url = '';
     this.data.message.multimedia.sourceUrl = '';
+    this.safeHtml = undefined;
+    this.showSaveHtml = false;
   }
 
   public openTextDialog(): void {
