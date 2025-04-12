@@ -15,6 +15,7 @@ const contact = require('./routes/contact');
 const message = require('./routes/message');
 const place = require('./routes/place');
 const translate = require('./routes/translate');
+const utils = require('./routes/utils');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
 const helmet = require('helmet');
@@ -118,6 +119,7 @@ app.use('/connect', connect);
 app.use('/contact', contact);
 app.use('/message', message);
 app.use('/translate', translateLimit, translate);
+app.use('/utils', utils);
 app.use('/place', place);
 
 // The last route

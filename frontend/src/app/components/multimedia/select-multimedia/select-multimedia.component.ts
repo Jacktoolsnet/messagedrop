@@ -2,6 +2,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Multimedia } from '../../../interfaces/multimedia';
+import { PinterestComponent } from '../../utils/pinterest/pinterest.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
 import { TiktokComponent } from '../../utils/tiktok/tiktok.component';
 import { YoutubeComponent } from '../../utils/youtube/youtube.component';
@@ -21,6 +22,7 @@ export class SelectMultimediaComponent {
     private tenorDialog: MatDialog,
     private youtubeDialog: MatDialog,
     private tiktokDialog: MatDialog,
+    private pinterestDialog: MatDialog,
     public dialogRef: MatDialogRef<SelectMultimediaComponent>,
   ) { }
 
@@ -72,6 +74,29 @@ export class SelectMultimediaComponent {
 
   public openTikTokDialog(): void {
     const dialogRef = this.tiktokDialog.open(TiktokComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
+      if (undefined !== multimedia) {
+        this.newMultimedia.emit(multimedia);
+      }
+    });
+  }
+
+  public openPinterestDialog(): void {
+    const dialogRef = this.pinterestDialog.open(PinterestComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},

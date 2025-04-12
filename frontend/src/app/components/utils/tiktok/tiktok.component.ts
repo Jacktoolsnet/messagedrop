@@ -42,7 +42,10 @@ export class TiktokComponent {
   validateUrl() {
     const tiktokRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
     const tiktokMatch = this.tiktokUrl.match(tiktokRegex);
-    if (tiktokMatch) {
+    const tiktokVmRegex = /^(https?:\/\/)?vm\.tiktok\.com\/([a-zA-Z0-9]+)\/?/;
+    const tiktokVmMatch = this.tiktokUrl.match(tiktokVmRegex);
+
+    if (tiktokMatch && tiktokMatch[3]) {
       this.oembedService.getTikTokEmbedCode(this.tiktokUrl)
       this.videoId = tiktokMatch[3];
       let oembedHtml = this.oembedService.getTikTokEmbedCode(this.videoId);
@@ -57,6 +60,21 @@ export class TiktokComponent {
       };
       this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed.html ? this.oembed.html : '');
       this.urlInvalid = false;
+    } else if (tiktokVmMatch && tiktokVmMatch[2]) {
+      this.oembedService.getTikTokVmEmbedCode(this.tiktokUrl)
+        .subscribe({
+          next: response => {
+            const regex = /<blockquote class="tiktok-embed" cite="([^"]+)"/;
+            const match = response.result.html?.match(regex);
+            if (match && match[1]) {
+              this.tiktokUrl = match[1];
+              this.validateUrl();
+            }
+          },
+          error: (err) => {
+          },
+          complete: () => { }
+        });
     } else {
       this.videoId = null;
       this.safeHtml = undefined;

@@ -26,6 +26,9 @@ export class ShowmultimediaComponent {
       if (this.multimedia?.type === MultimediaType.TIKTOK) {
         this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ? this.multimedia?.oembed.html : '');
       }
+      if (this.multimedia?.type === MultimediaType.PINTEREST) {
+        this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ? this.multimedia?.oembed.html : '');
+      }
     }
   }
 }

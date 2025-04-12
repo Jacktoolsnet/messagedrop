@@ -13,7 +13,7 @@ import { OembedService } from '../../../services/oembed.service';
 import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
-  selector: 'app-youtube',
+  selector: 'app-pinterest',
   imports: [
     CommonModule,
     MatDialogContent,
@@ -22,11 +22,11 @@ import { EditMessageComponent } from '../../editmessage/edit-message.component';
     MatFormFieldModule,
     MatInputModule
   ],
-  templateUrl: './youtube.component.html',
-  styleUrl: './youtube.component.css'
+  templateUrl: './pinterest.component.html',
+  styleUrl: './pinterest.component.css'
 })
-export class YoutubeComponent {
-  youtubeUrl: string = '';
+export class PinterestComponent {
+  pinterestUrl: string = '';
   videoId: string | null = null;
   oembed: Oembed | undefined;
   safeHtml: SafeHtml | undefined;
@@ -40,21 +40,53 @@ export class YoutubeComponent {
   ) { }
 
   validateUrl() {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const youtubeMatch = this.youtubeUrl.match(youtubeRegex);
-    if (youtubeMatch && youtubeMatch[5]) {
-      this.oembedService.getYoutubeEmbedCode(this.youtubeUrl)
+    console.log(this.pinterestUrl);
+    const pinterestRegex = /^(https?:\/\/)?(www\.)?pinterest\.[a-z]{2,3}\/pin\/(\d+)\/?$/;
+    const pinterestMatch = this.pinterestUrl.match(pinterestRegex);
+    const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;;
+    const pinterestShortMatch = this.pinterestUrl.match(pinterestShortRegex);
+    if (pinterestMatch && pinterestMatch[3]) {
+      this.oembedService.getPinterestEmbedCode(this.pinterestUrl)
         .subscribe({
           next: response => {
+            console.log(response);
             this.oembed = response.result;
+            console.log(this.oembed);
             this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed!.html ? this.oembed!.html : '');
           },
           error: (err) => {
+            console.error(err);
+            this.urlInvalid = true;
           },
           complete: () => { }
         });
-      this.videoId = youtubeMatch[5];
+      this.videoId = pinterestMatch[3];
       this.urlInvalid = false;
+    } else if (pinterestShortMatch) {
+      this.oembedService.resolveRedirectUrl(this.pinterestUrl)
+        .subscribe({
+          next: firstResponse => {
+            console.log(firstResponse.result)
+            this.oembedService.resolveRedirectUrl(firstResponse.result)
+              .subscribe({
+                next: finalResponse => {
+                  const regex = /^(https?:\/\/)?(www\.)?pinterest\.[a-z]{2,3}\/pin\/\d+/;
+                  const match = finalResponse.result.match(regex);
+                  if (match) {
+                    console.log(match[0].replace(/pinterest\.[a-z]{2,3}/, 'pinterest.com'))
+                    if (match[0] != this.pinterestUrl) {
+                      this.pinterestUrl = match[0].replace(/pinterest\.[a-z]{2,3}/, 'pinterest.com');
+                      this.validateUrl();
+                    }
+                  }
+                },
+                error: (err) => { },
+                complete: () => { }
+              });
+          },
+          error: (err) => { },
+          complete: () => { }
+        });
     } else {
       this.videoId = null;
       this.safeHtml = undefined;
@@ -64,11 +96,11 @@ export class YoutubeComponent {
 
   onApplyClick(): void {
     let multimedia: Multimedia = {
-      type: MultimediaType.YOUTUBE,
+      type: MultimediaType.PINTEREST,
       url: '',
       contentId: null != this.videoId ? this.videoId : '',
-      sourceUrl: this.youtubeUrl,
-      attribution: 'Powered by YouTube',
+      sourceUrl: this.pinterestUrl,
+      attribution: 'Powered by Pinterest',
       title: '',
       description: '',
       oembed: this.oembed
