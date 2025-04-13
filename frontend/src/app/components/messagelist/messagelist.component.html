@@ -1,15 +1,15 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back"
+    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="accent" aria-label="Back"
         (click)="goBack()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">collapse_content</mat-icon>
     </button>
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back"
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
         *ngIf="messageService.getSelectedMessages().length == 0" (click)="addMessagDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <button class="button_add"
         *ngIf="messageService.getSelectedMessages().length != 0 && user.id != messageService.getSelectedMessages().at(-1)?.userId"
-        mat-mini-fab color="secondary" aria-label="Drop a comment"
+        mat-mini-fab color="primary" aria-label="Drop a comment"
         (click)="addComment(messageService.getSelectedMessages().at(-1)!)">
         <mat-icon>add_comment</mat-icon>
     </button>
@@ -116,13 +116,16 @@
             </mat-card-actions>
         </mat-card>
         <div *ngIf="messageService.getSelectedMessages().at(-1)!.comments.length != 0">
-            <div class="item" *ngFor="let comment of messageService.getSelectedMessages().at(-1)?.comments; index as i"
-                (click)="goToMessageDetails(comment)">
+            <div class="item" *ngFor="let comment of messageService.getSelectedMessages().at(-1)?.comments; index as i">
                 <mat-card>
                     <img *ngIf="user.base64Avatar != '' && user.id == comment.userId" class="avatar"
                         src="{{user.base64Avatar}}" />
                     <img *ngIf="getMessageUserName(comment).base64Avatar != '' && user.id != comment.userId"
                         class="avatar" src="{{getMessageUserName(comment).base64Avatar}}" />
+                    <button [attr.aria-hidden]="false" class="button_detail" mat-mini-fab color="secondary"
+                        aria-label="Detial" (click)="goToMessageDetails(comment)">
+                        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">expand_content</mat-icon>
+                    </button>
                     <mat-card-header class="header">
                         <mat-card-title *ngIf="user.id == comment.userId">{{user.name}}</mat-card-title>
                         <mat-card-title
@@ -135,7 +138,7 @@
                             [message]="undefined != comment.translatedMessage ? comment.translatedMessage : comment.message"
                             [style]="comment.style"></app-showmessage>
                     </mat-card-content>
-                    <mat-card-actions class="buttonbar">
+                    <!--mat-card-actions class="buttonbar">
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
                             matBadge="{{comment.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
                             matBadgeOverlap="true">visibility</mat-icon>
@@ -148,7 +151,7 @@
                         <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
                             matBadge="{{comment.commentsNumber | shortNumber}}" matBadgePosition="after"
                             matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
-                    </mat-card-actions>
+                    </mat-card-actions-->
                 </mat-card>
             </div>
         </div>

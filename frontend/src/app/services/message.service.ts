@@ -425,8 +425,9 @@ export class MessageService {
               this.messages.splice(this.messages.map(e => e.id).indexOf(message.id), 1);
             } else if (this.messages.map(e => e.id).indexOf(message.parentId) !== -1) {
               let parentMessageIndex = this.messages.map(e => e.id).indexOf(message.parentId)
-              this.messages[parentMessageIndex].comments.splice(this.messages[parentMessageIndex].comments.map(e => e.id).indexOf(message.parentId), 1);
+              this.messages[parentMessageIndex].comments.splice(this.messages[parentMessageIndex].comments.map(e => e.id).indexOf(message.id), 1);
             }
+            // The last selected message was deleted. So remove it from the selectedMessage array.
             this.selectedMessages.pop();
             if (this.messages.length === 0) {
               console.log("close dialog");

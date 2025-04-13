@@ -147,8 +147,8 @@ button {
   bottom: 0;
   right: 0;
   z-index: 100;
-  margin-top: -1.25rem;
-  margin-left: -1.25rem;
+  margin-bottom: 0.75rem;
+  margin-right: 0.75rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 1.25rem;
