@@ -125,7 +125,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   if (undefined == req.body.parentMessageId) {
     req.body.parentMessageId = 0;
   }
-  tableMessage.create(req.database.db, req.body.parentMessageId, req.body.messageTyp, req.body.latitude, req.body.longtitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia, function (err) {
+  tableMessage.create(req.database.db, req.body.parentMessageId, req.body.messageTyp, req.body.latitude, req.body.longtitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia.replace(/\'/g, "''"), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -139,7 +139,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 
 router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
-  tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia, function (err) {
+  tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia.replace(/\'/g, "''"), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
