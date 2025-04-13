@@ -428,6 +428,10 @@ export class MessageService {
               this.messages[parentMessageIndex].comments.splice(this.messages[parentMessageIndex].comments.map(e => e.id).indexOf(message.parentId), 1);
             }
             this.selectedMessages.pop();
+            if (this.messages.length === 0) {
+              console.log("close dialog");
+              dialogRef.close();
+            }
           }
         },
         error: (err) => {

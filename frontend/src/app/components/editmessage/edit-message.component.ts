@@ -123,7 +123,7 @@ export class EditMessageComponent implements OnInit {
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.message.multimedia = newMultimedia;
     this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.message.multimedia?.oembed?.html ? this.data.message.multimedia?.oembed.html : '');
-    this.showSaveHtml = true;
+    this.showSaveHtml = this.data.message.multimedia.type != MultimediaType.TENOR;
   }
 
   public removeMultimedia(): void {
