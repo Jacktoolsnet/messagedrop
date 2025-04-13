@@ -8,18 +8,22 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
+import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
 import { User } from '../../../interfaces/user';
 import { StyleService } from '../../../services/style.service';
+import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
 import { TextComponent } from '../../utils/text/text.component';
 
 @Component({
   selector: 'app-message',
   imports: [
+    SelectMultimediaComponent,
     CommonModule,
     FormsModule,
     MatButtonModule,
@@ -35,8 +39,11 @@ import { TextComponent } from '../../utils/text/text.component';
   styleUrl: './contact-edit-message.component.css'
 })
 export class ContactEditMessageComponent implements OnInit {
+  safeHtml: SafeHtml | undefined = undefined;
+  showSaveHtml: boolean = false;
 
   constructor(
+    private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
     private tenorDialog: MatDialog,
     private textDialog: MatDialog,
@@ -91,6 +98,12 @@ export class ContactEditMessageComponent implements OnInit {
         this.data.shortMessage.multimedia.sourceUrl = data.itemurl;
       }
     });
+  }
+
+  applyNewMultimedia(newMultimedia: Multimedia) {
+    this.data.shortMessage.multimedia = newMultimedia;
+    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.shortMessage.multimedia?.oembed?.html ? this.data.shortMessage.multimedia?.oembed.html : '');
+    this.showSaveHtml = this.data.shortMessage.multimedia.type != MultimediaType.TENOR;
   }
 
   public removeMultimedia(): void {

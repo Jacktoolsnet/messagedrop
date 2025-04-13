@@ -5,27 +5,29 @@
 </button>
 <mat-dialog-content>
     <div class="content">
-        <div *ngIf="data.shortMessage.multimedia.url === ''" class="multimedia_container">
-            <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary">
-                <mat-icon class="material-symbols-outlined">animated_images</mat-icon>
-                <span>Add a GIF from Tenor</span>
-            </button>
-        </div>
-        <div *ngIf="data.shortMessage.multimedia.url !== ''" class="multimedia_container">
+        <app-select-multimedia *ngIf="data.shortMessage.multimedia.type === 'undefined'" class="oembed_container"
+            (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
+        <div *ngIf="data.shortMessage.multimedia.type === 'tenor'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <img class="multimedia_image" [src]="data.shortMessage.multimedia.url" (click)="openTenorDialog()">
+            <img class="multimedia_image" [src]="data.shortMessage.multimedia.url">
+        </div>
+        <div *ngIf="data.shortMessage.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <div [innerHTML]="safeHtml" class="oembed_container_iframe"></div>
         </div>
         <a class=" attribution_link" href="{{data.shortMessage.multimedia.sourceUrl}}"
             target="_blank">{{data.shortMessage.multimedia.attribution}}</a>
-        <div *ngIf="data.shortMessage.message === ''" class="multimedia_container">
+        <div *ngIf="data.shortMessage.message === ''" class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>
                 <span>Add a text</span>
             </button>
         </div>
-        <div *ngIf="data.shortMessage.message !== ''" class="text_container">
+        <div *ngIf="data.shortMessage.message !== ''" class="oembed_container">
             <button *ngIf="data.shortMessage.message !== ''" mat-mini-fab class="button_random" color="secondary"
                 aria-label="Drop a new message" (click)="onNewFontClick()">
                 <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>

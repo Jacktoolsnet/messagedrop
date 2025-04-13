@@ -296,6 +296,7 @@ export class ContactService {
           contact.userEncryptedMessage = JSON.parse(envelope.userEncryptedMessage);
           contact.lastMessageFrom = 'user';
           socketioService.sendShortMessageToContact(envelope);
+          console.log(contact)
         },
         error: (err) => { },
         complete: () => { }
