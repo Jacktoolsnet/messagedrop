@@ -8,35 +8,31 @@
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div class="content">
-        <div>
-            <div class="item" *ngFor="let note of notes; index as i">
-                <mat-card>
-                    <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" />
-                    <mat-card-header class="header">
-                        <mat-card-title>{{user.name}}</mat-card-title>
-                        <mat-card-subtitle></mat-card-subtitle>
-                    </mat-card-header>
-                    <mat-card-content>
-                        <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
-                        <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
-                    </mat-card-content>
-                    <mat-card-actions class="buttonbar">
-                        <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
-                        </button>
-                        <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
-                            <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
-                        </button>
-                        <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
-                            <mat-icon>place</mat-icon>
-                        </button>
-                        <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
-                            (click)="navigateToNoteLocation(note)">
-                            <mat-icon>assistant_direction</mat-icon>
-                        </button>
-                    </mat-card-actions>
-                </mat-card>
-            </div>
-        </div>
+        <mat-card class="item" *ngFor="let note of notes; index as i">
+            <img *ngIf="user.base64Avatar != ''" class="avatar" src="{{user.base64Avatar}}" />
+            <mat-card-header class="header">
+                <mat-card-title>{{user.name}}</mat-card-title>
+                <mat-card-subtitle></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
+                <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
+            </mat-card-content>
+            <mat-card-actions class="buttonbar">
+                <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
+                </button>
+                <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
+                </button>
+                <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
+                    <mat-icon>place</mat-icon>
+                </button>
+                <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
+                    (click)="navigateToNoteLocation(note)">
+                    <mat-icon>assistant_direction</mat-icon>
+                </button>
+            </mat-card-actions>
+        </mat-card>
     </div>
 </mat-dialog-content>
