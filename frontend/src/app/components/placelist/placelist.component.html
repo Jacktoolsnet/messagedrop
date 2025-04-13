@@ -1,17 +1,13 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="secondary" aria-label="Back"
+    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="accent" aria-label="Back"
         (click)="goBack()">
-        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">collapse_content</mat-icon>
     </button>
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="secondary" aria-label="Back"
+    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
         (click)="openPlaceDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
-    <div class="content" [ngClass]="{
-        'list': true, 
-        'gradientAnimation': animation.cssclass === 'gradientAnimation',
-        'radialAnimation': animation.cssclass === 'radialAnimation',
-        'conicAnimation': animation.cssclass === 'conicAnimation'}" [style]="animation.style">
+    <div class="content">
         <div *ngIf="places.length == 0" class="item">
             <mat-card>
                 <mat-card-header class="header">
