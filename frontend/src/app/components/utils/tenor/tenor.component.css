@@ -43,7 +43,7 @@
     }
 }
 
-.search-container {
+.url-container {
     display: flex;
     border: 1px solid gray;
     border-radius: 1rem;
@@ -51,7 +51,7 @@
     margin: 0.5rem;
 }
 
-.search-container input[type="text"] {
+.url-container input[type="text"] {
     flex-grow: 1;
     padding: 8px;
     border: none;
@@ -59,8 +59,9 @@
     height: 2rem;
 }
 
-.search-container button {
-    color: gray;
+.url-container button {
+    color: white;
+    background-color: gray;
     border: none;
     padding: 8px 12px;
     cursor: pointer;

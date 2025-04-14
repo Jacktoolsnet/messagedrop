@@ -40,12 +40,14 @@ export class PinterestComponent {
 
   validateUrl() {
     console.log(this.pinterestUrl);
-    const pinterestRegex = /pinterest\/pin\/([^\/]+)/i;;
+    const pinterestRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/.*-([^\/]+)/i;
     const pinterestMatch = this.pinterestUrl.match(pinterestRegex);
     const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;;
     const pinterestShortMatch = this.pinterestUrl.match(pinterestShortRegex);
-    if (pinterestMatch && pinterestMatch[1]) {
-      this.oembedService.getPinterestEmbedCode(this.pinterestUrl)
+    console.log(pinterestMatch);
+    console.log(pinterestShortMatch);
+    if (pinterestMatch && pinterestMatch[2]) {
+      this.oembedService.getPinterestEmbedCode(this.pinterestUrl.substring(0, this.pinterestUrl.indexOf('/pin/') + 5) + pinterestMatch[2])
         .subscribe({
           next: response => {
             this.oembed = response.result;
