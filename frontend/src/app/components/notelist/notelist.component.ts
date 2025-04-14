@@ -11,7 +11,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Animation } from '../../interfaces/animation';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -21,6 +20,7 @@ import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { NoteService } from '../../services/note.service';
 import { StyleService } from '../../services/style.service';
+import { UserService } from '../../services/user.service';
 import { EditNoteComponent } from '../editnote/edit-note.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
@@ -49,12 +49,12 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
 export class NotelistComponent implements OnInit {
   public notes: Note[];
   private noteToDelete!: Note
-  public user: User;
-  public animation!: Animation;
+  public user: User | undefined;
   public mode: typeof Mode = Mode;
   private snackBarRef: any;
 
   constructor(
+    private userService: UserService,
     private noteService: NoteService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
@@ -63,14 +63,13 @@ export class NotelistComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User, notes: Note[] }
+    @Inject(MAT_DIALOG_DATA) public data: { notes: Note[] }
   ) {
-    this.user = data.user;
     this.notes = data.notes;
   }
 
   ngOnInit(): void {
-    this.animation = this.style.getRandomColorAnimation();
+    this.user = this.userService.getUser();
   }
 
   public flyTo(note: Note) {
@@ -86,7 +85,7 @@ export class NotelistComponent implements OnInit {
   }
 
   public navigateToNoteLocation(note: Note) {
-    this.noteService.navigateToNoteLocation(this.user, note)
+    this.noteService.navigateToNoteLocation(this.userService.getUser(), note)
   }
 
   public deleteNote(note: Note) {
@@ -113,7 +112,7 @@ export class NotelistComponent implements OnInit {
   public editNote(note: Note) {
     const dialogRef = this.noteDialog.open(EditNoteComponent, {
       panelClass: '',
-      data: { mode: this.mode.EDIT_NOTE, user: this.user, note: note },
+      data: { mode: this.mode.EDIT_NOTE, note: note },
       closeOnNavigation: true,
       width: '90vh',
       height: '90vh',

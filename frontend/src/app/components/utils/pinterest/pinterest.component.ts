@@ -40,26 +40,23 @@ export class PinterestComponent {
 
   validateUrl() {
     console.log(this.pinterestUrl);
-    const pinterestRegex = /^(https?:\/\/)?(www\.)?pinterest\.[a-z]{2,3}\/pin\/(\d+)\/?$/;
+    const pinterestRegex = /pinterest\/pin\/([^\/]+)/i;;
     const pinterestMatch = this.pinterestUrl.match(pinterestRegex);
     const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;;
     const pinterestShortMatch = this.pinterestUrl.match(pinterestShortRegex);
-    if (pinterestMatch && pinterestMatch[3]) {
+    if (pinterestMatch && pinterestMatch[1]) {
       this.oembedService.getPinterestEmbedCode(this.pinterestUrl)
         .subscribe({
           next: response => {
-            console.log(response);
             this.oembed = response.result;
-            console.log(this.oembed);
             this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed!.html ? this.oembed!.html : '');
           },
           error: (err) => {
-            console.error(err);
             this.urlInvalid = true;
           },
           complete: () => { }
         });
-      this.videoId = pinterestMatch[3];
+      this.videoId = pinterestMatch[1];
       this.urlInvalid = false;
     } else if (pinterestShortMatch) {
       this.oembedService.resolveRedirectUrl(this.pinterestUrl)

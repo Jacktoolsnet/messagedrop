@@ -460,7 +460,7 @@ export class AppComponent implements OnInit {
       const dialogRef = this.messageListDialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
-        data: { user: this.userService.getUser(), notes: this.noteService.loadNotes() },
+        data: { notes: this.noteService.loadNotes() },
         width: 'auto',
         minWidth: '60vw',
         maxWidth: '90vw',
@@ -603,7 +603,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), notes: notes },
+      data: { notes: notes },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',

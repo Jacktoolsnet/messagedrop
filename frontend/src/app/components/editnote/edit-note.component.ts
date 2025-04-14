@@ -13,8 +13,8 @@ import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
-import { User } from '../../interfaces/user';
 import { StyleService } from '../../services/style.service';
+import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 
@@ -41,16 +41,17 @@ export class EditNoteComponent implements OnInit {
   showSaveHtml: boolean = false;
 
   constructor(
+    private userService: UserService,
     private sanitizer: DomSanitizer,
     private textDialog: MatDialog,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<EditNoteComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, note: Note }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, note: Note }
   ) { }
 
   ngOnInit(): void {
-    this.data.note.style = this.data.user.defaultStyle
+    this.data.note.style = this.userService.getUser().defaultStyle
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 
