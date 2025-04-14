@@ -10,7 +10,6 @@ import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { Oembed } from '../../../interfaces/oembed';
 import { OembedService } from '../../../services/oembed.service';
-import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
   selector: 'app-instagram',
@@ -33,7 +32,7 @@ export class TiktokComponent {
   urlInvalid: boolean = true;
 
   constructor(
-    public dialogRef: MatDialogRef<EditMessageComponent>,
+    public dialogRef: MatDialogRef<TiktokComponent>,
     private oembedService: OembedService,
     private sanitizer: DomSanitizer,
     @Inject(MAT_DIALOG_DATA) public data: {}

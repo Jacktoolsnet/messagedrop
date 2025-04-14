@@ -8,7 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -37,7 +37,8 @@ import { TextComponent } from '../utils/text/text.component';
   styleUrl: './edit-note.component.css'
 })
 export class EditNoteComponent implements OnInit {
-  safeUrl: SafeResourceUrl | undefined;
+  safeHtml: SafeHtml | undefined = undefined;
+  showSaveHtml: boolean = false;
 
   constructor(
     private sanitizer: DomSanitizer,
@@ -71,22 +72,8 @@ export class EditNoteComponent implements OnInit {
 
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.note.multimedia = newMultimedia;
-    if (this.data.note.multimedia.type === MultimediaType.YOUTUBE) {
-      this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-        `https://www.youtube.com/embed/${this.data.note.multimedia.contentId}`
-      );
-    }
-    if (this.data.note.multimedia.type === MultimediaType.INSTAGRAM) {
-      if (this.data.note.multimedia.sourceUrl.includes('/reel/')) {
-        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://www.instagram.com/reel/${this.data.note.multimedia?.contentId}/embed`
-        );
-      } else {
-        this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
-          `https://www.instagram.com/p/${this.data.note.multimedia?.contentId}/embed`
-        );
-      }
-    }
+    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.note.multimedia?.oembed?.html ? this.data.note.multimedia?.oembed.html : '');
+    this.showSaveHtml = this.data.note.multimedia.type != MultimediaType.TENOR;
   }
 
   public removeMultimedia(): void {
@@ -96,6 +83,8 @@ export class EditNoteComponent implements OnInit {
     this.data.note.multimedia.description = '';
     this.data.note.multimedia.url = '';
     this.data.note.multimedia.sourceUrl = '';
+    this.safeHtml = undefined;
+    this.showSaveHtml = false;
   }
 
   public openTextDialog(): void {

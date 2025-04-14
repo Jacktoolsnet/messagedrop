@@ -6,7 +6,6 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } fro
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
   selector: 'app-message',
@@ -27,7 +26,7 @@ import { EditMessageComponent } from '../../editmessage/edit-message.component';
 export class TextComponent implements OnInit {
 
   constructor(
-    public dialogRef: MatDialogRef<EditMessageComponent>,
+    public dialogRef: MatDialogRef<TextComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { text: string }
   ) { }
 

@@ -9,7 +9,6 @@ import { MatInputModule } from '@angular/material/input';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { TenorService } from '../../../services/tenor.service';
-import { EditMessageComponent } from '../../editmessage/edit-message.component';
 
 @Component({
   selector: 'app-multimedia',
@@ -33,7 +32,7 @@ export class TenorComponent {
   public results: any[] = [];
 
   constructor(
-    public dialogRef: MatDialogRef<EditMessageComponent>,
+    public dialogRef: MatDialogRef<TenorComponent>,
     private tensorService: TenorService,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) { }

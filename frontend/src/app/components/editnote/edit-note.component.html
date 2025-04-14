@@ -5,15 +5,29 @@
 </button>
 <mat-dialog-content>
     <div class="content">
-        <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="multimedia_container"
+        <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
             (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
-        <div *ngIf="data.note.multimedia.type === 'tenor'" class="multimedia_container">
+
+        <div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
             <img class="multimedia_image" [src]="data.note.multimedia.url">
         </div>
-        <div *ngIf="data.note.multimedia.type === 'youtube'" class="multimedia_container">
+        <div *ngIf="data.note.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <div [innerHTML]="safeHtml" class="oembed_container_iframe"></div>
+        </div>
+
+        <!--div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
+            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                <mat-icon>delete</mat-icon>
+            </button>
+            <img class="multimedia_image" [src]="data.note.multimedia.url">
+        </div>
+        <div *ngIf="data.note.multimedia.type === 'youtube'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
@@ -28,15 +42,15 @@
                     referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
             </div>
         </div>
-        <div *ngIf="data.note.multimedia?.type === 'instagram'" class="multimedia_container">
+        <div *ngIf="data.note.multimedia?.type === 'instagram'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
             <iframe [src]="safeUrl!" width="320" height="400" frameborder="0" allowtransparency="true"></iframe>
-        </div>
+        </div-->
         <a class=" attribution_link" href="{{data.note.multimedia.sourceUrl}}"
             target="_blank">{{data.note.multimedia.attribution}}</a>
-        <div *ngIf="data.note.note === ''" class="multimedia_container">
+        <div *ngIf="data.note.note === ''" class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>
                 <span>Add a text</span>
