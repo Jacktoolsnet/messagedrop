@@ -25,6 +25,7 @@ import { MessageService } from '../../services/message.service';
 import { RelatedUserService } from '../../services/related-user.service';
 import { StyleService } from '../../services/style.service';
 import { TranslateService } from '../../services/translate.service';
+import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
@@ -63,6 +64,7 @@ export class MessagelistComponent implements OnInit {
   public mode: typeof Mode = Mode;
 
   constructor(
+    private userService: UserService,
     public messageService: MessageService,
     private translateService: TranslateService,
     private mapService: MapService,
@@ -73,9 +75,9 @@ export class MessagelistComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User, messages: Message[] }
+    @Inject(MAT_DIALOG_DATA) public data: { messages: Message[] }
   ) {
-    this.user = data.user;
+    this.user = this.userService.getUser();
     this.messages = data.messages;
   }
 
@@ -191,7 +193,7 @@ export class MessagelistComponent implements OnInit {
   public editMessage(message: Message) {
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
-      data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, user: this.user, message: message },
+      data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message: message },
       closeOnNavigation: true,
       width: '90vw',
       minWidth: '20vw',
@@ -207,7 +209,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), data.user);
+        this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
       }
     });
   }
@@ -265,7 +267,7 @@ export class MessagelistComponent implements OnInit {
 
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
-      data: { mode: this.mode.ADD_COMMENT, user: this.user, message: message },
+      data: { mode: this.mode.ADD_COMMENT, message: message },
       closeOnNavigation: true,
       width: '90vw',
       minWidth: '20vw',
@@ -281,7 +283,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data.message) {
-        this.messageService.createComment(data.message, this.mapService.getMapLocation(), data.user);
+        this.messageService.createComment(data.message, this.mapService.getMapLocation(), this.userService.getUser());
       }
     });
   }
@@ -334,7 +336,7 @@ export class MessagelistComponent implements OnInit {
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.user, message: message },
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -349,7 +351,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
       }
     });
   }

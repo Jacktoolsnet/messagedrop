@@ -336,7 +336,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, user: this.userService.getUser(), message: message },
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -352,8 +352,9 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      console.log(data.message);
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), data.user);
+        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
@@ -415,7 +416,7 @@ export class AppComponent implements OnInit {
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { user: this.userService.getUser(), messages: this.messageService.getMessages() },
+            data: { messages: this.messageService.getMessages() },
             width: 'auto',
             minWidth: '60vw',
             maxWidth: '90vw',
@@ -578,7 +579,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), messages: messages },
+      data: { messages: messages },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',

@@ -13,10 +13,10 @@ import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
-import { User } from '../../interfaces/user';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
+import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 import { WaitComponent } from '../utils/wait/wait.component';
@@ -45,6 +45,7 @@ export class EditMessageComponent implements OnInit {
   showSaveHtml: boolean = false;
 
   constructor(
+    private userService: UserService,
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
     private textDialog: MatDialog,
@@ -53,11 +54,11 @@ export class EditMessageComponent implements OnInit {
     public dialogRef: MatDialogRef<EditMessageComponent>,
     private style: StyleService,
     private waitDialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, message: Message }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, message: Message }
   ) { }
 
   ngOnInit(): void {
-    this.data.message.style = this.data.user.defaultStyle;
+    this.data.message.style = this.userService.getUser().defaultStyle;
     this.applyNewMultimedia(this.data.message.multimedia);
   }
 
@@ -80,7 +81,7 @@ export class EditMessageComponent implements OnInit {
               .subscribe({
                 next: openAiModerateResponse => {
                   if (!openAiModerateResponse.results[0].flagged) {
-                    this.data.message.userId = this.data.user.id;
+                    this.data.message.userId = this.userService.getUser().id;
                     waitDialogRef.close();
                     this.dialogRef.close(this.data);
                   } else {
@@ -95,14 +96,14 @@ export class EditMessageComponent implements OnInit {
                 complete: () => { }
               });
           } else {
-            this.data.message.userId = this.data.user.id;
+            this.data.message.userId = this.userService.getUser().id;
             this.data.message.message = ''
             this.dialogRef.close(this.data);
           }
         }
         break;
       default:
-        this.data.message.userId = this.data.user.id;
+        this.data.message.userId = this.userService.getUser().id;
         this.dialogRef.close(this.data);
         break;
     }
