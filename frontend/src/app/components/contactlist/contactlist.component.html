@@ -30,6 +30,16 @@
                     <mat-card-subtitle></mat-card-subtitle>
                 </mat-card-header>
                 <mat-card-content>
+                    <button class="button_contactmenu" [matMenuTriggerFor]="contactMenu"
+                        [matMenuTriggerData]="{contact: contact}" aria-hidden="false" mat-mini-fab color="accent"
+                        aria-label="Message menu" (click)="{}">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
+                    </button>
+                    <button class="button_shortmessage" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false"
+                        mat-mini-fab color="primary" aria-label="Send a short message"
+                        (click)="openContactMessagDialog(contact)">
+                        <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
+                    </button>
                     <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
                         <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != '' || contact.userMessage.multimedia.type != 'undefined'"
                             class="from-me">
@@ -61,25 +71,6 @@
                         </p>
                     </div>
                 </mat-card-content>
-                <mat-card-actions class="buttonbar">
-                    <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
-                        (click)="editContact(contact)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
-                    </button>
-                    <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Delete note"
-                        (click)="deleteContact(contact)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
-                    </button>
-                    <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab
-                        color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place"
-                        (click)="subscribe(contact)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined">bookmark_flag</mat-icon>
-                    </button>
-                    <button *ngIf="socketioService.isReady()" [attr.aria-hidden]="false" mat-mini-fab color="secondary"
-                        aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
-                    </button>
-                </mat-card-actions>
             </mat-card>
         </div>
     </div>
@@ -94,4 +85,22 @@
         <mat-icon class="material-symbols-outlined">qr_code_scanner</mat-icon>
         <span>Scan QR-Code</span>
     </button>
+</mat-menu>
+
+<mat-menu #contactMenu="matMenu">
+    <ng-template matMenuContent let-contact="contact">
+        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
+            (click)="editContact(contact)">
+            <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
+        </button>
+        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Delete note"
+            (click)="deleteContact(contact)">
+            <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
+        </button>
+        <button [attr.aria-hidden]="false" *ngIf="!subscriptionError" mat-mini-fab
+            color="{{!contact.subscribed ? 'secondary' : 'primary'}}" aria-label="Subscribe to place"
+            (click)="subscribe(contact)">
+            <mat-icon aria-hidden="false" class="material-symbols-outlined">bookmark_flag</mat-icon>
+        </button>
+    </ng-template>
 </mat-menu>
