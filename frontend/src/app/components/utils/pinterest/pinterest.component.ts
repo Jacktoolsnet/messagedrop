@@ -44,23 +44,9 @@ export class PinterestComponent {
     const pinterestMatch = this.pinterestUrl.match(pinterestRegex);
     const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;;
     const pinterestShortMatch = this.pinterestUrl.match(pinterestShortRegex);
-    console.log(pinterestMatch);
-    console.log(pinterestShortMatch);
-    if (pinterestMatch && pinterestMatch[2]) {
-      this.oembedService.getPinterestEmbedCode(this.pinterestUrl.substring(0, this.pinterestUrl.indexOf('/pin/') + 5) + pinterestMatch[2])
-        .subscribe({
-          next: response => {
-            this.oembed = response.result;
-            this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed!.html ? this.oembed!.html : '');
-          },
-          error: (err) => {
-            this.urlInvalid = true;
-          },
-          complete: () => { }
-        });
-      this.videoId = pinterestMatch[1];
-      this.urlInvalid = false;
-    } else if (pinterestShortMatch) {
+    const pinterrestFinalRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/(\d+)/i;
+    const pinterrestFinalMatch = this.pinterestUrl.match(pinterrestFinalRegex);
+    if (pinterestShortMatch) {
       this.oembedService.resolveRedirectUrl(this.pinterestUrl)
         .subscribe({
           next: firstResponse => {
@@ -85,6 +71,23 @@ export class PinterestComponent {
           error: (err) => { },
           complete: () => { }
         });
+    } else if (pinterestMatch && pinterestMatch[2]) {
+      this.pinterestUrl = this.pinterestUrl.substring(0, this.pinterestUrl.indexOf('/pin/') + 5) + pinterestMatch[2];
+      this.validateUrl();
+    } else if (pinterrestFinalMatch && pinterrestFinalMatch[2]) {
+      this.oembedService.getPinterestEmbedCode(this.pinterestUrl)
+        .subscribe({
+          next: response => {
+            this.oembed = response.result;
+            this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed!.html ? this.oembed!.html : '');
+          },
+          error: (err) => {
+            this.urlInvalid = true;
+          },
+          complete: () => { }
+        });
+      this.videoId = pinterrestFinalMatch[2];
+      this.urlInvalid = false;
     } else {
       this.videoId = null;
       this.safeHtml = undefined;
