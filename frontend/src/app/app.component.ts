@@ -17,6 +17,8 @@ import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
+import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
+import { CreatePinComponent } from './components/pin/createpin/createpin.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
@@ -89,6 +91,8 @@ export class AppComponent implements OnInit {
     private statisticService: StatisticService,
     private socketioService: SocketioService,
     private snackBar: MatSnackBar,
+    public createPinDialog: MatDialog,
+    public checkPinDialog: MatDialog,
     public messageDialog: MatDialog,
     public noteDialog: MatDialog,
     public messageListDialog: MatDialog,
@@ -141,6 +145,9 @@ export class AppComponent implements OnInit {
         error: (err) => { },
         complete: () => { }
       });
+    // For Testeing
+    // this.openCreatePinDialog();
+    // this.openCheckPinDialog();
   }
 
   public ngOnInit(): void {
@@ -300,6 +307,42 @@ export class AppComponent implements OnInit {
 
   public handleClickEvent(event: Location) {
     this.mapService.flyTo(event);
+  }
+
+  public openCreatePinDialog(): void {
+    const dialogRef = this.createPinDialog.open(CreatePinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("messageDialog");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      console.log(data);
+    });
+  }
+
+  public openCheckPinDialog(): void {
+    const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("messageDialog");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      console.log(data);
+    });
   }
 
   public openMessagDialog(): void {

@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ isConfirming ? 'Confirm PIN' : 'Enter PIN' }}</h2>
+
+<div class="pin-display">
+    <ng-container *ngFor="let digit of isConfirming ? confirmPinDisplay : pinDisplay; let i = index">
+        <div [ngClass]="{'pin-dot': true, 'active': i === currentPinIndex}">
+            {{ digit || '•' }}
+        </div>
+    </ng-container>
+</div>
+
+<div class="pin-pad">
+    <ng-container *ngFor="let digit of ['1','2','3','4','5','6','7','8','9']">
+        <button mat-mini-fab color="accent" (click)="addDigit(digit)">
+            {{ digit }}
+        </button>
+    </ng-container>
+
+    <!-- Reset Button mit Icon -->
+    <button mat-mini-fab color="primary" (click)="reset()">
+        <mat-icon class="material-symbols-outlined">autorenew</mat-icon>
+    </button>
+
+    <!-- 0 Button -->
+    <button mat-mini-fab color="accent" (click)="addDigit('0')">
+        0
+    </button>
+
+    <!-- OK Button mit Icon -->
+    <button mat-mini-fab color="primary" [disabled]="confirmPin.length < 4" (click)="confirm()">
+        <mat-icon class="material-symbols-outlined">check_circle</mat-icon>
+    </button>
+</div>
+
+<h4 *ngIf="!isConfirming">In order to use the app I have to set a PIN.</h4>
+<h4 *ngIf="isConfirming">Finally, I have to confirm the PIN</h4>

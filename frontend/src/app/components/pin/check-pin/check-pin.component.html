@@ -1,0 +1,32 @@
+<h2 mat-dialog-title>Enter pin</h2>
+
+<div class="pin-display">
+    <ng-container *ngFor="let digit of pinDisplay; let i = index">
+        <div [ngClass]="{'pin-dot': true, 'active': i === currentPinIndex}">
+            {{ digit || '•' }}
+        </div>
+    </ng-container>
+</div>
+
+<div class="pin-pad">
+    <ng-container *ngFor="let digit of ['1','2','3','4','5','6','7','8','9']">
+        <button mat-mini-fab color="accent" (click)="addDigit(digit)">
+            {{ digit }}
+        </button>
+    </ng-container>
+
+    <!-- Reset Button mit Icon -->
+    <button mat-mini-fab color="primary" (click)="reset()">
+        <mat-icon class="material-symbols-outlined">autorenew</mat-icon>
+    </button>
+
+    <!-- 0 Button -->
+    <button mat-mini-fab color="accent" (click)="addDigit('0')">
+        0
+    </button>
+
+    <!-- OK Button mit Icon -->
+    <button mat-mini-fab color="primary" [disabled]="pin.length < 4" (click)="confirm()">
+        <mat-icon class="material-symbols-outlined">check_circle</mat-icon>
+    </button>
+</div>
