@@ -26,7 +26,7 @@ import { OembedService } from '../../../services/oembed.service';
 })
 export class PinterestComponent {
   pinterestUrl: string = '';
-  videoId: string | null = null;
+  pinterestId: string | null = null;
   oembed: Oembed | undefined;
   safeHtml: SafeHtml | undefined;
   urlInvalid: boolean = true;
@@ -86,10 +86,10 @@ export class PinterestComponent {
           },
           complete: () => { }
         });
-      this.videoId = pinterrestFinalMatch[2];
+      this.pinterestId = pinterrestFinalMatch[2];
       this.urlInvalid = false;
     } else {
-      this.videoId = null;
+      this.pinterestId = null;
       this.safeHtml = undefined;
       this.urlInvalid = true;
     }
@@ -99,7 +99,7 @@ export class PinterestComponent {
     let multimedia: Multimedia = {
       type: MultimediaType.PINTEREST,
       url: '',
-      contentId: null != this.videoId ? this.videoId : '',
+      contentId: null != this.pinterestId ? this.pinterestId : '',
       sourceUrl: this.pinterestUrl,
       attribution: 'Powered by Pinterest',
       title: '',

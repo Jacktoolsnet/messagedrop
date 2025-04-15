@@ -26,7 +26,7 @@ import { OembedService } from '../../../services/oembed.service';
 })
 export class TiktokComponent {
   tiktokUrl: string = '';
-  videoId: string | null = null;
+  tiktokId: string | null = null;
   oembed: Oembed | undefined;
   safeHtml: SafeHtml | undefined;
   urlInvalid: boolean = true;
@@ -46,8 +46,8 @@ export class TiktokComponent {
 
     if (tiktokMatch && tiktokMatch[3]) {
       this.oembedService.getTikTokEmbedCode(this.tiktokUrl)
-      this.videoId = tiktokMatch[3];
-      let oembedHtml = this.oembedService.getTikTokEmbedCode(this.videoId);
+      this.tiktokId = tiktokMatch[3];
+      let oembedHtml = this.oembedService.getTikTokEmbedCode(this.tiktokId);
       this.oembed = {
         html: oembedHtml,
         width: 0,
@@ -75,7 +75,7 @@ export class TiktokComponent {
           complete: () => { }
         });
     } else {
-      this.videoId = null;
+      this.tiktokId = null;
       this.safeHtml = undefined;
       this.urlInvalid = true;
     }
@@ -85,7 +85,7 @@ export class TiktokComponent {
     let multimedia: Multimedia = {
       type: MultimediaType.TIKTOK,
       url: '',
-      contentId: null != this.videoId ? this.videoId : '',
+      contentId: null != this.tiktokId ? this.tiktokId : '',
       sourceUrl: this.tiktokUrl,
       attribution: 'Powered by TikTok',
       title: '',

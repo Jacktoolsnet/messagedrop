@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { PinterestComponent } from '../../utils/pinterest/pinterest.component';
+import { SpotifyComponent } from '../../utils/spotify/spotify.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
 import { TiktokComponent } from '../../utils/tiktok/tiktok.component';
 import { YoutubeComponent } from '../../utils/youtube/youtube.component';
@@ -23,6 +24,7 @@ export class SelectMultimediaComponent {
     private youtubeDialog: MatDialog,
     private tiktokDialog: MatDialog,
     private pinterestDialog: MatDialog,
+    private spotifyDialog: MatDialog,
     public dialogRef: MatDialogRef<SelectMultimediaComponent>,
   ) { }
 
@@ -97,6 +99,29 @@ export class SelectMultimediaComponent {
 
   public openPinterestDialog(): void {
     const dialogRef = this.pinterestDialog.open(PinterestComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      width: '90vw',
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
+      if (undefined !== multimedia) {
+        this.newMultimedia.emit(multimedia);
+      }
+    });
+  }
+
+  public openSpotifyDialog(): void {
+    const dialogRef = this.spotifyDialog.open(SpotifyComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},

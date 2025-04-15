@@ -10,9 +10,10 @@ import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { Oembed } from '../../../interfaces/oembed';
 import { OembedService } from '../../../services/oembed.service';
+import { YoutubeComponent } from '../youtube/youtube.component';
 
 @Component({
-  selector: 'app-youtube',
+  selector: 'app-spotify',
   imports: [
     CommonModule,
     MatDialogContent,
@@ -21,12 +22,12 @@ import { OembedService } from '../../../services/oembed.service';
     MatFormFieldModule,
     MatInputModule
   ],
-  templateUrl: './youtube.component.html',
-  styleUrl: './youtube.component.css'
+  templateUrl: './spotify.component.html',
+  styleUrl: './spotify.component.css'
 })
-export class YoutubeComponent {
-  youtubeUrl: string = '';
-  youtubeId: string | null = null;
+export class SpotifyComponent {
+  spotifyUrl: string = '';
+  spotifyId: string | null = null;
   oembed: Oembed | undefined;
   safeHtml: SafeHtml | undefined;
   urlInvalid: boolean = true;
@@ -39,12 +40,14 @@ export class YoutubeComponent {
   ) { }
 
   validateUrl() {
-    const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const youtubeMatch = this.youtubeUrl.match(youtubeRegex);
-    if (youtubeMatch && youtubeMatch[5]) {
-      this.oembedService.getYoutubeEmbedCode(this.youtubeUrl)
+    const spotifyRegex = /https?:\/\/open\.spotify\.com\/(track|album|artist|playlist)\/([a-zA-Z0-9]+)/;
+    const spotifyMatch = this.spotifyUrl.match(spotifyRegex);
+    console.log(spotifyMatch);
+    if (spotifyMatch && spotifyMatch[2]) {
+      this.oembedService.getSpotifyEmbedCode(spotifyMatch[0])
         .subscribe({
           next: response => {
+            console.log(response);
             this.oembed = response.result;
             this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed!.html ? this.oembed!.html : '');
           },
@@ -52,10 +55,11 @@ export class YoutubeComponent {
           },
           complete: () => { }
         });
-      this.youtubeId = youtubeMatch[5];
+      this.spotifyUrl = spotifyMatch[0];
+      this.spotifyId = spotifyMatch[2];
       this.urlInvalid = false;
     } else {
-      this.youtubeId = null;
+      this.spotifyId = null;
       this.safeHtml = undefined;
       this.urlInvalid = true;
     }
@@ -65,8 +69,8 @@ export class YoutubeComponent {
     let multimedia: Multimedia = {
       type: MultimediaType.YOUTUBE,
       url: '',
-      contentId: null != this.youtubeId ? this.youtubeId : '',
-      sourceUrl: this.youtubeUrl,
+      contentId: null != this.spotifyId ? this.spotifyId : '',
+      sourceUrl: this.spotifyUrl,
       attribution: 'Powered by YouTube',
       title: '',
       description: '',

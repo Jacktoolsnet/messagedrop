@@ -70,4 +70,18 @@ export class OembedService {
       )
   }
 
+  public getSpotifyEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
+    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://open.spotify.com/oembed')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
+      .pipe(
+        map((response: GetOembedResponse) => {
+          //response.result.html = response.result.html?.replace(/width="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');
+          //response.result.html = response.result.html?.replace(/height="\d+"/g, '"');
+          return response;
+        }),
+      )
+      .pipe(
+        catchError(this.handleError)
+      )
+  }
+
 }
