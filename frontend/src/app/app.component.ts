@@ -24,6 +24,7 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
 import { Connect } from './interfaces/connect';
+import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
@@ -37,6 +38,7 @@ import { ConnectService } from './services/connect.service';
 import { ContactService } from './services/contact.service';
 import { CryptoService } from './services/crypto.service';
 import { GeolocationService } from './services/geolocation.service';
+import { IndexDbService } from './services/index-db.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NoteService } from './services/note.service';
@@ -79,6 +81,7 @@ export class AppComponent implements OnInit {
   private showComponent: boolean = false;
 
   constructor(
+    private indexDbService: IndexDbService,
     public userService: UserService,
     public mapService: MapService,
     public noteService: NoteService,
@@ -136,7 +139,14 @@ export class AppComponent implements OnInit {
     this.initApp();
   }
 
-  private initApp() {
+  async initApp() {
+    console.log('initApp');
+    if (await this.indexDbService.hasPinHash()) {
+      this.openCheckPinDialog();
+    } else {
+      this.openCreatePinDialog();
+    }
+
     this.userService.initUser(this.userSubject);
     // Count
     this.statisticService.countVisitor()
@@ -145,9 +155,6 @@ export class AppComponent implements OnInit {
         error: (err) => { },
         complete: () => { }
       });
-    // For Testeing
-    // this.openCreatePinDialog();
-    // this.openCheckPinDialog();
   }
 
   public ngOnInit(): void {
@@ -323,7 +330,11 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      console.log(data);
+      this.userService.setPin(data);
+      this.userService.getPinHash(data)
+        .subscribe((getPinHashResponse: GetPinHashResponse) => {
+          this.indexDbService.setPinHash(getPinHashResponse.pinHash);
+        });
     });
   }
 
@@ -341,7 +352,11 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      console.log(data);
+      if (data === undefined) {
+        console.log("PIN is not valid");
+      } else {
+        this.userService.setPin(data);
+      }
     });
   }
 

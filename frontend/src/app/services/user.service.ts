@@ -1,10 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
-import { catchError, Subject, throwError } from 'rxjs';
+import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { GetMessageResponse } from '../interfaces/get-message-response';
+import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { GetUserResponse } from '../interfaces/get-user-response';
 import { Keypair } from '../interfaces/keypair';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
@@ -16,6 +17,8 @@ import { StyleService } from './style.service';
   providedIn: 'root'
 })
 export class UserService {
+
+  private pin: string = '';
 
   private user: User = {
     id: '',
@@ -59,6 +62,22 @@ export class UserService {
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
     return throwError(() => error);
+  }
+
+  getPin(): string {
+    return this.pin;
+  }
+
+  setPin(pin: string) {
+    this.pin = pin;
+  }
+
+  getPinHash(pin: string): Observable<GetPinHashResponse> {
+    let body = { pin: pin };
+    return this.http.post<GetPinHashResponse>(`${environment.apiUrl}/user/hashpin`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
   }
 
   loadUserFromLocalStorage() {
@@ -121,7 +140,7 @@ export class UserService {
         });
     } else {
       // Check if the user exist. It could be that the database was deleted.  
-      this.getkUserById(this.user.id)
+      this.getUserById(this.user.id)
         .subscribe({
           next: (data) => {
           },
@@ -155,7 +174,7 @@ export class UserService {
     localStorage.setItem('user', JSON.stringify(user))
   }
 
-  createUser(encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey) {
+  createUser(encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey): Observable<CreateUserResponse> {
     let body = {
       encryptionPublicKey: JSON.stringify(encryptionPublicKey),
       signingPublicKey: JSON.stringify(signingPublicKey)
@@ -179,21 +198,21 @@ export class UserService {
       );
   }
 
-  getkUserById(userId: string) {
+  getUserById(userId: string): Observable<GetUserResponse> {
     return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
-  getUserMessages(user: User) {
+  getUserMessages(user: User): Observable<GetMessageResponse> {
     return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/userId/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
-  deleteUser(user: User) {
+  deleteUser(user: User): Observable<SimpleStatusResponse> {
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/delete/${user.id}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)

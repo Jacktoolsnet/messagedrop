@@ -5,6 +5,9 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { GetPinHashResponse } from '../../../interfaces/get-pin-hash-response';
+import { IndexDbService } from '../../../services/index-db.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-check-pin',
@@ -20,10 +23,12 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 })
 export class CheckPinComponent {
   pin: string = '';
-  confirmPin: string = '';
+  showResetButton: boolean = false;
   pinDisplay: string[] = ['', '', '', ''];
 
   constructor(
+    private userService: UserService,
+    private indexDbService: IndexDbService,
     private dialogRef: MatDialogRef<CheckPinComponent>,
     private snackBar: MatSnackBar
   ) { }
@@ -39,6 +44,7 @@ export class CheckPinComponent {
 
       if (this.pin.length === 4) {
         setTimeout(() => {
+          this.confirm();
         }, 500);
       }
     }
@@ -46,26 +52,44 @@ export class CheckPinComponent {
 
   showDigitTemporarily(index: number, isConfirming: boolean = false): void {
     const displayArray = this.pinDisplay;
-    const pin = isConfirming ? this.confirmPin : this.pin;
+    const pin = this.pin;
     displayArray[index] = pin[index];
     setTimeout(() => {
       displayArray[index] = '•';
-    }, 1000);
+    }, 500);
   }
 
   reset(): void {
     this.pin = '';
-    this.confirmPin = '';
     this.pinDisplay = ['', '', '', ''];
   }
 
   confirm(): void {
     // Todo: check if pin is correct
     if (this.pin.length === 4) {
-      this.dialogRef.close(this.pin);
+      this.userService.getPinHash(this.pin)
+        .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
+          if (!await this.indexDbService.checkPinHash(getPinHashResponse.pinHash)) {
+            this.snackBar.open('Pin is not valid. Please try again.', '', {
+              duration: 2000,
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            });
+            this.reset();
+            this.showResetButton = true;
+          } else {
+            this.showResetButton = false;
+            this.dialogRef.close(this.pin);
+          }
+        });
+
     } else {
       alert('PINs stimmen nicht überein');
       this.reset();
     }
+  }
+
+  resetUser(): void {
+    this.dialogRef.close(undefined);
   }
 }

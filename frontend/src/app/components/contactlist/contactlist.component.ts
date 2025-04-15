@@ -194,7 +194,7 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.contact) {
-        this.userService.getkUserById(data.contact.contactUserId)
+        this.userService.getUserById(data.contact.contactUserId)
           .subscribe({
             next: (userResponse: GetUserResponse) => {
               this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)

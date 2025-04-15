@@ -1,3 +1,5 @@
+require('dotenv').config();
+const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
@@ -42,6 +44,35 @@ router.get('/get/:userId', [security.checkToken], function (req, res) {
     }
     res.status(response.status).json(response);
   });
+});
+
+router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
+
+  if (!req.body.pin || typeof req.body.pin !== 'string' || req.body.pin.length !== 4) {
+    response.status = 400;
+    response.error = 'Invalid PIN';
+    return res.status(400).json(response);
+  }
+
+  try {
+    crypto.scrypt(req.body.pin, process.env.PIN_SALT, 64, (err, derivedKey) => {
+      if (err) {
+        response.status = 500;
+        response.error = 'Hashing failed';
+        return res.status(500).json(response);
+      }
+
+      response.status = 200;
+      response.pinHash = derivedKey.toString('hex');
+      return res.status(200).json(response);
+    });
+  } catch (err) {
+    response.status = 500;
+    response.error = 'Hashing failed';
+    return res.status(500).json(err);
+  }
+
 });
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {

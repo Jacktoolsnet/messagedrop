@@ -76,7 +76,7 @@ export class CreatePinComponent {
     displayArray[index] = pin[index];
     setTimeout(() => {
       displayArray[index] = '•';
-    }, 1000);
+    }, 500);
   }
 
   reset(): void {

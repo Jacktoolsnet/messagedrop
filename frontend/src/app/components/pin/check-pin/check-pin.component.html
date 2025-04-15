@@ -16,7 +16,7 @@
     </ng-container>
 
     <!-- Reset Button mit Icon -->
-    <button mat-mini-fab color="primary" (click)="reset()">
+    <button mat-mini-fab color="primary" [disabled]="pin === ''" (click)="reset()">
         <mat-icon class="material-symbols-outlined">autorenew</mat-icon>
     </button>
 
@@ -25,8 +25,8 @@
         0
     </button>
 
-    <!-- OK Button mit Icon -->
-    <button mat-mini-fab color="primary" [disabled]="pin.length < 4" (click)="confirm()">
-        <mat-icon class="material-symbols-outlined">check_circle</mat-icon>
+    <!-- Reset User Button mit Icon -->
+    <button mat-mini-fab color="primary" [disabled]="!showResetButton" (click)="resetUser()">
+        <mat-icon class="material-symbols-outlined">lock_reset</mat-icon>
     </button>
 </div>
