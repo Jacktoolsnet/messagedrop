@@ -321,7 +321,7 @@ export class AppComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -343,7 +343,7 @@ export class AppComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
