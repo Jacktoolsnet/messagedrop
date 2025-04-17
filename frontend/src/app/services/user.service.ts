@@ -7,7 +7,6 @@ import { CreateUserResponse } from '../interfaces/create-user-response';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { GetUserResponse } from '../interfaces/get-user-response';
-import { Keypair } from '../interfaces/keypair';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { CryptoService } from './crypto.service';
@@ -40,7 +39,9 @@ export class UserService {
       privateKey: {}
     },
     name: '',
-    base64Avatar: ''
+    base64Avatar: '',
+    cryptoPublicKey: '',
+    signingPublicKey: ''
   };
 
   private ready: boolean = false;
@@ -81,7 +82,7 @@ export class UserService {
   }
 
   loadUserFromLocalStorage() {
-    let userFromLocalStorage: any = JSON.parse(localStorage.getItem('user') || '{}');
+    /*let userFromLocalStorage: any = JSON.parse(localStorage.getItem('user') || '{}');
     if (JSON.stringify(userFromLocalStorage) === '{}') {
       this.user = {
         id: '',
@@ -114,11 +115,17 @@ export class UserService {
         name: undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
         base64Avatar: undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
       }
-    }
+    }*/
   }
 
-  initUser(userSubject: Subject<void>) {
-    this.loadUserFromLocalStorage();
+  initUser(userSubject: Subject<void>, createUserResponse: CreateUserResponse) {
+    this.user.id = createUserResponse.userId;
+    this.user.cryptoPublicKey = createUserResponse.cryptoPublicKey;
+    this.user.signingPublicKey = createUserResponse.signingPublicKey;
+    console.log(this.user)
+    this.ready = true;
+    userSubject.next();
+    /*this.loadUserFromLocalStorage();
     if (this.user.id === '') {
       this.cryptoService.createSymmetricalKey()
         .then((symmetricalKey: JsonWebKey) => {
@@ -128,13 +135,6 @@ export class UserService {
               this.cryptoService.createSigningKey()
                 .then((signingKeyPair: Keypair) => {
                   this.user!.signingKeyPair = signingKeyPair;
-                  this.createUser(this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey)
-                    .subscribe(createUserResponse => {
-                      this.user!.id = createUserResponse.userId;
-                      this.saveUser(this.user!);
-                      this.ready = true;
-                      userSubject.next();
-                    });
                 });
             });
         });
@@ -159,7 +159,7 @@ export class UserService {
             userSubject.next();
           }
         });
-    }
+    }*/
   }
 
   isReady(): boolean {
@@ -174,11 +174,8 @@ export class UserService {
     localStorage.setItem('user', JSON.stringify(user))
   }
 
-  createUser(encryptionPublicKey?: JsonWebKey, signingPublicKey?: JsonWebKey): Observable<CreateUserResponse> {
-    let body = {
-      encryptionPublicKey: JSON.stringify(encryptionPublicKey),
-      signingPublicKey: JSON.stringify(signingPublicKey)
-    };
+  createUser(): Observable<CreateUserResponse> {
+    let body = {};
     return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -220,7 +217,7 @@ export class UserService {
   }
 
   clearStorage() {
-    localStorage.clear();
+    /*localStorage.clear();
     this.user = {
       id: '',
       location: { latitude: 0, longitude: 0, plusCode: '' },
@@ -238,7 +235,7 @@ export class UserService {
       },
       name: 'Unnamed user',
       base64Avatar: ''
-    }
+    }*/
   }
 
   subscribe(user: User, subscription: string) {

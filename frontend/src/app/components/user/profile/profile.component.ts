@@ -54,7 +54,7 @@ export class ProfileComponent {
   }
 
   handleFile(event: any) {
-    this.user.base64Avatar = event.target.result;
+    //this.user.base64Avatar = event.target.result;
   }
 
   handleFileError(event: any) {
@@ -62,7 +62,7 @@ export class ProfileComponent {
   }
 
   deleteAvatar() {
-    this.user.base64Avatar = '';
+    //this.user.base64Avatar = '';
   }
 
   public showPolicy() {

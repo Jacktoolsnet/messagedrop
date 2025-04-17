@@ -8,6 +8,8 @@ export interface User {
     language: string,
     subscription: string,
     defaultStyle: string,
+    cryptoPublicKey: string,
+    signingPublicKey: string,
     encryptionKeyPair: Keypair,
     signingKeyPair: Keypair,
     name: string,

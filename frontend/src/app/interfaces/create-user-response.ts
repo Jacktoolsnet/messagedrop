@@ -1,5 +1,7 @@
 export interface CreateUserResponse {
     status: number,
-    userId: string
+    userId: string,
+    cryptoPublicKey: string,
+    signingPublicKey: string
 }
 

@@ -24,6 +24,7 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
 import { Connect } from './interfaces/connect';
+import { CreateUserResponse } from './interfaces/create-user-response';
 import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
@@ -147,7 +148,6 @@ export class AppComponent implements OnInit {
       this.openCreatePinDialog();
     }
 
-    this.userService.initUser(this.userSubject);
     // Count
     this.statisticService.countVisitor()
       .subscribe({
@@ -334,6 +334,10 @@ export class AppComponent implements OnInit {
       this.userService.getPinHash(data)
         .subscribe((getPinHashResponse: GetPinHashResponse) => {
           this.indexDbService.setPinHash(getPinHashResponse.pinHash);
+          this.userService.createUser()
+            .subscribe((createUserResponse: CreateUserResponse) => {
+              this.userService.initUser(this.userSubject, createUserResponse);
+            });
         });
     });
   }

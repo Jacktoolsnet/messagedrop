@@ -75,21 +75,51 @@ router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'applicati
 
 });
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+  const { subtle } = crypto;
+
   let response = { 'status': 0 };
-  let userId;
-  if (undefined === req.body.userId || req.body.userId === '') {
-    userId = uuid.v4();
-  } else {
-    userId = req.body.userId;
-  }
-  tableUser.create(req.database.db, userId, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.subscription, function (err) {
+
+  // Create userId
+  let userId = uuid.v4();
+
+  // generate crypto key
+  const cryptoKeyPair = await subtle.generateKey(
+    {
+      name: "RSA-OAEP",
+      modulusLength: 4096,
+      publicExponent: new Uint8Array([1, 0, 1]),
+      hash: "SHA-256"
+    },
+    true,
+    ["encrypt", "decrypt"]
+  );
+  const cryptoPublicKey = await subtle.exportKey("jwk", cryptoKeyPair.publicKey);
+  const cryptoPrivateKey = await subtle.exportKey("jwk", cryptoKeyPair.privateKey);
+
+  // generate signing key
+  const signingKeyPair = await subtle.generateKey(
+    {
+      name: "ECDSA",
+      namedCurve: "P-384",
+    },
+    true,
+    ["sign", "verify"]
+  );
+
+  const signingPublicKey = await subtle.exportKey("jwk", signingKeyPair.publicKey);
+  const signingPrivateKey = await subtle.exportKey("jwk", signingKeyPair.privateKey);
+
+  // Create user record
+  tableUser.create(req.database.db, userId, JSON.stringify(cryptoPrivateKey), JSON.stringify(signingPrivateKey), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
     } else {
       response.status = 200;
       response.userId = userId;
+      response.cryptoPublicKey = JSON.stringify(cryptoPublicKey);
+      response.signingPublicKey = JSON.stringify(signingPublicKey);
     }
     res.status(response.status).json(response);
   });
