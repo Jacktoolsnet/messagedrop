@@ -155,8 +155,8 @@ export class UserService {
       );
   }
 
-  deleteUser(user: User): Observable<SimpleStatusResponse> {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/delete/${user.id}`, this.httpOptions)
+  deleteUser(userId: string): Observable<SimpleStatusResponse> {
+    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/delete/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

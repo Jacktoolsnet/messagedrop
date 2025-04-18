@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { PinHintComponent } from '../pin-hint/pin-hint.component';
 
 @Component({
   selector: 'app-createpin',
@@ -15,8 +16,8 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatButtonModule,
     MatSnackBarModule
   ],
-  templateUrl: './createpin.component.html',
-  styleUrl: './createpin.component.css'
+  templateUrl: './create-pin.component.html',
+  styleUrl: './create-pin.component.css'
 })
 export class CreatePinComponent {
   pin: string = '';
@@ -38,6 +39,7 @@ export class CreatePinComponent {
   }
 
   constructor(
+    private pinHintDialog: MatDialog,
     private dialogRef: MatDialogRef<CreatePinComponent>,
     private snackBar: MatSnackBar
   ) { }
@@ -111,9 +113,14 @@ export class CreatePinComponent {
     this.isConfirming = false;
   }
 
-  confirm(): void {
-    if (this.pin === this.confirmPin && this.pin.length === this.pinLength) {
-      this.dialogRef.close(this.pin);
-    }
+  showPinHint(): void {
+    const dialogRef = this.pinHintDialog.open(PinHintComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe(result => { });
   }
 }

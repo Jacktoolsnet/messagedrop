@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { CreatePinComponent } from './createpin.component';
+import { CreatePinComponent } from './create-pin.component';
 
 describe('CreatepinComponent', () => {
   let component: CreatePinComponent;

@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { IndexDbService } from '../../../services/index-db.service';
-import { UserService } from '../../../services/user.service';
+import { ResetUserComponent } from '../../user/reset-user/reset-user.component';
 
 @Component({
   selector: 'app-check-pin',
@@ -24,7 +23,6 @@ import { UserService } from '../../../services/user.service';
 export class CheckPinComponent {
   pin: string = '';
   pinLength: number = 6;
-  showResetButton: boolean = false;
   pinDisplay: string[] = ['', '', '', '', '', ''];
 
   @HostListener('document:keydown', ['$event'])
@@ -39,8 +37,7 @@ export class CheckPinComponent {
   }
 
   constructor(
-    private userService: UserService,
-    private indexDbService: IndexDbService,
+    private resetDialog: MatDialog,
     private dialogRef: MatDialogRef<CheckPinComponent>,
     private snackBar: MatSnackBar
   ) { }
@@ -91,6 +88,18 @@ export class CheckPinComponent {
   }
 
   resetUser(): void {
-    this.dialogRef.close(undefined);
+    const dialogRef = this.resetDialog.open(ResetUserComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.dialogRef.close(undefined);
+      }
+    });
   }
 }

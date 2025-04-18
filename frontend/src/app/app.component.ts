@@ -18,7 +18,7 @@ import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
-import { CreatePinComponent } from './components/pin/createpin/createpin.component';
+import { CreatePinComponent } from './components/pin/create-pin/create-pin.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
@@ -26,6 +26,7 @@ import { UserComponent } from './components/user/user.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { Connect } from './interfaces/connect';
 import { CreateUserResponse } from './interfaces/create-user-response';
+import { CryptedUser } from './interfaces/crypted-user';
 import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
@@ -355,9 +356,24 @@ export class AppComponent implements OnInit {
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
+    dialogRef.afterClosed().subscribe(async (data: any) => {
       if (data === undefined) {
-        console.log("PIN is not valid");
+        console.log("Create new User");
+        let cryptedUser: CryptedUser | undefined = await this.indexDbService.getUser()
+        if (cryptedUser) {
+          this.userService.deleteUser(cryptedUser.id)
+            .subscribe({
+              next: () => {
+                this.indexDbService.deleteUser();
+                this.openCreatePinDialog();
+              },
+              error: (err) => {
+                this.indexDbService.deleteUser();
+                this.openCreatePinDialog();
+              },
+              complete: () => { }
+            });
+        }
       } else {
         this.userService.getPinHash(data)
           .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
@@ -728,7 +744,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.userService.deleteUser(this.userService.getUser())
+        this.userService.deleteUser(this.userService.getUser().id)
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {

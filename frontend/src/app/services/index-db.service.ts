@@ -80,4 +80,20 @@ export class IndexDbService {
       };
     });
   }
+
+  async deleteUser(): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.userStore, 'readwrite');
+      const store = tx.objectStore(this.userStore);
+      const request = store.delete('user');
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => {
+        console.error('Fehler beim Löschen des Benutzers:', request.error);
+        reject(request.error);
+      };
+    });
+  }
 }
