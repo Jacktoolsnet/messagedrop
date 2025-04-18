@@ -39,7 +39,6 @@ export class PinterestComponent {
   ) { }
 
   validateUrl() {
-    console.log(this.pinterestUrl);
     const pinterestRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/.*-([^\/]+)/i;
     const pinterestMatch = this.pinterestUrl.match(pinterestRegex);
     const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;;
@@ -50,14 +49,12 @@ export class PinterestComponent {
       this.oembedService.resolveRedirectUrl(this.pinterestUrl)
         .subscribe({
           next: firstResponse => {
-            console.log(firstResponse.result)
             this.oembedService.resolveRedirectUrl(firstResponse.result)
               .subscribe({
                 next: finalResponse => {
                   const regex = /^(https?:\/\/)?(www\.)?pinterest\.[a-z]{2,3}\/pin\/\d+/;
                   const match = finalResponse.result.match(regex);
                   if (match) {
-                    console.log(match[0].replace(/pinterest\.[a-z]{2,3}/, 'pinterest.com'))
                     if (match[0] != this.pinterestUrl) {
                       this.pinterestUrl = match[0].replace(/pinterest\.[a-z]{2,3}/, 'pinterest.com');
                       this.validateUrl();

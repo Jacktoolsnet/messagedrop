@@ -105,8 +105,13 @@ export class UserService {
     return this.user;
   }
 
-  saveUser(user: User) {
-    localStorage.setItem('user', JSON.stringify(user))
+  async saveUser() {
+    const cryptedUser: CryptedUser = {
+      id: this.user.id,
+      cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
+    };
+    this.indexDbService.setUser(cryptedUser)
+      .then(() => { });
   }
 
   createUser(): Observable<CreateUserResponse> {
@@ -214,19 +219,19 @@ export class UserService {
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
                 user.subscription = JSON.stringify(subscription);
-                this.saveUser(user);
+                this.saveUser();
               }
             },
             error: (err) => {
               user.subscription = '';
-              this.saveUser(user);
+              this.saveUser();
             },
             complete: () => { }
           });
       })
       .catch(err => {
         user.subscription = '';
-        this.saveUser(user);
+        this.saveUser();
       });
   }
 

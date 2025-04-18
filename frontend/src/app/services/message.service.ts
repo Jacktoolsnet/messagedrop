@@ -430,7 +430,6 @@ export class MessageService {
             // The last selected message was deleted. So remove it from the selectedMessage array.
             this.selectedMessages.pop();
             if (this.messages.length === 0) {
-              console.log("close dialog");
               dialogRef.close();
             }
           }

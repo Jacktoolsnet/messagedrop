@@ -42,12 +42,10 @@ export class SpotifyComponent {
   validateUrl() {
     const spotifyRegex = /https?:\/\/open\.spotify\.com\/(track|album|artist|playlist)\/([a-zA-Z0-9]+)/;
     const spotifyMatch = this.spotifyUrl.match(spotifyRegex);
-    console.log(spotifyMatch);
     if (spotifyMatch && spotifyMatch[2]) {
       this.oembedService.getSpotifyEmbedCode(spotifyMatch[0])
         .subscribe({
           next: response => {
-            console.log(response);
             this.oembed = response.result;
             this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.oembed!.html ? this.oembed!.html : '');
           },

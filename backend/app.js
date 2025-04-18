@@ -108,13 +108,19 @@ const translateLimit = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
+const userLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  limit: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+})
 
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
 app.use('/statistic', statistic);
 app.use('/openai', openAi)
-app.use('/user', user);
+app.use('/user', userLimit, user);
 app.use('/connect', connect);
 app.use('/contact', contact);
 app.use('/message', message);

@@ -90,9 +90,7 @@ export class EditMessageComponent implements OnInit {
                     this.snackBar.open(`My message will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
                   }
                 },
-                error: (err) => {
-                  console.log(err);
-                },
+                error: (err) => { },
                 complete: () => { }
               });
           } else {

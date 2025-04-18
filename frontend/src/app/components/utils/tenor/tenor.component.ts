@@ -62,9 +62,7 @@ export class TenorComponent {
         this.nextSearch = tensorResponse.next;
         this.nextFeatured = '';
       },
-      error: (err) => {
-        console.log(err);
-      },
+      error: (err) => { },
       complete: () => { }
     });
   }

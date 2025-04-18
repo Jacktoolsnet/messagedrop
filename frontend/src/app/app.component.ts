@@ -143,7 +143,6 @@ export class AppComponent implements OnInit {
   }
 
   async initApp() {
-    console.log('initApp');
     if (await this.indexDbService.hasUser()) {
       this.openCheckPinDialog();
     } else {
@@ -209,7 +208,7 @@ export class AppComponent implements OnInit {
         this.userService.getUser().location.latitude = position.coords.latitude;
         this.userService.getUser().location.longitude = position.coords.longitude;
         this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        this.userService.saveUser(this.userService.getUser());
+        this.userService.saveUser();
         this.mapService.setUserMarker(this.userService.getUser().location);
         if (this.initWatchingPosition) {
           this.mapService.flyToWithZoom(this.userService.getUser().location, 19);
@@ -358,7 +357,6 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
       if (data === undefined) {
-        console.log("Create new User");
         let cryptedUser: CryptedUser | undefined = await this.indexDbService.getUser()
         if (cryptedUser) {
           this.userService.deleteUser(cryptedUser.id)
@@ -445,7 +443,6 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      console.log(data.message);
       if (undefined !== data?.message) {
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
@@ -728,7 +725,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.userService.saveUser(result);
+        this.userService.saveUser();
       }
     });
   }
