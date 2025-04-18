@@ -1,4 +1,4 @@
-export interface User {
+export interface Profile {
     name: string,
     base64Avatar: string
 }
