@@ -1,6 +1,4 @@
 import { Injectable } from '@angular/core';
-import { random } from "colord";
-import { Animation } from '../interfaces/animation';
 
 @Injectable({
   providedIn: 'root'
@@ -11,58 +9,6 @@ export class StyleService {
 
   private getRandomNumber(from: number, to: number): number {
     return Math.floor(Math.random() * (to + 1)) + from;
-  }
-
-  private getGradiantColorAnimation(): Animation {
-    let animation: Animation = {
-      'cssclass': 'gradientAnimation',
-      'style': `
-      background-color: ${random().toHex()};
-      background-image: linear-gradient(${this.getRandomNumber(0, 365)}deg, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()});
-      background-size: 400% 400%;
-      animation-duration: ${this.getRandomNumber(5, 15)}s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease;`
-    };
-    return animation;
-  }
-
-  private getRadialColorAnimation(): Animation {
-    let animation: Animation = {
-      'cssclass': 'radialAnimation',
-      'style': `
-      background-color: ${random().toHex()};
-      background-image: radial-gradient(ellipse farthest-corner at ${this.getRandomNumber(25, 75)}% ${this.getRandomNumber(25, 75)}%, ${random().toHex()} 0%, ${random().toHex()} 8%, ${random().toHex()} 25%, ${random().toHex()} 62.5%, ${random().toHex()} 100%);
-      background-size: 400% 400%;
-      animation-duration: ${this.getRandomNumber(5, 15)}s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease;`
-    };
-    return animation;
-  }
-
-
-  private getConicColorAnimation(): Animation {
-    let animation: Animation = {
-      'cssclass': 'conicAnimation',
-      'style': `
-      background-color: ${random().toHex()};
-      background-image: conic-gradient(at ${this.getRandomNumber(25, 75)}% ${this.getRandomNumber(25, 75)}%, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()}, ${random().toHex()});
-      background-size: 400% 400%;
-      animation-duration: ${this.getRandomNumber(5, 15)}s;
-      animation-iteration-count: infinite;
-      animation-timing-function: ease;`
-    };
-    return animation;
-  }
-
-  getRandomColorAnimation(): Animation {
-    switch (this.getRandomNumber(1, 3)) {
-      case 1: return this.getRadialColorAnimation();
-      case 2: return this.getGradiantColorAnimation();
-      case 3: return this.getConicColorAnimation();
-      default: return this.getRadialColorAnimation();
-    }
   }
 
   getRandomFontFamily(): string {

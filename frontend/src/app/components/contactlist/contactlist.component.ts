@@ -7,7 +7,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@ang
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Animation } from '../../interfaces/animation';
 import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
 import { GetUserResponse } from '../../interfaces/get-user-response';
@@ -49,7 +48,6 @@ export class ContactlistComponent implements OnInit {
   private snackBarRef: any;
   private contactToDelete!: Contact
   public user!: User;
-  public animation!: Animation;
   public mode: typeof Mode = Mode;
   public subscriptionError: boolean = false;
 
@@ -72,7 +70,6 @@ export class ContactlistComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.animation = this.style.getRandomColorAnimation();
   }
 
   openConnectDialog(): void {

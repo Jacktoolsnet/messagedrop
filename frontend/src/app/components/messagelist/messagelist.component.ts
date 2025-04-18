@@ -11,7 +11,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Animation } from '../../interfaces/animation';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
@@ -58,7 +57,6 @@ export class MessagelistComponent implements OnInit {
   public messages!: Message[];
   public selectedMessageUser!: RelatedUser;
   public user!: User;
-  public animation!: Animation;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
   public mode: typeof Mode = Mode;
@@ -82,7 +80,6 @@ export class MessagelistComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.animation = this.style.getRandomColorAnimation();
   }
 
   public flyTo(message: Message) {

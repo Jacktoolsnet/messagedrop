@@ -11,7 +11,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Animation } from '../../interfaces/animation';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { Place } from '../../interfaces/place';
@@ -47,7 +46,6 @@ export class PlacelistComponent implements OnInit {
   public places!: Place[];
   private placeToDelete!: Place
   public user!: User;
-  public animation!: Animation;
   public mode: typeof Mode = Mode;
   private snackBarRef: any;
   public subscriptionError: boolean = false;
@@ -70,7 +68,6 @@ export class PlacelistComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.animation = this.style.getRandomColorAnimation();
   }
 
   public deletePlace(place: Place) {
