@@ -6,7 +6,6 @@ const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
-const { escape } = require('querystring');
 
 router.get('/get', [security.checkToken], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
@@ -135,7 +134,7 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
     response.status = 400;
     res.status(response.status).json(response);
   } else {
-    tableUser.getById(req.database.db, req.body.cryptedUser.id, function (err, row) {
+    tableUser.getById(req.database.db, req.body.cryptedUser.id, async function (err, row) {
       if (err) {
         response.status = 500;
         response.error = err;
@@ -146,9 +145,85 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
           response.status = 404;
           res.status(response.status).json(response);
         } else {
-          response.user = row;
-          response.status = 200;
-          res.status(response.status).json(response);
+          // Decrypt the cryptoKey
+          try {
+            const cryptedUser = JSON.parse(req.body.cryptedUser.cryptedUser);
+            const encryptionPrivateKey = JSON.parse(row.cryptoPrivateKey);
+            // Payload in ArrayBuffer umwandeln
+            const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedKey));
+            // RSA Private Key importieren
+            const rsaHashedImportParams = {
+              name: "RSA-OAEP",
+              hash: "SHA-256"
+            };
+
+            const privateKey = await subtle.importKey(
+              "jwk",
+              encryptionPrivateKey,
+              rsaHashedImportParams,
+              true,
+              ["decrypt"]
+            );
+
+            // Payload entschlüsseln
+            const decryptedPayload = await subtle.decrypt(
+              {
+                name: "RSA-OAEP",
+              },
+              privateKey,
+              payloadBuffer
+            );
+
+            // Entschlüsselten AES-Schlüssel importieren
+            const decryptedKeyString = new TextDecoder().decode(decryptedPayload);
+            const aesJwk = JSON.parse(decryptedKeyString);
+
+            const algorithmIdentifier = {
+              name: "AES-GCM"
+            };
+
+            const cryptoKey = await subtle.importKey(
+              'jwk',
+              aesJwk,
+              algorithmIdentifier,
+              true,
+              ['encrypt', 'decrypt']
+            );
+
+            // Decrypt the data.
+            try {
+              const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedData));
+              const decryptedPayload = await crypto.subtle.decrypt(
+                {
+                  name: 'AES-GCM',
+                  iv: Buffer.from(JSON.parse(cryptedUser.iv))
+                },
+                cryptoKey,
+                payloadBuffer,
+              );
+              let decoder = new TextDecoder('utf-8');
+              const user = JSON.parse(decoder.decode(decryptedPayload));
+
+              if (user.pinHash === req.body.pinHash) {
+                response.user = user;
+                response.status = 200;
+                res.status(response.status).json(response);
+              } else {
+                response.status = 401;
+                res.status(response.status).json(response);
+              }
+
+            } catch (err) {
+              console.error(err);
+              esponse.status = 500;
+              response.error = 'Encrption failed';
+              res.status(response.status).json(response);
+            }
+          } catch (err) {
+            response.status = 500;
+            response.error = 'Encrption failed';
+            res.status(response.status).json(response);
+          }
         }
       }
     });
@@ -207,5 +282,6 @@ router.get('/unsubscribe/:userId', [security.checkToken], function (req, res) {
     res.status(response.status).json(response);
   });
 });
+
 
 module.exports = router
