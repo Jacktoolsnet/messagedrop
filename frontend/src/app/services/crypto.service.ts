@@ -199,7 +199,6 @@ export class CryptoService {
     } catch (err) {
       return "";
     }
-
   }
 
 }

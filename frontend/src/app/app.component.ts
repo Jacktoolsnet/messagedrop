@@ -366,7 +366,7 @@ export class AppComponent implements OnInit {
             if (cruptedUser) {
               this.userService.confirmUser(getPinHashResponse.pinHash, cruptedUser)
                 .subscribe((confirmUserResponse: ConfirmUserResponse) => {
-                  console.log
+                  console.log(confirmUserResponse);
                 });
             }
           });

@@ -5,8 +5,6 @@ import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { CryptedUser } from '../../../interfaces/crypted-user';
-import { GetPinHashResponse } from '../../../interfaces/get-pin-hash-response';
 import { IndexDbService } from '../../../services/index-db.service';
 import { UserService } from '../../../services/user.service';
 
@@ -79,26 +77,8 @@ export class CheckPinComponent {
   }
 
   confirm(): void {
-    // Todo: check if pin is correct
     if (this.pin.length === this.pinLength) {
-      this.userService.getPinHash(this.pin)
-        .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
-          console.log(getPinHashResponse);
-          let cryptedUser: CryptedUser | undefined = await this.indexDbService.getUser();
-          if (cryptedUser !== undefined) {
-            console.log(cryptedUser);
-            /*this.snackBar.open('Pin is not valid. Please try again.', '', {
-              duration: 2000,
-              horizontalPosition: 'center',
-              verticalPosition: 'top'
-            });
-            this.reset();
-            this.showResetButton = true;*/
-          } /*else {
-            this.showResetButton = false;
-            this.dialogRef.close(this.pin);
-          } */
-        });
+      this.dialogRef.close(this.pin);
     }
   }
 

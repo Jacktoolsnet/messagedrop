@@ -151,7 +151,7 @@ export class UserService {
   confirmUser(pinHash: string, cryptedUser: CryptedUser): Observable<ConfirmUserResponse> {
     let body = {
       pinHash: pinHash,
-      cryptedUser: cryptedUser.cryptedUser,
+      cryptedUser: cryptedUser,
     };
     return this.http.post<ConfirmUserResponse>(`${environment.apiUrl}/user/confirm`, body, this.httpOptions)
       .pipe(

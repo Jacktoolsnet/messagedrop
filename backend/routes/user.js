@@ -6,6 +6,7 @@ const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
+const { escape } = require('querystring');
 
 router.get('/get', [security.checkToken], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
@@ -49,7 +50,7 @@ router.get('/get/:userId', [security.checkToken], function (req, res) {
 router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
 
-  if (!req.body.pin || typeof req.body.pin !== 'string' || req.body.pin.length !== 4) {
+  if (!req.body.pin || typeof req.body.pin !== 'string' || req.body.pin.length !== 6) {
     response.status = 400;
     response.error = 'Invalid PIN';
     return res.status(400).json(response);
@@ -130,20 +131,29 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
 
   let response = { 'status': 0 };
 
-  tableUser.getById(req.database.db, req.body.cryptedUser.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      if (!row) {
-        response.rawUser = {};
-        response.status = 404;
+  if (!req.body.cryptedUser && !req.body.cryptedUser.id && !req.body.cryptedUser.pinHash) {
+    response.status = 400;
+    res.status(response.status).json(response);
+  } else {
+    tableUser.getById(req.database.db, req.body.cryptedUser.id, function (err, row) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+        res.status(response.status).json(response);
       } else {
-        response.rawUser = row;
-        response.status = 200;
+        if (!row) {
+          response.user = {};
+          response.status = 404;
+          res.status(response.status).json(response);
+        } else {
+          response.user = row;
+          response.status = 200;
+          res.status(response.status).json(response);
+        }
       }
-    }
-  });
+    });
+  }
+
 });
 
 router.get('/clean', [security.checkToken], function (req, res) {
