@@ -1,15 +1,15 @@
 .button_profile {
     position: absolute;
-    left:    0;
-    bottom:   0;
+    left: 0;
+    bottom: 0;
     z-index: 100;
     margin: 2rem;
 }
 
 .button_drop {
     position: absolute;
-    right:    0;
-    bottom:   0;
+    right: 0;
+    bottom: 0;
     z-index: 100;
     margin-right: 2rem;
     margin-bottom: 2rem;
@@ -17,8 +17,8 @@
 
 .button_goToLocation {
     position: absolute;
-    right:    0;
-    bottom:   0;
+    right: 0;
+    bottom: 0;
     z-index: 100;
     margin-right: 6rem;
     margin-bottom: 2rem;
@@ -26,8 +26,8 @@
 
 .button_watchLocation {
     position: absolute;
-    right:    0;
-    bottom:   0;
+    right: 0;
+    bottom: 0;
     z-index: 100;
     margin-right: 6rem;
     margin-bottom: 2rem;
@@ -35,8 +35,8 @@
 
 .button_addLocationToPlace {
     position: absolute;
-    right:    0;
-    bottom:   0;
+    right: 0;
+    bottom: 0;
     z-index: 100;
     margin-right: 6rem;
     margin-bottom: 2rem;
@@ -44,8 +44,8 @@
 
 .button_removeLocationFromPlace {
     position: absolute;
-    right:    0;
-    bottom:   0;
+    right: 0;
+    bottom: 0;
     z-index: 100;
     margin-right: 6rem;
     margin-bottom: 2rem;

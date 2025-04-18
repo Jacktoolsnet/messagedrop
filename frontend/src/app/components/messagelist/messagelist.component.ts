@@ -30,7 +30,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { BlockMessageComponent } from './block-message/block-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
-import { EditUserComponent } from './edit-user/edit-user.component';
+import { EditProfileComponent } from './edit-profile/edit-profile.component';
 
 @Component({
   selector: 'app-messagelist',
@@ -215,7 +215,7 @@ export class MessagelistComponent implements OnInit {
     if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
       this.selectedMessageUser.id = message.userId;
     }
-    const dialogRef = this.dialog.open(EditUserComponent, {
+    const dialogRef = this.dialog.open(EditProfileComponent, {
       data: { relatedUser: this.selectedMessageUser },
       closeOnNavigation: true,
       hasBackdrop: true

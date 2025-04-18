@@ -23,15 +23,15 @@ import { RelatedUser } from '../../../interfaces/related-user';
     MatIcon,
     CommonModule
   ],
-  templateUrl: './edit-user.component.html',
-  styleUrl: './edit-user.component.css'
+  templateUrl: './edit-profile.component.html',
+  styleUrl: './edit-profile.component.css'
 })
-export class EditUserComponent {
+export class EditProfileComponent {
   public relatedUser!: RelatedUser;
 
   constructor(
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<EditUserComponent>,
+    public dialogRef: MatDialogRef<EditProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { relatedUser: RelatedUser }) {
     this.relatedUser = data.relatedUser;
   }

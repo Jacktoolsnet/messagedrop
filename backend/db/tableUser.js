@@ -3,6 +3,12 @@ const userStatus = {
     DISABLED: 'disabled'
 };
 
+const userType = {
+    USER: 'user',
+    ADMIN: 'admin',
+    BUSSINESS: 'business'
+}
+
 const tableName = 'tableUser';
 const columnUserId = 'id';
 const columnCryptoPrivateKey = 'cryptoPrivateKey';
@@ -12,6 +18,7 @@ const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
 const columnUserStatus = 'userStatus';
 const columnLastSignOfLife = 'lastSignOfLife';
 const columnSubscription = 'subscription';
+const columnType = 'type';
 
 const init = function (db) {
     try {
@@ -24,7 +31,8 @@ const init = function (db) {
             ${columnNumberOfBlockedMessages} INTEGER DEFAULT 0,
             ${columnUserStatus} TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
             ${columnLastSignOfLife} INTEGER NOT NULL,
-            ${columnSubscription} TEXT DEFAULT NULL
+            ${columnSubscription} TEXT DEFAULT NULL,
+            ${columnType} TEXT DEFAULT NULL
         );`;
 
         db.run(sql, (err) => {
@@ -44,12 +52,14 @@ const create = function (db, userId, cryptoPrivateKey, signingPrivateKey, callba
             ${columnUserId}, 
             ${columnCryptoPrivateKey},
             ${columnSigningPrivateKey},
+            ${columnType},
             ${columnLastSignOfLife}
         ) 
         VALUES (
             '${userId}', 
             '${cryptoPrivateKey}',
             '${signingPrivateKey}',
+            '${userType.USER}',
             datetime('now')
         );`;
         db.run(sql, (err) => {

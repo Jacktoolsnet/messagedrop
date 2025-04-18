@@ -11,6 +11,7 @@ import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { GetUserResponse } from '../interfaces/get-user-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
+import { UserType } from '../interfaces/user-type copy';
 import { CryptoService } from './crypto.service';
 import { IndexDbService } from './index-db.service';
 
@@ -42,7 +43,8 @@ export class UserService {
     name: '',
     base64Avatar: '',
     serverCryptoPublicKey: '',
-    serverSigningPublicKey: ''
+    serverSigningPublicKey: '',
+    type: UserType.USER
   };
 
   private ready: boolean = false;

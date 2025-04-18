@@ -1,5 +1,6 @@
 import { Keypair } from "./keypair";
 import { Location } from "./location";
+import { UserType } from "./user-type copy";
 
 export interface User {
     id: string,
@@ -14,5 +15,6 @@ export interface User {
     cryptoKeyPair: Keypair,
     signingKeyPair: Keypair,
     name: string,
-    base64Avatar: string
+    base64Avatar: string,
+    type: UserType,
 }

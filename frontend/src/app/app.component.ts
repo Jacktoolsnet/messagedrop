@@ -376,15 +376,49 @@ export class AppComponent implements OnInit {
         this.userService.getPinHash(data)
           .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
             this.userService.getUser().pinHash = getPinHashResponse.pinHash;
-            const cruptedUser = await this.indexDbService.getUser();
-            if (cruptedUser) {
-              this.userService.confirmUser(getPinHashResponse.pinHash, cruptedUser)
+            const cryptedUser = await this.indexDbService.getUser();
+            if (cryptedUser) {
+              this.userService.confirmUser(getPinHashResponse.pinHash, cryptedUser)
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user);
                   },
-                  error: () => {
-                    this.openCheckPinDialog();
+                  error: (err) => {
+                    if (err.status === 401) {
+                      this.snackBarRef = this.snackBar.open("Pin is not correct. Please try again.", undefined, {
+                        panelClass: ['snack-warning'],
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        duration: 3000
+                      });
+                      this.openCheckPinDialog();
+                    } else if (err.status === 404) {
+                      this.snackBarRef = this.snackBar.open("Pin did not exist anymore. Please create a new user.", undefined, {
+                        panelClass: ['snack-warning'],
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        duration: 3000
+                      });
+                      this.userService.deleteUser(cryptedUser.id)
+                        .subscribe({
+                          next: () => {
+                            this.indexDbService.clearAllData();
+                            this.openCreatePinDialog();
+                          },
+                          error: (err) => {
+                            this.indexDbService.clearAllData();
+                            this.openCreatePinDialog();
+                          },
+                          complete: () => { }
+                        });
+                    } else {
+                      this.snackBarRef = this.snackBar.open("Oops, something went wrong. Please try again later.", undefined, {
+                        panelClass: ['snack-warning'],
+                        horizontalPosition: 'center',
+                        verticalPosition: 'top',
+                        duration: 3000
+                      });
+                    }
                   }
                 });
             }

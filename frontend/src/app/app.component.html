@@ -15,12 +15,14 @@
         class="material-symbols-outlined">where_to_vote</mat-icon>{{this.placeService.getSelectedPlace().name}}
 </button>
 
-<button *ngIf="!locationReady" [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary"
-    aria-label="Watch user location" (click)="startWatchingPosition()">
+<button *ngIf="this.userService.isReady() && !locationReady" [attr.aria-hidden]="locationReady"
+    class="button_watchLocation" mat-fab color="primary" aria-label="Watch user location"
+    (click)="startWatchingPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button *ngIf="locationReady && !isUserLocation" [attr.aria-hidden]="!(this.userService.isReady() && locationReady)"
-    class="button_goToLocation" mat-fab color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
+<button *ngIf="this.userService.isReady() && locationReady && !isUserLocation"
+    [attr.aria-hidden]="!(this.userService.isReady() && locationReady)" class="button_goToLocation" mat-fab
+    color="primary" aria-label="Go to your location" (click)="goToUserLocation()">
     <mat-icon [attr.aria-hidden]="!(this.userService.isReady() && locationReady)"
         class="material-symbols-outlined">adjust</mat-icon>
 </button>
