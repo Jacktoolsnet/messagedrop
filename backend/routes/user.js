@@ -125,6 +125,27 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
+router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+  const { subtle } = crypto;
+
+  let response = { 'status': 0 };
+
+  tableUser.getById(req.database.db, req.body.cryptedUser.userId, function (err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      if (!row) {
+        response.rawUser = {};
+        response.status = 404;
+      } else {
+        response.rawUser = row;
+        response.status = 200;
+      }
+    }
+  });
+});
+
 router.get('/clean', [security.checkToken], function (req, res) {
   let response = { 'status': 0 };
   tableUser.clean(req.database.db, function (err) {

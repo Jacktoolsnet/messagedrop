@@ -118,7 +118,7 @@ export class ContactService {
                   if (valid) {
                     contact.userMessageVerified = true;
                     if (contact.userEncryptedMessage) {
-                      this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.userEncryptedMessage!)
+                      this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, contact.userEncryptedMessage!)
                         .then((message: string) => {
                           if (message !== '') {
                             contact.userMessage = JSON.parse(message);
@@ -165,7 +165,7 @@ export class ContactService {
                   if (valid) {
                     contact.contactUserMessageVerified = true;
                     if (contact.contactUserEncryptedMessage) {
-                      this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, contact.contactUserEncryptedMessage!)
+                      this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, contact.contactUserEncryptedMessage!)
                         .then((message: string) => {
                           if (message !== '') {
                             contact.contactUserMessage = JSON.parse(message);

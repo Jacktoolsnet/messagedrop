@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CryptedUser } from '../interfaces/crypted-user';
 
 @Injectable({
   providedIn: 'root'
@@ -6,6 +7,7 @@ import { Injectable } from '@angular/core';
 export class IndexDbService {
   private dbName = 'messageDropDb';
   private settingStore = 'settings';
+  private userStore = 'user';
 
   constructor() {
     this.openDB(); // optional preload
@@ -20,6 +22,9 @@ export class IndexDbService {
         if (!db.objectStoreNames.contains(this.settingStore)) {
           db.createObjectStore(this.settingStore);
         }
+        if (!db.objectStoreNames.contains(this.userStore)) {
+          db.createObjectStore(this.userStore);
+        }
       };
 
       request.onsuccess = () => resolve(request.result);
@@ -27,13 +32,13 @@ export class IndexDbService {
     });
   }
 
-  async hasPinHash(): Promise<boolean> {
+  async hasUser(): Promise<boolean> {
     const db = await this.openDB();
 
     return new Promise<boolean>((resolve, reject) => {
-      const tx = db.transaction(this.settingStore, 'readonly');
-      const store = tx.objectStore(this.settingStore);
-      const request = store.get('pinHash');
+      const tx = db.transaction(this.userStore, 'readonly');
+      const store = tx.objectStore(this.userStore);
+      const request = store.get('user');
 
       request.onsuccess = () => resolve(request.result !== undefined);
       request.onerror = () => {
@@ -42,13 +47,13 @@ export class IndexDbService {
     });
   }
 
-  async setPinHash(hash: string): Promise<void> {
+  async setUser(cryptedUser: CryptedUser): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.settingStore, 'readwrite');
-      const store = tx.objectStore(this.settingStore);
-      const request = store.put(hash, 'pinHash');
+      const tx = db.transaction(this.userStore, 'readwrite');
+      const store = tx.objectStore(this.userStore);
+      const request = store.put(cryptedUser, 'user');
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -57,21 +62,21 @@ export class IndexDbService {
     });
   }
 
-  async checkPinHash(pinHash: string): Promise<boolean> {
+  async getUser(): Promise<CryptedUser | undefined> {
     const db = await this.openDB();
 
-    return new Promise<boolean>((resolve, reject) => {
-      const tx = db.transaction(this.settingStore, 'readonly');
-      const store = tx.objectStore(this.settingStore);
-      const request = store.get('pinHash');
+    return new Promise<CryptedUser | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.userStore, 'readonly');
+      const store = tx.objectStore(this.userStore);
+      const request = store.get('user');
 
       request.onsuccess = () => {
-        const storedHash = request.result;
-        resolve(storedHash === pinHash);
+        resolve(request.result);
       };
 
       request.onerror = () => {
-        resolve(false);
+        console.error('Fehler beim Lesen des Benutzers:', request.error);
+        reject(request.error);
       };
     });
   }

@@ -199,7 +199,7 @@ export class ContactlistComponent implements OnInit {
             next: (userResponse: GetUserResponse) => {
               this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
                 .then((signature: string) => {
-                  this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, 'QR-Code')
+                  this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'QR-Code')
                     .then((encryptedHint: string) => {
                       data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
                       data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.encryptionPublicKey);
@@ -315,7 +315,7 @@ export class ContactlistComponent implements OnInit {
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
             envelope.messageSignature = signature;
-            this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, JSON.stringify(data?.shortMessage))
+            this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, JSON.stringify(data?.shortMessage))
               .then((encryptedMessage: string) => {
                 envelope.userEncryptedMessage = encryptedMessage;
                 this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, JSON.stringify(data?.shortMessage))

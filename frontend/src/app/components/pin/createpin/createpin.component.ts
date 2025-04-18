@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -20,10 +20,22 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 })
 export class CreatePinComponent {
   pin: string = '';
+  pinLength: number = 6;
   confirmPin: string = '';
-  pinDisplay: string[] = ['', '', '', ''];
-  confirmPinDisplay: string[] = ['', '', '', ''];
+  pinDisplay: string[] = ['', '', '', '', '', ''];
+  confirmPinDisplay: string[] = ['', '', '', '', '', ''];
   isConfirming: boolean = false;
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardInput(event: KeyboardEvent): void {
+    const key = event.key;
+
+    if (/^[0-9]$/.test(key)) {
+      this.addDigit(key);
+    } else if (key === 'Backspace') {
+      this.removeDigit();
+    }
+  }
 
   constructor(
     private dialogRef: MatDialogRef<CreatePinComponent>,
@@ -36,22 +48,22 @@ export class CreatePinComponent {
 
   addDigit(digit: string): void {
     if (!this.isConfirming) {
-      if (this.pin.length < 4) {
+      if (this.pin.length < this.pinLength) {
         this.pin += digit;
         this.showDigitTemporarily(this.pin.length - 1);
 
-        if (this.pin.length === 4) {
+        if (this.pin.length === this.pinLength) {
           setTimeout(() => {
             this.isConfirming = true;
           }, 500);
         }
       }
     } else {
-      if (this.confirmPin.length < 4) {
+      if (this.confirmPin.length < this.pinLength) {
         this.confirmPin += digit;
         this.showDigitTemporarily(this.confirmPin.length - 1, true);
 
-        if (this.confirmPin.length === 4) {
+        if (this.confirmPin.length === this.pinLength) {
           // Automatisch prüfen & ggf. schließen
           setTimeout(() => {
             if (this.confirmPin === this.pin) {
@@ -79,20 +91,29 @@ export class CreatePinComponent {
     }, 500);
   }
 
+  removeDigit(): void {
+    if (!this.isConfirming && this.pin.length > 0) {
+      const index = this.pin.length - 1;
+      this.pin = this.pin.slice(0, -1);
+      this.pinDisplay[index] = '';
+    } else if (this.isConfirming && this.confirmPin.length > 0) {
+      const index = this.confirmPin.length - 1;
+      this.confirmPin = this.confirmPin.slice(0, -1);
+      this.confirmPinDisplay[index] = '';
+    }
+  }
+
   reset(): void {
     this.pin = '';
     this.confirmPin = '';
-    this.pinDisplay = ['', '', '', ''];
-    this.confirmPinDisplay = ['', '', '', ''];
+    this.pinDisplay = ['', '', '', '', '', ''];
+    this.confirmPinDisplay = ['', '', '', '', '', ''];
     this.isConfirming = false;
   }
 
   confirm(): void {
-    if (this.pin === this.confirmPin && this.pin.length === 4) {
+    if (this.pin === this.confirmPin && this.pin.length === this.pinLength) {
       this.dialogRef.close(this.pin);
-    } else {
-      alert('PINs stimmen nicht überein');
-      this.reset();
     }
   }
 }

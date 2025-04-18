@@ -23,6 +23,7 @@ import { PlacelistComponent } from './components/placelist/placelist.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
+import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { Connect } from './interfaces/connect';
 import { CreateUserResponse } from './interfaces/create-user-response';
 import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
@@ -142,7 +143,7 @@ export class AppComponent implements OnInit {
 
   async initApp() {
     console.log('initApp');
-    if (await this.indexDbService.hasPinHash()) {
+    if (await this.indexDbService.hasUser()) {
       this.openCheckPinDialog();
     } else {
       this.openCreatePinDialog();
@@ -330,10 +331,9 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      this.userService.setPin(data);
       this.userService.getPinHash(data)
         .subscribe((getPinHashResponse: GetPinHashResponse) => {
-          this.indexDbService.setPinHash(getPinHashResponse.pinHash);
+          this.userService.getUser().pinHash = getPinHashResponse.pinHash;
           this.userService.createUser()
             .subscribe((createUserResponse: CreateUserResponse) => {
               this.userService.initUser(this.userSubject, createUserResponse);
@@ -359,7 +359,17 @@ export class AppComponent implements OnInit {
       if (data === undefined) {
         console.log("PIN is not valid");
       } else {
-        this.userService.setPin(data);
+        this.userService.getPinHash(data)
+          .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
+            this.userService.getUser().pinHash = getPinHashResponse.pinHash;
+            const cruptedUser = await this.indexDbService.getUser();
+            if (cruptedUser) {
+              this.userService.confirmUser(getPinHashResponse.pinHash, cruptedUser)
+                .subscribe((confirmUserResponse: ConfirmUserResponse) => {
+                  console.log
+                });
+            }
+          });
       }
     });
   }
@@ -750,14 +760,14 @@ export class AppComponent implements OnInit {
         case "shareUserId":
           this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
             .then((signature: string) => {
-              this.cryptoService.encrypt(this.userService.getUser().encryptionKeyPair.publicKey, result?.connectHint)
+              this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, result?.connectHint)
                 .then((encryptedHint: string) => {
                   let connect: Connect = {
                     id: '',
                     userId: this.userService.getUser().id,
                     hint: encryptedHint,
                     signature: signature,
-                    encryptionPublicKey: JSON.stringify(this.userService.getUser().encryptionKeyPair?.publicKey!),
+                    encryptionPublicKey: JSON.stringify(this.userService.getUser().cryptoKeyPair?.publicKey!),
                     signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
                   };
                   this.connectService.createConnect(connect)

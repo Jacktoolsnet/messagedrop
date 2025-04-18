@@ -3,24 +3,25 @@ import { Injectable } from '@angular/core';
 import { SwPush } from '@angular/service-worker';
 import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { ConfirmUserResponse } from '../interfaces/confirm-user-response';
 import { CreateUserResponse } from '../interfaces/create-user-response';
+import { CryptedUser } from '../interfaces/crypted-user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { GetUserResponse } from '../interfaces/get-user-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { CryptoService } from './crypto.service';
-import { StyleService } from './style.service';
+import { IndexDbService } from './index-db.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
 
-  private pin: string = '';
-
   private user: User = {
     id: '',
+    pinHash: '',
     location: {
       latitude: 0,
       longitude: 0,
@@ -30,7 +31,7 @@ export class UserService {
     language: '',
     subscription: '',
     defaultStyle: '',
-    encryptionKeyPair: {
+    cryptoKeyPair: {
       publicKey: {},
       privateKey: {}
     },
@@ -40,8 +41,8 @@ export class UserService {
     },
     name: '',
     base64Avatar: '',
-    cryptoPublicKey: '',
-    signingPublicKey: ''
+    serverCryptoPublicKey: '',
+    serverSigningPublicKey: ''
   };
 
   private ready: boolean = false;
@@ -56,21 +57,13 @@ export class UserService {
   constructor(
     private http: HttpClient,
     private swPush: SwPush,
-    private style: StyleService,
+    private indexDbService: IndexDbService,
     private cryptoService: CryptoService
   ) { }
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
     return throwError(() => error);
-  }
-
-  getPin(): string {
-    return this.pin;
-  }
-
-  setPin(pin: string) {
-    this.pin = pin;
   }
 
   getPinHash(pin: string): Observable<GetPinHashResponse> {
@@ -118,48 +111,21 @@ export class UserService {
     }*/
   }
 
-  initUser(userSubject: Subject<void>, createUserResponse: CreateUserResponse) {
+  async initUser(userSubject: Subject<void>, createUserResponse: CreateUserResponse) {
     this.user.id = createUserResponse.userId;
-    this.user.cryptoPublicKey = createUserResponse.cryptoPublicKey;
-    this.user.signingPublicKey = createUserResponse.signingPublicKey;
-    console.log(this.user)
-    this.ready = true;
-    userSubject.next();
-    /*this.loadUserFromLocalStorage();
-    if (this.user.id === '') {
-      this.cryptoService.createSymmetricalKey()
-        .then((symmetricalKey: JsonWebKey) => {
-          this.cryptoService.createEncryptionKey()
-            .then((encryptionKeyPair: Keypair) => {
-              this.user!.encryptionKeyPair = encryptionKeyPair;
-              this.cryptoService.createSigningKey()
-                .then((signingKeyPair: Keypair) => {
-                  this.user!.signingKeyPair = signingKeyPair;
-                });
-            });
-        });
-    } else {
-      // Check if the user exist. It could be that the database was deleted.  
-      this.getUserById(this.user.id)
-        .subscribe({
-          next: (data) => {
-          },
-          error: (err) => {
-            // Create the user when it does not exist in the database.
-            if (err.status === 404) {
-              this.restoreUser(this.user!.id, this.user!.encryptionKeyPair?.publicKey, this.user!.signingKeyPair?.publicKey, this.user!.subscription)
-                .subscribe(createUserResponse => {
-                  this.ready = true;
-                  userSubject.next();
-                });
-            }
-          },
-          complete: () => {
-            this.ready = true;
-            userSubject.next();
-          }
-        });
-    }*/
+    this.user.serverCryptoPublicKey = createUserResponse.cryptoPublicKey;
+    this.user.serverSigningPublicKey = createUserResponse.signingPublicKey;
+    this.user.cryptoKeyPair = await this.cryptoService.createEncryptionKey();
+    this.user.signingKeyPair = await this.cryptoService.createSigningKey();
+    const cryptedUser: CryptedUser = {
+      id: this.user.id,
+      cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
+    };
+    this.indexDbService.setUser(cryptedUser)
+      .then(() => {
+        this.ready = true;
+        userSubject.next();
+      });
   }
 
   isReady(): boolean {
@@ -177,6 +143,17 @@ export class UserService {
   createUser(): Observable<CreateUserResponse> {
     let body = {};
     return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  confirmUser(pinHash: string, cryptedUser: CryptedUser): Observable<ConfirmUserResponse> {
+    let body = {
+      pinHash: pinHash,
+      cryptedUser: cryptedUser.cryptedUser,
+    };
+    return this.http.post<ConfirmUserResponse>(`${environment.apiUrl}/user/confirm`, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

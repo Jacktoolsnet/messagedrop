@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, HostListener } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { CryptedUser } from '../../../interfaces/crypted-user';
 import { GetPinHashResponse } from '../../../interfaces/get-pin-hash-response';
 import { IndexDbService } from '../../../services/index-db.service';
 import { UserService } from '../../../services/user.service';
@@ -21,10 +22,23 @@ import { UserService } from '../../../services/user.service';
   templateUrl: './check-pin.component.html',
   styleUrl: './check-pin.component.css'
 })
+
 export class CheckPinComponent {
   pin: string = '';
+  pinLength: number = 6;
   showResetButton: boolean = false;
-  pinDisplay: string[] = ['', '', '', ''];
+  pinDisplay: string[] = ['', '', '', '', '', ''];
+
+  @HostListener('document:keydown', ['$event'])
+  handleKeyboardInput(event: KeyboardEvent): void {
+    const key = event.key;
+
+    if (/^[0-9]$/.test(key)) {
+      this.addDigit(key);
+    } else if (key === 'Backspace') {
+      this.removeDigit();
+    }
+  }
 
   constructor(
     private userService: UserService,
@@ -38,11 +52,11 @@ export class CheckPinComponent {
   }
 
   addDigit(digit: string): void {
-    if (this.pin.length < 4) {
+    if (this.pin.length < this.pinLength) {
       this.pin += digit;
       this.showDigitTemporarily(this.pin.length - 1);
 
-      if (this.pin.length === 4) {
+      if (this.pin.length === this.pinLength) {
         setTimeout(() => {
           this.confirm();
         }, 500);
@@ -61,31 +75,38 @@ export class CheckPinComponent {
 
   reset(): void {
     this.pin = '';
-    this.pinDisplay = ['', '', '', ''];
+    this.pinDisplay = ['', '', '', '', '', ''];
   }
 
   confirm(): void {
     // Todo: check if pin is correct
-    if (this.pin.length === 4) {
+    if (this.pin.length === this.pinLength) {
       this.userService.getPinHash(this.pin)
         .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
-          if (!await this.indexDbService.checkPinHash(getPinHashResponse.pinHash)) {
-            this.snackBar.open('Pin is not valid. Please try again.', '', {
+          console.log(getPinHashResponse);
+          let cryptedUser: CryptedUser | undefined = await this.indexDbService.getUser();
+          if (cryptedUser !== undefined) {
+            console.log(cryptedUser);
+            /*this.snackBar.open('Pin is not valid. Please try again.', '', {
               duration: 2000,
               horizontalPosition: 'center',
               verticalPosition: 'top'
             });
             this.reset();
-            this.showResetButton = true;
-          } else {
+            this.showResetButton = true;*/
+          } /*else {
             this.showResetButton = false;
             this.dialogRef.close(this.pin);
-          }
+          } */
         });
+    }
+  }
 
-    } else {
-      alert('PINs stimmen nicht überein');
-      this.reset();
+  removeDigit(): void {
+    if (this.pin.length > 0) {
+      const index = this.pin.length - 1;
+      this.pin = this.pin.slice(0, -1);
+      this.pinDisplay[index] = '';
     }
   }
 

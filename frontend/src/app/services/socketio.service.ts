@@ -101,7 +101,7 @@ export class SocketioService {
 
   public requestProfileForContact() {
     this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: { status: number, contact: Contact }) => {
-      this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(payload.contact.hint!))
+      this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.contact.hint!))
         .then((hint: string) => {
           if (hint !== '') {
             payload.contact.hint = hint;
@@ -168,7 +168,7 @@ export class SocketioService {
             if (valid) {
               contact.contactUserMessageVerified = true;
               if (payload.envelope.contactUserEncryptedMessage) {
-                this.cryptoService.decrypt(this.userService.getUser().encryptionKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
+                this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
                   .then((message: string) => {
                     if (message !== '') {
                       contact.contactUserMessage = JSON.parse(message);
