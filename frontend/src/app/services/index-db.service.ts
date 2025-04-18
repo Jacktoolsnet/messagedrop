@@ -8,6 +8,7 @@ export class IndexDbService {
   private dbName = 'messageDropDb';
   private settingStore = 'settings';
   private userStore = 'user';
+  private profileStore = 'profile';
 
   constructor() {
     this.openDB(); // optional preload
@@ -24,6 +25,9 @@ export class IndexDbService {
         }
         if (!db.objectStoreNames.contains(this.userStore)) {
           db.createObjectStore(this.userStore);
+        }
+        if (!db.objectStoreNames.contains(this.profileStore)) {
+          db.createObjectStore(this.profileStore);
         }
       };
 
@@ -93,6 +97,29 @@ export class IndexDbService {
       request.onerror = () => {
         console.error('Fehler beim Löschen des Benutzers:', request.error);
         reject(request.error);
+      };
+    });
+  }
+
+  async clearAllData(): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const storeNames = Array.from(db.objectStoreNames);
+      const tx = db.transaction(storeNames, 'readwrite');
+
+      for (const storeName of storeNames) {
+        tx.objectStore(storeName).clear();
+      }
+
+      tx.oncomplete = () => {
+        console.log('Alle Object Stores wurden geleert.');
+        resolve();
+      };
+
+      tx.onerror = () => {
+        console.error('Fehler beim Leeren der Stores:', tx.error);
+        reject(tx.error);
       };
     });
   }

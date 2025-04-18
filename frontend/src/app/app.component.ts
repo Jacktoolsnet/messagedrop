@@ -362,11 +362,11 @@ export class AppComponent implements OnInit {
           this.userService.deleteUser(cryptedUser.id)
             .subscribe({
               next: () => {
-                this.indexDbService.deleteUser();
+                this.indexDbService.clearAllData();
                 this.openCreatePinDialog();
               },
               error: (err) => {
-                this.indexDbService.deleteUser();
+                this.indexDbService.clearAllData();
                 this.openCreatePinDialog();
               },
               complete: () => { }
@@ -745,7 +745,7 @@ export class AppComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.userService.clearStorage();
+                this.indexDbService.clearAllData();
                 this.getMessages(this.mapService.getMapLocation());
               }
             },
