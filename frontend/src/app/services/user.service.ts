@@ -74,41 +74,10 @@ export class UserService {
       );
   }
 
-  loadUserFromLocalStorage() {
-    /*let userFromLocalStorage: any = JSON.parse(localStorage.getItem('user') || '{}');
-    if (JSON.stringify(userFromLocalStorage) === '{}') {
-      this.user = {
-        id: '',
-        location: { latitude: 0, longitude: 0, plusCode: '' },
-        local: navigator.language,
-        language: this.getLanguageForLocation(navigator.language),
-        subscription: '',
-        defaultStyle: this.style.getRandomStyle(),
-        encryptionKeyPair: {
-          publicKey: {},
-          privateKey: {}
-        },
-        signingKeyPair: {
-          publicKey: {},
-          privateKey: {}
-        },
-        name: 'Unnamed user',
-        base64Avatar: ''
-      }
-    } else {
-      this.user = {
-        id: undefined != userFromLocalStorage.id ? userFromLocalStorage.id : '',
-        location: undefined != userFromLocalStorage.location ? userFromLocalStorage.location : { latitude: 0, longitude: 0, zoom: 19, plusCode: '' },
-        local: navigator.language,
-        language: this.getLanguageForLocation(navigator.language),
-        subscription: undefined != userFromLocalStorage.subscription ? userFromLocalStorage.subscription : '',
-        defaultStyle: undefined != userFromLocalStorage.defaultStyle ? userFromLocalStorage.defaultStyle : this.style.getRandomStyle(),
-        encryptionKeyPair: undefined != userFromLocalStorage.encryptionKeyPair ? userFromLocalStorage.encryptionKeyPair : {},
-        signingKeyPair: undefined != userFromLocalStorage.signingKeyPair ? userFromLocalStorage.signingKeyPair : {},
-        name: undefined != userFromLocalStorage.name ? userFromLocalStorage.name : 'Unnamed user',
-        base64Avatar: undefined != userFromLocalStorage.base64Avatar ? userFromLocalStorage.base64Avatar : ''
-      }
-    }*/
+  setUser(userSubject: Subject<void>, user: User) {
+    this.user = user;
+    this.ready = true;
+    userSubject.next();
   }
 
   async initUser(userSubject: Subject<void>, createUserResponse: CreateUserResponse) {

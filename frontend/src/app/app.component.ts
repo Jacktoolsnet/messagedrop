@@ -365,8 +365,13 @@ export class AppComponent implements OnInit {
             const cruptedUser = await this.indexDbService.getUser();
             if (cruptedUser) {
               this.userService.confirmUser(getPinHashResponse.pinHash, cruptedUser)
-                .subscribe((confirmUserResponse: ConfirmUserResponse) => {
-                  console.log(confirmUserResponse);
+                .subscribe({
+                  next: (confirmUserResponse: ConfirmUserResponse) => {
+                    this.userService.setUser(this.userSubject, confirmUserResponse.user);
+                  },
+                  error: () => {
+                    this.openCheckPinDialog();
+                  }
                 });
             }
           });
