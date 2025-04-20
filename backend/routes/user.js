@@ -1,4 +1,5 @@
 require('dotenv').config();
+const { encryptJsonWebKey, decryptJsonWebKey } = require('../utils/keyStore');
 const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
@@ -76,7 +77,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
     ["encrypt", "decrypt"]
   );
   const cryptoPublicKey = await subtle.exportKey("jwk", cryptoKeyPair.publicKey);
-  const cryptoPrivateKey = await subtle.exportKey("jwk", cryptoKeyPair.privateKey);
+  const cryptoPrivateKey = await encryptJsonWebKey(await subtle.exportKey("jwk", cryptoKeyPair.privateKey));
 
   // generate signing key
   const signingKeyPair = await subtle.generateKey(
@@ -89,7 +90,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   );
 
   const signingPublicKey = await subtle.exportKey("jwk", signingKeyPair.publicKey);
-  const signingPrivateKey = await subtle.exportKey("jwk", signingKeyPair.privateKey);
+  const signingPrivateKey = await encryptJsonWebKey(await subtle.exportKey("jwk", signingKeyPair.privateKey));
 
   // Create user record
   tableUser.create(req.database.db, userId, JSON.stringify(cryptoPrivateKey), JSON.stringify(signingPrivateKey), function (err) {
@@ -129,7 +130,7 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
           // Decrypt the cryptoKey
           try {
             const cryptedUser = JSON.parse(req.body.cryptedUser.cryptedUser);
-            const encryptionPrivateKey = JSON.parse(row.cryptoPrivateKey);
+            const encryptionPrivateKey = await decryptJsonWebKey(JSON.parse(row.cryptoPrivateKey));
             // Payload in ArrayBuffer umwandeln
             const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedKey));
             // RSA Private Key importieren

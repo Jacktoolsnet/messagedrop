@@ -124,6 +124,83 @@ async function generateOrLoadKeypairs() {
     );
 }
 
+async function encryptJsonWebKey(jwk) {
+    if (!encryptionKey.publicKey) throw new Error('Public encryption key not loaded');
+
+    // 1. AES-GCM Key erzeugen
+    const aesKey = await subtle.generateKey(
+        { name: 'AES-GCM', length: 256 },
+        true,
+        ['encrypt', 'decrypt']
+    );
+
+    // 2. JWK serialisieren und verschlüsseln
+    const encodedJwk = new TextEncoder().encode(JSON.stringify(jwk));
+    const iv = webcrypto.getRandomValues(new Uint8Array(12));
+
+    const encryptedData = await subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        aesKey,
+        encodedJwk
+    );
+
+    // 3. AES-Key exportieren und mit vorhandenen CryptoKey verschlüsseln
+    const exportedAesKey = await subtle.exportKey('jwk', aesKey);
+    const aesKeyString = JSON.stringify(exportedAesKey);
+
+    const encryptedAesKey = await subtle.encrypt(
+        { name: 'RSA-OAEP' },
+        encryptionKey.publicKey, // direkt verwenden!
+        new TextEncoder().encode(aesKeyString)
+    );
+
+    // 4. Zusammensetzen und base64 zurückgeben
+    return Buffer.from(JSON.stringify({
+        iv: Buffer.from(iv).toString('base64'),
+        encryptedData: Buffer.from(encryptedData).toString('base64'),
+        encryptedAesKey: Buffer.from(encryptedAesKey).toString('base64')
+    })).toString('base64');
+}
+
+async function decryptJsonWebKey(base64Package) {
+    if (!encryptionKey.privateKey) throw new Error('Private encryption key not loaded');
+
+    // 1. Base64 → JSON → Buffer-Daten extrahieren
+    const decodedJson = Buffer.from(base64Package, 'base64').toString('utf-8');
+    const { iv, encryptedData, encryptedAesKey } = JSON.parse(decodedJson);
+
+    // 2. RSA entschlüsselt AES-Key (der verschlüsselt als base64 kommt)
+    const decryptedAesKeyBuffer = await subtle.decrypt(
+        { name: 'RSA-OAEP' },
+        encryptionKey.privateKey, // direkt verwenden!
+        Buffer.from(encryptedAesKey, 'base64')
+    );
+
+    const aesJwk = JSON.parse(new TextDecoder().decode(decryptedAesKeyBuffer));
+
+    // 3. AES-Key importieren
+    const aesKey = await subtle.importKey(
+        'jwk',
+        aesJwk,
+        { name: 'AES-GCM' },
+        true,
+        ['decrypt']
+    );
+
+    // 4. Payload entschlüsseln
+    const decryptedJwkBuffer = await subtle.decrypt(
+        {
+            name: 'AES-GCM',
+            iv: Buffer.from(iv, 'base64')
+        },
+        aesKey,
+        Buffer.from(encryptedData, 'base64')
+    );
+
+    // 5. Zurückgeben als JSON-WebKey
+    return JSON.parse(new TextDecoder().decode(decryptedJwkBuffer));
+}
+
 // Exporte
 module.exports = {
     generateOrLoadKeypairs,
@@ -131,4 +208,6 @@ module.exports = {
     getEncryptionPrivateKey: () => encryptionKey.privateKey,
     getSigningPublicKey: () => signingKey.publicKey,
     getSigningPrivateKey: () => signingKey.privateKey,
+    encryptJsonWebKey,
+    decryptJsonWebKey
 };

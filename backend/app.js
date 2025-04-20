@@ -22,7 +22,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit')
-const { generateOrLoadKeypairs } = require('./utils/keystore');
+const { generateOrLoadKeypairs } = require('./utils/keyStore');
 
 // ExpressJs
 const { createServer } = require('node:http');
