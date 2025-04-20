@@ -343,14 +343,39 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
-      this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
-        .subscribe((getPinHashResponse: GetPinHashResponse) => {
+      const waitDialogRef = this.waitDialog.open(WaitComponent, {
+        data: { title: 'User creation', message: `Creating user` },
+        closeOnNavigation: false,
+        hasBackdrop: false
+      });
+      const encrypted = await this.cryptoService.encrypt(
+        this.serverService.getCryptoPublicKey()!,
+        data
+      );
+
+      this.userService.getPinHash(encrypted).subscribe({
+        next: (getPinHashResponse: GetPinHashResponse) => {
           this.userService.getUser().pinHash = getPinHashResponse.pinHash;
-          this.userService.createUser()
-            .subscribe((createUserResponse: CreateUserResponse) => {
+
+          this.userService.createUser().subscribe({
+            next: (createUserResponse: CreateUserResponse) => {
               this.userService.initUser(this.userSubject, createUserResponse);
-            });
-        });
+            },
+            error: (err) => {
+              waitDialogRef.close();
+            },
+            complete: () => {
+              waitDialogRef.close();
+            }
+          });
+        },
+        error: (err) => {
+          waitDialogRef.close();
+        },
+        complete: () => {
+          waitDialogRef.close();
+        }
+      });
     });
   }
 
