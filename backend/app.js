@@ -22,6 +22,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit')
+const { generateOrLoadKeypairs } = require('./utils/keystore');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -131,11 +132,18 @@ app.use('/place', place);
 // The last route
 app.use('{*notFound}', notfound);
 
-// Start app
-server.listen(process.env.PORT, () => {
-  logger.info(`Example app listening on port ${process.env.PORT}`);
-  database.init(logger);
-})
+(async () => {
+  try {
+    await generateOrLoadKeypairs();
+    server.listen(process.env.PORT, () => {
+      logger.info(`Server läuft auf Port ${process.env.PORT}`);
+      database.init(logger);
+    });
+  } catch (err) {
+    logger.error('Fehler beim Initialisieren des Keystores:', err);
+    process.exit(1);
+  }
+})();
 
 // Cron
 // ┌────────────── second (optional)

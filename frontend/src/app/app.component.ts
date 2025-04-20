@@ -393,7 +393,7 @@ export class AppComponent implements OnInit {
                       });
                       this.openCheckPinDialog();
                     } else if (err.status === 404) {
-                      this.snackBarRef = this.snackBar.open("Pin did not exist anymore. Please create a new user.", undefined, {
+                      this.snackBarRef = this.snackBar.open("User did not exist anymore. Please create a new user.", undefined, {
                         panelClass: ['snack-warning'],
                         horizontalPosition: 'center',
                         verticalPosition: 'top',
