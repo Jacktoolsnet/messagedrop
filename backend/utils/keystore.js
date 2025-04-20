@@ -108,7 +108,7 @@ async function loadOrCreateKeyPair(filePath, password, keyType) {
 // Initialisierung beider Schlüssel
 async function generateOrLoadKeypairs() {
     if (!process.env.ENCRYPTION_KEY_PASSWORD || !process.env.SIGNING_KEY_PASSWORD) {
-        throw new Error('Fehlende Umgebungsvariablen für Key-Passwörter');
+        throw new Error('Missing environment variables for key passwords!');
     }
 
     encryptionKey = await loadOrCreateKeyPair(
@@ -122,8 +122,6 @@ async function generateOrLoadKeypairs() {
         process.env.SIGNING_KEY_PASSWORD,
         'signing'
     );
-
-    console.log('[KeyStore] Verschlüsselungs- und Signaturschlüssel bereit');
 }
 
 // Exporte
