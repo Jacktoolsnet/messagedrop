@@ -1,5 +1,6 @@
 require('dotenv').config();
-const { encryptJsonWebKey, decryptJsonWebKey } = require('../utils/keyStore');
+const { encryptJsonWebKey, decryptJsonWebKey, getEncryptionPrivateKey } = require('../utils/keyStore');
+const cryptoUtil = require('../utils/cryptoUtils');
 const crypto = require('crypto');
 const express = require('express');
 const router = express.Router();
@@ -28,17 +29,38 @@ router.get('/get', [security.checkToken], function (req, res) {
   });
 });
 
-router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.get('/get/:userId', [security.checkToken], function (req, res) {
+  let response = { 'status': 0 };
+  tableUser.getById(req.database.db, req.params.userId, function (err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      if (!row) {
+        response.rawUser = {};
+        response.status = 404;
+      } else {
+        response.rawUser = row;
+        response.status = 200;
+      }
+    }
+    res.status(response.status).json(response);
+  });
+});
+
+router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
 
-  if (!req.body.pin || typeof req.body.pin !== 'string' || req.body.pin.length !== 6) {
+  const pin = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), JSON.parse(req.body.pin));
+
+  if (!pin || typeof pin !== 'string' || pin.length !== 6) {
     response.status = 400;
     response.error = 'Invalid PIN';
     return res.status(400).json(response);
   }
 
   try {
-    crypto.scrypt(req.body.pin, process.env.PIN_SALT, 64, (err, derivedKey) => {
+    crypto.scrypt(pin, process.env.PIN_SALT, 64, (err, derivedKey) => {
       if (err) {
         response.status = 500;
         response.error = 'Hashing failed';

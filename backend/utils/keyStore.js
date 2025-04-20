@@ -201,6 +201,14 @@ async function decryptJsonWebKey(base64Package) {
     return JSON.parse(new TextDecoder().decode(decryptedJwkBuffer));
 }
 
+async function getEncryptionPublicJwk() {
+    return await subtle.exportKey('jwk', encryptionKey.publicKey);
+}
+
+async function getSigningPublicJwk() {
+    return await subtle.exportKey('jwk', signingKey.publicKey);
+}
+
 // Exporte
 module.exports = {
     generateOrLoadKeypairs,
@@ -209,5 +217,7 @@ module.exports = {
     getSigningPublicKey: () => signingKey.publicKey,
     getSigningPrivateKey: () => signingKey.privateKey,
     encryptJsonWebKey,
-    decryptJsonWebKey
+    decryptJsonWebKey,
+    getEncryptionPublicJwk,
+    getSigningPublicJwk
 };

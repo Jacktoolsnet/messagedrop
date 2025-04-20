@@ -46,6 +46,7 @@ import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NoteService } from './services/note.service';
 import { PlaceService } from './services/place.service';
+import { ServerService } from './services/server.service';
 import { SocketioService } from './services/socketio.service';
 import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
@@ -77,6 +78,7 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
+  private serverSubject: Subject<void>;
   private userSubject: Subject<void>;
   private contactSubject: Subject<void>;
   private messageSubject: Subject<void>;
@@ -85,6 +87,7 @@ export class AppComponent implements OnInit {
 
   constructor(
     private indexDbService: IndexDbService,
+    private serverService: ServerService,
     public userService: UserService,
     public mapService: MapService,
     public noteService: NoteService,
@@ -109,9 +112,20 @@ export class AppComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private swPush: SwPush
   ) {
+    this.serverSubject = new Subject<void>();
     this.userSubject = new Subject<void>();
     this.contactSubject = new Subject<void>();
     this.mapSubject = new Subject<void>();
+    this.serverSubject.subscribe({
+      next: async (v) => {
+        if (await this.indexDbService.hasUser()) {
+          this.openCheckPinDialog();
+        } else {
+          this.openCreatePinDialog();
+        }
+      },
+    });
+
     this.userSubject.subscribe({
       next: (v) => {
         this.contactService.initContacts(this.contactSubject);
@@ -143,12 +157,8 @@ export class AppComponent implements OnInit {
   }
 
   async initApp() {
-    if (await this.indexDbService.hasUser()) {
-      this.openCheckPinDialog();
-    } else {
-      this.openCreatePinDialog();
-    }
-
+    // Inin the server connection
+    this.serverService.init(this.serverSubject);
     // Count
     this.statisticService.countVisitor()
       .subscribe({
@@ -330,8 +340,8 @@ export class AppComponent implements OnInit {
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
-      this.userService.getPinHash(data)
+    dialogRef.afterClosed().subscribe(async (data: any) => {
+      this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
         .subscribe((getPinHashResponse: GetPinHashResponse) => {
           this.userService.getUser().pinHash = getPinHashResponse.pinHash;
           this.userService.createUser()
@@ -373,7 +383,7 @@ export class AppComponent implements OnInit {
             });
         }
       } else {
-        this.userService.getPinHash(data)
+        this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
           .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
             this.userService.getUser().pinHash = getPinHashResponse.pinHash;
             const cryptedUser = await this.indexDbService.getUser();
