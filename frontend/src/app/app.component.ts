@@ -23,6 +23,7 @@ import { PlacelistComponent } from './components/placelist/placelist.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
+import { WaitComponent } from './components/utils/wait/wait.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { Connect } from './interfaces/connect';
 import { CreateUserResponse } from './interfaces/create-user-response';
@@ -108,6 +109,7 @@ export class AppComponent implements OnInit {
     public placeListDialog: MatDialog,
     public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
+    public waitDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
     private swPush: SwPush
@@ -383,6 +385,11 @@ export class AppComponent implements OnInit {
             });
         }
       } else {
+        const waitDialogRef = this.waitDialog.open(WaitComponent, {
+          data: { title: 'PIN Verification', message: `Verifying PIN` },
+          closeOnNavigation: false,
+          hasBackdrop: false
+        });
         this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
           .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
             this.userService.getUser().pinHash = getPinHashResponse.pinHash;
@@ -392,8 +399,10 @@ export class AppComponent implements OnInit {
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user);
+                    waitDialogRef.close();
                   },
                   error: (err) => {
+                    waitDialogRef.close();
                     if (err.status === 401) {
                       this.snackBarRef = this.snackBar.open("Pin is not correct. Please try again.", undefined, {
                         panelClass: ['snack-warning'],
