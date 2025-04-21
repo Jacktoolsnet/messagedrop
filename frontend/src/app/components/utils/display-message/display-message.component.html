@@ -1,0 +1,8 @@
+<div class="dialog-container">
+    <img src="{{data.image}}" alt="Backend Error" class="backend-error-image" />
+    <h2>{{data.title}}</h2>
+    <p>
+        {{data.message}}
+    </p>
+    <button *ngIf="showOk" mat-raised-button color="primary" (click)="dialogRef.close()">{{data.button}}</button>
+</div>
