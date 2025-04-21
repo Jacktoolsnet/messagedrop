@@ -7,7 +7,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { RelatedUser } from '../../../interfaces/related-user';
+import { Profile } from '../../../interfaces/profile';
 
 @Component({
   selector: 'app-edit-user',
@@ -27,13 +27,22 @@ import { RelatedUser } from '../../../interfaces/related-user';
   styleUrl: './edit-profile.component.css'
 })
 export class EditProfileComponent {
-  public relatedUser!: RelatedUser;
+  public profile!: Profile;
+  public userId!: string;
 
   constructor(
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<EditProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { relatedUser: RelatedUser }) {
-    this.relatedUser = data.relatedUser;
+    @Inject(MAT_DIALOG_DATA) public data: { profile: Profile, userId: string }) {
+    if (data.profile) {
+      this.profile = data.profile;
+    } else {
+      this.profile = {
+        name: '',
+        base64Avatar: ''
+      };
+    }
+    this.userId = data.userId;
   }
 
   onAbortClick(): void {
@@ -52,7 +61,7 @@ export class EditProfileComponent {
   }
 
   handleFile(event: any) {
-    this.relatedUser.base64Avatar = event.target.result;
+    this.profile.base64Avatar = event.target.result;
   }
 
   handleFileError(event: any) {
@@ -60,7 +69,7 @@ export class EditProfileComponent {
   }
 
   deleteAvatar() {
-    this.relatedUser.base64Avatar = '';
+    this.profile.base64Avatar = '';
   }
 
   public showPolicy() {

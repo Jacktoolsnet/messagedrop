@@ -127,8 +127,8 @@ export class IndexedDbService {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.userStore, 'readwrite');
-      const store = tx.objectStore(this.userStore);
+      const tx = db.transaction(this.profileStore, 'readwrite');
+      const store = tx.objectStore(this.profileStore);
       const request = store.put(profile, userId);
 
       request.onsuccess = () => resolve();
@@ -160,8 +160,8 @@ export class IndexedDbService {
     const db = await this.openDB();
 
     return new Promise((resolve, reject) => {
-      const tx = db.transaction('profile', 'readonly');
-      const store = tx.objectStore('profile');
+      const tx = db.transaction(this.profileStore, 'readonly');
+      const store = tx.objectStore(this.profileStore);
 
       const keysRequest = store.getAllKeys();
       const valuesRequest = store.getAll();

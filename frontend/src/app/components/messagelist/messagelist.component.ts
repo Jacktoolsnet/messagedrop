@@ -55,7 +55,6 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 })
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];
-  public profile: Profile | undefined;
   public user!: User;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
@@ -111,7 +110,6 @@ export class MessagelistComponent implements OnInit {
 
   async goToMessageDetails(message: Message) {
     this.messageService.getSelectedMessages().push(message);
-    this.profile = await this.profileService.getProfile(message.userId);
     if (this.user.id !== message.userId) {
       this.messageCountView(message);
     }
@@ -214,7 +212,7 @@ export class MessagelistComponent implements OnInit {
 
   public editMessageUserProfile(message: Message) {
     const dialogRef = this.dialog.open(EditProfileComponent, {
-      data: { profile: this.profile, userId: message.userId },
+      data: { profile: this.profileService.getProfile(message.userId), userId: message.userId },
       closeOnNavigation: true,
       hasBackdrop: true
     });
@@ -225,7 +223,6 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.profileService.setProfile(result.userId, result.profile);
-        this.profile = result.profile;
       }
     });
   }
