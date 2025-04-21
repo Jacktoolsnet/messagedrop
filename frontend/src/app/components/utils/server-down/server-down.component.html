@@ -4,5 +4,8 @@
     <p>
         Apparently, our backend needed some “me time”. Don’t worry, we sent a carrier pigeon to bring it back.
     </p>
-    <button mat-raised-button color="primary" (click)="dialogRef.close()">Try again...</button>
+    <p *ngIf="!showRetry">
+        Please wait...
+    </p>
+    <button *ngIf="showRetry" mat-raised-button color="primary" (click)="dialogRef.close()">Try again...</button>
 </div>
