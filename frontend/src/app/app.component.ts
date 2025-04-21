@@ -23,6 +23,7 @@ import { PlacelistComponent } from './components/placelist/placelist.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
+import { ServerDownComponent } from './components/utils/server-down/server-down.component';
 import { WaitComponent } from './components/utils/wait/wait.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { Connect } from './interfaces/connect';
@@ -110,6 +111,7 @@ export class AppComponent implements OnInit {
     public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public waitDialog: MatDialog,
+    public serverDown: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
     private swPush: SwPush
@@ -120,10 +122,22 @@ export class AppComponent implements OnInit {
     this.mapSubject = new Subject<void>();
     this.serverSubject.subscribe({
       next: async (v) => {
-        if (await this.indexDbService.hasUser()) {
-          this.openCheckPinDialog();
-        } else {
-          this.openCreatePinDialog();
+        if (this.serverService.isReady()) {
+          if (await this.indexDbService.hasUser()) {
+            this.openCheckPinDialog();
+          } else {
+            this.openCreatePinDialog();
+          }
+        }
+        if (this.serverService.isFailed()) {
+          const dialogRef = this.waitDialog.open(ServerDownComponent, {
+            data: {},
+            closeOnNavigation: false,
+            hasBackdrop: false
+          });
+          dialogRef.afterClosed().subscribe(() => {
+            this.initApp();
+          });
         }
       },
     });

@@ -10,6 +10,7 @@ import { GetClientConnect } from '../interfaces/get-client-connect';
 export class ServerService {
 
   private ready: boolean = false;
+  private failed: boolean = false;
   private cryptoPublicKey: JsonWebKey | undefined;
   private signingPublicKey: JsonWebKey | undefined;
 
@@ -34,11 +35,15 @@ export class ServerService {
           if (connectResponse.status === 200) {
             this.cryptoPublicKey = connectResponse.cryptoPublicKey;
             this.signingPublicKey = connectResponse.signingPublicKey;
+            this.ready = true;
+            this.failed = false;
             serverSubject.next();
           }
         },
         error: (err) => {
-          console.log(err);
+          this.ready = false;
+          this.failed = true;
+          serverSubject.next();
         },
         complete: () => { }
       });
@@ -53,6 +58,10 @@ export class ServerService {
 
   isReady(): boolean {
     return this.ready;
+  }
+
+  isFailed(): boolean {
+    return this.failed;
   }
 
   public getCryptoPublicKey(): JsonWebKey | undefined {
