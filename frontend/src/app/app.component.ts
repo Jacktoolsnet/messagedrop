@@ -24,7 +24,6 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
-import { WaitComponent } from './components/utils/wait/wait.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { Connect } from './interfaces/connect';
 import { CreateUserResponse } from './interfaces/create-user-response';
@@ -110,7 +109,6 @@ export class AppComponent implements OnInit {
     public placeListDialog: MatDialog,
     public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
-    public waitDialog: MatDialog,
     public displayMessage: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation,
@@ -400,8 +398,17 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
-      const waitDialogRef = this.waitDialog.open(WaitComponent, {
-        data: { title: 'User creation', message: `Creating user` },
+      const displayMessageRef = this.displayMessage.open(DisplayMessage, {
+        data: {
+          title: 'User Creation',
+          image: '',
+          message: `Creating user`,
+          button: 'OK',
+          delay: 0,
+          showSpinner: true
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
         closeOnNavigation: false,
         hasBackdrop: false
       });
@@ -419,18 +426,18 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               this.userService.initUser(this.userSubject, createUserResponse);
             },
             error: (err) => {
-              waitDialogRef.close();
+              displayMessageRef.close();
             },
             complete: () => {
-              waitDialogRef.close();
+              displayMessageRef.close();
             }
           });
         },
         error: (err) => {
-          waitDialogRef.close();
+          displayMessageRef.close();
         },
         complete: () => {
-          waitDialogRef.close();
+          displayMessageRef.close();
         }
       });
     });
@@ -467,8 +474,17 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             });
         }
       } else {
-        const waitDialogRef = this.waitDialog.open(WaitComponent, {
-          data: { title: 'PIN Verification', message: `Verifying PIN` },
+        const displayMessageRef = this.displayMessage.open(DisplayMessage, {
+          data: {
+            title: 'PIN Verification',
+            image: '',
+            message: `Verifying PIN`,
+            button: 'OK',
+            delay: 0,
+            showSpinner: true
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
           closeOnNavigation: false,
           hasBackdrop: false
         });
@@ -481,10 +497,10 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user);
-                    waitDialogRef.close();
+                    displayMessageRef.close();
                   },
                   error: (err) => {
-                    waitDialogRef.close();
+                    displayMessageRef.close();
                     if (err.status === 401) {
                       this.snackBarRef = this.snackBar.open("Pin is not correct. Please try again.", undefined, {
                         panelClass: ['snack-warning'],
