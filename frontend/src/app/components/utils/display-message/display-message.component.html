@@ -1,5 +1,5 @@
 <div class="dialog-container">
-    <img src="{{data.image}}" alt="Backend Error" class="backend-error-image" />
+    <img *ngIf="data.image" src="{{data.image}}" alt="Backend Error" class="backend-error-image" />
     <h2>{{data.title}}</h2>
     <p>
         {{data.message}}
