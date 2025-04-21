@@ -4,5 +4,9 @@
     <p>
         {{data.message}}
     </p>
-    <button *ngIf="showOk" mat-raised-button color="primary" (click)="dialogRef.close()">{{data.button}}</button>
+    <div *ngIf="data.showSpinner" class="center">
+        <mat-spinner></mat-spinner>
+    </div>
+    <button *ngIf="showOk && !data.showSpinner" mat-raised-button color="primary"
+        (click)="dialogRef.close()">{{data.button}}</button>
 </div>

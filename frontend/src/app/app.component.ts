@@ -138,7 +138,8 @@ Basically: lose it, and your user is gone like your last cup of coffee.
 You can delete your user anytime (rage quit or just Marie Kondo your data).  
 Also, if you ghost us for 90 days, your user and all its data get quietly deleted – like a ninja in the night.`,
                 button: 'OK',
-                delay: 2000
+                delay: 2000,
+                showSpinner: false
               },
               maxWidth: '90vw',
               minHeight: '90vh',
@@ -165,7 +166,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               
               Don’t worry, we sent a carrier pigeon to bring it back.`,
               button: 'OK',
-              delay: 10000
+              delay: 10000,
+              showSpinner: false
             },
             maxWidth: '90vw',
             minHeight: '90vh',
@@ -503,7 +505,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                           
                           You can create a new one anytime — no signup, no hassle.`,
                           button: 'OK',
-                          delay: 2000
+                          delay: 2000,
+                          showSpinner: false
                         },
                         maxWidth: '90vw',
                         minHeight: '90vh',
@@ -537,7 +540,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                           image: 'assets/images/backend_error.png',
                           message: 'Something went wrong. Please try again later.',
                           button: 'OK',
-                          delay: 10000
+                          delay: 10000,
+                          showSpinner: false
                         },
                         maxWidth: '90vw',
                         minHeight: '90vh',
