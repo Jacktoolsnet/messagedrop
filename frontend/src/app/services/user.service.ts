@@ -13,7 +13,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type copy';
 import { CryptoService } from './crypto.service';
-import { IndexDbService } from './index-db.service';
+import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
   providedIn: 'root'
@@ -59,7 +59,7 @@ export class UserService {
   constructor(
     private http: HttpClient,
     private swPush: SwPush,
-    private indexDbService: IndexDbService,
+    private indexDbService: IndexedDbService,
     private cryptoService: CryptoService
   ) { }
 

@@ -15,13 +15,13 @@ import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
-import { RelatedUser } from '../../interfaces/related-user';
+import { Profile } from '../../interfaces/profile';
 import { User } from '../../interfaces/user';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
-import { RelatedUserService } from '../../services/related-user.service';
+import { ProfileService } from '../../services/profile.service';
 import { StyleService } from '../../services/style.service';
 import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
@@ -55,7 +55,7 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 })
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];
-  public selectedMessageUser!: RelatedUser;
+  public profile: Profile | undefined;
   public user!: User;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
@@ -67,7 +67,7 @@ export class MessagelistComponent implements OnInit {
     private translateService: TranslateService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
-    private relatedUserService: RelatedUserService,
+    public profileService: ProfileService,
     public dialogRef: MatDialogRef<any>,
     public messageDialog: MatDialog,
     public dialog: MatDialog,
@@ -79,7 +79,8 @@ export class MessagelistComponent implements OnInit {
     this.messages = data.messages;
   }
 
-  ngOnInit(): void {
+  async ngOnInit() {
+    await this.profileService.loadAllProfiles();
   }
 
   public flyTo(message: Message) {
@@ -108,9 +109,9 @@ export class MessagelistComponent implements OnInit {
     }
   }
 
-  public goToMessageDetails(message: Message) {
+  async goToMessageDetails(message: Message) {
     this.messageService.getSelectedMessages().push(message);
-    this.selectedMessageUser = this.relatedUserService.loadUser(message.userId);
+    this.profile = await this.profileService.getProfile(message.userId);
     if (this.user.id !== message.userId) {
       this.messageCountView(message);
     }
@@ -119,8 +120,8 @@ export class MessagelistComponent implements OnInit {
     this.messageService.getCommentsForParentMessage(message);
   }
 
-  public getMessageUserName(message: Message): RelatedUser {
-    return this.relatedUserService.loadUser(message.userId);
+  public async getMessageUserName(message: Message): Promise<Profile | undefined> {
+    return await this.profileService.getProfile(message.userId)
   }
 
   public likeMessage(message: Message) {
@@ -212,11 +213,8 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessageUserProfile(message: Message) {
-    if (undefined === this.selectedMessageUser.id || this.selectedMessageUser.id != message.userId) {
-      this.selectedMessageUser.id = message.userId;
-    }
     const dialogRef = this.dialog.open(EditProfileComponent, {
-      data: { relatedUser: this.selectedMessageUser },
+      data: { profile: this.profile, userId: message.userId },
       closeOnNavigation: true,
       hasBackdrop: true
     });
@@ -226,7 +224,8 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.relatedUserService.saveUser(result);
+        this.profileService.setProfile(result.userId, result.profile);
+        this.profile = result.profile;
       }
     });
   }

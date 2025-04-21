@@ -42,7 +42,7 @@ import { ConnectService } from './services/connect.service';
 import { ContactService } from './services/contact.service';
 import { CryptoService } from './services/crypto.service';
 import { GeolocationService } from './services/geolocation.service';
-import { IndexDbService } from './services/index-db.service';
+import { IndexedDbService } from './services/indexed-db.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NoteService } from './services/note.service';
@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
   private showComponent: boolean = false;
 
   constructor(
-    private indexDbService: IndexDbService,
+    private indexDbService: IndexedDbService,
     private serverService: ServerService,
     public userService: UserService,
     public mapService: MapService,

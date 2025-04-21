@@ -5,7 +5,7 @@ import { Profile } from '../interfaces/profile';
 @Injectable({
   providedIn: 'root'
 })
-export class IndexDbService {
+export class IndexedDbService {
   private dbName = 'messageDropDb';
   private settingStore = 'settings';
   private userStore = 'user';
@@ -153,6 +153,36 @@ export class IndexDbService {
       request.onerror = () => {
         reject(request.error);
       };
+    });
+  }
+
+  async getAllProfilesAsMap(): Promise<Map<string, Profile>> {
+    const db = await this.openDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction('profile', 'readonly');
+      const store = tx.objectStore('profile');
+
+      const keysRequest = store.getAllKeys();
+      const valuesRequest = store.getAll();
+
+      keysRequest.onsuccess = () => {
+        valuesRequest.onsuccess = () => {
+          const keys = keysRequest.result as string[];
+          const values = valuesRequest.result as Profile[];
+
+          const map = new Map<string, Profile>();
+          for (let i = 0; i < keys.length; i++) {
+            map.set(keys[i], values[i]);
+          }
+
+          resolve(map);
+        };
+
+        valuesRequest.onerror = () => reject(valuesRequest.error);
+      };
+
+      keysRequest.onerror = () => reject(keysRequest.error);
     });
   }
 
