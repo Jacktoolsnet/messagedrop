@@ -16,6 +16,7 @@ import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
 import { User } from '../../../interfaces/user';
 import { StyleService } from '../../../services/style.service';
+import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
 import { TextComponent } from '../../utils/text/text.component';
@@ -44,6 +45,7 @@ export class ContactEditMessageComponent implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
+    private userService: UserService,
     private snackBar: MatSnackBar,
     private tenorDialog: MatDialog,
     private textDialog: MatDialog,
@@ -53,7 +55,7 @@ export class ContactEditMessageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.data.shortMessage.style = this.data.user.defaultStyle;
+    this.data.shortMessage.style = this.userService.getUser().defaultStyle;
   }
 
   onApplyClick(): void {

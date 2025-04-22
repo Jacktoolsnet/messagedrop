@@ -141,8 +141,8 @@ Basically: lose it, and your user is gone like your last cup of coffee.
 You can delete your user anytime (rage quit or just Marie Kondo your data).
 
 Also, if you ghost us for 90 days, your user and all its data get quietly deleted – like a ninja in the night.`,
-                button: 'OK',
-                delay: 2000,
+                button: 'Create PIN',
+                delay: 200,
                 showSpinner: false
               },
               maxWidth: '90vw',
@@ -168,7 +168,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               message: `Apparently, our backend needed some “me time”.
               
               Don’t worry, we sent a carrier pigeon to bring it back.`,
-              button: 'OK',
+              button: 'Retry...',
               delay: 10000,
               showSpinner: false
             },
@@ -525,8 +525,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                           To keep things clean and simple, users are automatically deleted after 90 days of inactivity.
                           
                           You can create a new one anytime — no signup, no hassle.`,
-                          button: 'OK',
-                          delay: 2000,
+                          button: 'Create new user',
+                          delay: 200,
                           showSpinner: false
                         },
                         maxWidth: '90vw',
@@ -559,7 +559,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                           image: '',
                           icon: 'bug_report',
                           message: 'Something went wrong. Please try again later.',
-                          button: 'OK',
+                          button: 'Retry...',
                           delay: 10000,
                           showSpinner: false
                         },
@@ -896,7 +896,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
   public editUserProfile() {
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
-      data: { user: this.userService.getUser() },
+      data: {},
       closeOnNavigation: true,
       hasBackdrop: true
     });

@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { User } from '../../../interfaces/user';
 import { StyleService } from '../../../services/style.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -31,11 +32,12 @@ export class ProfileComponent {
   public user!: User;
 
   constructor(
+    private userService: UserService,
     private style: StyleService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
-    this.user = data.user;
+    @Inject(MAT_DIALOG_DATA) public data: {}) {
+    this.user = this.userService.getUser();
   }
 
   onAbortClick(): void {
