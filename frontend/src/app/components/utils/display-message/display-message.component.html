@@ -1,12 +1,13 @@
 <div class="dialog-container">
     <img *ngIf="data.image" src="{{data.image}}" alt="Backend Error" class="backend-error-image" />
-    <h2>{{data.title}}</h2>
-    <p>
-        {{data.message}}
-    </p>
+    <div *ngIf="data.icon" class="center">
+        <mat-icon aria-hidden="false" class="mat_icon">{{data.icon}}</mat-icon>
+    </div>
+    <h2 *ngIf="data.title">{{data.title}}</h2>
+    <p *ngIf="data.message" class="multiline-text">{{data.message}}</p>
     <div *ngIf="data.showSpinner" class="center">
         <mat-spinner></mat-spinner>
     </div>
-    <button *ngIf="showOk && !data.showSpinner" mat-raised-button color="primary"
+    <button *ngIf="showOk && data.button" mat-raised-button color="primary"
         (click)="dialogRef.close()">{{data.button}}</button>
 </div>

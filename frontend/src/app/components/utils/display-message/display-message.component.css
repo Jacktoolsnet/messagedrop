@@ -29,8 +29,19 @@
         padding-bottom: 1rem;
     }
 
+    .mat_icon {
+        color: white;
+        font-size: 4rem;
+        width: 4rem;
+        height: 4rem;
+    }
+
     .spinner {
         width: 1rem;
         height: 1rem;
+    }
+
+    .multiline-text {
+        white-space: pre-line;
     }
 }

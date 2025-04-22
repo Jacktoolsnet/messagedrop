@@ -126,24 +126,28 @@ export class AppComponent implements OnInit {
           } else {
             const dialogRef = this.displayMessage.open(DisplayMessage, {
               panelClass: '',
-              closeOnNavigation: true,
+              closeOnNavigation: false,
               data: {
-                title: 'Want to create a user? Easy peasy.', image: 'assets/images/create_user.png', message: `Just pick a PIN – no username, no password, no DNA sample.  
-But hey, *don’t forget that PIN!*  
+                title: 'Want to create a user? Easy peasy.',
+                image: '',
+                icon: 'person_add',
+                message: `Just pick a PIN – no username, no password, no DNA sample.
+
+But hey, *don’t forget that PIN!*
+
 We don’t store it, we don’t back it up, and we definitely can’t send you a “forgot PIN?” email.  
 Basically: lose it, and your user is gone like your last cup of coffee.
 
-You can delete your user anytime (rage quit or just Marie Kondo your data).  
+You can delete your user anytime (rage quit or just Marie Kondo your data).
+
 Also, if you ghost us for 90 days, your user and all its data get quietly deleted – like a ninja in the night.`,
                 button: 'OK',
                 delay: 2000,
                 showSpinner: false
               },
               maxWidth: '90vw',
-              minHeight: '90vh',
-              height: '90vh',
               maxHeight: '90vh',
-              hasBackdrop: true
+              hasBackdrop: false
             });
 
             dialogRef.afterOpened().subscribe(e => { });
@@ -156,10 +160,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         if (this.serverService.isFailed()) {
           const dialogRef = this.displayMessage.open(DisplayMessage, {
             panelClass: '',
-            closeOnNavigation: true,
+            closeOnNavigation: false,
             data: {
               title: 'Oops! Our server went on a coffee break...',
-              image: 'assets/images/backend_down.png',
+              image: '',
+              icon: 'cloud_off',
               message: `Apparently, our backend needed some “me time”.
               
               Don’t worry, we sent a carrier pigeon to bring it back.`,
@@ -168,10 +173,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               showSpinner: false
             },
             maxWidth: '90vw',
-            minHeight: '90vh',
-            height: '90vh',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: false
           });
 
           dialogRef.afterOpened().subscribe(e => { });
@@ -403,7 +406,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           title: 'User Creation',
           image: '',
           message: `Creating user`,
-          button: 'OK',
+          button: '',
           delay: 0,
           showSpinner: true
         },
@@ -479,7 +482,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             title: 'PIN Verification',
             image: '',
             message: `Verifying PIN`,
-            button: 'OK',
+            button: '',
             delay: 0,
             showSpinner: true
           },
@@ -512,11 +515,13 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                     } else if (err.status === 404) {
                       const dialogRef = this.displayMessage.open(DisplayMessage, {
                         panelClass: '',
-                        closeOnNavigation: true,
+                        closeOnNavigation: false,
                         data: {
                           title: 'User not found',
-                          image: 'assets/images/user_not_found.png',
+                          image: '',
+                          icon: 'person_remove',
                           message: `Looks like this user has been inactive for a while. 
+                          
                           To keep things clean and simple, users are automatically deleted after 90 days of inactivity.
                           
                           You can create a new one anytime — no signup, no hassle.`,
@@ -525,10 +530,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                           showSpinner: false
                         },
                         maxWidth: '90vw',
-                        minHeight: '90vh',
-                        height: '90vh',
                         maxHeight: '90vh',
-                        hasBackdrop: true
+                        hasBackdrop: false
                       });
 
                       dialogRef.afterOpened().subscribe(e => { });
@@ -550,20 +553,19 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                     } else {
                       const dialogRef = this.displayMessage.open(DisplayMessage, {
                         panelClass: '',
-                        closeOnNavigation: true,
+                        closeOnNavigation: false,
                         data: {
                           title: 'Oops! Backend error!',
-                          image: 'assets/images/backend_error.png',
+                          image: '',
+                          icon: 'bug_report',
                           message: 'Something went wrong. Please try again later.',
                           button: 'OK',
                           delay: 10000,
                           showSpinner: false
                         },
                         maxWidth: '90vw',
-                        minHeight: '90vh',
-                        height: '90vh',
                         maxHeight: '90vh',
-                        hasBackdrop: true
+                        hasBackdrop: false
                       });
 
                       dialogRef.afterOpened().subscribe(e => { });
@@ -615,11 +617,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -659,11 +659,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -694,11 +692,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { messages: this.messageService.getMessages() },
-            width: 'auto',
-            minWidth: '60vw',
+            minWidth: '20vw',
             maxWidth: '90vw',
-            height: 'auto',
-            minHeight: 'auto',
+            minHeight: '20vh',
             maxHeight: '90vh',
             hasBackdrop: true
           });
@@ -857,11 +853,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { messages: messages },
-      width: 'auto',
-      minWidth: '60vw',
+      minWidth: '20vw',
       maxWidth: '90vw',
-      height: 'auto',
-      minHeight: 'auto',
+      minHeight: '20vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

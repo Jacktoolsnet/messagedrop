@@ -77,11 +77,9 @@ export class ContactEditMessageComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

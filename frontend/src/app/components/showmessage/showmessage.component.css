@@ -1,4 +1,4 @@
-.text_container {
+.message_container {
     width: 100%;
     display: flex;
     justify-content: center;
@@ -6,6 +6,12 @@
     position: relative;
 }
 
-.text {
-    margin: 1rem;
+.message {
+    max-width: 100%;
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    text-align: center;
+    line-height: 3rem;
 }

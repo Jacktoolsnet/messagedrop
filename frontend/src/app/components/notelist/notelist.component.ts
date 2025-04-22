@@ -114,8 +114,8 @@ export class NotelistComponent implements OnInit {
       panelClass: '',
       data: { mode: this.mode.EDIT_NOTE, note: note },
       closeOnNavigation: true,
-      width: '90vh',
-      height: '90vh',
+      minWidth: '20vw',
+      minHeight: '20vh',
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true
@@ -157,11 +157,9 @@ export class NotelistComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_NOTE, note: note },
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

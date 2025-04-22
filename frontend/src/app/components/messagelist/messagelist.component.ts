@@ -191,11 +191,9 @@ export class MessagelistComponent implements OnInit {
       panelClass: '',
       data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message: message },
       closeOnNavigation: true,
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -262,11 +260,9 @@ export class MessagelistComponent implements OnInit {
       panelClass: '',
       data: { mode: this.mode.ADD_COMMENT, message: message },
       closeOnNavigation: true,
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -330,11 +326,9 @@ export class MessagelistComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
-      width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '90vh',
-      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

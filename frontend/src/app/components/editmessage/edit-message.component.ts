@@ -76,8 +76,9 @@ export class EditMessageComponent implements OnInit {
               data: {
                 title: 'Content Moderation',
                 image: '',
+                icon: 'preview',
                 message: `My message is currently being reviewed by OpenAi's moderation AI.`,
-                button: 'OK',
+                button: '',
                 delay: 0,
                 showSpinner: true
               },
