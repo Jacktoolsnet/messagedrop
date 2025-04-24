@@ -13,24 +13,26 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach((row) => {
-                    const payload = {
-                        "notification": {
-                            "title": `Messagedrop @${row.name}`,
-                            "body": message,
-                            "icon": "assets/icons/notify-icon.png",
-                            "vibrate": [100, 50, 100],
-                            "data": {
-                                "dateOfArrival": Date.now(),
-                                "primaryKey": { "type": "place", "id": plusCode },
-                                "onActionClick": {
-                                    "default": {
-                                        "operation": "focusLastFocusedOrOpen"
-                                    }
-                                },
+                    if (row.subscription != '') {
+                        const payload = {
+                            "notification": {
+                                "title": `Messagedrop @${row.name}`,
+                                "body": message,
+                                "icon": "assets/icons/notify-icon.png",
+                                "vibrate": [100, 50, 100],
+                                "data": {
+                                    "dateOfArrival": Date.now(),
+                                    "primaryKey": { "type": "place", "id": plusCode },
+                                    "onActionClick": {
+                                        "default": {
+                                            "operation": "focusLastFocusedOrOpen"
+                                        }
+                                    },
+                                }
                             }
-                        }
-                    };
-                    sendNotification(logger, JSON.parse(row.subscription), payload);
+                        };
+                        sendNotification(logger, JSON.parse(row.subscription), payload);
+                    }
                 });
             }
         });
@@ -51,24 +53,26 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach((row) => {
-                    const payload = {
-                        "notification": {
-                            "title": `New message from @${row.name}`,
-                            "body": message,
-                            "icon": "assets/icons/notify-icon.png",
-                            "vibrate": [100, 50, 100],
-                            "data": {
-                                "dateOfArrival": Date.now(),
-                                "primaryKey": { "type": "contact", "id": row.id },
-                                "onActionClick": {
-                                    "default": {
-                                        "operation": "focusLastFocusedOrOpen",
-                                    }
-                                },
+                    if (row.subscription != '') {
+                        const payload = {
+                            "notification": {
+                                "title": `New message from @${row.name}`,
+                                "body": message,
+                                "icon": "assets/icons/notify-icon.png",
+                                "vibrate": [100, 50, 100],
+                                "data": {
+                                    "dateOfArrival": Date.now(),
+                                    "primaryKey": { "type": "contact", "id": row.id },
+                                    "onActionClick": {
+                                        "default": {
+                                            "operation": "focusLastFocusedOrOpen",
+                                        }
+                                    },
+                                }
                             }
-                        }
-                    };
-                    sendNotification(logger, JSON.parse(row.subscription), payload);
+                        };
+                        sendNotification(logger, JSON.parse(row.subscription), payload);
+                    }
                 });
             }
         });
