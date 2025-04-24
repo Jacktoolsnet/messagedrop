@@ -7,7 +7,6 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { User } from '../../../interfaces/user';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
 
@@ -29,16 +28,13 @@ import { UserService } from '../../../services/user.service';
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
-  public user!: User;
 
   constructor(
-    private userService: UserService,
+    public userService: UserService,
     private style: StyleService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {}) {
-    this.user = this.userService.getUser();
-  }
+    @Inject(MAT_DIALOG_DATA) public data: {}) { }
 
   onAbortClick(): void {
     this.dialogRef.close();
@@ -56,7 +52,7 @@ export class ProfileComponent {
   }
 
   handleFile(event: any) {
-    this.user.base64Avatar = event.target.result;
+    this.userService.getUser().base64Avatar = event.target.result;
   }
 
   handleFileError(event: any) {
@@ -64,7 +60,7 @@ export class ProfileComponent {
   }
 
   deleteAvatar() {
-    this.user.base64Avatar = '';
+    this.userService.getUser().base64Avatar = '';
   }
 
   public showPolicy() {
@@ -72,6 +68,6 @@ export class ProfileComponent {
   }
 
   public changeDefaultStyle() {
-    this.user.defaultStyle = this.style.getRandomStyle();
+    this.userService.getUser().defaultStyle = this.style.getRandomStyle();
   }
 }
