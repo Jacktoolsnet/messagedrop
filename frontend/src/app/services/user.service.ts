@@ -59,7 +59,7 @@ export class UserService {
   constructor(
     private http: HttpClient,
     private swPush: SwPush,
-    private indexDbService: IndexedDbService,
+    private indexedDbService: IndexedDbService,
     private cryptoService: CryptoService
   ) { }
 
@@ -92,7 +92,7 @@ export class UserService {
       id: this.user.id,
       cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
     };
-    this.indexDbService.setUser(cryptedUser)
+    this.indexedDbService.setUser(cryptedUser)
       .then(() => {
         this.ready = true;
         userSubject.next();
@@ -112,7 +112,7 @@ export class UserService {
       id: this.user.id,
       cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
     };
-    this.indexDbService.setUser(cryptedUser)
+    this.indexedDbService.setUser(cryptedUser)
       .then(() => { });
   }
 
@@ -169,28 +169,6 @@ export class UserService {
       );
   }
 
-  clearStorage() {
-    /*localStorage.clear();
-    this.user = {
-      id: '',
-      location: { latitude: 0, longitude: 0, plusCode: '' },
-      local: navigator.language,
-      language: navigator.language.split('-')[0],
-      subscription: '',
-      defaultStyle: this.style.getRandomStyle(),
-      encryptionKeyPair: {
-        publicKey: {},
-        privateKey: {}
-      },
-      signingKeyPair: {
-        publicKey: {},
-        privateKey: {}
-      },
-      name: 'Unnamed user',
-      base64Avatar: ''
-    }*/
-  }
-
   subscribe(user: User, subscription: string) {
     let body = {
       'userId': user.id,
@@ -220,8 +198,7 @@ export class UserService {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                user.subscription = JSON.stringify(subscription);
-                this.saveUser();
+                this.indexedDbService.setSetting('subscription', subscriptionJson);
               }
             },
             error: (err) => {

@@ -6,10 +6,10 @@ import { Profile } from '../interfaces/profile';
   providedIn: 'root'
 })
 export class IndexedDbService {
-  private dbName = 'messageDropDb';
-  private settingStore = 'settings';
-  private userStore = 'user';
-  private profileStore = 'profile';
+  private dbName: string = 'messageDropDb';
+  private settingStore: string = 'settings';
+  private userStore: string = 'user';
+  private profileStore: string = 'profile';
 
   constructor() {
     this.openDB();
@@ -45,7 +45,9 @@ export class IndexedDbService {
       const tx = db.transaction(storeNames, 'readwrite');
 
       for (const storeName of storeNames) {
-        tx.objectStore(storeName).clear();
+        if (storeName !== this.settingStore) {
+          tx.objectStore(storeName).clear();
+        }
       }
 
       tx.oncomplete = () => {
@@ -60,17 +62,48 @@ export class IndexedDbService {
     });
   }
 
-  async hasUser(): Promise<boolean> {
+  async setSetting(key: string, value: any): Promise<void> {
     const db = await this.openDB();
 
-    return new Promise<boolean>((resolve, reject) => {
-      const tx = db.transaction(this.userStore, 'readonly');
-      const store = tx.objectStore(this.userStore);
-      const request = store.get('user');
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.settingStore, 'readwrite');
+      const store = tx.objectStore(this.settingStore);
+      const request = store.put(value, key);
 
-      request.onsuccess = () => resolve(request.result !== undefined);
+      request.onsuccess = () => resolve();
       request.onerror = () => {
-        resolve(false);
+        reject(request.error);
+      };
+    });
+  }
+
+  async getSetting(key: string): Promise<any> {
+    const db = await this.openDB();
+
+    return new Promise<any>((resolve, reject) => {
+      const tx = db.transaction(this.settingStore, 'readonly');
+      const store = tx.objectStore(this.settingStore);
+      const request = store.get(key);
+
+      request.onsuccess = () => {
+        resolve(request.result);
+      };
+
+      request.onerror = () => {
+        reject(request.error);
+      };
+    });
+  }
+
+  async deleteSetting(key: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.settingStore, 'readwrite');
+      const store = tx.objectStore(this.settingStore);
+      const request = store.delete(key);
+      request.onsuccess = () => resolve();
+      request.onerror = () => {
+        reject(request.error);
       };
     });
   }
@@ -119,6 +152,21 @@ export class IndexedDbService {
       request.onsuccess = () => resolve();
       request.onerror = () => {
         reject(request.error);
+      };
+    });
+  }
+
+  async hasUser(): Promise<boolean> {
+    const db = await this.openDB();
+
+    return new Promise<boolean>((resolve, reject) => {
+      const tx = db.transaction(this.userStore, 'readonly');
+      const store = tx.objectStore(this.userStore);
+      const request = store.get('user');
+
+      request.onsuccess = () => resolve(request.result !== undefined);
+      request.onerror = () => {
+        resolve(false);
       };
     });
   }
