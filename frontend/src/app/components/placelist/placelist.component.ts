@@ -14,7 +14,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { Place } from '../../interfaces/place';
-import { User } from '../../interfaces/user';
 import { CryptoService } from '../../services/crypto.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
@@ -45,7 +44,6 @@ import { DeletePlaceComponent } from './delete-place/delete-place.component';
 export class PlacelistComponent implements OnInit {
   public places!: Place[];
   private placeToDelete!: Place
-  public user!: User;
   public mode: typeof Mode = Mode;
   private snackBarRef: any;
   public subscriptionError: boolean = false;
@@ -54,16 +52,15 @@ export class PlacelistComponent implements OnInit {
     private mapService: MapService,
     private geolocationService: GeolocationService,
     private placeService: PlaceService,
-    private userService: UserService,
+    public userService: UserService,
     private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public placeDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User, places: Place[] }
+    @Inject(MAT_DIALOG_DATA) public data: { places: Place[] }
   ) {
-    this.user = data.user;
     this.places = data.places;
   }
 
@@ -101,7 +98,7 @@ export class PlacelistComponent implements OnInit {
   public editPlace(place: Place) {
     const dialogRef = this.placeDialog.open(PlaceComponent, {
       panelClass: '',
-      data: { mode: this.mode.EDIT_PLACE, user: this.user, place: place },
+      data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,
       width: '90vw',
       minWidth: '20vw',
@@ -145,7 +142,7 @@ export class PlacelistComponent implements OnInit {
 
   public subscribe(place: Place) {
     if (Notification.permission !== "granted") {
-      this.userService.registerSubscription(this.user);
+      this.userService.registerSubscription(this.userService.getUser());
     }
     if (!place.subscribed && Notification.permission === "granted") {
       // subscribe to place
@@ -186,7 +183,7 @@ export class PlacelistComponent implements OnInit {
   openPlaceDialog(): void {
     let place: Place = {
       id: '',
-      userId: this.user.id,
+      userId: this.userService.getUser().id,
       name: '',
       base64Avatar: '',
       subscribed: false,

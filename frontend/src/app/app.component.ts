@@ -758,7 +758,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.placeListDialog.open(PlacelistComponent, {
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), places: this.placeService.getPlaces() },
+      data: { places: this.placeService.getPlaces() },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
