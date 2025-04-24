@@ -800,7 +800,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.contactListDialog.open(ContactlistComponent, {
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
-      data: { user: this.userService.getUser(), contacts: this.contactService.getContacts() },
+      data: { contacts: this.contactService.getContacts() },
       width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',

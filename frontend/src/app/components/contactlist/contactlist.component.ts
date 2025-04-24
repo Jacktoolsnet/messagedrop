@@ -13,7 +13,6 @@ import { GetUserResponse } from '../../interfaces/get-user-response';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
-import { User } from '../../interfaces/user';
 import { ConnectService } from '../../services/connect.service';
 import { ContactService } from '../../services/contact.service';
 import { CryptoService } from '../../services/crypto.service';
@@ -47,12 +46,11 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
 export class ContactlistComponent implements OnInit {
   private snackBarRef: any;
   private contactToDelete!: Contact
-  public user!: User;
   public mode: typeof Mode = Mode;
   public subscriptionError: boolean = false;
 
   constructor(
-    private userService: UserService,
+    public userService: UserService,
     public socketioService: SocketioService,
     private connectService: ConnectService,
     public contactService: ContactService,
@@ -64,10 +62,8 @@ export class ContactlistComponent implements OnInit {
     public dialog: MatDialog,
     private style: StyleService,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User, contacts: Contact[] }
-  ) {
-    this.user = data.user;
-  }
+    @Inject(MAT_DIALOG_DATA) public data: { contacts: Contact[] }
+  ) { }
 
   ngOnInit(): void {
   }
@@ -75,7 +71,7 @@ export class ContactlistComponent implements OnInit {
   openConnectDialog(): void {
     let contact: Contact = {
       id: "",
-      userId: this.user.id,
+      userId: this.userService.getUser().id,
       contactUserId: '',
       name: '',
       subscribed: false,
@@ -136,7 +132,7 @@ export class ContactlistComponent implements OnInit {
   openScannerDialog(): void {
     let contact: Contact = {
       id: "",
-      userId: this.user.id,
+      userId: this.userService.getUser().id,
       contactUserId: '',
       hint: '',
       name: '',
@@ -257,7 +253,7 @@ export class ContactlistComponent implements OnInit {
 
   public subscribe(contact: Contact) {
     if (Notification.permission !== "granted") {
-      this.userService.registerSubscription(this.user);
+      this.userService.registerSubscription(this.userService.getUser());
     }
     if (!contact.subscribed && Notification.permission === "granted") {
       // subscribe to place

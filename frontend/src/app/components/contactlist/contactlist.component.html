@@ -55,7 +55,7 @@
                                 [style]="contact.contactUserMessage.style"></app-showmessage>
                         </p>
                     </div>
-                    <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
+                    <div *ngIf="contact.lastMessageFrom === 'userService.getUser()'" class="message">
                         <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != '' || contact.contactUserMessage.multimedia.type != 'undefined'"
                             class="from-them">
                             <app-showmultimedia
