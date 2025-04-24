@@ -5,7 +5,7 @@
   </button>
   <div class="buttonarea">
     <p>I can have this QR code scanned to connect</p>
-    <qrcode class="center" [qrdata]="data.user.id" [width]="256" [errorCorrectionLevel]="'M'">
+    <qrcode class="center" [qrdata]="userService.getUser().id" [width]="256" [errorCorrectionLevel]="'M'">
     </qrcode>
     <p>or I can share a connect id</p>
     <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"

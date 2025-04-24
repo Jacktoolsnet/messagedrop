@@ -946,7 +946,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
   public showUser() {
     const dialogRef = this.dialog.open(UserComponent, {
-      data: { user: this.userService.getUser() },
+      data: {},
       closeOnNavigation: true,
       hasBackdrop: true
     });

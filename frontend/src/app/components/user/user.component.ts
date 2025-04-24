@@ -8,7 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { QRCodeComponent } from 'angularx-qrcode';
-import { User } from '../../interfaces/user';
+import { UserService } from '../../services/user.service';
 
 @Component({
   selector: 'app-user',
@@ -30,13 +30,12 @@ import { User } from '../../interfaces/user';
 })
 export class UserComponent {
   private snackBarRef: any;
-  public user?: User;
   public connectHint: string = ``;
 
   constructor(
+    public userService: UserService,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { user: User }) {
-    this.user = data.user;
+    @Inject(MAT_DIALOG_DATA) public data: {}) {
   }
 
   public showPolicy() {
