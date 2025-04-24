@@ -87,7 +87,7 @@ export class AppComponent implements OnInit {
   private showComponent: boolean = false;
 
   constructor(
-    private indexDbService: IndexedDbService,
+    private indexedDbService: IndexedDbService,
     private serverService: ServerService,
     public userService: UserService,
     public mapService: MapService,
@@ -121,7 +121,7 @@ export class AppComponent implements OnInit {
     this.serverSubject.subscribe({
       next: async (v) => {
         if (this.serverService.isReady()) {
-          if (await this.indexDbService.hasUser()) {
+          if (await this.indexedDbService.hasUser()) {
             this.openCheckPinDialog();
           } else {
             const dialogRef = this.displayMessage.open(DisplayMessage, {
@@ -461,16 +461,16 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
       if (data === undefined) {
-        let cryptedUser: CryptedUser | undefined = await this.indexDbService.getUser()
+        let cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
         if (cryptedUser) {
           this.userService.deleteUser(cryptedUser.id)
             .subscribe({
               next: () => {
-                this.indexDbService.clearAllData();
+                this.indexedDbService.clearAllData();
                 this.openCreatePinDialog();
               },
               error: (err) => {
-                this.indexDbService.clearAllData();
+                this.indexedDbService.clearAllData();
                 this.openCreatePinDialog();
               },
               complete: () => { }
@@ -494,7 +494,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
           .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
             this.userService.getUser().pinHash = getPinHashResponse.pinHash;
-            const cryptedUser = await this.indexDbService.getUser();
+            const cryptedUser = await this.indexedDbService.getUser();
             if (cryptedUser) {
               this.userService.confirmUser(getPinHashResponse.pinHash, cryptedUser)
                 .subscribe({
@@ -540,11 +540,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         this.userService.deleteUser(cryptedUser.id)
                           .subscribe({
                             next: () => {
-                              this.indexDbService.clearAllData();
+                              this.indexedDbService.clearAllData();
                               this.openCreatePinDialog();
                             },
                             error: (err) => {
-                              this.indexDbService.clearAllData();
+                              this.indexedDbService.clearAllData();
                               this.openCreatePinDialog();
                             },
                             complete: () => { this.initApp(); }
@@ -926,7 +926,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.indexDbService.clearAllData();
+                this.indexedDbService.clearAllData();
                 this.getMessages(this.mapService.getMapLocation());
               }
             },
