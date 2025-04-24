@@ -209,9 +209,19 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
               const user = JSON.parse(decoder.decode(decryptedPayload));
 
               if (user.pinHash === req.body.pinHash) {
-                response.user = user;
-                response.status = 200;
-                res.status(response.status).json(response);
+                tableUser.updatePublicKeys(req.database.db, user.id, JSON.stringify(user.signingKeyPair.publicKey), JSON.stringify(user.cryptoKeyPair.publicKey), function (err) {
+                  if (err) {
+                    response.status = 500;
+                    response.error = err;
+                    res.status(response.status).json(response);
+                  }
+                  else {
+                    response.user = user;
+                    response.status = 200;
+                    res.status(response.status).json(response);
+                  }
+                }
+                );
               } else {
                 response.status = 401;
                 res.status(response.status).json(response);

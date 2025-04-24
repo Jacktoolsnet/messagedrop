@@ -195,7 +195,7 @@ export class ContactlistComponent implements OnInit {
                   this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'QR-Code')
                     .then((encryptedHint: string) => {
                       data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
-                      data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.encryptionPublicKey);
+                      data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
                       data.contact.signature = signature;
                       data.contact.hint = encryptedHint;
                       this.contactService.createContact(data?.contact, this.socketioService);

@@ -12,7 +12,9 @@ const userType = {
 const tableName = 'tableUser';
 const columnUserId = 'id';
 const columnCryptoPrivateKey = 'cryptoPrivateKey';
+const columnCryptoPublicKey = 'cryptoPublicKey';
 const columnSigningPrivateKey = 'signingPrivateKey';
+const columnSigningPublicKey = 'signingPublicKey';
 const columnNumberOfMessages = 'numberOfMessages';
 const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
 const columnUserStatus = 'userStatus';
@@ -26,7 +28,9 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnUserId} TEXT PRIMARY KEY NOT NULL, 
             ${columnCryptoPrivateKey} TEXT NOT NULL,
-            ${columnSigningPrivateKey} TEXT NOT NULL, 
+            ${columnCryptoPublicKey} TEXT DEFAULT NULL,
+            ${columnSigningPrivateKey} TEXT NOT NULL,
+            ${columnSigningPublicKey} TEXT DEFAULT NULL, 
             ${columnNumberOfMessages} INTEGER DEFAULT 0,
             ${columnNumberOfBlockedMessages} INTEGER DEFAULT 0,
             ${columnUserStatus} TEXT NOT NULL DEFAULT '${userStatus.ENABLED}',
@@ -139,11 +143,26 @@ const subscribe = function (db, userId, subscription, callback) {
     }
 };
 
-const unsubscribe = function (db, placeId, callback) {
+const unsubscribe = function (db, userId, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscription} = ''
+        WHERE ${columnUserId} = ?;`;
+
+        db.run(sql, [userId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const updatePublicKeys = function (db, userId, signingPublicKey, cryptoPublicKey, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnSigningPublicKey} = '${signingPublicKey}', ${columnCryptoPublicKey} = '${cryptoPublicKey}'
         WHERE ${columnUserId} = ?;`;
 
         db.run(sql, [userId], (err) => {
@@ -163,5 +182,6 @@ module.exports = {
     deleteById,
     clean,
     subscribe,
-    unsubscribe
+    unsubscribe,
+    updatePublicKeys
 }

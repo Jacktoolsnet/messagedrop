@@ -11,7 +11,7 @@ import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { GetUserResponse } from '../interfaces/get-user-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
-import { UserType } from '../interfaces/user-type copy';
+import { UserType } from '../interfaces/user-type';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 
@@ -82,7 +82,7 @@ export class UserService {
     userSubject.next();
   }
 
-  async initUser(userSubject: Subject<void>, createUserResponse: CreateUserResponse) {
+  async initUser(userSubject: Subject<void>, createUserResponse: CreateUserResponse, pinHash: string) {
     this.user.id = createUserResponse.userId;
     this.user.serverCryptoPublicKey = createUserResponse.cryptoPublicKey;
     this.user.serverSigningPublicKey = createUserResponse.signingPublicKey;
@@ -92,10 +92,18 @@ export class UserService {
       id: this.user.id,
       cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
     };
-    this.indexedDbService.setUser(cryptedUser)
-      .then(() => {
-        this.ready = true;
-        userSubject.next();
+    this.confirmUser(pinHash, cryptedUser)
+      .subscribe({
+        next: (confirmUserResponse: ConfirmUserResponse) => {
+          if (confirmUserResponse.status === 200) {
+            this.indexedDbService.setUser(cryptedUser)
+              .then(() => {
+                this.ready = true;
+                userSubject.next();
+              });
+          }
+        },
+        error: (err) => { }
       });
   }
 

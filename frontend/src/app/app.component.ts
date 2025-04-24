@@ -9,7 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterOutlet } from '@angular/router';
 import { SwPush } from '@angular/service-worker';
-import { Subject } from 'rxjs';
+import { Subject, take } from 'rxjs';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
@@ -140,7 +140,7 @@ Basically: lose it, and your user is gone like your last cup of coffee.
 
 You can delete your user anytime (rage quit or just Marie Kondo your data).
 
-Also, if you ghost us for 90 days, your user and all its data get quietly deleted – like a ninja in the night.`,
+Also, if you ghost us for 90 days, your user and all its data get quietly deleted.`,
                 button: 'Create PIN',
                 delay: 200,
                 showSpinner: false
@@ -400,7 +400,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe(async (data: any) => {
+    dialogRef.afterClosed().pipe(take(1)).subscribe(async (data: any) => {
       const displayMessageRef = this.displayMessage.open(DisplayMessage, {
         data: {
           title: 'User Creation',
@@ -415,6 +415,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         closeOnNavigation: false,
         hasBackdrop: false
       });
+
       const encrypted = await this.cryptoService.encrypt(
         this.serverService.getCryptoPublicKey()!,
         data
@@ -426,7 +427,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
           this.userService.createUser().subscribe({
             next: (createUserResponse: CreateUserResponse) => {
-              this.userService.initUser(this.userSubject, createUserResponse);
+              this.userService.initUser(this.userSubject, createUserResponse, getPinHashResponse.pinHash);
             },
             error: (err) => {
               displayMessageRef.close();
@@ -541,11 +542,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                           .subscribe({
                             next: () => {
                               this.indexedDbService.clearAllData();
-                              this.openCreatePinDialog();
                             },
                             error: (err) => {
                               this.indexedDbService.clearAllData();
-                              this.openCreatePinDialog();
                             },
                             complete: () => { this.initApp(); }
                           });

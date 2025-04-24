@@ -1,6 +1,6 @@
 import { Keypair } from "./keypair";
 import { Location } from "./location";
-import { UserType } from "./user-type copy";
+import { UserType } from "./user-type";
 
 export interface User {
     id: string,

@@ -51,12 +51,10 @@ export class IndexedDbService {
       }
 
       tx.oncomplete = () => {
-        console.log('Alle Object Stores wurden geleert.');
         resolve();
       };
 
       tx.onerror = () => {
-        console.error('Fehler beim Leeren der Stores:', tx.error);
         reject(tx.error);
       };
     });

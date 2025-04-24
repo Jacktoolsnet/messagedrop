@@ -26,6 +26,11 @@ export class CreatePinComponent {
   pinDisplay: string[] = ['', '', '', '', '', ''];
   confirmPinDisplay: string[] = ['', '', '', '', '', ''];
   isConfirming: boolean = false;
+  private dialogClosed = false;
+
+  ngOnDestroy(): void {
+    this.dialogClosed = true;
+  }
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardInput(event: KeyboardEvent): void {
@@ -68,7 +73,8 @@ export class CreatePinComponent {
         if (this.confirmPin.length === this.pinLength) {
           // Automatisch prüfen & ggf. schließen
           setTimeout(() => {
-            if (this.confirmPin === this.pin) {
+            if (this.confirmPin === this.pin && !this.dialogClosed) {
+              this.dialogClosed = true;
               this.dialogRef.close(this.pin);
             } else {
               this.snackBar.open('PINs do not match', '', {
@@ -78,7 +84,7 @@ export class CreatePinComponent {
               });
               this.reset();
             }
-          }, 1000); // erst nach Anzeige der letzten Ziffer prüfen
+          }, 500); // erst nach Anzeige der letzten Ziffer prüfen
         }
       }
     }
