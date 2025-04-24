@@ -14,7 +14,6 @@ import { Mode } from '../../../interfaces/mode';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
-import { User } from '../../../interfaces/user';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
@@ -45,13 +44,13 @@ export class ContactEditMessageComponent implements OnInit {
 
   constructor(
     private sanitizer: DomSanitizer,
-    private userService: UserService,
+    public userService: UserService,
     private snackBar: MatSnackBar,
     private tenorDialog: MatDialog,
     private textDialog: MatDialog,
     public dialogRef: MatDialogRef<ContactEditMessageComponent>,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, user: User, contact: Contact, shortMessage: ShortMessage }
+    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact, shortMessage: ShortMessage }
   ) { }
 
   ngOnInit(): void {
