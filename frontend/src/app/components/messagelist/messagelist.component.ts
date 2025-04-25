@@ -193,7 +193,6 @@ export class MessagelistComponent implements OnInit {
       closeOnNavigation: true,
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -262,7 +261,6 @@ export class MessagelistComponent implements OnInit {
       closeOnNavigation: true,
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -328,7 +326,6 @@ export class MessagelistComponent implements OnInit {
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

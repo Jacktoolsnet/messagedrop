@@ -23,7 +23,7 @@
                 (click)="goToMessageDetails(message)">
                 <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">expand_content</mat-icon>
             </button>
-            <mat-card-header class="header">
+            <mat-card-header>
                 <mat-card-title *ngIf="user.id == message.userId">{{user.name}}</mat-card-title>
                 <mat-card-title
                     *ngIf="user.id != message.userId && profileService.getProfile(message.userId)?.name != ''">{{profileService.getProfile(message.userId)?.name}}</mat-card-title>
@@ -35,20 +35,6 @@
                     [message]="undefined != message.translatedMessage ? message.translatedMessage : message.message"
                     [style]="message.style"></app-showmessage>
             </mat-card-content>
-            <!--mat-card-actions class="buttonbar">
-                <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                    matBadge="{{message.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-                    matBadgeOverlap="true">visibility</mat-icon>
-                <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                    matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-                    matBadgeOverlap="true">thumb_up</mat-icon>
-                <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                    matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-                    matBadgeOverlap="true">thumb_down</mat-icon>
-                <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                    matBadge="{{message.comments.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-                    matBadgeOverlap="true">chat_bubble_outline</mat-icon>
-            </mat-card-actions-->
         </mat-card>
     </div>
     <!-- Message Detail view-->
@@ -59,7 +45,7 @@
             <img *ngIf="profileService.getProfile(messageService.getSelectedMessages().at(-1)!.userId)?.base64Avatar && user.id != messageService.getSelectedMessages().at(-1)?.userId"
                 class="avatar"
                 src="{{profileService.getProfile(messageService.getSelectedMessages().at(-1)!.userId)?.base64Avatar}}" />
-            <mat-card-header class="header">
+            <mat-card-header>
                 <mat-card-title *ngIf="user.id == messageService.getSelectedMessages().at(-1)?.userId"
                     (click)="editMessage(messageService.getSelectedMessages().at(-1)!)">{{user.name}}</mat-card-title>
                 <mat-card-title
@@ -128,7 +114,7 @@
                     aria-label="Detial" (click)="goToMessageDetails(comment)">
                     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">expand_content</mat-icon>
                 </button>
-                <mat-card-header class="header">
+                <mat-card-header>
                     <mat-card-title *ngIf="user.id == comment.userId">{{user.name}}</mat-card-title>
                     <mat-card-title
                         *ngIf="user.id != comment.userId">{{profileService.getProfile(comment.userId)?.name}}</mat-card-title>
@@ -140,20 +126,6 @@
                         [message]="undefined != comment.translatedMessage ? comment.translatedMessage : comment.message"
                         [style]="comment.style"></app-showmessage>
                 </mat-card-content>
-                <!--mat-card-actions class="buttonbar">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                        matBadge="{{comment.views | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-                        matBadgeOverlap="true">visibility</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                        matBadge="{{comment.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
-                        matBadgeOverlap="true">thumb_up</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                        matBadge="{{comment.dislikes | shortNumber}}" matBadgePosition="after"
-                        matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined, buttonbar_icon"
-                        matBadge="{{comment.commentsNumber | shortNumber}}" matBadgePosition="after"
-                        matBadgeColor="accent" matBadgeOverlap="true">chat_bubble_outline</mat-icon>
-                </mat-card-actions-->
             </mat-card>
         </div>
     </div>

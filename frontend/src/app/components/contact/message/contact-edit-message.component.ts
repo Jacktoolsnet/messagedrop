@@ -80,7 +80,6 @@ export class ContactEditMessageComponent implements OnInit {
       data: {},
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

@@ -618,7 +618,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -660,7 +659,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -738,7 +736,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         minWidth: '60vw',
         maxWidth: '90vw',
         height: 'auto',
-        minHeight: 'auto',
         maxHeight: '90vh',
         hasBackdrop: true
       });
@@ -762,7 +759,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       minWidth: '60vw',
       maxWidth: '90vw',
       height: 'auto',
-      minHeight: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -804,7 +800,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       minWidth: '60vw',
       maxWidth: '90vw',
       height: 'auto',
-      minHeight: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -879,7 +874,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       minWidth: '60vw',
       maxWidth: '90vw',
       height: 'auto',
-      minHeight: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true
     });

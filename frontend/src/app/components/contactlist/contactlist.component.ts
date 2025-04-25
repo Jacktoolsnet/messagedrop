@@ -113,7 +113,6 @@ export class ContactlistComponent implements OnInit {
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: 'auto',
       height: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true
@@ -176,7 +175,6 @@ export class ContactlistComponent implements OnInit {
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: 'auto',
       height: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true
@@ -284,7 +282,6 @@ export class ContactlistComponent implements OnInit {
       data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, shortMessage: shortMessage },
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

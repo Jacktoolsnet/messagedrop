@@ -9,7 +9,7 @@
     </button>
     <div *ngIf="contactService.getContacts().length == 0" class="item">
         <mat-card>
-            <mat-card-header class="header">
+            <mat-card-header>
                 <mat-card-title>Contacts</mat-card-title>
                 <mat-card-subtitle></mat-card-subtitle>
             </mat-card-header>
@@ -18,61 +18,59 @@
         </mat-card>
     </div>
     <div *ngIf="contactService.getContacts().length != 0" class="content">
-        <div *ngIf="contactService.getContacts().length != 0">
-            <mat-card class="item" *ngFor="let contact of contactService.getContacts(); index as i">
-                <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != '' && contact.base64Avatar != 'undefined'"
-                    class="avatar" src="{{contact.base64Avatar}}" />
-                <mat-card-header class="header">
-                    <mat-card-title
-                        *ngIf="contact.name == undefined || contact.name === ''">{{contact.contactUserId}}</mat-card-title>
-                    <mat-card-title
-                        *ngIf="contact.name != undefined || contact.name !== ''">{{contact.name}}</mat-card-title>
-                    <mat-card-subtitle></mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>
-                    <button class="button_contactmenu" [matMenuTriggerFor]="contactMenu"
-                        [matMenuTriggerData]="{contact: contact}" aria-hidden="false" mat-mini-fab color="accent"
-                        aria-label="Message menu" (click)="{}">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
-                    </button>
-                    <button class="button_shortmessage" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false"
-                        mat-mini-fab color="primary" aria-label="Send a short message"
-                        (click)="openContactMessagDialog(contact)">
-                        <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
-                    </button>
-                    <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
-                        <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != '' || contact.userMessage.multimedia.type != 'undefined'"
-                            class="from-me">
-                            <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
-                            <app-showmessage [message]="contact.userMessage.message"
-                                [style]="contact.userMessage.style"></app-showmessage>
-                        </p>
-                        <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != '' || contact.contactUserMessage.multimedia.type != 'undefined'"
-                            class="from-them">
-                            <app-showmultimedia
-                                [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
-                            <app-showmessage [message]="contact.contactUserMessage.message"
-                                [style]="contact.contactUserMessage.style"></app-showmessage>
-                        </p>
-                    </div>
-                    <div *ngIf="contact.lastMessageFrom === 'userService.getUser()'" class="message">
-                        <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != '' || contact.contactUserMessage.multimedia.type != 'undefined'"
-                            class="from-them">
-                            <app-showmultimedia
-                                [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
-                            <app-showmessage [message]="contact.contactUserMessage.message"
-                                [style]="contact.contactUserMessage.style"></app-showmessage>
-                        </p>
-                        <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != '' || contact.userMessage.multimedia.type != 'undefined'"
-                            class="from-me">
-                            <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
-                            <app-showmessage [message]="contact.userMessage.message"
-                                [style]="contact.userMessage.style"></app-showmessage>
-                        </p>
-                    </div>
-                </mat-card-content>
-            </mat-card>
-        </div>
+        <mat-card class="item" *ngFor="let contact of contactService.getContacts(); index as i">
+            <img *ngIf="contact.base64Avatar != undefined && contact.base64Avatar != '' && contact.base64Avatar != 'undefined'"
+                class="avatar" src="{{contact.base64Avatar}}" />
+            <mat-card-header>
+                <mat-card-title
+                    *ngIf="contact.name == undefined || contact.name === ''">{{contact.contactUserId}}</mat-card-title>
+                <mat-card-title
+                    *ngIf="contact.name != undefined || contact.name !== ''">{{contact.name}}</mat-card-title>
+                <mat-card-subtitle></mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+                <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
+                    <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != '' || contact.userMessage.multimedia.type != 'undefined'"
+                        class="from-me">
+                        <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                        <app-showmessage [message]="contact.userMessage.message"
+                            [style]="contact.userMessage.style"></app-showmessage>
+                    </p>
+                    <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != '' || contact.contactUserMessage.multimedia.type != 'undefined'"
+                        class="from-them">
+                        <app-showmultimedia [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                        <app-showmessage [message]="contact.contactUserMessage.message"
+                            [style]="contact.contactUserMessage.style"></app-showmessage>
+                    </p>
+                </div>
+                <div *ngIf="contact.lastMessageFrom === 'userService.getUser()'" class="message">
+                    <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != '' || contact.contactUserMessage.multimedia.type != 'undefined'"
+                        class="from-them">
+                        <app-showmultimedia [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                        <app-showmessage [message]="contact.contactUserMessage.message"
+                            [style]="contact.contactUserMessage.style"></app-showmessage>
+                    </p>
+                    <p *ngIf="contact.userMessage != null && contact.userMessage != undefined && contact.userMessage.message != '' || contact.userMessage.multimedia.type != 'undefined'"
+                        class="from-me">
+                        <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                        <app-showmessage [message]="contact.userMessage.message"
+                            [style]="contact.userMessage.style"></app-showmessage>
+                    </p>
+                </div>
+            </mat-card-content>
+            <mat-card-actions class="buttonbar">
+                <button class="button_shortmessage" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false"
+                    mat-mini-fab color="primary" aria-label="Send a short message"
+                    (click)="openContactMessagDialog(contact)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
+                </button>
+                <button class="button_contactmenu" [matMenuTriggerFor]="contactMenu"
+                    [matMenuTriggerData]="{contact: contact}" aria-hidden="false" mat-mini-fab color="accent"
+                    aria-label="Message menu" (click)="{}">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
+                </button>
+            </mat-card-actions>
+        </mat-card>
     </div>
 </mat-dialog-content>
 

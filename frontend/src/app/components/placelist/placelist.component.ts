@@ -103,7 +103,6 @@ export class PlacelistComponent implements OnInit {
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: 'auto',
       height: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true
@@ -196,7 +195,6 @@ export class PlacelistComponent implements OnInit {
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: 'auto',
       height: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true

@@ -8,8 +8,6 @@
 
 .mat-mdc-dialog-content {
     padding: 0px !important;
-    max-height: 80vh;
-    height: 80vh;
 }
 
 .mat-mdc-dialog-actions {
@@ -107,7 +105,6 @@ h4 {
     align-items: center;
     position: relative;
     margin: 0.5rem;
-    height: 100%;
     background-color: rgb(142, 141, 141);
     color: white;
     border-radius: 0.25rem;

@@ -35,7 +35,6 @@ export class SelectMultimediaComponent {
       data: {},
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -56,7 +55,6 @@ export class SelectMultimediaComponent {
       data: {},
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -77,7 +75,6 @@ export class SelectMultimediaComponent {
       data: {},
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -98,7 +95,6 @@ export class SelectMultimediaComponent {
       data: {},
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -119,7 +115,6 @@ export class SelectMultimediaComponent {
       data: {},
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });

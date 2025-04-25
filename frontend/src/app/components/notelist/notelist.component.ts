@@ -159,7 +159,6 @@ export class NotelistComponent implements OnInit {
       data: { mode: this.mode.ADD_NOTE, note: note },
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true
     });
