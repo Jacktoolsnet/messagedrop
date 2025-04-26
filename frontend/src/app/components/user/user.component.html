@@ -3,27 +3,12 @@
   <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
   </button>
-  <div class="buttonarea">
-    <p>I can have this QR code scanned to connect</p>
-    <qrcode class="center" [qrdata]="userService.getUser().id" [width]="256" [errorCorrectionLevel]="'M'">
-    </qrcode>
-    <p>or I can share a connect id</p>
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
-      [mat-dialog-close]="{'action': 'shareUserId', connectHint: connectHint}">
-      <mat-icon class="material-symbols-outlined">share</mat-icon>
-      <span>Share connect id</span>
-    </button>
-    <p style="margin-top: 1rem;">and I can add a hint to the share id to remind myself who I wanted to connect with:</p>
-    <input matInput type="text" maxlength="64" placeholder="The connect hint.." [(ngModel)]="connectHint">
-
-    <p></p>
-    <p>Deleting my user cannot be undone.</p>
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
-      [mat-dialog-close]="{'action': 'deleteUserId'}">
-      <mat-icon class="material-symbols-outlined">delete</mat-icon>
-      <span>Delete my user</span>
-    </button>
-  </div>
+  <p>Deleting my user cannot be undone.</p>
+  <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
+    [mat-dialog-close]="{'action': 'deleteUserId'}">
+    <mat-icon class="material-symbols-outlined">delete</mat-icon>
+    <span>Delete my user</span>
+  </button>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial

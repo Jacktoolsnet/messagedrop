@@ -25,7 +25,6 @@ import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
-import { Connect } from './interfaces/connect';
 import { CreateUserResponse } from './interfaces/create-user-response';
 import { CryptedUser } from './interfaces/crypted-user';
 import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
@@ -949,34 +948,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe(result => {
       switch (result?.action) {
-        case "shareUserId":
-          this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
-            .then((signature: string) => {
-              this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, result?.connectHint)
-                .then((encryptedHint: string) => {
-                  let connect: Connect = {
-                    id: '',
-                    userId: this.userService.getUser().id,
-                    hint: encryptedHint,
-                    signature: signature,
-                    encryptionPublicKey: JSON.stringify(this.userService.getUser().cryptoKeyPair?.publicKey!),
-                    signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
-                  };
-                  this.connectService.createConnect(connect)
-                    .subscribe({
-                      next: createConnectResponse => {
-                        if (createConnectResponse.status === 200) {
-                          connect.id = createConnectResponse.connectId;
-                          navigator.clipboard.writeText(connect.id);
-                          this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
-                        }
-                      },
-                      error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                      complete: () => { }
-                    });
-                });
-            });
-          break
         case "deleteUserId":
           this.deleteUser();
           break

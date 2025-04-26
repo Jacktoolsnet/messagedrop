@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@ang
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
 import { GetUserResponse } from '../../interfaces/get-user-response';
@@ -25,6 +26,7 @@ import { ContactEditMessageComponent } from '../contact/message/contact-edit-mes
 import { ContactProfileComponent } from '../contact/profile/profile.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 @Component({
@@ -59,6 +61,7 @@ export class ContactlistComponent implements OnInit {
     public contactMessageDialog: MatDialog,
     public connectDialog: MatDialog,
     public scannerDialog: MatDialog,
+    public qrDialog: MatDialog,
     public dialog: MatDialog,
     private style: StyleService,
     private snackBar: MatSnackBar,
@@ -316,6 +319,47 @@ export class ContactlistComponent implements OnInit {
           });
       }
     });
+  }
+
+  public shareConnectId(): void {
+    this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+      .then((signature: string) => {
+        this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'No hint')
+          .then((encryptedHint: string) => {
+            let connect: Connect = {
+              id: '',
+              userId: this.userService.getUser().id,
+              hint: encryptedHint,
+              signature: signature,
+              encryptionPublicKey: JSON.stringify(this.userService.getUser().cryptoKeyPair?.publicKey!),
+              signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
+            };
+            this.connectService.createConnect(connect)
+              .subscribe({
+                next: createConnectResponse => {
+                  if (createConnectResponse.status === 200) {
+                    connect.id = createConnectResponse.connectId;
+                    navigator.clipboard.writeText(connect.id);
+                    this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
+                  }
+                },
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                complete: () => { }
+              });
+          });
+      });
+  }
+
+  public openQrDialog() {
+    const dialogRef = this.dialog.open(QrcodeComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      data: { qrData: this.userService.getUser().id }
+    });
+
+    dialogRef.afterOpened().subscribe({});
+
+    dialogRef.afterClosed().subscribe({});
   }
 
 }

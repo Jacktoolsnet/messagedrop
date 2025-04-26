@@ -137,8 +137,8 @@ export class SocketioService {
   public receiveProfileForContactEvent(contact: Contact) {
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
       if (payload.status == 200) {
-        contact.name = payload.contact.name;
-        contact.base64Avatar = payload.contact.base64Avatar;
+        contact.name = payload.contact.name !== '' ? payload.contact.name : "Not set";
+        contact.base64Avatar = payload.contact.base64Avatar !== '' ? payload.contact.base64Avatar : undefined;
         this.contactService.saveAditionalContactInfos();
       } else {
         this.snackBar.open("The contact declined the profile information request.", "Ok", {

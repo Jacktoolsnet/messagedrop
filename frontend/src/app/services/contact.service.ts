@@ -324,7 +324,7 @@ export class ContactService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            this.getContacts().splice(this.getContacts().findIndex(contact => contact.id !== contactToDelete.id), 1);
+            this.contacts.splice(this.contacts.map(e => e.id).indexOf(contactToDelete.id), 1);
           }
         },
         error: (err) => {
