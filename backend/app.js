@@ -93,10 +93,19 @@ app.use(bearerToken());
 Enable cors for all routes.
 */
 var corsOptions = {
-  origin: process.env.ORIGIN,
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, false);
+    if (process.env.ORIGIN == origin) {
+      callback(null, true);
+    } else {
+      callback(null, false);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
-app.use(cors())
+app.use(cors(corsOptions))
 
 app.use(databaseMw(database));
 app.use(loggerMw(logger));

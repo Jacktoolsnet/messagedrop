@@ -32,7 +32,8 @@ export class PlaceService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${environment.apiToken}`
+      Authorization: `Bearer ${environment.apiToken}`,
+      withCredentials: 'true'
     })
   };
 
