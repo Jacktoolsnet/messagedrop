@@ -5,6 +5,7 @@ import { Buffer } from 'buffer';
 import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
+import { ContactProfile } from '../interfaces/contactProfile';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { Envelope } from '../interfaces/envelope';
 import { GetContactResponse } from '../interfaces/get-contact-response';
@@ -14,6 +15,7 @@ import { RawContact } from '../interfaces/raw-contact';
 import { ShortMessage } from '../interfaces/short-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { CryptoService } from './crypto.service';
+import { IndexedDbService } from './indexed-db.service';
 import { SocketioService } from './socketio.service';
 import { UserService } from './user.service';
 
@@ -24,7 +26,7 @@ import { UserService } from './user.service';
 export class ContactService {
 
   private contacts: Contact[] = [];
-  private additionalContactInfos: { id: string, name: string, base64Avatar: string }[] = [];
+  private contactProfiles: Map<string, ContactProfile> = new Map<string, ContactProfile>();
   private ready: boolean = false;
 
   httpOptions = {
@@ -38,6 +40,7 @@ export class ContactService {
   constructor(
     private http: HttpClient,
     private userService: UserService,
+    private indexedDbService: IndexedDbService,
     private cryptoService: CryptoService,
     private snackBar: MatSnackBar
   ) { }
@@ -49,8 +52,8 @@ export class ContactService {
   initContacts(contactSubject: Subject<void>) {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
-        next: (getContactsResponse: GetContactsResponse) => {
-          this.loadAdditionalContactInfos();
+        next: async (getContactsResponse: GetContactsResponse) => {
+          this.contactProfiles = await this.indexedDbService.getAllContactProfilesAsMap();
           getContactsResponse.rows.forEach((rawContact: RawContact) => {
             let userSignatureBuffer = undefined
             let userSignature = undefined
@@ -80,8 +83,8 @@ export class ContactService {
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
               hint: rawContact.hint,
-              name: this.findAditionalContactInfo(rawContact.id).name,
-              base64Avatar: this.findAditionalContactInfo(rawContact.id).base64Avatar,
+              name: this.contactProfiles.get(rawContact.id)?.name,
+              base64Avatar: this.contactProfiles.get(rawContact.id)?.base64Avatar,
               lastMessageFrom: rawContact.lastMessageFrom,
               userMessage: {
                 message: '',
@@ -225,21 +228,10 @@ export class ContactService {
       });
   }
 
-  loadAdditionalContactInfos() {
-    this.additionalContactInfos = JSON.parse(localStorage.getItem('contacts') || '[]');
-  }
-
-  findAditionalContactInfo(contactId: string): { id: string, name: string, base64Avatar: string } {
-    const additionalContactInfo = this.additionalContactInfos.find((additionalContactInfo) => additionalContactInfo.id === contactId);
-    return undefined != additionalContactInfo ? additionalContactInfo : { id: contactId, name: '', base64Avatar: '' };
-  }
-
   saveAditionalContactInfos() {
-    this.additionalContactInfos = [];
     this.contacts.forEach((contact: Contact) => {
-      this.additionalContactInfos.push({ id: contact.id, name: contact.name!, base64Avatar: contact.base64Avatar! });
+      this.indexedDbService.setContactProfile(contact.id, { name: contact.name!, base64Avatar: contact.base64Avatar! });
     })
-    localStorage.setItem('contacts', JSON.stringify(this.additionalContactInfos))
   }
 
   getContacts(): Contact[] {
@@ -326,6 +318,7 @@ export class ContactService {
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
             this.contacts.splice(this.contacts.map(e => e.id).indexOf(contactToDelete.id), 1);
+            this.indexedDbService.deleteContactProfile(contactToDelete.id);
           }
         },
         error: (err) => {

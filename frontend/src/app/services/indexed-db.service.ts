@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { ContactProfile } from '../interfaces/contactProfile';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { Profile } from '../interfaces/profile';
 
@@ -10,6 +11,9 @@ export class IndexedDbService {
   private settingStore: string = 'settings';
   private userStore: string = 'user';
   private profileStore: string = 'profile';
+  private contactProfileStore: string = 'contactprofile';
+  private placeStore: string = 'place';
+  private noteStore: string = 'note';
 
   constructor() {
     this.openDB();
@@ -29,6 +33,15 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.profileStore)) {
           db.createObjectStore(this.profileStore);
+        }
+        if (!db.objectStoreNames.contains(this.contactProfileStore)) {
+          db.createObjectStore(this.contactProfileStore);
+        }
+        if (!db.objectStoreNames.contains(this.placeStore)) {
+          db.createObjectStore(this.placeStore);
+        }
+        if (!db.objectStoreNames.contains(this.noteStore)) {
+          db.createObjectStore(this.noteStore);
         }
       };
 
@@ -239,6 +252,84 @@ export class IndexedDbService {
       const tx = db.transaction(this.profileStore, 'readwrite');
       const store = tx.objectStore(this.profileStore);
       const request = store.delete(userId);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => {
+        reject(request.error);
+      };
+    });
+  }
+
+  async setContactProfile(contactProfileId: string, contactProfile: ContactProfile): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.contactProfileStore, 'readwrite');
+      const store = tx.objectStore(this.contactProfileStore);
+      const request = store.put(contactProfile, contactProfileId);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => {
+        reject(request.error);
+      };
+    });
+  }
+
+  async getContactProfile(contactProfileId: string): Promise<ContactProfile | undefined> {
+    const db = await this.openDB();
+
+    return new Promise<ContactProfile | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.contactProfileStore, 'readonly');
+      const store = tx.objectStore(this.contactProfileStore);
+      const request = store.get(contactProfileId);
+
+      request.onsuccess = () => {
+        resolve(request.result);
+      };
+
+      request.onerror = () => {
+        reject(request.error);
+      };
+    });
+  }
+
+  async getAllContactProfilesAsMap(): Promise<Map<string, ContactProfile>> {
+    const db = await this.openDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.contactProfileStore, 'readonly');
+      const store = tx.objectStore(this.contactProfileStore);
+
+      const keysRequest = store.getAllKeys();
+      const valuesRequest = store.getAll();
+
+      keysRequest.onsuccess = () => {
+        valuesRequest.onsuccess = () => {
+          const keys = keysRequest.result as string[];
+          const values = valuesRequest.result as ContactProfile[];
+
+          const map = new Map<string, ContactProfile>();
+          for (let i = 0; i < keys.length; i++) {
+            map.set(keys[i], values[i]);
+          }
+
+          resolve(map);
+        };
+
+        valuesRequest.onerror = () => reject(valuesRequest.error);
+      };
+
+      keysRequest.onerror = () => reject(keysRequest.error);
+    });
+  }
+
+  async deleteContactProfile(contactProfileId: string): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.contactProfileStore, 'readwrite');
+      const store = tx.objectStore(this.contactProfileStore);
+      const request = store.delete(contactProfileId);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
