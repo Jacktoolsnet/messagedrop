@@ -1,106 +1,113 @@
+/* === DIALOG GRUNDSTRUKTUR === */
 .dialog {
   width: 100%;
   min-width: 350px;
   max-width: 100%;
   max-height: 100%;
-  background-color: rgb(46, 45, 45);
+  background-color: #2e2d2d;
   border-radius: 1rem;
 }
 
+/* === CONTENT === */
 .content {
+  padding: 1rem;
   column-count: 1;
   column-gap: 1rem;
-  overflow-y: scroll;
-  background-color: transparent;
-  padding: 0.5rem;
-  margin: auto;
-  max-width: 100%;
+  white-space: normal;
 }
 
-.content mat-card {
-  display: inline-block;
-  white-space: nowrap;
-  justify-content: center;
-  align-items: center;
-}
-
+/* === ITEM DARSTELLUNG (Karten / Elemente) === */
 .item {
   margin: 0.75rem;
+  margin-top: 2.25rem;
   border-radius: 0.75rem;
-  border-color: #f8f8f8e9;
-  border-width: 0.1rem;
+  border: 0.1rem solid #f8f8f8e9;
+  break-inside: avoid;
+  page-break-inside: avoid;
+  -webkit-column-break-inside: avoid;
 }
 
-.avatar {
+/* === AVATAR + NAME BOX === */
+.avatar-box {
   position: absolute;
   top: 0;
   left: 0;
   z-index: 100;
-  margin-top: -1.25rem;
-  margin-left: -1.25rem;
+  margin-top: -2rem;
+  margin-left: -1.5rem;
+  max-width: 90%;
+  height: 3rem;
+  padding: 0.25rem 0.75rem;
+  background-color: #2a2a2a;
+  border-radius: 1.5rem;
+  border: 0.1rem solid #f8f8f8e9;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  overflow: hidden;
+}
+
+.avatar {
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 1.25rem;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
-.header {
+.name {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #f8f8f8;
+  white-space: nowrap;
   overflow: hidden;
-  margin-right: 1rem;
+  text-overflow: ellipsis;
+  max-width: 10rem;
 }
 
+/* === MESSAGE CONTENT === */
+.message-content {
+  font-size: 0.9rem;
+  color: #f8f8f8;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* === RESPONSIVES GRID === */
 @media (min-width: 450px) {
   .content {
-    padding: 1rem;
     column-count: 1;
-    column-gap: 1rem;
-  }
-
-  .content mat-card {
-    width: 95%;
   }
 }
 
 @media (min-width: 800px) {
   .content {
-    padding: 1rem;
     column-count: 2;
-    column-gap: 1rem;
-  }
-
-  .content mat-card {
-    width: 95%;
   }
 }
 
 @media (min-width: 1200px) {
   .content {
-    padding: 1rem;
     column-count: 3;
-    column-gap: 1rem;
-  }
-
-  .content mat-card {
-    width: 95%;
   }
 }
 
 @media (min-width: 1600px) {
   .content {
-    padding: 1rem;
     column-count: 4;
-    column-gap: 1rem;
-  }
-
-  .content mat-card {
-    width: 95%;
   }
 }
 
+/* === LISTEN UND BUTTONS === */
 .list {
   border-radius: 1.25rem;
 }
 
-button {
+button,
+.buttonbar_icon {
   padding: 0.5rem;
   margin: 0.5rem;
 }
@@ -109,11 +116,7 @@ button {
   flex-wrap: wrap;
 }
 
-.buttonbar_icon {
-  padding: 0.5rem;
-  margin: 0.5rem;
-}
-
+/* === BUTTON POSITIONIERUNGEN === */
 .button_back {
   position: absolute;
   top: 0;
@@ -128,7 +131,7 @@ button {
   bottom: 0;
   right: 0;
   z-index: 100;
-  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
   margin-right: 0.25rem;
 }
 
@@ -146,47 +149,9 @@ button {
   bottom: 0;
   right: 0;
   z-index: 100;
-  margin-bottom: 0.75rem;
-  margin-right: 0.75rem;
+  margin-bottom: -0.75rem;
+  margin-right: -0.75rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 1.25rem;
-}
-
-.gradientAnimation {
-  animation-name: move;
-}
-
-.radialAnimation {
-  animation-name: move;
-}
-
-.conicAnimation {
-  animation-name: move;
-}
-
-@property --x {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
-}
-
-@property --y {
-  syntax: '<percentage>';
-  inherits: false;
-  initial-value: 0%;
-}
-
-@keyframes move {
-  0% {
-    background-position: 0% 50%;
-  }
-
-  50% {
-    background-position: 100% 50%;
-  }
-
-  100% {
-    background-position: 0% 50%;
-  }
 }
