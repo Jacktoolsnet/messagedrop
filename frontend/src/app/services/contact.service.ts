@@ -26,7 +26,6 @@ import { UserService } from './user.service';
 export class ContactService {
 
   private contacts: Contact[] = [];
-  private contactProfiles: Map<string, ContactProfile> = new Map<string, ContactProfile>();
   private ready: boolean = false;
 
   httpOptions = {
@@ -52,9 +51,8 @@ export class ContactService {
   initContacts(contactSubject: Subject<void>) {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
-        next: async (getContactsResponse: GetContactsResponse) => {
-          this.contactProfiles = await this.indexedDbService.getAllContactProfilesAsMap();
-          getContactsResponse.rows.forEach((rawContact: RawContact) => {
+        next: (getContactsResponse: GetContactsResponse) => {
+          getContactsResponse.rows.forEach(async (rawContact: RawContact) => {
             let userSignatureBuffer = undefined
             let userSignature = undefined
             if (rawContact.userSignature) {
@@ -71,6 +69,7 @@ export class ContactService {
                 contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
               )
             }
+            let contactProfile: ContactProfile | undefined = await this.indexedDbService.getContactProfile(rawContact.id)
             let contact: Contact = {
               id: rawContact.id,
               userId: rawContact.userId,
@@ -83,8 +82,8 @@ export class ContactService {
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
               hint: rawContact.hint,
-              name: this.contactProfiles.get(rawContact.id)?.name,
-              base64Avatar: this.contactProfiles.get(rawContact.id)?.base64Avatar,
+              name: contactProfile?.name,
+              base64Avatar: contactProfile?.base64Avatar,
               lastMessageFrom: rawContact.lastMessageFrom,
               userMessage: {
                 message: '',

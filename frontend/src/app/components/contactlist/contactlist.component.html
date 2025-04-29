@@ -23,6 +23,16 @@
                 <img *ngIf="contact.base64Avatar" class="avatar" src="{{contact.base64Avatar}}" />
                 <span *ngIf="contact.name" class="name">{{contact.name}}</span>
             </div>
+            <button class="button_shortmessage" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false"
+                mat-mini-fab color="primary" aria-label="Send a short message"
+                (click)="openContactMessagDialog(contact)">
+                <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
+            </button>
+            <button class="button_contactmenu" [matMenuTriggerFor]="contactMenu"
+                [matMenuTriggerData]="{contact: contact}" aria-hidden="false" mat-mini-fab color="accent"
+                aria-label="Message menu" (click)="{}">
+                <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
+            </button>
             <mat-card-content>
                 <div class="message-content">
                     <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
@@ -40,7 +50,7 @@
                                 [style]="contact.contactUserMessage.style"></app-showmessage>
                         </p>
                     </div>
-                    <div *ngIf="contact.lastMessageFrom === 'userService.getUser()'" class="message">
+                    <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
                         <p *ngIf="contact.contactUserMessage != null && contact.contactUserMessage != undefined && contact.contactUserMessage.message != '' || contact.contactUserMessage.multimedia.type != 'undefined'"
                             class="from-them">
                             <app-showmultimedia
@@ -57,18 +67,6 @@
                     </div>
                 </div>
             </mat-card-content>
-            <mat-card-actions class="buttonbar">
-                <button class="button_shortmessage" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false"
-                    mat-mini-fab color="primary" aria-label="Send a short message"
-                    (click)="openContactMessagDialog(contact)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
-                </button>
-                <button class="button_contactmenu" [matMenuTriggerFor]="contactMenu"
-                    [matMenuTriggerData]="{contact: contact}" aria-hidden="false" mat-mini-fab color="accent"
-                    aria-label="Message menu" (click)="{}">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
-                </button>
-            </mat-card-actions>
         </mat-card>
     </div>
 </mat-dialog-content>
