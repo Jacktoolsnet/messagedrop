@@ -206,14 +206,14 @@ button,
 
 p.from-me {
   align-self: flex-end;
-  background-color: #82bcf7;
-  color: #000;
+  background-color: #908d8d;
+  color: #ffffff;
   text-align: right;
 }
 
 p.from-me::before {
   border-bottom-left-radius: 0.8rem 0.7rem;
-  border-right: 1rem solid #82bcf7;
+  border-right: 1rem solid #908d8d;
   right: -0.35rem;
   transform: translate(0, -0.1rem);
 }
@@ -245,14 +245,14 @@ p.from-me~p.from-me:last-child {
 
 p.from-them {
   align-items: flex-start;
-  background-color: #9aec7c;
-  color: #000;
+  background-color: #908d8d;
+  color: #ffffff;
   text-align: left;
 }
 
 p.from-them:before {
   border-bottom-right-radius: 0.8rem 0.7rem;
-  border-left: 1rem solid #9aec7c;
+  border-left: 1rem solid #908d8d;
   left: -0.35rem;
   transform: translate(0, -0.1rem);
 }
