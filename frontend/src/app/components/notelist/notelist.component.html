@@ -8,20 +8,7 @@
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div class="content">
-        <div *ngIf="notes.length == 0" class="item">
-            <mat-card>
-                <mat-card-header class="header">
-                    <mat-card-title>Notes</mat-card-title>
-                    <mat-card-subtitle></mat-card-subtitle>
-                </mat-card-header>
-                <mat-card-content>I can tap on the plus button to create a note.</mat-card-content>
-            </mat-card>
-        </div>
         <mat-card class="item" *ngFor="let note of notes; index as i">
-            <!--div class="avatar-box" *ngIf="user?.base64Avatar || user?.name">
-                <img *ngIf="user?.base64Avatar" class="avatar" src="{{user?.base64Avatar}}" />
-                <span *ngIf="user?.name" class="name">{{user?.name}}</span>
-            </div-->
             <mat-card-content>
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>

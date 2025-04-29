@@ -7,16 +7,6 @@
         [matMenuTriggerFor]="connectionMenu">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
-    <div *ngIf="contactService.getContacts().length == 0" class="item">
-        <mat-card>
-            <mat-card-header>
-                <mat-card-title>Contacts</mat-card-title>
-                <mat-card-subtitle></mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>I can tap on the plus button to add a contact.<br><br>The contact is saved on my
-                device and only visible to me.<br></mat-card-content>
-        </mat-card>
-    </div>
     <div *ngIf="contactService.getContacts().length != 0" class="content">
         <mat-card class="item" *ngFor="let contact of contactService.getContacts(); index as i">
             <div class="avatar-box" *ngIf="contact.base64Avatar || contact.name">

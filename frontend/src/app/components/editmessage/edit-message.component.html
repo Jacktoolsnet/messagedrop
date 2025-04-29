@@ -3,9 +3,6 @@
 <h2 *ngIf="data.mode == 'edit_public_message'" mat-dialog-title>Edit my public message</h2>
 <h2 *ngIf="data.mode == 'edit_comment'" mat-dialog-title>Edit my public comment</h2>
 
-<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
-</button>
 <mat-dialog-content>
     <div class="content">
         <app-select-multimedia *ngIf="data.message.multimedia.type === 'undefined'" class="oembed_container"

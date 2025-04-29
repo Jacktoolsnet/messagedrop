@@ -1,8 +1,6 @@
 <h2 *ngIf="data.mode == 'add_note'" mat-dialog-title>Add a private note</h2>
 <h2 *ngIf="data.mode == 'edit_note'" mat-dialog-title>Edit my private note</h2>
-<button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
-</button>
+
 <mat-dialog-content>
     <div class="content">
         <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"

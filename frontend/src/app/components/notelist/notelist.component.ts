@@ -102,9 +102,6 @@ export class NotelistComponent implements OnInit {
       if (result && undefined != this.noteToDelete) {
         this.notes.splice(this.notes.findIndex(note => note === this.noteToDelete), 1)
         this.noteService.saveNotes();
-        if (this.notes.length == 0) {
-          this.dialogRef.close();
-        }
       }
     });
   }

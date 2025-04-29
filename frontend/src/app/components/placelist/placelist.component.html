@@ -7,25 +7,14 @@
         (click)="openPlaceDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
-    <div *ngIf="places.length == 0" class="item">
-        <mat-card>
-            <mat-card-header class="header">
-                <mat-card-title>Places</mat-card-title>
-                <mat-card-subtitle></mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content>I can tap on the plus button to create a place.<br><br>I can add multiple location to
-                a place.<br><br>I can gat a notifications when a message is droped at the location, if I
-                like.</mat-card-content>
-        </mat-card>
-    </div>
     <div *ngIf="places.length != 0" class="content">
         <mat-card class="item" *ngFor="let place of places; index as i">
-            <img *ngIf="place.base64Avatar != ''" class="avatar" src="{{place.base64Avatar}}" />
-            <mat-card-header class="header">
-                <mat-card-title>{{place.name}}</mat-card-title>
-                <mat-card-subtitle></mat-card-subtitle>
-            </mat-card-header>
-            <mat-card-content></mat-card-content>
+            <div class="avatar-box" *ngIf="place.base64Avatar || place.name">
+                <img *ngIf="place.base64Avatar" class="avatar" src="{{place.base64Avatar}}" />
+                <span *ngIf="place.name" class="name">{{place.name}}</span>
+            </div>
+            <mat-card-content>
+            </mat-card-content>
             <mat-card-actions class="buttonbar">
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
                     (click)="editPlace(place)">

@@ -1,8 +1,5 @@
 <h2 *ngIf="data.mode == 'add_connect'" mat-dialog-title>Add a connection</h2>
 <mat-dialog-content>
-  <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
-  </button>
   The connect id I like to import
   <input matInput type="text" maxlength="64" placeholder="The connect id." [(ngModel)]="data.connectId">
 </mat-dialog-content>

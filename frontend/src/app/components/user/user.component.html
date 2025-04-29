@@ -1,8 +1,6 @@
 <h2 mat-dialog-title>My user</h2>
 <mat-dialog-content class="dialog">
-  <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
-  </button>
+
   <p>Deleting my user cannot be undone.</p>
   <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
     [mat-dialog-close]="{'action': 'deleteUserId'}">

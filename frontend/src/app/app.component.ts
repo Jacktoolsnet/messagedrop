@@ -719,34 +719,24 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public openUserNoteListDialog(): void {
-    if (this.noteService.loadNotes().length === 0) {
-      this.snackBarRef = this.snackBar.open("You have not written any note yet", undefined, {
-        panelClass: ['snack-warning'],
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-        duration: 2000
-      });
-    } else {
-      const dialogRef = this.messageListDialog.open(NotelistComponent, {
-        panelClass: 'NoteListDialog',
-        closeOnNavigation: true,
-        data: { notes: this.noteService.loadNotes() },
-        width: 'auto',
-        minWidth: '60vw',
-        maxWidth: '90vw',
-        height: 'auto',
-        maxHeight: '90vh',
-        hasBackdrop: true
-      });
+    const dialogRef = this.messageListDialog.open(NotelistComponent, {
+      panelClass: 'NoteListDialog',
+      closeOnNavigation: true,
+      data: { notes: this.noteService.loadNotes() },
+      minWidth: '60vw',
+      maxWidth: '90vw',
+      minHeight: '8rem',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
 
-      dialogRef.afterOpened().subscribe(e => {
-        this.myHistory.push("userNoteList");
-        window.history.replaceState(this.myHistory, '', '');
-      });
+    dialogRef.afterOpened().subscribe(e => {
+      this.myHistory.push("userNoteList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
 
-      dialogRef.afterClosed().subscribe((data: any) => {
-      });
-    }
+    dialogRef.afterClosed().subscribe((data: any) => {
+    });
   }
 
   public openPlaceListDialog(): void {
@@ -754,10 +744,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
       data: { places: this.placeService.getPlaces() },
-      width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
-      height: 'auto',
+      minHeight: '8rem',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -795,10 +784,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
       data: { contacts: this.contactService.getContacts() },
-      width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
-      height: 'auto',
+      minHeight: '8rem',
       maxHeight: '90vh',
       hasBackdrop: true
     });
@@ -869,10 +857,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { notes: notes },
-      width: 'auto',
       minWidth: '60vw',
       maxWidth: '90vw',
-      height: 'auto',
+      minHeight: '8rem',
       maxHeight: '90vh',
       hasBackdrop: true
     });

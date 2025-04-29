@@ -1,8 +1,6 @@
 <h2 mat-dialog-title>Edit profile</h2>
 <mat-dialog-content>
-  <button [attr.aria-hidden]="false" class="button_legal" mat-mini-fab aria-label="Legal" (click)="showPolicy()">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">policy</mat-icon>
-  </button>
+
   Give the profile a name
   <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="profile.name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
