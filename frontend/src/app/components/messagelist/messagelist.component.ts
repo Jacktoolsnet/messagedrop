@@ -22,7 +22,6 @@ import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
-import { StyleService } from '../../services/style.service';
 import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
@@ -71,7 +70,6 @@ export class MessagelistComponent implements OnInit {
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: { messages: Message[] }
   ) {
     this.user = this.userService.getUser();

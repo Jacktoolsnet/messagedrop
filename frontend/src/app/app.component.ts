@@ -2,7 +2,7 @@ import { CommonModule, PlatformLocation } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog } from '@angular/material/dialog';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -37,13 +37,13 @@ import { MultimediaType } from './interfaces/multimedia-type';
 import { Note } from './interfaces/note';
 import { Place } from './interfaces/place';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
-import { ConnectService } from './services/connect.service';
 import { ContactService } from './services/contact.service';
 import { CryptoService } from './services/crypto.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
+import { NetworkService } from './services/network.service';
 import { NoteService } from './services/note.service';
 import { PlaceService } from './services/place.service';
 import { ServerService } from './services/server.service';
@@ -78,14 +78,18 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
+  private networkOnlineSubject: Subject<void>;
+  private networkOfflineSubject: Subject<void>;
   private serverSubject: Subject<void>;
   private userSubject: Subject<void>;
   private contactSubject: Subject<void>;
   private messageSubject: Subject<void>;
   private mapSubject: Subject<void>;
   private showComponent: boolean = false;
+  private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
 
   constructor(
+    public networkService: NetworkService,
     private indexedDbService: IndexedDbService,
     private serverService: ServerService,
     public userService: UserService,
@@ -94,7 +98,6 @@ export class AppComponent implements OnInit {
     public placeService: PlaceService,
     public contactService: ContactService,
     private geolocationService: GeolocationService,
-    private connectService: ConnectService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
     private statisticService: StatisticService,
@@ -113,10 +116,42 @@ export class AppComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private swPush: SwPush
   ) {
+    this.networkOnlineSubject = new Subject<void>();
+    this.networkOfflineSubject = new Subject<void>();
     this.serverSubject = new Subject<void>();
     this.userSubject = new Subject<void>();
     this.contactSubject = new Subject<void>();
     this.mapSubject = new Subject<void>();
+
+    this.networkOnlineSubject.subscribe({
+      next: (v) => { this.networkDialogRef?.close() },
+    });
+
+    this.networkOfflineSubject.subscribe({
+      next: (v) => {
+        this.networkDialogRef = this.displayMessage.open(DisplayMessage, {
+          panelClass: '',
+          closeOnNavigation: false,
+          data: {
+            title: 'Oops! You are offline..',
+            image: '',
+            icon: '',
+            message: `Apparently, your network needed some “me time”.`,
+            button: '',
+            delay: 0,
+            showSpinner: false
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: false
+        });
+
+        this.networkDialogRef.afterOpened().subscribe(e => { });
+
+        this.networkDialogRef.afterClosed().subscribe(() => { });
+      },
+    });
+
     this.serverSubject.subscribe({
       next: async (v) => {
         if (this.serverService.isReady()) {
@@ -190,6 +225,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.contactService.initContacts(this.contactSubject);
       },
     });
+
     this.contactSubject.subscribe({
       next: (v) => {
         this.socketioService.initSocket();
@@ -197,11 +233,13 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.mapService.initMap(this.mapSubject);
       },
     });
+
     this.mapSubject.subscribe({
       next: (v) => {
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       },
     });
+
     this.messageSubject = new Subject<void>();
     this.messageSubject.subscribe({
       next: (v) => {
@@ -212,10 +250,13 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         }
       },
     });
+
     this.initApp();
   }
 
   async initApp() {
+    // Check network
+    this.networkService.init(this.networkOnlineSubject, this.networkOfflineSubject);
     // Inin the server connection
     this.serverService.init(this.serverSubject);
     // Count
