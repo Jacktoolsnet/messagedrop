@@ -25,6 +25,7 @@
   "dependencies": {
     "axios": "^1.8.4",
     "body-parser": "^1.20.2",
+    "compression": "^1.8.0",
     "cors": "^2.8.5",
     "deepl-node": "^1.11.0",
     "dotenv": "^16.4.5",

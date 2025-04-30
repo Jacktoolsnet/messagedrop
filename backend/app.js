@@ -1,4 +1,5 @@
 require('dotenv').config()
+const compression = require('compression');
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
@@ -29,6 +30,17 @@ const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { createServer } = require('node:http');
 const express = require('express');
 const app = express();
+
+// Compress
+
+app.use(compression({
+  threshold: 1024,
+  level: 6,
+  filter: (req, res) => {
+    const type = res.getHeader('Content-Type');
+    return type && /json|text|javascript|css|html/.test(type);
+  }
+}));
 
 // Logger
 const logger = winston.createLogger({
