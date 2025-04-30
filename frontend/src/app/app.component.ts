@@ -2,7 +2,7 @@ import { CommonModule, PlatformLocation } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -78,15 +78,13 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
-  private networkOnlineSubject: Subject<void>;
-  private networkOfflineSubject: Subject<void>;
   private serverSubject: Subject<void>;
   private userSubject: Subject<void>;
   private contactSubject: Subject<void>;
   private messageSubject: Subject<void>;
   private mapSubject: Subject<void>;
   private showComponent: boolean = false;
-  private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
+
 
   constructor(
     public networkService: NetworkService,
@@ -116,41 +114,10 @@ export class AppComponent implements OnInit {
     private platformLocation: PlatformLocation,
     private swPush: SwPush
   ) {
-    this.networkOnlineSubject = new Subject<void>();
-    this.networkOfflineSubject = new Subject<void>();
     this.serverSubject = new Subject<void>();
     this.userSubject = new Subject<void>();
     this.contactSubject = new Subject<void>();
     this.mapSubject = new Subject<void>();
-
-    this.networkOnlineSubject.subscribe({
-      next: (v) => { this.networkDialogRef?.close() },
-    });
-
-    this.networkOfflineSubject.subscribe({
-      next: (v) => {
-        this.networkDialogRef = this.displayMessage.open(DisplayMessage, {
-          panelClass: '',
-          closeOnNavigation: false,
-          data: {
-            title: 'Oops! You are offline..',
-            image: '',
-            icon: '',
-            message: `Apparently, your network needed some “me time”.`,
-            button: '',
-            delay: 0,
-            showSpinner: false
-          },
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          hasBackdrop: false
-        });
-
-        this.networkDialogRef.afterOpened().subscribe(e => { });
-
-        this.networkDialogRef.afterClosed().subscribe(() => { });
-      },
-    });
 
     this.serverSubject.subscribe({
       next: async (v) => {
@@ -256,7 +223,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
   async initApp() {
     // Check network
-    this.networkService.init(this.networkOnlineSubject, this.networkOfflineSubject);
+    this.networkService.init();
     // Inin the server connection
     this.serverService.init(this.serverSubject);
     // Count
