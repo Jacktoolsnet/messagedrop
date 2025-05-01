@@ -15,8 +15,6 @@ import { QRCodeComponent } from 'angularx-qrcode';
 })
 export class QrcodeComponent {
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { qrData: string }) {
-    console.log("QrcodeComponent data: ", data);
-  }
+  constructor(@Inject(MAT_DIALOG_DATA) public data: { qrData: string }) { }
 
 }

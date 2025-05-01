@@ -8,7 +8,7 @@ import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { CryptoService } from './crypto.service';
+import { IndexedDbService } from './indexed-db.service';
 import { MapService } from './map.service';
 import { UserService } from './user.service';
 
@@ -18,7 +18,6 @@ import { UserService } from './user.service';
 export class PlaceService {
 
   private places: Place[] = [];
-  private additionalPlaceInfos: { id: string, name: string, base64Avatar: string }[] = [];
   private selectedPlace: Place = {
     id: '',
     userId: '',
@@ -39,7 +38,7 @@ export class PlaceService {
 
   constructor(
     private userService: UserService,
-    private cryptoService: CryptoService,
+    private indexedDbService: IndexedDbService,
     private http: HttpClient) {
   }
 
@@ -48,11 +47,10 @@ export class PlaceService {
   }
 
   initPlaces() {
-    this.loadAdditionalPlaceInfos();
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
-          getPlacesResponse.rows.forEach(row => {
+          getPlacesResponse.rows.forEach((row) => {
             let plusCodes: string[] = [];
             if (null !== row.plusCodes && row.plusCodes !== '') {
               if (JSON.parse(row.plusCodes) instanceof Array) {
@@ -64,12 +62,13 @@ export class PlaceService {
             this.places.push({
               id: row.id,
               userId: row.userId,
-              name: this.findAdditionalPlaceInfo(row.id).name,
-              base64Avatar: this.findAdditionalPlaceInfo(row.id).base64Avatar,
+              name: '',
+              base64Avatar: '',
               subscribed: row.subscribed,
               plusCodes: plusCodes
             });
           });
+          this.updatePlaceProfile();
           this.ready = true;
         },
         error: (err) => {
@@ -84,21 +83,18 @@ export class PlaceService {
       });
   }
 
-  loadAdditionalPlaceInfos() {
-    this.additionalPlaceInfos = JSON.parse(localStorage.getItem('places') || '[]');
-  }
-
-  findAdditionalPlaceInfo(placeId: string): { id: string, name: string, base64Avatar: string } {
-    const additonalPlaceInfo = this.additionalPlaceInfos.find((additonalPlaceInfo) => additonalPlaceInfo.id === placeId);
-    return undefined != additonalPlaceInfo ? additonalPlaceInfo : { id: '', name: '', base64Avatar: '' };
+  private updatePlaceProfile() {
+    this.places.forEach(async (place: Place) => {
+      let placeProfile = await this.indexedDbService.getPlaceProfile(place.id);
+      place.name = undefined != placeProfile ? placeProfile.name : '';
+      place.base64Avatar = undefined != placeProfile ? placeProfile.base64Avatar : '';
+    });
   }
 
   saveAdditionalPlaceInfos() {
-    this.additionalPlaceInfos = [];
     this.places.forEach((place: Place) => {
-      this.additionalPlaceInfos.push({ id: place.id, name: place.name, base64Avatar: place.base64Avatar });
+      this.indexedDbService.setPlaceProfile(place.id, { name: place.name, base64Avatar: place.base64Avatar })
     })
-    localStorage.setItem('places', JSON.stringify(this.additionalPlaceInfos))
   }
 
   getPlaces(): Place[] {

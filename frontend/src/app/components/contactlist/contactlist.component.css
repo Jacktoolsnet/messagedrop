@@ -156,7 +156,7 @@ button,
   border-radius: 1.25rem;
 }
 
-.button_contactmenu {
+.button_top {
   position: absolute;
   top: 0;
   right: 0;
@@ -165,7 +165,7 @@ button,
   margin-right: -1.25rem;
 }
 
-.button_shortmessage {
+.button_bottom {
   position: absolute;
   bottom: 0;
   right: 0;

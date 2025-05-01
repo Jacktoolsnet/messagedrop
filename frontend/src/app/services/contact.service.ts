@@ -5,7 +5,6 @@ import { Buffer } from 'buffer';
 import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
-import { ContactProfile } from '../interfaces/contactProfile';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { Envelope } from '../interfaces/envelope';
 import { GetContactResponse } from '../interfaces/get-contact-response';
@@ -52,7 +51,7 @@ export class ContactService {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
-          getContactsResponse.rows.forEach(async (rawContact: RawContact) => {
+          getContactsResponse.rows.forEach((rawContact: RawContact) => {
             let userSignatureBuffer = undefined
             let userSignature = undefined
             if (rawContact.userSignature) {
@@ -69,7 +68,6 @@ export class ContactService {
                 contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
               )
             }
-            let contactProfile: ContactProfile | undefined = await this.indexedDbService.getContactProfile(rawContact.id)
             let contact: Contact = {
               id: rawContact.id,
               userId: rawContact.userId,
@@ -82,8 +80,8 @@ export class ContactService {
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
               hint: rawContact.hint,
-              name: contactProfile?.name,
-              base64Avatar: contactProfile?.base64Avatar,
+              name: '',
+              base64Avatar: '',
               lastMessageFrom: rawContact.lastMessageFrom,
               userMessage: {
                 message: '',
@@ -211,6 +209,7 @@ export class ContactService {
             }
             this.contacts.push(contact);
           })
+          this.updateContactProfile();
           this.ready = true;
           contactSubject.next();
         },
@@ -225,6 +224,14 @@ export class ContactService {
         },
         complete: () => { }
       });
+  }
+
+  private updateContactProfile() {
+    this.contacts.forEach(async (contact: Contact) => {
+      let contactProfile = await this.indexedDbService.getContactProfile(contact.id);
+      contact.name = undefined != contactProfile ? contactProfile.name : '';
+      contact.base64Avatar = undefined != contactProfile ? contactProfile.base64Avatar : '';
+    });
   }
 
   saveAditionalContactInfos() {

@@ -13,14 +13,12 @@
                 <img *ngIf="contact.base64Avatar" class="avatar" src="{{contact.base64Avatar}}" />
                 <span *ngIf="contact.name" class="name">{{contact.name}}</span>
             </div>
-            <button class="button_shortmessage" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false"
-                mat-mini-fab color="primary" aria-label="Send a short message"
-                (click)="openContactMessagDialog(contact)">
+            <button class="button_top" *ngIf="socketioService.isReady()" [attr.aria-hidden]="false" mat-mini-fab
+                color="primary" aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
                 <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
             </button>
-            <button class="button_contactmenu" [matMenuTriggerFor]="contactMenu"
-                [matMenuTriggerData]="{contact: contact}" aria-hidden="false" mat-mini-fab color="accent"
-                aria-label="Message menu" (click)="{}">
+            <button class="button_bottom" [matMenuTriggerFor]="contactMenu" [matMenuTriggerData]="{contact: contact}"
+                aria-hidden="false" mat-mini-fab color="accent" aria-label="Message menu" (click)="{}">
                 <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
             </button>
             <mat-card-content>

@@ -83,7 +83,7 @@ export class PlacelistComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.places.splice(this.places.findIndex(place => place.id === this.placeToDelete.id), 1);
+                this.places.splice(this.places.map(e => e.id).indexOf(this.placeToDelete.id), 1);
                 this.placeService.saveAdditionalPlaceInfos();
               }
             },
