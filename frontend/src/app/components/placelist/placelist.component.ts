@@ -113,27 +113,24 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        this.cryptoService.createHash(data.place.name)
-          .then((hashedName: string) => {
-            let updatePlace: Place = {
-              id: data.place.id,
-              userId: data.place.userId,
-              name: hashedName,
-              base64Avatar: data.place.base64Avatar,
-              subscribed: data.place.subscribe,
-              plusCodes: [...data.place.plusCodes]
-            };
-            this.placeService.updatePlace(updatePlace)
-              .subscribe({
-                next: simpleResponse => {
-                  if (simpleResponse.status === 200) {
-                    this.placeService.saveAdditionalPlaceInfos();
-                    this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
-                  }
-                },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                complete: () => { }
-              });
+        let updatePlace: Place = {
+          id: data.place.id,
+          userId: data.place.userId,
+          name: data.place.name,
+          base64Avatar: data.place.base64Avatar,
+          subscribed: data.place.subscribe,
+          plusCodes: [...data.place.plusCodes]
+        };
+        this.placeService.updatePlace(updatePlace)
+          .subscribe({
+            next: simpleResponse => {
+              if (simpleResponse.status === 200) {
+                this.placeService.saveAdditionalPlaceInfos();
+                this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
+              }
+            },
+            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+            complete: () => { }
           });
       }
     });
@@ -205,29 +202,26 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        this.cryptoService.createHash(data.place.name)
-          .then((hasedName: string) => {
-            let updatePlace: Place = {
-              id: data.place.id,
-              userId: data.place.userId,
-              name: hasedName,
-              base64Avatar: data.place.base64Avatar,
-              subscribed: data.place.subscribe,
-              plusCodes: [...data.place.plusCodes]
-            };
-            this.placeService.createPlace(updatePlace)
-              .subscribe({
-                next: createPlaceResponse => {
-                  if (createPlaceResponse.status === 200) {
-                    data.place.id = createPlaceResponse.placeId;
-                    this.places.unshift(data.place);
-                    this.placeService.saveAdditionalPlaceInfos();
-                    this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                  }
-                },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                complete: () => { }
-              });
+        let updatePlace: Place = {
+          id: data.place.id,
+          userId: data.place.userId,
+          name: data.place.name,
+          base64Avatar: data.place.base64Avatar,
+          subscribed: data.place.subscribe,
+          plusCodes: [...data.place.plusCodes]
+        };
+        this.placeService.createPlace(updatePlace)
+          .subscribe({
+            next: createPlaceResponse => {
+              if (createPlaceResponse.status === 200) {
+                data.place.id = createPlaceResponse.placeId;
+                this.places.unshift(data.place);
+                this.placeService.saveAdditionalPlaceInfos();
+                this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+              }
+            },
+            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+            complete: () => { }
           });
       }
     });
