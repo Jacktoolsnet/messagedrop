@@ -1,14 +1,17 @@
 const express = require('express');
+const { getEncryptionPublicKey } = require('../utils/keyStore');
+const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
 const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
   let placeId = uuid.v4()
-  tablePlace.create(req.database.db, placeId, req.body.userId, req.body.name.replace(/\'/g, "''"), function (err) {
+  let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+  tablePlace.create(req.database.db, placeId, req.body.userId, cryptedPlaceName, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -20,9 +23,10 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
-  tablePlace.update(req.database.db, req.body.id, req.body.name.replace(/\'/g, "''"), function (err) {
+  let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+  tablePlace.update(req.database.db, req.body.id, cryptedPlaceName, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

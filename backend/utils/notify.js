@@ -1,5 +1,8 @@
 // https://angular.dev/ecosystem/service-workers/push-notifications
 const webpush = require('web-push');
+const { getEncryptionPrivateKey } = require('../utils/keyStore');
+const cryptoUtil = require('../utils/cryptoUtils');
+
 
 const placeSubscriptions = function (logger, db, plusCode, userId, message) {
     try {
@@ -12,11 +15,12 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
         AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
-                rows.forEach((row) => {
+                rows.forEach(async (row) => {
                     if (row.subscription != '') {
+                        const placeName = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), row.name);
                         const payload = {
                             "notification": {
-                                "title": `Messagedrop @${row.name}`,
+                                "title": `Messagedrop @${placeName}`,
                                 "body": message,
                                 "icon": "assets/icons/notify-icon.png",
                                 "vibrate": [100, 50, 100],
