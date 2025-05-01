@@ -32,6 +32,8 @@ import { StyleService } from '../../services/style.service';
 })
 export class PlaceComponent implements OnInit {
 
+  private maxFileSize = 5 * 1024 * 1024; // 5MB
+
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,
@@ -50,23 +52,33 @@ export class PlaceComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
 
-    if (file) {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = this.handleFile.bind(this);
-      reader.onerror = this.handleFileError.bind(this);
+    if (!file) {
+      return;
     }
-  }
 
-  handleFile(event: any) {
-    this.data.place.base64Avatar = event.target.result;
-  }
+    if (!file.type.startsWith('image/')) {
+      this.snackBar.open('Please select a valid image file.', 'OK', { duration: 2000 });
+      return;
+    }
 
-  handleFileError(event: any) {
+    if (file.size > this.maxFileSize) {
+      this.snackBar.open('The image is too large. Maximum allowed size is 5MB.', 'OK', { duration: 2000 });
+      return;
+    }
 
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.data.place.base64Avatar = (e.target as FileReader).result as string;
+    };
+    reader.onerror = () => {
+      this.snackBar.open('Error reading the file.', 'OK', { duration: 2000 });
+    };
+
+    reader.readAsDataURL(file);
   }
 
   deleteAvatar() {
