@@ -274,6 +274,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   public translateMessage(message: Message) {
+    console.log(message)
     this.translateService.translate(message.message, this.user.language)
       .subscribe({
         next: (translateResponse) => {
