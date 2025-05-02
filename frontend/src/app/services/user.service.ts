@@ -14,6 +14,7 @@ import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
@@ -61,7 +62,8 @@ export class UserService {
     private http: HttpClient,
     private swPush: SwPush,
     private indexedDbService: IndexedDbService,
-    private cryptoService: CryptoService
+    private cryptoService: CryptoService,
+    private networkService: NetworkService,
   ) { }
 
   private handleError(error: HttpErrorResponse) {
@@ -70,6 +72,15 @@ export class UserService {
   }
 
   getPinHash(pin: string): Observable<GetPinHashResponse> {
+    this.networkService.setDisplayMessageConfig({
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Hashing your PIN`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = { pin: pin };
     return this.http.post<GetPinHashResponse>(`${environment.apiUrl}/user/hashpin`, body, this.httpOptions)
       .pipe(
@@ -126,6 +137,15 @@ export class UserService {
   }
 
   createUser(): Observable<CreateUserResponse> {
+    this.networkService.setDisplayMessageConfig({
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Creating user`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {};
     return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
       .pipe(
@@ -134,6 +154,15 @@ export class UserService {
   }
 
   confirmUser(pinHash: string, cryptedUser: CryptedUser): Observable<ConfirmUserResponse> {
+    this.networkService.setDisplayMessageConfig({
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Confirming user`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       pinHash: pinHash,
       cryptedUser: cryptedUser,
@@ -172,6 +201,15 @@ export class UserService {
   }
 
   deleteUser(userId: string): Observable<SimpleStatusResponse> {
+    this.networkService.setDisplayMessageConfig({
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Deleting user`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/delete/${userId}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)

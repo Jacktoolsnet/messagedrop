@@ -1,10 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
 import { Observable, Subject, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { GetClientConnect } from '../interfaces/get-client-connect';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,7 +23,7 @@ export class ServerService {
     })
   };
 
-  constructor(private http: HttpClient, private displayMessage: MatDialog) { }
+  constructor(private http: HttpClient, private networkService: NetworkService) { }
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -32,20 +31,6 @@ export class ServerService {
   }
 
   init(serverSubject: Subject<void>) {
-    const displayMessageRef = this.displayMessage.open(DisplayMessage, {
-      data: {
-        title: 'Connecting',
-        image: '',
-        message: `Connecting to backend...`,
-        button: '',
-        delay: 0,
-        showSpinner: true
-      },
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      closeOnNavigation: false,
-      hasBackdrop: false
-    });
     this.connect()
       .subscribe({
         next: (connectResponse: GetClientConnect) => {
@@ -62,11 +47,20 @@ export class ServerService {
           this.failed = true;
           serverSubject.next();
         },
-        complete: () => { displayMessageRef.close(); }
+        complete: () => { }
       });
   }
 
   connect(): Observable<GetClientConnect> {
+    this.networkService.setDisplayMessageConfig({
+      title: 'Connecting',
+      image: '',
+      icon: '',
+      message: `Connecting to backend...`,
+      button: '',
+      delay: 0,
+      showSpinner: true,
+    });
     return this.http.get<GetClientConnect>(`${environment.apiUrl}/clientconnect`, this.httpOptions)
       .pipe(
         catchError(this.handleError)

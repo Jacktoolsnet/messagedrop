@@ -408,20 +408,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (data: any) => {
-      const displayMessageRef = this.displayMessage.open(DisplayMessage, {
-        data: {
-          title: 'User Creation',
-          image: '',
-          message: `Creating user`,
-          button: '',
-          delay: 0,
-          showSpinner: true
-        },
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        closeOnNavigation: false,
-        hasBackdrop: false
-      });
 
       const encrypted = await this.cryptoService.encrypt(
         this.serverService.getCryptoPublicKey()!,
@@ -436,20 +422,12 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             next: (createUserResponse: CreateUserResponse) => {
               this.userService.initUser(this.userSubject, createUserResponse, getPinHashResponse.pinHash);
             },
-            error: (err) => {
-              displayMessageRef.close();
-            },
-            complete: () => {
-              displayMessageRef.close();
-            }
+            error: (err) => { },
+            complete: () => { }
           });
         },
-        error: (err) => {
-          displayMessageRef.close();
-        },
-        complete: () => {
-          displayMessageRef.close();
-        }
+        error: (err) => { },
+        complete: () => { }
       });
     });
   }
@@ -485,20 +463,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             });
         }
       } else {
-        const displayMessageRef = this.displayMessage.open(DisplayMessage, {
-          data: {
-            title: 'PIN Verification',
-            image: '',
-            message: `Verifying PIN`,
-            button: '',
-            delay: 0,
-            showSpinner: true
-          },
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          closeOnNavigation: false,
-          hasBackdrop: false
-        });
         this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
           .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
             this.userService.getUser().pinHash = getPinHashResponse.pinHash;
@@ -508,10 +472,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user);
-                    displayMessageRef.close();
                   },
                   error: (err) => {
-                    displayMessageRef.close();
                     if (err.status === 401) {
                       this.snackBarRef = this.snackBar.open("Pin is not correct. Please try again.", undefined, {
                         panelClass: ['snack-warning'],
