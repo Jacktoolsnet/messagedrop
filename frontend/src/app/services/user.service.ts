@@ -91,6 +91,8 @@ export class UserService {
 
   setUser(userSubject: Subject<void>, user: User) {
     this.user = user;
+    this.user.local = navigator.language;
+    this.user.language = this.getLanguageForLocation(this.user.local);
     this.ready = true;
     userSubject.next();
   }

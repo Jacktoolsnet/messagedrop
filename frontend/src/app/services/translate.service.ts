@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TranslateResponse } from '../interfaces/translate-response';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
@@ -17,14 +18,24 @@ export class TranslateService {
     })
   };
 
-  constructor(private http: HttpClient) { }
+  constructor(private http: HttpClient, private networkService: NetworkService) { }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
   }
 
   public translate(value: string, language: string) {
-    return this.http.get<TranslateResponse>(`${environment.apiUrl}/translate/${language}/${value}`, this.httpOptions)
+    let url = `${environment.apiUrl}/translate/${language}/${value}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Translate service',
+      image: '',
+      icon: '',
+      message: `Translating message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<TranslateResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

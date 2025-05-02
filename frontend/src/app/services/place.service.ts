@@ -110,64 +110,72 @@ export class PlaceService {
   }
 
   createPlace(place: Place) {
+    let url = `${environment.apiUrl}/place/create`;
     let body = {
       'userId': place.userId,
       'name': place.name,
     };
-    return this.http.post<CreatePlaceResponse>(`${environment.apiUrl}/place/create`, body, this.httpOptions)
+    return this.http.post<CreatePlaceResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   updatePlace(place: Place) {
+    let url = `${environment.apiUrl}/place/update`;
     let body = {
       'id': place.id,
       'name': place.name
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/update`, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getByUserId(userId: string) {
-    return this.http.get<GetPlacesResponse>(`${environment.apiUrl}/place/get/userId/${userId}`, this.httpOptions)
+    let url = `${environment.apiUrl}/place/get/userId/${userId}`;
+    return this.http.get<GetPlacesResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getById(placeId: string) {
-    return this.http.get<GetPlaceResponse>(`${environment.apiUrl}/place/get/${placeId}`, this.httpOptions)
+    let url = `${environment.apiUrl}/place/get/${placeId}`;
+    return this.http.get<GetPlaceResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getByUserIdAndName(userId: string, name: string) {
-    return this.http.get<GetPlaceResponse>(`${environment.apiUrl}/place/get/userId/${userId}/name/${name}`, this.httpOptions)
+    let url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
+    return this.http.get<GetPlaceResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   deletePlace(place: Place) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/delete/${place.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/place/delete/${place.id}`;
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   subscribe(place: Place) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/subscribe/${place.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/place/subscribe/${place.id}`;
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   unsubscribe(place: Place) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/place/unsubscribe/${place.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -175,11 +183,12 @@ export class PlaceService {
 
   addPlusCodeToPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
     place.plusCodes.push(location.plusCode);
+    let url = `${environment.apiUrl}/place/updatepluscodes`;
     let body = {
       'id': place.id,
       'pluscodes': JSON.stringify(place.plusCodes)
     };
-    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/updatepluscodes`, body, this.httpOptions)
+    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -200,11 +209,12 @@ export class PlaceService {
 
   removePlusCodeFromPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
     place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
+    let url = `${environment.apiUrl}/place/updatepluscodes`;
     let body = {
       'id': place.id,
       'pluscodes': JSON.stringify(place.plusCodes)
     };
-    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/place/updatepluscodes`, body, this.httpOptions)
+    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )

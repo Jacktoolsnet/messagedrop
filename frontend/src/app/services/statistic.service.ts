@@ -25,14 +25,16 @@ export class StatisticService {
   }
 
   countVisitor() {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/statistic/count/visitor`, this.httpOptions)
+    let url = `${environment.apiUrl}/statistic/count/visitor`;
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   countMessage() {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/statistic/count/message`, this.httpOptions)
+    let url = `${environment.apiUrl}/statistic/count/message`;
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

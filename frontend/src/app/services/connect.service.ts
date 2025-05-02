@@ -37,6 +37,7 @@ export class ConnectService {
   }
 
   createConnect(connect: Connect) {
+    let url = `${environment.apiUrl}/connect/create`;
     let body = {
       'userId': connect.userId,
       'hint': connect.hint,
@@ -44,14 +45,15 @@ export class ConnectService {
       'encryptionPublicKey': connect.encryptionPublicKey,
       'signingPublicKey': connect.signingPublicKey
     };
-    return this.http.post<CreateConnectResponse>(`${environment.apiUrl}/connect/create`, body, this.httpOptions)
+    return this.http.post<CreateConnectResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getById(connectId: string, contact: Contact, socketioService: SocketioService) {
-    this.http.get<GetConnectResponse>(`${environment.apiUrl}/connect/get/${connectId}`, this.httpOptions)
+    let url = `${environment.apiUrl}/connect/get/${connectId}`;
+    this.http.get<GetConnectResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -97,7 +99,8 @@ export class ConnectService {
   }
 
   deleteConnect(connect: Connect) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/connect/delete/${connect.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/connect/delete/${connect.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )

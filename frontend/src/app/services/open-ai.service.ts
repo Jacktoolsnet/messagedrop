@@ -26,10 +26,11 @@ export class OpenAiService {
   }
 
   public moderateMessage(message: Message): Observable<any> {
+    let url = `${environment.apiUrl}/openai/moderate`;
     let body = {
       'message': message.message
     };
-    return this.http.post<any>(`${environment.apiUrl}/openai/moderate`, body, this.httpOptions)
+    return this.http.post<any>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )

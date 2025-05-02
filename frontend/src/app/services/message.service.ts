@@ -102,6 +102,7 @@ export class MessageService {
   }
 
   createMessage(message: Message, location: Location, user: User) {
+    let url = `${environment.apiUrl}/message/create`;
     let body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
@@ -114,7 +115,7 @@ export class MessageService {
       'messageUserId': user.id,
       'multimedia': JSON.stringify(message.multimedia)
     };
-    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
+    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -136,6 +137,7 @@ export class MessageService {
 
   createComment(message: Message, location: Location, user: User) {
     let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
+    let url = `${environment.apiUrl}/message/create`;
     let body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
@@ -148,7 +150,7 @@ export class MessageService {
       'messageUserId': user.id,
       'multimedia': JSON.stringify(message.multimedia)
     };
-    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/create`, body, this.httpOptions)
+    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -169,13 +171,14 @@ export class MessageService {
   }
 
   updateMessage(message: Message, location: Location, user: User) {
+    let url = `${environment.apiUrl}/message/update`;
     let body = {
       'id': message.id,
       'message': message.message,
       'style': message.style,
       'multimedia': JSON.stringify(message.multimedia)
     };
-    this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/message/update`, body, this.httpOptions)
+    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -189,7 +192,8 @@ export class MessageService {
   }
 
   likeMessage(message: Message, user: User, likeButtonColor: string) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/like/${message.id}/by/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -208,7 +212,8 @@ export class MessageService {
   }
 
   unlikeMessage(message: Message, user: User, likeButtonColor: string) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -227,7 +232,8 @@ export class MessageService {
   }
 
   messageLikedByUser(message: Message, user: User, likeButtonColor: string) {
-    this.http.get<LikedByUserResponse>(`${environment.apiUrl}/message/id/${message.id}/likedby/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/id/${message.id}/likedby/${user.id}`;
+    this.http.get<LikedByUserResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -248,7 +254,8 @@ export class MessageService {
   }
 
   dislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -267,7 +274,8 @@ export class MessageService {
   }
 
   undislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -286,7 +294,8 @@ export class MessageService {
   }
 
   messageDislikedByUser(message: Message, user: User, dislikeButtonColor: string) {
-    return this.http.get<DislikedByUserResponse>(`${environment.apiUrl}/message/id/${message.id}/dislikedby/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/id/${message.id}/dislikedby/${user.id}`;
+    return this.http.get<DislikedByUserResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -307,7 +316,8 @@ export class MessageService {
   }
 
   getByPlusCode(location: Location, messageSubject: Subject<void>) {
-    this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`;
+    this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -351,7 +361,8 @@ export class MessageService {
   }
 
   getByPlusForMarker(location: Location) {
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/pluscode/${location.plusCode}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/get/pluscode/${location.plusCode}`;
+    return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -363,7 +374,8 @@ export class MessageService {
   }
 
   countView(message: Message) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countview/${message.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/countview/${message.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -380,7 +392,8 @@ export class MessageService {
   }
 
   countComment(message: Message) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/countcomment/${message.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/countcomment/${message.id}`;
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -397,7 +410,8 @@ export class MessageService {
   }
 
   disableMessage(message: Message, selectedMessages: Message[]) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/disable/${message.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/disable/${message.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -415,7 +429,8 @@ export class MessageService {
   }
 
   deleteMessage(message: Message, dialogRef: MatDialogRef<any>) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/message/delete/${message.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/delete/${message.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -442,7 +457,8 @@ export class MessageService {
   }
 
   getCommentsForParentMessage(message: Message) {
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/comment/${message.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/get/comment/${message.id}`;
+    return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )

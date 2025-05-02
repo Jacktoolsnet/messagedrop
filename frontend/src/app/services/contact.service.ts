@@ -250,6 +250,7 @@ export class ContactService {
 
   // We need a function from qrcode
   createContact(contact: Contact, socketioService: SocketioService) {
+    let url = `${environment.apiUrl}/contact/create`;
     let body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
@@ -257,7 +258,7 @@ export class ContactService {
       'contactUserEncryptionPublicKey': JSON.stringify(contact.contactUserEncryptionPublicKey),
       'hint': contact.hint
     };
-    this.http.post<CreateContactResponse>(`${environment.apiUrl}/contact/create`, body, this.httpOptions)
+    this.http.post<CreateContactResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -277,6 +278,7 @@ export class ContactService {
   }
 
   updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
+    let url = `${environment.apiUrl}/contact/update/message`;
     let body = {
       'contactId': envelope.contactId,
       'userId': envelope.userId,
@@ -285,7 +287,7 @@ export class ContactService {
       'contactUserEncryptedMessage': envelope.contactUserEncryptedMessage,
       'messageSignature': envelope.messageSignature
     };
-    this.http.post<boolean>(`${environment.apiUrl}/contact/update/message`, body, this.httpOptions)
+    this.http.post<boolean>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -302,21 +304,24 @@ export class ContactService {
   }
 
   getByUserId(userId: string) {
-    return this.http.get<GetContactsResponse>(`${environment.apiUrl}/contact/get/userId/${userId}`, this.httpOptions)
+    let url = `${environment.apiUrl}/contact/get/userId/${userId}`;
+    return this.http.get<GetContactsResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getById(contactId: string) {
-    return this.http.get<GetContactResponse>(`${environment.apiUrl}/contact/get/${contactId}`, this.httpOptions)
+    let url = `${environment.apiUrl}/contact/get/${contactId}`
+    return this.http.get<GetContactResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   deleteContact(contactToDelete: Contact) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/delete/${contactToDelete.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -334,7 +339,8 @@ export class ContactService {
   }
 
   subscribe(contact: Contact) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/subscribe/${contact.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -350,7 +356,8 @@ export class ContactService {
   }
 
   unsubscribe(contact: Contact) {
-    this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/contact/unsubscribe/${contact.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
