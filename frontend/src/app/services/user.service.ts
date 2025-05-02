@@ -72,7 +72,8 @@ export class UserService {
   }
 
   getPinHash(pin: string): Observable<GetPinHashResponse> {
-    this.networkService.setDisplayMessageConfig({
+    let url = `${environment.apiUrl}/user/hashpin`;
+    this.networkService.setNetworkMessageConfig(url, {
       title: 'User service',
       image: '',
       icon: '',
@@ -82,7 +83,7 @@ export class UserService {
       showSpinner: true
     });
     let body = { pin: pin };
-    return this.http.post<GetPinHashResponse>(`${environment.apiUrl}/user/hashpin`, body, this.httpOptions)
+    return this.http.post<GetPinHashResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -137,7 +138,8 @@ export class UserService {
   }
 
   createUser(): Observable<CreateUserResponse> {
-    this.networkService.setDisplayMessageConfig({
+    let url = `${environment.apiUrl}/user/create`;
+    this.networkService.setNetworkMessageConfig(url, {
       title: 'User service',
       image: '',
       icon: '',
@@ -147,14 +149,15 @@ export class UserService {
       showSpinner: true
     });
     let body = {};
-    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
+    return this.http.post<CreateUserResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   confirmUser(pinHash: string, cryptedUser: CryptedUser): Observable<ConfirmUserResponse> {
-    this.networkService.setDisplayMessageConfig({
+    let url = `${environment.apiUrl}/user/confirm`;
+    this.networkService.setNetworkMessageConfig(url, {
       title: 'User service',
       image: '',
       icon: '',
@@ -167,41 +170,49 @@ export class UserService {
       pinHash: pinHash,
       cryptedUser: cryptedUser,
     };
-    return this.http.post<ConfirmUserResponse>(`${environment.apiUrl}/user/confirm`, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  restoreUser(userId: string, encryptionPublicKey: JsonWebKey, signingPublicKey: JsonWebKey, subscription: string) {
-    let body = {
-      userId,
-      encryptionPublicKey: JSON.stringify(encryptionPublicKey),
-      signingPublicKey: JSON.stringify(signingPublicKey),
-      subscription: subscription
-    };
-    return this.http.post<CreateUserResponse>(`${environment.apiUrl}/user/create`, body, this.httpOptions)
+    return this.http.post<ConfirmUserResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getUserById(userId: string): Observable<GetUserResponse> {
-    return this.http.get<GetUserResponse>(`${environment.apiUrl}/user/get/${userId}`, this.httpOptions)
+    let url = `${environment.apiUrl}/user/get/${userId}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Getting user information`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<GetUserResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   getUserMessages(user: User): Observable<GetMessageResponse> {
-    return this.http.get<GetMessageResponse>(`${environment.apiUrl}/message/get/userId/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/message/get/userId/${user.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Getting user messages`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   deleteUser(userId: string): Observable<SimpleStatusResponse> {
-    this.networkService.setDisplayMessageConfig({
+    let url = `${environment.apiUrl}/user/delete/${userId}`;
+    this.networkService.setNetworkMessageConfig(url, {
       title: 'User service',
       image: '',
       icon: '',
@@ -210,25 +221,45 @@ export class UserService {
       delay: 0,
       showSpinner: true
     });
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/delete/${userId}`, this.httpOptions)
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   subscribe(user: User, subscription: string) {
+    let url = `${environment.apiUrl}/user/subscribe`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Subscribing to user`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'userId': user.id,
       'subscription': subscription,
     };
-    return this.http.post<SimpleStatusResponse>(`${environment.apiUrl}/user/subscribe`, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
   unsubscribe(user: User) {
-    return this.http.get<SimpleStatusResponse>(`${environment.apiUrl}/user/unsubscribe/${user.id}`, this.httpOptions)
+    let url = `${environment.apiUrl}/user/unsubscribe/${user.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'User service',
+      image: '',
+      icon: '',
+      message: `Unsubscribing from user`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

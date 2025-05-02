@@ -13,7 +13,7 @@ export class NetworkService {
   constructor(private displayMessage: MatDialog) { }
 
   online: boolean = true;
-  displayMessageConfig: DisplayMessageConfig | undefined = undefined;
+  private networkMessageMap = new Map<string, DisplayMessageConfig>();
 
   init() {
     window.addEventListener('online', () => {
@@ -45,26 +45,27 @@ export class NetworkService {
     });
   }
 
-  showLoadingDialog(): MatDialogRef<DisplayMessage> {
-    return this.displayMessage?.open(DisplayMessage, {
-      panelClass: '',
-      closeOnNavigation: false,
-      data: this.displayMessageConfig,
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      hasBackdrop: false
-    });
+  setNetworkMessageConfig(url: string, config: DisplayMessageConfig): void {
+    this.networkMessageMap.set(url, config);
+  }
+
+  showLoadingDialog(url: string): MatDialogRef<DisplayMessage> | undefined {
+    if (this.networkMessageMap.get(url)) {
+      return this.displayMessage?.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: this.networkMessageMap.get(url),
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: false
+      });
+    } else {
+      return undefined
+    }
   }
 
   isOnline(): boolean {
     return this.online;
   }
 
-  getDisplayMessageConfig(): DisplayMessageConfig | undefined {
-    return this.displayMessageConfig;
-  }
-
-  setDisplayMessageConfig(displayMessageConfig: DisplayMessageConfig) {
-    this.displayMessageConfig = displayMessageConfig;
-  }
 }

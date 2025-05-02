@@ -52,7 +52,8 @@ export class ServerService {
   }
 
   connect(): Observable<GetClientConnect> {
-    this.networkService.setDisplayMessageConfig({
+    const url = `${environment.apiUrl}/clientconnect`;
+    this.networkService.setNetworkMessageConfig(url, {
       title: 'Connecting',
       image: '',
       icon: '',
@@ -61,7 +62,7 @@ export class ServerService {
       delay: 0,
       showSpinner: true,
     });
-    return this.http.get<GetClientConnect>(`${environment.apiUrl}/clientconnect`, this.httpOptions)
+    return this.http.get<GetClientConnect>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

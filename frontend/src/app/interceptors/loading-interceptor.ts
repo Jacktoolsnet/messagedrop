@@ -7,10 +7,9 @@ import { NetworkService } from '../services/network.service';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     const networkService = inject(NetworkService);
-    const loadingDialogRef: MatDialogRef<DisplayMessage> = networkService.showLoadingDialog();
-
+    const loadingDialogRef: MatDialogRef<DisplayMessage> | undefined = networkService.showLoadingDialog(req.url);
     if (!loadingDialogRef) {
-        return next(req); // failsafe
+        return next(req);
     } else {
         return next(req).pipe(
             finalize(() => {
