@@ -2,6 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { NetworkService } from './network.service';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -17,7 +18,8 @@ export class TenorService {
 
   constructor(
     private http: HttpClient,
-    private userService: UserService
+    private userService: UserService,
+    private networkService: NetworkService,
   ) { }
 
   /**
@@ -71,6 +73,15 @@ export class TenorService {
     }
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/featured`, parameters);
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Tenor service',
+      image: '',
+      icon: '',
+      message: `Loading`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<any>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -105,6 +116,15 @@ export class TenorService {
     }
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/search`, parameters);
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Tenor service',
+      image: '',
+      icon: '',
+      message: `Loading`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<any>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)

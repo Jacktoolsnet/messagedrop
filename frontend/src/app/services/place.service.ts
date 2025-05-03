@@ -10,6 +10,7 @@ import { Place } from '../interfaces/place';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { IndexedDbService } from './indexed-db.service';
 import { MapService } from './map.service';
+import { NetworkService } from './network.service';
 import { UserService } from './user.service';
 
 @Injectable({
@@ -39,6 +40,7 @@ export class PlaceService {
   constructor(
     private userService: UserService,
     private indexedDbService: IndexedDbService,
+    private networkService: NetworkService,
     private http: HttpClient) {
   }
 
@@ -111,6 +113,15 @@ export class PlaceService {
 
   createPlace(place: Place) {
     let url = `${environment.apiUrl}/place/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Creating place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'userId': place.userId,
       'name': place.name,
@@ -123,6 +134,15 @@ export class PlaceService {
 
   updatePlace(place: Place) {
     let url = `${environment.apiUrl}/place/update`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Updating place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'id': place.id,
       'name': place.name
@@ -135,6 +155,15 @@ export class PlaceService {
 
   getByUserId(userId: string) {
     let url = `${environment.apiUrl}/place/get/userId/${userId}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Loading places`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetPlacesResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -143,6 +172,15 @@ export class PlaceService {
 
   getById(placeId: string) {
     let url = `${environment.apiUrl}/place/get/${placeId}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Loading place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetPlaceResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -151,6 +189,15 @@ export class PlaceService {
 
   getByUserIdAndName(userId: string, name: string) {
     let url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Loading places`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetPlaceResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -159,6 +206,15 @@ export class PlaceService {
 
   deletePlace(place: Place) {
     let url = `${environment.apiUrl}/place/delete/${place.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Deleting place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -167,6 +223,15 @@ export class PlaceService {
 
   subscribe(place: Place) {
     let url = `${environment.apiUrl}/place/subscribe/${place.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Subscribe to place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -175,6 +240,15 @@ export class PlaceService {
 
   unsubscribe(place: Place) {
     let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Unsubscribe from place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -184,6 +258,15 @@ export class PlaceService {
   addPlusCodeToPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
     place.plusCodes.push(location.plusCode);
     let url = `${environment.apiUrl}/place/updatepluscodes`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Adding pluscode from place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'id': place.id,
       'pluscodes': JSON.stringify(place.plusCodes)
@@ -210,6 +293,15 @@ export class PlaceService {
   removePlusCodeFromPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
     place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
     let url = `${environment.apiUrl}/place/updatepluscodes`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Removing pluscode from place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'id': place.id,
       'pluscodes': JSON.stringify(place.plusCodes)

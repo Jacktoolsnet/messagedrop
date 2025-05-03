@@ -11,6 +11,7 @@ import { GetConnectResponse } from '../interfaces/get-connect-response';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
+import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
 
 @Injectable({
@@ -29,7 +30,8 @@ export class ConnectService {
     private contactService: ContactService,
     private cryptoService: CryptoService,
     private http: HttpClient,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private networkService: NetworkService
   ) { }
 
   private handleError(error: HttpErrorResponse) {
@@ -38,6 +40,15 @@ export class ConnectService {
 
   createConnect(connect: Connect) {
     let url = `${environment.apiUrl}/connect/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Connect service',
+      image: '',
+      icon: '',
+      message: `Creating connect informations`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'userId': connect.userId,
       'hint': connect.hint,
@@ -53,6 +64,15 @@ export class ConnectService {
 
   getById(connectId: string, contact: Contact, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/connect/get/${connectId}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Connect service',
+      image: '',
+      icon: '',
+      message: `Loading connect informations`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<GetConnectResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -100,6 +120,15 @@ export class ConnectService {
 
   deleteConnect(connect: Connect) {
     let url = `${environment.apiUrl}/connect/delete/${connect.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Connect service',
+      image: '',
+      icon: '',
+      message: `Deleting connect informations`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)

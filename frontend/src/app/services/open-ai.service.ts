@@ -3,6 +3,7 @@ import { Injectable } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Message } from '../interfaces/message';
+import { NetworkService } from './network.service';
 
 @Injectable({
   providedIn: 'root'
@@ -18,6 +19,7 @@ export class OpenAiService {
   };
 
   constructor(
+    private networkService: NetworkService,
     private http: HttpClient
   ) { }
 
@@ -27,6 +29,15 @@ export class OpenAiService {
 
   public moderateMessage(message: Message): Observable<any> {
     let url = `${environment.apiUrl}/openai/moderate`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Moderation service',
+      image: '',
+      icon: '',
+      message: `Moderating message using OpenAI moderation AI`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'message': message.message
     };

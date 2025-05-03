@@ -18,7 +18,6 @@ import { OpenAiService } from '../../services/open-ai.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
-import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { TextComponent } from '../utils/text/text.component';
 
 @Component({
@@ -53,7 +52,6 @@ export class EditMessageComponent implements OnInit {
     private openAiService: OpenAiService,
     public dialogRef: MatDialogRef<EditMessageComponent>,
     private style: StyleService,
-    private displayMessage: MatDialog,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, message: Message }
   ) { }
 
@@ -72,31 +70,14 @@ export class EditMessageComponent implements OnInit {
           this.snackBar.open(`My message will not be published because it appears to contain personal information.`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
         } else {
           if (this.data.message.message !== '') {
-            const displayMessageRef = this.displayMessage.open(DisplayMessage, {
-              data: {
-                title: 'Content Moderation',
-                image: '',
-                icon: 'preview',
-                message: `My message is currently being reviewed by OpenAi's moderation AI.`,
-                button: '',
-                delay: 0,
-                showSpinner: true
-              },
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              closeOnNavigation: false,
-              hasBackdrop: false
-            });
             this.openAiService.moderateMessage(this.data.message)
               .subscribe({
                 next: openAiModerateResponse => {
                   if (!openAiModerateResponse.results[0].flagged) {
                     this.data.message.userId = this.userService.getUser().id;
-                    displayMessageRef.close();
                     this.dialogRef.close(this.data);
                   } else {
                     // abgelehnt
-                    displayMessageRef.close();
                     this.snackBar.open(`Content will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
                   }
                 },

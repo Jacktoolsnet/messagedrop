@@ -15,6 +15,7 @@ import { ShortMessage } from '../interfaces/short-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
+import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
 import { UserService } from './user.service';
 
@@ -40,7 +41,8 @@ export class ContactService {
     private userService: UserService,
     private indexedDbService: IndexedDbService,
     private cryptoService: CryptoService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private networkService: NetworkService
   ) { }
 
   private handleError(error: HttpErrorResponse) {
@@ -251,6 +253,15 @@ export class ContactService {
   // We need a function from qrcode
   createContact(contact: Contact, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/contact/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Creating contact`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
@@ -279,6 +290,15 @@ export class ContactService {
 
   updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/contact/update/message`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Sending message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'contactId': envelope.contactId,
       'userId': envelope.userId,
@@ -305,6 +325,15 @@ export class ContactService {
 
   getByUserId(userId: string) {
     let url = `${environment.apiUrl}/contact/get/userId/${userId}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Loading contacts`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetContactsResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -313,6 +342,15 @@ export class ContactService {
 
   getById(contactId: string) {
     let url = `${environment.apiUrl}/contact/get/${contactId}`
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Loading contact`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetContactResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -321,6 +359,15 @@ export class ContactService {
 
   deleteContact(contactToDelete: Contact) {
     let url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Deleting from contact`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -340,6 +387,15 @@ export class ContactService {
 
   subscribe(contact: Contact) {
     let url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Subscribing to contact`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -357,6 +413,15 @@ export class ContactService {
 
   unsubscribe(contact: Contact) {
     let url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Unsubscribing from contact`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)

@@ -14,6 +14,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { GeolocationService } from './geolocation.service';
 import { MapService } from './map.service';
+import { NetworkService } from './network.service';
 import { StatisticService } from './statistic.service';
 
 @Injectable({
@@ -39,7 +40,8 @@ export class MessageService {
     private statisticService: StatisticService,
     private http: HttpClient,
     private mapService: MapService,
-    private geolocationService: GeolocationService
+    private geolocationService: GeolocationService,
+    private networkService: NetworkService
   ) { }
 
   private handleError(error: HttpErrorResponse) {
@@ -103,6 +105,15 @@ export class MessageService {
 
   createMessage(message: Message, location: Location, user: User) {
     let url = `${environment.apiUrl}/message/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Creating message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
@@ -138,6 +149,15 @@ export class MessageService {
   createComment(message: Message, location: Location, user: User) {
     let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
     let url = `${environment.apiUrl}/message/create`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Creating message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
@@ -172,6 +192,15 @@ export class MessageService {
 
   updateMessage(message: Message, location: Location, user: User) {
     let url = `${environment.apiUrl}/message/update`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Updating message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     let body = {
       'id': message.id,
       'message': message.message,
@@ -193,6 +222,15 @@ export class MessageService {
 
   likeMessage(message: Message, user: User, likeButtonColor: string) {
     let url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Liking message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -213,6 +251,15 @@ export class MessageService {
 
   unlikeMessage(message: Message, user: User, likeButtonColor: string) {
     let url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Unliking message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -255,6 +302,15 @@ export class MessageService {
 
   dislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
     let url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `disliking message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -275,6 +331,15 @@ export class MessageService {
 
   undislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
     let url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Undisliking message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -317,6 +382,15 @@ export class MessageService {
 
   getByPlusCode(location: Location, messageSubject: Subject<void>) {
     let url = `${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Loading message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -362,6 +436,15 @@ export class MessageService {
 
   getByPlusForMarker(location: Location) {
     let url = `${environment.apiUrl}/message/get/pluscode/${location.plusCode}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Loading message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -411,6 +494,15 @@ export class MessageService {
 
   disableMessage(message: Message, selectedMessages: Message[]) {
     let url = `${environment.apiUrl}/message/disable/${message.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Disableing message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -430,6 +522,15 @@ export class MessageService {
 
   deleteMessage(message: Message, dialogRef: MatDialogRef<any>) {
     let url = `${environment.apiUrl}/message/delete/${message.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Deleting message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -458,6 +559,15 @@ export class MessageService {
 
   getCommentsForParentMessage(message: Message) {
     let url = `${environment.apiUrl}/message/get/comment/${message.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Loading comments`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
     return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
