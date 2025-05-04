@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -520,7 +519,7 @@ export class MessageService {
       });
   }
 
-  deleteMessage(message: Message, dialogRef: MatDialogRef<any>) {
+  deleteMessage(message: Message) {
     let url = `${environment.apiUrl}/message/delete/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       title: 'Message service',
@@ -546,9 +545,6 @@ export class MessageService {
             }
             // The last selected message was deleted. So remove it from the selectedMessage array.
             this.selectedMessages.pop();
-            if (this.messages.length === 0) {
-              dialogRef.close();
-            }
           }
         },
         error: (err) => {

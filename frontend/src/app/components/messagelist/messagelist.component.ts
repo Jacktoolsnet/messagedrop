@@ -97,9 +97,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   public goBack() {
-    if (this.messageService.getSelectedMessages().length == 0) {
-      this.dialogRef.close();
-    } else {
+    if (this.messageService.getSelectedMessages().length != 0) {
       this.messageService.getSelectedMessages().pop();
       this.likeButtonColor = 'secondary';
       this.dislikeButtonColor = 'secondary';
@@ -179,7 +177,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.deleteMessage(message, this.dialogRef);
+        this.messageService.deleteMessage(message);
       }
     });
   }

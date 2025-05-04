@@ -660,7 +660,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             data: { messages: this.messageService.getMessages() },
             minWidth: '20vw',
             maxWidth: '90vw',
-            minHeight: '20vh',
+            minHeight: '8rem',
             maxHeight: '90vh',
             hasBackdrop: true
           });
@@ -677,11 +677,25 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         },
         error: (err) => {
           this.messageService.clearMessages();
-          this.snackBarRef = this.snackBar.open("You have not written any messages yet", undefined, {
-            panelClass: ['snack-warning'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            duration: 2000
+          const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+            panelClass: 'MessageListDialog',
+            closeOnNavigation: true,
+            data: { messages: this.messageService.getMessages() },
+            minWidth: '20vw',
+            maxWidth: '90vw',
+            minHeight: '8rem',
+            maxHeight: '90vh',
+            hasBackdrop: true
+          });
+
+          dialogRef.afterOpened().subscribe(e => {
+            this.myHistory.push("userMessageList");
+            window.history.replaceState(this.myHistory, '', '');
+          });
+
+          dialogRef.afterClosed().subscribe((data: any) => {
+            this.messageService.clearSelectedMessages();
+            this.getMessages(this.mapService.getMapLocation());
           });
         },
         complete: () => { }
@@ -693,7 +707,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
       data: { notes: this.noteService.loadNotes() },
-      minWidth: '60vw',
+      minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
@@ -714,7 +728,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
       data: { places: this.placeService.getPlaces() },
-      minWidth: '60vw',
+      minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
@@ -754,7 +768,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
       data: { contacts: this.contactService.getContacts() },
-      minWidth: '60vw',
+      minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
@@ -827,7 +841,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { notes: notes },
-      minWidth: '60vw',
+      minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
