@@ -59,6 +59,7 @@ export class MapService {
 
   public initMap(mapSubject: Subject<void>) {
     this.mapSubject = mapSubject;
+    this.ready = true;
   }
 
   public initMapEvents(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
@@ -111,7 +112,6 @@ export class MapService {
     this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ffdbb5", weight: 1 }).addTo(this.map);
     this.drawSearchRectange(this.location);
 
-    this.ready = true;
     if (undefined !== this.mapSubject) {
       this.mapSubject.next();
     }

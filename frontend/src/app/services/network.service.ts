@@ -45,6 +45,22 @@ export class NetworkService {
     });
   }
 
+  isSlowConnection(): boolean {
+    const conn = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+
+    if (!conn) {
+      // Browser did not support the api → assume as slow.
+      return true;
+    }
+
+    const effectiveType = conn.effectiveType || '';
+    const saveData = conn.saveData || false;
+
+    const slowTypes = ['slow-2g', '2g', '3g'];
+
+    return saveData || slowTypes.includes(effectiveType);
+  }
+
   setNetworkMessageConfig(url: string, config: DisplayMessageConfig): void {
     this.networkMessageMap.set(url, config);
   }

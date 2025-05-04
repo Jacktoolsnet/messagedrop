@@ -316,10 +316,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
   }
 
-  private getMessages(location: Location) {
-    this.messageService.getByPlusCode(location, this.messageSubject);
-  }
-
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
     this.placeService.addPlusCodeToPlace(this.placeService.getSelectedPlace(), location, this.isPartOfPlace, this.mapService);
@@ -351,9 +347,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         // notes from local device
         this.noteService.filter(location.plusCode);
         // Messages
-        this.getMessages(location);
-        // MarkerLocations
-        this.createMarkerLocations();
+        this.messageService.getByPlusCode(location, this.messageSubject);
       } else {
         //this.createMarkerLocations();
       }
@@ -672,7 +666,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
-            this.getMessages(this.mapService.getMapLocation());
+            this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
           });
         },
         error: (err) => {
@@ -695,7 +689,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
-            this.getMessages(this.mapService.getMapLocation());
+            this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
           });
         },
         complete: () => { }
@@ -832,7 +826,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.messageService.clearSelectedMessages();
-      this.getMessages(this.mapService.getMapLocation());
+      this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
     });
   }
 
@@ -890,7 +884,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
                 this.indexedDbService.clearAllData();
-                this.getMessages(this.mapService.getMapLocation());
+                this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
               }
             },
             error: (err) => {

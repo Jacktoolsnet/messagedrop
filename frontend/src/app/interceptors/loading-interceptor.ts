@@ -7,14 +7,17 @@ import { NetworkService } from '../services/network.service';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     const networkService = inject(NetworkService);
-    const loadingDialogRef: MatDialogRef<DisplayMessage> | undefined = networkService.showLoadingDialog(req.url);
+    let loadingDialogRef: MatDialogRef<DisplayMessage> | undefined = undefined;
+    if (networkService.isSlowConnection()) {
+        loadingDialogRef = networkService.showLoadingDialog(req.url);
+    }
     if (!loadingDialogRef) {
         return next(req);
     } else {
         return next(req).pipe(
             finalize(() => {
                 try {
-                    loadingDialogRef.close();
+                    loadingDialogRef?.close();
                 } catch (err) {
                     console.warn('Failed to close dialog:', err);
                 }

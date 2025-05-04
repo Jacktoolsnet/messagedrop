@@ -31,7 +31,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
   }
 
   private async initComponent() {
-    while (!this.userService.isReady()) {
+    while (!this.mapService.isReady()) {
       await new Promise(f => setTimeout(f, 100));
     }
     this.mapService.initMapEvents(this.location, this.clickEvent, this.moveEndEvent, this.markerClickEvent);
