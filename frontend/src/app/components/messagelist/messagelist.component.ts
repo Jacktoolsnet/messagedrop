@@ -93,7 +93,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   public navigateToMessageLocation(message: Message) {
-    this.messageService.navigateToMessageLocation(this.user, message)
+    this.messageService.navigateToMessageLocation(message)
   }
 
   public goBack() {
