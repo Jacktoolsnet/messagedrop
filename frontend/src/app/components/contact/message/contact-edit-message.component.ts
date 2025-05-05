@@ -54,7 +54,7 @@ export class ContactEditMessageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.data.shortMessage.style = this.userService.getUser().defaultStyle;
+    this.data.shortMessage.style = this.userService.getProfile().defaultStyle!;
   }
 
   onApplyClick(): void {

@@ -55,6 +55,7 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];
   public user!: User;
+  public userProfile!: Profile;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
   public mode: typeof Mode = Mode;
@@ -73,6 +74,7 @@ export class MessagelistComponent implements OnInit {
     @Inject(MAT_DIALOG_DATA) public data: { messages: Message[] }
   ) {
     this.user = this.userService.getUser();
+    this.userProfile = this.userService.getProfile();
     this.messages = data.messages;
   }
 

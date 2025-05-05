@@ -452,7 +452,6 @@ export class MessageService {
 
   navigateToMessageLocation(message: Message) {
     let url: string = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.plusCode)}`;
-    console.log(url)
     window.open(url, '_blank');
   }
 

@@ -9,6 +9,7 @@ import { CryptedUser } from '../interfaces/crypted-user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { GetUserResponse } from '../interfaces/get-user-response';
+import { Profile } from '../interfaces/profile';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
@@ -32,7 +33,6 @@ export class UserService {
     local: '',
     language: '',
     subscription: '',
-    defaultStyle: '',
     cryptoKeyPair: {
       publicKey: {},
       privateKey: {}
@@ -41,11 +41,14 @@ export class UserService {
       publicKey: {},
       privateKey: {}
     },
-    name: '',
-    base64Avatar: '',
     serverCryptoPublicKey: '',
     serverSigningPublicKey: '',
     type: UserType.USER
+  };
+
+  private profile: Profile | undefined = {
+    name: '',
+    base64Avatar: ''
   };
 
   private ready: boolean = false;
@@ -93,6 +96,7 @@ export class UserService {
     this.user = user;
     this.user.local = navigator.language;
     this.user.language = this.getLanguageForLocation(this.user.local);
+    this.loadProfile();
     this.ready = true;
     userSubject.next();
   }
@@ -113,6 +117,7 @@ export class UserService {
           if (confirmUserResponse.status === 200) {
             this.indexedDbService.setUser(cryptedUser)
               .then(() => {
+                this.loadProfile();
                 this.ready = true;
                 userSubject.next();
               });
@@ -130,13 +135,33 @@ export class UserService {
     return this.user;
   }
 
+  getProfile(): Profile {
+    if (this.profile) {
+      return this.profile;
+    } else {
+      return {
+        name: '',
+        base64Avatar: ''
+      };
+    }
+  }
+
   async saveUser() {
     const cryptedUser: CryptedUser = {
       id: this.user.id,
       cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
     };
-    this.indexedDbService.setUser(cryptedUser)
-      .then(() => { });
+    this.indexedDbService.setUser(cryptedUser).then(() => { });
+  }
+
+  async saveProfile() {
+    if (this.profile) {
+      this.indexedDbService.setProfile(this.user.id, this.profile).then(() => { });
+    }
+  }
+
+  private async loadProfile() {
+    this.profile = await this.indexedDbService.getProfile(this.user.id)
   }
 
   createUser(): Observable<CreateUserResponse> {

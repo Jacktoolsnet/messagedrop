@@ -129,7 +129,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'application/json', limit: '10mb' })], async function (req, res) {
+router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   const { subtle } = crypto;
 
   let response = { 'status': 0 };

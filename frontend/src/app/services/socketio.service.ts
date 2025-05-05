@@ -119,8 +119,8 @@ export class SocketioService {
 
           dialogRef.afterClosed().subscribe(result => {
             if (result) {
-              payload.contact.name = this.userService.getUser().name;
-              payload.contact.base64Avatar = this.userService.getUser().base64Avatar;
+              payload.contact.name = this.userService.getProfile().name;
+              payload.contact.base64Avatar = this.userService.getProfile().base64Avatar;
               payload.contact.provided = true;
               this.socket.emit('contact:provideUserProfile', payload.contact);
             } else {

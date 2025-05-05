@@ -56,7 +56,7 @@ export class EditMessageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.data.message.style = this.userService.getUser().defaultStyle;
+    this.data.message.style = this.userService.getProfile().defaultStyle!;
     this.applyNewMultimedia(this.data.message.multimedia);
   }
 

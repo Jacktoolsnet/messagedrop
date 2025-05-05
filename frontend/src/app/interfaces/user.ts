@@ -9,12 +9,9 @@ export interface User {
     local: string,
     language: string,
     subscription: string,
-    defaultStyle: string,
     serverCryptoPublicKey: string,
     serverSigningPublicKey: string,
     cryptoKeyPair: Keypair,
     signingKeyPair: Keypair,
-    name: string,
-    base64Avatar: string,
     type: UserType,
 }

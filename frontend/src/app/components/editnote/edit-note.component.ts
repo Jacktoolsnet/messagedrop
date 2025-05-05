@@ -51,7 +51,7 @@ export class EditNoteComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.data.note.style = this.userService.getUser().defaultStyle
+    this.data.note.style = this.userService.getProfile().defaultStyle!
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 

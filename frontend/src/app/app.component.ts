@@ -863,7 +863,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.userService.saveUser();
+        this.userService.saveProfile();
       }
     });
   }

@@ -63,7 +63,7 @@ export class ProfileComponent {
 
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
-      this.userService.getUser().base64Avatar = (e.target as FileReader).result as string;
+      this.userService.getProfile().base64Avatar = (e.target as FileReader).result as string;
     };
     reader.onerror = () => {
       this.snackBar.open('Error reading the file.', 'OK', { duration: 2000 });
@@ -73,7 +73,7 @@ export class ProfileComponent {
   }
 
   deleteAvatar(): void {
-    this.userService.getUser().base64Avatar = '';
+    this.userService.getProfile().base64Avatar = '';
   }
 
   showPolicy(): void {
@@ -83,6 +83,6 @@ export class ProfileComponent {
   }
 
   changeDefaultStyle(): void {
-    this.userService.getUser().defaultStyle = this.styleService.getRandomStyle();
+    this.userService.getProfile().defaultStyle = this.styleService.getRandomStyle();
   }
 }
