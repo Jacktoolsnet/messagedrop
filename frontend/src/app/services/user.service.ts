@@ -139,10 +139,11 @@ export class UserService {
     if (this.profile) {
       return this.profile;
     } else {
-      return {
+      this.profile = {
         name: '',
         base64Avatar: ''
       };
+      return this.profile;
     }
   }
 
