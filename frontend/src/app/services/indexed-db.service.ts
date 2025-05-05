@@ -1,7 +1,5 @@
 import { Injectable } from '@angular/core';
-import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
-import { PlaceProfile } from '../interfaces/place-profile';
 import { Profile } from '../interfaces/profile';
 
 @Injectable({
@@ -261,7 +259,7 @@ export class IndexedDbService {
     });
   }
 
-  async setContactProfile(contactProfileId: string, contactProfile: ContactProfile): Promise<void> {
+  async setContactProfile(contactProfileId: string, contactProfile: Profile): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
@@ -276,10 +274,10 @@ export class IndexedDbService {
     });
   }
 
-  async getContactProfile(contactProfileId: string): Promise<ContactProfile | undefined> {
+  async getContactProfile(contactProfileId: string): Promise<Profile | undefined> {
     const db = await this.openDB();
 
-    return new Promise<ContactProfile | undefined>((resolve, reject) => {
+    return new Promise<Profile | undefined>((resolve, reject) => {
       const tx = db.transaction(this.contactProfileStore, 'readonly');
       const store = tx.objectStore(this.contactProfileStore);
       const request = store.get(contactProfileId);
@@ -309,7 +307,7 @@ export class IndexedDbService {
     });
   }
 
-  async setPlaceProfile(placeProfileId: string, placeProfile: PlaceProfile): Promise<void> {
+  async setPlaceProfile(placeProfileId: string, placeProfile: Profile): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
@@ -324,10 +322,10 @@ export class IndexedDbService {
     });
   }
 
-  async getPlaceProfile(placeProfileId: string): Promise<PlaceProfile | undefined> {
+  async getPlaceProfile(placeProfileId: string): Promise<Profile | undefined> {
     const db = await this.openDB();
 
-    return new Promise<ContactProfile | undefined>((resolve, reject) => {
+    return new Promise<Profile | undefined>((resolve, reject) => {
       const tx = db.transaction(this.placeProfileStore, 'readonly');
       const store = tx.objectStore(this.placeProfileStore);
       const request = store.get(placeProfileId);
