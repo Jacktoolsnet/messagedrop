@@ -61,7 +61,14 @@ const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
 const io = new Server(server, {
-  'force new connection': true
+  maxHttpBufferSize: 5 * 1024 * 1024,
+  pingInterval: 20000,
+  pingTimeout: 30000,
+  allowEIO3: false,
+  cors: {
+    origin: [process.env.ORIGIN],
+    credentials: true
+  }
 });
 const onConnection = (socket) => {
   socket.logger = logger;

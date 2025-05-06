@@ -19,7 +19,14 @@ import { UserService } from './user.service';
 
 export class SocketioService {
   private socket: Socket;
-  private ioConfig: SocketIoConfig = { url: `${environment.apiUrl}`, options: { transports: ['websocket'] } };
+  private ioConfig: SocketIoConfig = {
+    url: `${environment.apiUrl}`,
+    options: {
+      forceNew: true,
+      transports: ['websocket'],
+      withCredentials: true
+    }
+  };
   private ready: boolean = false;
   private joinedUserRoom: boolean = false;
 
