@@ -10,7 +10,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
-import { GetUserResponse } from '../../interfaces/get-user-response';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
@@ -112,8 +111,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.connectDialog.open(ConnectComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_CONNECT, contact: contact, connectId: "" },
-      width: '90vw',
+      data: { mode: this.mode.ADD_CONNECT, connectId: "" },
       minWidth: '20vw',
       maxWidth: '90vw',
       height: 'auto',
@@ -125,8 +123,9 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.contact) {
-        this.connectService.getById(data.connectId, data.contact, this.socketioService);
+      console.log(data)
+      if (data?.connectId !== '') {
+        this.connectService.getById(data.connectId, contact, this.socketioService);
       }
     });
   }
@@ -136,7 +135,6 @@ export class ContactlistComponent implements OnInit {
       id: "",
       userId: this.userService.getUser().id,
       contactUserId: '',
-      hint: '',
       name: '',
       subscribed: false,
       provided: false,
@@ -170,11 +168,10 @@ export class ContactlistComponent implements OnInit {
       userMessageVerified: false,
       contactUserMessageVerified: false
     };
-
     const dialogRef = this.scannerDialog.open(ScannerComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_CONNECT, contact: contact },
+      data: { mode: this.mode.ADD_CONNECT, connectId: "" },
       width: '90vw',
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -187,29 +184,8 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (data?.contact) {
-        this.userService.getUserById(data.contact.contactUserId)
-          .subscribe({
-            next: (userResponse: GetUserResponse) => {
-              this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
-                .then((signature: string) => {
-                  this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'QR-Code')
-                    .then((encryptedHint: string) => {
-                      data.contact.contactUserSigningPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
-                      data.contact.contactUserEncryptionPublicKey = JSON.parse(userResponse.rawUser.signingPublicKey);
-                      data.contact.signature = signature;
-                      data.contact.hint = encryptedHint;
-                      this.contactService.createContact(data?.contact, this.socketioService);
-                    });
-                });
-            },
-            error: (err) => {
-              if (err.status === 404) {
-                this.snackBarRef = this.snackBar.open(`The contact cannot be created because the user ID was not found.`, 'OK', {});
-              }
-            },
-            complete: () => { }
-          });
+      if (data?.connectId !== '') {
+        this.connectService.getById(data.connectId, contact, this.socketioService);
       }
     });
   }
@@ -351,15 +327,39 @@ export class ContactlistComponent implements OnInit {
   }
 
   public openQrDialog() {
-    const dialogRef = this.dialog.open(QrcodeComponent, {
-      closeOnNavigation: true,
-      hasBackdrop: true,
-      data: { qrData: this.userService.getUser().id }
-    });
+    this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+      .then((signature: string) => {
+        this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'No hint')
+          .then((encryptedHint: string) => {
+            let connect: Connect = {
+              id: '',
+              userId: this.userService.getUser().id,
+              hint: encryptedHint,
+              signature: signature,
+              encryptionPublicKey: JSON.stringify(this.userService.getUser().cryptoKeyPair?.publicKey!),
+              signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
+            };
+            this.connectService.createConnect(connect)
+              .subscribe({
+                next: createConnectResponse => {
+                  if (createConnectResponse.status === 200) {
+                    connect.id = createConnectResponse.connectId;
+                    const dialogRef = this.dialog.open(QrcodeComponent, {
+                      closeOnNavigation: true,
+                      hasBackdrop: true,
+                      data: { qrData: createConnectResponse.connectId }
+                    });
 
-    dialogRef.afterOpened().subscribe({});
+                    dialogRef.afterOpened().subscribe({});
 
-    dialogRef.afterClosed().subscribe({});
+                    dialogRef.afterClosed().subscribe({});
+                  }
+                },
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                complete: () => { }
+              });
+          });
+      });
   }
 
 }
