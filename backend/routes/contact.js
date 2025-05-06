@@ -1,4 +1,6 @@
 const express = require('express');
+const { getEncryptionPublicKey } = require('../utils/keyStore');
+const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
 const uuid = require('uuid');
 const security = require('../middleware/security');
@@ -18,6 +20,22 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.contactId = contactId;
     }
     res.status(response.status).json(response);
+  });
+});
+
+
+router.post('/update/name', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+  let response = { 'status': 0 };
+  let cryptedName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+  tableContact.updateName(req.database.db, req.body.contactId, cryptedName, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+      res.status(response.status).json(response);
+    } else {
+      response.status = 200;
+      res.status(response.status).json(response);
+    }
   });
 });
 
@@ -91,8 +109,8 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
             'contactUserEncryptedMessage': row.contactUserEncryptedMessage,
             'contactUserSignature': row.contactUserSignature,
             'subscribed': row.subscribed === 0 ? false : true,
-            'hint': row.hint,
-            'name': row.name,
+            'hint': row.hint == null ? '' : row.hint,
+            'name': row.name == null ? '' : row.name,
             'base64Avatar': row.base64Avatar,
             'lastMessageFrom': row.lastMessageFrom
           });

@@ -123,7 +123,6 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      console.log(data)
       if (data?.connectId !== '') {
         this.connectService.getById(data.connectId, contact, this.socketioService);
       }
@@ -219,6 +218,7 @@ export class ContactlistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (true) {
+        this.contactService.updateContactName(contact);
         this.contactService.saveAditionalContactInfos();
       }
     });

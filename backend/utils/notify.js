@@ -48,7 +48,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
 const contactSubscriptions = function (logger, db, userId, contactUserId, message) {
     try {
         let sql = `
-        SELECT tableContact.id, tableContact.userId, tableContact.contactUserId, tableContact.subscribed, tableContact.name, tableContact.base64Avatar, tableUser.subscription
+        SELECT tableContact.id, tableContact.userId, tableContact.contactUserId, tableContact.subscribed, tableContact.name, tableUser.subscription
         FROM tableContact
         INNER JOIN tableUser ON tableContact.userId = tableUser.id
         WHERE contactUserId = '${userId}'
@@ -56,11 +56,12 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         AND subscribed = 1;`;
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
-                rows.forEach((row) => {
+                rows.forEach(async (row) => {
                     if (row.subscription != '') {
+                        const contactName = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), row.name);
                         const payload = {
                             "notification": {
-                                "title": `New message from @${row.name}`,
+                                "title": `New message from @${contactName}`,
                                 "body": message,
                                 "icon": "assets/icons/notify-icon.png",
                                 "vibrate": [100, 50, 100],

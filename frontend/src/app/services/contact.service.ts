@@ -288,6 +288,32 @@ export class ContactService {
       });
   }
 
+  updateContactName(contact: Contact) {
+    let url = `${environment.apiUrl}/contact/update/name`;
+    this.networkService.setNetworkMessageConfig(url, {
+      title: 'Contact service',
+      image: '',
+      icon: '',
+      message: `Updating contact name`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    let body = {
+      'contactId': contact.id,
+      'name': contact.name
+    };
+    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      )
+      .subscribe({
+        next: () => { },
+        error: (err) => { },
+        complete: () => { }
+      });
+  }
+
   updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/contact/update/message`;
     this.networkService.setNetworkMessageConfig(url, {
