@@ -25,6 +25,7 @@
   break-inside: avoid;
   page-break-inside: avoid;
   -webkit-column-break-inside: avoid;
+  min-width: 250px;
 }
 
 /* === AVATAR + NAME BOX === */

@@ -27,7 +27,7 @@ module.exports = (io, socket) => {
 
   const newShortMessage = (envelope) => {
     // socket.logger.info("newShortMessage");
-    io.to(envelope.contactUserId).emit(`receiveShorMessage:${envelope.userId}`, {
+    io.to(envelope.contactUserId).emit(`receiveShorMessage:${envelope.contactUserId}`, {
       status: 200,
       envelope: envelope
     });

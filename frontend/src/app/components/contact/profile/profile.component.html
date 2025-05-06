@@ -24,11 +24,10 @@
     </button>
   </div>
   <div class="buttonarea" *ngIf="joinedUserRoom === true">
-    <h4>Or ask the contact to provide his profile information. User must be online and confirm the request.</h4>
-    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button"
+    <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button_style"
       (click)="getProfileFromContact(contact)">
       <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
-      <span>Ask contact</span>
+      <span>Ask contact for profile<br>information</span>
     </button>
   </div>
 </mat-dialog-content>

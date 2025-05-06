@@ -1,71 +1,75 @@
 h4 {
-    padding: 0.5rem;
-    color: floralwhite;
-  }
-  
-  button {
-    margin-right: 8px;
-  }
-  
-  input[type=text],
-  select {
-    width: 100%;
-    padding: 12px 20px;
-    margin: 8px 0;
-    display: inline-block;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    box-sizing: border-box;
-  }
-  
-  .file-input {
-    display: none;
-  }
-  
-  .center-left {
-    display: flex;
-    justify-content: left;
-    align-items: center;
-    width: 100%;
-    padding-bottom: 0.5rem;
-  }
-  
-  .center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    padding-bottom: 0.5rem;
-  }
-  
-  .upload-button {
-    margin-left: 0.5rem;
-  }
-  
-  .avatar {
-    width: 8rem;
-    height: 8rem;
-    border-radius: 4rem;
-  }
-  
-  .button_legal {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    margin-bottom: 0.5rem;
-    margin-right: 0.5rem;
-  }
+  padding: 0.5rem;
+  color: floralwhite;
+}
 
-  .buttonarea {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    height: auto;
-  }
+button {
+  margin-right: 8px;
+}
 
-  .button {
-    margin: auto;
-    width: 100%;
-  }
+input[type=text],
+select {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+}
+
+.file-input {
+  display: none;
+}
+
+.center-left {
+  display: flex;
+  justify-content: left;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 0.5rem;
+}
+
+.center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  padding-bottom: 0.5rem;
+}
+
+.upload-button {
+  margin-left: 0.5rem;
+}
+
+.avatar {
+  width: 8rem;
+  height: 8rem;
+  border-radius: 4rem;
+}
+
+.button_legal {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  z-index: 100;
+  margin-bottom: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.buttonarea {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  height: auto;
+}
+
+.button_style {
+  margin: auto;
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

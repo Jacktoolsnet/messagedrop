@@ -103,6 +103,8 @@ export class MessagelistComponent implements OnInit {
       this.messageService.getSelectedMessages().pop();
       this.likeButtonColor = 'secondary';
       this.dislikeButtonColor = 'secondary';
+    } else {
+      this.dialogRef.close()
     }
   }
 

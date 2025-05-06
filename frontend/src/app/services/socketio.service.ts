@@ -73,6 +73,12 @@ export class SocketioService {
   public initUserSocketEvents() {
     // Error handling
     this.socket.on("connect_error", (err: any) => {
+      this.snackBar.open(err.message, "", {
+        panelClass: ['snack-warning'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
       // the reason of the error, for example "xhr poll error"
       // console.log(err.message);
       // some additional description, for example the status code of the initial HTTP response
@@ -86,12 +92,12 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
-          /*this.snackBar.open(`Joined user room.`, "", {
+          this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 1000
-          })*/;
+          });
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
