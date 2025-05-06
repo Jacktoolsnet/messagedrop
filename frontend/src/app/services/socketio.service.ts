@@ -22,7 +22,6 @@ export class SocketioService {
   private ioConfig: SocketIoConfig = {
     url: `${environment.apiUrl}`,
     options: {
-      forceNew: true,
       transports: ['websocket'],
       withCredentials: true
     }

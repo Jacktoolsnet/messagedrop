@@ -166,7 +166,9 @@ app.use('{*notFound}', notfound);
   try {
     await generateOrLoadKeypairs();
     server.listen(process.env.PORT, () => {
-      logger.info(`Server läuft auf Port ${process.env.PORT}`);
+      const address = server.address();
+      const port = typeof address === 'string' ? address : address.port;
+      logger.info(`Server läuft auf Port ${port}`);
       database.init(logger);
     });
   } catch (err) {
