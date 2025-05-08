@@ -113,6 +113,10 @@ const onConnection = (socket) => {
 
   socket.logger.info(`Verbindung aufgebaut`);
 
+  socket.onAny((event, ...args) => {
+    socket.logger.info(`[SOCKET EVENT] ${event}`, args);
+  });
+
   // Globale Fehlerbehandlung für diesen Socket
   socket.on('error', (err) => {
     socket.logger.error('Socket-Fehler', {

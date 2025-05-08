@@ -1,5 +1,7 @@
 const { response } = require("express");
 
+console.log("[Socket.io] contactHandlers geladen");
+
 module.exports = (io, socket) => {
 
   const requestProfile = (contact) => {

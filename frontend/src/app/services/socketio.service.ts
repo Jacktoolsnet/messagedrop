@@ -148,12 +148,12 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
-          /*this.snackBar.open(`Joined user room.`, "", {
+          this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 1000
-          });*/
+          });
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
