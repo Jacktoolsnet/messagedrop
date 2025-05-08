@@ -54,7 +54,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         WHERE contactUserId = '${userId}'
         AND userId = '${contactUserId}'
         AND subscribed = 1;`;
-        logger.info(`contactSubscriptions: ${sql}`);
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach(async (row) => {
@@ -77,6 +76,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                 }
                             }
                         };
+                        logger.error(`contactSubscriptions: ${JSON.stringify(payload)}`);
                         sendNotification(logger, JSON.parse(row.subscription), payload);
                     }
                 });
