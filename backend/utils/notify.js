@@ -19,7 +19,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                     if (row.subscription != '') {
                         let placeName = '';
                         try {
-                            placeName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), row.name);
+                            placeName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }
@@ -65,7 +65,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                     if (row.subscription != '') {
                         let contactName = '';
                         try {
-                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), row.name);
+                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }

@@ -49,9 +49,9 @@ async function encrypt(rsaPublicKey, payload) {
  * @returns {Promise<string>} Klartext
  */
 async function decrypt(rsaPrivateKey, cryptoData) {
-    const iv = Buffer.from(JSON.parse(cryptoData).iv);
-    const encryptedKey = Buffer.from(JSON.parse(cryptoData).encryptedKey);
-    const encryptedData = Buffer.from(JSON.parse(cryptoData).encryptedData);
+    const iv = Buffer.from(JSON.parse(cryptoData.iv));
+    const encryptedKey = Buffer.from(JSON.parse(cryptoData.encryptedKey));
+    const encryptedData = Buffer.from(JSON.parse(cryptoData.encryptedData));
 
     const decryptedAesKeyJson = await subtle.decrypt(
         { name: 'RSA-OAEP' },

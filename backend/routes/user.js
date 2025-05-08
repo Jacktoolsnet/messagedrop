@@ -51,7 +51,7 @@ router.get('/get/:userId', [security.checkToken], function (req, res) {
 router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
 
-  const pin = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), JSON.parse(req.body.pin));
+  const pin = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(req.body.pin));
 
   if (!pin || typeof pin !== 'string' || pin.length !== 6) {
     response.status = 400;
