@@ -1,7 +1,5 @@
 const { response } = require("express");
 
-console.log("[Socket.io] contactHandlers geladen");
-
 module.exports = (io, socket) => {
 
   const requestProfile = (contact) => {
@@ -28,29 +26,10 @@ module.exports = (io, socket) => {
   }
 
   const newShortMessage = (envelope) => {
-    try {
-      socket.logger.info('newShortMessage', envelope);
-
-      if (!envelope || !envelope.contactUserId || !envelope.userId) {
-        throw new Error('Ungültiger envelope-Datensatz');
-      }
-
-      io.to(envelope.contactUserId).emit(`receiveShortMessage:${envelope.userId}`, {
-        status: 200,
-        envelope
-      });
-    } catch (err) {
-      socket.logger.error('Fehler bei newShortMessage', {
-        message: err.message,
-        envelope,
-        stack: err.stack
-      });
-
-      socket.emit('error:shortMessage', {
-        status: 500,
-        message: 'Interner Fehler beim Senden der Nachricht'
-      });
-    }
+    io.to(envelope.contactUserId).emit(`receiveShortMessage:${envelope.contactUserId}`, {
+      status: 200,
+      envelope
+    });
   };
 
   socket.on("contact:requestProfile", requestProfile);

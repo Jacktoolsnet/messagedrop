@@ -111,10 +111,10 @@ const onConnection = (socket) => {
   // Logger an den Socket hängen
   socket.logger = logger.child({ socketId: socket.id });
 
-  socket.logger.info(`Verbindung aufgebaut`);
+  // socket.logger.info(`Verbindung aufgebaut`);
 
   socket.onAny((event, ...args) => {
-    socket.logger.info(`[SOCKET EVENT] ${event}`, args);
+    // socket.logger.info(`[SOCKET EVENT] ${event}`, args);
   });
 
   // Globale Fehlerbehandlung für diesen Socket
@@ -126,7 +126,7 @@ const onConnection = (socket) => {
   });
 
   socket.on('disconnect', (reason) => {
-    socket.logger.warn(`Verbindung getrennt: ${reason}`);
+    // socket.logger.warn(`Verbindung getrennt: ${reason}`);
   });
 
   socket.on('connect_error', (err) => {

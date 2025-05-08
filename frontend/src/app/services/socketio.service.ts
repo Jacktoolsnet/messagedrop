@@ -45,21 +45,21 @@ export class SocketioService {
 
     this.socket.on("connect", () => {
       this.ready = this.socket.ioSocket.connected;
-      this.snackBar.open('connect', '', {
+      /*this.snackBar.open('connect', '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
-      });
+      });*/
     });
 
     this.socket.on("connect_error", (err: any) => {
-      this.snackBar.open(err.message, "", {
+      /*this.snackBar.open(err.message, "", {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
-      });
+      });*/
       // the reason of the error, for example "xhr poll error"
       // console.log(err.message);
       // some additional description, for example the status code of the initial HTTP response
@@ -70,42 +70,42 @@ export class SocketioService {
 
     this.socket.on("disconnect", () => {
       this.ready = this.socket.ioSocket.connected;
-      this.snackBar.open('disconnect', '', {
+      /*this.snackBar.open('disconnect', '', {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
-      });
+      });*/
     });
 
     this.socket.on('reconnect_attempt', (attempt) => {
       this.ready = this.socket.ioSocket.connected;
-      this.snackBar.open(`Reconnection attempt #${attempt}`, '', {
+      /*this.snackBar.open(`Reconnection attempt #${attempt}`, '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
-      });
+      });*/
     });
 
     this.socket.on('reconnect', () => {
       this.ready = this.socket.ioSocket.connected;
-      this.snackBar.open('Reconnected successfully!', '', {
+      /*this.snackBar.open('Reconnected successfully!', '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
-      });
+      });*/
     });
 
     this.socket.on('reconnect_failed', () => {
       this.ready = this.socket.ioSocket.connected;
-      this.snackBar.open('Reconnection failed', '', {
+      /*this.snackBar.open('Reconnection failed', '', {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
-      });
+      });*/
     });
 
   }
@@ -148,12 +148,12 @@ export class SocketioService {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
-          this.snackBar.open(`Joined user room.`, "", {
+          /*this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 1000
-          });
+          });*/
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
@@ -217,7 +217,7 @@ export class SocketioService {
   }
 
   public receiveShortMessage(contact: Contact) {
-    this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, envelope: Envelope }) => {
+    this.socket.on(`receiveShortMessage:${contact.userId}`, (payload: { status: number, envelope: Envelope }) => {
       if (payload.status == 200) {
         let messageSignatureBuffer = undefined;
         let messageSignature = undefined;
