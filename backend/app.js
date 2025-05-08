@@ -1,4 +1,5 @@
 require('dotenv').config()
+require('winston-daily-rotate-file');
 const compression = require('compression');
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
@@ -43,14 +44,49 @@ app.use(compression({
 }));
 
 // Logger
+
+// Format für bessere Lesbarkeit
+const logFormat = winston.format.combine(
+  winston.format.timestamp(),
+  winston.format.printf(({ timestamp, level, message, ...meta }) => {
+    return `${timestamp} [${level.toUpperCase()}] ${message} ${Object.keys(meta).length ? JSON.stringify(meta) : ''}`;
+  })
+);
+
+// Transport für Info-Logs
+const infoTransport = new winston.transports.DailyRotateFile({
+  filename: 'logs/info-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxFiles: '2d',
+  level: 'info'
+});
+
+// Transport für Error-Logs
+const errorTransport = new winston.transports.DailyRotateFile({
+  filename: 'logs/error-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxFiles: '2d',
+  level: 'error'
+});
+
+// Logger erstellen
 const logger = winston.createLogger({
   level: 'info',
-  format: winston.format.json(),
+  format: logFormat,
   transports: [
-    new winston.transports.File({ filename: 'error.txt', level: 'error' }),
-    new winston.transports.File({ filename: 'info.txt' }),
-  ],
+    infoTransport,
+    errorTransport
+  ]
 });
+
+// Optional: auch in der Konsole ausgeben
+if (process.env.NODE_ENV !== 'production') {
+  logger.add(new winston.transports.Console({
+    format: winston.format.simple()
+  }));
+}
 
 /**
  * Socket.io
