@@ -3,7 +3,7 @@ const { response } = require("express");
 module.exports = (io, socket) => {
 
   const requestProfile = (contact) => {
-    // socket.logger.info("requestProfile");
+    socket.logger.info('requestProfile', contact);
     io.to(contact.contactUserId).emit(`requestProfileForContact:${contact.contactUserId}`, {
       status: 200,
       contact: contact
@@ -11,7 +11,7 @@ module.exports = (io, socket) => {
   }
 
   const provideUserProfile = (contact) => {
-    // socket.logger.info("provideUserProfile");
+    socket.logger.info('provideUserProfile', contact);
     if (contact.provided == false) {
       io.to(contact.userId).emit(`receiveProfileForContact:${contact.id}`, {
         status: 500,
@@ -26,7 +26,7 @@ module.exports = (io, socket) => {
   }
 
   const newShortMessage = (envelope) => {
-    socket.logger.info("newShortMessage");
+    socket.logger.info('newShortMessage', envelope);
     io.to(envelope.contactUserId).emit(`receiveShorMessage:${envelope.userId}`, {
       status: 200,
       envelope: envelope
