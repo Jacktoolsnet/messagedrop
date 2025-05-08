@@ -62,7 +62,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach(async (row) => {
-                    logger.info(`name: JSON.parse(${row.name})`);
+                    logger.info(`name: ${JSON.parse(row.name)}`);
                     if (row.subscription != '') {
                         let contactName = '';
                         try {
