@@ -17,8 +17,9 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
             if (undefined != rows) {
                 rows.forEach(async (row) => {
                     if (row.subscription != '') {
+                        let placeName = '';
                         try {
-                            const placeName = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), row.name);
+                            placeName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), row.name);
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }
@@ -61,10 +62,11 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach(async (row) => {
-                    logger.info(`contactSubscriptions: ${JSON.stringify(row)}`);
+                    logger.info(`row: ${JSON.stringify(row.name)}`);
                     if (row.subscription != '') {
+                        let contactName = '';
                         try {
-                            const contactName = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), row.name);
+                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), row.name);
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }
