@@ -62,7 +62,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach(async (row) => {
-                    logger.info(`name: ${JSON.parse(row.name)}`);
                     if (row.subscription != '') {
                         let contactName = '';
                         try {
@@ -70,7 +69,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }
-                        logger.info(`contactName: ${contactName}`);
                         const payload = {
                             "notification": {
                                 "title": `New message from @${contactName}`,
@@ -88,7 +86,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                 }
                             }
                         };
-                        logger.info(`contactSubscriptions: ${JSON.stringify(payload)}`);
                         sendNotification(logger, JSON.parse(row.subscription), payload);
                     }
                 });
