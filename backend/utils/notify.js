@@ -66,7 +66,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                     if (row.subscription != '') {
                         let contactName = '';
                         try {
-                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
+                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), row.name);
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }
