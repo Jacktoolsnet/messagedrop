@@ -62,7 +62,7 @@ export class CreatePinComponent {
         if (this.pin.length === this.pinLength) {
           setTimeout(() => {
             this.isConfirming = true;
-          }, 500);
+          }, 250);
         }
       }
     } else {
@@ -84,7 +84,7 @@ export class CreatePinComponent {
               });
               this.reset();
             }
-          }, 500); // erst nach Anzeige der letzten Ziffer prüfen
+          }, 250);
         }
       }
     }
@@ -96,7 +96,7 @@ export class CreatePinComponent {
     displayArray[index] = pin[index];
     setTimeout(() => {
       displayArray[index] = '•';
-    }, 500);
+    }, 250);
   }
 
   removeDigit(): void {

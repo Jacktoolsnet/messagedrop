@@ -70,17 +70,49 @@ const io = new Server(server, {
     credentials: true
   }
 });
+
 const onConnection = (socket) => {
-  socket.logger = logger;
-  userHandlers(io, socket)
+  // Logger an den Socket hängen
+  socket.logger = logger.child({ socketId: socket.id });
+
+  socket.logger.info(`Verbindung aufgebaut`);
+
+  // Globale Fehlerbehandlung für diesen Socket
+  socket.on('error', (err) => {
+    socket.logger.error('Socket-Fehler', {
+      message: err.message,
+      stack: err.stack
+    });
+  });
+
+  socket.on('disconnect', (reason) => {
+    socket.logger.warn(`Verbindung getrennt: ${reason}`);
+  });
+
+  socket.on('connect_error', (err) => {
+    socket.logger.error('Verbindungsfehler', {
+      message: err.message,
+      stack: err.stack
+    });
+  });
+
+  // Eigentliche Handler laden
+  userHandlers(io, socket);
   contactHandlers(io, socket);
-}
+};
+
+// Socket.io: neue Verbindung
 io.on("connection", onConnection);
+
+// Fehler beim Verbindungsaufbau (z. B. Auth-Probleme)
 io.engine.on("connection_error", (err) => {
-  logger.error(err.req);      // the request object
-  logger.error(err.code);     // the error code, for example 1
-  logger.error(err.message);  // the error message, for example "Session ID unknown"
-  logger.error(err.context);  // some additional error context
+  logger.error('Engine-Fehler beim Verbindungsaufbau', {
+    ip: err.req?.socket?.remoteAddress,
+    url: err.req?.url,
+    code: err.code,
+    message: err.message,
+    context: err.context
+  });
 });
 
 /*

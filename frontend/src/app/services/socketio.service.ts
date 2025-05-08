@@ -218,7 +218,6 @@ export class SocketioService {
 
   public receiveShortMessage(contact: Contact) {
     this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, envelope: Envelope }) => {
-      console.log(payload);
       if (payload.status == 200) {
         let messageSignatureBuffer = undefined;
         let messageSignature = undefined;
@@ -226,23 +225,17 @@ export class SocketioService {
         messageSignature = messageSignatureBuffer.buffer.slice(
           messageSignatureBuffer.byteOffset, messageSignatureBuffer.byteOffset + messageSignatureBuffer.byteLength
         )
-        console.log(1);
         this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, payload.envelope.userId, messageSignature)
           .then((valid: Boolean) => {
-            console.log(2);
             if (valid) {
-              console.log(3);
               contact.contactUserMessageVerified = true;
               if (payload.envelope.contactUserEncryptedMessage) {
                 this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
                   .then((message: string) => {
-                    console.log(4);
                     if (message !== '') {
-                      console.log(5);
                       contact.contactUserMessage = JSON.parse(message);
                       // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
-                      console.log(5);
                     } else {
                       let errorMessage: ShortMessage = {
                         message: 'Message cannot be decrypted!',

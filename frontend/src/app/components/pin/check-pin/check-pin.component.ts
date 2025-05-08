@@ -54,7 +54,7 @@ export class CheckPinComponent {
       if (this.pin.length === this.pinLength) {
         setTimeout(() => {
           this.confirm();
-        }, 500);
+        }, 250);
       }
     }
   }
@@ -65,7 +65,7 @@ export class CheckPinComponent {
     displayArray[index] = pin[index];
     setTimeout(() => {
       displayArray[index] = '•';
-    }, 500);
+    }, 250);
   }
 
   reset(): void {
