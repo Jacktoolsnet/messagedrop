@@ -54,12 +54,9 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         WHERE contactUserId = '${userId}'
         AND userId = '${contactUserId}'
         AND subscribed = 1;`;
-        logger.info(`sql: ${sql}`);
         db.all(sql, (err, rows) => {
-            logger.info(`rows: ${rows}`);
             if (undefined != rows) {
                 rows.forEach(async (row) => {
-                    logger.info(`row: ${row}`);
                     if (row.subscription != '') {
                         const contactName = await cryptoUtil.decrypt(await getEncryptionPrivateKey(), row.name);
                         const payload = {
@@ -79,7 +76,6 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                 }
                             }
                         };
-                        logger.info(`payload: ${payload}`);
                         sendNotification(logger, JSON.parse(row.subscription), payload);
                     }
                 });
