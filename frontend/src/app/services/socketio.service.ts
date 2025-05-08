@@ -22,6 +22,11 @@ export class SocketioService {
   private ioConfig: SocketIoConfig = {
     url: `${environment.apiUrl}`,
     options: {
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+      randomizationFactor: 0.5,
       transports: ['websocket'],
       withCredentials: true
     }
@@ -37,12 +42,72 @@ export class SocketioService {
     private cryptoService: CryptoService
   ) {
     this.socket = new Socket(this.ioConfig);
+
     this.socket.on("connect", () => {
       this.ready = this.socket.ioSocket.connected;
+      this.snackBar.open('connect', '', {
+        panelClass: ['snack-info'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
     });
+
+    this.socket.on("connect_error", (err: any) => {
+      this.snackBar.open(err.message, "", {
+        panelClass: ['snack-warning'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
+      // the reason of the error, for example "xhr poll error"
+      // console.log(err.message);
+      // some additional description, for example the status code of the initial HTTP response
+      // console.log(err.description);
+      // some additional context, for example the XMLHttpRequest object
+      // console.log(err.context);
+    });
+
     this.socket.on("disconnect", () => {
-      this.ready = false;
+      this.ready = this.socket.ioSocket.connected;
+      this.snackBar.open('disconnect', '', {
+        panelClass: ['snack-warning'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
     });
+
+    this.socket.on('reconnect_attempt', (attempt) => {
+      this.ready = this.socket.ioSocket.connected;
+      this.snackBar.open(`Reconnection attempt #${attempt}`, '', {
+        panelClass: ['snack-info'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
+    });
+
+    this.socket.on('reconnect', () => {
+      this.ready = this.socket.ioSocket.connected;
+      this.snackBar.open('Reconnected successfully!', '', {
+        panelClass: ['snack-info'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
+    });
+
+    this.socket.on('reconnect_failed', () => {
+      this.ready = this.socket.ioSocket.connected;
+      this.snackBar.open('Reconnection failed', '', {
+        panelClass: ['snack-warning'],
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        duration: 1000
+      });
+    });
+
   }
 
   initSocket() {
@@ -77,33 +142,18 @@ export class SocketioService {
   }
 
   public initUserSocketEvents() {
-    // Error handling
-    this.socket.on("connect_error", (err: any) => {
-      this.snackBar.open(err.message, "", {
-        panelClass: ['snack-warning'],
-        horizontalPosition: 'center',
-        verticalPosition: 'top',
-        duration: 1000
-      });
-      // the reason of the error, for example "xhr poll error"
-      // console.log(err.message);
-      // some additional description, for example the status code of the initial HTTP response
-      // console.log(err.description);
-      // some additional context, for example the XMLHttpRequest object
-      // console.log(err.context);
-    });
     // User room.
     this.socket.emit('user:joinUserRoom', this.userService.getUser().id);
     this.socket.on(`${this.userService.getUser().id}`, (payload: { status: number, type: String, content: any }) => {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
-          this.snackBar.open(`Joined user room.`, "", {
+          /*this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
             verticalPosition: 'top',
             duration: 1000
-          });
+          });*/
           // Request to provide profile information.
           this.requestProfileForContact();
           break;
@@ -168,6 +218,7 @@ export class SocketioService {
 
   public receiveShortMessage(contact: Contact) {
     this.socket.on(`receiveShorMessage:${contact.contactUserId}`, (payload: { status: number, envelope: Envelope }) => {
+      console.log(payload);
       if (payload.status == 200) {
         let messageSignatureBuffer = undefined;
         let messageSignature = undefined;
@@ -175,17 +226,23 @@ export class SocketioService {
         messageSignature = messageSignatureBuffer.buffer.slice(
           messageSignatureBuffer.byteOffset, messageSignatureBuffer.byteOffset + messageSignatureBuffer.byteLength
         )
+        console.log(1);
         this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, payload.envelope.userId, messageSignature)
           .then((valid: Boolean) => {
+            console.log(2);
             if (valid) {
+              console.log(3);
               contact.contactUserMessageVerified = true;
               if (payload.envelope.contactUserEncryptedMessage) {
                 this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
                   .then((message: string) => {
+                    console.log(4);
                     if (message !== '') {
+                      console.log(5);
                       contact.contactUserMessage = JSON.parse(message);
                       // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
+                      console.log(5);
                     } else {
                       let errorMessage: ShortMessage = {
                         message: 'Message cannot be decrypted!',

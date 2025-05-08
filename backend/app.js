@@ -61,7 +61,7 @@ const contactHandlers = require("./socketIo/contactHandlers");
 const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
 const io = new Server(server, {
-  maxHttpBufferSize: 5 * 1024 * 1024,
+  maxHttpBufferSize: 5.5 * 1024 * 1024,
   pingInterval: 20000,
   pingTimeout: 30000,
   allowEIO3: false,
