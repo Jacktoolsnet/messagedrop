@@ -27,7 +27,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 router.post('/update/name', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
   let cryptedName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
-  tableContact.updateName(req.database.db, req.body.contactId, cryptedName, function (err) {
+  tableContact.updateName(req.database.db, req.body.contactId, JSON.stringify(cryptedName), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

@@ -62,11 +62,11 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
         db.all(sql, (err, rows) => {
             if (undefined != rows) {
                 rows.forEach(async (row) => {
-                    logger.info(`row: ${JSON.stringify(row.name)}`);
+                    logger.info(`row: ${row.name}`);
                     if (row.subscription != '') {
                         let contactName = '';
                         try {
-                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), row.name);
+                            contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
                         } catch (ex) {
                             logger.info(`error: ${ex}`);
                         }
