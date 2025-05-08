@@ -20,9 +20,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                         let placeName = '';
                         try {
                             placeName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
-                        } catch (ex) {
-                            logger.info(`error: ${ex}`);
-                        }
+                        } catch (ex) { }
                         const payload = {
                             "notification": {
                                 "title": `Messagedrop @${placeName}`,
@@ -66,9 +64,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         let contactName = '';
                         try {
                             contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
-                        } catch (ex) {
-                            logger.info(`error: ${ex}`);
-                        }
+                        } catch (ex) { }
                         const payload = {
                             "notification": {
                                 "title": `New message from @${contactName}`,
