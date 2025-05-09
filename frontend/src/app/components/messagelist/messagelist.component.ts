@@ -99,13 +99,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public goBack() {
-    if (this.messageService.getSelectedMessages().length != 0) {
-      this.messageService.getSelectedMessages().pop();
-      this.likeButtonColor = 'secondary';
-      this.dislikeButtonColor = 'secondary';
-    } else {
-      this.dialogRef.close()
-    }
+    this.messageService.getSelectedMessages().pop();
+    this.likeButtonColor = 'secondary';
+    this.dislikeButtonColor = 'secondary';
   }
 
   async goToMessageDetails(message: Message) {

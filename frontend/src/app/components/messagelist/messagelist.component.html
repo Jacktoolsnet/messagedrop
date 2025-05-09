@@ -1,7 +1,7 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="accent" aria-label="Back"
-        (click)="goBack()">
-        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">collapse_content</mat-icon>
+    <button *ngIf="this.messageService.getSelectedMessages().length != 0" [attr.aria-hidden]="false" class="button_back"
+        mat-mini-fab color="accent" aria-label="Back" (click)="goBack()">
+        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
     <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
         *ngIf="messageService.getSelectedMessages().length == 0" (click)="addMessagDialog()">
@@ -14,7 +14,7 @@
         <mat-icon>add_comment</mat-icon>
     </button>
     <div *ngIf="this.messageService.getSelectedMessages()?.length === 0" class="content">
-        <mat-card class="item" *ngFor="let message of messages; index as i">
+        <mat-card (click)="goToMessageDetails(message)" class="item" *ngFor="let message of messages; index as i">
             <div class="avatar-box" *ngIf="user.id == message.userId && (userProfile.base64Avatar || userProfile.name)">
                 <img *ngIf="userProfile.base64Avatar" class="avatar" src="{{userProfile.base64Avatar}}" />
                 <span *ngIf="userProfile.name" class="name">{{userProfile.name}}</span>
@@ -26,10 +26,6 @@
                 <span *ngIf="profileService.getProfile(message.userId)?.name"
                     class="name">{{profileService.getProfile(message.userId)?.name}}</span>
             </div>
-            <button [attr.aria-hidden]="false" class="button_detail" mat-mini-fab color="secondary" aria-label="Detial"
-                (click)="goToMessageDetails(message)">
-                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">expand_content</mat-icon>
-            </button>
             <mat-card-content>
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
@@ -109,7 +105,7 @@
             </mat-card-actions>
         </mat-card>
         <div *ngIf="messageService.getSelectedMessages().at(-1)!.comments.length != 0">
-            <mat-card class="item"
+            <mat-card class="item" (click)="goToMessageDetails(comment)"
                 *ngFor="let comment of messageService.getSelectedMessages().at(-1)?.comments; index as i">
                 <div class="avatar-box"
                     *ngIf="user.id == comment.userId && (userProfile.base64Avatar || userProfile.name)">
@@ -123,10 +119,6 @@
                     <span *ngIf="profileService.getProfile(comment.userId)?.name"
                         class="name">{{profileService.getProfile(comment.userId)?.name}}</span>
                 </div>
-                <button [attr.aria-hidden]="false" class="button_detail" mat-mini-fab color="secondary"
-                    aria-label="Detial" (click)="goToMessageDetails(comment)">
-                    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">expand_content</mat-icon>
-                </button>
                 <mat-card-content>
                     <div class="message-content">
                         <app-showmultimedia [multimedia]="comment.multimedia"></app-showmultimedia>
