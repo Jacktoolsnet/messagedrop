@@ -100,11 +100,6 @@ export class PlacelistComponent implements OnInit {
       panelClass: '',
       data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      height: 'auto',
-      maxHeight: '90vh',
       hasBackdrop: true
     });
 
@@ -189,11 +184,6 @@ export class PlacelistComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PLACE, place: place },
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      height: 'auto',
-      maxHeight: '90vh',
       hasBackdrop: true
     });
 

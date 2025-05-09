@@ -1,4 +1,4 @@
-<div *ngIf="multimedia?.type === 'tenor'" class="multimedia_container">
+<div *ngIf="multimedia?.type === 'tenor'" class="multimedia_container" click="editMultimedia()">
     <img class="multimedia_image" [src]="multimedia!.url">
 </div>
 <div *ngIf="safeHtml != ''" class="oembed_container" [innerHTML]="safeHtml"></div>

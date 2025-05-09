@@ -1,15 +1,11 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="accent" aria-label="Back"
-        (click)="goBack()">
-        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">collapse_content</mat-icon>
-    </button>
     <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
         (click)="openPlaceDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div *ngIf="places.length != 0" class="content">
         <mat-card class="item" *ngFor="let place of places; index as i">
-            <div class="avatar-box" *ngIf="place.base64Avatar || place.name">
+            <div class="avatar-box" *ngIf="place.base64Avatar || place.name" (click)="editPlace(place)">
                 <img *ngIf="place.base64Avatar" class="avatar" src="{{place.base64Avatar}}" />
                 <span *ngIf="place.name" class="name">{{place.name}}</span>
             </div>

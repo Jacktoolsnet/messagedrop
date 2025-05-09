@@ -1,15 +1,11 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_back" mat-mini-fab color="accent" aria-label="Back"
-        (click)="goBack()">
-        <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">collapse_content</mat-icon>
-    </button>
     <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
         (click)="openNoteDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div class="content">
         <mat-card class="item" *ngFor="let note of notes; index as i">
-            <mat-card-content>
+            <mat-card-content (click)="editNote(note)">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
                     <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>

@@ -56,3 +56,20 @@ select {
   margin-bottom: 0.5rem;
   margin-right: 0.5rem;
 }
+
+.buttonarea {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 100%;
+  height: auto;
+}
+
+.button_style {
+  margin: auto;
+  width: 100%;
+  height: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
