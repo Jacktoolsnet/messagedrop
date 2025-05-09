@@ -72,6 +72,10 @@
 
 <mat-menu #contactMenu="matMenu">
     <ng-template matMenuContent let-contact="contact">
+        <button *ngIf="socketioService.isReady()" [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+            aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
+            <mat-icon aria-hidden="false" class="material-symbols-outlined">quick_phrases</mat-icon>
+        </button>
         <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
             (click)="editContact(contact)">
             <mat-icon aria-hidden="false" class="material-symbols-outlined">person</mat-icon>
