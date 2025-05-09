@@ -14,19 +14,19 @@
         <mat-icon>add_comment</mat-icon>
     </button>
     <div *ngIf="this.messageService.getSelectedMessages()?.length === 0" class="content">
-        <mat-card (click)="goToMessageDetails(message)" class="item" *ngFor="let message of messages; index as i">
+        <mat-card class="item" *ngFor="let message of messages; index as i">
             <div class="avatar-box" *ngIf="user.id == message.userId && (userProfile.base64Avatar || userProfile.name)">
                 <img *ngIf="userProfile.base64Avatar" class="avatar" src="{{userProfile.base64Avatar}}" />
                 <span *ngIf="userProfile.name" class="name">{{userProfile.name}}</span>
             </div>
-            <div class="avatar-box"
+            <div class="avatar-box" (click)="editMessageUserProfile(message)"
                 *ngIf="user.id != message.userId && (profileService.getProfile(message.userId)?.base64Avatar || profileService.getProfile(message.userId)?.name)">
                 <img *ngIf="profileService.getProfile(message.userId)?.base64Avatar" class="avatar"
                     src="{{profileService.getProfile(message.userId)?.base64Avatar}}">
                 <span *ngIf="profileService.getProfile(message.userId)?.name"
                     class="name">{{profileService.getProfile(message.userId)?.name}}</span>
             </div>
-            <mat-card-content>
+            <mat-card-content (click)="goToMessageDetails(message)">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
                     <app-showmessage *ngIf="message.message"
@@ -44,7 +44,7 @@
                 <img *ngIf="userProfile.base64Avatar" class="avatar" src="{{userProfile.base64Avatar}}" />
                 <span *ngIf="userProfile.name" class="name">{{userProfile.name}}</span>
             </div>
-            <div class="avatar-box"
+            <div class="avatar-box" (click)="editMessageUserProfile(messageService.getSelectedMessages().at(-1)!)"
                 *ngIf="user.id != messageService.getSelectedMessages().at(-1)!.userId && (profileService.getProfile(messageService.getSelectedMessages().at(-1)!.userId)?.base64Avatar || profileService.getProfile(messageService.getSelectedMessages().at(-1)!.userId)?.name)">
                 <img *ngIf="profileService.getProfile(messageService.getSelectedMessages().at(-1)!.userId)?.base64Avatar"
                     class="avatar"
@@ -105,21 +105,21 @@
             </mat-card-actions>
         </mat-card>
         <div *ngIf="messageService.getSelectedMessages().at(-1)!.comments.length != 0">
-            <mat-card class="item" (click)="goToMessageDetails(comment)"
+            <mat-card class="item"
                 *ngFor="let comment of messageService.getSelectedMessages().at(-1)?.comments; index as i">
                 <div class="avatar-box"
                     *ngIf="user.id == comment.userId && (userProfile.base64Avatar || userProfile.name)">
                     <img *ngIf="userProfile.base64Avatar" class="avatar" src="{{userProfile.base64Avatar}}" />
                     <span *ngIf="userProfile.name" class="name">{{userProfile.name}}</span>
                 </div>
-                <div class="avatar-box"
+                <div class="avatar-box" (click)="editMessageUserProfile(comment)"
                     *ngIf="user.id != comment.userId && (profileService.getProfile(comment.userId)?.base64Avatar || profileService.getProfile(comment.userId)?.name)">
                     <img *ngIf="profileService.getProfile(comment.userId)?.base64Avatar" class="avatar"
                         src="{{profileService.getProfile(comment.userId)?.base64Avatar}}">
                     <span *ngIf="profileService.getProfile(comment.userId)?.name"
                         class="name">{{profileService.getProfile(comment.userId)?.name}}</span>
                 </div>
-                <mat-card-content>
+                <mat-card-content (click)="goToMessageDetails(comment)">
                     <div class="message-content">
                         <app-showmultimedia [multimedia]="comment.multimedia"></app-showmultimedia>
                         <app-showmessage

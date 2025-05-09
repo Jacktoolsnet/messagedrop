@@ -316,7 +316,7 @@ export class ContactlistComponent implements OnInit {
                   if (createConnectResponse.status === 200) {
                     connect.id = createConnectResponse.connectId;
                     navigator.clipboard.writeText(connect.id);
-                    this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard. I share the connect id only via services and with people I trust.`, 'OK', {});
+                    this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard.`, 'OK', {});
                   }
                 },
                 error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
