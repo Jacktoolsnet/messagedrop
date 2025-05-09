@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { TenorService } from '../../../services/tenor.service';
@@ -13,6 +14,7 @@ import { TenorService } from '../../../services/tenor.service';
 @Component({
   selector: 'app-multimedia',
   imports: [
+    ReactiveFormsModule,
     CommonModule,
     MatButtonModule,
     MatDialogContent,
@@ -25,7 +27,7 @@ import { TenorService } from '../../../services/tenor.service';
   styleUrl: './tenor.component.css'
 })
 export class TenorComponent {
-  public searchterm: string = '';
+  public searchterm: FormControl = new FormControl<string>("");
   public lastSearchterm: string = '';
   public nextFeatured: string = '';
   public nextSearch: string = '';
@@ -38,6 +40,12 @@ export class TenorComponent {
   ) { }
 
   ngOnInit(): void {
+    this.searchterm.valueChanges.pipe(
+      debounceTime(750),
+      distinctUntilChanged()
+    ).subscribe((keyword: string) => {
+      this.search();
+    });
     this.tensorGetFeaturedGifs();
   }
 
@@ -55,7 +63,7 @@ export class TenorComponent {
   }
 
   tensorSearchGifs(): void {
-    this.tensorService.searchGifs(this.searchterm, this.nextSearch).subscribe({
+    this.tensorService.searchGifs(this.searchterm.value, this.nextSearch).subscribe({
       next: tensorResponse => {
         this.results = [];
         this.results.push(...tensorResponse.results);
@@ -68,11 +76,11 @@ export class TenorComponent {
   }
 
   search(): void {
-    if (this.searchterm === '') {
+    if (this.searchterm.value === '') {
       this.tensorGetFeaturedGifs();
     } else {
-      if (this.searchterm !== this.lastSearchterm) {
-        this.lastSearchterm = this.searchterm;
+      if (this.searchterm.value !== this.lastSearchterm) {
+        this.lastSearchterm = this.searchterm.value;
         this.nextSearch = '';
       }
       this.tensorSearchGifs();

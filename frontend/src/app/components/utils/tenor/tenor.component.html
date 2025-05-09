@@ -1,10 +1,12 @@
 <div class="url-container">
-    <input type="text" [(ngModel)]="searchterm" placeholder="Search in Tenor">
-    <button *ngIf="(nextSearch === '' && searchterm !== '' || searchterm != lastSearchterm) || searchterm === ''"
+    <input type="text" [formControl]="searchterm" placeholder="Search in Tenor">
+    <button
+        *ngIf="(nextSearch === '' && searchterm.value !== '' || searchterm.value != lastSearchterm) || searchterm.value === ''"
         (click)="search()">
         <mat-icon>search</mat-icon>
     </button>
-    <button *ngIf="nextSearch !== '' && searchterm !== '' && searchterm === lastSearchterm" (click)="search()">
+    <button *ngIf="nextSearch !== '' && searchterm.value !== '' && searchterm.value === lastSearchterm"
+        (click)="search()">
         <mat-icon>arrow_circle_right</mat-icon>
     </button>
 </div>
