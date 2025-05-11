@@ -314,9 +314,28 @@ export class ContactlistComponent implements OnInit {
               .subscribe({
                 next: createConnectResponse => {
                   if (createConnectResponse.status === 200) {
-                    connect.id = createConnectResponse.connectId;
-                    navigator.clipboard.writeText(connect.id);
-                    this.snackBarRef = this.snackBar.open(`The connect id has been copied to the clipboard.`, 'OK', {});
+                    connect.id = createConnectResponse.connectId;;
+
+                    if (navigator.share) {
+                      navigator.share({
+                        title: 'MessageDrop – Share Connect-ID',
+                        text: connect.id
+                      }).then(() => {
+                        console.log('Connect-ID shared successfully');
+                      }).catch((err) => {
+                        console.warn('User canceled share or failed:', err);
+                      });
+                    } else {
+                      navigator.clipboard.writeText(connect.id).then(() => {
+                        this.snackBarRef = this.snackBar.open(
+                          'The Connect-ID has been copied to your clipboard.',
+                          'OK',
+                          { duration: 2500 }
+                        );
+                      }).catch(() => {
+                        this.snackBar.open('Copying failed. Please use QR-Code to connect.', 'OK', { duration: 2500 });
+                      });
+                    }
                   }
                 },
                 error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
