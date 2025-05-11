@@ -206,6 +206,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.mapSubject.subscribe({
       next: (v) => {
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        // Check if app is called from shared dialog or from push notification
+        // ###
       },
     });
 
@@ -226,7 +228,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   async initApp() {
     // Check network
     this.networkService.init();
-    // Inin the server connection
+    // Init the server connection
     this.serverService.init(this.serverSubject);
     // Count
     this.statisticService.countVisitor()
@@ -248,20 +250,16 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         }
       });
     }
+    // Click on Pushnotification
     this.swPush.notificationClicks.subscribe((result) => {
-      if (result.notification.data.primaryKey.type === 'place') {
-        this.showComponent = true;
-        let location: Location = this.geolocationService.getLocationFromPlusCode(result.notification.data.primaryKey.id);
-        if (!this.locationReady) {
-          this.mapService.flyToWithZoom(location, 19);
-        } else {
-          this.mapService.flyTo(location);
-        }
-      }
-      if (result.notification.data.primaryKey.type === 'contact') {
-        this.openContactListDialog();
-      }
+      const data = result.notification.data.primaryKey;
+
+      this.appService.setNotificationAction({
+        type: data.type,
+        id: data.id
+      });
     });
+    // Handle back button
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
         this.myHistory.pop();
