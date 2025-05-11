@@ -1,8 +1,12 @@
-/// <reference types="@angular/localize" />
-
 import { bootstrapApplication } from '@angular/platform-browser';
-import { appConfig } from './app/app.config';
 import { AppComponent } from './app/app.component';
+import { appConfig } from './app/app.config';
+import { registerLaunchHandler } from './app/utils/launch-manager';
+
 
 bootstrapApplication(AppComponent, appConfig)
+  .then(appRef => {
+    const injector = appRef.injector;
+    registerLaunchHandler(injector);
+  })
   .catch((err) => console.error(err));

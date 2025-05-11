@@ -1,5 +1,4 @@
 import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { NotificationAction } from '../interfaces/notification-action';
 import { SharedContent } from '../interfaces/shared-content';
 
@@ -9,9 +8,8 @@ import { SharedContent } from '../interfaces/shared-content';
 export class AppService {
   private sharedContent?: SharedContent;
   private notificationAction?: NotificationAction;
-  private snackBarRef: any;
 
-  constructor(private snackBar: MatSnackBar) { }
+  constructor() { }
 
   public set(formData: FormData): void {
     this.sharedContent = {
@@ -32,12 +30,6 @@ export class AppService {
   // Notification-Daten
   public setNotificationAction(action: NotificationAction): void {
     this.notificationAction = action;
-    this.snackBarRef = this.snackBar.open(`Shared content received: ${this.notificationAction.type}`, 'OK', {
-      panelClass: ['snack-info'],
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      duration: 1000
-    });
   }
 
   public getNotificationAction(): NotificationAction | undefined {

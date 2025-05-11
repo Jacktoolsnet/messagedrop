@@ -8,7 +8,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterOutlet } from '@angular/router';
-import { SwPush } from '@angular/service-worker';
 import { Subject, take } from 'rxjs';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
@@ -36,6 +35,7 @@ import { Mode } from './interfaces/mode';
 import { MultimediaType } from './interfaces/multimedia-type';
 import { Note } from './interfaces/note';
 import { Place } from './interfaces/place';
+import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AppService } from './services/app.service';
 import { ContactService } from './services/contact.service';
@@ -113,8 +113,7 @@ export class AppComponent implements OnInit {
     public userProfileDialog: MatDialog,
     public displayMessage: MatDialog,
     public dialog: MatDialog,
-    private platformLocation: PlatformLocation,
-    private swPush: SwPush
+    private platformLocation: PlatformLocation
   ) {
     this.serverSubject = new Subject<void>();
     this.userSubject = new Subject<void>();
@@ -208,20 +207,18 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         // Check if app is called from shared dialog or from push notification
         // ###
-        if (this.appService.getSharedContent()) {
-          this.snackBarRef = this.snackBar.open(`Shared content received: ${this.appService.getSharedContent()?.url}`, 'OK', {
-            panelClass: ['snack-info'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top'
-          });
+        const sharedContent: SharedContent | undefined = this.appService.getSharedContent();
+        if (sharedContent) {
+          this.snackBar.open(`Shared content received`, 'OK');
+        } else {
+          this.snackBar.open(`No shared content received`, 'OK');
         }
-        if (this.appService.getNotificationAction()) {
-          this.snackBarRef = this.snackBar.open(`Notification received: ${this.appService.getNotificationAction()?.type}`, 'OK', {
-            panelClass: ['snack-info'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top'
-          });
-        }
+        /*const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
+        if (notificationAction) {
+          this.snackBar.open(`Notification content received`, 'OK');
+        } else {
+          this.snackBar.open(`No notification content received`, 'OK');
+        }*/
       }
     });
 
@@ -254,25 +251,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public ngOnInit(): void {
-    // Other app use share function
-    if ('launchQueue' in window && 'setConsumer' in (window as any).launchQueue) {
-      (window as any).launchQueue.setConsumer((params: any) => {
-        const formData = params?.formData;
-        if (formData) {
-          // speichere die geteilten Daten z. B. im Service
-          this.appService.set(formData);
-        }
-      });
-    }
-    // Click on Pushnotification
-    this.swPush.notificationClicks.subscribe((result) => {
-      const data = result.notification.data.primaryKey;
-
-      this.appService.setNotificationAction({
-        type: data.type,
-        id: data.id
-      });
-    });
     // Handle back button
     this.platformLocation.onPopState((event) => {
       if (this.myHistory.length > 0) {
