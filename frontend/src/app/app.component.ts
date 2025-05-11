@@ -37,6 +37,7 @@ import { MultimediaType } from './interfaces/multimedia-type';
 import { Note } from './interfaces/note';
 import { Place } from './interfaces/place';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
+import { AppService } from './services/app.service';
 import { ContactService } from './services/contact.service';
 import { CryptoService } from './services/crypto.service';
 import { GeolocationService } from './services/geolocation.service';
@@ -87,6 +88,7 @@ export class AppComponent implements OnInit {
 
 
   constructor(
+    private appService: AppService,
     public networkService: NetworkService,
     private indexedDbService: IndexedDbService,
     private serverService: ServerService,
@@ -236,6 +238,16 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public ngOnInit(): void {
+    // Other app use share function
+    if ('launchQueue' in window && 'setConsumer' in (window as any).launchQueue) {
+      (window as any).launchQueue.setConsumer((params: any) => {
+        const formData = params?.formData;
+        if (formData) {
+          // speichere die geteilten Daten z. B. im Service
+          this.appService.set(formData);
+        }
+      });
+    }
     this.swPush.notificationClicks.subscribe((result) => {
       if (result.notification.data.primaryKey.type === 'place') {
         this.showComponent = true;
