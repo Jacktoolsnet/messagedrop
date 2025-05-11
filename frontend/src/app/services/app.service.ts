@@ -19,12 +19,6 @@ export class AppService {
       text: formData.get('text') as string,
       url: formData.get('url') as string
     };
-    this.snackBarRef = this.snackBar.open(`Shared content received: ${this.sharedContent}`, 'OK', {
-      panelClass: ['snack-info'],
-      horizontalPosition: 'center',
-      verticalPosition: 'top',
-      duration: 1000
-    });
   }
 
   public getSharedContent(): SharedContent | undefined {

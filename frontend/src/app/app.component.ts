@@ -208,7 +208,21 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         // Check if app is called from shared dialog or from push notification
         // ###
-      },
+        if (this.appService.getSharedContent()) {
+          this.snackBarRef = this.snackBar.open(`Shared content received: ${this.appService.getSharedContent()?.url}`, 'OK', {
+            panelClass: ['snack-info'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+        if (this.appService.getNotificationAction()) {
+          this.snackBarRef = this.snackBar.open(`Notification received: ${this.appService.getNotificationAction()?.type}`, 'OK', {
+            panelClass: ['snack-info'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+        }
+      }
     });
 
     this.messageSubject = new Subject<void>();
