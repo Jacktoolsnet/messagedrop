@@ -320,11 +320,9 @@ export class ContactlistComponent implements OnInit {
                       navigator.share({
                         title: 'MessageDrop – Share Connect-ID',
                         text: connect.id
-                      }).then(() => {
-                        console.log('Connect-ID shared successfully');
-                      }).catch((err) => {
-                        console.warn('User canceled share or failed:', err);
-                      });
+                      })
+                        .then(() => { })
+                        .catch((err) => { });
                     } else {
                       navigator.clipboard.writeText(connect.id).then(() => {
                         this.snackBarRef = this.snackBar.open(

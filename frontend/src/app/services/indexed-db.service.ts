@@ -6,7 +6,7 @@ import { Profile } from '../interfaces/profile';
   providedIn: 'root'
 })
 export class IndexedDbService {
-  private dbName: string = 'messageDropDb';
+  private dbName: string = 'MessageDrop';
   private settingStore: string = 'settings';
   private userStore: string = 'user';
   private profileStore: string = 'profile';

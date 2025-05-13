@@ -8,7 +8,7 @@
   "scope": "./",
   "start_url": "./",
   "share_target": {
-    "action": "./",
+    "action": "/share-target",
     "method": "POST",
     "enctype": "multipart/form-data",
     "params": {

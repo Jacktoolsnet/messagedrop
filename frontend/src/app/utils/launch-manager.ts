@@ -5,16 +5,6 @@ import { AppService } from '../services/app.service';
 export function registerLaunchHandler(injector: EnvironmentInjector) {
     runInInjectionContext(injector, () => {
         const appService = inject(AppService);
-        // Web Share Target
-        if ('launchQueue' in window && 'setConsumer' in (window as any).launchQueue) {
-            (window as any).launchQueue.setConsumer((params: any) => {
-                const formData = params?.formData;
-                if (formData) {
-                    const appService = inject(AppService);
-                    appService.set(formData);
-                }
-            });
-        }
 
         // Push Notification
         try {

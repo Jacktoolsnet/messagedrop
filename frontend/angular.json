@@ -38,6 +38,11 @@
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",
                 "output": "./assets"
+              },
+              {
+                "glob": "sw-share-handler.js",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [
@@ -113,6 +118,11 @@
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",
                 "output": "./assets"
+              },
+              {
+                "glob": "sw-share-handler.js",
+                "input": "src",
+                "output": "/"
               }
             ],
             "styles": [

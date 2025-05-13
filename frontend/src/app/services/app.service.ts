@@ -1,31 +1,13 @@
 import { Injectable } from '@angular/core';
 import { NotificationAction } from '../interfaces/notification-action';
-import { SharedContent } from '../interfaces/shared-content';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
-  private sharedContent?: SharedContent;
   private notificationAction?: NotificationAction;
 
   constructor() { }
-
-  public set(formData: FormData): void {
-    this.sharedContent = {
-      title: formData.get('title') as string,
-      text: formData.get('text') as string,
-      url: formData.get('url') as string
-    };
-  }
-
-  public getSharedContent(): SharedContent | undefined {
-    return this.sharedContent;
-  }
-
-  public clearSharedContent(): void {
-    this.sharedContent = undefined;
-  }
 
   // Notification-Daten
   public setNotificationAction(action: NotificationAction): void {

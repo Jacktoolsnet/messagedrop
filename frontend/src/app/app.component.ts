@@ -34,8 +34,8 @@ import { Message } from './interfaces/message';
 import { Mode } from './interfaces/mode';
 import { MultimediaType } from './interfaces/multimedia-type';
 import { Note } from './interfaces/note';
+import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
-import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AppService } from './services/app.service';
 import { ContactService } from './services/contact.service';
@@ -48,6 +48,7 @@ import { NetworkService } from './services/network.service';
 import { NoteService } from './services/note.service';
 import { PlaceService } from './services/place.service';
 import { ServerService } from './services/server.service';
+import { SharedContentService } from './services/shared-content.service';
 import { SocketioService } from './services/socketio.service';
 import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
@@ -90,6 +91,7 @@ export class AppComponent implements OnInit {
   constructor(
     private appService: AppService,
     public networkService: NetworkService,
+    private sharedContentService: SharedContentService,
     private indexedDbService: IndexedDbService,
     private serverService: ServerService,
     public userService: UserService,
@@ -207,18 +209,20 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         // Check if app is called from shared dialog or from push notification
         // ###
-        const sharedContent: SharedContent | undefined = this.appService.getSharedContent();
-        if (sharedContent) {
-          this.snackBar.open(`Shared content received`, 'OK');
-        } else {
-          this.snackBar.open(`No shared content received`, 'OK');
-        }
-        /*const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
+        // Observe shared content
+        this.sharedContentService.getSharedContentObservable().subscribe((items) => {
+          if (items) {
+            this.snackBar.open(`Shared content received: ${JSON.stringify(items)}`, 'OK');
+            // z. B. Navigation starten, Dialog öffnen, etc.
+          }
+        });
+        // First check
+        this.sharedContentService.checkNewSharedContent();
+        const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
         if (notificationAction) {
-          this.snackBar.open(`Notification content received`, 'OK');
-        } else {
-          this.snackBar.open(`No notification content received`, 'OK');
-        }*/
+          this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
+          // z. B. Navigation starten, Dialog öffnen, etc.
+        }
       }
     });
 
