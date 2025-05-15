@@ -2,29 +2,30 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { SharedContent } from '../interfaces/shared-content';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class SharedContentService {
   private dbName = 'ShareTargets';
   private storeName = 'shared';
-  private sharedContentSubject = new BehaviorSubject<SharedContent[] | null>(null);
+  private lastKey = 'last';
+
+  private sharedAvailableSubject = new BehaviorSubject<boolean>(false);
 
   constructor() {
     this.openDB();
     this.setupServiceWorkerListener();
+    this.checkIfSharedExists();
   }
 
-  public getSharedContentObservable(): Observable<SharedContent[] | null> {
-    return this.sharedContentSubject.asObservable();
+  public getSharedAvailableObservable(): Observable<boolean> {
+    return this.sharedAvailableSubject.asObservable();
   }
 
   private setupServiceWorkerListener() {
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', (event) => {
+      navigator.serviceWorker.addEventListener('message', async (event) => {
         if (event.data?.type === 'shared' && event.data.content) {
-          const incoming = event.data.content as SharedContent;
-          this.sharedContentSubject.next([incoming]);
+          await this.saveLast(event.data.content);
+          this.sharedAvailableSubject.next(true);
         }
       });
     }
@@ -44,43 +45,44 @@ export class SharedContentService {
     });
   }
 
-  public async getAllSharedContent(): Promise<SharedContent[]> {
+  public async getLast(): Promise<SharedContent | undefined> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(this.storeName, 'readonly');
       const store = tx.objectStore(this.storeName);
-      const request = store.getAll();
+      const request = store.get(this.lastKey);
+      request.onsuccess = () => resolve(request.result as SharedContent);
+      request.onerror = () => reject(request.error);
+    });
+  }
 
+  public async deleteLast(): Promise<void> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.storeName, 'readwrite');
+      const store = tx.objectStore(this.storeName);
+      const request = store.delete(this.lastKey);
       request.onsuccess = () => {
-        resolve(request.result);
+        this.sharedAvailableSubject.next(false);
+        resolve();
       };
       request.onerror = () => reject(request.error);
     });
   }
 
-  public async deleteSharedContent(id: string): Promise<void> {
+  private async saveLast(content: SharedContent): Promise<void> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(this.storeName, 'readwrite');
       const store = tx.objectStore(this.storeName);
-      const request = store.delete(id);
+      const request = store.put({ ...content, id: this.lastKey });
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
   }
 
-  private async getAndClear(): Promise<SharedContent[]> {
-    const all = await this.getAllSharedContent();
-    for (const entry of all) {
-      await this.deleteSharedContent(entry.id);
-    }
-    return all;
-  }
-
-  public async checkNewSharedContent(): Promise<void> {
-    const newItems = await this.getAndClear();
-    if (newItems.length > 0) {
-      this.sharedContentSubject.next(newItems);
-    }
+  private async checkIfSharedExists(): Promise<void> {
+    const last = await this.getLast();
+    this.sharedAvailableSubject.next(!!last);
   }
 }

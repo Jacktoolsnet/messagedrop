@@ -64,11 +64,10 @@ async function deliverToClientOrSave(content) {
 function saveSharedContentToDB(data) {
     return new Promise((resolve, reject) => {
         const request = indexedDB.open('ShareTargets', 1);
-
         request.onupgradeneeded = () => {
             const db = request.result;
             if (!db.objectStoreNames.contains('shared')) {
-                db.createObjectStore('shared', { keyPath: 'id' });
+                db.createObjectStore('shared', { keyPath: 'id' }); // "id" bleibt bestehen
             }
         };
 
@@ -76,7 +75,7 @@ function saveSharedContentToDB(data) {
             const db = request.result;
             const tx = db.transaction('shared', 'readwrite');
             const store = tx.objectStore('shared');
-            store.add(data);
+            store.put({ ...data, id: 'last' }); // überschreibt Eintrag mit id: "last"
             tx.oncomplete = () => resolve();
             tx.onerror = () => reject(tx.error);
         };
@@ -85,9 +84,3 @@ function saveSharedContentToDB(data) {
     });
 }
 
-function generateUUID() {
-    if (crypto.randomUUID) {
-        return crypto.randomUUID();
-    }
-    return (Date.now() + Math.random()).toString(36);
-}

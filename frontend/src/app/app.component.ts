@@ -19,6 +19,7 @@ import { NotelistComponent } from './components/notelist/notelist.component';
 import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
 import { CreatePinComponent } from './components/pin/create-pin/create-pin.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
+import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
@@ -114,6 +115,7 @@ export class AppComponent implements OnInit {
     public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public displayMessage: MatDialog,
+    public sharedContentDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
@@ -210,14 +212,40 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         // Check if app is called from shared dialog or from push notification
         // ###
         // Observe shared content
-        this.sharedContentService.getSharedContentObservable().subscribe((items) => {
-          if (items) {
-            this.snackBar.open(`Shared content received: ${JSON.stringify(items)}`, 'OK');
-            // z. B. Navigation starten, Dialog öffnen, etc.
+        this.sharedContentService.getSharedAvailableObservable().subscribe((sharedAvaliable: boolean) => {
+          if (sharedAvaliable) {
+            const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
+              data: {},
+              closeOnNavigation: true,
+              hasBackdrop: true
+            });
+
+            dialogRef.afterOpened().subscribe(e => {
+            });
+
+            dialogRef.afterClosed().subscribe(result => {
+              if (result) {
+                this.userService.saveProfile();
+              }
+            });
+          } else {
+            // Only for development
+            const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
+              data: {},
+              closeOnNavigation: true,
+              hasBackdrop: true
+            });
+
+            dialogRef.afterOpened().subscribe(e => {
+            });
+
+            dialogRef.afterClosed().subscribe(result => {
+              if (result) {
+                this.userService.saveProfile();
+              }
+            });
           }
         });
-        // First check
-        this.sharedContentService.checkNewSharedContent();
         const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
         if (notificationAction) {
           this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
