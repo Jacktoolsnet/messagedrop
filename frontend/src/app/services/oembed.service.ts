@@ -1,11 +1,12 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { DomSanitizer } from '@angular/platform-browser';
 import { catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetOembedResponse } from '../interfaces/get-oembed-response';
+import { Location } from '../interfaces/location';
 import { Multimedia } from '../interfaces/multimedia';
 import { MultimediaType } from '../interfaces/multimedia-type';
+import { GeolocationService } from './geolocation.service';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +15,7 @@ export class OembedService {
 
   constructor(
     private http: HttpClient,
-    private sanitizer: DomSanitizer
+    private geolocationService: GeolocationService,
   ) { }
 
   httpOptions = {
@@ -29,6 +30,14 @@ export class OembedService {
     return throwError(() => error);
   }
 
+  public isLocation(obj: any): obj is Location {
+    return obj && typeof obj.latitude === 'number' && typeof obj.longitude === 'number' && typeof obj.plusCode === 'string';
+  }
+
+  public isMultimedia(obj: any): obj is Multimedia {
+    return obj && typeof obj.sourceUrl === 'string' && 'type' in obj;
+  }
+
   resolveRedirectUrl(url: string): Observable<any> {
     return this.http.get<any>(`${environment.apiUrl}/utils/resolve/${encodeURIComponent(url)}`, this.httpOptions)
       .pipe(
@@ -36,26 +45,44 @@ export class OembedService {
       )
   }
 
-  public async getMultimediaFromUrl(url: string): Promise<Multimedia | undefined> {
+  public async getObjectFromUrl(url: string): Promise<Multimedia | Location | undefined> {
     const lowerUrl = url.toLowerCase();
 
     if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
       return await this.getYouTubeMultimedia(url);
     }
-
     if (lowerUrl.includes('tiktok.com') || lowerUrl.includes('vm.tiktok.com')) {
       return await this.getTikTokMultimedia(url);
     }
-
     if (lowerUrl.includes('pinterest.com') || lowerUrl.includes('pin.it')) {
       return await this.getPinterestMultimedia(url);
     }
-
     if (lowerUrl.includes('spotify.com')) {
       return await this.getSpotifyMultimedia(url);
     }
+    if (lowerUrl.includes('maps.app.goo.gl')) {
+      return await this.getGoogleMapsLocation(url);
+    }
+    return undefined;
+  }
 
-    // Fallback für unbekannte Plattformen
+  public async getGoogleMapsLocation(url: string): Promise<Location | undefined> {
+    try {
+      const response = await firstValueFrom(this.resolveRedirectUrl(url));
+
+      const finalUrl = response.result;
+      const coordMatch = finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
+        finalUrl.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
+      if (coordMatch) {
+        return {
+          latitude: parseFloat(coordMatch[1]),
+          longitude: parseFloat(coordMatch[2]),
+          plusCode: this.geolocationService.getPlusCode(parseFloat(coordMatch[1]), parseFloat(coordMatch[2])),
+        };
+      }
+    } catch (err) {
+      console.warn('Failed to resolve Google Maps shortlink:', err);
+    }
     return undefined;
   }
 

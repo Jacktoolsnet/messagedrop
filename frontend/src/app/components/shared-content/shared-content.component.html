@@ -1,6 +1,11 @@
-<mat-dialog-content class="full-width">
-    <h2 mat-dialog-title>Shared content received</h2>
-    <h4 *ngIf="sharedContent != ''">{{sharedContent}}</h4>
+<mat-dialog-content *ngIf="multimedia" class="full-width">
+    <h2 mat-dialog-title>Shared multimedia content received</h2>
     <app-showmultimedia *ngIf="multimedia" [multimedia]="multimedia">
     </app-showmultimedia>
+</mat-dialog-content>
+<mat-dialog-content *ngIf="location" class="full-width">
+    <h2 mat-dialog-title>Shared location received</h2>
+</mat-dialog-content>
+<mat-dialog-content class="full-width">
+    <h4 *ngIf="sharedContent != ''">{{sharedContent}}</h4>
 </mat-dialog-content>

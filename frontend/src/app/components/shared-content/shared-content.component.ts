@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
+import { MapService } from '../../services/map.service';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -19,13 +21,16 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 })
 
 export class SharedContentComponent implements OnInit {
-  public multimedia: Multimedia | undefined;
+  public objectFromUrl: Multimedia | Location | undefined = undefined;
+  public multimedia: Multimedia | undefined = undefined;
+  public location: Location | undefined = undefined;
   public sharedContent: string = '';
   public countdown: number = 7;
   private countdownInterval: any;
 
   constructor(
     private oembedService: OembedService,
+    private mapService: MapService,
     private sharedContentService: SharedContentService,
     private dialogRef: MatDialogRef<SharedContentComponent>
   ) { }
@@ -34,8 +39,19 @@ export class SharedContentComponent implements OnInit {
     const lastContent = await this.sharedContentService.getLast();
 
     if (lastContent?.url) {
-      this.multimedia = await this.oembedService.getMultimediaFromUrl(lastContent.url);
-      if (this.multimedia) {
+      this.objectFromUrl = await this.oembedService.getObjectFromUrl(lastContent.url);
+      if (this.objectFromUrl && this.oembedService.isMultimedia(this.objectFromUrl)) {
+        this.multimedia = this.objectFromUrl as Multimedia;
+        this.countdownInterval = setInterval(() => {
+          this.countdown--;
+          if (this.countdown <= 0) {
+            clearInterval(this.countdownInterval);
+            this.dialogRef.close();
+          }
+        }, 1000);
+      } else if (this.objectFromUrl && this.oembedService.isLocation(this.objectFromUrl)) {
+        this.location = this.objectFromUrl as Location;
+        this.mapService.flyToWithZoom(this.location, 17);
         this.countdownInterval = setInterval(() => {
           this.countdown--;
           if (this.countdown <= 0) {
