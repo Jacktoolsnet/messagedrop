@@ -217,22 +217,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
               data: {},
               closeOnNavigation: true,
-              hasBackdrop: true
-            });
-
-            dialogRef.afterOpened().subscribe(e => {
-            });
-
-            dialogRef.afterClosed().subscribe(result => {
-              if (result) {
-                this.userService.saveProfile();
-              }
-            });
-          } else {
-            // Only for development
-            const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
-              data: {},
-              closeOnNavigation: true,
+              minWidth: '20vw',
+              maxWidth: '90vw',
+              maxHeight: '90vh',
               hasBackdrop: true
             });
 

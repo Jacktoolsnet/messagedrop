@@ -17,7 +17,7 @@ async function handleShareTargetPost(event) {
     try {
         const formData = await event.request.formData();
         const sharedContent = {
-            id: generateUUID(),
+            id: 'last',
             title: formData.get('title'),
             text: formData.get('text'),
             url: formData.get('url'),
@@ -35,7 +35,7 @@ async function handleShareTargetPost(event) {
 async function handleShareTargetGet(url) {
     try {
         const sharedContent = {
-            id: generateUUID(),
+            id: 'last',
             title: url.searchParams.get('title'),
             text: url.searchParams.get('text'),
             url: url.searchParams.get('url'),
@@ -75,7 +75,7 @@ function saveSharedContentToDB(data) {
             const db = request.result;
             const tx = db.transaction('shared', 'readwrite');
             const store = tx.objectStore('shared');
-            store.put({ ...data, id: 'last' }); // überschreibt Eintrag mit id: "last"
+            store.put({ ...data, id: 'last' });
             tx.oncomplete = () => resolve();
             tx.onerror = () => reject(tx.error);
         };

@@ -1,4 +1,30 @@
+mat-dialog-content {
+    max-height: calc(90vh - 64px);
+    /* oder je nach Header-Höhe */
+    overflow-y: auto;
+    display: block;
+    padding: 1rem;
+}
+
 h2 {
     padding: 0.5rem;
     color: floralwhite;
+}
+
+h4 {
+    color: floralwhite;
+    text-align: center;
+    font-weight: 400;
+    margin-top: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    padding: 1rem;
+    border-radius: 0.5rem;
+}
+
+.countdown {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #cccccc;
+    margin-bottom: 1rem;
+    opacity: 0.8;
 }

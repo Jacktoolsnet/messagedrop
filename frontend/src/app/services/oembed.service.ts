@@ -43,45 +43,161 @@ export class OembedService {
       return await this.getYouTubeMultimedia(url);
     }
 
-    /*if (lowerUrl.includes('tiktok.com') || lowerUrl.includes('vm.tiktok.com')) {
+    if (lowerUrl.includes('tiktok.com') || lowerUrl.includes('vm.tiktok.com')) {
       return await this.getTikTokMultimedia(url);
     }
-  
+
     if (lowerUrl.includes('pinterest.com') || lowerUrl.includes('pin.it')) {
       return await this.getPinterestMultimedia(url);
     }
-  
+
     if (lowerUrl.includes('spotify.com')) {
       return await this.getSpotifyMultimedia(url);
-    }*/
+    }
 
     // Fallback für unbekannte Plattformen
     return undefined;
   }
 
-  private async getYouTubeMultimedia(youtubeUrl: string): Promise<Multimedia | undefined> {
+  private async getYouTubeMultimedia(url: string): Promise<Multimedia | undefined> {
     const youtubeRegex = /^(https?:\/\/)?(www\.)?(youtube\.com\/(watch\?v=|shorts\/)|youtu\.be\/)([?=a-zA-Z0-9_-]+)/;
-    const youtubeMatch = youtubeUrl.match(youtubeRegex);
+    const youtubeMatch = url.match(youtubeRegex);
     if (youtubeMatch && youtubeMatch[5]) {
       try {
-        const response = await firstValueFrom(this.getYoutubeEmbedCode(youtubeUrl));
+        const response = await firstValueFrom(this.getYoutubeEmbedCode(url));
         return {
           type: MultimediaType.YOUTUBE,
           url: '',
           contentId: null != youtubeMatch[5] ? youtubeMatch[5] : '',
-          sourceUrl: youtubeUrl,
+          sourceUrl: url,
           attribution: 'Powered by YouTube',
           title: '',
           description: '',
           oembed: response.result
-        }
-          ;
+        };
       } catch (error) {
         return undefined;
       }
     } else {
       return undefined;
     }
+  }
+
+  private async getTikTokMultimedia(url: string): Promise<Multimedia | undefined> {
+    const tiktokRegex = /^(https?:\/\/)?(www\.)?tiktok\.com\/@[\w.-]+\/video\/(\d+)/;
+    const tiktokMatch = url.match(tiktokRegex);
+    const tiktokVmRegex = /^(https?:\/\/)?vm\.tiktok\.com\/([a-zA-Z0-9]+)\/?/;
+    const tiktokVmMatch = url.match(tiktokVmRegex);
+
+    if (tiktokMatch && tiktokMatch[3]) {
+      this.getTikTokEmbedCode(url)
+      let tiktokId = tiktokMatch[3];
+      let oembedHtml = this.getTikTokEmbedCode(tiktokId);
+      return {
+        type: MultimediaType.TIKTOK,
+        url: '',
+        contentId: null != tiktokId ? tiktokId : '',
+        sourceUrl: url,
+        attribution: 'Powered by TikTok',
+        title: '',
+        description: '',
+        oembed: {
+          html: oembedHtml,
+          width: 0,
+          height: 0,
+          provider_name: 'TikTok',
+          provider_url: 'https://www.tiktok.com/',
+          type: 'rich',
+          version: '1.0'
+        }
+      };
+    } else if (tiktokVmMatch && tiktokVmMatch[2]) {
+      try {
+        const response = await firstValueFrom(this.getTikTokVmEmbedCode(url));
+        const regex = /<blockquote class="tiktok-embed" cite="([^"]+)"/;
+        const match = response.result.html?.match(regex);
+        if (match && match[1]) {
+          url = match[1];
+          return await this.getTikTokMultimedia(url);
+        } else {
+          return undefined;
+        }
+      } catch (error) {
+        return undefined;
+      }
+    }
+
+    return undefined;
+  }
+
+  private async getPinterestMultimedia(url: string): Promise<Multimedia | undefined> {
+    const pinterestRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/.*-([^\/]+)/i;
+    const pinterestMatch = url.match(pinterestRegex);
+    const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;
+    const pinterestShortMatch = url.match(pinterestShortRegex);
+    const pinterestFinalRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/(\d+)/i;
+    const pinterestFinalMatch = url.match(pinterestFinalRegex);
+
+    if (pinterestShortMatch) {
+      try {
+        const firstResponse = await firstValueFrom(this.resolveRedirectUrl(url));
+        const finalResponse = await firstValueFrom(this.resolveRedirectUrl(firstResponse.result));
+        const regex = /^(https?:\/\/)?(www\.)?pinterest\.[a-z]{2,3}\/pin\/\d+/;
+        const match = finalResponse.result.match(regex);
+
+        if (match) {
+          const resolvedUrl = match[0].replace(/pinterest\.[a-z]{2,3}/, 'pinterest.com');
+          return await this.getPinterestMultimedia(resolvedUrl);
+        }
+      } catch (error) {
+        return undefined;
+      }
+    } else if (pinterestMatch && pinterestMatch[2]) {
+      const normalizedUrl = url.substring(0, url.indexOf('/pin/') + 5) + pinterestMatch[2];
+      return await this.getPinterestMultimedia(normalizedUrl);
+    } else if (pinterestFinalMatch && pinterestFinalMatch[2]) {
+      try {
+        const response = await firstValueFrom(this.getPinterestEmbedCode(url));
+        return {
+          type: MultimediaType.PINTEREST,
+          url: '',
+          contentId: pinterestFinalMatch[2],
+          sourceUrl: url,
+          attribution: 'Powered by Pinterest',
+          title: '',
+          description: '',
+          oembed: response.result
+        };
+      } catch (error) {
+        return undefined;
+      }
+    }
+    return undefined;
+  }
+
+  private async getSpotifyMultimedia(url: string): Promise<Multimedia | undefined> {
+    const spotifyRegex = /https?:\/\/open\.spotify\.com\/(track|album|artist|playlist)\/([a-zA-Z0-9]+)/;
+    const spotifyMatch = url.match(spotifyRegex);
+
+    if (spotifyMatch && spotifyMatch[2]) {
+      try {
+        const response = await firstValueFrom(this.getSpotifyEmbedCode(spotifyMatch[0]));
+        return {
+          type: MultimediaType.SPOTIFY,
+          url: '',
+          contentId: spotifyMatch[2],
+          sourceUrl: spotifyMatch[0],
+          attribution: 'Powered by Spotify',
+          title: '',
+          description: '',
+          oembed: response.result
+        };
+      } catch (error) {
+        return undefined;
+      }
+    }
+
+    return undefined;
   }
 
   public getYoutubeEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
