@@ -20,7 +20,8 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 
 export class SharedContentComponent implements OnInit {
   public multimedia: Multimedia | undefined;
-  public countdown: number = 3;
+  public sharedContent: string = '';
+  public countdown: number = 7;
   private countdownInterval: any;
 
   constructor(
@@ -34,7 +35,6 @@ export class SharedContentComponent implements OnInit {
 
     if (lastContent?.url) {
       this.multimedia = await this.oembedService.getMultimediaFromUrl(lastContent.url);
-
       if (this.multimedia) {
         this.countdownInterval = setInterval(() => {
           this.countdown--;
@@ -43,6 +43,8 @@ export class SharedContentComponent implements OnInit {
             this.dialogRef.close();
           }
         }, 1000);
+      } else {
+        this.sharedContent = JSON.stringify(lastContent, null, 2);
       }
     }
   }

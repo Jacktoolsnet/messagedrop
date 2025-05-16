@@ -16,11 +16,24 @@ self.addEventListener('fetch', (event) => {
 async function handleShareTargetPost(event) {
     try {
         const formData = await event.request.formData();
+        let title = formData.get('title') || '';
+        let text = formData.get('text') || '';
+        let url = formData.get('url');
+
+        // URL aus Text extrahieren, falls nötig
+        if (!url && text) {
+            const extracted = extractUrlFromText(text);
+            if (extracted) {
+                url = extracted;
+                text = '';
+            }
+        }
+
         const sharedContent = {
             id: 'last',
-            title: formData.get('title'),
-            text: formData.get('text'),
-            url: formData.get('url'),
+            title,
+            text,
+            url,
             timestamp: new Date().toISOString(),
             method: 'POST'
         };
@@ -32,13 +45,25 @@ async function handleShareTargetPost(event) {
     }
 }
 
-async function handleShareTargetGet(url) {
+async function handleShareTargetGet(urlObj) {
     try {
+        let title = urlObj.searchParams.get('title') || '';
+        let text = urlObj.searchParams.get('text') || '';
+        let url = urlObj.searchParams.get('url');
+
+        if (!url && text) {
+            const extracted = extractUrlFromText(text);
+            if (extracted) {
+                url = extracted;
+                text = '';
+            }
+        }
+
         const sharedContent = {
             id: 'last',
-            title: url.searchParams.get('title'),
-            text: url.searchParams.get('text'),
-            url: url.searchParams.get('url'),
+            title,
+            text,
+            url,
             timestamp: new Date().toISOString(),
             method: 'GET'
         };
@@ -48,6 +73,12 @@ async function handleShareTargetGet(url) {
         console.error('[ServiceWorker] Failed to handle share-target GET:', err);
         return new Response('Error processing GET share target', { status: 500 });
     }
+}
+
+function extractUrlFromText(text) {
+    const urlRegex = /(https?:\/\/[^\s]+)/i;
+    const match = text.match(urlRegex);
+    return match ? match[0] : null;
 }
 
 async function deliverToClientOrSave(content) {
