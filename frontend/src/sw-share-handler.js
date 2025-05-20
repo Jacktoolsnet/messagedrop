@@ -76,6 +76,7 @@ function extractUrlFromText(text) {
 
 function detectContentType(url) {
     if (!url) return 'unknown';
+
     const patterns = {
         multimedia: [
             /youtube\.com/,
@@ -85,12 +86,17 @@ function detectContentType(url) {
             /tiktok\.com/
         ],
         location: [
-            /google\.[^\/]+\/maps/
+            /google\.[^\/]+\/maps/,
+            /maps\.app\.goo\.gl/
         ]
     };
+
     for (const type in patterns) {
-        if (patterns[type].some((regex) => regex.test(url))) return type;
+        if (patterns[type].some((regex) => regex.test(url))) {
+            return type;
+        }
     }
+
     return 'unknown';
 }
 
