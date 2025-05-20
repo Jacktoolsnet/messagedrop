@@ -2,10 +2,9 @@
     <h2 mat-dialog-title>Shared multimedia content received</h2>
     <app-showmultimedia *ngIf="multimedia" [multimedia]="multimedia">
     </app-showmultimedia>
+    <h4>Add this content to a post, note or message.</h4>
 </mat-dialog-content>
 <mat-dialog-content *ngIf="location" class="full-width">
     <h2 mat-dialog-title>Shared location received</h2>
-</mat-dialog-content>
-<mat-dialog-content class="full-width">
-    <h4 *ngIf="sharedContent != ''">{{sharedContent}}</h4>
+    <h4> Jumping to the shared location on the map.</h4>
 </mat-dialog-content>

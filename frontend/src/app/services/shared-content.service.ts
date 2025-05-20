@@ -24,7 +24,7 @@ export class SharedContentService {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', async (event) => {
         if (event.data?.type === 'shared' && event.data.content) {
-          await this.saveLast(event.data.content);
+          await this.saveSharedContent('last', event.data.content);
           this.sharedAvailableSubject.next(true);
         }
       });
@@ -45,44 +45,46 @@ export class SharedContentService {
     });
   }
 
-  public async getLast(): Promise<SharedContent | undefined> {
+  public async getSharedContent(id: string): Promise<SharedContent | undefined> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(this.storeName, 'readonly');
       const store = tx.objectStore(this.storeName);
-      const request = store.get(this.lastKey);
+      const request = store.get(id);
       request.onsuccess = () => resolve(request.result as SharedContent);
       request.onerror = () => reject(request.error);
     });
   }
 
-  public async deleteLast(): Promise<void> {
+  private async saveSharedContent(id: string, content: SharedContent): Promise<void> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(this.storeName, 'readwrite');
       const store = tx.objectStore(this.storeName);
-      const request = store.delete(this.lastKey);
+      const request = store.put({ ...content, id });
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  public async deleteSharedContent(id: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.storeName, 'readwrite');
+      const store = tx.objectStore(this.storeName);
+      const request = store.delete(id);
       request.onsuccess = () => {
-        this.sharedAvailableSubject.next(false);
+        if (id === this.lastKey) {
+          this.sharedAvailableSubject.next(false);
+        }
         resolve();
       };
       request.onerror = () => reject(request.error);
     });
   }
 
-  private async saveLast(content: SharedContent): Promise<void> {
-    const db = await this.openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.storeName, 'readwrite');
-      const store = tx.objectStore(this.storeName);
-      const request = store.put({ ...content, id: this.lastKey });
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
   private async checkIfSharedExists(): Promise<void> {
-    const last = await this.getLast();
+    const last = await this.getSharedContent('last');
     this.sharedAvailableSubject.next(!!last);
   }
 }

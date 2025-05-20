@@ -68,21 +68,42 @@ export class OembedService {
 
   public async getGoogleMapsLocation(url: string): Promise<Location | undefined> {
     try {
-      const response = await firstValueFrom(this.resolveRedirectUrl(url));
+      let currentUrl = url;
+      let attempts = 0;
 
-      const finalUrl = response.result;
-      const coordMatch = finalUrl.match(/@(-?\d+\.\d+),(-?\d+\.\d+)/) ||
-        finalUrl.match(/q=(-?\d+\.\d+),(-?\d+\.\d+)/);
-      if (coordMatch) {
-        return {
-          latitude: parseFloat(coordMatch[1]),
-          longitude: parseFloat(coordMatch[2]),
-          plusCode: this.geolocationService.getPlusCode(parseFloat(coordMatch[1]), parseFloat(coordMatch[2])),
-        };
+      while (attempts < 4) {
+        // Prüfe sofort nach der Auflösung, ob Koordinaten enthalten sind
+        const coordPatterns = [
+          /@(-?\d+\.\d+),(-?\d+\.\d+)/,
+          /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
+          /\/place\/[^\/]*\/@(-?\d+\.\d+),(-?\d+\.\d+)/,
+        ];
+
+        for (const pattern of coordPatterns) {
+          const match = currentUrl.match(pattern);
+          if (match) {
+            const lat = parseFloat(match[1]);
+            const lon = parseFloat(match[2]);
+            return {
+              latitude: lat,
+              longitude: lon,
+              plusCode: this.geolocationService.getPlusCode(lat, lon),
+            };
+          }
+        }
+
+        // Wenn keine Koordinaten gefunden wurden: Weiterleiten
+        const response = await firstValueFrom(this.resolveRedirectUrl(currentUrl));
+        if (!response.result || response.result === currentUrl) {
+          break; // keine neue URL mehr
+        }
+        currentUrl = response.result;
+        attempts++;
       }
     } catch (err) {
-      console.warn('Failed to resolve Google Maps shortlink:', err);
+      console.warn('Failed to resolve Google Maps location:', err);
     }
+
     return undefined;
   }
 

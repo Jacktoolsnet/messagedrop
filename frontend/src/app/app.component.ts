@@ -33,6 +33,7 @@ import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
 import { Message } from './interfaces/message';
 import { Mode } from './interfaces/mode';
+import { Multimedia } from './interfaces/multimedia';
 import { MultimediaType } from './interfaces/multimedia-type';
 import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
@@ -47,6 +48,7 @@ import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NetworkService } from './services/network.service';
 import { NoteService } from './services/note.service';
+import { OembedService } from './services/oembed.service';
 import { PlaceService } from './services/place.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
@@ -98,6 +100,7 @@ export class AppComponent implements OnInit {
     public userService: UserService,
     public mapService: MapService,
     public noteService: NoteService,
+    private oembedService: OembedService,
     public placeService: PlaceService,
     public contactService: ContactService,
     private geolocationService: GeolocationService,
@@ -212,10 +215,26 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         // Check if app is called from shared dialog or from push notification
         // ###
         // Observe shared content
-        this.sharedContentService.getSharedAvailableObservable().subscribe((sharedAvaliable: boolean) => {
+        this.sharedContentService.getSharedAvailableObservable().subscribe(async (sharedAvaliable: boolean) => {
           if (sharedAvaliable) {
+            const lastContent = await this.sharedContentService.getSharedContent('last');
+            let multimedia: Multimedia | undefined = undefined;
+            let location: Location | undefined = undefined;
+            if (lastContent?.url) {
+              const objectFromUrl = await this.oembedService.getObjectFromUrl(lastContent.url);
+              if (objectFromUrl && this.oembedService.isMultimedia(objectFromUrl)) {
+                multimedia = objectFromUrl as Multimedia;
+              } else if (objectFromUrl && this.oembedService.isLocation(objectFromUrl)) {
+                location = objectFromUrl as Location;
+              } else {
+                this.snackBar.open(JSON.stringify(lastContent, null, 2), 'OK', {
+                  horizontalPosition: 'center',
+                  verticalPosition: 'top',
+                });
+              }
+            }
             const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
-              data: {},
+              data: { multimedia: multimedia, location: location },
               closeOnNavigation: true,
               minWidth: '20vw',
               maxWidth: '90vw',
