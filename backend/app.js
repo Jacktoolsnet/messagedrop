@@ -217,11 +217,6 @@ const userLimit = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 })
 
-//verify loaderio
-app.get('/loaderio-003dba8261deeb3015a9501fa9363270.txt', (req, res) => {
-  res.type('text/plain').send('loaderio-003dba8261deeb3015a9501fa9363270');
-});
-
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
