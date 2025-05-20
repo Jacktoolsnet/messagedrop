@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { TiktokComponent } from './tiktok.component';
+import { ImportMultimediaComponent } from './import-multimedia.component';
 
-describe('InstagramComponent', () => {
-  let component: TiktokComponent;
-  let fixture: ComponentFixture<TiktokComponent>;
+describe('PinterestComponent', () => {
+  let component: ImportMultimediaComponent;
+  let fixture: ComponentFixture<ImportMultimediaComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [TiktokComponent]
+      imports: [ImportMultimediaComponent]
     })
       .compileComponents();
 
-    fixture = TestBed.createComponent(TiktokComponent);
+    fixture = TestBed.createComponent(ImportMultimediaComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

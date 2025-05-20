@@ -1,9 +1,0 @@
-<div class="url-container">
-    <input type="text" [(ngModel)]="tiktokUrl" (input)="validateUrl()" placeholder="Enter TikTok url" />
-    <button *ngIf="!urlInvalid" mat-icon-button (click)="onApplyClick()">
-        <mat-icon>check</mat-icon>
-    </button>
-</div>
-<mat-dialog-content class="full-width">
-    <div *ngIf="safeHtml != undefined" class="multimedia_container" [innerHTML]="safeHtml"></div>
-</mat-dialog-content>

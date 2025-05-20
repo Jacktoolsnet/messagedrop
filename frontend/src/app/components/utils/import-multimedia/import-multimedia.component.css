@@ -1,3 +1,15 @@
+h2 {
+    color: floralwhite;
+    text-align: center;
+
+}
+
+h4 {
+    color: floralwhite;
+    text-align: center;
+    font-weight: 400;
+}
+
 .messageDropDialog .mat-dialog-container {
     padding: 0rem;
 }
@@ -41,23 +53,30 @@
     height: 2.5rem;
 }
 
+.content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
 .multimedia_container {
-    margin: 1rem;
     padding: 1rem;
+    margin: 1rem;
     display: flex;
     justify-content: center;
     align-items: center;
     position: relative;
     background-color: gray;
     color: white;
-    border-radius: 0.5rem;
+    border-radius: 1rem;
 }
 
-.multimedia_container_iframe {
-    width: 100%;
+.center {
     display: flex;
     justify-content: center;
     align-items: center;
-    position: relative;
-    aspect-ratio: 16 / 9;
+    width: 100%;
+    padding-bottom: 0.5rem;
 }

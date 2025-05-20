@@ -2,11 +2,8 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Multimedia } from '../../../interfaces/multimedia';
-import { PinterestComponent } from '../../utils/pinterest/pinterest.component';
-import { SpotifyComponent } from '../../utils/spotify/spotify.component';
+import { ImportMultimediaComponent } from '../../utils/import-multimedia/import-multimedia.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
-import { TiktokComponent } from '../../utils/tiktok/tiktok.component';
-import { YoutubeComponent } from '../../utils/youtube/youtube.component';
 
 @Component({
   selector: 'app-select-multimedia',
@@ -48,68 +45,8 @@ export class SelectMultimediaComponent {
     });
   }
 
-  public openYoutubeDialog(): void {
-    const dialogRef = this.youtubeDialog.open(YoutubeComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
-      if (undefined !== multimedia) {
-        this.newMultimedia.emit(multimedia);
-      }
-    });
-  }
-
-  public openTikTokDialog(): void {
-    const dialogRef = this.tiktokDialog.open(TiktokComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
-      if (undefined !== multimedia) {
-        this.newMultimedia.emit(multimedia);
-      }
-    });
-  }
-
-  public openPinterestDialog(): void {
-    const dialogRef = this.pinterestDialog.open(PinterestComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
-      if (undefined !== multimedia) {
-        this.newMultimedia.emit(multimedia);
-      }
-    });
-  }
-
-  public openSpotifyDialog(): void {
-    const dialogRef = this.spotifyDialog.open(SpotifyComponent, {
+  public openImportMultimediaDialog(): void {
+    const dialogRef = this.pinterestDialog.open(ImportMultimediaComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},

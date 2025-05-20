@@ -213,7 +213,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       next: (v) => {
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         // Check if app is called from shared dialog or from push notification
-        // ###
+
         // Observe shared content
         this.sharedContentService.getSharedAvailableObservable().subscribe(async (sharedAvaliable: boolean) => {
           if (sharedAvaliable) {
