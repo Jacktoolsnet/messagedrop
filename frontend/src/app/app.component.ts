@@ -685,6 +685,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         contentId: ''
       }
     };
+
     const dialogRef = this.noteDialog.open(EditNoteComponent, {
       panelClass: '',
       closeOnNavigation: true,

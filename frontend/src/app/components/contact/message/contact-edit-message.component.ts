@@ -54,6 +54,10 @@ export class ContactEditMessageComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    if (undefined != this.data.shortMessage.multimedia) {
+      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.shortMessage.multimedia?.oembed?.html ? this.data.shortMessage.multimedia?.oembed.html : '');
+      this.showSaveHtml = this.data.shortMessage.multimedia.type != MultimediaType.TENOR;
+    }
     this.data.shortMessage.style = this.userService.getProfile().defaultStyle!;
   }
 

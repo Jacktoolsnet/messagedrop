@@ -10,12 +10,16 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
+import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
+import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { ConnectService } from '../../services/connect.service';
 import { ContactService } from '../../services/contact.service';
 import { CryptoService } from '../../services/crypto.service';
+import { OembedService } from '../../services/oembed.service';
+import { SharedContentService } from '../../services/shared-content.service';
 import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
@@ -56,6 +60,8 @@ export class ContactlistComponent implements OnInit {
     private connectService: ConnectService,
     public contactService: ContactService,
     private cryptoService: CryptoService,
+    private oembedService: OembedService,
+    private sharedContentService: SharedContentService,
     public dialogRef: MatDialogRef<any>,
     public contactMessageDialog: MatDialog,
     public connectDialog: MatDialog,
@@ -241,11 +247,23 @@ export class ContactlistComponent implements OnInit {
     }
   }
 
-  public openContactMessagDialog(contact: Contact): void {
+  async openContactMessagDialog(contact: Contact): Promise<void> {
+    const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
+    let lastMultimedia: Multimedia | undefined = undefined;
+    if (undefined != lastMultimediaContent) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+    }
+    const lastLocationContent = await this.sharedContentService.getSharedContent('lastLocation');
+    let lastLocation: Location | undefined = undefined;
+    if (undefined != lastLocationContent) {
+      lastLocation = await this.oembedService.getObjectFromUrl(lastLocationContent!.url) as Location;
+      if (undefined != lastLocation) {
+      }
+    }
     let shortMessage: ShortMessage = {
       message: '',
       style: '',
-      multimedia: {
+      multimedia: undefined != lastMultimedia ? lastMultimedia : {
         type: MultimediaType.UNDEFINED,
         url: '',
         sourceUrl: '',
@@ -258,7 +276,7 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.contactMessageDialog.open(ContactEditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, shortMessage: shortMessage },
+      data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, shortMessage: shortMessage, lastLocation: lastLocation },
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -293,6 +311,9 @@ export class ContactlistComponent implements OnInit {
                   });
               });
           });
+        this.sharedContentService.deleteSharedContent('last');
+        this.sharedContentService.deleteSharedContent('lastMultimedia');
+        this.sharedContentService.deleteSharedContent('lastLocation');
       }
     });
   }
