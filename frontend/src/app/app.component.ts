@@ -584,7 +584,20 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
   }
 
-  public openMessagDialog(): void {
+  async openMessagDialog(): Promise<void> {
+    const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
+    let lastMultimedia: Multimedia | undefined = undefined;
+    if (undefined != lastMultimediaContent) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+    }
+    const lastLocationContent = await this.sharedContentService.getSharedContent('lastLocation');
+    let lastLocation: Location | undefined = undefined;
+    if (undefined != lastLocationContent) {
+      lastLocation = await this.oembedService.getObjectFromUrl(lastLocationContent!.url) as Location;
+      if (undefined != lastLocation) {
+        this.mapService.flyToWithZoom(lastLocation, 19);
+      }
+    }
     let message: Message = {
       id: 0,
       parentId: 0,
@@ -594,7 +607,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       latitude: 0,
       longitude: 0,
       plusCode: '',
-      message: '',
+      message: undefined != lastMultimediaContent ? lastMultimediaContent.text : '',
       markerType: 'default',
       style: '',
       views: 0,
@@ -604,7 +617,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       commentsNumber: 0,
       status: 'enabled',
       userId: '',
-      multimedia: {
+      multimedia: undefined != lastMultimedia ? lastMultimedia : {
         type: MultimediaType.UNDEFINED,
         url: '',
         sourceUrl: '',
@@ -618,7 +631,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message, lastLocation: lastLocation },
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -634,11 +647,27 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       if (undefined !== data?.message) {
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        this.sharedContentService.deleteSharedContent('last');
+        this.sharedContentService.deleteSharedContent('lastMultimedia');
+        this.sharedContentService.deleteSharedContent('lastLocation');
       }
     });
   }
 
-  public openNoteDialog(): void {
+  async openNoteDialog(): Promise<void> {
+    const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
+    let lastMultimedia: Multimedia | undefined = undefined;
+    if (undefined != lastMultimediaContent) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+    }
+    const lastLocationContent = await this.sharedContentService.getSharedContent('lastLocation');
+    let lastLocation: Location | undefined = undefined;
+    if (undefined != lastLocationContent) {
+      lastLocation = await this.oembedService.getObjectFromUrl(lastLocationContent!.url) as Location;
+      if (undefined != lastLocation) {
+        this.mapService.flyToWithZoom(lastLocation, 19);
+      }
+    }
     let note: Note = {
       latitude: 0,
       longitude: 0,
@@ -646,7 +675,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       note: '',
       markerType: 'note',
       style: '',
-      multimedia: {
+      multimedia: undefined != lastMultimedia ? lastMultimedia : {
         type: MultimediaType.UNDEFINED,
         url: '',
         sourceUrl: '',
@@ -659,7 +688,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.noteDialog.open(EditNoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
+      data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note, lastLocation: lastLocation },
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -679,6 +708,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.noteService.addNote(data.note);
         this.noteService.saveNotes();
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        this.sharedContentService.deleteSharedContent('last');
+        this.sharedContentService.deleteSharedContent('lastMultimedia');
+        this.sharedContentService.deleteSharedContent('lastLocation');
       }
     });
   }

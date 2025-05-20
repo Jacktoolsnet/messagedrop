@@ -77,23 +77,44 @@ function extractUrlFromText(text) {
 function detectContentType(url) {
     if (!url) return 'unknown';
 
-    const patterns = {
-        multimedia: [
-            /youtube\.com/,
-            /youtu\.be/,
-            /spotify\.com/,
-            /pinterest\.com/,
-            /tiktok\.com/
-        ],
-        location: [
-            /google\.[^\/]+\/maps/,
-            /maps\.app\.goo\.gl/
-        ]
-    };
+    const lowerUrl = url.toLowerCase();
 
-    for (const type in patterns) {
-        if (patterns[type].some((regex) => regex.test(url))) {
-            return type;
+    const multimediaPatterns = [
+        // YouTube
+        /youtube\.com\/watch/,
+        /youtube\.com\/shorts/,
+        /youtube\.com\/embed/,
+        /youtu\.be\//,
+
+        // Spotify
+        /open\.spotify\.com\/(track|album|artist|playlist)/,
+        /spotify\.com\/.+/,
+
+        // Pinterest
+        /pinterest\.com\/pin\//,
+        /pin\.it/, // Shortlink
+
+        // TikTok
+        /tiktok\.com\/@.*\/video\//,
+        /tiktok\.com\/t\//,
+        /vm\.tiktok\.com\//
+    ];
+
+    const locationPatterns = [
+        /google\.[^\/]+\/maps/,
+        /maps\.app\.goo\.gl/,
+        /goo\.gl\/maps/
+    ];
+
+    for (const pattern of multimediaPatterns) {
+        if (pattern.test(lowerUrl)) {
+            return 'multimedia';
+        }
+    }
+
+    for (const pattern of locationPatterns) {
+        if (pattern.test(lowerUrl)) {
+            return 'location';
         }
     }
 
@@ -101,13 +122,12 @@ function detectContentType(url) {
 }
 
 async function deliverToClientOrSave(content, type) {
+    await saveSharedContentToDB(content, type);
     const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
     if (clientList.length > 0) {
         for (const client of clientList) {
             client.postMessage({ type: 'shared', content });
         }
-    } else {
-        await saveSharedContentToDB(content, type);
     }
 }
 
