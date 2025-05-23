@@ -66,4 +66,32 @@ canvas {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+    text-align: left;
+    justify-content: flex-start;
+}
+
+.chart-icon {
+    margin-right: 0.5rem;
+    vertical-align: middle;
+}
+
+.chart-switch.mini-fab {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.chart-switch.mini-fab button {
+    flex: 1 1 0;
+    height: 3rem;
+    max-height: 3rem;
+    width: 3rem;
+    max-width: 3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    margin-top: 0.5rem;
 }

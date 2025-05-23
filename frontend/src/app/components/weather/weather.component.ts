@@ -2,6 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
+import { MatTooltip } from '@angular/material/tooltip';
 import {
   CategoryScale, Chart, ChartConfiguration,
   ChartType,
@@ -23,6 +25,8 @@ import { WeatherService } from '../../services/weather.service';
     CommonModule,
     MatDialogModule,
     MatButtonModule,
+    MatIcon,
+    MatTooltip,
     BaseChartDirective
   ],
   templateUrl: './weather.component.html',
@@ -120,6 +124,14 @@ export class WeatherComponent implements OnInit {
       case 'temperature': return 'Temperature';
       case 'precipitation': return 'Precipitation Probability';
       case 'uvIndex': return 'UV Index';
+    }
+  }
+
+  getChartIcon(mode: 'temperature' | 'precipitation' | 'uvIndex'): string {
+    switch (mode) {
+      case 'temperature': return 'thermostat';
+      case 'precipitation': return 'water_drop';
+      case 'uvIndex': return 'light_mode';
     }
   }
 

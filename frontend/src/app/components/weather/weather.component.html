@@ -8,15 +8,16 @@
                 {{ getDayLabel(i) }}
             </button>
         </div>
-        <div class="chart-switch">
-            <button mat-raised-button *ngFor="let mode of chartModes"
-                [color]="selectedChart === mode ? 'primary' : 'secondary'" (click)="onChartToggle(mode)">
-                {{ getChartLabel(mode) }}
-            </button>
-        </div>
         <div class="chart-container">
             <canvas baseChart [type]="lineChartType" [data]="tempChartData" [options]="chartOptions">
             </canvas>
+        </div>
+        <div class="chart-switch mini-fab">
+            <button mat-mini-fab *ngFor="let mode of chartModes"
+                [color]="selectedChart === mode ? 'primary' : 'secondary'" (click)="onChartToggle(mode)"
+                [matTooltip]="getChartLabel(mode)">
+                <mat-icon>{{ getChartIcon(mode) }}</mat-icon>
+            </button>
         </div>
     </ng-container>
 </mat-dialog-content>
