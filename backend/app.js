@@ -19,6 +19,7 @@ const message = require('./routes/message');
 const place = require('./routes/place');
 const translate = require('./routes/translate');
 const utils = require('./routes/utils');
+const weather = require('./routes/weather');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
 const helmet = require('helmet');
@@ -208,6 +209,9 @@ const translateLimit = rateLimit({
   limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many translate requests, please try again after 15 minutes.'
+  }
 })
 
 const userLimit = rateLimit({
@@ -215,6 +219,19 @@ const userLimit = rateLimit({
   limit: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many user requests, please try again after a minute.'
+  }
+})
+
+const weatherLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  limit: 3, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many weather requests, please try again after a minute.'
+  }
 })
 
 // ROUTES
@@ -230,6 +247,7 @@ app.use('/message', message);
 app.use('/translate', translateLimit, translate);
 app.use('/utils', utils);
 app.use('/place', place);
+app.use('/weather', weatherLimit, weather);
 
 // The last route
 app.use('{*notFound}', notfound);

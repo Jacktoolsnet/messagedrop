@@ -47,7 +47,7 @@
     [attr.aria-hidden]="!(this.userService.isReady() && locationReady)" [matMenuTriggerFor]="messageMenu"
     class="button_drop" mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
     <mat-icon [attr.aria-hidden]="!(this.userService.isReady() && locationReady)"
-        class="material-symbols-outlined">send</mat-icon>
+        class="material-symbols-outlined">menu</mat-icon>
 </button>
 
 <mat-menu #userMenu="matMenu">
@@ -89,6 +89,10 @@
     <button mat-menu-item *ngIf="contactService.isReady()" (click)="openContactListDialog()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>Contacts message</span>
+    </button>
+    <button mat-menu-item *ngIf="this.userService.isReady()" (click)="showWeather()">
+        <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>
+        <span>Weather</span>
     </button>
 </mat-menu>
 <router-outlet />

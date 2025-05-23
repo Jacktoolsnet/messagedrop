@@ -24,6 +24,7 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
+import { WeatherComponent } from './components/weather/weather.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { CreateUserResponse } from './interfaces/create-user-response';
 import { CryptedUser } from './interfaces/crypted-user';
@@ -991,6 +992,23 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           break
       }
     });
+  }
+
+  public showWeather() {
+    const dialogRef = this.dialog.open(WeatherComponent, {
+      data: {},
+      closeOnNavigation: true,
+      minWidth: '90vw',
+      maxWidth: '90vw',
+      minHeight: '20vh',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe();
   }
 
   private createMarkerLocations() {

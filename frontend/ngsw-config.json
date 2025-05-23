@@ -24,7 +24,11 @@
           "/assets/**",
           "/assets/fonts/*.ttf",
           "/assets/icons/*.png",
-          "/assets/markers/*.svg"
+          "/assets/markers/*.svg",
+          "/assets/weather-icons/css/*.css",
+          "/assets/weather-icons/fonts/*.ttf",
+          "/assets/weather-icons/fonts/*.woff",
+          "/assets/weather-icons/fonts/*.woff2"
         ]
       }
     }

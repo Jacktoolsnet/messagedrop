@@ -1,0 +1,22 @@
+<mat-dialog-content>
+    <ng-container *ngIf="!loading && weather">
+        <h2>Weather</h2>
+
+        <div class="day-switch">
+            <button mat-raised-button *ngFor="let day of weather.daily; let i = index"
+                [color]="i === selectedDayIndex ? 'primary' : 'secondary'" (click)="onDayChange(i)">
+                {{ getDayLabel(i) }}
+            </button>
+        </div>
+        <div class="chart-switch">
+            <button mat-raised-button *ngFor="let mode of chartModes"
+                [color]="selectedChart === mode ? 'primary' : 'secondary'" (click)="onChartToggle(mode)">
+                {{ getChartLabel(mode) }}
+            </button>
+        </div>
+        <div class="chart-container">
+            <canvas baseChart [type]="lineChartType" [data]="tempChartData" [options]="chartOptions">
+            </canvas>
+        </div>
+    </ng-container>
+</mat-dialog-content>
