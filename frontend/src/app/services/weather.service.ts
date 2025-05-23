@@ -58,17 +58,14 @@ export class WeatherService {
         time: t,
         temperature: data.hourly.temperature_2m[i],
         precipitationProbability: data.hourly.precipitation_probability[i],
-        windspeed: data.hourly.windspeed_10m[i],
-        cloudcover: data.hourly.cloudcover[i]
+        uvIndex: data.hourly.uv_index[i]
       })),
       daily: data.daily.time.map((d: string, i: number) => ({
         date: d,
         sunrise: data.daily.sunrise[i],
         sunset: data.daily.sunset[i],
         temperatureMax: data.daily.temperature_2m_max[i],
-        temperatureMin: data.daily.temperature_2m_min[i],
-        precipitationSum: data.daily.precipitation_sum[i],
-        windspeedMax: data.daily.windspeed_10m_max[i]
+        temperatureMin: data.daily.temperature_2m_min[i]
       }))
     };
   }

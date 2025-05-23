@@ -6,6 +6,7 @@ import {
   CategoryScale, Chart, ChartConfiguration,
   ChartType,
   Filler, LinearScale, LineController, LineElement, PointElement,
+  ScriptableContext,
   Title, Tooltip
 } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
@@ -32,8 +33,8 @@ export class WeatherComponent implements OnInit {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   selectedDayIndex = 0;
   weather: Weather | null = null;
-  selectedChart: 'temperature' | 'precipitation' = 'temperature';
-  chartModes: Array<'temperature' | 'precipitation'> = ['temperature', 'precipitation'];
+  selectedChart: 'temperature' | 'precipitation' | 'uvIndex' = 'temperature';
+  chartModes: Array<'temperature' | 'precipitation' | 'uvIndex'> = ['temperature', 'precipitation', 'uvIndex'];
 
   loading = true;
 
@@ -114,8 +115,12 @@ export class WeatherComponent implements OnInit {
     return date.toLocaleDateString(undefined, options);
   }
 
-  getChartLabel(mode: 'temperature' | 'precipitation'): string {
-    return mode === 'temperature' ? 'Temperature' : 'Precipitation Probability';
+  getChartLabel(mode: 'temperature' | 'precipitation' | 'uvIndex'): string {
+    switch (mode) {
+      case 'temperature': return 'Temperature';
+      case 'precipitation': return 'Precipitation Probability';
+      case 'uvIndex': return 'UV Index';
+    }
   }
 
   onDayChange(index: number): void {
@@ -123,7 +128,7 @@ export class WeatherComponent implements OnInit {
     this.updateChart();
   }
 
-  onChartToggle(type: 'temperature' | 'precipitation') {
+  onChartToggle(type: 'temperature' | 'precipitation' | 'uvIndex'): void {
     this.selectedChart = type; this.updateChart();
   }
 
@@ -242,14 +247,35 @@ export class WeatherComponent implements OnInit {
         }
       }
 
-    } else {
+    } else if (this.selectedChart === 'precipitation') {
       dataset = {
         data: dayHourly.map(h => h.precipitationProbability),
-        label: 'Precipitation (%)',
+        label: 'Precipitation Probability (%)',
         borderColor: '#42A5F5',
         backgroundColor: 'rgba(66, 165, 245, 0.2)',
         tension: 0.3,
         fill: true
+      };
+    } else {
+      const uvValues = dayHourly.map(h => h.uvIndex);
+      dataset = {
+        data: uvValues,
+        label: 'UV Index',
+        borderColor: '#AB47BC',
+        backgroundColor: (ctx: ScriptableContext<'line'>) => {
+          const chart = ctx.chart;
+          const { ctx: canvasCtx, chartArea } = chart;
+          const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+          gradient.addColorStop(0, 'rgba(0,0,0,0)');
+          gradient.addColorStop(0.2, '#FFEB3B');
+          gradient.addColorStop(0.5, '#FF9800');
+          gradient.addColorStop(1.0, '#AB47BC');
+          return gradient;
+        },
+        tension: 0.4,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: uvValues.map(v => this.getUvColor(v))
       };
     }
 
@@ -258,7 +284,6 @@ export class WeatherComponent implements OnInit {
       annotation: { annotations }
     };
 
-    // Standard-Y-Achse zurücksetzen
     this.chartOptions!.scales = {
       x: {
         ticks: { color: '#ccc' },
@@ -267,8 +292,8 @@ export class WeatherComponent implements OnInit {
       y: {
         ticks: { color: '#ccc' },
         grid: { color: '#444' },
-        suggestedMin: this.selectedChart === 'precipitation' ? 0 : undefined,
-        suggestedMax: this.selectedChart === 'precipitation' ? 100 : undefined
+        min: this.selectedChart === 'uvIndex' ? 0 : this.selectedChart === 'precipitation' ? 0 : undefined,
+        max: this.selectedChart === 'uvIndex' ? 11 : this.selectedChart === 'precipitation' ? 100 : undefined
       }
     };
 
@@ -276,6 +301,15 @@ export class WeatherComponent implements OnInit {
       labels,
       datasets: [dataset]
     };
+  }
+
+
+  getUvColor(uv: number): string {
+    if (uv <= 2) return '#4CAF50';
+    if (uv <= 5) return '#FFEB3B';
+    if (uv <= 7) return '#FF9800';
+    if (uv <= 10) return '#F44336';
+    return '#9C27B0';
   }
 
   private getHourIndex(time: string): number {
@@ -299,12 +333,4 @@ export class WeatherComponent implements OnInit {
     }
   }
 
-  getTodayAverageCloudcover(): number | null {
-    if (!this.weather || !this.weather.hourly?.length || !this.weather.daily?.length) return null;
-    const today = this.weather.daily[0].date;
-    const todayHourly = this.weather.hourly.filter(h => h.time.startsWith(today));
-    if (!todayHourly.length) return null;
-    const sum = todayHourly.reduce((acc, h) => acc + h.cloudcover, 0);
-    return Math.round(sum / todayHourly.length);
-  }
 }

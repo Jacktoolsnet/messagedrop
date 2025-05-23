@@ -4,6 +4,4 @@ export interface DailyWeather {
     sunset: string;
     temperatureMax: number;
     temperatureMin: number;
-    precipitationSum: number;
-    windspeedMax: number;
 }
