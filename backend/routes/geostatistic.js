@@ -7,13 +7,20 @@ const security = require('../middleware/security');
 const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
 const tableGeoStatistic = require('../db/tableGeoStatistic');
 
-async function getWorldBankIndicator(countryCode, indicator) {
-    const url = `http://api.worldbank.org/v2/country/${countryCode}/indicator/${indicator}?format=json&per_page=1`;
+// Helper function for World Bank API
+async function getWorldBankIndicator(countryAlpha3, indicator) {
+    const url = `http://api.worldbank.org/v2/country/${countryAlpha3}/indicator/${indicator}?format=json&per_page=10`;
     const response = await axios.get(url);
-    const data = response.data[1]?.[0];
+    const dataArray = response.data[1];
+
+    if (!Array.isArray(dataArray)) {
+        return { year: null, value: null };
+    }
+
+    const validEntry = dataArray.find(entry => entry.value !== null);
     return {
-        year: data?.date,
-        value: data?.value
+        year: validEntry?.date || null,
+        value: validEntry?.value || null
     };
 }
 
@@ -24,18 +31,18 @@ router.get('/:latitude/:longitude', [security.checkToken], async (req, res) => {
     try {
         const { latitude, longitude } = req.params;
 
-        // 1. Hole Nominatim
+        // Step 1: Get country code from Nominatim (Alpha-2)
         const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
         const address = nominatimData.address;
-        const countryCode = address?.country_code?.toUpperCase();
+        const countryAlpha2 = address?.country_code?.toUpperCase();
 
-        if (!countryCode) {
+        if (!countryAlpha2) {
             throw new Error('Country code not found');
         }
 
-        // 2. Prüfe Cache
+        // Step 2: Check SQLite cache
         const cachedData = await new Promise((resolve, reject) => {
-            tableGeoStatistic.getCountryData(db, countryCode, (err, row) => {
+            tableGeoStatistic.getCountryData(db, countryAlpha2, (err, row) => {
                 if (err) return reject(err);
                 resolve(row);
             });
@@ -48,29 +55,33 @@ router.get('/:latitude/:longitude', [security.checkToken], async (req, res) => {
             const expiryDate = new Date(Date.now() - CACHE_TTL_DAYS * 24 * 60 * 60 * 1000);
 
             if (lastUpdate >= expiryDate) {
-                // Cache gültig → verwende gespeicherte Daten
                 countryData = JSON.parse(cachedData.countryData);
                 worldBankData = JSON.parse(cachedData.worldbankData);
             }
         }
 
-        // 3. Wenn kein gültiger Cache → APIs abfragen
+        // Step 3: If no valid cache, fetch fresh data
         if (!countryData || !worldBankData) {
-            const restCountriesResponse = await axios.get(`https://restcountries.com/v3.1/alpha/${countryCode}`);
+            const restCountriesResponse = await axios.get(`https://restcountries.com/v3.1/alpha/${countryAlpha2}`);
             countryData = restCountriesResponse.data[0];
 
-            const gdp = await getWorldBankIndicator(countryCode, 'NY.GDP.MKTP.CD');
-            const gniPerCapita = await getWorldBankIndicator(countryCode, 'NY.GNP.PCAP.CD');
-            const lifeExpectancy = await getWorldBankIndicator(countryCode, 'SP.DYN.LE00.IN');
-            const povertyRate = await getWorldBankIndicator(countryCode, 'SI.POV.DDAY');
+            const countryAlpha3 = countryData.cca3;
+            if (!countryAlpha3) {
+                throw new Error('Alpha-3 country code not found for World Bank API');
+            }
+
+            const gdp = await getWorldBankIndicator(countryAlpha3, 'NY.GDP.MKTP.CD');
+            const gniPerCapita = await getWorldBankIndicator(countryAlpha3, 'NY.GNP.PCAP.CD');
+            const lifeExpectancy = await getWorldBankIndicator(countryAlpha3, 'SP.DYN.LE00.IN');
+            const povertyRate = await getWorldBankIndicator(countryAlpha3, 'SI.POV.DDAY');
 
             worldBankData = { gdp, gniPerCapita, lifeExpectancy, povertyRate };
 
-            // Speichere in DB
+            // Save new data to cache
             await new Promise((resolve, reject) => {
                 tableGeoStatistic.setCountryData(
                     db,
-                    countryCode,
+                    countryAlpha2,
                     JSON.stringify(countryData),
                     JSON.stringify(worldBankData),
                     (err) => {
@@ -81,15 +92,15 @@ router.get('/:latitude/:longitude', [security.checkToken], async (req, res) => {
             });
         }
 
-        // 4. Berechnungen
+        // Step 4: Calculate derived metrics
         const population = countryData.population;
         const area = countryData.area;
         const populationDensity = population && area ? population / area : null;
         const gdpPerCapita = worldBankData.gdp.value && population ? worldBankData.gdp.value / population : null;
 
-        // 5. Zusammenfassung
+        // Step 5: Build final response
         response.status = 200;
-        response.data = {
+        response.result = {
             coordinates: { latitude, longitude },
             nominatim: {
                 country: address.country,

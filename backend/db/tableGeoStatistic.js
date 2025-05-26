@@ -34,8 +34,7 @@ const setCountryData = function (db, countryCode, countryData, worldBankData, ca
         db.run(sql, [
             countryCode,
             countryData,
-            worldBankData,
-            now
+            worldBankData
         ], (err) => {
             callback(err)
         });

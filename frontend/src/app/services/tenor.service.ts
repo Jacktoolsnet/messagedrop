@@ -63,7 +63,7 @@ export class TenorService {
     parameters.set('key', environment.tenor_api_key);
     parameters.set('client_key', environment.tenor_client_key);
     parameters.set('country', this.userService.getUser().language);
-    parameters.set('locale', this.userService.getUser().local.replace('-', '_'));
+    parameters.set('locale', this.userService.getUser().locale.replace('-', '_'));
     parameters.set('media_filter', 'gif')
     parameters.set('ar_range', 'standard');
     parameters.set('contentfilter', 'low');
@@ -106,7 +106,7 @@ export class TenorService {
     parameters.set('client_key', environment.tenor_client_key);
     parameters.set('q', searchTerm);
     parameters.set('country', this.userService.getUser().language);
-    parameters.set('locale', this.userService.getUser().local.replace('-', '_'));
+    parameters.set('locale', this.userService.getUser().locale.replace('-', '_'));
     parameters.set('media_filter', 'gif')
     parameters.set('ar_range', 'standard');
     parameters.set('contentfilter', 'low');

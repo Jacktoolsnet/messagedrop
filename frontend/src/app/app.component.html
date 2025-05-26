@@ -94,5 +94,9 @@
         <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>
         <span>Weather</span>
     </button>
+    <button mat-menu-item *ngIf="this.userService.isReady()" (click)="showGeoStatistic()">
+        <mat-icon class="material-symbols-outlined">data_exploration</mat-icon>
+        <span>Statistic</span>
+    </button>
 </mat-menu>
 <router-outlet />

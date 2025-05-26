@@ -12,6 +12,7 @@ import { Subject, take } from 'rxjs';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
+import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
@@ -28,6 +29,7 @@ import { WeatherComponent } from './components/weather/weather.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { CreateUserResponse } from './interfaces/create-user-response';
 import { CryptedUser } from './interfaces/crypted-user';
+import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
@@ -43,6 +45,7 @@ import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AppService } from './services/app.service';
 import { ContactService } from './services/contact.service';
 import { CryptoService } from './services/crypto.service';
+import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
 import { MapService } from './services/map.service';
@@ -57,6 +60,7 @@ import { SocketioService } from './services/socketio.service';
 import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
+
 
 @Component({
   selector: 'app-root',
@@ -111,6 +115,7 @@ export class AppComponent implements OnInit {
     private statisticService: StatisticService,
     private socketioService: SocketioService,
     private weatherService: WeatherService,
+    private geoStatisticService: GeoStatisticService,
     private snackBar: MatSnackBar,
     public createPinDialog: MatDialog,
     public checkPinDialog: MatDialog,
@@ -1046,6 +1051,67 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         }
       });
 
+  }
+
+  public showGeoStatistic() {
+    this.geoStatisticService
+      .getDataForLocation(
+        this.mapService.getMapLocation().latitude,
+        this.mapService.getMapLocation().longitude
+      )
+      .subscribe({
+        next: (response: GetGeoStatisticResponse) => {
+          if (response.status === 200) {
+            console.log(response.result);
+            const dialogRef = this.dialog.open(GeoStatisticComponent, {
+              data: { geoStatistic: response.result },
+              closeOnNavigation: true,
+              minWidth: '90vw',
+              maxWidth: '90vw',
+              minHeight: '20vh',
+              maxHeight: '90vh',
+              hasBackdrop: true
+            });
+
+            dialogRef.afterOpened().subscribe(() => { });
+
+            dialogRef.afterClosed().subscribe(() => { });
+          } else {
+            // Bei Fehlerstatus trotzdem Fehlerdialog zeigen
+            this.showGeoStatisticError('Unexpected response');
+          }
+        },
+        error: (err) => {
+          this.showGeoStatisticError(err.error);
+        }
+      });
+  }
+
+  private showGeoStatisticError(message: string) {
+    const dialogRef = this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        title: 'GeoStatistic Service',
+        image: '',
+        icon: 'bug_report',
+        message: message,
+        button: '',
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      // Optional: Aktionen nach Öffnen
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      // Optional: Aktionen nach Schließen
+    });
   }
 
   private createMarkerLocations() {

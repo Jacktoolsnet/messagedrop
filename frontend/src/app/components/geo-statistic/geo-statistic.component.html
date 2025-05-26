@@ -1,0 +1,105 @@
+<mat-dialog-content #dialogContent>
+    <ng-container *ngIf="geoStatistic">
+        <h2>
+            {{ geoStatistic.countryInfo.name }} ({{ geoStatistic.nominatim.country }})
+            <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
+                <mat-icon inline>open_in_new</mat-icon>
+            </a>
+        </h2>
+
+        <div class="block-container">
+            <!-- Block 1: Flag + Country Info -->
+            <div class="info-block">
+                <div class="icon-section">
+                    <img [src]="geoStatistic.countryInfo.flag_svg" alt="Flag" class="flag">
+                </div>
+                <div class="table-section">
+                    <table>
+                        <tr>
+                            <td>Capital:</td>
+                            <td>{{ geoStatistic.countryInfo.capital }}</td>
+                        </tr>
+                        <tr>
+                            <td>Region:</td>
+                            <td>{{ geoStatistic.countryInfo.region }} ({{ geoStatistic.countryInfo.subregion }})</td>
+                        </tr>
+                        <tr>
+                            <td>Languages:</td>
+                            <td>{{ geoStatistic.countryInfo.languages.join(', ') }}</td>
+                        </tr>
+                        <tr>
+                            <td>Currencies:</td>
+                            <td>{{ geoStatistic.countryInfo.currencies.join(', ') }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Block 2: Pin + Nominatim Info -->
+            <div class="info-block">
+                <div class="icon-section">
+                    <mat-icon class="pin-icon">place</mat-icon>
+                </div>
+                <div class="table-section">
+                    <table>
+                        <tr *ngIf="geoStatistic.nominatim.state">
+                            <td>State:</td>
+                            <td>{{ geoStatistic.nominatim.state }}</td>
+                        </tr>
+                        <tr *ngIf="geoStatistic.nominatim.county">
+                            <td>County:</td>
+                            <td>{{ geoStatistic.nominatim.county }}</td>
+                        </tr>
+                        <tr *ngIf="geoStatistic.nominatim.city">
+                            <td>City:</td>
+                            <td>{{ geoStatistic.nominatim.city }}</td>
+                        </tr>
+                        <tr *ngIf="geoStatistic.nominatim.suburb">
+                            <td>Suburb:</td>
+                            <td>{{ geoStatistic.nominatim.suburb }}</td>
+                        </tr>
+                        <tr *ngIf="geoStatistic.nominatim.neighbourhood">
+                            <td>Neighbourhood:</td>
+                            <td>{{ geoStatistic.nominatim.neighbourhood }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="stat-grid">
+            <div *ngIf="geoStatistic.countryInfo.population != null">
+                Population: {{ geoStatistic.countryInfo.population | number }}
+            </div>
+            <div *ngIf="geoStatistic.countryInfo.area_km2 != null">
+                Area: {{ geoStatistic.countryInfo.area_km2 | number }} km²
+            </div>
+            <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null">
+                Density: {{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} per
+                km²
+            </div>
+            <div *ngIf="geoStatistic.worldBank.gdp?.value != null">
+                GDP: ${{ geoStatistic.worldBank.gdp.value | number }}
+            </div>
+            <div *ngIf="geoStatistic.worldBank.gdpPerCapita != null">
+                GDP per capita: ${{ geoStatistic.worldBank.gdpPerCapita | number:'1.0-0' }}
+            </div>
+            <div *ngIf="geoStatistic.worldBank.gniPerCapita?.value != null">
+                GNI per capita: ${{ geoStatistic.worldBank.gniPerCapita.value | number:'1.0-0' }}
+            </div>
+            <div *ngIf="geoStatistic.worldBank.lifeExpectancy?.value != null">
+                Life expectancy: {{ geoStatistic.worldBank.lifeExpectancy.value | number:'1.0-1' }} years
+            </div>
+            <div *ngIf="geoStatistic.worldBank.povertyRate?.value_percent != null">
+                Poverty rate: {{ (geoStatistic.worldBank.povertyRate.value_percent ?? 0) * 100 | number:'1.1-1' }}%
+            </div>
+        </div>
+
+        <div class="data-source">
+            Data sources:
+            <a href="https://openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a>,
+            <a href="https://restcountries.com/" target="_blank" rel="noopener">REST Countries</a>,
+            <a href="https://data.worldbank.org/" target="_blank" rel="noopener">World Bank</a>
+        </div>
+    </ng-container>
+</mat-dialog-content>

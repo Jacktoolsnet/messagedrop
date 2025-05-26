@@ -30,7 +30,7 @@ export class UserService {
       longitude: 0,
       plusCode: ''
     },
-    local: '',
+    locale: '',
     language: '',
     subscription: '',
     cryptoKeyPair: {
@@ -94,8 +94,8 @@ export class UserService {
 
   setUser(userSubject: Subject<void>, user: User) {
     this.user = user;
-    this.user.local = navigator.language;
-    this.user.language = this.getLanguageForLocation(this.user.local);
+    this.user.locale = navigator.language;
+    this.user.language = this.getLanguageForLocation(this.user.locale);
     this.loadProfile();
     this.ready = true;
     userSubject.next();
