@@ -67,30 +67,37 @@
         </div>
 
         <div class="stat-grid">
-            <div *ngIf="geoStatistic.countryInfo.population != null">
+            <div *ngIf="geoStatistic.countryInfo.population != null"
+                matTooltip="Total number of people living in the country">
                 Population: {{ geoStatistic.countryInfo.population | number }}
             </div>
-            <div *ngIf="geoStatistic.countryInfo.area_km2 != null">
+            <div *ngIf="geoStatistic.countryInfo.area_km2 != null"
+                matTooltip="Total area of the country in square kilometers">
                 Area: {{ geoStatistic.countryInfo.area_km2 | number }} km²
             </div>
-            <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null">
+            <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null"
+                matTooltip="Average number of people per square kilometer">
                 Density: {{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} per
                 km²
             </div>
-            <div *ngIf="geoStatistic.worldBank.gdp?.value != null">
+            <div *ngIf="geoStatistic.worldBank.gdp?.value != null"
+                matTooltip="Gross Domestic Product: total value of goods and services produced">
                 GDP: ${{ geoStatistic.worldBank.gdp.value | number }}
             </div>
-            <div *ngIf="geoStatistic.worldBank.gdpPerCapita != null">
+            <div *ngIf="geoStatistic.worldBank.gdpPerCapita != null" matTooltip="GDP divided by the number of people">
                 GDP per capita: ${{ geoStatistic.worldBank.gdpPerCapita | number:'1.0-0' }}
             </div>
-            <div *ngIf="geoStatistic.worldBank.gniPerCapita?.value != null">
+            <div *ngIf="geoStatistic.worldBank.gniPerCapita?.value != null"
+                matTooltip="Gross National Income per person">
                 GNI per capita: ${{ geoStatistic.worldBank.gniPerCapita.value | number:'1.0-0' }}
             </div>
-            <div *ngIf="geoStatistic.worldBank.lifeExpectancy?.value != null">
+            <div *ngIf="geoStatistic.worldBank.lifeExpectancy?.value != null"
+                matTooltip="Average life expectancy at birth">
                 Life expectancy: {{ geoStatistic.worldBank.lifeExpectancy.value | number:'1.0-1' }} years
             </div>
-            <div *ngIf="geoStatistic.worldBank.povertyRate?.value_percent != null">
-                Poverty rate: {{ (geoStatistic.worldBank.povertyRate.value_percent ?? 0) * 100 | number:'1.1-1' }}%
+            <div *ngIf="geoStatistic.worldBank.povertyRate?.value_percent != null"
+                matTooltip="Percentage of population living below the poverty line">
+                Poverty rate: {{ (geoStatistic.worldBank.povertyRate.value_percent ?? 0) * 100 | number:'1.1-1' }}%%
             </div>
         </div>
 

@@ -3,6 +3,7 @@ import { Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { GeoStatistic } from '../../interfaces/geo-statistic';
 
 @Component({
@@ -11,7 +12,8 @@ import { GeoStatistic } from '../../interfaces/geo-statistic';
     CommonModule,
     MatDialogModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatTooltipModule
   ],
   templateUrl: './geo-statistic.component.html',
   styleUrl: './geo-statistic.component.css'
