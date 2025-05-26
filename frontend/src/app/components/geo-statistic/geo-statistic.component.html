@@ -1,9 +1,8 @@
 <mat-dialog-content #dialogContent>
     <ng-container *ngIf="geoStatistic">
         <h2>
-            {{ geoStatistic.countryInfo.name }} ({{ geoStatistic.nominatim.country }})
             <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
-                <mat-icon inline>open_in_new</mat-icon>
+                {{ geoStatistic.countryInfo.name }} ({{ geoStatistic.nominatim.country }})
             </a>
         </h2>
 
