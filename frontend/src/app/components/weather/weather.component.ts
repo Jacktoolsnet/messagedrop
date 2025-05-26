@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
@@ -14,9 +14,6 @@ import {
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
 import { Weather } from '../../interfaces/weather';
-import { MapService } from '../../services/map.service';
-import { UserService } from '../../services/user.service';
-import { WeatherService } from '../../services/weather.service';
 
 @Component({
   selector: 'app-weather',
@@ -32,15 +29,16 @@ import { WeatherService } from '../../services/weather.service';
   templateUrl: './weather.component.html',
   styleUrls: ['./weather.component.css']
 })
-export class WeatherComponent implements OnInit {
+export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
 
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  @ViewChild('dialogContent', { static: true }) dialogContentRef!: ElementRef;
+  private resizeObserver?: ResizeObserver;
+
   selectedDayIndex = 0;
   weather: Weather | null = null;
   selectedChart: 'temperature' | 'precipitation' | 'uvIndex' = 'temperature';
   chartModes: Array<'temperature' | 'precipitation' | 'uvIndex'> = ['temperature', 'precipitation', 'uvIndex'];
-
-  loading = true;
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {
@@ -74,11 +72,17 @@ export class WeatherComponent implements OnInit {
   };
 
   constructor(
-    private userService: UserService,
-    private weatherService: WeatherService,
-    private mapService: MapService,
-    private dialogRef: MatDialogRef<WeatherComponent>
+    private dialogRef: MatDialogRef<WeatherComponent>,
+    @Inject(MAT_DIALOG_DATA) public data: { weather: Weather }
   ) {
+    this.dialogRef.afterOpened().subscribe(() => {
+      setTimeout(() => {
+        this.updateChart();
+        this.chart?.chart?.resize();
+        this.chart?.chart?.update();
+      }, 0);
+    });
+    this.weather = this.data.weather;
     Chart.register(
       LineController,
       LineElement,
@@ -92,25 +96,18 @@ export class WeatherComponent implements OnInit {
     );
   }
 
-  ngOnInit(): void {
-    const location = this.mapService.getMapLocation();
-    this.weatherService
-      .getWeather(
-        this.userService.getUser().language?.slice(0, 2) || 'de',
-        location.latitude,
-        location.longitude,
-        3
-      )
-      .subscribe({
-        next: (res) => {
-          this.weather = res;
-          this.loading = false;
-          this.updateChart();
-        },
-        error: () => {
-          this.loading = false;
-        }
-      });
+  ngOnInit(): void { }
+
+  ngAfterViewInit(): void {
+    this.resizeObserver = new ResizeObserver(() => {
+      this.chart?.chart?.resize();
+      this.chart?.chart?.update();
+    });
+    this.resizeObserver.observe(this.dialogContentRef.nativeElement);
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
   }
 
   getDayLabel(index: number): string {

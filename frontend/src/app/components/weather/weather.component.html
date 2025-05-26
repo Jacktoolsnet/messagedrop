@@ -1,5 +1,5 @@
-<mat-dialog-content>
-    <ng-container *ngIf="!loading && weather">
+<mat-dialog-content #dialogContent>
+    <ng-container *ngIf="weather">
         <h2>Weather</h2>
 
         <div class="day-switch">
@@ -20,4 +20,8 @@
             </button>
         </div>
     </ng-container>
+    <div class="data-source">
+        Weather data provided by
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
+    </div>
 </mat-dialog-content>

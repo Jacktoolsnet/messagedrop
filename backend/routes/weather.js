@@ -24,7 +24,6 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
         response.data = weatherRes.data;
         res.status(200).json(response);
     } catch (err) {
-        console.error('Open-Meteo Error:', err.response?.data || err.message);
         response.status = err.response?.status || 500;
         response.error = err.response?.data || 'Request failed';
         res.status(response.status).json(response);

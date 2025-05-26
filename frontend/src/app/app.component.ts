@@ -56,6 +56,7 @@ import { SharedContentService } from './services/shared-content.service';
 import { SocketioService } from './services/socketio.service';
 import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
+import { WeatherService } from './services/weather.service';
 
 @Component({
   selector: 'app-root',
@@ -109,6 +110,7 @@ export class AppComponent implements OnInit {
     private messageService: MessageService,
     private statisticService: StatisticService,
     private socketioService: SocketioService,
+    private weatherService: WeatherService,
     private snackBar: MatSnackBar,
     public createPinDialog: MatDialog,
     public checkPinDialog: MatDialog,
@@ -995,20 +997,55 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public showWeather() {
-    const dialogRef = this.dialog.open(WeatherComponent, {
-      data: {},
-      closeOnNavigation: true,
-      minWidth: '90vw',
-      maxWidth: '90vw',
-      minHeight: '20vh',
-      maxHeight: '90vh',
-      hasBackdrop: true
-    });
+    this.weatherService
+      .getWeather(
+        this.userService.getUser().language?.slice(0, 2) || 'de',
+        this.mapService.getMapLocation().latitude,
+        this.mapService.getMapLocation().longitude,
+        3
+      )
+      .subscribe({
+        next: (weather) => {
+          const dialogRef = this.dialog.open(WeatherComponent, {
+            data: { weather: weather },
+            closeOnNavigation: true,
+            minWidth: '90vw',
+            maxWidth: '90vw',
+            minHeight: '20vh',
+            maxHeight: '90vh',
+            hasBackdrop: true
+          });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
+          dialogRef.afterOpened().subscribe(e => {
+          });
 
-    dialogRef.afterClosed().subscribe();
+          dialogRef.afterClosed().subscribe();
+        },
+        error: (err) => {
+          const dialogRef = this.displayMessage.open(DisplayMessage, {
+            panelClass: '',
+            closeOnNavigation: false,
+            data: {
+              title: err.statusText,
+              image: '',
+              icon: 'hourglass_bottom',
+              message: err.error?.error,
+              button: '',
+              delay: 0,
+              showSpinner: false
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            hasBackdrop: true
+          });
+
+          dialogRef.afterOpened().subscribe(e => { });
+
+          dialogRef.afterClosed().subscribe(() => {
+          });
+        }
+      });
+
   }
 
   private createMarkerLocations() {
