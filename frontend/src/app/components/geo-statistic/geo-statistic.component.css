@@ -30,7 +30,6 @@ h2 a {
     display: flex;
     flex-wrap: wrap;
     gap: 1rem;
-    margin-bottom: 1rem;
     width: 100%;
 }
 
@@ -116,4 +115,39 @@ td:first-child {
 
 .data-source a:hover {
     text-decoration: none;
+}
+
+.category-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+
+.category-dropdown {
+    flex: 1 1 200px;
+    min-width: 200px;
+    display: flex;
+    align-items: center;
+}
+
+.indicator-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    flex: 2 1 400px;
+}
+
+.indicator-buttons button {
+    flex: 1 1 auto;
+    min-width: 120px;
+    min-height: 3.5rem;
+    /* hier setzen wir die Zielhöhe */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    font-size: 1rem;
+    line-height: 1.2;
 }

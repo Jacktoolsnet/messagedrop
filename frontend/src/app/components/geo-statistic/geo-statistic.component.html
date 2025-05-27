@@ -101,6 +101,25 @@
             </div>
         </div>
 
+        <div class="category-container">
+            <mat-form-field appearance="fill" class="category-dropdown">
+                <mat-label>Category</mat-label>
+                <mat-select [(value)]="selectedCategory">
+                    <mat-option *ngFor="let category of categories" [value]="category.value">
+                        {{ category.label }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <div class="indicator-buttons">
+                <button mat-raised-button *ngFor="let indicator of activeIndicators"
+                    (click)="onIndicatorSelect(indicator)" [matTooltip]="getTooltipText(indicator.key)"
+                    matTooltipPosition="above">
+                    {{ indicator.label }}
+                </button>
+            </div>
+        </div>
+
         <div class="data-source">
             Data sources:
             <a href="https://openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a>,
