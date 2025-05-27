@@ -1,124 +1,170 @@
 <mat-dialog-content #dialogContent>
     <ng-container *ngIf="geoStatistic">
-        <h2>
-            <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
-                {{ geoStatistic.countryInfo.name }} ({{ geoStatistic.nominatim.country }})
-            </a>
-        </h2>
+        <mat-accordion multi>
 
-        <div class="block-container">
-            <!-- Block 1: Flag + Country Info -->
-            <div class="info-block">
-                <div class="icon-section">
-                    <img [src]="geoStatistic.countryInfo.flag_svg" alt="Flag" class="flag">
+            <!-- Location (Nominatim) -->
+            <mat-expansion-panel expanded>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Location Details
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="block-container">
+                    <div class="info-block">
+                        <div class="icon-section">
+                            <mat-icon class="pin-icon">place</mat-icon>
+                        </div>
+                        <div class="table-section">
+                            <table>
+                                <tr *ngIf="geoStatistic.nominatim.state">
+                                    <td>State:</td>
+                                    <td>{{ geoStatistic.nominatim.state }}</td>
+                                </tr>
+                                <tr *ngIf="geoStatistic.nominatim.county">
+                                    <td>County:</td>
+                                    <td>{{ geoStatistic.nominatim.county }}</td>
+                                </tr>
+                                <tr *ngIf="geoStatistic.nominatim.city">
+                                    <td>City:</td>
+                                    <td>{{ geoStatistic.nominatim.city }}</td>
+                                </tr>
+                                <tr *ngIf="geoStatistic.nominatim.suburb">
+                                    <td>Suburb:</td>
+                                    <td>{{ geoStatistic.nominatim.suburb }}</td>
+                                </tr>
+                                <tr *ngIf="geoStatistic.nominatim.neighbourhood">
+                                    <td>Neighbourhood:</td>
+                                    <td>{{ geoStatistic.nominatim.neighbourhood }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-                <div class="table-section">
-                    <table>
-                        <tr>
-                            <td>Capital:</td>
-                            <td>{{ geoStatistic.countryInfo.capital }}</td>
-                        </tr>
-                        <tr>
-                            <td>Region:</td>
-                            <td>{{ geoStatistic.countryInfo.region }} ({{ geoStatistic.countryInfo.subregion }})</td>
-                        </tr>
-                        <tr>
-                            <td>Languages:</td>
-                            <td>{{ geoStatistic.countryInfo.languages.join(', ') }}</td>
-                        </tr>
-                        <tr>
-                            <td>Currencies:</td>
-                            <td>{{ geoStatistic.countryInfo.currencies.join(', ') }}</td>
-                        </tr>
-                    </table>
+            </mat-expansion-panel>
+
+            <!-- Country Information -->
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Country Information
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="block-container">
+                    <div class="info-block">
+                        <div class="icon-section">
+                            <img [src]="geoStatistic.countryInfo.flag_svg" alt="Flag" class="flag">
+                        </div>
+                        <div class="table-section">
+                            <table>
+                                <tr>
+                                    <td>Capital:</td>
+                                    <td>{{ geoStatistic.countryInfo.capital }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Region:</td>
+                                    <td>{{ geoStatistic.countryInfo.region }} ({{ geoStatistic.countryInfo.subregion }})
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Languages:</td>
+                                    <td>{{ geoStatistic.countryInfo.languages.join(', ') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Currencies:</td>
+                                    <td>{{ geoStatistic.countryInfo.currencies.join(', ') }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Google Maps:</td>
+                                    <td>
+                                        <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
+                                            {{ geoStatistic.countryInfo.name }} ({{ geoStatistic.nominatim.country }})
+                                        </a>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            </mat-expansion-panel>
 
-            <!-- Block 2: Pin + Nominatim Info -->
-            <div class="info-block">
-                <div class="icon-section">
-                    <mat-icon class="pin-icon">place</mat-icon>
+            <!-- Statistics -->
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Country Statistics
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="stat-grid">
+                    <div *ngIf="geoStatistic.countryInfo.population != null"
+                        matTooltip="Total number of people living in the country">
+                        Population: {{ geoStatistic.countryInfo.population | number }}
+                    </div>
+                    <div *ngIf="geoStatistic.countryInfo.area_km2 != null"
+                        matTooltip="Total area of the country in square kilometers">
+                        Area: {{ geoStatistic.countryInfo.area_km2 | number }} km²
+                    </div>
+                    <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null"
+                        matTooltip="Average number of people per square kilometer">
+                        Density: {{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} per km²
+                    </div>
+                    <div *ngIf="geoStatistic.worldBank.gdp?.value != null"
+                        matTooltip="Gross Domestic Product: total value of goods and services produced">
+                        GDP: ${{ geoStatistic.worldBank.gdp.value | number }}
+                    </div>
+                    <div *ngIf="geoStatistic.worldBank.gdpPerCapita != null"
+                        matTooltip="GDP divided by the number of people">
+                        GDP per capita: ${{ geoStatistic.worldBank.gdpPerCapita | number:'1.0-0' }}
+                    </div>
+                    <div *ngIf="geoStatistic.worldBank.gniPerCapita?.value != null"
+                        matTooltip="Gross National Income per person">
+                        GNI per capita: ${{ geoStatistic.worldBank.gniPerCapita.value | number:'1.0-0' }}
+                    </div>
+                    <div *ngIf="geoStatistic.worldBank.lifeExpectancy?.value != null"
+                        matTooltip="Average life expectancy at birth">
+                        Life expectancy: {{ geoStatistic.worldBank.lifeExpectancy.value | number:'1.0-1' }} years
+                    </div>
+                    <div *ngIf="geoStatistic.worldBank.povertyRate?.value_percent != null"
+                        matTooltip="Percentage of population living below the poverty line">
+                        Poverty rate: {{ (geoStatistic.worldBank.povertyRate.value_percent ?? 0) * 100 | number:'1.1-1'
+                        }}%
+                    </div>
                 </div>
-                <div class="table-section">
-                    <table>
-                        <tr *ngIf="geoStatistic.nominatim.state">
-                            <td>State:</td>
-                            <td>{{ geoStatistic.nominatim.state }}</td>
-                        </tr>
-                        <tr *ngIf="geoStatistic.nominatim.county">
-                            <td>County:</td>
-                            <td>{{ geoStatistic.nominatim.county }}</td>
-                        </tr>
-                        <tr *ngIf="geoStatistic.nominatim.city">
-                            <td>City:</td>
-                            <td>{{ geoStatistic.nominatim.city }}</td>
-                        </tr>
-                        <tr *ngIf="geoStatistic.nominatim.suburb">
-                            <td>Suburb:</td>
-                            <td>{{ geoStatistic.nominatim.suburb }}</td>
-                        </tr>
-                        <tr *ngIf="geoStatistic.nominatim.neighbourhood">
-                            <td>Neighbourhood:</td>
-                            <td>{{ geoStatistic.nominatim.neighbourhood }}</td>
-                        </tr>
-                    </table>
+            </mat-expansion-panel>
+
+            <!-- Category and Indicators -->
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <mat-panel-title>
+                        Explore Indicators
+                    </mat-panel-title>
+                </mat-expansion-panel-header>
+                <div class="category-container">
+                    <mat-form-field appearance="fill" class="category-dropdown">
+                        <mat-label>Category</mat-label>
+                        <mat-select [(value)]="selectedCategory">
+                            <mat-option *ngFor="let category of categories" [value]="category.value">
+                                {{ category.label }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="fill" class="subcategory-dropdown">
+                        <mat-label>Indicator</mat-label>
+                        <mat-select (selectionChange)="onIndicatorSelect($event.value)">
+                            <mat-option *ngFor="let indicator of activeIndicators" [value]="indicator">
+                                {{ indicator.label }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
                 </div>
-            </div>
-        </div>
 
-        <div class="stat-grid">
-            <div *ngIf="geoStatistic.countryInfo.population != null"
-                matTooltip="Total number of people living in the country">
-                Population: {{ geoStatistic.countryInfo.population | number }}
-            </div>
-            <div *ngIf="geoStatistic.countryInfo.area_km2 != null"
-                matTooltip="Total area of the country in square kilometers">
-                Area: {{ geoStatistic.countryInfo.area_km2 | number }} km²
-            </div>
-            <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null"
-                matTooltip="Average number of people per square kilometer">
-                Density: {{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} per
-                km²
-            </div>
-            <div *ngIf="geoStatistic.worldBank.gdp?.value != null"
-                matTooltip="Gross Domestic Product: total value of goods and services produced">
-                GDP: ${{ geoStatistic.worldBank.gdp.value | number }}
-            </div>
-            <div *ngIf="geoStatistic.worldBank.gdpPerCapita != null" matTooltip="GDP divided by the number of people">
-                GDP per capita: ${{ geoStatistic.worldBank.gdpPerCapita | number:'1.0-0' }}
-            </div>
-            <div *ngIf="geoStatistic.worldBank.gniPerCapita?.value != null"
-                matTooltip="Gross National Income per person">
-                GNI per capita: ${{ geoStatistic.worldBank.gniPerCapita.value | number:'1.0-0' }}
-            </div>
-            <div *ngIf="geoStatistic.worldBank.lifeExpectancy?.value != null"
-                matTooltip="Average life expectancy at birth">
-                Life expectancy: {{ geoStatistic.worldBank.lifeExpectancy.value | number:'1.0-1' }} years
-            </div>
-            <div *ngIf="geoStatistic.worldBank.povertyRate?.value_percent != null"
-                matTooltip="Percentage of population living below the poverty line">
-                Poverty rate: {{ (geoStatistic.worldBank.povertyRate.value_percent ?? 0) * 100 | number:'1.1-1' }}%%
-            </div>
-        </div>
-
-        <div class="category-container">
-            <mat-form-field appearance="fill" class="category-dropdown">
-                <mat-label>Category</mat-label>
-                <mat-select [(value)]="selectedCategory">
-                    <mat-option *ngFor="let category of categories" [value]="category.value">
-                        {{ category.label }}
-                    </mat-option>
-                </mat-select>
-            </mat-form-field>
-
-            <div class="indicator-buttons">
-                <button mat-raised-button *ngFor="let indicator of activeIndicators"
-                    (click)="onIndicatorSelect(indicator)" [matTooltip]="getTooltipText(indicator.key)"
-                    matTooltipPosition="above">
-                    {{ indicator.label }}
-                </button>
-            </div>
-        </div>
+                <div *ngIf="selectedIndicator" class="indicator-display">
+                    <h3>{{ selectedIndicator.label }}</h3>
+                    <p>{{ getTooltipText(selectedIndicator.key) }}</p>
+                    <!-- TODO: Insert chart or detailed data display here -->
+                </div>
+            </mat-expansion-panel>
+        </mat-accordion>
 
         <div class="data-source">
             Data sources:

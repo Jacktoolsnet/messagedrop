@@ -21,6 +21,20 @@ mat-dialog-content {
     overflow: auto;
 }
 
+mat-expansion-panel {
+    background-color: #3a3a3a;
+    color: inherit;
+}
+
+mat-expansion-panel-header {
+    background-color: #444;
+    color: inherit;
+}
+
+mat-expansion-panel-header.mat-expanded {
+    background-color: #555;
+}
+
 h2 a {
     color: inherit;
     text-decoration: none;
@@ -125,29 +139,15 @@ td:first-child {
     margin-bottom: 1rem;
 }
 
-.category-dropdown {
+.category-dropdown,
+.subcategory-dropdown {
     flex: 1 1 200px;
     min-width: 200px;
-    display: flex;
-    align-items: center;
 }
 
-.indicator-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    flex: 2 1 400px;
-}
-
-.indicator-buttons button {
-    flex: 1 1 auto;
-    min-width: 120px;
-    min-height: 3.5rem;
-    /* hier setzen wir die Zielhöhe */
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    white-space: nowrap;
-    font-size: 1rem;
-    line-height: 1.2;
+.indicator-display {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #3a3a3a;
+    border-radius: 0.5rem;
 }
