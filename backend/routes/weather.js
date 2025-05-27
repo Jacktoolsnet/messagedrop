@@ -30,4 +30,66 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
     }
 });
 
+router.get('/history/:latitude/:longitude/:years', [security.checkToken], async (req, res) => {
+    let response = { status: 0 };
+    const db = req.database.db;
+
+    try {
+        const { latitude, longitude, years } = req.params;
+
+        const endDate = new Date();
+        const startDate = new Date();
+        startDate.setFullYear(endDate.getFullYear() - years);
+
+        const cacheKey = `${latitude}_${longitude}_${years}`;
+        const cachedData = await new Promise((resolve, reject) => {
+            tableWeatherHistory.getHistoryData(db, cacheKey, (err, row) => {
+                if (err) return reject(err);
+                resolve(row);
+            });
+        });
+
+        if (cachedData) {
+            response.status = 200;
+            response.data = JSON.parse(cachedData.historyData);
+            return res.status(200).json(response);
+        }
+
+        const url = 'https://archive-api.open-meteo.com/v1/archive';
+        const params = {
+            latitude,
+            longitude,
+            start_date: startDate.toISOString().split('T')[0],
+            end_date: endDate.toISOString().split('T')[0],
+            temperature_2m_mean: 'true',
+            precipitation_sum: 'true',
+            timezone: 'auto'
+        };
+
+        const weatherRes = await axios.get(url, { params });
+        const historyData = weatherRes.data;
+
+        await new Promise((resolve, reject) => {
+            tableWeatherHistory.setHistoryData(
+                db,
+                cacheKey,
+                JSON.stringify(historyData),
+                (err) => {
+                    if (err) return reject(err);
+                    resolve();
+                }
+            );
+        });
+
+        response.status = 200;
+        response.data = historyData;
+        res.status(200).json(response);
+
+    } catch (err) {
+        response.status = err.response?.status || 500;
+        response.error = err.response?.data || err.message || 'Request failed';
+        res.status(response.status).json(response);
+    }
+});
+
 module.exports = router;

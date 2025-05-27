@@ -316,3 +316,17 @@ cron.schedule('*/5 * * * *', () => {
     }
   });
 });
+
+cron.schedule('0 0 * * *', () => {
+  tableGeoStatistic.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableWeatherHistory.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+});

@@ -2,11 +2,11 @@ export interface GeoStatistic {
     coordinates: { latitude: number; longitude: number; };
     nominatim: {
         country: string;
-        state: string;
-        county: string;
-        city: string;
-        suburb: string;
-        neighbourhood: string;
+        state?: string;
+        county?: string;
+        city?: string;
+        suburb?: string;
+        neighbourhood?: string;
     };
     countryInfo: {
         name: string;
@@ -28,5 +28,16 @@ export interface GeoStatistic {
         gniPerCapita: { year: string; value: number | null; };
         lifeExpectancy: { year: string; value: number | null; };
         povertyRate: { year: string; value_percent: number | null; };
+    };
+    weatherHistory: {
+        latitude: number;
+        longitude: number;
+        elevation: number;
+        timezone: string;
+        daily: {
+            time: string[];
+            temperature_2m_mean: number[];
+            precipitation_sum: number[];
+        };
     };
 }

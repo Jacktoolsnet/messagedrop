@@ -55,8 +55,17 @@ const getCountryData = function (db, countryCode, callback) {
     }
 };
 
+const cleanExpired = function (db, callback) {
+    const sql = `
+        DELETE FROM ${tableName}
+        WHERE ${columnLastUpdate} < DATETIME('now', '-1 month');
+    `;
+    db.run(sql, callback);
+};
+
 module.exports = {
     init,
     setCountryData,
-    getCountryData
+    getCountryData,
+    cleanExpired
 }
