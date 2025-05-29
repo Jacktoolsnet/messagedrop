@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,6 +11,7 @@ import {
   LinearScale, LineController, LineElement, PointElement, Title, Tooltip
 } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
+import { debounceTime, fromEvent, Subscription } from 'rxjs';
 import { GeoStatistic } from '../../interfaces/geo-statistic';
 type WorldBankKey = keyof GeoStatistic['worldBank'];
 
@@ -29,7 +30,13 @@ type WorldBankKey = keyof GeoStatistic['worldBank'];
   templateUrl: './geo-statistic.component.html',
   styleUrl: './geo-statistic.component.css'
 })
-export class GeoStatisticComponent {
+export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
+
+  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  @ViewChild('dialogContent', { static: true }) dialogContentRef!: ElementRef;
+  private resizeObserver?: ResizeObserver;
+  private windowResizeSub?: Subscription;
+
   public geoStatistic: GeoStatistic | undefined;
   selectedCategory = 'economy';
   selectedIndicator: { key: string; label: string } | null = null;
@@ -43,30 +50,30 @@ export class GeoStatisticComponent {
   // Original complete map
   fullIndicatorMap: { [key: string]: { key: string; label: string }[] } = {
     economy: [
-      { key: 'gdp', label: 'GDP' },
-      { key: 'gdpPerCapita', label: 'GDP per Capita' },
-      { key: 'militaryExpenditure', label: 'Military Expenditure' },
-      { key: 'governmentSpending', label: 'Government Spending' },
-      { key: 'inflation', label: 'Inflation' },
-      { key: 'unemployment', label: 'Unemployment' },
-      { key: 'investment', label: 'Investment' }
+      { key: 'gdp', label: 'GDP (USD)' },
+      { key: 'gdpPerCapita', label: 'GDP per Capita (USD)' },
+      { key: 'militaryExpenditure', label: 'Military Expenditure (USD)' },
+      { key: 'governmentSpending', label: 'Government Spending (USD)' },
+      { key: 'inflation', label: 'Inflation (%)' },
+      { key: 'unemployment', label: 'Unemployment (%)' },
+      { key: 'investment', label: 'Investment (USD)' }
     ],
     social: [
-      { key: 'lifeExpectancy', label: 'Life Expectancy' },
-      { key: 'povertyRate', label: 'Poverty Rate' },
-      { key: 'literacyRate', label: 'Literacy Rate' },
-      { key: 'primaryEnrollment', label: 'Primary Enrollment' },
-      { key: 'secondaryEnrollment', label: 'Secondary Enrollment' },
+      { key: 'lifeExpectancy', label: 'Life Expectancy (years)' },
+      { key: 'povertyRate', label: 'Poverty (absolute number)' },
+      { key: 'literacyRate', label: 'Literacy Rate (%)' },
+      { key: 'primaryEnrollment', label: 'Primary Enrollment (%)' },
+      { key: 'secondaryEnrollment', label: 'Secondary Enrollment (%)' },
       { key: 'giniIndex', label: 'Gini Index' }
     ],
     climate: [
-      { key: 'co2Emissions', label: 'CO₂ Emissions' },
-      { key: 'renewableEnergy', label: 'Renewable Energy' },
-      { key: 'forestArea', label: 'Forest Area' },
-      { key: 'airPollution', label: 'Air Pollution' },
-      { key: 'energyUse', label: 'Energy Use' },
-      { key: 'temperatureTrend', label: 'Temperature Trend' },
-      { key: 'precipitationTrend', label: 'Precipitation Trend' }
+      { key: 'co2Emissions', label: 'CO₂ Emissions (kilotons)' },
+      { key: 'renewableEnergy', label: 'Renewable Energy (absolute)' },
+      { key: 'forestArea', label: 'Forest Area (%)' },
+      { key: 'airPollution', label: 'Air Pollution (PM2.5 µg/m³)' },
+      { key: 'energyUse', label: 'Energy Use (kg oil equivalent per capita)' },
+      { key: 'temperatureTrend', label: 'Temperature Trend (°C)' },
+      { key: 'precipitationTrend', label: 'Precipitation Trend (mm)' }
     ]
   };
 
@@ -108,6 +115,33 @@ export class GeoStatisticComponent {
     this.buildIndicatorMap();
   }
 
+  ngOnInit(): void { }
+
+  ngAfterViewInit(): void {
+    // Beobachtet lokale Größenänderungen (z. B. Inhalte im Dialog)
+    this.resizeObserver = new ResizeObserver(() => {
+      this.updateChartSize();
+    });
+    this.resizeObserver.observe(this.dialogContentRef.nativeElement);
+
+    // Beobachtet Fensteränderungen (z. B. Browser maximieren)
+    this.windowResizeSub = fromEvent(window, 'resize')
+      .pipe(debounceTime(200))  // Warte 200ms, bevor es reagiert
+      .subscribe(() => {
+        this.updateChartSize();
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
+    this.windowResizeSub?.unsubscribe();
+  }
+
+  private updateChartSize() {
+    this.chart?.chart?.resize();
+    this.chart?.chart?.update();
+  }
+
   buildIndicatorMap() {
     if (!this.geoStatistic) return;
 
@@ -127,10 +161,10 @@ export class GeoStatisticComponent {
 
     this.indicatorMap = resultMap;
 
-    const firstAvailable = this.indicatorMap[this.selectedCategory]?.[0];
+    /*const firstAvailable = this.indicatorMap[this.selectedCategory]?.[0];
     if (firstAvailable) {
       this.onIndicatorSelect(firstAvailable);
-    }
+    }*/
   }
 
   firstValidValue(series: { year: string; value: number | null }[] | undefined): number | null {
@@ -145,26 +179,26 @@ export class GeoStatisticComponent {
 
   getTooltipText(key: string): string {
     const tooltips: { [key: string]: string } = {
-      gdp: 'Gross Domestic Product over time.',
-      gdpPerCapita: 'GDP divided by population over time.',
-      militaryExpenditure: 'Military spending over time.',
-      governmentSpending: 'Government spending as % of GDP.',
-      inflation: 'Consumer price inflation rate.',
-      unemployment: 'Unemployment rate.',
-      investment: 'Gross capital formation.',
-      lifeExpectancy: 'Average lifespan.',
-      povertyRate: 'Percentage below poverty line.',
-      literacyRate: 'Adult literacy rate.',
-      primaryEnrollment: 'Primary school enrollment.',
-      secondaryEnrollment: 'Secondary school enrollment.',
-      giniIndex: 'Income inequality index.',
-      co2Emissions: 'Per capita CO₂ emissions.',
-      renewableEnergy: 'Share of renewable energy.',
-      forestArea: 'Percentage of land area forested.',
-      airPollution: 'Average PM2.5 air pollution.',
-      energyUse: 'Energy use per capita.',
-      temperatureTrend: 'Historical average temperatures.',
-      precipitationTrend: 'Historical precipitation sums.'
+      gdp: 'Gross Domestic Product (GDP) in absolute USD over time.',
+      gdpPerCapita: 'GDP divided by total population (USD per person).',
+      militaryExpenditure: 'Total military spending in USD over time.',
+      governmentSpending: 'Total government expenditure in USD over time.',
+      inflation: 'Annual consumer price inflation rate (%).',
+      unemployment: 'Percentage of the labor force unemployed (%).',
+      investment: 'Gross capital formation in USD over time.',
+      lifeExpectancy: 'Average expected lifespan at birth (years).',
+      povertyRate: 'Number of people living below the poverty line.',
+      literacyRate: 'Adult literacy rate (% of population aged 15 and above).',
+      primaryEnrollment: 'Primary school enrollment rate (% of eligible children).',
+      secondaryEnrollment: 'Secondary school enrollment rate (% of eligible youth).',
+      giniIndex: 'Gini Index measuring income inequality (0 = equality, 100 = inequality).',
+      co2Emissions: 'Total CO₂ emissions in kilotons per year.',
+      renewableEnergy: 'Absolute amount of renewable energy used.',
+      forestArea: 'Percentage of land area covered by forests (%).',
+      airPollution: 'Average PM2.5 air pollution concentration (µg/m³).',
+      energyUse: 'Energy use per capita (kg of oil equivalent).',
+      temperatureTrend: 'Historical yearly average temperatures (°C).',
+      precipitationTrend: 'Historical yearly total precipitation (mm).'
     };
     return tooltips[key] || 'Click to view details';
   }

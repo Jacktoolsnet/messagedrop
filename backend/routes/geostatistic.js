@@ -23,9 +23,9 @@ async function getWorldBankIndicator(countryAlpha3, indicator, years) {
 router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
     const db = req.database.db;
+
     try {
         const { latitude, longitude, years } = req.params;
-
         const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
         const address = nominatimData.address;
         const countryAlpha2 = address?.country_code?.toUpperCase();
@@ -54,8 +54,11 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             const countryAlpha3 = countryData.cca3;
             if (!countryAlpha3) throw new Error('Alpha-3 country code not found');
 
+            // --- Load raw indicators ---
             const gdp = await getWorldBankIndicator(countryAlpha3, 'NY.GDP.MKTP.CD', years);
             const population = await getWorldBankIndicator(countryAlpha3, 'SP.POP.TOTL', years);
+            const energyUse = await getWorldBankIndicator(countryAlpha3, 'EG.USE.PCAP.KG.OE', years);
+
             const gdpPerCapita = gdp.map(gdpEntry => {
                 const popEntry = population.find(p => p.year === gdpEntry.year);
                 const popValue = popEntry?.value ?? null;
@@ -81,26 +84,58 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             const renewableEnergy = await getWorldBankIndicator(countryAlpha3, 'EG.FEC.RNEW.ZS', years);
             const forestArea = await getWorldBankIndicator(countryAlpha3, 'AG.LND.FRST.ZS', years);
             const airPollution = await getWorldBankIndicator(countryAlpha3, 'EN.ATM.PM25.MC.M3', years);
-            const energyUse = await getWorldBankIndicator(countryAlpha3, 'EG.USE.PCAP.KG.OE', years);
+
+            // --- Convert percentage values to absolute ---
+            const militaryExpenditureAbs = militaryExpenditure.map(entry => {
+                const gdpEntry = gdp.find(g => g.year === entry.year);
+                return {
+                    year: entry.year,
+                    value: gdpEntry && entry.value !== null ? (entry.value / 100) * gdpEntry.value : null
+                };
+            });
+
+            const governmentSpendingAbs = governmentSpending.map(entry => {
+                const gdpEntry = gdp.find(g => g.year === entry.year);
+                return {
+                    year: entry.year,
+                    value: gdpEntry && entry.value !== null ? (entry.value / 100) * gdpEntry.value : null
+                };
+            });
+
+            const povertyRateAbs = povertyRate.map(entry => {
+                const popEntry = population.find(p => p.year === entry.year);
+                return {
+                    year: entry.year,
+                    value: popEntry && entry.value !== null ? (entry.value / 100) * popEntry.value : null
+                };
+            });
+
+            const renewableEnergyAbs = renewableEnergy.map(entry => {
+                const energyEntry = energyUse.find(e => e.year === entry.year);
+                return {
+                    year: entry.year,
+                    value: energyEntry && entry.value !== null ? (entry.value / 100) * energyEntry.value : null
+                };
+            });
 
             worldBankData = {
                 gdp,
                 population,
                 gdpPerCapita,
                 gniPerCapita,
-                militaryExpenditure,
-                governmentSpending,
+                militaryExpenditure: militaryExpenditureAbs,
+                governmentSpending: governmentSpendingAbs,
                 inflation,
                 unemployment,
                 investment,
                 lifeExpectancy,
-                povertyRate,
+                povertyRate: povertyRateAbs,
                 literacyRate,
                 primaryEnrollment,
                 secondaryEnrollment,
                 giniIndex,
                 co2Emissions,
-                renewableEnergy,
+                renewableEnergy: renewableEnergyAbs,
                 forestArea,
                 airPollution,
                 energyUse
@@ -129,7 +164,6 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             const endDate = new Date();
             const startDate = new Date();
             startDate.setFullYear(endDate.getFullYear() - years);
-
             const weatherRes = await axios.get('https://archive-api.open-meteo.com/v1/archive', {
                 params: {
                     latitude,
@@ -140,9 +174,7 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
                     timezone: 'auto'
                 }
             });
-
             weatherHistoryData = weatherRes.data;
-
             await new Promise((resolve, reject) => {
                 tableWeatherHistory.setHistoryData(
                     db,
@@ -155,7 +187,6 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
 
         let temperatureTrend = [];
         let precipitationTrend = [];
-
         if (weatherHistoryData.daily && Array.isArray(weatherHistoryData.daily.time)) {
             const dailyData = weatherHistoryData.daily;
             const startYear = new Date(dailyData.time[0]).getFullYear();
@@ -169,7 +200,6 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
                         precip: dailyData.precipitation_sum[index]
                     }))
                     .filter(entry => new Date(entry.date).getFullYear() === year);
-
                 if (yearData.length > 0) {
                     const avgTemp = yearData.reduce((sum, e) => sum + e.temp, 0) / yearData.length;
                     const totalPrecip = yearData.reduce((sum, e) => sum + e.precip, 0);

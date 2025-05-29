@@ -13,6 +13,7 @@ import {
 } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
+import { debounceTime, fromEvent, Subscription } from 'rxjs';
 import { Weather } from '../../interfaces/weather';
 
 @Component({
@@ -34,6 +35,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   @ViewChild('dialogContent', { static: true }) dialogContentRef!: ElementRef;
   private resizeObserver?: ResizeObserver;
+  private windowResizeSub?: Subscription;
 
   selectedDayIndex = 0;
   weather: Weather | null = null;
@@ -99,15 +101,28 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void { }
 
   ngAfterViewInit(): void {
+    // Beobachtet lokale Größenänderungen (z. B. Inhalte im Dialog)
     this.resizeObserver = new ResizeObserver(() => {
-      this.chart?.chart?.resize();
-      this.chart?.chart?.update();
+      this.updateChartSize();
     });
     this.resizeObserver.observe(this.dialogContentRef.nativeElement);
+
+    // Beobachtet Fensteränderungen (z. B. Browser maximieren)
+    this.windowResizeSub = fromEvent(window, 'resize')
+      .pipe(debounceTime(200))  // Warte 200ms, bevor es reagiert
+      .subscribe(() => {
+        this.updateChartSize();
+      });
   }
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
+    this.windowResizeSub?.unsubscribe();
+  }
+
+  private updateChartSize() {
+    this.chart?.chart?.resize();
+    this.chart?.chart?.update();
   }
 
   getDayLabel(index: number): string {
