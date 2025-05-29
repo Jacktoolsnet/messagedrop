@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
   CategoryScale, Chart, ChartConfiguration,
+  ChartDataset,
   ChartType,
   Filler, LinearScale, LineController, LineElement, PointElement,
   ScriptableContext,
@@ -43,30 +44,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   chartModes: Array<'temperature' | 'precipitation' | 'uvIndex'> = ['temperature', 'precipitation', 'uvIndex'];
 
   lineChartType: ChartType = 'line';
-  chartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    plugins: {
-      legend: {
-        display: false
-      },
-      tooltip: {
-        enabled: true,
-        backgroundColor: '#333',
-        titleColor: '#fff',
-        bodyColor: '#eee'
-      }
-    },
-    scales: {
-      x: {
-        ticks: { color: '#ccc' },
-        grid: { color: '#444' }
-      },
-      y: {
-        ticks: { color: '#ccc' },
-        grid: { color: '#444' }
-      }
-    }
-  };
+  chartOptions: ChartConfiguration['options'] = {};
 
   tempChartData: ChartConfiguration['data'] = {
     labels: [],
@@ -157,9 +135,14 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateChart(): void {
+    let dataset: ChartDataset<'line', number[]> = {
+      data: [],
+      label: '',
+      borderColor: '',
+      backgroundColor: '',
+    };
     const chartWidth = this.chart?.chart?.width ?? window.innerWidth;
     const showLabels = chartWidth >= 450;
-
     if (!this.weather) return;
 
     const selectedDate = this.weather.daily[this.selectedDayIndex].date;
@@ -197,22 +180,61 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       }
     };
 
-    let dataset;
+    // Always find the "now" point if today is selected
+    let nowAnnotation: Partial<AnnotationOptions> | null = null;
+    if (this.selectedDayIndex === 0) {
+      const now = new Date();
+      const hour = now.getHours().toString().padStart(2, '0');
+      const nowIndex = dayHourly.findIndex(h => h.time.includes(`T${hour}:`));
+      if (nowIndex !== -1) {
+        const labelTime = labels[nowIndex];
+        let value = 0;
+        let labelText = '';
+
+        if (this.selectedChart === 'temperature') {
+          value = dayHourly[nowIndex].temperature;
+          labelText = `Now: ${value} °C`;
+        } else if (this.selectedChart === 'precipitation') {
+          value = dayHourly[nowIndex].precipitationProbability;
+          labelText = `Now: ${value} %`;
+        } else if (this.selectedChart === 'uvIndex') {
+          value = dayHourly[nowIndex].uvIndex;
+          labelText = `Now: ${value}`;
+        }
+
+        nowAnnotation = {
+          type: 'line',
+          xMin: labelTime,
+          xMax: labelTime,
+          yMin: value,
+          yMax: value + 0.01,
+          borderColor: '#00BCD4',
+          borderWidth: 3,
+          label: {
+            display: true,  // always show now label!
+            content: labelText,
+            backgroundColor: '#00BCD4',
+            color: '#000000',
+            position: 'start'
+          }
+        };
+      }
+    }
 
     if (this.selectedChart === 'temperature') {
       const temps = dayHourly.map(h => h.temperature);
       const minHour = dayHourly.reduce((a, b) => a.temperature < b.temperature ? a : b);
       const maxHour = dayHourly.reduce((a, b) => a.temperature > b.temperature ? a : b);
-
       dataset = {
         data: temps,
         label: 'Temperature (°C)',
         borderColor: '#EF5350',
         backgroundColor: 'rgba(239, 83, 80, 0.2)',
         tension: 0.3,
-        fill: true
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#EF5350'
       };
-
       annotations['minPoint'] = {
         type: 'line',
         xMin: minHour.time.split('T')[1].slice(0, 5),
@@ -228,7 +250,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
           color: '#ffffff'
         }
       };
-
       annotations['maxPoint'] = {
         type: 'line',
         xMin: maxHour.time.split('T')[1].slice(0, 5),
@@ -244,33 +265,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
           color: '#ffffff'
         }
       };
-
-      if (this.selectedDayIndex === 0) {
-        const now = new Date();
-        const hour = now.getHours().toString().padStart(2, '0');
-        const nowIndex = dayHourly.findIndex(h => h.time.includes(`T${hour}:`));
-        if (nowIndex !== -1) {
-          const tempNow = dayHourly[nowIndex].temperature;
-          const labelTime = labels[nowIndex];
-          annotations['now'] = {
-            type: 'line',
-            xMin: labelTime,
-            xMax: labelTime,
-            yMin: tempNow,
-            yMax: tempNow + 0.01,
-            borderColor: '#00BCD4',
-            borderWidth: 3,
-            label: {
-              display: showLabels,
-              content: `Now: ${tempNow} °C`,
-              backgroundColor: '#00BCD4',
-              color: '#000000',
-              position: 'start'
-            }
-          };
-        }
-      }
-
     } else if (this.selectedChart === 'precipitation') {
       dataset = {
         data: dayHourly.map(h => h.precipitationProbability),
@@ -278,9 +272,11 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         borderColor: '#42A5F5',
         backgroundColor: 'rgba(66, 165, 245, 0.2)',
         tension: 0.3,
-        fill: true
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#42A5F5'
       };
-    } else {
+    } else if (this.selectedChart === 'uvIndex') {
       const uvValues = dayHourly.map(h => h.uvIndex);
       dataset = {
         data: uvValues,
@@ -303,11 +299,14 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
 
+    if (nowAnnotation) {
+      annotations['now'] = nowAnnotation;
+    }
+
     this.chartOptions!.plugins = {
       ...(this.chartOptions!.plugins ?? {}),
       annotation: { annotations }
     };
-
     this.chartOptions!.scales = {
       x: {
         ticks: { color: '#ccc' },
@@ -320,7 +319,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         max: this.selectedChart === 'uvIndex' ? 11 : this.selectedChart === 'precipitation' ? 100 : undefined
       }
     };
-
     this.tempChartData = {
       labels,
       datasets: [dataset]

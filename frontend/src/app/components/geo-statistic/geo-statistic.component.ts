@@ -8,7 +8,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   CategoryScale, Chart, ChartConfiguration, ChartType,
   Filler,
-  LinearScale, LineController, LineElement, PointElement, Title, Tooltip
+  LinearScale, LineController, LineElement, PointElement, SubTitle, Title, Tooltip
 } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { debounceTime, fromEvent, Subscription } from 'rxjs';
@@ -77,21 +77,34 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     ]
   };
 
+  indicatorUnits: { [key: string]: string } = {
+    gdp: 'USD',
+    gdpPerCapita: 'USD per person',
+    militaryExpenditure: 'USD',
+    governmentSpending: 'USD',
+    inflation: '%',
+    unemployment: '%',
+    investment: 'USD',
+    lifeExpectancy: 'years',
+    povertyRate: 'people',
+    literacyRate: '%',
+    primaryEnrollment: '%',
+    secondaryEnrollment: '%',
+    giniIndex: '',  // kein direktes Einheitssuffix
+    co2Emissions: 'kilotons',
+    renewableEnergy: 'MWh',
+    forestArea: '%',
+    airPollution: 'µg/m³',
+    energyUse: 'kg oil eq. per capita',
+    temperatureTrend: '°C',
+    precipitationTrend: 'mm'
+  };
+
   // Filtered map (only those with available data)
   indicatorMap: { [key: string]: { key: string; label: string }[] } = {};
 
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
-  chartOptions: ChartConfiguration['options'] = {
-    responsive: true,
-    plugins: {
-      legend: { display: true },
-      tooltip: { enabled: true }
-    },
-    scales: {
-      x: { ticks: { color: '#ccc' }, grid: { color: '#444' } },
-      y: { ticks: { color: '#ccc' }, grid: { color: '#444' } }
-    }
-  };
+  chartOptions: ChartConfiguration['options'] = {};
   chartType: ChartType = 'line';
 
   constructor(
@@ -108,7 +121,8 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
       CategoryScale,
       Filler,
       Title,
-      Tooltip
+      Tooltip,
+      SubTitle
     );
 
     // Build filtered indicators
@@ -160,11 +174,113 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     });
 
     this.indicatorMap = resultMap;
+  }
 
-    /*const firstAvailable = this.indicatorMap[this.selectedCategory]?.[0];
-    if (firstAvailable) {
-      this.onIndicatorSelect(firstAvailable);
-    }*/
+  setChartOptionsForIndicator(indicatorKey: string) {
+    const unit = this.indicatorUnits[indicatorKey] || '';
+    const locale = navigator.language;
+    const allIndicators = Object.values(this.fullIndicatorMap).flat();
+    const indicator = allIndicators.find(i => i.key === indicatorKey);
+    const label = indicator ? indicator.label : indicatorKey;
+    const canvasWidth = this.chart?.chart?.width || 300;  // fallback falls chart nicht da
+    const subtitleText = this.getWrappedTextByWidth(
+      this.getIndicatorDescription(indicatorKey),
+      canvasWidth,
+      12
+    );
+
+    this.chartOptions = {
+      responsive: true,
+      plugins: {
+        legend: { display: true },
+        title: {
+          display: true,
+          text: label,
+          color: '#ccc',
+          font: {
+            size: 18,
+            weight: 'bold'
+          }
+        },
+        subtitle: {
+          display: true,
+          text: subtitleText,
+          color: '#aaa',
+          font: {
+            size: 12,
+            family: 'Arial',  // oder was dir gefällt
+            weight: 'normal',
+            lineHeight: 1.2   // etwas mehr Zeilenhöhe für Umbruch
+          },
+          padding: {
+            top: 10,    // Abstand nach oben (zum Titel)
+            bottom: 25  // Abstand nach unten (zum Diagramm)
+          },
+          align: 'center'
+        },
+        tooltip: {
+          enabled: true,
+          callbacks: {
+            label: (context) => {
+              const rawValue = context.raw as number;
+              let formatted = '';
+              if (Math.abs(rawValue) >= 1_000_000) {
+                formatted = new Intl.NumberFormat(locale, {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  maximumFractionDigits: 1
+                }).format(rawValue);
+              } else {
+                formatted = new Intl.NumberFormat(locale, {
+                  maximumFractionDigits: 0
+                }).format(rawValue);
+              }
+              return unit ? `${formatted} ${unit}` : `${formatted}`;
+            }
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            color: '#ccc',
+            callback: function (value) {
+              const num = typeof value === 'number' ? value : Number(value);
+              let formatted = '';
+
+              if (Math.abs(num) >= 1_000_000) {
+                formatted = new Intl.NumberFormat(locale, {
+                  notation: 'compact',
+                  compactDisplay: 'short',
+                  maximumFractionDigits: 1
+                }).format(num);
+              } else {
+                formatted = new Intl.NumberFormat(locale, {
+                  maximumFractionDigits: 1
+                }).format(num);
+              }
+
+              return unit ? `${formatted}` : formatted;
+            }
+          },
+          grid: { color: '#444' },
+          title: {
+            display: !!unit,
+            text: unit,
+            color: '#ccc'
+          }
+        },
+        x: {
+          ticks: { color: '#ccc' },
+          grid: { color: '#444' },
+          title: {
+            display: true,
+            text: 'Years',
+            color: '#ccc'
+          }
+        }
+      }
+    };
   }
 
   firstValidValue(series: { year: string; value: number | null }[] | undefined): number | null {
@@ -175,6 +291,53 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
 
   get activeIndicators() {
     return this.indicatorMap[this.selectedCategory] || [];
+  }
+
+  getIndicatorDescription(key: string): string {
+    const descriptions: { [key: string]: string } = {
+      gdp: 'Gross Domestic Product (GDP) represents the total value of all goods and services produced within a country.',
+      gdpPerCapita: 'GDP per capita is the average economic output per person, calculated by dividing GDP by the total population.',
+      militaryExpenditure: 'Total military spending in absolute terms, covering equipment, personnel, and operations.',
+      governmentSpending: 'Total government expenditure in absolute values, including healthcare, education, defense, and infrastructure.',
+      inflation: 'Annual percentage change in the average consumer price level, reflecting the cost of living.',
+      unemployment: 'Percentage of the labor force that is unemployed and actively seeking work.',
+      investment: 'Gross capital formation, representing investments in infrastructure, machinery, and other assets.',
+      lifeExpectancy: 'The average number of years a person is expected to live at birth.',
+      povertyRate: 'Total number of people living below the international poverty line.',
+      literacyRate: 'Percentage of adults (15 years and older) who can read and write.',
+      primaryEnrollment: 'Percentage of children of official primary school age enrolled in school.',
+      secondaryEnrollment: 'Percentage of youth of official secondary school age enrolled in secondary education.',
+      giniIndex: 'A measure of income inequality where 0 indicates perfect equality and 100 indicates maximal inequality.',
+      co2Emissions: 'Total annual CO₂ emissions measured in kilotons, reflecting the environmental impact.',
+      renewableEnergy: 'Absolute amount of renewable energy used, including wind, solar, and hydroelectric sources.',
+      forestArea: 'Percentage of total land area covered by forests.',
+      airPollution: 'Average concentration of fine particulate matter (PM2.5) in micrograms per cubic meter.',
+      energyUse: 'Average energy consumption per person, measured in kilograms of oil equivalent.',
+      temperatureTrend: 'Average annual temperature trends over time in degrees Celsius.',
+      precipitationTrend: 'Total annual precipitation sums over time, measured in millimeters.'
+    };
+
+    return descriptions[key] || 'No description available for this indicator.';
+  }
+
+  getWrappedTextByWidth(text: string, canvasWidth: number, fontSize: number = 12): string[] {
+    const approxCharPerLine = Math.floor(canvasWidth / (fontSize * 0.6));
+    const words = text.split(' ');
+    const lines: string[] = [];
+    let currentLine = '';
+
+    words.forEach(word => {
+      if ((currentLine + ' ' + word).trim().length <= approxCharPerLine) {
+        currentLine += (currentLine ? ' ' : '') + word;
+      } else {
+        if (currentLine) lines.push(currentLine);
+        currentLine = word;
+      }
+    });
+
+    if (currentLine) lines.push(currentLine);
+
+    return lines;
   }
 
   getTooltipText(key: string): string {
@@ -205,6 +368,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onIndicatorSelect(indicator: { key: string; label: string }) {
     this.selectedIndicator = indicator;
+    this.setChartOptionsForIndicator(indicator.key);
     if (!this.geoStatistic) return;
 
     if (indicator.key === 'temperatureTrend' || indicator.key === 'precipitationTrend') {

@@ -1,6 +1,6 @@
 <mat-dialog-content #dialogContent>
     <ng-container *ngIf="geoStatistic">
-        <mat-accordion multi>
+        <mat-accordion>
             <!-- Location Details -->
             <mat-expansion-panel expanded>
                 <mat-expansion-panel-header>
@@ -36,15 +36,6 @@
                             </table>
                         </div>
                     </div>
-                </div>
-            </mat-expansion-panel>
-
-            <!-- Country Information -->
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Country Information</mat-panel-title>
-                </mat-expansion-panel-header>
-                <div class="block-container">
                     <div class="info-block">
                         <div class="icon-section">
                             <img [src]="geoStatistic.countryInfo.flag_svg" alt="Flag" class="flag">
@@ -69,6 +60,19 @@
                                     <td>{{ geoStatistic.countryInfo.currencies.join(', ') }}</td>
                                 </tr>
                                 <tr>
+                                    <td>Population</td>
+                                    <td>{{ geoStatistic.countryInfo.population | number }} people</td>
+                                </tr>
+                                <tr>
+                                    <td>Area</td>
+                                    <td>{{ geoStatistic.countryInfo.area_km2 | number }} km²</td>
+                                </tr>
+                                <tr>
+                                    <td>Density</td>
+                                    <td>{{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }}
+                                        people/km²</td>
+                                </tr>
+                                <tr>
                                     <td>Google Maps:</td>
                                     <td>
                                         <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
@@ -82,36 +86,10 @@
                 </div>
             </mat-expansion-panel>
 
-            <!-- Statistics -->
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Country Statistics</mat-panel-title>
-                </mat-expansion-panel-header>
-                <div class="stat-grid">
-                    <div *ngIf="geoStatistic.countryInfo.population != null" matTooltip="Total population">
-                        Population: {{ geoStatistic.countryInfo.population | number }}
-                    </div>
-                    <div *ngIf="geoStatistic.countryInfo.area_km2 != null" matTooltip="Total area">
-                        Area: {{ geoStatistic.countryInfo.area_km2 | number }} km²
-                    </div>
-                    <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null"
-                        matTooltip="Population density">
-                        Density: {{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} per km²
-                    </div>
-                    <div *ngIf="firstValidValue(geoStatistic.worldBank.gdp) != null" matTooltip="GDP value">
-                        GDP: ${{ firstValidValue(geoStatistic.worldBank.gdp) | number }}
-                    </div>
-                    <div *ngIf="firstValidValue(geoStatistic.worldBank.gdpPerCapita) != null"
-                        matTooltip="GDP per capita">
-                        GDP per capita: ${{ firstValidValue(geoStatistic.worldBank.gdpPerCapita) | number:'1.0-0' }}
-                    </div>
-                </div>
-            </mat-expansion-panel>
-
             <!-- Indicators & Chart -->
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
-                    <mat-panel-title>Explore Indicators</mat-panel-title>
+                    <mat-panel-title>Location Statistic</mat-panel-title>
                 </mat-expansion-panel-header>
                 <div class="category-container">
                     <mat-form-field appearance="fill" class="category-dropdown">
@@ -134,8 +112,6 @@
                 </div>
 
                 <div *ngIf="selectedIndicator" class="indicator-display">
-                    <h3>{{ selectedIndicator.label }}</h3>
-                    <p>{{ getTooltipText(selectedIndicator.key) }}</p>
                     <div class="chart-container">
                         <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType"></canvas>
                     </div>

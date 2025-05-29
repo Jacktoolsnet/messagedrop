@@ -49,14 +49,21 @@ h2 a {
 }
 
 .info-block {
-    display: flex;
-    flex: 1 1 25rem;
+    flex: 1 1 calc(50% - 0.5rem);
     background-color: #3a3a3a;
     padding: 1rem;
     border-radius: 0.5rem;
+    display: flex;
     align-items: flex-start;
     gap: 1rem;
-    min-width: 15rem;
+    min-width: 250px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 1000px) {
+    .info-block {
+        flex: 1 1 100%;
+    }
 }
 
 .icon-section {
