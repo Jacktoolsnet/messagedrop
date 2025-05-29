@@ -7,6 +7,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import {
   CategoryScale, Chart, ChartConfiguration, ChartType,
+  Filler,
   LinearScale, LineController, LineElement, PointElement, Title, Tooltip
 } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
@@ -88,7 +89,15 @@ export class GeoStatisticComponent {
     @Inject(MAT_DIALOG_DATA) public data: { geoStatistic: GeoStatistic }
   ) {
     this.geoStatistic = data.geoStatistic;
-    Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip);
+    Chart.register(
+      LineController,
+      LineElement,
+      PointElement,
+      LinearScale,
+      CategoryScale,
+      Filler,
+      Title,
+      Tooltip);
   }
 
   get activeIndicators() {
@@ -131,48 +140,48 @@ export class GeoStatisticComponent {
     this.selectedIndicator = indicator;
 
     if (!this.geoStatistic) return;
-
     const wb = this.geoStatistic.worldBank;
 
-    if (indicator.key === 'temperatureTrend' || indicator.key === 'precipitationTrend') {
-      const weather = this.geoStatistic.weatherHistory;
-      if (!weather) return;
-      const isTemp = indicator.key === 'temperatureTrend';
-      const labels = weather.daily.time;
-      const data = isTemp ? weather.daily.temperature_2m_mean : weather.daily.precipitation_sum;
-
-      console.log('Weather chart data:', data);
-
-      this.chartData = {
-        labels,
-        datasets: [{
-          data,
-          label: isTemp ? 'Mean Temperature (°C)' : 'Total Precipitation (mm)',
-          fill: true,
-          tension: 0.3,
-          borderColor: isTemp ? '#FF5722' : '#2196F3',
-          backgroundColor: isTemp ? 'rgba(255, 87, 34, 0.3)' : 'rgba(33, 150, 243, 0.3)'
-        }]
-      };
-    } else if (wb && wb[indicator.key as WorldBankKey]) {
+    if (wb && wb[indicator.key as WorldBankKey]) {
       const series = wb[indicator.key as WorldBankKey];
       const values = Array.isArray(series) ? series : [series];
-      const labels = values.map(v => v.year).reverse();
-      const data = values.map(v => v.value ?? 0).reverse();
 
-      console.log('World Bank chart labels:', labels);
-      console.log('World Bank chart data:', data);
+      const labels = values.map(v => v.year).reverse();  // Jüngste rechts
+      const data = values.map(v => v.value ?? 0).reverse();
 
       this.chartData = {
         labels,
         datasets: [{
           data,
           label: indicator.label,
-          fill: true,
-          tension: 0.3,
           borderColor: '#4CAF50',
-          backgroundColor: 'rgba(76, 175, 80, 0.3)'
+          backgroundColor: 'rgba(80, 239, 117, 0.2)',
+          pointBackgroundColor: '#4CAF50',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6
         }]
+      };
+
+      this.chartOptions = {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: true }
+        },
+        scales: {
+          x: {
+            beginAtZero: false,
+            ticks: { color: '#ccc' },
+            grid: { color: '#444' }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: { color: '#ccc' },
+            grid: { color: '#444' }
+          }
+        }
       };
     }
   }
