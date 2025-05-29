@@ -25,6 +25,7 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
         };
         const weatherRes = await axios.get(url, { params });
         response.status = 200;
+
         response.data = {
             ...weatherRes.data,
             address: address
