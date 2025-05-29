@@ -1,13 +1,10 @@
 <mat-dialog-content #dialogContent>
     <ng-container *ngIf="geoStatistic">
         <mat-accordion multi>
-
-            <!-- Location (Nominatim) -->
+            <!-- Location Details -->
             <mat-expansion-panel expanded>
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Location Details
-                    </mat-panel-title>
+                    <mat-panel-title>Location Details</mat-panel-title>
                 </mat-expansion-panel-header>
                 <div class="block-container">
                     <div class="info-block">
@@ -45,9 +42,7 @@
             <!-- Country Information -->
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Country Information
-                    </mat-panel-title>
+                    <mat-panel-title>Country Information</mat-panel-title>
                 </mat-expansion-panel-header>
                 <div class="block-container">
                     <div class="info-block">
@@ -77,7 +72,7 @@
                                     <td>Google Maps:</td>
                                     <td>
                                         <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
-                                            {{ geoStatistic.countryInfo.name }} ({{ geoStatistic.nominatim.country }})
+                                            {{ geoStatistic.countryInfo.name }}
                                         </a>
                                     </td>
                                 </tr>
@@ -90,53 +85,33 @@
             <!-- Statistics -->
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Country Statistics
-                    </mat-panel-title>
+                    <mat-panel-title>Country Statistics</mat-panel-title>
                 </mat-expansion-panel-header>
                 <div class="stat-grid">
-                    <div *ngIf="geoStatistic.countryInfo.population != null"
-                        matTooltip="Total number of people living in the country">
+                    <div *ngIf="geoStatistic.countryInfo.population != null" matTooltip="Total population">
                         Population: {{ geoStatistic.countryInfo.population | number }}
                     </div>
-                    <div *ngIf="geoStatistic.countryInfo.area_km2 != null"
-                        matTooltip="Total area of the country in square kilometers">
+                    <div *ngIf="geoStatistic.countryInfo.area_km2 != null" matTooltip="Total area">
                         Area: {{ geoStatistic.countryInfo.area_km2 | number }} km²
                     </div>
                     <div *ngIf="geoStatistic.countryInfo.populationDensity_per_km2 != null"
-                        matTooltip="Average number of people per square kilometer">
+                        matTooltip="Population density">
                         Density: {{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} per km²
                     </div>
-                    <div *ngIf="geoStatistic.worldBank.gdp?.value != null"
-                        matTooltip="Gross Domestic Product: total value of goods and services produced">
-                        GDP: ${{ geoStatistic.worldBank.gdp.value | number }}
+                    <div *ngIf="firstValidValue(geoStatistic.worldBank.gdp) != null" matTooltip="GDP value">
+                        GDP: ${{ firstValidValue(geoStatistic.worldBank.gdp) | number }}
                     </div>
-                    <div *ngIf="geoStatistic.worldBank.gdpPerCapita != null"
-                        matTooltip="GDP divided by the number of people">
-                        GDP per capita: ${{ geoStatistic.worldBank.gdpPerCapita | number:'1.0-0' }}
-                    </div>
-                    <div *ngIf="geoStatistic.worldBank.gniPerCapita?.value != null"
-                        matTooltip="Gross National Income per person">
-                        GNI per capita: ${{ geoStatistic.worldBank.gniPerCapita.value | number:'1.0-0' }}
-                    </div>
-                    <div *ngIf="geoStatistic.worldBank.lifeExpectancy?.value != null"
-                        matTooltip="Average life expectancy at birth">
-                        Life expectancy: {{ geoStatistic.worldBank.lifeExpectancy.value | number:'1.0-1' }} years
-                    </div>
-                    <div *ngIf="geoStatistic.worldBank.povertyRate?.value_percent != null"
-                        matTooltip="Percentage of population living below the poverty line">
-                        Poverty rate: {{ (geoStatistic.worldBank.povertyRate.value_percent ?? 0) * 100 | number:'1.1-1'
-                        }}%
+                    <div *ngIf="firstValidValue(geoStatistic.worldBank.gdpPerCapita) != null"
+                        matTooltip="GDP per capita">
+                        GDP per capita: ${{ firstValidValue(geoStatistic.worldBank.gdpPerCapita) | number:'1.0-0' }}
                     </div>
                 </div>
             </mat-expansion-panel>
 
-            <!-- Category and Indicators -->
+            <!-- Indicators & Chart -->
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
-                    <mat-panel-title>
-                        Explore Indicators
-                    </mat-panel-title>
+                    <mat-panel-title>Explore Indicators</mat-panel-title>
                 </mat-expansion-panel-header>
                 <div class="category-container">
                     <mat-form-field appearance="fill" class="category-dropdown">
@@ -161,7 +136,9 @@
                 <div *ngIf="selectedIndicator" class="indicator-display">
                     <h3>{{ selectedIndicator.label }}</h3>
                     <p>{{ getTooltipText(selectedIndicator.key) }}</p>
-                    <!-- TODO: Insert chart or detailed data display here -->
+                    <div class="chart-container">
+                        <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType"></canvas>
+                    </div>
                 </div>
             </mat-expansion-panel>
         </mat-accordion>

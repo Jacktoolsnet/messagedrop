@@ -1057,7 +1057,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.geoStatisticService
       .getDataForLocation(
         this.mapService.getMapLocation().latitude,
-        this.mapService.getMapLocation().longitude
+        this.mapService.getMapLocation().longitude,
+        10
       )
       .subscribe({
         next: (response: GetGeoStatisticResponse) => {
@@ -1082,7 +1083,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           }
         },
         error: (err) => {
-          this.showGeoStatisticError(err.error);
+          this.showGeoStatisticError(err.error.error);
         }
       });
   }

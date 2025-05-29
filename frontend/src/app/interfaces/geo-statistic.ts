@@ -1,5 +1,8 @@
 export interface GeoStatistic {
-    coordinates: { latitude: number; longitude: number; };
+    coordinates: {
+        latitude: number;
+        longitude: number;
+    };
     nominatim: {
         country: string;
         state?: string;
@@ -23,11 +26,25 @@ export interface GeoStatistic {
         googleMaps: string;
     };
     worldBank: {
-        gdp: { year: string; value: number | null; };
-        gdpPerCapita: number | null;
-        gniPerCapita: { year: string; value: number | null; };
-        lifeExpectancy: { year: string; value: number | null; };
-        povertyRate: { year: string; value_percent: number | null; };
+        gdp: { year: string; value: number | null }[];
+        gniPerCapita: { year: string; value: number | null }[];
+        militaryExpenditure: { year: string; value: number | null }[];
+        governmentSpending: { year: string; value: number | null }[];
+        inflation: { year: string; value: number | null }[];
+        unemployment: { year: string; value: number | null }[];
+        investment: { year: string; value: number | null }[];
+        lifeExpectancy: { year: string; value: number | null }[];
+        povertyRate: { year: string; value: number | null }[];
+        literacyRate: { year: string; value: number | null }[];
+        primaryEnrollment: { year: string; value: number | null }[];
+        secondaryEnrollment: { year: string; value: number | null }[];
+        giniIndex: { year: string; value: number | null }[];
+        co2Emissions: { year: string; value: number | null }[];
+        renewableEnergy: { year: string; value: number | null }[];
+        forestArea: { year: string; value: number | null }[];
+        airPollution: { year: string; value: number | null }[];
+        energyUse: { year: string; value: number | null }[];
+        gdpPerCapita: { year: string; value: number | null }[];
     };
     weatherHistory: {
         latitude: number;

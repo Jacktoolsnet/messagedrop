@@ -27,8 +27,8 @@ export class GeoStatisticService {
     return throwError(() => error);
   }
 
-  getDataForLocation(latitude: number, longitude: number): Observable<GetGeoStatisticResponse> {
-    const url = `${environment.apiUrl}/geostatistic/${latitude}/${longitude}`;
+  getDataForLocation(latitude: number, longitude: number, years: number): Observable<GetGeoStatisticResponse> {
+    const url = `${environment.apiUrl}/geostatistic/${latitude}/${longitude}/${years}`;
     this.networkService.setNetworkMessageConfig(url, {
       title: 'GeoStatistic Service',
       image: '',
