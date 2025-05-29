@@ -1063,7 +1063,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       .subscribe({
         next: (response: GetGeoStatisticResponse) => {
           if (response.status === 200) {
-            console.log(response.result);
             const dialogRef = this.dialog.open(GeoStatisticComponent, {
               data: { geoStatistic: response.result },
               closeOnNavigation: true,

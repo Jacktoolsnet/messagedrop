@@ -377,7 +377,6 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
         : this.geoStatistic.weatherHistory.precipitationTrend;
 
       if (!trendData || trendData.length === 0) {
-        console.warn('No weather trend data available for', indicator.key);
         return;
       }
 

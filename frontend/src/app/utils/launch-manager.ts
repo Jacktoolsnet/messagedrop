@@ -16,8 +16,6 @@ export function registerLaunchHandler(injector: EnvironmentInjector) {
                     id: data.id
                 });
             });
-        } catch (e) {
-            console.warn('SwPush not available');
-        }
+        } catch (e) { }
     });
 }

@@ -18,9 +18,7 @@ export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
             finalize(() => {
                 try {
                     loadingDialogRef?.close();
-                } catch (err) {
-                    console.warn('Failed to close dialog:', err);
-                }
+                } catch (err) { }
             })
         );
     }

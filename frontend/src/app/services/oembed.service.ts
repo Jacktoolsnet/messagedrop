@@ -100,9 +100,7 @@ export class OembedService {
         currentUrl = response.result;
         attempts++;
       }
-    } catch (err) {
-      console.warn('Failed to resolve Google Maps location:', err);
-    }
+    } catch (err) { }
 
     return undefined;
   }

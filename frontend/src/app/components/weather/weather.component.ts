@@ -355,4 +355,12 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  getLocationName(): string {
+    if (!this.weather?.address) return 'Unknown location';
+    const addr = this.weather.address;
+    const place = addr.city || addr.town || addr.village || addr.hamlet || 'Unknown place';
+    const country = addr.country || '';
+    return `${place}${country ? ', ' + country : ''}`;
+  }
+
 }

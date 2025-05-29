@@ -36,7 +36,6 @@ async function handleShareTargetPost(event) {
         await deliverToClientOrSave(sharedContent, type);
         return caches.match('/index.html') || fetch('/index.html');
     } catch (err) {
-        console.error('[ServiceWorker] Failed to handle share-target POST:', err);
         return new Response('Error processing POST share target', { status: 500 });
     }
 }
@@ -63,7 +62,6 @@ async function handleShareTargetGet(urlObj) {
         await deliverToClientOrSave(sharedContent, type);
         return caches.match('/index.html') || fetch('/index.html');
     } catch (err) {
-        console.error('[ServiceWorker] Failed to handle share-target GET:', err);
         return new Response('Error processing GET share target', { status: 500 });
     }
 }

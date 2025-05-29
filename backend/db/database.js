@@ -20,7 +20,7 @@ class Database {
   init(logger) {
     this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
       if (err) {
-        return console.error(err.message);
+        return;
       } else {
         this.db.run('PRAGMA foreign_keys = ON;', [], function (err) {
           if (err) {
@@ -45,7 +45,7 @@ class Database {
   close() {
     this.db.close((err) => {
       if (err) {
-        return console.error(err.message);
+        return;
       }
       logger.info('Close the database connection.');
     });

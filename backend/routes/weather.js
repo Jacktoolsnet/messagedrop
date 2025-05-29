@@ -2,11 +2,15 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const axios = require('axios');
+const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
 
 router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
     try {
         const { locale, latitude, longitude, days } = req.params;
+
+        const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
+        const address = nominatimData.address;
 
         const url = 'https://api.open-meteo.com/v1/forecast';
         const params = {
@@ -21,7 +25,10 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
         };
         const weatherRes = await axios.get(url, { params });
         response.status = 200;
-        response.data = weatherRes.data;
+        response.data = {
+            ...weatherRes.data,
+            address: address
+        };
         res.status(200).json(response);
     } catch (err) {
         response.status = err.response?.status || 500;

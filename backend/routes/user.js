@@ -228,7 +228,6 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
               }
 
             } catch (err) {
-              console.error(err);
               esponse.status = 500;
               response.error = 'Encrption failed';
               res.status(response.status).json(response);
