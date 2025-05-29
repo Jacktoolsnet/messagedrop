@@ -7,13 +7,11 @@ const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
 const tableGeoStatistic = require('../db/tableGeoStatistic');
 const tableWeatherHistory = require('../db/tableWeatherHistory');
 
-// Helper function for World Bank API
 async function getWorldBankIndicator(countryAlpha3, indicator, years) {
     const url = `http://api.worldbank.org/v2/country/${countryAlpha3}/indicator/${indicator}?format=json&per_page=${years}`;
     const response = await axios.get(url);
     const dataArray = response.data[1];
     if (!Array.isArray(dataArray)) return [];
-
     return dataArray
         .filter(entry => entry.value !== null)
         .map(entry => ({
@@ -25,18 +23,14 @@ async function getWorldBankIndicator(countryAlpha3, indicator, years) {
 router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
     const db = req.database.db;
-
     try {
         const { latitude, longitude, years } = req.params;
-        const yearCount = parseInt(years, 10) || 10;
 
-        // Step 1: Get country code (Alpha-2) from Nominatim
         const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
         const address = nominatimData.address;
         const countryAlpha2 = address?.country_code?.toUpperCase();
         if (!countryAlpha2) throw new Error('Country code not found');
 
-        // Step 2: Check SQLite cache
         const cachedData = await new Promise((resolve, reject) => {
             tableGeoStatistic.getCountryData(db, countryAlpha2, (err, row) => {
                 if (err) return reject(err);
@@ -54,35 +48,45 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             }
         }
 
-        // Step 3: If no valid cache, fetch fresh data
         if (!countryData || !worldBankData) {
             const restCountriesResponse = await axios.get(`https://restcountries.com/v3.1/alpha/${countryAlpha2}`);
             countryData = restCountriesResponse.data[0];
             const countryAlpha3 = countryData.cca3;
-            if (!countryAlpha3) throw new Error('Alpha-3 country code not found for World Bank API');
+            if (!countryAlpha3) throw new Error('Alpha-3 country code not found');
 
-            // World Bank indicators (get arrays of last N years)
-            const gdp = await getWorldBankIndicator(countryAlpha3, 'NY.GDP.MKTP.CD', yearCount);
-            const gniPerCapita = await getWorldBankIndicator(countryAlpha3, 'NY.GNP.PCAP.CD', yearCount);
-            const militaryExpenditure = await getWorldBankIndicator(countryAlpha3, 'MS.MIL.XPND.GD.ZS', yearCount);
-            const governmentSpending = await getWorldBankIndicator(countryAlpha3, 'GC.XPN.TOTL.GD.ZS', yearCount);
-            const inflation = await getWorldBankIndicator(countryAlpha3, 'FP.CPI.TOTL.ZG', yearCount);
-            const unemployment = await getWorldBankIndicator(countryAlpha3, 'SL.UEM.TOTL.ZS', yearCount);
-            const investment = await getWorldBankIndicator(countryAlpha3, 'NE.GDI.TOTL.ZS', yearCount);
-            const lifeExpectancy = await getWorldBankIndicator(countryAlpha3, 'SP.DYN.LE00.IN', yearCount);
-            const povertyRate = await getWorldBankIndicator(countryAlpha3, 'SI.POV.DDAY', yearCount);
-            const literacyRate = await getWorldBankIndicator(countryAlpha3, 'SE.ADT.LITR.ZS', yearCount);
-            const primaryEnrollment = await getWorldBankIndicator(countryAlpha3, 'SE.PRM.ENRR', yearCount);
-            const secondaryEnrollment = await getWorldBankIndicator(countryAlpha3, 'SE.SEC.ENRR', yearCount);
-            const giniIndex = await getWorldBankIndicator(countryAlpha3, 'SI.POV.GINI', yearCount);
-            const co2Emissions = await getWorldBankIndicator(countryAlpha3, 'EN.ATM.CO2E.PC', yearCount);
-            const renewableEnergy = await getWorldBankIndicator(countryAlpha3, 'EG.FEC.RNEW.ZS', yearCount);
-            const forestArea = await getWorldBankIndicator(countryAlpha3, 'AG.LND.FRST.ZS', yearCount);
-            const airPollution = await getWorldBankIndicator(countryAlpha3, 'EN.ATM.PM25.MC.M3', yearCount);
-            const energyUse = await getWorldBankIndicator(countryAlpha3, 'EG.USE.PCAP.KG.OE', yearCount);
+            const gdp = await getWorldBankIndicator(countryAlpha3, 'NY.GDP.MKTP.CD', years);
+            const population = await getWorldBankIndicator(countryAlpha3, 'SP.POP.TOTL', years);
+            const gdpPerCapita = gdp.map(gdpEntry => {
+                const popEntry = population.find(p => p.year === gdpEntry.year);
+                const popValue = popEntry?.value ?? null;
+                return {
+                    year: gdpEntry.year,
+                    value: popValue ? gdpEntry.value / popValue : null
+                };
+            });
+
+            const gniPerCapita = await getWorldBankIndicator(countryAlpha3, 'NY.GNP.PCAP.CD', years);
+            const militaryExpenditure = await getWorldBankIndicator(countryAlpha3, 'MS.MIL.XPND.GD.ZS', years);
+            const governmentSpending = await getWorldBankIndicator(countryAlpha3, 'GC.XPN.TOTL.GD.ZS', years);
+            const inflation = await getWorldBankIndicator(countryAlpha3, 'FP.CPI.TOTL.ZG', years);
+            const unemployment = await getWorldBankIndicator(countryAlpha3, 'SL.UEM.TOTL.ZS', years);
+            const investment = await getWorldBankIndicator(countryAlpha3, 'NE.GDI.TOTL.ZS', years);
+            const lifeExpectancy = await getWorldBankIndicator(countryAlpha3, 'SP.DYN.LE00.IN', years);
+            const povertyRate = await getWorldBankIndicator(countryAlpha3, 'SI.POV.DDAY', years);
+            const literacyRate = await getWorldBankIndicator(countryAlpha3, 'SE.ADT.LITR.ZS', years);
+            const primaryEnrollment = await getWorldBankIndicator(countryAlpha3, 'SE.PRM.ENRR', years);
+            const secondaryEnrollment = await getWorldBankIndicator(countryAlpha3, 'SE.SEC.ENRR', years);
+            const giniIndex = await getWorldBankIndicator(countryAlpha3, 'SI.POV.GINI', years);
+            const co2Emissions = await getWorldBankIndicator(countryAlpha3, 'EN.ATM.CO2E.KT', years);
+            const renewableEnergy = await getWorldBankIndicator(countryAlpha3, 'EG.FEC.RNEW.ZS', years);
+            const forestArea = await getWorldBankIndicator(countryAlpha3, 'AG.LND.FRST.ZS', years);
+            const airPollution = await getWorldBankIndicator(countryAlpha3, 'EN.ATM.PM25.MC.M3', years);
+            const energyUse = await getWorldBankIndicator(countryAlpha3, 'EG.USE.PCAP.KG.OE', years);
 
             worldBankData = {
                 gdp,
+                population,
+                gdpPerCapita,
                 gniPerCapita,
                 militaryExpenditure,
                 governmentSpending,
@@ -102,7 +106,6 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
                 energyUse
             };
 
-            // Save to cache
             await new Promise((resolve, reject) => {
                 tableGeoStatistic.setCountryData(
                     db,
@@ -114,8 +117,7 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             });
         }
 
-        // Step 4: Get Weather History (from cache or fresh)
-        const cacheKey = `${latitude}_${longitude}_${yearCount}`;
+        const cacheKey = `${latitude}_${longitude}_${years}`;
         let weatherHistoryData = await new Promise((resolve, reject) => {
             tableWeatherHistory.getHistoryData(db, cacheKey, (err, row) => {
                 if (err) return reject(err);
@@ -126,19 +128,21 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
         if (!weatherHistoryData) {
             const endDate = new Date();
             const startDate = new Date();
-            startDate.setFullYear(endDate.getFullYear() - yearCount);
+            startDate.setFullYear(endDate.getFullYear() - years);
+
             const weatherRes = await axios.get('https://archive-api.open-meteo.com/v1/archive', {
                 params: {
                     latitude,
                     longitude,
                     start_date: startDate.toISOString().split('T')[0],
                     end_date: endDate.toISOString().split('T')[0],
-                    temperature_2m_mean: 'true',
-                    precipitation_sum: 'true',
+                    daily: 'temperature_2m_mean,precipitation_sum',
                     timezone: 'auto'
                 }
             });
+
             weatherHistoryData = weatherRes.data;
+
             await new Promise((resolve, reject) => {
                 tableWeatherHistory.setHistoryData(
                     db,
@@ -149,7 +153,32 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             });
         }
 
-        // Step 5: Build final response
+        let temperatureTrend = [];
+        let precipitationTrend = [];
+
+        if (weatherHistoryData.daily && Array.isArray(weatherHistoryData.daily.time)) {
+            const dailyData = weatherHistoryData.daily;
+            const startYear = new Date(dailyData.time[0]).getFullYear();
+            const endYear = new Date(dailyData.time[dailyData.time.length - 1]).getFullYear();
+
+            for (let year = startYear; year <= endYear; year++) {
+                const yearData = dailyData.time
+                    .map((date, index) => ({
+                        date,
+                        temp: dailyData.temperature_2m_mean[index],
+                        precip: dailyData.precipitation_sum[index]
+                    }))
+                    .filter(entry => new Date(entry.date).getFullYear() === year);
+
+                if (yearData.length > 0) {
+                    const avgTemp = yearData.reduce((sum, e) => sum + e.temp, 0) / yearData.length;
+                    const totalPrecip = yearData.reduce((sum, e) => sum + e.precip, 0);
+                    temperatureTrend.push({ year: String(year), value: avgTemp });
+                    precipitationTrend.push({ year: String(year), value: totalPrecip });
+                }
+            }
+        }
+
         const population = countryData.population;
         const area = countryData.area;
         const populationDensity = population && area ? population / area : null;
@@ -180,11 +209,17 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
                 googleMaps: countryData.maps.googleMaps
             },
             worldBank: worldBankData,
-            weatherHistory: weatherHistoryData
+            weatherHistory: {
+                latitude: weatherHistoryData.latitude,
+                longitude: weatherHistoryData.longitude,
+                elevation: weatherHistoryData.elevation,
+                timezone: weatherHistoryData.timezone,
+                temperatureTrend,
+                precipitationTrend
+            }
         };
 
         res.status(200).json(response);
-
     } catch (err) {
         response.status = err.response?.status || 500;
         response.error = err.response?.data || err.message || 'Request failed';

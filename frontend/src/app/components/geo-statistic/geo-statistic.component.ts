@@ -12,7 +12,6 @@ import {
 } from 'chart.js';
 import { BaseChartDirective } from 'ng2-charts';
 import { GeoStatistic } from '../../interfaces/geo-statistic';
-
 type WorldBankKey = keyof GeoStatistic['worldBank'];
 
 @Component({
@@ -41,7 +40,8 @@ export class GeoStatisticComponent {
     { value: 'climate', label: 'Environment' }
   ];
 
-  indicatorMap: { [key: string]: { key: string; label: string }[] } = {
+  // Original complete map
+  fullIndicatorMap: { [key: string]: { key: string; label: string }[] } = {
     economy: [
       { key: 'gdp', label: 'GDP' },
       { key: 'gdpPerCapita', label: 'GDP per Capita' },
@@ -70,6 +70,9 @@ export class GeoStatisticComponent {
     ]
   };
 
+  // Filtered map (only those with available data)
+  indicatorMap: { [key: string]: { key: string; label: string }[] } = {};
+
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
   chartOptions: ChartConfiguration['options'] = {
     responsive: true,
@@ -89,6 +92,7 @@ export class GeoStatisticComponent {
     @Inject(MAT_DIALOG_DATA) public data: { geoStatistic: GeoStatistic }
   ) {
     this.geoStatistic = data.geoStatistic;
+
     Chart.register(
       LineController,
       LineElement,
@@ -97,17 +101,46 @@ export class GeoStatisticComponent {
       CategoryScale,
       Filler,
       Title,
-      Tooltip);
+      Tooltip
+    );
+
+    // Build filtered indicators
+    this.buildIndicatorMap();
   }
 
-  get activeIndicators() {
-    return this.indicatorMap[this.selectedCategory] || [];
+  buildIndicatorMap() {
+    if (!this.geoStatistic) return;
+
+    const weatherKeys = ['temperatureTrend', 'precipitationTrend'] as const;
+    const resultMap: { [key: string]: { key: string; label: string }[] } = {};
+
+    Object.keys(this.fullIndicatorMap).forEach(category => {
+      resultMap[category] = this.fullIndicatorMap[category].filter(indicator => {
+        const isWeatherKey = weatherKeys.includes(indicator.key as typeof weatherKeys[number]);
+        const data = isWeatherKey
+          ? (this.geoStatistic?.weatherHistory as any)[indicator.key]
+          : this.geoStatistic?.worldBank[indicator.key as WorldBankKey];
+
+        return Array.isArray(data) && data.some(item => item?.value !== null && item?.value !== undefined);
+      });
+    });
+
+    this.indicatorMap = resultMap;
+
+    const firstAvailable = this.indicatorMap[this.selectedCategory]?.[0];
+    if (firstAvailable) {
+      this.onIndicatorSelect(firstAvailable);
+    }
   }
 
   firstValidValue(series: { year: string; value: number | null }[] | undefined): number | null {
     if (!series || !Array.isArray(series)) return null;
-    const validEntry = series.find(e => e.value !== null);
+    const validEntry = series.find(e => e.value !== null && e.value !== undefined);
     return validEntry ? validEntry.value : null;
+  }
+
+  get activeIndicators() {
+    return this.indicatorMap[this.selectedCategory] || [];
   }
 
   getTooltipText(key: string): string {
@@ -138,50 +171,53 @@ export class GeoStatisticComponent {
 
   onIndicatorSelect(indicator: { key: string; label: string }) {
     this.selectedIndicator = indicator;
-
     if (!this.geoStatistic) return;
-    const wb = this.geoStatistic.worldBank;
 
-    if (wb && wb[indicator.key as WorldBankKey]) {
-      const series = wb[indicator.key as WorldBankKey];
-      const values = Array.isArray(series) ? series : [series];
+    if (indicator.key === 'temperatureTrend' || indicator.key === 'precipitationTrend') {
+      const trendData = indicator.key === 'temperatureTrend'
+        ? this.geoStatistic.weatherHistory.temperatureTrend
+        : this.geoStatistic.weatherHistory.precipitationTrend;
 
-      const labels = values.map(v => v.year).reverse();  // Jüngste rechts
-      const data = values.map(v => v.value ?? 0).reverse();
+      if (!trendData || trendData.length === 0) {
+        console.warn('No weather trend data available for', indicator.key);
+        return;
+      }
 
+      const labels = trendData.map(e => e.year);
+      const data = trendData.map(e => e.value);
       this.chartData = {
         labels,
         datasets: [{
           data,
           label: indicator.label,
-          borderColor: '#4CAF50',
-          backgroundColor: 'rgba(80, 239, 117, 0.2)',
-          pointBackgroundColor: '#4CAF50',
+          borderColor: indicator.key === 'temperatureTrend' ? '#FF5722' : '#2196F3',
+          backgroundColor: indicator.key === 'temperatureTrend' ? 'rgba(255, 87, 34, 0.3)' : 'rgba(33, 150, 243, 0.3)',
+          pointBackgroundColor: indicator.key === 'temperatureTrend' ? '#FF5722' : '#2196F3',
           tension: 0.3,
           fill: true,
           pointRadius: 4,
           pointHoverRadius: 6
         }]
       };
-
-      this.chartOptions = {
-        responsive: true,
-        plugins: {
-          legend: { display: false },
-          tooltip: { enabled: true }
-        },
-        scales: {
-          x: {
-            beginAtZero: false,
-            ticks: { color: '#ccc' },
-            grid: { color: '#444' }
-          },
-          y: {
-            beginAtZero: true,
-            ticks: { color: '#ccc' },
-            grid: { color: '#444' }
-          }
-        }
+    } else {
+      const wb = this.geoStatistic.worldBank;
+      const series = wb[indicator.key as WorldBankKey];
+      const values = Array.isArray(series) ? series : [series];
+      const labels = values.map(v => v.year).reverse();
+      const data = values.map(v => v.value ?? 0).reverse();
+      this.chartData = {
+        labels,
+        datasets: [{
+          data,
+          label: indicator.label,
+          borderColor: '#4CAF50',
+          backgroundColor: 'rgba(76, 175, 80, 0.3)',
+          pointBackgroundColor: '#4CAF50',
+          tension: 0.3,
+          fill: true,
+          pointRadius: 4,
+          pointHoverRadius: 6
+        }]
       };
     }
   }

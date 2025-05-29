@@ -51,10 +51,7 @@ export interface GeoStatistic {
         longitude: number;
         elevation: number;
         timezone: string;
-        daily: {
-            time: string[];
-            temperature_2m_mean: number[];
-            precipitation_sum: number[];
-        };
+        temperatureTrend: { year: string; value: number }[];
+        precipitationTrend: { year: string; value: number }[];
     };
 }
