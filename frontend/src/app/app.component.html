@@ -19,7 +19,7 @@
 
 <button *ngIf="networkService.isOnline() && this.userService.isReady() && !locationReady"
     [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary"
-    aria-label="Watch user location" (click)="startWatchingPosition()">
+    aria-label="Watch user location" (click)="getCurrentPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
 <button *ngIf="networkService.isOnline() && this.userService.isReady() && locationReady && !isUserLocation"

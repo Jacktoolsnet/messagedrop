@@ -317,17 +317,12 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     }
   }
 
-  public startWatchingPosition() {
-    this.initWatchingPosition = true;
-    this.watchPosition();
-  }
-
   public goToUserLocation() {
     this.mapService.flyTo(this.userService.getUser().location);
   }
 
-  private watchPosition() {
-    this.geolocationService.watchPosition().subscribe({
+  public getCurrentPosition() {
+    this.geolocationService.getCurrentPosition().subscribe({
       next: (position) => {
         this.locationReady = true;
         this.userService.getUser().location.latitude = position.coords.latitude;
@@ -335,10 +330,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
         this.userService.saveUser();
         this.mapService.setUserMarker(this.userService.getUser().location);
-        if (this.initWatchingPosition) {
-          this.mapService.flyToWithZoom(this.userService.getUser().location, 19);
-          this.initWatchingPosition = false;
-        }
+        this.mapService.flyToWithZoom(this.userService.getUser().location, 19);
       },
       error: (error) => {
         this.locationReady = false;
@@ -358,7 +350,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           });
         }
         this.snackBarRef.afterDismissed().subscribe(() => {
-          this.watchPosition();
+          this.getCurrentPosition();
         });
       }
     });
