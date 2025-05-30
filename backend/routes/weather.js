@@ -9,9 +9,6 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
     try {
         const { locale, latitude, longitude, days } = req.params;
 
-        const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
-        const address = nominatimData.address;
-
         const url = 'https://api.open-meteo.com/v1/forecast';
         const params = {
             latitude,
@@ -25,10 +22,7 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
         };
         const weatherRes = await axios.get(url, { params });
         response.status = 200;
-        response.data = {
-            ...weatherRes.data,
-            address: address
-        };
+        response.data = { ...weatherRes.data };
         res.status(200).json(response);
     } catch (err) {
         response.status = err.response?.status || 500;

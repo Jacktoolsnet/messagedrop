@@ -21,6 +21,7 @@ const translate = require('./routes/translate');
 const utils = require('./routes/utils');
 const geoStatistic = require('./routes/geostatistic');
 const weather = require('./routes/weather');
+const nominatim = require('./routes/nominatim');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
 const helmet = require('helmet');
@@ -249,16 +250,17 @@ const weatherLimit = rateLimit({
 app.use('/', root);
 app.use('/check', check);
 app.use('/clientconnect', clientConnect);
-app.use('/statistic', statistic);
-app.use('/openai', openAi)
-app.use('/user', userLimit, user);
 app.use('/connect', connect);
 app.use('/contact', contact);
-app.use('/message', message);
-app.use('/translate', translateLimit, translate);
-app.use('/utils', utils);
-app.use('/place', place);
 app.use('/geostatistic', geoStatisticLimit, geoStatistic);
+app.use('/message', message);
+app.use('/nominatim', nominatim);
+app.use('/openai', openAi);
+app.use('/place', place);
+app.use('/statistic', statistic);
+app.use('/translate', translateLimit, translate);
+app.use('/user', userLimit, user);
+app.use('/utils', utils);
 app.use('/weather', weatherLimit, weather);
 
 // The last route

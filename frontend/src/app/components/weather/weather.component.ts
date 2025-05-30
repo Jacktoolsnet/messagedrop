@@ -12,8 +12,11 @@ import {
 } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
-import { debounceTime, fromEvent, Subscription } from 'rxjs';
+import { catchError, debounceTime, fromEvent, map, Observable, of, Subscription } from 'rxjs';
+import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Weather } from '../../interfaces/weather';
+import { MapService } from '../../services/map.service';
+import { NominatimService } from '../../services/nominatim.service';
 
 @Component({
   selector: 'app-weather',
@@ -48,7 +51,11 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   chartOptions: ChartConfiguration['options'] = {};
   tempChartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
 
+  locationName$: Observable<string> | undefined;
+
   constructor(
+    private mapService: MapService,
+    private nomatinService: NominatimService,
     private dialogRef: MatDialogRef<WeatherComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { weather: Weather }
   ) {
@@ -71,6 +78,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     } else {
       this.selectedHour = 0;
     }
+    this.getLocationName();
   }
 
   ngAfterViewInit(): void {
@@ -349,12 +357,18 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  getLocationName(): string {
-    if (!this.weather?.address) return 'Unknown location';
-    const addr = this.weather.address;
-    const place = addr.city || addr.town || addr.village || addr.hamlet || 'Unknown place';
-    const country = addr.country || '';
-    return `${place}${country ? ', ' + country : ''}`;
+  getLocationName(): void {
+    this.locationName$ = this.nomatinService
+      .getAddress(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude)
+      .pipe(
+        map((res: GetNominatimAddressResponse) => {
+          const addr = res.address;
+          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || 'Unknown place';
+          const country = addr?.country || '';
+          return `Weather for ${place}${country ? ', ' + country : ''}`;
+        }),
+        catchError(() => of('Weather'))
+      );
   }
 
   moveSelectedHourAnnotation(): void {

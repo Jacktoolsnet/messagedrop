@@ -66,8 +66,7 @@ export class WeatherService {
         sunset: data.daily.sunset[i],
         temperatureMax: data.daily.temperature_2m_max[i],
         temperatureMin: data.daily.temperature_2m_min[i]
-      })),
-      address: data.address
+      }))
     };
   }
 }
