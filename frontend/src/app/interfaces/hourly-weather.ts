@@ -3,4 +3,6 @@ export interface HourlyWeather {
     temperature: number;
     precipitationProbability: number;
     uvIndex: number;
+    pressure: number;
+    wind: number;
 }

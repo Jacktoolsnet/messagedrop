@@ -8,7 +8,9 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltip } from '@angular/material/tooltip';
 import {
   CategoryScale, Chart, ChartConfiguration, ChartDataset, ChartType, Filler, LinearScale, LineController, LineElement,
-  PointElement, ScriptableContext, Title, Tooltip
+  PointElement,
+  ScriptableContext,
+  Title, Tooltip
 } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
@@ -45,8 +47,8 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   selectedHour: number = new Date().getHours();
   weather: Weather | null = null;
 
-  selectedChart: 'temperature' | 'precipitation' | 'uvIndex' = 'temperature';
-  chartModes: Array<'temperature' | 'precipitation' | 'uvIndex'> = ['temperature', 'precipitation', 'uvIndex'];
+  selectedChart: 'temperature' | 'precipitation' | 'uvIndex' | 'wind' | 'pressure' = 'temperature';
+  chartModes: Array<'temperature' | 'precipitation' | 'uvIndex' | 'wind' | 'pressure'> = ['temperature', 'precipitation', 'uvIndex', 'wind', 'pressure'];
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
   tempChartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
@@ -60,7 +62,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: { weather: Weather }
   ) {
     this.weather = this.data.weather;
-
+    console.log('Weather data:', this.weather);
     Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler, annotationPlugin);
 
     this.dialogRef.afterOpened().subscribe(() => {
@@ -125,7 +127,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     this.moveSelectedHourAnnotation();
   }
 
-  onChartToggle(type: 'temperature' | 'precipitation' | 'uvIndex'): void {
+  onChartToggle(type: 'temperature' | 'precipitation' | 'uvIndex' | 'wind' | 'pressure'): void {
     this.selectedChart = type;
     this.updateChart();
   }
@@ -177,96 +179,63 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
 
     const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
-    if (selectedIndex !== -1) {
-      const valueForHour = this.getSelectedChartValue(dayHourly[selectedIndex]);
-      const labelTime = labels[selectedIndex];
-      annotations['selectedHour'] = {
-        type: 'line',
-        xMin: labelTime,
-        xMax: labelTime,
-        yMin: valueForHour,
-        yMax: valueForHour + 0.01,
-        borderColor: '#FF4081',
-        borderWidth: 3,
-        label: {
-          display: true,
-          content: `${labelTime}: ${valueForHour}${this.getSelectedChartUnit()}`,
-          backgroundColor: '#FF4081',
-          color: '#000000',
-          position: 'start'
-        }
-      };
-    }
+
+    let color = '#FF4081'; // Default pink
+    let label = '';
+    let data: number[] = [];
+    let backgroundColor: string | ((ctx: ScriptableContext<'line'>) => CanvasGradient | string) = '';
 
     if (this.selectedChart === 'temperature') {
-      dataset = {
-        data: dayHourly.map(h => h.temperature),
-        label: 'Temperature (°C)',
-        borderColor: '#EF5350',
-        backgroundColor: 'rgba(239, 83, 80, 0.2)',
-        tension: 0.3,
-        fill: true,
-        pointRadius: 3,
-        pointBackgroundColor: '#EF5350'
-      };
+      color = '#EF5350';
+      label = 'Temperature (°C)';
+      data = dayHourly.map(h => h.temperature);
+      backgroundColor = 'rgba(239, 83, 80, 0.2)';
     } else if (this.selectedChart === 'precipitation') {
-      dataset = {
-        data: dayHourly.map(h => h.precipitationProbability),
-        label: 'Precipitation Probability (%)',
-        borderColor: '#42A5F5',
-        backgroundColor: 'rgba(66, 165, 245, 0.2)',
-        tension: 0.3,
-        fill: true,
-        pointRadius: 3,
-        pointBackgroundColor: '#42A5F5'
-      };
+      color = '#42A5F5';
+      label = 'Precipitation Probability (%)';
+      data = dayHourly.map(h => h.precipitationProbability);
+      backgroundColor = 'rgba(66, 165, 245, 0.2)';
     } else if (this.selectedChart === 'uvIndex') {
       const uvValues = dayHourly.map(h => h.uvIndex);
-      dataset = {
-        data: uvValues,
-        label: 'UV Index',
-        borderColor: '#AB47BC',
-        backgroundColor: (ctx: ScriptableContext<'line'>) => {
-          const chart = ctx.chart;
-          const { ctx: canvasCtx, chartArea } = chart;
-          const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-          gradient.addColorStop(0, 'rgba(0,0,0,0)');
-          gradient.addColorStop(0.2, '#FFEB3B');
-          gradient.addColorStop(0.5, '#FF9800');
-          gradient.addColorStop(1.0, '#AB47BC');
-          return gradient;
-        },
-        tension: 0.4,
-        fill: true,
-        pointRadius: 3,
-        pointBackgroundColor: uvValues.map(v => this.getUvColor(v))
+      color = '#AB47BC';
+      label = 'UV Index';
+      data = uvValues;
+      backgroundColor = (ctx: ScriptableContext<'line'>) => {
+        const chart = ctx.chart;
+        const { ctx: canvasCtx, chartArea } = chart;
+        const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+        gradient.addColorStop(0, 'rgba(0,0,0,0)');
+        gradient.addColorStop(0.2, '#FFEB3B');
+        gradient.addColorStop(0.5, '#FF9800');
+        gradient.addColorStop(1.0, '#AB47BC');
+        return gradient;
       };
+    } else if (this.selectedChart === 'wind') {
+      color = '#9E9E9E'; // Grau
+      label = 'Wind Speed (km/h)';
+      data = dayHourly.map(h => h.wind);
+      backgroundColor = 'rgba(158, 158, 158, 0.2)';
+    } else if (this.selectedChart === 'pressure') {
+      color = '#BA68C8'; // Flieder
+      label = 'Air Pressure (hPa)';
+      data = dayHourly.map(h => h.pressure);
+      backgroundColor = 'rgba(186, 104, 200, 0.2)';
     }
 
-    this.chartOptions!.plugins = { ...(this.chartOptions!.plugins ?? {}), annotation: { annotations } };
-    this.chartOptions!.scales = {
-      x: { ticks: { color: '#ccc' }, grid: { color: '#444' } },
-      y: {
-        ticks: { color: '#ccc' },
-        grid: { color: '#444' },
-        min: this.selectedChart === 'uvIndex' ? 0 : this.selectedChart === 'precipitation' ? 0 : undefined,
-        max: this.selectedChart === 'uvIndex' ? 11 : this.selectedChart === 'precipitation' ? 100 : undefined
-      }
+    dataset = {
+      data,
+      label,
+      borderColor: color,
+      backgroundColor,
+      tension: 0.3,
+      fill: true,
+      pointRadius: 3,
+      pointBackgroundColor: color
     };
 
-    // Dynamische Farbe je nach Modus auch hier setzen
-    let color = '#FF4081'; // Default: rot/pink
-    if (this.selectedChart === 'precipitation') {
-      color = '#42A5F5'; // Blau
-    } else if (this.selectedChart === 'uvIndex') {
-      color = '#FF9800'; // Orange
-    }
-
-    // Add selected hour annotation (from slider or initial)
     if (selectedIndex !== -1) {
       const valueForHour = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const labelTime = labels[selectedIndex];
-
       annotations['selectedHour'] = {
         type: 'line',
         xMin: labelTime,
@@ -285,6 +254,28 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
 
+    this.chartOptions!.plugins = {
+      ...(this.chartOptions!.plugins ?? {}),
+      annotation: { annotations }
+    };
+
+    this.chartOptions!.scales = {
+      x: { ticks: { color: '#ccc' }, grid: { color: '#444' } },
+      y: {
+        ticks: { color: '#ccc' },
+        grid: { color: '#444' },
+        min:
+          this.selectedChart === 'uvIndex' ? 0 :
+            this.selectedChart === 'precipitation' ? 0 :
+              this.selectedChart === 'wind' ? 0 :
+                undefined,
+        max:
+          this.selectedChart === 'uvIndex' ? 11 :
+            this.selectedChart === 'precipitation' ? 100 :
+              undefined
+      }
+    };
+
     this.tempChartData = { labels, datasets: [dataset] };
   }
 
@@ -300,6 +291,8 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'temperature': return hourData.temperature;
       case 'precipitation': return hourData.precipitationProbability;
       case 'uvIndex': return hourData.uvIndex;
+      case 'wind': return hourData.wind;
+      case 'pressure': return hourData.pressure;
       default: return 0;
     }
   }
@@ -309,6 +302,8 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       case 'temperature': return '°C';
       case 'precipitation': return '%';
       case 'uvIndex': return '';
+      case 'wind': return ' km/h';
+      case 'pressure': return ' hPa';
       default: return '';
     }
   }
@@ -319,19 +314,23 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     return date.toLocaleDateString(undefined, options);
   }
 
-  getChartLabel(mode: 'temperature' | 'precipitation' | 'uvIndex'): string {
+  getChartLabel(mode: 'temperature' | 'precipitation' | 'uvIndex' | 'wind' | 'pressure'): string {
     switch (mode) {
       case 'temperature': return 'Temperature';
       case 'precipitation': return 'Precipitation Probability';
       case 'uvIndex': return 'UV Index';
+      case 'wind': return 'Wind Speed';
+      case 'pressure': return 'Pressure';
     }
   }
 
-  getChartIcon(mode: 'temperature' | 'precipitation' | 'uvIndex'): string {
+  getChartIcon(mode: 'temperature' | 'precipitation' | 'uvIndex' | 'wind' | 'pressure'): string {
     switch (mode) {
       case 'temperature': return 'thermostat';
       case 'precipitation': return 'water_drop';
       case 'uvIndex': return 'light_mode';
+      case 'wind': return 'air';
+      case 'pressure': return 'compress';
     }
   }
 

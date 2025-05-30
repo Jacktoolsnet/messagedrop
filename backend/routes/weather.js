@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const axios = require('axios');
-const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
 
 router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
@@ -14,7 +13,7 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
             latitude,
             longitude,
             current_weather: true,
-            hourly: 'temperature_2m,precipitation_probability,uv_index',
+            hourly: 'temperature_2m,precipitation_probability,uv_index,pressure_msl,windspeed_10m',
             daily: 'sunrise,sunset,temperature_2m_max,temperature_2m_min',
             forecast_days: days,
             timezone: 'auto',

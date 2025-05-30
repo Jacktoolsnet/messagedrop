@@ -58,7 +58,9 @@ export class WeatherService {
         time: t,
         temperature: data.hourly.temperature_2m[i],
         precipitationProbability: data.hourly.precipitation_probability[i],
-        uvIndex: data.hourly.uv_index[i]
+        uvIndex: data.hourly.uv_index[i],
+        pressure: data.hourly.pressure_msl[i],
+        wind: data.hourly.windspeed_10m[i]
       })),
       daily: data.daily.time.map((d: string, i: number) => ({
         date: d,
