@@ -8,10 +8,12 @@
                 {{ getDayLabel(i) }}
             </button>
         </div>
+
         <div class="chart-container">
             <canvas baseChart [type]="lineChartType" [data]="tempChartData" [options]="chartOptions">
             </canvas>
         </div>
+
         <div class="chart-switch mini-fab">
             <button mat-mini-fab *ngFor="let mode of chartModes"
                 [color]="selectedChart === mode ? 'primary' : 'secondary'" (click)="onChartToggle(mode)"
@@ -19,7 +21,14 @@
                 <mat-icon>{{ getChartIcon(mode) }}</mat-icon>
             </button>
         </div>
+
+        <div class="hour-slider">
+            <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
+                <input matSliderThumb [(ngModel)]="selectedHour">
+            </mat-slider>
+        </div>
     </ng-container>
+
     <div class="data-source">
         Weather data provided by
         <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
