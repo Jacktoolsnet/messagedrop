@@ -163,7 +163,40 @@ td:first-child {
 }
 
 .chart-container {
-    position: relative;
+    flex: 1 1 auto;
     width: 100%;
-    height: auto;
+    aspect-ratio: 16 / 9;
+    min-height: 10rem;
+    max-height: 100%;
+    /* reserviere Platz für Buttons und Slider */
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+canvas {
+    width: 100% !important;
+    aspect-ratio: 16 / 9;
+    min-height: 10rem;
+    max-height: 100%;
+}
+
+.chart-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.5rem;
+}
+
+.chart-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #ccc;
+}
+
+.info-icon {
+    font-size: 1.2rem;
+    color: #aaa;
+    cursor: pointer;
 }

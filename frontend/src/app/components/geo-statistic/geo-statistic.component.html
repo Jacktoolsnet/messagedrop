@@ -94,7 +94,7 @@
                 <div class="category-container">
                     <mat-form-field appearance="fill" class="category-dropdown">
                         <mat-label>Category</mat-label>
-                        <mat-select [(value)]="selectedCategory">
+                        <mat-select [value]="selectedCategory" (selectionChange)="onCategoryChange($event.value)">
                             <mat-option *ngFor="let category of categories" [value]="category.value">
                                 {{ category.label }}
                             </mat-option>
@@ -112,6 +112,13 @@
                 </div>
 
                 <div *ngIf="selectedIndicator" class="indicator-display">
+                    <div *ngIf="isSmallScreen" class="chart-header">
+                        <span class="chart-title">{{ selectedIndicator.label }}</span>
+                        <button mat-icon-button color="accent" matTooltip="{{ currentIndicatorDescription }}"
+                            matTooltipPosition="above" aria-label="Info">
+                            <mat-icon>info</mat-icon>
+                        </button>
+                    </div>
                     <div class="chart-container">
                         <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType"></canvas>
                     </div>

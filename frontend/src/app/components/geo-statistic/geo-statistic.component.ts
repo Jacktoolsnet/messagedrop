@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
@@ -25,7 +26,9 @@ type WorldBankKey = keyof GeoStatistic['worldBank'];
     MatSelectModule,
     MatTooltipModule,
     MatExpansionModule,
-    BaseChartDirective
+    BaseChartDirective,
+    MatButtonModule,
+    MatTooltipModule
   ],
   templateUrl: './geo-statistic.component.html',
   styleUrl: './geo-statistic.component.css'
@@ -40,6 +43,8 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   public geoStatistic: GeoStatistic | undefined;
   selectedCategory = 'economy';
   selectedIndicator: { key: string; label: string } | null = null;
+  currentIndicatorDescription: string = '';
+  public isSmallScreen = false;
 
   categories = [
     { value: 'economy', label: 'Economy' },
@@ -75,6 +80,24 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
       { key: 'temperatureTrend', label: 'Temperature Trend (°C)' },
       { key: 'precipitationTrend', label: 'Precipitation Trend (mm)' }
     ]
+  };
+
+  categoryColors: { [key: string]: { border: string; background: string; point: string } } = {
+    economy: {
+      border: '#2196F3',
+      background: 'rgba(33, 150, 243, 0.3)',
+      point: '#2196F3'
+    },
+    social: {
+      border: '#9C27B0',
+      background: 'rgba(156, 39, 176, 0.3)',
+      point: '#9C27B0'
+    },
+    climate: {
+      border: '#4CAF50',
+      background: 'rgba(76, 175, 80, 0.3)',
+      point: '#4CAF50'
+    }
   };
 
   indicatorUnits: { [key: string]: string } = {
@@ -134,6 +157,8 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     // Beobachtet lokale Größenänderungen (z. B. Inhalte im Dialog)
     this.resizeObserver = new ResizeObserver(() => {
+      this.checkScreenSize();
+      this.setChartOptionsForIndicator(this.selectedIndicator?.key || 'gdp');
       this.updateChartSize();
     });
     this.resizeObserver.observe(this.dialogContentRef.nativeElement);
@@ -142,6 +167,8 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     this.windowResizeSub = fromEvent(window, 'resize')
       .pipe(debounceTime(200))  // Warte 200ms, bevor es reagiert
       .subscribe(() => {
+        this.setChartOptionsForIndicator(this.selectedIndicator?.key || 'gdp');
+        this.checkScreenSize();
         this.updateChartSize();
       });
   }
@@ -154,6 +181,10 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   private updateChartSize() {
     this.chart?.chart?.resize();
     this.chart?.chart?.update();
+  }
+
+  checkScreenSize() {
+    this.isSmallScreen = window.innerWidth < 600;
   }
 
   buildIndicatorMap() {
@@ -182,19 +213,16 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     const allIndicators = Object.values(this.fullIndicatorMap).flat();
     const indicator = allIndicators.find(i => i.key === indicatorKey);
     const label = indicator ? indicator.label : indicatorKey;
-    const canvasWidth = this.chart?.chart?.width || 300;  // fallback falls chart nicht da
-    const subtitleText = this.getWrappedTextByWidth(
-      this.getIndicatorDescription(indicatorKey),
-      canvasWidth,
-      12
-    );
+    const description = this.getIndicatorDescription(indicatorKey);
+    const canvasWidth = this.chart?.chart?.width || 300;
+    const isSmallScreen = window.innerWidth < 500 || canvasWidth < 300;
 
     this.chartOptions = {
       responsive: true,
       plugins: {
         legend: { display: true },
         title: {
-          display: true,
+          display: !isSmallScreen,  // nur bei größeren Screens
           text: label,
           color: '#ccc',
           font: {
@@ -203,18 +231,18 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
           }
         },
         subtitle: {
-          display: true,
-          text: subtitleText,
+          display: !isSmallScreen,
+          text: description,
           color: '#aaa',
           font: {
             size: 12,
-            family: 'Arial',  // oder was dir gefällt
+            family: 'Arial',
             weight: 'normal',
-            lineHeight: 1.2   // etwas mehr Zeilenhöhe für Umbruch
+            lineHeight: 1.2
           },
           padding: {
-            top: 10,    // Abstand nach oben (zum Titel)
-            bottom: 25  // Abstand nach unten (zum Diagramm)
+            top: 10,
+            bottom: 20
           },
           align: 'center'
         },
@@ -247,7 +275,6 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
             callback: function (value) {
               const num = typeof value === 'number' ? value : Number(value);
               let formatted = '';
-
               if (Math.abs(num) >= 1_000_000) {
                 formatted = new Intl.NumberFormat(locale, {
                   notation: 'compact',
@@ -259,8 +286,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
                   maximumFractionDigits: 1
                 }).format(num);
               }
-
-              return unit ? `${formatted}` : formatted;
+              return formatted;
             }
           },
           grid: { color: '#444' },
@@ -281,6 +307,9 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       }
     };
+
+    // Speichere description separat für Info-Icon-Tooltip
+    this.currentIndicatorDescription = description;
   }
 
   firstValidValue(series: { year: string; value: number | null }[] | undefined): number | null {
@@ -366,6 +395,12 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     return tooltips[key] || 'Click to view details';
   }
 
+  onCategoryChange(newCategory: string) {
+    this.selectedCategory = newCategory;
+    this.selectedIndicator = null;
+    this.chartData = { labels: [], datasets: [] };  // Chart leeren
+  }
+
   onIndicatorSelect(indicator: { key: string; label: string }) {
     this.selectedIndicator = indicator;
     this.setChartOptionsForIndicator(indicator.key);
@@ -402,14 +437,16 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
       const values = Array.isArray(series) ? series : [series];
       const labels = values.map(v => v.year).reverse();
       const data = values.map(v => v.value ?? 0).reverse();
+      const colors = this.categoryColors[this.selectedCategory];
+
       this.chartData = {
         labels,
         datasets: [{
           data,
           label: indicator.label,
-          borderColor: '#4CAF50',
-          backgroundColor: 'rgba(76, 175, 80, 0.3)',
-          pointBackgroundColor: '#4CAF50',
+          borderColor: colors.border,
+          backgroundColor: colors.background,
+          pointBackgroundColor: colors.point,
           tension: 0.3,
           fill: true,
           pointRadius: 4,
