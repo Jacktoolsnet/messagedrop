@@ -146,6 +146,29 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     const dayHourly = this.weather.hourly.filter(h => h.time.startsWith(selectedDate));
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
 
+    // Dynamische Farbe je nach Modus (klarer switch)
+    let color: string;
+    switch (this.selectedChart) {
+      case 'temperature':
+        color = '#EF5350'; // Rot
+        break;
+      case 'precipitation':
+        color = '#42A5F5'; // Blau
+        break;
+      case 'uvIndex':
+        color = '#AB47BC'; // Lila
+        break;
+      case 'wind':
+        color = '#9E9E9E'; // Grau
+        break;
+      case 'pressure':
+        color = '#BA68C8'; // Flieder
+        break;
+      default:
+        color = '#FF4081'; // Fallback pink (falls was Unerwartetes passiert)
+        break;
+    }
+
     const annotations: Record<string, Partial<AnnotationOptions>> = {
       sunrise: {
         type: 'line',
@@ -180,59 +203,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
 
-    let color = '#FF4081'; // Default pink
-    let label = '';
-    let data: number[] = [];
-    let backgroundColor: string | ((ctx: ScriptableContext<'line'>) => CanvasGradient | string) = '';
-
-    if (this.selectedChart === 'temperature') {
-      color = '#EF5350';
-      label = 'Temperature (°C)';
-      data = dayHourly.map(h => h.temperature);
-      backgroundColor = 'rgba(239, 83, 80, 0.2)';
-    } else if (this.selectedChart === 'precipitation') {
-      color = '#42A5F5';
-      label = 'Precipitation Probability (%)';
-      data = dayHourly.map(h => h.precipitationProbability);
-      backgroundColor = 'rgba(66, 165, 245, 0.2)';
-    } else if (this.selectedChart === 'uvIndex') {
-      const uvValues = dayHourly.map(h => h.uvIndex);
-      color = '#AB47BC';
-      label = 'UV Index';
-      data = uvValues;
-      backgroundColor = (ctx: ScriptableContext<'line'>) => {
-        const chart = ctx.chart;
-        const { ctx: canvasCtx, chartArea } = chart;
-        const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-        gradient.addColorStop(0, 'rgba(0,0,0,0)');
-        gradient.addColorStop(0.2, '#FFEB3B');
-        gradient.addColorStop(0.5, '#FF9800');
-        gradient.addColorStop(1.0, '#AB47BC');
-        return gradient;
-      };
-    } else if (this.selectedChart === 'wind') {
-      color = '#9E9E9E'; // Grau
-      label = 'Wind Speed (km/h)';
-      data = dayHourly.map(h => h.wind);
-      backgroundColor = 'rgba(158, 158, 158, 0.2)';
-    } else if (this.selectedChart === 'pressure') {
-      color = '#BA68C8'; // Flieder
-      label = 'Air Pressure (hPa)';
-      data = dayHourly.map(h => h.pressure);
-      backgroundColor = 'rgba(186, 104, 200, 0.2)';
-    }
-
-    dataset = {
-      data,
-      label,
-      borderColor: color,
-      backgroundColor,
-      tension: 0.3,
-      fill: true,
-      pointRadius: 3,
-      pointBackgroundColor: color
-    };
-
     if (selectedIndex !== -1) {
       const valueForHour = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const labelTime = labels[selectedIndex];
@@ -254,25 +224,94 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       };
     }
 
-    this.chartOptions!.plugins = {
-      ...(this.chartOptions!.plugins ?? {}),
-      annotation: { annotations }
-    };
+    // ---- Dataset Setup ----
+    if (this.selectedChart === 'temperature') {
+      dataset = {
+        data: dayHourly.map(h => h.temperature),
+        label: 'Temperature (°C)',
+        borderColor: '#EF5350',
+        backgroundColor: 'rgba(239, 83, 80, 0.2)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#EF5350'
+      };
+    } else if (this.selectedChart === 'precipitation') {
+      dataset = {
+        data: dayHourly.map(h => h.precipitationProbability),
+        label: 'Precipitation Probability (%)',
+        borderColor: '#42A5F5',
+        backgroundColor: 'rgba(66, 165, 245, 0.2)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#42A5F5'
+      };
+    } else if (this.selectedChart === 'uvIndex') {
+      const uvValues = dayHourly.map(h => h.uvIndex);
+      dataset = {
+        data: uvValues,
+        label: 'UV Index',
+        borderColor: '#AB47BC',
+        backgroundColor: (ctx: ScriptableContext<'line'>) => {
+          const chart = ctx.chart;
+          const { ctx: canvasCtx, chartArea } = chart;
+          const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+          gradient.addColorStop(0, 'rgba(0,0,0,0)');
+          gradient.addColorStop(0.2, '#FFEB3B');
+          gradient.addColorStop(0.5, '#FF9800');
+          gradient.addColorStop(1.0, '#AB47BC');
+          return gradient;
+        },
+        tension: 0.4,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: uvValues.map(v => this.getUvColor(v))
+      };
+    } else if (this.selectedChart === 'wind') {
+      dataset = {
+        data: dayHourly.map(h => h.wind),
+        label: 'Wind (km/h)',
+        borderColor: '#9E9E9E',
+        backgroundColor: 'rgba(158, 158, 158, 0.2)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#9E9E9E'
+      };
+    } else if (this.selectedChart === 'pressure') {
+      dataset = {
+        data: dayHourly.map(h => h.pressure),
+        label: 'Pressure (hPa)',
+        borderColor: '#BA68C8',
+        backgroundColor: 'rgba(186, 104, 200, 0.2)',
+        tension: 0.3,
+        fill: true,
+        pointRadius: 3,
+        pointBackgroundColor: '#BA68C8'
+      };
+    }
 
+    this.chartOptions!.plugins = { ...(this.chartOptions!.plugins ?? {}), annotation: { annotations } };
     this.chartOptions!.scales = {
       x: { ticks: { color: '#ccc' }, grid: { color: '#444' } },
       y: {
         ticks: { color: '#ccc' },
         grid: { color: '#444' },
         min:
-          this.selectedChart === 'uvIndex' ? 0 :
-            this.selectedChart === 'precipitation' ? 0 :
-              this.selectedChart === 'wind' ? 0 :
-                undefined,
+          this.selectedChart === 'uvIndex'
+            ? 0
+            : this.selectedChart === 'precipitation'
+              ? 0
+              : this.selectedChart === 'wind'
+                ? 0
+                : undefined,
         max:
-          this.selectedChart === 'uvIndex' ? 11 :
-            this.selectedChart === 'precipitation' ? 100 :
-              undefined
+          this.selectedChart === 'uvIndex'
+            ? 11
+            : this.selectedChart === 'precipitation'
+              ? 100
+              : undefined
       }
     };
 
@@ -385,11 +424,9 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const annotations = pluginOptions.annotations as Record<string, Partial<AnnotationOptions>>;
-
     const selectedDate = this.weather!.daily[this.selectedDayIndex].date;
     const dayHourly = this.weather!.hourly.filter(h => h.time.startsWith(selectedDate));
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
-
     const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
 
@@ -398,11 +435,23 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       const labelTime = labels[selectedIndex];
 
       // Dynamische Farbe je nach Chart-Modus
-      let color = '#FF4081'; // Default: rot/pink
-      if (this.selectedChart === 'precipitation') {
-        color = '#42A5F5'; // Blau
-      } else if (this.selectedChart === 'uvIndex') {
-        color = '#FF9800'; // Orange
+      let color = '#FF4081'; // Default pink/rot
+      switch (this.selectedChart) {
+        case 'temperature':
+          color = '#EF5350'; // Rot
+          break;
+        case 'precipitation':
+          color = '#42A5F5'; // Blau
+          break;
+        case 'uvIndex':
+          color = '#AB47BC'; // Lila
+          break;
+        case 'wind':
+          color = '#9E9E9E'; // Grau
+          break;
+        case 'pressure':
+          color = '#BA68C8'; // Flieder
+          break;
       }
 
       annotations['selectedHour'] = {
@@ -422,7 +471,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         }
       };
 
-      chartInstance.update('none');  // update without animation
+      chartInstance.update('none'); // update without animation
     }
   }
 }
