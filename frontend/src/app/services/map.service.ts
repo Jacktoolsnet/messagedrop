@@ -151,6 +151,11 @@ export class MapService {
     this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }
 
+  public moveToWithZoom(location: Location, zoom: number): void {
+    this.map?.setZoom(zoom);
+    this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());
+  }
+
   public setUserMarker(location: Location) {
     if (undefined === this.userMarker) {
       this.userMarker = leaflet.marker([location.latitude, location.longitude], { icon: userMarker, zIndexOffset: 0 }).addTo(this.map);

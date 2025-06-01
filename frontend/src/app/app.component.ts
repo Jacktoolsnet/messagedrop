@@ -138,42 +138,8 @@ export class AppComponent implements OnInit {
     this.serverSubject.subscribe({
       next: async (v) => {
         if (this.serverService.isReady()) {
-          if (await this.indexedDbService.hasUser()) {
-            this.openCheckPinDialog();
-          } else {
-            const dialogRef = this.displayMessage.open(DisplayMessage, {
-              panelClass: '',
-              closeOnNavigation: false,
-              data: {
-                showAlways: true,
-                title: 'Want to create a user? Easy peasy.',
-                image: '',
-                icon: 'person_add',
-                message: `Just pick a PIN – no username, no password, no DNA sample.
-
-But hey, *don’t forget that PIN!*
-
-We don’t store it, we don’t back it up, and we definitely can’t send you a “forgot PIN?” email.  
-Basically: lose it, and your user is gone like your last cup of coffee.
-
-You can delete your user anytime (rage quit or just Marie Kondo your data).
-
-Also, if you ghost us for 90 days, your user and all its data get quietly deleted.`,
-                button: 'Create PIN',
-                delay: 200,
-                showSpinner: false
-              },
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              hasBackdrop: false
-            });
-
-            dialogRef.afterOpened().subscribe(e => { });
-
-            dialogRef.afterClosed().subscribe(() => {
-              this.openCreatePinDialog();
-            });
-          }
+          // Init the map
+          this.mapService.initMap(this.mapSubject);
         }
         if (this.serverService.isFailed()) {
           const dialogRef = this.displayMessage.open(DisplayMessage, {
@@ -215,58 +181,19 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       next: (v) => {
         this.socketioService.initSocket();
         this.placeService.initPlaces();
-        this.mapService.initMap(this.mapSubject);
       },
     });
 
     this.mapSubject.subscribe({
       next: (v) => {
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
-        // Check if app is called from shared dialog or from push notification
-
-        // Observe shared content
-        this.sharedContentService.getSharedAvailableObservable().subscribe(async (sharedAvaliable: boolean) => {
-          if (sharedAvaliable) {
-            const lastContent = await this.sharedContentService.getSharedContent('last');
-            let multimedia: Multimedia | undefined = undefined;
-            let location: Location | undefined = undefined;
-            if (lastContent?.url) {
-              const objectFromUrl = await this.oembedService.getObjectFromUrl(lastContent.url);
-              if (objectFromUrl && this.oembedService.isMultimedia(objectFromUrl)) {
-                multimedia = objectFromUrl as Multimedia;
-              } else if (objectFromUrl && this.oembedService.isLocation(objectFromUrl)) {
-                location = objectFromUrl as Location;
-              } else {
-                this.snackBar.open(JSON.stringify(lastContent, null, 2), 'OK', {
-                  horizontalPosition: 'center',
-                  verticalPosition: 'top',
-                });
-              }
-            }
-            const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
-              data: { multimedia: multimedia, location: location },
-              closeOnNavigation: true,
-              minWidth: '20vw',
-              maxWidth: '90vw',
-              maxHeight: '90vh',
-              hasBackdrop: true
-            });
-
-            dialogRef.afterOpened().subscribe(e => {
-            });
-
-            dialogRef.afterClosed().subscribe(result => {
-              if (result) {
-                this.userService.saveProfile();
-              }
-            });
+        // Fly to position if user alrady allowed location.
+        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+          if (result.state === 'granted') {
+            this.getCurrentPosition();
+          } else {
+            this.updateDataForLocation(this.mapService.getMapLocation(), true);
           }
         });
-        const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
-        if (notificationAction) {
-          this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
-          // z. B. Navigation starten, Dialog öffnen, etc.
-        }
       }
     });
 
@@ -311,6 +238,93 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     window.history.pushState(this.myHistory, '', '');
   }
 
+  private async loginUser() {
+    if (await this.indexedDbService.hasUser()) {
+      this.openCheckPinDialog();
+    } else {
+      const dialogRef = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: 'Want to create a user? Easy peasy.',
+          image: '',
+          icon: 'person_add',
+          message: `Just pick a PIN – no username, no password, no DNA sample.
+
+But hey, *don’t forget that PIN!*
+
+We don’t store it, we don’t back it up, and we definitely can’t send you a “forgot PIN?” email.  
+Basically: lose it, and your user is gone like your last cup of coffee.
+
+You can delete your user anytime (rage quit or just Marie Kondo your data).
+
+Also, if you ghost us for 90 days, your user and all its data get quietly deleted.`,
+          button: 'Create PIN',
+          delay: 200,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: false
+      });
+
+      dialogRef.afterOpened().subscribe(e => { });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.openCreatePinDialog();
+      });
+    }
+  }
+
+  public handleSharedContentOrNotification() {
+    // Check if app is called from shared dialog or from push notification
+
+    // Observe shared content
+    this.sharedContentService.getSharedAvailableObservable().subscribe(async (sharedAvaliable: boolean) => {
+      if (sharedAvaliable) {
+        const lastContent = await this.sharedContentService.getSharedContent('last');
+        let multimedia: Multimedia | undefined = undefined;
+        let location: Location | undefined = undefined;
+        if (lastContent?.url) {
+          const objectFromUrl = await this.oembedService.getObjectFromUrl(lastContent.url);
+          if (objectFromUrl && this.oembedService.isMultimedia(objectFromUrl)) {
+            multimedia = objectFromUrl as Multimedia;
+          } else if (objectFromUrl && this.oembedService.isLocation(objectFromUrl)) {
+            location = objectFromUrl as Location;
+          } else {
+            this.snackBar.open(JSON.stringify(lastContent, null, 2), 'OK', {
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+            });
+          }
+        }
+        const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
+          data: { multimedia: multimedia, location: location },
+          closeOnNavigation: true,
+          minWidth: '20vw',
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: true
+        });
+
+        dialogRef.afterOpened().subscribe(e => {
+        });
+
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.userService.saveProfile();
+          }
+        });
+      }
+    });
+    const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
+    if (notificationAction) {
+      this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
+      // z. B. Navigation starten, Dialog öffnen, etc.
+    }
+  }
+
   private setIsUserLocation(): void {
     if (this.userService.getUser().location.plusCode === this.mapService.getMapLocation().plusCode) {
       this.isUserLocation = true;
@@ -319,43 +333,67 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     }
   }
 
-  public goToUserLocation() {
-    this.mapService.flyTo(this.userService.getUser().location);
-  }
-
   public getCurrentPosition() {
-    this.geolocationService.getCurrentPosition().subscribe({
-      next: (position) => {
-        this.locationReady = true;
-        this.userService.getUser().location.latitude = position.coords.latitude;
-        this.userService.getUser().location.longitude = position.coords.longitude;
-        this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
-        this.userService.saveUser();
-        this.mapService.setUserMarker(this.userService.getUser().location);
-        this.mapService.flyToWithZoom(this.userService.getUser().location, 19);
+    const dialogRef = this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: 'Locating You',
+        image: '',
+        icon: 'place',
+        message: 'Please wait while we determine your current location...',
+        button: '',
+        delay: 0,
+        showSpinner: true
       },
-      error: (error) => {
-        this.locationReady = false;
-        if (error.code == 1) {
-          this.snackBarRef = this.snackBar.open(`Please authorize location.`, 'OK', {
-            panelClass: ['snack-info'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            duration: 1000
-          });
-        } else {
-          this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later.", 'OK', {
-            panelClass: ['snack-info'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top',
-            duration: 1000
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.geolocationService.getCurrentPosition().subscribe({
+        next: (position) => {
+          dialogRef.close();
+          this.locationReady = true;
+          this.userService.getUser().location.latitude = position.coords.latitude;
+          this.userService.getUser().location.longitude = position.coords.longitude;
+          this.userService.getUser().location.plusCode = this.geolocationService.getPlusCode(position.coords.latitude, position.coords.longitude)
+          this.userService.saveUser();
+          this.mapService.setUserMarker(this.userService.getUser().location);
+          this.mapService.moveToWithZoom(this.userService.getUser().location, 19);
+          this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        },
+        error: (error) => {
+          dialogRef.close();
+          this.locationReady = false;
+          if (error.code == 1) {
+            this.snackBarRef = this.snackBar.open(`Please authorize location.`, 'OK', {
+              panelClass: ['snack-info'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              duration: 1000
+            });
+          } else {
+            this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later.", 'OK', {
+              panelClass: ['snack-info'],
+              horizontalPosition: 'center',
+              verticalPosition: 'top',
+              duration: 1000
+            });
+          }
+          this.snackBarRef.afterDismissed().subscribe(() => {
+            this.getCurrentPosition();
           });
         }
-        this.snackBarRef.afterDismissed().subscribe(() => {
-          this.getCurrentPosition();
-        });
-      }
+      });
     });
+
+    dialogRef.afterClosed().subscribe(() => {
+      // Optional: Aktionen nach Schließen
+    });
+
   }
 
   public addLocationToPlace() {
@@ -406,7 +444,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public handleMarkerClickEvent(event: any) {
-    this.mapService.flyTo({
+    this.mapService.moveTo({
       latitude: event.latitude,
       longitude: event.longitude,
       plusCode: event.plusCode
@@ -427,7 +465,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public handleClickEvent(event: Location) {
-    this.mapService.flyTo(event);
+    this.mapService.moveTo(event);
   }
 
   public openCreatePinDialog(): void {
