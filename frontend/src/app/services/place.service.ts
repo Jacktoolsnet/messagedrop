@@ -114,6 +114,7 @@ export class PlaceService {
   createPlace(place: Place) {
     let url = `${environment.apiUrl}/place/create`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -135,6 +136,7 @@ export class PlaceService {
   updatePlace(place: Place) {
     let url = `${environment.apiUrl}/place/update`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -156,6 +158,7 @@ export class PlaceService {
   getByUserId(userId: string) {
     let url = `${environment.apiUrl}/place/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -173,6 +176,7 @@ export class PlaceService {
   getById(placeId: string) {
     let url = `${environment.apiUrl}/place/get/${placeId}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -190,6 +194,7 @@ export class PlaceService {
   getByUserIdAndName(userId: string, name: string) {
     let url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -207,6 +212,7 @@ export class PlaceService {
   deletePlace(place: Place) {
     let url = `${environment.apiUrl}/place/delete/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -224,6 +230,7 @@ export class PlaceService {
   subscribe(place: Place) {
     let url = `${environment.apiUrl}/place/subscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -241,6 +248,7 @@ export class PlaceService {
   unsubscribe(place: Place) {
     let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -259,6 +267,7 @@ export class PlaceService {
     place.plusCodes.push(location.plusCode);
     let url = `${environment.apiUrl}/place/updatepluscodes`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',
@@ -294,6 +303,7 @@ export class PlaceService {
     place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
     let url = `${environment.apiUrl}/place/updatepluscodes`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Place service',
       image: '',
       icon: '',

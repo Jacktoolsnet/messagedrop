@@ -254,6 +254,7 @@ export class ContactService {
   createContact(contact: Contact, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -291,6 +292,7 @@ export class ContactService {
   updateContactName(contact: Contact) {
     let url = `${environment.apiUrl}/contact/update/name`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -317,6 +319,7 @@ export class ContactService {
   updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/contact/update/message`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -352,6 +355,7 @@ export class ContactService {
   getByUserId(userId: string) {
     let url = `${environment.apiUrl}/contact/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -369,6 +373,7 @@ export class ContactService {
   getById(contactId: string) {
     let url = `${environment.apiUrl}/contact/get/${contactId}`
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -386,6 +391,7 @@ export class ContactService {
   deleteContact(contactToDelete: Contact) {
     let url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -414,6 +420,7 @@ export class ContactService {
   subscribe(contact: Contact) {
     let url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -440,6 +447,7 @@ export class ContactService {
   unsubscribe(contact: Contact) {
     let url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Contact service',
       image: '',
       icon: '',

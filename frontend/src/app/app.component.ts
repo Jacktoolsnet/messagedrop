@@ -145,6 +145,7 @@ export class AppComponent implements OnInit {
               panelClass: '',
               closeOnNavigation: false,
               data: {
+                showAlways: true,
                 title: 'Want to create a user? Easy peasy.',
                 image: '',
                 icon: 'person_add',
@@ -179,6 +180,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             panelClass: '',
             closeOnNavigation: false,
             data: {
+              showAlways: true,
               title: 'Oops! Our server went on a coffee break...',
               image: '',
               icon: 'cloud_off',
@@ -521,6 +523,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         panelClass: '',
                         closeOnNavigation: false,
                         data: {
+                          showAlways: true,
                           title: 'User not found',
                           image: '',
                           icon: 'person_remove',
@@ -557,6 +560,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         panelClass: '',
                         closeOnNavigation: false,
                         data: {
+                          showAlways: true,
                           title: 'Oops! Backend error!',
                           image: '',
                           icon: 'bug_report',
@@ -1023,6 +1027,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             panelClass: '',
             closeOnNavigation: false,
             data: {
+              showAlways: true,
               title: err.statusText,
               image: '',
               icon: 'hourglass_bottom',
@@ -1085,6 +1090,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: '',
       closeOnNavigation: false,
       data: {
+        showAlways: true,
         title: 'GeoStatistic Service',
         image: '',
         icon: 'bug_report',

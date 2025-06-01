@@ -30,6 +30,7 @@ export class GeoStatisticService {
   getDataForLocation(latitude: number, longitude: number, years: number): Observable<GetGeoStatisticResponse> {
     const url = `${environment.apiUrl}/geostatistic/${latitude}/${longitude}/${years}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: true,
       title: 'GeoStatistic Service',
       image: '',
       icon: '',

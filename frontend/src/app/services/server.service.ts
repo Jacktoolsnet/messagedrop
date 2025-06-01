@@ -54,6 +54,7 @@ export class ServerService {
   connect(): Observable<GetClientConnect> {
     const url = `${environment.apiUrl}/clientconnect`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Connecting',
       image: '',
       icon: '',

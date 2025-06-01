@@ -26,6 +26,7 @@ export class NetworkService {
         panelClass: '',
         closeOnNavigation: false,
         data: {
+          showAlways: true,
           title: 'Oops! You are offline..',
           image: '',
           icon: '',
@@ -78,6 +79,10 @@ export class NetworkService {
     } else {
       return undefined
     }
+  }
+
+  isShowAlways(url: string): boolean {
+    return this.networkMessageMap.get(url)?.showAlways || false;
   }
 
   isOnline(): boolean {

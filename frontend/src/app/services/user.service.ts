@@ -77,6 +77,7 @@ export class UserService {
   getPinHash(pin: string): Observable<GetPinHashResponse> {
     let url = `${environment.apiUrl}/user/hashpin`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -168,6 +169,7 @@ export class UserService {
   createUser(): Observable<CreateUserResponse> {
     let url = `${environment.apiUrl}/user/create`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -186,6 +188,7 @@ export class UserService {
   confirmUser(pinHash: string, cryptedUser: CryptedUser): Observable<ConfirmUserResponse> {
     let url = `${environment.apiUrl}/user/confirm`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -207,6 +210,7 @@ export class UserService {
   getUserById(userId: string): Observable<GetUserResponse> {
     let url = `${environment.apiUrl}/user/get/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -224,6 +228,7 @@ export class UserService {
   getUserMessages(user: User): Observable<GetMessageResponse> {
     let url = `${environment.apiUrl}/message/get/userId/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -241,6 +246,7 @@ export class UserService {
   deleteUser(userId: string): Observable<SimpleStatusResponse> {
     let url = `${environment.apiUrl}/user/delete/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -258,6 +264,7 @@ export class UserService {
   subscribe(user: User, subscription: string) {
     let url = `${environment.apiUrl}/user/subscribe`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',
@@ -279,6 +286,7 @@ export class UserService {
   unsubscribe(user: User) {
     let url = `${environment.apiUrl}/user/unsubscribe/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'User service',
       image: '',
       icon: '',

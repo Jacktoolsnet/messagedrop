@@ -74,6 +74,7 @@ export class TenorService {
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/featured`, parameters);
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Tenor service',
       image: '',
       icon: '',
@@ -117,6 +118,7 @@ export class TenorService {
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/search`, parameters);
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Tenor service',
       image: '',
       icon: '',

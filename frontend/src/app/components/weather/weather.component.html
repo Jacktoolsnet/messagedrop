@@ -1,10 +1,10 @@
 <mat-dialog-content #dialogContent>
     <ng-container *ngIf="weather">
         <ng-container *ngIf="locationName$ | async as locationName; else loading">
-            <h2>{{ locationName }}</h2>
+            <h2>{{ getChartLabel(selectedChart) }} for {{ locationName }}</h2>
         </ng-container>
         <ng-template #loading>
-            <h2>Weather</h2>
+            <h2>{{ getChartLabel(selectedChart) }}</h2>
         </ng-template>
 
         <div class="day-switch">

@@ -27,6 +27,7 @@ export class TranslateService {
   public translate(value: string, language: string) {
     let url = `${environment.apiUrl}/translate/${language}/${value}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Translate service',
       image: '',
       icon: '',

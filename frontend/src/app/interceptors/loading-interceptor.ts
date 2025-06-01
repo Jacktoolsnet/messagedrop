@@ -8,7 +8,7 @@ import { NetworkService } from '../services/network.service';
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     const networkService = inject(NetworkService);
     let loadingDialogRef: MatDialogRef<DisplayMessage> | undefined = undefined;
-    if (networkService.isSlowConnection()) {
+    if (networkService.isShowAlways(req.url) || networkService.isSlowConnection()) {
         loadingDialogRef = networkService.showLoadingDialog(req.url);
     }
     if (!loadingDialogRef) {

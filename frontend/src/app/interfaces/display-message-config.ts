@@ -1,4 +1,5 @@
 export interface DisplayMessageConfig {
+    showAlways: boolean,
     title: string,
     image: string,
     icon: string,

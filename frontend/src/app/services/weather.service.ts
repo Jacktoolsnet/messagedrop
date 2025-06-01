@@ -30,6 +30,7 @@ export class WeatherService {
   getWeather(locale: string, latitude: number, longitude: number, days: number): Observable<Weather> {
     const url = `${environment.apiUrl}/weather/${locale}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: true,
       title: 'Weather service',
       image: '',
       icon: '',

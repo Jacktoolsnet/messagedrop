@@ -41,6 +41,7 @@ export class ConnectService {
   createConnect(connect: Connect) {
     let url = `${environment.apiUrl}/connect/create`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Connect service',
       image: '',
       icon: '',
@@ -65,6 +66,7 @@ export class ConnectService {
   getById(connectId: string, contact: Contact, socketioService: SocketioService) {
     let url = `${environment.apiUrl}/connect/get/${connectId}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Connect service',
       image: '',
       icon: '',
@@ -121,6 +123,7 @@ export class ConnectService {
   deleteConnect(connect: Connect) {
     let url = `${environment.apiUrl}/connect/delete/${connect.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Connect service',
       image: '',
       icon: '',

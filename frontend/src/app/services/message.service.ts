@@ -105,6 +105,7 @@ export class MessageService {
   createMessage(message: Message, location: Location, user: User) {
     let url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -149,6 +150,7 @@ export class MessageService {
     let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
     let url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -192,6 +194,7 @@ export class MessageService {
   updateMessage(message: Message, location: Location, user: User) {
     let url = `${environment.apiUrl}/message/update`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -222,6 +225,7 @@ export class MessageService {
   likeMessage(message: Message, user: User, likeButtonColor: string) {
     let url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -251,6 +255,7 @@ export class MessageService {
   unlikeMessage(message: Message, user: User, likeButtonColor: string) {
     let url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -302,6 +307,7 @@ export class MessageService {
   dislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
     let url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -331,6 +337,7 @@ export class MessageService {
   undislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
     let url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -382,6 +389,7 @@ export class MessageService {
   getByPlusCode(location: Location, messageSubject: Subject<void>) {
     let url = `${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -436,6 +444,7 @@ export class MessageService {
   getByPlusForMarker(location: Location) {
     let url = `${environment.apiUrl}/message/get/pluscode/${location.plusCode}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -494,6 +503,7 @@ export class MessageService {
   disableMessage(message: Message, selectedMessages: Message[]) {
     let url = `${environment.apiUrl}/message/disable/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -522,6 +532,7 @@ export class MessageService {
   deleteMessage(message: Message) {
     let url = `${environment.apiUrl}/message/delete/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
@@ -556,6 +567,7 @@ export class MessageService {
   getCommentsForParentMessage(message: Message) {
     let url = `${environment.apiUrl}/message/get/comment/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
       title: 'Message service',
       image: '',
       icon: '',
