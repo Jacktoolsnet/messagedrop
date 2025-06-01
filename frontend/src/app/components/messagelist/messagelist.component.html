@@ -4,11 +4,11 @@
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
     <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
-        *ngIf="messageService.getSelectedMessages().length == 0" (click)="addMessagDialog()">
+        *ngIf="userService.isReady() &&  messageService.getSelectedMessages().length == 0" (click)="addMessagDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <button class="button_add"
-        *ngIf="messageService.getSelectedMessages().length != 0 && user.id != messageService.getSelectedMessages().at(-1)?.userId"
+        *ngIf="userService.isReady() &&  messageService.getSelectedMessages().length != 0 && user.id != messageService.getSelectedMessages().at(-1)?.userId"
         mat-mini-fab color="primary" aria-label="Drop a comment"
         (click)="addComment(messageService.getSelectedMessages().at(-1)!)">
         <mat-icon>add_comment</mat-icon>
@@ -62,15 +62,15 @@
                 </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">
-                <button *ngIf="user.id != messageService.getSelectedMessages().at(-1)?.userId" mat-mini-fab
-                    [color]="likeButtonColor" aria-label="Like message"
+                <button *ngIf="userService.isReady() && user.id != messageService.getSelectedMessages().at(-1)?.userId"
+                    mat-mini-fab [color]="likeButtonColor" aria-label="Like message"
                     (click)="likeMessage(messageService.getSelectedMessages().at(-1)!)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{messageService.getSelectedMessages().at(-1)!.likes | shortNumber}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                <button *ngIf="user.id != messageService.getSelectedMessages().at(-1)?.userId" mat-mini-fab
-                    [color]="dislikeButtonColor" aria-label="Dislike message"
+                <button *ngIf="userService.isReady() && user.id != messageService.getSelectedMessages().at(-1)?.userId"
+                    mat-mini-fab [color]="dislikeButtonColor" aria-label="Dislike message"
                     (click)="dislikeMessage(messageService.getSelectedMessages().at(-1)!)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{messageService.getSelectedMessages().at(-1)!.dislikes | shortNumber}}"
@@ -141,8 +141,8 @@
             (click)="navigateToMessageLocation(message)">
             <mat-icon>assistant_direction</mat-icon>
         </button>
-        <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Block message"
-            (click)="disableMessage(message)">
+        <button *ngIf="userService.isReady() && user.id != message.userId" mat-mini-fab color="secondary"
+            aria-label="Block message" (click)="disableMessage(message)">
             <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
         </button>
     </ng-template>

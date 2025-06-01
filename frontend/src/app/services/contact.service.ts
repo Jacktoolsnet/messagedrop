@@ -228,6 +228,11 @@ export class ContactService {
       });
   }
 
+  public logout() {
+    this.ready = false;
+    this.contacts = [];
+  }
+
   private updateContactProfile() {
     this.contacts.forEach(async (contact: Contact) => {
       let contactProfile = await this.indexedDbService.getContactProfile(contact.id);

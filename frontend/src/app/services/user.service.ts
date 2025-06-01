@@ -74,6 +74,33 @@ export class UserService {
     return throwError(() => error);
   }
 
+  public logout() {
+    this.user = {
+      id: '',
+      pinHash: '',
+      location: {
+        latitude: 0,
+        longitude: 0,
+        plusCode: ''
+      },
+      locale: '',
+      language: '',
+      subscription: '',
+      cryptoKeyPair: {
+        publicKey: {},
+        privateKey: {}
+      },
+      signingKeyPair: {
+        publicKey: {},
+        privateKey: {}
+      },
+      serverCryptoPublicKey: '',
+      serverSigningPublicKey: '',
+      type: UserType.USER
+    };
+    this.ready = false;
+  }
+
   getPinHash(pin: string): Observable<GetPinHashResponse> {
     let url = `${environment.apiUrl}/user/hashpin`;
     this.networkService.setNetworkMessageConfig(url, {

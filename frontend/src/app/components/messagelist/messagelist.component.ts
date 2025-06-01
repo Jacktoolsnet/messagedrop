@@ -61,7 +61,7 @@ export class MessagelistComponent implements OnInit {
   public mode: typeof Mode = Mode;
 
   constructor(
-    private userService: UserService,
+    public userService: UserService,
     public messageService: MessageService,
     private translateService: TranslateService,
     private mapService: MapService,

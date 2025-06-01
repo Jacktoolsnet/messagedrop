@@ -85,6 +85,19 @@ export class PlaceService {
       });
   }
 
+  public logout() {
+    this.places = [];
+    this.selectedPlace = {
+      id: '',
+      userId: '',
+      name: '',
+      base64Avatar: '',
+      subscribed: false,
+      plusCodes: []
+    };
+    this.ready = false;
+  }
+
   private updatePlaceProfile() {
     this.places.forEach(async (place: Place) => {
       let placeProfile = await this.indexedDbService.getPlaceProfile(place.id);

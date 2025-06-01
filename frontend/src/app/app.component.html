@@ -1,8 +1,12 @@
-<app-map *ngIf="networkService.isOnline()" [lastMarkerUpdate]="lastMarkerUpdate"
+<app-map *ngIf="networkService.isOnline() && serverService.isReady()" [lastMarkerUpdate]="lastMarkerUpdate"
     [location]="mapService.getMapLocation()" [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)"
     (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
+<button *ngIf="networkService.isOnline() && serverService.isReady() && !userService.isReady()" aria-hidden="false"
+    class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="login()">
+    <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
+</button>
 <button
-    *ngIf="networkService.isOnline() && this.userService.isReady() && this.placeService.getSelectedPlace().id === ''"
+    *ngIf="networkService.isOnline() && serverService.isReady() && userService.isReady() && placeService.getSelectedPlace().id === ''"
     [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent"
     aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
@@ -10,42 +14,43 @@
 </button>
 
 <button
-    *ngIf="networkService.isOnline() && this.userService.isReady() && this.placeService.getSelectedPlace().id !== ''"
-    aria-hidden="this.userService.isReady() && this.placeService.getSelectedPlace().id !== ''" class="button_profile"
-    mat-fab extended color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
+    *ngIf="networkService.isOnline() && serverService.isReady() && userService.isReady() && placeService.getSelectedPlace().id !== ''"
+    aria-hidden="userService.isReady() && placeService.getSelectedPlace().id !== ''" class="button_profile" mat-fab
+    extended color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
     <mat-icon aria-hidden="false"
-        class="material-symbols-outlined">where_to_vote</mat-icon>{{this.placeService.getSelectedPlace().name}}
+        class="material-symbols-outlined">where_to_vote</mat-icon>{{placeService.getSelectedPlace().name}}
 </button>
 
-<button *ngIf="networkService.isOnline()" [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab
-    color="primary" aria-label="Watch user location" (click)="getCurrentPosition()">
+<button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="locationReady"
+    class="button_watchLocation" mat-fab color="primary" aria-label="Watch user location"
+    (click)="getCurrentPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button *ngIf="this.placeService.getSelectedPlace().id !== '' && !isPartOfPlace"
-    [attr.aria-hidden]="this.userService.isReady()" class="button_drop" mat-fab color="secondary"
-    aria-label="Add_location_to_place" (click)="addLocationToPlace()">
-    <mat-icon [attr.aria-hidden]="this.userService.isReady()"
-        class="material-symbols-outlined">add_location_alt</mat-icon>
+<button *ngIf="placeService.getSelectedPlace().id !== '' && !isPartOfPlace" [attr.aria-hidden]="userService.isReady()"
+    class="button_drop" mat-fab color="secondary" aria-label="Add_location_to_place" (click)="addLocationToPlace()">
+    <mat-icon [attr.aria-hidden]="userService.isReady()" class="material-symbols-outlined">add_location_alt</mat-icon>
 </button>
-<button *ngIf="this.placeService.getSelectedPlace().id !== '' && isPartOfPlace"
-    [attr.aria-hidden]="this.userService.isReady()" class="button_drop" mat-fab color="primary"
-    aria-label="Add_location_to_place" (click)="removeLocationFromPlace()">
-    <mat-icon [attr.aria-hidden]="this.userService.isReady()"
-        class="material-symbols-outlined">wrong_location</mat-icon>
+<button *ngIf="placeService.getSelectedPlace().id !== '' && isPartOfPlace" [attr.aria-hidden]="userService.isReady()"
+    class="button_drop" mat-fab color="primary" aria-label="Add_location_to_place" (click)="removeLocationFromPlace()">
+    <mat-icon [attr.aria-hidden]="userService.isReady()" class="material-symbols-outlined">wrong_location</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() &&  this.placeService.getSelectedPlace().id === ''"
-    [attr.aria-hidden]="!(this.userService.isReady() && locationReady)" [matMenuTriggerFor]="messageMenu"
-    class="button_drop" mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
-    <mat-icon [attr.aria-hidden]="!(this.userService.isReady() && locationReady)"
+<button *ngIf="networkService.isOnline() && serverService.isReady() &&  placeService.getSelectedPlace().id === ''"
+    [attr.aria-hidden]="!(userService.isReady() && locationReady)" [matMenuTriggerFor]="messageMenu" class="button_drop"
+    mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
+    <mat-icon [attr.aria-hidden]="!(userService.isReady() && locationReady)"
         class="material-symbols-outlined">menu</mat-icon>
 </button>
 
 <mat-menu #userMenu="matMenu">
+    <button mat-menu-item (click)="logout()">
+        <mat-icon *ngIf="userService.isReady()" class="material-symbols-outlined">lock</mat-icon>
+        <span>Logout</span>
+    </button>
     <button mat-menu-item (click)="showUser()">
-        <mat-icon *ngIf="this.userService.getUser()" class="material-symbols-outlined">account_circle</mat-icon>
+        <mat-icon *ngIf="userService.isReady()" class="material-symbols-outlined">account_circle</mat-icon>
         <span>My user</span>
     </button>
-    <button *ngIf="this.userService.getUser()" mat-menu-item (click)="editUserProfile()">
+    <button *ngIf="userService.isReady()" mat-menu-item (click)="editUserProfile()">
         <mat-icon class="material-symbols-outlined">badge</mat-icon>
         <span>My profile</span>
     </button>
@@ -68,23 +73,23 @@
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
-    <button mat-menu-item (click)="openMessagDialog()">
+    <button mat-menu-item (click)="openMessagDialog()" *ngIf="userService.isReady()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         <span>Public message</span>
     </button>
-    <button *ngIf="this.userService.isReady()" mat-menu-item (click)="openNoteDialog()">
+    <button mat-menu-item (click)="openNoteDialog()" *ngIf="userService.isReady()">
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
         <span>Private note</span>
     </button>
-    <button mat-menu-item *ngIf="contactService.isReady()" (click)="openContactListDialog()">
+    <button mat-menu-item (click)="openContactListDialog()" *ngIf="userService.isReady() && contactService.isReady()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>Contacts message</span>
     </button>
-    <button mat-menu-item *ngIf="this.userService.isReady()" (click)="showWeather()">
+    <button mat-menu-item (click)="showWeather()">
         <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>
         <span>Weather</span>
     </button>
-    <button mat-menu-item *ngIf="this.userService.isReady()" (click)="showGeoStatistic()">
+    <button mat-menu-item (click)="showGeoStatistic()">
         <mat-icon class="material-symbols-outlined">data_exploration</mat-icon>
         <span>Statistic</span>
     </button>

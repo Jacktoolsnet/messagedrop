@@ -102,7 +102,7 @@ export class AppComponent implements OnInit {
     public networkService: NetworkService,
     private sharedContentService: SharedContentService,
     private indexedDbService: IndexedDbService,
-    private serverService: ServerService,
+    public serverService: ServerService,
     public userService: UserService,
     public mapService: MapService,
     public noteService: NoteService,
@@ -238,7 +238,7 @@ export class AppComponent implements OnInit {
     window.history.pushState(this.myHistory, '', '');
   }
 
-  private async loginUser() {
+  public async login() {
     if (await this.indexedDbService.hasUser()) {
       this.openCheckPinDialog();
     } else {
@@ -266,7 +266,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false
+        hasBackdrop: true
       });
 
       dialogRef.afterOpened().subscribe(e => { });
@@ -275,6 +275,12 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.openCreatePinDialog();
       });
     }
+  }
+
+  public logout() {
+    this.userService.logout()
+    this.placeService.logout();
+    this.contactService.logout();
   }
 
   public handleSharedContentOrNotification() {
@@ -473,7 +479,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: false
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -511,7 +517,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: false
+      hasBackdrop: true
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -520,7 +526,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
-      if (data === undefined) {
+      console.log('Pin entered: ', data);
+      if (data === 'reset') {
         let cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
         if (cryptedUser) {
           this.userService.deleteUser(cryptedUser.id)
@@ -555,7 +562,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         verticalPosition: 'top',
                         duration: 3000
                       });
-                      this.openCheckPinDialog();
                     } else if (err.status === 404) {
                       const dialogRef = this.displayMessage.open(DisplayMessage, {
                         panelClass: '',
@@ -576,7 +582,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         },
                         maxWidth: '90vw',
                         maxHeight: '90vh',
-                        hasBackdrop: false
+                        hasBackdrop: true
                       });
 
                       dialogRef.afterOpened().subscribe(e => { });
@@ -609,7 +615,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         },
                         maxWidth: '90vw',
                         maxHeight: '90vh',
-                        hasBackdrop: false
+                        hasBackdrop: true
                       });
 
                       dialogRef.afterOpened().subscribe(e => { });

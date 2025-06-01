@@ -98,7 +98,7 @@ export class CheckPinComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.dialogRef.close(undefined);
+        this.dialogRef.close('reset');
       }
     });
   }
