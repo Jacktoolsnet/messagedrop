@@ -160,7 +160,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         const temps = dayHourly.map(h => h.temperature);
         const minTemp = Math.min(...temps);
         const maxTemp = Math.max(...temps);
-
         dataset = {
           ...dataset,
           data: temps,
@@ -177,7 +176,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
             const chart = ctx.chart;
             const { ctx: canvasCtx, chartArea } = chart;
             const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-            // Dynamisch: Farbverlauf zwischen minTemp und maxTemp
             gradient.addColorStop(0, this.getTemperatureColor(minTemp));
             gradient.addColorStop(1, this.getTemperatureColor(maxTemp));
             return gradient;
@@ -185,12 +183,10 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         break;
       }
-
       case 'uvIndex': {
         const uvs = dayHourly.map(h => h.uvIndex);
         const minUv = Math.min(...uvs);
         const maxUv = Math.max(...uvs);
-
         dataset = {
           ...dataset,
           data: uvs,
@@ -207,10 +203,8 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
             const chart = ctx.chart;
             const { ctx: canvasCtx, chartArea } = chart;
             const gradient = canvasCtx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-
             gradient.addColorStop(0, this.getUvColor(minUv));
             gradient.addColorStop(1, this.getUvColor(maxUv));
-
             return gradient;
           }
         };
@@ -218,8 +212,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         maxY = 11;
         break;
       }
-
-      case 'precipitation':
+      case 'precipitation': {
         const precips = dayHourly.map(h => h.precipitationProbability);
         dataset = {
           ...dataset,
@@ -232,8 +225,8 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         minY = 0;
         maxY = 100;
         break;
-
-      case 'wind':
+      }
+      case 'wind': {
         const winds = dayHourly.map(h => h.wind);
         dataset = {
           ...dataset,
@@ -245,8 +238,8 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
         };
         minY = 0;
         break;
-
-      case 'pressure':
+      }
+      case 'pressure': {
         const pressures = dayHourly.map(h => h.pressure);
         dataset = {
           ...dataset,
@@ -257,6 +250,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
           pointBackgroundColor: '#BA68C8'
         };
         break;
+      }
     }
 
     // Annotations
@@ -283,6 +277,14 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       const valueForHour = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const labelTime = labels[selectedIndex];
       let color = this.getAnnotationColorForChart();
+
+      // Dynamische Label-Farbe je nach Punktwert für Temperatur & UV
+      if (this.selectedChart === 'temperature') {
+        color = this.getTemperatureColor(valueForHour);
+      } else if (this.selectedChart === 'uvIndex') {
+        color = this.getUvColor(valueForHour);
+      }
+
       annotations['selectedHour'] = {
         type: 'line',
         xMin: labelTime,
@@ -370,49 +372,64 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
-  private getAnnotationColorForChart(): string {
+  getAnnotationColorForChart(): string {
     switch (this.selectedChart) {
-      case 'temperature':
-        const currentTemp = this.weather!.hourly.find(h => h.time.includes(`T${this.selectedHour.toString().padStart(2, '0')}:`))?.temperature ?? 0;
-        return this.getTemperatureColor(currentTemp);
-      case 'precipitation':
-        return '#42A5F5'; // Blau
-      case 'uvIndex':
-        const currentUv = this.weather!.hourly.find(h => h.time.includes(`T${this.selectedHour.toString().padStart(2, '0')}:`))?.uvIndex ?? 0;
-        return this.getUvColor(currentUv);
-      case 'wind':
-        return '#9E9E9E'; // Grau
-      case 'pressure':
-        return '#BA68C8'; // Flieder
-      default:
-        return '#FF4081'; // Fallback pink
+      case 'temperature': return '#EF5350';
+      case 'precipitation': return '#42A5F5';
+      case 'uvIndex': return '#AB47BC';
+      case 'wind': return '#9E9E9E';
+      case 'pressure': return '#BA68C8';
+      default: return '#FF4081'; // fallback pink
     }
   }
 
-  private mixColors(color1: string, color2: string): string {
-    // Simple average between two hex colors
-    const hex = (c: string) => c.replace('#', '');
-    const r = Math.round((parseInt(hex(color1).substring(0, 2), 16) + parseInt(hex(color2).substring(0, 2), 16)) / 2);
-    const g = Math.round((parseInt(hex(color1).substring(2, 4), 16) + parseInt(hex(color2).substring(2, 4), 16)) / 2);
-    const b = Math.round((parseInt(hex(color1).substring(4, 6), 16) + parseInt(hex(color2).substring(4, 6), 16)) / 2);
-    return `#${[r, g, b].map(x => x.toString(16).padStart(2, '0')).join('')}`;
+  mixColors(color1: string, color2: string): string {
+    const hexToRgb = (hex: string) => {
+      const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+      return result
+        ? {
+          r: parseInt(result[1], 16),
+          g: parseInt(result[2], 16),
+          b: parseInt(result[3], 16)
+        }
+        : { r: 0, g: 0, b: 0 };
+    };
+
+    const rgbToHex = (r: number, g: number, b: number) =>
+      '#' +
+      [r, g, b]
+        .map(x => {
+          const hex = x.toString(16);
+          return hex.length === 1 ? '0' + hex : hex;
+        })
+        .join('');
+
+    const rgb1 = hexToRgb(color1);
+    const rgb2 = hexToRgb(color2);
+
+    const mixed = {
+      r: Math.round((rgb1.r + rgb2.r) / 2),
+      g: Math.round((rgb1.g + rgb2.g) / 2),
+      b: Math.round((rgb1.b + rgb2.b) / 2)
+    };
+
+    return rgbToHex(mixed.r, mixed.g, mixed.b);
   }
 
   getTemperatureColor(temp: number): string {
-    if (temp <= -10) return '#0D47A1'; // sehr dunkelblau
-    if (temp <= 0) return '#1565C0';   // mittelblau
-    if (temp <= 10) return '#42A5F5';  // hellblau
-    if (temp <= 20) return '#66BB6A';  // grün
-    if (temp <= 30) return '#FFA726';  // orange
-    return '#EF5350';                  // rot
+    if (temp <= 0) return '#1565C0'; // dunkles Blau für Frost
+    if (temp <= 10) return '#42A5F5'; // helles Blau für kühl
+    if (temp <= 20) return '#66BB6A'; // grün für mild
+    if (temp <= 30) return '#FFA726'; // orange für warm
+    return '#EF5350'; // rot für heiß
   }
 
   getUvColor(uv: number): string {
-    if (uv <= 2) return '#4CAF50';  // Grün
-    if (uv <= 5) return '#FFEB3B';  // Gelb
-    if (uv <= 7) return '#FF9800';  // Orange
-    if (uv <= 10) return '#F44336'; // Rot
-    return '#9C27B0';               // Violett
+    if (uv <= 2) return '#4CAF50'; // grün
+    if (uv <= 5) return '#FFEB3B'; // gelb
+    if (uv <= 7) return '#FF9800'; // orange
+    if (uv <= 10) return '#F44336'; // rot
+    return '#9C27B0'; // violett
   }
 
   getWeatherIconClass(code: number): string {
@@ -446,13 +463,11 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
   moveSelectedHourAnnotation(): void {
     const chartInstance = this.chart?.chart;
     if (!chartInstance) return;
-
     const pluginOptions = chartInstance.options.plugins?.annotation;
     if (!pluginOptions) {
       console.warn('Annotation plugin is not configured.');
       return;
     }
-
     if (!pluginOptions.annotations) {
       pluginOptions.annotations = {};
     }
@@ -468,24 +483,11 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       const valueForHour = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const labelTime = labels[selectedIndex];
 
-      // Dynamische Farbe je nach Chart-Modus
-      let color = '#FF4081'; // Default pink/rot
-      switch (this.selectedChart) {
-        case 'temperature':
-          color = '#EF5350'; // Rot
-          break;
-        case 'precipitation':
-          color = '#42A5F5'; // Blau
-          break;
-        case 'uvIndex':
-          color = '#AB47BC'; // Lila
-          break;
-        case 'wind':
-          color = '#9E9E9E'; // Grau
-          break;
-        case 'pressure':
-          color = '#BA68C8'; // Flieder
-          break;
+      let color = this.getAnnotationColorForChart(); // fallback/feste Farbe
+      if (this.selectedChart === 'temperature') {
+        color = this.getTemperatureColor(valueForHour);
+      } else if (this.selectedChart === 'uvIndex') {
+        color = this.getUvColor(valueForHour);
       }
 
       annotations['selectedHour'] = {
