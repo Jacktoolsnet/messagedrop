@@ -21,6 +21,7 @@ const translate = require('./routes/translate');
 const utils = require('./routes/utils');
 const geoStatistic = require('./routes/geostatistic');
 const weather = require('./routes/weather');
+const pollen = require('./routes/pollen');
 const nominatim = require('./routes/nominatim');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
@@ -236,6 +237,16 @@ const geoStatisticLimit = rateLimit({
   }
 })
 
+const pollenLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minutes
+  limit: 3, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  message: {
+    error: 'Too many weather requests, please try again after a minute.'
+  }
+})
+
 const weatherLimit = rateLimit({
   windowMs: 1 * 60 * 1000, // 1 minutes
   limit: 3, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
@@ -257,6 +268,7 @@ app.use('/message', message);
 app.use('/nominatim', nominatim);
 app.use('/openai', openAi);
 app.use('/place', place);
+app.use('/pollen', pollenLimit, pollen);
 app.use('/statistic', statistic);
 app.use('/translate', translateLimit, translate);
 app.use('/user', userLimit, user);
