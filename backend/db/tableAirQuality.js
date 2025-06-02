@@ -1,26 +1,26 @@
-const tableName = 'tablePollenCache';
+const tableName = 'tableAirQuality';
 const columnCacheKey = 'cacheKey';
-const columnPollenData = 'pollenData';
+const columnAirQualityData = 'airQualityData';
 const columnLastUpdate = 'lastUpdate';
 
 const init = function (db) {
     const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnCacheKey} TEXT PRIMARY KEY,
-            ${columnPollenData} TEXT,
+            ${columnAirQualityData} TEXT,
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );`;
     db.run(sql);
 };
 
-const setPollenData = function (db, cacheKey, pollenData, callback) {
+const setAirQualityData = function (db, cacheKey, airQualityData, callback) {
     const sql = `
-        INSERT OR REPLACE INTO ${tableName} (${columnCacheKey}, ${columnPollenData}, ${columnLastUpdate})
+        INSERT OR REPLACE INTO ${tableName} (${columnCacheKey}, ${columnAirQualityData}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));`;
-    db.run(sql, [cacheKey, pollenData], callback);
+    db.run(sql, [cacheKey, airQualityData], callback);
 };
 
-const getPollenData = function (db, cacheKey, callback) {
+const getAirQualityData = function (db, cacheKey, callback) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnCacheKey} = ?;`;
     db.get(sql, [cacheKey], callback);
 };
@@ -35,7 +35,7 @@ const cleanExpired = function (db, callback) {
 
 module.exports = {
     init,
-    setPollenData,
-    getPollenData,
+    setAirQualityData,
+    getAirQualityData,
     cleanExpired
 };

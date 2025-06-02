@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { RouterOutlet } from '@angular/router';
 import { Subject, take } from 'rxjs';
+import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
@@ -42,6 +43,7 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
+import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
 import { ContactService } from './services/contact.service';
 import { CryptoService } from './services/crypto.service';
@@ -114,6 +116,7 @@ export class AppComponent implements OnInit {
     private messageService: MessageService,
     private statisticService: StatisticService,
     private socketioService: SocketioService,
+    private airQualityService: AirQualityService,
     private weatherService: WeatherService,
     private geoStatisticService: GeoStatisticService,
     private snackBar: MatSnackBar,
@@ -1092,6 +1095,46 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         }
       });
 
+  }
+
+  public showAirQuality() {
+    this.airQualityService
+      .getAirQuality(
+        this.mapService.getMapLocation().plusCode,
+        this.mapService.getMapLocation().latitude,
+        this.mapService.getMapLocation().longitude,
+        3
+      )
+      .subscribe({
+        next: (airQualityData) => {
+          const dialogRef = this.dialog.open(AirQualityComponent, {
+            data: { airQualityData: airQualityData },
+            closeOnNavigation: true,
+            minWidth: '90vw',
+            maxWidth: '90vw',
+            minHeight: '20vh',
+            maxHeight: '90vh',
+            hasBackdrop: true
+          });
+          dialogRef.afterOpened().subscribe();
+          dialogRef.afterClosed().subscribe();
+        },
+        error: (err) => {
+          const dialogRef = this.displayMessage.open(DisplayMessage, {
+            data: {
+              showAlways: true,
+              title: err.statusText || 'Error',
+              icon: 'error',
+              message: err.error?.error || 'Failed to load air quality data.',
+              showSpinner: false
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            hasBackdrop: true
+          });
+          dialogRef.afterClosed().subscribe();
+        }
+      });
   }
 
   public showGeoStatistic() {
