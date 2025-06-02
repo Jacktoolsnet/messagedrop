@@ -1,1 +1,41 @@
-<p>air-quality works!</p>
+<mat-dialog-content #dialogContent>
+    <ng-container *ngIf="airQuality">
+        <ng-container *ngIf="locationName$ | async as locationName; else loading">
+            <h2>{{ getCategoryLabel(selectedCategory) }} for {{ locationName }}</h2>
+        </ng-container>
+        <ng-template #loading>
+            <h2>{{ getCategoryLabel(selectedCategory) }}</h2>
+        </ng-template>
+
+        <div class="day-switch">
+            <button mat-raised-button *ngFor="let day of getDayLabels(); let i = index"
+                [color]="i === selectedDayIndex ? 'primary' : 'secondary'" (click)="onDayChange(i)">
+                {{ day }}
+            </button>
+        </div>
+
+        <div class="chart-container">
+            <canvas baseChart [type]="chartType" [data]="chartData" [options]="chartOptions">
+            </canvas>
+        </div>
+
+        <div class="category-switch mini-fab">
+            <button mat-mini-fab *ngFor="let category of categoryModes"
+                [color]="selectedCategory === category ? 'primary' : 'secondary'" (click)="onCategoryToggle(category)"
+                [matTooltip]="getCategoryLabel(category)">
+                <mat-icon>{{ getCategoryIcon(category) }}</mat-icon>
+            </button>
+        </div>
+
+        <div class="hour-slider">
+            <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="updateChart()">
+                <input matSliderThumb [(ngModel)]="selectedHour">
+            </mat-slider>
+        </div>
+    </ng-container>
+
+    <div class="data-source">
+        Air quality data provided by
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
+    </div>
+</mat-dialog-content>
