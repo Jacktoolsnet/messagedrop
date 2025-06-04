@@ -354,7 +354,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         title: 'Locating You',
         image: '',
         icon: 'place',
-        message: 'Please wait while we determine your current location...',
+        message: 'Please wait while your device determine your current location...',
         button: '',
         delay: 0,
         showSpinner: true
