@@ -28,7 +28,7 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 
 export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestroy {
-  @Input() tile: any;
+  @Input() tile!: any;
   @Output() close = new EventEmitter<void>();
   @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
   @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
@@ -44,6 +44,7 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
+    console.log(this.tile);
     this.selectedHour = this.getDefaultHour();
   }
 
