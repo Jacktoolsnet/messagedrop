@@ -1,8 +1,9 @@
+import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -10,6 +11,7 @@ import { Observable, catchError, map, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
+import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
 
 @Component({
   selector: 'app-air-quality',
@@ -21,7 +23,21 @@ import { NominatimService } from '../../services/nominatim.service';
     MatIconModule,
     MatTooltipModule,
     MatSliderModule,
-    FormsModule
+    FormsModule,
+    AirQualityDetailComponent
+  ],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('300ms ease-out', style({ opacity: 1 }))
+      ])
+    ]),
+    trigger('fadeOut', [
+      transition(':leave', [
+        animate('200ms ease-in', style({ opacity: 0 }))
+      ])
+    ])
   ],
   templateUrl: './air-quality.component.html',
   styleUrls: ['./air-quality.component.css']
@@ -42,10 +58,13 @@ export class AirQualityComponent implements OnInit {
   selectedHour = 0;
   selectedCategory: 'pollen' | 'particulateMatter' | 'pollutants' = 'pollen';
   locationName$: Observable<string> | undefined;
+  locationName: string = '';
+  selectedTile: any = null;
 
   constructor(
     private mapService: MapService,
     private nominatimService: NominatimService,
+    private dialog: MatDialog,
     private dialogRef: MatDialogRef<AirQualityComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { airQuality: AirQualityData }
   ) { }
@@ -202,7 +221,8 @@ export class AirQualityComponent implements OnInit {
           const addr = res.address;
           const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || 'Unknown';
           const country = addr?.country || '';
-          return `${place}${country ? ', ' + country : ''}`;
+          this.locationName = `${place}${country ? ', ' + country : ''}`
+          return this.locationName;
         }),
         catchError(() => of('Air Quality'))
       );
@@ -356,4 +376,9 @@ export class AirQualityComponent implements OnInit {
     sulphur_dioxide: 'SO₂ can cause respiratory symptoms and aggravate asthma.',
     ozone: 'O₃ is a reactive gas that can cause airway inflammation and breathing issues.',
   };
+
+  onTileClick(tile: any): void {
+    if (tile.value == null || tile.value === 0) return;
+    this.selectedTile = tile;
+  }
 }

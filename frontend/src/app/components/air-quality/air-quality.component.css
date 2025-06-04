@@ -143,3 +143,19 @@ mat-slider {
     color: #fff;
     text-decoration: none;
 }
+
+.tile-detail-button {
+    margin-top: 0.5rem;
+    width: 100%;
+    border: 2px solid currentColor;
+    color: currentColor;
+    background-color: transparent;
+    font-size: 0.85rem;
+    text-transform: none;
+    font-weight: 500;
+    border-radius: 0.5rem;
+}
+
+.tile-detail-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}

@@ -62,7 +62,6 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: { weather: Weather }
   ) {
     this.weather = this.data.weather;
-    console.log('Weather data:', this.weather);
     Chart.register(LineController, LineElement, PointElement, LinearScale, CategoryScale, Title, Tooltip, Filler, annotationPlugin);
 
     this.dialogRef.afterOpened().subscribe(() => {
