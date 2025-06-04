@@ -114,13 +114,12 @@
                 <div *ngIf="selectedIndicator" class="indicator-display">
                     <div *ngIf="isSmallScreen" class="chart-header">
                         <span class="chart-title">{{ selectedIndicator.label }}</span>
-                        <button mat-icon-button color="accent" matTooltip="{{ currentIndicatorDescription }}"
-                            matTooltipPosition="above" aria-label="Info">
-                            <mat-icon>info</mat-icon>
-                        </button>
                     </div>
                     <div class="chart-container">
                         <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType"></canvas>
+                    </div>
+                    <div *ngIf="isSmallScreen" class="chart-header">
+                        <span class="chart-description">{{ currentIndicatorDescription }}</span>
                     </div>
                 </div>
             </mat-expansion-panel>
