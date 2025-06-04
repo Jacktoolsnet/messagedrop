@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -30,8 +30,6 @@ import { BaseChartDirective } from 'ng2-charts';
 export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() tile!: any;
   @Output() close = new EventEmitter<void>();
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-  @ViewChild('chartCanvas') chartCanvas!: ElementRef<HTMLCanvasElement>;
 
   selectedDayIndex = 0;
   selectedHour = 0;
@@ -44,34 +42,26 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
-    console.log(this.tile);
     this.selectedHour = this.getDefaultHour();
+    this.updateChart();
   }
 
-  ngAfterViewInit(): void {
-    this.initChart();
-  }
+  ngAfterViewInit(): void { }
 
-  ngOnDestroy(): void {
-  }
+  ngOnDestroy(): void { }
 
   getDefaultHour(): number {
     return this.selectedDayIndex === 0 ? new Date().getHours() : 12;
   }
 
-  initChart(): void {
-    const ctx = this.chartCanvas.nativeElement.getContext('2d');
-    if (!ctx) return;
-
-    const values: number[] = this.tile.values || [];
-    const time: string[] = this.tile.time || [];
-
+  updateChart(): void {
+    if (!this.tile?.values || !this.tile?.time) return;
     const start = this.selectedDayIndex * 24;
     const end = start + 24;
-    const dayValues = values.slice(start, end);
-    const dayLabels = time.slice(start, end).map((t: string) => t.slice(11));
+    const dayValues = this.tile.values.slice(start, end);
+    const dayLabels = this.tile.time.slice(start, end).map((t: string) => t.slice(11));
 
-    const data = {
+    this.chartData = {
       labels: dayLabels,
       datasets: [{
         label: this.tile.label,
@@ -90,7 +80,7 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
       }]
     };
 
-    const options: ChartConfiguration<'line'>['options'] = {
+    this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
@@ -123,7 +113,7 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
   onDayChange(index: number): void {
     this.selectedDayIndex = index;
     this.selectedHour = this.getDefaultHour();
-    this.initChart();
+    this.updateChart();
   }
 
   onHourChange(): void { }

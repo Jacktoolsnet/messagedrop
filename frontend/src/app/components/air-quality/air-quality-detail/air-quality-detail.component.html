@@ -8,12 +8,10 @@
                 {{ day }}
             </button>
         </div>
-
         <div class="chart-container">
             <canvas baseChart [type]="lineChartType" [data]="chartData" [options]="chartOptions">
             </canvas>
         </div>
-
         <div class="hour-slider">
             <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
                 <input matSliderThumb [(ngModel)]="selectedHour">

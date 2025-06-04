@@ -46,6 +46,8 @@ export class AirQualityComponent implements OnInit {
   tileValues: {
     key: string;
     value: number;
+    values: number[];
+    time: string[];
     label: string;
     unit: string;
     color: string;
@@ -191,13 +193,17 @@ export class AirQualityComponent implements OnInit {
 
     const timeIndices = this.getDayTimeIndices(this.selectedDayIndex);
     const hourIndex = timeIndices[this.selectedHour];
+    const fullTimeArray = this.airQuality.hourly.time; // z. B. 168 Werte (7 Tage * 24h)
 
     this.tileValues = this.getCategoryKeys().map((key) => {
       const valueArray = (this.airQuality!.hourly as any)[key] as number[];
       const value = valueArray?.[hourIndex] ?? 0;
+
       return {
         key,
         value,
+        values: valueArray,
+        time: fullTimeArray,
         label: this.getChartLabel(key),
         unit: this.getUnitForKey(key),
         color: this.getPollenColor(value),
