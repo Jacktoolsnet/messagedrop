@@ -1,20 +1,11 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import {
-  BarController, BarElement,
-  CategoryScale, Chart, ChartConfiguration,
-  ChartType, Filler, LinearScale,
-  ScriptableContext,
-  Title, Tooltip
-} from 'chart.js';
-import annotationPlugin from 'chartjs-plugin-annotation';
-import { BaseChartDirective } from 'ng2-charts';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { MapService } from '../../services/map.service';
@@ -29,23 +20,27 @@ import { NominatimService } from '../../services/nominatim.service';
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,
-    BaseChartDirective,
     MatSliderModule,
     FormsModule
   ],
   templateUrl: './air-quality.component.html',
   styleUrls: ['./air-quality.component.css']
 })
-export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
-  @ViewChild('dialogContent', { static: true }) dialogContentRef!: ElementRef;
-  private resizeObserver?: ResizeObserver;
+export class AirQualityComponent implements OnInit {
+  tileValues: {
+    key: string;
+    value: number;
+    label: string;
+    unit: string;
+    color: string;
+    icon: string;
+    description: string;
+    levelText: string;
+  }[] = [];
+  categoryModes: Array<'pollen' | 'particulateMatter' | 'pollutants'> = ['pollen', 'particulateMatter', 'pollutants'];
   selectedDayIndex = 0;
-  selectedHour: number = new Date().getHours();
+  selectedHour = 0;
   selectedCategory: 'pollen' | 'particulateMatter' | 'pollutants' = 'pollen';
-  chartType: ChartType = 'bar';
-  chartOptions: ChartConfiguration['options'] = {};
-  chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
   locationName$: Observable<string> | undefined;
 
   constructor(
@@ -53,16 +48,7 @@ export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
     private nominatimService: NominatimService,
     private dialogRef: MatDialogRef<AirQualityComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { airQuality: AirQualityData }
-  ) {
-    Chart.register(BarController, BarElement, LinearScale, CategoryScale, Title, Tooltip, Filler, annotationPlugin);
-    this.dialogRef.afterOpened().subscribe(() => {
-      setTimeout(() => {
-        this.updateChart();
-        this.chart?.chart?.resize();
-        this.chart?.chart?.update();
-      }, 0);
-    });
-  }
+  ) { }
 
   get airQuality(): AirQualityData | null {
     return this.data.airQuality;
@@ -72,25 +58,27 @@ export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedDayIndex === 0) {
       this.selectedHour = new Date().getHours();
     } else {
-      this.selectedHour = 0;
+      this.selectedHour = 12;
     }
+    this.checkAvailableCategories();
     this.getLocationName();
+    this.updateTiles();
   }
 
-  ngAfterViewInit(): void {
-    this.resizeObserver = new ResizeObserver(() => {
-      this.chart?.chart?.resize();
-      this.chart?.chart?.update();
-    });
-    this.resizeObserver.observe(this.dialogContentRef.nativeElement);
-  }
+  checkAvailableCategories(): void {
+    let pollenAvailable = false;
+    const values = this.airQuality?.hourly?.alder_pollen;
+    if (Array.isArray(values) && values.some(v => v != null)) {
+      pollenAvailable = true;
+    }
 
-  ngOnDestroy(): void {
-    this.resizeObserver?.disconnect();
-  }
+    this.categoryModes = pollenAvailable
+      ? ['pollen', 'particulateMatter', 'pollutants']
+      : ['particulateMatter', 'pollutants'];
 
-  get categoryModes(): Array<'pollen' | 'particulateMatter' | 'pollutants'> {
-    return ['pollen', 'particulateMatter', 'pollutants'];
+    if (!pollenAvailable && this.selectedCategory === 'pollen') {
+      this.selectedCategory = 'pollutants';
+    }
   }
 
   getCategoryKeys(): string[] {
@@ -113,6 +101,13 @@ export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
     });
   }
 
+  getCurrentValue(key: string): number {
+    const date = this.airQuality?.hourly.time[this.getDayTimeIndices(this.selectedDayIndex)[12]]; // Mittagswert
+    const arr = (this.airQuality?.hourly as any)[key] as number[];
+    const idx = this.airQuality?.hourly.time.indexOf(date!);
+    return arr?.[idx!] ?? 0;
+  }
+
   getDayTimeIndices(dayIndex: number): number[] {
     const uniqueDates = Array.from(new Set(this.airQuality?.hourly.time.map(t => t.split('T')[0]) || []));
     const targetDate = uniqueDates[dayIndex];
@@ -120,78 +115,6 @@ export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
       .map((t, idx) => ({ t, idx }))
       .filter(entry => entry.t.startsWith(targetDate))
       .map(entry => entry.idx);
-  }
-
-  updateChart(): void {
-    if (!this.airQuality) return;
-    const keys = this.getCategoryKeys();
-    const timeIndices = this.getDayTimeIndices(this.selectedDayIndex);
-    const values = keys.map(k => {
-      const arr = (this.airQuality!.hourly as any)[k] as number[];
-      return arr[timeIndices[this.selectedHour]];
-    });
-
-    this.chartData = {
-      labels: keys.map(k => this.getChartLabel(k)),
-      datasets: [{
-        label: `${this.getCategoryLabel(this.selectedCategory)} Level`,
-        data: values,
-        borderWidth: 1,
-        backgroundColor: (ctx: ScriptableContext<'bar'>) => {
-          const chart = ctx.chart;
-          const { ctx: canvasCtx, chartArea } = chart;
-          if (!chartArea) return '#BDBDBD'; // fallback
-
-          const index = ctx.dataIndex;
-          const value = values[index];
-
-          // Dynamischer Gradient je nach Wert
-          const gradient = canvasCtx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
-
-          if (value === 0) {
-            gradient.addColorStop(0, '#BDBDBD');
-            gradient.addColorStop(1, '#BDBDBD');
-          } else if (value <= 10) {
-            gradient.addColorStop(0, '#BDBDBD');
-            gradient.addColorStop(1, '#4CAF50');
-          } else if (value <= 30) {
-            gradient.addColorStop(0, '#BDBDBD');
-            gradient.addColorStop(0.5, '#4CAF50');
-            gradient.addColorStop(1, '#FFEB3B');
-          } else if (value <= 50) {
-            gradient.addColorStop(0, '#BDBDBD');
-            gradient.addColorStop(0.3, '#4CAF50');
-            gradient.addColorStop(0.6, '#FFEB3B');
-            gradient.addColorStop(1, '#FF9800');
-          } else {
-            gradient.addColorStop(0, '#BDBDBD');
-            gradient.addColorStop(0.25, '#4CAF50');
-            gradient.addColorStop(0.5, '#FFEB3B');
-            gradient.addColorStop(0.75, '#FF9800');
-            gradient.addColorStop(1, '#F44336');
-          }
-
-          return gradient;
-        }
-      }]
-    };
-
-    this.chartOptions = {
-      indexAxis: 'y',
-      scales: {
-        x: { beginAtZero: true, ticks: { color: '#ccc' }, grid: { color: '#444' } },
-        y: { ticks: { color: '#ccc' }, grid: { color: '#444' } }
-      },
-      plugins: {
-        tooltip: {
-          callbacks: {
-            label: context => `${context.dataset.label}: ${context.parsed.x}`
-          }
-        }
-      },
-      responsive: true,
-      maintainAspectRatio: false
-    };
   }
 
   getChartLabel(key: string): string {
@@ -232,12 +155,43 @@ export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onDayChange(index: number): void {
     this.selectedDayIndex = index;
-    this.updateChart();
+    if (this.selectedDayIndex === 0) {
+      this.selectedHour = new Date().getHours();
+    } else {
+      this.selectedHour = 12;
+    }
+    this.updateTiles();
+  }
+
+  onHourChange(): void {
+    this.updateTiles(); // falls du dynamisch Inhalte aktualisierst
+  }
+
+  updateTiles(): void {
+    if (!this.airQuality) return;
+
+    const timeIndices = this.getDayTimeIndices(this.selectedDayIndex);
+    const hourIndex = timeIndices[this.selectedHour];
+
+    this.tileValues = this.getCategoryKeys().map((key) => {
+      const valueArray = (this.airQuality!.hourly as any)[key] as number[];
+      const value = valueArray?.[hourIndex] ?? 0;
+      return {
+        key,
+        value,
+        label: this.getChartLabel(key),
+        unit: this.getUnitForKey(key),
+        color: this.getPollenColor(value),
+        icon: this.getWeatherIcon(key),
+        description: this.getValueDescription(value, key),
+        levelText: this.getLevelTextForCategoryValue(this.selectedCategory, value),
+      };
+    });
   }
 
   onCategoryToggle(category: 'pollen' | 'particulateMatter' | 'pollutants'): void {
     this.selectedCategory = category;
-    this.updateChart();
+    this.updateTiles();
   }
 
   getLocationName(): void {
@@ -254,4 +208,152 @@ export class AirQualityComponent implements OnInit, AfterViewInit, OnDestroy {
       );
   }
 
+  getWeatherIcon(key: string): string {
+    const map: Record<string, string> = {
+      alder_pollen: 'nature',
+      birch_pollen: 'park',
+      grass_pollen: 'grass',
+      mugwort_pollen: 'spa',
+      olive_pollen: 'eco',
+      ragweed_pollen: 'local_florist',
+      pm10: 'blur_on',
+      pm2_5: 'filter_drama',
+      carbon_monoxide: 'cloud',
+      nitrogen_dioxide: 'waves',
+      sulphur_dioxide: 'science',
+      ozone: 'flare'
+    };
+    return map[key] || 'help_outline';
+  }
+
+  getLevelTextForCategoryValue(category: string, value: number): string {
+    switch (category) {
+      case 'pollen':
+        if (value === 0) return 'None';
+        if (value <= 10) return 'Low';
+        if (value <= 30) return 'Moderate';
+        if (value <= 50) return 'High';
+        return 'Very High';
+
+      case 'particulateMatter':
+        // Beispiel für PM10 / µg/m³
+        if (value <= 20) return 'Good';
+        if (value <= 40) return 'Moderate';
+        if (value <= 60) return 'Unhealthy for Sensitive';
+        if (value <= 100) return 'Unhealthy';
+        return 'Very Unhealthy';
+
+      case 'pollutants':
+        // Beispiel für NO2 / µg/m³
+        if (value <= 40) return 'Good';
+        if (value <= 100) return 'Moderate';
+        if (value <= 200) return 'Unhealthy';
+        return 'Very Unhealthy';
+
+      default:
+        return 'Unknown';
+    }
+  }
+
+  getLevelClass(value: number): string {
+    if (value === 0) return 'level-none';
+    if (value <= 10) return 'level-low';
+    if (value <= 30) return 'level-moderate';
+    if (value <= 50) return 'level-high';
+    if (value <= 70) return 'level-very-high';
+    return 'level-extreme';
+  }
+
+  getValueForKey(key: string): number {
+    const dayIndices = this.getDayTimeIndices(this.selectedDayIndex);
+    const values = (this.airQuality!.hourly as any)[key] as number[];
+    const dayValues = dayIndices.map(i => values[i]).filter(v => v !== null && v !== undefined);
+    const sum = dayValues.reduce((a, b) => a + b, 0);
+    return dayValues.length ? Math.round(sum / dayValues.length) : 0;
+  }
+
+  getUnitForKey(key: string): string {
+    if (key.endsWith('_pollen')) return ''; // Pollen meist ohne Einheit
+    if (key === 'pm10' || key === 'pm2_5') return 'µg/m³';
+    if (key === 'carbon_monoxide') return 'ppm';
+    if (key === 'nitrogen_dioxide' || key === 'sulphur_dioxide' || key === 'ozone') return 'ppb';
+    return '';
+  }
+
+  getPollenColor(value: number): string {
+    if (value === 0) return '#BDBDBD';       // Grau
+    if (value <= 10) return '#4CAF50';       // Grün
+    if (value <= 30) return '#FFEB3B';       // Gelb
+    if (value <= 50) return '#FF9800';       // Orange
+    return '#F44336';                        // Rot
+  }
+
+  getSeverityLabel(value: number): string {
+    if (value === 0) return 'None';
+    if (value <= 10) return 'Low';
+    if (value <= 30) return 'Moderate';
+    if (value <= 50) return 'High';
+    return 'Very High';
+  }
+
+  getInfoTooltip(key: string): string {
+    return this.infoTooltips[key] || 'No description available.';
+  }
+
+  getValueDescription(value: number, key: string): string {
+    if (this.selectedCategory === 'pollen') {
+      if (value === 0) return 'No pollen exposure expected.';
+      if (value <= 10) return 'Low pollen concentration.';
+      if (value <= 30) return 'Moderate pollen concentration.';
+      if (value <= 50) return 'High pollen concentration.';
+      return 'Very high pollen concentration.';
+    }
+
+    if (this.selectedCategory === 'particulateMatter') {
+      if (key === 'pm10') {
+        if (value <= 20) return 'Low PM10 level. Air quality is good.';
+        if (value <= 40) return 'Moderate PM10 level.';
+        if (value <= 60) return 'Unhealthy for sensitive groups.';
+        return 'High PM10 level. Consider limiting outdoor activity.';
+      }
+      if (key === 'pm2_5') {
+        if (value <= 10) return 'Low PM2.5 level. Air is clean.';
+        if (value <= 25) return 'Moderate PM2.5 level.';
+        if (value <= 50) return 'High PM2.5. Avoid prolonged exposure.';
+        return 'Very high PM2.5. Unhealthy air quality.';
+      }
+    }
+
+    if (this.selectedCategory === 'pollutants') {
+      const pollutantsInfo: Record<string, string> = {
+        carbon_monoxide: 'Carbon monoxide (CO) – a colorless, odorless gas harmful in high concentrations.',
+        nitrogen_dioxide: 'Nitrogen dioxide (NO₂) – a pollutant from traffic and combustion.',
+        sulphur_dioxide: 'Sulphur dioxide (SO₂) – can irritate airways and affect lung function.',
+        ozone: 'Ozone (O₃) – high levels can lead to respiratory problems.',
+      };
+      return pollutantsInfo[key] || 'Air pollutant level.';
+    }
+
+    return 'No description available.';
+  }
+
+  private infoTooltips: Record<string, string> = {
+    // Pollen
+    alder_pollen: 'Alder pollen can cause allergic reactions like sneezing or itchy eyes.',
+    birch_pollen: 'Birch pollen is a common allergen, especially in spring.',
+    grass_pollen: 'Grass pollen is a major cause of hay fever during the summer months.',
+    mugwort_pollen: 'Mugwort pollen is active late summer and may trigger asthma.',
+    olive_pollen: 'Olive pollen is common in Mediterranean areas.',
+    ragweed_pollen: 'Ragweed pollen is highly allergenic and spreads easily.',
+
+    // Particulate Matter
+    pm10: 'PM10 refers to coarse particles that can enter the lungs and cause respiratory issues.',
+    pm2_5: 'PM2.5 are fine particles that penetrate deep into the lungs and bloodstream.',
+
+    // Pollutants
+    carbon_monoxide: 'CO is a toxic gas that can impair oxygen transport in the body.',
+    nitrogen_dioxide: 'NO₂ is produced by traffic emissions and affects lung function.',
+    sulphur_dioxide: 'SO₂ can cause respiratory symptoms and aggravate asthma.',
+    ozone: 'O₃ is a reactive gas that can cause airway inflammation and breathing issues.',
+  };
 }

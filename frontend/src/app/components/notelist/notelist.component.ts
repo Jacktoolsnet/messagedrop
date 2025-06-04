@@ -115,7 +115,8 @@ export class NotelistComponent implements OnInit {
       minHeight: '20vh',
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -157,7 +158,8 @@ export class NotelistComponent implements OnInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {

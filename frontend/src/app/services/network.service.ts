@@ -37,7 +37,8 @@ export class NetworkService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false
+        hasBackdrop: false,
+        autoFocus: false
       });
 
       this.networkDialogRef?.afterOpened().subscribe(e => { });
@@ -74,7 +75,8 @@ export class NetworkService {
         data: this.networkMessageMap.get(url),
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false
+        hasBackdrop: false,
+        autoFocus: false
       });
     } else {
       return undefined

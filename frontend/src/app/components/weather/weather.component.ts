@@ -78,7 +78,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     if (this.selectedDayIndex === 0) {
       this.selectedHour = new Date().getHours();
     } else {
-      this.selectedHour = 0;
+      this.selectedHour = 12;
     }
     this.getLocationName();
   }
@@ -114,10 +114,10 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
       const selectedDate = this.weather?.daily[index].date ?? '';
       const dayHourly = this.weather?.hourly.filter(h => h.time.startsWith(selectedDate));
       if (dayHourly && dayHourly.length > 0) {
-        const firstHour = +dayHourly[0].time.split('T')[1].split(':')[0];
+        const firstHour = +dayHourly[12].time.split('T')[1].split(':')[0];
         this.selectedHour = firstHour;
       } else {
-        this.selectedHour = 0;
+        this.selectedHour = 12;
       }
     }
     this.updateChart();
@@ -138,7 +138,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     const selectedDate = this.weather.daily[this.selectedDayIndex].date;
     const dayHourly = this.weather.hourly.filter(h => h.time.startsWith(selectedDate));
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
-    const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
+    const selectedHourStr = this.selectedHour.toString().padStart(2, '12');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
 
     let dataset: ChartDataset<'line', number[]> = {
@@ -476,7 +476,7 @@ export class WeatherComponent implements OnInit, AfterViewInit, OnDestroy {
     const selectedDate = this.weather!.daily[this.selectedDayIndex].date;
     const dayHourly = this.weather!.hourly.filter(h => h.time.startsWith(selectedDate));
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
-    const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
+    const selectedHourStr = this.selectedHour.toString().padStart(2, '12');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
 
     if (selectedIndex !== -1) {

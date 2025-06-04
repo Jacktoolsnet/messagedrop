@@ -162,7 +162,8 @@ export class AppComponent implements OnInit {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: false
+            hasBackdrop: false,
+            autoFocus: false
           });
 
           dialogRef.afterOpened().subscribe(e => { });
@@ -269,7 +270,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true
+        hasBackdrop: true,
+        autoFocus: false
       });
 
       dialogRef.afterOpened().subscribe(e => { });
@@ -314,7 +316,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           minWidth: '20vw',
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: true
+          hasBackdrop: true,
+          autoFocus: false
         });
 
         dialogRef.afterOpened().subscribe(e => {
@@ -358,7 +361,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(() => {
@@ -373,7 +377,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             this.userService.saveUser();
           }
           this.mapService.setUserMarker(this.userService.getUser().location);
-          this.mapService.moveToWithZoom(this.userService.getUser().location, 19);
+          this.mapService.moveToWithZoom(this.userService.getUser().location, 17);
           this.updateDataForLocation(this.mapService.getMapLocation(), true);
         },
         error: (error) => {
@@ -587,7 +591,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         },
                         maxWidth: '90vw',
                         maxHeight: '90vh',
-                        hasBackdrop: true
+                        hasBackdrop: true,
+                        autoFocus: false
                       });
 
                       dialogRef.afterOpened().subscribe(e => { });
@@ -620,7 +625,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         },
                         maxWidth: '90vw',
                         maxHeight: '90vh',
-                        hasBackdrop: true
+                        hasBackdrop: true,
+                        autoFocus: false
                       });
 
                       dialogRef.afterOpened().subscribe(e => { });
@@ -688,7 +694,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -746,7 +753,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -782,7 +790,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             maxWidth: '90vw',
             minHeight: '8rem',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: true,
+            autoFocus: false
           });
 
           dialogRef.afterOpened().subscribe(e => {
@@ -805,7 +814,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             maxWidth: '90vw',
             minHeight: '8rem',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: true,
+            autoFocus: false
           });
 
           dialogRef.afterOpened().subscribe(e => {
@@ -831,7 +841,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -852,7 +863,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -892,7 +904,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -942,7 +955,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       maxWidth: '90vw',
       minHeight: '20vh',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -965,7 +979,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       maxWidth: '90vw',
       minHeight: '8rem',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -1063,7 +1078,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             maxWidth: '90vw',
             minHeight: '20vh',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: true,
+            autoFocus: false
           });
 
           dialogRef.afterOpened().subscribe(e => {
@@ -1116,7 +1132,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             maxWidth: '90vw',
             minHeight: '20vh',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: true,
+            autoFocus: false
           });
           dialogRef.afterOpened().subscribe();
           dialogRef.afterClosed().subscribe();
@@ -1132,7 +1149,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: true,
+            autoFocus: false
           });
           dialogRef.afterClosed().subscribe();
         }
@@ -1190,7 +1208,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(() => {

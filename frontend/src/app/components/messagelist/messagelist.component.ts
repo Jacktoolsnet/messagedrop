@@ -190,7 +190,8 @@ export class MessagelistComponent implements OnInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -258,7 +259,8 @@ export class MessagelistComponent implements OnInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {
@@ -323,7 +325,8 @@ export class MessagelistComponent implements OnInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => {

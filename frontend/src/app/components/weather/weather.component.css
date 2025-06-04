@@ -68,8 +68,8 @@ mat-dialog-content {
     width: 100%;
     aspect-ratio: 16 / 9;
     min-height: 200px;
-    max-height: calc(90vh - 300px);
-    /* reserviere Platz für Buttons und Slider */
+    height: auto;
+    max-height: 50%;
     overflow: hidden;
     display: flex;
     align-items: center;

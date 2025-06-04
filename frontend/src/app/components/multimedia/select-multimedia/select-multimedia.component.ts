@@ -33,7 +33,8 @@ export class SelectMultimediaComponent {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => { });
@@ -53,7 +54,8 @@ export class SelectMultimediaComponent {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterOpened().subscribe(e => { });
