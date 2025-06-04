@@ -1,89 +1,22 @@
-:host {
-    display: block;
-    padding: 1rem;
-    background-color: #1e1e1e;
-    color: #f0f0f0;
-    border-radius: 1rem;
-    max-height: 90vh;
-    overflow-y: auto;
-    font-family: 'Roboto', sans-serif;
-}
-
-h2 {
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-    font-weight: 500;
-    color: #ffffff;
-}
-
-.day-switch {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
-}
-
 .chart-container {
+    margin-top: 1rem;
     position: relative;
     width: 100%;
-    height: 300px;
-    margin-bottom: 1rem;
+    aspect-ratio: 16 / 9;
+    min-height: 300px;
+    max-height: 90vh;
 }
 
-.hour-slider {
-    margin-bottom: 1rem;
+/* Das Chart selbst */
+.chart-container canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
-.hour-label {
-    text-align: center;
-    font-weight: bold;
-    margin-top: 0.5rem;
-    font-size: 1rem;
-}
-
-.sun-info {
-    text-align: center;
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
-    color: #bbbbbb;
-}
-
-.close-btn {
-    display: flex;
-    justify-content: center;
-    margin-top: 1rem;
-}
-
-.data-source {
-    margin-top: 2rem;
-    text-align: center;
-    font-size: 0.8rem;
-    color: #999;
-}
-
-.data-source a {
-    color: #64b5f6;
-    text-decoration: none;
-}
-
-.data-source a:hover {
-    text-decoration: underline;
-}
-
-@media (max-width: 600px) {
-    h2 {
-        font-size: 1.2rem;
-    }
-
-    .chart-container {
-        height: 250px;
-    }
-
-    .hour-label {
-        font-size: 0.9rem;
-    }
-
-    .sun-info {
-        font-size: 0.8rem;
-    }
+/* FAB Close-Button */
+.chart-container .close-btn {
+    position: absolute;
+    top: -0.75rem;
+    right: -0.75rem;
+    z-index: 10;
 }

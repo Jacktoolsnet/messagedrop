@@ -1,4 +1,3 @@
-import { animate, style, transition, trigger } from '@angular/animations';
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -25,19 +24,6 @@ import { AirQualityDetailComponent } from './air-quality-detail/air-quality-deta
     MatSliderModule,
     FormsModule,
     AirQualityDetailComponent
-  ],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0 }),
-        animate('300ms ease-out', style({ opacity: 1 }))
-      ])
-    ]),
-    trigger('fadeOut', [
-      transition(':leave', [
-        animate('200ms ease-in', style({ opacity: 0 }))
-      ])
-    ])
   ],
   templateUrl: './air-quality.component.html',
   styleUrls: ['./air-quality.component.css']

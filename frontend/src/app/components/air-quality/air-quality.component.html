@@ -19,7 +19,7 @@
         </div>
 
         <!-- air-quality.component.html -->
-        <div *ngIf="!selectedTile" @fadeOut>
+        <div *ngIf="!selectedTile">
             <div class="tile-grid">
                 <div class="tile" *ngFor="let tile of tileValues" (click)="onTileClick(tile)"
                     [style.color]="tile.color">
@@ -34,20 +34,18 @@
                 </div>
             </div>
         </div>
-        <div *ngIf="selectedTile" @fadeIn>
+        <div *ngIf="selectedTile">
             <app-air-quality-detail [tile]="selectedTile" (close)="selectedTile = null"></app-air-quality-detail>
         </div>
 
-        <div class="hour-slider">
-            <div class="hour-slider">
-                <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
-                    <input matSliderThumb [(ngModel)]="selectedHour">
-                </mat-slider>
-                <div class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
-            </div>
+        <div *ngIf="!selectedTile" class="hour-slider">
+            <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
+                <input matSliderThumb [(ngModel)]="selectedHour">
+            </mat-slider>
+            <div class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
         </div>
 
-        <div class="category-switch">
+        <div *ngIf="!selectedTile" class="category-switch">
             <button mat-mini-fab *ngFor="let category of categoryModes"
                 [color]="selectedCategory === category ? 'primary' : 'secondary'" (click)="onCategoryToggle(category)"
                 [matTooltip]="getCategoryLabel(category)">

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -27,12 +27,11 @@ import { BaseChartDirective } from 'ng2-charts';
   styleUrl: './air-quality-detail.component.css'
 })
 
-export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestroy {
+export class AirQualityDetailComponent implements OnInit, AfterViewInit {
   @Input() tile!: any;
   @Output() close = new EventEmitter<void>();
 
   selectedDayIndex = 0;
-  selectedHour = 0;
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
@@ -42,17 +41,10 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
   }
 
   ngOnInit(): void {
-    this.selectedHour = this.getDefaultHour();
     this.updateChart();
   }
 
   ngAfterViewInit(): void { }
-
-  ngOnDestroy(): void { }
-
-  getDefaultHour(): number {
-    return this.selectedDayIndex === 0 ? new Date().getHours() : 12;
-  }
 
   updateChart(): void {
     if (!this.tile?.values || !this.tile?.time) return;
@@ -75,7 +67,7 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
         },
         fill: true,
         pointRadius: 4,
-        pointBackgroundColor: dayValues.map((v: number) => this.getColorForValue(v)),
+        pointBackgroundColor: this.tile.color,
         tension: 0.3
       }]
     };
@@ -90,20 +82,39 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
             title: ctx => this.getTimeLabel(ctx[0].dataIndex)
           }
         },
-        legend: { display: false }
+        legend: { display: false },
+        title: {
+          display: true,
+          text: this.tile.label,
+          color: '#fff', // Titel in weiß
+          font: {
+            size: 18,
+            weight: 'bold'
+          },
+          padding: {
+            top: 10,
+            bottom: 20
+          }
+        }
       },
       scales: {
         x: {
-          ticks: { color: '#888', maxRotation: 0, autoSkip: true }
+          ticks: { color: '#fff', maxRotation: 0, autoSkip: true },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)' // ✅ zart weißes Gitternetz
+          }
         },
         y: {
           beginAtZero: true,
-          ticks: { color: this.tile.color },
+          ticks: { color: '#fff' },
           title: {
             display: true,
             text: this.tile.unit,
-            color: this.tile.color,
+            color: '#fff',
             font: { size: 14, weight: 'bold' }
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
           }
         }
       }
@@ -112,7 +123,6 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
 
   onDayChange(index: number): void {
     this.selectedDayIndex = index;
-    this.selectedHour = this.getDefaultHour();
     this.updateChart();
   }
 
@@ -126,22 +136,5 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit, OnDestr
   getValueLabel(hour: number): string {
     const value = this.tile.values?.[this.selectedDayIndex * 24 + hour];
     return value != null ? `${value} ${this.tile.unit}` : '–';
-  }
-
-  getColorForValue(value: number): string {
-    if (value == null) return '#ccc';
-    if (value < 20) return '#4caf50';
-    if (value < 50) return '#ffeb3b';
-    if (value < 100) return '#ff9800';
-    return '#f44336';
-  }
-
-  get highlightColor(): string {
-    const value = this.tile.values?.[this.selectedDayIndex * 24 + this.selectedHour];
-    return this.getColorForValue(typeof value === 'number' ? value : 0);
-  }
-
-  getDayLabels(): string[] {
-    return ['to', 'do', 'later']
   }
 }

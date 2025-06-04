@@ -1,37 +1,11 @@
-<mat-dialog-content #dialogContent>
-    <ng-container *ngIf="tile">
-        <h2>{{ tile.label }} for {{ tile.location }}</h2>
-
-        <div class="day-switch">
-            <button mat-raised-button *ngFor="let day of getDayLabels(); let i = index"
-                [color]="i === selectedDayIndex ? 'primary' : 'secondary'" (click)="onDayChange(i)">
-                {{ day }}
+<ng-container *ngIf="tile">
+    <div class="chart-container">
+        <div class="close-btn">
+            <button mat-mini-fab color="primary" (click)="close.emit()" matTooltip="Close">
+                <mat-icon>close</mat-icon>
             </button>
         </div>
-        <div class="chart-container">
-            <canvas baseChart [type]="lineChartType" [data]="chartData" [options]="chartOptions">
-            </canvas>
-        </div>
-        <div class="hour-slider">
-            <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
-                <input matSliderThumb [(ngModel)]="selectedHour">
-            </mat-slider>
-            <div class="hour-label" [style.color]="highlightColor">
-                {{ getTimeLabel(selectedHour) }}: {{ getValueLabel(selectedHour) }}
-            </div>
-        </div>
-
-        <div class="sun-info" *ngIf="tile.sunrise && tile.sunset">
-            <p>Sunrise: {{ tile.sunrise }} | Sunset: {{ tile.sunset }}</p>
-        </div>
-
-        <div class="close-btn">
-            <button mat-stroked-button color="warn" (click)="close.emit()">Close</button>
-        </div>
-    </ng-container>
-
-    <div class="data-source">
-        Air quality data provided by
-        <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
+        <canvas baseChart [type]="lineChartType" [data]="chartData" [options]="chartOptions">
+        </canvas>
     </div>
-</mat-dialog-content>
+</ng-container>
