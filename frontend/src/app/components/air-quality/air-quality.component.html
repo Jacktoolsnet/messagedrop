@@ -35,10 +35,12 @@
             </div>
         </div>
         <div *ngIf="selectedTile">
-            <app-air-quality-detail [tile]="selectedTile" (close)="selectedTile = null"></app-air-quality-detail>
+            <app-air-quality-detail [tile]="selectedTile" [selectedDayIndex]="selectedDayIndex"
+                [selectedHour]="selectedHour" (close)="selectedTile = null">
+            </app-air-quality-detail>
         </div>
 
-        <div *ngIf="!selectedTile" class="hour-slider">
+        <div class="hour-slider">
             <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
                 <input matSliderThumb [(ngModel)]="selectedHour">
             </mat-slider>

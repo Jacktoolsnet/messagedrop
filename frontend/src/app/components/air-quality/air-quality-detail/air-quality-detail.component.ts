@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -27,11 +27,12 @@ import { BaseChartDirective } from 'ng2-charts';
   styleUrl: './air-quality-detail.component.css'
 })
 
-export class AirQualityDetailComponent implements OnInit, AfterViewInit {
+export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewInit {
   @Input() tile!: any;
+  @Input() selectedDayIndex = 0;
+  @Input() selectedHour = 0;
   @Output() close = new EventEmitter<void>();
 
-  selectedDayIndex = 0;
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
@@ -45,6 +46,12 @@ export class AirQualityDetailComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void { }
+
+  ngOnChanges(): void {
+    if (this.tile) {
+      this.updateChart(); // oder initChart(), je nachdem
+    }
+  }
 
   updateChart(): void {
     if (!this.tile?.values || !this.tile?.time) return;
