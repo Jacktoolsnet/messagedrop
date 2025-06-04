@@ -1,10 +1,18 @@
 .chart-container {
-    margin-top: 1rem;
     position: relative;
     width: 100%;
     aspect-ratio: 16 / 9;
-    min-height: 300px;
-    max-height: 90vh;
+    max-height: 70%;
+    min-height: 250px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* Das Chart selbst */
