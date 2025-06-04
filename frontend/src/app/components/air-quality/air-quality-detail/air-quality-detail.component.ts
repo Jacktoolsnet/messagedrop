@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { CategoryScale, Chart, ChartConfiguration, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
+import annotationPlugin from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
@@ -32,13 +33,14 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
   @Output() close = new EventEmitter<void>();
+  @ViewChild(BaseChartDirective) chartCanvas!: BaseChartDirective;
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
 
   constructor() {
-    Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, LineController);
+    Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, LineController, annotationPlugin);
   }
 
   ngOnInit(): void {
@@ -47,9 +49,17 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
 
   ngAfterViewInit(): void { }
 
-  ngOnChanges(): void {
-    if (this.tile) {
-      this.updateChart(); // oder initChart(), je nachdem
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedDayIndex'] && !changes['selectedDayIndex'].firstChange) {
+      this.updateChart();
+    }
+
+    if (changes['selectedHour'] && !changes['selectedHour'].firstChange) {
+      this.moveSelectedHourAnnotation();
+    }
+
+    if (changes['tile'] && changes['tile'].currentValue) {
+      this.updateChart();
     }
   }
 
@@ -126,6 +136,38 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
         }
       }
     };
+
+    const hour = this.selectedHour;
+    const hourLabel = dayLabels[hour] ?? `${hour}:00`;
+    const value = dayValues[hour] ?? 0;
+
+    this.chartOptions.plugins = {
+      ...this.chartOptions.plugins,
+      annotation: {
+        annotations: {
+          selectedHour: {
+            type: 'line',
+            xMin: hourLabel,
+            xMax: hourLabel,
+            yMin: value,
+            yMax: value + 0.01,
+            borderColor: this.tile.color,
+            borderWidth: 3,
+            label: {
+              display: true,
+              content: `${hourLabel}: ${value}${this.tile.unit}`,
+              backgroundColor: this.tile.color,
+              color: '#000000',
+              position: 'start'
+            }
+          }
+        }
+      }
+    };
+
+    if (this.chartCanvas?.chart) {
+      this.chartCanvas.update();
+    }
   }
 
   onDayChange(index: number): void {
@@ -143,5 +185,46 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   getValueLabel(hour: number): string {
     const value = this.tile.values?.[this.selectedDayIndex * 24 + hour];
     return value != null ? `${value} ${this.tile.unit}` : '–';
+  }
+
+  moveSelectedHourAnnotation(): void {
+    const chart = this.chartCanvas?.chart;
+    if (!chart) return;
+
+    const hour = this.selectedHour;
+    const hourLabel = this.chartData.labels?.[hour] ?? `${hour}:00`;
+    const rawValue = this.chartData.datasets?.[0]?.data?.[hour];
+    const numericValue = typeof rawValue === 'number' ? rawValue : 0;
+
+    const annotations = (chart.options.plugins?.annotation?.annotations ?? {}) as any;
+
+    if (!annotations.selectedHour) {
+      // Falls Annotation noch nicht da ist, einfach neu setzen
+      annotations.selectedHour = {
+        type: 'line',
+        xMin: hourLabel,
+        xMax: hourLabel,
+        yMin: numericValue,
+        yMax: numericValue + 0.01,
+        borderColor: this.tile.color,
+        borderWidth: 3,
+        label: {
+          display: true,
+          content: `${hourLabel}: ${numericValue}${this.tile.unit}`,
+          backgroundColor: this.tile.color,
+          color: '#000',
+          position: 'start'
+        }
+      };
+    } else {
+      // Ansonsten aktualisieren
+      annotations.selectedHour.xMin = hourLabel;
+      annotations.selectedHour.xMax = hourLabel;
+      annotations.selectedHour.yMin = numericValue;
+      annotations.selectedHour.yMax = numericValue + 0.01;
+      annotations.selectedHour.label.content = `${hourLabel}: ${numericValue}${this.tile.unit}`;
+    }
+
+    chart.update('none');
   }
 }
