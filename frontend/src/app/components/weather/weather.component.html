@@ -1,10 +1,14 @@
 <mat-dialog-content #dialogContent>
     <ng-container *ngIf="weather">
         <ng-container *ngIf="locationName$ | async as locationName; else loading">
-            <h2>{{ getChartLabel(selectedChart) }} for {{ locationName }}</h2>
+            <div class="header-title">
+                Weather for {{ locationName }}
+            </div>
         </ng-container>
         <ng-template #loading>
-            <h2>{{ getChartLabel(selectedChart) }}</h2>
+            <div class="header-title">
+                Weather
+            </div>
         </ng-template>
 
         <div class="day-switch">
@@ -14,19 +18,31 @@
             </button>
         </div>
 
-        <div class="chart-container">
-            <canvas baseChart [type]="lineChartType" [data]="tempChartData" [options]="chartOptions">
-            </canvas>
+        <!-- TILE GRID -->
+        <div *ngIf="!selectedChart" class="tile-grid">
+            <div class="tile" *ngFor="let mode of chartModes" [style.color]="getAnnotationColorForChart(mode)">
+                <div class="tile-title">{{ getChartLabel(mode) }}</div>
+                <div class="tile-icon-wrapper">
+                    <mat-icon class="tile-icon">{{ getChartIcon(mode) }}</mat-icon>
+                </div>
+                <div class="tile-value">
+                    {{ getLatestValue(mode) }} {{ getSelectedChartUnit(mode) }}
+                </div>
+                <button mat-mini-fab class="tile-action-button" color="primary" (click)="onChartToggle(mode)">
+                    <mat-icon>show_chart</mat-icon>
+                </button>
+            </div>
         </div>
 
-        <div class="chart-switch mini-fab">
-            <button mat-mini-fab *ngFor="let mode of chartModes"
-                [color]="selectedChart === mode ? 'primary' : 'secondary'" (click)="onChartToggle(mode)"
-                [matTooltip]="getChartLabel(mode)">
-                <mat-icon>{{ getChartIcon(mode) }}</mat-icon>
+        <!-- CHART VIEW -->
+        <div *ngIf="selectedChart" class="chart-container">
+            <canvas baseChart [type]="lineChartType" [data]="tempChartData" [options]="chartOptions"></canvas>
+            <button mat-mini-fab class="close-button" color="accent" (click)="selectedChart = null">
+                <mat-icon>close</mat-icon>
             </button>
         </div>
 
+        <!-- SLIDER -->
         <div class="hour-slider">
             <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
                 <input matSliderThumb [(ngModel)]="selectedHour">

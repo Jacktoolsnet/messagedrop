@@ -1,0 +1,41 @@
+<mat-dialog-content #dialogContent>
+    <ng-container *ngIf="weather">
+        <ng-container *ngIf="locationName$ | async as locationName; else loading">
+            <h2>{{ getChartLabel(selectedChart) }} for {{ locationName }}</h2>
+        </ng-container>
+        <ng-template #loading>
+            <h2>{{ getChartLabel(selectedChart) }}</h2>
+        </ng-template>
+
+        <div class="day-switch">
+            <button mat-raised-button *ngFor="let day of weather.daily; let i = index"
+                [color]="i === selectedDayIndex ? 'primary' : 'secondary'" (click)="onDayChange(i)">
+                {{ getDayLabel(i) }}
+            </button>
+        </div>
+
+        <div class="chart-container">
+            <canvas baseChart [type]="lineChartType" [data]="tempChartData" [options]="chartOptions">
+            </canvas>
+        </div>
+
+        <div class="chart-switch mini-fab">
+            <button mat-mini-fab *ngFor="let mode of chartModes"
+                [color]="selectedChart === mode ? 'primary' : 'secondary'" (click)="onChartToggle(mode)"
+                [matTooltip]="getChartLabel(mode)">
+                <mat-icon>{{ getChartIcon(mode) }}</mat-icon>
+            </button>
+        </div>
+
+        <div class="hour-slider">
+            <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
+                <input matSliderThumb [(ngModel)]="selectedHour">
+            </mat-slider>
+        </div>
+    </ng-container>
+
+    <div class="data-source">
+        Weather data provided by
+        <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
+    </div>
+</mat-dialog-content>
