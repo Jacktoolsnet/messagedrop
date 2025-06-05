@@ -68,6 +68,18 @@ mat-dialog-content {
     width: 100%;
 }
 
+@media (max-width: 320px) {
+    .tile-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (min-width: 321px) and (max-width: 500px) {
+    .tile-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 .tile-title {
     font-weight: 500;
     font-size: 1rem;
@@ -92,6 +104,13 @@ mat-dialog-content {
     font-size: 0.9rem;
     font-weight: 500;
     opacity: 0.9;
+}
+
+.tile-action-button {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    z-index: 10;
 }
 
 .hour-slider {
