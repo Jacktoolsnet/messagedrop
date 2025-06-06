@@ -43,11 +43,11 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
     Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, LineController, annotationPlugin);
   }
 
-  ngOnInit(): void {
+  ngOnInit(): void { }
+
+  ngAfterViewInit(): void {
     this.updateChart();
   }
-
-  ngAfterViewInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDayIndex'] && !changes['selectedDayIndex'].firstChange) {
@@ -65,6 +65,7 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
 
   updateChart(): void {
     if (!this.tile?.values || !this.tile?.time) return;
+
     const start = this.selectedDayIndex * 24;
     const end = start + 24;
     const dayValues = this.tile.values.slice(start, end);
@@ -89,6 +90,10 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
       }]
     };
 
+    const hour = this.selectedHour;
+    const hourLabel = dayLabels[hour] ?? `${hour}:00`;
+    const value = dayValues[hour] ?? 0;
+
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -103,7 +108,7 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
         title: {
           display: true,
           text: this.tile.label,
-          color: '#fff', // Titel in weiß
+          color: '#fff',
           font: {
             size: 18,
             weight: 'bold'
@@ -112,54 +117,64 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
             top: 10,
             bottom: 20
           }
+        },
+        annotation: {
+          annotations: {
+            selectedHour: {
+              type: 'line',
+              xMin: hourLabel,
+              xMax: hourLabel,
+              yMin: value,
+              yMax: value + 0.01,
+              borderColor: this.tile.color,
+              borderWidth: 3,
+              label: {
+                display: true,
+                content: `${hourLabel}: ${value}${this.tile.unit}`,
+                backgroundColor: this.tile.color,
+                color: '#000000',
+                position: 'start'
+              }
+            }
+          }
         }
       },
       scales: {
         x: {
-          ticks: { color: '#fff', maxRotation: 0, autoSkip: true },
-          grid: {
-            color: 'rgba(255, 255, 255, 0.1)' // ✅ zart weißes Gitternetz
-          }
-        },
-        y: {
-          beginAtZero: true,
-          ticks: { color: '#fff' },
           title: {
             display: true,
-            text: this.tile.unit,
+            text: 'Time',
             color: '#fff',
-            font: { size: 14, weight: 'bold' }
+            font: {
+              size: 14,
+              weight: 'bold'
+            }
+          },
+          ticks: {
+            color: '#fff',
+            maxRotation: 45,
+            minRotation: 45
           },
           grid: {
             color: 'rgba(255, 255, 255, 0.1)'
           }
-        }
-      }
-    };
-
-    const hour = this.selectedHour;
-    const hourLabel = dayLabels[hour] ?? `${hour}:00`;
-    const value = dayValues[hour] ?? 0;
-
-    this.chartOptions.plugins = {
-      ...this.chartOptions.plugins,
-      annotation: {
-        annotations: {
-          selectedHour: {
-            type: 'line',
-            xMin: hourLabel,
-            xMax: hourLabel,
-            yMin: value,
-            yMax: value + 0.01,
-            borderColor: this.tile.color,
-            borderWidth: 3,
-            label: {
-              display: true,
-              content: `${hourLabel}: ${value}${this.tile.unit}`,
-              backgroundColor: this.tile.color,
-              color: '#000000',
-              position: 'start'
+        },
+        y: {
+          beginAtZero: true,
+          title: {
+            display: true,
+            text: this.tile.unit,
+            color: '#fff',
+            font: {
+              size: 14,
+              weight: 'bold'
             }
+          },
+          ticks: {
+            color: '#fff'
+          },
+          grid: {
+            color: 'rgba(255, 255, 255, 0.1)'
           }
         }
       }
@@ -169,13 +184,6 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
       this.chartCanvas.update();
     }
   }
-
-  onDayChange(index: number): void {
-    this.selectedDayIndex = index;
-    this.updateChart();
-  }
-
-  onHourChange(): void { }
 
   getTimeLabel(hour: number): string {
     const label = this.tile.time?.[this.selectedDayIndex * 24 + hour];

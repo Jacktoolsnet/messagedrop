@@ -4,15 +4,9 @@
     aspect-ratio: 16 / 9;
     max-height: 70%;
     min-height: 250px;
-    margin-bottom: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-}
-
-canvas {
-    width: 100% !important;
-    height: 100% !important;
 }
 
 /* Das Chart selbst */
@@ -24,7 +18,7 @@ canvas {
 /* FAB Close-Button */
 .chart-container .close-btn {
     position: absolute;
-    top: -0.75rem;
-    right: -0.75rem;
+    top: 0rem;
+    right: 0rem;
     z-index: 10;
 }

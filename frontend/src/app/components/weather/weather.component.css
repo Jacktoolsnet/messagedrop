@@ -7,6 +7,59 @@
     color: #f5f5f5;
 }
 
+mat-dialog-content {
+    width: 100%;
+    max-height: 90vh;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    box-sizing: border-box;
+}
+
+.header-title {
+    text-align: left;
+    font-size: 1.25rem;
+    font-weight: 600;
+}
+
+.day-switch {
+    display: flex;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.day-switch button {
+    flex: 1 1 0;
+    min-width: 0;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.tile {
+    position: relative;
+    border-radius: 1rem;
+    background-color: #3a3a3a;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    padding: 1rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 0.25rem;
+    min-height: 140px;
+    height: auto;
+}
+
+.tile:hover {
+    background-color: #4a4a4a;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    transform: scale(1.02);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
 .tile-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
@@ -25,29 +78,6 @@
     .tile-grid {
         grid-template-columns: repeat(2, 1fr);
     }
-}
-
-.tile {
-    position: relative;
-    border-radius: 1rem;
-    background-color: #3a3a3a;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    padding: 1rem;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 0.25rem;
-    min-height: 140px;
-    height: auto;
-    cursor: pointer;
-}
-
-.tile:hover {
-    background-color: #4a4a4a;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-    transform: scale(1.02);
-    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 .tile-title {
@@ -70,9 +100,87 @@
     font-weight: bold;
 }
 
+.tile-severity {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
 .tile-action-button {
     position: absolute;
     top: -0.5rem;
     right: -0.5rem;
     z-index: 10;
+}
+
+.hour-slider {
+    width: 100%;
+    padding: 0.5rem 1rem;
+    box-sizing: border-box;
+}
+
+.selected-hour {
+    text-align: center;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    color: #ccc;
+}
+
+mat-slider {
+    width: 100%;
+}
+
+.category-switch {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.category-switch button {
+    flex: 1 1 0;
+    height: 3rem;
+    min-width: 3rem;
+    max-width: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.data-source {
+    font-size: 0.8rem;
+    text-align: center;
+    color: #aaa;
+}
+
+.data-source a {
+    color: inherit;
+    text-decoration: underline;
+}
+
+.data-source a:hover {
+    color: #fff;
+    text-decoration: none;
+}
+
+.tile-detail-button {
+    margin-top: 0.5rem;
+    width: 100%;
+    border: 2px solid currentColor;
+    color: currentColor;
+    background-color: transparent;
+    font-size: 0.85rem;
+    text-transform: none;
+    font-weight: 500;
+    border-radius: 0.5rem;
+}
+
+.tile-detail-button:hover {
+    background-color: rgba(255, 255, 255, 0.08);
+}
+
+app-weather-detail {
+    max-height: 60vh;
+    display: flex;
+    flex-direction: column;
 }

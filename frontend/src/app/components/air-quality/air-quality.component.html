@@ -44,7 +44,7 @@
             </app-air-quality-detail>
         </div>
 
-        <div *ngIf="selectedTile" class="hour-slider">
+        <div class="hour-slider">
             <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
                 <input matSliderThumb [(ngModel)]="selectedHour">
             </mat-slider>

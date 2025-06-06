@@ -59,6 +59,7 @@ export class WeatherService {
         time: t,
         temperature: data.hourly.temperature_2m[i],
         precipitationProbability: data.hourly.precipitation_probability[i],
+        precipitation: data.hourly.precipitation[i],
         uvIndex: data.hourly.uv_index[i],
         pressure: data.hourly.pressure_msl[i],
         wind: data.hourly.windspeed_10m[i]

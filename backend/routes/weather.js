@@ -13,7 +13,7 @@ router.get('/:locale/:latitude/:longitude/:days', [security.checkToken], async (
             latitude,
             longitude,
             current_weather: true,
-            hourly: 'temperature_2m,precipitation_probability,uv_index,pressure_msl,windspeed_10m',
+            hourly: 'temperature_2m,precipitation_probability,precipitation,uv_index,pressure_msl,windspeed_10m',
             daily: 'sunrise,sunset,temperature_2m_max,temperature_2m_min',
             forecast_days: days,
             timezone: 'auto',

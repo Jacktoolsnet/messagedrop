@@ -162,11 +162,6 @@ export class AirQualityComponent implements OnInit {
 
   onDayChange(index: number): void {
     this.selectedDayIndex = index;
-    if (this.selectedDayIndex === 0) {
-      this.selectedHour = new Date().getHours();
-    } else {
-      this.selectedHour = 12;
-    }
     this.updateTiles();
   }
 
