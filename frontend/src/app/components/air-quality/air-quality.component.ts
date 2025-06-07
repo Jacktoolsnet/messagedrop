@@ -41,6 +41,18 @@ export class AirQualityComponent implements OnInit {
     description: string;
     levelText: string;
   }[] = [];
+  allTileValues: {
+    key: string;
+    value: number;
+    values: number[];
+    time: string[];
+    label: string;
+    unit: string;
+    color: string;
+    icon: string;
+    description: string;
+    levelText: string;
+  }[] = [];
   categoryModes: Array<'pollen' | 'particulateMatter' | 'pollutants'> = ['pollen', 'particulateMatter', 'pollutants'];
   selectedDayIndex = 0;
   selectedHour = 0;
@@ -48,6 +60,8 @@ export class AirQualityComponent implements OnInit {
   locationName$: Observable<string> | undefined;
   locationName: string = '';
   selectedTile: any = null;
+  allKeys = this.getAllCategoryKeys();
+  tileIndex = 0;
 
   constructor(
     private mapService: MapService,
@@ -62,11 +76,7 @@ export class AirQualityComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.selectedDayIndex === 0) {
-      this.selectedHour = new Date().getHours();
-    } else {
-      this.selectedHour = 12;
-    }
+    this.selectedHour = new Date().getHours();
     this.checkAvailableCategories();
     this.getLocationName();
     this.updateTiles();
@@ -96,6 +106,27 @@ export class AirQualityComponent implements OnInit {
         return ['pm10', 'pm2_5'];
       case 'pollutants':
         return ['carbon_monoxide', 'nitrogen_dioxide', 'sulphur_dioxide', 'ozone'];
+    }
+  }
+
+  getAllCategoryKeys(): string[] {
+    return [
+      ...this.getCategoryKeysByType('pollen'),
+      ...this.getCategoryKeysByType('particulateMatter'),
+      ...this.getCategoryKeysByType('pollutants')
+    ];
+  }
+
+  getCategoryKeysByType(type: string): string[] {
+    switch (type) {
+      case 'pollen':
+        return ['alder_pollen', 'birch_pollen', 'grass_pollen', 'mugwort_pollen', 'olive_pollen', 'ragweed_pollen'];
+      case 'particulateMatter':
+        return ['pm10', 'pm2_5'];
+      case 'pollutants':
+        return ['carbon_monoxide', 'nitrogen_dioxide', 'sulphur_dioxide', 'ozone'];
+      default:
+        return [];
     }
   }
 
@@ -366,6 +397,52 @@ export class AirQualityComponent implements OnInit {
 
   onTileClick(tile: any): void {
     if (tile.value == null || tile.value === 0) return;
-    this.selectedTile = tile;
+    this.allTileValues = this.getAllTileValues();
+    this.allKeys = this.getAllCategoryKeys(); // Alle verfügbaren Keys sammeln
+    this.tileIndex = this.allKeys.findIndex(k => k === tile.key);
+    this.selectedTile = tile; // <-- Das fehlte!
   }
+
+  selectPreviousTile(): void {
+    if (this.tileIndex > 0) {
+      this.tileIndex--;
+      const key = this.allKeys[this.tileIndex];
+      this.selectedTile = this.allTileValues.find(t => t.key === key) ?? null;
+    }
+  }
+
+  selectNextTile(): void {
+    if (this.tileIndex < this.allKeys.length - 1) {
+      this.tileIndex++;
+      const key = this.allKeys[this.tileIndex];
+      this.selectedTile = this.allTileValues.find(t => t.key === key) ?? null;
+    }
+  }
+
+  getAllTileValues(): any[] {
+    if (!this.airQuality) return [];
+    const timeIndices = this.getDayTimeIndices(this.selectedDayIndex);
+    const hourIndex = timeIndices[this.selectedHour];
+    const fullTimeArray = this.airQuality.hourly.time;
+
+    return this.categoryModes.flatMap((category) => {
+      return this.getCategoryKeysByType(category).map((key) => {
+        const valueArray = (this.airQuality!.hourly as any)[key] as number[];
+        const value = valueArray?.[hourIndex] ?? 0;
+        return {
+          key,
+          value,
+          values: valueArray,
+          time: fullTimeArray,
+          label: this.getChartLabel(key),
+          unit: this.getUnitForKey(key),
+          color: this.getPollenColor(value),
+          icon: this.getWeatherIcon(key),
+          description: this.getValueDescription(value, key),
+          levelText: this.getLevelTextForCategoryValue(category, value),
+        };
+      });
+    });
+  }
+
 }

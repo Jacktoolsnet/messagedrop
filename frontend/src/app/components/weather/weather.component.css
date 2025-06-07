@@ -64,7 +64,6 @@ mat-dialog-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
     gap: 1rem;
-    margin-top: 1rem;
     width: 100%;
 }
 
@@ -115,8 +114,12 @@ mat-dialog-content {
 
 .hour-slider {
     width: 100%;
-    padding: 0.5rem 1rem;
     box-sizing: border-box;
+}
+
+.tile-nav-buttons {
+    display: flex;
+    justify-content: space-around;
 }
 
 .selected-hour {
@@ -180,7 +183,13 @@ mat-slider {
 }
 
 app-weather-detail {
-    max-height: 60vh;
+    max-height: 52vh;
     display: flex;
     flex-direction: column;
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+    .hour-slider {
+        margin-top: 1rem;
+    }
 }

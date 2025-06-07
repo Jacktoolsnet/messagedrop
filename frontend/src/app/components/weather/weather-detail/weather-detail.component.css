@@ -14,11 +14,3 @@
     width: 100% !important;
     height: 100% !important;
 }
-
-/* FAB Close-Button */
-.chart-container .close-btn {
-    position: absolute;
-    top: 0rem;
-    right: 0rem;
-    z-index: 10;
-}

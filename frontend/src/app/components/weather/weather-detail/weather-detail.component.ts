@@ -1,11 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, Inject, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
-import { MatIcon } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
-import { MatTooltip } from '@angular/material/tooltip';
 import { CategoryScale, Chart, ChartConfiguration, ChartDataset, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
@@ -16,9 +13,6 @@ import { Weather } from '../../../interfaces/weather';
   imports: [
     CommonModule,
     MatDialogModule,
-    MatButtonModule,
-    MatIcon,
-    MatTooltip,
     BaseChartDirective,
     MatSliderModule,
     FormsModule
@@ -31,7 +25,6 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
   @Input() weather: Weather | null = null;
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
-  @Output() close = new EventEmitter<void>();
   @ViewChild(BaseChartDirective) chartCanvas?: BaseChartDirective;
 
   lineChartType: ChartType = 'line';
@@ -144,19 +137,30 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
         maxY = 11;
         break;
       }
-      case 'precipitationprobability':
-      case 'precipitation': {
-        const precips = dayHourly.map(h => h.precipitationProbability);
+      case 'precipitationprobability': {
+        const precipitationProbability = dayHourly.map(h => h.precipitationProbability);
         dataset = {
           ...dataset,
-          data: precips,
-          label: 'Precipitation Probability (%)',
+          data: precipitationProbability,
+          label: 'Rain chance (%)',
           borderColor: '#42A5F5',
           backgroundColor: 'rgba(66, 165, 245, 0.2)',
           pointBackgroundColor: '#42A5F5'
         };
         minY = 0;
         maxY = 100;
+        break;
+      }
+      case 'precipitation': {
+        const precipitation = dayHourly.map(h => h.precipitation);
+        dataset = {
+          ...dataset,
+          data: precipitation,
+          label: 'Rainfall (mm/h)',
+          borderColor: '#42A5F5',
+          backgroundColor: 'rgba(66, 165, 245, 0.2)',
+          pointBackgroundColor: '#42A5F5'
+        };
         break;
       }
       case 'wind': {
@@ -301,17 +305,18 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
     this.chartCanvas?.update();
   }
 
-  private getHourIndex(time: string): number {
+  /*private getHourIndex(time: string): number {
     const hour = +time.split('T')[1].split(':')[0];
     return this.weather?.hourly.findIndex(h =>
       h.time.includes(`T${hour.toString().padStart(2, '0')}:`)
     ) ?? -1;
-  }
+  }*/
 
   private getSelectedChartValue(hourData: any): number {
     switch (this.tile.type) {
       case 'temperature': return hourData.temperature;
-      case 'precipitation': return hourData.precipitationProbability;
+      case 'precipitationprobability': return hourData.precipitationProbability;
+      case 'precipitation': return hourData.precipitation;
       case 'uvIndex': return hourData.uvIndex;
       case 'wind': return hourData.wind;
       case 'pressure': return hourData.pressure;
@@ -320,9 +325,11 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   private getSelectedChartUnit(): string {
+    console.log(this.tile.type)
     switch (this.tile.type) {
       case 'temperature': return '°C';
-      case 'precipitation': return '%';
+      case 'precipitationprobability': return '%';
+      case 'precipitation': return 'mm/h';
       case 'uvIndex': return '';
       case 'wind': return ' km/h';
       case 'pressure': return ' hPa';
@@ -333,6 +340,7 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
   getAnnotationColorForChart(): string {
     switch (this.tile.type) {
       case 'temperature': return '#EF5350';
+      case 'precipitationprobability': return '#42A5F5';
       case 'precipitation': return '#42A5F5';
       case 'uvIndex': return '#AB47BC';
       case 'wind': return '#9E9E9E';
@@ -388,20 +396,6 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
     if (uv <= 7) return '#FF9800'; // orange
     if (uv <= 10) return '#F44336'; // rot
     return '#9C27B0'; // violett
-  }
-
-  getWeatherIconClass(code: number): string {
-    switch (code) {
-      case 0: return 'wi-day-sunny';
-      case 1: return 'wi-day-sunny-overcast';
-      case 2: return 'wi-day-cloudy';
-      case 3: return 'wi-cloudy';
-      case 45: return 'wi-fog';
-      case 51: return 'wi-sprinkle';
-      case 61: return 'wi-rain';
-      case 71: return 'wi-snow';
-      default: return 'wi-na';
-    }
   }
 
   moveSelectedHourAnnotation(): void {

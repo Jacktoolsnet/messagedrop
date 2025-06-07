@@ -1,14 +1,8 @@
-<mat-dialog-content #dialogContent>
-    <ng-container *ngIf="weather">
-        <ng-container *ngIf="locationName$ | async as locationName; else loading">
-            <div class="header-title">
-                Weather for {{ locationName }}
-            </div>
-        </ng-container>
-        <ng-template #loading>
-            <div class="header-title">
-                Weather
-            </div>
+<mat-dialog-content #dialogContent> <ng-container *ngIf="weather"> <ng-container
+            *ngIf="locationName$ | async as locationName; else loading">
+            <div class="header-title"> Weather for {{ locationName }} </div>
+        </ng-container> <ng-template #loading>
+            <div class="header-title"> Weather </div>
         </ng-template>
 
         <div class="day-switch">
@@ -37,7 +31,7 @@
         <!-- CHART VIEW -->
         <div *ngIf="selectedTile">
             <app-weather-detail [tile]="selectedTile" [weather]="weather" [selectedDayIndex]="selectedDayIndex"
-                [selectedHour]="selectedHour" (close)="selectedTile = null">
+                [selectedHour]="selectedHour">
             </app-weather-detail>
         </div>
 
@@ -48,10 +42,24 @@
             </mat-slider>
             <div *ngIf="!selectedTile" class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
         </div>
+
+        <!-- TILE NAVIGATION BUTTONS -->
+        <div *ngIf="selectedTile" class="tile-nav-buttons">
+            <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
+                <mat-icon>chevron_left</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" (click)="selectedTile = null">
+                <mat-icon>close</mat-icon>
+            </button>
+            <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === tiles.length - 1">
+                <mat-icon>chevron_right</mat-icon>
+            </button>
+        </div>
     </ng-container>
 
     <div class="data-source">
         Weather data provided by
         <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
     </div>
+
 </mat-dialog-content>

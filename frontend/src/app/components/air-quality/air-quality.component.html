@@ -40,7 +40,7 @@
         </div>
         <div *ngIf="selectedTile">
             <app-air-quality-detail [tile]="selectedTile" [selectedDayIndex]="selectedDayIndex"
-                [selectedHour]="selectedHour" (close)="selectedTile = null">
+                [selectedHour]="selectedHour">
             </app-air-quality-detail>
         </div>
 
@@ -49,6 +49,22 @@
                 <input matSliderThumb [(ngModel)]="selectedHour">
             </mat-slider>
             <div *ngIf="!selectedTile" class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
+        </div>
+
+        <!-- TILE NAVIGATION BUTTONS -->
+        <div *ngIf="selectedTile" class="tile-nav-buttons">
+            <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
+                <mat-icon>chevron_left</mat-icon>
+            </button>
+
+            <button mat-mini-fab color="primary" (click)="selectedTile = null">
+                <mat-icon>close</mat-icon>
+            </button>
+
+            <button mat-mini-fab color="accent" (click)="selectNextTile()"
+                [disabled]="tileIndex === allKeys.length - 1">
+                <mat-icon>chevron_right</mat-icon>
+            </button>
         </div>
 
         <div *ngIf="!selectedTile" class="category-switch">

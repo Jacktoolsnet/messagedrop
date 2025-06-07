@@ -1,11 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSliderModule } from '@angular/material/slider';
-import { MatTooltipModule } from '@angular/material/tooltip';
 import { CategoryScale, Chart, ChartConfiguration, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
 import { BaseChartDirective } from 'ng2-charts';
@@ -16,10 +12,6 @@ import { BaseChartDirective } from 'ng2-charts';
   imports: [
     CommonModule,
     MatDialogModule,
-    MatButtonModule,
-    MatIconModule,
-    MatTooltipModule,
-    MatSliderModule,
     FormsModule,
     FormsModule,
     BaseChartDirective
@@ -32,7 +24,6 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   @Input() tile!: any;
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
-  @Output() close = new EventEmitter<void>();
   @ViewChild(BaseChartDirective) chartCanvas!: BaseChartDirective;
 
   lineChartType: ChartType = 'line';

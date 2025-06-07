@@ -44,6 +44,8 @@ export class WeatherComponent implements OnInit {
   selectedHour: number = new Date().getHours();
 
   selectedTile: any = null;
+  tileIndex = 0;
+
   locationName$: Observable<string> | undefined;
 
   constructor(
@@ -68,6 +70,21 @@ export class WeatherComponent implements OnInit {
   onTileClick(tile: any): void {
     if (tile.value == null || tile.value === 0) return;
     this.selectedTile = tile;
+    this.tileIndex = this.tiles.findIndex(t => t.type === tile.type);
+  }
+
+  selectPreviousTile(): void {
+    if (this.tileIndex > 0) {
+      this.tileIndex--;
+      this.selectedTile = this.tiles[this.tileIndex];
+    }
+  }
+
+  selectNextTile(): void {
+    if (this.tileIndex < this.tiles.length - 1) {
+      this.tileIndex++;
+      this.selectedTile = this.tiles[this.tileIndex];
+    }
   }
 
   onDayChange(index: number): void {
@@ -292,4 +309,5 @@ export class WeatherComponent implements OnInit {
         return '';
     }
   }
+
 }
