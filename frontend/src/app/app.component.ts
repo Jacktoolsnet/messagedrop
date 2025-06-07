@@ -1075,8 +1075,10 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             data: { weather: weather },
             closeOnNavigation: true,
             minWidth: '90vw',
+            width: '90vw',
             maxWidth: '90vw',
-            minHeight: '20vh',
+            minHeight: '90vh',
+            height: '90vh',
             maxHeight: '90vh',
             hasBackdrop: true,
             autoFocus: false
@@ -1129,8 +1131,10 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             data: { airQuality: airQualityData },
             closeOnNavigation: true,
             minWidth: '90vw',
+            width: '90vw',
             maxWidth: '90vw',
-            minHeight: '20vh',
+            minHeight: '90vh',
+            height: '90vh',
             maxHeight: '90vh',
             hasBackdrop: true,
             autoFocus: false

@@ -1,7 +1,9 @@
-<mat-dialog-content #dialogContent> <ng-container *ngIf="weather"> <ng-container
-            *ngIf="locationName$ | async as locationName; else loading">
+<mat-dialog-content #dialogContent>
+    <ng-container *ngIf="weather">
+        <ng-container *ngIf="locationName$ | async as locationName; else loading">
             <div class="header-title"> Weather for {{ locationName }} </div>
-        </ng-container> <ng-template #loading>
+        </ng-container>
+        <ng-template #loading>
             <div class="header-title"> Weather </div>
         </ng-template>
 
