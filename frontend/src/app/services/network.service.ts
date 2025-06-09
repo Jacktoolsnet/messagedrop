@@ -91,4 +91,55 @@ export class NetworkService {
     return this.online;
   }
 
+  getErrorTitle(status: number): string {
+    switch (status) {
+      case 0: return 'No Connection';
+      case 400: return 'Bad Request';
+      case 401: return 'Unauthorized';
+      case 403: return 'Forbidden';
+      case 404: return 'Not Found';
+      case 408: return 'Request Timeout';
+      case 429: return 'Too Many Requests';
+      case 500: return 'Server Error';
+      case 502: return 'Bad Gateway';
+      case 503: return 'Service Unavailable';
+      case 504: return 'Gateway Timeout';
+      default: return 'Unexpected Error';
+    }
+  }
+
+  getErrorIcon(status: number): string {
+    switch (status) {
+      case 0: return 'wifi_off';             // Kein Internet
+      case 400: return 'error_outline';      // Bad Request
+      case 401: return 'lock';               // Unauthorized
+      case 403: return 'block';              // Forbidden
+      case 404: return 'search_off';         // Not Found
+      case 408: return 'hourglass_empty';    // Timeout
+      case 429: return 'schedule';           // Rate Limit
+      case 500: return 'warning';            // Server Error
+      case 502: return 'cloud_off';          // Bad Gateway
+      case 503: return 'cloud_queue';        // Service Unavailable
+      case 504: return 'hourglass_disabled'; // Gateway Timeout
+      default: return 'error';               // Unbekannter Fehler
+    }
+  }
+
+  getErrorMessage(status: number): string {
+    switch (status) {
+      case 0: return 'Please check your internet connection.';
+      case 400: return 'The request could not be processed.';
+      case 401: return 'You need to sign in to continue.';
+      case 403: return 'You are not allowed to access this resource.';
+      case 404: return 'The requested resource was not found.';
+      case 408: return 'The request took too long to complete.';
+      case 429: return 'You sent too many requests. Please wait a moment.';
+      case 500: return 'An unexpected server error occurred.';
+      case 502: return 'The server received an invalid response.';
+      case 503: return 'The service is temporarily unavailable.';
+      case 504: return 'The server took too long to respond.';
+      default: return 'Something went wrong. Please try again later.';
+    }
+  }
+
 }

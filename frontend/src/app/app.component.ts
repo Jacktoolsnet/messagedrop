@@ -1095,12 +1095,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             closeOnNavigation: false,
             data: {
               showAlways: true,
-              title: err.statusText,
-              image: '',
-              icon: 'hourglass_bottom',
-              message: err.error?.error,
-              button: '',
-              delay: 0,
+              title: this.networkService.getErrorTitle(err.status),
+              icon: this.networkService.getErrorIcon(err.status),
+              message: this.networkService.getErrorMessage(err.status),
               showSpinner: false
             },
             maxWidth: '90vw',
@@ -1146,9 +1143,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           const dialogRef = this.displayMessage.open(DisplayMessage, {
             data: {
               showAlways: true,
-              title: err.statusText || 'Error',
-              icon: 'error',
-              message: err.error?.error || 'Failed to load air quality data.',
+              title: this.networkService.getErrorTitle(err.status),
+              icon: this.networkService.getErrorIcon(err.status),
+              message: this.networkService.getErrorMessage(err.status),
               showSpinner: false
             },
             maxWidth: '90vw',
