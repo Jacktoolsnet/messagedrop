@@ -15,6 +15,15 @@
     margin-bottom: 2rem;
 }
 
+.button_search {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    margin-right: 2rem;
+    margin-bottom: 6rem;
+}
+
 .button_goToLocation {
     position: absolute;
     right: 0;

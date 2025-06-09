@@ -1,8 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
-const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
+const { getCountryCodeFromNominatim, getPlaceFromNominatimText } = require('../utils/nominatimQueue');
 const tableNominatimCache = require('../db/tableNominatimCache');
+const tableGeoSearch = require('../db/tableGeoSearch')
 
 router.get('/:pluscode/:latitude/:longitude', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
@@ -43,7 +44,57 @@ router.get('/:pluscode/:latitude/:longitude', [security.checkToken], async (req,
         });
     } catch (error) {
         response.status = 500;
-        response.error = JSON.stringify(error);
+        response.error = error;
+        return res.status(500).json(response);
+    }
+});
+
+router.get('/search/:searchTerm/:limit', [security.checkToken], async (req, res) => {
+    let response = { status: 0 };
+    const { searchTerm, limit } = req.params;
+    const db = req.database.db;
+
+    try {
+        // 1. Prüfen, ob der Begriff bereits gecacht wurde
+        tableGeoSearch.getGeoSearchResult(db, searchTerm, async (err, cachedRow) => {
+            if (err) {
+                response.status = 500;
+                response.error = 'Database error';
+                return res.status(500).json(response);
+            }
+
+            if (cachedRow) {
+                response.status = 200;
+                response.result = JSON.parse(cachedRow.result);
+                return res.status(200).json(response);
+            }
+
+            try {
+                // 2. Anfrage an Nominatim
+                const result = await getPlaceFromNominatimText(searchTerm, limit);
+
+                if (!result || !Array.isArray(result) || result.length === 0) {
+                    response.status = 404;
+                    response.error = 'No results found';
+                    return res.status(404).json(response);
+                }
+
+                // 3. In den Cache schreiben
+                tableGeoSearch.setGeoSearchResult(db, searchTerm, JSON.stringify(result), () => { });
+
+                response.status = 200;
+                response.result = result;
+                return res.status(200).json(response);
+
+            } catch (err) {
+                response.status = 500;
+                response.error = err.message || err;
+                return res.status(500).json(response);
+            }
+        });
+    } catch (error) {
+        response.status = 500;
+        response.error = error;
         return res.status(500).json(response);
     }
 });

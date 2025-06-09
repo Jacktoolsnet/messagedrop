@@ -35,10 +35,14 @@
     <mat-icon [attr.aria-hidden]="userService.isReady()" class="material-symbols-outlined">wrong_location</mat-icon>
 </button>
 <button *ngIf="networkService.isOnline() && serverService.isReady() &&  placeService.getSelectedPlace().id === ''"
-    [attr.aria-hidden]="!(userService.isReady() && locationReady)" [matMenuTriggerFor]="messageMenu" class="button_drop"
-    mat-fab color="primary" aria-label="Drop a new message" (click)="{}">
-    <mat-icon [attr.aria-hidden]="!(userService.isReady() && locationReady)"
-        class="material-symbols-outlined">menu</mat-icon>
+    [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary"
+    aria-label="Mainmenu" (click)="{}">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">menu</mat-icon>
+</button>
+<button *ngIf="networkService.isOnline() && serverService.isReady() &&  placeService.getSelectedPlace().id === ''"
+    [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab color="primary"
+    aria-label="Search" (click)="{}">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">search</mat-icon>
 </button>
 
 <mat-menu #userMenu="matMenu">
@@ -96,6 +100,13 @@
     <button mat-menu-item (click)="showGeoStatistic()">
         <mat-icon class="material-symbols-outlined">data_exploration</mat-icon>
         <span>Statistic</span>
+    </button>
+</mat-menu>
+
+<mat-menu #searchMenu="matMenu">
+    <button mat-menu-item (click)="{}">
+        <mat-icon class="material-symbols-outlined">travel_explore</mat-icon>
+        <span>Search a place</span>
     </button>
 </mat-menu>
 <router-outlet />

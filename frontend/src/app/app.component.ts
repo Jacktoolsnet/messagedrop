@@ -258,6 +258,8 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
+    // Subscribe for shared content
+    // this.handleSharedContentOrNotification()
   }
 
   public async login() {

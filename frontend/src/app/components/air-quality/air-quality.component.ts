@@ -233,7 +233,7 @@ export class AirQualityComponent implements OnInit {
 
   getLocationName(): void {
     this.locationName$ = this.nominatimService
-      .getAddress(this.mapService.getMapLocation().plusCode, this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude)
+      .getAddressByLocation(this.mapService.getMapLocation())
       .pipe(
         map(res => {
           const addr = res.address;

@@ -362,5 +362,11 @@ cron.schedule('0 0 * * *', () => {
       logger.error(err);
     }
   });
+
+  tableGeoSearch.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
 });
 
