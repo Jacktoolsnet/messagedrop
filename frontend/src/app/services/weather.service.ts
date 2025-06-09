@@ -23,7 +23,6 @@ export class WeatherService {
   ) { }
 
   private handleError(error: HttpErrorResponse) {
-    // Return an observable with a user-facing error message.
     return throwError(() => error);
   }
 

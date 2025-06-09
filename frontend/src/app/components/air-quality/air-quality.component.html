@@ -21,8 +21,7 @@
         <!-- air-quality.component.html -->
         <div *ngIf="!selectedTile">
             <div class="tile-grid">
-                <div class="tile" *ngFor="let tile of tileValues" [style.color]="tile.color"
-                    [matTooltip]="getInfoTooltip(tile.key)" matTooltipPosition="above">
+                <div class="tile" *ngFor="let tile of tileValues" [style.color]="tile.color">
                     <div class="tile-title">{{ tile.label }}</div>
                     <div class="tile-icon-wrapper">
                         <mat-icon class="tile-icon">{{ tile.icon }}</mat-icon>
@@ -31,6 +30,7 @@
                         {{ tile.value }} {{ tile.unit }}
                     </div>
                     <div class="tile-level" *ngIf="tile.levelText">{{ tile.levelText }}</div>
+                    <!--div class="tile-hint" *ngIf="tile.value != 0">{{getInfoTooltip(tile.key)}}</div-->
                     <button *ngIf="tile.value != 0" class="tile-action-button" mat-mini-fab color="primary"
                         (click)="onTileClick(tile);" [matTooltip]="'Show details'">
                         <mat-icon>show_chart</mat-icon>

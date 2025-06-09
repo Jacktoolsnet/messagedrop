@@ -23,8 +23,7 @@ export class AirQualityService {
   ) { }
 
   private handleError(error: HttpErrorResponse) {
-    console.error('AirQualityService error:', error);
-    return throwError(() => new Error('Failed to fetch air quality data.'));
+    return throwError(() => error);
   }
 
   getAirQuality(pluscode: string, latitude: number, longitude: number, days: number): Observable<AirQualityData> {
