@@ -11,6 +11,8 @@ const tablePlace = require('./tablePlace');
 const tableGeoStatistic = require('./tableGeoStatistic');
 const tableWeatherHistory = require('./tableWeatherHistory');
 const tableAirQuality = require('./tableAirQuality');
+const tableNominatimCache = require('./tableNominatimCache');
+const tableWeather = require('./tableWeather');
 
 class Database {
 
@@ -39,6 +41,8 @@ class Database {
         tableGeoStatistic.init(this.db);
         tableWeatherHistory.init(this.db);
         tableAirQuality.init(this.db);
+        tableNominatimCache.init(this.db);
+        tableWeather.init(this.db);
         logger.info('Connected to the messagedrop SQlite database.');
       }
     });

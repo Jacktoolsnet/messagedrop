@@ -331,7 +331,20 @@ cron.schedule('*/5 * * * *', () => {
   });
 });
 
+// Clean cached data.
 cron.schedule('0 0 * * *', () => {
+  tableAirQuality.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableWeather.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
   tableGeoStatistic.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
@@ -343,4 +356,11 @@ cron.schedule('0 0 * * *', () => {
       logger.error(err);
     }
   });
+
+  tableNominatimCache.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
 });
+

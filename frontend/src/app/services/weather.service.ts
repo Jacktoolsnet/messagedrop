@@ -26,8 +26,8 @@ export class WeatherService {
     return throwError(() => error);
   }
 
-  getWeather(locale: string, latitude: number, longitude: number, days: number): Observable<Weather> {
-    const url = `${environment.apiUrl}/weather/${locale}/${latitude}/${longitude}/${days}`;
+  getWeather(locale: string, pluscode: string, latitude: number, longitude: number, days: number): Observable<Weather> {
+    const url = `${environment.apiUrl}/weather/${locale}/${pluscode}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: true,
       title: 'Weather service',

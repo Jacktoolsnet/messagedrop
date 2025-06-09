@@ -2,21 +2,49 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
+const tableNominatimCache = require('../db/tableNominatimCache');
 
-router.get('/:latitude/:longitude', [security.checkToken], async (req, res) => {
+router.get('/:pluscode/:latitude/:longitude', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
+    const { pluscode, latitude, longitude } = req.params;
+    const db = req.database.db;
+
     try {
-        const { latitude, longitude } = req.params;
+        // 1. Prüfen ob Cache vorhanden ist
+        tableNominatimCache.getNominatimCache(db, pluscode, async (err, cachedRow) => {
+            if (err) {
+                response.status = 500;
+                response.error = 'Database error';
+                return res.status(500).json(response);
+            }
 
-        const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
+            if (undefined != cachedRow) {
+                response.status = 200;
+                response.address = JSON.parse(cachedRow.address);
+                return res.status(200).json(response);
+            }
 
-        response.status = 200;
-        response.address = nominatimData.address;
-        res.status(200).json(response);
-    } catch (err) {
-        response.status = err.response?.status || 500;
-        response.error = err.response?.data || 'Request failed';
-        res.status(response.status).json(response);
+            // 2. Fallback: Request an Nominatim
+            try {
+                const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
+                const address = nominatimData.address;
+                response.status = 200;
+                response.address = address;
+
+                // 3. Ergebnis in Cache speichern
+                tableNominatimCache.setNominatimCache(db, pluscode, JSON.stringify(address), (err) => { });
+
+                return res.status(200).json(response);
+            } catch (err) {
+                response.status = 500;
+                response.error = err;
+                return res.status(response.status).json(response);
+            }
+        });
+    } catch (error) {
+        response.status = 500;
+        response.error = JSON.stringify(error);
+        return res.status(500).json(response);
     }
 });
 

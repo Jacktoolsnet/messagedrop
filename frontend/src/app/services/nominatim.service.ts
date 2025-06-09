@@ -27,8 +27,8 @@ export class NominatimService {
     return throwError(() => error);
   }
 
-  getAddress(latitude: number, longitude: number): Observable<GetNominatimAddressResponse> {
-    const url = `${environment.apiUrl}/nominatim/${latitude}/${longitude}`;
+  getAddress(pluscode: string, latitude: number, longitude: number): Observable<GetNominatimAddressResponse> {
+    const url = `${environment.apiUrl}/nominatim/${pluscode}/${latitude}/${longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
       title: 'Nominatim service',

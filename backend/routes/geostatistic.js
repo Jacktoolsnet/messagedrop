@@ -20,12 +20,13 @@ async function getWorldBankIndicator(countryAlpha3, indicator, years) {
         }));
 }
 
-router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, res) => {
+router.get('/:pluscode/:latitude/:longitude/:years', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
     const db = req.database.db;
 
     try {
-        const { latitude, longitude, years } = req.params;
+        const { pluscode, latitude, longitude, years } = req.params;
+
         const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
         const address = nominatimData.address;
         const countryAlpha2 = address?.country_code?.toUpperCase();
@@ -152,7 +153,8 @@ router.get('/:latitude/:longitude/:years', [security.checkToken], async (req, re
             });
         }
 
-        const cacheKey = `${latitude}_${longitude}_${years}`;
+        const reducedPluscode = pluscode.substring(0, 8); // ≈100m Genauigkeit
+        const cacheKey = `${reducedPluscode}`;
         let weatherHistoryData = await new Promise((resolve, reject) => {
             tableWeatherHistory.getHistoryData(db, cacheKey, (err, row) => {
                 if (err) return reject(err);

@@ -11,18 +11,16 @@ router.get('/:pluscode/:latitude/:longitude/:days', [security.checkToken], async
 
     try {
         const reducedPluscode = pluscode.substring(0, 8); // ≈100m Genauigkeit
-        const cacheKey = `${reducedPluscode}_${days}`;
+        const cacheKey = `${reducedPluscode}`;
 
         airQualityCache.getAirQualityData(db, cacheKey, async (err, row) => {
             if (err) {
-                console.error('DB read error:', err);
                 response.status = 500;
-                response.error = 'Database read error';
+                response.error = err;
                 return res.status(response.status).json(response);
             }
 
             if (row) {
-                console.log('Serving air quality data from cache');
                 response.status = 200;
                 response.data = JSON.parse(row.airQualityData);
                 return res.status(200).json(response);
@@ -44,7 +42,6 @@ router.get('/:pluscode/:latitude/:longitude/:days', [security.checkToken], async
             ].join(',');
 
             const openMeteoUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&forecast_days=${days}&hourly=${hourlyParams}&timezone=auto`;
-            console.log('Fetching air quality data from Open-Meteo:', openMeteoUrl);
 
             try {
                 const apiResult = await axios.get(openMeteoUrl);

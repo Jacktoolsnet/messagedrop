@@ -1065,6 +1065,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.weatherService
       .getWeather(
         this.userService.getUser().language?.slice(0, 2) || 'de',
+        this.mapService.getMapLocation().plusCode,
         this.mapService.getMapLocation().latitude,
         this.mapService.getMapLocation().longitude,
         3
@@ -1161,6 +1162,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   public showGeoStatistic() {
     this.geoStatisticService
       .getDataForLocation(
+        this.mapService.getMapLocation().plusCode,
         this.mapService.getMapLocation().latitude,
         this.mapService.getMapLocation().longitude,
         10
