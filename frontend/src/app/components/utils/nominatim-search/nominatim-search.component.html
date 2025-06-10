@@ -1,0 +1,18 @@
+<div class="searchTerm-container">
+    <input type="text" [formControl]="searchterm" placeholder="Search in Tenor">
+    <button
+        *ngIf="(nextSearch === '' && searchterm.value !== '' || searchterm.value != lastSearchterm) || searchterm.value === ''"
+        (click)="search()">
+        <mat-icon>search</mat-icon>
+    </button>
+    <button *ngIf="nextSearch !== '' && searchterm.value !== '' && searchterm.value === lastSearchterm"
+        (click)="search()">
+        <mat-icon>arrow_circle_right</mat-icon>
+    </button>
+</div>
+<mat-dialog-content class="full-width">
+    <div *ngIf="results">
+        <div *ngFor="let result of results">
+        </div>
+    </div>
+</mat-dialog-content>

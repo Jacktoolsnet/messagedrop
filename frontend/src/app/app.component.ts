@@ -27,6 +27,7 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
+import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { CreateUserResponse } from './interfaces/create-user-response';
@@ -40,6 +41,7 @@ import { Message } from './interfaces/message';
 import { Mode } from './interfaces/mode';
 import { Multimedia } from './interfaces/multimedia';
 import { MultimediaType } from './interfaces/multimedia-type';
+import { NominatimPlace } from './interfaces/nominatim-place';
 import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
@@ -133,6 +135,7 @@ export class AppComponent implements OnInit {
     public userProfileDialog: MatDialog,
     public displayMessage: MatDialog,
     public sharedContentDialog: MatDialog,
+    public nominatimSearchDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
@@ -1243,6 +1246,25 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe(() => {
       // Optional: Aktionen nach Schließen
+    });
+  }
+
+  public showNominatimSearchDialog() {
+    const dialogRef = this.nominatimSearchDialog.open(NominatimSearchComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe((nominatimPlace: NominatimPlace) => {
+
     });
   }
 
