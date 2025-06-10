@@ -85,6 +85,9 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
         const temps = dayHourly.map(h => h.temperature);
         const minTemp = Math.min(...temps);
         const maxTemp = Math.max(...temps);
+        const { min, max } = this.getHourlyMinMax('temperature');
+        minY = min - 1;
+        maxY = max + 1;
         dataset = {
           ...dataset,
           data: temps,
@@ -151,6 +154,9 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       }
       case 'precipitation': {
         const precipitation = dayHourly.map(h => h.precipitation);
+        const { min, max } = this.getHourlyMinMax('precipitation');
+        minY = min - 1;
+        maxY = max + 1;
         dataset = {
           ...dataset,
           data: precipitation,
@@ -163,6 +169,9 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       }
       case 'wind': {
         const winds = dayHourly.map(h => h.wind);
+        const { min, max } = this.getHourlyMinMax('wind');
+        minY = min - 1;
+        maxY = max + 1;
         dataset = {
           ...dataset,
           data: winds,
@@ -176,6 +185,9 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       }
       case 'pressure': {
         const pressures = dayHourly.map(h => h.pressure);
+        const { min, max } = this.getHourlyMinMax('pressure');
+        minY = min - 1;
+        maxY = max + 1;
         dataset = {
           ...dataset,
           data: pressures,
@@ -445,5 +457,20 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
     }
 
     chart.update('none');
+  }
+
+  getHourlyMinMax(field: 'temperature' | 'precipitation' | 'wind' | 'pressure'): { min: number, max: number } {
+    if (!this.weather || !this.weather.hourly) return { min: 0, max: 0 };
+
+    const values = this.weather.hourly
+      .map(h => h[field])
+      .filter(v => typeof v === 'number');
+
+    if (values.length === 0) return { min: 0, max: 0 };
+
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+
+    return { min, max };
   }
 }

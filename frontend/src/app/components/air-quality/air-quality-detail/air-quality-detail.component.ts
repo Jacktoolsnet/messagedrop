@@ -62,6 +62,9 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
     const dayValues = this.tile.values.slice(start, end);
     const dayLabels = this.tile.time.slice(start, end).map((t: string) => t.slice(11));
 
+    const globalMin = Math.min(...this.tile.values);
+    const globalMax = Math.max(...this.tile.values);
+
     this.chartData = {
       labels: dayLabels,
       datasets: [{
@@ -152,6 +155,8 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
         },
         y: {
           beginAtZero: true,
+          min: globalMin,
+          max: globalMax,
           title: {
             display: true,
             text: this.tile.unit,
