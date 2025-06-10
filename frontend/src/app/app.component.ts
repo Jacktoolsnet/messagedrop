@@ -258,8 +258,6 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
-    // Subscribe for shared content
-    // this.handleSharedContentOrNotification()
   }
 
   public async login() {
@@ -530,6 +528,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           this.userService.createUser().subscribe({
             next: (createUserResponse: CreateUserResponse) => {
               this.userService.initUser(this.userSubject, createUserResponse, getPinHashResponse.pinHash);
+              // Subscribe for shared content
+              this.handleSharedContentOrNotification()
             },
             error: (err) => { },
             complete: () => { }
@@ -582,6 +582,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user);
+                    // Subscribe for shared content
+                    this.handleSharedContentOrNotification()
                   },
                   error: (err) => {
                     if (err.status === 401) {

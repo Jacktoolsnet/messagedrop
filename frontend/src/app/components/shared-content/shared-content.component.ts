@@ -36,8 +36,8 @@ export class SharedContentComponent implements OnInit {
 
   public async ngOnInit(): Promise<void> {
     if (this.data.location) {
-      this.countdown = 10;
-      this.mapService.flyToWithZoom(this.data.location, 19);
+      this.countdown = 1;
+      this.mapService.moveToWithZoom(this.data.location, 17);
     }
 
     this.countdownInterval = setInterval(() => {
