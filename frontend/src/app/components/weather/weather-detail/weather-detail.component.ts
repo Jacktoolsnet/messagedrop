@@ -335,7 +335,6 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   private getSelectedChartUnit(): string {
-    console.log(this.tile.type)
     switch (this.tile.type) {
       case 'temperature': return '°C';
       case 'precipitationprobability': return '%';

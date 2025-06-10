@@ -5,7 +5,7 @@ const { getCountryCodeFromNominatim, getPlaceFromNominatimText } = require('../u
 const tableNominatimCache = require('../db/tableNominatimCache');
 const tableGeoSearch = require('../db/tableGeoSearch')
 
-router.get('/:pluscode/:latitude/:longitude', [security.checkToken], async (req, res) => {
+router.get('/countryCode/:pluscode/:latitude/:longitude', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
     const { pluscode, latitude, longitude } = req.params;
     const db = req.database.db;

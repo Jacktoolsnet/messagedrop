@@ -1,3 +1,13 @@
+.messageDropDialog .mat-dialog-container {
+    padding: 0rem;
+}
+
+.mat-mdc-dialog-content {
+    padding: 0px !important;
+    max-height: none;
+    height: 90%;
+}
+
 .full-width {
     width: 100%;
     height: 100%;
@@ -21,11 +31,20 @@
     align-items: center;
 }
 
+.searchTerm-container select {
+    height: 2.65rem;
+    padding: 0 0.75rem;
+    font-size: 1rem;
+    background: gray;
+    color: white;
+    min-width: 7rem;
+}
+
 .searchTerm-container button {
     color: white;
     background-color: gray;
     border: none;
     padding: 8px 12px;
     cursor: pointer;
-    height: 2.5rem;
+    height: 2.65rem;
 }

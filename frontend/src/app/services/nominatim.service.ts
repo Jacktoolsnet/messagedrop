@@ -30,7 +30,7 @@ export class NominatimService {
   }
 
   getAddressByLocation(location: Location): Observable<GetNominatimAddressResponse> {
-    const url = `${environment.apiUrl}/nominatim/${location.plusCode}/${location.latitude}/${location.longitude}`;
+    const url = `${environment.apiUrl}/nominatim/countryCode/${location.plusCode}/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
       title: 'Nominatim service',

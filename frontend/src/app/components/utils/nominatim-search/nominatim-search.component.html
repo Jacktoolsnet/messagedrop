@@ -1,18 +1,17 @@
 <div class="searchTerm-container">
-    <input type="text" [formControl]="searchterm" placeholder="Search in Tenor">
-    <button
-        *ngIf="(nextSearch === '' && searchterm.value !== '' || searchterm.value != lastSearchterm) || searchterm.value === ''"
-        (click)="search()">
+    <input type="text" [formControl]="searchterm" placeholder="Search in OpenStreetMap">
+    <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
+        <option *ngFor="let r of radiusOptions" [value]="r.value">
+            {{ r.label }}
+        </option>
+    </select>
+    <button (click)="search()">
         <mat-icon>search</mat-icon>
-    </button>
-    <button *ngIf="nextSearch !== '' && searchterm.value !== '' && searchterm.value === lastSearchterm"
-        (click)="search()">
-        <mat-icon>arrow_circle_right</mat-icon>
     </button>
 </div>
 <mat-dialog-content class="full-width">
-    <div *ngIf="results">
-        <div *ngFor="let result of results">
+    <div *ngIf="nominatimPlaces" class="gallery">
+        <div *ngFor="let nominatimPlace of nominatimPlaces">
         </div>
     </div>
 </mat-dialog-content>

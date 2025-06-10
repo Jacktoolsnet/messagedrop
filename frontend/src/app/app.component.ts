@@ -558,7 +558,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
-      console.log('Pin entered: ', data);
       if (data === 'reset') {
         let cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
         if (cryptedUser) {
@@ -1253,9 +1252,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.nominatimSearchDialog.open(NominatimSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: {},
+      data: { location: this.mapService.getMapLocation() },
       minWidth: '20vw',
+      width: '90vw',
       maxWidth: '90vw',
+      height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true,
       autoFocus: false
