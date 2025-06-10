@@ -67,4 +67,56 @@ export class NominatimService {
       catchError(this.handleError)
     );
   }
+
+  getAddressBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 1, boxSize = 0.5): Observable<NominatimPlace[]> {
+    const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
+    const encodedTerm = encodeURIComponent(searchTerm);
+    const encodedViewbox = encodeURIComponent(viewbox);
+    const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}/${encodedViewbox}`;
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
+      title: 'Searching location',
+      image: '',
+      icon: '',
+      message: `Searching for "${searchTerm}" near your location`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    return this.http.get<NominatimPlace[]>(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getAddressBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 1, boxSize = 0.5): Observable<NominatimPlace[]> {
+    const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
+    const encodedTerm = encodeURIComponent(searchTerm);
+    const encodedViewbox = encodeURIComponent(viewbox);
+    const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}/${encodedViewbox}/${bounded}`;
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
+      title: 'Searching location',
+      image: '',
+      icon: '',
+      message: `Searching for "${searchTerm}" in defined area`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    return this.http.get<NominatimPlace[]>(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private calculateViewbox(lat: number, lon: number, size: number): string {
+    const minLon = lon - size;
+    const maxLon = lon + size;
+    const minLat = lat - size;
+    const maxLat = lat + size;
+    return `${minLon},${maxLat},${maxLon},${minLat}`;
+  }
 }

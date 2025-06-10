@@ -99,4 +99,106 @@ router.get('/search/:searchTerm/:limit', [security.checkToken], async (req, res)
     }
 });
 
+router.get('/search/:searchTerm/:limit/:viewbox', [security.checkToken], async (req, res) => {
+    let response = { status: 0 };
+    const { searchTerm, limit, viewbox } = req.params;
+    const db = req.database.db;
+    const cacheKey = `${searchTerm}_${viewbox}`
+
+    try {
+        // 1. Prüfen, ob bereits gecacht
+        tableGeoSearch.getGeoSearchResult(db, cacheKey, async (err, cachedRow) => {
+            if (err) {
+                response.status = 500;
+                response.error = 'Database error';
+                return res.status(500).json(response);
+            }
+            if (cachedRow) {
+                response.status = 200;
+                response.result = JSON.parse(cachedRow.result);
+                return res.status(200).json(response);
+            }
+
+            try {
+                // 2. Viewbox optional verwenden
+                const options = { viewbox };
+
+                const result = await getPlaceFromNominatimText(searchTerm, limit, options);
+
+                if (!result || !Array.isArray(result) || result.length === 0) {
+                    response.status = 404;
+                    response.error = 'No results found';
+                    return res.status(404).json(response);
+                }
+
+                // 3. Cache schreiben
+                tableGeoSearch.setGeoSearchResult(db, cacheKey, JSON.stringify(result), () => { });
+                response.status = 200;
+                response.result = result;
+                return res.status(200).json(response);
+
+            } catch (err) {
+                response.status = 500;
+                response.error = err.message || err;
+                return res.status(500).json(response);
+            }
+        });
+    } catch (error) {
+        response.status = 500;
+        response.error = error;
+        return res.status(500).json(response);
+    }
+});
+
+router.get('/search/:searchTerm/:limit/:viewbox/:bounded', [security.checkToken], async (req, res) => {
+    let response = { status: 0 };
+    const { searchTerm, limit, viewbox, bounded } = req.params;
+    const db = req.database.db;
+    const cacheKey = `${searchTerm}_${viewbox}_${bounded}`
+
+    try {
+        // 1. Prüfen, ob bereits gecacht
+        tableGeoSearch.getGeoSearchResult(db, cacheKey, async (err, cachedRow) => {
+            if (err) {
+                response.status = 500;
+                response.error = 'Database error';
+                return res.status(500).json(response);
+            }
+            if (cachedRow) {
+                response.status = 200;
+                response.result = JSON.parse(cachedRow.result);
+                return res.status(200).json(response);
+            }
+
+            try {
+                // 2. Viewbox optional verwenden
+                const options = { viewbox, bounded };
+
+                const result = await getPlaceFromNominatimText(searchTerm, limit, options);
+
+                if (!result || !Array.isArray(result) || result.length === 0) {
+                    response.status = 404;
+                    response.error = 'No results found';
+                    return res.status(404).json(response);
+                }
+
+                // 3. Cache schreiben
+                tableGeoSearch.setGeoSearchResult(db, cacheKey, JSON.stringify(result), () => { });
+                response.status = 200;
+                response.result = result;
+                return res.status(200).json(response);
+
+            } catch (err) {
+                response.status = 500;
+                response.error = err.message || err;
+                return res.status(500).json(response);
+            }
+        });
+    } catch (error) {
+        response.status = 500;
+        response.error = error;
+        return res.status(500).json(response);
+    }
+});
+
 module.exports = router;
