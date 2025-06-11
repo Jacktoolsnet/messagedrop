@@ -9,9 +9,25 @@
         <mat-icon>search</mat-icon>
     </button>
 </div>
-<mat-dialog-content class="full-width">
-    <div *ngIf="nominatimPlaces" class="gallery">
-        <div *ngFor="let nominatimPlace of nominatimPlaces">
+<div class="content">
+    <mat-card class="item" *ngFor="let place of nominatimPlaces; index as i">
+        <div class="avatar-box">
+            <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
+            <span *ngIf="place.name" class="name">{{ place.name }}</span>
         </div>
-    </div>
-</mat-dialog-content>
+        <mat-card-content>
+            <div class="tile-value address-text">
+                {{ getFormattedAddress(place) }}
+            </div>
+            <div class="tile-severity" *ngIf="place.distance !== undefined">
+                Distance: {{ formatDistance(place.distance) }}
+            </div>
+        </mat-card-content>
+        <!--mat-card-actions class="buttonbar">
+                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to message"
+                    (click)="{}">
+                    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">place</mat-icon>
+                </button>
+            </mat-card-actions-->
+    </mat-card>
+</div>

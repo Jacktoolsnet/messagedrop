@@ -48,7 +48,7 @@ export class NominatimService {
       );
   }
 
-  getAddressBySearchTerm(searchTerm: string, limit = 1): Observable<NominatimPlace[]> {
+  getAddressBySearchTerm(searchTerm: string, limit = 100): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const encodedTerm = encodeURIComponent(searchTerm);
     const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}`;
 
@@ -63,17 +63,16 @@ export class NominatimService {
       showSpinner: true
     });
 
-    return this.http.get<NominatimPlace[]>(url, this.httpOptions).pipe(
+    return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
       catchError(this.handleError)
     );
   }
 
-  getAddressBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 1, boxSize = 0.5): Observable<NominatimPlace[]> {
+  getAddressBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
-    const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}/${encodedViewbox}`;
-
+    const url = `${environment.apiUrl}/nominatim/noboundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
       title: 'Searching location',
@@ -85,16 +84,16 @@ export class NominatimService {
       showSpinner: true
     });
 
-    return this.http.get<NominatimPlace[]>(url, this.httpOptions).pipe(
+    return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
       catchError(this.handleError)
     );
   }
 
-  getAddressBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 1, boxSize = 0.5): Observable<NominatimPlace[]> {
+  getAddressBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 100, boxSize = 5000): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
-    const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}/${encodedViewbox}/${bounded}`;
+    const url = `${environment.apiUrl}/nominatim/boundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
@@ -107,16 +106,22 @@ export class NominatimService {
       showSpinner: true
     });
 
-    return this.http.get<NominatimPlace[]>(url, this.httpOptions).pipe(
+    return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
       catchError(this.handleError)
     );
   }
 
-  private calculateViewbox(lat: number, lon: number, size: number): string {
-    const minLon = lon - size;
-    const maxLon = lon + size;
-    const minLat = lat - size;
-    const maxLat = lat + size;
+  private calculateViewbox(lat: number, lon: number, radiusMeters: number): string {
+    const earthRadius = 6378137; // in Metern (WGS84)
+
+    const deltaLat = (radiusMeters / earthRadius) * (180 / Math.PI);
+    const deltaLon = (radiusMeters / (earthRadius * Math.cos(Math.PI * lat / 180))) * (180 / Math.PI);
+
+    const minLat = lat - deltaLat;
+    const maxLat = lat + deltaLat;
+    const minLon = lon - deltaLon;
+    const maxLon = lon + deltaLon;
+
     return `${minLon},${maxLat},${maxLon},${minLat}`;
   }
 }

@@ -40,7 +40,6 @@ async function processQueue() {
             if (job.options?.bounded) {
                 params.bounded = job.options.bounded;
             }
-
             result = await axios.get('https://nominatim.openstreetmap.org/search', {
                 params,
                 headers: {
@@ -64,7 +63,6 @@ function getCountryCodeFromNominatim(lat, lon) {
 
 function getPlaceFromNominatimText(text, limit = 1, options = {}) {
     return new Promise((resolve, reject) => {
-        console.log('yyy')
         queue.push({ type: 'search', text, limit, options, resolve, reject });
         if (!interval) interval = setInterval(processQueue, 1000);
     });

@@ -65,7 +65,7 @@ router.get('/search/:searchTerm/:limit', [security.checkToken], async (req, res)
 
             if (cachedRow) {
                 response.status = 200;
-                response.result = JSON.parse(cachedRow.result);
+                response.result = JSON.parse(cachedRow);
                 return res.status(200).json(response);
             }
 
@@ -99,11 +99,11 @@ router.get('/search/:searchTerm/:limit', [security.checkToken], async (req, res)
     }
 });
 
-router.get('/search/:searchTerm/:limit/:viewbox', [security.checkToken], async (req, res) => {
+router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
     const { searchTerm, limit, viewbox } = req.params;
     const db = req.database.db;
-    const cacheKey = `${searchTerm}_${viewbox}`
+    const cacheKey = `${searchTerm}_${viewbox}_nobounded`
 
     try {
         // 1. Prüfen, ob bereits gecacht
@@ -115,7 +115,7 @@ router.get('/search/:searchTerm/:limit/:viewbox', [security.checkToken], async (
             }
             if (cachedRow) {
                 response.status = 200;
-                response.result = JSON.parse(cachedRow.result);
+                response.result = JSON.parse(cachedRow);
                 return res.status(200).json(response);
             }
 
@@ -150,11 +150,11 @@ router.get('/search/:searchTerm/:limit/:viewbox', [security.checkToken], async (
     }
 });
 
-router.get('/search/:searchTerm/:limit/:viewbox/:bounded', [security.checkToken], async (req, res) => {
+router.get('/boundedsearch/:searchTerm/:limit/:viewbox', [security.checkToken], async (req, res) => {
     let response = { status: 0 };
-    const { searchTerm, limit, viewbox, bounded } = req.params;
+    const { searchTerm, limit, viewbox } = req.params;
     const db = req.database.db;
-    const cacheKey = `${searchTerm}_${viewbox}_${bounded}`
+    const cacheKey = `${searchTerm}_${viewbox}_bounded`
 
     try {
         // 1. Prüfen, ob bereits gecacht
@@ -166,13 +166,13 @@ router.get('/search/:searchTerm/:limit/:viewbox/:bounded', [security.checkToken]
             }
             if (cachedRow) {
                 response.status = 200;
-                response.result = JSON.parse(cachedRow.result);
+                response.result = JSON.parse(cachedRow);
                 return res.status(200).json(response);
             }
 
             try {
                 // 2. Viewbox optional verwenden
-                const options = { viewbox, bounded };
+                const options = { viewbox, bounded: 1 };
 
                 const result = await getPlaceFromNominatimText(searchTerm, limit, options);
 

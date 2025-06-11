@@ -8,11 +8,6 @@
     height: 90%;
 }
 
-.full-width {
-    width: 100%;
-    height: 100%;
-}
-
 .searchTerm-container {
     display: flex;
     border: 1px solid gray;
@@ -47,4 +42,93 @@
     padding: 8px 12px;
     cursor: pointer;
     height: 2.65rem;
+}
+
+/* === CONTENT === */
+.content {
+    padding: 1rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    white-space: normal;
+}
+
+/* === RESPONSIVES GRID === */
+@media (min-width: 500px) {
+    .content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (min-width: 1000px) {
+    .content {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+@media (min-width: 1500px) {
+    .content {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (min-width: 2000px) {
+    .content {
+        grid-template-columns: repeat(8, 1fr);
+    }
+}
+
+
+/* === ITEM DARSTELLUNG (Karten / Elemente) === */
+.item {
+    margin: 0.75rem;
+    margin-top: 2.25rem;
+    border-radius: 0.75rem;
+    color: white;
+    border: 0.1rem solid #f8f8f8e9;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+}
+
+/* === AVATAR + NAME BOX === */
+.avatar-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    margin-top: -2rem;
+    margin-left: -1.5rem;
+    max-width: 90%;
+    height: 3rem;
+    padding: 0.25rem 0.75rem;
+    background-color: #2a2a2a;
+    border-radius: 1.5rem;
+    border: 0.1rem solid #f8f8f8e9;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+    color: white;
+}
+
+.name {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #f8f8f8;
+    max-width: 10rem;
+}
+
+/* === MESSAGE CONTENT === */
+.message-content {
+    font-size: 0.9rem;
+    color: #f8f8f8;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.address-text {
+    margin-top: 2.25rem;
+    white-space: pre-line;
 }
