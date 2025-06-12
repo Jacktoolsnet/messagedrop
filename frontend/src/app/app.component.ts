@@ -1248,11 +1248,12 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
   }
 
-  public showNominatimSearchDialog() {
+  async showNominatimSearchDialog() {
+    let searchValues: string = await this.indexedDbService.getSetting('nominatimSearch');
     const dialogRef = this.nominatimSearchDialog.open(NominatimSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { location: this.mapService.getMapLocation() },
+      data: { location: this.mapService.getMapLocation(), searchValues: undefined != searchValues ? JSON.parse(searchValues) : undefined },
       minWidth: '20vw',
       width: '90vw',
       maxWidth: '90vw',
@@ -1264,8 +1265,26 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterOpened().subscribe(e => { });
 
-    dialogRef.afterClosed().subscribe((nominatimPlace: NominatimPlace) => {
-
+    dialogRef.afterClosed().subscribe((result: {
+      action: string,
+      selectedPlace: NominatimPlace;
+      searchValues: {
+        searchterm: string,
+        selectedRadius: number,
+        nominatimPlaces: NominatimPlace[]
+      }
+    }) => {
+      if (result) {
+        this.indexedDbService.setSetting('nominatimSearch', JSON.stringify(result.searchValues));
+        switch (result.action) {
+          case 'saveSearch':
+            this.indexedDbService.setSetting('nominatimSelectedPlace', JSON.stringify(result.selectedPlace));
+            break;
+        }
+      } else {
+        this.indexedDbService.deleteSetting('nominatimSelectedPlace')
+        this.indexedDbService.deleteSetting('nominatimSearch')
+      }
     });
   }
 

@@ -32,7 +32,7 @@ export class NominatimService {
   getAddressByLocation(location: Location): Observable<GetNominatimAddressResponse> {
     const url = `${environment.apiUrl}/nominatim/countryCode/${location.plusCode}/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: true,
       title: 'Nominatim service',
       image: '',
       icon: '',
@@ -53,7 +53,7 @@ export class NominatimService {
     const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}`;
 
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: true,
       title: 'Searching location',
       image: '',
       icon: '',
@@ -74,7 +74,7 @@ export class NominatimService {
     const encodedViewbox = encodeURIComponent(viewbox);
     const url = `${environment.apiUrl}/nominatim/noboundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: true,
       title: 'Searching location',
       image: '',
       icon: '',
@@ -96,7 +96,7 @@ export class NominatimService {
     const url = `${environment.apiUrl}/nominatim/boundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
 
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: true,
       title: 'Searching location',
       image: '',
       icon: '',
@@ -123,5 +123,25 @@ export class NominatimService {
     const maxLon = lon + deltaLon;
 
     return `${minLon},${maxLat},${maxLon},${minLat}`;
+  }
+
+  navigateToNominatimPlace(place: NominatimPlace) {
+    const address = place.address;
+
+    // Prüfe auf sinnvolle Adressbestandteile
+    if (address?.road && (address.house_number || address.postcode || address.city)) {
+      const parts = [
+        address.road,
+        address.house_number,
+        address.postcode,
+        address.city,
+        address.country,
+      ].filter(Boolean); // entfernt undefined/null
+      const query = encodeURIComponent(parts.join(', '));
+      window.open(`https://www.google.com/maps/search/?api=1&query=${query}`, '_blank');
+    } else {
+      // Fallback: Koordinaten
+      window.open(`https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lon}`, '_blank');
+    }
   }
 }

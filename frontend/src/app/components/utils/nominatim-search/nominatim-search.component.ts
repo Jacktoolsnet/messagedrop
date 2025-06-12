@@ -13,6 +13,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
+import { GeolocationService } from '../../../services/geolocation.service';
+import { MapService } from '../../../services/map.service';
 import { NominatimService } from '../../../services/nominatim.service';
 
 @Component({
@@ -53,10 +55,25 @@ export class NominatimSearchComponent {
   nominatimPlaces: NominatimPlace[] = [];
 
   constructor(
-    private nominatimService: NominatimService,
+    public nominatimService: NominatimService,
+    private geolocationService: GeolocationService,
+    private mapService: MapService,
     public dialogRef: MatDialogRef<NominatimSearchComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { location: Location }
-  ) { }
+    @Inject(MAT_DIALOG_DATA) public data: {
+      location: Location,
+      searchValues: {
+        searchterm: string,
+        selectedRadius: number,
+        nominatimPlaces: NominatimPlace[]
+      }
+    }
+  ) {
+    if (data.searchValues) {
+      this.searchterm.setValue(data.searchValues.searchterm);
+      this.selectedRadius = data.searchValues.selectedRadius;
+      this.nominatimPlaces = data.searchValues.nominatimPlaces;
+    }
+  }
 
   ngOnInit(): void { }
 
@@ -198,5 +215,26 @@ export class NominatimSearchComponent {
     }).format(distance >= 1000 ? distance / 1000 : distance);
 
     return `${formattedDistance} ${distance >= 1000 ? 'km' : 'm'}`;
+  }
+
+  public flyTo(place: NominatimPlace) {
+    let location: Location = {
+      latitude: parseFloat(place.lat),
+      longitude: parseFloat(place.lon),
+      plusCode: this.geolocationService.getPlusCode(parseFloat(place.lat), parseFloat(place.lon))
+    }
+    this.mapService.setCircleMarker(location);
+    this.mapService.setDrawCircleMarker(true);
+    this.mapService.flyToWithZoom(location, 18);
+    let result = {
+      action: 'saveSearch',
+      selectedPlace: place,
+      searchValues: {
+        searchterm: this.searchterm.value?.trim() || '',
+        selectedRadius: this.selectedRadius,
+        nominatimPlaces: this.nominatimPlaces
+      }
+    };
+    this.dialogRef.close(result);
   }
 }

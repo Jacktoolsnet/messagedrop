@@ -23,11 +23,15 @@
                 Distance: {{ formatDistance(place.distance) }}
             </div>
         </mat-card-content>
-        <!--mat-card-actions class="buttonbar">
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to message"
-                    (click)="{}">
-                    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">place</mat-icon>
-                </button>
-            </mat-card-actions-->
+        <mat-card-actions class="buttonbar">
+            <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
+                (click)="flyTo(place)">
+                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">place</mat-icon>
+            </button>
+            <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Navigate to place"
+                (click)="nominatimService.navigateToNominatimPlace(place)">
+                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">assistant_direction</mat-icon>
+            </button>
+        </mat-card-actions>
     </mat-card>
 </div>
