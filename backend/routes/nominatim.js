@@ -21,19 +21,18 @@ router.get('/countryCode/:pluscode/:latitude/:longitude', [security.checkToken],
 
             if (undefined != cachedRow) {
                 response.status = 200;
-                response.address = JSON.parse(cachedRow.address);
+                response.nominatimPlace = JSON.parse(cachedRow.nominatimPlace);
                 return res.status(200).json(response);
             }
 
             // 2. Fallback: Request an Nominatim
             try {
-                const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
-                const address = nominatimData.address;
+                const nominatimPlace = await getCountryCodeFromNominatim(latitude, longitude);
                 response.status = 200;
-                response.address = address;
+                response.nominatimPlace = nominatimPlace;
 
                 // 3. Ergebnis in Cache speichern
-                tableNominatimCache.setNominatimCache(db, pluscode, JSON.stringify(address), (err) => { });
+                tableNominatimCache.setNominatimCache(db, pluscode, JSON.stringify(nominatimPlace), (err) => { });
 
                 return res.status(200).json(response);
             } catch (err) {

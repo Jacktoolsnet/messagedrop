@@ -1,6 +1,6 @@
 const tableName = 'tableNominatimCache';
 const columnCacheKey = 'cacheKey';
-const columnAddress = 'address';
+const columnNominatimPlace = 'nominatimPlace';
 const columnLastUpdate = 'lastUpdate';
 
 const init = function (db) {
@@ -8,7 +8,7 @@ const init = function (db) {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnCacheKey} TEXT PRIMARY KEY,
-            ${columnAddress} TEXT,
+            ${columnNominatimPlace} TEXT,
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );`;
         db.run(sql, (err) => {
@@ -19,13 +19,13 @@ const init = function (db) {
     }
 };
 
-const setNominatimCache = function (db, cacheKey, addressJson, callback) {
+const setNominatimCache = function (db, cacheKey, nominatimPlaceJson, callback) {
     try {
         const sql = `
         INSERT OR REPLACE INTO ${tableName}
-        (${columnCacheKey}, ${columnAddress}, ${columnLastUpdate})
+        (${columnCacheKey}, ${columnNominatimPlace}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));`;
-        db.run(sql, [cacheKey, addressJson], (err) => {
+        db.run(sql, [cacheKey, nominatimPlaceJson], (err) => {
             callback(err);
         });
     } catch (error) {

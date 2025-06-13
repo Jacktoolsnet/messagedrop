@@ -1,7 +1,7 @@
-import { Address } from "./address";
+import { NominatimPlace } from "./nominatim-place";
 
 export interface GetNominatimAddressResponse {
     status: number,
-    address: Address
+    nominatimPlace: NominatimPlace
 }
 

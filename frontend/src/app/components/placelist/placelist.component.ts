@@ -17,6 +17,7 @@ import { Place } from '../../interfaces/place';
 import { CryptoService } from '../../services/crypto.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
+import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
@@ -49,6 +50,7 @@ export class PlacelistComponent implements OnInit {
   public subscriptionError: boolean = false;
 
   constructor(
+    private nominatimService: NominatimService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
     private placeService: PlaceService,

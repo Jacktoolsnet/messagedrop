@@ -236,7 +236,7 @@ export class AirQualityComponent implements OnInit {
       .getAddressByLocation(this.mapService.getMapLocation())
       .pipe(
         map(res => {
-          const addr = res.address;
+          const addr = res.nominatimPlace.address;
           const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || 'Unknown';
           const country = addr?.country || '';
           this.locationName = `${place}${country ? ', ' + country : ''}`
