@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as plusCodes from 'pluscodes';
+import OpenLocationCode from 'open-location-code-typescript';
 import { Observable } from 'rxjs';
 import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
@@ -15,12 +15,8 @@ export class GeolocationService {
   constructor() { }
 
   public getPlusCode(latitude: number, longitude: number): string {
-    let plusCode = plusCodes.encode({ latitude, longitude });
-    if (null === plusCode) {
-      return '';
-    } else {
-      return plusCode;
-    }
+    let plusCode = OpenLocationCode.encode(latitude, longitude, 10);
+    return plusCode || '';
   }
 
   public getLocationFromMessage(message: Message): Location {
@@ -34,8 +30,8 @@ export class GeolocationService {
 
   public getLocationFromPlusCode(plusCode: string): Location {
     let location: Location = {
-      latitude: plusCodes.decode(plusCode)?.latitude || 0,
-      longitude: plusCodes.decode(plusCode)?.longitude || 0,
+      latitude: OpenLocationCode.decode(plusCode)?.latitudeCenter || 0,
+      longitude: OpenLocationCode.decode(plusCode)?.longitudeCenter || 0,
       plusCode: plusCode
     };
     return location;
