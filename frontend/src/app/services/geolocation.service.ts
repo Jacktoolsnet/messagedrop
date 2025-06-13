@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import OpenLocationCode from 'open-location-code-typescript';
 import { Observable } from 'rxjs';
+import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
 import { PlusCodeArea } from '../interfaces/plus-code-area';
@@ -145,86 +146,63 @@ export class GeolocationService {
   }
 
   public getGridFromPlusCode(plusCode: string): PlusCodeArea {
-    let codeAlphabet: string = '23456789CFGHJMPQRVWX';
-    let latitudeMax: number = 90;
-    let longitudeMax: number = 180;
-    let gridRows: number = 9;
-    let gridColumns: number = 18;
-    let latitudeLo: number = 0.0;
-    let longitudeLo: number = 0.0;
-    let pairResolutions: number[] = [20.0, 1.0, .05, .0025, .000125];
-    let gridSizeDegrees: number = 0.0;
-    let latPlaceValue: number = 0.0;
-    let lngPlaceValue: number = 0.0;
-    let latitudeHi: number = 0.0;
-    let longitudeHi: number = 0.0;
-    let i: number = 0;
+    const decoded = OpenLocationCode.decode(plusCode);
+    return {
+      latitudeLo: decoded.latitudeLo,
+      longitudeLo: decoded.longitudeLo,
+      latitudeHi: decoded.latitudeHi,
+      longitudeHi: decoded.longitudeHi,
+      codeLength: plusCode.length,
+      latitudeCenter: decoded.latitudeCenter,
+      longitudeCenter: decoded.longitudeCenter
+    };
+  }
 
-    while (i < plusCode.length) {
-      if (plusCode.charAt(i) == '+') {
-        i += 1;
-      }
-      switch (i) {
-        case 0:
-        case 1:
-          gridSizeDegrees = pairResolutions[0];
-          gridRows = 9;
-          gridColumns = 18;
-          break;
-        case 2:
-        case 3:
-          gridSizeDegrees = pairResolutions[1];
-          gridRows = 20;
-          gridColumns = 20;
-          break;
-        case 4:
-        case 5:
-          gridSizeDegrees = pairResolutions[2];
-          gridRows = 20;
-          gridColumns = 20;
-          break;
-        case 6:
-        case 7:
-          gridSizeDegrees = pairResolutions[3];
-          gridRows = 20;
-          gridColumns = 20;
-          break;
-        case 8:
-        case 9:
-        case 10:
-          gridSizeDegrees = pairResolutions[4];
-          gridRows = 20;
-          gridColumns = 20;
-          break;
-      }
-      latPlaceValue = gridSizeDegrees;
-      lngPlaceValue = gridSizeDegrees;
-      let codeIndexRow: number = codeAlphabet.indexOf(plusCode.charAt(i));
-      i += 1;
-      let codeIndexColumn: number = codeAlphabet.indexOf(plusCode.charAt(i));
-      switch (i) {
-        case 1:
-          latitudeLo += codeIndexRow * latPlaceValue - 90;
-          longitudeLo += codeIndexColumn * lngPlaceValue - 180;
-          break;
-        default:
-          latitudeLo += codeIndexRow * latPlaceValue;
-          longitudeLo += codeIndexColumn * lngPlaceValue;
-      }
-      latitudeHi = latitudeLo + latPlaceValue;
-      longitudeHi = longitudeLo + lngPlaceValue;
-      i += 1;
+  public getBoundingBoxFromPlusCodes(plusCodes: string[]): BoundingBox | null {
+    if (!plusCodes.length) return null;
+
+    let latMin = Infinity;
+    let latMax = -Infinity;
+    let lonMin = Infinity;
+    let lonMax = -Infinity;
+
+    for (const code of plusCodes) {
+      const area = OpenLocationCode.decode(code);
+      latMin = Math.min(latMin, area.latitudeLo);
+      latMax = Math.max(latMax, area.latitudeHi);
+      lonMin = Math.min(lonMin, area.longitudeLo);
+      lonMax = Math.max(lonMax, area.longitudeHi);
     }
 
-    let plusCodeArea: PlusCodeArea = {
-      latitudeLo,
-      longitudeLo,
-      latitudeHi,
-      longitudeHi,
-      codeLength: plusCode.length,
-      latitudeCenter: Math.min(latitudeLo + (latitudeHi - latitudeLo) / 2, latitudeMax),
-      longitudeCenter: Math.min(longitudeLo + (longitudeHi - longitudeLo) / 2, longitudeMax)
+    return { latMin, latMax, lonMin, lonMax };
+  }
+
+  public getPlusCodesInBoundingBox(box: BoundingBox, codeLength: number = 10): string[] {
+    const resolutionMap: Record<number, number> = {
+      10: 0.000125,
+      8: 0.0025,
+      6: 0.05,
+      4: 1.0
     };
-    return plusCodeArea;
+
+    const step = resolutionMap[codeLength] || 0.000125;
+    const result: Set<string> = new Set();
+
+    for (let lat = box.latMin; lat <= box.latMax; lat += step) {
+      for (let lon = box.lonMin; lon <= box.lonMax; lon += step) {
+        result.add(OpenLocationCode.encode(lat, lon, codeLength));
+      }
+    }
+
+    return Array.from(result);
+  }
+
+  public getPlusCodesByZoom(box: BoundingBox, zoom: number): string[] {
+    let codeLength = 10;
+    if (zoom <= 14) codeLength = 8;
+    if (zoom <= 10) codeLength = 6;
+    if (zoom <= 7) codeLength = 4;
+
+    return this.getPlusCodesInBoundingBox(box, codeLength);
   }
 }
