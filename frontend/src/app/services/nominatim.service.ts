@@ -29,7 +29,7 @@ export class NominatimService {
     return throwError(() => error);
   }
 
-  getAddressByLocation(location: Location): Observable<GetNominatimAddressResponse> {
+  getNominatimPlaceByLocation(location: Location): Observable<GetNominatimAddressResponse> {
     const url = `${environment.apiUrl}/nominatim/countryCode/${location.plusCode}/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
@@ -48,7 +48,7 @@ export class NominatimService {
       );
   }
 
-  getAddressBySearchTerm(searchTerm: string, limit = 100): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTerm(searchTerm: string, limit = 100): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const encodedTerm = encodeURIComponent(searchTerm);
     const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}`;
 
@@ -68,7 +68,7 @@ export class NominatimService {
     );
   }
 
-  getAddressBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
@@ -89,7 +89,7 @@ export class NominatimService {
     );
   }
 
-  getAddressBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 100, boxSize = 5000): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 100, boxSize = 5000): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);

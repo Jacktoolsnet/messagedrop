@@ -104,7 +104,7 @@ export class WeatherComponent implements OnInit {
 
   getLocationName(): void {
     this.locationName$ = this.nomatinService
-      .getAddressByLocation(this.mapService.getMapLocation())
+      .getNominatimPlaceByLocation(this.mapService.getMapLocation())
       .pipe(
         map((res: GetNominatimAddressResponse) => {
           const addr = res.nominatimPlace.address;

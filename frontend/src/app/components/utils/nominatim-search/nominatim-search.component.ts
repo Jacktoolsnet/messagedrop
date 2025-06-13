@@ -91,7 +91,7 @@ export class NominatimSearchComponent {
     const radius = Number(this.selectedRadius);
     if (radius === 0) {
       // Umkreissuche ohne Bound
-      this.nominatimService.getAddressBySearchTermWithViewbox(
+      this.nominatimService.getNominatimPlaceBySearchTermWithViewbox(
         term,
         this.data.location.latitude,
         this.data.location.longitude,
@@ -108,7 +108,7 @@ export class NominatimSearchComponent {
       });
     } else {
       // Umkreissuche mit Bound
-      this.nominatimService.getAddressBySearchTermWithViewboxAndBounded(
+      this.nominatimService.getNominatimPlaceBySearchTermWithViewboxAndBounded(
         term,
         this.data.location.latitude,
         this.data.location.longitude,
