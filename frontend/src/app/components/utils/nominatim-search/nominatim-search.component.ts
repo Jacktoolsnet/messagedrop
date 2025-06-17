@@ -159,32 +159,7 @@ export class NominatimSearchComponent {
   }
 
   getIconForPlace(place: NominatimPlace): string {
-    const type = place.type?.toLowerCase() || '';
-    switch (type) {
-      case 'zoo':
-      case 'animal':
-        return 'pets';
-      case 'restaurant':
-      case 'food':
-        return 'restaurant';
-      case 'school':
-        return 'school';
-      case 'park':
-        return 'park';
-      case 'city':
-      case 'town':
-      case 'village':
-        return 'location_city';
-      case 'museum':
-        return 'museum';
-      case 'hotel':
-        return 'hotel';
-      case 'station':
-      case 'bus_station':
-        return 'directions_bus';
-      default:
-        return 'place';
-    }
+    return this.nominatimService.getIconForPlace(place);
   }
 
   getFormattedAddress(place: NominatimPlace): string {
@@ -219,9 +194,9 @@ export class NominatimSearchComponent {
 
   public flyTo(place: NominatimPlace) {
     let location: Location = {
-      latitude: parseFloat(place.lat),
-      longitude: parseFloat(place.lon),
-      plusCode: this.geolocationService.getPlusCode(parseFloat(place.lat), parseFloat(place.lon))
+      latitude: place.lat,
+      longitude: place.lon,
+      plusCode: this.geolocationService.getPlusCode(place.lat, place.lon)
     }
     this.mapService.setCircleMarker(location);
     this.mapService.setDrawCircleMarker(true);

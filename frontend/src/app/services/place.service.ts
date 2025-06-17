@@ -24,7 +24,9 @@ export class PlaceService {
     userId: '',
     name: '',
     base64Avatar: '',
+    icon: '',
     subscribed: false,
+    boundingBox: undefined,
     plusCodes: []
   };
   private ready: boolean = false;
@@ -66,8 +68,10 @@ export class PlaceService {
               userId: row.userId,
               name: '',
               base64Avatar: '',
+              icon: '',
               subscribed: row.subscribed,
-              plusCodes: plusCodes
+              plusCodes: plusCodes,
+              boundingBox: undefined
             });
           });
           this.updatePlaceProfile();
@@ -92,7 +96,9 @@ export class PlaceService {
       userId: '',
       name: '',
       base64Avatar: '',
+      icon: '',
       subscribed: false,
+      boundingBox: undefined,
       plusCodes: []
     };
     this.ready = false;

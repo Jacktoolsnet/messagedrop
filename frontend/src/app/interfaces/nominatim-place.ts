@@ -5,8 +5,8 @@ export interface NominatimPlace {
     licence: string;
     osm_type: string;
     osm_id: number;
-    lat: string;
-    lon: string;
+    lat: number;
+    lon: number;
     class: string;
     type: string;
     place_rank: number;
@@ -17,4 +17,5 @@ export interface NominatimPlace {
     address: Address;
     boundingbox: [string, string, string, string];
     distance?: number;
+    error?: string;
 }

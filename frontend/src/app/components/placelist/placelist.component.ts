@@ -11,11 +11,15 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { BoundingBox } from '../../interfaces/bounding-box';
+import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
+import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { Place } from '../../interfaces/place';
 import { CryptoService } from '../../services/crypto.service';
 import { GeolocationService } from '../../services/geolocation.service';
+import { IndexedDbService } from '../../services/indexed-db.service';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
@@ -50,6 +54,7 @@ export class PlacelistComponent implements OnInit {
   public subscriptionError: boolean = false;
 
   constructor(
+    private indexedDbService: IndexedDbService,
     private nominatimService: NominatimService,
     private mapService: MapService,
     private geolocationService: GeolocationService,
@@ -116,7 +121,9 @@ export class PlacelistComponent implements OnInit {
           name: data.place.name,
           base64Avatar: data.place.base64Avatar,
           subscribed: data.place.subscribe,
-          plusCodes: [...data.place.plusCodes]
+          plusCodes: [...data.place.plusCodes],
+          icon: '',
+          boundingBox: undefined
         };
         this.placeService.updatePlace(updatePlace)
           .subscribe({
@@ -173,15 +180,71 @@ export class PlacelistComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  openPlaceDialog(): void {
+  async openPlaceDialog() {
     let place: Place = {
       id: '',
       userId: this.userService.getUser().id,
       name: '',
       base64Avatar: '',
+      icon: '',
       subscribed: false,
+      boundingBox: undefined,
       plusCodes: []
     };
+    let nominatimPlace: NominatimPlace | undefined = undefined;
+
+    let selectedPlace: string = await this.indexedDbService.getSetting('nominatimSelectedPlace');
+    if (selectedPlace) {
+      nominatimPlace = JSON.parse(selectedPlace) as NominatimPlace;
+      const isNearby = this.geolocationService.areLocationsNear(this.mapService.getMapLocation(), this.nominatimService.getLocationFromNominatimPlace(nominatimPlace), 50); // innerhalb 50 m
+      if (!isNearby) {
+        this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation()).subscribe({
+          next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
+            console.log('NominatimAddressResponse: ' + JSON.stringify(nominatimAddressResponse));
+            if (nominatimAddressResponse.status === 200) {
+              if (nominatimAddressResponse.nominatimPlace.error) {
+                let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
+                place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
+                place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(place.boundingBox!);
+                console.log(place);
+              } else {
+                nominatimPlace = nominatimAddressResponse.nominatimPlace;
+                place.name = nominatimPlace.name!;
+                let boundingBox: BoundingBox;
+                if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {
+                  boundingBox = {
+                    latMin: parseFloat(nominatimPlace.boundingbox[0]),
+                    latMax: parseFloat(nominatimPlace.boundingbox[1]),
+                    lonMin: parseFloat(nominatimPlace.boundingbox[2]),
+                    lonMax: parseFloat(nominatimPlace.boundingbox[3])
+                  };
+                  place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+                  place.boundingBox = boundingBox;
+                  place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
+                }
+              }
+            }
+          }),
+          error: ((err) => { })
+        });
+      } else {
+        place.name = nominatimPlace.name!;
+        let boundingBox: BoundingBox;
+        if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {
+          boundingBox = {
+            latMin: parseFloat(nominatimPlace.boundingbox[0]),
+            latMax: parseFloat(nominatimPlace.boundingbox[1]),
+            lonMin: parseFloat(nominatimPlace.boundingbox[2]),
+            lonMax: parseFloat(nominatimPlace.boundingbox[3])
+          };
+          place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+          place.boundingBox = boundingBox;
+          place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
+        }
+        console.log(place);
+      }
+    }
+
     const dialogRef = this.placeDialog.open(PlaceComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -200,7 +263,9 @@ export class PlacelistComponent implements OnInit {
           name: data.place.name,
           base64Avatar: data.place.base64Avatar,
           subscribed: data.place.subscribe,
-          plusCodes: [...data.place.plusCodes]
+          plusCodes: [...data.place.plusCodes],
+          icon: '',
+          boundingBox: undefined
         };
         this.placeService.createPlace(updatePlace)
           .subscribe({

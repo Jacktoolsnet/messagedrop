@@ -144,4 +144,42 @@ export class NominatimService {
       window.open(`https://www.google.com/maps/search/?api=1&query=${place.lat},${place.lon}`, '_blank');
     }
   }
+
+  getLocationFromNominatimPlace(place: NominatimPlace): Location {
+    let location: Location = {
+      latitude: place.lat,
+      longitude: place.lon,
+      plusCode: ''
+    };
+    return location;
+  }
+
+  getIconForPlace(nominatimPlace: NominatimPlace): string {
+    const type = nominatimPlace.type?.toLowerCase() || '';
+    switch (type) {
+      case 'zoo':
+      case 'animal':
+        return 'pets';
+      case 'restaurant':
+      case 'food':
+        return 'restaurant';
+      case 'school':
+        return 'school';
+      case 'park':
+        return 'park';
+      case 'city':
+      case 'town':
+      case 'village':
+        return 'location_city';
+      case 'museum':
+        return 'museum';
+      case 'hotel':
+        return 'hotel';
+      case 'station':
+      case 'bus_station':
+        return 'directions_bus';
+      default:
+        return 'place';
+    }
+  }
 }
