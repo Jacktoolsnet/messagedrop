@@ -1,4 +1,3 @@
-import { Place } from "./place";
 
 export interface GetPlacesResponse {
     status: number,
@@ -7,7 +6,10 @@ export interface GetPlacesResponse {
         userId: string,
         name: string,
         subscribed: boolean,
-        plusCodes: string
+        latMin: number,
+        latMax: number,
+        lonMin: number,
+        lonMax: number
     }[]
 }
 

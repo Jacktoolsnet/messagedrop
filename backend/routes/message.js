@@ -130,7 +130,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
       response.status = 500;
       response.error = err;
     } else {
-      notify.placeSubscriptions(req.logger, req.database.db, req.body.plusCode, req.body.messageUserId, req.body.message.replace(/\'/g, "''"));
+      notify.placeSubscriptions(req.logger, req.database.db, req.body.latitude, req.body.longtitude, req.body.messageUserId, req.body.message.replace(/\'/g, "''"));
       response.status = 200;
     }
     res.status(response.status).json(response);

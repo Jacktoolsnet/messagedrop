@@ -86,7 +86,7 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && undefined != this.placeToDelete) {
-        this.placeService.deletePlace(this.placeToDelete)
+        this.placeService.deletePlace(this.placeToDelete.id)
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
@@ -115,17 +115,7 @@ export class PlacelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.place) {
-        let updatePlace: Place = {
-          id: data.place.id,
-          userId: data.place.userId,
-          name: data.place.name,
-          base64Avatar: data.place.base64Avatar,
-          subscribed: data.place.subscribe,
-          plusCodes: [...data.place.plusCodes],
-          icon: '',
-          boundingBox: undefined
-        };
-        this.placeService.updatePlace(updatePlace)
+        this.placeService.updatePlace(data.place)
           .subscribe({
             next: simpleResponse => {
               if (simpleResponse.status === 200) {
@@ -200,13 +190,24 @@ export class PlacelistComponent implements OnInit {
       if (!isNearby) {
         this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation()).subscribe({
           next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
-            console.log('NominatimAddressResponse: ' + JSON.stringify(nominatimAddressResponse));
             if (nominatimAddressResponse.status === 200) {
               if (nominatimAddressResponse.nominatimPlace.error) {
                 let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
                 place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
                 place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(place.boundingBox!);
-                console.log(place);
+                this.placeService.createPlace(place)
+                  .subscribe({
+                    next: createPlaceResponse => {
+                      if (createPlaceResponse.status === 200) {
+                        place.id = createPlaceResponse.placeId;
+                        this.places.unshift(place);
+                        this.placeService.saveAdditionalPlaceInfos();
+                        this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                      }
+                    },
+                    error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                    complete: () => { }
+                  });
               } else {
                 nominatimPlace = nominatimAddressResponse.nominatimPlace;
                 place.name = nominatimPlace.name!;
@@ -222,6 +223,19 @@ export class PlacelistComponent implements OnInit {
                   place.boundingBox = boundingBox;
                   place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
                 }
+                this.placeService.createPlace(place)
+                  .subscribe({
+                    next: createPlaceResponse => {
+                      if (createPlaceResponse.status === 200) {
+                        place.id = createPlaceResponse.placeId;
+                        this.places.unshift(place);
+                        this.placeService.saveAdditionalPlaceInfos();
+                        this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                      }
+                    },
+                    error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                    complete: () => { }
+                  });
               }
             }
           }),
@@ -241,38 +255,12 @@ export class PlacelistComponent implements OnInit {
           place.boundingBox = boundingBox;
           place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
         }
-        console.log(place);
-      }
-    }
-
-    const dialogRef = this.placeDialog.open(PlaceComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PLACE, place: place },
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.place) {
-        let updatePlace: Place = {
-          id: data.place.id,
-          userId: data.place.userId,
-          name: data.place.name,
-          base64Avatar: data.place.base64Avatar,
-          subscribed: data.place.subscribe,
-          plusCodes: [...data.place.plusCodes],
-          icon: '',
-          boundingBox: undefined
-        };
-        this.placeService.createPlace(updatePlace)
+        this.placeService.createPlace(place)
           .subscribe({
             next: createPlaceResponse => {
               if (createPlaceResponse.status === 200) {
-                data.place.id = createPlaceResponse.placeId;
-                this.places.unshift(data.place);
+                place.id = createPlaceResponse.placeId;
+                this.places.unshift(place);
                 this.placeService.saveAdditionalPlaceInfos();
                 this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
               }
@@ -281,11 +269,11 @@ export class PlacelistComponent implements OnInit {
             complete: () => { }
           });
       }
-    });
+    }
   }
 
   public flyTo(place: Place) {
-    let location: Location = this.geolocationService.getLocationFromPlusCode(place.plusCodes[0]);
+    let location: Location = this.geolocationService.getCenterOfBoundingBox(place.boundingBox!);
     this.mapService.flyToWithZoom(location, 18);
     this.dialogRef.close();
   }

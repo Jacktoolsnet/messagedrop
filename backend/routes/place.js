@@ -11,7 +11,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   let response = { 'status': 0 };
   let placeId = uuid.v4()
   let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
-  tablePlace.create(req.database.db, placeId, req.body.userId, cryptedPlaceName, function (err) {
+  tablePlace.create(req.database.db, placeId, req.body.userId, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -26,20 +26,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
   let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
-  tablePlace.update(req.database.db, req.body.id, JSON.stringify(cryptedPlaceName), function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
-
-router.post('/updatepluscodes', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
-  let response = { 'status': 0 };
-  tablePlace.updatePlusCodes(req.database.db, req.body.id, req.body.pluscodes, function (err) {
+  tablePlace.update(req.database.db, req.body.id, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

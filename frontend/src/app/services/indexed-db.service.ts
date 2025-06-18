@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CryptedUser } from '../interfaces/crypted-user';
+import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
 
 @Injectable({
@@ -7,11 +8,11 @@ import { Profile } from '../interfaces/profile';
 })
 export class IndexedDbService {
   private dbName: string = 'MessageDrop';
-  private settingStore: string = 'settings';
+  private settingStore: string = 'setting';
   private userStore: string = 'user';
   private profileStore: string = 'profile';
   private contactProfileStore: string = 'contactprofile';
-  private placeProfileStore: string = 'placeprofile';
+  private placeStore: string = 'place';
   private noteStore: string = 'note';
 
   constructor() {
@@ -36,8 +37,8 @@ export class IndexedDbService {
         if (!db.objectStoreNames.contains(this.contactProfileStore)) {
           db.createObjectStore(this.contactProfileStore);
         }
-        if (!db.objectStoreNames.contains(this.placeProfileStore)) {
-          db.createObjectStore(this.placeProfileStore);
+        if (!db.objectStoreNames.contains(this.placeStore)) {
+          db.createObjectStore(this.placeStore);
         }
         if (!db.objectStoreNames.contains(this.noteStore)) {
           db.createObjectStore(this.noteStore);
@@ -307,13 +308,13 @@ export class IndexedDbService {
     });
   }
 
-  async setPlaceProfile(placeProfileId: string, placeProfile: Profile): Promise<void> {
+  async setPlaceProfile(placeId: string, place: Place): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.placeProfileStore, 'readwrite');
-      const store = tx.objectStore(this.placeProfileStore);
-      const request = store.put(placeProfile, placeProfileId);
+      const tx = db.transaction(this.placeStore, 'readwrite');
+      const store = tx.objectStore(this.placeStore);
+      const request = store.put(place, placeId);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -322,13 +323,13 @@ export class IndexedDbService {
     });
   }
 
-  async getPlaceProfile(placeProfileId: string): Promise<Profile | undefined> {
+  async getPlace(placeId: string): Promise<Place | undefined> {
     const db = await this.openDB();
 
-    return new Promise<Profile | undefined>((resolve, reject) => {
-      const tx = db.transaction(this.placeProfileStore, 'readonly');
-      const store = tx.objectStore(this.placeProfileStore);
-      const request = store.get(placeProfileId);
+    return new Promise<Place | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.placeStore, 'readonly');
+      const store = tx.objectStore(this.placeStore);
+      const request = store.get(placeId);
 
       request.onsuccess = () => {
         resolve(request.result);
@@ -340,13 +341,13 @@ export class IndexedDbService {
     });
   }
 
-  async deletePlaceProfile(placeProfileId: string): Promise<void> {
+  async deletePlace(placeId: string): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.placeProfileStore, 'readwrite');
-      const store = tx.objectStore(this.placeProfileStore);
-      const request = store.delete(placeProfileId);
+      const tx = db.transaction(this.placeStore, 'readwrite');
+      const store = tx.objectStore(this.placeStore);
+      const request = store.delete(placeId);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {

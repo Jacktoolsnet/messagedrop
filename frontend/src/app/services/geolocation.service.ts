@@ -309,4 +309,16 @@ export class GeolocationService {
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
   }
+
+  public getCenterOfBoundingBox(box: BoundingBox): Location {
+    const latitude = (box.latMin + box.latMax) / 2;
+    const longitude = (box.lonMin + box.lonMax) / 2;
+    const plusCode = this.getPlusCode(latitude, longitude); // optional, falls du ihn brauchst
+
+    return {
+      latitude,
+      longitude,
+      plusCode
+    };
+  }
 }

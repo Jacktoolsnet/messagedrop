@@ -5,7 +5,8 @@
     </button>
     <div *ngIf="places.length != 0" class="content">
         <mat-card class="item" *ngFor="let place of places; index as i">
-            <div class="avatar-box" *ngIf="place.base64Avatar || place.name" (click)="editPlace(place)">
+            <div class="avatar-box" (click)="editPlace(place)">
+                <mat-icon *ngIf="place.icon && !place.base64Avatar">{{ place.icon || 'location' }}</mat-icon>
                 <img *ngIf="place.base64Avatar" class="avatar" src="{{place.base64Avatar}}" />
                 <span *ngIf="place.name" class="name">{{place.name}}</span>
             </div>

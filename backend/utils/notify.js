@@ -4,13 +4,13 @@ const { getEncryptionPrivateKey } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 
 
-const placeSubscriptions = function (logger, db, plusCode, userId, message) {
+const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
     try {
-        let sql = `
-        SELECT tablePlace.id, tablePlace.userId, tablePlace.subscribed, tablePlace.name, tablePlace.plusCodes, tableUser.subscription
+        const sql = `SELECT tablePlace.id, tablePlace.userId, tablePlace.subscribed, tablePlace.name, tablePlace.latMin,tablePlace.latMax,tablePlace.lonMin,tablePlace.lonMax,tableUser.subscription
         FROM tablePlace
         INNER JOIN tableUser ON tablePlace.userId = tableUser.id
-        WHERE tablePlace.plusCodes LIKE '%${plusCode}%'
+        WHERE '${lat}' BETWEEN tablePlace.latMin AND tablePlace.latMax
+        AND '${lon}' BETWEEN tablePlace.lonMin AND tablePlace.lonMax
         AND tablePlace.subscribed = 1
         AND tablePlace.userId <> '${userId}';`;
         db.all(sql, (err, rows) => {
@@ -29,7 +29,7 @@ const placeSubscriptions = function (logger, db, plusCode, userId, message) {
                                 "vibrate": [100, 50, 100],
                                 "data": {
                                     "dateOfArrival": Date.now(),
-                                    "primaryKey": { "type": "place", "id": plusCode },
+                                    "primaryKey": { "type": "place", "id": row.id },
                                     "onActionClick": {
                                         "default": {
                                             "operation": "focusLastFocusedOrOpen"

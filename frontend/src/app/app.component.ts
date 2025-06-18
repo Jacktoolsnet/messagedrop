@@ -434,21 +434,33 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
   public addLocationToPlace() {
     let location: Location = this.mapService.getMapLocation();
-    this.placeService.addPlusCodeToPlace(this.placeService.getSelectedPlace(), location, this.isPartOfPlace, this.mapService);
+    this.placeService.getSelectedPlace().plusCodes.push(location.plusCode);
+    this.mapService.addPlaceLocationRectange(location);
+    this.placeService.getSelectedPlace().boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes(this.placeService.getSelectedPlace().plusCodes);
   }
 
   public removeLocationFromPlace() {
     let location: Location = this.mapService.getMapLocation();
-    this.placeService.removePlusCodeFromPlace(this.placeService.getSelectedPlace()!, location, this.isPartOfPlace, this.mapService);
+    let place = this.placeService.getSelectedPlace();
+    place.plusCodes = place.plusCodes.filter(code => code !== location.plusCode);
+    this.mapService.removePlaceLocationRectange(location);
+    this.placeService.getSelectedPlace().boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes(this.placeService.getSelectedPlace().plusCodes);
   }
 
   public finishEditingPlace() {
     this.mapService.setMapMinMaxZoom(3, 19);
-    this.placeService.getSelectedPlace().id = '';
-    this.placeService.getSelectedPlace().userId = '';
-    this.placeService.getSelectedPlace().name = '';
-    this.placeService.getSelectedPlace().subscribed = false;
-    this.placeService.getSelectedPlace().plusCodes = [];
+    this.placeService.updatePlace(this.placeService.getSelectedPlace())
+      .subscribe({
+        next: simpleResponse => {
+          if (simpleResponse.status === 200) {
+            this.placeService.saveAdditionalPlaceInfos();
+            this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
+          }
+        },
+        error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+        complete: () => { }
+      });
+    this.placeService.unselectPlace();
     this.mapService.removeAllPlaceLocationRectange();
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
@@ -464,8 +476,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.noteService.filter(location.plusCode);
         // Messages
         this.messageService.getByPlusCode(location, this.messageSubject);
-      } else {
-        //this.createMarkerLocations();
       }
     }
   }
@@ -900,6 +910,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       if (undefined != data) {
         this.messageService.clearMessages();
         this.markerLocations.clear()
+        this.mapService.flyToWithZoom(this.geolocationService.getCenterOfBoundingBox(data.boundingBox!), 18);
         this.createMarkerLocations()
         this.mapService.setMapMinMaxZoom(18, 19);
         this.placeService.getSelectedPlace().id = data.id;
@@ -912,7 +923,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         });
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         if (this.placeService.getSelectedPlace().plusCodes.length != 0) {
-          let location: Location = this.geolocationService.getLocationFromPlusCode(this.placeService.getSelectedPlace().plusCodes[0]);
+          let location: Location = this.geolocationService.getCenterOfBoundingBox(this.placeService.getSelectedPlace().boundingBox!);
           this.mapService.flyToWithZoom(location, 18);
         }
       }

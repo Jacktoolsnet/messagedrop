@@ -5,11 +5,9 @@ import { environment } from '../../environments/environment';
 import { CreatePlaceResponse } from '../interfaces/create-place-response';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
-import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { IndexedDbService } from './indexed-db.service';
-import { MapService } from './map.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
 
@@ -55,26 +53,8 @@ export class PlaceService {
       .subscribe({
         next: (getPlacesResponse: GetPlacesResponse) => {
           getPlacesResponse.rows.forEach((row) => {
-            let plusCodes: string[] = [];
-            if (null !== row.plusCodes && row.plusCodes !== '') {
-              if (JSON.parse(row.plusCodes) instanceof Array) {
-                plusCodes = [...JSON.parse(row.plusCodes)];
-              } else {
-                plusCodes.push(JSON.parse(row.plusCodes));
-              }
-            }
-            this.places.push({
-              id: row.id,
-              userId: row.userId,
-              name: '',
-              base64Avatar: '',
-              icon: '',
-              subscribed: row.subscribed,
-              plusCodes: plusCodes,
-              boundingBox: undefined
-            });
+            this.loadPlaceFromIndexedDb(row.id);
           });
-          this.updatePlaceProfile();
           this.ready = true;
         },
         error: (err) => {
@@ -104,17 +84,24 @@ export class PlaceService {
     this.ready = false;
   }
 
-  private updatePlaceProfile() {
-    this.places.forEach(async (place: Place) => {
-      let placeProfile = await this.indexedDbService.getPlaceProfile(place.id);
-      place.name = undefined != placeProfile ? placeProfile.name : '';
-      place.base64Avatar = undefined != placeProfile ? placeProfile.base64Avatar : '';
-    });
+  private async loadPlaceFromIndexedDb(placeId: string) {
+    const placeFromIndexedDb = await this.indexedDbService.getPlace(placeId);
+    if (placeFromIndexedDb) {
+      this.places.push(placeFromIndexedDb);
+    } else {
+      this.deletePlace(placeId)
+        .subscribe({
+          next: (simpleStatusResponse) => { },
+          error: (err) => {
+          },
+          complete: () => { }
+        });
+    }
   }
 
   saveAdditionalPlaceInfos() {
     this.places.forEach((place: Place) => {
-      this.indexedDbService.setPlaceProfile(place.id, { name: place.name, base64Avatar: place.base64Avatar })
+      this.indexedDbService.setPlaceProfile(place.id, place)
     })
   }
 
@@ -124,6 +111,19 @@ export class PlaceService {
 
   getSelectedPlace(): Place {
     return this.selectedPlace;
+  }
+
+  unselectPlace() {
+    this.selectedPlace = {
+      id: '',
+      userId: '',
+      name: '',
+      base64Avatar: '',
+      icon: '',
+      subscribed: false,
+      boundingBox: undefined,
+      plusCodes: []
+    };;
   }
 
   isReady(): boolean {
@@ -145,6 +145,10 @@ export class PlaceService {
     let body = {
       'userId': place.userId,
       'name': place.name,
+      'latMin': place.boundingBox?.latMin,
+      'latMax': place.boundingBox?.latMax,
+      'lonMin': place.boundingBox?.lonMin,
+      'lonMax': place.boundingBox?.lonMax
     };
     return this.http.post<CreatePlaceResponse>(url, body, this.httpOptions)
       .pipe(
@@ -166,7 +170,11 @@ export class PlaceService {
     });
     let body = {
       'id': place.id,
-      'name': place.name
+      'name': place.name,
+      'latMin': place.boundingBox?.latMin,
+      'latMax': place.boundingBox?.latMax,
+      'lonMin': place.boundingBox?.lonMin,
+      'lonMax': place.boundingBox?.lonMax
     };
     return this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
@@ -228,8 +236,9 @@ export class PlaceService {
       );
   }
 
-  deletePlace(place: Place) {
-    let url = `${environment.apiUrl}/place/delete/${place.id}`;
+  deletePlace(placeId: string) {
+    let url = `${environment.apiUrl}/place/delete/${placeId}`;
+    console.log(url);
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
       title: 'Place service',
@@ -281,77 +290,4 @@ export class PlaceService {
         catchError(this.handleError)
       );
   }
-
-  addPlusCodeToPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
-    place.plusCodes.push(location.plusCode);
-    let url = `${environment.apiUrl}/place/updatepluscodes`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
-      title: 'Place service',
-      image: '',
-      icon: '',
-      message: `Adding pluscode from place`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    let body = {
-      'id': place.id,
-      'pluscodes': JSON.stringify(place.plusCodes)
-    };
-    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            mapService.addPlaceLocationRectange(location);
-            isPartOfPlace = true;
-          }
-        },
-        error: (err) => {
-          place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
-          isPartOfPlace = false;
-        },
-        complete: () => { }
-      });;
-  }
-
-  removePlusCodeFromPlace(place: Place, location: Location, isPartOfPlace: boolean, mapService: MapService) {
-    place.plusCodes.splice(place.plusCodes.findIndex(item => item === location.plusCode), 1)
-    let url = `${environment.apiUrl}/place/updatepluscodes`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
-      title: 'Place service',
-      image: '',
-      icon: '',
-      message: `Removing pluscode from place`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    let body = {
-      'id': place.id,
-      'pluscodes': JSON.stringify(place.plusCodes)
-    };
-    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            isPartOfPlace = false;
-            mapService.removePlaceLocationRectange(location);
-          }
-        },
-        error: (err) => {
-          place.plusCodes.push(location.plusCode);
-          isPartOfPlace = true;
-        },
-        complete: () => { }
-      });
-  }
-
 }
