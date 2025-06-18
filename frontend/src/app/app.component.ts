@@ -436,7 +436,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let location: Location = this.mapService.getMapLocation();
     this.placeService.getSelectedPlace().plusCodes.push(location.plusCode);
     this.mapService.addPlaceLocationRectange(location);
-    this.placeService.getSelectedPlace().boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes(this.placeService.getSelectedPlace().plusCodes);
   }
 
   public removeLocationFromPlace() {
@@ -444,11 +443,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let place = this.placeService.getSelectedPlace();
     place.plusCodes = place.plusCodes.filter(code => code !== location.plusCode);
     this.mapService.removePlaceLocationRectange(location);
-    this.placeService.getSelectedPlace().boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes(this.placeService.getSelectedPlace().plusCodes);
   }
 
   public finishEditingPlace() {
     this.mapService.setMapMinMaxZoom(3, 19);
+    this.placeService.getSelectedPlace().boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes(this.placeService.getSelectedPlace().plusCodes);
     this.placeService.updatePlace(this.placeService.getSelectedPlace())
       .subscribe({
         next: simpleResponse => {
@@ -906,25 +905,19 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: Place) => {
-      if (undefined != data) {
+    dialogRef.afterClosed().subscribe((place: Place) => {
+      if (undefined != place) {
+        this.mapService.removeAllPlaceLocationRectange();
         this.messageService.clearMessages();
         this.markerLocations.clear()
-        this.mapService.flyToWithZoom(this.geolocationService.getCenterOfBoundingBox(data.boundingBox!), 18);
-        this.createMarkerLocations()
         this.mapService.setMapMinMaxZoom(18, 19);
-        this.placeService.getSelectedPlace().id = data.id;
-        this.placeService.getSelectedPlace().userId = data.userId;
-        this.placeService.getSelectedPlace().name = data.name;
-        this.placeService.getSelectedPlace().subscribed = data.subscribed;
-        this.placeService.getSelectedPlace().plusCodes = data.plusCodes;
+        this.placeService.setSelectedPlace(place);
         this.placeService.getSelectedPlace().plusCodes?.forEach(plusCode => {
           this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode));
         });
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
         if (this.placeService.getSelectedPlace().plusCodes.length != 0) {
           let location: Location = this.geolocationService.getCenterOfBoundingBox(this.placeService.getSelectedPlace().boundingBox!);
-          this.mapService.flyToWithZoom(location, 18);
+          this.mapService.flyToWithZoom(location, 19);
         }
       }
     });

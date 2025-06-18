@@ -113,6 +113,10 @@ export class PlaceService {
     return this.selectedPlace;
   }
 
+  setSelectedPlace(place: Place) {
+    this.selectedPlace = place;
+  }
+
   unselectPlace() {
     this.selectedPlace = {
       id: '',

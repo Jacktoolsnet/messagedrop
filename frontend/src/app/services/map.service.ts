@@ -178,7 +178,7 @@ export class MapService {
   //this.searchRectangle = leaflet.rectangle([[0, 0],[0, 0]], {color: "#ff7800", weight: 1}).addTo(this.map);
   //placeLocationRectangels
   public addPlaceLocationRectange(location: Location) {
-    let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.map?.getZoom()));
+    let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(location.plusCode);
     let newRectangle = leaflet.rectangle([[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo], [plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]], { color: "#02bd2a", weight: 1 }).addTo(this.map);
     this.placeLocationRectangels.set(location.plusCode, newRectangle);
   }
