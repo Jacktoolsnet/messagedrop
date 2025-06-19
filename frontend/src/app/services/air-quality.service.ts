@@ -26,10 +26,10 @@ export class AirQualityService {
     return throwError(() => error);
   }
 
-  getAirQuality(pluscode: string, latitude: number, longitude: number, days: number): Observable<AirQualityData> {
+  getAirQuality(pluscode: string, latitude: number, longitude: number, days: number, showAlways: boolean = true): Observable<AirQualityData> {
     const url = `${environment.apiUrl}/airquality/${pluscode}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: true,
+      showAlways: showAlways,
       title: 'Air Quality Service',
       image: '',
       icon: 'eco',

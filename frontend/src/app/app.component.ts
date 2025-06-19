@@ -197,13 +197,13 @@ export class AppComponent implements OnInit {
     this.mapSubject.subscribe({
       next: (v) => {
         // Fly to position if user alrady allowed location.
-        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+        /* navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted') {
             this.getCurrentPosition();
           } else {
             this.updateDataForLocation(this.mapService.getMapLocation(), true);
           }
-        });
+        });*/
       }
     });
 
@@ -420,7 +420,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
             });
           }
           this.snackBarRef.afterDismissed().subscribe(() => {
-            this.getCurrentPosition();
+            // this.getCurrentPosition();
           });
         }
       });

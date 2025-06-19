@@ -102,10 +102,10 @@ export class MessageService {
     return this.lastSearchedLocation;
   }
 
-  createMessage(message: Message, location: Location, user: User) {
+  createMessage(message: Message, location: Location, user: User, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -146,11 +146,11 @@ export class MessageService {
       })
   }
 
-  createComment(message: Message, location: Location, user: User) {
+  createComment(message: Message, location: Location, user: User, showAlways: boolean = false) {
     let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
     let url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -191,10 +191,10 @@ export class MessageService {
       })
   }
 
-  updateMessage(message: Message, location: Location, user: User) {
+  updateMessage(message: Message, location: Location, user: User, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/update`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -222,10 +222,10 @@ export class MessageService {
       });
   }
 
-  likeMessage(message: Message, user: User, likeButtonColor: string) {
+  likeMessage(message: Message, user: User, likeButtonColor: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -252,10 +252,10 @@ export class MessageService {
       })
   }
 
-  unlikeMessage(message: Message, user: User, likeButtonColor: string) {
+  unlikeMessage(message: Message, user: User, likeButtonColor: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -304,10 +304,10 @@ export class MessageService {
       })
   }
 
-  dislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
+  dislikeMessage(message: Message, user: User, dislikeButtonColor: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -334,10 +334,10 @@ export class MessageService {
       })
   }
 
-  undislikeMessage(message: Message, user: User, dislikeButtonColor: string) {
+  undislikeMessage(message: Message, user: User, dislikeButtonColor: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -386,10 +386,10 @@ export class MessageService {
       });
   }
 
-  getByPlusCode(location: Location, messageSubject: Subject<void>) {
+  getByPlusCode(location: Location, messageSubject: Subject<void>, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -441,10 +441,10 @@ export class MessageService {
       });
   }
 
-  getByPlusForMarker(location: Location) {
+  getByPlusForMarker(location: Location, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/get/pluscode/${location.plusCode}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -500,10 +500,10 @@ export class MessageService {
       });
   }
 
-  disableMessage(message: Message, selectedMessages: Message[]) {
+  disableMessage(message: Message, selectedMessages: Message[], showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/disable/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -529,10 +529,10 @@ export class MessageService {
       });
   }
 
-  deleteMessage(message: Message) {
+  deleteMessage(message: Message, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/delete/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -564,10 +564,10 @@ export class MessageService {
       });
   }
 
-  getCommentsForParentMessage(message: Message) {
+  getCommentsForParentMessage(message: Message, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/get/comment/${message.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Message service',
       image: '',
       icon: '',

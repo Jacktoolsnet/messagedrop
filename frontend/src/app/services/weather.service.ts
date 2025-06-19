@@ -26,10 +26,10 @@ export class WeatherService {
     return throwError(() => error);
   }
 
-  getWeather(locale: string, pluscode: string, latitude: number, longitude: number, days: number): Observable<Weather> {
+  getWeather(locale: string, pluscode: string, latitude: number, longitude: number, days: number, showAlways: boolean = false): Observable<Weather> {
     const url = `${environment.apiUrl}/weather/${locale}/${pluscode}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: true,
+      showAlways: showAlways,
       title: 'Weather service',
       image: '',
       icon: '',

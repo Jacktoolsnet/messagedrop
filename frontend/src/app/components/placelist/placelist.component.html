@@ -1,6 +1,6 @@
 <mat-dialog-content class="dialog">
     <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
-        (click)="openPlaceDialog()">
+        (click)="addPlace()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <div *ngIf="places.length != 0" class="content">

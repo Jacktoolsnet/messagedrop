@@ -101,10 +101,10 @@ export class UserService {
     this.ready = false;
   }
 
-  getPinHash(pin: string): Observable<GetPinHashResponse> {
+  getPinHash(pin: string, showAlways: boolean = false): Observable<GetPinHashResponse> {
     let url = `${environment.apiUrl}/user/hashpin`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -193,10 +193,10 @@ export class UserService {
     this.profile = await this.indexedDbService.getProfile(this.user.id)
   }
 
-  createUser(): Observable<CreateUserResponse> {
+  createUser(showAlways: boolean = true): Observable<CreateUserResponse> {
     let url = `${environment.apiUrl}/user/create`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -212,10 +212,10 @@ export class UserService {
       );
   }
 
-  confirmUser(pinHash: string, cryptedUser: CryptedUser): Observable<ConfirmUserResponse> {
+  confirmUser(pinHash: string, cryptedUser: CryptedUser, showAlways: boolean = true): Observable<ConfirmUserResponse> {
     let url = `${environment.apiUrl}/user/confirm`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -234,10 +234,10 @@ export class UserService {
       );
   }
 
-  getUserById(userId: string): Observable<GetUserResponse> {
+  getUserById(userId: string, showAlways: boolean = false): Observable<GetUserResponse> {
     let url = `${environment.apiUrl}/user/get/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -252,10 +252,10 @@ export class UserService {
       );
   }
 
-  getUserMessages(user: User): Observable<GetMessageResponse> {
+  getUserMessages(user: User, showAlways: boolean = false): Observable<GetMessageResponse> {
     let url = `${environment.apiUrl}/message/get/userId/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -270,10 +270,10 @@ export class UserService {
       );
   }
 
-  deleteUser(userId: string): Observable<SimpleStatusResponse> {
+  deleteUser(userId: string, showAlways: boolean = false): Observable<SimpleStatusResponse> {
     let url = `${environment.apiUrl}/user/delete/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -288,10 +288,10 @@ export class UserService {
       );
   }
 
-  subscribe(user: User, subscription: string) {
+  subscribe(user: User, subscription: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/user/subscribe`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',
@@ -310,10 +310,10 @@ export class UserService {
       );
   }
 
-  unsubscribe(user: User) {
+  unsubscribe(user: User, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/user/unsubscribe/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'User service',
       image: '',
       icon: '',

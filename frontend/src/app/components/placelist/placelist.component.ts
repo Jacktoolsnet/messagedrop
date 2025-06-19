@@ -170,7 +170,7 @@ export class PlacelistComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  async openPlaceDialog() {
+  async addPlace() {
     let place: Place = {
       id: '',
       userId: this.userService.getUser().id,
@@ -182,66 +182,68 @@ export class PlacelistComponent implements OnInit {
       plusCodes: []
     };
     let nominatimPlace: NominatimPlace | undefined = undefined;
-
     let selectedPlace: string = await this.indexedDbService.getSetting('nominatimSelectedPlace');
+    let isNearby: boolean = false;
     if (selectedPlace) {
       nominatimPlace = JSON.parse(selectedPlace) as NominatimPlace;
-      const isNearby = this.geolocationService.areLocationsNear(this.mapService.getMapLocation(), this.nominatimService.getLocationFromNominatimPlace(nominatimPlace), 50); // innerhalb 50 m
-      if (!isNearby) {
-        this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation()).subscribe({
-          next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
-            if (nominatimAddressResponse.status === 200) {
-              if (nominatimAddressResponse.nominatimPlace.error) {
-                let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
-                place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
-                place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(place.boundingBox!);
-                this.placeService.createPlace(place)
-                  .subscribe({
-                    next: createPlaceResponse => {
-                      if (createPlaceResponse.status === 200) {
-                        place.id = createPlaceResponse.placeId;
-                        this.places.unshift(place);
-                        this.placeService.saveAdditionalPlaceInfos();
-                        this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                      }
-                    },
-                    error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                    complete: () => { }
-                  });
-              } else {
-                nominatimPlace = nominatimAddressResponse.nominatimPlace;
-                place.name = nominatimPlace.name!;
-                let boundingBox: BoundingBox;
-                if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {
-                  boundingBox = {
-                    latMin: parseFloat(nominatimPlace.boundingbox[0]),
-                    latMax: parseFloat(nominatimPlace.boundingbox[1]),
-                    lonMin: parseFloat(nominatimPlace.boundingbox[2]),
-                    lonMax: parseFloat(nominatimPlace.boundingbox[3])
-                  };
-                  place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
-                  place.boundingBox = boundingBox;
-                  place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
-                }
-                this.placeService.createPlace(place)
-                  .subscribe({
-                    next: createPlaceResponse => {
-                      if (createPlaceResponse.status === 200) {
-                        place.id = createPlaceResponse.placeId;
-                        this.places.unshift(place);
-                        this.placeService.saveAdditionalPlaceInfos();
-                        this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                      }
-                    },
-                    error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                    complete: () => { }
-                  });
+      isNearby = this.geolocationService.areLocationsNear(this.mapService.getMapLocation(), this.nominatimService.getLocationFromNominatimPlace(nominatimPlace), 50); // innerhalb 50 m
+    }
+    if (!isNearby) {
+      this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation(), true).subscribe({
+        next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
+          if (nominatimAddressResponse.status === 200) {
+            if (nominatimAddressResponse.nominatimPlace.error) {
+              let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
+              place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
+              place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(place.boundingBox!);
+              this.placeService.createPlace(place)
+                .subscribe({
+                  next: createPlaceResponse => {
+                    if (createPlaceResponse.status === 200) {
+                      place.id = createPlaceResponse.placeId;
+                      this.places.unshift(place);
+                      this.placeService.saveAdditionalPlaceInfos();
+                      this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                    }
+                  },
+                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                  complete: () => { }
+                });
+            } else {
+              nominatimPlace = nominatimAddressResponse.nominatimPlace;
+              place.name = nominatimPlace.name!;
+              let boundingBox: BoundingBox;
+              if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {
+                boundingBox = {
+                  latMin: parseFloat(nominatimPlace.boundingbox[0]),
+                  latMax: parseFloat(nominatimPlace.boundingbox[1]),
+                  lonMin: parseFloat(nominatimPlace.boundingbox[2]),
+                  lonMax: parseFloat(nominatimPlace.boundingbox[3])
+                };
+                place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+                place.boundingBox = boundingBox;
+                place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
               }
+              this.placeService.createPlace(place)
+                .subscribe({
+                  next: createPlaceResponse => {
+                    if (createPlaceResponse.status === 200) {
+                      place.id = createPlaceResponse.placeId;
+                      this.places.unshift(place);
+                      this.placeService.saveAdditionalPlaceInfos();
+                      this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                    }
+                  },
+                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                  complete: () => { }
+                });
             }
-          }),
-          error: ((err) => { })
-        });
-      } else {
+          }
+        }),
+        error: ((err) => { })
+      });
+    } else {
+      if (nominatimPlace) {
         place.name = nominatimPlace.name!;
         let boundingBox: BoundingBox;
         if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {

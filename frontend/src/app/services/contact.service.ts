@@ -256,10 +256,10 @@ export class ContactService {
   }
 
   // We need a function from qrcode
-  createContact(contact: Contact, socketioService: SocketioService) {
+  createContact(contact: Contact, socketioService: SocketioService, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -294,10 +294,10 @@ export class ContactService {
       });
   }
 
-  updateContactName(contact: Contact) {
+  updateContactName(contact: Contact, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/update/name`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -321,10 +321,10 @@ export class ContactService {
       });
   }
 
-  updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService) {
+  updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/update/message`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -357,10 +357,10 @@ export class ContactService {
       });
   }
 
-  getByUserId(userId: string) {
+  getByUserId(userId: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -375,10 +375,10 @@ export class ContactService {
       );
   }
 
-  getById(contactId: string) {
+  getById(contactId: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/get/${contactId}`
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -393,10 +393,10 @@ export class ContactService {
       );
   }
 
-  deleteContact(contactToDelete: Contact) {
+  deleteContact(contactToDelete: Contact, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -422,10 +422,10 @@ export class ContactService {
       });
   }
 
-  subscribe(contact: Contact) {
+  subscribe(contact: Contact, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',
@@ -449,10 +449,10 @@ export class ContactService {
       });
   }
 
-  unsubscribe(contact: Contact) {
+  unsubscribe(contact: Contact, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Contact service',
       image: '',
       icon: '',

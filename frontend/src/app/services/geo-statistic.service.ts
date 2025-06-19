@@ -27,10 +27,10 @@ export class GeoStatisticService {
     return throwError(() => error);
   }
 
-  getDataForLocation(pluscode: string, latitude: number, longitude: number, years: number): Observable<GetGeoStatisticResponse> {
+  getDataForLocation(pluscode: string, latitude: number, longitude: number, years: number, showAlways: boolean = true): Observable<GetGeoStatisticResponse> {
     const url = `${environment.apiUrl}/geostatistic/${pluscode}/${latitude}/${longitude}/${years}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: true,
+      showAlways: showAlways,
       title: 'GeoStatistic Service',
       image: '',
       icon: '',

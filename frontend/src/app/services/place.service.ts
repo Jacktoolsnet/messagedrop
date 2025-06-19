@@ -134,10 +134,10 @@ export class PlaceService {
     return this.ready;
   }
 
-  createPlace(place: Place) {
+  createPlace(place: Place, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/create`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -160,10 +160,10 @@ export class PlaceService {
       );
   }
 
-  updatePlace(place: Place) {
+  updatePlace(place: Place, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/update`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -186,10 +186,10 @@ export class PlaceService {
       );
   }
 
-  getByUserId(userId: string) {
+  getByUserId(userId: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -204,10 +204,10 @@ export class PlaceService {
       );
   }
 
-  getById(placeId: string) {
+  getById(placeId: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/get/${placeId}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -222,10 +222,10 @@ export class PlaceService {
       );
   }
 
-  getByUserIdAndName(userId: string, name: string) {
+  getByUserIdAndName(userId: string, name: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -240,11 +240,11 @@ export class PlaceService {
       );
   }
 
-  deletePlace(placeId: string) {
+  deletePlace(placeId: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/delete/${placeId}`;
     console.log(url);
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -259,10 +259,10 @@ export class PlaceService {
       );
   }
 
-  subscribe(place: Place) {
+  subscribe(place: Place, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/subscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',
@@ -277,10 +277,10 @@ export class PlaceService {
       );
   }
 
-  unsubscribe(place: Place) {
+  unsubscribe(place: Place, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Place service',
       image: '',
       icon: '',

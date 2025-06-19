@@ -63,10 +63,10 @@ export class ConnectService {
       );
   }
 
-  getById(connectId: string, contact: Contact, socketioService: SocketioService) {
+  getById(connectId: string, contact: Contact, socketioService: SocketioService, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/connect/get/${connectId}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Connect service',
       image: '',
       icon: '',
@@ -120,10 +120,10 @@ export class ConnectService {
       });
   }
 
-  deleteConnect(connect: Connect) {
+  deleteConnect(connect: Connect, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/connect/delete/${connect.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Connect service',
       image: '',
       icon: '',
