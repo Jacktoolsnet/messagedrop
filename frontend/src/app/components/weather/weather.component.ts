@@ -41,7 +41,7 @@ export class WeatherComponent implements OnInit {
   }> = [];
 
   selectedDayIndex = 0;
-  selectedHour: number = new Date().getHours();
+  selectedHour = 0;
 
   selectedTile: any = null;
   tileIndex = 0;
@@ -58,11 +58,7 @@ export class WeatherComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (this.selectedDayIndex === 0) {
-      this.selectedHour = new Date().getHours();
-    } else {
-      this.selectedHour = 12;
-    }
+    this.selectedHour = new Date().getHours();
     this.getLocationName();
     this.updateTiles();
   }

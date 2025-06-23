@@ -436,6 +436,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let location: Location = this.mapService.getMapLocation();
     this.placeService.getSelectedPlace().plusCodes.push(location.plusCode);
     this.mapService.addPlaceLocationRectange(location);
+    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
   }
 
   public removeLocationFromPlace() {
@@ -443,6 +444,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let place = this.placeService.getSelectedPlace();
     place.plusCodes = place.plusCodes.filter(code => code !== location.plusCode);
     this.mapService.removePlaceLocationRectange(location);
+    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
   }
 
   public finishEditingPlace() {

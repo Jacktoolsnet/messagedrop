@@ -29,7 +29,7 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
-  tempChartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
+  chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
 
   constructor(
     @Inject(MAT_DIALOG_DATA) public data: { weather: Weather }
@@ -40,7 +40,9 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
 
   ngOnInit(): void { }
 
-  ngAfterViewInit(): void { }
+  ngAfterViewInit(): void {
+    this.updateChart();
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDayIndex'] && !changes['selectedDayIndex'].firstChange) {
@@ -54,15 +56,16 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
     if (changes['tile'] && changes['tile'].currentValue) {
       this.updateChart();
     }
+
   }
 
   private updateChart(): void {
     if (!this.weather) return;
 
-    const selectedDate = this.weather.daily[this.selectedDayIndex].date;
-    const dayHourly = this.weather.hourly.filter(h => h.time.startsWith(selectedDate));
+    const selectedDate = this.weather!.daily[this.selectedDayIndex].date;
+    const dayHourly = this.weather!.hourly.filter(h => h.time.startsWith(selectedDate));
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
-    const selectedHourStr = this.selectedHour.toString().padStart(2, '12');
+    const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
 
     let dataset: ChartDataset<'line', number[]> = {
@@ -241,7 +244,6 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       } else if (this.tile.type === 'uvIndex') {
         color = this.getUvColor(value);
       }
-
       annotations['selectedHour'] = {
         type: 'line',
         xMin: label,
@@ -311,8 +313,10 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       }
     };
 
-    this.tempChartData = { labels, datasets: [dataset] };
-    this.chartCanvas?.update();
+    this.chartData = { labels, datasets: [dataset] };
+    if (this.chartCanvas && this.chartCanvas.chart) {
+      this.chartCanvas.update();
+    }
   }
 
   /*private getHourIndex(time: string): number {
@@ -416,6 +420,7 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
     const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
     const selectedIndex = dayHourly.findIndex(h => h.time.includes(`T${selectedHourStr}:`));
+
     if (selectedIndex === -1) return;
 
     const labelTime = labels[selectedIndex];
@@ -454,7 +459,6 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       annotations.selectedHour.label.content = `${labelTime}: ${value}${this.getSelectedChartUnit()}`;
       annotations.selectedHour.label.backgroundColor = color;
     }
-
     chart.update('none');
   }
 
