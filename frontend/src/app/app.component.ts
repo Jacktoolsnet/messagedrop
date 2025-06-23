@@ -595,6 +595,14 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user);
+                    // Fly to position if user alrady allowed location.
+                    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+                      if (result.state === 'granted') {
+                        this.getCurrentPosition();
+                      } else {
+                        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+                      }
+                    });
                     // Subscribe for shared content
                     this.handleSharedContentOrNotification()
                   },
