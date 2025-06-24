@@ -1,10 +1,12 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { DateTime } from 'luxon';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreatePlaceResponse } from '../interfaces/create-place-response';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
+import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { IndexedDbService } from './indexed-db.service';
@@ -25,7 +27,8 @@ export class PlaceService {
     icon: '',
     subscribed: false,
     boundingBox: undefined,
-    plusCodes: []
+    plusCodes: [],
+    timezone: ''
   };
   private ready: boolean = false;
 
@@ -79,7 +82,8 @@ export class PlaceService {
       icon: '',
       subscribed: false,
       boundingBox: undefined,
-      plusCodes: []
+      plusCodes: [],
+      timezone: ''
     };
     this.ready = false;
   }
@@ -126,7 +130,8 @@ export class PlaceService {
       icon: '',
       subscribed: false,
       boundingBox: undefined,
-      plusCodes: []
+      plusCodes: [],
+      timezone: ''
     };;
   }
 
@@ -293,5 +298,31 @@ export class PlaceService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  getTimezone(location: Location, showAlways: boolean = false) {
+    let url = `${environment.apiUrl}/place/timezone/${location.latitude}/${location.longitude}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Unsubscribe from place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  getFormattedTime(timezone: string, locale: string): string {
+    return DateTime.now().setZone(timezone).setLocale(locale).toFormat('HH:mm:ss');
+  }
+
+  getFormattedDate(timezone: string, locale: string): string {
+    return DateTime.now().setZone(timezone).setLocale(locale).toFormat('cccc, dd LLL yyyy');
   }
 }

@@ -6,6 +6,7 @@ const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
+const geoTz = require('geo-tz');
 
 router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
@@ -136,6 +137,24 @@ router.get('/delete/:placeId', [security.checkToken], function (req, res) {
     }
     res.status(response.status).json(response);
   });
+});
+
+router.get('/timezone/:latitude/:longitude', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
+  try {
+    const lat = parseFloat(req.params.latitude);
+    const lon = parseFloat(req.params.longitude);
+    const [timezone] = geoTz.find(lat, lon);
+
+    response.status = 200;
+    response.timezone = timezone;
+    res.status(200).json(response);
+  } catch (err) {
+    console.error(err);
+    response.status = 500;
+    response.error = 'Could not determine timezone';
+    res.status(500).json(response);
+  }
 });
 
 module.exports = router

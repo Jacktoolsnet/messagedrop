@@ -26,6 +26,7 @@ import { PlaceService } from '../../services/place.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { PlaceComponent } from '../place/place.component';
+import { DateTimeComponent } from './date-time/date-time.component';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
 
 @Component({
@@ -41,7 +42,8 @@ import { DeletePlaceComponent } from './delete-place/delete-place.component';
     FormsModule,
     MatFormFieldModule,
     MatMenuModule,
-    MatInputModule
+    MatInputModule,
+    DateTimeComponent
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'
@@ -179,7 +181,8 @@ export class PlacelistComponent implements OnInit {
       icon: '',
       subscribed: false,
       boundingBox: undefined,
-      plusCodes: []
+      plusCodes: [],
+      timezone: ''
     };
     let nominatimPlace: NominatimPlace | undefined = undefined;
     let selectedPlace: string = await this.indexedDbService.getSetting('nominatimSelectedPlace');
@@ -196,19 +199,28 @@ export class PlacelistComponent implements OnInit {
               let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
               place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
               place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(place.boundingBox!);
-              this.placeService.createPlace(place)
-                .subscribe({
-                  next: createPlaceResponse => {
-                    if (createPlaceResponse.status === 200) {
-                      place.id = createPlaceResponse.placeId;
-                      this.places.unshift(place);
-                      this.placeService.saveAdditionalPlaceInfos();
-                      this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                    }
-                  },
-                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                  complete: () => { }
-                });
+              this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
+                next: (timezoneResponse: any) => {
+                  if (timezoneResponse.status === 200) {
+                    place.timezone = timezoneResponse.timezone;
+                    this.placeService.createPlace(place)
+                      .subscribe({
+                        next: createPlaceResponse => {
+                          if (createPlaceResponse.status === 200) {
+                            place.id = createPlaceResponse.placeId;
+                            this.places.unshift(place);
+                            this.placeService.saveAdditionalPlaceInfos();
+                            this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                          }
+                        },
+                        error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                        complete: () => { }
+                      });
+                  }
+                },
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                complete: () => { }
+              });
             } else {
               nominatimPlace = nominatimAddressResponse.nominatimPlace;
               place.name = nominatimPlace.name!;
@@ -224,19 +236,28 @@ export class PlacelistComponent implements OnInit {
                 place.boundingBox = boundingBox;
                 place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
               }
-              this.placeService.createPlace(place)
-                .subscribe({
-                  next: createPlaceResponse => {
-                    if (createPlaceResponse.status === 200) {
-                      place.id = createPlaceResponse.placeId;
-                      this.places.unshift(place);
-                      this.placeService.saveAdditionalPlaceInfos();
-                      this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                    }
-                  },
-                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                  complete: () => { }
-                });
+              this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
+                next: (timezoneResponse: any) => {
+                  if (timezoneResponse.status === 200) {
+                    place.timezone = timezoneResponse.timezone;
+                    this.placeService.createPlace(place)
+                      .subscribe({
+                        next: createPlaceResponse => {
+                          if (createPlaceResponse.status === 200) {
+                            place.id = createPlaceResponse.placeId;
+                            this.places.unshift(place);
+                            this.placeService.saveAdditionalPlaceInfos();
+                            this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                          }
+                        },
+                        error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                        complete: () => { }
+                      });
+                  }
+                },
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                complete: () => { }
+              });
             }
           }
         }),
@@ -257,19 +278,28 @@ export class PlacelistComponent implements OnInit {
           place.boundingBox = boundingBox;
           place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
         }
-        this.placeService.createPlace(place)
-          .subscribe({
-            next: createPlaceResponse => {
-              if (createPlaceResponse.status === 200) {
-                place.id = createPlaceResponse.placeId;
-                this.places.unshift(place);
-                this.placeService.saveAdditionalPlaceInfos();
-                this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-              }
-            },
-            error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-            complete: () => { }
-          });
+        this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
+          next: (timezoneResponse: any) => {
+            if (timezoneResponse.status === 200) {
+              place.timezone = timezoneResponse.timezone;
+              this.placeService.createPlace(place)
+                .subscribe({
+                  next: createPlaceResponse => {
+                    if (createPlaceResponse.status === 200) {
+                      place.id = createPlaceResponse.placeId;
+                      this.places.unshift(place);
+                      this.placeService.saveAdditionalPlaceInfos();
+                      this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                    }
+                  },
+                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+                  complete: () => { }
+                });
+            }
+          },
+          error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
+          complete: () => { }
+        });
       }
     }
   }
@@ -278,6 +308,10 @@ export class PlacelistComponent implements OnInit {
     let location: Location = this.geolocationService.getCenterOfBoundingBox(place.boundingBox!);
     this.mapService.flyToWithZoom(location, 18);
     this.dialogRef.close();
+  }
+
+  public getLocationForPlace(place: Place): Location {
+    return this.geolocationService.getCenterOfBoundingBox(place.boundingBox!);
   }
 
 }

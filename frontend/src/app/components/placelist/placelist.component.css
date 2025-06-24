@@ -11,8 +11,9 @@
 /* === CONTENT === */
 .content {
   padding: 1rem;
-  column-count: 1;
-  column-gap: 1rem;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
   white-space: normal;
 }
 
@@ -77,25 +78,25 @@
 /* === RESPONSIVES GRID === */
 @media (min-width: 450px) {
   .content {
-    column-count: 1;
+    grid-template-columns: repeat(1, 1fr);
   }
 }
 
 @media (min-width: 800px) {
   .content {
-    column-count: 2;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (min-width: 1200px) {
   .content {
-    column-count: 3;
+    grid-template-columns: repeat(3, 1fr);
   }
 }
 
 @media (min-width: 1600px) {
   .content {
-    column-count: 4;
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 
@@ -153,4 +154,28 @@ button,
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 1.25rem;
+}
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+  margin-top: 2.5rem;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 0.95rem;
+  color: #fff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s;
+}
+
+.tile:hover {
+  transform: scale(1.02);
 }

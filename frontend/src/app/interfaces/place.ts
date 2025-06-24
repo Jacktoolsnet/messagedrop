@@ -8,6 +8,7 @@ export interface Place {
     icon: string,
     subscribed: boolean,
     boundingBox: BoundingBox | undefined,
-    plusCodes: string[]
+    plusCodes: string[],
+    timezone: string
 }
 

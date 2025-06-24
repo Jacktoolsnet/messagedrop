@@ -11,6 +11,13 @@
                 <span *ngIf="place.name" class="name">{{place.name}}</span>
             </div>
             <mat-card-content>
+                <div class="tile-grid">
+                    <app-date-time [timezone]="place.timezone" />
+                    <div class="tile weather">
+                        <mat-icon>wb_sunny</mat-icon>
+                        <span>Wetter</span>
+                    </div>
+                </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Edit note"
