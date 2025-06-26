@@ -8,6 +8,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { catchError, map, Observable, of } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
+import { Location } from '../../interfaces/location';
 import { Weather } from '../../interfaces/weather';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
@@ -32,6 +33,7 @@ import { WeatherDetailComponent } from './weather-detail/weather-detail.componen
 export class WeatherComponent implements OnInit {
 
   weather: Weather | null = null;
+  location: Location;
   tiles: Array<{
     type: string;
     label: string;
@@ -52,9 +54,10 @@ export class WeatherComponent implements OnInit {
     private mapService: MapService,
     private nomatinService: NominatimService,
     private dialogRef: MatDialogRef<WeatherComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { weather: Weather }
+    @Inject(MAT_DIALOG_DATA) public data: { weather: Weather, location: Location }
   ) {
     this.weather = this.data.weather;
+    this.location = this.data.location;
   }
 
   ngOnInit(): void {
@@ -100,7 +103,7 @@ export class WeatherComponent implements OnInit {
 
   getLocationName(): void {
     this.locationName$ = this.nomatinService
-      .getNominatimPlaceByLocation(this.mapService.getMapLocation())
+      .getNominatimPlaceByLocation(this.location)
       .pipe(
         map((res: GetNominatimAddressResponse) => {
           const addr = res.nominatimPlace.address;

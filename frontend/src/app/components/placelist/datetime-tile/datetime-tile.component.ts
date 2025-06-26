@@ -1,14 +1,14 @@
-import { Component, Input } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { PlaceService } from '../../../services/place.service';
 
 @Component({
-  selector: 'app-date-time',
+  selector: 'app-datetime-tile',
   imports: [MatIcon],
-  templateUrl: './date-time.component.html',
-  styleUrl: './date-time.component.css'
+  templateUrl: './datetime-tile.component.html',
+  styleUrl: './datetime-tile.component.css'
 })
-export class DateTimeComponent {
+export class DateTimeTileComponent implements OnInit, OnDestroy {
   @Input() timezone!: string;
   time = '';
   date = '';

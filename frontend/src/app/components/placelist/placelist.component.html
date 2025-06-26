@@ -12,11 +12,8 @@
             </div>
             <mat-card-content>
                 <div class="tile-grid">
-                    <app-date-time [timezone]="place.timezone" />
-                    <div class="tile weather">
-                        <mat-icon>wb_sunny</mat-icon>
-                        <span>Wetter</span>
-                    </div>
+                    <app-datetime-tile [timezone]="place.timezone" />
+                    <app-weather-tile [place]="place" />
                 </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">

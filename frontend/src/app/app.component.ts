@@ -1104,7 +1104,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       .subscribe({
         next: (weather) => {
           const dialogRef = this.dialog.open(WeatherComponent, {
-            data: { weather: weather },
+            data: { weather: weather, location: this.mapService.getMapLocation() },
             closeOnNavigation: true,
             minWidth: '90vw',
             width: '90vw',

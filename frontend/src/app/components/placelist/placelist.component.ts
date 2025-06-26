@@ -26,8 +26,9 @@ import { PlaceService } from '../../services/place.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { PlaceComponent } from '../place/place.component';
-import { DateTimeComponent } from './date-time/date-time.component';
+import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
+import { WeatherTileComponent } from './weather-tile/weather-tile.component';
 
 @Component({
   selector: 'app-placelist',
@@ -43,7 +44,8 @@ import { DeletePlaceComponent } from './delete-place/delete-place.component';
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    DateTimeComponent
+    DateTimeTileComponent,
+    WeatherTileComponent
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'
