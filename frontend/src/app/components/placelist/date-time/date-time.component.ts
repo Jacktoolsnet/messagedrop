@@ -12,6 +12,7 @@ export class DateTimeComponent {
   @Input() timezone!: string;
   time = '';
   date = '';
+  week = '';
   private timer: any;
   private locale = navigator.language || 'en';
 
@@ -29,5 +30,6 @@ export class DateTimeComponent {
   private updateTime() {
     this.time = this.placeService.getFormattedTime(this.timezone, this.locale);
     this.date = this.placeService.getFormattedDate(this.timezone, this.locale);
+    this.week = this.placeService.getWeekNumber(this.timezone, this.locale);
   }
 }

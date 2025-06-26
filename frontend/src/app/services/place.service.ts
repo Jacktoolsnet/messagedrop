@@ -325,4 +325,13 @@ export class PlaceService {
   getFormattedDate(timezone: string, locale: string): string {
     return DateTime.now().setZone(timezone).setLocale(locale).toFormat('cccc, dd LLL yyyy');
   }
+
+  getWeekNumber(timezone: string, locale: string): string {
+    const dt = DateTime.now().setZone(timezone).setLocale(locale);
+    const weekNumber = dt.weekNumber;
+
+    // Lokalisierte Präfixe
+    const prefix = locale.startsWith('de') ? 'KW' : 'Wk';
+    return `${prefix} ${weekNumber}`;
+  }
 }
