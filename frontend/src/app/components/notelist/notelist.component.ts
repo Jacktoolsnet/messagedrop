@@ -100,8 +100,9 @@ export class NotelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result && undefined != this.noteToDelete) {
-        this.notes.splice(this.notes.findIndex(note => note === this.noteToDelete), 1)
-        this.noteService.saveNotes();
+        this.noteService.deleteNote(this.noteToDelete).then(() => {
+          this.notes = this.notes.filter(note => note.id !== this.noteToDelete.id);
+        });
       }
     });
   }
@@ -124,7 +125,7 @@ export class NotelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.note) {
-        this.noteService.saveNotes();
+        this.noteService.updateNote(data.note)
       }
     });
   }
@@ -135,12 +136,14 @@ export class NotelistComponent implements OnInit {
 
   openNoteDialog(): void {
     let note: Note = {
+      id: '',
       latitude: 0,
       longitude: 0,
       plusCode: '',
       note: '',
       markerType: 'note',
       style: '',
+      timestamp: 0,
       multimedia: {
         type: MultimediaType.UNDEFINED,
         url: '',
@@ -171,7 +174,6 @@ export class NotelistComponent implements OnInit {
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
         this.noteService.addNote(data.note);
-        this.noteService.saveNotes();
       }
     });
   }

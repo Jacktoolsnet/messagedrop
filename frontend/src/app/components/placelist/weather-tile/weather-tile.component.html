@@ -9,7 +9,7 @@
 </div>
 <div *ngIf="weather" class="tile weather-tile" (click)="openWeatherDetails()">
     <div class="tile-info">
-        <i class="wi wi-{{ weatherIcon }}" style="font-size: 1.5rem"></i>
+        <i class="wi wi-{{ weatherIcon }}"></i>
         <div class="tile-content">
             <div class="tile-temperature">{{ weather.current.temperature }} °C</div>
             <div class="tile-windspeed">{{ weather.current.windspeed }} km/h</div>

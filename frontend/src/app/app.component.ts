@@ -474,7 +474,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         // Clear markerLocations
         this.markerLocations.clear()
         // notes from local device
-        this.noteService.filter(location.plusCode);
+        this.noteService.filterByPlusCode(location.plusCode);
         // Messages
         this.messageService.getByPlusCode(location, this.messageSubject);
       }
@@ -501,11 +501,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.openMarkerMessageListDialog(this.messageService.getMessages());
         break;
       case MarkerType.PRIVATE_NOTE:
-        this.openMarkerNoteListDialog(this.noteService.filter(event.plusCode));
+        this.noteService.filterByPlusCode(event.plusCode).then(notes => {
+          this.openMarkerNoteListDialog(notes);
+        });
         break;
       case MarkerType.MULTI:
-        let messages: Message[] = this.messageService.getMessages().filter((message) => message.plusCode === event.plusCode);
-        let notes: Note[] = this.noteService.filter(event.plusCode);
         this.openMarkerMultiDialog(this.messageService.getMessages(), this.noteService.getNotes());
         break;
     }
@@ -765,12 +765,14 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       }
     }
     let note: Note = {
+      id: '',
       latitude: 0,
       longitude: 0,
       plusCode: '',
       note: '',
       markerType: 'note',
       style: '',
+      timestamp: 0,
       multimedia: undefined != lastMultimedia ? lastMultimedia : {
         type: MultimediaType.UNDEFINED,
         url: '',
@@ -804,7 +806,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         data.note.longitude = this.mapService.getMapLocation().longitude;
         data.note.plusCode = this.mapService.getMapLocation().plusCode;
         this.noteService.addNote(data.note);
-        this.noteService.saveNotes();
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
         this.sharedContentService.deleteSharedContent('last');
         this.sharedContentService.deleteSharedContent('lastMultimedia');
@@ -869,24 +870,26 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public openUserNoteListDialog(): void {
-    const dialogRef = this.messageListDialog.open(NotelistComponent, {
-      panelClass: 'NoteListDialog',
-      closeOnNavigation: true,
-      data: { notes: this.noteService.loadNotes() },
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '8rem',
-      maxHeight: '90vh',
-      hasBackdrop: true,
-      autoFocus: false
-    });
+    this.noteService.loadNotes().then(notes => {
+      const dialogRef = this.messageListDialog.open(NotelistComponent, {
+        panelClass: 'NoteListDialog',
+        closeOnNavigation: true,
+        data: { notes: notes },
+        minWidth: '20vw',
+        maxWidth: '90vw',
+        minHeight: '8rem',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
 
-    dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("userNoteList");
-      window.history.replaceState(this.myHistory, '', '');
-    });
+      dialogRef.afterOpened().subscribe(e => {
+        this.myHistory.push("userNoteList");
+        window.history.replaceState(this.myHistory, '', '');
+      });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
+      dialogRef.afterClosed().subscribe((data: any) => {
+      });
     });
   }
 

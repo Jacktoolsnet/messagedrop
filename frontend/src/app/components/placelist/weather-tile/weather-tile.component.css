@@ -4,7 +4,7 @@
     background-color: #3a3a3a;
     box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
     padding: 1rem;
-    text-align: center;
+    text-align: left;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -33,4 +33,14 @@
 .tile-temperature {
     font-size: 1.2rem;
     font-weight: bold;
+}
+
+.wi {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.5rem;
 }

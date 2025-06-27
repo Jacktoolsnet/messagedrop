@@ -1,45 +1,58 @@
 import { Injectable } from '@angular/core';
+import { BoundingBox } from '../interfaces/bounding-box';
 import { Note } from '../interfaces/note';
 import { User } from '../interfaces/user';
+import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class NoteService {
-
   private notes: Note[] = [];
 
-  constructor() { }
+  constructor(private indexedDbService: IndexedDbService) { }
 
   getNotes(): Note[] {
-    return this.notes
-  }
-
-  addNote(note: Note) {
-    this.notes.unshift(note);
-  }
-
-  filter(plusCode: string): Note[] {
-    this.notes = JSON.parse(localStorage.getItem('notes') || '[]');
-    this.notes = this.notes.filter((note) => note.plusCode.startsWith(plusCode));
     return this.notes;
   }
 
-  loadNotes(): Note[] {
-    this.notes = JSON.parse(localStorage.getItem('notes') || '[]');
+  async loadNotes(): Promise<Note[]> {
+    this.notes = await this.indexedDbService.getAllNotes();
     return this.notes;
   }
 
-  saveNotes() {
-    localStorage.setItem('notes', JSON.stringify(this.notes))
+  async addNote(note: Note): Promise<Note> {
+    const noteWithId: Note = { ...note, id: await this.indexedDbService.saveNote(note) };
+    this.notes.unshift(noteWithId);
+    return noteWithId;
   }
 
-  deleteNotesFromStorage() {
-    localStorage.removeItem('notes');
+  async updateNote(note: Note): Promise<void> {
+    await this.indexedDbService.updateNote(note);
+    const index = this.notes.findIndex(n => n.id === note.id);
+    if (index !== -1) {
+      this.notes[index] = note;
+    }
   }
 
-  navigateToNoteLocation(user: User, note: Note) {
-    let url: string = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(note.plusCode)}`
+  async deleteNote(note: Note): Promise<void> {
+    await this.indexedDbService.deleteNote(note.id);
+    this.notes = this.notes.filter(note => note.id !== note.id);
+  }
+
+  async filterByPlusCode(plusCode: string): Promise<Note[]> {
+    const allNotes = await this.indexedDbService.getAllNotes();
+    this.notes = allNotes.filter(note => note.plusCode.startsWith(plusCode));
+    return this.notes;
+  }
+
+  async getNotesInBoundingBox(bbox: BoundingBox): Promise<Note[]> {
+    this.notes = await this.indexedDbService.getNotesInBoundingBox(bbox);
+    return this.notes;
+  }
+
+  navigateToNoteLocation(user: User, note: Note): void {
+    const url = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(note.plusCode)}`;
     window.open(url, '_blank');
   }
 }
