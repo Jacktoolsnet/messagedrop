@@ -51,7 +51,6 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (weather) => {
-            console.log('Weather data received:', weather);
             this.weather = weather;
             this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
           },
@@ -98,7 +97,6 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
   }
 
   openWeatherDetails(): void {
-    console.log('Opening weather details dialog');
     let boundingBox: BoundingBox | undefined = this.geolocationService.getBoundingBoxFromPlusCodes(this.place.plusCodes);
     const dialogRef = this.dialog.open(WeatherComponent, {
       data: { weather: this.weather, location: this.geolocationService.getCenterOfBoundingBox(boundingBox!) },

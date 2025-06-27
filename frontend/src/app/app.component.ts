@@ -874,7 +874,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       const dialogRef = this.messageListDialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
-        data: { notes: notes },
+        data: { notes: notes, location: this.mapService.getMapLocation() },
         minWidth: '20vw',
         maxWidth: '90vw',
         minHeight: '8rem',
@@ -1008,7 +1008,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { notes: notes },
+      data: { notes: notes, location: this.mapService.getMapLocation() },
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',

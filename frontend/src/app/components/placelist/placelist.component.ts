@@ -17,7 +17,6 @@ import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { Place } from '../../interfaces/place';
-import { CryptoService } from '../../services/crypto.service';
 import { GeolocationService } from '../../services/geolocation.service';
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { MapService } from '../../services/map.service';
@@ -28,6 +27,7 @@ import { UserService } from '../../services/user.service';
 import { PlaceComponent } from '../place/place.component';
 import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
+import { NoteTileComponent } from './note-tile/note-tile.component';
 import { WeatherTileComponent } from './weather-tile/weather-tile.component';
 
 @Component({
@@ -45,7 +45,8 @@ import { WeatherTileComponent } from './weather-tile/weather-tile.component';
     MatMenuModule,
     MatInputModule,
     DateTimeTileComponent,
-    WeatherTileComponent
+    WeatherTileComponent,
+    NoteTileComponent
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'
@@ -64,7 +65,6 @@ export class PlacelistComponent implements OnInit {
     private geolocationService: GeolocationService,
     private placeService: PlaceService,
     public userService: UserService,
-    private cryptoService: CryptoService,
     public dialogRef: MatDialogRef<PlacelistComponent>,
     public placeDialog: MatDialog,
     public dialog: MatDialog,

@@ -162,7 +162,6 @@ const deleteById = function (db, placeId, callback) {
         DELETE FROM ${tableName}
         WHERE ${columnPlaceId} = ?;`;
         db.run(sql, [placeId], (err) => {
-            console.log(err)
             if (err) {
                 callback(err);
             } else {

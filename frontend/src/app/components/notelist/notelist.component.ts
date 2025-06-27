@@ -48,6 +48,7 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
 })
 export class NotelistComponent implements OnInit {
   public notes: Note[];
+  private location: Location;
   private noteToDelete!: Note
   public user: User | undefined;
   public mode: typeof Mode = Mode;
@@ -63,9 +64,10 @@ export class NotelistComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { notes: Note[] }
+    @Inject(MAT_DIALOG_DATA) public data: { notes: Note[], location: Location }
   ) {
     this.notes = data.notes;
+    this.location = data.location;
   }
 
   ngOnInit(): void {
@@ -170,9 +172,9 @@ export class NotelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.note) {
-        data.note.latitude = this.mapService.getMapLocation().latitude;
-        data.note.longitude = this.mapService.getMapLocation().longitude;
-        data.note.plusCode = this.mapService.getMapLocation().plusCode;
+        data.note.latitude = this.location.latitude;
+        data.note.longitude = this.location.longitude;
+        data.note.plusCode = this.location.plusCode;
         this.noteService.addNote(data.note);
       }
     });

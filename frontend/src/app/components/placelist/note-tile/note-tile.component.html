@@ -1,0 +1,16 @@
+<div class="tile" (click)="openNoteDialog()">
+    <div class="tile-header">
+        <mat-icon class="material-symbols-outlined tile-icon">clinical_notes</mat-icon>
+        <span class="tile-title">Private notes</span>
+    </div>
+
+    <ng-container *ngIf="visibleNotes.length > 0; else noNotes">
+        <div class="note-card" *ngFor="let note of visibleNotes">
+            <span class="note-text">{{ note.note }}</span>
+        </div>
+    </ng-container>
+
+    <ng-template #noNotes>
+        <div class="note-empty">No notes found.</div>
+    </ng-template>
+</div>
