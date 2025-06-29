@@ -307,6 +307,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.userService.logout()
     this.placeService.logout();
     this.contactService.logout();
+    this.noteService.logout();
+    this.updateDataForLocation(this.mapService.getMapLocation(), true);
   }
 
   public handleSharedContentOrNotification() {
@@ -466,7 +468,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
-  private updateDataForLocation(location: Location, forceSearch: boolean) {
+  private async updateDataForLocation(location: Location, forceSearch: boolean) {
     if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
       this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
     } else {
@@ -474,9 +476,12 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         // Clear markerLocations
         this.markerLocations.clear()
         // notes from local device
-        this.noteService.filterByPlusCode(location.plusCode);
+        if (this.userService.isReady()) {
+          await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
+        }
         // Messages
         this.messageService.getByPlusCode(location, this.messageSubject);
+        this.createMarkerLocations();
       }
     }
   }
@@ -491,19 +496,22 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public handleMarkerClickEvent(event: any) {
-    this.mapService.moveTo({
+    let location: Location = {
       latitude: event.latitude,
       longitude: event.longitude,
       plusCode: event.plusCode
-    });
+    }
+    this.mapService.moveTo(location);
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
         this.openMarkerMessageListDialog(this.messageService.getMessages());
         break;
       case MarkerType.PRIVATE_NOTE:
-        this.noteService.filterByPlusCode(event.plusCode).then(notes => {
-          this.openMarkerNoteListDialog(notes);
-        });
+        if (this.userService.isReady()) {
+          this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())).then(notes => {
+            this.openMarkerNoteListDialog(notes);
+          });
+        }
         break;
       case MarkerType.MULTI:
         this.openMarkerMultiDialog(this.messageService.getMessages(), this.noteService.getNotes());

@@ -212,20 +212,22 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessageUserProfile(message: Message) {
-    const dialogRef = this.dialog.open(EditProfileComponent, {
-      data: { profile: this.profileService.getProfile(message.userId), userId: message.userId },
-      closeOnNavigation: true,
-      hasBackdrop: true
-    });
+    if (this.userService.isReady()) {
+      const dialogRef = this.dialog.open(EditProfileComponent, {
+        data: { profile: this.profileService.getProfile(message.userId), userId: message.userId },
+        closeOnNavigation: true,
+        hasBackdrop: true
+      });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
+      dialogRef.afterOpened().subscribe(e => {
+      });
 
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.profileService.setProfile(result.userId, result.profile);
-      }
-    });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.profileService.setProfile(result.userId, result.profile);
+        }
+      });
+    }
   }
 
   public addComment(parentMessage: Message) {

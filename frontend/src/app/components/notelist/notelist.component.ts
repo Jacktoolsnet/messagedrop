@@ -56,7 +56,7 @@ export class NotelistComponent implements OnInit {
   private snackBarRef: any;
 
   constructor(
-    private userService: UserService,
+    public userService: UserService,
     private noteService: NoteService,
     private mapService: MapService,
     private geolocationService: GeolocationService,

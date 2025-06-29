@@ -12,17 +12,20 @@
                 </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">
-                <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
+                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Edit note"
+                    (click)="editNote(note)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
+                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Delete note"
+                    (click)="deleteNote(note)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
+                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Fly to note"
+                    (click)="flyTo(note)">
                     <mat-icon>place</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
-                    (click)="navigateToNoteLocation(note)">
+                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary"
+                    aria-label="Navigate to note location." (click)="navigateToNoteLocation(note)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
             </mat-card-actions>

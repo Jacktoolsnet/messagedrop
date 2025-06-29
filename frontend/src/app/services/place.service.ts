@@ -247,7 +247,6 @@ export class PlaceService {
 
   deletePlace(placeId: string, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/delete/${placeId}`;
-    console.log(url);
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',

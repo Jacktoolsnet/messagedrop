@@ -6,7 +6,7 @@
         <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
             (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
         <app-showmultimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
-            [multimedia]="note.multimedia"></app-showmultimedia>
+            [multimedia]="data.note.multimedia"></app-showmultimedia>
         <!--div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>

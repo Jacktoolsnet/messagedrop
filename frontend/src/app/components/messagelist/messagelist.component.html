@@ -82,8 +82,8 @@
                     (click)="translateMessage(messageService.getSelectedMessages().at(-1)!)">
                     <mat-icon>translate</mat-icon>
                 </button>
-                <button *ngIf="user.id != messageService.getSelectedMessages().at(-1)?.userId" mat-mini-fab
-                    color="secondary" aria-label="Edit message"
+                <button *ngIf="userService.isReady() && user.id != messageService.getSelectedMessages().at(-1)?.userId"
+                    mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(messageService.getSelectedMessages().at(-1)!)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">person</mat-icon>
                 </button>
