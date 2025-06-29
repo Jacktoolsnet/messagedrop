@@ -5,8 +5,9 @@
     <div class="content">
         <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
             (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
-
-        <div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
+        <app-showmultimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
+            [multimedia]="note.multimedia"></app-showmultimedia>
+        <!--div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
@@ -17,7 +18,7 @@
                 <mat-icon>delete</mat-icon>
             </button>
             <div [innerHTML]="safeHtml" class="oembed_container_iframe"></div>
-        </div>
+        </div-->
 
         <!--div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
@@ -46,8 +47,8 @@
             </button>
             <iframe [src]="safeUrl!" width="320" height="400" frameborder="0" allowtransparency="true"></iframe>
         </div-->
-        <a class=" attribution_link" href="{{data.note.multimedia.sourceUrl}}"
-            target="_blank">{{data.note.multimedia.attribution}}</a>
+        <!--a class=" attribution_link" href="{{data.note.multimedia.sourceUrl}}"
+            target="_blank">{{data.note.multimedia.attribution}}</a-->
         <div *ngIf="data.note.note === ''" class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>

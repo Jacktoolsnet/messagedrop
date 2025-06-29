@@ -732,9 +732,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
-      this.sharedContentService.deleteSharedContent('last');
-      this.sharedContentService.deleteSharedContent('lastMultimedia');
-      this.sharedContentService.deleteSharedContent('lastLocation');
     });
   }
 
@@ -783,9 +780,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.noteService.addNote(data.note);
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
-      this.sharedContentService.deleteSharedContent('last');
-      this.sharedContentService.deleteSharedContent('lastMultimedia');
-      this.sharedContentService.deleteSharedContent('lastLocation');
     });
   }
 

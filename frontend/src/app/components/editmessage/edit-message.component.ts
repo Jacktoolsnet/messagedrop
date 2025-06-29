@@ -15,15 +15,18 @@ import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
+import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
+import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 
 @Component({
   selector: 'app-message',
   imports: [
     SelectMultimediaComponent,
+    ShowmultimediaComponent,
     CommonModule,
     FormsModule,
     MatButtonModule,
@@ -45,6 +48,7 @@ export class EditMessageComponent implements OnInit {
 
   constructor(
     private userService: UserService,
+    private sharedContentService: SharedContentService,
     private sanitizer: DomSanitizer,
     private snackBar: MatSnackBar,
     private textDialog: MatDialog,
@@ -125,6 +129,9 @@ export class EditMessageComponent implements OnInit {
     this.data.message.multimedia.sourceUrl = '';
     this.safeHtml = undefined;
     this.showSaveHtml = false;
+    this.sharedContentService.deleteSharedContent('last');
+    this.sharedContentService.deleteSharedContent('lastMultimedia');
+    this.sharedContentService.deleteSharedContent('lastLocation');
   }
 
   public openTextDialog(): void {
