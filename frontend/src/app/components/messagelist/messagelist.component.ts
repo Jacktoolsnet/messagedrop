@@ -22,6 +22,7 @@ import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
+import { SharedContentService } from '../../services/shared-content.service';
 import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
@@ -54,6 +55,7 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 })
 export class MessagelistComponent implements OnInit {
   public messages!: Message[];
+  private location: Location;
   public user!: User;
   public userProfile!: Profile;
   public likeButtonColor: string = 'secondary';
@@ -67,15 +69,17 @@ export class MessagelistComponent implements OnInit {
     private mapService: MapService,
     private geolocationService: GeolocationService,
     public profileService: ProfileService,
+    private sharedContentService: SharedContentService,
     public dialogRef: MatDialogRef<any>,
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { messages: Message[] }
+    @Inject(MAT_DIALOG_DATA) public data: { messages: Message[], location: Location }
   ) {
     this.user = this.userService.getUser();
     this.userProfile = this.userService.getProfile();
     this.messages = data.messages;
+    this.location = data.location;
   }
 
   async ngOnInit() {
@@ -183,6 +187,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessage(message: Message) {
+    if (message.multimedia.type !== MultimediaType.UNDEFINED) {
+      this.sharedContentService.addSharedContentToMessage(message);
+    }
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message: message },
@@ -251,6 +258,7 @@ export class MessagelistComponent implements OnInit {
         contentId: ''
       }
     };
+    this.sharedContentService.addSharedContentToMessage(message);
 
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
@@ -318,6 +326,8 @@ export class MessagelistComponent implements OnInit {
         contentId: ''
       }
     };
+    this.sharedContentService.addSharedContentToMessage(message);
+
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -334,7 +344,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
+        this.messageService.createMessage(data.message, this.location, this.userService.getUser());
       }
     });
   }

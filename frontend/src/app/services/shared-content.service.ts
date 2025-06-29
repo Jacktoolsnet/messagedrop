@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { Message } from '../interfaces/message';
+import { Multimedia } from '../interfaces/multimedia';
+import { Note } from '../interfaces/note';
 import { SharedContent } from '../interfaces/shared-content';
+import { MapService } from './map.service';
+import { OembedService } from './oembed.service';
 
 @Injectable({ providedIn: 'root' })
 export class SharedContentService {
@@ -10,7 +15,10 @@ export class SharedContentService {
 
   private sharedAvailableSubject = new BehaviorSubject<boolean>(false);
 
-  constructor() {
+  constructor(
+    private oembedService: OembedService, // Assuming OembedService is defined elsewhere
+    private mapService: MapService // Assuming MapService is defined elsewhere
+  ) {
     this.openDB();
     this.setupServiceWorkerListener();
     this.checkIfSharedExists();
@@ -86,5 +94,27 @@ export class SharedContentService {
   private async checkIfSharedExists(): Promise<void> {
     const last = await this.getSharedContent('last');
     this.sharedAvailableSubject.next(!!last);
+  }
+
+  public async addSharedContentToMessage(message: Message): Promise<void> {
+    const lastMultimediaContent = await this.getSharedContent('lastMultimedia');
+    let lastMultimedia: Multimedia | undefined = undefined;
+    if (lastMultimediaContent) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+      if (undefined != lastMultimedia) {
+        message.multimedia = lastMultimedia;
+      }
+    }
+  }
+
+  public async addSharedContentToNote(note: Note): Promise<void> {
+    const lastMultimediaContent = await this.getSharedContent('lastMultimedia');
+    let lastMultimedia: Multimedia | undefined = undefined;
+    if (lastMultimediaContent) {
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+      if (undefined != lastMultimedia) {
+        note.multimedia = lastMultimedia;
+      }
+    }
   }
 }
