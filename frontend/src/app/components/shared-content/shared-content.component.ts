@@ -1,9 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MapService } from '../../services/map.service';
+import { SharedContentService } from '../../services/shared-content.service';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 
 @Component({
@@ -12,6 +14,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
   imports: [
     CommonModule,
     MatDialogContent,
+    MatIcon,
     ShowmultimediaComponent
   ],
   templateUrl: './shared-content.component.html',
@@ -27,6 +30,7 @@ export class SharedContentComponent implements OnInit {
 
   constructor(
     private mapService: MapService,
+    private sharedContentService: SharedContentService,
     private dialogRef: MatDialogRef<SharedContentComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { multimedia: Multimedia | undefined, location: Location | undefined }
   ) {
@@ -47,6 +51,21 @@ export class SharedContentComponent implements OnInit {
         this.dialogRef.close();
       }
     }, 1000);
+  }
+
+  public deleteSharedContent(): void {
+    if (this.multimedia) {
+      this.sharedContentService.deleteSharedContent('last');
+      this.sharedContentService.deleteSharedContent('lastMultimedia');
+    }
+    this.dialogRef.close();
+  }
+
+  public deleteSharedLocation(): void {
+    if (this.location) {
+      this.sharedContentService.deleteSharedContent('last');
+      this.sharedContentService.deleteSharedContent('lastLocation');
+    }
   }
 
   public ngOnDestroy(): void {

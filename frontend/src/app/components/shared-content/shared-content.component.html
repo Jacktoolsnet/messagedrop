@@ -3,8 +3,22 @@
     <app-showmultimedia *ngIf="multimedia" [multimedia]="multimedia">
     </app-showmultimedia>
     <h4>Add this content to a post, note or message.</h4>
+    <div class="buttonarea">
+        <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button_style"
+            (click)="deleteSharedContent()">
+            <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+            <span>Remove shared content</span>
+        </button>
+    </div>
 </mat-dialog-content>
 <mat-dialog-content *ngIf="location" class="full-width">
     <h2 mat-dialog-title>Shared location received</h2>
     <h4> Jumping to the shared location on the map.</h4>
+    <div class="buttonarea">
+        <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button_style"
+            (click)="deleteSharedLocation()">
+            <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+            <span>Remove shared location</span>
+        </button>
+    </div>
 </mat-dialog-content>
