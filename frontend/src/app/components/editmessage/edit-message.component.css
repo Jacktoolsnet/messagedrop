@@ -87,15 +87,6 @@ h4 {
     border-radius: 0.25rem;
 }
 
-.oembed_container_iframe {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    aspect-ratio: 16 / 9;
-}
-
 .text_container {
     width: 75%;
     margin: 1rem;

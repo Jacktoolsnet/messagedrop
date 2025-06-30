@@ -1,16 +1,16 @@
-.multimedia_container {
-    width: 100%;
+.media_block {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    position: relative;
-    background-color: transparent;
+    width: 100%;
 }
 
 .multimedia_image {
     max-width: 95%;
     object-fit: contain;
     border-radius: 0.5rem;
+    display: block;
+    margin: 0 auto;
 }
 
 .oembed_container {

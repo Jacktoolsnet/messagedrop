@@ -5,6 +5,10 @@ import { UserService } from '../services/user.service';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
     const userService = inject(UserService);
 
+    if (req.url.includes('tenor')) {
+        return next(req);
+    }
+
     if (userService.isReady()) {
         const authReq = req.clone({
             setHeaders: {

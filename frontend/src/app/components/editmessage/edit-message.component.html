@@ -7,16 +7,14 @@
     <div class="content">
         <app-select-multimedia *ngIf="data.message.multimedia.type === 'undefined'" class="oembed_container"
             (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
-        <app-showmultimedia *ngIf="data.message.multimedia.type === 'undefined'" class="oembed_container"
-            [multimedia]="data.message.multimedia"></app-showmultimedia>
-
-        <!--div *ngIf="data.message.multimedia.type === 'tenor'" class="oembed_container">
+        <div *ngIf="data.message.multimedia.type !== 'undefined'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <img class="multimedia_image" [src]="data.message.multimedia.url">
+            <app-showmultimedia class="oembed_container" [multimedia]="data.message.multimedia">
+            </app-showmultimedia>
         </div>
-        <div *ngIf="data.message.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
+        <!--div *ngIf="data.message.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>

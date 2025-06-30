@@ -5,15 +5,17 @@
     <div class="content">
         <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
             (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
-        <app-showmultimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
-            [multimedia]="data.note.multimedia"></app-showmultimedia>
-        <!--div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
+        <div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <img class="multimedia_image" [src]="data.note.multimedia.url">
+            <app-showmultimedia class="oembed_container" [multimedia]="data.note.multimedia">
+                <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
+                    <mat-icon>delete</mat-icon>
+                </button>
+            </app-showmultimedia>
         </div>
-        <div *ngIf="data.note.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
+        <!--div *ngIf="data.note.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
