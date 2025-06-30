@@ -5,7 +5,7 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableConnect = require('../db/tableConnect');
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   let connectId = uuid.v4();
   tableConnect.create(req.database.db, connectId, req.body.userId, req.body.hint, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.signature, function (err) {
@@ -20,7 +20,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.get('/get/:connectId', [security.checkToken], function (req, res) {
+router.get('/get/:connectId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableConnect.getById(req.database.db, req.params.connectId, function (err, row) {
     if (err) {
@@ -38,7 +38,7 @@ router.get('/get/:connectId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/delete/:connectId', [security.checkToken], function (req, res) {
+router.get('/delete/:connectId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableConnect.deleteById(req.database.db, req.params.connectId, function (err) {
     if (err) {

@@ -5,7 +5,7 @@ const bodyParser = require('body-parser');
 const OpenAI = require('openai')
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-router.post('/moderate', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/moderate', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   openai.moderations.create({
     model: "omni-moderation-latest",
     input: req.body.message.replace(/\'/g, "''"),

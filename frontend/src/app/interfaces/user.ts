@@ -5,6 +5,8 @@ import { UserType } from "./user-type";
 export interface User {
     id: string,
     pinHash: string,
+    jwt?: string,
+    jwtExpiresAt?: number,
     location: Location,
     locale: string,
     language: string,

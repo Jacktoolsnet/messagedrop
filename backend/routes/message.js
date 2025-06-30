@@ -120,7 +120,7 @@ router.get('/get/pluscode/:plusCode', [security.checkToken], function (req, res)
   }
 });
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   if (undefined == req.body.parentMessageId) {
     req.body.parentMessageId = 0;
@@ -137,7 +137,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/update', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia.replace(/\'/g, "''"), function (err) {
     if (err) {
@@ -189,7 +189,7 @@ router.get('/enable/:messageId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/delete/:messageId', [security.checkToken], function (req, res) {
+router.get('/delete/:messageId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableMessage.deleteById(req.database.db, req.params.messageId, function (err) {
     if (err) {
@@ -202,7 +202,7 @@ router.get('/delete/:messageId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/like/:messageId/by/:userId', [security.checkToken], function (req, res) {
+router.get('/like/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableLike.like(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
     if (err) {
@@ -217,7 +217,7 @@ router.get('/like/:messageId/by/:userId', [security.checkToken], function (req, 
   });
 });
 
-router.get('/id/:messageId/likedby/:userId', [security.checkToken], function (req, res) {
+router.get('/id/:messageId/likedby/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableLike.likedByUser(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
     if (err) {
@@ -236,7 +236,7 @@ router.get('/id/:messageId/likedby/:userId', [security.checkToken], function (re
   });
 });
 
-router.get('/unlike/:messageId/by/:userId', [security.checkToken], function (req, res) {
+router.get('/unlike/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableLike.unlike(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
     if (err) {
@@ -251,7 +251,7 @@ router.get('/unlike/:messageId/by/:userId', [security.checkToken], function (req
   });
 });
 
-router.get('/dislike/:messageId/by/:userId', [security.checkToken], function (req, res) {
+router.get('/dislike/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableDislike.dislike(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
     if (err) {
@@ -264,7 +264,7 @@ router.get('/dislike/:messageId/by/:userId', [security.checkToken], function (re
   });
 });
 
-router.get('/id/:messageId/dislikedby/:userId', [security.checkToken], function (req, res) {
+router.get('/id/:messageId/dislikedby/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableDislike.dislikedByUser(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
     if (err) {
@@ -283,7 +283,7 @@ router.get('/id/:messageId/dislikedby/:userId', [security.checkToken], function 
   });
 });
 
-router.get('/undislike/:messageId/by/:userId', [security.checkToken], function (req, res) {
+router.get('/undislike/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableDislike.undislike(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
     if (err) {

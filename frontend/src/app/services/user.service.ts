@@ -1,8 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { SwPush } from '@angular/service-worker';
+import { jwtDecode, JwtPayload } from 'jwt-decode';
 import { catchError, Observable, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { ConfirmUserResponse } from '../interfaces/confirm-user-response';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
@@ -51,12 +54,14 @@ export class UserService {
     base64Avatar: ''
   };
 
+  private tokenRenewalTimeout: any = null;
+
   private ready: boolean = false;
 
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${environment.apiToken}`,
+      'X-API-Authorization': `${environment.apiToken}`,
       withCredentials: 'true'
     })
   };
@@ -67,6 +72,7 @@ export class UserService {
     private indexedDbService: IndexedDbService,
     private cryptoService: CryptoService,
     private networkService: NetworkService,
+    private displayMessage: MatDialog
   ) { }
 
   private handleError(error: HttpErrorResponse) {
@@ -75,6 +81,7 @@ export class UserService {
   }
 
   public logout() {
+    this.clearJwtRenewal();
     this.user = {
       id: '',
       pinHash: '',
@@ -120,11 +127,15 @@ export class UserService {
       );
   }
 
-  setUser(userSubject: Subject<void>, user: User) {
+  setUser(userSubject: Subject<void>, user: User, jwt: string) {
     this.user = user;
+    this.user.jwt = jwt;
+    const payload = jwtDecode<JwtPayload>(jwt);
+    this.user.jwtExpiresAt = payload.exp! * 1000;
     this.user.locale = navigator.language;
     this.user.language = this.getLanguageForLocation(this.user.locale);
     this.loadProfile();
+    this.startJwtRenewal();
     this.ready = true;
     userSubject.next();
   }
@@ -145,13 +156,63 @@ export class UserService {
           if (confirmUserResponse.status === 200) {
             this.indexedDbService.setUser(cryptedUser)
               .then(() => {
-                this.loadProfile();
-                this.ready = true;
-                userSubject.next();
+                const dialogRef = this.displayMessage.open(DisplayMessage, {
+                  panelClass: '',
+                  closeOnNavigation: false,
+                  data: {
+                    showAlways: true,
+                    title: 'User Service',
+                    image: '',
+                    icon: 'verified_user',
+                    message: 'Your account has been created. You can log in now.',
+                    button: 'Ok',
+                    delay: 0,
+                    showSpinner: false
+                  },
+                  maxWidth: '90vw',
+                  maxHeight: '90vh',
+                  hasBackdrop: true,
+                  autoFocus: false
+                });
+
+                dialogRef.afterOpened().subscribe(() => {
+                  // Optional: Aktionen nach Öffnen
+                });
+
+                dialogRef.afterClosed().subscribe(() => {
+                  // Optional: Aktionen nach Schließen
+                });
               });
           }
         },
-        error: (err) => { }
+        error: (err) => {
+          const dialogRef = this.displayMessage.open(DisplayMessage, {
+            panelClass: '',
+            closeOnNavigation: false,
+            data: {
+              showAlways: true,
+              title: 'User Service',
+              image: '',
+              icon: 'bug_report',
+              message: 'Uuups! Something went wrong while creating your user. Please try again later.',
+              button: 'Ok',
+              delay: 0,
+              showSpinner: false
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            hasBackdrop: true,
+            autoFocus: false
+          });
+
+          dialogRef.afterOpened().subscribe(() => {
+            // Optional: Aktionen nach Öffnen
+          });
+
+          dialogRef.afterClosed().subscribe(() => {
+            // Optional: Aktionen nach Schließen
+          });
+        }
       });
   }
 
@@ -232,6 +293,101 @@ export class UserService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  private clearJwtRenewal(): void {
+    if (this.tokenRenewalTimeout) {
+      clearTimeout(this.tokenRenewalTimeout);
+      this.tokenRenewalTimeout = null;
+    }
+  }
+
+  private renewJwt(): void {
+    let url = `${environment.apiUrl}/user/renewjwt/`;
+    this.http.get<{ token: string }>(url, this.httpOptions).subscribe({
+      next: (res) => {
+        if (res.token) {
+          this.user.jwt = res.token;
+          const payload = jwtDecode<JwtPayload>(res.token);
+          this.user.jwtExpiresAt = payload.exp! * 1000;
+          this.startJwtRenewal();
+        } else {
+          this.logout();
+          const dialogRef = this.displayMessage.open(DisplayMessage, {
+            panelClass: '',
+            closeOnNavigation: false,
+            data: {
+              showAlways: true,
+              title: 'Session expired',
+              image: '',
+              icon: 'logout', // oder: 'schedule', 'lock', 'warning'
+              message: 'Your session has expired for security reasons. Please log in again to continue.',
+              button: 'Ok',
+              delay: 0,
+              showSpinner: false
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            hasBackdrop: true,
+            autoFocus: false
+          });
+
+          dialogRef.afterOpened().subscribe(() => {
+            // Optional: Aktionen nach Öffnen
+          });
+
+          dialogRef.afterClosed().subscribe(() => {
+            // Optional: Aktionen nach Schließen
+          });
+        }
+      },
+      error: (err) => {
+        this.logout();
+        const dialogRef = this.displayMessage.open(DisplayMessage, {
+          panelClass: '',
+          closeOnNavigation: false,
+          data: {
+            showAlways: true,
+            title: 'Session expired',
+            image: '',
+            icon: 'logout', // oder: 'schedule', 'lock', 'warning'
+            message: 'Your session has expired for security reasons. Please log in again to continue.',
+            button: 'Ok',
+            delay: 0,
+            showSpinner: false
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: true,
+          autoFocus: false
+        });
+
+        dialogRef.afterOpened().subscribe(() => {
+          // Optional: Aktionen nach Öffnen
+        });
+
+        dialogRef.afterClosed().subscribe(() => {
+          // Optional: Aktionen nach Schließen
+        });
+      }
+    });
+  }
+
+  private startJwtRenewal(): void {
+    if (!this.user?.jwtExpiresAt) return;
+
+    const now = Date.now();
+    const bufferTime = 5 * 60 * 1000; // 5 Minuten vorher
+    const delay = this.user.jwtExpiresAt - now - bufferTime;
+
+    if (delay <= 0) {
+      this.logout();
+      return;
+    }
+
+    this.tokenRenewalTimeout = setTimeout(() => {
+      this.renewJwt();
+    }, delay);
   }
 
   getUserById(userId: string, showAlways: boolean = false): Observable<GetUserResponse> {

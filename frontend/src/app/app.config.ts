@@ -5,13 +5,14 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideServiceWorker } from '@angular/service-worker';
 import { routes } from './app.routes';
+import { authInterceptor } from './interceptors/auth-interceptor';
 import { loadingInterceptor } from './interceptors/loading-interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: navigator.language },
     provideHttpClient(
-      withInterceptors([loadingInterceptor])
+      withInterceptors([authInterceptor, loadingInterceptor])
     ),
     provideRouter(routes),
     provideAnimationsAsync(),

@@ -66,7 +66,6 @@ import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
 
-
 @Component({
   selector: 'app-root',
   imports: [
@@ -550,10 +549,35 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           this.userService.createUser().subscribe({
             next: (createUserResponse: CreateUserResponse) => {
               this.userService.initUser(this.userSubject, createUserResponse, getPinHashResponse.pinHash);
-              // Subscribe for shared content
-              this.handleSharedContentOrNotification()
             },
-            error: (err) => { },
+            error: (err) => {
+              const dialogRef = this.displayMessage.open(DisplayMessage, {
+                panelClass: '',
+                closeOnNavigation: false,
+                data: {
+                  showAlways: true,
+                  title: 'User Service',
+                  image: '',
+                  icon: 'bug_report',
+                  message: 'Uuups! Something went wrong while creating your user. Please try again later.',
+                  button: 'Ok',
+                  delay: 0,
+                  showSpinner: false
+                },
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                hasBackdrop: true,
+                autoFocus: false
+              });
+
+              dialogRef.afterOpened().subscribe(() => {
+                // Optional: Aktionen nach Öffnen
+              });
+
+              dialogRef.afterClosed().subscribe(() => {
+                // Optional: Aktionen nach Schließen
+              });
+            },
             complete: () => { }
           });
         },
@@ -602,7 +626,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               this.userService.confirmUser(getPinHashResponse.pinHash, cryptedUser)
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
-                    this.userService.setUser(this.userSubject, confirmUserResponse.user);
+                    this.userService.setUser(this.userSubject, confirmUserResponse.user, confirmUserResponse.jwt);
                     this.updateDataForLocation(this.mapService.getMapLocation(), true);
                     // Subscribe for shared content
                     this.handleSharedContentOrNotification()
@@ -1035,8 +1059,15 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
+                this.userService.logout();
                 this.indexedDbService.clearAllData();
-                this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
+                this.updateDataForLocation(this.mapService.getMapLocation(), true)
+                this.snackBarRef = this.snackBar.open("User and related data were removed permanently.", undefined, {
+                  panelClass: ['snack-success'],
+                  horizontalPosition: 'center',
+                  verticalPosition: 'top',
+                  duration: 3000
+                });
               }
             },
             error: (err) => {
@@ -1044,7 +1075,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 panelClass: ['snack-warning'],
                 horizontalPosition: 'center',
                 verticalPosition: 'top',
-                duration: 1000
+                duration: 2000
               });
             },
             complete: () => { }

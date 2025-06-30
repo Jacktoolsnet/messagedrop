@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
 const geoTz = require('geo-tz');
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
   let placeId = uuid.v4()
   let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
@@ -24,7 +24,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.post('/update', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+router.post('/update', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
   let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
   tablePlace.update(req.database.db, req.body.id, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
@@ -38,7 +38,7 @@ router.post('/update', [security.checkToken, bodyParser.json({ type: 'applicatio
   });
 });
 
-router.get('/get/:placeId', [security.checkToken], function (req, res) {
+router.get('/get/:placeId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tablePlace.getById(req.database.db, req.params.placeId, function (err, row) {
     if (err) {
@@ -56,7 +56,7 @@ router.get('/get/:placeId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/get/userId/:userId/name/:name', [security.checkToken], function (req, res) {
+router.get('/get/userId/:userId/name/:name', [security.checkToken], security.authenticate, function (req, res) {
   let response = { 'status': 0 };
   tablePlace.getByUserIdAndName(req.database.db, req.params.userId, req.params.name, function (err, row) {
     if (err) {
@@ -74,7 +74,7 @@ router.get('/get/userId/:userId/name/:name', [security.checkToken], function (re
   });
 });
 
-router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
+router.get('/get/userId/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tablePlace.getByUserId(req.database.db, req.params.userId, function (err, rows) {
     if (err) {
@@ -100,7 +100,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/subscribe/:placeId', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.get('/subscribe/:placeId', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   tablePlace.subscribe(req.database.db, req.params.placeId, function (err) {
     if (err) {
@@ -113,7 +113,7 @@ router.get('/subscribe/:placeId', [security.checkToken, bodyParser.json({ type: 
   });
 });
 
-router.get('/unsubscribe/:placeId', [security.checkToken], function (req, res) {
+router.get('/unsubscribe/:placeId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tablePlace.unsubscribe(req.database.db, req.params.placeId, function (err) {
     if (err) {
@@ -126,7 +126,7 @@ router.get('/unsubscribe/:placeId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/delete/:placeId', [security.checkToken], function (req, res) {
+router.get('/delete/:placeId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tablePlace.deleteById(req.database.db, req.params.placeId, function (err) {
     if (err) {

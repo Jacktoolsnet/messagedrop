@@ -2,6 +2,7 @@ require('dotenv').config();
 const { encryptJsonWebKey, decryptJsonWebKey, getEncryptionPrivateKey } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
 const uuid = require('uuid');
@@ -9,7 +10,7 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
 
-router.get('/get', [security.checkToken], function (req, res) {
+router.get('/get', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableUser.getAll(req.database.db, function (err, rows) {
     if (err) {
@@ -130,6 +131,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 });
 
 router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+  const secret = process.env.JWT_SECRET;
   const { subtle } = crypto;
 
   let response = { 'status': 0 };
@@ -216,6 +218,11 @@ router.post('/confirm', [security.checkToken, bodyParser.json({ type: 'applicati
                     res.status(response.status).json(response);
                   }
                   else {
+                    response.jwt = jwt.sign(
+                      { userId: user.id },
+                      secret,
+                      { expiresIn: '1h' }
+                    );
                     response.user = user;
                     response.status = 200;
                     res.status(response.status).json(response);
@@ -257,7 +264,7 @@ router.get('/clean', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/delete/:userId', [security.checkToken], function (req, res) {
+router.get('/delete/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableUser.deleteById(req.database.db, req.params.userId, function (err) {
     if (err) {
@@ -270,7 +277,18 @@ router.get('/delete/:userId', [security.checkToken], function (req, res) {
   });
 });
 
-router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.get('/renewjwt', [security.checkToken, security.authenticate], (req, res) => {
+  const secret = process.env.JWT_SECRET;
+  const token = jwt.sign(
+    { userId: req.jwtUser.id },
+    secret,
+    { expiresIn: '1h' }
+  );
+
+  res.json({ status: 200, token });
+});
+
+router.post('/subscribe', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
     if (err) {
@@ -283,7 +301,7 @@ router.post('/subscribe', [security.checkToken, bodyParser.json({ type: 'applica
   });
 });
 
-router.get('/unsubscribe/:userId', [security.checkToken], function (req, res) {
+router.get('/unsubscribe/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableUser.unsubscribe(req.database.db, req.params.userId, function (err) {
     if (err) {

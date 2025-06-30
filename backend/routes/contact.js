@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const tableContact = require('../db/tableContact');
 const notify = require('../utils/notify');
 
-router.post('/create', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   let contactId = uuid.v4()
   tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, req.body.contactUserSigningPublicKey, req.body.contactUserEncryptionPublicKey, function (err) {
@@ -24,7 +24,7 @@ router.post('/create', [security.checkToken, bodyParser.json({ type: 'applicatio
 });
 
 
-router.post('/update/name', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
+router.post('/update/name', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
   let cryptedName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
   tableContact.updateName(req.database.db, req.body.contactId, JSON.stringify(cryptedName), function (err) {
@@ -44,7 +44,7 @@ router.post('/update/name', [security.checkToken, bodyParser.json({ type: 'appli
  * Find the other contact (userID = contactUserId and contactUserID = userID) and set the contact message
  * Notify other User
  */
-router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.post('/update/message', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.userEncryptedMessage, req.body.messageSignature, function (err) {
     if (err) {
@@ -67,7 +67,7 @@ router.post('/update/message', [security.checkToken, bodyParser.json({ type: 'ap
   });
 });
 
-router.get('/get/:contactId', [security.checkToken], function (req, res) {
+router.get('/get/:contactId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableContact.getById(req.database.db, req.params.contactId, function (err, row) {
     if (err) {
@@ -85,7 +85,7 @@ router.get('/get/:contactId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
+router.get('/get/userId/:userId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableContact.getByUserId(req.database.db, req.params.userId, function (err, rows) {
     if (err) {
@@ -121,7 +121,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/subscribe/:contactId', [security.checkToken, bodyParser.json({ type: 'application/json' })], function (req, res) {
+router.get('/subscribe/:contactId', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };
   tableContact.subscribe(req.database.db, req.params.contactId, function (err) {
     if (err) {
@@ -134,7 +134,7 @@ router.get('/subscribe/:contactId', [security.checkToken, bodyParser.json({ type
   });
 });
 
-router.get('/unsubscribe/:contactId', [security.checkToken], function (req, res) {
+router.get('/unsubscribe/:contactId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableContact.unsubscribe(req.database.db, req.params.contactId, function (err) {
     if (err) {
@@ -147,7 +147,7 @@ router.get('/unsubscribe/:contactId', [security.checkToken], function (req, res)
   });
 });
 
-router.get('/delete/:contactId', [security.checkToken], function (req, res) {
+router.get('/delete/:contactId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableContact.deleteById(req.database.db, req.params.contactId, function (err) {
     if (err) {

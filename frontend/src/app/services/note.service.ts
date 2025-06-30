@@ -47,7 +47,6 @@ export class NoteService {
   async filterByPlusCode(plusCode: string): Promise<Note[]> {
     const allNotes = await this.indexedDbService.getAllNotes();
     this.notes = allNotes.filter(note => note.plusCode.startsWith(plusCode));
-    console.log(this.notes)
     return this.notes;
   }
 
