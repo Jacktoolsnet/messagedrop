@@ -27,7 +27,6 @@ export class PlaceService {
     icon: '',
     subscribed: false,
     boundingBox: undefined,
-    plusCodes: [],
     timezone: ''
   };
   private ready: boolean = false;
@@ -82,7 +81,6 @@ export class PlaceService {
       icon: '',
       subscribed: false,
       boundingBox: undefined,
-      plusCodes: [],
       timezone: ''
     };
     this.ready = false;
@@ -130,7 +128,6 @@ export class PlaceService {
       icon: '',
       subscribed: false,
       boundingBox: undefined,
-      plusCodes: [],
       timezone: ''
     };;
   }

@@ -434,23 +434,23 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public addLocationToPlace() {
-    let location: Location = this.mapService.getMapLocation();
+    /*let location: Location = this.mapService.getMapLocation();
     this.placeService.getSelectedPlace().plusCodes.push(location.plusCode);
     this.mapService.addPlaceLocationRectange(location);
-    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
+    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);*/
   }
 
   public removeLocationFromPlace() {
-    let location: Location = this.mapService.getMapLocation();
+    /*let location: Location = this.mapService.getMapLocation();
     let place = this.placeService.getSelectedPlace();
     place.plusCodes = place.plusCodes.filter(code => code !== location.plusCode);
     this.mapService.removePlaceLocationRectange(location);
-    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
+    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);*/
   }
 
   public finishEditingPlace() {
     this.mapService.setMapMinMaxZoom(3, 19);
-    this.placeService.getSelectedPlace().boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes(this.placeService.getSelectedPlace().plusCodes);
+    this.placeService.getSelectedPlace().boundingBox = this.placeService.getSelectedPlace().boundingBox;
     this.placeService.updatePlace(this.placeService.getSelectedPlace())
       .subscribe({
         next: simpleResponse => {
@@ -468,21 +468,21 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   private async updateDataForLocation(location: Location, forceSearch: boolean) {
-    if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
+    /*if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
       this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
-    } else {
-      if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.messageService.getLastSearchedLocation() || forceSearch) {
-        // Clear markerLocations
-        this.markerLocations.clear()
-        // notes from local device
-        if (this.userService.isReady()) {
-          await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
-        }
-        // Messages
-        this.messageService.getByPlusCode(location, this.messageSubject);
-        this.createMarkerLocations();
+    } else {*/
+    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.messageService.getLastSearchedLocation() || forceSearch) {
+      // Clear markerLocations
+      this.markerLocations.clear()
+      // notes from local device
+      if (this.userService.isReady()) {
+        await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
       }
+      // Messages
+      this.messageService.getByPlusCode(location, this.messageSubject);
+      this.createMarkerLocations();
     }
+    /*}*/
   }
 
   public handleMoveEndEvent(event: Location) {
@@ -921,13 +921,13 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         this.markerLocations.clear()
         this.mapService.setMapMinMaxZoom(18, 19);
         this.placeService.setSelectedPlace(place);
-        this.placeService.getSelectedPlace().plusCodes?.forEach(plusCode => {
+        /*this.placeService.getSelectedPlace().plusCodes?.forEach(plusCode => {
           this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode));
         });
         if (this.placeService.getSelectedPlace().plusCodes.length != 0) {
           let location: Location = this.geolocationService.getCenterOfBoundingBox(this.placeService.getSelectedPlace().boundingBox!);
           this.mapService.flyToWithZoom(location, 19);
-        }
+        }*/
       }
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });

@@ -39,7 +39,7 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void { }
 
   private getWeather() {
-    let boundingBox: BoundingBox | undefined = this.geolocationService.getBoundingBoxFromPlusCodes(this.place.plusCodes);
+    let boundingBox: BoundingBox | undefined = this.place.boundingBox;
     if (boundingBox) {
       let location: Location = this.geolocationService.getCenterOfBoundingBox(boundingBox)
       this.weatherService
@@ -99,7 +99,7 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
   }
 
   openWeatherDetails(): void {
-    let boundingBox: BoundingBox | undefined = this.geolocationService.getBoundingBoxFromPlusCodes(this.place.plusCodes);
+    let boundingBox: BoundingBox | undefined = this.place.boundingBox;
     const dialogRef = this.dialog.open(WeatherComponent, {
       data: { weather: this.weather, location: this.geolocationService.getCenterOfBoundingBox(boundingBox!) },
       closeOnNavigation: true,

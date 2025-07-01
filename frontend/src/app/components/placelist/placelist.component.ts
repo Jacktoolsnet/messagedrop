@@ -185,7 +185,6 @@ export class PlacelistComponent implements OnInit {
       icon: '',
       subscribed: false,
       boundingBox: undefined,
-      plusCodes: [],
       timezone: ''
     };
     let nominatimPlace: NominatimPlace | undefined = undefined;
@@ -202,7 +201,6 @@ export class PlacelistComponent implements OnInit {
             if (nominatimAddressResponse.nominatimPlace.error) {
               let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
               place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
-              place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(place.boundingBox!);
               this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
                 next: (timezoneResponse: any) => {
                   if (timezoneResponse.status === 200) {
@@ -238,7 +236,6 @@ export class PlacelistComponent implements OnInit {
                 };
                 place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
                 place.boundingBox = boundingBox;
-                place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
               }
               this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
                 next: (timezoneResponse: any) => {
@@ -280,7 +277,6 @@ export class PlacelistComponent implements OnInit {
           };
           place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
           place.boundingBox = boundingBox;
-          place.plusCodes = this.geolocationService.getPlusCodesInBoundingBox(boundingBox);
         }
         this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
           next: (timezoneResponse: any) => {
