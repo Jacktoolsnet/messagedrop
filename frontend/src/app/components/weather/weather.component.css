@@ -168,12 +168,14 @@ mat-slider {
 }
 
 .data-source {
+    margin-top: auto;
     font-size: 0.8rem;
     text-align: center;
     color: #aaa;
 }
 
 .data-source a {
+    margin-top: auto;
     color: inherit;
     text-decoration: underline;
 }

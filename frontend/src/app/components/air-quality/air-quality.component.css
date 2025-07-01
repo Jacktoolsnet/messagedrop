@@ -160,8 +160,7 @@ mat-slider {
 
 .category-switch {
     display: flex;
-    justify-content: space-between;
-    gap: 0.5rem;
+    justify-content: space-around;
 }
 
 .category-switch button {
@@ -176,12 +175,14 @@ mat-slider {
 }
 
 .data-source {
+    margin-top: auto;
     font-size: 0.8rem;
     text-align: center;
     color: #aaa;
 }
 
 .data-source a {
+    margin-top: auto;
     color: inherit;
     text-decoration: underline;
 }

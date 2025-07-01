@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { v4 as uuidv4 } from 'uuid';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { CryptedUser } from '../interfaces/crypted-user';
@@ -21,6 +22,18 @@ export class IndexedDbService {
   private contactProfileStore: string = 'contactprofile';
   private placeStore: string = 'place';
   private noteStore: string = 'note';
+
+  private compress(value: any): string {
+    return compressToUTF16(JSON.stringify(value));
+  }
+
+  private decompress<T>(data: string): any | undefined {
+    try {
+      return JSON.parse(decompressFromUTF16(data)) as any;
+    } catch {
+      return undefined;
+    }
+  }
 
   /**
    * Initializes the IndexedDB database on service construction.
@@ -103,7 +116,8 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.settingStore, 'readwrite');
       const store = tx.objectStore(this.settingStore);
-      const request = store.put(value, key);
+      const compressed = this.compress(value);
+      const request = store.put(compressed, key);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -126,7 +140,7 @@ export class IndexedDbService {
       const request = store.get(key);
 
       request.onsuccess = () => {
-        resolve(request.result);
+        resolve(this.decompress<any>(request.result));
       };
 
       request.onerror = () => {
@@ -164,7 +178,8 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.userStore, 'readwrite');
       const store = tx.objectStore(this.userStore);
-      const request = store.put(cryptedUser, 'user');
+      const compressed = this.compress(cryptedUser);
+      const request = store.put(compressed, 'user');
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -186,7 +201,7 @@ export class IndexedDbService {
       const request = store.get('user');
 
       request.onsuccess = () => {
-        resolve(request.result);
+        resolve(this.decompress<any>(request.result));
       };
 
       request.onerror = () => {
@@ -245,7 +260,8 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.profileStore, 'readwrite');
       const store = tx.objectStore(this.profileStore);
-      const request = store.put(profile, userId);
+      const compressed = this.compress(profile);
+      const request = store.put(compressed, userId);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -268,7 +284,7 @@ export class IndexedDbService {
       const request = store.get(userId);
 
       request.onsuccess = () => {
-        resolve(request.result);
+        resolve(this.decompress<any>(request.result));
       };
 
       request.onerror = () => {
@@ -343,7 +359,8 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.contactProfileStore, 'readwrite');
       const store = tx.objectStore(this.contactProfileStore);
-      const request = store.put(contactProfile, contactProfileId);
+      const compressed = this.compress(contactProfile);
+      const request = store.put(compressed, contactProfileId);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -366,7 +383,7 @@ export class IndexedDbService {
       const request = store.get(contactProfileId);
 
       request.onsuccess = () => {
-        resolve(request.result);
+        resolve(this.decompress<any>(request.result));
       };
 
       request.onerror = () => {
@@ -407,7 +424,8 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.placeStore, 'readwrite');
       const store = tx.objectStore(this.placeStore);
-      const request = store.put(place, placeId);
+      const compressed = this.compress(place);
+      const request = store.put(compressed, placeId);
 
       request.onsuccess = () => resolve();
       request.onerror = () => {
@@ -430,7 +448,7 @@ export class IndexedDbService {
       const request = store.get(placeId);
 
       request.onsuccess = () => {
-        resolve(request.result);
+        resolve(this.decompress<any>(request.result));
       };
 
       request.onerror = () => {
@@ -476,7 +494,8 @@ export class IndexedDbService {
     return new Promise<string>((resolve, reject) => {
       const tx = db.transaction(this.noteStore, 'readwrite');
       const store = tx.objectStore(this.noteStore);
-      const request = store.put(noteWithMeta, key);
+      const compressed = this.compress(noteWithMeta);
+      const request = store.put(compressed, key);
       request.onsuccess = () => resolve(key);
       request.onerror = () => reject(request.error);
     });
@@ -499,7 +518,8 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.noteStore, 'readwrite');
       const store = tx.objectStore(this.noteStore);
-      const request = store.put(updatedNote, note.id);
+      const compressed = this.compress(updatedNote);
+      const request = store.put(compressed, note.id);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -516,7 +536,7 @@ export class IndexedDbService {
       const tx = db.transaction(this.noteStore, 'readonly');
       const store = tx.objectStore(this.noteStore);
       const request = store.get(id);
-      request.onsuccess = () => resolve(request.result);
+      request.onsuccess = () => resolve(this.decompress<any>(request.result));
       request.onerror = () => reject(request.error);
     });
   }
@@ -548,7 +568,11 @@ export class IndexedDbService {
       const store = tx.objectStore(this.noteStore);
       const request = store.getAll();
       request.onsuccess = () => {
-        const notes = request.result as Note[];
+        const compressedNotes = request.result as string[];
+        let notes: Note[] = [];
+        compressedNotes.forEach(compressedNote => {
+          notes.push(this.decompress<any>(compressedNote))
+        })
         resolve(notes.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
       };
       request.onerror = () => reject(request.error);

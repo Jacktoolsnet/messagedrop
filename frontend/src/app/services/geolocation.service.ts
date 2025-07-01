@@ -262,19 +262,23 @@ export class GeolocationService {
   }
 
   public getPlusCodesInBoundingBox(box: BoundingBox, codeLength: number = 10): string[] {
-    const resolutionMap: Record<number, number> = {
-      10: 0.000125,
-      8: 0.0025,
-      6: 0.05,
-      4: 1.0
-    };
+    const resolutionMap: { threshold: number, codeLength: number, step: number }[] = [
+      { threshold: 0.01, codeLength: 10, step: 0.000125 },
+      { threshold: 0.1, codeLength: 8, step: 0.0025 },
+      { threshold: 1.0, codeLength: 6, step: 0.05 },
+      { threshold: Infinity, codeLength: 4, step: 1.0 }
+    ];
 
-    const step = resolutionMap[codeLength] || 0.000125;
-    const result: Set<string> = new Set();
+    const deltaLat = box.latMax - box.latMin;
+    const deltaLon = box.lonMax - box.lonMin;
+    const area = deltaLat * deltaLon;
 
-    for (let lat = box.latMin; lat <= box.latMax; lat += step) {
-      for (let lon = box.lonMin; lon <= box.lonMax; lon += step) {
-        result.add(OpenLocationCode.encode(lat, lon, codeLength));
+    const resolution = resolutionMap.find(r => area <= r.threshold)!;
+
+    const result = new Set<string>();
+    for (let lat = box.latMin; lat <= box.latMax; lat += resolution.step) {
+      for (let lon = box.lonMin; lon <= box.lonMax; lon += resolution.step) {
+        result.add(OpenLocationCode.encode(lat, lon, resolution.codeLength));
       }
     }
     return Array.from(result);
