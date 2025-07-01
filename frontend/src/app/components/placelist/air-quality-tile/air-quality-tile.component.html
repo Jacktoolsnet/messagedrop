@@ -1,0 +1,19 @@
+<div *ngIf="!airQuality" class="tile airQuality-tile">
+    <div class="tile-info">
+        <i class="wi wi-na" style="font-size: 1.5rem"></i>
+        <div class="tile-content">
+            <div class="tile-value">Too many</div>
+            <div class="tile-minmax">requests</div>
+        </div>
+    </div>
+</div>
+<div *ngIf="airQuality" class="tile airQuality-tile" (click)="openAirQualityDetails()">
+    <div class="tile-info">
+        <mat-icon>{{ airQualityIcon }}</mat-icon>
+        <div class="tile-content">
+            <div class="tile-label">{{ value }}</div>
+            <div class="tile-value">{{ label }} ({{ level }})</div>
+            <div class="tile-minmax" *ngIf="minMax">{{minMax.min}} - {{minMax.max}}</div>
+        </div>
+    </div>
+</div>

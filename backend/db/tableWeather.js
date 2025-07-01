@@ -28,7 +28,7 @@ const getWeatherData = function (db, cacheKey, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLastUpdate} < DATETIME('now', '-1 hour');
+        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 hour');
     `;
     db.run(sql, callback);
 };

@@ -11,7 +11,7 @@ const tablePlace = require('./tablePlace');
 const tableGeoStatistic = require('./tableGeoStatistic');
 const tableWeatherHistory = require('./tableWeatherHistory');
 const tableAirQuality = require('./tableAirQuality');
-const tableNominatimCache = require('./tableNominatimCache');
+const tableNominatimCache = require('./tableNominatimCache.js');
 const tableWeather = require('./tableWeather');
 const tableGeoSearch = require('./tableGeoSearch')
 

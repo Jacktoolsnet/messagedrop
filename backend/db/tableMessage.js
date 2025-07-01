@@ -287,7 +287,7 @@ const cleanPublic = function (db, callback) {
         let sql = `
         DELETE FROM ${tableName}
         WHERE ${columnMessageType} = '${messageType.PUBLIC}'
-        AND ${columnMessageDeleteDateTime} < date('now');`;
+        AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now');`;
 
         db.run(sql, (err) => {
             if (err) {

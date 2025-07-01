@@ -31,6 +31,17 @@ const winston = require('winston');
 const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 
+// Tables for cronjobs
+const tableUser = require('./db/tableUser');
+const tableConnect = require('./db/tableConnect');
+const tableMessage = require('./db/tableMessage')
+const tableGeoStatistic = require('./db/tableGeoStatistic');
+const tableWeatherHistory = require('./db/tableWeatherHistory');
+const tableAirQuality = require('./db/tableAirQuality');
+const tableNominatimCache = require('./db/tableNominatimCache.js');
+const tableWeather = require('./db/tableWeather');
+const tableGeoSearch = require('./db/tableGeoSearch')
+
 // ExpressJs
 const { createServer } = require('node:http');
 const express = require('express');
@@ -331,8 +342,8 @@ cron.schedule('*/5 * * * *', () => {
   });
 });
 
-// Clean cached data.
-cron.schedule('0 0 * * *', () => {
+// Clean short cached data.
+cron.schedule('*/1 * * * *', () => {
   tableAirQuality.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
@@ -344,7 +355,10 @@ cron.schedule('0 0 * * *', () => {
       logger.error(err);
     }
   });
+});
 
+// Clean long cached data.
+cron.schedule('5 0 * * *', () => {
   tableGeoStatistic.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);

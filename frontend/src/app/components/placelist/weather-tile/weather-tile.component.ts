@@ -23,6 +23,7 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
 
   weather: Weather | undefined;
   weatherIcon: string | undefined;
+  minMax: { min: number, max: number } | undefined;
 
   public constructor(
     private userService: UserService,
@@ -53,6 +54,7 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
           next: (weather) => {
             this.weather = weather;
             this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
+            this.minMax = this.getHourlyMinMax('temperature');
           },
           error: (err) => { }
         });
@@ -115,5 +117,29 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
     });
 
     dialogRef.afterClosed().subscribe();
+  }
+
+  getHourlyMinMax(field: 'temperature' | 'precipitationProbability' | 'precipitation' | 'wind' | 'pressure' | 'uvIndex'): { min: number, max: number } {
+    if (
+      !this.weather ||
+      !this.weather.hourly ||
+      !this.weather.current?.time
+    ) {
+      return { min: 0, max: 0 };
+    }
+
+    const currentDate = this.weather.current.time.split('T')[0];
+
+    const values = this.weather.hourly
+      .filter(h => h.time.startsWith(currentDate))
+      .map(h => h[field])
+      .filter(v => typeof v === 'number');
+
+    if (values.length === 0) return { min: 0, max: 0 };
+
+    return {
+      min: Math.min(...values),
+      max: Math.max(...values)
+    };
   }
 }

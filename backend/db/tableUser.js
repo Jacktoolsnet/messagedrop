@@ -118,7 +118,7 @@ const clean = function (db, callback) {
     try {
         let sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLastSignOfLife} < datetime('now','-90 days');`;
+        WHERE DATETIME(${columnLastSignOfLife}) < DATETIME('now','-90 days');`;
 
         db.run(sql, (err) => {
             callback(err)

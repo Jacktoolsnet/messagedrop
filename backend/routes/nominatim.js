@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const { getCountryCodeFromNominatim, getPlaceFromNominatimText } = require('../utils/nominatimQueue');
-const tableNominatimCache = require('../db/tableNominatimCache');
+const tableNominatimCache = require('../db/tableNominatimCache.js');
 const tableGeoSearch = require('../db/tableGeoSearch')
 
 router.get('/countryCode/:pluscode/:latitude/:longitude', [security.checkToken], async (req, res) => {

@@ -47,7 +47,7 @@ const getNominatimCache = function (db, cacheKey, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLastUpdate} < DATETIME('now', '-30 days');
+        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-3 month');
     `;
     db.run(sql, callback);
 };

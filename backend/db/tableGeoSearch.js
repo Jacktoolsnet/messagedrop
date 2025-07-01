@@ -55,7 +55,7 @@ const getGeoSearchResult = function (db, rawQuery, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLastUpdate} < DATETIME('now', '-30 days');
+        WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 month');
     `;
     db.run(sql, callback);
 };

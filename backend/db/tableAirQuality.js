@@ -28,7 +28,7 @@ const getAirQualityData = function (db, cacheKey, callback) {
 const cleanExpired = function (db, callback) {
     const sql = `
         DELETE FROM ${tableName}
-        WHERE ${columnLastUpdate} < DATETIME('now', '-1 day');
+        WHERE DATE(${columnLastUpdate}) < DATE('now', '-1 day');
     `;
     db.run(sql, callback);
 };
