@@ -40,6 +40,7 @@ export class AirQualityComponent implements OnInit {
     icon: string;
     description: string;
     levelText: string;
+    minMax: { min: number, max: number }
   }[] = [];
   allTileValues: {
     key: string;
@@ -222,6 +223,7 @@ export class AirQualityComponent implements OnInit {
         icon: this.getWeatherIcon(key),
         description: this.getValueDescription(value, key),
         levelText: this.getLevelTextForCategoryValue(this.selectedCategory, value),
+        minMax: this.getHourlyMinMaxFromAirQuality(key)
       };
     });
   }
@@ -443,6 +445,46 @@ export class AirQualityComponent implements OnInit {
         };
       });
     });
+  }
+
+  getHourlyMinMaxFromAirQuality(field: string): { min: number, max: number } {
+    if (
+      !this.airQuality ||
+      !this.airQuality.hourly ||
+      !this.airQuality.hourly.time ||
+      !(field in this.airQuality.hourly) ||
+      !Array.isArray((this.airQuality.hourly as any)[field]) ||
+      this.selectedDayIndex == null
+    ) {
+      return { min: 0, max: 0 };
+    }
+
+    const timeArray = this.airQuality.hourly.time;
+
+    // Alle einzigartigen Tage extrahieren (z. B. "2025-06-23")
+    const uniqueDates = [...new Set(timeArray.map(t => t.split('T')[0]))];
+
+    if (this.selectedDayIndex >= uniqueDates.length) {
+      return { min: 0, max: 0 };
+    }
+
+    const selectedDate = uniqueDates[this.selectedDayIndex];
+
+    // Indizes für die Stundenwerte des gewählten Tages
+    const indicesForDay = timeArray
+      .map((t, i) => t.startsWith(selectedDate) ? i : -1)
+      .filter(i => i !== -1);
+
+    const values = indicesForDay
+      .map(i => ((this.airQuality!.hourly as any)[field] as number[])[i])
+      .filter((v: number) => typeof v === 'number' && !isNaN(v));
+
+    if (values.length === 0) return { min: 0, max: 0 };
+
+    return {
+      min: Math.min(...values),
+      max: Math.max(...values)
+    };
   }
 
 }

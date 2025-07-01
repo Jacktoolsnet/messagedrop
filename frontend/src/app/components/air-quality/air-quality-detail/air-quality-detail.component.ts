@@ -36,9 +36,7 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
 
   ngOnInit(): void { }
 
-  ngAfterViewInit(): void {
-    this.updateChart();
-  }
+  ngAfterViewInit(): void { }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDayIndex'] && !changes['selectedDayIndex'].firstChange) {

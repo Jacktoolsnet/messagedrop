@@ -847,7 +847,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { messages: this.messageService.getMessages(), locatoin: this.mapService.getMapLocation() },
+            data: { messages: this.messageService.getMessages(), location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: '90vw',
             minHeight: '8rem',
@@ -864,6 +864,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
             this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
+            this.updateDataForLocation(this.mapService.getMapLocation(), true);
           });
         },
         complete: () => { }
@@ -890,6 +891,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       });
 
       dialogRef.afterClosed().subscribe((data: any) => {
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
       });
     });
   }
@@ -927,6 +929,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           this.mapService.flyToWithZoom(location, 19);
         }
       }
+      this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }
 
@@ -1002,6 +1005,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     dialogRef.afterClosed().subscribe((data: any) => {
       this.messageService.clearSelectedMessages();
       this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
+      this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }
 
@@ -1024,6 +1028,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }
 

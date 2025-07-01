@@ -31,6 +31,7 @@
                         {{ tile.value }} {{ tile.unit }}
                     </div>
                     <div class="tile-level" *ngIf="tile.levelText">{{ tile.levelText }}</div>
+                    <div class="tile-minmax" *ngIf="tile.minMax">{{tile.minMax.min}} - {{tile.minMax.max}}</div>
                 </div>
             </div>
         </div>

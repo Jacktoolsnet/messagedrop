@@ -117,6 +117,12 @@ mat-dialog-content {
     opacity: 0.9;
 }
 
+.tile-minmax {
+    font-size: 0.9rem;
+    font-weight: 500;
+    opacity: 0.9;
+}
+
 .tile-hint {
     font-size: 0.9rem;
     font-weight: 500;

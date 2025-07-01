@@ -10,7 +10,6 @@ import { catchError, map, Observable, of } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
 import { Weather } from '../../interfaces/weather';
-import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 
@@ -40,6 +39,7 @@ export class WeatherComponent implements OnInit {
     icon: string;
     value: string;
     levelText: string;
+    minMax: { min: number, max: number }
   }> = [];
 
   selectedDayIndex = 0;
@@ -51,7 +51,6 @@ export class WeatherComponent implements OnInit {
   locationName$: Observable<string> | undefined;
 
   constructor(
-    private mapService: MapService,
     private nomatinService: NominatimService,
     private dialogRef: MatDialogRef<WeatherComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { weather: Weather, location: Location }
@@ -137,7 +136,8 @@ export class WeatherComponent implements OnInit {
       icon: string,
       value: string,
       levelText: string,
-    ) => ({ type, label, icon, value, levelText });
+      minMax: { min: number, max: number }
+    ) => ({ type, label, icon, value, levelText, minMax });
 
     const timeList = hourly
       .filter(h => h.time.startsWith(date))
@@ -149,42 +149,48 @@ export class WeatherComponent implements OnInit {
         'Temperature',
         'thermostat',
         `${hourData.temperature} °C`,
-        this.getTileLevel('temperature', hourData.temperature)
+        this.getTileLevel('temperature', hourData.temperature),
+        this.getHourlyMinMax('temperature')
       ),
       make(
         'precipitationprobability',
         'Rain chance',
         'water_drop',
         `${hourData.precipitationProbability} %`,
-        this.getTileLevel('precipitationprobability', hourData.precipitationProbability)
+        this.getTileLevel('precipitationprobability', hourData.precipitationProbability),
+        this.getHourlyMinMax('precipitationProbability')
       ),
       make(
         'precipitation',
         'Rainfall',
         'grain',
         `${hourData.precipitation} mm/h`,
-        this.getTileLevel('precipitation', hourData.precipitation)
+        this.getTileLevel('precipitation', hourData.precipitation),
+        this.getHourlyMinMax('precipitation')
       ),
       make(
         'uvIndex',
         'UV Index',
         'light_mode',
         `${hourData.uvIndex}`,
-        this.getTileLevel('uvIndex', hourData.uvIndex)
+        this.getTileLevel('uvIndex', hourData.uvIndex),
+        this.getHourlyMinMax('uvIndex')
       ),
       make(
         'wind',
         'Wind',
         'air',
         `${hourData.wind} km/h`,
-        this.getTileLevel('wind', hourData.wind)
+        this.getTileLevel('wind', hourData.wind),
+        this.getHourlyMinMax('wind')
       ),
       make(
         'pressure',
         'Pressure',
         'compress',
         `${hourData.pressure} hPa`,
-        this.getTileLevel('pressure', hourData.pressure)
+        this.getTileLevel('pressure', hourData.pressure),
+        this.getHourlyMinMax('pressure')
       )
     ];
   }
@@ -307,6 +313,32 @@ export class WeatherComponent implements OnInit {
       default:
         return '';
     }
+  }
+
+  getHourlyMinMax(field: 'temperature' | 'precipitationProbability' | 'precipitation' | 'wind' | 'pressure' | 'uvIndex'): { min: number, max: number } {
+    if (
+      !this.weather ||
+      !this.weather.hourly ||
+      !this.weather.daily ||
+      this.selectedDayIndex == null ||
+      !this.weather.daily[this.selectedDayIndex]
+    ) {
+      return { min: 0, max: 0 };
+    }
+
+    const selectedDate = this.weather.daily[this.selectedDayIndex].date;
+
+    const values = this.weather.hourly
+      .filter(h => h.time.startsWith(selectedDate))
+      .map(h => h[field])
+      .filter(v => typeof v === 'number');
+
+    if (values.length === 0) return { min: 0, max: 0 };
+
+    return {
+      min: Math.min(...values),
+      max: Math.max(...values)
+    };
   }
 
 }
