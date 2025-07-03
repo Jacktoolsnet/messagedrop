@@ -211,7 +211,6 @@ export class PlacelistComponent implements OnInit {
     if (!isNearby) {
       this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation(), true).subscribe({
         next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
-          console.log(nominatimAddressResponse);
           if (nominatimAddressResponse.status === 200) {
             if (nominatimAddressResponse.nominatimPlace.error) {
               place.location = this.mapService.getMapLocation()

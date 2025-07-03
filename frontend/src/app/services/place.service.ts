@@ -392,9 +392,13 @@ export class PlaceService {
     return `${prefix} ${weekNumber}`;
   }
 
-  isDatasetExpired(dataset: Dataset<any> | undefined, expirationInMinutes: number = 60): boolean {
-    if (!dataset) return true;
-    if (!dataset.lastUpdate) return true;
-    return dataset.lastUpdate.plus({ minutes: expirationInMinutes }) < DateTime.now();
+  isDatasetExpired(dataset: Dataset<any> | undefined, expirationInMinutes = 60): boolean {
+    if (!dataset?.lastUpdate) return true;
+
+    const last = typeof dataset.lastUpdate === 'string'
+      ? DateTime.fromISO(dataset.lastUpdate)
+      : dataset.lastUpdate;
+
+    return last.plus({ minutes: expirationInMinutes }) < DateTime.now();
   }
 }
