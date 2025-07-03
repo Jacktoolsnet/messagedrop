@@ -92,9 +92,9 @@ export class MessagelistComponent implements OnInit {
       longitude: message.longitude,
       plusCode: this.geolocationService.getPlusCode(message.latitude, message.longitude)
     }
+    this.mapService.moveTo(location);
     this.mapService.setCircleMarker(location);
     this.mapService.setDrawCircleMarker(true);
-    this.mapService.flyToWithZoom(location, 18);
     this.dialogRef.close();
   }
 
