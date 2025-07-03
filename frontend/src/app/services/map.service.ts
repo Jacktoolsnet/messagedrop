@@ -86,15 +86,10 @@ export class MapService {
       this.circleMarker?.removeFrom(this.map);
     });
 
-    this.map.on('zoomend', (ev: any) => {
-      //this.location.latitude = this.map.getCenter().lat;
-      //this.location.longitude = this.map.getCenter().lng;
-      //this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
-    });
+    this.map.on('zoomend', (ev: any) => { });
 
-    // MoveEnd fires after click (only if flyto is used) and after zoomeend (always).
+    // MoveEnd fires always.
     this.map.on('moveend', (ev: any) => {
-      console.log('movend')
       this.location.latitude = this.map.getCenter().lat;
       this.location.longitude = this.map.getCenter().lng;
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);

@@ -1269,7 +1269,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     // Process messages
     this.messageService.getMessages().forEach((message) => {
       key = this.createMarkerKey(message.location);
-      if (this.mapService.getMapZoom() > 19) {
+      if (this.mapService.getMapZoom() > 17) {
         center = [message.location.latitude, message.location.longitude]
       } else {
         center = this.mapService.getSearchRectangeCenter(message.location);
@@ -1291,7 +1291,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         plusCode: note.plusCode
       };
       key = this.createMarkerKey(location);
-      if (this.mapService.getMapZoom() > 19) {
+      if (this.mapService.getMapZoom() > 17) {
         center = [note.latitude, note.longitude]
       } else {
         center = this.mapService.getSearchRectangeCenter(location);
