@@ -87,13 +87,8 @@ export class MessagelistComponent implements OnInit {
   }
 
   public flyTo(message: Message) {
-    let location: Location = {
-      latitude: message.latitude,
-      longitude: message.longitude,
-      plusCode: this.geolocationService.getPlusCode(message.latitude, message.longitude)
-    }
-    this.mapService.moveTo(location);
-    this.mapService.setCircleMarker(location);
+    this.mapService.moveTo(message.location);
+    this.mapService.setCircleMarker(message.location);
     this.mapService.setDrawCircleMarker(true);
     this.dialogRef.close();
   }
@@ -206,7 +201,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.updateMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
+        this.messageService.updateMessage(data.message);
       }
     });
   }
@@ -237,9 +232,7 @@ export class MessagelistComponent implements OnInit {
       typ: 'public',
       createDateTime: '',
       deleteDateTime: '',
-      latitude: parentMessage.latitude,
-      longitude: parentMessage.longitude,
-      plusCode: parentMessage.plusCode,
+      location: parentMessage.location,
       message: '',
       markerType: 'none',
       style: '',
@@ -278,7 +271,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data.message) {
-        this.messageService.createComment(data.message, this.mapService.getMapLocation(), this.userService.getUser());
+        this.messageService.createComment(data.message, this.userService.getUser());
       }
     });
   }
@@ -305,9 +298,7 @@ export class MessagelistComponent implements OnInit {
       typ: 'public',
       createDateTime: '',
       deleteDateTime: '',
-      latitude: 0,
-      longitude: 0,
-      plusCode: '',
+      location: this.location,
       message: '',
       markerType: 'default',
       style: '',
@@ -346,7 +337,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.location, this.userService.getUser());
+        this.messageService.createMessage(data.message, this.userService.getUser());
       }
     });
   }

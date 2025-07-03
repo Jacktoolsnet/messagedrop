@@ -1,3 +1,4 @@
+import { Location } from "./location"
 import { Multimedia } from "./multimedia"
 
 export interface Message {
@@ -6,9 +7,7 @@ export interface Message {
     typ: string,
     createDateTime: string,
     deleteDateTime: string,
-    latitude: number,
-    longitude: number,
-    plusCode: string,
+    location: Location,
     message: string,
     translatedMessage?: string,
     markerType: string,

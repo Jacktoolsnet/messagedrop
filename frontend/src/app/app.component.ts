@@ -680,9 +680,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       typ: 'public',
       createDateTime: '',
       deleteDateTime: '',
-      latitude: 0,
-      longitude: 0,
-      plusCode: '',
+      location: this.mapService.getMapLocation(),
       message: '',
       markerType: 'default',
       style: '',
@@ -723,7 +721,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.mapService.getMapLocation(), this.userService.getUser());
+        this.messageService.createMessage(data.message, this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
@@ -1270,22 +1268,17 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let center: number[] = [];
     // Process messages
     this.messageService.getMessages().forEach((message) => {
-      let location: Location = {
-        latitude: message.latitude,
-        longitude: message.longitude,
-        plusCode: message.plusCode
-      };
-      key = this.createMarkerKey(location);
+      key = this.createMarkerKey(message.location);
       if (this.mapService.getMapZoom() > 19) {
-        center = [message.latitude, message.longitude]
+        center = [message.location.latitude, message.location.longitude]
       } else {
-        center = this.mapService.getSearchRectangeCenter(location);
+        center = this.mapService.getSearchRectangeCenter(message.location);
       }
       if (!this.markerLocations.has(key)) {
         this.markerLocations.set(key, {
           latitude: center[0],
           longitude: center[1],
-          plusCode: message.plusCode,
+          plusCode: message.location.plusCode,
           type: MarkerType.PUBLIC_MESSAGE
         });
       }

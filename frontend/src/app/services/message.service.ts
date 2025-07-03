@@ -60,9 +60,11 @@ export class MessageService {
         typ: rawMessage.typ,
         createDateTime: rawMessage.createDateTime,
         deleteDateTime: rawMessage.deleteDateTime,
-        latitude: rawMessage.latitude,
-        longitude: rawMessage.longitude,
-        plusCode: rawMessage.plusCode,
+        location: {
+          latitude: rawMessage.latitude,
+          longitude: rawMessage.longitude,
+          plusCode: rawMessage.plusCode,
+        },
         message: rawMessage.message,
         markerType: rawMessage.markerType,
         style: rawMessage.style,
@@ -102,7 +104,7 @@ export class MessageService {
     return this.lastSearchedLocation;
   }
 
-  createMessage(message: Message, location: Location, user: User, showAlways: boolean = false) {
+  createMessage(message: Message, user: User, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
@@ -117,9 +119,9 @@ export class MessageService {
     let body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
-      'latitude': location.latitude,
-      'longtitude': location.longitude,
-      'plusCode': location.plusCode,
+      'latitude': message.location.latitude,
+      'longtitude': message.location.longitude,
+      'plusCode': message.location.plusCode,
       'message': message.message,
       'markerType': message.markerType,
       'style': message.style,
@@ -146,7 +148,7 @@ export class MessageService {
       })
   }
 
-  createComment(message: Message, location: Location, user: User, showAlways: boolean = false) {
+  createComment(message: Message, user: User, showAlways: boolean = false) {
     let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
     let url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
@@ -162,9 +164,9 @@ export class MessageService {
     let body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
-      'latitude': location.latitude,
-      'longtitude': location.longitude,
-      'plusCode': location.plusCode,
+      'latitude': message.location.latitude,
+      'longtitude': message.location.longitude,
+      'plusCode': message.location.plusCode,
       'message': message.message,
       'markerType': message.markerType,
       'style': message.style,
@@ -191,7 +193,7 @@ export class MessageService {
       })
   }
 
-  updateMessage(message: Message, location: Location, user: User, showAlways: boolean = false) {
+  updateMessage(message: Message, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/message/update`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
@@ -413,9 +415,11 @@ export class MessageService {
               typ: rawMessage.typ,
               createDateTime: rawMessage.createDateTime,
               deleteDateTime: rawMessage.deleteDateTime,
-              latitude: rawMessage.latitude,
-              longitude: rawMessage.longitude,
-              plusCode: rawMessage.plusCode,
+              location: {
+                latitude: rawMessage.latitude,
+                longitude: rawMessage.longitude,
+                plusCode: rawMessage.plusCode,
+              },
               message: rawMessage.message,
               markerType: rawMessage.markerType,
               style: rawMessage.style,
@@ -460,7 +464,7 @@ export class MessageService {
   }
 
   navigateToMessageLocation(message: Message) {
-    let url: string = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.plusCode)}`;
+    let url: string = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.location.plusCode)}`;
     window.open(url, '_blank');
   }
 
@@ -590,9 +594,11 @@ export class MessageService {
               typ: rawMessage.typ,
               createDateTime: rawMessage.createDateTime,
               deleteDateTime: rawMessage.deleteDateTime,
-              latitude: rawMessage.latitude,
-              longitude: rawMessage.longitude,
-              plusCode: rawMessage.plusCode,
+              location: {
+                latitude: rawMessage.latitude,
+                longitude: rawMessage.longitude,
+                plusCode: rawMessage.plusCode,
+              },
               message: rawMessage.message,
               markerType: rawMessage.markerType,
               style: rawMessage.style,

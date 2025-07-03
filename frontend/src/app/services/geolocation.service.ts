@@ -3,7 +3,6 @@ import OpenLocationCode from 'open-location-code-typescript';
 import { Observable } from 'rxjs';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
-import { Message } from '../interfaces/message';
 import { PlusCodeArea } from '../interfaces/plus-code-area';
 
 @Injectable({
@@ -18,15 +17,6 @@ export class GeolocationService {
   public getPlusCode(latitude: number, longitude: number): string {
     let plusCode = OpenLocationCode.encode(latitude, longitude, 10);
     return plusCode || '';
-  }
-
-  public getLocationFromMessage(message: Message): Location {
-    let location: Location = {
-      latitude: message.latitude || 0,
-      longitude: message.longitude || 0,
-      plusCode: message.plusCode || ''
-    };
-    return location;
   }
 
   public getLocationFromPlusCode(plusCode: string): Location {
