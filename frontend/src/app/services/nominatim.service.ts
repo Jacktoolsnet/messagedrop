@@ -2,9 +2,11 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { Injectable } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { BoundingBox } from '../interfaces/bounding-box';
 import { GetNominatimAddressResponse } from '../interfaces/get-nominatim-address-response copy';
 import { Location } from '../interfaces/location';
 import { NominatimPlace } from '../interfaces/nominatim-place';
+import { GeolocationService } from './geolocation.service';
 import { NetworkService } from './network.service';
 
 @Injectable({
@@ -20,6 +22,7 @@ export class NominatimService {
   };
 
   constructor(
+    private geolocationService: GeolocationService,
     private http: HttpClient,
     private networkService: NetworkService
   ) { }
@@ -89,6 +92,24 @@ export class NominatimService {
     );
   }
 
+  getBoundingBoxFromNominatimPlace(place: NominatimPlace): BoundingBox {
+    let boundingBox: BoundingBox = {
+      latMin: 0,
+      lonMin: 0,
+      latMax: 0,
+      lonMax: 0
+    };
+    if (place.boundingbox && place.boundingbox.length === 4) {
+      boundingBox = {
+        latMin: parseFloat(place.boundingbox[0]),
+        latMax: parseFloat(place.boundingbox[1]),
+        lonMin: parseFloat(place.boundingbox[2]),
+        lonMax: parseFloat(place.boundingbox[3])
+      };
+    }
+    return boundingBox
+  }
+
   getNominatimPlaceBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 100, boxSize = 5000, showAlways: boolean = false): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
@@ -149,7 +170,7 @@ export class NominatimService {
     let location: Location = {
       latitude: place.lat,
       longitude: place.lon,
-      plusCode: ''
+      plusCode: this.geolocationService.getPlusCode(place.lat, place.lon)
     };
     return location;
   }
@@ -181,5 +202,38 @@ export class NominatimService {
       default:
         return 'place';
     }
+  }
+
+  getFormattedAddress(place: NominatimPlace, joinWith: string = '\n'): string {
+    const address = place.address;
+    if (!address) return '';
+
+    const lines: string[] = [];
+
+    const street = [address.road, address.house_number].filter(Boolean).join(' ');
+    if (street) lines.push(street);
+
+    const cityLine = [address.postcode, address.city || address.town || address.village].filter(Boolean).join(' ');
+    if (cityLine) lines.push(cityLine);
+
+    const suburb = address.suburb;
+    if (suburb) lines.push(suburb)
+
+    const country = address.country;
+    if (country && !lines.includes(country)) lines.push(country);
+
+    return lines.join(joinWith);
+  }
+
+  getFormattedStreet(place: NominatimPlace, joinWith: string = '\n'): string {
+    const address = place.address;
+    if (!address) return '';
+
+    const lines: string[] = [];
+
+    const street = [address.road, address.house_number].filter(Boolean).join(' ');
+    if (street) lines.push(street);
+
+    return lines.join(joinWith);
   }
 }

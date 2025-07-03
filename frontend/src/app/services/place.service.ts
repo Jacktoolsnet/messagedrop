@@ -23,10 +23,20 @@ export class PlaceService {
     id: '',
     userId: '',
     name: '',
+    location: {
+      latitude: 0,
+      longitude: 0,
+      plusCode: ''
+    },
     base64Avatar: '',
     icon: '',
     subscribed: false,
-    boundingBox: undefined,
+    boundingBox: {
+      latMin: 0,
+      lonMin: 0,
+      latMax: 0,
+      lonMax: 0
+    },
     timezone: ''
   };
   private ready: boolean = false;
@@ -77,10 +87,20 @@ export class PlaceService {
       id: '',
       userId: '',
       name: '',
+      location: {
+        latitude: 0,
+        longitude: 0,
+        plusCode: ''
+      },
       base64Avatar: '',
       icon: '',
       subscribed: false,
-      boundingBox: undefined,
+      boundingBox: {
+        latMin: 0,
+        lonMin: 0,
+        latMax: 0,
+        lonMax: 0
+      },
       timezone: ''
     };
     this.ready = false;
@@ -124,10 +144,20 @@ export class PlaceService {
       id: '',
       userId: '',
       name: '',
+      location: {
+        latitude: 0,
+        longitude: 0,
+        plusCode: ''
+      },
       base64Avatar: '',
       icon: '',
       subscribed: false,
-      boundingBox: undefined,
+      boundingBox: {
+        latMin: 0,
+        lonMin: 0,
+        latMax: 0,
+        lonMax: 0
+      },
       timezone: ''
     };;
   }

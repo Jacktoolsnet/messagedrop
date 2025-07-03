@@ -11,9 +11,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { BoundingBox } from '../../interfaces/bounding-box';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
-import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { Place } from '../../interfaces/place';
@@ -168,10 +166,6 @@ export class PlacelistComponent implements OnInit {
     }
   }
 
-  public editLocation(place: Place) {
-    this.dialogRef.close(place);
-  }
-
   public goBack() {
     this.dialogRef.close();
   }
@@ -181,10 +175,20 @@ export class PlacelistComponent implements OnInit {
       id: '',
       userId: this.userService.getUser().id,
       name: '',
+      location: {
+        latitude: 0,
+        longitude: 0,
+        plusCode: ''
+      },
       base64Avatar: '',
       icon: '',
       subscribed: false,
-      boundingBox: undefined,
+      boundingBox: {
+        latMin: 0,
+        lonMin: 0,
+        latMax: 0,
+        lonMax: 0
+      },
       timezone: ''
     };
     let nominatimPlace: NominatimPlace | undefined = undefined;
@@ -197,10 +201,11 @@ export class PlacelistComponent implements OnInit {
     if (!isNearby) {
       this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation(), true).subscribe({
         next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
+          console.log(nominatimAddressResponse);
           if (nominatimAddressResponse.status === 200) {
             if (nominatimAddressResponse.nominatimPlace.error) {
-              let plusCode = this.geolocationService.getPlusCode(this.mapService.getMapLocation().latitude, this.mapService.getMapLocation().longitude);
-              place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([plusCode]);
+              place.location = this.mapService.getMapLocation()
+              place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([place.location.plusCode]);
               this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
                 next: (timezoneResponse: any) => {
                   if (timezoneResponse.status === 200) {
@@ -225,18 +230,10 @@ export class PlacelistComponent implements OnInit {
               });
             } else {
               nominatimPlace = nominatimAddressResponse.nominatimPlace;
-              place.name = nominatimPlace.name!;
-              let boundingBox: BoundingBox;
-              if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {
-                boundingBox = {
-                  latMin: parseFloat(nominatimPlace.boundingbox[0]),
-                  latMax: parseFloat(nominatimPlace.boundingbox[1]),
-                  lonMin: parseFloat(nominatimPlace.boundingbox[2]),
-                  lonMax: parseFloat(nominatimPlace.boundingbox[3])
-                };
-                place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
-                place.boundingBox = boundingBox;
-              }
+              place.name = nominatimPlace.name ? nominatimPlace.name : this.nominatimService.getFormattedStreet(nominatimPlace, ' ');
+              place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+              place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
+              place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
               this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
                 next: (timezoneResponse: any) => {
                   if (timezoneResponse.status === 200) {
@@ -267,17 +264,9 @@ export class PlacelistComponent implements OnInit {
     } else {
       if (nominatimPlace) {
         place.name = nominatimPlace.name!;
-        let boundingBox: BoundingBox;
-        if (nominatimPlace.boundingbox && nominatimPlace.boundingbox.length === 4) {
-          boundingBox = {
-            latMin: parseFloat(nominatimPlace.boundingbox[0]),
-            latMax: parseFloat(nominatimPlace.boundingbox[1]),
-            lonMin: parseFloat(nominatimPlace.boundingbox[2]),
-            lonMax: parseFloat(nominatimPlace.boundingbox[3])
-          };
-          place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
-          place.boundingBox = boundingBox;
-        }
+        place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+        place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
+        place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
         this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
           next: (timezoneResponse: any) => {
             if (timezoneResponse.status === 200) {
@@ -305,13 +294,8 @@ export class PlacelistComponent implements OnInit {
   }
 
   public flyTo(place: Place) {
-    let location: Location = this.geolocationService.getCenterOfBoundingBox(place.boundingBox!);
-    this.mapService.flyToWithZoom(location, 18);
+    this.mapService.fitMapToBounds(place.boundingBox);
     this.dialogRef.close();
-  }
-
-  public getLocationForPlace(place: Place): Location {
-    return this.geolocationService.getCenterOfBoundingBox(place.boundingBox!);
   }
 
 }

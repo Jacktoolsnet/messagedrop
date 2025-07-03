@@ -242,8 +242,13 @@ export class GeolocationService {
     };
   }
 
-  public getBoundingBoxFromPlusCodes(plusCodes: string[]): BoundingBox | undefined {
-    if (!plusCodes.length) return undefined;
+  public getBoundingBoxFromPlusCodes(plusCodes: string[]): BoundingBox {
+    if (!plusCodes.length) return {
+      latMin: 0,
+      lonMin: 0,
+      latMax: 0,
+      lonMax: 0
+    };
 
     let latMin = Infinity;
     let latMax = -Infinity;
@@ -259,38 +264,6 @@ export class GeolocationService {
     }
 
     return { latMin, latMax, lonMin, lonMax };
-  }
-
-  public getPlusCodesInBoundingBox(box: BoundingBox, codeLength: number = 10): string[] {
-    const resolutionMap: { threshold: number, codeLength: number, step: number }[] = [
-      { threshold: 0.01, codeLength: 10, step: 0.000125 },
-      { threshold: 0.1, codeLength: 8, step: 0.0025 },
-      { threshold: 1.0, codeLength: 6, step: 0.05 },
-      { threshold: Infinity, codeLength: 4, step: 1.0 }
-    ];
-
-    const deltaLat = box.latMax - box.latMin;
-    const deltaLon = box.lonMax - box.lonMin;
-    const area = deltaLat * deltaLon;
-
-    const resolution = resolutionMap.find(r => area <= r.threshold)!;
-
-    const result = new Set<string>();
-    for (let lat = box.latMin; lat <= box.latMax; lat += resolution.step) {
-      for (let lon = box.lonMin; lon <= box.lonMax; lon += resolution.step) {
-        result.add(OpenLocationCode.encode(lat, lon, resolution.codeLength));
-      }
-    }
-    return Array.from(result);
-  }
-
-  public getPlusCodesByZoom(box: BoundingBox, zoom: number): string[] {
-    let codeLength = 10;
-    if (zoom <= 14) codeLength = 8;
-    if (zoom <= 10) codeLength = 6;
-    if (zoom <= 7) codeLength = 4;
-
-    return this.getPlusCodesInBoundingBox(box, codeLength);
   }
 
   public areLocationsNear(loc1: Location, loc2: Location, maxDistanceMeters: number = 20): boolean {

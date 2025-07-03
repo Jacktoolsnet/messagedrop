@@ -221,6 +221,9 @@ export class AppComponent implements OnInit {
   }
 
   async initApp() {
+    // Clear cache
+    this.indexedDbService.deleteSetting('nominatimSelectedPlace')
+    this.indexedDbService.deleteSetting('nominatimSearch')
     // Check network
     this.networkService.init();
     // Init the server connection
@@ -420,9 +423,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               duration: 1000
             });
           }
-          this.snackBarRef.afterDismissed().subscribe(() => {
-            // this.getCurrentPosition();
-          });
+          this.snackBarRef.afterDismissed().subscribe(() => { });
         }
       });
     });
@@ -430,47 +431,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     dialogRef.afterClosed().subscribe(() => {
       // Optional: Aktionen nach Schließen
     });
-
-  }
-
-  public addLocationToPlace() {
-    /*let location: Location = this.mapService.getMapLocation();
-    this.placeService.getSelectedPlace().plusCodes.push(location.plusCode);
-    this.mapService.addPlaceLocationRectange(location);
-    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);*/
-  }
-
-  public removeLocationFromPlace() {
-    /*let location: Location = this.mapService.getMapLocation();
-    let place = this.placeService.getSelectedPlace();
-    place.plusCodes = place.plusCodes.filter(code => code !== location.plusCode);
-    this.mapService.removePlaceLocationRectange(location);
-    this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);*/
-  }
-
-  public finishEditingPlace() {
-    this.mapService.setMapMinMaxZoom(3, 19);
-    this.placeService.getSelectedPlace().boundingBox = this.placeService.getSelectedPlace().boundingBox;
-    this.placeService.updatePlace(this.placeService.getSelectedPlace())
-      .subscribe({
-        next: simpleResponse => {
-          if (simpleResponse.status === 200) {
-            this.placeService.saveAdditionalPlaceInfos();
-            this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
-          }
-        },
-        error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-        complete: () => { }
-      });
-    this.placeService.unselectPlace();
-    this.mapService.removeAllPlaceLocationRectange();
-    this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
   private async updateDataForLocation(location: Location, forceSearch: boolean) {
-    /*if (this.placeService.getSelectedPlace().plusCodes.length > 0) {
-      this.isPartOfPlace = this.placeService.getSelectedPlace().plusCodes.some(element => element === this.mapService.getMapLocation().plusCode);
-    } else {*/
     if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.messageService.getLastSearchedLocation() || forceSearch) {
       // Clear markerLocations
       this.markerLocations.clear()
@@ -482,7 +445,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       this.messageService.getByPlusCode(location, this.messageSubject);
       this.createMarkerLocations();
     }
-    /*}*/
   }
 
   public handleMoveEndEvent(event: Location) {
@@ -915,20 +877,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().subscribe((place: Place) => {
-      if (undefined != place) {
-        this.mapService.removeAllPlaceLocationRectange();
-        this.messageService.clearMessages();
-        this.markerLocations.clear()
-        this.mapService.setMapMinMaxZoom(18, 19);
-        this.placeService.setSelectedPlace(place);
-        /*this.placeService.getSelectedPlace().plusCodes?.forEach(plusCode => {
-          this.mapService.addPlaceLocationRectange(this.geolocationService.getLocationFromPlusCode(plusCode));
-        });
-        if (this.placeService.getSelectedPlace().plusCodes.length != 0) {
-          let location: Location = this.geolocationService.getCenterOfBoundingBox(this.placeService.getSelectedPlace().boundingBox!);
-          this.mapService.flyToWithZoom(location, 19);
-        }*/
-      }
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }

@@ -12,27 +12,10 @@
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
         class="material-symbols-outlined">person</mat-icon>
 </button>
-
-<button
-    *ngIf="networkService.isOnline() && serverService.isReady() && userService.isReady() && placeService.getSelectedPlace().id !== ''"
-    aria-hidden="userService.isReady() && placeService.getSelectedPlace().id !== ''" class="button_profile" mat-fab
-    extended color="accent" aria-label="User Profile" (click)="finishEditingPlace()">
-    <mat-icon aria-hidden="false"
-        class="material-symbols-outlined">where_to_vote</mat-icon>{{placeService.getSelectedPlace().name}}
-</button>
-
 <button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="locationReady"
     class="button_watchLocation" mat-fab color="primary" aria-label="Watch user location"
     (click)="getCurrentPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
-</button>
-<button *ngIf="placeService.getSelectedPlace().id !== '' && !isPartOfPlace" [attr.aria-hidden]="userService.isReady()"
-    class="button_drop" mat-fab color="secondary" aria-label="Add_location_to_place" (click)="addLocationToPlace()">
-    <mat-icon [attr.aria-hidden]="userService.isReady()" class="material-symbols-outlined">add_location_alt</mat-icon>
-</button>
-<button *ngIf="placeService.getSelectedPlace().id !== '' && isPartOfPlace" [attr.aria-hidden]="userService.isReady()"
-    class="button_drop" mat-fab color="primary" aria-label="Add_location_to_place" (click)="removeLocationFromPlace()">
-    <mat-icon [attr.aria-hidden]="userService.isReady()" class="material-symbols-outlined">wrong_location</mat-icon>
 </button>
 <button *ngIf="networkService.isOnline() && serverService.isReady() &&  placeService.getSelectedPlace().id === ''"
     [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary"

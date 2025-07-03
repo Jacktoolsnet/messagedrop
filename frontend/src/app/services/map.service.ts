@@ -1,6 +1,7 @@
 import { EventEmitter, Injectable } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Subject } from 'rxjs';
+import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
@@ -70,8 +71,8 @@ export class MapService {
       zoom: 3
     });
 
-    this.map.setMinZoom(3);
-    this.map.setMaxZoom(19);
+    //xthis.map.setMinZoom(3);
+    // this.map.setMaxZoom(19);
 
     this.map.on('click', (ev: any) => {
       this.drawCircleMarker = false;
@@ -119,6 +120,14 @@ export class MapService {
 
   isReady(): boolean {
     return this.ready;
+  }
+
+  public fitMapToBounds(boundingBox: BoundingBox, paddingX: number = 20, paddingY: number = 20) {
+    const bounds = leaflet.latLngBounds(
+      [boundingBox.latMin, boundingBox.lonMin],
+      [boundingBox.latMax, boundingBox.lonMax]
+    );
+    this.map.fitBounds(bounds, { padding: [paddingX, paddingY] });
   }
 
   public setMapMinMaxZoom(minZoom: number, maxZoom: number) {

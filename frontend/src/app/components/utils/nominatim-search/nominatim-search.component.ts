@@ -163,24 +163,7 @@ export class NominatimSearchComponent {
   }
 
   getFormattedAddress(place: NominatimPlace): string {
-    const address = place.address;
-    if (!address) return '';
-
-    const lines: string[] = [];
-
-    const street = [address.road, address.house_number].filter(Boolean).join(' ');
-    if (street) lines.push(street);
-
-    const cityLine = [address.postcode, address.city || address.town || address.village].filter(Boolean).join(' ');
-    if (cityLine) lines.push(cityLine);
-
-    const suburb = address.suburb;
-    if (suburb) lines.push(suburb)
-
-    const country = address.country;
-    if (country && !lines.includes(country)) lines.push(country);
-
-    return lines.join('\n');
+    return this.nominatimService.getFormattedAddress(place);
   }
 
   formatDistance(distance: number): string {
@@ -193,14 +176,7 @@ export class NominatimSearchComponent {
   }
 
   public flyTo(place: NominatimPlace) {
-    let location: Location = {
-      latitude: place.lat,
-      longitude: place.lon,
-      plusCode: this.geolocationService.getPlusCode(place.lat, place.lon)
-    }
-    this.mapService.setCircleMarker(location);
-    this.mapService.setDrawCircleMarker(true);
-    this.mapService.flyToWithZoom(location, 18);
+    this.mapService.fitMapToBounds(this.nominatimService.getBoundingBoxFromNominatimPlace(place));
     let result = {
       action: 'saveSearch',
       selectedPlace: place,
