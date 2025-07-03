@@ -876,7 +876,12 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((place: Place) => {
+    dialogRef.afterClosed().subscribe((places: Place[]) => {
+      if (places) {
+        places.forEach(place => {
+          this.placeService.updatePlace(place);
+        });
+      }
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }

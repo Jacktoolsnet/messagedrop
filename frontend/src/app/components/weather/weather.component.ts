@@ -62,7 +62,7 @@ export class WeatherComponent implements OnInit {
   ngOnInit(): void {
     this.selectedHour = new Date().getHours();
     this.getLocationName();
-    this.updateTiles();
+    this.updateTiles(true);
   }
 
   onTileClick(tile: any): void {
@@ -114,7 +114,7 @@ export class WeatherComponent implements OnInit {
       );
   }
 
-  private updateTiles(): void {
+  private updateTiles(init: boolean = false): void {
     const date = this.weather?.daily[this.selectedDayIndex]?.date;
     const hour = this.selectedHour.toString().padStart(2, '0');
     const hourly = this.weather?.hourly;
@@ -148,7 +148,7 @@ export class WeatherComponent implements OnInit {
         'temperature',
         'Temperature',
         'thermostat',
-        `${hourData.temperature} °C`,
+        `${init ? this.weather?.current.temperature : hourData.temperature} °C`,
         this.getTileLevel('temperature', hourData.temperature),
         this.getHourlyMinMax('temperature')
       ),

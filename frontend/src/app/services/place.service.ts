@@ -4,6 +4,7 @@ import { DateTime } from 'luxon';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreatePlaceResponse } from '../interfaces/create-place-response';
+import { Dataset } from '../interfaces/dataset';
 import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
@@ -37,7 +38,17 @@ export class PlaceService {
       latMax: 0,
       lonMax: 0
     },
-    timezone: ''
+    timezone: '',
+    datasets: {
+      weatherDataset: {
+        data: undefined,
+        lastUpdate: undefined
+      },
+      airQualityDataset: {
+        data: undefined,
+        lastUpdate: undefined
+      }
+    }
   };
   private ready: boolean = false;
 
@@ -101,7 +112,17 @@ export class PlaceService {
         latMax: 0,
         lonMax: 0
       },
-      timezone: ''
+      timezone: '',
+      datasets: {
+        weatherDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        },
+        airQualityDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        }
+      }
     };
     this.ready = false;
   }
@@ -158,7 +179,17 @@ export class PlaceService {
         latMax: 0,
         lonMax: 0
       },
-      timezone: ''
+      timezone: '',
+      datasets: {
+        weatherDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        },
+        airQualityDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        }
+      }
     };;
   }
 
@@ -359,5 +390,11 @@ export class PlaceService {
     // Lokalisierte Präfixe
     const prefix = locale.startsWith('de') ? 'KW' : 'Wk';
     return `${prefix} ${weekNumber}`;
+  }
+
+  isDatasetExpired(dataset: Dataset<any> | undefined, expirationInMinutes: number = 60): boolean {
+    if (!dataset) return true;
+    if (!dataset.lastUpdate) return true;
+    return dataset.lastUpdate.plus({ minutes: expirationInMinutes }) < DateTime.now();
   }
 }

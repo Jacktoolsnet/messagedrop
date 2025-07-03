@@ -1,11 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { DateTime } from 'luxon';
 import { BoundingBox } from '../../../interfaces/bounding-box';
 import { Location } from '../../../interfaces/location';
 import { Place } from '../../../interfaces/place';
 import { Weather } from '../../../interfaces/weather';
 import { GeolocationService } from '../../../services/geolocation.service';
+import { PlaceService } from '../../../services/place.service';
 import { UserService } from '../../../services/user.service';
 import { WeatherService } from '../../../services/weather.service';
 import { WeatherComponent } from '../../weather/weather.component';
@@ -27,13 +29,24 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
 
   public constructor(
     private userService: UserService,
+    private placeService: PlaceService,
     private weatherService: WeatherService,
     private geolocationService: GeolocationService,
     private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
-    this.getWeather();
+    if (this.place.datasets.weatherDataset.data) {
+      if (this.placeService.isDatasetExpired(this.place.datasets.weatherDataset)) {
+        this.getWeather();
+      } else {
+        this.weather = this.place.datasets.weatherDataset.data;
+        this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
+        this.minMax = this.getHourlyMinMax('temperature');
+      }
+    } else {
+      this.getWeather();
+    }
   }
 
   ngOnDestroy(): void { }
@@ -52,6 +65,8 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (weather) => {
+            this.place.datasets.weatherDataset.data = weather;
+            this.place.datasets.weatherDataset.lastUpdate = DateTime.now();
             this.weather = weather;
             this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
             this.minMax = this.getHourlyMinMax('temperature');
@@ -127,7 +142,6 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
     ) {
       return { min: 0, max: 0 };
     }
-
     const currentDate = this.weather.current.time.split('T')[0];
 
     const values = this.weather.hourly

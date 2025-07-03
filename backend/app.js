@@ -249,8 +249,8 @@ const geoStatisticLimit = rateLimit({
 })
 
 const airQualtiyLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  limit: 3, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
+  windowMs: 100 * 60 * 1000, // 1 minutes
+  limit: 10, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: {
@@ -259,7 +259,7 @@ const airQualtiyLimit = rateLimit({
 })
 
 const weatherLimit = rateLimit({
-  windowMs: 1 * 15 * 1000, // 15 minutes
+  windowMs: 100 * 60 * 1000, // 15 minutes
   limit: 10, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers

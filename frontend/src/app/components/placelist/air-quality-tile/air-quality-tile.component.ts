@@ -2,12 +2,13 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { DateTime } from 'luxon';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
 import { Location } from '../../../interfaces/location';
 import { Place } from '../../../interfaces/place';
 import { AirQualityService } from '../../../services/air-quality.service';
 import { GeolocationService } from '../../../services/geolocation.service';
-import { UserService } from '../../../services/user.service';
+import { PlaceService } from '../../../services/place.service';
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
 
 @Component({
@@ -40,14 +41,28 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
   ] as const;
 
   public constructor(
-    private userService: UserService,
+    private placeService: PlaceService,
     private airQualityService: AirQualityService,
     private geolocationService: GeolocationService,
     private dialog: MatDialog,
   ) { }
 
   ngOnInit(): void {
-    this.getAirQuality();
+    if (this.place.datasets.airQualityDataset.data) {
+      if (this.placeService.isDatasetExpired(this.place.datasets.weatherDataset)) {
+        this.getAirQuality();
+      } else {
+        this.airQuality = this.place.datasets.airQualityDataset.data;
+        const getDominantPollenType = this.getDominantPollenType();
+        this.label = this.getChartLabel(getDominantPollenType);
+        this.value = this.getHourlyValue(getDominantPollenType)
+        this.level = this.getLevelTextForCategoryValue(this.value)
+        this.airQualityIcon = this.getAirQualityIcon(getDominantPollenType);
+        this.minMax = this.getHourlyMinMax(getDominantPollenType);
+      }
+    } else {
+      this.getAirQuality();
+    }
   }
 
   ngOnDestroy(): void { }
@@ -64,6 +79,8 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
         )
         .subscribe({
           next: (airQuality) => {
+            this.place.datasets.airQualityDataset.data = airQuality;
+            this.place.datasets.airQualityDataset.lastUpdate = DateTime.now();
             this.airQuality = airQuality;
 
             const getDominantPollenType = this.getDominantPollenType();

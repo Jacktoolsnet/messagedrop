@@ -167,7 +167,7 @@ export class PlacelistComponent implements OnInit {
   }
 
   public goBack() {
-    this.dialogRef.close();
+    this.dialogRef.close(this.places);
   }
 
   async addPlace() {
@@ -189,7 +189,17 @@ export class PlacelistComponent implements OnInit {
         latMax: 0,
         lonMax: 0
       },
-      timezone: ''
+      timezone: '',
+      datasets: {
+        weatherDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        },
+        airQualityDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        }
+      }
     };
     let nominatimPlace: NominatimPlace | undefined = undefined;
     let selectedPlace: string = await this.indexedDbService.getSetting('nominatimSelectedPlace');
@@ -295,7 +305,7 @@ export class PlacelistComponent implements OnInit {
 
   public flyTo(place: Place) {
     this.mapService.fitMapToBounds(place.boundingBox);
-    this.dialogRef.close();
+    this.dialogRef.close(this.places);
   }
 
 }

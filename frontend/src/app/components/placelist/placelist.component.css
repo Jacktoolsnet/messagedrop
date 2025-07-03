@@ -35,7 +35,7 @@
   z-index: 100;
   margin-top: -2rem;
   margin-left: -1.5rem;
-  max-width: 90%;
+  max-width: 95%;
   height: 3rem;
   padding: 0.25rem 0.75rem;
   background-color: #2a2a2a;
@@ -62,7 +62,7 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 10rem;
+  max-width: 95%;
 }
 
 /* === MESSAGE CONTENT === */
