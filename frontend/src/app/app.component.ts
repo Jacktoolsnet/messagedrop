@@ -457,26 +457,26 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.mapService.setDrawCircleMarker(false);
   }
 
-  public handleMarkerClickEvent(event: any) {
+  public handleMarkerClickEvent(event: MarkerLocation) {
     let location: Location = {
-      latitude: event.latitude,
-      longitude: event.longitude,
-      plusCode: event.plusCode
+      latitude: event.location.latitude,
+      longitude: event.location.longitude,
+      plusCode: event.location.plusCode
     }
-    this.mapService.moveTo(location);
+    //this.mapService.moveTo(location);
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
-        this.openMarkerMessageListDialog(this.messageService.getMessages());
+        this.openMarkerMessageListDialog(event.messages);
         break;
       case MarkerType.PRIVATE_NOTE:
         if (this.userService.isReady()) {
           this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())).then(notes => {
-            this.openMarkerNoteListDialog(notes);
+            this.openMarkerNoteListDialog(event.notes);
           });
         }
         break;
       case MarkerType.MULTI:
-        this.openMarkerMultiDialog(this.messageService.getMessages(), this.noteService.getNotes());
+        this.openMarkerMultiDialog(event.messages, event.notes);
         break;
     }
   }
@@ -494,7 +494,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("messageDialog");
+      this.myHistory.push("createPingDialog");
       window.history.replaceState(this.myHistory, '', '');
     });
 
@@ -559,7 +559,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("messageDialog");
+      this.myHistory.push("checkPinDialog");
       window.history.replaceState(this.myHistory, '', '');
     });
 
@@ -1281,20 +1281,20 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       }
       if (!this.markerLocations.has(center.plusCode)) {
         this.markerLocations.set(center.plusCode, {
-          latitude: center!.latitude,
-          longitude: center!.longitude,
-          plusCode: message.location.plusCode,
+          location: center,
+          messages: [message],
+          notes: [],
           type: MarkerType.PUBLIC_MESSAGE
         });
+      } else {
+        this.markerLocations.get(center.plusCode)!.messages.push(message)
+        if (this.markerLocations.get(center.plusCode)?.type != MarkerType.PUBLIC_MESSAGE) {
+          this.markerLocations.get(center.plusCode)!.type = MarkerType.MULTI;
+        }
       }
     });
     // Process notes
     this.noteService.getNotes().forEach((note) => {
-      let location: Location = {
-        latitude: note.latitude,
-        longitude: note.longitude,
-        plusCode: note.plusCode
-      };
       let noteLocation: Location = {
         latitude: note.latitude,
         longitude: note.longitude,
@@ -1312,19 +1312,15 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         };
       }
       if (this.markerLocations.has(center.plusCode)) {
+        this.markerLocations.get(center.plusCode)!.notes.push(note)
         if (this.markerLocations.get(center.plusCode)?.type != MarkerType.PRIVATE_NOTE) {
-          this.markerLocations.set(center.plusCode, {
-            latitude: center!.latitude,
-            longitude: center!.longitude,
-            plusCode: note.plusCode,
-            type: MarkerType.MULTI
-          });
+          this.markerLocations.get(center.plusCode)!.type = MarkerType.MULTI;
         }
       } else {
         this.markerLocations.set(center.plusCode, {
-          latitude: center!.latitude,
-          longitude: center!.longitude,
-          plusCode: note.plusCode,
+          location: center,
+          messages: [],
+          notes: [note],
           type: MarkerType.PRIVATE_NOTE
         });
       }

@@ -217,13 +217,13 @@ export class MapService {
     markerLocations.forEach((markerLocation) => {
       switch (markerLocation.type) {
         case MarkerType.PUBLIC_MESSAGE:
-          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], { icon: messageMarker, zIndexOffset: 20 })
+          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: messageMarker, zIndexOffset: 20 })
           markerForPublicMessage.on('click', ($event: leaflet.LeafletMouseEvent) => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
-              latitude: markerLocation.latitude,
-              longitude: markerLocation.longitude,
-              plusCode: markerLocation.plusCode
+              latitude: markerLocation.location.latitude,
+              longitude: markerLocation.location.longitude,
+              plusCode: markerLocation.location.plusCode
             });
             this.drawCircleMarker = false;
             this.showDataFromMarker(markerLocation);
@@ -231,13 +231,13 @@ export class MapService {
           this.messageMarkers.push(markerForPublicMessage)
           break;
         case MarkerType.PRIVATE_NOTE:
-          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], { icon: noteMarker, zIndexOffset: 15 })
+          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: noteMarker, zIndexOffset: 15 })
           markerForPrivateNote.on('click', ($event: leaflet.LeafletMouseEvent) => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
-              latitude: markerLocation.latitude,
-              longitude: markerLocation.longitude,
-              plusCode: markerLocation.plusCode
+              latitude: markerLocation.location.latitude,
+              longitude: markerLocation.location.longitude,
+              plusCode: markerLocation.location.plusCode
             });
             this.drawCircleMarker = false;
             this.showDataFromMarker(markerLocation);
@@ -245,13 +245,13 @@ export class MapService {
           this.messageMarkers.push(markerForPrivateNote)
           break;
         case MarkerType.MULTI:
-          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.latitude, markerLocation.longitude], { icon: multiMarker, zIndexOffset: 5 })
+          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: multiMarker, zIndexOffset: 5 })
           markerMulti.on('click', ($event: leaflet.LeafletMouseEvent) => {
             this.drawCircleMarker = true;
             this.setCircleMarker({
-              latitude: markerLocation.latitude,
-              longitude: markerLocation.longitude,
-              plusCode: markerLocation.plusCode
+              latitude: markerLocation.location.latitude,
+              longitude: markerLocation.location.longitude,
+              plusCode: markerLocation.location.plusCode
             });
             this.drawCircleMarker = false;
             this.showDataFromMarker(markerLocation);
