@@ -21,6 +21,7 @@ export class NoteService {
   }
 
   async loadNotes(): Promise<Note[]> {
+    this.notes = [];
     this.notes = await this.indexedDbService.getAllNotes();
     return this.notes;
   }

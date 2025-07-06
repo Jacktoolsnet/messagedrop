@@ -41,6 +41,44 @@
                         [style]="message.style"></app-showmessage>
                 </div>
             </mat-card-content>
+            <mat-card-actions class="buttonbar">
+                <button *ngIf="userService.isReady() && user.id != message.userId" mat-mini-fab
+                    [color]="likeButtonColor" aria-label="Like message" (click)="likeMessage(message)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined"
+                        matBadge="{{message.likes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+                        matBadgeOverlap="true">thumb_up</mat-icon>
+                </button>
+                <button *ngIf="userService.isReady() && user.id != message.userId" mat-mini-fab
+                    [color]="dislikeButtonColor" aria-label="Dislike message" (click)="dislikeMessage(message)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined"
+                        matBadge="{{message.dislikes | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+                        matBadgeOverlap="true">thumb_down</mat-icon>
+                </button>
+                <button
+                    *ngIf="userService.isReady() && user.id != message.userId && messageService.getSelectedMessages().at(-1)?.message != '' && messageService.getSelectedMessages().at(-1)?.translatedMessage === undefined"
+                    mat-mini-fab color="secondary" aria-label="Translate message" (click)="translateMessage(message)">
+                    <mat-icon>translate</mat-icon>
+                </button>
+                <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
+                    <mat-icon>place</mat-icon>
+                </button>
+                <button *ngIf="userService.isReady() && user.id != message.userId" mat-mini-fab color="secondary"
+                    aria-label="Edit message" (click)="editMessageUserProfile(message)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">person</mat-icon>
+                </button>
+                <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Edit message"
+                    (click)="editMessage(message)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
+                </button>
+                <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Delete message"
+                    (click)="deleteMessage(message)">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
+                </button>
+                <button [matMenuTriggerFor]="messageMenu" [matMenuTriggerData]="{user: user, message: message}"
+                    aria-hidden="false" mat-mini-fab color="secondary" aria-label="Message menu" (click)="{}">
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">more_vert</mat-icon>
+                </button>
+            </mat-card-actions>
         </mat-card>
     </div>
     <!-- Message Detail view-->

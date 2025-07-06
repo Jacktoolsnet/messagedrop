@@ -61,7 +61,6 @@
 
 /* === CONTENT === */
 .content {
-  padding: 1rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 1rem;
@@ -85,9 +84,8 @@
   position: absolute;
   top: 0;
   left: 0;
+  transform: translate(-1.75rem, -50%);
   z-index: 100;
-  margin-top: -2rem;
-  margin-left: -1.5rem;
   max-width: 95%;
   height: 3rem;
   padding: 0.25rem 0.75rem;
