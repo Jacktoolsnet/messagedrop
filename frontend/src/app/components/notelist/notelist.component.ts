@@ -181,7 +181,9 @@ export class NotelistComponent implements OnInit {
         data.note.latitude = this.location.latitude;
         data.note.longitude = this.location.longitude;
         data.note.plusCode = this.location.plusCode;
-        this.noteService.addNote(data.note);
+        this.noteService.addNote(data.note).then(() => {
+          this.notes.push(data.note);
+        });
       }
     });
   }
