@@ -35,6 +35,7 @@ export class PlaceComponent implements OnInit {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
+  private oriIcon: string | undefined = undefined;
 
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
@@ -44,6 +45,7 @@ export class PlaceComponent implements OnInit {
   ) {
     this.oriName = data.place.name;
     this.oriBase64Avatar = data.place.base64Avatar
+    this.oriIcon = data.place.icon;
   }
 
   ngOnInit(): void {
@@ -54,11 +56,14 @@ export class PlaceComponent implements OnInit {
   }
 
   onAbortClick(): void {
-    if (this.oriName) {
+    if (undefined != this.oriName) {
       this.data.place.name = this.oriName;
     }
-    if (this.oriBase64Avatar) {
+    if (undefined != this.oriBase64Avatar) {
       this.data.place.base64Avatar = this.oriBase64Avatar;
+    }
+    if (undefined != this.oriIcon) {
+      this.data.place.icon = this.oriIcon;
     }
     this.dialogRef.close();
   }

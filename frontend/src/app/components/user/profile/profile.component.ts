@@ -48,13 +48,13 @@ export class ProfileComponent {
   }
 
   onAbortClick(): void {
-    if (this.oriName) {
+    if (undefined != this.oriName) {
       this.userService.getProfile().name = this.oriName;
     }
-    if (this.oriBase64Avatar) {
+    if (undefined != this.oriBase64Avatar) {
       this.userService.getProfile().base64Avatar = this.oriBase64Avatar;
     }
-    if (this.oriDefaultStyle) {
+    if (undefined != this.oriDefaultStyle) {
       this.userService.getProfile().defaultStyle = this.oriDefaultStyle;
     }
     this.dialogRef.close();

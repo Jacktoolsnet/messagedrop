@@ -10,6 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { Location } from '../../interfaces/location';
+import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { User } from '../../interfaces/user';
@@ -90,16 +91,25 @@ export class NotelistComponent implements OnInit {
   }
 
   editNote(note: Note) {
+    let oriNote: string = note.note;
+    let oriMultimedia: Multimedia = JSON.parse(JSON.stringify(note.multimedia));
+    let oriStyle: string = note.style;
     if (note.multimedia.type !== MultimediaType.UNDEFINED) {
       this.sharedContentService.addSharedContentToNote(note);
     }
+
     const dialogRef = this.dialog.open(EditNoteComponent, {
       data: { note },
       closeOnNavigation: true
     });
+
     dialogRef.afterClosed().subscribe(async result => {
       if (result?.note) {
         await this.noteService.updateNote(result.note);
+      } else {
+        note.note = oriNote;
+        note.multimedia = oriMultimedia;
+        note.style = oriStyle;
       }
     });
   }

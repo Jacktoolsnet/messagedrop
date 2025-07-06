@@ -2,7 +2,7 @@
 <mat-dialog-content>
 
   Set my profile name
-  <input matInput type="text" maxlength="64" placeholder="User name.." [(ngModel)]="userService.getProfile().name">
+  <input matInput type="text" maxlength="64" placeholder="Profile name.." [(ngModel)]="userService.getProfile().name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload>
 

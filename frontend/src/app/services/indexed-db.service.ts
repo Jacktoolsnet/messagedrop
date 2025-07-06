@@ -310,11 +310,11 @@ export class IndexedDbService {
       keysRequest.onsuccess = () => {
         valuesRequest.onsuccess = () => {
           const keys = keysRequest.result as string[];
-          const values = valuesRequest.result as Profile[];
+          const values = valuesRequest.result as string[];
 
           const map = new Map<string, Profile>();
           for (let i = 0; i < keys.length; i++) {
-            map.set(keys[i], values[i]);
+            map.set(keys[i], this.decompress<any>(values[i]) as Profile);
           }
 
           resolve(map);

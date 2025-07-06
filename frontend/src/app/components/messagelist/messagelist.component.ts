@@ -14,6 +14,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
+import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Profile } from '../../interfaces/profile';
 import { User } from '../../interfaces/user';
@@ -182,6 +183,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessage(message: Message) {
+    let oriMessage: string = message.message;
+    let oriMultimedia: Multimedia = JSON.parse(JSON.stringify(message.multimedia));
+    let oriStyle: string = message.style;
     if (message.multimedia.type !== MultimediaType.UNDEFINED) {
       this.sharedContentService.addSharedContentToMessage(message);
     }
@@ -202,26 +206,46 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (undefined !== data?.message) {
         this.messageService.updateMessage(data.message);
+      } else {
+        message.message = oriMessage;
+        message.multimedia = oriMultimedia;
+        message.style = oriStyle;
       }
     });
   }
 
   public editMessageUserProfile(message: Message) {
     if (this.userService.isReady()) {
-      const dialogRef = this.dialog.open(EditProfileComponent, {
-        data: { profile: this.profileService.getProfile(message.userId), userId: message.userId },
-        closeOnNavigation: true,
-        hasBackdrop: true
-      });
+      let profile: Profile | undefined = this.profileService.getProfile(message.userId);
+      if (profile) {
+        let oriName = profile.name;
+        let oriBase64Avatar = profile.base64Avatar;
+        let oriDefaultStyle = profile.defaultStyle;
+        const dialogRef = this.dialog.open(EditProfileComponent, {
+          data: { profile: profile, userId: message.userId },
+          closeOnNavigation: true,
+          hasBackdrop: true
+        });
 
-      dialogRef.afterOpened().subscribe(e => {
-      });
+        dialogRef.afterOpened().subscribe(e => {
+        });
 
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.profileService.setProfile(result.userId, result.profile);
-        }
-      });
+        dialogRef.afterClosed().subscribe(result => {
+          if (result) {
+            this.profileService.setProfile(result.userId, result.profile);
+          } else {
+            if (oriName) {
+              profile.name = oriName;
+            }
+            if (undefined != oriBase64Avatar) {
+              profile.base64Avatar = oriBase64Avatar;
+            }
+            if (oriDefaultStyle) {
+              profile.defaultStyle = oriDefaultStyle;
+            }
+          }
+        });
+      }
     }
   }
 

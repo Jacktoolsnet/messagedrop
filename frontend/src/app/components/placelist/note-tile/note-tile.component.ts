@@ -1,9 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, computed, Input, OnDestroy, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { Note } from '../../../interfaces/note';
 import { Place } from '../../../interfaces/place';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { NoteService } from '../../../services/note.service';
@@ -21,9 +20,15 @@ import { NotelistComponent } from '../../notelist/notelist.component';
 })
 export class NoteTileComponent implements OnInit, OnDestroy {
   @Input() place!: Place;
+  readonly allNotesSignal = this.noteService.getNotesSignal();
 
-  private notes: Note[] = [];
-  public visibleNotes: Note[] = [];
+  readonly visibleNotesSignal = computed(() => {
+    const allNotes = this.noteService.getNotesSignal()();
+    return allNotes
+      .filter(n => n.note?.trim().length > 0);
+  });
+
+  readonly hasNotes = computed(() => this.visibleNotesSignal().length > 0);
 
   constructor(
     private noteService: NoteService,
@@ -31,17 +36,7 @@ export class NoteTileComponent implements OnInit, OnDestroy {
     private matDialog: MatDialog
   ) { }
 
-  ngOnInit(): void {
-    if (this.place) {
-      this.noteService.getNotesInBoundingBox(this.place.boundingBox!).then((notes: Note[]) => {
-        this.notes = notes;
-        this.visibleNotes = notes.filter(n => n.note?.trim().length > 0);
-      });
-    }
-  }
-
-  ngOnDestroy(): void {
-  }
+  ngOnInit(): void { }
 
   openNoteDialog(): void {
     const dialogRef = this.matDialog.open(NotelistComponent, {
@@ -56,16 +51,8 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (this.place) {
-        this.noteService.getNotesInBoundingBox(this.place.boundingBox!).then((notes: Note[]) => {
-          this.notes = notes;
-          this.visibleNotes = notes.filter(n => n.note?.trim().length > 0);
-        });
-      }
-    });
+    dialogRef.afterClosed().subscribe(() => { });
   }
+
+  ngOnDestroy(): void { }
 }

@@ -46,6 +46,7 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
+import { Profile } from './interfaces/profile';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -984,6 +985,10 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public editUserProfile() {
+    let profile: Profile = this.userService.getProfile()
+    let oriName: string | undefined = profile.name;
+    let oriBase64Avatar: string | undefined = profile.base64Avatar;
+    let oriDefaultStyle: string | undefined = profile.defaultStyle;
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
       data: {},
       closeOnNavigation: true,
@@ -996,6 +1001,16 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.userService.saveProfile();
+      } else {
+        if (undefined != oriName) {
+          profile.name = oriName;
+        }
+        if (undefined != oriBase64Avatar) {
+          profile.base64Avatar = oriBase64Avatar;
+        }
+        if (undefined != oriDefaultStyle) {
+          profile.defaultStyle = oriDefaultStyle;
+        }
       }
     });
   }
