@@ -33,20 +33,18 @@ export class GeolocationService {
     switch (zoom) {
       case 19:
       case 18:
-        plusCode = location.plusCode;
-        break;
       case 17:
       case 16:
-      case 15:
-      case 14:
         plusCode = location.plusCode.substring(0, 8);
         break;
+      case 15:
+      case 14:
       case 13:
       case 12:
       case 11:
-      case 10:
         plusCode = location.plusCode.substring(0, 6);
         break;
+      case 10:
       case 9:
       case 8:
       case 7:
@@ -59,33 +57,33 @@ export class GeolocationService {
     return plusCode;
   }
 
-  public getGroupedPlusCodeLengthBasedOnMapZoom(location: Location, zoom: number): number {
-    let plusCodeLength: number = 11;
+  public getGroupedPlusCodeBasedOnMapZoom(location: Location, zoom: number): string {
+    let plusCode: string = '';
     switch (zoom) {
       case 19:
       case 18:
       case 17:
       case 16:
+        plusCode = location.plusCode.substring(0, 12);
+        break;
       case 15:
       case 14:
-        plusCodeLength = 8;
-        break;
       case 13:
       case 12:
       case 11:
-      case 10:
-        plusCodeLength = 6;
+        plusCode = location.plusCode.substring(0, 8);
         break;
+      case 10:
       case 9:
       case 8:
       case 7:
-        plusCodeLength = 4;
+        plusCode = location.plusCode.substring(0, 6);
         break;
       default:
-        plusCodeLength = 2;
+        plusCode = location.plusCode.substring(0, 4);
         break;
     }
-    return plusCodeLength;
+    return plusCode;
   }
 
   public getCurrentPosition(): Observable<any> {

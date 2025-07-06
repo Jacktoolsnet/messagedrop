@@ -45,6 +45,7 @@ import { NominatimPlace } from './interfaces/nominatim-place';
 import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
+import { PlusCodeArea } from './interfaces/plus-code-area';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -1263,21 +1264,25 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   private createMarkerLocations() {
-    let key: string = "";
     this.markerLocations.clear();
-    let center: number[] = [];
+    let center: Location | undefined = undefined;
     // Process messages
     this.messageService.getMessages().forEach((message) => {
-      key = this.createMarkerKey(message.location);
       if (this.mapService.getMapZoom() > 17) {
-        center = [message.location.latitude, message.location.longitude]
+        center = message.location
       } else {
-        center = this.mapService.getSearchRectangeCenter(message.location);
+        let plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(message.location, this.mapService.getMapZoom());
+        let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: plusCode
+        };
       }
-      if (!this.markerLocations.has(key)) {
-        this.markerLocations.set(key, {
-          latitude: center[0],
-          longitude: center[1],
+      if (!this.markerLocations.has(center.plusCode)) {
+        this.markerLocations.set(center.plusCode, {
+          latitude: center!.latitude,
+          longitude: center!.longitude,
           plusCode: message.location.plusCode,
           type: MarkerType.PUBLIC_MESSAGE
         });
@@ -1290,25 +1295,35 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         longitude: note.longitude,
         plusCode: note.plusCode
       };
-      key = this.createMarkerKey(location);
+      let noteLocation: Location = {
+        latitude: note.latitude,
+        longitude: note.longitude,
+        plusCode: note.plusCode
+      };
       if (this.mapService.getMapZoom() > 17) {
-        center = [note.latitude, note.longitude]
+        center = noteLocation;
       } else {
-        center = this.mapService.getSearchRectangeCenter(location);
+        let plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(noteLocation, this.mapService.getMapZoom());
+        let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: plusCode
+        };
       }
-      if (this.markerLocations.has(key)) {
-        if (this.markerLocations.get(key)?.type != MarkerType.PRIVATE_NOTE) {
-          this.markerLocations.set(key, {
-            latitude: center[0],
-            longitude: center[1],
+      if (this.markerLocations.has(center.plusCode)) {
+        if (this.markerLocations.get(center.plusCode)?.type != MarkerType.PRIVATE_NOTE) {
+          this.markerLocations.set(center.plusCode, {
+            latitude: center!.latitude,
+            longitude: center!.longitude,
             plusCode: note.plusCode,
             type: MarkerType.MULTI
           });
         }
       } else {
-        this.markerLocations.set(key, {
-          latitude: center[0],
-          longitude: center[1],
+        this.markerLocations.set(center.plusCode, {
+          latitude: center!.latitude,
+          longitude: center!.longitude,
           plusCode: note.plusCode,
           type: MarkerType.PRIVATE_NOTE
         });
@@ -1317,14 +1332,4 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     // Save last markerupdet to fire the angular change listener
     this.lastMarkerUpdate = new Date().getMilliseconds();
   }
-
-  private createMarkerKey(location: Location): string {
-    if (this.mapService.getMapZoom() > 19) {
-      return location.plusCode;
-    } else {
-      return this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-    }
-  }
-
-
 }

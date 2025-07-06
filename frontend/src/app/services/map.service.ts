@@ -90,6 +90,11 @@ export class MapService {
 
     // MoveEnd fires always.
     this.map.on('moveend', (ev: any) => {
+      if (this.getMapZoom() < 17) {
+        this.removeUserMarker();
+      } else {
+        this.restoreUserMarker();
+      }
       this.location.latitude = this.map.getCenter().lat;
       this.location.longitude = this.map.getCenter().lng;
       this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
@@ -166,6 +171,16 @@ export class MapService {
       this.userMarker = leaflet.marker([location.latitude, location.longitude], { icon: userMarker, zIndexOffset: 0 }).addTo(this.map);
     } else {
       this.userMarker?.setLatLng([location.latitude, location.longitude]).update();
+    }
+  }
+
+  public restoreUserMarker() {
+    this.userMarker?.addTo(this.map);
+  }
+
+  public removeUserMarker() {
+    if (this.userMarker) {
+      this.userMarker.removeFrom(this.map);
     }
   }
 
