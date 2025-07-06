@@ -33,13 +33,18 @@ import { StyleService } from '../../services/style.service';
 export class PlaceComponent implements OnInit {
 
   private maxFileSize = 5 * 1024 * 1024; // 5MB
+  private oriName: string | undefined = undefined;
+  private oriBase64Avatar: string | undefined = undefined;
 
   constructor(
     public dialogRef: MatDialogRef<PlaceComponent>,
     private style: StyleService,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, place: Place }
-  ) { }
+  ) {
+    this.oriName = data.place.name;
+    this.oriBase64Avatar = data.place.base64Avatar
+  }
 
   ngOnInit(): void {
   }
@@ -49,6 +54,12 @@ export class PlaceComponent implements OnInit {
   }
 
   onAbortClick(): void {
+    if (this.oriName) {
+      this.data.place.name = this.oriName;
+    }
+    if (this.oriBase64Avatar) {
+      this.data.place.base64Avatar = this.oriBase64Avatar;
+    }
     this.dialogRef.close();
   }
 

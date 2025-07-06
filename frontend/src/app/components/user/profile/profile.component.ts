@@ -31,15 +31,32 @@ import { UserService } from '../../../services/user.service';
 export class ProfileComponent {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
 
+  private oriName: string | undefined = undefined;
+  private oriBase64Avatar: string | undefined = undefined;
+  private oriDefaultStyle: string | undefined = undefined;
+
   constructor(
     public userService: UserService,
     private styleService: StyleService,
     private snackBar: MatSnackBar,
     public dialogRef: MatDialogRef<ProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {}
-  ) { }
+  ) {
+    this.oriName = this.userService.getProfile().name;
+    this.oriBase64Avatar = this.userService.getProfile().base64Avatar
+    this.oriDefaultStyle = this.userService.getProfile().defaultStyle;
+  }
 
   onAbortClick(): void {
+    if (this.oriName) {
+      this.userService.getProfile().name = this.oriName;
+    }
+    if (this.oriBase64Avatar) {
+      this.userService.getProfile().base64Avatar = this.oriBase64Avatar;
+    }
+    if (this.oriDefaultStyle) {
+      this.userService.getProfile().defaultStyle = this.oriDefaultStyle;
+    }
     this.dialogRef.close();
   }
 

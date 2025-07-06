@@ -1,26 +1,33 @@
 <h2 *ngIf="data.mode == 'add_place'" mat-dialog-title>Add a place</h2>
-<h2 *ngIf="data.mode == 'edit_place'" mat-dialog-title>Edit the place</h2>
+<h2 *ngIf="data.mode == 'edit_place'" mat-dialog-title>Place settings</h2>
 <mat-dialog-content>
-  <input matInput type="text" maxlength="64" placeholder="The place name.." [(ngModel)]="data.place.name">
+  <span>The place name:</span>
+  <input matInput type="text" maxlength="64" placeholder="Enter the place name.." [(ngModel)]="data.place.name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload>
-  <div class="center-left" *ngIf="data.place.base64Avatar == ''">
-    Set the place avatar:
-    <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
-      <mat-icon>attach_file</mat-icon>
-    </button>
+
+  <div class="avatar-area" *ngIf="data.place.base64Avatar == ''">
+    <div class="center">
+      Set the place avatar.
+    </div>
+    <div class="button-style">
+      <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
+        <mat-icon>attach_file</mat-icon>
+      </button>
+    </div>
   </div>
-  <div class="center">
-    <img *ngIf="data.place.base64Avatar != ''" class="avatar" src="{{data.place.base64Avatar}}" /><br>
-  </div>
-  <div class="center" *ngIf="data.place.base64Avatar != ''">
-    <button *ngIf="data.place.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button"
-      (click)="deleteAvatar()">
-      <mat-icon>delete</mat-icon>
-    </button>
+  <div class="avatar-area" *ngIf="data.place.base64Avatar != ''">
+    <div class="center">
+      <img *ngIf="data.place.base64Avatar != ''" class="avatar" src="{{data.place.base64Avatar}}" /><br>
+    </div>
+    <div class="button-style">
+      <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
   </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button *ngIf="data.place.name != ''" mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
+  <button mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
 </mat-dialog-actions>
