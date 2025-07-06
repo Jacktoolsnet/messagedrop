@@ -47,7 +47,7 @@ export class NoteTileComponent implements OnInit, OnDestroy {
     const dialogRef = this.matDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
-      data: { notes: this.notes, location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!) },
+      data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!) },
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',

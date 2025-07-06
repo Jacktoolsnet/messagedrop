@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, computed, Inject, OnInit, Signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -52,7 +52,8 @@ import { WeatherTileComponent } from './weather-tile/weather-tile.component';
   styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent implements OnInit {
-  public places!: Place[];
+  placesSignal: Signal<Place[]>;
+  readonly hasPlaces = computed(() => this.placesSignal().length > 0);
   private placeToDelete!: Place
   public mode: typeof Mode = Mode;
   private snackBarRef: any;
@@ -70,9 +71,9 @@ export class PlacelistComponent implements OnInit {
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
     private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { places: Place[] }
+    @Inject(MAT_DIALOG_DATA) public data: {}
   ) {
-    this.places = data.places;
+    this.placesSignal = this.placeService.places;
   }
 
   ngOnInit(): void {
@@ -94,8 +95,7 @@ export class PlacelistComponent implements OnInit {
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.places.splice(this.places.map(e => e.id).indexOf(this.placeToDelete.id), 1);
-                this.placeService.saveAdditionalPlaceInfos();
+                this.placeService.removePlace(this.placeToDelete.id);
               }
             },
             error: (err) => {
@@ -121,12 +121,7 @@ export class PlacelistComponent implements OnInit {
       if (undefined !== data?.place) {
         this.placeService.updatePlace(data.place)
           .subscribe({
-            next: simpleResponse => {
-              if (simpleResponse.status === 200) {
-                this.placeService.saveAdditionalPlaceInfos();
-                this.snackBarRef = this.snackBar.open(`Place succesfully edited.`, '', { duration: 1000 });
-              }
-            },
+            next: simpleResponse => { },
             error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
             complete: () => { }
           });
@@ -167,7 +162,7 @@ export class PlacelistComponent implements OnInit {
   }
 
   public goBack() {
-    this.dialogRef.close(this.places);
+    this.dialogRef.close();
   }
 
   async addPlace() {
@@ -224,8 +219,7 @@ export class PlacelistComponent implements OnInit {
                         next: createPlaceResponse => {
                           if (createPlaceResponse.status === 200) {
                             place.id = createPlaceResponse.placeId;
-                            this.places.unshift(place);
-                            this.placeService.saveAdditionalPlaceInfos();
+                            this.placeService.saveAdditionalPlaceInfos(place);
                             this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
                           }
                         },
@@ -250,10 +244,10 @@ export class PlacelistComponent implements OnInit {
                     this.placeService.createPlace(place)
                       .subscribe({
                         next: createPlaceResponse => {
+                          console.log(createPlaceResponse)
                           if (createPlaceResponse.status === 200) {
                             place.id = createPlaceResponse.placeId;
-                            this.places.unshift(place);
-                            this.placeService.saveAdditionalPlaceInfos();
+                            this.placeService.saveAdditionalPlaceInfos(place);
                             this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
                           }
                         },
@@ -285,8 +279,7 @@ export class PlacelistComponent implements OnInit {
                   next: createPlaceResponse => {
                     if (createPlaceResponse.status === 200) {
                       place.id = createPlaceResponse.placeId;
-                      this.places.unshift(place);
-                      this.placeService.saveAdditionalPlaceInfos();
+                      this.placeService.saveAdditionalPlaceInfos(place);
                       this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
                     }
                   },
@@ -304,7 +297,7 @@ export class PlacelistComponent implements OnInit {
 
   public flyTo(place: Place) {
     this.mapService.fitMapToBounds(place.boundingBox);
-    this.dialogRef.close(this.places);
+    this.dialogRef.close();
   }
 
 }

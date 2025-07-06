@@ -5,8 +5,7 @@
     class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="login()">
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
 </button>
-<button
-    *ngIf="networkService.isOnline() && serverService.isReady() && userService.isReady() && placeService.getSelectedPlace().id === ''"
+<button *ngIf="networkService.isOnline() && serverService.isReady() && userService.isReady()"
     [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent"
     aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
@@ -17,14 +16,12 @@
     (click)="getCurrentPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() && serverService.isReady() &&  placeService.getSelectedPlace().id === ''"
-    [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary"
-    aria-label="Mainmenu" (click)="{}">
+<button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="false"
+    [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary" aria-label="Mainmenu" (click)="{}">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">menu</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() && serverService.isReady() &&  placeService.getSelectedPlace().id === ''"
-    [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab color="primary"
-    aria-label="Search" (click)="{}">
+<button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="false"
+    [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab color="primary" aria-label="Search" (click)="{}">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">search</mat-icon>
 </button>
 

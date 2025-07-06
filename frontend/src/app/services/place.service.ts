@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { DateTime } from 'luxon';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -19,37 +19,8 @@ import { UserService } from './user.service';
 })
 export class PlaceService {
 
-  private places: Place[] = [];
-  private selectedPlace: Place = {
-    id: '',
-    userId: '',
-    name: '',
-    location: {
-      latitude: 0,
-      longitude: 0,
-      plusCode: ''
-    },
-    base64Avatar: '',
-    icon: '',
-    subscribed: false,
-    boundingBox: {
-      latMin: 0,
-      lonMin: 0,
-      latMax: 0,
-      lonMax: 0
-    },
-    timezone: '',
-    datasets: {
-      weatherDataset: {
-        data: undefined,
-        lastUpdate: undefined
-      },
-      airQualityDataset: {
-        data: undefined,
-        lastUpdate: undefined
-      }
-    }
-  };
+  private _places = signal<Place[]>([]);
+  private _selectedPlace = signal<Place | null>(null);
   private ready: boolean = false;
 
   httpOptions = {
@@ -64,133 +35,59 @@ export class PlaceService {
     private userService: UserService,
     private indexedDbService: IndexedDbService,
     private networkService: NetworkService,
-    private http: HttpClient) {
-  }
+    private http: HttpClient) { }
+
+  get places() { return this._places.asReadonly(); }
+  get selectedPlace() { return this._selectedPlace.asReadonly(); }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
   }
 
   initPlaces() {
-    this.getByUserId(this.userService.getUser().id)
-      .subscribe({
-        next: (getPlacesResponse: GetPlacesResponse) => {
-          getPlacesResponse.rows.forEach((row) => {
-            this.loadPlaceFromIndexedDb(row.id);
-          });
-          this.ready = true;
-        },
-        error: (err) => {
-          if (err.status === 404) {
-            this.places = [];
-            this.ready = true;
-          } else {
-            this.ready = false;
-          }
-        },
-        complete: () => { }
-      });
+    this.getByUserId(this.userService.getUser().id).subscribe({
+      next: async (response) => {
+        const places = await Promise.all(response.rows.map(row => this.loadPlaceFromIndexedDb(row.id)));
+        this._places.set(places.filter(Boolean) as Place[]);
+        this.ready = true;
+      },
+      error: (err) => {
+        this._places.set([]);
+        this.ready = true;
+      }
+    });
   }
 
-  public logout() {
-    this.places = [];
-    this.selectedPlace = {
-      id: '',
-      userId: '',
-      name: '',
-      location: {
-        latitude: 0,
-        longitude: 0,
-        plusCode: ''
-      },
-      base64Avatar: '',
-      icon: '',
-      subscribed: false,
-      boundingBox: {
-        latMin: 0,
-        lonMin: 0,
-        latMax: 0,
-        lonMax: 0
-      },
-      timezone: '',
-      datasets: {
-        weatherDataset: {
-          data: undefined,
-          lastUpdate: undefined
-        },
-        airQualityDataset: {
-          data: undefined,
-          lastUpdate: undefined
-        }
-      }
-    };
+  logout() {
+    this._places.set([]);
+    this._selectedPlace.set(null);
     this.ready = false;
   }
 
-  private async loadPlaceFromIndexedDb(placeId: string) {
-    const placeFromIndexedDb = await this.indexedDbService.getPlace(placeId);
-    if (placeFromIndexedDb) {
-      this.places.push(placeFromIndexedDb);
-    } else {
-      this.deletePlace(placeId)
-        .subscribe({
-          next: (simpleStatusResponse) => { },
-          error: (err) => {
-          },
-          complete: () => { }
-        });
+  private async loadPlaceFromIndexedDb(placeId: string): Promise<Place | null> {
+    const place = await this.indexedDbService.getPlace(placeId);
+    if (!place) {
+      this.deletePlace(placeId).subscribe();
     }
-  }
-
-  saveAdditionalPlaceInfos() {
-    this.places.forEach((place: Place) => {
-      this.indexedDbService.setPlaceProfile(place.id, place)
-    })
-  }
-
-  getPlaces(): Place[] {
-    return this.places;
-  }
-
-  getSelectedPlace(): Place {
-    return this.selectedPlace;
+    return place ?? null;
   }
 
   setSelectedPlace(place: Place) {
-    this.selectedPlace = place;
+    this._selectedPlace.set(place);
   }
 
-  unselectPlace() {
-    this.selectedPlace = {
-      id: '',
-      userId: '',
-      name: '',
-      location: {
-        latitude: 0,
-        longitude: 0,
-        plusCode: ''
-      },
-      base64Avatar: '',
-      icon: '',
-      subscribed: false,
-      boundingBox: {
-        latMin: 0,
-        lonMin: 0,
-        latMax: 0,
-        lonMax: 0
-      },
-      timezone: '',
-      datasets: {
-        weatherDataset: {
-          data: undefined,
-          lastUpdate: undefined
-        },
-        airQualityDataset: {
-          data: undefined,
-          lastUpdate: undefined
-        }
-      }
-    };;
+  async saveAdditionalPlaceInfos(place: Place) {
+    // Aktuelles Array holen
+    const places = this._places();
+
+    // Neuen Place einfügen (du kannst hier noch prüfen, ob er schon existiert)
+    const updatedPlaces = [...places.filter(p => p.id !== place.id), place];
+
+    // Signal updaten
+    this._places.set(updatedPlaces);
+
+    // Alle Places in die IndexedDB schreiben
+    await Promise.all(updatedPlaces.map(p => this.indexedDbService.setPlaceProfile(p.id, p)));
   }
 
   isReady(): boolean {
@@ -319,6 +216,12 @@ export class PlaceService {
       .pipe(
         catchError(this.handleError)
       );
+  }
+
+  removePlace(placeId: string): void {
+    const updatedPlaces = this._places().filter(place => place.id !== placeId);
+    this._places.set(updatedPlaces);
+    this.indexedDbService.deletePlace(placeId).catch(err => { });
   }
 
   subscribe(place: Place, showAlways: boolean = false) {
