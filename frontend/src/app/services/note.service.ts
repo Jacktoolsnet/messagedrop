@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Note } from '../interfaces/note';
 import { User } from '../interfaces/user';
@@ -8,52 +8,53 @@ import { IndexedDbService } from './indexed-db.service';
   providedIn: 'root'
 })
 export class NoteService {
-  private notes: Note[] = [];
+  private notesSignal = signal<Note[]>([]);
 
   constructor(private indexedDbService: IndexedDbService) { }
 
-  logout(): void {
-    this.notes = [];
+  /** Zugriff auf die Notes als Signal */
+  getNotesSignal() {
+    return this.notesSignal.asReadonly();
   }
 
-  getNotes(): Note[] {
-    return this.notes;
+  logout(): void {
+    this.notesSignal.set([]);
   }
 
   async loadNotes(): Promise<Note[]> {
-    this.notes = [];
-    this.notes = await this.indexedDbService.getAllNotes();
-    return this.notes;
+    const notes = await this.indexedDbService.getAllNotes();
+    this.notesSignal.set(notes);
+    return notes;
   }
 
   async addNote(note: Note): Promise<Note> {
-    const noteWithId: Note = { ...note, id: await this.indexedDbService.saveNote(note) };
-    this.notes.unshift(noteWithId);
-    return noteWithId;
+    const id = await this.indexedDbService.saveNote(note);
+    const newNote: Note = { ...note, id };
+    this.notesSignal.update(notes => [newNote, ...notes]);
+    return newNote;
   }
 
   async updateNote(note: Note): Promise<void> {
     await this.indexedDbService.updateNote(note);
-    const index = this.notes.findIndex(n => n.id === note.id);
-    if (index !== -1) {
-      this.notes[index] = note;
-    }
+    this.notesSignal.update(notes => notes.map(n => n.id === note.id ? note : n));
   }
 
   async deleteNote(note: Note): Promise<void> {
     await this.indexedDbService.deleteNote(note.id);
-    this.notes = this.notes.filter(note => note.id !== note.id);
+    this.notesSignal.update(notes => notes.filter(n => n.id !== note.id));
   }
 
   async filterByPlusCode(plusCode: string): Promise<Note[]> {
     const allNotes = await this.indexedDbService.getAllNotes();
-    this.notes = allNotes.filter(note => note.location.plusCode.startsWith(plusCode));
-    return this.notes;
+    const filteredNotes = allNotes.filter(note => note.location.plusCode.startsWith(plusCode));
+    this.notesSignal.set(filteredNotes);
+    return filteredNotes;
   }
 
   async getNotesInBoundingBox(bbox: BoundingBox): Promise<Note[]> {
-    this.notes = await this.indexedDbService.getNotesInBoundingBox(bbox);
-    return this.notes;
+    const notes = await this.indexedDbService.getNotesInBoundingBox(bbox);
+    this.notesSignal.set(notes);
+    return notes;
   }
 
   navigateToNoteLocation(user: User, note: Note): void {

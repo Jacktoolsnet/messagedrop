@@ -1,18 +1,15 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-
 import { CommonModule } from '@angular/common';
+import { Component, computed, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '../../interfaces/location';
-import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { User } from '../../interfaces/user';
@@ -20,7 +17,6 @@ import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { NoteService } from '../../services/note.service';
 import { SharedContentService } from '../../services/shared-content.service';
-import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { EditNoteComponent } from '../editnote/edit-note.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -45,15 +41,15 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
     MatInputModule
   ],
   templateUrl: './notelist.component.html',
-  styleUrl: './notelist.component.css'
+  styleUrl: './notelist.component.css',
+  standalone: true
 })
 export class NotelistComponent implements OnInit {
-  public notes: Note[];
-  private location: Location;
-  private noteToDelete!: Note
+
+  readonly notesSignal = this.noteService.getNotesSignal();
+  readonly hasNotes = computed(() => this.notesSignal().length > 0);
   public user: User | undefined;
-  public mode: typeof Mode = Mode;
-  private snackBarRef: any;
+  private location: Location;
 
   constructor(
     public userService: UserService,
@@ -62,13 +58,9 @@ export class NotelistComponent implements OnInit {
     private geolocationService: GeolocationService,
     private sharedContentService: SharedContentService,
     public dialogRef: MatDialogRef<NotelistComponent>,
-    public noteDialog: MatDialog,
     public dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { notes: Note[], location: Location }
+    @Inject(MAT_DIALOG_DATA) public data: { location: Location }
   ) {
-    this.notes = data.notes;
     this.location = data.location;
   }
 
@@ -76,69 +68,40 @@ export class NotelistComponent implements OnInit {
     this.user = this.userService.getUser();
   }
 
-  public flyTo(note: Note) {
-    let location: Location = {
-      latitude: note.location.latitude,
-      longitude: note.location.longitude,
-      plusCode: this.geolocationService.getPlusCode(note.location.latitude, note.location.longitude)
-    }
+  flyTo(note: Note) {
+    const location = { ...note.location, plusCode: this.geolocationService.getPlusCode(note.location.latitude, note.location.longitude) };
     this.mapService.setCircleMarker(location);
     this.mapService.setDrawCircleMarker(true);
     this.mapService.flyTo(location);
     this.dialogRef.close();
   }
 
-  public navigateToNoteLocation(note: Note) {
-    this.noteService.navigateToNoteLocation(this.userService.getUser(), note)
+  navigateToNoteLocation(note: Note) {
+    this.noteService.navigateToNoteLocation(this.userService.getUser(), note);
   }
 
-  public deleteNote(note: Note) {
-    this.noteToDelete = note;
-    const dialogRef = this.dialog.open(DeleteNoteComponent, {
-      closeOnNavigation: true,
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && undefined != this.noteToDelete) {
-        this.noteService.deleteNote(this.noteToDelete).then(() => {
-          this.notes = this.notes.filter(note => note.id !== this.noteToDelete.id);
-        });
+  deleteNote(note: Note) {
+    const dialogRef = this.dialog.open(DeleteNoteComponent);
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result) {
+        await this.noteService.deleteNote(note);
       }
     });
   }
 
-  public editNote(note: Note) {
+  editNote(note: Note) {
     if (note.multimedia.type !== MultimediaType.UNDEFINED) {
       this.sharedContentService.addSharedContentToNote(note);
     }
-    const dialogRef = this.noteDialog.open(EditNoteComponent, {
-      panelClass: '',
-      data: { mode: this.mode.EDIT_NOTE, note: note },
-      closeOnNavigation: true,
-      minWidth: '20vw',
-      minHeight: '30vh',
-      maxHeight: '90vh',
-      maxWidth: '90vw',
-      hasBackdrop: true,
-      autoFocus: false
+    const dialogRef = this.dialog.open(EditNoteComponent, {
+      data: { note },
+      closeOnNavigation: true
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.note) {
-        this.noteService.updateNote(data.note)
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result?.note) {
+        await this.noteService.updateNote(result.note);
       }
     });
-  }
-
-  public goBack() {
-    this.dialogRef.close();
   }
 
   openNoteDialog(): void {
@@ -160,32 +123,17 @@ export class NotelistComponent implements OnInit {
       }
     };
     this.sharedContentService.addSharedContentToNote(note);
-
-    const dialogRef = this.noteDialog.open(EditNoteComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: { mode: this.mode.ADD_NOTE, note: note },
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '30vh',
-      maxHeight: '90vh',
-      hasBackdrop: true,
-      autoFocus: false
+    const dialogRef = this.dialog.open(EditNoteComponent, {
+      data: { note },
+      closeOnNavigation: true
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.note) {
-        data.note.latitude = this.location.latitude;
-        data.note.longitude = this.location.longitude;
-        data.note.plusCode = this.location.plusCode;
-        this.noteService.addNote(data.note).then(() => {
-          this.notes = this.noteService.getNotes();
-        });
+    dialogRef.afterClosed().subscribe(async result => {
+      if (result?.note) {
+        result.note.latitude = this.location.latitude;
+        result.note.longitude = this.location.longitude;
+        result.note.plusCode = this.location.plusCode;
+        await this.noteService.addNote(result.note);
       }
     });
   }
-
 }

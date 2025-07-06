@@ -1293,7 +1293,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       }
     });
     // Process notes
-    this.noteService.getNotes().forEach((note) => {
+    const notes = this.noteService.getNotesSignal()();
+    notes.forEach((note) => {
       let noteLocation: Location = {
         latitude: note.location.latitude,
         longitude: note.location.longitude,

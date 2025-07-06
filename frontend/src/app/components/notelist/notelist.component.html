@@ -1,16 +1,16 @@
 <mat-dialog-content class="dialog">
-    <button *ngIf="notes.length != 0" [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
+    <button *ngIf="hasNotes()" [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
         aria-label="Back" (click)="openNoteDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
-    <div *ngIf="notes.length == 0" class="no-content">
+    <div *ngIf="!hasNotes()" class="no-content">
         <button class="first-button" mat-flat-button class color="primary" [attr.aria-hidden]="false"
             (click)="openNoteDialog()">
             <span>Add my first private note</span>
         </button>
     </div>
-    <div *ngIf="notes.length != 0" class="content">
-        <mat-card class="item" *ngFor="let note of notes; index as i">
+    <div *ngIf="hasNotes()" class="content">
+        <mat-card class="item" *ngFor="let note of notesSignal(); index as i">
             <mat-card-content (click)="editNote(note)">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>

@@ -52,7 +52,9 @@ export class EditNoteComponent implements OnInit {
     public dialogRef: MatDialogRef<EditNoteComponent>,
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, note: Note }
-  ) { }
+  ) {
+    console.log(data);
+  }
 
   ngOnInit(): void {
     this.data.note.style = this.userService.getProfile().defaultStyle!
