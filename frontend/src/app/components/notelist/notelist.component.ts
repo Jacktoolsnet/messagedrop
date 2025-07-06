@@ -78,9 +78,9 @@ export class NotelistComponent implements OnInit {
 
   public flyTo(note: Note) {
     let location: Location = {
-      latitude: note.latitude,
-      longitude: note.longitude,
-      plusCode: this.geolocationService.getPlusCode(note.latitude, note.longitude)
+      latitude: note.location.latitude,
+      longitude: note.location.longitude,
+      plusCode: this.geolocationService.getPlusCode(note.location.latitude, note.location.longitude)
     }
     this.mapService.setCircleMarker(location);
     this.mapService.setDrawCircleMarker(true);
@@ -120,7 +120,7 @@ export class NotelistComponent implements OnInit {
       data: { mode: this.mode.EDIT_NOTE, note: note },
       closeOnNavigation: true,
       minWidth: '20vw',
-      minHeight: '20vh',
+      minHeight: '30vh',
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true,
@@ -144,9 +144,7 @@ export class NotelistComponent implements OnInit {
   openNoteDialog(): void {
     let note: Note = {
       id: '',
-      latitude: 0,
-      longitude: 0,
-      plusCode: '',
+      location: this.mapService.getMapLocation(),
       note: '',
       markerType: 'note',
       style: '',
@@ -169,6 +167,7 @@ export class NotelistComponent implements OnInit {
       data: { mode: this.mode.ADD_NOTE, note: note },
       minWidth: '20vw',
       maxWidth: '90vw',
+      minHeight: '30vh',
       maxHeight: '90vh',
       hasBackdrop: true,
       autoFocus: false

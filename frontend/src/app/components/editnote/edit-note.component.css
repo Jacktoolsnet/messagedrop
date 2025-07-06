@@ -1,17 +1,32 @@
+/* Dialog-Container: Passt sich dem Inhalt an */
 .messageDropDialog .mat-dialog-container {
-    padding: 0rem;
+    display: flex;
+    flex-direction: column;
+    max-height: 90vh;
+    /* Begrenzung für kleinere Screens */
+    overflow: hidden;
+    padding: 0;
 }
 
-.mat-mdc-dialog-title {
-    padding-bottom: 0px !important;
-}
-
+/* Inhalt kann scrollen, wenn zu groß */
 .mat-mdc-dialog-content {
-    padding: 0px !important;
+    overflow-y: auto;
+    max-height: calc(90vh - 4rem);
+    /* Abzug für Header/Footer, falls vorhanden */
+    width: 100%;
+    box-sizing: border-box;
 }
 
+/* Optional: Aktionen immer sichtbar halten */
 .mat-mdc-dialog-actions {
-    padding: 0px !important;
+    flex-shrink: 0;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+/* Titel optional flex-shrink */
+.mat-mdc-dialog-title {
+    flex-shrink: 0;
 }
 
 h4 {
@@ -40,8 +55,9 @@ h4 {
 
 .button_random {
     position: absolute;
-    right: -1rem;
-    top: 2rem;
+    right: 0;
+    bottom: 0;
+    transform: translate(50%, 50%);
 }
 
 .button_legal {
@@ -55,15 +71,17 @@ h4 {
 
 .button_remove_multimedia {
     position: absolute;
-    top: -1rem;
-    right: -1rem;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
     z-index: 100;
 }
 
 .button_remove_text {
     position: absolute;
-    top: -1rem;
-    right: -1rem;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
     z-index: 100;
 }
 
@@ -75,6 +93,7 @@ h4 {
 }
 
 .oembed_container {
+    padding-top: 1rem;
     width: 75%;
     margin: 1rem;
     padding: 1rem;
@@ -88,6 +107,7 @@ h4 {
 }
 
 .text_container {
+    padding-bottom: 1rem;
     width: 75%;
     margin: 1rem;
     padding: 1rem;

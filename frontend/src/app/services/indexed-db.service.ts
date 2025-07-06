@@ -588,10 +588,10 @@ export class IndexedDbService {
     const allNotes = await this.getAllNotes();
     return allNotes
       .filter(note =>
-        note.latitude >= boundingBox.latMin &&
-        note.latitude <= boundingBox.latMax &&
-        note.longitude >= boundingBox.lonMin &&
-        note.longitude <= boundingBox.lonMax
+        note.location.latitude >= boundingBox.latMin &&
+        note.location.latitude <= boundingBox.latMax &&
+        note.location.longitude >= boundingBox.lonMin &&
+        note.location.longitude <= boundingBox.lonMax
       )
       .sort((a, b) => b.timestamp - a.timestamp); // Newest first
   }

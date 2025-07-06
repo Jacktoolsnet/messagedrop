@@ -1,10 +1,9 @@
+import { Location } from "./location";
 import { Multimedia } from "./multimedia";
 
 export interface Note {
     id: string,
-    latitude: number,
-    longitude: number,
-    plusCode: string,
+    location: Location,
     note: string,
     markerType: string,
     style: string,

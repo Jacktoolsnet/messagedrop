@@ -15,42 +15,6 @@
                 </button>
             </app-showmultimedia>
         </div>
-        <!--div *ngIf="data.note.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
-            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-                <mat-icon>delete</mat-icon>
-            </button>
-            <div [innerHTML]="safeHtml" class="oembed_container_iframe"></div>
-        </div-->
-
-        <!--div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
-            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-                <mat-icon>delete</mat-icon>
-            </button>
-            <img class="multimedia_image" [src]="data.note.multimedia.url">
-        </div>
-        <div *ngIf="data.note.multimedia.type === 'youtube'" class="oembed_container">
-            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-                <mat-icon>delete</mat-icon>
-            </button>
-            <div *ngIf="data.note.multimedia?.type === 'youtube'">
-                <iframe *ngIf="!data.note.multimedia?.sourceUrl?.includes('shorts/')" [src]="safeUrl!" width="560"
-                    height="315" title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-                <iframe *ngIf="data.note.multimedia?.sourceUrl?.includes('shorts/')" [src]="safeUrl!" width="315"
-                    height="560" title="YouTube video player" frameborder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                    referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
-            </div>
-        </div>
-        <div *ngIf="data.note.multimedia?.type === 'instagram'" class="oembed_container">
-            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-                <mat-icon>delete</mat-icon>
-            </button>
-            <iframe [src]="safeUrl!" width="320" height="400" frameborder="0" allowtransparency="true"></iframe>
-        </div-->
-        <!--a class=" attribution_link" href="{{data.note.multimedia.sourceUrl}}"
-            target="_blank">{{data.note.multimedia.attribution}}</a-->
         <div *ngIf="data.note.note === ''" class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>
@@ -60,7 +24,7 @@
         <div *ngIf="data.note.note !== ''" class="text_container">
             <button *ngIf="data.note.note !== ''" mat-mini-fab class="button_random" color="secondary"
                 aria-label="Drop a new message" (click)="onNewFontClick()">
-                <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+                <mat-icon class="material-symbols-outlined">cycle</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
                 <mat-icon>delete</mat-icon>

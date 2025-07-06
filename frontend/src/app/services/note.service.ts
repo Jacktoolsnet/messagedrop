@@ -46,7 +46,7 @@ export class NoteService {
 
   async filterByPlusCode(plusCode: string): Promise<Note[]> {
     const allNotes = await this.indexedDbService.getAllNotes();
-    this.notes = allNotes.filter(note => note.plusCode.startsWith(plusCode));
+    this.notes = allNotes.filter(note => note.location.plusCode.startsWith(plusCode));
     return this.notes;
   }
 
@@ -56,7 +56,7 @@ export class NoteService {
   }
 
   navigateToNoteLocation(user: User, note: Note): void {
-    const url = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(note.plusCode)}`;
+    const url = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(note.location.plusCode)}`;
     window.open(url, '_blank');
   }
 }

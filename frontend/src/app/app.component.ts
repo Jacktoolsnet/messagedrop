@@ -731,9 +731,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   async openNoteDialog(): Promise<void> {
     let note: Note = {
       id: '',
-      latitude: 0,
-      longitude: 0,
-      plusCode: '',
+      location: this.mapService.getMapLocation(),
       note: '',
       markerType: 'note',
       style: '',
@@ -755,6 +753,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
       minWidth: '20vw',
       maxWidth: '90vw',
+      minHeight: '30vh',
       maxHeight: '90vh',
       hasBackdrop: true,
       autoFocus: false
@@ -1296,9 +1295,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     // Process notes
     this.noteService.getNotes().forEach((note) => {
       let noteLocation: Location = {
-        latitude: note.latitude,
-        longitude: note.longitude,
-        plusCode: note.plusCode
+        latitude: note.location.latitude,
+        longitude: note.location.longitude,
+        plusCode: note.location.plusCode
       };
       if (this.mapService.getMapZoom() > 17) {
         center = noteLocation;
