@@ -1,8 +1,14 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back" (click)="{}"
-        [matMenuTriggerFor]="connectionMenu">
+    <button *ngIf="contactService.getContacts().length != 0" [attr.aria-hidden]="false" class="button_add" mat-mini-fab
+        color="primary" aria-label="Back" (click)="{}" [matMenuTriggerFor]="connectionMenu">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
+    <div *ngIf="contactService.getContacts().length == 0" class="no-content">
+        <button class="first-button" mat-flat-button class color="primary" [attr.aria-hidden]="false" (click)="{}"
+            [matMenuTriggerFor]="connectionMenu">
+            <span>Start connecting</span>
+        </button>
+    </div>
     <div *ngIf="contactService.getContacts().length != 0" class="content">
         <mat-card class="item" *ngFor="let contact of contactService.getContacts(); index as i">
             <div class="avatar-box" *ngIf="contact.base64Avatar || contact.name" (click)="editContact(contact)">

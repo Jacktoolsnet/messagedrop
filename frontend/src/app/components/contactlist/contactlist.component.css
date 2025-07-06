@@ -8,6 +8,27 @@
   border-radius: 1rem;
 }
 
+.no-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.first-button {
+  width: 95%;
+  max-width: 600px;
+  padding: 1rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* === CONTENT === */
 .content {
   padding: 1rem;

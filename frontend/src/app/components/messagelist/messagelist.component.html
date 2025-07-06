@@ -4,7 +4,8 @@
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
     <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
-        *ngIf="userService.isReady() &&  messageService.getSelectedMessages().length == 0" (click)="addMessagDialog()">
+        *ngIf="userService.isReady() && messages.length != 0 &&  messageService.getSelectedMessages().length == 0"
+        (click)="addMessagDialog()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
     <button class="button_add"
@@ -13,7 +14,13 @@
         (click)="addComment(messageService.getSelectedMessages().at(-1)!)">
         <mat-icon>add_comment</mat-icon>
     </button>
-    <div *ngIf="this.messageService.getSelectedMessages()?.length === 0" class="content">
+    <div *ngIf="messages.length == 0" class="no-content">
+        <button class="first-button" mat-flat-button class color="primary" [attr.aria-hidden]="false"
+            (click)="addMessagDialog()">
+            <span>Add my first public message</span>
+        </button>
+    </div>
+    <div *ngIf="messages.length != 0 && this.messageService.getSelectedMessages()?.length === 0" class="content">
         <mat-card class="item" *ngFor="let message of messages; index as i">
             <div class="avatar-box" *ngIf="user.id == message.userId && (userProfile.base64Avatar || userProfile.name)">
                 <img *ngIf="userProfile.base64Avatar" class="avatar" src="{{userProfile.base64Avatar}}" />
@@ -82,6 +89,10 @@
                     (click)="translateMessage(messageService.getSelectedMessages().at(-1)!)">
                     <mat-icon>translate</mat-icon>
                 </button>
+                <button mat-mini-fab color="secondary" aria-label="Fly to message"
+                    (click)="flyTo(messageService.getSelectedMessages().at(-1)!)">
+                    <mat-icon>place</mat-icon>
+                </button>
                 <button *ngIf="userService.isReady() && user.id != messageService.getSelectedMessages().at(-1)?.userId"
                     mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(messageService.getSelectedMessages().at(-1)!)">
@@ -134,9 +145,6 @@
 
 <mat-menu #messageMenu="matMenu">
     <ng-template matMenuContent let-user="user" let-message="message">
-        <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
-            <mat-icon>place</mat-icon>
-        </button>
         <button mat-mini-fab color="secondary" aria-label="Navigate to message location."
             (click)="navigateToMessageLocation(message)">
             <mat-icon>assistant_direction</mat-icon>

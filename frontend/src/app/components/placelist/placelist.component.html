@@ -1,8 +1,14 @@
 <mat-dialog-content class="dialog">
-    <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
-        (click)="addPlace()">
+    <button *ngIf="places.length != 0" [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
+        aria-label="Back" (click)="addPlace()">
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
+    <div *ngIf="places.length == 0" class="no-content">
+        <button class="first-button" mat-flat-button class color="primary" [attr.aria-hidden]="false"
+            (click)="addPlace()">
+            <span>Add my first place</span>
+        </button>
+    </div>
     <div *ngIf="places.length != 0" class="content">
         <mat-card class="item" *ngFor="let place of places; index as i">
             <div class="avatar-box" (click)="editPlace(place)">

@@ -7,6 +7,27 @@
   background-color: #2e2d2d;
 }
 
+.no-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.first-button {
+  width: 95%;
+  max-width: 600px;
+  padding: 1rem;
+  font-size: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+}
+
 /* === CONTENT === */
 .content {
   padding: 1rem;
@@ -18,6 +39,7 @@
 
 /* === ITEM DARSTELLUNG (Karten / Elemente) === */
 .item {
+  min-width: 300px;
   margin: 0.75rem;
   margin-top: 2.25rem;
   border-radius: 0.75rem;
