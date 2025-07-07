@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -21,9 +21,9 @@ import { StatisticService } from './statistic.service';
 })
 export class MessageService {
 
-  private messages: Message[] = [];
-  public selectedMessages: Message[] = [];
-  private comments: Message[] = [];
+  readonly messagesSignal = signal<Message[]>([]);
+  readonly selectedMessagesSignal = signal<Message[]>([]);
+  readonly commentsSignal = signal<Message[]>([]);
   private lastSearchedLocation: string = '';
 
   httpOptions = {
@@ -47,61 +47,51 @@ export class MessageService {
     return throwError(() => error);
   }
 
-  getMessages(): Message[] {
-    return this.messages;
-  }
-
   setMessages(rawMessages: RawMessage[]) {
-    this.messages = [];
-    rawMessages.forEach((rawMessage: RawMessage) => {
-      let message: Message = {
-        id: rawMessage.id,
-        parentId: rawMessage.parentId,
-        typ: rawMessage.typ,
-        createDateTime: rawMessage.createDateTime,
-        deleteDateTime: rawMessage.deleteDateTime,
-        location: {
-          latitude: rawMessage.latitude,
-          longitude: rawMessage.longitude,
-          plusCode: rawMessage.plusCode,
-        },
-        message: rawMessage.message,
-        markerType: rawMessage.markerType,
-        style: rawMessage.style,
-        views: rawMessage.views,
-        likes: rawMessage.likes,
-        dislikes: rawMessage.dislikes,
-        comments: [],
-        commentsNumber: rawMessage.commentsNumber,
-        status: rawMessage.status,
-        userId: rawMessage.userId,
-        multimedia: JSON.parse(rawMessage.multimedia)
-      };
-      this.messages.push(message);
-    });
-  }
-
-  getSelectedMessages(): Message[] {
-    return this.selectedMessages;
-  }
-
-  getComments(): Message[] {
-    return this.comments;
+    const mappedMessages = rawMessages.map(raw => this.mapRawMessage(raw));
+    this.messagesSignal.set(mappedMessages);
   }
 
   clearMessages() {
-    this.messages = [];
+    this.messagesSignal.set([]);
   }
 
   clearComments() {
-    this.comments = [];
+    this.commentsSignal.set([]);
   }
 
   clearSelectedMessages() {
-    this.selectedMessages = [];
+    this.selectedMessagesSignal.set([]);
   }
+
   getLastSearchedLocation(): string {
     return this.lastSearchedLocation;
+  }
+
+  private mapRawMessage(raw: RawMessage): Message {
+    return {
+      id: raw.id,
+      parentId: raw.parentId,
+      typ: raw.typ,
+      createDateTime: raw.createDateTime,
+      deleteDateTime: raw.deleteDateTime,
+      location: {
+        latitude: raw.latitude,
+        longitude: raw.longtitude,
+        plusCode: raw.plusCode,
+      },
+      message: raw.message,
+      markerType: raw.markerType,
+      style: raw.style,
+      views: raw.views,
+      likes: raw.likes,
+      dislikes: raw.dislikes,
+      comments: [],
+      commentsNumber: raw.commentsNumber,
+      status: raw.status,
+      userId: raw.userId,
+      multimedia: JSON.parse(raw.multimedia)
+    };
   }
 
   createMessage(message: Message, user: User, showAlways: boolean = false) {
@@ -134,7 +124,7 @@ export class MessageService {
       )
       .subscribe({
         next: createMessageResponse => {
-          this.messages.unshift(message);
+          this.messagesSignal.update(messages => [message, ...messages]);
           this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
           this.statisticService.countMessage()
             .subscribe({
@@ -149,10 +139,10 @@ export class MessageService {
   }
 
   createComment(message: Message, user: User, showAlways: boolean = false) {
-    let parentMessage: Message = this.selectedMessages[this.selectedMessages.length - 1];
-    let url = `${environment.apiUrl}/message/create`;
+    const url = `${environment.apiUrl}/message/create`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -161,7 +151,8 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+
+    const body = {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
       'latitude': message.location.latitude,
@@ -173,30 +164,42 @@ export class MessageService {
       'messageUserId': user.id,
       'multimedia': JSON.stringify(message.multimedia)
     };
+
     this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
-        next: createMessageResponse => {
-          parentMessage.comments.push(message);
-          this.snackBar.open(`Comment succesfully dropped.`, '', { duration: 1000 });
-          this.statisticService.countMessage()
-            .subscribe({
-              next: (data) => { },
-              error: (err) => { },
-              complete: () => { }
+        next: () => {
+          // Message State updaten
+          this.messagesSignal.update(messages => {
+            return messages.map(parent => {
+              if (parent.id === message.parentId) {
+                return {
+                  ...parent,
+                  comments: [...parent.comments, message],
+                  commentsNumber: parent.commentsNumber + 1
+                };
+              }
+              return parent;
             });
+          });
+
+          this.snackBar.open(`Comment succesfully dropped.`, '', { duration: 1000 });
+
+          this.statisticService.countMessage().subscribe({
+            next: () => { },
+            error: () => { },
+            complete: () => { }
+          });
         },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); },
-        complete: () => { }
-      })
+        error: err => this.snackBar.open(err.message, 'OK')
+      });
   }
 
   updateMessage(message: Message, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/update`;
+    const url = `${environment.apiUrl}/message/update`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -205,29 +208,34 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+
+    const body = {
       'id': message.id,
       'message': message.message,
       'style': message.style,
       'multimedia': JSON.stringify(message.multimedia)
     };
+
     this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
-        next: createMessageResponse => {
-          this.snackBar.open(`Succesfully updated.`, '', { duration: 1000 });
+        next: () => {
+          // Update der Nachricht im State
+          this.messagesSignal.update(messages => {
+            return messages.map(m => m.id === message.id ? { ...m, ...message } : m);
+          });
+
+          this.snackBar.open(`Successfully updated.`, '', { duration: 1000 });
         },
-        error: (err: any) => { this.snackBar.open(err.message, 'OK'); },
-        complete: () => { }
+        error: err => this.snackBar.open(err.message, 'OK')
       });
   }
 
-  likeMessage(message: Message, user: User, likeButtonColor: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
+  likeMessage(message: Message, user: User, showAlways: boolean = false) {
+    const url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -236,28 +244,30 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            message.likes = message.likes + 1;
-            likeButtonColor = 'primary';
-            message.likedByUser = true;
+            // Message State updaten
+            this.messagesSignal.update(messages => {
+              return messages.map(m => m.id === message.id
+                ? { ...m, likes: m.likes + 1, likedByUser: true }
+                : m
+              );
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
-      })
+        error: () => { }
+      });
   }
 
-  unlikeMessage(message: Message, user: User, likeButtonColor: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
+  unlikeMessage(message: Message, user: User, showAlways: boolean = false) {
+    const url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -266,80 +276,80 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            message.likes = message.likes - 1;
-            likeButtonColor = 'secondary';
-            message.likedByUser = false;
+            this.messagesSignal.update(messages => {
+              return messages.map(m => m.id === message.id
+                ? { ...m, likes: m.likes - 1, likedByUser: false }
+                : m
+              );
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
-      })
+        error: () => { }
+      });
   }
 
-  messageLikedByUser(message: Message, user: User, likeButtonColor: string) {
-    let url = `${environment.apiUrl}/message/id/${message.id}/likedby/${user.id}`;
+  messageLikedByUser(message: Message, user: User) {
+    const url = `${environment.apiUrl}/message/id/${message.id}/likedby/${user.id}`;
+
     this.http.get<LikedByUserResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (likedByUserResponse) => {
-          if (likedByUserResponse.status === 200 && likedByUserResponse.likedByUser) {
-            likeButtonColor = 'primary';
-            message.likedByUser = true;
-          } else {
-            likeButtonColor = 'secondary';
-            message.likedByUser = false;
-          }
+          const isLiked = likedByUserResponse.status === 200 && likedByUserResponse.likedByUser;
+
+          this.messagesSignal.update(messages => {
+            return messages.map(m => m.id === message.id
+              ? { ...m, likedByUser: isLiked }
+              : m
+            );
+          });
         },
-        error: (err) => {
-        },
-        complete: () => { }
-      })
+        error: () => { }
+      });
   }
 
-  dislikeMessage(message: Message, user: User, dislikeButtonColor: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
+  dislikeMessage(message: Message, user: User, showAlways: boolean = false) {
+    const url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
-      message: `disliking message`,
+      message: `Disliking message`,
       button: '',
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            message.dislikes = message.dislikes + 1;
-            dislikeButtonColor = 'primary';
-            message.dislikedByUser = true;
+            this.messagesSignal.update(messages => {
+              return messages.map(m => m.id === message.id
+                ? { ...m, dislikes: m.dislikes + 1, dislikedByUser: true }
+                : m
+              );
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
-      })
+        error: () => { }
+      });
   }
 
-  undislikeMessage(message: Message, user: User, dislikeButtonColor: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
+  undislikeMessage(message: Message, user: User, showAlways: boolean = false) {
+    const url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -348,50 +358,50 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            message.dislikes = message.dislikes - 1;
-            dislikeButtonColor = 'secondary';
-            message.dislikedByUser = false;
+            this.messagesSignal.update(messages => {
+              return messages.map(m => m.id === message.id
+                ? { ...m, dislikes: m.dislikes - 1, dislikedByUser: false }
+                : m
+              );
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
-      })
+        error: () => { }
+      });
   }
 
-  messageDislikedByUser(message: Message, user: User, dislikeButtonColor: string) {
-    let url = `${environment.apiUrl}/message/id/${message.id}/dislikedby/${user.id}`;
-    return this.http.get<DislikedByUserResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+  messageDislikedByUser(message: Message, user: User) {
+    const url = `${environment.apiUrl}/message/id/${message.id}/dislikedby/${user.id}`;
+
+    this.http.get<DislikedByUserResponse>(url, this.httpOptions)
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (dislikedByUserResponse) => {
-          if (dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser) {
-            dislikeButtonColor = 'primary';
-            message.dislikedByUser = true;
-          } else {
-            dislikeButtonColor = 'secondary';
-            message.dislikedByUser = false;
-          }
+          const isDisliked = dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser;
+
+          this.messagesSignal.update(messages => {
+            return messages.map(m => m.id === message.id
+              ? { ...m, dislikedByUser: isDisliked }
+              : m
+            );
+          });
         },
-        error: (err) => {
-        },
-        complete: () => { }
+        error: () => { }
       });
   }
 
   getByPlusCode(location: Location, messageSubject: Subject<void>, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/get/pluscode/${this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())}`;
+    const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
+    const url = `${environment.apiUrl}/message/get/pluscode/${plusCode}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -400,48 +410,26 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (getMessageResponse) => {
-          this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-          this.clearMessages();
-          getMessageResponse.rows.forEach((rawMessage: RawMessage) => {
-            let message: Message = {
-              id: rawMessage.id,
-              parentId: rawMessage.parentId,
-              typ: rawMessage.typ,
-              createDateTime: rawMessage.createDateTime,
-              deleteDateTime: rawMessage.deleteDateTime,
-              location: {
-                latitude: rawMessage.latitude,
-                longitude: rawMessage.longitude,
-                plusCode: rawMessage.plusCode,
-              },
-              message: rawMessage.message,
-              markerType: rawMessage.markerType,
-              style: rawMessage.style,
-              views: rawMessage.views,
-              likes: rawMessage.likes,
-              dislikes: rawMessage.dislikes,
-              comments: [],
-              commentsNumber: rawMessage.commentsNumber,
-              status: rawMessage.status,
-              userId: rawMessage.userId,
-              multimedia: JSON.parse(rawMessage.multimedia)
-            };
-            this.messages.push(message);
-          });
+          // lastSearchedLocation aktualisieren
+          this.lastSearchedLocation = plusCode;
+
+          // Messages neu setzen
+          const mappedMessages = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
+          this.messagesSignal.set(mappedMessages);
+
           messageSubject.next();
         },
-        error: (err) => {
-          this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-          this.messages = [];
+        error: () => {
+          // Fehlerfall: Location trotzdem aktualisieren, Messages leeren
+          this.lastSearchedLocation = plusCode;
+          this.messagesSignal.set([]);
           messageSubject.next();
-        },
-        complete: () => { }
+        }
       });
   }
 
@@ -469,74 +457,84 @@ export class MessageService {
   }
 
   countView(message: Message) {
-    let url = `${environment.apiUrl}/message/countview/${message.id}`;
+    const url = `${environment.apiUrl}/message/countview/${message.id}`;
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
-        next: (SimpleStatusResponse) => {
-          if (SimpleStatusResponse.status === 200) {
-            message.views = message.views + 1;
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            this.messagesSignal.update(messages => {
+              return messages.map(m => m.id === message.id
+                ? { ...m, views: m.views + 1 }
+                : m
+              );
+            });
           }
         },
-        error: (err: any) => {
-        },
-        complete: () => { }
+        error: () => { }
       });
   }
 
   countComment(message: Message) {
-    let url = `${environment.apiUrl}/message/countcomment/${message.id}`;
-    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+    const url = `${environment.apiUrl}/message/countcomment/${message.id}`;
+
+    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+      .pipe(catchError(this.handleError))
       .subscribe({
-        next: (SimpleStatusResponse) => {
-          if (SimpleStatusResponse.status === 200) {
-            message.commentsNumber = message.commentsNumber + 1;
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            this.messagesSignal.update(messages => {
+              return messages.map(m => m.id === message.id
+                ? { ...m, commentsNumber: m.commentsNumber + 1 }
+                : m
+              );
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
+        error: () => { }
       });
   }
 
-  disableMessage(message: Message, selectedMessages: Message[], showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/disable/${message.id}`;
+  disableMessage(message: Message, showAlways: boolean = false) {
+    const url = `${environment.apiUrl}/message/disable/${message.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
-      message: `Disableing message`,
+      message: `Disabling message`,
       button: '',
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            this.messages = this.messages.filter(element => element.id !== message.id);
-            selectedMessages.pop();
+            // Messages-Array updaten
+            this.messagesSignal.update(messages => messages.filter(m => m.id !== message.id));
+
+            // Selected-Messages stack reduzieren
+            this.selectedMessagesSignal.update(selected => {
+              const newSelected = [...selected];
+              newSelected.pop();
+              return newSelected;
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
+        error: () => { }
       });
   }
 
   deleteMessage(message: Message, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/delete/${message.id}`;
+    const url = `${environment.apiUrl}/message/delete/${message.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -545,33 +543,51 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
+
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            if (this.messages.map(e => e.id).indexOf(message.id) !== -1) {
-              this.messages.splice(this.messages.map(e => e.id).indexOf(message.id), 1);
-            } else if (this.messages.map(e => e.id).indexOf(message.parentId) !== -1) {
-              let parentMessageIndex = this.messages.map(e => e.id).indexOf(message.parentId)
-              this.messages[parentMessageIndex].comments.splice(this.messages[parentMessageIndex].comments.map(e => e.id).indexOf(message.id), 1);
-            }
-            // The last selected message was deleted. So remove it from the selectedMessage array.
-            this.selectedMessages.pop();
+
+            this.messagesSignal.update(messages => {
+              // 1. Prüfen, ob es eine Hauptnachricht ist
+              const isRootMessage = messages.some(m => m.id === message.id);
+
+              if (isRootMessage) {
+                return messages.filter(m => m.id !== message.id);
+              }
+
+              // 2. Andernfalls: Kommentar → Parent suchen und Comments-Array anpassen
+              return messages.map(parent => {
+                if (parent.id === message.parentId) {
+                  return {
+                    ...parent,
+                    comments: parent.comments.filter(c => c.id !== message.id),
+                    commentsNumber: Math.max(parent.commentsNumber - 1, 0)
+                  };
+                }
+                return parent;
+              });
+            });
+
+            // Selected-Messages stack reduzieren
+            this.selectedMessagesSignal.update(selected => {
+              const newSelected = [...selected];
+              newSelected.pop();
+              return newSelected;
+            });
           }
         },
-        error: (err) => {
-        },
-        complete: () => { }
+        error: () => { }
       });
   }
 
   getCommentsForParentMessage(message: Message, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/get/comment/${message.id}`;
+    const url = `${environment.apiUrl}/message/get/comment/${message.id}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -580,44 +596,33 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
-    return this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+
+    this.http.get<GetMessageResponse>(url, this.httpOptions)
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (getMessageResponse) => {
-          message.comments = [];
-          getMessageResponse.rows.forEach((rawMessage: RawMessage) => {
-            let comment: Message = {
-              id: rawMessage.id,
-              parentId: rawMessage.parentId,
-              typ: rawMessage.typ,
-              createDateTime: rawMessage.createDateTime,
-              deleteDateTime: rawMessage.deleteDateTime,
-              location: {
-                latitude: rawMessage.latitude,
-                longitude: rawMessage.longitude,
-                plusCode: rawMessage.plusCode,
-              },
-              message: rawMessage.message,
-              markerType: rawMessage.markerType,
-              style: rawMessage.style,
-              views: rawMessage.views,
-              likes: rawMessage.likes,
-              dislikes: rawMessage.dislikes,
-              comments: [],
-              commentsNumber: rawMessage.commentsNumber,
-              status: rawMessage.status,
-              userId: rawMessage.userId,
-              multimedia: JSON.parse(rawMessage.multimedia)
-            };
-            message.comments.push(comment);
+          const comments = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
+
+          // Parent-Message im State updaten
+          this.messagesSignal.update(messages => {
+            return messages.map(m => {
+              if (m.id === message.id) {
+                return { ...m, comments };
+              }
+              return m;
+            });
           });
         },
-        error: (err) => {
-          message.comments = [];
-        },
-        complete: () => { }
+        error: () => {
+          this.messagesSignal.update(messages => {
+            return messages.map(m => {
+              if (m.id === message.id) {
+                return { ...m, comments: [] };
+              }
+              return m;
+            });
+          });
+        }
       });
   }
 

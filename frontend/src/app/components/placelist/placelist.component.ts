@@ -258,7 +258,6 @@ export class PlacelistComponent implements OnInit {
                     this.placeService.createPlace(place)
                       .subscribe({
                         next: createPlaceResponse => {
-                          console.log(createPlaceResponse)
                           if (createPlaceResponse.status === 200) {
                             place.id = createPlaceResponse.placeId;
                             this.placeService.saveAdditionalPlaceInfos(place);

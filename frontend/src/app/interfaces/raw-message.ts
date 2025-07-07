@@ -5,7 +5,7 @@ export interface RawMessage {
     createDateTime: string,
     deleteDateTime: string,
     latitude: number,
-    longitude: number,
+    longtitude: number,
     plusCode: string,
     message: string,
     translatedMessage?: string,

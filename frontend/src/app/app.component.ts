@@ -210,11 +210,12 @@ export class AppComponent implements OnInit {
 
     this.messageSubject = new Subject<void>();
     this.messageSubject.subscribe({
-      next: (v) => {
-        this.createMarkerLocations()
-        if (this.showComponent && this.messageService.getMessages().length != 0) {
+      next: () => {
+        this.createMarkerLocations();
+
+        if (this.showComponent && this.messageService.messagesSignal().length !== 0) {
           this.showComponent = false;
-          this.openMarkerMessageListDialog(this.messageService.getMessages());
+          this.openMarkerMessageListDialog(this.messageService.messagesSignal());
         }
       },
     });
@@ -784,7 +785,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { messages: this.messageService.getMessages(), location: this.mapService.getMapLocation() },
+            data: { location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: '90vw',
             minHeight: '8rem',
@@ -808,7 +809,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { messages: this.messageService.getMessages(), location: this.mapService.getMapLocation() },
+            data: { location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: '90vw',
             minHeight: '8rem',
@@ -1281,7 +1282,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.markerLocations.clear();
     let center: Location | undefined = undefined;
     // Process messages
-    this.messageService.getMessages().forEach((message) => {
+    const messages = this.messageService.messagesSignal();
+    messages.forEach((message) => {
       if (this.mapService.getMapZoom() > 17) {
         center = message.location
       } else {

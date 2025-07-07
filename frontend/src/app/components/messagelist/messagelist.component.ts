@@ -1,11 +1,10 @@
-import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-
 import { CommonModule } from '@angular/common';
+import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -14,12 +13,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
-import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Profile } from '../../interfaces/profile';
 import { User } from '../../interfaces/user';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
-import { GeolocationService } from '../../services/geolocation.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
@@ -46,7 +43,6 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
     MatButtonModule,
     MatDialogContent,
     MatIcon,
-    FormsModule,
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule
@@ -55,10 +51,12 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
   styleUrl: './messagelist.component.css'
 })
 export class MessagelistComponent implements OnInit {
-  public messages!: Message[];
-  private location: Location;
-  public user!: User;
-  public userProfile!: Profile;
+
+  readonly messagesSignal = this.messageService.messagesSignal;
+  readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
+
+  public user: User;
+  public userProfile: Profile;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
   public mode: typeof Mode = Mode;
@@ -68,19 +66,16 @@ export class MessagelistComponent implements OnInit {
     public messageService: MessageService,
     private translateService: TranslateService,
     private mapService: MapService,
-    private geolocationService: GeolocationService,
     public profileService: ProfileService,
     private sharedContentService: SharedContentService,
     public dialogRef: MatDialogRef<any>,
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { messages: Message[], location: Location }
+    @Inject(MAT_DIALOG_DATA) public data: { location: Location }
   ) {
     this.user = this.userService.getUser();
     this.userProfile = this.userService.getProfile();
-    this.messages = data.messages;
-    this.location = data.location;
   }
 
   async ngOnInit() {
@@ -95,59 +90,23 @@ export class MessagelistComponent implements OnInit {
   }
 
   public navigateToMessageLocation(message: Message) {
-    this.messageService.navigateToMessageLocation(message)
-  }
-
-  public goBack() {
-    this.messageService.getSelectedMessages().pop();
-    this.likeButtonColor = 'secondary';
-    this.dislikeButtonColor = 'secondary';
-  }
-
-  async goToMessageDetails(message: Message) {
-    this.messageService.getSelectedMessages().push(message);
-    if (this.user.id !== message.userId) {
-      this.messageCountView(message);
-    }
-    this.messageLikedByUser(message);
-    this.messageDislikedByUser(message);
-    this.messageService.getCommentsForParentMessage(message);
-  }
-
-  public async getMessageUserName(message: Message): Promise<Profile | undefined> {
-    return await this.profileService.getProfile(message.userId)
+    this.messageService.navigateToMessageLocation(message);
   }
 
   public likeMessage(message: Message) {
     if (!message.likedByUser) {
-      this.messageService.likeMessage(message, this.user, this.likeButtonColor);
+      this.messageService.likeMessage(message, this.user);
     } else {
-      this.messageService.unlikeMessage(message, this.user, this.likeButtonColor);
+      this.messageService.unlikeMessage(message, this.user);
     }
-  }
-
-  public messageLikedByUser(message: Message) {
-    this.messageService.messageLikedByUser(message, this.user, this.likeButtonColor);
   }
 
   public dislikeMessage(message: Message) {
     if (!message.dislikedByUser) {
-      this.messageService.dislikeMessage(message, this.user, this.dislikeButtonColor);
+      this.messageService.dislikeMessage(message, this.user);
     } else {
-      this.messageService.undislikeMessage(message, this.user, this.dislikeButtonColor);
+      this.messageService.undislikeMessage(message, this.user);
     }
-  }
-
-  public messageDislikedByUser(message: Message) {
-    this.messageService.messageDislikedByUser(message, this.user, this.dislikeButtonColor);
-  }
-
-  private messageCountView(message: Message) {
-    this.messageService.countView(message);
-  }
-
-  private countComment(parentMessage: Message) {
-    this.messageService.countComment(parentMessage);
   }
 
   public disableMessage(message: Message) {
@@ -155,13 +114,9 @@ export class MessagelistComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.messageService.disableMessage(message, this.messageService.getSelectedMessages());
+        this.messageService.disableMessage(message);
       }
     });
   }
@@ -171,10 +126,6 @@ export class MessagelistComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.messageService.deleteMessage(message);
@@ -183,15 +134,17 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessage(message: Message) {
-    let oriMessage: string = message.message;
-    let oriMultimedia: Multimedia = JSON.parse(JSON.stringify(message.multimedia));
-    let oriStyle: string = message.style;
+    const oriMessage = message.message;
+    const oriMultimedia = JSON.parse(JSON.stringify(message.multimedia));
+    const oriStyle = message.style;
+
     if (message.multimedia.type !== MultimediaType.UNDEFINED) {
       this.sharedContentService.addSharedContentToMessage(message);
     }
+
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
-      data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message: message },
+      data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message },
       closeOnNavigation: true,
       minWidth: '20vw',
       maxWidth: '90vw',
@@ -200,11 +153,8 @@ export class MessagelistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.message) {
+      if (data?.message) {
         this.messageService.updateMessage(data.message);
       } else {
         message.message = oriMessage;
@@ -215,114 +165,52 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessageUserProfile(message: Message) {
-    if (this.userService.isReady()) {
-      let profile: Profile | undefined = this.profileService.getProfile(message.userId);
-      if (profile) {
-        let oriName = profile.name;
-        let oriBase64Avatar = profile.base64Avatar;
-        let oriDefaultStyle = profile.defaultStyle;
-        const dialogRef = this.dialog.open(EditProfileComponent, {
-          data: { profile: profile, userId: message.userId },
-          closeOnNavigation: true,
-          hasBackdrop: true
-        });
+    if (!this.userService.isReady()) return;
+    const profile = this.profileService.getProfile(message.userId);
+    if (!profile) return;
 
-        dialogRef.afterOpened().subscribe(e => {
-        });
+    const oriName = profile.name;
+    const oriBase64Avatar = profile.base64Avatar;
+    const oriDefaultStyle = profile.defaultStyle;
 
-        dialogRef.afterClosed().subscribe(result => {
-          if (result) {
-            this.profileService.setProfile(result.userId, result.profile);
-          } else {
-            if (oriName) {
-              profile.name = oriName;
-            }
-            if (undefined != oriBase64Avatar) {
-              profile.base64Avatar = oriBase64Avatar;
-            }
-            if (oriDefaultStyle) {
-              profile.defaultStyle = oriDefaultStyle;
-            }
-          }
-        });
-      }
-    }
-  }
-
-  public addComment(parentMessage: Message) {
-    let message: Message = {
-      id: 0,
-      parentId: parentMessage.id,
-      typ: 'public',
-      createDateTime: '',
-      deleteDateTime: '',
-      location: parentMessage.location,
-      message: '',
-      markerType: 'none',
-      style: '',
-      views: 0,
-      likes: 0,
-      dislikes: 0,
-      comments: [],
-      commentsNumber: 0,
-      status: 'enabled',
-      userId: '',
-      multimedia: {
-        type: MultimediaType.UNDEFINED,
-        url: '',
-        sourceUrl: '',
-        attribution: '',
-        title: '',
-        description: '',
-        contentId: ''
-      }
-    };
-    this.sharedContentService.addSharedContentToMessage(message);
-
-    const dialogRef = this.messageDialog.open(EditMessageComponent, {
-      panelClass: '',
-      data: { mode: this.mode.ADD_COMMENT, message: message },
+    const dialogRef = this.dialog.open(EditProfileComponent, {
+      data: { profile, userId: message.userId },
       closeOnNavigation: true,
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      hasBackdrop: true,
-      autoFocus: false
+      hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data.message) {
-        this.messageService.createComment(data.message, this.userService.getUser());
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.profileService.setProfile(result.userId, result.profile);
+      } else {
+        profile.name = oriName;
+        profile.base64Avatar = oriBase64Avatar;
+        profile.defaultStyle = oriDefaultStyle;
       }
     });
   }
 
   public translateMessage(message: Message) {
-    this.translateService.translate(message.message, this.user.language)
-      .subscribe({
-        next: (translateResponse) => {
-          if (translateResponse.status === 200) {
-            message.translatedMessage = translateResponse.result?.text;
-          }
-        },
-        error: (translateResponse) => {
-          this.snackBar.open(translateResponse.error.error, '', { duration: 3000 });
-        },
-        complete: () => { }
-      });
+    this.translateService.translate(message.message, this.user.language).subscribe({
+      next: response => {
+        if (response.status === 200) {
+          message.translatedMessage = response.result?.text;
+        }
+      },
+      error: err => {
+        this.snackBar.open(err.error.error, '', { duration: 3000 });
+      }
+    });
   }
 
   addMessagDialog(): void {
-    let message: Message = {
+    const message: Message = {
       id: 0,
       parentId: 0,
       typ: 'public',
       createDateTime: '',
       deleteDateTime: '',
-      location: this.location,
+      location: this.data.location,
       message: '',
       markerType: 'default',
       style: '',
@@ -343,12 +231,13 @@ export class MessagelistComponent implements OnInit {
         contentId: ''
       }
     };
+
     this.sharedContentService.addSharedContentToMessage(message);
 
     const dialogRef = this.messageDialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
+      data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message },
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
@@ -356,12 +245,9 @@ export class MessagelistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.message) {
-        this.messageService.createMessage(data.message, this.userService.getUser());
+      if (data?.message) {
+        this.messageService.createMessage(data.message, this.user);
       }
     });
   }
