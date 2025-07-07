@@ -15,7 +15,6 @@ const tableName = 'tableMessage';
 
 const columnMessageId = 'id';
 const columnUuid = 'uuid';
-const columnParentMessageId = 'parentId';
 const columnParentUuid = 'parentUuid';
 const columnMessageType = 'typ'; // Public, private, friend, comment
 const columnMessageCreateDateTime = 'createDateTime';
@@ -39,9 +38,8 @@ const init = function (db) {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnMessageId} INTEGER PRIMARY KEY NOT NULL,
-            ${columnUuid} TEXT NOT NULL UNIQUE, 
-            ${columnParentMessageId} INTEGER DEFAULT NULL,
-            ${columnParentUuid} TEXT NOT NULL UNIQUE,
+            ${columnUuid} TEXT NOT NULL UNIQUE,
+            ${columnParentUuid} TEXT DEFAUTL NULL,
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
@@ -61,8 +59,8 @@ const init = function (db) {
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
-            CONSTRAINT FK_PARENT FOREIGN KEY (${columnParentMessageId})
-            REFERENCES ${tableName} (${columnMessageId})
+            CONSTRAINT FK_PARENT FOREIGN KEY (${columnParentUuid})
+            REFERENCES ${tableName} (${columnUuid})
             ON UPDATE CASCADE ON DELETE CASCADE 
         );`;
 
@@ -76,16 +74,12 @@ const init = function (db) {
     }
 };
 
-const create = function (db, uuid, parentMessageId, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
+const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
-        if (parentMessageId == 0) {
-            parentMessageId = null;
-        }
 
         const insertSql = `
         INSERT INTO ${tableName} (
             ${columnUuid},
-            ${columnParentMessageId},
             ${columnParentUuid},
             ${columnMessageType}, 
             ${columnMessageCreateDateTime},
@@ -100,8 +94,7 @@ const create = function (db, uuid, parentMessageId, parentUuid, messageTyp, lati
             ${columnMultimedia}
         ) VALUES (
             '${uuid}',
-            ${parentMessageId === null ? 'NULL' : parentMessageId},
-            '${parentUuid}',
+            ${parentUuid === '' ? 'NULL' : 'parentUuid'},
             '${messageTyp}', 
             datetime('now'),
             datetime('now', '+30 days'),
@@ -114,18 +107,17 @@ const create = function (db, uuid, parentMessageId, parentUuid, messageTyp, lati
             '${userId}',
             '${multimedia}'
         );`;
-
         db.run(insertSql, (err) => {
             if (err) {
                 callback(err);
                 return;
             }
 
-            if (parentMessageId !== null) {
+            if (parentUuid !== null) {
                 const updateSql = `
                     UPDATE ${tableName}
                     SET ${columnCommentsNumber} = ${columnCommentsNumber} + 1
-                    WHERE ${columnMessageId} = ${parentMessageId};
+                    WHERE ${columnUuid} = '${parentUuid}';
                 `;
                 db.run(updateSql, (updateErr) => {
                     callback(updateErr);
@@ -202,7 +194,7 @@ const getByPlusCode = function (db, plusCode, callback) {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} LIKE ?
-        AND ${columnParentMessageId} IS NULL
+        AND ${columnParentUuid} IS NULL
         AND ${columnStatus} = '${messageStatus.ENABLED}'      
         ORDER BY ${columnMessageCreateDateTime} DESC;`;
 
@@ -214,15 +206,15 @@ const getByPlusCode = function (db, plusCode, callback) {
     }
 };
 
-const getByParentId = function (db, parentMessageId, callback) {
+const getByParentId = function (db, parentUuid, callback) {
     try {
         let sql = `
         SELECT * FROM ${tableName}
-        WHERE ${columnParentMessageId} = ?
+        WHERE ${columnParentUuid} = ?
         AND ${columnStatus} = '${messageStatus.ENABLED}'
         ORDER BY ${columnMessageCreateDateTime} ASC;`;
 
-        db.all(sql, [parentMessageId], (err, rows) => {
+        db.all(sql, [parentUuid], (err, rows) => {
             callback(err, rows);
         });
     } catch (error) {
@@ -294,7 +286,7 @@ const deleteById = function (db, messageId, callback) {
     try {
         // Zuerst den Parent ermitteln
         const selectSql = `
-            SELECT ${columnParentMessageId}
+            SELECT ${columnParentUuid}
             FROM ${tableName}
             WHERE ${columnMessageId} = ?;`;
 
@@ -304,7 +296,7 @@ const deleteById = function (db, messageId, callback) {
                 return;
             }
 
-            const parentMessageId = row ? row[columnParentMessageId] : null;
+            const parentUuid = row ? row[columnParentUuid] : null;
 
             // Danach den eigentlichen Delete ausführen
             const deleteSql = `
@@ -318,13 +310,13 @@ const deleteById = function (db, messageId, callback) {
                 }
 
                 // Wenn es einen Parent gibt → Zähler reduzieren
-                if (parentMessageId) {
+                if (parentUuid) {
                     const updateSql = `
                         UPDATE ${tableName}
                         SET ${columnCommentsNumber} = MAX(${columnCommentsNumber} - 1, 0)
-                        WHERE ${columnMessageId} = ?;`;
+                        WHERE ${columnUuid} = ?;`;
 
-                    db.run(updateSql, [parentMessageId], (updateErr) => {
+                    db.run(updateSql, [parentUuid], (updateErr) => {
                         callback(updateErr);
                     });
                 } else {
@@ -340,12 +332,12 @@ const deleteById = function (db, messageId, callback) {
 const cleanPublic = function (db, callback) {
     try {
         const selectSql = `
-            SELECT ${columnParentMessageId} AS parentId, COUNT(*) AS count
+            SELECT ${columnUuid} AS parentUuid, COUNT(*) AS count
             FROM ${tableName}
             WHERE ${columnMessageType} = '${messageType.PUBLIC}'
             AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now')
-            AND ${columnParentMessageId} IS NOT NULL
-            GROUP BY ${columnParentMessageId};
+            AND ${columnParentUuid} IS NOT NULL
+            GROUP BY ${columnParentUuid};
         `;
 
         db.all(selectSql, [], (err, rows) => {
@@ -358,9 +350,9 @@ const cleanPublic = function (db, callback) {
                     const updateSql = `
                         UPDATE ${tableName}
                         SET ${columnCommentsNumber} = MAX(${columnCommentsNumber} - ?, 0)
-                        WHERE ${columnMessageId} = ?;
+                        WHERE ${columnUuid} = ?;
                     `;
-                    db.run(updateSql, [row.count, row.parentId], function (updateErr) {
+                    db.run(updateSql, [row.count, row.parentUuid], function (updateErr) {
                         if (updateErr) return reject(updateErr);
                         resolve();
                     });
