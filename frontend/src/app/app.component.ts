@@ -1,5 +1,5 @@
 import { CommonModule, PlatformLocation } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, computed, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -101,6 +101,11 @@ export class AppComponent implements OnInit {
   private messageSubject: Subject<void>;
   private mapSubject: Subject<void>;
   private showComponent: boolean = false;
+  readonly userMessagesSignal = computed(() =>
+    this.messageService.messagesSignal().filter(
+      msg => msg.userId === this.userService.getUser().id
+    )
+  );
 
 
   constructor(
@@ -785,7 +790,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { location: this.mapService.getMapLocation() },
+            data: { messages: this.userMessagesSignal(), location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: '90vw',
             minHeight: '8rem',
@@ -809,7 +814,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { location: this.mapService.getMapLocation() },
+            data: { messages: this.userMessagesSignal(), location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: '90vw',
             minHeight: '8rem',

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, computed, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -53,7 +53,16 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 export class MessagelistComponent implements OnInit {
 
   readonly messagesSignal = this.messageService.messagesSignal;
+  readonly filteredMessagesSignal = computed(() =>
+    this.messageService.messagesSignal().filter(msg =>
+      this.data.messages.some(message => message.id === msg.id)
+    )
+  );
   readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
+  readonly commentsSignal = computed(() => {
+    const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
+    return parentMessage ? this.messageService.getCommentsSignalForMessage(parentMessage.id)() : [];
+  });
 
   public user: User;
   public userProfile: Profile;
@@ -72,7 +81,7 @@ export class MessagelistComponent implements OnInit {
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { location: Location }
+    @Inject(MAT_DIALOG_DATA) public data: { messages: Message[], location: Location }
   ) {
     this.user = this.userService.getUser();
     this.userProfile = this.userService.getProfile();
@@ -80,6 +89,14 @@ export class MessagelistComponent implements OnInit {
 
   async ngOnInit() {
     await this.profileService.loadAllProfiles();
+  }
+
+  public goBack() {
+    if (this.messageService.selectedMessagesSignal().length !== 0) {
+      this.messageService.selectedMessagesSignal.set([]);
+    } else {
+      this.dialogRef.close();
+    }
   }
 
   public flyTo(message: Message) {
@@ -126,10 +143,21 @@ export class MessagelistComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true
     });
+
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.messageService.deleteMessage(message);
-      }
+      if (!result) return;
+
+      const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
+      if (!parentMessage) return;
+
+      this.messageService.deleteMessage(message);
+
+      setTimeout(() => {
+        const comments = this.messageService.getCommentsSignalForMessage(parentMessage.id)();
+        if (comments.length === 0) {
+          this.messageService.selectedMessagesSignal.set([]);
+        }
+      }, 50);
     });
   }
 
@@ -248,6 +276,70 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
         this.messageService.createMessage(data.message, this.user);
+      }
+    });
+  }
+
+  public handleCommentClick(message: Message) {
+    if (message.commentsNumber > 0) {
+      this.messageService.getCommentsForParentMessage(message);
+      this.messageService.selectedMessagesSignal.set([message]);
+    } else {
+      // Ersten Kommentar erstellen
+      this.addComment(message);
+    }
+  }
+
+  public showComments(message: Message) {
+    // Signal setzen, damit die View umschaltet
+    this.messageService.selectedMessagesSignal.set([message]);
+  }
+
+  public addComment(parentMessage: Message) {
+    const message: Message = {
+      id: 0,
+      parentId: parentMessage.id,
+      typ: 'public',
+      createDateTime: '',
+      deleteDateTime: '',
+      location: parentMessage.location,
+      message: '',
+      markerType: 'none',
+      style: '',
+      views: 0,
+      likes: 0,
+      dislikes: 0,
+      comments: [],
+      commentsNumber: 0,
+      status: 'enabled',
+      userId: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        url: '',
+        sourceUrl: '',
+        attribution: '',
+        title: '',
+        description: '',
+        contentId: ''
+      }
+    };
+
+    this.sharedContentService.addSharedContentToMessage(message);
+
+    const dialogRef = this.messageDialog.open(EditMessageComponent, {
+      panelClass: '',
+      data: { mode: this.mode.ADD_COMMENT, message },
+      closeOnNavigation: true,
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((data: any) => {
+      if (data?.message) {
+        this.messageService.createComment(data.message, this.userService.getUser());
       }
     });
   }

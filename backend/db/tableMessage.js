@@ -19,7 +19,7 @@ const columnMessageType = 'typ'; // Public, private, friend, comment
 const columnMessageCreateDateTime = 'createDateTime';
 const columnMessageDeleteDateTime = 'deleteDateTime'; // On creation the message has a lifetime of 30 Days
 const columnLatitude = 'latitude';
-const columnLongtitude = 'longtitude';
+const columnLongitude = 'longitude';
 const columnPlusCode = 'plusCode'; // https://maps.google.com/pluscodes/
 const columnMessage = 'message'; // Max. 256 charachters.
 const columnMarkerType = 'markerType'; // Default, Food, Funny...
@@ -42,7 +42,7 @@ const init = function (db) {
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
             ${columnLatitude} NUMBER NOT NULL,
-            ${columnLongtitude} NUMBER NOT NULL,
+            ${columnLongitude} NUMBER NOT NULL,
             ${columnPlusCode} TEXT NOT NULL DEFAULT 'undefined',
             ${columnMessage} TEXT NOT NULL,
             ${columnMarkerType} TEXT NOT NULL DEFAULT 'default',
@@ -72,19 +72,20 @@ const init = function (db) {
     }
 };
 
-const create = function (db, parentMessageId, messageTyp, latitude, longtitude, plusCode, message, markerType, style, userId, multimedia, callback) {
+const create = function (db, parentMessageId, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
         if (parentMessageId == 0) {
             parentMessageId = null;
         }
-        let sql = `
+
+        const insertSql = `
         INSERT INTO ${tableName} (
             ${columnParentMessageId},
             ${columnMessageType}, 
             ${columnMessageCreateDateTime},
             ${columnMessageDeleteDateTime},
             ${columnLatitude},
-            ${columnLongtitude},
+            ${columnLongitude},
             ${columnPlusCode},
             ${columnMessage},
             ${columnMarkerType},
@@ -92,12 +93,12 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             ${columnUserId},
             ${columnMultimedia}
         ) VALUES (
-            ${parentMessageId},
+            ${parentMessageId === null ? 'NULL' : parentMessageId},
             '${messageTyp}', 
             datetime('now'),
             datetime('now', '+30 days'),
             ${latitude},
-            ${longtitude},
+            ${longitude},
             '${plusCode}',
             '${message}',
             '${markerType}',
@@ -105,8 +106,25 @@ const create = function (db, parentMessageId, messageTyp, latitude, longtitude, 
             '${userId}',
             '${multimedia}'
         );`;
-        db.run(sql, (err) => {
-            callback(err)
+
+        db.run(insertSql, (err) => {
+            if (err) {
+                callback(err);
+                return;
+            }
+
+            if (parentMessageId !== null) {
+                const updateSql = `
+                    UPDATE ${tableName}
+                    SET ${columnCommentsNumber} = ${columnCommentsNumber} + 1
+                    WHERE ${columnMessageId} = ${parentMessageId};
+                `;
+                db.run(updateSql, (updateErr) => {
+                    callback(updateErr);
+                });
+            } else {
+                callback(null);
+            }
         });
     } catch (error) {
         throw error;
@@ -266,16 +284,45 @@ const enableMessage = function (db, messageId, callback) {
 
 const deleteById = function (db, messageId, callback) {
     try {
-        let sql = `
-        DELETE FROM ${tableName}
-        WHERE ${columnMessageId} = ?;`;
+        // Zuerst den Parent ermitteln
+        const selectSql = `
+            SELECT ${columnParentMessageId}
+            FROM ${tableName}
+            WHERE ${columnMessageId} = ?;`;
 
-        db.run(sql, [messageId], (err) => {
+        db.get(selectSql, [messageId], (err, row) => {
             if (err) {
                 callback(err);
-            } else {
-                callback(err);
+                return;
             }
+
+            const parentMessageId = row ? row[columnParentMessageId] : null;
+
+            // Danach den eigentlichen Delete ausführen
+            const deleteSql = `
+                DELETE FROM ${tableName}
+                WHERE ${columnMessageId} = ?;`;
+
+            db.run(deleteSql, [messageId], (deleteErr) => {
+                if (deleteErr) {
+                    callback(deleteErr);
+                    return;
+                }
+
+                // Wenn es einen Parent gibt → Zähler reduzieren
+                if (parentMessageId) {
+                    const updateSql = `
+                        UPDATE ${tableName}
+                        SET ${columnCommentsNumber} = MAX(${columnCommentsNumber} - 1, 0)
+                        WHERE ${columnMessageId} = ?;`;
+
+                    db.run(updateSql, [parentMessageId], (updateErr) => {
+                        callback(updateErr);
+                    });
+                } else {
+                    callback(null); // Kein Parent, fertig
+                }
+            });
         });
     } catch (error) {
         throw error;

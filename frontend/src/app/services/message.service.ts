@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, Subject, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -24,6 +24,8 @@ export class MessageService {
   readonly messagesSignal = signal<Message[]>([]);
   readonly selectedMessagesSignal = signal<Message[]>([]);
   readonly commentsSignal = signal<Message[]>([]);
+  private readonly commentsSignals = new Map<number, WritableSignal<Message[]>>();
+
   private lastSearchedLocation: string = '';
 
   httpOptions = {
@@ -68,6 +70,13 @@ export class MessageService {
     return this.lastSearchedLocation;
   }
 
+  getCommentsSignalForMessage(parentMessageId: number): WritableSignal<Message[]> {
+    if (!this.commentsSignals.has(parentMessageId)) {
+      this.commentsSignals.set(parentMessageId, signal<Message[]>([]));
+    }
+    return this.commentsSignals.get(parentMessageId)!;
+  }
+
   private mapRawMessage(raw: RawMessage): Message {
     return {
       id: raw.id,
@@ -77,7 +86,7 @@ export class MessageService {
       deleteDateTime: raw.deleteDateTime,
       location: {
         latitude: raw.latitude,
-        longitude: raw.longtitude,
+        longitude: raw.longitude,
         plusCode: raw.plusCode,
       },
       message: raw.message,
@@ -110,7 +119,7 @@ export class MessageService {
       'parentMessageId': message.parentId,
       'messageTyp': message.typ,
       'latitude': message.location.latitude,
-      'longtitude': message.location.longitude,
+      'longitude': message.location.longitude,
       'plusCode': message.location.plusCode,
       'message': message.message,
       'markerType': message.markerType,
@@ -138,9 +147,8 @@ export class MessageService {
       })
   }
 
-  createComment(message: Message, user: User, showAlways: boolean = false) {
+  public createComment(message: Message, user: User, showAlways: boolean = false) {
     const url = `${environment.apiUrl}/message/create`;
-
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: 'Message service',
@@ -153,38 +161,38 @@ export class MessageService {
     });
 
     const body = {
-      'parentMessageId': message.parentId,
-      'messageTyp': message.typ,
-      'latitude': message.location.latitude,
-      'longtitude': message.location.longitude,
-      'plusCode': message.location.plusCode,
-      'message': message.message,
-      'markerType': message.markerType,
-      'style': message.style,
-      'messageUserId': user.id,
-      'multimedia': JSON.stringify(message.multimedia)
+      parentMessageId: message.parentId,
+      messageTyp: message.typ,
+      latitude: message.location.latitude,
+      longitude: message.location.longitude,
+      plusCode: message.location.plusCode,
+      message: message.message,
+      markerType: message.markerType,
+      style: message.style,
+      messageUserId: user.id,
+      multimedia: JSON.stringify(message.multimedia)
     };
 
     this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
         next: () => {
-          // Message State updaten
-          this.messagesSignal.update(messages => {
-            return messages.map(parent => {
-              if (parent.id === message.parentId) {
-                return {
-                  ...parent,
-                  comments: [...parent.comments, message],
-                  commentsNumber: parent.commentsNumber + 1
-                };
-              }
-              return parent;
-            });
-          });
+          // 1. Comment in Comments-Signal einfügen
+          const commentsSignal = this.getCommentsSignalForMessage(message.parentId!);
+          commentsSignal.set([...commentsSignal(), message]);
 
-          this.snackBar.open(`Comment succesfully dropped.`, '', { duration: 1000 });
+          // 2. Comments-Number im Parent in messagesSignal hochzählen
+          this.messagesSignal.update(messages =>
+            messages.map(parent =>
+              parent.id === message.parentId
+                ? { ...parent, commentsNumber: parent.commentsNumber + 1 }
+                : parent
+            )
+          );
 
+          this.snackBar.open(`Comment successfully dropped.`, '', { duration: 1000 });
+
+          // Statistik bleibt wie sie ist
           this.statisticService.countMessage().subscribe({
             next: () => { },
             error: () => { },
@@ -548,44 +556,39 @@ export class MessageService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
+          if (simpleStatusResponse.status !== 200) return;
 
-            this.messagesSignal.update(messages => {
-              // 1. Prüfen, ob es eine Hauptnachricht ist
-              const isRootMessage = messages.some(m => m.id === message.id);
+          const isRootMessage = this.messagesSignal().some(m => m.id === message.id);
 
-              if (isRootMessage) {
-                return messages.filter(m => m.id !== message.id);
+          if (isRootMessage) {
+            // Root-Nachricht löschen
+            this.messagesSignal.update(messages => messages.filter(m => m.id !== message.id));
+
+            // Detailansicht zurücksetzen
+            this.selectedMessagesSignal.set([]);
+          } else {
+            // Kommentar löschen → Comments-Signal anpassen
+            const commentsSignal = this.getCommentsSignalForMessage(message.parentId!);
+            commentsSignal.set(commentsSignal().filter(c => c.id !== message.id));
+
+            // Außerdem commentsNumber im Parent aktualisieren
+            this.messagesSignal.update(messages => messages.map(parent => {
+              if (parent.id === message.parentId) {
+                return {
+                  ...parent,
+                  commentsNumber: Math.max(parent.commentsNumber - 1, 0)
+                };
               }
-
-              // 2. Andernfalls: Kommentar → Parent suchen und Comments-Array anpassen
-              return messages.map(parent => {
-                if (parent.id === message.parentId) {
-                  return {
-                    ...parent,
-                    comments: parent.comments.filter(c => c.id !== message.id),
-                    commentsNumber: Math.max(parent.commentsNumber - 1, 0)
-                  };
-                }
-                return parent;
-              });
-            });
-
-            // Selected-Messages stack reduzieren
-            this.selectedMessagesSignal.update(selected => {
-              const newSelected = [...selected];
-              newSelected.pop();
-              return newSelected;
-            });
+              return parent;
+            }));
           }
         },
         error: () => { }
       });
   }
 
-  getCommentsForParentMessage(message: Message, showAlways: boolean = false) {
+  public getCommentsForParentMessage(message: Message, showAlways: boolean = false) {
     const url = `${environment.apiUrl}/message/get/comment/${message.id}`;
-
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: 'Message service',
@@ -597,31 +600,42 @@ export class MessageService {
       showSpinner: true
     });
 
+    const commentsSignal = this.getCommentsSignalForMessage(message.id);
+
     this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
+      .pipe(
+        catchError(this.handleError)
+      )
       .subscribe({
         next: (getMessageResponse) => {
-          const comments = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
+          const comments = getMessageResponse.rows.map((rawMessage: RawMessage) => ({
+            id: rawMessage.id,
+            parentId: rawMessage.parentId,
+            typ: rawMessage.typ,
+            createDateTime: rawMessage.createDateTime,
+            deleteDateTime: rawMessage.deleteDateTime,
+            location: {
+              latitude: rawMessage.latitude,
+              longitude: rawMessage.longitude,
+              plusCode: rawMessage.plusCode,
+            },
+            message: rawMessage.message,
+            markerType: rawMessage.markerType,
+            style: rawMessage.style,
+            views: rawMessage.views,
+            likes: rawMessage.likes,
+            dislikes: rawMessage.dislikes,
+            comments: [],
+            commentsNumber: rawMessage.commentsNumber,
+            status: rawMessage.status,
+            userId: rawMessage.userId,
+            multimedia: JSON.parse(rawMessage.multimedia)
+          }));
 
-          // Parent-Message im State updaten
-          this.messagesSignal.update(messages => {
-            return messages.map(m => {
-              if (m.id === message.id) {
-                return { ...m, comments };
-              }
-              return m;
-            });
-          });
+          commentsSignal.set(comments);
         },
         error: () => {
-          this.messagesSignal.update(messages => {
-            return messages.map(m => {
-              if (m.id === message.id) {
-                return { ...m, comments: [] };
-              }
-              return m;
-            });
-          });
+          commentsSignal.set([]);
         }
       });
   }
