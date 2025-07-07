@@ -80,6 +80,7 @@ export class MessageService {
   private mapRawMessage(raw: RawMessage): Message {
     return {
       id: raw.id,
+      uuid: raw.uuid,
       parentId: raw.parentId,
       typ: raw.typ,
       createDateTime: raw.createDateTime,
@@ -116,16 +117,17 @@ export class MessageService {
       showSpinner: true
     });
     let body = {
-      'parentMessageId': message.parentId,
-      'messageTyp': message.typ,
-      'latitude': message.location.latitude,
-      'longitude': message.location.longitude,
-      'plusCode': message.location.plusCode,
-      'message': message.message,
-      'markerType': message.markerType,
-      'style': message.style,
-      'messageUserId': user.id,
-      'multimedia': JSON.stringify(message.multimedia)
+      uuid: message.uuid,
+      parentMessageId: message.parentId,
+      messageTyp: message.typ,
+      latitude: message.location.latitude,
+      longitude: message.location.longitude,
+      plusCode: message.location.plusCode,
+      message: message.message,
+      markerType: message.markerType,
+      style: message.style,
+      messageUserId: user.id,
+      multimedia: JSON.stringify(message.multimedia)
     };
     this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
@@ -161,6 +163,7 @@ export class MessageService {
     });
 
     const body = {
+      uuid: message.uuid,
       parentMessageId: message.parentId,
       messageTyp: message.typ,
       latitude: message.location.latitude,
@@ -177,30 +180,43 @@ export class MessageService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: () => {
-          // 1. Comment in Comments-Signal einfügen
+          // 1. Kommentar hinzufügen
           const commentsSignal = this.getCommentsSignalForMessage(message.parentId!);
           commentsSignal.set([...commentsSignal(), message]);
 
-          // 2. Comments-Number im Parent in messagesSignal hochzählen
-          this.messagesSignal.update(messages =>
-            messages.map(parent =>
-              parent.id === message.parentId
-                ? { ...parent, commentsNumber: parent.commentsNumber + 1 }
-                : parent
-            )
-          );
+          // 2. Parent in selectedMessagesSignal hochzählen
+          this.selectedMessagesSignal.update(selected => selected.map(m =>
+            m.id === message.parentId ? { ...m, commentsNumber: m.commentsNumber + 1 } : m
+          ));
+
+          // 3. Rekursiv in messagesSignal suchen & hochzählen
+          // Immer in messagesSignal updaten, wenn der Parent dort drin ist
+          this.messagesSignal.update(messages => {
+            return messages.map(m => {
+              if (m.id === message.parentId) {
+                console.log(`[CommentCounter] Updated parent ${m.id} in messagesSignal`);
+                return { ...m, commentsNumber: m.commentsNumber + 1 };
+              }
+              return m;
+            });
+          });
 
           this.snackBar.open(`Comment successfully dropped.`, '', { duration: 1000 });
-
-          // Statistik bleibt wie sie ist
-          this.statisticService.countMessage().subscribe({
-            next: () => { },
-            error: () => { },
-            complete: () => { }
-          });
+          this.statisticService.countMessage().subscribe({ complete: () => { } });
         },
         error: err => this.snackBar.open(err.message, 'OK')
       });
+  }
+
+  private incrementCommentsNumberInTree(messages: Message[], parentId: number): Message[] {
+    return messages.map(m => {
+      if (m.id === parentId) {
+        return { ...m, commentsNumber: m.commentsNumber + 1 };
+      } else if (m.comments.length > 0) {
+        return { ...m, comments: this.incrementCommentsNumberInTree(m.comments, parentId) };
+      }
+      return m;
+    });
   }
 
   updateMessage(message: Message, showAlways: boolean = false) {
@@ -610,6 +626,7 @@ export class MessageService {
         next: (getMessageResponse) => {
           const comments = getMessageResponse.rows.map((rawMessage: RawMessage) => ({
             id: rawMessage.id,
+            uuid: rawMessage.uuid,
             parentId: rawMessage.parentId,
             typ: rawMessage.typ,
             createDateTime: rawMessage.createDateTime,

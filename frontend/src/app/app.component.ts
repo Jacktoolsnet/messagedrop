@@ -684,6 +684,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   async openMessagDialog(): Promise<void> {
     let message: Message = {
       id: 0,
+      uuid: crypto.randomUUID(),
       parentId: 0,
       typ: 'public',
       createDateTime: '',

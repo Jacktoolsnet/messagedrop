@@ -44,7 +44,7 @@
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
-                <button mat-mini-fab color="secondary" aria-label="Show or add comments"
+                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.commentsNumber > 0 ? (message.commentsNumber | shortNumber) : '' }}"
@@ -89,8 +89,7 @@
 
     <!-- Comment Detail View -->
     <div *ngIf="messageService.selectedMessagesSignal().length !== 0" class="content">
-        <button mat-mini-fab color="primary" class="button_add"
-            (click)="addComment(messageService.selectedMessagesSignal().at(-1)!)">
+        <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
             <mat-icon>add</mat-icon>
         </button>
 
@@ -104,7 +103,7 @@
                 </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">
-                <button mat-mini-fab color="secondary" aria-label="Show or add comments"
+                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.commentsNumber > 0 ? (message.commentsNumber | shortNumber) : '' }}"

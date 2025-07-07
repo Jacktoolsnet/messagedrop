@@ -54,15 +54,21 @@ export class MessagelistComponent implements OnInit {
 
   readonly messagesSignal = this.messageService.messagesSignal;
   readonly filteredMessagesSignal = computed(() =>
-    this.messageService.messagesSignal().filter(msg =>
-      this.data.messages.some(message => message.id === msg.id)
-    )
+    !this.data.messages || this.data.messages.length === 0
+      ? this.messageService.messagesSignal()
+      : this.messageService.messagesSignal().filter(msg =>
+        this.data.messages.some(message => message.id === msg.id)
+      )
   );
   readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
   readonly commentsSignal = computed(() => {
     const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
     return parentMessage ? this.messageService.getCommentsSignalForMessage(parentMessage.id)() : [];
   });
+
+  readonly currentParentSignal = computed(() =>
+    this.messageService.selectedMessagesSignal().at(-1)
+  );
 
   public user: User;
   public userProfile: Profile;
@@ -146,12 +152,10 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
-
       const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
-      if (!parentMessage) return;
-
       this.messageService.deleteMessage(message);
 
+      if (!parentMessage) return;
       setTimeout(() => {
         const comments = this.messageService.getCommentsSignalForMessage(parentMessage.id)();
         if (comments.length === 0) {
@@ -234,6 +238,7 @@ export class MessagelistComponent implements OnInit {
   addMessagDialog(): void {
     const message: Message = {
       id: 0,
+      uuid: crypto.randomUUID(),
       parentId: 0,
       typ: 'public',
       createDateTime: '',
@@ -276,16 +281,26 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
         this.messageService.createMessage(data.message, this.user);
+        this.data.messages.push(data.message);
       }
     });
   }
 
   public handleCommentClick(message: Message) {
-    if (message.commentsNumber > 0) {
-      this.messageService.getCommentsForParentMessage(message);
-      this.messageService.selectedMessagesSignal.set([message]);
+    const currentSelected = this.messageService.selectedMessagesSignal();
+    const commentsSignal = this.messageService.getCommentsSignalForMessage(message.id);
+
+    // Gibt es bereits geladene Comments ODER zeigt der Counter, dass es Comments gibt?
+    if (commentsSignal().length > 0 || message.commentsNumber > 0) {
+      // → Neue Ebene im Stack hinzufügen
+      this.messageService.selectedMessagesSignal.set([...currentSelected, message]);
+
+      // → Nur laden, wenn noch nicht im Signal
+      if (commentsSignal().length === 0) {
+        this.messageService.getCommentsForParentMessage(message);
+      }
     } else {
-      // Ersten Kommentar erstellen
+      // Noch keine Comments → Erstellt einen neuen Comment
       this.addComment(message);
     }
   }
@@ -298,6 +313,7 @@ export class MessagelistComponent implements OnInit {
   public addComment(parentMessage: Message) {
     const message: Message = {
       id: 0,
+      uuid: crypto.randomUUID(),
       parentId: parentMessage.id,
       typ: 'public',
       createDateTime: '',

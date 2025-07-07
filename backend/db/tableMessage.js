@@ -14,6 +14,7 @@ const messageStatus = {
 const tableName = 'tableMessage';
 
 const columnMessageId = 'id';
+const columnUuid = 'uuid';
 const columnParentMessageId = 'parentId';
 const columnMessageType = 'typ'; // Public, private, friend, comment
 const columnMessageCreateDateTime = 'createDateTime';
@@ -36,7 +37,8 @@ const init = function (db) {
     try {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnMessageId} INTEGER PRIMARY KEY NOT NULL, 
+            ${columnMessageId} INTEGER PRIMARY KEY NOT NULL,
+            ${columnUuid} TEXT NOT NULL UNIQUE, 
             ${columnParentMessageId} INTEGER DEFAULT NULL,
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
@@ -72,7 +74,7 @@ const init = function (db) {
     }
 };
 
-const create = function (db, parentMessageId, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
+const create = function (db, uuid, parentMessageId, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
         if (parentMessageId == 0) {
             parentMessageId = null;
@@ -80,6 +82,7 @@ const create = function (db, parentMessageId, messageTyp, latitude, longitude, p
 
         const insertSql = `
         INSERT INTO ${tableName} (
+            ${columnUuid},
             ${columnParentMessageId},
             ${columnMessageType}, 
             ${columnMessageCreateDateTime},
@@ -93,6 +96,7 @@ const create = function (db, parentMessageId, messageTyp, latitude, longitude, p
             ${columnUserId},
             ${columnMultimedia}
         ) VALUES (
+            '${uuid}',
             ${parentMessageId === null ? 'NULL' : parentMessageId},
             '${messageTyp}', 
             datetime('now'),

@@ -1,5 +1,6 @@
 export interface RawMessage {
     id: number,
+    uuid: string,
     parentId: number,
     typ: string,
     createDateTime: string,
