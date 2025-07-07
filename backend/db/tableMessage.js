@@ -16,6 +16,7 @@ const tableName = 'tableMessage';
 const columnMessageId = 'id';
 const columnUuid = 'uuid';
 const columnParentMessageId = 'parentId';
+const columnParentUuid = 'parentUuid';
 const columnMessageType = 'typ'; // Public, private, friend, comment
 const columnMessageCreateDateTime = 'createDateTime';
 const columnMessageDeleteDateTime = 'deleteDateTime'; // On creation the message has a lifetime of 30 Days
@@ -40,6 +41,7 @@ const init = function (db) {
             ${columnMessageId} INTEGER PRIMARY KEY NOT NULL,
             ${columnUuid} TEXT NOT NULL UNIQUE, 
             ${columnParentMessageId} INTEGER DEFAULT NULL,
+            ${columnParentUuid} TEXT NOT NULL UNIQUE,
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
@@ -74,7 +76,7 @@ const init = function (db) {
     }
 };
 
-const create = function (db, uuid, parentMessageId, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
+const create = function (db, uuid, parentMessageId, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
         if (parentMessageId == 0) {
             parentMessageId = null;
@@ -84,6 +86,7 @@ const create = function (db, uuid, parentMessageId, messageTyp, latitude, longit
         INSERT INTO ${tableName} (
             ${columnUuid},
             ${columnParentMessageId},
+            ${columnParentUuid},
             ${columnMessageType}, 
             ${columnMessageCreateDateTime},
             ${columnMessageDeleteDateTime},
@@ -98,6 +101,7 @@ const create = function (db, uuid, parentMessageId, messageTyp, latitude, longit
         ) VALUES (
             '${uuid}',
             ${parentMessageId === null ? 'NULL' : parentMessageId},
+            '${parentUuid}',
             '${messageTyp}', 
             datetime('now'),
             datetime('now', '+30 days'),

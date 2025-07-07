@@ -686,6 +686,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       id: 0,
       uuid: crypto.randomUUID(),
       parentId: 0,
+      parentUuid: '',
       typ: 'public',
       createDateTime: '',
       deleteDateTime: '',

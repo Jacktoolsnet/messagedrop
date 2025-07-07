@@ -5,6 +5,7 @@ export interface Message {
     id: number,
     uuid: string,
     parentId: number,
+    parentUuid: string,
     typ: string,
     createDateTime: string,
     deleteDateTime: string,

@@ -82,6 +82,7 @@ export class MessageService {
       id: raw.id,
       uuid: raw.uuid,
       parentId: raw.parentId,
+      parentUuid: raw.parentUuid,
       typ: raw.typ,
       createDateTime: raw.createDateTime,
       deleteDateTime: raw.deleteDateTime,
@@ -119,6 +120,7 @@ export class MessageService {
     let body = {
       uuid: message.uuid,
       parentMessageId: message.parentId,
+      parentUuid: message.parentUuid,
       messageTyp: message.typ,
       latitude: message.location.latitude,
       longitude: message.location.longitude,
@@ -165,6 +167,7 @@ export class MessageService {
     const body = {
       uuid: message.uuid,
       parentMessageId: message.parentId,
+      parentUuid: message.parentUuid,
       messageTyp: message.typ,
       latitude: message.location.latitude,
       longitude: message.location.longitude,
@@ -628,6 +631,7 @@ export class MessageService {
             id: rawMessage.id,
             uuid: rawMessage.uuid,
             parentId: rawMessage.parentId,
+            parentUuid: rawMessage.parentUuid,
             typ: rawMessage.typ,
             createDateTime: rawMessage.createDateTime,
             deleteDateTime: rawMessage.deleteDateTime,

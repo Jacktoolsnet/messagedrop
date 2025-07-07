@@ -125,7 +125,7 @@ router.post('/create', [security.checkToken, security.authenticate, bodyParser.j
   if (undefined == req.body.parentMessageId) {
     req.body.parentMessageId = 0;
   }
-  tableMessage.create(req.database.db, req.body.uuid, req.body.parentMessageId, req.body.messageTyp, req.body.latitude, req.body.longitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia.replace(/\'/g, "''"), function (err) {
+  tableMessage.create(req.database.db, req.body.uuid, req.body.parentMessageId, req.body.parentUuid, req.body.messageTyp, req.body.latitude, req.body.longitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia.replace(/\'/g, "''"), function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
