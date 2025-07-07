@@ -33,9 +33,8 @@
         </div>
     </div>
 </mat-dialog-content>
-<mat-dialog-actions *ngIf="data.note.note !== '' || data.note.multimedia.type !== 'undefined'">
-    <button mat-flat-button class="button_drop" color="primary" aria-label="Drop your note" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">check_circle</mat-icon>
-        Apply
-    </button>
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
+    <button *ngIf="data.note.note !== '' || data.note.multimedia.type !== 'undefined'" mat-button mat-dialog-close
+        (click)="onApplyClick()">Apply</button>
 </mat-dialog-actions>

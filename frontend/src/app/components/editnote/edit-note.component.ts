@@ -43,6 +43,10 @@ export class EditNoteComponent implements OnInit {
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml: boolean = false;
 
+  private oriNote: string | undefined = undefined;
+  private oriMultimedia: Multimedia | undefined = undefined;
+  private oriStyle: string | undefined = undefined;
+
   constructor(
     private userService: UserService,
     private sharedContentService: SharedContentService,
@@ -53,16 +57,33 @@ export class EditNoteComponent implements OnInit {
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, note: Note }
   ) {
-    console.log(data);
+    this.oriNote = this.data.note.note;
+    this.oriMultimedia = JSON.parse(JSON.stringify(this.data.note.multimedia));
+    this.oriStyle = this.data.note.style
   }
 
   ngOnInit(): void {
-    this.data.note.style = this.userService.getProfile().defaultStyle!
+    if (!this.data.note.style) {
+      this.data.note.style = this.userService.getProfile().defaultStyle!;
+    }
     this.applyNewMultimedia(this.data.note.multimedia);
   }
 
   onApplyClick(): void {
     this.dialogRef.close(this.data);
+  }
+
+  onAbortClick(): void {
+    if (undefined != this.oriNote) {
+      this.data.note.note = this.oriNote;
+    }
+    if (undefined != this.oriMultimedia) {
+      this.data.note.multimedia = this.oriMultimedia;
+    }
+    if (undefined != this.oriStyle) {
+      this.data.note.style = this.oriStyle;
+    }
+    this.dialogRef.close();
   }
 
   onNewFontClick(): void {

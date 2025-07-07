@@ -31,25 +31,10 @@
         </div>
     </div>
 </mat-dialog-content>
-<mat-dialog-actions *ngIf="data.message.message !== '' || data.message.multimedia.type !== 'undefined'">
-    <button *ngIf="data.mode == 'add_public_message'" mat-flat-button class="button_drop" color="primary"
-        aria-label="Drop your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">send</mat-icon>
-        Drop public message
-    </button>
-    <button *ngIf="data.mode == 'add_short_message'" mat-flat-button class="button_drop" color="primary"
-        aria-label="Send your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">send</mat-icon>
-        Send your message
-    </button>
-    <button *ngIf="data.mode == 'add_comment'" mat-flat-button class="button_drop" color="primary"
-        aria-label="Drop your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
-        Drop public comment
-    </button>
-    <button *ngIf="data.mode == 'edit_public_message' || data.mode == 'edit_comment'" mat-flat-button
-        class="button_drop" color="primary" aria-label="Update your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">check</mat-icon>
-        Apply changes
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
+    <button *ngIf="data.message.message !== '' || data.message.multimedia.type !== 'undefined'" mat-flat-button
+        aria-label="Update your message" (click)="onApplyClick()">
+        Apply
     </button>
 </mat-dialog-actions>

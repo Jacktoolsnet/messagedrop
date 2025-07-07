@@ -46,6 +46,10 @@ export class EditMessageComponent implements OnInit {
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml: boolean = false;
 
+  private oriMessage: string | undefined = undefined;
+  private oriMultimedia: Multimedia | undefined = undefined;
+  private oriStyle: string | undefined = undefined;
+
   constructor(
     private userService: UserService,
     private sharedContentService: SharedContentService,
@@ -57,10 +61,16 @@ export class EditMessageComponent implements OnInit {
     public dialogRef: MatDialogRef<EditMessageComponent>,
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, message: Message }
-  ) { }
+  ) {
+    this.oriMessage = this.data.message.message;
+    this.oriMultimedia = JSON.parse(JSON.stringify(this.data.message.multimedia));
+    this.oriStyle = this.data.message.style
+  }
 
   ngOnInit(): void {
-    this.data.message.style = this.userService.getProfile().defaultStyle!;
+    if (!this.data.message.style) {
+      this.data.message.style = this.userService.getProfile().defaultStyle!;
+    }
     this.applyNewMultimedia(this.data.message.multimedia);
   }
 
@@ -100,6 +110,19 @@ export class EditMessageComponent implements OnInit {
         this.dialogRef.close(this.data);
         break;
     }
+  }
+
+  onAbortClick(): void {
+    if (undefined != this.oriMessage) {
+      this.data.message.message = this.oriMessage;
+    }
+    if (undefined != this.oriMultimedia) {
+      this.data.message.multimedia = this.oriMultimedia;
+    }
+    if (undefined != this.oriStyle) {
+      this.data.message.style = this.oriStyle;
+    }
+    this.dialogRef.close();
   }
 
   onNewFontClick(): void {
