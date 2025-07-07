@@ -24,7 +24,7 @@ export class MessageService {
   readonly messagesSignal = signal<Message[]>([]);
   readonly selectedMessagesSignal = signal<Message[]>([]);
   readonly commentsSignal = signal<Message[]>([]);
-  private readonly commentsSignals = new Map<number, WritableSignal<Message[]>>();
+  private readonly commentsSignals = new Map<string, WritableSignal<Message[]>>();
 
   private lastSearchedLocation: string = '';
 
@@ -70,11 +70,11 @@ export class MessageService {
     return this.lastSearchedLocation;
   }
 
-  getCommentsSignalForMessage(parentMessageId: number): WritableSignal<Message[]> {
-    if (!this.commentsSignals.has(parentMessageId)) {
-      this.commentsSignals.set(parentMessageId, signal<Message[]>([]));
+  getCommentsSignalForMessage(parentUuid: string): WritableSignal<Message[]> {
+    if (!this.commentsSignals.has(parentUuid)) {
+      this.commentsSignals.set(parentUuid, signal<Message[]>([]));
     }
-    return this.commentsSignals.get(parentMessageId)!;
+    return this.commentsSignals.get(parentUuid)!;
   }
 
   private mapRawMessage(raw: RawMessage): Message {
@@ -184,7 +184,7 @@ export class MessageService {
       .subscribe({
         next: () => {
           // 1. Kommentar hinzufügen
-          const commentsSignal = this.getCommentsSignalForMessage(message.parentId!);
+          const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
           commentsSignal.set([...commentsSignal(), message]);
 
           // 2. Parent in selectedMessagesSignal hochzählen
@@ -207,7 +207,9 @@ export class MessageService {
           this.snackBar.open(`Comment successfully dropped.`, '', { duration: 1000 });
           this.statisticService.countMessage().subscribe({ complete: () => { } });
         },
-        error: err => this.snackBar.open(err.message, 'OK')
+        error: (err) => {
+          this.snackBar.open(err.message, 'OK')
+        }
       });
   }
 
@@ -587,7 +589,7 @@ export class MessageService {
             this.selectedMessagesSignal.set([]);
           } else {
             // Kommentar löschen → Comments-Signal anpassen
-            const commentsSignal = this.getCommentsSignalForMessage(message.parentId!);
+            const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
             commentsSignal.set(commentsSignal().filter(c => c.id !== message.id));
 
             // Außerdem commentsNumber im Parent aktualisieren
@@ -619,7 +621,7 @@ export class MessageService {
       showSpinner: true
     });
 
-    const commentsSignal = this.getCommentsSignalForMessage(message.id);
+    const commentsSignal = this.getCommentsSignalForMessage(message.uuid);
 
     this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(

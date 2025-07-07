@@ -63,7 +63,7 @@ export class MessagelistComponent implements OnInit {
   readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
   readonly commentsSignal = computed(() => {
     const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
-    return parentMessage ? this.messageService.getCommentsSignalForMessage(parentMessage.id)() : [];
+    return parentMessage ? this.messageService.getCommentsSignalForMessage(parentMessage.uuid)() : [];
   });
 
   readonly currentParentSignal = computed(() =>
@@ -157,7 +157,7 @@ export class MessagelistComponent implements OnInit {
 
       if (!parentMessage) return;
       setTimeout(() => {
-        const comments = this.messageService.getCommentsSignalForMessage(parentMessage.id)();
+        const comments = this.messageService.getCommentsSignalForMessage(parentMessage.uuid)();
         if (comments.length === 0) {
           this.messageService.selectedMessagesSignal.set([]);
         }
@@ -289,7 +289,7 @@ export class MessagelistComponent implements OnInit {
 
   public handleCommentClick(message: Message) {
     const currentSelected = this.messageService.selectedMessagesSignal();
-    const commentsSignal = this.messageService.getCommentsSignalForMessage(message.id);
+    const commentsSignal = this.messageService.getCommentsSignalForMessage(message.uuid);
 
     // Gibt es bereits geladene Comments ODER zeigt der Counter, dass es Comments gibt?
     if (commentsSignal().length > 0 || message.commentsNumber > 0) {
