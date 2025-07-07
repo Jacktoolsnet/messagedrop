@@ -171,24 +171,41 @@ export class MessagelistComponent implements OnInit {
       if (!result) return;
 
       const selected = this.messageService.selectedMessagesSignal();
-      const parentMessage = selected.at(-1);
-      if (!parentMessage) return;
 
-      // Löschen
+      // 1. Löschen
       this.messageService.deleteMessage(message);
 
-      setTimeout(() => {
-        const comments = this.messageService.getCommentsSignalForMessage(parentMessage.uuid)();
-        if (comments.length === 0) {
-          const newSelected = [...selected];
-          newSelected.pop();
-          if (newSelected.length > 0) {
-            this.messageService.selectedMessagesSignal.set(newSelected);
-          } else {
-            this.messageService.selectedMessagesSignal.set([]);
-          }
-        }
-      }, 50);
+      // 2. Parent in selectedMessagesSignal runterzählen
+      this.messageService.selectedMessagesSignal.update(selected =>
+        selected.map(m =>
+          m.uuid === message.parentUuid
+            ? { ...m, commentsNumber: Math.max(m.commentsNumber - 1, 0) }
+            : m
+        )
+      );
+
+      // 3. Parent in messagesSignal runterzählen
+      this.messageService.messagesSignal.update(messages =>
+        messages.map(m =>
+          m.uuid === message.parentUuid
+            ? { ...m, commentsNumber: Math.max(m.commentsNumber - 1, 0) }
+            : m
+        )
+      );
+
+      // 4. Prüfen, ob in der aktuellen Ebene noch Comments da sind
+      const parentUuid = message.parentUuid;
+      if (!parentUuid) return; // Root → nichts zu tun
+
+      const commentsSignal = this.messageService.getCommentsSignalForMessage(parentUuid);
+      const remainingComments = commentsSignal().filter(c => c.id !== message.id);
+
+      if (remainingComments.length === 0) {
+        // Eine Ebene zurückgehen
+        const newSelected = [...selected];
+        newSelected.pop();
+        this.messageService.selectedMessagesSignal.set(newSelected);
+      }
     });
   }
 

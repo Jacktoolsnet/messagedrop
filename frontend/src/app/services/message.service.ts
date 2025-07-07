@@ -196,7 +196,6 @@ export class MessageService {
           // Immer in messagesSignal updaten, wenn der Parent dort drin ist
           this.messagesSignal.update(messages => {
             return messages.map(m => {
-              console.log(m);
               if (m.uuid === message.parentUuid) {
                 console.log(`[CommentCounter] Updated parent ${m.uuid} in messagesSignal`);
                 return { ...m, commentsNumber: m.commentsNumber + 1 };
