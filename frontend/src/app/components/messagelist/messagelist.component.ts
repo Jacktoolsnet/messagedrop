@@ -98,9 +98,26 @@ export class MessagelistComponent implements OnInit {
   }
 
   public goBack() {
-    if (this.messageService.selectedMessagesSignal().length !== 0) {
+    const selected = this.messageService.selectedMessagesSignal();
+    if (selected.length > 1) {
+      // Eine Ebene zurück
+      const newSelected = [...selected];
+      newSelected.pop();
+      this.messageService.selectedMessagesSignal.set(newSelected);
+
+      // Parent wieder sichtbar machen
+      setTimeout(() => {
+        const parent = newSelected.at(-1);
+        if (parent) {
+          const element = document.getElementById(`message-${parent.id}`);
+          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
+    } else if (selected.length === 1) {
+      // Root-Ebene → Stack leeren
       this.messageService.selectedMessagesSignal.set([]);
     } else {
+      // Nichts mehr ausgewählt → Dialog schließen
       this.dialogRef.close();
     }
   }
@@ -152,14 +169,24 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (!result) return;
-      const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
+
+      const selected = this.messageService.selectedMessagesSignal();
+      const parentMessage = selected.at(-1);
+      if (!parentMessage) return;
+
+      // Löschen
       this.messageService.deleteMessage(message);
 
-      if (!parentMessage) return;
       setTimeout(() => {
         const comments = this.messageService.getCommentsSignalForMessage(parentMessage.uuid)();
         if (comments.length === 0) {
-          this.messageService.selectedMessagesSignal.set([]);
+          const newSelected = [...selected];
+          newSelected.pop();
+          if (newSelected.length > 0) {
+            this.messageService.selectedMessagesSignal.set(newSelected);
+          } else {
+            this.messageService.selectedMessagesSignal.set([]);
+          }
         }
       }, 50);
     });
@@ -302,13 +329,10 @@ export class MessagelistComponent implements OnInit {
       }
     } else {
       // Noch keine Comments → Erstellt einen neuen Comment
-      this.addComment(message);
+      if (this.userService.isReady()) {
+        this.addComment(message);
+      }
     }
-  }
-
-  public showComments(message: Message) {
-    // Signal setzen, damit die View umschaltet
-    this.messageService.selectedMessagesSignal.set([message]);
   }
 
   public addComment(parentMessage: Message) {

@@ -196,8 +196,9 @@ export class MessageService {
           // Immer in messagesSignal updaten, wenn der Parent dort drin ist
           this.messagesSignal.update(messages => {
             return messages.map(m => {
-              if (m.id === message.parentId) {
-                console.log(`[CommentCounter] Updated parent ${m.id} in messagesSignal`);
+              console.log(m);
+              if (m.uuid === message.parentUuid) {
+                console.log(`[CommentCounter] Updated parent ${m.uuid} in messagesSignal`);
                 return { ...m, commentsNumber: m.commentsNumber + 1 };
               }
               return m;
@@ -211,17 +212,6 @@ export class MessageService {
           this.snackBar.open(err.message, 'OK')
         }
       });
-  }
-
-  private incrementCommentsNumberInTree(messages: Message[], parentId: number): Message[] {
-    return messages.map(m => {
-      if (m.id === parentId) {
-        return { ...m, commentsNumber: m.commentsNumber + 1 };
-      } else if (m.comments.length > 0) {
-        return { ...m, comments: this.incrementCommentsNumberInTree(m.comments, parentId) };
-      }
-      return m;
-    });
   }
 
   updateMessage(message: Message, showAlways: boolean = false) {
@@ -609,7 +599,7 @@ export class MessageService {
   }
 
   public getCommentsForParentMessage(message: Message, showAlways: boolean = false) {
-    const url = `${environment.apiUrl}/message/get/comment/${message.id}`;
+    const url = `${environment.apiUrl}/message/get/comment/${message.uuid}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: 'Message service',
@@ -624,9 +614,7 @@ export class MessageService {
     const commentsSignal = this.getCommentsSignalForMessage(message.uuid);
 
     this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+      .pipe(catchError(this.handleError))
       .subscribe({
         next: (getMessageResponse) => {
           const comments = getMessageResponse.rows.map((rawMessage: RawMessage) => ({
@@ -654,7 +642,6 @@ export class MessageService {
             userId: rawMessage.userId,
             multimedia: JSON.parse(rawMessage.multimedia)
           }));
-
           commentsSignal.set(comments);
         },
         error: () => {

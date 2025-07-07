@@ -8,7 +8,7 @@
         <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add</mat-icon>
     </button>
 
-    <div *ngIf="messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0"
+    <div *ngIf="userService.isReady() && messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0"
         class="no-content">
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
             (click)="addMessagDialog()">
@@ -44,7 +44,8 @@
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
-                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Show or add comments"
+                <button *ngIf="(userService.isReady() && message.commentsNumber == 0) || message.commentsNumber > 0"
+                    mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.commentsNumber > 0 ? (message.commentsNumber | shortNumber) : '' }}"
@@ -89,7 +90,8 @@
 
     <!-- Comment Detail View -->
     <div *ngIf="messageService.selectedMessagesSignal().length !== 0" class="content">
-        <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
+        <button *ngIf="userService.isReady()" mat-mini-fab color="primary" class="button_add"
+            (click)="addComment(currentParentSignal()!)">
             <mat-icon>add</mat-icon>
         </button>
 
@@ -103,7 +105,8 @@
                 </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">
-                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Show or add comments"
+                <button *ngIf="(userService.isReady() && message.commentsNumber == 0) || message.commentsNumber > 0"
+                    mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.commentsNumber > 0 ? (message.commentsNumber | shortNumber) : '' }}"

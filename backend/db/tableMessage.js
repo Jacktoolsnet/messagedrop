@@ -93,7 +93,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
             ${columnMultimedia}
         ) VALUES (
             '${uuid}',
-            '${parentUuid === '' ? NULL : parentUuid}',
+            ${parentUuid === '' ? null : "'" + parentUuid + "'"},
             '${messageTyp}', 
             datetime('now'),
             datetime('now', '+30 days'),
@@ -108,7 +108,6 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
         );`;
         db.run(insertSql, (err) => {
             if (err) {
-                console.log(err);
                 callback(err);
                 return;
             }
@@ -206,7 +205,7 @@ const getByPlusCode = function (db, plusCode, callback) {
     }
 };
 
-const getByParentId = function (db, parentUuid, callback) {
+const getByParentUuid = function (db, parentUuid, callback) {
     try {
         let sql = `
         SELECT * FROM ${tableName}
@@ -390,7 +389,7 @@ module.exports = {
     getById,
     getByUserId,
     getByPlusCode,
-    getByParentId,
+    getByParentUuid,
     countView,
     countComment,
     deleteById,

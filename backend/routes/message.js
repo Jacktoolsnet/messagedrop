@@ -66,9 +66,9 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/get/comment/:parentMessageId', [security.checkToken], function (req, res) {
+router.get('/get/comment/:parentUuid', [security.checkToken], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
-  tableMessage.getByParentId(req.database.db, req.params.parentMessageId, function (err, rows) {
+  tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
     if (err) {
       response.status = 500;
       response.error = err;
