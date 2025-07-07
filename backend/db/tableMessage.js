@@ -284,18 +284,52 @@ const deleteById = function (db, messageId, callback) {
 
 const cleanPublic = function (db, callback) {
     try {
-        let sql = `
-        DELETE FROM ${tableName}
-        WHERE ${columnMessageType} = '${messageType.PUBLIC}'
-        AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now');`;
+        const selectSql = `
+            SELECT ${columnParentMessageId} AS parentId, COUNT(*) AS count
+            FROM ${tableName}
+            WHERE ${columnMessageType} = '${messageType.PUBLIC}'
+            AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now')
+            AND ${columnParentMessageId} IS NOT NULL
+            GROUP BY ${columnParentMessageId};
+        `;
 
-        db.run(sql, (err) => {
+        db.all(selectSql, [], (err, rows) => {
             if (err) {
-                callback(err);
+                return callback(err);
             }
+
+            const updatePromises = rows.map(row => {
+                return new Promise((resolve, reject) => {
+                    const updateSql = `
+                        UPDATE ${tableName}
+                        SET ${columnCommentsNumber} = MAX(${columnCommentsNumber} - ?, 0)
+                        WHERE ${columnMessageId} = ?;
+                    `;
+                    db.run(updateSql, [row.count, row.parentId], function (updateErr) {
+                        if (updateErr) return reject(updateErr);
+                        resolve();
+                    });
+                });
+            });
+
+            Promise.all(updatePromises)
+                .then(() => {
+                    const deleteSql = `
+                        DELETE FROM ${tableName}
+                        WHERE ${columnMessageType} = '${messageType.PUBLIC}'
+                        AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now');
+                    `;
+                    db.run(deleteSql, (deleteErr) => {
+                        if (deleteErr) {
+                            return callback(deleteErr);
+                        }
+                        callback(null);
+                    });
+                })
+                .catch(err => callback(err));
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 
