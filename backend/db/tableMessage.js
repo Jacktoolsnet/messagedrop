@@ -76,7 +76,6 @@ const init = function (db) {
 
 const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
-
         const insertSql = `
         INSERT INTO ${tableName} (
             ${columnUuid},
@@ -94,7 +93,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
             ${columnMultimedia}
         ) VALUES (
             '${uuid}',
-            ${parentUuid === '' ? 'NULL' : 'parentUuid'},
+            '${parentUuid === '' ? NULL : parentUuid}',
             '${messageTyp}', 
             datetime('now'),
             datetime('now', '+30 days'),
@@ -109,6 +108,7 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
         );`;
         db.run(insertSql, (err) => {
             if (err) {
+                console.log(err);
                 callback(err);
                 return;
             }
