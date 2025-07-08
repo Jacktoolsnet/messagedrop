@@ -48,7 +48,7 @@
                     mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
-                        matBadge="{{ message.commentsNumber > 0 ? (message.commentsNumber | shortNumber) : '' }}"
+                        matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
                         forum
                     </mat-icon>
@@ -109,7 +109,7 @@
                     mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
-                        matBadge="{{ message.commentsNumber > 0 ? (message.commentsNumber | shortNumber) : '' }}"
+                        [matBadge]="getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
                         forum
                     </mat-icon>

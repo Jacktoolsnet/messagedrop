@@ -24,7 +24,10 @@ export class MessageService {
   readonly messagesSignal = signal<Message[]>([]);
   readonly selectedMessagesSignal = signal<Message[]>([]);
   readonly commentsSignal = signal<Message[]>([]);
-  private readonly commentsSignals = new Map<string, WritableSignal<Message[]>>();
+  readonly commentsSignals = new Map<string, WritableSignal<Message[]>>();
+  readonly commentCountsSignal = signal<Record<string, number>>({});
+
+  private commentCounts: Record<string, number> = {};
 
   private lastSearchedLocation: string = '';
 
@@ -49,17 +52,17 @@ export class MessageService {
     return throwError(() => error);
   }
 
-  setMessages(rawMessages: RawMessage[]) {
-    const mappedMessages = rawMessages.map(raw => this.mapRawMessage(raw));
-    this.messagesSignal.set(mappedMessages);
+  setMessages(messages: Message[]) {
+    this.commentCounts = {};
+    messages.forEach(msg => {
+      this.commentCounts[msg.uuid] = msg.commentsNumber;
+    });
+    this.commentCountsSignal.set(this.commentCounts);
+    this.messagesSignal.set(messages);
   }
 
   clearMessages() {
     this.messagesSignal.set([]);
-  }
-
-  clearComments() {
-    this.commentsSignal.set([]);
   }
 
   clearSelectedMessages() {
@@ -75,6 +78,12 @@ export class MessageService {
       this.commentsSignals.set(parentUuid, signal<Message[]>([]));
     }
     return this.commentsSignals.get(parentUuid)!;
+  }
+
+  public mapRawMessages(rawMessages: RawMessage[]): Message[] {
+    let messages: Message[] = [];
+    rawMessages.forEach(rawMessage => messages.push(this.mapRawMessage(rawMessage)));
+    return messages;
   }
 
   private mapRawMessage(raw: RawMessage): Message {
@@ -183,26 +192,10 @@ export class MessageService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: () => {
-          // 1. Kommentar hinzufügen
           const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
           commentsSignal.set([...commentsSignal(), message]);
 
-          // 2. Parent in selectedMessagesSignal hochzählen
-          this.selectedMessagesSignal.update(selected => selected.map(m =>
-            m.id === message.parentId ? { ...m, commentsNumber: m.commentsNumber + 1 } : m
-          ));
-
-          // 3. Rekursiv in messagesSignal suchen & hochzählen
-          // Immer in messagesSignal updaten, wenn der Parent dort drin ist
-          this.messagesSignal.update(messages => {
-            return messages.map(m => {
-              if (m.uuid === message.parentUuid) {
-                console.log(`[CommentCounter] Updated parent ${m.uuid} in messagesSignal`);
-                return { ...m, commentsNumber: m.commentsNumber + 1 };
-              }
-              return m;
-            });
-          });
+          this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
 
           this.snackBar.open(`Comment successfully dropped.`, '', { duration: 1000 });
           this.statisticService.countMessage().subscribe({ complete: () => { } });
@@ -581,16 +574,12 @@ export class MessageService {
             const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
             commentsSignal.set(commentsSignal().filter(c => c.id !== message.id));
 
-            // Außerdem commentsNumber im Parent aktualisieren
-            this.messagesSignal.update(messages => messages.map(parent => {
-              if (parent.id === message.parentId) {
-                return {
-                  ...parent,
-                  commentsNumber: Math.max(parent.commentsNumber - 1, 0)
-                };
-              }
-              return parent;
+            this.commentCountsSignal.update(counts => ({
+              ...counts,
+              [message.parentUuid]: Math.max((counts[message.parentUuid] || 0) - 1, 0)
             }));
+
+            this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] - 1 < 0 ? 0 : this.commentCounts[message.parentUuid] - 1;
           }
         },
         error: () => { }
@@ -642,6 +631,11 @@ export class MessageService {
             multimedia: JSON.parse(rawMessage.multimedia)
           }));
           commentsSignal.set(comments);
+          // commentCountsSignal aktualisieren
+          comments.forEach(comment => {
+            this.commentCounts[comment.uuid] = comment.commentsNumber;
+          });
+          this.commentCountsSignal.set(this.commentCounts);
         },
         error: () => {
           commentsSignal.set([]);

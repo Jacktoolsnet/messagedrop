@@ -70,6 +70,11 @@ export class MessagelistComponent implements OnInit {
     this.messageService.selectedMessagesSignal().at(-1)
   );
 
+  readonly commentCountsSignal = this.messageService.commentCountsSignal;
+  readonly commentCountForMessage = (uuid: string) => computed(() =>
+    this.commentCountsSignal()[uuid] || 0
+  );
+
   public user: User;
   public userProfile: Profile;
   public likeButtonColor: string = 'secondary';
@@ -97,29 +102,39 @@ export class MessagelistComponent implements OnInit {
     await this.profileService.loadAllProfiles();
   }
 
+  getCommentBadge(uuid: string): number {
+    const count = this.commentCountForMessage(uuid)() ?? 0;
+    return count;
+  }
+
   public goBack() {
     const selected = this.messageService.selectedMessagesSignal();
     if (selected.length > 1) {
-      // Eine Ebene zurück
       const newSelected = [...selected];
       newSelected.pop();
-      this.messageService.selectedMessagesSignal.set(newSelected);
 
-      // Parent wieder sichtbar machen
-      setTimeout(() => {
-        const parent = newSelected.at(-1);
-        if (parent) {
-          const element = document.getElementById(`message-${parent.id}`);
-          element?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      }, 50);
+      // Hier: Parent aus dem Signal neu holen → damit counts aktuell sind
+      const parent = newSelected.at(-1);
+      if (parent) {
+        const updatedParent = this.findMessageInSignals(parent.uuid) || parent;
+        newSelected[newSelected.length - 1] = updatedParent;
+      }
+
+      this.messageService.selectedMessagesSignal.set(newSelected);
     } else if (selected.length === 1) {
-      // Root-Ebene → Stack leeren
       this.messageService.selectedMessagesSignal.set([]);
     } else {
-      // Nichts mehr ausgewählt → Dialog schließen
       this.dialogRef.close();
     }
+  }
+
+  private findMessageInSignals(uuid: string): Message | undefined {
+    return (
+      this.messageService.messagesSignal().find(m => m.uuid === uuid) ||
+      Array.from(this.messageService.commentsSignals.values())
+        .flatMap(signal => signal())
+        .find(m => m.uuid === uuid)
+    );
   }
 
   public flyTo(message: Message) {
@@ -175,25 +190,7 @@ export class MessagelistComponent implements OnInit {
       // 1. Löschen
       this.messageService.deleteMessage(message);
 
-      // 2. Parent in selectedMessagesSignal runterzählen
-      this.messageService.selectedMessagesSignal.update(selected =>
-        selected.map(m =>
-          m.uuid === message.parentUuid
-            ? { ...m, commentsNumber: Math.max(m.commentsNumber - 1, 0) }
-            : m
-        )
-      );
-
-      // 3. Parent in messagesSignal runterzählen
-      this.messageService.messagesSignal.update(messages =>
-        messages.map(m =>
-          m.uuid === message.parentUuid
-            ? { ...m, commentsNumber: Math.max(m.commentsNumber - 1, 0) }
-            : m
-        )
-      );
-
-      // 4. Prüfen, ob in der aktuellen Ebene noch Comments da sind
+      // 2. Prüfen, ob in der aktuellen Ebene noch Comments da sind
       const parentUuid = message.parentUuid;
       if (!parentUuid) return; // Root → nichts zu tun
 
@@ -332,20 +329,17 @@ export class MessagelistComponent implements OnInit {
   }
 
   public handleCommentClick(message: Message) {
-    const currentSelected = this.messageService.selectedMessagesSignal();
     const commentsSignal = this.messageService.getCommentsSignalForMessage(message.uuid);
+    const comments = commentsSignal();
 
-    // Gibt es bereits geladene Comments ODER zeigt der Counter, dass es Comments gibt?
-    if (commentsSignal().length > 0 || message.commentsNumber > 0) {
-      // → Neue Ebene im Stack hinzufügen
-      this.messageService.selectedMessagesSignal.set([...currentSelected, message]);
+    // Falls noch keine Kommentare geladen → jetzt holen
+    this.messageService.getCommentsForParentMessage(message);
 
-      // → Nur laden, wenn noch nicht im Signal
-      if (commentsSignal().length === 0) {
-        this.messageService.getCommentsForParentMessage(message);
-      }
-    } else {
-      // Noch keine Comments → Erstellt einen neuen Comment
+    // Immer die aktuelle Ebene (die Kinder) als neue Ebene im Stack speichern
+    this.messageService.selectedMessagesSignal.set([...this.messageService.selectedMessagesSignal(), message]);
+
+    // Sonderfall: Noch keine Comments → Direkt einen Kommentar erstellen
+    if (comments.length === 0 && message.commentsNumber === 0) {
       if (this.userService.isReady()) {
         this.addComment(message);
       }

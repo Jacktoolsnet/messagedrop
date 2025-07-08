@@ -473,6 +473,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     //this.mapService.moveTo(location);
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
+        this.messageService.setMessages(event.messages)
         this.openMarkerMessageListDialog(event.messages);
         break;
       case MarkerType.PRIVATE_NOTE:
@@ -788,7 +789,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.userService.getUserMessages(this.userService.getUser())
       .subscribe({
         next: (getMessageResponse) => {
-          this.messageService.setMessages(getMessageResponse.rows)
+          const allMessages: Message[] = this.messageService.mapRawMessages(getMessageResponse.rows);
+          this.messageService.setMessages(allMessages.filter(msg => !msg.parentUuid))
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
@@ -934,6 +936,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       if (result) {
         switch (result.type) {
           case 'public_message':
+            this.messageService.setMessages(result.messages)
             this.openMarkerMessageListDialog(result.messages);
             break
           case 'private_note':
