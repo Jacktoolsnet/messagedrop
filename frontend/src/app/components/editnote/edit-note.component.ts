@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +29,6 @@ import { TextComponent } from '../utils/text/text.component';
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogTitle,
     MatDialogContent,
     MatIcon,
     FormsModule,

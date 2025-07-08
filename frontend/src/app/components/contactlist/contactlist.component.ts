@@ -215,6 +215,10 @@ export class ContactlistComponent implements OnInit {
   }
 
   public editContact(contact: Contact) {
+
+    let oriName: string | undefined = contact.name;
+    let oriBase64Avatar: string | undefined = contact.base64Avatar;
+
     const dialogRef = this.dialog.open(ContactProfileComponent, {
       data: { contact: contact },
       closeOnNavigation: true,
@@ -225,9 +229,12 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (true) {
+      if (result) {
         this.contactService.updateContactName(contact);
         this.contactService.saveAditionalContactInfos();
+      } else {
+        contact.name = oriName;
+        contact.base64Avatar = oriBase64Avatar
       }
     });
   }

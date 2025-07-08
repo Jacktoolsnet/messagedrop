@@ -39,7 +39,7 @@ export class ContactProfileComponent {
     public dialogRef: MatDialogRef<ContactProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }
   ) {
-    this.contact = data.contact;
+    this.contact = this.data.contact;
     this.joinedUserRoom = this.socketioService.hasJoinedUserRoom();
   }
 
