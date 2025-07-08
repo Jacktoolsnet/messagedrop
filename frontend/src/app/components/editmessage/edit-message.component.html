@@ -1,8 +1,3 @@
-<h2 *ngIf="data.mode == 'add_public_message'" mat-dialog-title>Add a public message</h2>
-<h2 *ngIf="data.mode == 'add_comment'" mat-dialog-title>Add a public comment</h2>
-<h2 *ngIf="data.mode == 'edit_public_message'" mat-dialog-title>Edit my public message</h2>
-<h2 *ngIf="data.mode == 'edit_comment'" mat-dialog-title>Edit my public comment</h2>
-
 <mat-dialog-content>
     <div class="content">
         <app-select-multimedia *ngIf="data.message.multimedia.type === 'undefined'" class="oembed_container"

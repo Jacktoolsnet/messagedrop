@@ -34,7 +34,7 @@ h2 {
     justify-items: center;
     width: 100%;
     box-sizing: border-box;
-    padding: 1rem;
+    padding: 1.5rem;
 }
 
 /* Ab mittleren Bildschirmen zwei Spalten */
@@ -90,15 +90,17 @@ h2 {
 .button_remove_multimedia,
 .button_remove_text {
     position: absolute;
-    top: -0.5rem;
-    right: -0.5rem;
+    top: 0;
+    right: 0;
+    transform: translate(50%, -50%);
     z-index: 100;
 }
 
 .button_random {
     position: absolute;
-    top: -0.5rem;
-    left: -0.5rem;
+    bottom: 0;
+    right: 0;
+    transform: translate(50%, 50%);
 }
 
 /* === SONSTIGE BUTTONS === */
