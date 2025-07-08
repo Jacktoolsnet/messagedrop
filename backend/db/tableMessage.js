@@ -329,7 +329,6 @@ const deleteById = function (db, messageId, callback) {
 };
 
 const cleanPublic = function (db, callback) {
-    console.log('cleanPublic');
     try {
         const selectSql = `
             SELECT ${columnParentUuid} AS parentUuid, COUNT(*) AS count

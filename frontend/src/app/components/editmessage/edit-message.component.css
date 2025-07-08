@@ -1,126 +1,73 @@
-/* Dialog-Container: Passt sich dem Inhalt an */
+/* === DIALOG-GRUNDEINSTELLUNGEN === */
 .messageDropDialog .mat-dialog-container {
     display: flex;
     flex-direction: column;
     max-height: 90vh;
-    /* Begrenzung für kleinere Screens */
     overflow: hidden;
     padding: 0;
 }
 
-/* Inhalt kann scrollen, wenn zu groß */
 .mat-mdc-dialog-content {
     overflow-y: auto;
     max-height: calc(90vh - 4rem);
-    /* Abzug für Header/Footer, falls vorhanden */
     width: 100%;
     box-sizing: border-box;
 }
 
-/* Optional: Aktionen immer sichtbar halten */
 .mat-mdc-dialog-actions {
     flex-shrink: 0;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* Titel optional flex-shrink */
-.mat-mdc-dialog-title {
-    flex-shrink: 0;
-}
-
-h4 {
+/* === TITEL === */
+h2 {
     padding: 0.5rem;
     color: floralwhite;
 }
 
-.buttonarea {
-    display: block;
-    margin: auto;
-    width: 80%;
-    height: auto;
-}
-
-.button_drop {
-    margin: auto;
-    width: 70%;
-    border-radius: 0.5rem;
-}
-
-.button_default {
-    margin: 1rem;
-    width: 95%;
-    border-radius: 0.5rem;
-}
-
-.button_random {
-    position: absolute;
-    right: -1rem;
-    top: 2rem;
-}
-
-.button_legal {
-    position: absolute;
-    bottom: 0;
-    right: 0;
-    z-index: 100;
-    margin-bottom: 0.5rem;
-    margin-right: 0.5rem;
-}
-
-.button_remove_multimedia {
-    position: absolute;
-    top: -1rem;
-    right: -1rem;
-    z-index: 100;
-}
-
-.button_remove_text {
-    position: absolute;
-    top: -1rem;
-    right: -1rem;
-    z-index: 100;
-}
-
+/* === GRID-LAYOUT FÜR DEN CONTENT === */
 .content {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-}
-
-.oembed_container {
-    width: 75%;
-    margin: 1rem;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    justify-items: center;
+    width: 100%;
+    box-sizing: border-box;
     padding: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    background-color: rgb(142, 141, 141);
-    color: white;
-    border-radius: 0.25rem;
 }
 
+/* Ab mittleren Bildschirmen zwei Spalten */
+@media (min-width: 800px) {
+    .content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* === CONTAINER FÜR MULTIMEDIA UND TEXT === */
+.oembed_container,
 .text_container {
-    width: 75%;
-    margin: 1rem;
-    padding: 1rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    margin: 0.5rem;
+    width: 100%;
     background-color: rgb(142, 141, 141);
     color: white;
     border-radius: 0.25rem;
+    padding: 1rem;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
 }
 
+/* === TEXT-INHALT === */
 .text {
-    max-width: 75%;
+    max-width: 100%;
     margin: 1rem;
+    text-align: center;
+    word-break: break-word;
 }
 
+/* === MULTIMEDIA-BILD === */
 .multimedia_image {
     max-width: 75%;
     object-fit: contain;
@@ -128,6 +75,7 @@ h4 {
     margin: 1rem;
 }
 
+/* === ATTRIBUTION LINK === */
 .attribution_link {
     color: white;
     text-align: center;
@@ -136,4 +84,32 @@ h4 {
     text-decoration: none;
     margin-bottom: 0.25rem;
     font-size: 0.75rem;
+}
+
+/* === BUTTON-POSITIONIERUNG === */
+.button_remove_multimedia,
+.button_remove_text {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    z-index: 100;
+}
+
+.button_random {
+    position: absolute;
+    top: -0.5rem;
+    left: -0.5rem;
+}
+
+/* === SONSTIGE BUTTONS === */
+.buttonarea {
+    display: block;
+    margin: auto;
+    width: 80%;
+}
+
+.button_default {
+    margin: 1rem;
+    width: 95%;
+    border-radius: 0.5rem;
 }
