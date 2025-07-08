@@ -329,16 +329,16 @@ const deleteById = function (db, messageId, callback) {
 };
 
 const cleanPublic = function (db, callback) {
+    console.log('cleanPublic');
     try {
         const selectSql = `
-            SELECT ${columnUuid} AS parentUuid, COUNT(*) AS count
+            SELECT ${columnParentUuid} AS parentUuid, COUNT(*) AS count
             FROM ${tableName}
             WHERE ${columnMessageType} = '${messageType.PUBLIC}'
             AND DATETIME(${columnMessageDeleteDateTime}) < DATETIME('now')
             AND ${columnParentUuid} IS NOT NULL
             GROUP BY ${columnParentUuid};
         `;
-
         db.all(selectSql, [], (err, rows) => {
             if (err) {
                 return callback(err);

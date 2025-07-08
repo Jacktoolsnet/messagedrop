@@ -334,7 +334,7 @@ cron.schedule('0 * * * *', () => {
 });
 
 // Clean messages every 5 minutes
-cron.schedule('*/5 * * * *', () => {
+cron.schedule('*/1 * * * *', () => {
   tableMessage.cleanPublic(database.db, function (err) {
     if (err) {
       logger.error(err);

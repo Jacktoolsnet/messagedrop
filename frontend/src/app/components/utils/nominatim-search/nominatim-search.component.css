@@ -25,11 +25,14 @@ mat-card-actions.buttonbar {
 
 .searchTerm-container {
     display: flex;
+    align-items: center;
     border: 1px solid gray;
     border-radius: 1rem;
     overflow: hidden;
     margin: 0.5rem;
     min-height: 2.5rem;
+    max-width: 100%;
+    /* optional, damit er nicht über die Elternbreite hinausgeht */
 }
 
 .searchTerm-container input[type="text"] {
@@ -38,7 +41,8 @@ mat-card-actions.buttonbar {
     border: none;
     outline: none;
     height: 2.5rem;
-    align-items: center;
+    min-width: 0;
+    /* wichtig, damit es sich korrekt verkleinert */
 }
 
 .searchTerm-container select {
@@ -48,15 +52,23 @@ mat-card-actions.buttonbar {
     background: gray;
     color: white;
     min-width: 7rem;
+    flex-shrink: 0;
+    /* verhindert, dass das Select kleiner wird */
 }
 
 .searchTerm-container button {
     color: white;
     background-color: gray;
     border: none;
-    padding: 8px 12px;
-    cursor: pointer;
+    width: 3rem;
+    /* feste Breite */
     height: 2.65rem;
+    flex-shrink: 0;
+    /* verhindert, dass der Button kleiner wird */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
 
 /* === CONTENT === */
