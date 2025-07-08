@@ -43,7 +43,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 1.75rem;
   box-sizing: border-box;
   overflow: hidden;
 }
@@ -65,11 +65,12 @@
   grid-template-columns: 1fr;
   gap: 1rem;
   white-space: normal;
+  padding-left: 1rem;
+  padding-right: 1rem;
 }
 
 /* === ITEM DARSTELLUNG (Karten / Elemente) === */
 .item {
-  min-width: 300px;
   margin: 0.75rem;
   margin-top: 2.25rem;
   border-radius: 0.75rem;
@@ -132,11 +133,19 @@
   .content {
     grid-template-columns: repeat(1, 1fr);
   }
+
+  .item {
+    min-width: calc(100% / 1 - 10%);
+  }
 }
 
 @media (min-width: 800px) {
   .content {
     grid-template-columns: repeat(2, 1fr);
+  }
+
+  .item {
+    min-width: calc(100% / 2 - 10%);
   }
 }
 
@@ -144,11 +153,19 @@
   .content {
     grid-template-columns: repeat(3, 1fr);
   }
+
+  .item {
+    min-width: calc(100% / 3 - 10%);
+  }
 }
 
 @media (min-width: 1600px) {
   .content {
     grid-template-columns: repeat(4, 1fr);
+  }
+
+  .item {
+    min-width: calc(100% / 4 - 10%);
   }
 }
 
@@ -177,8 +194,8 @@ button,
   top: 0;
   right: 0;
   z-index: 100;
-  margin-top: 0.25rem;
-  margin-right: 0.25rem;
+  width: 2.5rem;
+  height: 2.5rem;
 }
 
 .button_add {
@@ -186,27 +203,6 @@ button,
   bottom: 0;
   right: 0;
   z-index: 100;
-  margin-bottom: 0.25rem;
-  margin-right: 0.25rem;
-}
-
-.button_messagemenu {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  z-index: 100;
-  margin-bottom: -1rem;
-  margin-left: -1rem;
-}
-
-.button_detail {
-  position: absolute;
-  bottom: 0;
-  right: 0;
-  z-index: 100;
-  margin-bottom: -0.75rem;
-  margin-right: -0.75rem;
   width: 2.5rem;
   height: 2.5rem;
-  border-radius: 1.25rem;
 }

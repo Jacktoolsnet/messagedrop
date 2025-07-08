@@ -73,7 +73,8 @@ mat-card-actions.buttonbar {
 
 /* === CONTENT === */
 .content {
-    padding: 1rem;
+    padding-left: 1.75rem;
+    padding-right: 1.75rem;
     display: grid;
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -85,11 +86,19 @@ mat-card-actions.buttonbar {
     .content {
         grid-template-columns: repeat(2, 1fr);
     }
+
+    .item {
+        min-width: calc(100% / 2 - 10%);
+    }
 }
 
 @media (min-width: 1000px) {
     .content {
         grid-template-columns: repeat(4, 1fr);
+    }
+
+    .item {
+        min-width: calc(100% / 4 - 10%);
     }
 }
 
@@ -97,11 +106,19 @@ mat-card-actions.buttonbar {
     .content {
         grid-template-columns: repeat(6, 1fr);
     }
+
+    .item {
+        min-width: calc(100% / 6 - 10%);
+    }
 }
 
 @media (min-width: 2000px) {
     .content {
         grid-template-columns: repeat(8, 1fr);
+    }
+
+    .item {
+        min-width: calc(100% / 8 - 10%);
     }
 }
 
@@ -123,10 +140,9 @@ mat-card-actions.buttonbar {
     position: absolute;
     top: 0;
     left: 0;
+    transform: translate(-1.75rem, -50%);
     z-index: 100;
-    margin-top: -2rem;
-    margin-left: -1.5rem;
-    max-width: 90%;
+    max-width: 95%;
     height: 3rem;
     padding: 0.25rem 0.75rem;
     background-color: #2a2a2a;
@@ -136,14 +152,24 @@ mat-card-actions.buttonbar {
     align-items: center;
     gap: 0.5rem;
     overflow: hidden;
-    color: white;
+}
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
 }
 
 .name {
     font-size: 1rem;
     font-weight: 500;
     color: #f8f8f8;
-    max-width: 10rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
 }
 
 /* === MESSAGE CONTENT === */

@@ -69,6 +69,10 @@ export class NotelistComponent implements OnInit {
     this.user = this.userService.getUser();
   }
 
+  goBack(): void {
+    this.dialogRef.close();
+  }
+
   flyTo(note: Note) {
     const location = { ...note.location, plusCode: this.geolocationService.getPlusCode(note.location.latitude, note.location.longitude) };
     this.mapService.setCircleMarker(location);
