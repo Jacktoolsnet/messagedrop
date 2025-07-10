@@ -116,7 +116,7 @@
                         <span class="chart-title">{{ selectedIndicator.label }}</span>
                     </div>
                     <div class="chart-container">
-                        <canvas baseChart [data]="chartData" [options]="chartOptions" [type]="chartType"></canvas>
+                        <canvas #chartCanvas></canvas>
                     </div>
                     <div *ngIf="isSmallScreen" class="chart-header">
                         <span class="chart-description">{{ currentIndicatorDescription }}</span>

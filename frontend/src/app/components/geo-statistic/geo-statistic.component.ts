@@ -11,7 +11,6 @@ import {
   Filler,
   LinearScale, LineController, LineElement, PointElement, SubTitle, Title, Tooltip
 } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts';
 import { debounceTime, fromEvent, Subscription } from 'rxjs';
 import { GeoStatistic } from '../../interfaces/geo-statistic';
 type WorldBankKey = keyof GeoStatistic['worldBank'];
@@ -26,7 +25,6 @@ type WorldBankKey = keyof GeoStatistic['worldBank'];
     MatSelectModule,
     MatTooltipModule,
     MatExpansionModule,
-    BaseChartDirective,
     MatButtonModule,
     MatTooltipModule
   ],
@@ -35,7 +33,8 @@ type WorldBankKey = keyof GeoStatistic['worldBank'];
 })
 export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
 
-  @ViewChild(BaseChartDirective) chart?: BaseChartDirective;
+  @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
+  private chart!: Chart;
   @ViewChild('dialogContent', { static: true }) dialogContentRef!: ElementRef;
   private resizeObserver?: ResizeObserver;
   private windowResizeSub?: Subscription;
@@ -126,6 +125,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   // Filtered map (only those with available data)
   indicatorMap: { [key: string]: { key: string; label: string }[] } = {};
 
+  lineChartType: ChartType = 'line';
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
   chartOptions: ChartConfiguration['options'] = {};
   chartType: ChartType = 'line';
@@ -155,6 +155,11 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   ngOnInit(): void { }
 
   ngAfterViewInit(): void {
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: this.lineChartType,
+      data: this.chartData,
+      options: this.chartOptions
+    });
     // Beobachtet lokale Größenänderungen (z. B. Inhalte im Dialog)
     this.resizeObserver = new ResizeObserver(() => {
       this.checkScreenSize();
@@ -179,8 +184,8 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   private updateChartSize() {
-    this.chart?.chart?.resize();
-    this.chart?.chart?.update();
+    this.chart?.resize();
+    this.chart?.update();
   }
 
   checkScreenSize() {
@@ -214,7 +219,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     const indicator = allIndicators.find(i => i.key === indicatorKey);
     const label = indicator ? indicator.label : indicatorKey;
     const description = this.getIndicatorDescription(indicatorKey);
-    const canvasWidth = this.chart?.chart?.width || 300;
+    const canvasWidth = this.chart?.width || 300;
     const isSmallScreen = window.innerWidth < 500 || canvasWidth < 300;
 
     this.chartOptions = {
@@ -454,5 +459,6 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
         }]
       };
     }
+    this.chart?.update();
   }
 }

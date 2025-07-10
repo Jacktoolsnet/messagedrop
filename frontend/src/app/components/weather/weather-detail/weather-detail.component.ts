@@ -1,11 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, Inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Inject, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatSliderModule } from '@angular/material/slider';
 import { CategoryScale, Chart, ChartConfiguration, ChartDataset, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
-import { BaseChartDirective } from 'ng2-charts';
 import { Weather } from '../../../interfaces/weather';
 
 @Component({
@@ -13,7 +12,6 @@ import { Weather } from '../../../interfaces/weather';
   imports: [
     CommonModule,
     MatDialogModule,
-    BaseChartDirective,
     MatSliderModule,
     FormsModule
   ],
@@ -25,7 +23,9 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
   @Input() weather: Weather | null = null;
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
-  @ViewChild(BaseChartDirective) chartCanvas?: BaseChartDirective;
+  @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
+
+  private chart!: Chart;
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
@@ -40,7 +40,13 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
 
   ngOnInit(): void { }
 
-  ngAfterViewInit(): void { }
+  ngAfterViewInit(): void {
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: this.lineChartType,
+      data: this.chartData,
+      options: this.chartOptions
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDayIndex'] && !changes['selectedDayIndex'].firstChange) {
@@ -312,8 +318,8 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
     };
 
     this.chartData = { labels, datasets: [dataset] };
-    if (this.chartCanvas && this.chartCanvas.chart) {
-      this.chartCanvas.update();
+    if (this.chart) {
+      this.chart.update();
     }
   }
 
@@ -410,9 +416,6 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
   }
 
   moveSelectedHourAnnotation(): void {
-    const chart = this.chartCanvas?.chart;
-    if (!chart) return;
-
     const selectedDate = this.weather!.daily[this.selectedDayIndex].date;
     const dayHourly = this.weather!.hourly.filter(h => h.time.startsWith(selectedDate));
     const labels = dayHourly.map(h => h.time.split('T')[1].slice(0, 5));
@@ -430,7 +433,7 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       color = this.getUvColor(value);
     }
 
-    const annotations = (chart.options.plugins?.annotation?.annotations ?? {}) as any;
+    const annotations = (this.chart.options.plugins?.annotation?.annotations ?? {}) as any;
 
     if (!annotations.selectedHour) {
       annotations.selectedHour = {
@@ -457,7 +460,7 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       annotations.selectedHour.label.content = `${labelTime}: ${value}${this.getSelectedChartUnit()}`;
       annotations.selectedHour.label.backgroundColor = color;
     }
-    chart.update('none');
+    this.chart.update('none');
   }
 
   getHourlyMinMax(field: 'temperature' | 'precipitation' | 'wind' | 'pressure'): { min: number, max: number } {

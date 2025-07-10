@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CategoryScale, Chart, ChartConfiguration, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
-import { BaseChartDirective } from 'ng2-charts';
 
 @Component({
   selector: 'app-air-quality-detail',
@@ -13,8 +12,7 @@ import { BaseChartDirective } from 'ng2-charts';
     CommonModule,
     MatDialogModule,
     FormsModule,
-    FormsModule,
-    BaseChartDirective
+    FormsModule
   ],
   templateUrl: './air-quality-detail.component.html',
   styleUrl: './air-quality-detail.component.css'
@@ -24,7 +22,8 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   @Input() tile!: any;
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
-  @ViewChild(BaseChartDirective) chartCanvas!: BaseChartDirective;
+  @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
+  private chart!: Chart;
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
@@ -36,7 +35,13 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
 
   ngOnInit(): void { }
 
-  ngAfterViewInit(): void { }
+  ngAfterViewInit(): void {
+    this.chart = new Chart(this.chartCanvas.nativeElement, {
+      type: this.lineChartType,
+      data: this.chartData,
+      options: this.chartOptions
+    });
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['selectedDayIndex'] && !changes['selectedDayIndex'].firstChange) {
@@ -174,8 +179,8 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
       }
     };
 
-    if (this.chartCanvas?.chart) {
-      this.chartCanvas.update();
+    if (this.chart) {
+      this.chart.update();
     }
   }
 
@@ -190,15 +195,12 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   }
 
   moveSelectedHourAnnotation(): void {
-    const chart = this.chartCanvas?.chart;
-    if (!chart) return;
-
     const hour = this.selectedHour;
     const hourLabel = this.chartData.labels?.[hour] ?? `${hour}:00`;
     const rawValue = this.chartData.datasets?.[0]?.data?.[hour];
     const numericValue = typeof rawValue === 'number' ? rawValue : 0;
 
-    const annotations = (chart.options.plugins?.annotation?.annotations ?? {}) as any;
+    const annotations = (this.chart.options.plugins?.annotation?.annotations ?? {}) as any;
 
     if (!annotations.selectedHour) {
       // Falls Annotation noch nicht da ist, einfach neu setzen
@@ -227,6 +229,6 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
       annotations.selectedHour.label.content = `${hourLabel}: ${numericValue}${this.tile.unit}`;
     }
 
-    chart.update('none');
+    this.chart.update('none');
   }
 }
