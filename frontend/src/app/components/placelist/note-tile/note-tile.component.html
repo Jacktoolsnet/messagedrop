@@ -3,11 +3,13 @@
         <mat-icon class="material-symbols-outlined tile-icon">clinical_notes</mat-icon>
         <span class="tile-title">Private notes</span>
     </div>
-    <ng-container *ngIf="visibleNotesSignal() as notes">
+    <ng-container *ngIf="placeNotes() as notes">
         <ng-container *ngIf="notes.length > 0; else noNotes">
-            <div class="note-card" *ngFor="let note of notes">
-                <span class="note-text" [style]="note.style">{{ note.note }}</span>
-            </div>
+            <ng-container *ngFor="let note of notes">
+                <div class="note-card" *ngIf="note.note?.trim() !== ''">
+                    <span class="note-text" [style]="note.style">{{ note.note }}</span>
+                </div>
+            </ng-container>
         </ng-container>
     </ng-container>
     <ng-template #noNotes>

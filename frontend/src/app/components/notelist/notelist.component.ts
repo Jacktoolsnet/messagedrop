@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Inject, OnInit } from '@angular/core';
+import { Component, computed, Inject, OnInit, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,10 +46,9 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
   standalone: true
 })
 export class NotelistComponent implements OnInit {
-
-  readonly notesSignal = this.noteService.getNotesSignal();
   readonly hasNotes = computed(() => this.notesSignal().length > 0);
   public user: User | undefined;
+  public notesSignal!: WritableSignal<Note[]>;
   private location: Location;
 
   constructor(
@@ -60,9 +59,10 @@ export class NotelistComponent implements OnInit {
     private sharedContentService: SharedContentService,
     public dialogRef: MatDialogRef<NotelistComponent>,
     public dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public data: { location: Location }
+    @Inject(MAT_DIALOG_DATA) public data: { location: Location, notesSignal: WritableSignal<Note[]> }
   ) {
-    this.location = data.location;
+    this.location = this.data.location;
+    this.notesSignal = this.data.notesSignal;
   }
 
   ngOnInit(): void {
@@ -90,6 +90,8 @@ export class NotelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
         await this.noteService.deleteNote(note);
+        const updatedNotes = this.notesSignal().filter(n => n.id !== note.id);
+        this.notesSignal.set(updatedNotes);
       }
     });
   }
@@ -121,7 +123,7 @@ export class NotelistComponent implements OnInit {
   openNoteDialog(): void {
     let note: Note = {
       id: '',
-      location: this.mapService.getMapLocation(),
+      location: this.location,
       note: '',
       markerType: 'note',
       style: '',
@@ -147,6 +149,8 @@ export class NotelistComponent implements OnInit {
         result.note.longitude = this.location.longitude;
         result.note.plusCode = this.location.plusCode;
         await this.noteService.addNote(result.note);
+        const updatedNotes = [result.note, ...this.notesSignal()];
+        this.notesSignal.set(updatedNotes);
       }
     });
   }

@@ -122,10 +122,15 @@ export class PlacelistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
+      console.log(data);
       if (undefined !== data?.place) {
         this.placeService.updatePlace(data.place)
           .subscribe({
-            next: simpleResponse => { },
+            next: simpleResponse => {
+              if (simpleResponse.status === 200) {
+                this.placeService.saveAdditionalPlaceInfos(data.place);
+              }
+            },
             error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
             complete: () => { }
           });

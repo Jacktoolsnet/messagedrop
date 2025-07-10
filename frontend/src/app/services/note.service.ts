@@ -53,7 +53,6 @@ export class NoteService {
 
   async getNotesInBoundingBox(bbox: BoundingBox): Promise<Note[]> {
     const notes = await this.indexedDbService.getNotesInBoundingBox(bbox);
-    this.notesSignal.set(notes);
     return notes;
   }
 

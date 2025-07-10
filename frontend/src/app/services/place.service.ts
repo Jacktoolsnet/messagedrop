@@ -140,6 +140,7 @@ export class PlaceService {
       'lonMin': place.boundingBox?.lonMin,
       'lonMax': place.boundingBox?.lonMax
     };
+    console.log(body)
     return this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)

@@ -1,5 +1,5 @@
 import { CommonModule, PlatformLocation } from '@angular/common';
-import { Component, computed, OnInit } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -847,7 +847,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       const dialogRef = this.messageListDialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
-        data: { location: this.mapService.getMapLocation() },
+        data: { location: this.mapService.getMapLocation(), notesSignal: this.noteService.getNotesSignal() },
         minWidth: '20vw',
         maxWidth: '90vw',
         minHeight: '8rem',
@@ -888,7 +888,15 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     dialogRef.afterClosed().subscribe((places: Place[]) => {
       if (places) {
         places.forEach(place => {
-          this.placeService.updatePlace(place);
+          this.placeService.updatePlace(place).subscribe({
+            next: simpleResponse => {
+              if (simpleResponse.status === 200) {
+                this.placeService.saveAdditionalPlaceInfos(place);
+              }
+            },
+            error: (err) => { },
+            complete: () => { }
+          });
         });
       }
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
@@ -973,10 +981,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public openMarkerNoteListDialog(notes: Note[]) {
+    const notesSignal = signal<Note[]>(notes);
     const dialogRef = this.messageListDialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { location: this.mapService.getMapLocation() },
+      data: { location: this.mapService.getMapLocation(), notesSignal: notesSignal },
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',
