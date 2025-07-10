@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { ApplicationRef, Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
@@ -39,9 +39,10 @@ export class SocketioService {
     private snackBar: MatSnackBar,
     private userService: UserService,
     private contactService: ContactService,
-    private cryptoService: CryptoService
+    private cryptoService: CryptoService,
+    private appRef: ApplicationRef
   ) {
-    this.socket = new Socket(this.ioConfig);
+    this.socket = new Socket(this.ioConfig, this.appRef);
 
     this.socket.on("connect", () => {
       this.ready = this.socket.ioSocket.connected;
