@@ -191,7 +191,7 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (data?.connectId !== '') {
+      if (data?.connectId && data?.connectId !== '') {
         this.connectService.getById(data.connectId, contact, this.socketioService);
       }
     });

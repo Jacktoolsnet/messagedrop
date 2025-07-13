@@ -1,38 +1,67 @@
-import { Component, Inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { BarcodeFormat } from '@zxing/library';
-import { ZXingScannerModule } from '@zxing/ngx-scanner';
+import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
+import { Result } from '@zxing/library';
 import { Mode } from '../../../interfaces/mode';
 
 @Component({
   selector: 'app-scanner',
   imports: [
-    ZXingScannerModule
+    MatDialogContent
   ],
   templateUrl: './scanner.component.html',
   styleUrl: './scanner.component.css'
 })
-export class ScannerComponent {
+export class ScannerComponent implements AfterViewInit, OnDestroy {
 
-  formatsEnabled: BarcodeFormat[] = [
-    BarcodeFormat.QR_CODE,
-  ];
+  @ViewChild('video') videoRef!: ElementRef<HTMLVideoElement>;
+
+  private controls: IScannerControls | null = null;
+  private codeReader = new BrowserMultiFormatReader();
+  private scanning = false;
 
   constructor(
     public dialogRef: MatDialogRef<ScannerComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, connectId: string }
   ) { }
 
+  ngAfterViewInit(): void {
+    this.codeReader.decodeFromVideoDevice(
+      undefined,
+      this.videoRef.nativeElement,
+      (result: Result | undefined, error: any, controls) => {
+        this.controls = controls;
+
+        if (result) {
+          this.onCodeResult(result.getText());
+          controls.stop(); // direkt hier oder im destroy
+        } else if (error) {
+          this.onScanFailure();
+        }
+      }
+    ).catch(err => {
+      this.onScanError(err);
+    });
+  }
+
+  ngOnDestroy(): void {
+    if (this.controls) {
+      this.controls.stop();
+    }
+  }
+
   onCodeResult(resultString: string) {
-    switch (this.data.mode) {
-      case 'add_connect':
-        this.data.connectId = resultString
-        break
+    if (this.data.mode === 'add_connect') {
+      this.data.connectId = resultString;
     }
     this.dialogRef.close(this.data);
   }
 
-  onScanFailure() { }
+  onScanFailure() {
+    // optional: visuelles Feedback
+  }
 
-  onScanError(err: any) { }
+  onScanError(err: any) {
+    console.error('Scan error:', err);
+  }
 }
