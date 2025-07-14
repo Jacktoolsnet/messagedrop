@@ -9,7 +9,7 @@
     (change)="onFileSelected($event)" #fileUpload />
 
   <!-- Avatar Auswahl -->
-  @if (!profile?.base64Avatar || profile.base64Avatar === '') {
+  @if (!profile.base64Avatar || profile.base64Avatar === '') {
   <div class="avatar-area">
     <div class="center">Give the profile an avatar:</div>
     <div class="button-style">
@@ -21,7 +21,7 @@
   }
 
   <!-- Avatar Vorschau + Löschen -->
-  @if (profile?.base64Avatar && profile.base64Avatar !== '') {
+  @if (profile.base64Avatar && profile.base64Avatar !== '') {
   <div class="avatar-area">
     <div class="center">
       <img class="avatar" [src]="profile.base64Avatar" /><br />
