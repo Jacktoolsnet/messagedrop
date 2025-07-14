@@ -1,19 +1,19 @@
 <h2 mat-dialog-title>Enter pin</h2>
 
 <div class="pin-display">
-    <ng-container *ngFor="let digit of pinDisplay; let i = index">
-        <div [ngClass]="{'pin-dot': true, 'active': i === currentPinIndex}">
-            {{ digit || '•' }}
-        </div>
-    </ng-container>
+    @for (digit of pinDisplay; track $index) {
+    <div [ngClass]="{ 'pin-dot': true, 'active': $index === currentPinIndex }">
+        {{ digit || '•' }}
+    </div>
+    }
 </div>
 
 <div class="pin-pad">
-    <ng-container *ngFor="let digit of ['1','2','3','4','5','6','7','8','9']">
-        <button mat-mini-fab color="accent" (click)="addDigit(digit)">
-            {{ digit }}
-        </button>
-    </ng-container>
+    @for (digit of ['1','2','3','4','5','6','7','8','9']; track $index) {
+    <button mat-mini-fab color="accent" (click)="addDigit(digit)">
+        {{ digit }}
+    </button>
+    }
 
     <!-- Reset Button mit Icon -->
     <button mat-mini-fab color="primary" [disabled]="pin === ''" (click)="reset()">
