@@ -1,16 +1,19 @@
 <div class="searchTerm-container">
     <input type="text" [formControl]="searchterm" placeholder="Search in OpenStreetMap">
     <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
-        <option *ngFor="let r of radiusOptions" [value]="r.value">
+        @for (r of radiusOptions; track r.value) {
+        <option [value]="r.value">
             {{ r.label }}
         </option>
+        }
     </select>
     <button (click)="search()">
         <mat-icon>search</mat-icon>
     </button>
 </div>
 <div class="content">
-    <mat-card class="item" *ngFor="let place of nominatimPlaces; index as i">
+    @for (place of nominatimPlaces; track place.place_id) {
+    <mat-card class="item">
         <div class="avatar-box">
             <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
             <span *ngIf="place.name" class="name">{{ place.name }}</span>
@@ -34,4 +37,5 @@
             </button>
         </mat-card-actions>
     </mat-card>
+    }
 </div>
