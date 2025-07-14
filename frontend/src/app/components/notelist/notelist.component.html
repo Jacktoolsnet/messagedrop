@@ -1,21 +1,24 @@
 <mat-dialog-content class="dialog">
-    <div *ngIf="!hasNotes()" class="no-content">
+    @if (!hasNotes()) {
+    <div class="no-content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button class="first-button" mat-flat-button class color="primary" [attr.aria-hidden]="false"
+        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
             (click)="openNoteDialog()">
             <span>Add my first private note</span>
         </button>
     </div>
-    <div *ngIf="hasNotes()" class="content">
+    } @else {
+    <div class="content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button *ngIf="hasNotes()" [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
-            aria-label="Back" (click)="openNoteDialog()">
+        <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
+            (click)="openNoteDialog()">
             <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add_notes</mat-icon>
         </button>
+
         @for (note of notesSignal(); track note.id) {
         <mat-card class="item">
             <mat-card-content (click)="editNote(note)">
@@ -24,26 +27,25 @@
                     <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
                 </div>
             </mat-card-content>
-
             <mat-card-actions class="buttonbar">
-                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Edit note"
-                    (click)="editNote(note)">
+                @if (userService.isReady()) {
+                <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
                     <mat-icon class="material-symbols-outlined">edit</mat-icon>
                 </button>
-                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Delete note"
-                    (click)="deleteNote(note)">
+                <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
                     <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
-                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary" aria-label="Fly to note"
-                    (click)="flyTo(note)">
+                <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
                     <mat-icon>place</mat-icon>
                 </button>
-                <button *ngIf="userService.isReady()" mat-mini-fab color="secondary"
-                    aria-label="Navigate to note location." (click)="navigateToNoteLocation(note)">
+                <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
+                    (click)="navigateToNoteLocation(note)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
+                }
             </mat-card-actions>
         </mat-card>
         }
     </div>
+    }
 </mat-dialog-content>

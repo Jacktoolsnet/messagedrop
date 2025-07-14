@@ -1,139 +1,160 @@
 <mat-dialog-content #dialogContent>
-    <ng-container *ngIf="geoStatistic">
-        <mat-accordion>
-            <!-- Location Details -->
-            <mat-expansion-panel expanded>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Location Details</mat-panel-title>
-                </mat-expansion-panel-header>
-                <div class="block-container">
-                    <div class="info-block">
-                        <div class="icon-section">
-                            <mat-icon class="pin-icon">place</mat-icon>
-                        </div>
-                        <div class="table-section">
-                            <table>
-                                <tr *ngIf="geoStatistic.nominatim.state">
-                                    <td>State:</td>
-                                    <td>{{ geoStatistic.nominatim.state }}</td>
-                                </tr>
-                                <tr *ngIf="geoStatistic.nominatim.county">
-                                    <td>County:</td>
-                                    <td>{{ geoStatistic.nominatim.county }}</td>
-                                </tr>
-                                <tr *ngIf="geoStatistic.nominatim.city">
-                                    <td>City:</td>
-                                    <td>{{ geoStatistic.nominatim.city }}</td>
-                                </tr>
-                                <tr *ngIf="geoStatistic.nominatim.suburb">
-                                    <td>Suburb:</td>
-                                    <td>{{ geoStatistic.nominatim.suburb }}</td>
-                                </tr>
-                                <tr *ngIf="geoStatistic.nominatim.neighbourhood">
-                                    <td>Neighbourhood:</td>
-                                    <td>{{ geoStatistic.nominatim.neighbourhood }}</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="info-block">
-                        <div class="icon-section">
-                            <img [src]="geoStatistic.countryInfo.flag_svg" alt="Flag" class="flag">
-                        </div>
-                        <div class="table-section">
-                            <table>
-                                <tr>
-                                    <td>Capital:</td>
-                                    <td>{{ geoStatistic.countryInfo.capital }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Region:</td>
-                                    <td>{{ geoStatistic.countryInfo.region }} ({{ geoStatistic.countryInfo.subregion }})
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>Languages:</td>
-                                    <td>{{ geoStatistic.countryInfo.languages.join(', ') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Currencies:</td>
-                                    <td>{{ geoStatistic.countryInfo.currencies.join(', ') }}</td>
-                                </tr>
-                                <tr>
-                                    <td>Population</td>
-                                    <td>{{ geoStatistic.countryInfo.population | number }} people</td>
-                                </tr>
-                                <tr>
-                                    <td>Area</td>
-                                    <td>{{ geoStatistic.countryInfo.area_km2 | number }} km²</td>
-                                </tr>
-                                <tr>
-                                    <td>Density</td>
-                                    <td>{{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }}
-                                        people/km²</td>
-                                </tr>
-                                <tr>
-                                    <td>Google Maps:</td>
-                                    <td>
-                                        <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
-                                            {{ geoStatistic.countryInfo.name }}
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </mat-expansion-panel>
+    @if (geoStatistic) {
+    <mat-accordion>
+        <!-- Location Details -->
+        <mat-expansion-panel expanded>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Location Details</mat-panel-title>
+            </mat-expansion-panel-header>
 
-            <!-- Indicators & Chart -->
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
-                    <mat-panel-title>Location Statistic</mat-panel-title>
-                </mat-expansion-panel-header>
-                <div class="category-container">
-                    <mat-form-field appearance="fill" class="category-dropdown">
-                        <mat-label>Category</mat-label>
-                        <mat-select [value]="selectedCategory" (selectionChange)="onCategoryChange($event.value)">
-                            @for (category of categories; track category.label) {
-                            <mat-option [value]="category.value">
-                                {{ category.label }}
-                            </mat-option>
+            <div class="block-container">
+                <!-- Left: Nominatim Info -->
+                <div class="info-block">
+                    <div class="icon-section">
+                        <mat-icon class="pin-icon">place</mat-icon>
+                    </div>
+                    <div class="table-section">
+                        <table>
+                            @if (geoStatistic.nominatim.state) {
+                            <tr>
+                                <td>State:</td>
+                                <td>{{ geoStatistic.nominatim.state }}</td>
+                            </tr>
                             }
-                        </mat-select>
-                    </mat-form-field>
-
-                    <mat-form-field appearance="fill" class="subcategory-dropdown">
-                        <mat-label>Indicator</mat-label>
-                        <mat-select (selectionChange)="onIndicatorSelect($event.value)">
-                            @for (indicator of activeIndicators; track indicator.label) {
-                            <mat-option [value]="indicator">
-                                {{ indicator.label }}
-                            </mat-option>
+                            @if (geoStatistic.nominatim.county) {
+                            <tr>
+                                <td>County:</td>
+                                <td>{{ geoStatistic.nominatim.county }}</td>
+                            </tr>
                             }
-                        </mat-select>
-                    </mat-form-field>
+                            @if (geoStatistic.nominatim.city) {
+                            <tr>
+                                <td>City:</td>
+                                <td>{{ geoStatistic.nominatim.city }}</td>
+                            </tr>
+                            }
+                            @if (geoStatistic.nominatim.suburb) {
+                            <tr>
+                                <td>Suburb:</td>
+                                <td>{{ geoStatistic.nominatim.suburb }}</td>
+                            </tr>
+                            }
+                            @if (geoStatistic.nominatim.neighbourhood) {
+                            <tr>
+                                <td>Neighbourhood:</td>
+                                <td>{{ geoStatistic.nominatim.neighbourhood }}</td>
+                            </tr>
+                            }
+                        </table>
+                    </div>
                 </div>
 
-                <div *ngIf="selectedIndicator" class="indicator-display">
-                    <div *ngIf="isSmallScreen" class="chart-header">
-                        <span class="chart-title">{{ selectedIndicator.label }}</span>
+                <!-- Right: Country Info -->
+                <div class="info-block">
+                    <div class="icon-section">
+                        <img [src]="geoStatistic.countryInfo.flag_svg" alt="Flag" class="flag">
                     </div>
-                    <div class="chart-container">
-                        <canvas #chartCanvas></canvas>
-                    </div>
-                    <div *ngIf="isSmallScreen" class="chart-header">
-                        <span class="chart-description">{{ currentIndicatorDescription }}</span>
+                    <div class="table-section">
+                        <table>
+                            <tr>
+                                <td>Capital:</td>
+                                <td>{{ geoStatistic.countryInfo.capital }}</td>
+                            </tr>
+                            <tr>
+                                <td>Region:</td>
+                                <td>{{ geoStatistic.countryInfo.region }} ({{ geoStatistic.countryInfo.subregion }})
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Languages:</td>
+                                <td>{{ geoStatistic.countryInfo.languages.join(', ') }}</td>
+                            </tr>
+                            <tr>
+                                <td>Currencies:</td>
+                                <td>{{ geoStatistic.countryInfo.currencies.join(', ') }}</td>
+                            </tr>
+                            <tr>
+                                <td>Population</td>
+                                <td>{{ geoStatistic.countryInfo.population | number }} people</td>
+                            </tr>
+                            <tr>
+                                <td>Area</td>
+                                <td>{{ geoStatistic.countryInfo.area_km2 | number }} km²</td>
+                            </tr>
+                            <tr>
+                                <td>Density</td>
+                                <td>{{ geoStatistic.countryInfo.populationDensity_per_km2 | number:'1.1-1' }} people/km²
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Google Maps:</td>
+                                <td>
+                                    <a [href]="geoStatistic.countryInfo.googleMaps" target="_blank" rel="noopener">
+                                        {{ geoStatistic.countryInfo.name }}
+                                    </a>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
-            </mat-expansion-panel>
-        </mat-accordion>
+            </div>
+        </mat-expansion-panel>
 
-        <div class="data-source">
-            Data sources:
-            <a href="https://openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a>,
-            <a href="https://restcountries.com/" target="_blank" rel="noopener">REST Countries</a>,
-            <a href="https://data.worldbank.org/" target="_blank" rel="noopener">World Bank</a>
-        </div>
-    </ng-container>
+        <!-- Indicators & Chart -->
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                <mat-panel-title>Location Statistic</mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="category-container">
+                <!-- Category Select -->
+                <mat-form-field appearance="fill" class="category-dropdown">
+                    <mat-label>Category</mat-label>
+                    <mat-select [value]="selectedCategory" (selectionChange)="onCategoryChange($event.value)">
+                        @for (category of categories; track category.label) {
+                        <mat-option [value]="category.value">{{ category.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+
+                <!-- Indicator Select -->
+                <mat-form-field appearance="fill" class="subcategory-dropdown">
+                    <mat-label>Indicator</mat-label>
+                    <mat-select (selectionChange)="onIndicatorSelect($event.value)">
+                        @for (indicator of activeIndicators; track indicator.label) {
+                        <mat-option [value]="indicator">{{ indicator.label }}</mat-option>
+                        }
+                    </mat-select>
+                </mat-form-field>
+            </div>
+
+            @if (selectedIndicator) {
+            <div class="indicator-display">
+                @if (isSmallScreen) {
+                <div class="chart-header">
+                    <span class="chart-title">{{ selectedIndicator.label }}</span>
+                </div>
+                }
+
+                <div class="chart-container">
+                    <canvas #chartCanvas></canvas>
+                </div>
+
+                @if (isSmallScreen) {
+                <div class="chart-header">
+                    <span class="chart-description">{{ currentIndicatorDescription }}</span>
+                </div>
+                }
+            </div>
+            }
+        </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="data-source">
+        Data sources:
+        <a href="https://openstreetmap.org/" target="_blank" rel="noopener">OpenStreetMap</a>,
+        <a href="https://restcountries.com/" target="_blank" rel="noopener">REST Countries</a>,
+        <a href="https://data.worldbank.org/" target="_blank" rel="noopener">World Bank</a>
+    </div>
+    }
 </mat-dialog-content>
