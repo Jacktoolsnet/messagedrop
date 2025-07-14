@@ -1,32 +1,41 @@
 <h2 mat-dialog-title>Edit profile</h2>
+
 <mat-dialog-content>
+  <label for="profile-name">Set the profile name</label>
+  <input id="profile-name" matInput type="text" maxlength="64" placeholder="Profile name.."
+    [(ngModel)]="profile.name" />
 
-  Set the profile name
-  <input matInput type="text" maxlength="64" placeholder="Profile name.." [(ngModel)]="profile.name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
-    (change)="onFileSelected($event)" #fileUpload>
+    (change)="onFileSelected($event)" #fileUpload />
 
-  <div class="avatar-area" *ngIf="!profile?.base64Avatar">
-    Give the profile an avatar:
+  <!-- Avatar Auswahl -->
+  @if (!profile?.base64Avatar || profile.base64Avatar === '') {
+  <div class="avatar-area">
+    <div class="center">Give the profile an avatar:</div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
         <mat-icon>attach_file</mat-icon>
       </button>
     </div>
   </div>
-  <div class="avatar-area" *ngIf="profile?.base64Avatar">
+  }
+
+  <!-- Avatar Vorschau + Löschen -->
+  @if (profile?.base64Avatar && profile.base64Avatar !== '') {
+  <div class="avatar-area">
     <div class="center">
-      <img *ngIf="profile?.base64Avatar" class="avatar" src="{{profile.base64Avatar}}" /><br>
+      <img class="avatar" [src]="profile.base64Avatar" /><br />
     </div>
     <div class="button-style">
-      <button *ngIf="profile.base64Avatar != ''" mat-mini-fab color="primary" class="upload-button"
-        (click)="deleteAvatar()">
+      <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
         <mat-icon>delete</mat-icon>
       </button>
     </div>
   </div>
+  }
 </mat-dialog-content>
+
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="{profile: profile, userId: userId}">Apply</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="{ profile, userId }">Apply</button>
 </mat-dialog-actions>

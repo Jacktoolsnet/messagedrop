@@ -1,11 +1,9 @@
 <mat-dialog-content class="dialog">
-    <!-- No messages -->
-    <div *ngIf="messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0"
-        class="no-content">
+    @if (messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0) {
+    <div class="no-content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-
         <div class="no-content">
             <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
                 (click)="addMessagDialog()">
@@ -13,40 +11,43 @@
             </button>
         </div>
     </div>
-
-    <!-- List View -->
-    <div *ngIf="messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0" class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
-            *ngIf="messageService.selectedMessagesSignal().length === 0" (click)="addMessagDialog()">
-            <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">chat_add_on</mat-icon>
-        </button>
+    }@if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) { <div class="content">
+        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()"> <mat-icon>arrow_back</mat-icon>
+        </button> <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
+            (click)="addMessagDialog()"> <mat-icon [attr.aria-hidden]="false"
+                class="material-symbols-outlined">chat_add_on</mat-icon> </button>
 
         @for (message of filteredMessagesSignal(); track message.id) {
         <mat-card class="item">
-
-            <div class="avatar-box" *ngIf="user.id == message.userId && (userProfile.base64Avatar || userProfile.name)">
-                <img *ngIf="userProfile.base64Avatar" class="avatar" [src]="userProfile.base64Avatar" />
-                <span *ngIf="userProfile.name" class="name">{{ userProfile.name }}</span>
+            @if (user.id == message.userId && (userProfile.base64Avatar || userProfile.name)) {
+            <div class="avatar-box">
+                @if (userProfile.base64Avatar) {
+                <img class="avatar" [src]="userProfile.base64Avatar" />
+                }
+                @if (userProfile.name) {
+                <span class="name">{{ userProfile.name }}</span>
+                }
             </div>
-
-            <div class="avatar-box" (click)="editMessageUserProfile(message)"
-                *ngIf="user.id != message.userId && (profileService.getProfile(message.userId)?.base64Avatar || profileService.getProfile(message.userId)?.name)">
-                <img *ngIf="profileService.getProfile(message.userId)?.base64Avatar" class="avatar"
-                    [src]="profileService.getProfile(message.userId)?.base64Avatar">
-                <span *ngIf="profileService.getProfile(message.userId)?.name" class="name">
-                    {{ profileService.getProfile(message.userId)?.name }}
-                </span>
+            }
+            @if (user.id != message.userId && (profileService.getProfile(message.userId)?.base64Avatar ||
+            profileService.getProfile(message.userId)?.name)) {
+            <div class="avatar-box" (click)="editMessageUserProfile(message)">
+                @if (profileService.getProfile(message.userId)?.base64Avatar) {
+                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar">
+                }
+                @if (profileService.getProfile(message.userId)?.name) {
+                <span class="name">{{ profileService.getProfile(message.userId)?.name }}</span>
+                }
             </div>
+            }
 
             <mat-card-content>
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
-                    <app-showmessage *ngIf="message.message" [message]="message.translatedMessage ?? message.message"
-                        [style]="message.style">
-                    </app-showmessage>
+                    @if (message.message) {
+                    <app-showmessage [message]="message.translatedMessage ?? message.message"
+                        [style]="message.style"></app-showmessage>
+                    }
                 </div>
             </mat-card-content>
 
@@ -55,21 +56,20 @@
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
-                        matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
-                        forum
-                    </mat-icon>
+                        matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Dislike message"
-                    (click)="dislikeMessage(message)">
+                @if (user.id != message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
+                }
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
                     <mat-icon>place</mat-icon>
                 </button>
@@ -77,66 +77,68 @@
                     (click)="navigateToMessageLocation(message)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
-                <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Edit message"
+                @if (user.id != message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">person</mat-icon>
                 </button>
-                <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Edit message"
-                    (click)="editMessage(message)">
+                }
+                @if (user.id == message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
-                <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Delete message"
-                    (click)="deleteMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
-                <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Block message"
-                    (click)="disableMessage(message)">
+                }
+                @if (user.id != message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
                 </button>
+                }
             </mat-card-actions>
         </mat-card>
         }
     </div>
 
-    <!-- Comment Detail View -->
-    <div *ngIf="messageService.selectedMessagesSignal().length !== 0" class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
-            <mat-icon>add_comment</mat-icon>
-        </button>
+    }
+
+    @if (messageService.selectedMessagesSignal().length !== 0) { <div class="content"> <button mat-mini-fab
+            color="accent" class="button_back" (click)="goBack()"> <mat-icon>arrow_back</mat-icon> </button> <button
+            mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
+            <mat-icon>add_comment</mat-icon> </button>
 
         @for (message of commentsSignal(); track message.id) {
         <mat-card class="item">
             <mat-card-content>
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
-                    <app-showmessage *ngIf="message.message" [message]="message.translatedMessage ?? message.message"
-                        [style]="message.style">
-                    </app-showmessage>
+                    @if (message.message) {
+                    <app-showmessage [message]="message.translatedMessage ?? message.message"
+                        [style]="message.style"></app-showmessage>
+                    }
                 </div>
             </mat-card-content>
+
             <mat-card-actions class="buttonbar">
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
-                        matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
-                        forum
-                    </mat-icon>
+                        matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Dislike message"
-                    (click)="dislikeMessage(message)">
+                @if (user.id != message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
+                }
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
                     <mat-icon>place</mat-icon>
                 </button>
@@ -144,26 +146,29 @@
                     (click)="navigateToMessageLocation(message)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
-                <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Edit message"
+                @if (user.id != message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">person</mat-icon>
                 </button>
-                <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Edit message"
-                    (click)="editMessage(message)">
+                }
+                @if (user.id == message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
-                <button *ngIf="user.id == message.userId" mat-mini-fab color="secondary" aria-label="Delete message"
-                    (click)="deleteMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
-                <button *ngIf="user.id != message.userId" mat-mini-fab color="secondary" aria-label="Block message"
-                    (click)="disableMessage(message)">
+                }
+                @if (user.id != message.userId) {
+                <button mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
                 </button>
+                }
             </mat-card-actions>
         </mat-card>
         }
-
     </div>
 
+    }
 </mat-dialog-content>

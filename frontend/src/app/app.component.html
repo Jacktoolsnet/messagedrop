@@ -1,82 +1,115 @@
-<app-map *ngIf="networkService.isOnline() && serverService.isReady()" [lastMarkerUpdate]="lastMarkerUpdate"
-    [location]="mapService.getMapLocation()" [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)"
-    (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)"></app-map>
-<button *ngIf="networkService.isOnline() && serverService.isReady() && !userService.isReady()" aria-hidden="false"
-    class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="login()">
+@if (networkService.isOnline() && serverService.isReady()) {
+<app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()"
+    [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)"
+    (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)">
+</app-map>
+
+@if (!userService.isReady()) {
+<button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="login()">
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() && serverService.isReady() && userService.isReady()"
-    [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent"
+} @else {
+<button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent"
     aria-label="User Profile" (click)="{}">
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
         class="material-symbols-outlined">person</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="locationReady"
-    class="button_watchLocation" mat-fab color="primary" aria-label="Watch user location"
-    (click)="getCurrentPosition()">
+}
+
+<button [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary"
+    aria-label="Watch user location" (click)="getCurrentPosition()">
     <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="false"
-    [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary" aria-label="Mainmenu" (click)="{}">
+
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary"
+    aria-label="Mainmenu" (click)="{}">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">menu</mat-icon>
 </button>
-<button *ngIf="networkService.isOnline() && serverService.isReady()" [attr.aria-hidden]="false"
-    [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab color="primary" aria-label="Search" (click)="{}">
+
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab color="primary"
+    aria-label="Search" (click)="{}">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">search</mat-icon>
 </button>
+}
 
 <mat-menu #userMenu="matMenu">
     <button mat-menu-item (click)="logout()">
-        <mat-icon *ngIf="userService.isReady()" class="material-symbols-outlined">lock</mat-icon>
+        @if (userService.isReady()) {
+        <mat-icon class="material-symbols-outlined">lock</mat-icon>
+        }
         <span>Logout</span>
     </button>
+
     <button mat-menu-item (click)="showUser()">
-        <mat-icon *ngIf="userService.isReady()" class="material-symbols-outlined">account_circle</mat-icon>
+        @if (userService.isReady()) {
+        <mat-icon class="material-symbols-outlined">account_circle</mat-icon>
+        }
         <span>My user</span>
     </button>
-    <button *ngIf="userService.isReady()" mat-menu-item (click)="editUserProfile()">
+
+    @if (userService.isReady()) {
+    <button mat-menu-item (click)="editUserProfile()">
         <mat-icon class="material-symbols-outlined">badge</mat-icon>
         <span>My profile</span>
     </button>
+    }
+
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon class="material-symbols-outlined">speaker_notes</mat-icon>
         <span>My public messages</span>
     </button>
-    <button *ngIf="userService.isReady()" mat-menu-item (click)="openUserNoteListDialog()">
+
+    @if (userService.isReady()) {
+    <button mat-menu-item (click)="openUserNoteListDialog()">
         <mat-icon class="material-symbols-outlined">clinical_notes</mat-icon>
         <span>My private notes</span>
     </button>
-    <button *ngIf="placeService.isReady()" mat-menu-item (click)="openPlaceListDialog()">
+    }
+
+    @if (placeService.isReady()) {
+    <button mat-menu-item (click)="openPlaceListDialog()">
         <mat-icon class="material-symbols-outlined">personal_places</mat-icon>
         <span>My places</span>
     </button>
-    <button mat-menu-item *ngIf="contactService.isReady()" (click)="openContactListDialog()">
+    }
+
+    @if (contactService.isReady()) {
+    <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>My contacts</span>
     </button>
+    }
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
-    <button mat-menu-item (click)="openMessagDialog()" *ngIf="userService.isReady()">
+    @if (userService.isReady()) {
+    <button mat-menu-item (click)="openMessagDialog()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         <span>Public message</span>
     </button>
-    <button mat-menu-item (click)="openNoteDialog()" *ngIf="userService.isReady()">
+    <button mat-menu-item (click)="openNoteDialog()">
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
         <span>Private note</span>
     </button>
-    <button mat-menu-item (click)="openContactListDialog()" *ngIf="userService.isReady() && contactService.isReady()">
+    }
+
+    @if (userService.isReady() && contactService.isReady()) {
+    <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>Contacts message</span>
     </button>
+    }
+
     <button mat-menu-item (click)="showWeather()">
         <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>
         <span>Weather</span>
     </button>
+
     <button mat-menu-item (click)="showAirQuality()">
         <mat-icon class="material-symbols-outlined">eco</mat-icon>
         <span>Air quality</span>
     </button>
+
     <button mat-menu-item (click)="showGeoStatistic()">
         <mat-icon class="material-symbols-outlined">data_exploration</mat-icon>
         <span>Statistic</span>
