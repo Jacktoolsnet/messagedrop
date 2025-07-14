@@ -8,16 +8,19 @@
         </ng-template>
 
         <div class="day-switch">
-            <button mat-raised-button *ngFor="let day of weather.daily; let i = index"
-                [color]="i === selectedDayIndex ? 'primary' : 'secondary'" (click)="onDayChange(i)">
-                {{ getDayLabel(i) }}
+            @for (day of weather.daily; track $index) {
+            <button mat-raised-button [color]="$index === selectedDayIndex ? 'primary' : 'secondary'"
+                (click)="onDayChange($index)">
+                {{ getDayLabel($index) }}
             </button>
+            }
         </div>
 
         <!-- TILE GRID -->
         <div *ngIf="!selectedTile" class="tile-grid">
-            <div class="tile" *ngFor="let tile of tiles"
-                [style.color]="getTileColor(tile.type, getTileNumericValue(tile.type))" (click)="onTileClick(tile)">
+            @for (tile of tiles; track tile.type) {
+            <div class="tile" [style.color]="getTileColor(tile.type, getTileNumericValue(tile.type))"
+                (click)="onTileClick(tile)">
                 <div class="tile-title">{{ tile.label }}</div>
                 <div class="tile-icon-wrapper">
                     <mat-icon class="tile-icon">{{ tile.icon }}</mat-icon>
@@ -26,6 +29,7 @@
                 <div class="tile-level" *ngIf="tile.levelText">{{ tile.levelText }}</div>
                 <div class="tile-minmax" *ngIf="tile.minMax">{{tile.minMax.min}} - {{tile.minMax.max}}</div>
             </div>
+            }
         </div>
 
         <!-- CHART VIEW -->
