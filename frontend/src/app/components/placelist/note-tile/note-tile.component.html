@@ -3,18 +3,16 @@
         <mat-icon class="material-symbols-outlined tile-icon">clinical_notes</mat-icon>
         <span class="tile-title">Private notes</span>
     </div>
-    <ng-container *ngIf="placeNotes() as notes">
-        <ng-container *ngIf="notes.length > 0; else noNotes">
-            @for (note of notes; track note.id) {
-            @if (note.note.trim() !== '') {
-            <div class="note-card">
-                <span class="note-text" [style]="note.style">{{ note.note }}</span>
-            </div>
-            }
-            }
-        </ng-container>
-    </ng-container>
-    <ng-template #noNotes>
-        <div class="note-empty">No notes found.</div>
-    </ng-template>
+
+    @if (placeNotes().length > 0) {
+    @for (note of placeNotes(); track note.id) {
+    @if (note.note.trim() !== '') {
+    <div class="note-card">
+        <span class="note-text" [style]="note.style">{{ note.note }}</span>
+    </div>
+    }
+    }
+    } @else {
+    <div class="note-empty">No notes found.</div>
+    }
 </div>

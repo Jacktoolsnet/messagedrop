@@ -1,67 +1,80 @@
 <mat-dialog-content class="dialog">
-
     <div *ngIf="contactService.getContacts().length == 0" class="no-content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button class="first-button" mat-flat-button class color="primary" [attr.aria-hidden]="false" (click)="{}"
-            [matMenuTriggerFor]="connectionMenu">
+        <button class="first-button" mat-flat-button color="primary" [matMenuTriggerFor]="connectionMenu">
             <span>Start connecting</span>
         </button>
     </div>
+
     <div *ngIf="contactService.getContacts().length != 0" class="content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button *ngIf="contactService.getContacts().length != 0" [attr.aria-hidden]="false" class="button_add"
-            mat-mini-fab color="primary" aria-label="Back" (click)="{}" [matMenuTriggerFor]="connectionMenu">
-            <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">connect_without_contact</mat-icon>
+        <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
+            [matMenuTriggerFor]="connectionMenu">
+            <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
         </button>
 
         @for (contact of contactService.getContacts(); track contact.id) {
         <mat-card class="item">
             <div class="avatar-box" *ngIf="contact.base64Avatar || contact.name" (click)="editContact(contact)">
-                <img *ngIf="contact.base64Avatar" class="avatar" [src]="contact.base64Avatar" />
-                <span *ngIf="contact.name" class="name">{{ contact.name }}</span>
+                @if (contact.base64Avatar) {
+                <img class="avatar" [src]="contact.base64Avatar" />
+                }
+                @if (contact.name) {
+                <span class="name">{{ contact.name }}</span>
+                }
             </div>
 
             <mat-card-content (click)="openContactMessagDialog(contact)">
                 <div class="message-content">
-
-                    <!-- Last message from contact -->
+                    <!-- Wenn letzte Nachricht vom Kontakt kam -->
                     <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
-                        <p *ngIf="contact.userMessage?.message || contact.userMessage?.multimedia?.type !== 'undefined'"
-                            class="from-me">
+                        <p class="from-me" *ngIf="hasContent(contact.userMessage)">
+                            @if (contact.userMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                            }
+                            @if (contact.userMessage.message.trim() !== '') {
                             <app-showmessage [message]="contact.userMessage.message"
                                 [style]="contact.userMessage.style"></app-showmessage>
+                            }
                         </p>
-                        <p *ngIf="contact.contactUserMessage?.message || contact.contactUserMessage?.multimedia?.type !== 'undefined'"
-                            class="from-them">
+                        <p class="from-them" *ngIf="hasContent(contact.contactUserMessage)">
+                            @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia
                                 [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                            }
+                            @if (contact.contactUserMessage.message.trim() !== '') {
                             <app-showmessage [message]="contact.contactUserMessage.message"
                                 [style]="contact.contactUserMessage.style"></app-showmessage>
+                            }
                         </p>
                     </div>
 
-                    <!-- Last message from user -->
+                    <!-- Wenn letzte Nachricht vom User kam -->
                     <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
-                        <p *ngIf="contact.contactUserMessage?.message || contact.contactUserMessage?.multimedia?.type !== 'undefined'"
-                            class="from-them">
+                        <p class="from-them" *ngIf="hasContent(contact.contactUserMessage)">
+                            @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia
                                 [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                            }
+                            @if (contact.contactUserMessage.message.trim() !== '') {
                             <app-showmessage [message]="contact.contactUserMessage.message"
                                 [style]="contact.contactUserMessage.style"></app-showmessage>
+                            }
                         </p>
-                        <p *ngIf="contact.userMessage?.message || contact.userMessage?.multimedia?.type !== 'undefined'"
-                            class="from-me">
+                        <p class="from-me" *ngIf="hasContent(contact.userMessage)">
+                            @if (contact.userMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                            }
+                            @if (contact.userMessage.message.trim() !== '') {
                             <app-showmessage [message]="contact.userMessage.message"
                                 [style]="contact.userMessage.style"></app-showmessage>
+                            }
                         </p>
                     </div>
-
                 </div>
             </mat-card-content>
 
@@ -70,17 +83,14 @@
                     aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
                     <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
                 </button>
-
-                <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editContact(contact)">
+                <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
                     <mat-icon class="material-symbols-outlined">person</mat-icon>
                 </button>
-
                 <button *ngIf="!subscriptionError" mat-mini-fab [color]="!contact.subscribed ? 'secondary' : 'primary'"
-                    aria-label="Subscribe to place" (click)="subscribe(contact)">
+                    aria-label="Subscribe" (click)="subscribe(contact)">
                     <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
                 </button>
-
-                <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteContact(contact)">
+                <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
                     <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
             </mat-card-actions>

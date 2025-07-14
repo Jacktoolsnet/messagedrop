@@ -410,4 +410,8 @@ export class ContactlistComponent implements OnInit {
       });
   }
 
+  hasContent(message?: ShortMessage): boolean {
+    return !!message && (message.message?.trim() !== '' || message.multimedia?.type !== 'undefined');
+  }
+
 }
