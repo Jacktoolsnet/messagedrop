@@ -12,8 +12,10 @@
 </div>
 <mat-dialog-content class="full-width">
     <div *ngIf="results" class="gallery">
-        <div *ngFor="let result of results">
+        @for (result of results; track result.id) {
+        <div>
             <img [src]="result.media_formats.gif.url" alt="Gif" (click)="onApplyClick(result)">
         </div>
+        }
     </div>
 </mat-dialog-content>
