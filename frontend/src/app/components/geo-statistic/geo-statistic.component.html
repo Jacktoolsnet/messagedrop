@@ -95,18 +95,22 @@
                     <mat-form-field appearance="fill" class="category-dropdown">
                         <mat-label>Category</mat-label>
                         <mat-select [value]="selectedCategory" (selectionChange)="onCategoryChange($event.value)">
-                            <mat-option *ngFor="let category of categories" [value]="category.value">
+                            @for (category of categories; track category.label) {
+                            <mat-option [value]="category.value">
                                 {{ category.label }}
                             </mat-option>
+                            }
                         </mat-select>
                     </mat-form-field>
 
                     <mat-form-field appearance="fill" class="subcategory-dropdown">
                         <mat-label>Indicator</mat-label>
                         <mat-select (selectionChange)="onIndicatorSelect($event.value)">
-                            <mat-option *ngFor="let indicator of activeIndicators" [value]="indicator">
+                            @for (indicator of activeIndicators; track indicator.label) {
+                            <mat-option [value]="indicator">
                                 {{ indicator.label }}
                             </mat-option>
+                            }
                         </mat-select>
                     </mat-form-field>
                 </div>
