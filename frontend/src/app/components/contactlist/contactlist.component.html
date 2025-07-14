@@ -1,5 +1,6 @@
 <mat-dialog-content class="dialog">
-    <div *ngIf="contactService.getContacts().length == 0" class="no-content">
+    @if (contactService.getContacts().length === 0) {
+    <div class="no-content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
@@ -7,19 +8,18 @@
             <span>Start connecting</span>
         </button>
     </div>
-
-    <div *ngIf="contactService.getContacts().length != 0" class="content">
+    } @else {
+    <div class="content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
         <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
             [matMenuTriggerFor]="connectionMenu">
             <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
-        </button>
-
-        @for (contact of contactService.getContacts(); track contact.id) {
+        </button>@for (contact of contactService.getContacts(); track contact.id) {
         <mat-card class="item">
-            <div class="avatar-box" *ngIf="contact.base64Avatar || contact.name" (click)="editContact(contact)">
+            @if (contact.base64Avatar || contact.name) {
+            <div class="avatar-box" (click)="editContact(contact)">
                 @if (contact.base64Avatar) {
                 <img class="avatar" [src]="contact.base64Avatar" />
                 }
@@ -27,12 +27,14 @@
                 <span class="name">{{ contact.name }}</span>
                 }
             </div>
+            }
 
             <mat-card-content (click)="openContactMessagDialog(contact)">
                 <div class="message-content">
-                    <!-- Wenn letzte Nachricht vom Kontakt kam -->
-                    <div *ngIf="contact.lastMessageFrom === 'contactUser'" class="message">
-                        <p class="from-me" *ngIf="hasContent(contact.userMessage)">
+                    @if (contact.lastMessageFrom === 'contactUser') {
+                    <div class="message">
+                        @if (hasContent(contact.userMessage)) {
+                        <p class="from-me">
                             @if (contact.userMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
                             }
@@ -41,7 +43,9 @@
                                 [style]="contact.userMessage.style"></app-showmessage>
                             }
                         </p>
-                        <p class="from-them" *ngIf="hasContent(contact.contactUserMessage)">
+                        }
+                        @if (hasContent(contact.contactUserMessage)) {
+                        <p class="from-them">
                             @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia
                                 [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
@@ -51,11 +55,12 @@
                                 [style]="contact.contactUserMessage.style"></app-showmessage>
                             }
                         </p>
+                        }
                     </div>
-
-                    <!-- Wenn letzte Nachricht vom User kam -->
-                    <div *ngIf="contact.lastMessageFrom === 'user'" class="message">
-                        <p class="from-them" *ngIf="hasContent(contact.contactUserMessage)">
+                    } @else if (contact.lastMessageFrom === 'user') {
+                    <div class="message">
+                        @if (hasContent(contact.contactUserMessage)) {
+                        <p class="from-them">
                             @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia
                                 [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
@@ -65,7 +70,9 @@
                                 [style]="contact.contactUserMessage.style"></app-showmessage>
                             }
                         </p>
-                        <p class="from-me" *ngIf="hasContent(contact.userMessage)">
+                        }
+                        @if (hasContent(contact.userMessage)) {
+                        <p class="from-me">
                             @if (contact.userMessage.multimedia.type !== 'undefined') {
                             <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
                             }
@@ -74,22 +81,28 @@
                                 [style]="contact.userMessage.style"></app-showmessage>
                             }
                         </p>
+                        }
                     </div>
+                    }
                 </div>
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
-                <button *ngIf="socketioService.isReady()" mat-mini-fab color="secondary"
-                    aria-label="Send a short message" (click)="openContactMessagDialog(contact)">
+                @if (socketioService.isReady()) {
+                <button mat-mini-fab color="secondary" aria-label="Send a short message"
+                    (click)="openContactMessagDialog(contact)">
                     <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
                 </button>
+                }
                 <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
                     <mat-icon class="material-symbols-outlined">person</mat-icon>
                 </button>
-                <button *ngIf="!subscriptionError" mat-mini-fab [color]="!contact.subscribed ? 'secondary' : 'primary'"
-                    aria-label="Subscribe" (click)="subscribe(contact)">
+                @if (!subscriptionError) {
+                <button mat-mini-fab [color]="!contact.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
+                    (click)="subscribe(contact)">
                     <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
                 </button>
+                }
                 <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
                     <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
@@ -97,23 +110,15 @@
         </mat-card>
         }
     </div>
+
+    }
 </mat-dialog-content>
 
-<mat-menu #connectionMenu="matMenu">
-    <button mat-menu-item (click)="shareConnectId()">
-        <mat-icon class="material-symbols-outlined">share</mat-icon>
-        <span>Share connect id</span>
-    </button>
-    <button mat-menu-item (click)="openConnectDialog()">
-        <mat-icon class="material-symbols-outlined">link</mat-icon>
-        <span>Connect with connect id</span>
-    </button>
-    <button mat-menu-item (click)="openQrDialog()">
-        <mat-icon class="material-symbols-outlined">qr_code</mat-icon>
-        <span>Share QR-Code</span>
-    </button>
-    <button mat-menu-item (click)="openScannerDialog()">
-        <mat-icon class="material-symbols-outlined">qr_code_scanner</mat-icon>
-        <span>Connect scanning QR-Code</span>
-    </button>
+<mat-menu #connectionMenu="matMenu"> <button mat-menu-item (click)="shareConnectId()"> <mat-icon
+            class="material-symbols-outlined">share</mat-icon> <span>Share connect id</span> </button> <button
+        mat-menu-item (click)="openConnectDialog()"> <mat-icon class="material-symbols-outlined">link</mat-icon>
+        <span>Connect with connect id</span> </button> <button mat-menu-item (click)="openQrDialog()"> <mat-icon
+            class="material-symbols-outlined">qr_code</mat-icon> <span>Share QR-Code</span> </button> <button
+        mat-menu-item (click)="openScannerDialog()"> <mat-icon
+            class="material-symbols-outlined">qr_code_scanner</mat-icon> <span>Connect scanning QR-Code</span> </button>
 </mat-menu>
