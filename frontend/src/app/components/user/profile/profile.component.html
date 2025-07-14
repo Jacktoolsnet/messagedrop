@@ -1,24 +1,24 @@
 <h2 mat-dialog-title>My profile</h2>
 <mat-dialog-content>
+  <span>Set my profile name</span>
+  <input matInput type="text" maxlength="64" placeholder="Profile name.." [(ngModel)]="userService.getProfile().name" />
 
-  Set my profile name
-  <input matInput type="text" maxlength="64" placeholder="Profile name.." [(ngModel)]="userService.getProfile().name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
-    (change)="onFileSelected($event)" #fileUpload>
+    (change)="onFileSelected($event)" #fileUpload />
 
-  <div class="avatar-area" *ngIf="userService.getProfile().base64Avatar == ''">
-    <div class="center">
-      Set my profile avatar.
-    </div>
+  @if (userService.getProfile().base64Avatar === '') {
+  <div class="avatar-area">
+    <div class="center">Set my profile avatar.</div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
         <mat-icon>attach_file</mat-icon>
       </button>
     </div>
   </div>
-  <div class="avatar-area" *ngIf="userService.getProfile().base64Avatar != ''">
+  } @else {
+  <div class="avatar-area">
     <div class="center">
-      <img class="avatar" src="{{userService.getProfile().base64Avatar}}" /><br>
+      <img class="avatar" [src]="userService.getProfile().base64Avatar" /><br />
     </div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
@@ -26,17 +26,21 @@
       </button>
     </div>
   </div>
+  }
+
   <div class="button-area">
     <div class="sample-style" [style]="userService.getProfile().defaultStyle">
       My selected font style
     </div>
-    <button mat-mini-fab class color="primary" [attr.aria-hidden]="false" class="button-style"
-      (click)="changeDefaultStyle()">
+    <button mat-mini-fab color="primary" aria-hidden="false" class="button-style" (click)="changeDefaultStyle()">
       <mat-icon class="material-symbols-outlined">cycle</mat-icon>
     </button>
   </div>
 </mat-dialog-content>
+
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="userService.getProfile()">Apply</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="userService.getProfile()">
+    Apply
+  </button>
 </mat-dialog-actions>

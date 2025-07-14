@@ -1,29 +1,34 @@
 <mat-dialog-content class="dialog">
-
-    <div *ngIf="!hasPlaces()" class="no-content">
+    @if (!hasPlaces()) {
+    <div class="no-content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false" (click)="addPlace()">
+        <button class="first-button" mat-flat-button color="primary" (click)="addPlace()">
             <span>Add my first place</span>
         </button>
     </div>
-
-    <div *ngIf="hasPlaces()" class="content">
+    } @else {
+    <div class="content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
-        <button *ngIf="hasPlaces()" [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
-            aria-label="Add" (click)="addPlace()">
-            <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add_location</mat-icon>
+        <button class="button_add" mat-mini-fab color="primary" aria-label="Add" (click)="addPlace()">
+            <mat-icon class="material-symbols-outlined">add_location</mat-icon>
         </button>
 
         @for (place of placesSignal(); track place.id) {
         <mat-card class="item">
             <div class="avatar-box" (click)="editPlace(place)">
-                <mat-icon *ngIf="place.icon && !place.base64Avatar">{{ place.icon || 'location' }}</mat-icon>
-                <img *ngIf="place.base64Avatar" class="avatar" [src]="place.base64Avatar" />
-                <span *ngIf="place.name" class="name">{{ place.name }}</span>
+                @if (place.icon && !place.base64Avatar) {
+                <mat-icon>{{ place.icon || 'location' }}</mat-icon>
+                }
+                @if (place.base64Avatar) {
+                <img class="avatar" [src]="place.base64Avatar" />
+                }
+                @if (place.name) {
+                <span class="name">{{ place.name }}</span>
+                }
             </div>
 
             <mat-card-content>
@@ -42,10 +47,12 @@
                 <button mat-mini-fab color="secondary" aria-label="Delete place" (click)="deletePlace(place)">
                     <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
-                <button *ngIf="!subscriptionError" mat-mini-fab [color]="!place.subscribed ? 'secondary' : 'primary'"
-                    aria-label="Subscribe" (click)="subscribe(place)">
+                @if (!subscriptionError) {
+                <button mat-mini-fab [color]="!place.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
+                    (click)="subscribe(place)">
                     <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
                 </button>
+                }
                 <button mat-mini-fab color="secondary" aria-label="Fly to place" (click)="flyTo(place)">
                     <mat-icon class="material-symbols-outlined">place</mat-icon>
                 </button>
@@ -53,4 +60,5 @@
         </mat-card>
         }
     </div>
+    }
 </mat-dialog-content>

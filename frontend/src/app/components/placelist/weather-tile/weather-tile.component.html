@@ -1,4 +1,5 @@
-<div *ngIf="!weather" class="tile weather-tile">
+@if (!weather) {
+<div class="tile weather-tile">
     <div class="tile-info">
         <i class="wi wi-na" style="font-size: 1.5rem"></i>
         <div class="tile-content">
@@ -7,12 +8,16 @@
         </div>
     </div>
 </div>
-<div *ngIf="weather" class="tile weather-tile" (click)="openWeatherDetails()">
+} @else {
+<div class="tile weather-tile" (click)="openWeatherDetails()">
     <div class="tile-info">
         <i class="wi wi-{{ weatherIcon }}"></i>
         <div class="tile-content">
             <div class="tile-temperature">{{ weather.current.temperature }} °C</div>
-            <div class="tile-minmax" *ngIf="minMax">{{minMax.min}} °C - {{minMax.max}} °C</div>
+            @if (minMax) {
+            <div class="tile-minmax">{{ minMax.min }} °C - {{ minMax.max }} °C</div>
+            }
         </div>
     </div>
 </div>
+}
