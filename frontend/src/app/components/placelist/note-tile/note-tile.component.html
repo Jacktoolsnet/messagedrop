@@ -5,11 +5,13 @@
     </div>
     <ng-container *ngIf="placeNotes() as notes">
         <ng-container *ngIf="notes.length > 0; else noNotes">
-            <ng-container *ngFor="let note of notes">
-                <div class="note-card" *ngIf="note.note?.trim() !== ''">
-                    <span class="note-text" [style]="note.style">{{ note.note }}</span>
-                </div>
-            </ng-container>
+            @for (note of notes; track note.id) {
+            @if (note.note.trim() !== '') {
+            <div class="note-card">
+                <span class="note-text" [style]="note.style">{{ note.note }}</span>
+            </div>
+            }
+            }
         </ng-container>
     </ng-container>
     <ng-template #noNotes>
