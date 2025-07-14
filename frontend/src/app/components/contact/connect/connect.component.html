@@ -1,10 +1,20 @@
-<h2 *ngIf="data.mode == 'add_connect'" mat-dialog-title>Add a connection</h2>
+@if (data.mode == 'add_connect') {
+<h2 mat-dialog-title>Add a connection</h2>
+}
+
 <mat-dialog-content>
-  The connect id I like to import
-  <input matInput type="text" maxlength="64" placeholder="The connect id." [(ngModel)]="data.connectId">
+  <p>The connect id I like to import</p>
+  <input matInput type="text" maxlength="64" placeholder="The connect id." [(ngModel)]="data.connectId" />
 </mat-dialog-content>
+
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button *ngIf="data.connectId != ''" [attr.aria-hidden]="false" mat-button mat-dialog-close
-    (click)="onApplyClick()">Apply</button>
+  <button mat-button mat-dialog-close cdkFocusInitial aria-label="Abort import" (click)="onAbortClick()">
+    Abort
+  </button>
+
+  @if (data.connectId != '') {
+  <button mat-button mat-dialog-close aria-label="Apply connection" (click)="onApplyClick()">
+    Apply
+  </button>
+  }
 </mat-dialog-actions>

@@ -1,21 +1,29 @@
 <div class="url-container">
-    <input type="text" [formControl]="searchterm" placeholder="Search in Tenor">
-    <button
-        *ngIf="(nextSearch === '' && searchterm.value !== '' || searchterm.value != lastSearchterm) || searchterm.value === ''"
-        (click)="search()">
+    <input type="text" [formControl]="searchterm" placeholder="Search in Tenor" />
+
+    @if (
+    (nextSearch === '' && searchterm.value !== '') ||
+    (searchterm.value !== lastSearchterm) ||
+    (searchterm.value === '')
+    ) {
+    <button (click)="search()">
         <mat-icon>search</mat-icon>
     </button>
-    <button *ngIf="nextSearch !== '' && searchterm.value !== '' && searchterm.value === lastSearchterm"
-        (click)="search()">
+    } @else {
+    <button (click)="search()">
         <mat-icon>arrow_circle_right</mat-icon>
     </button>
+    }
 </div>
+
 <mat-dialog-content class="full-width">
-    <div *ngIf="results" class="gallery">
+    @if (results.length > 0) {
+    <div class="gallery">
         @for (result of results; track result.id) {
         <div>
-            <img [src]="result.media_formats.gif.url" alt="Gif" (click)="onApplyClick(result)">
+            <img [src]="result.media_formats.gif.url" alt="Gif" (click)="onApplyClick(result)" />
         </div>
         }
     </div>
+    }
 </mat-dialog-content>

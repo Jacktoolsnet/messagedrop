@@ -1,13 +1,31 @@
 <div class="dialog-container">
-    <img *ngIf="data.image" src="{{data.image}}" alt="Backend Error" class="backend-error-image" />
-    <div *ngIf="data.icon" class="center">
-        <mat-icon aria-hidden="false" class="mat_icon">{{data.icon}}</mat-icon>
+    @if (data.image) {
+    <img src="{{ data.image }}" alt="Backend Error" class="backend-error-image" />
+    }
+
+    @if (data.icon) {
+    <div class="center">
+        <mat-icon aria-hidden="false" class="mat_icon">{{ data.icon }}</mat-icon>
     </div>
-    <h2 *ngIf="data.title">{{data.title}}</h2>
-    <p *ngIf="data.message" class="multiline-text">{{data.message}}</p>
-    <div *ngIf="data.showSpinner" class="center">
+    }
+
+    @if (data.title) {
+    <h2>{{ data.title }}</h2>
+    }
+
+    @if (data.message) {
+    <p class="multiline-text">{{ data.message }}</p>
+    }
+
+    @if (data.showSpinner) {
+    <div class="center">
         <mat-spinner></mat-spinner>
     </div>
-    <button *ngIf="showOk && data.button" mat-raised-button color="primary"
-        (click)="dialogRef.close()">{{data.button}}</button>
+    }
+
+    @if (showOk && data.button) {
+    <button mat-raised-button color="primary" (click)="dialogRef.close()">
+        {{ data.button }}
+    </button>
+    }
 </div>

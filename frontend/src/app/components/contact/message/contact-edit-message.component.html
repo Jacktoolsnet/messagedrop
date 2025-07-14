@@ -1,46 +1,70 @@
-<h2 *ngIf="data.mode == 'add_short_message'" mat-dialog-title>Send a short message</h2>
+@if (data.mode == 'add_short_message') {
+<h2 mat-dialog-title>Send a short message</h2>
+}
 
 <mat-dialog-content>
     <div class="content">
-        <app-select-multimedia *ngIf="data.shortMessage.multimedia.type === 'undefined'" class="oembed_container"
-            (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
-        <div *ngIf="data.shortMessage.multimedia.type === 'tenor'" class="oembed_container">
+        @if (data.shortMessage.multimedia.type === 'undefined') {
+        <app-select-multimedia class="oembed_container" (newMultimedia)="applyNewMultimedia($event)">
+        </app-select-multimedia>
+        }
+
+        @if (data.shortMessage.multimedia.type === 'tenor') {
+        <div class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <img class="multimedia_image" [src]="data.shortMessage.multimedia.url">
+            <img class="multimedia_image" [src]="data.shortMessage.multimedia.url" />
         </div>
-        <div *ngIf="data.shortMessage.multimedia.type !== 'undefined' && showSaveHtml" class="oembed_container">
+        }
+
+        @if (data.shortMessage.multimedia.type !== 'undefined' && showSaveHtml && data.shortMessage.multimedia.type !==
+        'tenor') {
+        <div class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
             <div [innerHTML]="safeHtml" class="oembed_container_iframe"></div>
         </div>
-        <a class=" attribution_link" href="{{data.shortMessage.multimedia.sourceUrl}}"
-            target="_blank">{{data.shortMessage.multimedia.attribution}}</a>
-        <div *ngIf="data.shortMessage.message === ''" class="oembed_container">
+        }
+
+        @if (data.shortMessage.multimedia.attribution) {
+        <a class="attribution_link" [href]="data.shortMessage.multimedia.sourceUrl" target="_blank">
+            {{ data.shortMessage.multimedia.attribution }}
+        </a>
+        }
+
+        @if (data.shortMessage.message === '') {
+        <div class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>
                 <span>Add a text</span>
             </button>
         </div>
-        <div *ngIf="data.shortMessage.message !== ''" class="oembed_container">
-            <button *ngIf="data.shortMessage.message !== ''" mat-mini-fab class="button_random" color="secondary"
-                aria-label="Drop a new message" (click)="onNewFontClick()">
+        } @else {
+        <div class="oembed_container">
+            <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message"
+                (click)="onNewFontClick()">
                 <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <p class="text" (click)="openTextDialog()" [style]="data.shortMessage.style">{{data.shortMessage.message}}
+            <p class="text" (click)="openTextDialog()" [style]="data.shortMessage.style">
+                {{ data.shortMessage.message }}
             </p>
         </div>
+        }
     </div>
 </mat-dialog-content>
-<mat-dialog-actions *ngIf="data.shortMessage.message !== '' || data.shortMessage.multimedia.type !== 'undefined'">
-    <button *ngIf="data.mode == 'add_short_message'" mat-flat-button class="button_drop" color="primary"
-        aria-label="Drop your message" (click)="onApplyClick()">
+
+@if (data.shortMessage.message !== '' || data.shortMessage.multimedia.type !== 'undefined') {
+<mat-dialog-actions>
+    @if (data.mode == 'add_short_message') {
+    <button mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
         Send message
     </button>
+    }
 </mat-dialog-actions>
+}

@@ -1,25 +1,27 @@
 <h2 mat-dialog-title>Contact profile</h2>
+
 <mat-dialog-content>
+  <mat-form-field appearance="fill" class="full-width">
+    <mat-label>Contact name</mat-label>
+    <input matInput maxlength="64" [(ngModel)]="contact.name" />
+  </mat-form-field>
 
-  Set contact name
-  <input matInput type="text" maxlength="64" placeholder="Contact name.." [(ngModel)]="contact.name">
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
-    (change)="onFileSelected($event)" #fileUpload>
+    (change)="onFileSelected($event)" #fileUpload />
 
-  <div class="avatar-area" *ngIf="contact.base64Avatar === undefined || contact.base64Avatar === ''">
-    <div class="center">
-      Set contact avatar
-    </div>
+  @if (!contact.base64Avatar) {
+  <div class="avatar-area">
+    <div class="center">Set contact avatar</div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
         <mat-icon>attach_file</mat-icon>
       </button>
     </div>
   </div>
-
-  <div class="avatar-area" *ngIf="contact.base64Avatar !== undefined && contact.base64Avatar !== ''">
+  } @else {
+  <div class="avatar-area">
     <div class="center">
-      <img class="avatar" src="{{contact.base64Avatar}}" /><br>
+      <img class="avatar" [src]="contact.base64Avatar" /><br />
     </div>
     <div class="center">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
@@ -27,16 +29,20 @@
       </button>
     </div>
   </div>
+  }
+
+  @if (joinedUserRoom) {
   <div class="avatar-area">
-    <div class="buttonarea" *ngIf="joinedUserRoom === true">
-      <button mat-flat-button class color="primary" [attr.aria-hidden]="false" class="button_style"
-        (click)="getProfileFromContact(contact)">
+    <div class="buttonarea">
+      <button mat-flat-button color="primary" class="button_style" (click)="getProfileFromContact(contact)">
         <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
         <span>Ask contact for profile</span>
       </button>
     </div>
   </div>
+  }
 </mat-dialog-content>
+
 <mat-dialog-actions>
   <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
   <button mat-button mat-dialog-close [mat-dialog-close]="true">Apply</button>
