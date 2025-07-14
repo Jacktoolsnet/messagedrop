@@ -33,6 +33,7 @@ h4 {
     overflow: hidden;
     margin: 0.5rem;
     min-height: 2.5rem;
+    background-color: gray;
 }
 
 .url-container input[type="text"] {
@@ -79,4 +80,29 @@ h4 {
     align-items: center;
     width: 100%;
     padding-bottom: 0.5rem;
+}
+
+.platform-tile-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    padding: 1rem;
+    width: 100%;
+}
+
+.platform-tile {
+    background-color: #3a3a3a;
+    color: floralwhite;
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.05rem;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 0.2s ease;
+}
+
+.platform-tile:hover {
+    background-color: #4a4a4a;
+    transform: scale(1.02);
 }

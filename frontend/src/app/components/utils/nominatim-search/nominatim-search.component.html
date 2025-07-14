@@ -1,5 +1,6 @@
 <div class="searchTerm-container">
     <input type="text" [formControl]="searchterm" placeholder="Search in OpenStreetMap">
+
     <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
         @for (r of radiusOptions; track r.value) {
         <option [value]="r.value">
@@ -7,33 +8,43 @@
         </option>
         }
     </select>
+
     <button (click)="search()">
         <mat-icon>search</mat-icon>
     </button>
 </div>
+
 <div class="content">
     @for (place of nominatimPlaces; track place.place_id) {
     <mat-card class="item">
         <div class="avatar-box">
             <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
-            <span *ngIf="place.name" class="name">{{ place.name }}</span>
+            @if (place.name) {
+            <span class="name">{{ place.name }}</span>
+            }
         </div>
+
         <mat-card-content>
             <div class="tile-value address-text">
                 {{ getFormattedAddress(place) }}
             </div>
-            <div class="tile-severity" *ngIf="place.distance !== undefined">
+
+            @if (place.distance !== undefined) {
+            <div class="tile-severity">
                 Distance: {{ formatDistance(place.distance) }}
             </div>
+            }
         </mat-card-content>
+
         <mat-card-actions class="buttonbar">
             <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
                 (click)="flyTo(place)">
-                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">place</mat-icon>
+                <mat-icon class="material-symbols-outlined">place</mat-icon>
             </button>
+
             <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Navigate to place"
                 (click)="nominatimService.navigateToNominatimPlace(place)">
-                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">assistant_direction</mat-icon>
+                <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
             </button>
         </mat-card-actions>
     </mat-card>

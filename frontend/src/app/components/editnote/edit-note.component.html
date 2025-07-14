@@ -1,8 +1,11 @@
 <mat-dialog-content>
     <div class="content">
-        <app-select-multimedia *ngIf="data.note.multimedia.type === 'undefined'" class="oembed_container"
-            (newMultimedia)="applyNewMultimedia($event)"></app-select-multimedia>
-        <div *ngIf="data.note.multimedia.type === 'tenor'" class="oembed_container">
+
+        @if (data.note.multimedia.type === 'undefined') {
+        <app-select-multimedia class="oembed_container" (newMultimedia)="applyNewMultimedia($event)">
+        </app-select-multimedia>
+        } @else if (data.note.multimedia.type === 'tenor') {
+        <div class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
@@ -12,26 +15,34 @@
                 </button>
             </app-showmultimedia>
         </div>
-        <div *ngIf="data.note.note === ''" class="oembed_container">
+        }
+
+        @if (data.note.note === '') {
+        <div class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon class="material-symbols-outlined">post_add</mat-icon>
                 <span>Add a text</span>
             </button>
         </div>
-        <div *ngIf="data.note.note !== ''" class="text_container">
-            <button *ngIf="data.note.note !== ''" mat-mini-fab class="button_random" color="secondary"
-                aria-label="Drop a new message" (click)="onNewFontClick()">
+        } @else {
+        <div class="text_container">
+            <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message"
+                (click)="onNewFontClick()">
                 <mat-icon class="material-symbols-outlined">cycle</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <p class="text" (click)="openTextDialog()" [style]="data.note.style">{{data.note.note}}</p>
+            <p class="text" (click)="openTextDialog()" [style]="data.note.style">{{ data.note.note }}</p>
         </div>
+        }
+
     </div>
 </mat-dialog-content>
+
 <mat-dialog-actions>
     <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-    <button *ngIf="data.note.note !== '' || data.note.multimedia.type !== 'undefined'" mat-button mat-dialog-close
-        (click)="onApplyClick()">Apply</button>
+    @if (data.note.note !== '' || data.note.multimedia.type !== 'undefined') {
+    <button mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
+    }
 </mat-dialog-actions>

@@ -1,15 +1,21 @@
-<div *ngIf="multimedia?.type === 'tenor'" class="media_block">
+@if (multimedia?.type === 'tenor') {
+<div class="media_block">
     <div class="multimedia_container">
         <img class="multimedia_image" [src]="multimedia!.url">
     </div>
-    <a *ngIf="multimedia?.attribution !== ''" class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
+    @if (multimedia?.attribution !== '') {
+    <a class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
         {{ multimedia?.attribution }}
     </a>
+    }
 </div>
-
-<div *ngIf="multimedia?.type !== 'tenor' && safeHtml != ''" class="media_block">
+} @else if (multimedia?.type !== 'tenor' && safeHtml !== '') {
+<div class="media_block">
     <div class="oembed_container" [innerHTML]="safeHtml"></div>
-    <a *ngIf="multimedia?.attribution !== ''" class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
+    @if (multimedia?.attribution !== '') {
+    <a class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
         {{ multimedia?.attribution }}
     </a>
+    }
 </div>
+}

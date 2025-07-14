@@ -1,21 +1,29 @@
 <div class="url-container">
     <input type="text" [(ngModel)]="multimediaUrl" (input)="validateUrl()" placeholder="Enter multimedia url" />
-    <button *ngIf="!urlInvalid" mat-icon-button (click)="onApplyClick()">
+    @if (!urlInvalid) {
+    <button mat-icon-button (click)="onApplyClick()">
         <mat-icon>check</mat-icon>
     </button>
+    }
 </div>
+
 <mat-dialog-content class="full-width">
-    <div *ngIf="safeHtml != undefined" class="multimedia_container" [innerHTML]="safeHtml"></div>
-    <div class="center" *ngIf="safeHtml != undefined">
+    @if (safeHtml !== undefined) {
+    <div class="multimedia_container" [innerHTML]="safeHtml"></div>
+    <div class="center">
         <button mat-mini-fab color="primary" class="upload-button" (click)="clearContent()">
             <mat-icon>delete</mat-icon>
         </button>
     </div>
-    <div *ngIf="safeHtml == undefined">
-        <h2>Supportet Websites</h2>
-        <h4>TikTok</h4><br />
-        <h4>Pinterest</h4><br />
-        <h4>Spotify</h4><br />
-        <h4>YouTube</h4><br />
+    } @else {
+    <div class="content">
+        <h2>Supported Platforms</h2>
+        <div class="platform-tile-container">
+            <div class="platform-tile">YouTube</div>
+            <div class="platform-tile">Spotify</div>
+            <div class="platform-tile">TikTok</div>
+            <div class="platform-tile">Pinterest</div>
+        </div>
     </div>
+    }
 </mat-dialog-content>
