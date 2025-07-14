@@ -58,6 +58,7 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   }
 
   updateChart(): void {
+    console.log('Updating chart for tile:', this.tile);
     if (!this.tile?.values || !this.tile?.time) return;
 
     const start = this.selectedDayIndex * 24;
@@ -180,6 +181,8 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
     };
 
     if (this.chart) {
+      this.chart.data = this.chartData; // <- wichtig!
+      this.chart.options = this.chartOptions;
       this.chart.update();
     }
   }

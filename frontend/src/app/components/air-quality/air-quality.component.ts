@@ -63,6 +63,7 @@ export class AirQualityComponent implements OnInit {
   selectedTile: any = null;
   allKeys = this.getAllCategoryKeys();
   tileIndex = 0;
+  dayLabels: string[] = [];
 
   constructor(
     private mapService: MapService,
@@ -81,6 +82,7 @@ export class AirQualityComponent implements OnInit {
     this.checkAvailableCategories();
     this.getLocationName();
     this.updateTiles();
+    this.dayLabels = this.getDayLabels();
   }
 
   checkAvailableCategories(): void {

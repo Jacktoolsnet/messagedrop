@@ -319,6 +319,8 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
 
     this.chartData = { labels, datasets: [dataset] };
     if (this.chart) {
+      this.chart.data = this.chartData; // <- wichtig!
+      this.chart.options = this.chartOptions;
       this.chart.update();
     }
   }

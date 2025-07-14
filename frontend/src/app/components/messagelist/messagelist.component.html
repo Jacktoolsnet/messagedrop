@@ -24,7 +24,8 @@
             <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">chat_add_on</mat-icon>
         </button>
 
-        <mat-card class="item" *ngFor="let message of filteredMessagesSignal(); index as i">
+        @for (message of filteredMessagesSignal(); track message.id) {
+        <mat-card class="item">
 
             <div class="avatar-box" *ngIf="user.id == message.userId && (userProfile.base64Avatar || userProfile.name)">
                 <img *ngIf="userProfile.base64Avatar" class="avatar" [src]="userProfile.base64Avatar" />
@@ -94,6 +95,7 @@
                 </button>
             </mat-card-actions>
         </mat-card>
+        }
     </div>
 
     <!-- Comment Detail View -->
@@ -105,7 +107,8 @@
             <mat-icon>add_comment</mat-icon>
         </button>
 
-        <mat-card class="item" *ngFor="let message of commentsSignal()">
+        @for (message of commentsSignal(); track message.id) {
+        <mat-card class="item">
             <mat-card-content>
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
@@ -159,6 +162,8 @@
                 </button>
             </mat-card-actions>
         </mat-card>
+        }
+
     </div>
 
 </mat-dialog-content>

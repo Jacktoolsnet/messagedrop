@@ -12,17 +12,19 @@
         </ng-template>
 
         <div class="day-switch">
-            <button mat-raised-button *ngFor="let day of getDayLabels(); let i = index"
-                [color]="i === selectedDayIndex ? 'primary' : 'secondary'" (click)="onDayChange(i)">
-                {{ day }}
+            @for (dayLabel of dayLabels; track dayLabel) {
+            <button mat-raised-button [color]="$index === selectedDayIndex ? 'primary' : 'secondary'"
+                (click)="onDayChange($index)">
+                {{ dayLabel }}
             </button>
+            }
         </div>
 
         <!-- air-quality.component.html -->
         <div *ngIf="!selectedTile">
             <div class="tile-grid">
-                <div class="tile" *ngFor="let tile of tileValues" [style.color]="tile.color"
-                    (click)="onTileClick(tile);">
+                @for(tile of tileValues; track tile.label){
+                <div class="tile" [style.color]="tile.color" (click)="onTileClick(tile);">
                     <div class="tile-title">{{ tile.label }}</div>
                     <div class="tile-icon-wrapper">
                         <mat-icon class="tile-icon">{{ tile.icon }}</mat-icon>
@@ -33,6 +35,7 @@
                     <div class="tile-level" *ngIf="tile.levelText">{{ tile.levelText }}</div>
                     <div class="tile-minmax" *ngIf="tile.minMax">{{tile.minMax.min}} - {{tile.minMax.max}}</div>
                 </div>
+                }
             </div>
         </div>
         <div *ngIf="selectedTile">
@@ -65,11 +68,12 @@
         </div>
 
         <div *ngIf="!selectedTile" class="category-switch">
-            <button mat-mini-fab *ngFor="let category of categoryModes"
-                [color]="selectedCategory === category ? 'primary' : 'secondary'" (click)="onCategoryToggle(category)"
-                [matTooltip]="getCategoryLabel(category)">
+            @for(category of categoryModes; track category){
+            <button mat-mini-fab [color]="selectedCategory === category ? 'primary' : 'secondary'"
+                (click)="onCategoryToggle(category)" [matTooltip]="getCategoryLabel(category)">
                 <mat-icon>{{ getCategoryIcon(category) }}</mat-icon>
             </button>
+            }
         </div>
     </ng-container>
 
