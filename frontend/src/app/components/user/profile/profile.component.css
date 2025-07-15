@@ -1,3 +1,15 @@
+::ng-deep mat-dialog-content {
+  max-height: unset !important;
+  overflow: visible !important;
+  display: block;
+}
+
+::ng-deep mat-dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 95vh;
+}
+
 h4 {
   padding: 0.5rem;
   color: floralwhite;
@@ -92,5 +104,11 @@ select {
 }
 
 .full-width {
+  width: 100%;
+}
+
+.theme-select {
+  min-width: 200px;
+  max-width: 100%;
   width: 100%;
 }

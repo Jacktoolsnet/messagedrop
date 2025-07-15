@@ -231,6 +231,15 @@ export class AppComponent implements OnInit {
 
 
   async initApp() {
+    // Theme
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    // Light/Dark setzen
+    document.body.classList.add(prefersDark ? 'dark' : 'light');
+
+    // Farbtheme setzen (standardmäßig 'violet')
+    const savedTheme = localStorage.getItem('theme') || 'violet';
+    this.appService.setTheme(savedTheme);
     // Shared Content
     effect(() => {
       const content = this.sharedContentService.getSharedContentSignal()();
@@ -255,6 +264,7 @@ export class AppComponent implements OnInit {
         complete: () => { }
       });
   }
+
 
   public ngOnInit(): void {
     // Titel
@@ -325,6 +335,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public logout() {
+    this.appService.setTheme('azure');
     this.userService.logout()
     this.placeService.logout();
     this.contactService.logout();
@@ -603,6 +614,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user, confirmUserResponse.jwt);
+                    this.appService.setTheme(this.userService.getProfile().defaultTheme || 'azure');
                     this.updateDataForLocation(this.mapService.getMapLocation(), true);
                   },
                   error: (err) => {
@@ -1012,9 +1024,13 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let oriName: string | undefined = profile.name;
     let oriBase64Avatar: string | undefined = profile.base64Avatar;
     let oriDefaultStyle: string | undefined = profile.defaultStyle;
+    let oriDefaultTheme: string | undefined = profile.defaultTheme;
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
       data: {},
       closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      autoFocus: false,
       hasBackdrop: true
     });
 
@@ -1033,6 +1049,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         }
         if (undefined != oriDefaultStyle) {
           profile.defaultStyle = oriDefaultStyle;
+        }
+        if (undefined != oriDefaultTheme) {
+          profile.defaultTheme = oriDefaultTheme;
         }
       }
     });

@@ -51,7 +51,8 @@ export class UserService {
 
   private profile: Profile | undefined = {
     name: '',
-    base64Avatar: ''
+    base64Avatar: '',
+    defaultTheme: 'azure'
   };
 
   private tokenRenewalTimeout: any = null;
@@ -230,7 +231,8 @@ export class UserService {
     } else {
       this.profile = {
         name: '',
-        base64Avatar: ''
+        base64Avatar: '',
+        defaultTheme: 'azure'
       };
       return this.profile;
     }

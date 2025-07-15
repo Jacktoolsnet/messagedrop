@@ -6,7 +6,9 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { AppService } from '../../../services/app.service';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
 
@@ -23,19 +25,38 @@ import { UserService } from '../../../services/user.service';
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatIconModule
+    MatIconModule,
+    MatSelectModule,
+    MatFormFieldModule,
   ],
   templateUrl: './profile.component.html',
   styleUrl: './profile.component.css'
 })
 export class ProfileComponent {
+  public availableThemes = [
+    'azure',
+    'blue',
+    'chartreuse',
+    'cyan',
+    'green',
+    'magenta',
+    'orange',
+    'red',
+    'rose',
+    'spring-green',
+    'violet',
+    'yellow'
+  ];
+
   private maxFileSize = 5 * 1024 * 1024; // 5MB
 
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
   private oriDefaultStyle: string | undefined = undefined;
+  private oriDefaultTheme: string | undefined = undefined;
 
   constructor(
+    private appService: AppService,
     public userService: UserService,
     private styleService: StyleService,
     private snackBar: MatSnackBar,
@@ -45,6 +66,7 @@ export class ProfileComponent {
     this.oriName = this.userService.getProfile().name;
     this.oriBase64Avatar = this.userService.getProfile().base64Avatar
     this.oriDefaultStyle = this.userService.getProfile().defaultStyle;
+    this.oriDefaultTheme = this.userService.getProfile().defaultTheme;
   }
 
   onAbortClick(): void {
@@ -56,6 +78,9 @@ export class ProfileComponent {
     }
     if (undefined != this.oriDefaultStyle) {
       this.userService.getProfile().defaultStyle = this.oriDefaultStyle;
+    }
+    if (undefined != this.oriDefaultTheme) {
+      this.userService.getProfile().defaultTheme = this.oriDefaultTheme;
     }
     this.dialogRef.close();
   }
@@ -91,6 +116,11 @@ export class ProfileComponent {
 
   deleteAvatar(): void {
     this.userService.getProfile().base64Avatar = '';
+  }
+
+  setTheme(themeName: string): void {
+    this.userService.getProfile().defaultTheme = themeName;
+    this.appService.setTheme(this.userService.getProfile().defaultTheme);
   }
 
   showPolicy(): void {

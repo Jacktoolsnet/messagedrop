@@ -1,5 +1,6 @@
 export interface Profile {
     name: string,
     base64Avatar: string
-    defaultStyle?: string
+    defaultStyle?: string,
+    defaultTheme: string
 }

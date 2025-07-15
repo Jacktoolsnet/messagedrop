@@ -22,6 +22,17 @@ export class AppService {
     this.notificationAction = undefined;
   }
 
+  setTheme(themeName: string): void {
+    // alte theme-[x] Klassen entfernen
+    const current = Array.from(document.body.classList).find(cls => cls.startsWith('theme-'));
+    if (current) {
+      document.body.classList.remove(current);
+    }
+
+    document.body.classList.add(`theme-${themeName}`);
+    localStorage.setItem('theme', themeName);
+  }
+
   /*this.swPush.notificationClicks.subscribe((result) => {
     if (result.notification.data.primaryKey.type === 'place') {
       this.showComponent = true;

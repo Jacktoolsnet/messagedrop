@@ -39,7 +39,8 @@ export class EditProfileComponent {
     } else {
       this.profile = {
         name: '',
-        base64Avatar: ''
+        base64Avatar: '',
+        defaultTheme: ''
       };
     }
     this.userId = data.userId;

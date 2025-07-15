@@ -1,49 +1,72 @@
-/* You can add global styles to this file, and also import other style files */
+@use '@angular/material' as mat;
 
+$paletten: (
+  red: mat.$red-palette,
+  green: mat.$green-palette,
+  blue: mat.$blue-palette,
+  yellow: mat.$yellow-palette,
+  cyan: mat.$cyan-palette,
+  magenta: mat.$magenta-palette,
+  orange: mat.$orange-palette,
+  chartreuse: mat.$chartreuse-palette,
+  spring-green: mat.$spring-green-palette,
+  azure: mat.$azure-palette,
+  violet: mat.$violet-palette,
+  rose: mat.$rose-palette
+);
+
+@each $name, $palette in $paletten {
+  .theme-#{"#{$name}"}.light {
+@include mat.all-component-themes(mat.define-theme((color: (theme-type: light,
+          primary: $palette ))));
+}
+
+.theme-#{"#{$name}"}.dark {
+@include mat.all-component-themes(mat.define-theme((color: (theme-type: dark,
+        primary: $palette ))));
+}
+}
+
+/* === GLOBAL STYLES === */
 html,
 body {
   height: 100%;
   margin: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
-  background-color: #292929;
+  background-color: var(--background-color, #292929);
+  color: var(--text-color, #fff);
 }
 
-.material-symbols-outlined {
-  font-variation-settings:
-    'FILL' 0,
-    'wght' 400,
-    'GRAD' 0,
-    'opsz' 24
-}
-
+/* === SNACKBAR STYLES === */
 .snack-error {
-  --mdc-snackbar-container-color: rgb(233, 64, 64, 0.75);
+  --mdc-snackbar-container-color: rgba(233, 64, 64, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
 .snack-warning {
-  --mdc-snackbar-container-color: rgb(255, 120, 0, 0.75);
+  --mdc-snackbar-container-color: rgba(255, 120, 0, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
 .snack-success {
-  --mdc-snackbar-container-color: rgb(96, 201, 93, 0.75);
+  --mdc-snackbar-container-color: rgba(96, 201, 93, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
 .snack-info {
-  --mdc-snackbar-container-color: rgb(75, 212, 253, 0.75);
+  --mdc-snackbar-container-color: rgba(75, 212, 253, 0.75);
   --mat-mdc-snack-bar-button-color: #fff;
   --mdc-snackbar-supporting-text-color: #000;
   text-align: center;
 }
 
+/* === FONTS === */
 @font-face {
   font-family: 'DancingScript';
   src: url('./assets/fonts/DancingScript.ttf');
