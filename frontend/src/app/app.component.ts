@@ -231,15 +231,7 @@ export class AppComponent implements OnInit {
 
 
   async initApp() {
-    // Theme
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    // Light/Dark setzen
-    document.body.classList.add(prefersDark ? 'dark' : 'light');
-
-    // Farbtheme setzen (standardmäßig 'violet')
-    const savedTheme = localStorage.getItem('theme') || 'violet';
-    this.appService.setTheme(savedTheme);
+    this.appService.setTheme('azure');
     // Shared Content
     effect(() => {
       const content = this.sharedContentService.getSharedContentSignal()();
