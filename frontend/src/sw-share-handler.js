@@ -33,7 +33,7 @@ async function handleShareTargetPost(event) {
             type
         };
 
-        await deliverToClientOrSave(sharedContent, type);
+        await deliverToClientAndSave(sharedContent, type);
         return caches.match('/index.html') || fetch('/index.html');
     } catch (err) {
         return new Response('Error processing POST share target', { status: 500 });
@@ -59,7 +59,7 @@ async function handleShareTargetGet(urlObj) {
             type
         };
 
-        await deliverToClientOrSave(sharedContent, type);
+        await deliverToClientAndSave(sharedContent, type);
         return caches.match('/index.html') || fetch('/index.html');
     } catch (err) {
         return new Response('Error processing GET share target', { status: 500 });
@@ -119,14 +119,12 @@ function detectContentType(url) {
     return 'unknown';
 }
 
-async function deliverToClientOrSave(content, type) {
+async function deliverToClientAndSave(content, type) {
     await saveSharedContentToDB(content, type);
-    const clientList = await clients.matchAll({ type: 'window', includeUncontrolled: true });
-    if (clientList.length > 0) {
-        for (const client of clientList) {
-            client.postMessage({ type: 'shared', content });
-        }
-    }
+
+    const bc = new BroadcastChannel('shared-content');
+    bc.postMessage({ type: 'shared', content });
+    bc.close();
 }
 
 function saveSharedContentToDB(data, type) {

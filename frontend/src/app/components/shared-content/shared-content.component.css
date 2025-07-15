@@ -15,34 +15,9 @@ h2 {
 
 h4 {
     color: floralwhite;
-    text-align: center;
+    text-align: left;
     font-weight: 400;
     margin-top: 1rem;
     padding: 1rem;
     border-radius: 0.5rem;
-}
-
-.countdown {
-    text-align: center;
-    font-size: 0.95rem;
-    color: #cccccc;
-    margin-bottom: 1rem;
-    opacity: 0.8;
-}
-
-.buttonarea {
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
-    width: 100%;
-    height: auto;
-}
-
-.button_style {
-    margin: auto;
-    width: 100%;
-    height: 3rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
 }

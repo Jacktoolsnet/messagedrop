@@ -1,10 +1,8 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { computed, Injectable, signal } from '@angular/core';
 import { Message } from '../interfaces/message';
 import { Multimedia } from '../interfaces/multimedia';
 import { Note } from '../interfaces/note';
 import { SharedContent } from '../interfaces/shared-content';
-import { MapService } from './map.service';
 import { OembedService } from './oembed.service';
 
 @Injectable({ providedIn: 'root' })
@@ -13,30 +11,30 @@ export class SharedContentService {
   private storeName = 'shared';
   private lastKey = 'last';
 
-  private sharedAvailableSubject = new BehaviorSubject<boolean>(false);
+  private broadcastChannel = new BroadcastChannel('shared-content');
+  private sharedContentSignal = signal<SharedContent | null>(null);
 
-  constructor(
-    private oembedService: OembedService, // Assuming OembedService is defined elsewhere
-    private mapService: MapService // Assuming MapService is defined elsewhere
-  ) {
-    this.openDB();
-    this.setupServiceWorkerListener();
-    this.checkIfSharedExists();
+  constructor(private oembedService: OembedService) {
+    this.broadcastChannel.addEventListener('message', (event) => {
+      if (event.data?.type === 'shared' && event.data.content) {
+        this.sharedContentSignal.set(event.data.content);
+      }
+    });
+
+    this.openDB().then(async () => {
+      const content = await this.getSharedContent('last');
+      if (content) {
+        this.sharedContentSignal.set(content);
+      }
+    });
   }
 
-  public getSharedAvailableObservable(): Observable<boolean> {
-    return this.sharedAvailableSubject.asObservable();
+  public getSharedContentSignal() {
+    return this.sharedContentSignal.asReadonly();
   }
 
-  private setupServiceWorkerListener() {
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.addEventListener('message', async (event) => {
-        if (event.data?.type === 'shared' && event.data.content) {
-          await this.saveSharedContent('last', event.data.content);
-          this.sharedAvailableSubject.next(true);
-        }
-      });
-    }
+  public getIsSharedAvailableSignal() {
+    return computed(() => this.sharedContentSignal() !== null);
   }
 
   private openDB(): Promise<IDBDatabase> {
@@ -64,17 +62,6 @@ export class SharedContentService {
     });
   }
 
-  private async saveSharedContent(id: string, content: SharedContent): Promise<void> {
-    const db = await this.openDB();
-    return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.storeName, 'readwrite');
-      const store = tx.objectStore(this.storeName);
-      const request = store.put({ ...content, id });
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
-    });
-  }
-
   public async deleteSharedContent(id: string): Promise<void> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
@@ -83,17 +70,11 @@ export class SharedContentService {
       const request = store.delete(id);
       request.onsuccess = () => {
         if (id === this.lastKey) {
-          this.sharedAvailableSubject.next(false);
         }
         resolve();
       };
       request.onerror = () => reject(request.error);
     });
-  }
-
-  private async checkIfSharedExists(): Promise<void> {
-    const last = await this.getSharedContent('last');
-    this.sharedAvailableSubject.next(!!last);
   }
 
   public async addSharedContentToMessage(message: Message): Promise<void> {

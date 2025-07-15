@@ -1,5 +1,5 @@
 import { CommonModule, PlatformLocation } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, OnInit, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -47,6 +47,7 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { Profile } from './interfaces/profile';
+import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -84,6 +85,7 @@ import { WeatherService } from './services/weather.service';
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
+
 export class AppComponent implements OnInit {
   public locationReady: boolean = false;
   public myHistory: string[] = [];
@@ -106,7 +108,6 @@ export class AppComponent implements OnInit {
       msg => msg.userId === this.userService.getUser().id
     )
   );
-
 
   constructor(
     private titleService: Title,
@@ -228,7 +229,17 @@ export class AppComponent implements OnInit {
     this.initApp();
   }
 
+
   async initApp() {
+    // Shared Content
+    effect(() => {
+      const content = this.sharedContentService.getSharedContentSignal()();
+      if (content) {
+        this.handleSharedContent(content);
+      }
+    });
+    // Notification Action
+    this.handleNotification();
     // Clear cache
     this.indexedDbService.deleteSetting('nominatimSelectedPlace')
     this.indexedDbService.deleteSetting('nominatimSearch')
@@ -321,48 +332,42 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     this.updateDataForLocation(this.mapService.getMapLocation(), true);
   }
 
-  public handleSharedContentOrNotification() {
-    // Check if app is called from shared dialog or from push notification
+  private async handleSharedContent(content: SharedContent) {
+    let multimedia: Multimedia | undefined = undefined;
+    let location: Location | undefined = undefined;
 
-    // Observe shared content
-    this.sharedContentService.getSharedAvailableObservable().subscribe(async (sharedAvaliable: boolean) => {
-      if (sharedAvaliable) {
-        const lastContent = await this.sharedContentService.getSharedContent('last');
-        let multimedia: Multimedia | undefined = undefined;
-        let location: Location | undefined = undefined;
-        if (lastContent?.url) {
-          const objectFromUrl = await this.oembedService.getObjectFromUrl(lastContent.url);
-          if (objectFromUrl && this.oembedService.isMultimedia(objectFromUrl)) {
-            multimedia = objectFromUrl as Multimedia;
-          } else if (objectFromUrl && this.oembedService.isLocation(objectFromUrl)) {
-            location = objectFromUrl as Location;
-          } else {
-            this.snackBar.open(JSON.stringify(lastContent, null, 2), 'OK', {
-              horizontalPosition: 'center',
-              verticalPosition: 'top',
-            });
-          }
-        }
-        const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
-          data: { multimedia: multimedia, location: location },
-          closeOnNavigation: true,
-          minWidth: '20vw',
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          hasBackdrop: true,
-          autoFocus: false
-        });
-
-        dialogRef.afterOpened().subscribe(e => {
-        });
-
-        dialogRef.afterClosed().subscribe(result => {
-          if (result) {
-            this.userService.saveProfile();
-          }
+    if (content.url) {
+      const objectFromUrl = await this.oembedService.getObjectFromUrl(content.url);
+      if (this.oembedService.isMultimedia(objectFromUrl)) {
+        multimedia = objectFromUrl;
+      } else if (this.oembedService.isLocation(objectFromUrl)) {
+        location = objectFromUrl;
+      } else {
+        this.snackBar.open(JSON.stringify(content, null, 2), 'OK', {
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
         });
       }
+    }
+
+    const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
+      data: { multimedia, location },
+      closeOnNavigation: true,
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.userService.saveProfile();
+      }
+    });
+  }
+
+  public handleNotification() {
     const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
     if (notificationAction) {
       this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
@@ -599,8 +604,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user, confirmUserResponse.jwt);
                     this.updateDataForLocation(this.mapService.getMapLocation(), true);
-                    // Subscribe for shared content
-                    this.handleSharedContentOrNotification()
                   },
                   error: (err) => {
                     if (err.status === 401) {

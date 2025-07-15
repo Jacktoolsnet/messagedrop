@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-import { MatIcon } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MapService } from '../../services/map.service';
@@ -14,8 +14,12 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
   imports: [
     CommonModule,
     MatDialogContent,
-    MatIcon,
-    ShowmultimediaComponent
+    MatButtonModule,
+    MatDialogTitle,
+    MatDialogActions,
+    MatDialogClose,
+    ShowmultimediaComponent,
+    MatDialogModule
   ],
   templateUrl: './shared-content.component.html',
   styleUrl: './shared-content.component.css'
@@ -44,13 +48,13 @@ export class SharedContentComponent implements OnInit {
       this.mapService.moveToWithZoom(this.data.location, 17);
     }
 
-    this.countdownInterval = setInterval(() => {
+    /*this.countdownInterval = setInterval(() => {
       this.countdown--;
       if (this.countdown <= 0) {
         clearInterval(this.countdownInterval);
         this.dialogRef.close();
       }
-    }, 1000);
+    }, 1000);*/
   }
 
   public deleteSharedContent(): void {

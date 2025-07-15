@@ -58,7 +58,6 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   }
 
   updateChart(): void {
-    console.log('Updating chart for tile:', this.tile);
     if (!this.tile?.values || !this.tile?.time) return;
 
     const start = this.selectedDayIndex * 24;

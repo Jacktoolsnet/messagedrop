@@ -122,7 +122,6 @@ export class PlacelistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      console.log(data);
       if (undefined !== data?.place) {
         this.placeService.updatePlace(data.place)
           .subscribe({
