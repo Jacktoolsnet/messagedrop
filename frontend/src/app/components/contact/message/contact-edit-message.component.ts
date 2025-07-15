@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -17,6 +17,7 @@ import { ShortMessage } from '../../../interfaces/short-message';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
+import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
 import { TenorComponent } from '../../utils/tenor/tenor.component';
 import { TextComponent } from '../../utils/text/text.component';
 
@@ -28,12 +29,12 @@ import { TextComponent } from '../../utils/text/text.component';
     FormsModule,
     MatButtonModule,
     MatDialogActions,
-    MatDialogTitle,
     MatDialogContent,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    ShowmultimediaComponent
   ],
   templateUrl: './contact-edit-message.component.html',
   styleUrl: './contact-edit-message.component.css'
@@ -63,6 +64,10 @@ export class ContactEditMessageComponent implements OnInit {
 
   onApplyClick(): void {
     this.dialogRef.close(this.data);
+  }
+
+  onAbortClick(): void {
+    this.dialogRef.close();
   }
 
   onNewFontClick(): void {

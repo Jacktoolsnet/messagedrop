@@ -1,37 +1,16 @@
-@if (data.mode == 'add_short_message') {
-<h2 mat-dialog-title>Send a short message</h2>
-}
-
 <mat-dialog-content>
     <div class="content">
         @if (data.shortMessage.multimedia.type === 'undefined') {
         <app-select-multimedia class="oembed_container" (newMultimedia)="applyNewMultimedia($event)">
         </app-select-multimedia>
-        }
-
-        @if (data.shortMessage.multimedia.type === 'tenor') {
+        } @else {
         <div class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <img class="multimedia_image" [src]="data.shortMessage.multimedia.url" />
+            <app-showmultimedia class="oembed_container" [multimedia]="data.shortMessage.multimedia">
+            </app-showmultimedia>
         </div>
-        }
-
-        @if (data.shortMessage.multimedia.type !== 'undefined' && showSaveHtml && data.shortMessage.multimedia.type !==
-        'tenor') {
-        <div class="oembed_container">
-            <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-                <mat-icon>delete</mat-icon>
-            </button>
-            <div [innerHTML]="safeHtml" class="oembed_container_iframe"></div>
-        </div>
-        }
-
-        @if (data.shortMessage.multimedia.attribution) {
-        <a class="attribution_link" [href]="data.shortMessage.multimedia.sourceUrl" target="_blank">
-            {{ data.shortMessage.multimedia.attribution }}
-        </a>
         }
 
         @if (data.shortMessage.message === '') {
@@ -58,13 +37,12 @@
     </div>
 </mat-dialog-content>
 
-@if (data.shortMessage.message !== '' || data.shortMessage.multimedia.type !== 'undefined') {
 <mat-dialog-actions>
-    @if (data.mode == 'add_short_message') {
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
+
+    @if (data.shortMessage.message !== '' || data.shortMessage.multimedia.type !== 'undefined') {
     <button mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">send</mat-icon>
-        Send message
+        Apply
     </button>
     }
 </mat-dialog-actions>
-}
