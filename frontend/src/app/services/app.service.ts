@@ -23,13 +23,27 @@ export class AppService {
   }
 
   setTheme(themeName: string): void {
-    // alte theme-[x] Klassen entfernen
-    const current = Array.from(document.body.classList).find(cls => cls.startsWith('theme-'));
-    if (current) {
-      document.body.classList.remove(current);
-    }
+    // Alte theme-[x] Klassen entfernen
+    const themeClass = Array.from(document.body.classList).find(cls => cls.startsWith('theme-'));
+    if (themeClass) document.body.classList.remove(themeClass);
 
+    // Neue theme-[name] Klasse setzen
     document.body.classList.add(`theme-${themeName}`);
+
+    // Listener-Funktion zum Setzen des Dark/Light Modus
+    const applyModeClass = (isDark: boolean) => {
+      document.body.classList.remove('light', 'dark');
+      document.body.classList.add(isDark ? 'dark' : 'light');
+    };
+
+    const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    applyModeClass(darkModeQuery.matches);
+
+    // alten Listener sicherheitshalber entfernen und neuen setzen
+    darkModeQuery.removeEventListener?.('change', (e) => applyModeClass(e.matches));
+    darkModeQuery.addEventListener('change', (e) => applyModeClass(e.matches));
+
+    // Theme speichern
     localStorage.setItem('theme', themeName);
   }
 
