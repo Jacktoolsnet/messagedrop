@@ -1,3 +1,7 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
 ::ng-deep mat-dialog-content {
   max-height: unset !important;
   overflow: visible !important;
@@ -12,22 +16,11 @@
 
 h4 {
   padding: 0.5rem;
-  color: floralwhite;
 }
 
 button {
   margin-right: 8px;
-}
-
-input[type=text],
-select {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  z-index: 1000;
 }
 
 .file-input {
@@ -48,7 +41,8 @@ select {
   border-radius: 1rem;
   margin-top: 1rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  background-color: var(--mat-option-selected-state-layer-color);
+  box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
 }
 
 .center {
@@ -82,9 +76,10 @@ select {
   position: relative;
   display: block;
   border-radius: 1rem;
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  background-color: var(--mat-option-selected-state-layer-color);
+  box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
 }
 
 .sample-style {
