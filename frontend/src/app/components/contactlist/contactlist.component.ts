@@ -178,11 +178,6 @@ export class ContactlistComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
-      width: '90vw',
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      height: 'auto',
-      maxHeight: '90vh',
       hasBackdrop: true,
       autoFocus: false
     });

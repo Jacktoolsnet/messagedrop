@@ -1,4 +1,4 @@
-h4 {
+h2 {
   padding: 0.5rem;
   color: floralwhite;
 }
@@ -88,4 +88,8 @@ select {
   bottom: 0;
   right: 0;
   transform: translate(50%, 50%);
+}
+
+.full-width {
+  width: 100%;
 }

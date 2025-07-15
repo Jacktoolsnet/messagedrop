@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, ViewChild } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Result } from '@zxing/library';
 import { Mode } from '../../../interfaces/mode';
@@ -7,7 +8,11 @@ import { Mode } from '../../../interfaces/mode';
 @Component({
   selector: 'app-scanner',
   imports: [
-    MatDialogContent
+    MatDialogContent,
+    MatButtonModule,
+    MatDialogTitle,
+    MatDialogActions,
+    MatDialogClose,
   ],
   templateUrl: './scanner.component.html',
   styleUrl: './scanner.component.css'
