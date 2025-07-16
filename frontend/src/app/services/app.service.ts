@@ -1,13 +1,47 @@
 import { Injectable } from '@angular/core';
+import { AppSettings } from '../interfaces/app-settings';
 import { NotificationAction } from '../interfaces/notification-action';
+import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AppService {
+  private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
+  private appSettings: AppSettings = { defaultTheme: 'azure', themeMode: 'system' };
   private notificationAction?: NotificationAction;
 
-  constructor() { }
+  constructor(
+    private indexedDbService: IndexedDbService
+  ) { }
+
+  public setAppSettings(newAppSettings: AppSettings): void {
+    this.indexedDbService.setSetting('appSettings', JSON.stringify(newAppSettings)).then(() => {
+      this.appSettings = newAppSettings;
+      this.setTheme(this.appSettings);
+    });
+  }
+
+  public getAppSettings(): AppSettings {
+    if (!this.appSettings) {
+      this.appSettings = { defaultTheme: 'azure', themeMode: 'system' };
+    }
+    return this.appSettings;
+  }
+
+  async loadAppSettings(): Promise<void> {
+    try {
+      const settings = JSON.parse(await this.indexedDbService.getSetting('appSettings'));
+      if (settings) {
+        this.appSettings = settings;
+      } else {
+        this.appSettings = { defaultTheme: 'azure', themeMode: 'system' };
+      }
+    } catch (error) {
+      this.appSettings = { defaultTheme: 'azure', themeMode: 'system' };
+    }
+    this.setTheme(this.appSettings);
+  }
 
   // Notification-Daten
   public setNotificationAction(action: NotificationAction): void {
@@ -22,29 +56,33 @@ export class AppService {
     this.notificationAction = undefined;
   }
 
-  setTheme(themeName: string): void {
-    // Alte theme-[x] Klassen entfernen
+  setTheme(appSettings: AppSettings): void {
     const themeClass = Array.from(document.body.classList).find(cls => cls.startsWith('theme-'));
     if (themeClass) document.body.classList.remove(themeClass);
+    document.body.classList.add(`theme-${appSettings.defaultTheme}`);
 
-    // Neue theme-[name] Klasse setzen
-    document.body.classList.add(`theme-${themeName}`);
-
-    // Listener-Funktion zum Setzen des Dark/Light Modus
     const applyModeClass = (isDark: boolean) => {
       document.body.classList.remove('light', 'dark');
       document.body.classList.add(isDark ? 'dark' : 'light');
     };
 
     const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    applyModeClass(darkModeQuery.matches);
 
-    // alten Listener sicherheitshalber entfernen und neuen setzen
-    darkModeQuery.removeEventListener?.('change', (e) => applyModeClass(e.matches));
-    darkModeQuery.addEventListener('change', (e) => applyModeClass(e.matches));
+    // Nur entfernen, wenn vorhanden
+    if (this.themeListener) {
+      darkModeQuery.removeEventListener('change', this.themeListener);
+      this.themeListener = null;
+    }
 
-    // Theme speichern
-    localStorage.setItem('theme', themeName);
+    if (appSettings.themeMode === 'dark') {
+      applyModeClass(true);
+    } else if (appSettings.themeMode === 'light') {
+      applyModeClass(false);
+    } else {
+      applyModeClass(darkModeQuery.matches);
+      this.themeListener = (e: MediaQueryListEvent) => applyModeClass(e.matches);
+      darkModeQuery.addEventListener('change', this.themeListener);
+    }
   }
 
   /*this.swPush.notificationClicks.subscribe((result) => {

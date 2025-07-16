@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>App settings</h2>
+<mat-dialog-content>
+    <mat-form-field appearance="fill" class="theme-select">
+        <mat-label>Theme</mat-label>
+        <mat-select [value]="appSettings.defaultTheme" (selectionChange)="setTheme($event.value)">
+            <mat-option *ngFor="let theme of availableThemes" [value]="theme">
+                {{ theme | titlecase }}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="fill" class="theme-select">
+        <mat-label>Theme Mode</mat-label>
+        <mat-select [value]="appSettings.themeMode" (selectionChange)="setThemeMode($event.value)">
+            <mat-option value="system">System</mat-option>
+            <mat-option value="light">Light</mat-option>
+            <mat-option value="dark">Dark</mat-option>
+        </mat-select>
+    </mat-form-field>
+
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
+        <button mat-button mat-dialog-close [mat-dialog-close]="appSettings">
+            Apply
+        </button>
+    </mat-dialog-actions>

@@ -11,6 +11,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { Subject, take } from 'rxjs';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
+import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
@@ -29,6 +30,7 @@ import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
+import { AppSettings } from './interfaces/app-settings';
 import { ConfirmUserResponse } from './interfaces/confirm-user-response';
 import { CreateUserResponse } from './interfaces/create-user-response';
 import { CryptedUser } from './interfaces/crypted-user';
@@ -140,6 +142,7 @@ export class AppComponent implements OnInit {
     public placeListDialog: MatDialog,
     public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
+    public appSettingsDialog: MatDialog,
     public displayMessage: MatDialog,
     public sharedContentDialog: MatDialog,
     public nominatimSearchDialog: MatDialog,
@@ -231,7 +234,7 @@ export class AppComponent implements OnInit {
 
 
   async initApp() {
-    this.appService.setTheme('azure');
+    this.appService.loadAppSettings();
     // Shared Content
     effect(() => {
       const content = this.sharedContentService.getSharedContentSignal()();
@@ -327,7 +330,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
   }
 
   public logout() {
-    this.appService.setTheme('azure');
     this.userService.logout()
     this.placeService.logout();
     this.contactService.logout();
@@ -606,7 +608,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 .subscribe({
                   next: (confirmUserResponse: ConfirmUserResponse) => {
                     this.userService.setUser(this.userSubject, confirmUserResponse.user, confirmUserResponse.jwt);
-                    this.appService.setTheme(this.userService.getProfile().defaultTheme || 'azure');
                     this.updateDataForLocation(this.mapService.getMapLocation(), true);
                   },
                   error: (err) => {
@@ -1011,12 +1012,33 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
   }
 
+  public editAppSettings() {
+    let appSettings: AppSettings = this.appService.getAppSettings();
+
+    const dialogRef = this.userProfileDialog.open(AppSettingsComponent, {
+      data: { appSettings: appSettings },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      autoFocus: false,
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe((newAppSettings: AppSettings) => {
+      if (newAppSettings) {
+        this.appService.setAppSettings(newAppSettings);
+      }
+    });
+  }
+
   public editUserProfile() {
     let profile: Profile = this.userService.getProfile()
     let oriName: string | undefined = profile.name;
     let oriBase64Avatar: string | undefined = profile.base64Avatar;
     let oriDefaultStyle: string | undefined = profile.defaultStyle;
-    let oriDefaultTheme: string | undefined = profile.defaultTheme;
     const dialogRef = this.userProfileDialog.open(ProfileComponent, {
       data: {},
       closeOnNavigation: true,
@@ -1041,9 +1063,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         }
         if (undefined != oriDefaultStyle) {
           profile.defaultStyle = oriDefaultStyle;
-        }
-        if (undefined != oriDefaultTheme) {
-          profile.defaultTheme = oriDefaultTheme;
         }
       }
     });

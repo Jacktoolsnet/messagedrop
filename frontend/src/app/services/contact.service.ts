@@ -243,7 +243,7 @@ export class ContactService {
 
   saveAditionalContactInfos() {
     this.contacts.forEach((contact: Contact) => {
-      this.indexedDbService.setContactProfile(contact.id, { name: contact.name!, base64Avatar: contact.base64Avatar!, defaultTheme: '' });
+      this.indexedDbService.setContactProfile(contact.id, { name: contact.name!, base64Avatar: contact.base64Avatar! });
     })
   }
 

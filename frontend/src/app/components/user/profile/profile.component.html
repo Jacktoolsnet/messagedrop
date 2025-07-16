@@ -5,15 +5,6 @@
     <input matInput maxlength="64" [(ngModel)]="userService.getProfile().name" />
   </mat-form-field>
 
-  <mat-form-field appearance="fill" class="theme-select">
-    <mat-label>Theme</mat-label>
-    <mat-select [value]="this.userService.getProfile().defaultTheme" (selectionChange)="setTheme($event.value)">
-      <mat-option *ngFor="let theme of availableThemes" [value]="theme">
-        {{ theme | titlecase }}
-      </mat-option>
-    </mat-select>
-  </mat-form-field>
-
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"
     (change)="onFileSelected($event)" #fileUpload />
 
