@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
@@ -24,7 +25,8 @@ import { WeatherDetailComponent } from './weather-detail/weather-detail.componen
     MatTooltipModule,
     MatSliderModule,
     FormsModule,
-    WeatherDetailComponent
+    WeatherDetailComponent,
+    MatButtonToggleModule
   ],
   templateUrl: './weather.component.html',
   styleUrls: ['./weather.component.css']

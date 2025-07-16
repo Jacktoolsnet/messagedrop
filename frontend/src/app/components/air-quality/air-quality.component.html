@@ -11,11 +11,11 @@
     }
 
     <mat-button-toggle-group class="day-toggle-group" [value]="selectedDayIndex" (change)="onDayChange($event.value)">
-
-        <mat-button-toggle *ngFor="let dayLabel of dayLabels; let i = index" [value]="i">
+        @for (dayLabel of dayLabels; track dayLabel; let i = $index) {
+        <mat-button-toggle [value]="i">
             {{ dayLabel }}
         </mat-button-toggle>
-
+        }
     </mat-button-toggle-group>
 
     @if (!selectedTile) {

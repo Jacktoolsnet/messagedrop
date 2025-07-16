@@ -93,8 +93,8 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
         const minTemp = Math.min(...temps);
         const maxTemp = Math.max(...temps);
         const { min, max } = this.getHourlyMinMax('temperature');
-        minY = min - 1;
-        maxY = max + 1;
+        minY = min - min * 0.1;
+        maxY = max + max * 0.1;
         dataset = {
           ...dataset,
           data: temps,
@@ -162,8 +162,8 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       case 'precipitation': {
         const precipitation = dayHourly.map(h => h.precipitation);
         const { min, max } = this.getHourlyMinMax('precipitation');
-        minY = min - 1;
-        maxY = max + 1;
+        minY = 0;
+        maxY = max + max * 0.1;
         dataset = {
           ...dataset,
           data: precipitation,
@@ -177,8 +177,8 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       case 'wind': {
         const winds = dayHourly.map(h => h.wind);
         const { min, max } = this.getHourlyMinMax('wind');
-        minY = min - 1;
-        maxY = max + 1;
+        minY = min - min * 0.1;
+        maxY = max + max * 0.1;
         dataset = {
           ...dataset,
           data: winds,
@@ -193,8 +193,8 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       case 'pressure': {
         const pressures = dayHourly.map(h => h.pressure);
         const { min, max } = this.getHourlyMinMax('pressure');
-        minY = min - 1;
-        maxY = max + 1;
+        minY = min - 0.1;
+        maxY = max + 0.1;
         dataset = {
           ...dataset,
           data: pressures,
@@ -266,6 +266,11 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       };
     }
 
+    const isDark = document.body.classList.contains('dark');
+    const bgColor = isDark ? '#1e1e1e' : '#ffffff';
+    const textColor = isDark ? '#ffffff' : '#000000';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
     // === Chart Optionen und Daten setzen ===
     this.chartOptions = {
       responsive: true,
@@ -276,7 +281,7 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
         title: {
           display: true,
           text: this.tile.label,
-          color: '#fff',
+          color: textColor,
           font: {
             size: 18,
             weight: 'bold'
@@ -290,27 +295,27 @@ export class WeatherDetailComponent implements OnInit, OnChanges, AfterViewInit 
       scales: {
         x: {
           ticks: {
-            color: '#ccc',
+            color: textColor,
             maxRotation: 45,
             minRotation: 45
           },
-          grid: { color: '#444' },
+          grid: { color: gridColor },
           title: {
             display: true,
             text: 'Time',
-            color: '#fff',
+            color: textColor,
             font: { size: 14, weight: 'bold' }
           }
         },
         y: {
-          ticks: { color: '#ccc' },
-          grid: { color: '#444' },
+          ticks: { color: textColor },
+          grid: { color: gridColor },
           min: minY,
           max: maxY,
           title: {
             display: true,
             text: this.getSelectedChartUnit(),
-            color: '#fff',
+            color: textColor,
             font: { size: 14, weight: 'bold' }
           }
         }
