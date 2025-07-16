@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,6 +28,7 @@ import { ProfileComponent } from '../user/profile/profile.component';
     MatIconModule,
     MatSelectModule,
     MatFormFieldModule,
+    MatButtonToggleModule
   ],
   templateUrl: './app-settings.component.html',
   styleUrl: './app-settings.component.css'

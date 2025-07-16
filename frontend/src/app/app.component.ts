@@ -1044,7 +1044,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      autoFocus: false,
       hasBackdrop: true
     });
 

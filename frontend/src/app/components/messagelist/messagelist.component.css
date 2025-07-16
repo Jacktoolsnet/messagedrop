@@ -1,3 +1,7 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
 /* Dialog-Container: Passt sich dem Inhalt an */
 .messageDropDialog .mat-dialog-container {
   display: flex;
@@ -35,7 +39,6 @@
   min-width: 350px;
   max-width: 100%;
   max-height: 100%;
-  background-color: #2e2d2d;
 }
 
 .no-content {
@@ -74,7 +77,8 @@
   margin: 0.75rem;
   margin-top: 2.25rem;
   border-radius: 0.75rem;
-  border: 0.1rem solid #f8f8f8e9;
+  background-color: var(--mat-option-selected-state-layer-color);
+  box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
   break-inside: avoid;
   page-break-inside: avoid;
   -webkit-column-break-inside: avoid;
@@ -90,9 +94,9 @@
   max-width: 95%;
   height: 3rem;
   padding: 0.25rem 0.75rem;
-  background-color: #2a2a2a;
+  background-color: var(--mat-option-selected-state-layer-color);
+  border: 0.1rem solid var(--mat-select-focused-arrow-color);
   border-radius: 1.5rem;
-  border: 0.1rem solid #f8f8f8e9;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -110,7 +114,6 @@
 .name {
   font-size: 1rem;
   font-weight: 500;
-  color: #f8f8f8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -120,7 +123,6 @@
 /* === MESSAGE CONTENT === */
 .message-content {
   font-size: 0.9rem;
-  color: #f8f8f8;
   margin-top: 2.5rem;
   margin-bottom: 1.5rem;
   white-space: normal;

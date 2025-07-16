@@ -53,3 +53,42 @@ h4 {
     max-width: 100%;
     width: 100%;
 }
+
+.theme-toggle-group {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    margin: 1rem 0;
+
+    ::ng-deep .mat-button-toggle {
+        flex: 1 1 0;
+    }
+
+    ::ng-deep .mat-button-toggle-button {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-radius: 1rem;
+        text-transform: none;
+        gap: 0.25rem;
+    }
+
+    ::ng-deep .mat-button-toggle-checked {
+        background-color: var(--md-sys-color-primary-container);
+        color: var(--md-sys-color-on-primary-container);
+    }
+
+    ::ng-deep .mat-button-toggle-button:hover {
+        background-color: var(--md-sys-color-surface-container-highest);
+    }
+
+    ::ng-deep .mat-icon {
+        font-size: 1.5rem;
+    }
+}

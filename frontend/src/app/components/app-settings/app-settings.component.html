@@ -9,14 +9,21 @@
         </mat-select>
     </mat-form-field>
 
-    <mat-form-field appearance="fill" class="theme-select">
-        <mat-label>Theme Mode</mat-label>
-        <mat-select [value]="appSettings.themeMode" (selectionChange)="setThemeMode($event.value)">
-            <mat-option value="system">System</mat-option>
-            <mat-option value="light">Light</mat-option>
-            <mat-option value="dark">Dark</mat-option>
-        </mat-select>
-    </mat-form-field>
+    <mat-button-toggle-group [value]="appSettings.themeMode" (change)="setThemeMode($event.value)"
+        class="theme-toggle-group" exclusive aria-label="Theme mode toggle">
+        <mat-button-toggle value="light">
+            <mat-icon>light_mode</mat-icon>
+            Light
+        </mat-button-toggle>
+        <mat-button-toggle value="dark">
+            <mat-icon>dark_mode</mat-icon>
+            Dark
+        </mat-button-toggle>
+        <mat-button-toggle value="system">
+            <mat-icon>settings</mat-icon>
+            System
+        </mat-button-toggle>
+    </mat-button-toggle-group>
 
     <mat-dialog-actions>
         <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
