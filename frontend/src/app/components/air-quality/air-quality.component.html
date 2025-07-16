@@ -21,7 +21,7 @@
     @if (!selectedTile) {
     <div class="tile-grid">
         @for (tile of tileValues; track tile.label) {
-        <div class="tile" [style.color]="tile.color" (click)="onTileClick(tile)">
+        <div class="tile" (click)="onTileClick(tile)">
             <div class="tile-title">{{ tile.label }}</div>
             <div class="tile-icon-wrapper">
                 <mat-icon class="tile-icon">{{ tile.icon }}</mat-icon>
