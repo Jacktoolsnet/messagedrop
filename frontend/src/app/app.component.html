@@ -9,25 +9,25 @@
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
 </button>
 } @else {
-<button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab color="accent"
-    aria-label="User Profile" (click)="{}">
+<button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab aria-label="User Profile"
+    (click)="{}">
     <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
         class="material-symbols-outlined">person</mat-icon>
 </button>
 }
 
-<button [attr.aria-hidden]="locationReady" class="button_watchLocation" mat-fab color="primary"
-    aria-label="Watch user location" (click)="getCurrentPosition()">
-    <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="appMenu" class="button_app" mat-fab aria-label="Appmenu"
+    (click)="{}">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">apps</mat-icon>
 </button>
 
-<button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab color="primary"
-    aria-label="Mainmenu" (click)="{}">
-    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">menu</mat-icon>
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab aria-label="Mainmenu"
+    (click)="{}">
+    <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">pin_drop</mat-icon>
 </button>
 
-<button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab color="primary"
-    aria-label="Search" (click)="{}">
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab aria-label="Search"
+    (click)="{}">
     <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">search</mat-icon>
 </button>
 }
@@ -81,6 +81,25 @@
     }
 </mat-menu>
 
+<mat-menu #appMenu="matMenu">
+    <button mat-menu-item (click)="{}">
+        <mat-icon class="material-symbols-outlined">settings_applications</mat-icon>
+        <span>App settings</span>
+    </button>
+    <button mat-menu-item (click)="{}">
+        <mat-icon class="material-symbols-outlined">gavel</mat-icon>
+        <span>Legal notice</span>
+    </button>
+    <button mat-menu-item (click)="{}">
+        <mat-icon class="material-symbols-outlined">rule</mat-icon>
+        <span>Terms of Service</span>
+    </button>
+    <button mat-menu-item (click)="{}">
+        <mat-icon class="material-symbols-outlined">privacy_tip</mat-icon>
+        <span>Privacy Policy</span>
+    </button>
+</mat-menu>
+
 <mat-menu #messageMenu="matMenu">
     @if (userService.isReady()) {
     <button mat-menu-item (click)="openMessagDialog()">
@@ -91,14 +110,16 @@
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
         <span>Private note</span>
     </button>
-    }
-
-    @if (userService.isReady() && contactService.isReady()) {
     <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>Contacts message</span>
     </button>
     }
+
+    <button mat-menu-item (click)="getCurrentPosition()">
+        <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
+        <span>Locate me</span>
+    </button>
 
     <button mat-menu-item (click)="showWeather()">
         <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>

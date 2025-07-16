@@ -6,6 +6,15 @@
     margin: 2rem;
 }
 
+.button_app {
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    margin-top: 2rem;
+    margin-right: 2rem;
+}
+
 .button_drop {
     position: absolute;
     right: 0;
