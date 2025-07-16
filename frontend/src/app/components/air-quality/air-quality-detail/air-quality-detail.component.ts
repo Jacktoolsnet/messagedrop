@@ -91,6 +91,11 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
     const hourLabel = dayLabels[hour] ?? `${hour}:00`;
     const value = dayValues[hour] ?? 0;
 
+    const isDark = document.body.classList.contains('dark');
+    const bgColor = isDark ? '#1e1e1e' : '#ffffff';
+    const textColor = isDark ? '#ffffff' : '#000000';
+    const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -105,7 +110,7 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
         title: {
           display: true,
           text: this.tile.label,
-          color: '#fff',
+          color: textColor,
           font: {
             size: 18,
             weight: 'bold'
@@ -141,19 +146,19 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
           title: {
             display: true,
             text: 'Time',
-            color: '#fff',
+            color: textColor,
             font: {
               size: 14,
               weight: 'bold'
             }
           },
           ticks: {
-            color: '#fff',
+            color: textColor,
             maxRotation: 45,
             minRotation: 45
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: gridColor
           }
         },
         y: {
@@ -163,17 +168,17 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
           title: {
             display: true,
             text: this.tile.unit,
-            color: '#fff',
+            color: textColor,
             font: {
               size: 14,
               weight: 'bold'
             }
           },
           ticks: {
-            color: '#fff'
+            color: textColor
           },
           grid: {
-            color: 'rgba(255, 255, 255, 0.1)'
+            color: gridColor
           }
         }
       }

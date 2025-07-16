@@ -10,14 +10,13 @@
     </div>
     }
 
-    <div class="day-switch">
-        @for (dayLabel of dayLabels; track dayLabel) {
-        <button mat-raised-button [color]="$index === selectedDayIndex ? 'primary' : 'secondary'"
-            (click)="onDayChange($index)">
+    <mat-button-toggle-group class="day-toggle-group" [value]="selectedDayIndex" (change)="onDayChange($event.value)">
+
+        <mat-button-toggle *ngFor="let dayLabel of dayLabels; let i = index" [value]="i">
             {{ dayLabel }}
-        </button>
-        }
-    </div>
+        </mat-button-toggle>
+
+    </mat-button-toggle-group>
 
     @if (!selectedTile) {
     <div class="tile-grid">
@@ -55,27 +54,28 @@
 
     @if (selectedTile) {
     <div class="tile-nav-buttons">
-        <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
+        <button mat-mini-fab (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
             <mat-icon>chevron_left</mat-icon>
         </button>
-        <button mat-mini-fab color="primary" (click)="selectedTile = null">
+        <button mat-mini-fab (click)="selectedTile = null">
             <mat-icon>close</mat-icon>
         </button>
-        <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === allKeys.length - 1">
+        <button mat-mini-fab (click)="selectNextTile()" [disabled]="tileIndex === allKeys.length - 1">
             <mat-icon>chevron_right</mat-icon>
         </button>
     </div>
     }
 
     @if (!selectedTile) {
-    <div class="category-switch">
-        @for (category of categoryModes; track category) {
-        <button mat-mini-fab [color]="selectedCategory === category ? 'primary' : 'secondary'"
-            (click)="onCategoryToggle(category)" [matTooltip]="getCategoryLabel(category)">
+    <mat-button-toggle-group class="category-toggle-group" [value]="selectedCategory"
+        (change)="onCategoryToggle($event.value)" multiple="false">
+
+        <mat-button-toggle *ngFor="let category of categoryModes" [value]="category"
+            matTooltip="{{ getCategoryLabel(category) }}">
             <mat-icon>{{ getCategoryIcon(category) }}</mat-icon>
-        </button>
-        }
-    </div>
+        </mat-button-toggle>
+
+    </mat-button-toggle-group>
     }
     }
 

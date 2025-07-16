@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Inject, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
@@ -23,7 +24,8 @@ import { AirQualityDetailComponent } from './air-quality-detail/air-quality-deta
     MatTooltipModule,
     MatSliderModule,
     FormsModule,
-    AirQualityDetailComponent
+    AirQualityDetailComponent,
+    MatButtonToggleModule
   ],
   templateUrl: './air-quality.component.html',
   styleUrls: ['./air-quality.component.css']
@@ -325,8 +327,8 @@ export class AirQualityComponent implements OnInit {
   getPollenColor(value: number): string {
     if (value === 0) return '#BDBDBD';       // Grau
     if (value <= 10) return '#4CAF50';       // Grün
-    if (value <= 30) return '#FFEB3B';       // Gelb
-    if (value <= 50) return '#FF9800';       // Orange
+    if (value <= 30) return '#FFC107';       // Dunkleres Orange-Gelb (statt Gelb)
+    if (value <= 50) return '#FF5722';       // Satteres Orange (statt Helles)
     return '#F44336';                        // Rot
   }
 
