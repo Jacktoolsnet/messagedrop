@@ -203,10 +203,8 @@ const allowedOrigins = process.env.ORIGIN?.split(',').map(o => o.trim()) || [];
 const corsOptions = {
   origin: function (origin, callback) {
     if (origin && allowedOrigins.includes(origin)) {
-      logger.info(`Origin ${origin} allowed by CORS`);
       callback(null, true);
     } else {
-      logger.info(`Origin ${origin} not allowed by CORS`);
       callback(null, false);
     }
   },
@@ -214,7 +212,6 @@ const corsOptions = {
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   optionsSuccessStatus: 200
 }
-app.options(/.*/, cors(corsOptions));
 app.use(cors(corsOptions))
 
 app.use(databaseMw(database));
