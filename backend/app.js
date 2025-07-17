@@ -216,8 +216,6 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
-app.options('*', cors(corsOptions));
-
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
