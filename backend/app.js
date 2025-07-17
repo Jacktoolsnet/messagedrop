@@ -198,12 +198,15 @@ app.use(bearerToken());
 /*
 Enable cors for all routes.
 */
-var corsOptions = {
+const allowedOrigins = process.env.ORIGIN?.split(',') || [];
+
+const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, false);
-    if (process.env.ORIGIN == origin) {
+    if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      logger.info(`Origin ${origin} not allowed by CORS`);
       callback(null, false);
     }
   },
@@ -212,6 +215,8 @@ var corsOptions = {
   optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
 }
 app.use(cors(corsOptions))
+
+app.options('*', cors(corsOptions));
 
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
