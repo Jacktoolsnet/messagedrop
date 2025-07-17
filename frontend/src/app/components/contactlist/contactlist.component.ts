@@ -217,6 +217,8 @@ export class ContactlistComponent implements OnInit {
     const dialogRef = this.dialog.open(ContactProfileComponent, {
       data: { contact: contact },
       closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
       hasBackdrop: true
     });
 

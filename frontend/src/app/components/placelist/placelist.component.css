@@ -1,10 +1,44 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+/* Dialog-Container: Passt sich dem Inhalt an */
+.messageDropDialog .mat-dialog-container {
+  display: flex;
+  flex-direction: column;
+  max-height: 90vh;
+  /* Begrenzung für kleinere Screens */
+  overflow: hidden;
+  padding: 0;
+}
+
+/* Inhalt kann scrollen, wenn zu groß */
+.mat-mdc-dialog-content {
+  overflow-y: auto;
+  max-height: calc(90vh - 4rem);
+  /* Abzug für Header/Footer, falls vorhanden */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Optional: Aktionen immer sichtbar halten */
+.mat-mdc-dialog-actions {
+  flex-shrink: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Titel optional flex-shrink */
+.mat-mdc-dialog-title {
+  flex-shrink: 0;
+}
+
 /* === DIALOG GRUNDSTRUKTUR === */
 .dialog {
   width: 100%;
   min-width: 350px;
   max-width: 100%;
   max-height: 100%;
-  background-color: #2e2d2d;
 }
 
 .no-content {
@@ -43,7 +77,9 @@
   margin: 0.75rem;
   margin-top: 2.25rem;
   border-radius: 0.75rem;
-  border: 0.1rem solid #f8f8f8e9;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   break-inside: avoid;
   page-break-inside: avoid;
   -webkit-column-break-inside: avoid;
@@ -59,9 +95,10 @@
   max-width: 95%;
   height: 3rem;
   padding: 0.25rem 0.75rem;
-  background-color: #2a2a2a;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   border-radius: 1.5rem;
-  border: 0.1rem solid #f8f8f8e9;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -79,7 +116,6 @@
 .name {
   font-size: 1rem;
   font-weight: 500;
-  color: #f8f8f8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -89,7 +125,6 @@
 /* === MESSAGE CONTENT === */
 .message-content {
   font-size: 0.9rem;
-  color: #f8f8f8;
   margin-top: 2.5rem;
   margin-bottom: 1.5rem;
   white-space: normal;
@@ -183,11 +218,11 @@ button,
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: rgba(255, 255, 255, 0.05);
   border-radius: 0.5rem;
   font-size: 0.95rem;
-  color: #fff;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   transition: transform 0.2s;
 }
 

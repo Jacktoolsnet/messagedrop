@@ -38,7 +38,6 @@ export class ProfileComponent {
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
   private oriDefaultStyle: string | undefined = undefined;
-  private oriDefaultTheme: string | undefined = undefined;
 
   constructor(
     private appService: AppService,
