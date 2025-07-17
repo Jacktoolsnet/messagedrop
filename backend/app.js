@@ -203,7 +203,7 @@ const allowedOrigins = process.env.ORIGIN?.split(',').map(o => o.trim()) || [];
 const corsOptions = {
   origin: function (origin, callback) {
     logger.info(`Allowed origins: ${JSON.stringify(allowedOrigins)}`);
-    logger.info(`Incoming origin: ${origin}`);
+    logger.info(`Incoming origin: "${origin}"`);
     if (origin && allowedOrigins.includes(origin)) {
       logger.info(`Origin ${origin} not allowed by CORS`);
       callback(null, true);
