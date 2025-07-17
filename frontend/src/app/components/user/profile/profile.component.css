@@ -41,8 +41,9 @@ button {
   border-radius: 1rem;
   margin-top: 1rem;
   padding: 1.5rem;
-  background-color: var(--mat-option-selected-state-layer-color);
-  box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 .center {
@@ -72,14 +73,15 @@ button {
   margin-right: 0.5rem;
 }
 
-.button-area {
+.style-area {
   position: relative;
   display: block;
   border-radius: 1rem;
   margin-top: 1.5rem;
   padding: 1.5rem;
-  background-color: var(--mat-option-selected-state-layer-color);
-  box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 .sample-style {

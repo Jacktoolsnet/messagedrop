@@ -238,13 +238,12 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessageUserProfile(message: Message) {
-    if (!this.userService.isReady()) return;
-    const profile = this.profileService.getProfile(message.userId);
-    if (!profile) return;
 
-    const oriName = profile.name;
-    const oriBase64Avatar = profile.base64Avatar;
-    const oriDefaultStyle = profile.defaultStyle;
+    const profile = this.profileService.getProfile(message.userId);
+
+    const oriName = profile ? profile.name : '';
+    const oriBase64Avatar = profile ? profile.base64Avatar : '';
+    const oriDefaultStyle = profile ? profile.defaultStyle : '';
 
     const dialogRef = this.dialog.open(EditProfileComponent, {
       data: { profile, userId: message.userId },
@@ -256,9 +255,11 @@ export class MessagelistComponent implements OnInit {
       if (result) {
         this.profileService.setProfile(result.userId, result.profile);
       } else {
-        profile.name = oriName;
-        profile.base64Avatar = oriBase64Avatar;
-        profile.defaultStyle = oriDefaultStyle;
+        if (profile) {
+          profile.name = oriName;
+          profile.base64Avatar = oriBase64Avatar;
+          profile.defaultStyle = oriDefaultStyle;
+        }
       }
     });
   }

@@ -20,7 +20,7 @@
     .backend-error-image {
         max-width: 100%;
         border-radius: 12px;
-        box-shadow: 0 4px 8px var(--mat-fab-small-container-color);
+        box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
     }
 
     .center {

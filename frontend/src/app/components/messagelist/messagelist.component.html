@@ -4,19 +4,27 @@
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
         </button>
+        @if(userService.isReady()) {
         <div class="no-content">
             <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
                 (click)="addMessagDialog()">
                 <span>Add my first public message</span>
             </button>
         </div>
+        }
     </div>
-    }@if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) { <div class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()"> <mat-icon>arrow_back</mat-icon>
-        </button> <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
-            (click)="addMessagDialog()"> <mat-icon [attr.aria-hidden]="false"
-                class="material-symbols-outlined">chat_add_on</mat-icon> </button>
-
+    }
+    @if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) {
+    <div class="content">
+        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+        @if(userService.isReady()) {
+        <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
+            (click)="addMessagDialog()">
+            <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">chat_add_on</mat-icon>
+        </button>
+        }
         @for (message of filteredMessagesSignal(); track message.id) {
         <mat-card class="item">
             @if (user.id == message.userId && (userProfile.base64Avatar || userProfile.name)) {
@@ -103,10 +111,17 @@
 
     }
 
-    @if (messageService.selectedMessagesSignal().length !== 0) { <div class="content"> <button mat-mini-fab
-            color="accent" class="button_back" (click)="goBack()"> <mat-icon>arrow_back</mat-icon> </button> <button
-            mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
-            <mat-icon>add_comment</mat-icon> </button>
+    @if (messageService.selectedMessagesSignal().length !== 0) {
+    <div class="content">
+        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+            <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        @if(userService.isReady()) {
+        <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
+            <mat-icon>add_comment</mat-icon>
+        </button>
+        }
 
         @for (message of commentsSignal(); track message.id) {
         <mat-card class="item">

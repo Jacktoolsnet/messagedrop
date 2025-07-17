@@ -77,8 +77,9 @@
   margin: 0.75rem;
   margin-top: 2.25rem;
   border-radius: 0.75rem;
-  background-color: var(--mat-option-selected-state-layer-color);
-  box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   break-inside: avoid;
   page-break-inside: avoid;
   -webkit-column-break-inside: avoid;
@@ -94,8 +95,9 @@
   max-width: 95%;
   height: 3rem;
   padding: 0.25rem 0.75rem;
-  background-color: var(--mat-option-selected-state-layer-color);
-  border: 0.1rem solid var(--mat-select-focused-arrow-color);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   border-radius: 1.5rem;
   display: flex;
   align-items: center;

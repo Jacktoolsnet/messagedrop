@@ -222,51 +222,57 @@ export class WeatherComponent implements OnInit {
 
   getTileColor(type: string, value: number | null): string {
     if (value == null) return '';
-    switch (type) {
-      case 'temperature':
-        if (value < 0) return '#1565C0';         // Freezing
-        if (value < 10) return '#42A5F5';        // Cold
-        if (value < 20) return '#66BB6A';        // Cool
-        if (value < 28) return '#FFA726';        // Warm
-        if (value < 35) return '#EF5350';        // Hot
-        return '#B71C1C';                        // Extreme heat
+    const isDarkMode = document.body.classList.contains('dark');
 
-      case 'uvIndex':
-        if (value < 3) return '#4CAF50';         // Low
-        if (value < 6) return '#FFEB3B';         // Moderate
-        if (value < 8) return '#FF9800';         // High
-        if (value < 11) return '#F44336';        // Very high
-        return '#9C27B0';                        // Extreme
+    const color = (() => {
+      switch (type) {
+        case 'temperature':
+          if (value < 0) return '#1565C0';
+          if (value < 10) return '#42A5F5';
+          if (value < 20) return '#66BB6A';
+          if (value < 28) return '#FFA726';
+          if (value < 35) return '#EF5350';
+          return '#B71C1C';
+        case 'uvIndex':
+          if (value < 3) return '#4CAF50';
+          if (value < 6) return '#FFEB3B';
+          if (value < 8) return '#FF9800';
+          if (value < 11) return '#F44336';
+          return '#9C27B0';
+        case 'precipitationprobability':
+          if (value < 20) return '#e0f7fa';
+          if (value < 50) return '#81d4fa';
+          if (value < 80) return '#0288d1';
+          return '#01579b';
+        case 'precipitation':
+          if (value < 0.1) return '#e0f7fa';
+          if (value < 1.0) return '#b3e5fc';
+          if (value < 5.0) return '#81d4fa';
+          if (value < 10.0) return '#4fc3f7';
+          return '#0288d1';
+        case 'wind':
+          if (value < 5) return '#c8e6c9';
+          if (value < 15) return '#aed581';
+          if (value < 30) return '#fbc02d';
+          if (value < 50) return '#fb8c00';
+          return '#e64a19';
+        case 'pressure':
+          if (value < 980) return '#81d4fa';
+          if (value < 1010) return '#c8e6c9';
+          if (value < 1030) return '#ffcc80';
+          return '#ffb74d';
+        default:
+          return '#ffffff';
+      }
+    })();
 
-      case 'precipitationprobability':
-        if (value < 20) return '#e0f7fa';        // Unlikely
-        if (value < 50) return '#81d4fa';        // Possible
-        if (value < 80) return '#0288d1';        // Likely
-        return '#01579b';                        // Very likely
+    return isDarkMode ? color : this.adjustColor(color, -50);
+  }
 
-      case 'precipitation':
-        if (value < 0.1) return '#e0f7fa';        // Dry
-        if (value < 1.0) return '#b3e5fc';        // Light rain
-        if (value < 5.0) return '#81d4fa';        // Rain
-        if (value < 10.0) return '#4fc3f7';       // Heavy rain
-        return '#0288d1';                         // Downpour
-
-      case 'wind':
-        if (value < 5) return '#c8e6c9';          // Calm
-        if (value < 15) return '#aed581';         // Breezy
-        if (value < 30) return '#fbc02d';         // Windy
-        if (value < 50) return '#fb8c00';         // Strong wind
-        return '#e64a19';                         // Storm
-
-      case 'pressure':
-        if (value < 980) return '#81d4fa';        // Low
-        if (value < 1010) return '#c8e6c9';       // Moderate
-        if (value < 1030) return '#ffcc80';       // High
-        return '#ffb74d';                         // Very high
-
-      default:
-        return '#ffffff'; // fallback
-    }
+  private adjustColor(hex: string, amount: number): string {
+    return '#' + hex.replace(/^#/, '').replace(/../g, c =>
+      ('0' + Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).slice(-2)
+    );
   }
 
   getTileLevel(type: string, value: number): string {

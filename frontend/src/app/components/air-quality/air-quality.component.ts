@@ -325,11 +325,21 @@ export class AirQualityComponent implements OnInit {
   }
 
   getPollenColor(value: number): string {
-    if (value === 0) return '#BDBDBD';       // Grau
-    if (value <= 10) return '#4CAF50';       // Grün
-    if (value <= 30) return '#FFC107';       // Dunkleres Orange-Gelb (statt Gelb)
-    if (value <= 50) return '#FF5722';       // Satteres Orange (statt Helles)
-    return '#F44336';                        // Rot
+    const isDarkMode = document.body.classList.contains('dark');
+    const color = (() => {
+      if (value === 0) return '#BDBDBD';       // Grau
+      if (value <= 10) return '#4CAF50';       // Grün
+      if (value <= 30) return '#FFC107';       // Dunkleres Orange-Gelb (statt Gelb)
+      if (value <= 50) return '#FF5722';       // Satteres Orange (statt Helles)
+      return '#F44336';
+    })();
+    return isDarkMode ? color : this.adjustColor(color, -50);
+  }
+
+  private adjustColor(hex: string, amount: number): string {
+    return '#' + hex.replace(/^#/, '').replace(/../g, c =>
+      ('0' + Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).slice(-2)
+    );
   }
 
   getSeverityLabel(value: number): string {

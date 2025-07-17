@@ -101,6 +101,11 @@
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
+    <button mat-menu-item (click)="getCurrentPosition()">
+        <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
+        <span>Locate me</span>
+    </button>
+
     @if (userService.isReady()) {
     <button mat-menu-item (click)="openMessagDialog()">
         <mat-icon class="material-symbols-outlined">send</mat-icon>
@@ -115,11 +120,6 @@
         <span>Contacts message</span>
     </button>
     }
-
-    <button mat-menu-item (click)="getCurrentPosition()">
-        <mat-icon [attr.aria-hidden]="locationReady" class="material-symbols-outlined">place</mat-icon>
-        <span>Locate me</span>
-    </button>
 
     <button mat-menu-item (click)="showWeather()">
         <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>

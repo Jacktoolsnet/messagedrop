@@ -1,3 +1,7 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
 mat-dialog-content {
     max-height: calc(90vh - 64px);
     /* oder je nach Header-Höhe */
@@ -8,13 +12,11 @@ mat-dialog-content {
 
 h2 {
     padding: 0.5rem;
-    color: floralwhite;
     text-align: center;
 
 }
 
 h4 {
-    color: floralwhite;
     text-align: left;
     font-weight: 400;
     margin-top: 1rem;

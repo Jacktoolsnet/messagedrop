@@ -45,8 +45,9 @@ mat-dialog-content {
 .tile {
     position: relative;
     border-radius: 1rem;
-    background-color: var(--mat-fab-small-container-color);
-    box-shadow: 0 2px 6px var(--mat-fab-small-foreground-color);
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
     padding: 1rem;
     text-align: center;
     display: flex;
@@ -58,8 +59,6 @@ mat-dialog-content {
 }
 
 .tile:hover {
-    background-color: var(--mat-fab-small-container-color);
-    box-shadow: 0 4px 12px var(--mat-fab-small-foreground-color);
     transform: scale(1.02);
     transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
@@ -233,18 +232,17 @@ app-air-quality-detail {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        border-radius: 1rem;
         text-transform: none;
         gap: 0.25rem;
     }
 
     ::ng-deep .mat-button-toggle-checked {
-        background-color: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container);
+        color: var(--mat-card-subtitle-text-color);
+        background-color: var(--mat-card-filled-container-color);
     }
 
     ::ng-deep .mat-button-toggle-button:hover {
-        background-color: var(--md-sys-color-surface-container-highest);
+        background-color: var(--mat-card-filled-container-color);
     }
 }
 
@@ -265,18 +263,17 @@ app-air-quality-detail {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        border-radius: 1rem;
         text-transform: none;
         gap: 0.25rem;
     }
 
     ::ng-deep .mat-button-toggle-checked {
-        background-color: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container);
+        color: var(--mat-card-subtitle-text-color);
+        background-color: var(--mat-card-filled-container-color);
     }
 
     ::ng-deep .mat-button-toggle-button:hover {
-        background-color: var(--md-sys-color-surface-container-highest);
+        background-color: var(--mat-card-filled-container-color);
     }
 
     ::ng-deep .mat-icon {
