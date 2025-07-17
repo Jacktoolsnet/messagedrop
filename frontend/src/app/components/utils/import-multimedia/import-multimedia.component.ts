@@ -58,4 +58,12 @@ export class ImportMultimediaComponent {
   onApplyClick(): void {
     this.dialogRef.close(this.multimedia);
   }
+
+  onCancelClick(): void {
+    if (this.multimediaUrl !== '') {
+      this.clearContent();
+    } else {
+      this.dialogRef.close();
+    }
+  }
 }

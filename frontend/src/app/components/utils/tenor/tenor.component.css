@@ -1,3 +1,7 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
 .messageDropDialog .mat-dialog-container {
     padding: 0rem;
 }
@@ -45,7 +49,7 @@
 
 .url-container {
     display: flex;
-    border: 1px solid gray;
+    border: 1px solid var(--mat-fab-small-container-color);
     border-radius: 1rem;
     overflow: hidden;
     margin: 0.5rem;
@@ -62,8 +66,8 @@
 }
 
 .url-container button {
-    color: white;
-    background-color: gray;
+    color: var(--mat-fab-small-foreground-color);
+    background-color: var(--mat-fab-small-container-color);
     border: none;
     padding: 8px 12px;
     cursor: pointer;

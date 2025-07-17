@@ -1,14 +1,7 @@
-h2 {
-    color: floralwhite;
-    text-align: center;
-
+:host {
+    color: var(--mat-app-text-color);
 }
 
-h4 {
-    color: floralwhite;
-    text-align: center;
-    font-weight: 400;
-}
 
 .messageDropDialog .mat-dialog-container {
     padding: 0rem;
@@ -28,12 +21,12 @@ h4 {
 
 .url-container {
     display: flex;
-    border: 1px solid gray;
+    border: 1px solid var(--mat-fab-small-container-color);
     border-radius: 1rem;
     overflow: hidden;
     margin: 0.5rem;
     min-height: 2.5rem;
-    background-color: gray;
+    background-color: var(--mat-fab-small-container-color);
 }
 
 .url-container input[type="text"] {
@@ -46,8 +39,8 @@ h4 {
 }
 
 .url-container button {
-    color: white;
-    background-color: gray;
+    color: var(--mat-fab-small-foreground-color);
+    background-color: var(--mat-fab-small-container-color);
     border: none;
     padding: 8px 12px;
     cursor: pointer;
@@ -69,8 +62,9 @@ h4 {
     justify-content: center;
     align-items: center;
     position: relative;
-    background-color: gray;
-    color: white;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
     border-radius: 1rem;
 }
 
@@ -91,18 +85,17 @@ h4 {
 }
 
 .platform-tile {
-    background-color: #3a3a3a;
-    color: floralwhite;
     border-radius: 1rem;
     padding: 1rem;
     text-align: center;
     font-weight: 500;
     font-size: 1.05rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    transition: transform 0.2s ease;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 .platform-tile:hover {
-    background-color: #4a4a4a;
     transform: scale(1.02);
+    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }

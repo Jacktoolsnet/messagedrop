@@ -1,3 +1,7 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
 .messageDropDialog .mat-dialog-container {
     padding: 0rem;
 }
@@ -26,7 +30,7 @@ mat-card-actions.buttonbar {
 .searchTerm-container {
     display: flex;
     align-items: center;
-    border: 1px solid gray;
+    border: 1px solid var(--mat-fab-small-container-color);
     border-radius: 1rem;
     overflow: hidden;
     margin: 0.5rem;
@@ -49,16 +53,16 @@ mat-card-actions.buttonbar {
     height: 2.65rem;
     padding: 0 0.75rem;
     font-size: 1rem;
-    background: gray;
-    color: white;
+    background: var(--mat-fab-small-container-color);
+    color: var(--mat-fab-small-foreground-color);
     min-width: 7rem;
     flex-shrink: 0;
-    /* verhindert, dass das Select kleiner wird */
+    border: none;
 }
 
 .searchTerm-container button {
-    color: white;
-    background-color: gray;
+    color: var(--mat-fab-small-foreground-color);
+    background-color: var(--mat-fab-small-container-color);
     border: none;
     width: 3rem;
     /* feste Breite */
@@ -73,11 +77,11 @@ mat-card-actions.buttonbar {
 
 /* === CONTENT === */
 .content {
-    padding-left: 1.75rem;
-    padding-right: 1.75rem;
+    padding-left: 2.5rem;
+    padding-right: 1.5rem;
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 2.5rem;
     white-space: normal;
 }
 
@@ -125,11 +129,11 @@ mat-card-actions.buttonbar {
 
 /* === ITEM DARSTELLUNG (Karten / Elemente) === */
 .item {
-    margin: 0.75rem;
     margin-top: 2.25rem;
     border-radius: 0.75rem;
-    color: white;
-    border: 0.1rem solid #f8f8f8e9;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
     break-inside: avoid;
     page-break-inside: avoid;
     -webkit-column-break-inside: avoid;
@@ -145,9 +149,10 @@ mat-card-actions.buttonbar {
     max-width: 95%;
     height: 3rem;
     padding: 0.25rem 0.75rem;
-    background-color: #2a2a2a;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
     border-radius: 1.5rem;
-    border: 0.1rem solid #f8f8f8e9;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -165,7 +170,6 @@ mat-card-actions.buttonbar {
 .name {
     font-size: 1rem;
     font-weight: 500;
-    color: #f8f8f8;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -175,7 +179,8 @@ mat-card-actions.buttonbar {
 /* === MESSAGE CONTENT === */
 .message-content {
     font-size: 0.9rem;
-    color: #f8f8f8;
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
     white-space: normal;
     overflow-wrap: break-word;
     word-break: break-word;
