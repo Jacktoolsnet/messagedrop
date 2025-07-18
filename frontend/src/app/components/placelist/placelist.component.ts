@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
+import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -47,12 +48,21 @@ import { WeatherTileComponent } from './weather-tile/weather-tile.component';
     WeatherTileComponent,
     AirQualityTileComponent,
     NoteTileComponent,
+    MatExpansionModule
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent implements OnInit {
   placesSignal: Signal<Place[]>;
+
+  readonly sortedPlacesSignal = computed(() =>
+    this.placeService.getPlaces().slice().sort((a, b) => {
+      const nameCompare = a.name.localeCompare(b.name);
+      return nameCompare !== 0 ? nameCompare : a.id.localeCompare(b.id);
+    })
+  );
+
   readonly hasPlaces = computed(() => this.placesSignal().length > 0);
   private placeToDelete!: Place
   public mode: typeof Mode = Mode;
@@ -73,7 +83,7 @@ export class PlacelistComponent implements OnInit {
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) {
-    this.placesSignal = this.placeService.places;
+    this.placesSignal = this.placeService.getPlaces;
   }
 
   ngOnInit(): void {

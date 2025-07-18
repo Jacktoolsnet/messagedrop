@@ -17,9 +17,9 @@
             <mat-icon class="material-symbols-outlined">add_location</mat-icon>
         </button>
 
-        @for (place of placesSignal(); track place.id) {
-        <mat-card class="item">
-            <div class="avatar-box" (click)="editPlace(place)">
+        @for (place of sortedPlacesSignal(); track place.id){
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
                 @if (place.icon && !place.base64Avatar) {
                 <mat-icon>{{ place.icon || 'location' }}</mat-icon>
                 }
@@ -29,35 +29,36 @@
                 @if (place.name) {
                 <span class="name">{{ place.name }}</span>
                 }
-            </div>
+            </mat-expansion-panel-header>
+            <mat-card>
+                <mat-card-content>
+                    <div class="tile-grid">
+                        <app-datetime-tile [timezone]="place.timezone"></app-datetime-tile>
+                        <app-weather-tile [place]="place"></app-weather-tile>
+                        <app-air-quality-tile [place]="place"></app-air-quality-tile>
+                        <app-note-tile [place]="place"></app-note-tile>
+                    </div>
+                </mat-card-content>
 
-            <mat-card-content>
-                <div class="tile-grid">
-                    <app-datetime-tile [timezone]="place.timezone"></app-datetime-tile>
-                    <app-weather-tile [place]="place"></app-weather-tile>
-                    <app-air-quality-tile [place]="place"></app-air-quality-tile>
-                    <app-note-tile [place]="place"></app-note-tile>
-                </div>
-            </mat-card-content>
-
-            <mat-card-actions class="buttonbar">
-                <button mat-mini-fab color="secondary" aria-label="Edit place" (click)="editPlace(place)">
-                    <mat-icon class="material-symbols-outlined">edit</mat-icon>
-                </button>
-                <button mat-mini-fab color="secondary" aria-label="Delete place" (click)="deletePlace(place)">
-                    <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
-                </button>
-                @if (!subscriptionError) {
-                <button mat-mini-fab [color]="!place.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
-                    (click)="subscribe(place)">
-                    <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
-                </button>
-                }
-                <button mat-mini-fab color="secondary" aria-label="Fly to place" (click)="flyTo(place)">
-                    <mat-icon class="material-symbols-outlined">place</mat-icon>
-                </button>
-            </mat-card-actions>
-        </mat-card>
+                <mat-card-actions class="buttonbar">
+                    <button mat-mini-fab color="secondary" aria-label="Edit place" (click)="editPlace(place)">
+                        <mat-icon class="material-symbols-outlined">edit</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="secondary" aria-label="Delete place" (click)="deletePlace(place)">
+                        <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+                    </button>
+                    @if (!subscriptionError) {
+                    <button mat-mini-fab [color]="!place.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
+                        (click)="subscribe(place)">
+                        <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
+                    </button>
+                    }
+                    <button mat-mini-fab color="secondary" aria-label="Fly to place" (click)="flyTo(place)">
+                        <mat-icon class="material-symbols-outlined">place</mat-icon>
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </mat-expansion-panel>
         }
     </div>
     }

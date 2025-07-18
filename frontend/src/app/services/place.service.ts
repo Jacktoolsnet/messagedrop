@@ -37,7 +37,7 @@ export class PlaceService {
     private networkService: NetworkService,
     private http: HttpClient) { }
 
-  get places() { return this._places.asReadonly(); }
+  get getPlaces() { return this._places.asReadonly(); }
   get selectedPlace() { return this._selectedPlace.asReadonly(); }
 
   private handleError(error: HttpErrorResponse) {
