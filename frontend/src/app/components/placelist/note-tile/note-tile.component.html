@@ -6,11 +6,9 @@
 
     @if (placeNotes().length > 0) {
     @for (note of placeNotes(); track note.id) {
-    @if (note.note.trim() !== '') {
     <div class="note-card">
         <span class="note-text" [style]="note.style">{{ note.note }}</span>
     </div>
-    }
     }
     } @else {
     <div class="note-empty">No notes found.</div>

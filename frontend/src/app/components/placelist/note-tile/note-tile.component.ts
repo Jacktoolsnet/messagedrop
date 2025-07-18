@@ -22,6 +22,7 @@ import { NotelistComponent } from '../../notelist/notelist.component';
 export class NoteTileComponent implements OnInit, OnDestroy {
   @Input() place!: Place;
   readonly placeNotes = signal<Note[]>([]);
+  readonly allPlaceNotes = signal<Note[]>([]);
 
   constructor(
     private noteService: NoteService,
@@ -31,7 +32,11 @@ export class NoteTileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.noteService.getNotesInBoundingBox(this.place.boundingBox!).then(notes => {
-      this.placeNotes.set(notes);
+      this.allPlaceNotes.set(notes);
+      const visibleNotes = notes
+        .filter(n => n.note?.trim() !== '')  // Nur Notizen mit Inhalt
+        .slice(0, 3);                        // Maximal 3 Notizen
+      this.placeNotes.set(visibleNotes);
     });
   }
 
@@ -39,7 +44,7 @@ export class NoteTileComponent implements OnInit, OnDestroy {
     const dialogRef = this.matDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
-      data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!), notesSignal: this.placeNotes },
+      data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!), notesSignal: this.allPlaceNotes },
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '8rem',
@@ -48,7 +53,13 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe(() => { });
+    dialogRef.afterClosed().subscribe(() => {
+      const visibleNotes = this.allPlaceNotes()
+        .filter(n => n.note?.trim() !== '')
+        .slice(0, 3);
+
+      this.placeNotes.set(visibleNotes);
+    });
   }
 
   ngOnDestroy(): void { }
