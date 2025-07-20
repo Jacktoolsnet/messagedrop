@@ -66,12 +66,12 @@
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
+                @if (user.id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                @if (user.id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
@@ -142,12 +142,12 @@
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
+                @if (user.id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                @if (user.id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
