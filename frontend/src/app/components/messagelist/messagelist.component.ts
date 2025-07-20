@@ -53,13 +53,9 @@ import { EditProfileComponent } from './edit-profile/edit-profile.component';
 export class MessagelistComponent implements OnInit {
 
   readonly messagesSignal = this.messageService.messagesSignal;
-  readonly filteredMessagesSignal = computed(() =>
-    !this.data.messages || this.data.messages.length === 0
-      ? this.messageService.messagesSignal()
-      : this.messageService.messagesSignal().filter(msg =>
-        this.data.messages.some(message => message.id === msg.id)
-      )
-  );
+  readonly filteredMessagesSignal = computed(() => {
+    return this.messageService.messagesSignal();
+  });
   readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
   readonly commentsSignal = computed(() => {
     const parentMessage = this.messageService.selectedMessagesSignal().at(-1);
@@ -324,7 +320,6 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
         this.messageService.createMessage(data.message, this.user);
-        this.data.messages.push(data.message);
       }
     });
   }

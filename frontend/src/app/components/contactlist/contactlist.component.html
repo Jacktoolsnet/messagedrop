@@ -18,7 +18,7 @@
             <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
         </button>
 
-        @for (contact of contactService.getContacts(); track contact.id){
+        @for (contact of contactService.getSortedContacts(); track contact.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 @if (contact.base64Avatar || contact.name) {

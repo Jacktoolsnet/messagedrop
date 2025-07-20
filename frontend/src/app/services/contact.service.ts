@@ -251,6 +251,20 @@ export class ContactService {
     return this.contacts;
   }
 
+  getSortedContacts(): Contact[] {
+    return this.contacts.sort((a, b) => {
+      if (a.name && b.name) {
+        return a.name.localeCompare(b.name);
+      } else if (a.name && !b.name) {
+        return -1; // a has name, b does not
+      } else if (!a.name && b.name) {
+        return 1; // b has name, a does not
+      } else {
+        return 0; // both are undefined or empty
+      }
+    });
+  }
+
   isReady(): boolean {
     return this.ready;
   }

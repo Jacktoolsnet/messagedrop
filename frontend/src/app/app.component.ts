@@ -967,7 +967,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { messages: messages, location: this.mapService.getMapLocation() },
+      data: { messages: messages, location: messages[0].location },
       minWidth: '20vw',
       maxWidth: '90vw',
       minHeight: '20vh',
