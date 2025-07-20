@@ -1,19 +1,18 @@
 <div class="url-container">
-    <input type="text" [formControl]="searchterm" placeholder="Search in Tenor" />
+    <input type="text" [formControl]="searchterm" (keydown.enter)="search()" placeholder="Search in Tenor" />
 
-    @if (
-    (nextSearch === '' && searchterm.value !== '') ||
-    (searchterm.value !== lastSearchterm) ||
-    (searchterm.value === '')
-    ) {
     <button (click)="search()">
+        @if (
+        (nextSearch === '' && searchterm.value !== '') ||
+        (searchterm.value !== lastSearchterm) ||
+        (searchterm.value === '')
+        ) {
         <mat-icon>search</mat-icon>
-    </button>
-    } @else {
-    <button (click)="search()">
+        } @else {
         <mat-icon>arrow_circle_right</mat-icon>
+        }
     </button>
-    }
+
 </div>
 
 <mat-dialog-content class="full-width">

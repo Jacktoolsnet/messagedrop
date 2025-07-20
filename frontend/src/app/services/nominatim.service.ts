@@ -71,7 +71,7 @@ export class NominatimService {
     );
   }
 
-  getNominatimPlaceBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000, showAlways: boolean = false): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000, showAlways: boolean = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);

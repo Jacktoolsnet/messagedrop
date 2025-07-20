@@ -58,7 +58,7 @@ export class TenorService {
    * passing query parameters such as API keys, user locale, and content filters.
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
-  getFeaturedGifs(next: string): Observable<any> {
+  getFeaturedGifs(next: string, showAlways: boolean = true): Observable<any> {
     let parameters: Map<string, string> = new Map();
     parameters.set('key', environment.tenor_api_key);
     parameters.set('client_key', environment.tenor_client_key);
@@ -74,7 +74,7 @@ export class TenorService {
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/featured`, parameters);
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Tenor service',
       image: '',
       icon: '',
@@ -101,7 +101,7 @@ export class TenorService {
    * passing query parameters such as API keys, user locale, and content filters.
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
-  searchGifs(searchTerm: string, next: string): Observable<any> {
+  searchGifs(searchTerm: string, next: string, showAlways: boolean = true): Observable<any> {
     let parameters: Map<string, string> = new Map();
     parameters.set('key', environment.tenor_api_key);
     parameters.set('client_key', environment.tenor_client_key);
@@ -118,7 +118,7 @@ export class TenorService {
 
     let url: string = this.createUrl(`${environment.tenor_base_url}/search`, parameters);
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: false,
+      showAlways: showAlways,
       title: 'Tenor service',
       image: '',
       icon: '',

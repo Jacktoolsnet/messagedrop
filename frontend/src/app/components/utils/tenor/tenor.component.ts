@@ -6,7 +6,6 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { debounceTime, distinctUntilChanged } from 'rxjs';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { TenorService } from '../../../services/tenor.service';
@@ -40,12 +39,6 @@ export class TenorComponent {
   ) { }
 
   ngOnInit(): void {
-    this.searchterm.valueChanges.pipe(
-      debounceTime(750),
-      distinctUntilChanged()
-    ).subscribe((keyword: string) => {
-      this.search();
-    });
     this.tensorGetFeaturedGifs();
   }
 
