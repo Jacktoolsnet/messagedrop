@@ -4,6 +4,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -44,6 +45,7 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
     MatDialogContent,
     MatIcon,
     MatMenuModule,
+    MatExpansionModule
   ],
   templateUrl: './contactlist.component.html',
   styleUrl: './contactlist.component.css'

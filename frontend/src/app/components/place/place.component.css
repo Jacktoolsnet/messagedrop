@@ -14,24 +14,13 @@
   max-height: 95vh;
 }
 
-h2 {
+h4 {
   padding: 0.5rem;
-  color: floralwhite;
 }
 
 button {
   margin-right: 8px;
-}
-
-input[type=text],
-select {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
+  z-index: 1000;
 }
 
 .file-input {
@@ -50,9 +39,11 @@ select {
   position: relative;
   display: block;
   border-radius: 1rem;
-  margin-top: 1rem;
+  margin-bottom: 2rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 .center {
@@ -82,15 +73,18 @@ select {
   margin-right: 0.5rem;
 }
 
-.buttonarea {
+.style-area {
+  position: relative;
   display: block;
-  margin-left: auto;
-  margin-right: auto;
-  width: 100%;
-  height: auto;
+  border-radius: 1rem;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
-.button_style {
+.sample-style {
   margin: auto;
   width: 100%;
   height: 3rem;
@@ -107,5 +101,11 @@ select {
 }
 
 .full-width {
+  width: 100%;
+}
+
+.theme-select {
+  min-width: 200px;
+  max-width: 100%;
   width: 100%;
 }

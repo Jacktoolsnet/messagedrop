@@ -203,6 +203,14 @@ mat-expansion-panel-header {
   padding: 0.5rem 1rem;
 }
 
+mat-expansion-panel-header mat-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  background-color: var(--mat-card-filled-container-color);
+}
+
 mat-expansion-panel-header .avatar,
 mat-expansion-panel-header mat-icon {
   width: 2.5rem;

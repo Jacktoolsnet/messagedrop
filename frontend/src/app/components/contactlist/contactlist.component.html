@@ -16,98 +16,104 @@
         <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
             [matMenuTriggerFor]="connectionMenu">
             <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
-        </button>@for (contact of contactService.getContacts(); track contact.id) {
-        <mat-card class="item">
-            @if (contact.base64Avatar || contact.name) {
-            <div class="avatar-box" (click)="editContact(contact)">
+        </button>
+
+        @for (contact of contactService.getContacts(); track contact.id){
+        <mat-expansion-panel>
+            <mat-expansion-panel-header>
+                @if (contact.base64Avatar || contact.name) {
                 @if (contact.base64Avatar) {
                 <img class="avatar" [src]="contact.base64Avatar" />
                 }
                 @if (contact.name) {
                 <span class="name">{{ contact.name }}</span>
                 }
-            </div>
-            }
+                } @else {
+                <mat-icon>person</mat-icon>
+                <span class="name">Unnamed</span>
+                }
+            </mat-expansion-panel-header>
+            <mat-card>
+                <mat-card-content (click)="openContactMessagDialog(contact)">
+                    <div class="message-content">
+                        @if (contact.lastMessageFrom === 'contactUser') {
+                        <div class="message">
+                            @if (hasContent(contact.userMessage)) {
+                            <p class="from-me">
+                                @if (contact.userMessage.multimedia.type !== 'undefined') {
+                                <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                                }
+                                @if (contact.userMessage.message.trim() !== '') {
+                                <app-showmessage [message]="contact.userMessage.message"
+                                    [style]="contact.userMessage.style"></app-showmessage>
+                                }
+                            </p>
+                            }
+                            @if (hasContent(contact.contactUserMessage)) {
+                            <p class="from-them">
+                                @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
+                                <app-showmultimedia
+                                    [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                                }
+                                @if (contact.contactUserMessage.message.trim() !== '') {
+                                <app-showmessage [message]="contact.contactUserMessage.message"
+                                    [style]="contact.contactUserMessage.style"></app-showmessage>
+                                }
+                            </p>
+                            }
+                        </div>
+                        } @else if (contact.lastMessageFrom === 'user') {
+                        <div class="message">
+                            @if (hasContent(contact.contactUserMessage)) {
+                            <p class="from-them">
+                                @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
+                                <app-showmultimedia
+                                    [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                                }
+                                @if (contact.contactUserMessage.message.trim() !== '') {
+                                <app-showmessage [message]="contact.contactUserMessage.message"
+                                    [style]="contact.contactUserMessage.style"></app-showmessage>
+                                }
+                            </p>
+                            }
+                            @if (hasContent(contact.userMessage)) {
+                            <p class="from-me">
+                                @if (contact.userMessage.multimedia.type !== 'undefined') {
+                                <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                                }
+                                @if (contact.userMessage.message.trim() !== '') {
+                                <app-showmessage [message]="contact.userMessage.message"
+                                    [style]="contact.userMessage.style"></app-showmessage>
+                                }
+                            </p>
+                            }
+                        </div>
+                        }
+                    </div>
+                </mat-card-content>
 
-            <mat-card-content (click)="openContactMessagDialog(contact)">
-                <div class="message-content">
-                    @if (contact.lastMessageFrom === 'contactUser') {
-                    <div class="message">
-                        @if (hasContent(contact.userMessage)) {
-                        <p class="from-me">
-                            @if (contact.userMessage.multimedia.type !== 'undefined') {
-                            <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
-                            }
-                            @if (contact.userMessage.message.trim() !== '') {
-                            <app-showmessage [message]="contact.userMessage.message"
-                                [style]="contact.userMessage.style"></app-showmessage>
-                            }
-                        </p>
-                        }
-                        @if (hasContent(contact.contactUserMessage)) {
-                        <p class="from-them">
-                            @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
-                            <app-showmultimedia
-                                [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
-                            }
-                            @if (contact.contactUserMessage.message.trim() !== '') {
-                            <app-showmessage [message]="contact.contactUserMessage.message"
-                                [style]="contact.contactUserMessage.style"></app-showmessage>
-                            }
-                        </p>
-                        }
-                    </div>
-                    } @else if (contact.lastMessageFrom === 'user') {
-                    <div class="message">
-                        @if (hasContent(contact.contactUserMessage)) {
-                        <p class="from-them">
-                            @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
-                            <app-showmultimedia
-                                [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
-                            }
-                            @if (contact.contactUserMessage.message.trim() !== '') {
-                            <app-showmessage [message]="contact.contactUserMessage.message"
-                                [style]="contact.contactUserMessage.style"></app-showmessage>
-                            }
-                        </p>
-                        }
-                        @if (hasContent(contact.userMessage)) {
-                        <p class="from-me">
-                            @if (contact.userMessage.multimedia.type !== 'undefined') {
-                            <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
-                            }
-                            @if (contact.userMessage.message.trim() !== '') {
-                            <app-showmessage [message]="contact.userMessage.message"
-                                [style]="contact.userMessage.style"></app-showmessage>
-                            }
-                        </p>
-                        }
-                    </div>
+                <mat-card-actions class="buttonbar">
+                    @if (socketioService.isReady()) {
+                    <button mat-mini-fab color="secondary" aria-label="Send a short message"
+                        (click)="openContactMessagDialog(contact)">
+                        <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
+                    </button>
                     }
-                </div>
-            </mat-card-content>
-
-            <mat-card-actions class="buttonbar">
-                @if (socketioService.isReady()) {
-                <button mat-mini-fab color="secondary" aria-label="Send a short message"
-                    (click)="openContactMessagDialog(contact)">
-                    <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
-                </button>
-                }
-                <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
-                    <mat-icon class="material-symbols-outlined">person</mat-icon>
-                </button>
-                @if (!subscriptionError) {
-                <button mat-mini-fab [color]="!contact.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
-                    (click)="subscribe(contact)">
-                    <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
-                </button>
-                }
-                <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
-                    <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
-                </button>
-            </mat-card-actions>
-        </mat-card>
+                    <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
+                        <mat-icon class="material-symbols-outlined">person</mat-icon>
+                    </button>
+                    @if (!subscriptionError) {
+                    <button mat-mini-fab [color]="!contact.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
+                        (click)="subscribe(contact)">
+                        <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
+                    </button>
+                    }
+                    <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
+                        <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </mat-expansion-panel>
         }
     </div>
 

@@ -39,7 +39,7 @@ button {
   position: relative;
   display: block;
   border-radius: 1rem;
-  margin-top: 1rem;
+  margin-bottom: 2rem;
   padding: 1.5rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
