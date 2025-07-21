@@ -85,6 +85,7 @@ export class ContactlistComponent implements OnInit {
       contactUserId: '',
       name: '',
       subscribed: false,
+      pinned: false,
       provided: false,
       userMessage: {
         message: '',
@@ -145,6 +146,7 @@ export class ContactlistComponent implements OnInit {
       contactUserId: '',
       name: '',
       subscribed: false,
+      pinned: false,
       provided: false,
       userMessage: {
         message: '',

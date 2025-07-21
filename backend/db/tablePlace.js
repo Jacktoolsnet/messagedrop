@@ -4,6 +4,7 @@ const columnPlaceId = 'id';
 const columnUserId = 'userId';
 const columnName = 'name'; // Max. 64 charachters.
 const columnSubscribed = 'subscribed';
+const columnPinned = 'pinned';
 const columnLatMin = 'latMin';
 const columnLatMax = 'latMax';
 const columnLonMin = 'lonMin';
@@ -17,6 +18,7 @@ const init = function (db) {
             ${columnUserId} TEXT DEFAULT NULL,
             ${columnName} TEXT NOT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
+            ${columnPinned} BOOLEAN NOT NULL DEFAULT false,
             ${columnLatMin} REAL DEFAULT NULL,
             ${columnLatMax} REAL DEFAULT NULL,
             ${columnLonMin} REAL DEFAULT NULL,
@@ -97,11 +99,40 @@ const subscribe = function (db, placeId, callback) {
     }
 };
 
+const pin = function (db, placeId, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnPinned} = true
+        WHERE ${columnPlaceId} = ?;`;
+        db.run(sql, [placeId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const unsubscribe = function (db, placeId, callback) {
     try {
         let sql = `
         UPDATE ${tableName}
         SET ${columnSubscribed} = false
+        WHERE ${columnPlaceId} = ?;`;
+
+        db.run(sql, [placeId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const unpin = function (db, placeId, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnPinned} = false
         WHERE ${columnPlaceId} = ?;`;
 
         db.run(sql, [placeId], (err) => {
@@ -178,7 +209,9 @@ module.exports = {
     create,
     update,
     subscribe,
+    pin,
     unsubscribe,
+    unpin,
     getById,
     getByUserId,
     getByUserIdAndName,

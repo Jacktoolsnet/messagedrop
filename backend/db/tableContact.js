@@ -10,6 +10,7 @@ const columnContactUserEncryptionPublicKey = 'contactUserEncryptionPublicKey';
 const columnContactUserEncryptedMessage = 'contactUserEncryptedMessage';
 const columnContactUserSignature = 'contactUserSignature';
 const columnSubscribed = 'subscribed';
+const columnPinned = 'pinned';
 const columnHint = 'hint';
 const columnName = 'name';
 const columnLastMessageFrom = 'lastMessageFrom';
@@ -28,6 +29,7 @@ const init = function (db) {
             ${columnContactUserEncryptedMessage} TEXT DEFAULT NULL,
             ${columnContactUserSignature} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
+            ${columnPinned} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
             ${columnName} TEXT DEFAULT NULL,
             ${columnLastMessageFrom} TEXT DEFAULT '',
@@ -140,6 +142,20 @@ const subscribe = function (db, contactId, callback) {
     }
 };
 
+const pin = function (db, contactId, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnPinned} = true
+        WHERE ${columnContactId} = ?;`;
+        db.run(sql, [contactId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const unsubscribe = function (db, contactId, callback) {
     try {
         let sql = `
@@ -147,6 +163,20 @@ const unsubscribe = function (db, contactId, callback) {
         SET ${columnSubscribed} = false
         WHERE ${columnContactId} = ?;`;
 
+        db.run(sql, [contactId], (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+const unpin = function (db, contactId, callback) {
+    try {
+        let sql = `
+        UPDATE ${tableName}
+        SET ${columnPinned} = false
+        WHERE ${columnContactId} = ?;`;
         db.run(sql, [contactId], (err) => {
             callback(err);
         });
@@ -208,7 +238,9 @@ module.exports = {
     updateUserMessage,
     updateContactUserMessage,
     subscribe,
+    pin,
     unsubscribe,
+    unpin,
     getById,
     getByUserId,
     deleteById

@@ -113,9 +113,35 @@ router.get('/subscribe/:placeId', [security.checkToken, security.authenticate, b
   });
 });
 
+router.get('/pin/:placeId', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
+  let response = { 'status': 0 };
+  tablePlace.pin(req.database.db, req.params.placeId, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.status(response.status).json(response);
+  });
+});
+
 router.get('/unsubscribe/:placeId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tablePlace.unsubscribe(req.database.db, req.params.placeId, function (err) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      response.status = 200;
+    }
+    res.status(response.status).json(response);
+  });
+});
+
+router.get('/unpin/:placeId', [security.checkToken, security.authenticate], function (req, res) {
+  let response = { 'status': 0 };
+  tablePlace.unpin(req.database.db, req.params.placeId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

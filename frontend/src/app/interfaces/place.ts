@@ -12,6 +12,7 @@ export interface Place {
     base64Avatar: string
     icon: string,
     subscribed: boolean,
+    pinned: boolean,
     boundingBox: BoundingBox,
     timezone: string,
     datasets: {

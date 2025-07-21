@@ -242,6 +242,24 @@ export class PlaceService {
       );
   }
 
+  pin(place: Place, showAlways: boolean = false) {
+    let url = `${environment.apiUrl}/place/pin/${place.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Pinning place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   unsubscribe(place: Place, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
@@ -250,6 +268,24 @@ export class PlaceService {
       image: '',
       icon: '',
       message: `Unsubscribe from place`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+    return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  unpin(place: Place, showAlways: boolean = false) {
+    let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: 'Place service',
+      image: '',
+      icon: '',
+      message: `Unpinning place`,
       button: '',
       delay: 0,
       showSpinner: true

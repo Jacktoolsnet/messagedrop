@@ -206,6 +206,7 @@ export class PlacelistComponent implements OnInit {
       base64Avatar: '',
       icon: '',
       subscribed: false,
+      pinned: false,
       boundingBox: {
         latMin: 0,
         lonMin: 0,

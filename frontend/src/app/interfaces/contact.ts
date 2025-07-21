@@ -21,6 +21,7 @@ export interface Contact {
     name?: string,
     base64Avatar?: string,
     subscribed: boolean,
+    pinned: boolean,
     provided: boolean,
     lastMessageFrom: string,
     envelope?: Envelope
