@@ -291,7 +291,7 @@ p.from-me::before {
 }
 
 p.from-me::after {
-  background-color: var(--mat-card-filled-container-color);
+  background-color: var(--mat-card-elevated-container-color);
   border-bottom-left-radius: 0.5rem;
   right: -40px;
   transform: translate(-30px, -2px);
@@ -329,7 +329,7 @@ p.from-them:before {
 }
 
 p.from-them::after {
-  background-color: var(--mat-card-filled-container-color);
+  background-color: var(--mat-card-elevated-container-color);
   border-bottom-right-radius: 0.5rem;
   left: 20px;
   transform: translate(-30px, -2px);
@@ -364,7 +364,6 @@ p[class^="from-"].emoji::before {
 mat-expansion-panel-header {
   display: flex;
   align-items: center;
-  padding: 0.4rem 1rem;
 }
 
 mat-expansion-panel-header mat-icon {
@@ -373,7 +372,7 @@ mat-expansion-panel-header mat-icon {
   justify-content: center;
   font-size: 1.5rem;
   background-color: var(--mat-card-filled-container-color);
-  margin-top: 0.4rem;
+
 }
 
 mat-expansion-panel-header .avatar,
@@ -383,7 +382,6 @@ mat-expansion-panel-header mat-icon {
   object-fit: cover;
   border-radius: 50%;
   flex-shrink: 0;
-  margin-top: 0.4rem;
 }
 
 mat-expansion-panel-header .name {
@@ -395,6 +393,5 @@ mat-expansion-panel-header .name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-top: 0.4rem;
   margin-left: 0.75rem;
 }
