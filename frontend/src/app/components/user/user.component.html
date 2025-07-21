@@ -1,6 +1,7 @@
 <h2 mat-dialog-title>My user</h2>
 <mat-dialog-content class="dialog">
-
+  <p>User-ID:</p>
+  <p>{{userService.getUser().id}}</p>
   <p>Deleting my user cannot be undone.</p>
   <button mat-flat-button class color="warn" [attr.aria-hidden]="false" class="button"
     [mat-dialog-close]="{'action': 'deleteUserId'}">
@@ -10,5 +11,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial
-    [mat-dialog-close]="{'action': 'back'}">Abort</button>
+    [mat-dialog-close]="{'action': 'back'}">Close</button>
 </mat-dialog-actions>

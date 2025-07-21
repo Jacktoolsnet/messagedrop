@@ -229,3 +229,14 @@ mat-expansion-panel-header .name {
   text-overflow: ellipsis;
   margin-left: 0.75rem;
 }
+
+.subscribed-button {
+  background-color: var(--mat-select-focused-arrow-color);
+  color: var(--mat-pseudo-checkbox-full-selected-checkmark-color);
+}
+
+.unsubscribed-button {
+  background-color: var(--mdc-outlined-button-container-color);
+  color: var(--mdc-outlined-button-label-text-color);
+  border: 1px solid var(--mdc-outlined-button-outline-color);
+}

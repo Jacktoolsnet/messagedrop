@@ -157,7 +157,7 @@ export class PlacelistComponent implements OnInit {
     });
   }
 
-  public subscribe(place: Place) {
+  public subscribeToPlace(place: Place) {
     if (Notification.permission !== "granted") {
       this.userService.registerSubscription(this.userService.getUser());
     }

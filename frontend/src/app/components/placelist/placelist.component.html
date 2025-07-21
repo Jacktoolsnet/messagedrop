@@ -48,8 +48,8 @@
                         <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
                     </button>
                     @if (!subscriptionError) {
-                    <button mat-mini-fab [color]="!place.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
-                        (click)="subscribe(place)">
+                    <button mat-mini-fab [ngClass]="place.subscribed ? 'subscribed-button' : 'unsubscribed-button'"
+                        aria-label="Subscribe" (click)="subscribeToPlace(place)">
                         <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
                     </button>
                     }
