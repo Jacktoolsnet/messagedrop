@@ -58,8 +58,16 @@ export class PlacelistComponent implements OnInit {
 
   readonly sortedPlacesSignal = computed(() =>
     this.placeService.getPlaces().slice().sort((a, b) => {
+      if (a.pinned !== b.pinned) {
+        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      }
+
       const nameCompare = a.name.localeCompare(b.name);
-      return nameCompare !== 0 ? nameCompare : a.id.localeCompare(b.id);
+      if (nameCompare !== 0) {
+        return nameCompare;
+      }
+
+      return a.id.localeCompare(b.id);
     })
   );
 
@@ -157,7 +165,7 @@ export class PlacelistComponent implements OnInit {
     });
   }
 
-  public subscribeToPlace(place: Place) {
+  public handleSubscription(place: Place) {
     if (Notification.permission !== "granted") {
       this.userService.registerSubscription(this.userService.getUser());
     }
@@ -168,6 +176,7 @@ export class PlacelistComponent implements OnInit {
           next: (simpleStatusResponse) => {
             if (simpleStatusResponse.status === 200) {
               place.subscribed = true;
+              this.placeService.saveAdditionalPlaceInfos(place);
             }
           },
           error: (err) => { },
@@ -180,6 +189,7 @@ export class PlacelistComponent implements OnInit {
           next: (simpleStatusResponse) => {
             if (simpleStatusResponse.status === 200) {
               place.subscribed = false;
+              this.placeService.saveAdditionalPlaceInfos(place);
             }
           },
           error: (err) => {
@@ -187,6 +197,24 @@ export class PlacelistComponent implements OnInit {
           complete: () => { }
         });
     }
+  }
+
+  public pinPlace(place: Place) {
+    place.pinned = true;
+    this.placeService.saveAdditionalPlaceInfos(place);
+    const updatedPlaces = this.placeService.getPlaces().map(p =>
+      p.id === place.id ? { ...p, pinned: true } : p
+    );
+    this.placeService.setPlaces(updatedPlaces);
+  }
+
+  public unpinPlace(place: Place) {
+    place.pinned = false;
+    this.placeService.saveAdditionalPlaceInfos(place);
+    const updatedPlaces = this.placeService.getPlaces().map(p =>
+      p.id === place.id ? { ...p, pinned: false } : p
+    );
+    this.placeService.setPlaces(updatedPlaces);
   }
 
   public goBack() {

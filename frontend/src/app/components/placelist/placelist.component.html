@@ -41,6 +41,15 @@
                 </mat-card-content>
 
                 <mat-card-actions class="buttonbar">
+                    @if(place.pinned) {
+                    <button mat-mini-fab aria-label="Pin" [ngClass]="'active-button'" (click)="unpinPlace(place)">
+                        <mat-icon class="material-symbols-outlined">keep_off</mat-icon>
+                    </button>
+                    } @else {
+                    <button mat-mini-fab aria-label="Unpin" [ngClass]="'inactiv-button'" (click)="pinPlace(place)">
+                        <mat-icon class="material-symbols-outlined">keep</mat-icon>
+                    </button>
+                    }
                     <button mat-mini-fab color="secondary" aria-label="Edit place" (click)="editPlace(place)">
                         <mat-icon class="material-symbols-outlined">edit</mat-icon>
                     </button>
@@ -48,10 +57,17 @@
                         <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
                     </button>
                     @if (!subscriptionError) {
-                    <button mat-mini-fab [ngClass]="place.subscribed ? 'subscribed-button' : 'unsubscribed-button'"
-                        aria-label="Subscribe" (click)="subscribeToPlace(place)">
-                        <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
+                    @if (place.subscribed) {
+                    <button mat-mini-fab aria-label="Unsubscribe" [ngClass]="'active-button'"
+                        (click)="handleSubscription(place)">
+                        <mat-icon class="material-symbols-outlined">bookmark_remove</mat-icon>
                     </button>
+                    } @else {
+                    <button mat-mini-fab aria-label="Subscribe" [ngClass]="'inactiv-button'"
+                        (click)="handleSubscription(place)">
+                        <mat-icon class="material-symbols-outlined">bookmark_add</mat-icon>
+                    </button>
+                    }
                     }
                     <button mat-mini-fab color="secondary" aria-label="Fly to place" (click)="flyTo(place)">
                         <mat-icon class="material-symbols-outlined">place</mat-icon>

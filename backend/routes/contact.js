@@ -134,35 +134,9 @@ router.get('/subscribe/:contactId', [security.checkToken, security.authenticate,
   });
 });
 
-router.get('/pin/:contactId', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
-  let response = { 'status': 0 };
-  tableContact.pin(req.database.db, req.params.contactId, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
-
 router.get('/unsubscribe/:contactId', [security.checkToken, security.authenticate], function (req, res) {
   let response = { 'status': 0 };
   tableContact.unsubscribe(req.database.db, req.params.contactId, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
-
-router.get('/unpin/:contactId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableContact.unpin(req.database.db, req.params.contactId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;

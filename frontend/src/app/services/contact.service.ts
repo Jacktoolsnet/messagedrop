@@ -464,33 +464,6 @@ export class ContactService {
       });
   }
 
-  pin(contact: Contact, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/pin/${contact.id}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Pinning to contact`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            contact.subscribed = true;
-          }
-        },
-        error: (err) => { },
-        complete: () => { }
-      });
-  }
-
   unsubscribe(contact: Contact, showAlways: boolean = false) {
     let url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
@@ -499,34 +472,6 @@ export class ContactService {
       image: '',
       icon: '',
       message: `Unsubscribing from contact`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            contact.subscribed = false;
-          }
-        },
-        error: (err) => {
-        },
-        complete: () => { }
-      });
-  }
-
-  unpin(contact: Contact, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/unpin/${contact.id}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Unpinning contact`,
       button: '',
       delay: 0,
       showSpinner: true
