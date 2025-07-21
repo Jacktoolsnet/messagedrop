@@ -25,7 +25,7 @@ import { CreatePinComponent } from './components/pin/create-pin/create-pin.compo
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
-import { ProfileComponent } from './components/user/profile/profile.component';
+import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
@@ -1039,7 +1039,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     let oriName: string | undefined = profile.name;
     let oriBase64Avatar: string | undefined = profile.base64Avatar;
     let oriDefaultStyle: string | undefined = profile.defaultStyle;
-    const dialogRef = this.userProfileDialog.open(ProfileComponent, {
+    const dialogRef = this.userProfileDialog.open(UserProfileComponent, {
       data: {},
       closeOnNavigation: true,
       maxHeight: '90vh',

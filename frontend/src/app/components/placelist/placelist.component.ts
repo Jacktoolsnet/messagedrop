@@ -23,11 +23,11 @@ import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
-import { PlaceComponent } from '../place/place.component';
 import { AirQualityTileComponent } from './air-quality-tile/air-quality-tile.component';
 import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
 import { NoteTileComponent } from './note-tile/note-tile.component';
+import { PlaceProfileComponent } from './place-profile/place-profile.component';
 import { WeatherTileComponent } from './weather-tile/weather-tile.component';
 
 @Component({
@@ -121,7 +121,7 @@ export class PlacelistComponent implements OnInit {
     let oriBase64Avatar: string = place.base64Avatar;
     let oriIcon: string = place.icon;
 
-    const dialogRef = this.placeDialog.open(PlaceComponent, {
+    const dialogRef = this.placeDialog.open(PlaceProfileComponent, {
       panelClass: '',
       data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,

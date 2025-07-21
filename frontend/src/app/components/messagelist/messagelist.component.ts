@@ -28,7 +28,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { BlockMessageComponent } from './block-message/block-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
-import { EditProfileComponent } from './edit-profile/edit-profile.component';
+import { MessageProfileComponent } from './message-profile/message-profile.component';
 
 @Component({
   selector: 'app-messagelist',
@@ -241,7 +241,7 @@ export class MessagelistComponent implements OnInit {
     const oriBase64Avatar = profile ? profile.base64Avatar : '';
     const oriDefaultStyle = profile ? profile.defaultStyle : '';
 
-    const dialogRef = this.dialog.open(EditProfileComponent, {
+    const dialogRef = this.dialog.open(MessageProfileComponent, {
       data: { profile, userId: message.userId },
       closeOnNavigation: true,
       hasBackdrop: true

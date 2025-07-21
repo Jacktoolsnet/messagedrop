@@ -23,16 +23,16 @@ import { Profile } from '../../../interfaces/profile';
     MatIcon,
     CommonModule
   ],
-  templateUrl: './edit-profile.component.html',
-  styleUrl: './edit-profile.component.css'
+  templateUrl: './message-profile.component.html',
+  styleUrl: './message-profile.component.css'
 })
-export class EditProfileComponent {
+export class MessageProfileComponent {
   public profile!: Profile;
   public userId!: string;
 
   constructor(
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<EditProfileComponent>,
+    public dialogRef: MatDialogRef<MessageProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { profile: Profile, userId: string }) {
     if (data.profile) {
       this.profile = data.profile;

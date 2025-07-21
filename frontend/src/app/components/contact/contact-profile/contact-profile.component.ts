@@ -25,8 +25,8 @@ import { SocketioService } from '../../../services/socketio.service';
     MatDialogClose,
     MatIconModule
   ],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  templateUrl: './contact-profile.component.html',
+  styleUrl: './contact-profile.component.css'
 })
 export class ContactProfileComponent {
   public contact!: Contact;

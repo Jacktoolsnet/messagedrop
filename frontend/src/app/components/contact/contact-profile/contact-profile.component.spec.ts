@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ContactProfileComponent } from './profile.component';
+import { ContactProfileComponent } from './contact-profile.component';
 
 describe('ProfileComponent', () => {
   let component: ContactProfileComponent;
@@ -10,7 +10,7 @@ describe('ProfileComponent', () => {
     await TestBed.configureTestingModule({
       imports: [ContactProfileComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
     fixture = TestBed.createComponent(ContactProfileComponent);
     component = fixture.componentInstance;

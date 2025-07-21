@@ -11,7 +11,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
-import { ProfileComponent } from '../user/profile/profile.component';
+import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 
 @Component({
   selector: 'app-app-settings',
@@ -53,7 +53,7 @@ export class AppSettingsComponent {
   constructor(
     private appService: AppService,
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ProfileComponent>,
+    public dialogRef: MatDialogRef<UserProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: { appSettings: AppSettings }
   ) {
     this.appSettings = this.data.appSettings;

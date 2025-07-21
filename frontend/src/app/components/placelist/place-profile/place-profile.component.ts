@@ -8,9 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Mode } from '../../interfaces/mode';
-import { Place } from '../../interfaces/place';
-import { StyleService } from '../../services/style.service';
+import { Mode } from '../../../interfaces/mode';
+import { Place } from '../../../interfaces/place';
+import { StyleService } from '../../../services/style.service';
 
 @Component({
   selector: 'app-place',
@@ -27,10 +27,10 @@ import { StyleService } from '../../services/style.service';
     MatFormFieldModule,
     MatInputModule
   ],
-  templateUrl: './place.component.html',
-  styleUrl: './place.component.css'
+  templateUrl: './place-profile.component.html',
+  styleUrl: './place-profile.component.css'
 })
-export class PlaceComponent implements OnInit {
+export class PlaceProfileComponent implements OnInit {
 
   private maxFileSize = 5 * 1024 * 1024; // 5MB
   private oriName: string | undefined = undefined;
@@ -38,7 +38,7 @@ export class PlaceComponent implements OnInit {
   private oriIcon: string | undefined = undefined;
 
   constructor(
-    public dialogRef: MatDialogRef<PlaceComponent>,
+    public dialogRef: MatDialogRef<PlaceProfileComponent>,
     private style: StyleService,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, place: Place }

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlaceComponent } from './place.component';
+import { PlaceProfileComponent } from './place-profile.component';
 
 describe('DropmessageComponent', () => {
-  let component: PlaceComponent;
-  let fixture: ComponentFixture<PlaceComponent>;
+  let component: PlaceProfileComponent;
+  let fixture: ComponentFixture<PlaceProfileComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PlaceComponent]
+      imports: [PlaceProfileComponent]
     })
-    .compileComponents();
-    
-    fixture = TestBed.createComponent(PlaceComponent);
+      .compileComponents();
+
+    fixture = TestBed.createComponent(PlaceProfileComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

@@ -29,10 +29,10 @@ import { UserService } from '../../../services/user.service';
     MatSelectModule,
     MatFormFieldModule,
   ],
-  templateUrl: './profile.component.html',
-  styleUrl: './profile.component.css'
+  templateUrl: './user-profile.component.html',
+  styleUrl: './user-profile.component.css'
 })
-export class ProfileComponent {
+export class UserProfileComponent {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
 
   private oriName: string | undefined = undefined;
@@ -44,7 +44,7 @@ export class ProfileComponent {
     public userService: UserService,
     private styleService: StyleService,
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ProfileComponent>,
+    public dialogRef: MatDialogRef<UserProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) {
     this.oriName = this.userService.getProfile().name;
