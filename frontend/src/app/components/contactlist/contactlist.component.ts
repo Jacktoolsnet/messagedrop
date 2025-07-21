@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, effect, Inject, OnInit } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -52,6 +52,7 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
 })
 export class ContactlistComponent implements OnInit {
   private snackBarRef: any;
+  public contacts: Contact[] = [];
   private contactToDelete!: Contact
   public mode: typeof Mode = Mode;
   public subscriptionError: boolean = false;
@@ -73,9 +74,16 @@ export class ContactlistComponent implements OnInit {
     private style: StyleService,
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { contacts: Contact[] }
-  ) { }
+  ) {
+    effect(() => {
+      if (this.contactService.contactCreatedSignal()) {
+        this.contacts = this.contactService.getSortedContacts();
+      }
+    });
+  }
 
   ngOnInit(): void {
+    this.contacts = this.data.contacts;
   }
 
   openConnectDialog(): void {
@@ -210,6 +218,7 @@ export class ContactlistComponent implements OnInit {
       if (result && undefined != this.contactToDelete) {
         this.contactService.deleteContact(this.contactToDelete);
       }
+      this.contacts = this.contactService.getSortedContacts();
     });
   }
 
@@ -237,6 +246,7 @@ export class ContactlistComponent implements OnInit {
         contact.name = oriName;
         contact.base64Avatar = oriBase64Avatar
       }
+      this.contacts = this.contactService.getSortedContacts();
     });
   }
 
@@ -255,6 +265,18 @@ export class ContactlistComponent implements OnInit {
       // Unsubscribe from place.
       this.contactService.unsubscribe(contact);
     }
+  }
+
+  public pinContact(contact: Contact) {
+    contact.pinned = true;
+    this.contactService.saveAditionalContactInfos();
+    this.contacts = this.contactService.getSortedContacts();
+  }
+
+  public unpinContact(contact: Contact) {
+    contact.pinned = false;
+    this.contactService.saveAditionalContactInfos();
+    this.contacts = this.contactService.getSortedContacts();
   }
 
   async openContactMessagDialog(contact: Contact): Promise<void> {

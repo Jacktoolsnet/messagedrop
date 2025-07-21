@@ -18,7 +18,7 @@
             <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
         </button>
 
-        @for (contact of contactService.getSortedContacts(); track contact.id){
+        @for (contact of contacts; track contact.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 @if (contact.base64Avatar || contact.name) {
@@ -93,7 +93,15 @@
                 </mat-card-content>
 
                 <mat-card-actions class="buttonbar">
-                    @if (socketioService.isReady()) {
+                    @if (contact.pinned) {
+                    <button mat-mini-fab [ngClass]="'active-button'" aria-label="Unpin" (click)="unpinContact(contact)">
+                        <mat-icon class="material-symbols-outlined">keep_off</mat-icon>
+                    </button>
+                    } @else {
+                    <button mat-mini-fab [ngClass]="'inactive-button'" aria-label="Pin" (click)="pinContact(contact)">
+                        <mat-icon class="material-symbols-outlined">keep</mat-icon>
+                    </button>
+                    } @if (socketioService.isReady()) {
                     <button mat-mini-fab color="secondary" aria-label="Send a short message"
                         (click)="openContactMessagDialog(contact)">
                         <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
@@ -103,10 +111,16 @@
                         <mat-icon class="material-symbols-outlined">person</mat-icon>
                     </button>
                     @if (!subscriptionError) {
-                    <button mat-mini-fab [color]="!contact.subscribed ? 'secondary' : 'primary'" aria-label="Subscribe"
-                        (click)="subscribe(contact)">
-                        <mat-icon class="material-symbols-outlined">bookmark_flag</mat-icon>
+                    @if (contact.subscribed) {
+                    <button mat-mini-fab [color]="'active-button'" aria-label="Subscribe" (click)="subscribe(contact)">
+                        <mat-icon class="material-symbols-outlined">bookmark_remove</mat-icon>
                     </button>
+                    } @else {
+                    <button mat-mini-fab [color]="'inactive-button'" aria-label="Subscribe"
+                        (click)="subscribe(contact)">
+                        <mat-icon class="material-symbols-outlined">bookmark_add</mat-icon>
+                    </button>
+                    }
                     }
                     <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
                         <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>

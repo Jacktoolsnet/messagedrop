@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
 import { catchError, Subject, throwError } from 'rxjs';
@@ -24,6 +24,9 @@ import { UserService } from './user.service';
 })
 
 export class ContactService {
+
+  private readonly _contactCreatedSignal = signal<boolean>(false);
+  readonly contactCreatedSignal = this._contactCreatedSignal.asReadonly();
 
   private contacts: Contact[] = [];
   private ready: boolean = false;
@@ -81,7 +84,7 @@ export class ContactService {
               contactUserEncryptedMessage: 'undefined' !== rawContact.contactUserEncryptedMessage ? JSON.parse(rawContact.contactUserEncryptedMessage) : undefined,
               contactUserSignature: contactUserSignature,
               subscribed: rawContact.subscribed,
-              pinned: rawContact.pinned,
+              pinned: false,
               hint: rawContact.hint,
               name: '',
               base64Avatar: '',
@@ -239,12 +242,13 @@ export class ContactService {
       let contactProfile = await this.indexedDbService.getContactProfile(contact.id);
       contact.name = undefined != contactProfile ? contactProfile.name : '';
       contact.base64Avatar = undefined != contactProfile ? contactProfile.base64Avatar : '';
+      contact.pinned = undefined != contactProfile ? contactProfile.pinned : false;
     });
   }
 
   saveAditionalContactInfos() {
     this.contacts.forEach((contact: Contact) => {
-      this.indexedDbService.setContactProfile(contact.id, { name: contact.name!, base64Avatar: contact.base64Avatar! });
+      this.indexedDbService.setContactProfile(contact.id, { name: contact.name!, base64Avatar: contact.base64Avatar!, pinned: contact.pinned });
     })
   }
 
@@ -254,15 +258,13 @@ export class ContactService {
 
   getSortedContacts(): Contact[] {
     return this.contacts.sort((a, b) => {
-      if (a.name && b.name) {
-        return a.name.localeCompare(b.name);
-      } else if (a.name && !b.name) {
-        return -1; // a has name, b does not
-      } else if (!a.name && b.name) {
-        return 1; // b has name, a does not
-      } else {
-        return 0; // both are undefined or empty
+      if (a.pinned !== b.pinned) {
+        return a.pinned ? -1 : 1;
       }
+
+      const nameA = a.name?.trim().toLowerCase() || 'unnamed';
+      const nameB = b.name?.trim().toLowerCase() || 'unnamed';
+      return nameA.localeCompare(nameB);
     });
   }
 
@@ -302,6 +304,7 @@ export class ContactService {
             socketioService.receiveShortMessage(contact)
             this.saveAditionalContactInfos();
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
+            this._contactCreatedSignal.set(true);
           }
         },
         error: (err) => { this.snackBar.open(err.message, 'OK'); },

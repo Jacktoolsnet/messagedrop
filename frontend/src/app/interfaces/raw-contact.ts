@@ -16,7 +16,6 @@ export interface RawContact {
     contactSignature: string,
     name: string,
     base64Avatar: string,
-    pinned: boolean,
     subscribed: boolean,
     provided: boolean,
     lastMessageFrom: string,

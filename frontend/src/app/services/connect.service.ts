@@ -98,7 +98,6 @@ export class ConnectService {
               this.cryptoService.verifySignature(contact.contactUserSigningPublicKey, contact.contactUserId, contact.contactSignature!)
                 .then((valid: Boolean) => {
                   if (valid) {
-                    this.snackBar.open(`Connect data is valid.`, 'OK');
                     // Generate Id
                     this.contactService.createContact(contact, socketioService);
                     // Delete connect record

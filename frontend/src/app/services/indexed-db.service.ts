@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { v4 as uuidv4 } from 'uuid';
 import { BoundingBox } from '../interfaces/bounding-box';
+import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
@@ -353,7 +354,7 @@ export class IndexedDbService {
    * @param contactProfile The profile to store.
    * @returns Promise that resolves when the contact profile is stored.
    */
-  async setContactProfile(contactProfileId: string, contactProfile: Profile): Promise<void> {
+  async setContactProfile(contactProfileId: string, contactProfile: ContactProfile): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
@@ -374,10 +375,10 @@ export class IndexedDbService {
    * @param contactProfileId The contact profile ID.
    * @returns Promise that resolves with the profile or undefined if not found.
    */
-  async getContactProfile(contactProfileId: string): Promise<Profile | undefined> {
+  async getContactProfile(contactProfileId: string): Promise<ContactProfile | undefined> {
     const db = await this.openDB();
 
-    return new Promise<Profile | undefined>((resolve, reject) => {
+    return new Promise<ContactProfile | undefined>((resolve, reject) => {
       const tx = db.transaction(this.contactProfileStore, 'readonly');
       const store = tx.objectStore(this.contactProfileStore);
       const request = store.get(contactProfileId);
