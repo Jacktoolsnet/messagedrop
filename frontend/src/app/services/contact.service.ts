@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
 import { catchError, Subject, throwError } from 'rxjs';
@@ -25,10 +25,7 @@ import { UserService } from './user.service';
 
 export class ContactService {
 
-  private readonly _contactCreatedSignal = signal<boolean>(false);
-  readonly contactCreatedSignal = this._contactCreatedSignal.asReadonly();
-
-  private contacts: Contact[] = [];
+  private _contacts = signal<Contact[]>([]);
   private ready: boolean = false;
 
   httpOptions = {
@@ -47,6 +44,8 @@ export class ContactService {
     private snackBar: MatSnackBar,
     private networkService: NetworkService
   ) { }
+
+  get contactsSignal() { return this._contacts.asReadonly(); }
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -213,7 +212,7 @@ export class ContactService {
                   }
                 });
             }
-            this.contacts.push(contact);
+            this._contacts.update(contacts => [...contacts, contact]);
           })
           this.updateContactProfile();
           this.ready = true;
@@ -221,7 +220,7 @@ export class ContactService {
         },
         error: (err) => {
           if (err.status === 404) {
-            this.contacts = [];
+            this._contacts.set([]);
             this.ready = true;
           } else {
             this.ready = false;
@@ -234,42 +233,46 @@ export class ContactService {
 
   public logout() {
     this.ready = false;
-    this.contacts = [];
+    this._contacts.set([]);
   }
 
-  private updateContactProfile() {
-    this.contacts.forEach(async (contact: Contact) => {
-      let contactProfile = await this.indexedDbService.getContactProfile(contact.id);
-      contact.name = undefined != contactProfile ? contactProfile.name : '';
-      contact.base64Avatar = undefined != contactProfile ? contactProfile.base64Avatar : '';
-      contact.pinned = undefined != contactProfile ? contactProfile.pinned : false;
-    });
+  private async updateContactProfile() {
+    await Promise.all(this._contacts().map(async contact => {
+      const profile = await this.indexedDbService.getContactProfile(contact.id);
+      contact.name = profile?.name || '';
+      contact.base64Avatar = profile?.base64Avatar || '';
+      contact.pinned = profile?.pinned || false;
+    }));
+    this._contacts.set(this._contacts());
   }
 
-  saveAditionalContactInfos() {
-    this.contacts.forEach((contact: Contact) => {
-      this.indexedDbService.setContactProfile(contact.id, { name: contact.name!, base64Avatar: contact.base64Avatar!, pinned: contact.pinned });
-    })
-  }
-
-  getContacts(): Contact[] {
-    return this.contacts;
-  }
-
-  getSortedContacts(): Contact[] {
-    return this.contacts.sort((a, b) => {
-      if (a.pinned !== b.pinned) {
-        return a.pinned ? -1 : 1;
-      }
-
-      const nameA = a.name?.trim().toLowerCase() || 'unnamed';
-      const nameB = b.name?.trim().toLowerCase() || 'unnamed';
-      return nameA.localeCompare(nameB);
-    });
+  async saveAditionalContactInfos() {
+    await Promise.all(this._contacts().map(contact => {
+      this.indexedDbService.setContactProfile(contact.id, {
+        name: contact.name ? contact.name : '',
+        base64Avatar: contact.base64Avatar ? contact.base64Avatar : '',
+        pinned: contact.pinned
+      });
+    }));
   }
 
   isReady(): boolean {
     return this.ready;
+  }
+
+  readonly sortedContactsSignal = computed(() =>
+    this._contacts().slice().sort((a, b) => {
+      if (a.pinned !== b.pinned) {
+        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      }
+      const nameA = a.name?.trim().toLowerCase() || 'unnamed';
+      const nameB = b.name?.trim().toLowerCase() || 'unnamed';
+      return nameA.localeCompare(nameB);
+    })
+  );
+
+  setContacts(contacts: Contact[]) {
+    this._contacts.set(contacts);
   }
 
   // We need a function from qrcode
@@ -300,11 +303,10 @@ export class ContactService {
         next: createContactResponse => {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
-            this.getContacts().unshift(contact);
             socketioService.receiveShortMessage(contact)
             this.saveAditionalContactInfos();
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
-            this._contactCreatedSignal.set(true);
+            this._contacts.update(contacts => [...contacts, contact]);
           }
         },
         error: (err) => { this.snackBar.open(err.message, 'OK'); },
@@ -430,7 +432,9 @@ export class ContactService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            this.contacts.splice(this.contacts.map(e => e.id).indexOf(contactToDelete.id), 1);
+            this._contacts.update(contacts =>
+              contacts.filter(c => c.id !== contactToDelete.id)
+            );
             this.indexedDbService.deleteContactProfile(contactToDelete.id);
           }
         },
@@ -460,6 +464,7 @@ export class ContactService {
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
             contact.subscribed = true;
+            this._contacts.set(this._contacts());
           }
         },
         error: (err) => { },
@@ -487,6 +492,7 @@ export class ContactService {
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
             contact.subscribed = false;
+            this._contacts.set(this._contacts());
           }
         },
         error: (err) => {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, Inject, OnInit } from '@angular/core';
+import { Component, Inject, OnInit, Signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -52,7 +52,8 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
 })
 export class ContactlistComponent implements OnInit {
   private snackBarRef: any;
-  public contacts: Contact[] = [];
+  public contactsSignal: Signal<Contact[]>;
+
   private contactToDelete!: Contact
   public mode: typeof Mode = Mode;
   public subscriptionError: boolean = false;
@@ -73,17 +74,12 @@ export class ContactlistComponent implements OnInit {
     public dialog: MatDialog,
     private style: StyleService,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { contacts: Contact[] }
+    @Inject(MAT_DIALOG_DATA) public data: {}
   ) {
-    effect(() => {
-      if (this.contactService.contactCreatedSignal()) {
-        this.contacts = this.contactService.getSortedContacts();
-      }
-    });
+    this.contactsSignal = this.contactService.sortedContactsSignal;
   }
 
   ngOnInit(): void {
-    this.contacts = this.data.contacts;
   }
 
   openConnectDialog(): void {
@@ -218,7 +214,6 @@ export class ContactlistComponent implements OnInit {
       if (result && undefined != this.contactToDelete) {
         this.contactService.deleteContact(this.contactToDelete);
       }
-      this.contacts = this.contactService.getSortedContacts();
     });
   }
 
@@ -246,7 +241,6 @@ export class ContactlistComponent implements OnInit {
         contact.name = oriName;
         contact.base64Avatar = oriBase64Avatar
       }
-      this.contacts = this.contactService.getSortedContacts();
     });
   }
 
@@ -270,13 +264,19 @@ export class ContactlistComponent implements OnInit {
   public pinContact(contact: Contact) {
     contact.pinned = true;
     this.contactService.saveAditionalContactInfos();
-    this.contacts = this.contactService.getSortedContacts();
+    const updatedContacts = this.contactService.contactsSignal().map(c =>
+      c.id === contact.id ? { ...c, pinned: true } : c
+    );
+    this.contactService.setContacts(updatedContacts);
   }
 
   public unpinContact(contact: Contact) {
     contact.pinned = false;
     this.contactService.saveAditionalContactInfos();
-    this.contacts = this.contactService.getSortedContacts();
+    const updatedContacts = this.contactService.contactsSignal().map(c =>
+      c.id === contact.id ? { ...c, pinned: false } : c
+    );
+    this.contactService.setContacts(updatedContacts);
   }
 
   async openContactMessagDialog(contact: Contact): Promise<void> {

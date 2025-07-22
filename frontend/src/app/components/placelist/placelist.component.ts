@@ -56,21 +56,6 @@ import { WeatherTileComponent } from './weather-tile/weather-tile.component';
 export class PlacelistComponent implements OnInit {
   placesSignal: Signal<Place[]>;
 
-  readonly sortedPlacesSignal = computed(() =>
-    this.placeService.getPlaces().slice().sort((a, b) => {
-      if (a.pinned !== b.pinned) {
-        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
-      }
-
-      const nameCompare = a.name.localeCompare(b.name);
-      if (nameCompare !== 0) {
-        return nameCompare;
-      }
-
-      return a.id.localeCompare(b.id);
-    })
-  );
-
   readonly hasPlaces = computed(() => this.placesSignal().length > 0);
   private placeToDelete!: Place
   public mode: typeof Mode = Mode;
@@ -91,7 +76,7 @@ export class PlacelistComponent implements OnInit {
     private style: StyleService,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) {
-    this.placesSignal = this.placeService.getPlaces;
+    this.placesSignal = this.placeService.sortedPlacesSignal;
   }
 
   ngOnInit(): void {

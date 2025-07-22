@@ -117,7 +117,7 @@ export class SocketioService {
   }
 
   async initContacts() {
-    this.contactService.getContacts().forEach((contact: Contact) => {
+    this.contactService.contactsSignal().forEach((contact: Contact) => {
       this.receiveShortMessage(contact);
     });
   }

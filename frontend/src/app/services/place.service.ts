@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { DateTime } from 'luxon';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -71,6 +71,21 @@ export class PlaceService {
     }
     return place ?? null;
   }
+
+  readonly sortedPlacesSignal = computed(() =>
+    this.getPlaces().slice().sort((a, b) => {
+      if (a.pinned !== b.pinned) {
+        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      }
+
+      const nameCompare = a.name.localeCompare(b.name);
+      if (nameCompare !== 0) {
+        return nameCompare;
+      }
+
+      return a.id.localeCompare(b.id);
+    })
+  );
 
   setPlaces(places: Place[]) {
     this._places.set(places);

@@ -1,5 +1,5 @@
 <mat-dialog-content class="dialog">
-    @if (contactService.getContacts().length === 0) {
+    @if (contactsSignal().length === 0) {
     <div class="no-content">
         <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
             <mat-icon>arrow_back</mat-icon>
@@ -18,7 +18,7 @@
             <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
         </button>
 
-        @for (contact of contacts; track contact.id){
+        @for (contact of contactsSignal(); track contact.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 @if (contact.base64Avatar || contact.name) {
