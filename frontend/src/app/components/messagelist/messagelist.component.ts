@@ -203,10 +203,6 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessage(message: Message) {
-    const oriMessage = message.message;
-    const oriMultimedia = JSON.parse(JSON.stringify(message.multimedia));
-    const oriStyle = message.style;
-
     if (message.multimedia.type !== MultimediaType.UNDEFINED) {
       this.sharedContentService.addSharedContentToMessage(message);
     }
@@ -225,10 +221,6 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
         this.messageService.updateMessage(data.message);
-      } else {
-        message.message = oriMessage;
-        message.multimedia = oriMultimedia;
-        message.style = oriStyle;
       }
     });
   }

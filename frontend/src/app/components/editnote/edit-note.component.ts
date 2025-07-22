@@ -128,7 +128,9 @@ export class EditNoteComponent implements OnInit {
     dialogRef.afterOpened().subscribe(e => { });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      this.data.note.note = data.text
+      if (data) {
+        this.data.note.note = data.text;
+      }
     });
   }
 

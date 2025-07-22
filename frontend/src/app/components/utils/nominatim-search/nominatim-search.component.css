@@ -30,20 +30,18 @@ mat-card-actions.buttonbar {
 .searchTerm-container {
     position: sticky;
     z-index: 1000;
-    top: 0.5rem;
-    margin-left: 0.5rem;
-    margin-right: 0.5rem;
+    height: 4rem;
+    top: 0;
     display: flex;
     align-items: center;
-    border: 1px solid var(--mat-fab-small-container-color);
-    border-radius: 1rem;
+    background-color: var(--mat-fab-foreground-color);
     overflow: hidden;
-    min-height: 2.5rem;
-    max-width: 100%;
-    /* optional, damit er nicht über die Elternbreite hinausgeht */
+    min-height: 4rem;
+    width: 100%;
 }
 
 .searchTerm-container input[type="search"] {
+    margin-left: 1rem;
     padding-left: 0.5rem;
     flex-grow: 1;
     border: none;
@@ -65,6 +63,7 @@ mat-card-actions.buttonbar {
 }
 
 .searchTerm-container button {
+    margin-right: 1rem;
     color: var(--mat-fab-small-foreground-color);
     background-color: var(--mat-fab-small-container-color);
     border: none;

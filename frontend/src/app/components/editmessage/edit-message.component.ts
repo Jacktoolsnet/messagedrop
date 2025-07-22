@@ -167,7 +167,9 @@ export class EditMessageComponent implements OnInit {
     dialogRef.afterOpened().subscribe(e => { });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      this.data.message.message = data.text;
+      if (data) {
+        this.data.message.message = data.text;
+      }
     });
   }
 
