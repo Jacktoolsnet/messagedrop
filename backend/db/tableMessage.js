@@ -195,7 +195,8 @@ const getByPlusCode = function (db, plusCode, callback) {
         WHERE ${columnPlusCode} LIKE ?
         AND ${columnParentUuid} IS NULL
         AND ${columnStatus} = '${messageStatus.ENABLED}'      
-        ORDER BY ${columnMessageCreateDateTime} DESC;`;
+        ORDER BY ${columnMessageCreateDateTime} DESC
+        LIMIT 256;`;
 
         db.all(sql, [plusCode], (err, rows) => {
             callback(err, rows);
@@ -211,7 +212,8 @@ const getByParentUuid = function (db, parentUuid, callback) {
         SELECT * FROM ${tableName}
         WHERE ${columnParentUuid} = ?
         AND ${columnStatus} = '${messageStatus.ENABLED}'
-        ORDER BY ${columnMessageCreateDateTime} ASC;`;
+        ORDER BY ${columnMessageCreateDateTime} DESC
+        LIMIT 256;`;
 
         db.all(sql, [parentUuid], (err, rows) => {
             callback(err, rows);
