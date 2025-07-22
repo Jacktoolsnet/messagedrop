@@ -1,9 +1,11 @@
 <mat-dialog-content class="dialog">
     @if (!hasNotes()) {
     <div class="no-content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
             (click)="openNoteDialog()">
             <span>Add my first private note</span>
@@ -11,13 +13,15 @@
     </div>
     } @else {
     <div class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
-            (click)="openNoteDialog()">
-            <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add_notes</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
+                (click)="openNoteDialog()">
+                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add_notes</mat-icon>
+            </button>
+        </div>
 
         @for (note of notesSignal(); track note.id) {
         <mat-card class="item">

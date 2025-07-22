@@ -928,8 +928,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       minWidth: '20vw',
       maxWidth: 'none',
       width: 'auto',
-      minHeight: '8rem',
-      maxHeight: '90vh',
+      maxHeight: 'none',
+      height: 'auto',
       hasBackdrop: true,
       autoFocus: false
     });
