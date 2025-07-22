@@ -88,6 +88,10 @@
                             </p>
                             }
                         </div>
+                        } @else {
+                        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false">
+                            <span>Create my first short message</span>
+                        </button>
                         }
                     </div>
                 </mat-card-content>

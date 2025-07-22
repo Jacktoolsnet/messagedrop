@@ -18,12 +18,14 @@ $paletten: (
 @each $name, $palette in $paletten {
   .theme-#{"#{$name}"}.light {
 @include mat.all-component-themes(mat.define-theme((color: (theme-type: light,
-          primary: $palette ))));
+          primary: $palette,
+          tertiary: mat.$azure-palette ))));
 }
 
 .theme-#{"#{$name}"}.dark {
 @include mat.all-component-themes(mat.define-theme((color: (theme-type: dark,
-        primary: $palette ))));
+        primary: $palette,
+        tertiary: mat.$azure-palette ))));
 }
 }
 
