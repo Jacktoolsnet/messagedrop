@@ -12,10 +12,6 @@
     height: 90%;
 }
 
-.full-width {
-    width: 100%;
-    height: 100%;
-}
 
 .gallery {
     padding: 1rem;
@@ -48,6 +44,11 @@
 }
 
 .url-container {
+    position: sticky;
+    z-index: 1000;
+    top: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     display: flex;
     border: 1px solid var(--mat-fab-small-container-color);
     border-radius: 1rem;

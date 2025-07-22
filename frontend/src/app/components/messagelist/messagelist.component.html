@@ -27,24 +27,30 @@
         }
         @for (message of filteredMessagesSignal(); track message.id) {
         <mat-card class="item">
-            @if (user.id == message.userId && (userProfile.base64Avatar || userProfile.name)) {
+            @if (user.id == message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {
                 <img class="avatar" [src]="userProfile.base64Avatar" />
+                } @else {
+                <mat-icon>person</mat-icon>
                 }
                 @if (userProfile.name) {
                 <span class="name">{{ userProfile.name }}</span>
+                } @else {
+                <span class="name">Myself</span>
                 }
             </div>
-            }
-            @if (user.id != message.userId && (profileService.getProfile(message.userId)?.base64Avatar ||
-            profileService.getProfile(message.userId)?.name)) {
+            } @else {
             <div class="avatar-box" (click)="editMessageUserProfile(message)">
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
                 <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar">
+                } @else {
+                <mat-icon>person</mat-icon>
                 }
                 @if (profileService.getProfile(message.userId)?.name) {
                 <span class="name">{{ profileService.getProfile(message.userId)?.name }}</span>
+                } @else {
+                <span class="name">Unnamed</span>
                 }
             </div>
             }

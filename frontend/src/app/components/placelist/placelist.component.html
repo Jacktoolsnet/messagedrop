@@ -20,14 +20,15 @@
         @for (place of placesSignal(); track place.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>
-                @if (place.icon && !place.base64Avatar) {
-                <mat-icon>{{ place.icon || 'location' }}</mat-icon>
-                }
                 @if (place.base64Avatar) {
                 <img class="avatar" [src]="place.base64Avatar" />
+                } @else {
+                <mat-icon>{{ place.icon || 'location' }}</mat-icon>
                 }
                 @if (place.name) {
                 <span class="name">{{ place.name }}</span>
+                } @else {
+                <span class="name">Unnamed</span>
                 }
             </mat-expansion-panel-header>
             <mat-card>

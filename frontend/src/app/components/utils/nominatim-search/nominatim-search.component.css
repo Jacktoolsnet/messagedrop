@@ -28,12 +28,16 @@ mat-card-actions.buttonbar {
 }
 
 .searchTerm-container {
+    position: sticky;
+    z-index: 1000;
+    top: 0.5rem;
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
     display: flex;
     align-items: center;
     border: 1px solid var(--mat-fab-small-container-color);
     border-radius: 1rem;
     overflow: hidden;
-    margin: 0.5rem;
     min-height: 2.5rem;
     max-width: 100%;
     /* optional, damit er nicht über die Elternbreite hinausgeht */
@@ -77,58 +81,22 @@ mat-card-actions.buttonbar {
 
 /* === CONTENT === */
 .content {
-    padding-left: 2.5rem;
-    padding-right: 1.5rem;
+    width: auto;
+    max-width: none;
+    padding-top: 1rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin: 0, auto;
     display: grid;
-    grid-template-columns: 1fr;
-    gap: 2.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
+    justify-content: center;
+    gap: 0.5rem;
     white-space: normal;
 }
 
-/* === RESPONSIVES GRID === */
-@media (min-width: 500px) {
-    .content {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    .item {
-        min-width: calc(100% / 2 - 10%);
-    }
-}
-
-@media (min-width: 1000px) {
-    .content {
-        grid-template-columns: repeat(4, 1fr);
-    }
-
-    .item {
-        min-width: calc(100% / 4 - 10%);
-    }
-}
-
-@media (min-width: 1500px) {
-    .content {
-        grid-template-columns: repeat(6, 1fr);
-    }
-
-    .item {
-        min-width: calc(100% / 6 - 10%);
-    }
-}
-
-@media (min-width: 2000px) {
-    .content {
-        grid-template-columns: repeat(8, 1fr);
-    }
-
-    .item {
-        min-width: calc(100% / 8 - 10%);
-    }
-}
-
-
 /* === ITEM DARSTELLUNG (Karten / Elemente) === */
 .item {
+    margin: 0.75rem;
     margin-top: 2.25rem;
     border-radius: 0.75rem;
     color: var(--mat-card-subtitle-text-color);
