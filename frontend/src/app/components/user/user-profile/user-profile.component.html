@@ -10,12 +10,9 @@
 
   @if (userService.getProfile().base64Avatar === '') {
   <div class="avatar-area">
-    <div class="center">Set my profile avatar.</div>
-    <div class="button-style">
-      <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
-        <mat-icon>attach_file</mat-icon>
-      </button>
-    </div>
+    <button mat-flat-button class="button-set-avatar" (click)="fileUpload.click()">
+      <span>Set my profile avatar.</span>
+    </button>
   </div>
   } @else {
   <div class="avatar-area">
@@ -34,7 +31,7 @@
     <div class="sample-style" [style]="userService.getProfile().defaultStyle">
       My selected font style
     </div>
-    <button mat-mini-fab color="primary" aria-hidden="false" class="button-style" (click)="changeDefaultStyle()">
+    <button mat-flat-button aria-hidden="false" class="button-set-avatar" (click)="changeDefaultStyle()">
       <mat-icon class="material-symbols-outlined">cycle</mat-icon>
     </button>
   </div>

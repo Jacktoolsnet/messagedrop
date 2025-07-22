@@ -248,9 +248,10 @@ export class MessagelistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      if (result === true) {
         this.profileService.setProfile(result.userId, result.profile);
-      } else {
+      }
+      if (result === false) {
         if (profile) {
           profile.name = oriName;
           profile.base64Avatar = oriBase64Avatar;

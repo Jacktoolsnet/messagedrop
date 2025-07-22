@@ -14,9 +14,16 @@
   max-height: 95vh;
 }
 
-h2 {
+h4 {
   padding: 0.5rem;
-  color: floralwhite;
+}
+
+.button-set-avatar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin: auto;
 }
 
 button {

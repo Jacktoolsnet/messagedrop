@@ -2,7 +2,7 @@
 <mat-dialog-content class="dialog">
   <p>User-ID:</p>
   <p>{{userService.getUser().id}}</p>
-  <button mat-flat-button class color="warn" [attr.aria-hidden]="false" class="button"
+  <button mat-flat-button color="warn" [attr.aria-hidden]="false" class="button"
     [mat-dialog-close]="{'action': 'deleteUserId'}">
     <mat-icon class="material-symbols-outlined">delete</mat-icon>
     <span>Delete my user</span>

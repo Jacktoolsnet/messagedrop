@@ -110,9 +110,6 @@ export class PlacelistComponent implements OnInit {
   }
 
   public editPlace(place: Place) {
-    let oriName: string = place.name;
-    let oriBase64Avatar: string = place.base64Avatar;
-    let oriIcon: string = place.icon;
 
     const dialogRef = this.placeDialog.open(PlaceProfileComponent, {
       panelClass: '',
@@ -136,16 +133,6 @@ export class PlacelistComponent implements OnInit {
             error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
             complete: () => { }
           });
-      } else {
-        if (undefined != oriName) {
-          place.name = oriName;
-        }
-        if (undefined != oriBase64Avatar) {
-          place.base64Avatar = oriBase64Avatar;
-        }
-        if (undefined != oriIcon) {
-          place.icon = oriIcon;
-        }
       }
     });
   }

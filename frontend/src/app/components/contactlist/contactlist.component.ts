@@ -234,10 +234,11 @@ export class ContactlistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result) {
+      if (result === true) {
         this.contactService.updateContactName(contact);
         this.contactService.saveAditionalContactInfos();
-      } else {
+      }
+      if (result === false) {
         contact.name = oriName;
         contact.base64Avatar = oriBase64Avatar
       }

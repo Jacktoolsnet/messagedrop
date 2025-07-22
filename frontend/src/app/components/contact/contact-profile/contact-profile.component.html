@@ -11,12 +11,9 @@
 
   @if (!contact.base64Avatar) {
   <div class="avatar-area">
-    <div class="center">Set contact avatar</div>
-    <div class="button-style">
-      <button mat-mini-fab color="primary" class="upload-button" (click)="fileUpload.click()">
-        <mat-icon>attach_file</mat-icon>
-      </button>
-    </div>
+    <button mat-flat-button class="button-set-avatar" (click)="fileUpload.click()">
+      <span>Set the contact avatar.</span>
+    </button>
   </div>
   } @else {
   <div class="avatar-area">
