@@ -1,9 +1,11 @@
 <mat-dialog-content class="dialog">
     @if (messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0) {
     <div class="no-content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </div>
         @if(userService.isReady()) {
         <div class="no-content">
             <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
@@ -16,15 +18,17 @@
     }
     @if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) {
     <div class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        @if(userService.isReady()) {
-        <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
-            (click)="addMessagDialog()">
-            <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">chat_add_on</mat-icon>
-        </button>
-        }
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            @if(userService.isReady()) {
+            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
+                (click)="addMessagDialog()">
+                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">chat_add_on</mat-icon>
+            </button>
+            }
+        </div>
         @for (message of filteredMessagesSignal(); track message.id) {
         <mat-card class="item">
             @if (user.id == message.userId) {
@@ -119,15 +123,17 @@
 
     @if (messageService.selectedMessagesSignal().length !== 0) {
     <div class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
 
-        @if(userService.isReady()) {
-        <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
-            <mat-icon>add_comment</mat-icon>
-        </button>
-        }
+            @if(userService.isReady()) {
+            <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
+                <mat-icon>add_comment</mat-icon>
+            </button>
+            }
+        </div>
 
         @for (message of commentsSignal(); track message.id) {
         <mat-card class="item">
@@ -190,6 +196,5 @@
         </mat-card>
         }
     </div>
-
     }
 </mat-dialog-content>

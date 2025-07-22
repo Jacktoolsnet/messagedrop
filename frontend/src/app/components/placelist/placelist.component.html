@@ -1,22 +1,25 @@
 <mat-dialog-content>
     @if (!hasPlaces()) {
     <div class="no-content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </div>
         <button class="first-button" mat-flat-button color="primary" (click)="addPlace()">
             <span>Add my first place</span>
         </button>
     </div>
     } @else {
     <div class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <button class="button_add" mat-mini-fab color="primary" aria-label="Add" (click)="addPlace()">
-            <mat-icon class="material-symbols-outlined">add_location</mat-icon>
-        </button>
-
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <button class="button_add" mat-mini-fab color="primary" aria-label="Add" (click)="addPlace()">
+                <mat-icon class="material-symbols-outlined">add_location</mat-icon>
+            </button>
+        </div>
         @for (place of placesSignal(); track place.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>

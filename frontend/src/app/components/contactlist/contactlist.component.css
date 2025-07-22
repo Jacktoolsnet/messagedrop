@@ -32,6 +32,16 @@
   gap: 0.5rem;
 }
 
+.toolbar {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 3.5rem;
+  height: 100%;
+  background-color: var(--mat-fab-foreground-color);
+  z-index: 200;
+}
+
 /* === CONTENT === */
 .content {
   width: auto;

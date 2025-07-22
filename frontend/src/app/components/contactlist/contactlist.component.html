@@ -1,22 +1,26 @@
 <mat-dialog-content class="dialog">
     @if (contactsSignal().length === 0) {
     <div class="no-content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+        </div>
         <button class="first-button" mat-flat-button color="primary" [matMenuTriggerFor]="connectionMenu">
             <span>Start connecting</span>
         </button>
     </div>
     } @else {
     <div class="content">
-        <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-            <mat-icon>arrow_back</mat-icon>
-        </button>
-        <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
-            [matMenuTriggerFor]="connectionMenu">
-            <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
-        </button>
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
+            </button>
+            <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
+                [matMenuTriggerFor]="connectionMenu">
+                <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
+            </button>
+        </div>
 
         @for (contact of contactsSignal(); track contact.id){
         <mat-expansion-panel>
