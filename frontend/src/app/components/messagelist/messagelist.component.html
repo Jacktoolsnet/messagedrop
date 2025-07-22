@@ -150,12 +150,14 @@
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
+                @if (message.commentsNumber != 0 || userService.isReady()){
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
+                }
                 @if (user.id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
