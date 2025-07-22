@@ -1,5 +1,6 @@
 <div class="searchTerm-container">
-    <input type="text" [formControl]="searchterm" (keydown.enter)="search()" placeholder="Search in OpenStreetMap">
+    <input #searchInput type="search" enterkeyhint="search" [formControl]="searchterm" (keyup.enter)="search()"
+        placeholder="Search in OpenStreetMap">
 
     <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
         @for (r of radiusOptions; track r.value) {

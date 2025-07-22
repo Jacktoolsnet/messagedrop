@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -26,6 +26,8 @@ import { TenorService } from '../../../services/tenor.service';
   styleUrl: './tenor.component.css'
 })
 export class TenorComponent {
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+
   public searchterm: FormControl = new FormControl<string>("");
   public lastSearchterm: string = '';
   public nextFeatured: string = '';
@@ -69,6 +71,8 @@ export class TenorComponent {
   }
 
   search(): void {
+    // Fokus entfernen → Tastatur schließt sich
+    this.searchInput.nativeElement.blur();
     if (this.searchterm.value === '') {
       this.tensorGetFeaturedGifs();
     } else {
@@ -94,3 +98,4 @@ export class TenorComponent {
   }
 
 }
+

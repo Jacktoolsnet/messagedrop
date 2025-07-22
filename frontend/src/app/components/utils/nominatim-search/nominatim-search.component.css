@@ -43,7 +43,7 @@ mat-card-actions.buttonbar {
     /* optional, damit er nicht über die Elternbreite hinausgeht */
 }
 
-.searchTerm-container input[type="text"] {
+.searchTerm-container input[type="search"] {
     padding-left: 0.5rem;
     flex-grow: 1;
     border: none;

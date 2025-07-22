@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -38,6 +38,8 @@ import { NominatimService } from '../../../services/nominatim.service';
   styleUrl: './nominatim-search.component.css'
 })
 export class NominatimSearchComponent {
+
+  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   searchterm: FormControl = new FormControl<string>("");
 
   selectedRadius: number = 0; // z. B. 1000 = 1km
@@ -84,6 +86,7 @@ export class NominatimSearchComponent {
   }
 
   search(): void {
+    this.searchInput.nativeElement.blur();
     this.nominatimPlaces = [];
     const term = this.searchterm.value?.trim();
     if (!term) return;

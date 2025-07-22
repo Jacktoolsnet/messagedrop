@@ -1,5 +1,6 @@
 <div class="url-container">
-    <input type="text" [formControl]="searchterm" (keydown.enter)="search()" placeholder="Search in Tenor" />
+    <input #searchInput type="search" enterKeyHint="search" [formControl]="searchterm" (keyup.enter)="search()"
+        placeholder="Search in Tenor" />
 
     <button (click)="search()">
         @if (
