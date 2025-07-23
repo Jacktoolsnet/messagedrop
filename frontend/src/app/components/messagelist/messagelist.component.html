@@ -59,7 +59,7 @@
             </div>
             }
 
-            <mat-card-content (click)="userService.isReady() ? editMessage(message) : {}">
+            <mat-card-content (click)="userService.isReady() && user.id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
                     @if (message.message) {
@@ -139,7 +139,7 @@
 
         @for (message of commentsSignal(); track message.id) {
         <mat-card class="item">
-            <mat-card-content (click)="userService.isReady() ? editMessage(message) : {}">
+            <mat-card-content (click)="userService.isReady() && user.id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
                     @if (message.message) {
