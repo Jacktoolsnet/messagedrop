@@ -105,10 +105,8 @@ export class NotelistComponent implements OnInit {
       closeOnNavigation: true
     });
 
-    dialogRef.afterClosed().subscribe(async result => {
-      if (result?.note) {
-        await this.noteService.updateNote(result.note);
-      }
+    dialogRef.afterClosed().subscribe(async () => {
+      await this.noteService.updateNote(note);
     });
   }
 

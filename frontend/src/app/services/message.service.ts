@@ -235,8 +235,6 @@ export class MessageService {
           this.messagesSignal.update(messages => {
             return messages.map(m => m.id === message.id ? { ...m, ...message } : m);
           });
-
-          this.snackBar.open(`Successfully updated.`, '', { duration: 1000 });
         },
         error: err => this.snackBar.open(err.message, 'OK')
       });
