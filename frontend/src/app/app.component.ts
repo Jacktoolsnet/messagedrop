@@ -1046,9 +1046,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
   public editUserProfile() {
     let profile: Profile = this.userService.getProfile()
-    let oriName: string | undefined = profile.name;
-    let oriBase64Avatar: string | undefined = profile.base64Avatar;
-    let oriDefaultStyle: string | undefined = profile.defaultStyle;
+
     const dialogRef = this.userProfileDialog.open(UserProfileComponent, {
       data: {},
       closeOnNavigation: true,
@@ -1061,20 +1059,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.userService.saveProfile();
-      }
-      if (result === false) {
-        if (undefined != oriName) {
-          profile.name = oriName;
-        }
-        if (undefined != oriBase64Avatar) {
-          profile.base64Avatar = oriBase64Avatar;
-        }
-        if (undefined != oriDefaultStyle) {
-          profile.defaultStyle = oriDefaultStyle;
-        }
-      }
+      this.userService.saveProfile();
     });
   }
 

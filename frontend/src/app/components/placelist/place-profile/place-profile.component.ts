@@ -52,7 +52,7 @@ export class PlaceProfileComponent implements OnInit {
   }
 
   onApplyClick(): void {
-    this.dialogRef.close(this.data);
+    this.dialogRef.close();
   }
 
   onAbortClick(): void {

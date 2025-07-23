@@ -229,10 +229,6 @@ export class MessagelistComponent implements OnInit {
 
     const profile = this.profileService.getProfile(message.userId);
 
-    const oriName = profile ? profile.name : '';
-    const oriBase64Avatar = profile ? profile.base64Avatar : '';
-    const oriDefaultStyle = profile ? profile.defaultStyle : '';
-
     const dialogRef = this.dialog.open(MessageProfileComponent, {
       data: { profile, userId: message.userId },
       closeOnNavigation: true,
@@ -240,15 +236,8 @@ export class MessagelistComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
-      if (result === true) {
-        this.profileService.setProfile(result.userId, result.profile);
-      }
-      if (result === false) {
-        if (profile) {
-          profile.name = oriName;
-          profile.base64Avatar = oriBase64Avatar;
-          profile.defaultStyle = oriDefaultStyle;
-        }
+      if (profile) {
+        this.profileService.setProfile(message.userId, profile);
       }
     });
   }

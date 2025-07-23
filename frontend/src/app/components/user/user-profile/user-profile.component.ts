@@ -8,6 +8,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { Profile } from '../../../interfaces/profile';
 import { AppService } from '../../../services/app.service';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
@@ -34,10 +35,7 @@ import { UserService } from '../../../services/user.service';
 })
 export class UserProfileComponent {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
-
-  private oriName: string | undefined = undefined;
-  private oriBase64Avatar: string | undefined = undefined;
-  private oriDefaultStyle: string | undefined = undefined;
+  private oriProfile: Profile;
 
   constructor(
     private appService: AppService,
@@ -47,21 +45,11 @@ export class UserProfileComponent {
     public dialogRef: MatDialogRef<UserProfileComponent>,
     @Inject(MAT_DIALOG_DATA) public data: {}
   ) {
-    this.oriName = this.userService.getProfile().name;
-    this.oriBase64Avatar = this.userService.getProfile().base64Avatar
-    this.oriDefaultStyle = this.userService.getProfile().defaultStyle;
+    this.oriProfile = structuredClone(this.userService.getProfile());
   }
 
   onAbortClick(): void {
-    if (undefined != this.oriName) {
-      this.userService.getProfile().name = this.oriName;
-    }
-    if (undefined != this.oriBase64Avatar) {
-      this.userService.getProfile().base64Avatar = this.oriBase64Avatar;
-    }
-    if (undefined != this.oriDefaultStyle) {
-      this.userService.getProfile().defaultStyle = this.oriDefaultStyle;
-    }
+    Object.assign(this.userService.getProfile(), this.oriProfile);
     this.dialogRef.close();
   }
 

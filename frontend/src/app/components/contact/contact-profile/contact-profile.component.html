@@ -41,6 +41,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">Apply</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
+  <button mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
 </mat-dialog-actions>

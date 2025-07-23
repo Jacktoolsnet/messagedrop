@@ -29,6 +29,7 @@ import { Profile } from '../../../interfaces/profile';
 export class MessageProfileComponent {
   public profile!: Profile;
   public userId!: string;
+  private oriProfile: Profile;
 
   constructor(
     private snackBar: MatSnackBar,
@@ -42,10 +43,17 @@ export class MessageProfileComponent {
         base64Avatar: ''
       };
     }
+    this.oriProfile = structuredClone(this.profile);
     this.userId = data.userId;
   }
 
   onAbortClick(): void {
+    Object.assign(this.profile, this.oriProfile);
+    this.dialogRef.close();
+  }
+
+  onApplyClick(): void {
+    Object.assign(this.data.profile, this.profile);
     this.dialogRef.close();
   }
 

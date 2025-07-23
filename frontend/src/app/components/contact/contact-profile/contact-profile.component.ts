@@ -32,6 +32,7 @@ export class ContactProfileComponent {
   public contact!: Contact;
   public joinedUserRoom = false;
   private maxFileSize = 5 * 1024 * 1024; // 5MB
+  private oriContact: Contact;
 
   constructor(
     private socketioService: SocketioService,
@@ -40,6 +41,7 @@ export class ContactProfileComponent {
     @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }
   ) {
     this.contact = this.data.contact;
+    this.oriContact = structuredClone(this.contact);
     this.joinedUserRoom = this.socketioService.hasJoinedUserRoom();
   }
 
@@ -96,5 +98,14 @@ export class ContactProfileComponent {
       horizontalPosition: 'center',
       verticalPosition: 'top'
     });
+  }
+
+  onAbortClick() {
+    Object.assign(this.data.contact, this.oriContact);
+    this.dialogRef.close();
+  }
+
+  onApplyClick() {
+    this.dialogRef.close();
   }
 }
