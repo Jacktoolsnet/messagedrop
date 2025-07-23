@@ -225,7 +225,11 @@ export class MessagelistComponent implements OnInit {
 
   public editMessageUserProfile(message: Message) {
 
-    const profile = this.profileService.getProfile(message.userId);
+    let profile: Profile | undefined = this.profileService.getProfile(message.userId);
+
+    if (!profile) {
+      profile = { name: '', base64Avatar: '', defaultStyle: '' };
+    }
 
     const dialogRef = this.dialog.open(MessageProfileComponent, {
       data: { profile, userId: message.userId },
