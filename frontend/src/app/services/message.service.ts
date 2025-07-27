@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, Subject, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
 import { GetMessageResponse } from '../interfaces/get-message-response';
@@ -26,6 +26,9 @@ export class MessageService {
   readonly commentsSignal = signal<Message[]>([]);
   readonly commentsSignals = new Map<string, WritableSignal<Message[]>>();
   readonly commentCountsSignal = signal<Record<string, number>>({});
+
+  private _messageSet = signal(false);
+  readonly messageSet = this._messageSet.asReadonly();
 
   private commentCounts: Record<string, number> = {};
 
@@ -405,7 +408,7 @@ export class MessageService {
       });
   }
 
-  getByPlusCode(location: Location, messageSubject: Subject<void>, showAlways: boolean = false) {
+  getByPlusCode(location: Location, showAlways: boolean = false) {
     const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
     const url = `${environment.apiUrl}/message/get/pluscode/${plusCode}`;
 
@@ -431,13 +434,13 @@ export class MessageService {
           const mappedMessages = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
           this.messagesSignal.set(mappedMessages);
 
-          messageSubject.next();
+          this._messageSet.set(true);
         },
         error: () => {
           // Fehlerfall: Location trotzdem aktualisieren, Messages leeren
           this.lastSearchedLocation = plusCode;
           this.messagesSignal.set([]);
-          messageSubject.next();
+          this._messageSet.set(true);
         }
       });
   }

@@ -11,11 +11,15 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
+import { Place } from '../../../interfaces/place';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { MapService } from '../../../services/map.service';
 import { NominatimService } from '../../../services/nominatim.service';
+import { PlaceService } from '../../../services/place.service';
+import { UserService } from '../../../services/user.service';
 
 @Component({
   selector: 'app-nominatim-search',
@@ -58,10 +62,13 @@ export class NominatimSearchComponent {
   nominatimPlaces: NominatimPlace[] = [];
 
   constructor(
+    public userService: UserService,
+    private placeService: PlaceService,
     public nominatimService: NominatimService,
     private geolocationService: GeolocationService,
     private mapService: MapService,
     public dialogRef: MatDialogRef<NominatimSearchComponent>,
+    private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: {
       location: Location,
       searchValues: {
@@ -121,6 +128,7 @@ export class NominatimSearchComponent {
         radius
       ).subscribe({
         next: ((response) => {
+          console.log(response);
           this.nominatimPlaces = this.sortByDistance(
             this.data.location.latitude,
             this.data.location.longitude,
@@ -191,5 +199,68 @@ export class NominatimSearchComponent {
       }
     };
     this.dialogRef.close(result);
+  }
+
+  lgoinAndAddToMypPlaces(nominatimPlace: NominatimPlace) {
+    this.userService.login(() => this.addToMyPlaces(nominatimPlace))
+  }
+
+  addToMyPlaces(nominatimPlace: NominatimPlace) {
+    let place: Place = {
+      id: '',
+      userId: this.userService.getUser().id,
+      name: '',
+      location: {
+        latitude: 0,
+        longitude: 0,
+        plusCode: ''
+      },
+      base64Avatar: '',
+      icon: '',
+      subscribed: false,
+      pinned: false,
+      boundingBox: {
+        latMin: 0,
+        lonMin: 0,
+        latMax: 0,
+        lonMax: 0
+      },
+      timezone: '',
+      datasets: {
+        weatherDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        },
+        airQualityDataset: {
+          data: undefined,
+          lastUpdate: undefined
+        }
+      }
+    };
+    place.name = nominatimPlace.name!;
+    place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+    place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
+    place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
+    this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
+      next: (timezoneResponse: any) => {
+        if (timezoneResponse.status === 200) {
+          place.timezone = timezoneResponse.timezone;
+          this.placeService.createPlace(place)
+            .subscribe({
+              next: createPlaceResponse => {
+                if (createPlaceResponse.status === 200) {
+                  place.id = createPlaceResponse.placeId;
+                  this.placeService.saveAdditionalPlaceInfos(place);
+                  this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                }
+              },
+              error: (err) => { this.snackBar.open(err.message, 'OK'); },
+              complete: () => { }
+            });
+        }
+      },
+      error: (err) => { this.snackBar.open(err.message, 'OK'); },
+      complete: () => { }
+    });
   }
 }

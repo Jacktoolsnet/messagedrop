@@ -1,6 +1,5 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { EventEmitter, Injectable, signal } from '@angular/core';
 import * as leaflet from 'leaflet';
-import { Subject } from 'rxjs';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { MarkerLocation } from '../interfaces/marker-location';
@@ -41,6 +40,9 @@ const userMarker = leaflet.icon({
 })
 export class MapService {
 
+  private _mapSet = signal(false);
+  readonly mapSet = this._mapSet.asReadonly();
+
   private map: any;
   private userMarker: any;
   private searchRectangle!: any;
@@ -54,13 +56,12 @@ export class MapService {
   private placeLocationRectangels = new Map<string, leaflet.Rectangle>();
 
   private ready: boolean = false;
-  private mapSubject: Subject<void> | undefined;
 
   constructor(private geolocationService: GeolocationService) { }
 
-  public initMap(mapSubject: Subject<void>) {
-    this.mapSubject = mapSubject;
+  public initMap() {
     this.ready = true;
+    this._mapSet.set(true);
   }
 
   public initMapEvents(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
@@ -114,9 +115,7 @@ export class MapService {
     this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ffdbb5", weight: 1 }).addTo(this.map);
     this.drawSearchRectange(this.location);
 
-    if (undefined !== this.mapSubject) {
-      this.mapSubject.next();
-    }
+    this._mapSet.set(true);
   }
 
   isReady(): boolean {

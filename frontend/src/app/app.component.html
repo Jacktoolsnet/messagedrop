@@ -5,7 +5,8 @@
 </app-map>
 
 @if (!userService.isReady()) {
-<button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile" (click)="login()">
+<button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile"
+    (click)="userService.login()">
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
 </button>
 } @else {
@@ -108,7 +109,8 @@
         <span>Locate me</span>
     </button>
 
-    <button mat-menu-item (click)="!userService.isReady() ? login(openMessagDialog.bind(this)) : openMessagDialog()">
+    <button mat-menu-item
+        (click)="!userService.isReady() ? userService.login(openMessagDialog.bind(this)) : openMessagDialog()">
         @if (!userService.isReady()){
         <mat-icon class="material-symbols-outlined">locked</mat-icon>
         } @else {
@@ -116,7 +118,8 @@
         }
         <span>Public message</span>
     </button>
-    <button mat-menu-item (click)="!userService.isReady() ? login(openNoteDialog.bind(this)) : openNoteDialog()">
+    <button mat-menu-item
+        (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
         @if (!userService.isReady()){
         <mat-icon class="material-symbols-outlined">locked</mat-icon>
         } @else {
@@ -125,7 +128,7 @@
         <span>Private note</span>
     </button>
     <button mat-menu-item
-        (click)="!userService.isReady() ? login(openContactListDialog.bind(this)) : openContactListDialog()">
+        (click)="!userService.isReady() ? userService.login(openContactListDialog.bind(this)) : openContactListDialog()">
         @if (!userService.isReady()){
         <mat-icon class="material-symbols-outlined">locked</mat-icon>
         } @else {

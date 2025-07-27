@@ -2,7 +2,7 @@ import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http
 import { computed, Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
-import { catchError, Subject, throwError } from 'rxjs';
+import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
@@ -26,6 +26,8 @@ import { UserService } from './user.service';
 export class ContactService {
 
   private _contacts = signal<Contact[]>([]);
+  private _contactsSet = signal(false);
+  readonly contactsSet = this._contactsSet.asReadonly();
   private ready: boolean = false;
 
   httpOptions = {
@@ -51,7 +53,7 @@ export class ContactService {
     return throwError(() => error);
   }
 
-  initContacts(contactSubject: Subject<void>) {
+  initContacts() {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
@@ -216,7 +218,7 @@ export class ContactService {
           })
           this.updateContactProfile();
           this.ready = true;
-          contactSubject.next();
+          this._contactsSet.set(true);
         },
         error: (err) => {
           if (err.status === 404) {
@@ -225,7 +227,7 @@ export class ContactService {
           } else {
             this.ready = false;
           }
-          contactSubject.next();
+          this._contactsSet.set(false);
         },
         complete: () => { }
       });

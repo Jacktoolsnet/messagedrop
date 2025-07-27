@@ -1,6 +1,6 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { Observable, Subject, catchError, throwError } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
+import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetClientConnect } from '../interfaces/get-client-connect';
 import { NetworkService } from './network.service';
@@ -9,6 +9,9 @@ import { NetworkService } from './network.service';
   providedIn: 'root'
 })
 export class ServerService {
+
+  private _serverSet = signal(false);
+  readonly serverSet = this._serverSet.asReadonly();
 
   private ready: boolean = false;
   private failed: boolean = false;
@@ -30,7 +33,7 @@ export class ServerService {
     return throwError(() => error);
   }
 
-  init(serverSubject: Subject<void>) {
+  init() {
     this.connect()
       .subscribe({
         next: (connectResponse: GetClientConnect) => {
@@ -39,13 +42,13 @@ export class ServerService {
             this.signingPublicKey = connectResponse.signingPublicKey;
             this.ready = true;
             this.failed = false;
-            serverSubject.next();
+            this._serverSet.set(true);
           }
         },
         error: (err) => {
           this.ready = false;
           this.failed = true;
-          serverSubject.next();
+          this._serverSet.set(false)
         },
         complete: () => { }
       });

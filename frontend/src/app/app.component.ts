@@ -9,7 +9,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { Subject, take } from 'rxjs';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
@@ -20,8 +19,6 @@ import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
-import { CheckPinComponent } from './components/pin/check-pin/check-pin.component';
-import { CreatePinComponent } from './components/pin/create-pin/create-pin.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
@@ -31,11 +28,7 @@ import { DisplayMessage } from './components/utils/display-message/display-messa
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { AppSettings } from './interfaces/app-settings';
-import { ConfirmUserResponse } from './interfaces/confirm-user-response';
-import { CreateUserResponse } from './interfaces/create-user-response';
-import { CryptedUser } from './interfaces/crypted-user';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
-import { GetPinHashResponse } from './interfaces/get-pin-hash-response';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
@@ -99,11 +92,6 @@ export class AppComponent implements OnInit {
   public lastMarkerUpdate: number = 0;
   public locationSubscriptionError: boolean = false;
   public isPartOfPlace: boolean = false;
-  private serverSubject: Subject<void>;
-  private userSubject: Subject<void>;
-  private contactSubject: Subject<void>;
-  private messageSubject: Subject<void>;
-  private mapSubject: Subject<void>;
   private showComponent: boolean = false;
   readonly userMessagesSignal = computed(() =>
     this.messageService.messagesSignal().filter(
@@ -134,7 +122,6 @@ export class AppComponent implements OnInit {
     private weatherService: WeatherService,
     private geoStatisticService: GeoStatisticService,
     private snackBar: MatSnackBar,
-    public createPinDialog: MatDialog,
     public checkPinDialog: MatDialog,
     public messageDialog: MatDialog,
     public noteDialog: MatDialog,
@@ -149,16 +136,11 @@ export class AppComponent implements OnInit {
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
-    this.serverSubject = new Subject<void>();
-    this.userSubject = new Subject<void>();
-    this.contactSubject = new Subject<void>();
-    this.mapSubject = new Subject<void>();
-
-    this.serverSubject.subscribe({
-      next: async (v) => {
+    effect(() => {
+      if (this.serverService.serverSet()) {
         if (this.serverService.isReady()) {
           // Init the map
-          this.mapService.initMap(this.mapSubject);
+          this.mapService.initMap();
         }
         if (this.serverService.isFailed()) {
           const dialogRef = this.displayMessage.open(DisplayMessage, {
@@ -188,24 +170,11 @@ export class AppComponent implements OnInit {
             this.initApp();
           });
         }
-      },
+      }
     });
 
-    this.userSubject.subscribe({
-      next: (v) => {
-        this.contactService.initContacts(this.contactSubject);
-      },
-    });
-
-    this.contactSubject.subscribe({
-      next: (v) => {
-        this.socketioService.initSocket();
-        this.placeService.initPlaces();
-      },
-    });
-
-    this.mapSubject.subscribe({
-      next: (v) => {
+    effect(() => {
+      if (this.mapService.mapSet()) {
         // Fly to position if user alrady allowed location.
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted') {
@@ -217,16 +186,24 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.messageSubject = new Subject<void>();
-    this.messageSubject.subscribe({
-      next: () => {
-        this.createMarkerLocations();
+    effect(() => {
+      if (this.userService.userSet()) {
+        this.contactService.initContacts();
+        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      }
+    });
 
-        if (this.showComponent && this.messageService.messagesSignal().length !== 0) {
-          this.showComponent = false;
-          this.openMarkerMessageListDialog(this.messageService.messagesSignal());
-        }
-      },
+    effect(() => {
+      if (this.contactService.contactsSet()) {
+        this.socketioService.initSocket();
+        this.placeService.initPlaces();
+      }
+    });
+
+    effect(() => {
+      if (this.messageService.messageSet()) {
+        this.createMarkerLocations();
+      }
     });
 
     this.initApp();
@@ -250,7 +227,7 @@ export class AppComponent implements OnInit {
     // Check network
     this.networkService.init();
     // Init the server connection
-    this.serverService.init(this.serverSubject);
+    this.serverService.init();
     // Count
     this.statisticService.countVisitor()
       .subscribe({
@@ -259,7 +236,6 @@ export class AppComponent implements OnInit {
         complete: () => { }
       });
   }
-
 
   public ngOnInit(): void {
     // Titel
@@ -287,46 +263,6 @@ export class AppComponent implements OnInit {
       }
     });
     window.history.pushState(this.myHistory, '', '');
-  }
-
-  public async login(afterLogin?: () => void) {
-    if (await this.indexedDbService.hasUser()) {
-      this.openCheckPinDialog(afterLogin);
-    } else {
-      const dialogRef = this.displayMessage.open(DisplayMessage, {
-        panelClass: '',
-        closeOnNavigation: false,
-        data: {
-          showAlways: true,
-          title: 'Want to create a user? Easy peasy.',
-          image: '',
-          icon: 'person_add',
-          message: `Just pick a PIN – no username, no password, no DNA sample.
-
-But hey, *don’t forget that PIN!*
-
-We don’t store it, we don’t back it up, and we definitely can’t send you a “forgot PIN?” email.  
-Basically: lose it, and your user is gone like your last cup of coffee.
-
-You can delete your user anytime (rage quit or just Marie Kondo your data).
-
-Also, if you ghost us for 90 days, your user and all its data get quietly deleted.`,
-          button: 'Create PIN',
-          delay: 200,
-          showSpinner: false
-        },
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        hasBackdrop: true,
-        autoFocus: false
-      });
-
-      dialogRef.afterOpened().subscribe(e => { });
-
-      dialogRef.afterClosed().subscribe(() => {
-        this.openCreatePinDialog();
-      });
-    }
   }
 
   public logout() {
@@ -460,7 +396,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
       }
       // Messages
-      this.messageService.getByPlusCode(location, this.messageSubject);
+      this.messageService.getByPlusCode(location);
       this.createMarkerLocations();
     }
   }
@@ -501,204 +437,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
   public handleClickEvent(event: Location) {
     this.mapService.moveTo(event);
-  }
-
-  public openCreatePinDialog(): void {
-    const dialogRef = this.createPinDialog.open(CreatePinComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("createPingDialog");
-      window.history.replaceState(this.myHistory, '', '');
-    });
-
-    dialogRef.afterClosed().pipe(take(1)).subscribe(async (data: any) => {
-
-      const encrypted = await this.cryptoService.encrypt(
-        this.serverService.getCryptoPublicKey()!,
-        data
-      );
-
-      this.userService.getPinHash(encrypted).subscribe({
-        next: (getPinHashResponse: GetPinHashResponse) => {
-          this.userService.getUser().pinHash = getPinHashResponse.pinHash;
-
-          this.userService.createUser().subscribe({
-            next: (createUserResponse: CreateUserResponse) => {
-              this.userService.initUser(this.userSubject, createUserResponse, getPinHashResponse.pinHash);
-            },
-            error: (err) => {
-              const dialogRef = this.displayMessage.open(DisplayMessage, {
-                panelClass: '',
-                closeOnNavigation: false,
-                data: {
-                  showAlways: true,
-                  title: 'User Service',
-                  image: '',
-                  icon: 'bug_report',
-                  message: 'Uuups! Something went wrong while creating your user. Please try again later.',
-                  button: 'Ok',
-                  delay: 0,
-                  showSpinner: false
-                },
-                maxWidth: '90vw',
-                maxHeight: '90vh',
-                hasBackdrop: true,
-                autoFocus: false
-              });
-
-              dialogRef.afterOpened().subscribe(() => {
-                // Optional: Aktionen nach Öffnen
-              });
-
-              dialogRef.afterClosed().subscribe(() => {
-                // Optional: Aktionen nach Schließen
-              });
-            },
-            complete: () => { }
-          });
-        },
-        error: (err) => { },
-        complete: () => { }
-      });
-    });
-  }
-
-  public openCheckPinDialog(callback?: () => void): void {
-    const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
-      panelClass: '',
-      closeOnNavigation: true,
-      data: {},
-      hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-      this.myHistory.push("checkPinDialog");
-      window.history.replaceState(this.myHistory, '', '');
-    });
-
-    dialogRef.afterClosed().subscribe(async (data: any) => {
-      if (data === 'reset') {
-        let cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
-        if (cryptedUser) {
-          this.userService.deleteUser(cryptedUser.id)
-            .subscribe({
-              next: () => {
-                this.indexedDbService.clearAllData();
-                this.openCreatePinDialog();
-              },
-              error: (err) => {
-                this.indexedDbService.clearAllData();
-                this.openCreatePinDialog();
-              },
-              complete: () => { }
-            });
-        }
-      } else {
-        this.userService.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
-          .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
-            this.userService.getUser().pinHash = getPinHashResponse.pinHash;
-            const cryptedUser = await this.indexedDbService.getUser();
-            if (cryptedUser) {
-              this.userService.confirmUser(getPinHashResponse.pinHash, cryptedUser)
-                .subscribe({
-                  next: (confirmUserResponse: ConfirmUserResponse) => {
-                    this.userService.setUser(this.userSubject, confirmUserResponse.user, confirmUserResponse.jwt);
-                    if (Notification.permission === "granted") {
-                      if (this.userService.getUser().subscription !== '') {
-                        this.indexedDbService.setSetting('subscription', this.userService.getUser().subscription);
-                      } else {
-                        this.indexedDbService.deleteSetting('subscription');
-                        this.userService.registerSubscription(this.userService.getUser());
-                      }
-                    }
-                    this.updateDataForLocation(this.mapService.getMapLocation(), true);
-                    if (callback) {
-                      callback();
-                    }
-                  },
-                  error: (err) => {
-                    if (err.status === 401) {
-                      this.snackBarRef = this.snackBar.open("Pin is not correct. Please try again.", undefined, {
-                        panelClass: ['snack-warning'],
-                        horizontalPosition: 'center',
-                        verticalPosition: 'top',
-                        duration: 3000
-                      });
-                    } else if (err.status === 404) {
-                      const dialogRef = this.displayMessage.open(DisplayMessage, {
-                        panelClass: '',
-                        closeOnNavigation: false,
-                        data: {
-                          showAlways: true,
-                          title: 'User not found',
-                          image: '',
-                          icon: 'person_remove',
-                          message: `Looks like this user has been inactive for a while. 
-                          
-                          To keep things clean and simple, users are automatically deleted after 90 days of inactivity.
-                          
-                          You can create a new one anytime — no signup, no hassle.`,
-                          button: 'Create new user',
-                          delay: 200,
-                          showSpinner: false
-                        },
-                        maxWidth: '90vw',
-                        maxHeight: '90vh',
-                        hasBackdrop: true,
-                        autoFocus: false
-                      });
-
-                      dialogRef.afterOpened().subscribe(e => { });
-
-                      dialogRef.afterClosed().subscribe(() => {
-                        this.userService.deleteUser(cryptedUser.id)
-                          .subscribe({
-                            next: () => {
-                              this.indexedDbService.clearAllData();
-                            },
-                            error: (err) => {
-                              this.indexedDbService.clearAllData();
-                            },
-                            complete: () => { this.initApp(); }
-                          });
-                      });
-                    } else {
-                      const dialogRef = this.displayMessage.open(DisplayMessage, {
-                        panelClass: '',
-                        closeOnNavigation: false,
-                        data: {
-                          showAlways: true,
-                          title: 'Oops! Backend error!',
-                          image: '',
-                          icon: 'bug_report',
-                          message: 'Something went wrong. Please try again later.',
-                          button: 'Retry...',
-                          delay: 10000,
-                          showSpinner: false
-                        },
-                        maxWidth: '90vw',
-                        maxHeight: '90vh',
-                        hasBackdrop: true,
-                        autoFocus: false
-                      });
-
-                      dialogRef.afterOpened().subscribe(e => { });
-
-                      dialogRef.afterClosed().subscribe(() => {
-                        this.initApp();
-                      });
-                    }
-                  }
-                });
-            }
-          });
-      }
-    });
   }
 
   async openMessagDialog(): Promise<void> {
@@ -829,7 +567,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
-            this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
+            this.messageService.getByPlusCode(this.mapService.getMapLocation());
           });
         },
         error: (err) => {
@@ -853,7 +591,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
-            this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
+            this.messageService.getByPlusCode(this.mapService.getMapLocation());
             this.updateDataForLocation(this.mapService.getMapLocation(), true);
           });
         },
@@ -996,7 +734,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.messageService.clearSelectedMessages();
-      this.messageService.getByPlusCode(this.mapService.getMapLocation(), this.messageSubject);
+      this.messageService.getByPlusCode(this.mapService.getMapLocation());
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }
