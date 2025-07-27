@@ -289,9 +289,9 @@ export class AppComponent implements OnInit {
     window.history.pushState(this.myHistory, '', '');
   }
 
-  public async login() {
+  public async login(afterLogin?: () => void) {
     if (await this.indexedDbService.hasUser()) {
-      this.openCheckPinDialog();
+      this.openCheckPinDialog(afterLogin);
     } else {
       const dialogRef = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
@@ -568,7 +568,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     });
   }
 
-  public openCheckPinDialog(): void {
+  public openCheckPinDialog(callback?: () => void): void {
     const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -617,6 +617,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                       }
                     }
                     this.updateDataForLocation(this.mapService.getMapLocation(), true);
+                    if (callback) {
+                      callback();
+                    }
                   },
                   error: (err) => {
                     if (err.status === 401) {

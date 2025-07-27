@@ -54,10 +54,12 @@
     </button>
     }
 
+    @if (userService.isReady()) {
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon class="material-symbols-outlined">speaker_notes</mat-icon>
         <span>My public messages</span>
     </button>
+    }
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="openUserNoteListDialog()">
@@ -66,14 +68,14 @@
     </button>
     }
 
-    @if (placeService.isReady()) {
+    @if (userService.isReady() && placeService.isReady()) {
     <button mat-menu-item (click)="openPlaceListDialog()">
         <mat-icon class="material-symbols-outlined">personal_places</mat-icon>
         <span>My places</span>
     </button>
     }
 
-    @if (contactService.isReady()) {
+    @if (userService.isReady() && contactService.isReady()) {
     <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
         <span>My contacts</span>
@@ -106,20 +108,31 @@
         <span>Locate me</span>
     </button>
 
-    @if (userService.isReady()) {
-    <button mat-menu-item (click)="openMessagDialog()">
+    <button mat-menu-item (click)="!userService.isReady() ? login(openMessagDialog.bind(this)) : openMessagDialog()">
+        @if (!userService.isReady()){
+        <mat-icon class="material-symbols-outlined">locked</mat-icon>
+        } @else {
         <mat-icon class="material-symbols-outlined">send</mat-icon>
+        }
         <span>Public message</span>
     </button>
-    <button mat-menu-item (click)="openNoteDialog()">
+    <button mat-menu-item (click)="!userService.isReady() ? login(openNoteDialog.bind(this)) : openNoteDialog()">
+        @if (!userService.isReady()){
+        <mat-icon class="material-symbols-outlined">locked</mat-icon>
+        } @else {
         <mat-icon class="material-symbols-outlined">add_notes</mat-icon>
+        }
         <span>Private note</span>
     </button>
-    <button mat-menu-item (click)="openContactListDialog()">
+    <button mat-menu-item
+        (click)="!userService.isReady() ? login(openContactListDialog.bind(this)) : openContactListDialog()">
+        @if (!userService.isReady()){
+        <mat-icon class="material-symbols-outlined">locked</mat-icon>
+        } @else {
         <mat-icon class="material-symbols-outlined">contacts</mat-icon>
+        }
         <span>Contacts message</span>
     </button>
-    }
 
     <button mat-menu-item (click)="showWeather()">
         <mat-icon class="material-symbols-outlined">weather_mix</mat-icon>
