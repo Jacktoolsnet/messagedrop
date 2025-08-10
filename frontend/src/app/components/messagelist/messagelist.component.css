@@ -42,19 +42,33 @@
 
 /* === CONTENT === */
 .content {
-  width: auto;
-  max-width: calc(90vw - 2.5rem);
-  padding-right: 2.5rem;
-  margin: 0, auto;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, max-content));
-  justify-content: center;
-  gap: 0.5rem;
-  white-space: normal;
+  margin-top: 1rem;
+  margin-right: 3rem;
+  column-count: 1;
 }
 
-.content>mat-expansion-panel {
-  align-self: start;
+.content>* {
+  break-inside: avoid;
+  display: block;
+  /* zur Sicherheit */
+}
+
+@media (min-width: 800px) {
+  .content {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1200px) {
+  .content {
+    column-count: 4;
+  }
 }
 
 /* === ITEM DARSTELLUNG (Karten / Elemente) === */
