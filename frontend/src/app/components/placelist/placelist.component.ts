@@ -26,6 +26,7 @@ import { UserService } from '../../services/user.service';
 import { AirQualityTileComponent } from './air-quality-tile/air-quality-tile.component';
 import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
+import { MessageTileComponent } from "./message-tile/messagetile.component";
 import { NoteTileComponent } from './note-tile/note-tile.component';
 import { PlaceProfileComponent } from './place-profile/place-profile.component';
 import { WeatherTileComponent } from './weather-tile/weather-tile.component';
@@ -48,7 +49,8 @@ import { WeatherTileComponent } from './weather-tile/weather-tile.component';
     WeatherTileComponent,
     AirQualityTileComponent,
     NoteTileComponent,
-    MatExpansionModule
+    MatExpansionModule,
+    MessageTileComponent
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'

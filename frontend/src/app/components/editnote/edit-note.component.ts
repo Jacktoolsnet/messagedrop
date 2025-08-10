@@ -69,7 +69,7 @@ export class EditNoteComponent implements OnInit {
   }
 
   onApplyClick(): void {
-    this.dialogRef.close();
+    this.dialogRef.close(this.data);
   }
 
   onAbortClick(): void {

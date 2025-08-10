@@ -128,13 +128,17 @@ export class NotelistComponent implements OnInit {
         contentId: ''
       }
     };
+
     this.sharedContentService.addSharedContentToNote(note);
     const dialogRef = this.dialog.open(EditNoteComponent, {
       data: { note },
       closeOnNavigation: true
     });
+
     dialogRef.afterClosed().subscribe(async result => {
       if (result?.note) {
+        console.log(result?.note)
+        console.log(this.location)
         result.note.latitude = this.location.latitude;
         result.note.longitude = this.location.longitude;
         result.note.plusCode = this.location.plusCode;

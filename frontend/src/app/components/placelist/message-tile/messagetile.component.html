@@ -1,0 +1,16 @@
+<div class="tile" (click)="{}">
+    <div class="tile-header">
+        <mat-icon class="material-symbols-outlined tile-icon">speaker_notes</mat-icon>
+        <span class="tile-title">Messages</span>
+    </div>
+
+    @if (placeMessages().length > 0) {
+    @for (message of placeMessages(); track message.id) {
+    <div class="message-card">
+        <span class="message-text" [style]="message.style">{{ message.message }}</span>
+    </div>
+    }
+    } @else {
+    <div class="message-empty">No notes found.</div>
+    }
+</div>

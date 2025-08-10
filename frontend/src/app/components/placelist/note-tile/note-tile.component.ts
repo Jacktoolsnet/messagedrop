@@ -40,6 +40,8 @@ export class NoteTileComponent implements OnInit, OnDestroy {
     });
   }
 
+  ngOnDestroy(): void { }
+
   openNoteDialog(): void {
     const dialogRef = this.matDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
@@ -61,6 +63,4 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       this.placeNotes.set(visibleNotes);
     });
   }
-
-  ngOnDestroy(): void { }
 }

@@ -52,13 +52,11 @@
 }
 
 .no-content {
-  width: 100%;
-  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1.75rem;
-  box-sizing: border-box;
-  overflow: hidden;
+  margin: auto;
+  padding-top: 1rem;
+  padding-right: 3rem;
 }
 
 .first-button {

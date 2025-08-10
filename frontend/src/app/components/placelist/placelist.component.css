@@ -12,13 +12,11 @@
 }
 
 .no-content {
-  width: 100%;
-  display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
-  box-sizing: border-box;
-  overflow: hidden;
+  margin: auto;
+  padding-top: 1rem;
+  padding-right: 3rem;
 }
 
 .first-button {
@@ -49,7 +47,7 @@
   padding-right: 2.5rem;
   margin: 0, auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, max-content));
+  grid-template-columns: repeat(auto-fit, minmax(350px, max-content));
   justify-content: center;
   gap: 0.5rem;
   white-space: normal;
@@ -103,15 +101,25 @@ button,
 }
 
 .tile-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  column-count: 1;
+  column-gap: 1rem;
+  padding: 0.5rem;
 }
 
 @media (min-width: 1200px) {
   .tile-grid {
-    grid-template-columns: repeat(2, 1fr);
+    column-count: 2;
   }
+}
+
+.tile-grid>* {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+  /* simuliert row-gap */
+  width: 100%;
+  /* verhindert "Umbruch" */
+  display: block;
+  /* zur Sicherheit */
 }
 
 mat-expansion-panel {
