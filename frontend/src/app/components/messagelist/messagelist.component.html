@@ -20,16 +20,14 @@
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
-            @if(userService.isReady()) {
             <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
-                (click)="addMessagDialog()">
+                (click)="!userService.isReady() ? userService.login(addMessagDialog.bind(this)) : addMessagDialog()">
                 <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">chat_add_on</mat-icon>
             </button>
-            }
         </div>
         @for (message of filteredMessagesSignal(); track message.id) {
         <mat-card class="item" appMasonryItem>
-            @if (user.id == message.userId) {
+            @if (this.userService.getUser().id == message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {
                 <img class="avatar" [src]="userProfile.base64Avatar" />
@@ -57,7 +55,8 @@
             </div>
             }
 
-            <mat-card-content (click)="userService.isReady() && user.id == message.userId ? editMessage(message) : {}">
+            <mat-card-content
+                (click)="userService.isReady() && this.userService.getUser().id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
                     @if (message.message) {
@@ -68,15 +67,13 @@
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
-                @if (message.commentsNumber != 0 || userService.isReady()){
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
-                }
-                @if (user.id != message.userId) {
+                @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
@@ -95,13 +92,13 @@
                     (click)="navigateToMessageLocation(message)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
-                @if (user.id != message.userId) {
+                @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">settings_account_box</mat-icon>
                 </button>
                 }
-                @if (user.id == message.userId) {
+                @if (this.userService.getUser().id == message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
@@ -109,7 +106,7 @@
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
                 }
-                @if (user.id != message.userId) {
+                @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
                 </button>
@@ -128,16 +125,16 @@
                 <mat-icon>arrow_back</mat-icon>
             </button>
 
-            @if(userService.isReady()) {
-            <button mat-mini-fab color="primary" class="button_add" (click)="addComment(currentParentSignal()!)">
+            <button mat-mini-fab color="primary" class="button_add"
+                (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
                 <mat-icon>add_comment</mat-icon>
             </button>
-            }
         </div>
 
         @for (message of commentsSignal(); track message.id) {
         <mat-card class="item" appMasonryItem>
-            <mat-card-content (click)="userService.isReady() && user.id == message.userId ? editMessage(message) : {}">
+            <mat-card-content
+                (click)="userService.isReady() && this.userService.getUser().id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
                     @if (message.message) {
@@ -156,7 +153,7 @@
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 }
-                @if (user.id != message.userId) {
+                @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
@@ -175,13 +172,13 @@
                     (click)="navigateToMessageLocation(message)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
-                @if (user.id != message.userId) {
+                @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">settings_account_box</mat-icon>
                 </button>
                 }
-                @if (user.id == message.userId) {
+                @if (this.userService.getUser().id == message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
@@ -189,7 +186,7 @@
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
                 }
-                @if (user.id != message.userId) {
+                @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
                 </button>

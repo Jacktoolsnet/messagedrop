@@ -16,7 +16,6 @@ import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Profile } from '../../interfaces/profile';
-import { User } from '../../interfaces/user';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
@@ -73,7 +72,6 @@ export class MessagelistComponent implements OnInit {
     this.commentCountsSignal()[uuid] || 0
   );
 
-  public user: User;
   public userProfile: Profile;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
@@ -92,7 +90,6 @@ export class MessagelistComponent implements OnInit {
     private snackBar: MatSnackBar,
     @Inject(MAT_DIALOG_DATA) public data: { messages: Message[], location: Location }
   ) {
-    this.user = this.userService.getUser();
     this.userProfile = this.userService.getProfile();
   }
 
@@ -148,17 +145,17 @@ export class MessagelistComponent implements OnInit {
 
   public likeMessage(message: Message) {
     if (!message.likedByUser) {
-      this.messageService.likeMessage(message, this.user);
+      this.messageService.likeMessage(message, this.userService.getUser());
     } else {
-      this.messageService.unlikeMessage(message, this.user);
+      this.messageService.unlikeMessage(message, this.userService.getUser());
     }
   }
 
   public dislikeMessage(message: Message) {
     if (!message.dislikedByUser) {
-      this.messageService.dislikeMessage(message, this.user);
+      this.messageService.dislikeMessage(message, this.userService.getUser());
     } else {
-      this.messageService.undislikeMessage(message, this.user);
+      this.messageService.undislikeMessage(message, this.userService.getUser());
     }
   }
 
@@ -247,7 +244,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   public translateMessage(message: Message) {
-    this.translateService.translate(message.message, this.user.language).subscribe({
+    this.translateService.translate(message.message, this.userService.getUser().language).subscribe({
       next: response => {
         if (response.status === 200) {
           message.translatedMessage = response.result?.text;
@@ -271,7 +268,7 @@ export class MessagelistComponent implements OnInit {
       location: this.data.location,
       message: '',
       markerType: 'default',
-      style: '',
+      style: this.userService.getProfile().defaultStyle ?? '',
       views: 0,
       likes: 0,
       dislikes: 0,
@@ -305,7 +302,7 @@ export class MessagelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
-        this.messageService.createMessage(data.message, this.user);
+        this.messageService.createMessage(data.message, this.userService.getUser());
       }
     });
   }
@@ -328,6 +325,10 @@ export class MessagelistComponent implements OnInit {
     }
   }
 
+  public addCommentAfterLogin() {
+    this.addComment(this.currentParentSignal()!)
+  }
+
   public addComment(parentMessage: Message) {
     const message: Message = {
       id: 0,
@@ -340,7 +341,7 @@ export class MessagelistComponent implements OnInit {
       location: parentMessage.location,
       message: '',
       markerType: 'none',
-      style: '',
+      style: this.userService.getProfile().defaultStyle ?? '',
       views: 0,
       likes: 0,
       dislikes: 0,
@@ -375,6 +376,8 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
         this.messageService.createComment(data.message, this.userService.getUser());
+      } else {
+        this.dialogRef.close();
       }
     });
   }

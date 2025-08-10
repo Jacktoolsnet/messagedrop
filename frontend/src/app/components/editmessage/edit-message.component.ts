@@ -67,9 +67,6 @@ export class EditMessageComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.data.message.style) {
-      this.data.message.style = this.userService.getProfile().defaultStyle!;
-    }
     this.applyNewMultimedia(this.data.message.multimedia);
   }
 
@@ -169,6 +166,9 @@ export class EditMessageComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data) {
         this.data.message.message = data.text;
+        if (!this.data.message.style) {
+          this.data.message.style = this.userService.getProfile().defaultStyle!;
+        }
       }
     });
   }
