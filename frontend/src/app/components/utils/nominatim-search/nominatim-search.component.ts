@@ -128,7 +128,6 @@ export class NominatimSearchComponent {
         radius
       ).subscribe({
         next: ((response) => {
-          console.log(response);
           this.nominatimPlaces = this.sortByDistance(
             this.data.location.latitude,
             this.data.location.longitude,

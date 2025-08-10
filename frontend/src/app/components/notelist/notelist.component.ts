@@ -137,8 +137,6 @@ export class NotelistComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(async result => {
       if (result?.note) {
-        console.log(result?.note)
-        console.log(this.location)
         result.note.latitude = this.location.latitude;
         result.note.longitude = this.location.longitude;
         result.note.plusCode = this.location.plusCode;
