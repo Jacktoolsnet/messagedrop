@@ -24,7 +24,7 @@
         </div>
 
         @for (note of notesSignal(); track note.id) {
-        <mat-card class="item">
+        <mat-card class="item" appMasonryItem>
             <mat-card-content (click)="editNote(note)">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
