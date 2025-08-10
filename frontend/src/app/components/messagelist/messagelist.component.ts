@@ -10,6 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MasonryItemDirective } from '../../directives/masonry-item';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
@@ -45,7 +46,8 @@ import { MessageProfileComponent } from './message-profile/message-profile.compo
     MatIcon,
     MatFormFieldModule,
     MatMenuModule,
-    MatInputModule
+    MatInputModule,
+    MasonryItemDirective
   ],
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'

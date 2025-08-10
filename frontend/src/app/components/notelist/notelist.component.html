@@ -1,4 +1,4 @@
-<mat-dialog-content class="dialog">
+<mat-dialog-content>
     @if (!hasNotes()) {
     <div class="no-content">
         <div class="toolbar">
@@ -8,7 +8,7 @@
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
             (click)="openNoteDialog()">
-            <span>Add my first private note</span>
+            <span>Add first private note</span>
         </button>
     </div>
     } @else {

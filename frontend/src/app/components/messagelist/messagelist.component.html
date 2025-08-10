@@ -1,4 +1,4 @@
-<mat-dialog-content class="dialog">
+<mat-dialog-content>
     @if (messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0) {
     <div class="no-content">
         <div class="toolbar">
@@ -7,12 +7,10 @@
             </button>
         </div>
         @if(userService.isReady()) {
-        <div class="no-content">
-            <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-                (click)="addMessagDialog()">
-                <span>Add my first public message</span>
-            </button>
-        </div>
+        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
+            (click)="addMessagDialog()">
+            <span>Add my first public message</span>
+        </button>
         }
     </div>
     }
@@ -30,7 +28,7 @@
             }
         </div>
         @for (message of filteredMessagesSignal(); track message.id) {
-        <mat-card class="item">
+        <mat-card class="item" appMasonryItem>
             @if (user.id == message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {
@@ -138,7 +136,7 @@
         </div>
 
         @for (message of commentsSignal(); track message.id) {
-        <mat-card class="item">
+        <mat-card class="item" appMasonryItem>
             <mat-card-content (click)="userService.isReady() && user.id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
                     <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>

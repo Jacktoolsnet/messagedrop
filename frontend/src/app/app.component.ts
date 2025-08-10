@@ -553,9 +553,10 @@ export class AppComponent implements OnInit {
             closeOnNavigation: true,
             data: { messages: this.userMessagesSignal(), location: this.mapService.getMapLocation() },
             minWidth: '20vw',
-            maxWidth: '90vw',
-            minHeight: '8rem',
-            maxHeight: '90vh',
+            maxWidth: 'none',
+            width: 'auto',
+            maxHeight: 'none',
+            height: 'auto',
             hasBackdrop: true,
             autoFocus: false
           });
@@ -577,9 +578,10 @@ export class AppComponent implements OnInit {
             closeOnNavigation: true,
             data: { messages: this.userMessagesSignal(), location: this.mapService.getMapLocation() },
             minWidth: '20vw',
-            maxWidth: '90vw',
-            minHeight: '8rem',
-            maxHeight: '90vh',
+            maxWidth: 'none',
+            width: 'auto',
+            maxHeight: 'none',
+            height: 'auto',
             hasBackdrop: true,
             autoFocus: false
           });
@@ -606,9 +608,10 @@ export class AppComponent implements OnInit {
         closeOnNavigation: true,
         data: { location: this.mapService.getMapLocation(), notesSignal: this.noteService.getNotesSignal() },
         minWidth: '20vw',
-        maxWidth: '90vw',
-        minHeight: '8rem',
-        maxHeight: '90vh',
+        maxWidth: 'none',
+        width: 'auto',
+        maxHeight: 'none',
+        height: 'auto',
         hasBackdrop: true,
         autoFocus: false
       });
@@ -720,9 +723,10 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       data: { messages: messages, location: messages[0].location },
       minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '20vh',
-      maxHeight: '90vh',
+      maxWidth: 'none',
+      width: 'auto',
+      maxHeight: 'none',
+      height: 'auto',
       hasBackdrop: true,
       autoFocus: false
     });
@@ -746,9 +750,10 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       data: { location: this.mapService.getMapLocation(), notesSignal: notesSignal },
       minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '8rem',
-      maxHeight: '90vh',
+      maxWidth: 'none',
+      width: 'auto',
+      maxHeight: 'none',
+      height: 'auto',
       hasBackdrop: true,
       autoFocus: false
     });

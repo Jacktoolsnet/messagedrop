@@ -48,9 +48,10 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!), notesSignal: this.allPlaceNotes },
       minWidth: '20vw',
-      maxWidth: '90vw',
-      minHeight: '8rem',
-      maxHeight: '90vh',
+      maxWidth: 'none',
+      width: 'auto',
+      maxHeight: 'none',
+      height: 'auto',
       hasBackdrop: true,
       autoFocus: false
     });

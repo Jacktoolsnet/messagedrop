@@ -1,24 +1,26 @@
+/* === Host/global colors === */
 :host {
   color: var(--mat-app-text-color);
 }
 
-/* Inhalt kann scrollen, wenn zu groß */
+/* === Dialog content: scroll if needed === */
 .mat-mdc-dialog-content {
   overflow-y: auto;
   max-height: calc(90vh - 4rem);
-  /* Abzug für Header/Footer, falls vorhanden */
   width: 100%;
   box-sizing: border-box;
 }
 
+/* === Empty state area === */
 .no-content {
+  display: block;
+  margin: auto;
+  padding-right: 3rem;
   justify-content: center;
   align-items: center;
-  margin: auto;
-  display: block;
-  padding-right: 3rem;
 }
 
+/* === Primary CTA button in empty state === */
 .first-button {
   width: 95%;
   max-width: 600px;
@@ -30,108 +32,163 @@
   gap: 0.5rem;
 }
 
+/* === Fixed toolbar on the right edge === */
 .toolbar {
   position: absolute;
   top: 0;
   right: 0;
   width: 3.5rem;
+  /* toolbar width */
   height: 100%;
   background-color: var(--mat-fab-foreground-color);
   z-index: 200;
 }
 
-/* === CONTENT === */
+/* === Masonry grid container (works with the directive) === */
 .content {
-  margin-top: 1rem;
-  margin-right: 3rem;
-  column-count: 1;
+  /* layout sizing */
+  width: auto;
+  max-width: calc(90vw - 2.5rem);
+
+  /* keep clear of the right toolbar globally */
+  --toolbar-gap: 1rem;
+  padding-top: 1rem;
+  padding-right: calc(3.5rem + var(--toolbar-gap));
+
+  /* responsive columns */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+
+  /* gaps: directive reads rowGap for vertical math */
+  row-gap: 1.5rem;
+  /* vertical gap between items (larger for badge clearance) */
+  column-gap: 1.5rem;
+  /* horizontal gap between columns */
+
+  /* masonry math unit (in px); grid-auto-rows uses the same */
+  --masonry-row-height: 4;
+  grid-auto-rows: calc(var(--masonry-row-height) * 1px);
+
+  /* prevent stretching; let cards keep natural height */
+  align-items: start;
+  white-space: normal;
 }
 
-.content>* {
-  break-inside: avoid;
-  display: block;
-  /* zur Sicherheit */
-}
-
-@media (min-width: 800px) {
-  .content {
-    column-count: 2;
-  }
-}
-
-@media (min-width: 1200px) {
-  .content {
-    column-count: 3;
-  }
-}
-
-@media (min-width: 1200px) {
-  .content {
-    column-count: 4;
-  }
-}
-
-/* === ITEM DARSTELLUNG (Karten / Elemente) === */
+/* === Card items inside the grid === */
 .item {
-  margin: 0.75rem;
-  margin-top: 2.25rem;
+  position: relative;
+  /* anchor for the avatar badge */
+  margin: 0;
+  /* gaps are controlled by the grid */
   border-radius: 0.75rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+
+  /* printing/columns safety (harmless in grid) */
   break-inside: avoid;
-  page-break-inside: avoid;
   -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
 }
 
-/* === AVATAR + NAME BOX === */
+/* Add a small top spacer ONLY when a card has an avatar badge:
+   prevents the badge from visually colliding with the previous item */
+.item:has(.avatar-box) {
+  /* this is outside the grid-gap budget, so keep it small */
+  margin-top: 6px;
+}
+
+/* === Avatar badge (overlapping top-left corner) === */
 .avatar-box {
   position: absolute;
   top: 0;
   left: 0;
-  transform: translate(-1.75rem, -50%);
-  z-index: 100;
-  max-width: 95%;
+  transform: translate(-0.65rem, -40%);
+  /* gentler overlap to reduce collisions */
+  z-index: 250;
+  /* above the toolbar (toolbar: 200) */
+
   height: 3rem;
   padding: 0.25rem 0.75rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  /* single line, clamp width, hide overflow */
+  max-width: min(82%, 22rem);
+  overflow: hidden;
+
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
   border-radius: 1.5rem;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  overflow: hidden;
+
+  pointer-events: auto;
+  /* clickable */
 }
 
+/* Slightly smaller overlap on very narrow screens */
+@media (max-width: 600px) {
+  .avatar-box {
+    transform: translate(-0.5rem, -35%);
+    max-width: 85%;
+  }
+}
+
+/* Avatar image style */
 .avatar {
+  flex: 0 0 2.5rem;
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
+/* Avatar icon fallback */
+.avatar-box mat-icon {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+/* Avatar name: keep to one line with ellipsis */
 .name {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* required for ellipsis in flex */
   font-size: 1rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 95%;
 }
 
-/* === MESSAGE CONTENT === */
+/* === Message content inside cards === */
 .message-content {
   font-size: 0.9rem;
-  margin-top: 2.5rem;
+  margin-top: 1.25rem;
+  /* breathing room under the overlapping badge */
   margin-bottom: 1.5rem;
   white-space: normal;
   overflow-wrap: break-word;
   word-break: break-word;
 }
 
-/* === LISTEN UND BUTTONS === */
+/* Scale media only inside the message content (do not affect avatar) */
+.message-content img,
+.message-content video,
+.message-content iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* === Lists and buttons inside cards === */
 .list {
   border-radius: 1.25rem;
 }
@@ -149,7 +206,7 @@ button,
   margin-top: auto;
 }
 
-/* === BUTTON POSITIONIERUNGEN === */
+/* === Floating action buttons (back/add) === */
 .button_back {
   position: absolute;
   top: 0;
