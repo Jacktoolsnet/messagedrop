@@ -488,7 +488,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.message) {
+      if (undefined !== data) {
         this.messageService.createMessage(data.message, this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }

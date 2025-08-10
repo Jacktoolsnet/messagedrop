@@ -100,7 +100,7 @@ export class EditMessageComponent implements OnInit {
           } else {
             this.data.message.userId = this.userService.getUser().id;
             this.data.message.message = ''
-            this.dialogRef.close();
+            this.dialogRef.close(this.data);
           }
         }
         break;
