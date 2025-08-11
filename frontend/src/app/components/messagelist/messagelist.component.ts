@@ -72,6 +72,7 @@ export class MessagelistComponent implements OnInit {
     this.commentCountsSignal()[uuid] || 0
   );
 
+  private clickedMessage: Message | undefined = undefined;
   public userProfile: Profile;
   public likeButtonColor: string = 'secondary';
   public dislikeButtonColor: string = 'secondary';
@@ -307,20 +308,32 @@ export class MessagelistComponent implements OnInit {
     });
   }
 
+  public handleCommentAfterLoginClick(message: Message) {
+    this.clickedMessage = message;
+    this.userService.login(this.handleComment.bind(this))
+  }
+
   public handleCommentClick(message: Message) {
-    const commentsSignal = this.messageService.getCommentsSignalForMessage(message.uuid);
-    const comments = commentsSignal();
+    this.clickedMessage = message;
+    this.handleComment();
+  }
 
-    // Falls noch keine Kommentare geladen → jetzt holen
-    this.messageService.getCommentsForParentMessage(message);
+  public handleComment() {
+    if (this.clickedMessage) {
+      const commentsSignal = this.messageService.getCommentsSignalForMessage(this.clickedMessage.uuid);
+      const comments = commentsSignal();
 
-    // Immer die aktuelle Ebene (die Kinder) als neue Ebene im Stack speichern
-    this.messageService.selectedMessagesSignal.set([...this.messageService.selectedMessagesSignal(), message]);
+      // Falls noch keine Kommentare geladen → jetzt holen
+      this.messageService.getCommentsForParentMessage(this.clickedMessage);
 
-    // Sonderfall: Noch keine Comments → Direkt einen Kommentar erstellen
-    if (comments.length === 0 && message.commentsNumber === 0) {
-      if (this.userService.isReady()) {
-        this.addComment(message);
+      // Immer die aktuelle Ebene (die Kinder) als neue Ebene im Stack speichern
+      this.messageService.selectedMessagesSignal.set([...this.messageService.selectedMessagesSignal(), this.clickedMessage]);
+
+      // Sonderfall: Noch keine Comments → Direkt einen Kommentar erstellen
+      if (comments.length === 0 && this.clickedMessage.commentsNumber === 0) {
+        if (this.userService.isReady()) {
+          this.addComment(this.clickedMessage);
+        }
       }
     }
   }
@@ -376,8 +389,6 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: any) => {
       if (data?.message) {
         this.messageService.createComment(data.message, this.userService.getUser());
-      } else {
-        this.dialogRef.close();
       }
     });
   }

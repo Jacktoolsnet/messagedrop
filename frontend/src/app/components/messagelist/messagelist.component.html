@@ -6,12 +6,10 @@
                 <mat-icon>arrow_back</mat-icon>
             </button>
         </div>
-        @if(userService.isReady()) {
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-            (click)="addMessagDialog()">
+            (click)="!userService.isReady() ? userService.login(addMessagDialog.bind(this)) : addMessagDialog()">
             <span>Add my first public message</span>
         </button>
-        }
     </div>
     }
     @if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) {
@@ -68,7 +66,7 @@
 
             <mat-card-actions class="buttonbar">
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
-                    (click)="handleCommentClick(message)">
+                    (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
@@ -119,15 +117,25 @@
     }
 
     @if (messageService.selectedMessagesSignal().length !== 0) {
-    <div class="content">
+
+    @if (commentsSignal().length === 0) {
+    <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
-
-            <button mat-mini-fab color="primary" class="button_add"
-                (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
-                <mat-icon>add_comment</mat-icon>
+        </div>
+        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
+            (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
+            <span>Add my first public comment</span>
+        </button>
+    </div>
+    }
+    @if (commentsSignal().length !== 0) {
+    <div class="content">
+        <div class="toolbar">
+            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
+                <mat-icon>arrow_back</mat-icon>
             </button>
         </div>
 
@@ -195,5 +203,6 @@
         </mat-card>
         }
     </div>
+    }
     }
 </mat-dialog-content>
