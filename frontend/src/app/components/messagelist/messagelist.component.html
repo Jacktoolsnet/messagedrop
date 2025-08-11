@@ -137,6 +137,10 @@
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
+            <button mat-mini-fab color="primary" class="button_add"
+                (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
+                <mat-icon>add_comment</mat-icon>
+            </button>
         </div>
 
         @for (message of commentsSignal(); track message.id) {
