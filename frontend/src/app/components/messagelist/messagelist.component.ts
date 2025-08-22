@@ -144,19 +144,35 @@ export class MessagelistComponent implements OnInit {
     this.messageService.navigateToMessageLocation(message);
   }
 
-  public likeMessage(message: Message) {
-    if (!message.likedByUser) {
-      this.messageService.likeMessage(message, this.userService.getUser());
-    } else {
-      this.messageService.unlikeMessage(message, this.userService.getUser());
+  public likeMessageAfterLoginClick(message: Message) {
+    this.clickedMessage = message;
+    this.userService.login(this.likeMessage.bind(this))
+  }
+
+  public likeMessageClick(message: Message) {
+    this.clickedMessage = message;
+    this.likeMessage();
+  }
+
+  public likeMessage() {
+    if (undefined != this.clickedMessage) {
+      this.messageService.likeToggle(this.clickedMessage, this.userService.getUser());
     }
   }
 
-  public dislikeMessage(message: Message) {
-    if (!message.dislikedByUser) {
-      this.messageService.dislikeMessage(message, this.userService.getUser());
-    } else {
-      this.messageService.undislikeMessage(message, this.userService.getUser());
+  public dislikeMessageAfterLoginClick(message: Message) {
+    this.clickedMessage = message;
+    this.userService.login(this.dislikeMessage.bind(this))
+  }
+
+  public dislikeMessageClick(message: Message) {
+    this.clickedMessage = message;
+    this.dislikeMessage();
+  }
+
+  public dislikeMessage() {
+    if (undefined != this.clickedMessage) {
+      this.messageService.dislikeToggle(this.clickedMessage, this.userService.getUser());
     }
   }
 

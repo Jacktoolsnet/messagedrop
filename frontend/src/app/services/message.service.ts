@@ -3,13 +3,12 @@ import { Injectable, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DislikedByUserResponse } from '../interfaces/disliked-by-user-respons';
 import { GetMessageResponse } from '../interfaces/get-message-response';
-import { LikedByUserResponse } from '../interfaces/liked-by-user-respons';
 import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
 import { RawMessage } from '../interfaces/raw-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { ToggleResponse } from '../interfaces/toggle-response';
 import { User } from '../interfaces/user';
 import { GeolocationService } from './geolocation.service';
 import { MapService } from './map.service';
@@ -243,168 +242,65 @@ export class MessageService {
       });
   }
 
-  likeMessage(message: Message, user: User, showAlways: boolean = false) {
+  private patchMessageSnapshot(id: number, patch: Partial<Message>) {
+    this.messagesSignal.update(messages =>
+      messages.map(m => (m.id === id ? { ...m, ...patch } : m))
+    );
+  }
+
+  // LIKE toggle – übernimmt vollständigen Snapshot vom Server
+  likeToggle(message: Message, user: User, showAlways = false) {
     const url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
-
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: 'Message service',
       image: '',
       icon: '',
-      message: `Liking message`,
+      message: 'Toggling like',
       button: '',
       delay: 0,
       showSpinner: true
     });
 
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+    this.http.get<ToggleResponse>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            // Message State updaten
-            this.messagesSignal.update(messages => {
-              return messages.map(m => m.id === message.id
-                ? { ...m, likes: m.likes + 1, likedByUser: true }
-                : m
-              );
-            });
-          }
-        },
-        error: () => { }
-      });
-  }
-
-  unlikeMessage(message: Message, user: User, showAlways: boolean = false) {
-    const url = `${environment.apiUrl}/message/unlike/${message.id}/by/${user.id}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: 'Message service',
-      image: '',
-      icon: '',
-      message: `Unliking message`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.messagesSignal.update(messages => {
-              return messages.map(m => m.id === message.id
-                ? { ...m, likes: m.likes - 1, likedByUser: false }
-                : m
-              );
-            });
-          }
-        },
-        error: () => { }
-      });
-  }
-
-  messageLikedByUser(message: Message, user: User) {
-    const url = `${environment.apiUrl}/message/id/${message.id}/likedby/${user.id}`;
-
-    this.http.get<LikedByUserResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (likedByUserResponse) => {
-          const isLiked = likedByUserResponse.status === 200 && likedByUserResponse.likedByUser;
-
-          this.messagesSignal.update(messages => {
-            return messages.map(m => m.id === message.id
-              ? { ...m, likedByUser: isLiked }
-              : m
-            );
+      .subscribe(res => {
+        if (res.status === 200) {
+          this.patchMessageSnapshot(message.id, {
+            likes: res.likes,
+            dislikes: res.dislikes,
+            likedByUser: res.likedByUser,
+            dislikedByUser: res.dislikedByUser
           });
-        },
-        error: () => { }
+        }
       });
   }
 
-  dislikeMessage(message: Message, user: User, showAlways: boolean = false) {
+  // DISLIKE toggle – übernimmt vollständigen Snapshot vom Server
+  dislikeToggle(message: Message, user: User, showAlways = false) {
     const url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
-
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
       title: 'Message service',
       image: '',
       icon: '',
-      message: `Disliking message`,
+      message: 'Toggling dislike',
       button: '',
       delay: 0,
       showSpinner: true
     });
 
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+    this.http.get<ToggleResponse>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.messagesSignal.update(messages => {
-              return messages.map(m => m.id === message.id
-                ? { ...m, dislikes: m.dislikes + 1, dislikedByUser: true }
-                : m
-              );
-            });
-          }
-        },
-        error: () => { }
-      });
-  }
-
-  undislikeMessage(message: Message, user: User, showAlways: boolean = false) {
-    const url = `${environment.apiUrl}/message/undislike/${message.id}/by/${user.id}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: 'Message service',
-      image: '',
-      icon: '',
-      message: `Undisliking message`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.messagesSignal.update(messages => {
-              return messages.map(m => m.id === message.id
-                ? { ...m, dislikes: m.dislikes - 1, dislikedByUser: false }
-                : m
-              );
-            });
-          }
-        },
-        error: () => { }
-      });
-  }
-
-  messageDislikedByUser(message: Message, user: User) {
-    const url = `${environment.apiUrl}/message/id/${message.id}/dislikedby/${user.id}`;
-
-    this.http.get<DislikedByUserResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (dislikedByUserResponse) => {
-          const isDisliked = dislikedByUserResponse.status === 200 && dislikedByUserResponse.dislikedByUser;
-
-          this.messagesSignal.update(messages => {
-            return messages.map(m => m.id === message.id
-              ? { ...m, dislikedByUser: isDisliked }
-              : m
-            );
+      .subscribe(res => {
+        if (res.status === 200) {
+          this.patchMessageSnapshot(message.id, {
+            likes: res.likes,
+            dislikes: res.dislikes,
+            likedByUser: res.likedByUser,
+            dislikedByUser: res.dislikedByUser
           });
-        },
-        error: () => { }
+        }
       });
   }
 

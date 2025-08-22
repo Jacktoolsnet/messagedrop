@@ -202,97 +202,35 @@ router.get('/delete/:messageId', [security.checkToken, security.authenticate], f
   });
 });
 
-router.get('/like/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableLike.like(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      // Updat the Likes
-      response.message = row;
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+// Like-Toggle
+router.get('/like/:messageId/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
+  const messageId = Number(req.params.messageId);
+  const userId = String(req.params.userId);
+  if (!Number.isInteger(messageId) || !userId) {
+    return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
+  }
+
+  tableLike.toggleLike(req.database.db, messageId, userId, (err, result) => {
+    if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
+
+    // result enthält: liked, likes, dislikedByUser, dislikes
+    res.status(200).json({ status: 200, ...result });
   });
 });
 
-router.get('/id/:messageId/likedby/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableLike.likedByUser(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      if (!row) {
-        response.likedByUser = false;
-        response.status = 404;
-      } else {
-        response.likedByUser = row.likedByUser === 0 ? false : true;
-        response.status = 200;
-      }
-    }
-    res.status(response.status).json(response);
-  });
-});
+// Dislike-Toggle
+router.get('/dislike/:messageId/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
+  const messageId = Number(req.params.messageId);
+  const userId = String(req.params.userId);
+  if (!Number.isInteger(messageId) || !userId) {
+    return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
+  }
 
-router.get('/unlike/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableLike.unlike(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      // Updat the Likes
-      response.message = row;
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
+  tableDislike.toggleDislike(req.database.db, messageId, userId, (err, result) => {
+    if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
 
-router.get('/dislike/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableDislike.dislike(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
-
-router.get('/id/:messageId/dislikedby/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableDislike.dislikedByUser(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      if (!row) {
-        response.dislikedByUser = false;
-        response.status = 404;
-      } else {
-        response.dislikedByUser = row.dislikedByUser === 0 ? false : true;
-        response.status = 200;
-      }
-    }
-    res.status(response.status).json(response);
-  });
-});
-
-router.get('/undislike/:messageId/by/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableDislike.undislike(req.database.db, req.params.messageId, req.params.userId, function (err, row) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+    // result enthält: disliked, dislikes, likedByUser, likes
+    res.status(200).json({ status: 200, ...result });
   });
 });
 

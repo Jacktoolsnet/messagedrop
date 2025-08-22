@@ -74,59 +74,61 @@ const init = function (db) {
     }
 };
 
-const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
+const create = function (
+    db,
+    uuid,
+    parentUuid,
+    messageTyp,
+    latitude,
+    longitude,
+    plusCode,
+    message,
+    markerType,
+    style,
+    userId,
+    multimedia,
+    callback
+) {
     try {
         const insertSql = `
-        INSERT INTO ${tableName} (
-            ${columnUuid},
-            ${columnParentUuid},
-            ${columnMessageType}, 
-            ${columnMessageCreateDateTime},
-            ${columnMessageDeleteDateTime},
-            ${columnLatitude},
-            ${columnLongitude},
-            ${columnPlusCode},
-            ${columnMessage},
-            ${columnMarkerType},
-            ${columnStyle},
-            ${columnUserId},
-            ${columnMultimedia}
-        ) VALUES (
-            '${uuid}',
-            ${parentUuid === '' ? null : "'" + parentUuid + "'"},
-            '${messageTyp}', 
-            datetime('now'),
-            datetime('now', '+30 days'),
-            ${latitude},
-            ${longitude},
-            '${plusCode}',
-            '${message}',
-            '${markerType}',
-            '${style}',
-            '${userId}',
-            '${multimedia}'
-        );`;
-        db.run(insertSql, (err) => {
-            if (err) {
-                callback(err);
-                return;
-            }
+      INSERT INTO ${tableName} (
+        ${columnUuid},
+        ${columnParentUuid},
+        ${columnMessageType}, 
+        ${columnMessageCreateDateTime},
+        ${columnMessageDeleteDateTime},
+        ${columnLatitude},
+        ${columnLongitude},
+        ${columnPlusCode},
+        ${columnMessage},
+        ${columnMarkerType},
+        ${columnStyle},
+        ${columnUserId},
+        ${columnMultimedia}
+      ) VALUES (
+        ?, ?, ?, strftime('%s','now'), strftime('%s','now','+30 days'),
+        ?, ?, UPPER(?), ?, ?, ?, ?, ?
+      );`;
 
-            if (parentUuid !== null) {
-                const updateSql = `
-                    UPDATE ${tableName}
-                    SET ${columnCommentsNumber} = ${columnCommentsNumber} + 1
-                    WHERE ${columnUuid} = '${parentUuid}';
-                `;
-                db.run(updateSql, (updateErr) => {
-                    callback(updateErr);
-                });
-            } else {
-                callback(null);
-            }
+        const params = [
+            uuid,
+            parentUuid && parentUuid !== '' ? parentUuid : null,
+            messageTyp,
+            latitude,
+            longitude,
+            plusCode,   // wird im SQL via UPPER(?) normalisiert
+            message,
+            markerType,
+            style,
+            userId,
+            multimedia && multimedia !== '' ? multimedia : null
+        ];
+
+        db.run(insertSql, params, (err) => {
+            callback(err || null);
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 
@@ -192,7 +194,7 @@ const getByPlusCode = function (db, plusCode, callback) {
     try {
         let sql = `
         SELECT * FROM ${tableName}
-        WHERE ${columnPlusCode} LIKE ?
+        WHERE ${columnPlusCode} LIKE UPPER(?)
         AND ${columnParentUuid} IS NULL
         AND ${columnStatus} = '${messageStatus.ENABLED}'      
         ORDER BY ${columnMessageCreateDateTime} DESC
@@ -285,48 +287,14 @@ const enableMessage = function (db, messageId, callback) {
 
 const deleteById = function (db, messageId, callback) {
     try {
-        // Zuerst den Parent ermitteln
-        const selectSql = `
-            SELECT ${columnParentUuid}
-            FROM ${tableName}
-            WHERE ${columnMessageId} = ?;`;
+        const sql = `DELETE FROM tableMessage WHERE id = ?;`;
+        db.run(sql, [messageId], function (err) {
+            if (err) return callback(err);
 
-        db.get(selectSql, [messageId], (err, row) => {
-            if (err) {
-                callback(err);
-                return;
-            }
-
-            const parentUuid = row ? row[columnParentUuid] : null;
-
-            // Danach den eigentlichen Delete ausführen
-            const deleteSql = `
-                DELETE FROM ${tableName}
-                WHERE ${columnMessageId} = ?;`;
-
-            db.run(deleteSql, [messageId], (deleteErr) => {
-                if (deleteErr) {
-                    callback(deleteErr);
-                    return;
-                }
-
-                // Wenn es einen Parent gibt → Zähler reduzieren
-                if (parentUuid) {
-                    const updateSql = `
-                        UPDATE ${tableName}
-                        SET ${columnCommentsNumber} = MAX(${columnCommentsNumber} - 1, 0)
-                        WHERE ${columnUuid} = ?;`;
-
-                    db.run(updateSql, [parentUuid], (updateErr) => {
-                        callback(updateErr);
-                    });
-                } else {
-                    callback(null); // Kein Parent, fertig
-                }
-            });
+            callback(null);
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 

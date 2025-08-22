@@ -45,6 +45,12 @@ class Database {
         tableNominatimCache.init(this.db);
         tableWeather.init(this.db);
         tableGeoSearch.init(this.db)
+
+        // Trigger initialisieren
+        this.initTriggers(logger);
+
+        this.initIndexes(logger);
+
         logger.info('Connected to the messagedrop SQlite database.');
       }
     });
@@ -58,6 +64,182 @@ class Database {
       logger.info('Close the database connection.');
     });
   };
+
+  initTriggers(logger) {
+    const triggers = `
+    /* =======================
+       LIKE / DISLIKE 
+       ======================= */
+       
+    -- Likes inkrementieren
+    CREATE TRIGGER IF NOT EXISTS trg_like_after_insert
+    AFTER INSERT ON tableLike
+    BEGIN
+      UPDATE tableMessage
+      SET likes = likes + 1
+      WHERE id = NEW.likeMessageId;
+    END;
+
+    -- Likes dekrementieren
+    CREATE TRIGGER IF NOT EXISTS trg_like_after_delete
+    AFTER DELETE ON tableLike
+    BEGIN
+      UPDATE tableMessage
+      SET likes = CASE WHEN likes > 0 THEN likes - 1 ELSE 0 END
+      WHERE id = OLD.likeMessageId;
+    END;
+
+    -- Dislikes inkrementieren
+    CREATE TRIGGER IF NOT EXISTS trg_dislike_after_insert
+    AFTER INSERT ON tableDislike
+    BEGIN
+      UPDATE tableMessage
+      SET dislikes = dislikes + 1
+      WHERE id = NEW.dislikeMessageId;
+    END;
+
+    -- Dislikes dekrementieren
+    CREATE TRIGGER IF NOT EXISTS trg_dislike_after_delete
+    AFTER DELETE ON tableDislike
+    BEGIN
+      UPDATE tableMessage
+      SET dislikes = CASE WHEN dislikes > 0 THEN dislikes - 1 ELSE 0 END
+      WHERE id = OLD.dislikeMessageId;
+    END;
+
+    /* ===== XOR: Like vs. Dislike ===== */
+
+    /* Wenn ein Like gesetzt wird, lösche ggf. das Dislike des gleichen Users/Message */
+    CREATE TRIGGER IF NOT EXISTS trg_like_xor_dislike
+    AFTER INSERT ON tableLike
+    BEGIN
+      DELETE FROM tableDislike
+      WHERE dislikeMessageId = NEW.likeMessageId
+        AND dislikeUserId    = NEW.likeUserId;
+    END;
+
+    /* Wenn ein Dislike gesetzt wird, lösche ggf. das Like des gleichen Users/Message */
+    CREATE TRIGGER IF NOT EXISTS trg_dislike_xor_like
+    AFTER INSERT ON tableDislike
+    BEGIN
+      DELETE FROM tableLike
+      WHERE likeMessageId = NEW.dislikeMessageId
+        AND likeUserId    = NEW.dislikeUserId;
+    END;
+
+    /* =======================
+       COMMENTS COUNTER
+       ======================= */
+
+    -- 1) Neuer Kommentar: Parent-Zähler ++ (nur wenn der Kommentar enabled ist)
+    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_insert
+    AFTER INSERT ON tableMessage
+    WHEN NEW.parentUuid IS NOT NULL AND NEW.status = 'enabled'
+    BEGIN
+      UPDATE tableMessage
+      SET commentsNumber = commentsNumber + 1
+      WHERE uuid = NEW.parentUuid;
+    END;
+
+    -- 2) Kommentar gelöscht: Parent-Zähler -- (nur wenn der Kommentar enabled war)
+    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_delete
+    AFTER DELETE ON tableMessage
+    WHEN OLD.parentUuid IS NOT NULL AND OLD.status = 'enabled'
+    BEGIN
+      UPDATE tableMessage
+      SET commentsNumber = CASE
+        WHEN commentsNumber > 0 THEN commentsNumber - 1
+        ELSE 0
+      END
+      WHERE uuid = OLD.parentUuid;
+    END;
+
+    -- 3) Kommentar-Status geändert: disabled -> enabled  => ++
+    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_update_status_enable
+    AFTER UPDATE OF status ON tableMessage
+    WHEN NEW.parentUuid IS NOT NULL
+         AND OLD.status <> 'enabled'
+         AND NEW.status = 'enabled'
+    BEGIN
+      UPDATE tableMessage
+      SET commentsNumber = commentsNumber + 1
+      WHERE uuid = NEW.parentUuid;
+    END;
+
+    -- 4) Kommentar-Status geändert: enabled -> disabled  => --
+    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_update_status_disable
+    AFTER UPDATE OF status ON tableMessage
+    WHEN NEW.parentUuid IS NOT NULL
+         AND OLD.status = 'enabled'
+         AND NEW.status <> 'enabled'
+    BEGIN
+      UPDATE tableMessage
+      SET commentsNumber = CASE
+        WHEN commentsNumber > 0 THEN commentsNumber - 1
+        ELSE 0
+      END
+      WHERE uuid = NEW.parentUuid;
+    END;
+
+    -- 5) Kommentar wird umgehängt (Parentwechsel): alter-- / neuer++
+    CREATE TRIGGER IF NOT EXISTS trg_msg_comment_after_update_parent
+    AFTER UPDATE OF parentUuid ON tableMessage
+    WHEN (OLD.parentUuid IS NOT NEW.parentUuid) AND NEW.status = 'enabled'
+    BEGIN
+      -- beim alten Parent dekrementieren (wenn vorhanden)
+      UPDATE tableMessage
+      SET commentsNumber = CASE
+        WHEN commentsNumber > 0 THEN commentsNumber - 1
+        ELSE 0
+      END
+      WHERE uuid = OLD.parentUuid AND OLD.parentUuid IS NOT NULL;
+
+      -- beim neuen Parent inkrementieren (wenn vorhanden)
+      UPDATE tableMessage
+      SET commentsNumber = commentsNumber + 1
+      WHERE uuid = NEW.parentUuid AND NEW.parentUuid IS NOT NULL;
+    END;
+  `;
+
+    this.db.exec(triggers, (err) => {
+      if (err) {
+        logger.error('Error creating triggers: ' + err.message);
+      } else {
+        logger.info('Database triggers initialized.');
+      }
+    });
+  }
+
+  initIndexes(logger) {
+    const sql = `
+    -- getByPlusCode: nur ENABLED & root (parent IS NULL)
+    CREATE INDEX IF NOT EXISTS idx_msg_plus_enabled_root_createdesc
+      ON tableMessage(plusCode, createDateTime DESC)
+      WHERE status='enabled' AND parentUuid IS NULL;
+
+    -- getByParentUuid: nur ENABLED
+    CREATE INDEX IF NOT EXISTS idx_msg_parent_enabled_createdesc
+      ON tableMessage(parentUuid, createDateTime DESC)
+      WHERE status='enabled';
+
+    -- getByUserId
+    CREATE INDEX IF NOT EXISTS idx_msg_user_createdesc
+      ON tableMessage(userId, createDateTime DESC);
+
+    -- cleanPublic
+    CREATE INDEX IF NOT EXISTS idx_msg_public_delete_parent
+      ON tableMessage(deleteDateTime, parentUuid)
+      WHERE typ='public';
+  `;
+
+    this.db.exec(sql, (err) => {
+      if (err) {
+        logger.error('Error creating partial indexes: ' + err.message);
+      } else {
+        logger.info('Partial indexes for messages initialized.');
+      }
+    });
+  }
 
 }
 

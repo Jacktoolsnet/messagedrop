@@ -71,18 +71,18 @@
                         matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
-                @if (this.userService.getUser().id != message.userId) {
-                <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Like message"
+                    (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Dislike message"
+                    (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
-                }
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
                     <mat-icon>place</mat-icon>
                 </button>
@@ -165,18 +165,18 @@
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 }
-                @if (this.userService.getUser().id != message.userId) {
-                <button mat-mini-fab color="secondary" aria-label="Like message" (click)="likeMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Like message"
+                    (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Dislike message" (click)="dislikeMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Dislike message"
+                    (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
                         matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
                         matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
-                }
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
                     <mat-icon>place</mat-icon>
                 </button>
