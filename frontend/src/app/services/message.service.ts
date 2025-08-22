@@ -13,7 +13,6 @@ import { User } from '../interfaces/user';
 import { GeolocationService } from './geolocation.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
-import { StatisticService } from './statistic.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,7 +42,6 @@ export class MessageService {
 
   constructor(
     private snackBar: MatSnackBar,
-    private statisticService: StatisticService,
     private http: HttpClient,
     private mapService: MapService,
     private geolocationService: GeolocationService,
@@ -150,12 +148,6 @@ export class MessageService {
         next: createMessageResponse => {
           this.messagesSignal.update(messages => [message, ...messages]);
           this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
-          this.statisticService.countMessage()
-            .subscribe({
-              next: (data) => { },
-              error: (err) => { },
-              complete: () => { }
-            });
         },
         error: (err) => { this.snackBar.open(err.message, 'OK'); },
         complete: () => { }
@@ -200,7 +192,6 @@ export class MessageService {
           this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
 
           this.snackBar.open(`Comment successfully dropped.`, '', { duration: 1000 });
-          this.statisticService.countMessage().subscribe({ complete: () => { } });
         },
         error: (err) => {
           this.snackBar.open(err.message, 'OK')

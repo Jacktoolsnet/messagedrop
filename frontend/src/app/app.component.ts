@@ -60,7 +60,6 @@ import { PlaceService } from './services/place.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SocketioService } from './services/socketio.service';
-import { StatisticService } from './services/statistic.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
 
@@ -116,7 +115,6 @@ export class AppComponent implements OnInit {
     private geolocationService: GeolocationService,
     private cryptoService: CryptoService,
     private messageService: MessageService,
-    private statisticService: StatisticService,
     private socketioService: SocketioService,
     private airQualityService: AirQualityService,
     private weatherService: WeatherService,
@@ -228,13 +226,6 @@ export class AppComponent implements OnInit {
     this.networkService.init();
     // Init the server connection
     this.serverService.init();
-    // Count
-    this.statisticService.countVisitor()
-      .subscribe({
-        next: (data) => { },
-        error: (err) => { },
-        complete: () => { }
-      });
   }
 
   public ngOnInit(): void {
