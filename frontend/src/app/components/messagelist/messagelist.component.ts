@@ -326,7 +326,11 @@ export class MessagelistComponent implements OnInit {
 
   public handleCommentAfterLoginClick(message: Message) {
     this.clickedMessage = message;
-    this.userService.login(this.handleComment.bind(this))
+    if (this.getCommentBadge(message.uuid) == 0) {
+      this.userService.login(this.handleComment.bind(this))
+    } else {
+      this.handleComment();
+    }
   }
 
   public handleCommentClick(message: Message) {

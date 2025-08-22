@@ -232,32 +232,36 @@ export class MessageService {
         error: err => this.snackBar.open(err.message, 'OK')
       });
   }
+  private patchMessageSnapshotSmart(target: Message, patch: Partial<Message>) {
+    const isComment = !!target.parentUuid; // Kommentare haben parentUuid != null
 
-  private patchMessageSnapshot(id: number, patch: Partial<Message>) {
-    this.messagesSignal.update(messages =>
-      messages.map(m => (m.id === id ? { ...m, ...patch } : m))
-    );
+    if (isComment) {
+      // 1) das beschreibbare Comments-Signal für den Parent holen
+      const commentsSig = this.getCommentsSignalForMessage(target.parentUuid);
+      // 2) dort updaten
+      commentsSig.update(list =>
+        list.map(c => (c.id === target.id ? { ...c, ...patch } : c))
+      );
+    } else {
+      // Top-Level-Message patchen
+      this.messagesSignal.update(list =>
+        list.map(m => (m.id === target.id ? { ...m, ...patch } : m))
+      );
+    }
   }
 
-  // LIKE toggle – übernimmt vollständigen Snapshot vom Server
   likeToggle(message: Message, user: User, showAlways = false) {
     const url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: 'Message service',
-      image: '',
-      icon: '',
-      message: 'Toggling like',
-      button: '',
-      delay: 0,
-      showSpinner: true
+      showAlways, title: 'Message service', image: '', icon: '',
+      message: 'Toggling like', button: '', delay: 0, showSpinner: true
     });
 
     this.http.get<ToggleResponse>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe(res => {
         if (res.status === 200) {
-          this.patchMessageSnapshot(message.id, {
+          this.patchMessageSnapshotSmart(message, {
             likes: res.likes,
             dislikes: res.dislikes,
             likedByUser: res.likedByUser,
@@ -267,25 +271,18 @@ export class MessageService {
       });
   }
 
-  // DISLIKE toggle – übernimmt vollständigen Snapshot vom Server
   dislikeToggle(message: Message, user: User, showAlways = false) {
     const url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: 'Message service',
-      image: '',
-      icon: '',
-      message: 'Toggling dislike',
-      button: '',
-      delay: 0,
-      showSpinner: true
+      showAlways, title: 'Message service', image: '', icon: '',
+      message: 'Toggling dislike', button: '', delay: 0, showSpinner: true
     });
 
     this.http.get<ToggleResponse>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe(res => {
         if (res.status === 200) {
-          this.patchMessageSnapshot(message.id, {
+          this.patchMessageSnapshotSmart(message, {
             likes: res.likes,
             dislikes: res.dislikes,
             likedByUser: res.likedByUser,
