@@ -50,29 +50,42 @@ const init = function (db) {
     }
 };
 
-const create = function (db, contactId, userId, contactUserId, hint, contactUserSigningPublicKey, contactUserEncryptionPublicKey, callback) {
+const create = function (
+    db,
+    contactId,
+    userId,
+    contactUserId,
+    hint,
+    contactUserSigningPublicKey,
+    contactUserEncryptionPublicKey,
+    callback
+) {
     try {
-        let sql = `
-        INSERT INTO ${tableName} (
-            ${columnContactId},
-            ${columnUserId},
-            ${columnContactUserId},
-            ${columnContactUserSigningPublicKey},
-            ${columnContactUserEncryptionPublicKey},
-            ${columnHint}
-        ) VALUES (
-            '${contactId}',
-            '${userId}',
-            '${contactUserId}',
-            '${contactUserSigningPublicKey}',
-            '${contactUserEncryptionPublicKey}',
-            '${hint}'
-        );`;
-        db.run(sql, (err) => {
-            callback(err)
+        const sql = `
+      INSERT INTO ${tableName} (
+        ${columnContactId},
+        ${columnUserId},
+        ${columnContactUserId},
+        ${columnContactUserSigningPublicKey},
+        ${columnContactUserEncryptionPublicKey},
+        ${columnHint}
+      ) VALUES (?, ?, ?, ?, ?, ?);
+    `;
+
+        const params = [
+            contactId,
+            userId,
+            contactUserId,
+            contactUserSigningPublicKey,
+            contactUserEncryptionPublicKey,
+            hint ?? null, // leere/fehlende Hinweise als NULL speichern
+        ];
+
+        db.run(sql, params, function (err) {
+            if (err) return callback(err);
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 

@@ -49,28 +49,38 @@ const init = function (db) {
     }
 };
 
-const create = function (db, userId, cryptoPrivateKey, signingPrivateKey, callback) {
+const create = function (
+    db,
+    userId,
+    cryptoPrivateKey,
+    signingPrivateKey,
+    callback
+) {
     try {
-        let sql = `
-        INSERT INTO ${tableName} (
-            ${columnUserId}, 
-            ${columnCryptoPrivateKey},
-            ${columnSigningPrivateKey},
-            ${columnType},
-            ${columnLastSignOfLife}
-        ) 
-        VALUES (
-            '${userId}', 
-            '${cryptoPrivateKey}',
-            '${signingPrivateKey}',
-            '${userType.USER}',
-            datetime('now')
-        );`;
-        db.run(sql, (err) => {
-            callback(err)
+        const sql = `
+      INSERT INTO ${tableName} (
+        ${columnUserId}, 
+        ${columnCryptoPrivateKey},
+        ${columnSigningPrivateKey},
+        ${columnType},
+        ${columnLastSignOfLife}
+      ) 
+      VALUES (?, ?, ?, ?, strftime('%s','now'));
+    `;
+
+        const params = [
+            userId,
+            cryptoPrivateKey,
+            signingPrivateKey,
+            userType.USER
+        ];
+
+        db.run(sql, params, function (err) {
+            if (err) return callback(err);
+            callback(null, { lastID: this.lastID, changes: this.changes });
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 

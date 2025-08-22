@@ -34,31 +34,45 @@ const init = function (db) {
     }
 };
 
-const create = function (db, connectId, userId, hint, encryptionPublicKey, signingPublicKey, signature, callback) {
+const create = function (
+    db,
+    connectId,
+    userId,
+    hint,
+    encryptionPublicKey,
+    signingPublicKey,
+    signature,
+    callback
+) {
     try {
-        let sql = `
-        INSERT INTO ${tableName} (
-            ${columnConnectId},
-            ${columnUserId},
-            ${columnHint},
-            ${columnSignature},
-            ${columnEncryptionPublicKey},
-            ${columnSigningPublicKey},
-            ${columnTimeOfCreation}
-        ) VALUES (
-            '${connectId}',
-            '${userId}',
-            '${hint}',
-            '${signature}',
-            '${encryptionPublicKey}',
-            '${signingPublicKey}',
-            datetime('now')
-        );`;
-        db.run(sql, (err) => {
-            callback(err)
+        const sql = `
+      INSERT INTO ${tableName} (
+        ${columnConnectId},
+        ${columnUserId},
+        ${columnHint},
+        ${columnSignature},
+        ${columnEncryptionPublicKey},
+        ${columnSigningPublicKey},
+        ${columnTimeOfCreation}
+      ) VALUES (
+        ?, ?, ?, ?, ?, ?, strftime('%s','now')
+      );
+    `;
+
+        const params = [
+            connectId,
+            userId,
+            hint ?? null,
+            signature,
+            encryptionPublicKey,
+            signingPublicKey
+        ];
+
+        db.run(sql, params, function (err) {
+            if (err) return callback(err);
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 

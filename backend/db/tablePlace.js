@@ -37,31 +37,45 @@ const init = function (db) {
     }
 };
 
-const create = function (db, placeId, userId, name, latMin, latMax, lonMin, lonMax, callback) {
+const create = function (
+    db,
+    placeId,
+    userId,
+    name,
+    latMin,
+    latMax,
+    lonMin,
+    lonMax,
+    callback
+) {
     try {
-        let sql = `
-        INSERT INTO ${tableName} (
-            ${columnPlaceId},
-            ${columnUserId},
-            ${columnName},
-            ${columnLatMin},
-            ${columnLatMax},
-            ${columnLonMin},
-            ${columnLonMax}
-        ) VALUES (
-            '${placeId}',
-            '${userId}',
-            '${name}',
-            ${latMin},
-            ${latMax},
-            ${lonMin},
-            ${lonMax}
-        );`;
-        db.run(sql, (err) => {
-            callback(err)
+        const sql = `
+      INSERT INTO ${tableName} (
+        ${columnPlaceId},
+        ${columnUserId},
+        ${columnName},
+        ${columnLatMin},
+        ${columnLatMax},
+        ${columnLonMin},
+        ${columnLonMax}
+      ) VALUES (?, ?, ?, ?, ?, ?, ?);
+    `;
+
+        const params = [
+            placeId,
+            userId,
+            (name ?? '').trim(),
+            Number(latMin),
+            Number(latMax),
+            Number(lonMin),
+            Number(lonMax),
+        ];
+
+        db.run(sql, params, function (err) {
+            if (err) return callback(err);
         });
     } catch (error) {
-        throw error;
+        callback(error);
     }
 };
 
