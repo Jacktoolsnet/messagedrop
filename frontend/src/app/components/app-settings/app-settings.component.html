@@ -9,8 +9,8 @@
         </mat-select>
     </mat-form-field>
 
-    <mat-button-toggle-group [value]="appSettings.themeMode" (change)="setThemeMode($event.value)"
-        class="theme-toggle-group" exclusive aria-label="Theme mode toggle">
+    <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.themeMode"
+        (change)="setThemeMode($event.value)" class="theme-toggle-group" exclusive aria-label="Theme mode toggle">
         <mat-button-toggle value="light">
             <mat-icon>light_mode</mat-icon>
             Light

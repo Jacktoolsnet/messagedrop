@@ -76,15 +76,6 @@ h4 {
         gap: 0.25rem;
     }
 
-    ::ng-deep .mat-button-toggle-checked {
-        background-color: var(--md-sys-color-primary-container);
-        color: var(--md-sys-color-on-primary-container);
-    }
-
-    ::ng-deep .mat-button-toggle-button:hover {
-        background-color: var(--md-sys-color-surface-container-highest);
-    }
-
     ::ng-deep .mat-icon {
         font-size: 1.5rem;
     }

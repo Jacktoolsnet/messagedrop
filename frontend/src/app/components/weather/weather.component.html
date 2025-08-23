@@ -8,7 +8,8 @@
     </ng-template>
 
     <!-- Day Switch -->
-    <mat-button-toggle-group class="day-toggle-group" [value]="selectedDayIndex" (change)="onDayChange($event.value)">
+    <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="day-toggle-group" [value]="selectedDayIndex"
+        (change)="onDayChange($event.value)">
         @for (day of weather.daily; track day; let i = $index) {
         <mat-button-toggle [value]="i">
             {{ getDayLabel(i) }}

@@ -228,13 +228,4 @@ app-weather-detail {
         text-transform: none;
         gap: 0.25rem;
     }
-
-    ::ng-deep .mat-button-toggle-checked {
-        color: var(--mat-card-subtitle-text-color);
-        background-color: var(--mat-card-filled-container-color);
-    }
-
-    ::ng-deep .mat-button-toggle-button:hover {
-        background-color: var(--mat-card-filled-container-color);
-    }
 }

@@ -10,7 +10,8 @@
     </div>
     }
 
-    <mat-button-toggle-group class="day-toggle-group" [value]="selectedDayIndex" (change)="onDayChange($event.value)">
+    <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="day-toggle-group" [value]="selectedDayIndex"
+        (change)="onDayChange($event.value)">
         @for (dayLabel of dayLabels; track dayLabel; let i = $index) {
         <mat-button-toggle [value]="i">
             {{ dayLabel }}
@@ -67,8 +68,8 @@
     }
 
     @if (!selectedTile) {
-    <mat-button-toggle-group class="category-toggle-group" [value]="selectedCategory"
-        (change)="onCategoryToggle($event.value)" multiple="false">
+    <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="category-toggle-group"
+        [value]="selectedCategory" (change)="onCategoryToggle($event.value)" multiple="false">
 
         <mat-button-toggle *ngFor="let category of categoryModes" [value]="category"
             matTooltip="{{ getCategoryLabel(category) }}">
