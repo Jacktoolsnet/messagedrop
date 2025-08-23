@@ -4,6 +4,7 @@ import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, } from 
   selector: '[appMasonryItem]',
   standalone: true,
 })
+
 export class MasonryItemDirective implements AfterViewInit, OnDestroy {
   /** Optional override for row unit in pixels. If not set, we read computed grid-auto-rows. */
   @Input() rowUnitPx?: number;
