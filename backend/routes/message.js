@@ -203,14 +203,14 @@ router.get('/delete/:messageId', [security.checkToken, security.authenticate], f
 });
 
 // Like-Toggle
-router.get('/like/:messageId/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
-  const messageId = Number(req.params.messageId);
+router.get('/like/:messageUuid/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
+  const messageUuid = String(req.params.messageUuid);
   const userId = String(req.params.userId);
-  if (!Number.isInteger(messageId) || !userId) {
+  if (!messageUuid || !userId) {
     return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
   }
 
-  tableLike.toggleLike(req.database.db, messageId, userId, (err, result) => {
+  tableLike.toggleLike(req.database.db, messageUuid, userId, (err, result) => {
     if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
 
     // result enthält: liked, likes, dislikedByUser, dislikes
@@ -219,14 +219,14 @@ router.get('/like/:messageId/by/:userId', [security.checkToken, security.authent
 });
 
 // Dislike-Toggle
-router.get('/dislike/:messageId/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
-  const messageId = Number(req.params.messageId);
+router.get('/dislike/:messageUuid/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
+  const messageUuid = String(req.params.messageUuid);
   const userId = String(req.params.userId);
-  if (!Number.isInteger(messageId) || !userId) {
+  if (!messageUuid || !userId) {
     return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
   }
 
-  tableDislike.toggleDislike(req.database.db, messageId, userId, (err, result) => {
+  tableDislike.toggleDislike(req.database.db, messageUuid, userId, (err, result) => {
     if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
 
     // result enthält: disliked, dislikes, likedByUser, likes

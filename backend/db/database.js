@@ -77,7 +77,7 @@ class Database {
     BEGIN
       UPDATE tableMessage
       SET likes = likes + 1
-      WHERE id = NEW.likeMessageId;
+      WHERE uuid = NEW.likeMessageUuid;
     END;
 
     -- Likes dekrementieren
@@ -86,7 +86,7 @@ class Database {
     BEGIN
       UPDATE tableMessage
       SET likes = CASE WHEN likes > 0 THEN likes - 1 ELSE 0 END
-      WHERE id = OLD.likeMessageId;
+      WHERE uuid = OLD.likeMessageUuid;
     END;
 
     -- Dislikes inkrementieren
@@ -95,7 +95,7 @@ class Database {
     BEGIN
       UPDATE tableMessage
       SET dislikes = dislikes + 1
-      WHERE id = NEW.dislikeMessageId;
+      WHERE uuid = NEW.dislikeMessageUuid;
     END;
 
     -- Dislikes dekrementieren
@@ -104,7 +104,7 @@ class Database {
     BEGIN
       UPDATE tableMessage
       SET dislikes = CASE WHEN dislikes > 0 THEN dislikes - 1 ELSE 0 END
-      WHERE id = OLD.dislikeMessageId;
+      WHERE uuid = OLD.dislikeMessageUuid;
     END;
 
     /* ===== XOR: Like vs. Dislike ===== */
@@ -114,7 +114,7 @@ class Database {
     AFTER INSERT ON tableLike
     BEGIN
       DELETE FROM tableDislike
-      WHERE dislikeMessageId = NEW.likeMessageId
+      WHERE dislikeMessageUuid = NEW.likeMessageUuid
         AND dislikeUserId    = NEW.likeUserId;
     END;
 
@@ -123,7 +123,7 @@ class Database {
     AFTER INSERT ON tableDislike
     BEGIN
       DELETE FROM tableLike
-      WHERE likeMessageId = NEW.dislikeMessageId
+      WHERE likeMessageUuid = NEW.dislikeMessageUuid
         AND likeUserId    = NEW.dislikeUserId;
     END;
 

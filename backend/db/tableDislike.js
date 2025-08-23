@@ -1,21 +1,21 @@
 const tableName = 'tableDislike';
-const columnDislikeMessageId = 'dislikeMessageId';
+const columnDislikeMessageUuid = 'dislikeMessageUuid';
 const columnDislikeUserId = 'dislikeUserId';
 
 const init = function (db) {
     const sql = `
     CREATE TABLE IF NOT EXISTS ${tableName} (
-      ${columnDislikeMessageId} INTEGER NOT NULL,
+      ${columnDislikeMessageUuid} TEXT NOT NULL,
       ${columnDislikeUserId} TEXT NOT NULL,
-      PRIMARY KEY (${columnDislikeMessageId}, ${columnDislikeUserId}),
-      FOREIGN KEY (${columnDislikeMessageId}) 
-        REFERENCES tableMessage (id) 
+      PRIMARY KEY (${columnDislikeMessageUuid}, ${columnDislikeUserId}),
+      FOREIGN KEY (${columnDislikeMessageUuid}) 
+        REFERENCES tableMessage (uuid) 
         ON UPDATE CASCADE ON DELETE CASCADE,
       FOREIGN KEY (${columnDislikeUserId}) 
         REFERENCES tableUser (id) 
         ON UPDATE CASCADE ON DELETE CASCADE
     );
-    CREATE INDEX IF NOT EXISTS idx_dislike_msg ON ${tableName}(${columnDislikeMessageId});
+    CREATE INDEX IF NOT EXISTS idx_dislike_msg ON ${tableName}(${columnDislikeMessageUuid});
   `;
     db.exec(sql, (err) => {
         if (err) throw err;
@@ -27,16 +27,16 @@ const init = function (db) {
  * - Wenn Dislike existiert: löschen (Trigger dekrementiert Zähler)
  * - Sonst: einfügen (Trigger inkrementiert Zähler)
  */
-const toggleDislike = function (db, messageId, userId, callback) {
+const toggleDislike = function (db, messageUuid, userId, callback) {
     db.serialize(() => {
         db.run('BEGIN IMMEDIATE', (bErr) => {
             if (bErr) return callback(bErr);
 
             const delSql = `
-        DELETE FROM tableDislike
-        WHERE dislikeMessageId = ? AND dislikeUserId = ?;
+        DELETE FROM ${tableName}
+        WHERE ${columnDislikeMessageUuid} = ? AND ${columnDislikeUserId} = ?;
       `;
-            db.run(delSql, [messageId, userId], function (delErr) {
+            db.run(delSql, [messageUuid, userId], function (delErr) {
                 if (delErr) {
                     db.run('ROLLBACK');
                     return callback(delErr);
@@ -47,11 +47,11 @@ const toggleDislike = function (db, messageId, userId, callback) {
                 const insertIfNeeded = (next) => {
                     if (deleted) return next(null); // war disliked -> jetzt entfernt
                     const insSql = `
-            INSERT INTO tableDislike (dislikeMessageId, dislikeUserId)
+            INSERT INTO ${tableName} (${columnDislikeMessageUuid}, ${columnDislikeUserId})
             VALUES (?, ?)
-            ON CONFLICT(dislikeMessageId, dislikeUserId) DO NOTHING;
+            ON CONFLICT(${columnDislikeMessageUuid}, ${columnDislikeUserId}) DO NOTHING;
           `;
-                    db.run(insSql, [messageId, userId], (insErr) => {
+                    db.run(insSql, [messageUuid, userId], (insErr) => {
                         if (insErr) return next(insErr);
                         // Hinweis: Dein XOR-Trigger löscht hier ggf. ein vorhandenes Like automatisch.
                         next(null);
@@ -67,12 +67,9 @@ const toggleDislike = function (db, messageId, userId, callback) {
                     // finalen Zustand (inkl. XOR-Effekt) ermitteln
                     const stateSql = `
             SELECT
-              (SELECT COUNT(*) FROM tableLike    WHERE likeMessageId    = ?) AS likes,
-              (SELECT COUNT(*) FROM tableDislike WHERE dislikeMessageId = ?) AS dislikes,
-              EXISTS(SELECT 1 FROM tableLike    WHERE likeMessageId=? AND likeUserId=?)      AS likedByUser,
-              EXISTS(SELECT 1 FROM tableDislike WHERE dislikeMessageId=? AND dislikeUserId=?) AS dislikedByUser
-          `;
-                    const params = [messageId, messageId, messageId, userId, messageId, userId];
+              (SELECT COUNT(*) FROM tableLike WHERE likeMessageUuid = ?) AS likes,
+              (SELECT COUNT(*) FROM ${tableName} WHERE ${columnDislikeMessageUuid} = ?) AS dislikes;`;
+                    const params = [messageUuid, messageUuid];
 
                     db.get(stateSql, params, (stateErr, row) => {
                         if (stateErr) {
@@ -83,9 +80,7 @@ const toggleDislike = function (db, messageId, userId, callback) {
                         db.run('COMMIT', (cErr) => {
                             if (cErr) return callback(cErr);
                             const result = {
-                                disliked: !!row.dislikedByUser,
                                 dislikes: row.dislikes | 0,
-                                likedByUser: !!row.likedByUser,
                                 likes: row.likes | 0
                             };
                             callback(null, result);

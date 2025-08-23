@@ -1,21 +1,21 @@
 const tableName = 'tableLike';
-const columnLikeMessageId = 'likeMessageId';
+const columnLikeMessageUuid = 'likeMessageUuid';
 const columnLikeUserId = 'likeUserId';
 
 const init = function (db) {
     const sql = `
     CREATE TABLE IF NOT EXISTS ${tableName} (
-      ${columnLikeMessageId} INTEGER NOT NULL,
+      ${columnLikeMessageUuid} TEXT NOT NULL,
       ${columnLikeUserId} TEXT NOT NULL,
-      PRIMARY KEY (${columnLikeMessageId}, ${columnLikeUserId}),
-      FOREIGN KEY (${columnLikeMessageId}) 
-        REFERENCES tableMessage (id) 
+      PRIMARY KEY (${columnLikeMessageUuid}, ${columnLikeUserId}),
+      FOREIGN KEY (${columnLikeMessageUuid}) 
+        REFERENCES tableMessage (uuid) 
         ON UPDATE CASCADE ON DELETE CASCADE,
       FOREIGN KEY (${columnLikeUserId}) 
         REFERENCES tableUser (id) 
         ON UPDATE CASCADE ON DELETE CASCADE
     );
-    CREATE INDEX IF NOT EXISTS idx_like_msg ON ${tableName}(${columnLikeMessageId});
+    CREATE INDEX IF NOT EXISTS idx_like_msg ON ${tableName}(${columnLikeMessageUuid});
   `;
     db.exec(sql, (err) => {
         if (err) throw err;
@@ -28,16 +28,16 @@ const init = function (db) {
  *  - Sonst: einfügen (like)
  *  -> Trigger kümmern sich um das Aktualisieren von "likes" in tableMessage
  */
-const toggleLike = function (db, messageId, userId, callback) {
+const toggleLike = function (db, messageUuid, userId, callback) {
     db.serialize(() => {
         db.run('BEGIN IMMEDIATE', (bErr) => {
             if (bErr) return callback(bErr);
 
             const delSql = `
-        DELETE FROM tableLike
-        WHERE likeMessageId = ? AND likeUserId = ?;
+        DELETE FROM ${tableName}
+        WHERE ${columnLikeMessageUuid} = ? AND ${columnLikeUserId} = ?;
       `;
-            db.run(delSql, [messageId, userId], function (delErr) {
+            db.run(delSql, [messageUuid, userId], function (delErr) {
                 if (delErr) {
                     db.run('ROLLBACK');
                     return callback(delErr);
@@ -48,11 +48,11 @@ const toggleLike = function (db, messageId, userId, callback) {
                 const insertIfNeeded = (next) => {
                     if (deleted) return next(null); // war geliked -> jetzt entfernt
                     const insSql = `
-            INSERT INTO tableLike (likeMessageId, likeUserId)
+            INSERT INTO ${tableName} (${columnLikeMessageUuid}, ${columnLikeUserId})
             VALUES (?, ?)
-            ON CONFLICT(likeMessageId, likeUserId) DO NOTHING;
+            ON CONFLICT(${columnLikeMessageUuid}, ${columnLikeUserId}) DO NOTHING;
           `;
-                    db.run(insSql, [messageId, userId], (insErr) => {
+                    db.run(insSql, [messageUuid, userId], (insErr) => {
                         if (insErr) return next(insErr);
                         // Hinweis: XOR-Trigger löscht hier ggf. ein vorhandenes Dislike automatisch.
                         next(null);
@@ -68,12 +68,9 @@ const toggleLike = function (db, messageId, userId, callback) {
                     // Aktuellen Zustand ermitteln (Likes/Dislikes + Flags)
                     const stateSql = `
             SELECT
-              (SELECT COUNT(*) FROM tableLike    WHERE likeMessageId    = ?) AS likes,
-              (SELECT COUNT(*) FROM tableDislike WHERE dislikeMessageId = ?) AS dislikes,
-              EXISTS(SELECT 1 FROM tableLike    WHERE likeMessageId=? AND likeUserId=?)      AS likedByUser,
-              EXISTS(SELECT 1 FROM tableDislike WHERE dislikeMessageId=? AND dislikeUserId=?) AS dislikedByUser
-          `;
-                    const params = [messageId, messageId, messageId, userId, messageId, userId];
+              (SELECT COUNT(*) FROM ${tableName} WHERE ${columnLikeMessageUuid} = ?) AS likes,
+              (SELECT COUNT(*) FROM tableDislike WHERE dislikeMessageUuid = ?) AS dislikes;`;
+                    const params = [messageUuid, messageUuid];
 
                     db.get(stateSql, params, (stateErr, row) => {
                         if (stateErr) {
@@ -86,9 +83,7 @@ const toggleLike = function (db, messageId, userId, callback) {
                             if (cErr) return callback(cErr);
                             // liked spiegelt den aktuellen Zustand wider (nicht nur die Aktion)
                             const result = {
-                                liked: !!row.likedByUser,
                                 likes: row.likes | 0,
-                                dislikedByUser: !!row.dislikedByUser,
                                 dislikes: row.dislikes | 0
                             };
                             callback(null, result);

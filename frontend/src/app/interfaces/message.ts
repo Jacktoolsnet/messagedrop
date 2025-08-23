@@ -20,9 +20,7 @@ export interface Message {
     comments: Message[],
     commentsNumber: number,
     status: string,
-    userId: string,
-    likedByUser?: boolean,
-    dislikedByUser?: boolean
+    userId: string
     multimedia: Multimedia
 }
 

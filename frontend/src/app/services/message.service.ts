@@ -240,21 +240,27 @@ export class MessageService {
       const commentsSig = this.getCommentsSignalForMessage(target.parentUuid);
       // 2) dort updaten
       commentsSig.update(list =>
-        list.map(c => (c.id === target.id ? { ...c, ...patch } : c))
+        list.map(comment => (comment.uuid === target.uuid ? { ...comment, ...patch } : comment))
       );
     } else {
       // Top-Level-Message patchen
       this.messagesSignal.update(list =>
-        list.map(m => (m.id === target.id ? { ...m, ...patch } : m))
+        list.map(message => (message.uuid === target.uuid ? { ...message, ...patch } : message))
       );
     }
   }
 
   likeToggle(message: Message, user: User, showAlways = false) {
-    const url = `${environment.apiUrl}/message/like/${message.id}/by/${user.id}`;
+    const url = `${environment.apiUrl}/message/like/${message.uuid}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways, title: 'Message service', image: '', icon: '',
-      message: 'Toggling like', button: '', delay: 0, showSpinner: true
+      showAlways,
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: 'Toggling like',
+      button: '',
+      delay: 0,
+      showSpinner: true
     });
 
     this.http.get<ToggleResponse>(url, this.httpOptions)
@@ -263,19 +269,23 @@ export class MessageService {
         if (res.status === 200) {
           this.patchMessageSnapshotSmart(message, {
             likes: res.likes,
-            dislikes: res.dislikes,
-            likedByUser: res.likedByUser,
-            dislikedByUser: res.dislikedByUser
+            dislikes: res.dislikes
           });
         }
       });
   }
 
   dislikeToggle(message: Message, user: User, showAlways = false) {
-    const url = `${environment.apiUrl}/message/dislike/${message.id}/by/${user.id}`;
+    const url = `${environment.apiUrl}/message/dislike/${message.uuid}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways, title: 'Message service', image: '', icon: '',
-      message: 'Toggling dislike', button: '', delay: 0, showSpinner: true
+      showAlways,
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: 'Toggling dislike',
+      button: '',
+      delay: 0,
+      showSpinner: true
     });
 
     this.http.get<ToggleResponse>(url, this.httpOptions)
@@ -284,9 +294,7 @@ export class MessageService {
         if (res.status === 200) {
           this.patchMessageSnapshotSmart(message, {
             likes: res.likes,
-            dislikes: res.dislikes,
-            likedByUser: res.likedByUser,
-            dislikedByUser: res.dislikedByUser
+            dislikes: res.dislikes
           });
         }
       });
