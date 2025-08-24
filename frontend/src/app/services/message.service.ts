@@ -232,6 +232,7 @@ export class MessageService {
         error: err => this.snackBar.open(err.message, 'OK')
       });
   }
+
   private patchMessageSnapshotSmart(target: Message, patch: Partial<Message>) {
     const isComment = !!target.parentUuid; // Kommentare haben parentUuid != null
 
