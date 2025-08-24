@@ -17,7 +17,7 @@ router.get('/get', [security.checkToken, security.authenticate], function (req, 
       response.status = 500;
       response.error = err;
     } else {
-      if (rows.length == 0) {
+      if (!rows || rows.length == 0) {
         response.status = 404;
       } else {
         rows.forEach((row) => {

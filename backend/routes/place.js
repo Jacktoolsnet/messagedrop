@@ -82,7 +82,7 @@ router.get('/get/userId/:userId', [security.checkToken, security.authenticate], 
       response.error = err;
     } else {
       response.status = 200;
-      if (rows.length == 0) {
+      if (!rows || rows.length == 0) {
         response.status = 404;
       } else {
         rows.forEach((row) => {

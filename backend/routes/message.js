@@ -14,7 +14,7 @@ router.get('/get', [security.checkToken], function (req, res) {
       response.status = 500;
       response.error = err;
     } else {
-      if (rows.length == 0) {
+      if (!rows || rows.length == 0) {
         response.status = 404;
       } else {
         rows.forEach((row) => {
@@ -53,7 +53,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
       response.status = 500;
       response.error = err;
     } else {
-      if (rows.length == 0) {
+      if (!rows || rows.length == 0) {
         response.status = 404;
       } else {
         rows.forEach((row) => {
@@ -73,7 +73,7 @@ router.get('/get/comment/:parentUuid', [security.checkToken], function (req, res
       response.status = 500;
       response.error = err;
     } else {
-      if (rows.length == 0) {
+      if (!rows || rows.length == 0) {
         response.status = 404;
       } else {
         rows.forEach((row) => {
@@ -105,7 +105,7 @@ router.get('/get/pluscode/:plusCode', [security.checkToken], function (req, res)
           response.status = 500;
           response.error = err;
         } else {
-          if (rows.length == 0) {
+          if (!rows || rows.length == 0) {
             response.status = 404;
           } else {
             rows.forEach((row) => {
@@ -119,6 +119,49 @@ router.get('/get/pluscode/:plusCode', [security.checkToken], function (req, res)
     });
   }
 });
+
+router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax', [security.checkToken], function (req, res) {
+  let response = { status: 0, rows: [] };
+
+  // Parse params to numbers
+  const latMin = parseFloat(req.params.latMin);
+  const lonMin = parseFloat(req.params.lonMin);
+  const latMax = parseFloat(req.params.latMax);
+  const lonMax = parseFloat(req.params.lonMax);
+
+  // --- Validation ---
+  const isValidLat = (lat) => !isNaN(lat) && lat >= -90 && lat <= 90;
+  const isValidLon = (lon) => !isNaN(lon) && lon >= -180 && lon <= 180;
+
+  if (
+    !isValidLat(latMin) || !isValidLat(latMax) ||
+    !isValidLon(lonMin) || !isValidLon(lonMax) ||
+    latMin === latMax || lonMin === lonMax
+  ) {
+    response.status = 400; // Bad Request
+    response.error = 'Invalid bounding box parameters';
+    return res.status(response.status).json(response);
+  }
+
+  // --- Query DB ---
+  tableMessage.getByBoundingBox(
+    req.database.db,
+    latMin, lonMin, latMax, lonMax,
+    function (err, rows) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else if (!rows || rows.length === 0) {
+        response.status = 404;
+      } else {
+        response.rows = rows;
+        response.status = 200;
+      }
+      res.status(response.status).json(response);
+    }
+  );
+}
+);
 
 router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };

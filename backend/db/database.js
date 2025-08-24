@@ -212,6 +212,7 @@ class Database {
 
   initIndexes(logger) {
     const sql = `
+    -- === Bestehende Indexe ===
     -- getByPlusCode: nur ENABLED & root (parent IS NULL)
     CREATE INDEX IF NOT EXISTS idx_msg_plus_enabled_root_createdesc
       ON tableMessage(plusCode, createDateTime DESC)
@@ -230,6 +231,29 @@ class Database {
     CREATE INDEX IF NOT EXISTS idx_msg_public_delete_parent
       ON tableMessage(deleteDateTime, parentUuid)
       WHERE typ='public';
+
+    -- === Neue/zusätzliche Indexe ===
+
+    -- 1) Häufige Filter (allgemein): parentUuid + status
+    --    Nutzt SQLite auch für Queries, die nur auf parent/status filtern.
+    CREATE INDEX IF NOT EXISTS idx_msg_parent_status
+      ON tableMessage(parentUuid, status);
+
+    -- 2) Geo-Index für Bounding-Box-Abfragen:
+    --    - Partial Index nur für aktive Root-Messages (status enabled, parent NULL)
+    --    - Reihenfolge: latitude, longitude (Range-Filter) + createDateTime DESC (Sortierung)
+    --    -> Sehr gut passend zu: WHERE parentUuid IS NULL AND status='enabled'
+    --                             AND latitude BETWEEN ? AND ?
+    --                             AND (longitude BETWEEN ... OR ...)
+    --                             ORDER BY createDateTime DESC LIMIT ?
+    CREATE INDEX IF NOT EXISTS idx_msg_geo_enabled_root_lat_lon_createdesc
+      ON tableMessage(latitude, longitude, createDateTime DESC)
+      WHERE status='enabled' AND parentUuid IS NULL;
+
+    -- 3) Allgemeiner Sortierindex:
+    --    Falls andere Abfragen stark auf createDateTime sortieren, kann das helfen.
+    CREATE INDEX IF NOT EXISTS idx_msg_created_desc
+      ON tableMessage(createDateTime DESC);
   `;
 
     this.db.exec(sql, (err) => {

@@ -196,11 +196,71 @@ const getByPlusCode = function (db, plusCode, callback) {
         SELECT * FROM ${tableName}
         WHERE ${columnPlusCode} LIKE UPPER(?)
         AND ${columnParentUuid} IS NULL
-        AND ${columnStatus} = '${messageStatus.ENABLED}'      
+        AND ${columnStatus} = ?      
         ORDER BY ${columnMessageCreateDateTime} DESC
         LIMIT 256;`;
 
-        db.all(sql, [plusCode], (err, rows) => {
+        db.all(sql, [plusCode, messageStatus.ENABLED], (err, rows) => {
+            callback(err, rows);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Assumes: messageStatus.ENABLED is available in scope
+
+const getByBoundingBox = function (db, latMin, lonMin, latMax, lonMax, callback) {
+    try {
+        // --- Normalize input (ensure min/max in correct order) ---
+        const latLow = Math.min(Number(latMin), Number(latMax));
+        const latHigh = Math.max(Number(latMin), Number(latMax));
+        const lonA = Number(lonMin);
+        const lonB = Number(lonMax);
+
+        // SQLite longitudes are typically in range [-180, 180]
+        // Crossing the antimeridian happens when lonMin > lonMax (e.g., 170 .. -170)
+        const crossesAntiMeridian = lonA > lonB;
+
+        // --- Build SQL dynamically for the longitude condition ---
+        // If we cross the antimeridian, we need: lon BETWEEN lonMin AND 180 OR lon BETWEEN -180 AND lonMax
+        // Otherwise: lon BETWEEN min(lonMin, lonMax) AND max(lonMin, lonMax)
+        let sql = `
+            SELECT *
+            FROM ${tableName}
+            WHERE ${columnParentUuid} IS NULL
+                AND ${columnStatus} = ?
+                AND ${columnLatitude} BETWEEN ? AND ?
+                AND (
+                ${crossesAntiMeridian
+                ? `(${columnLongitude} BETWEEN ? AND 180) OR (${columnLongitude} BETWEEN -180 AND ?)`
+                : `${columnLongitude} BETWEEN ? AND ?`
+            }
+                )
+            ORDER BY ${columnMessageCreateDateTime} DESC
+            LIMIT 256;
+            `;
+
+        let params;
+        if (crossesAntiMeridian) {
+            params = [
+                messageStatus.ENABLED, // status
+                latLow, latHigh,       // latitude
+                lonA,                  // from lonMin to 180
+                lonBi                  // from -180 to lonMax
+            ];
+        } else {
+            const lonLow = Math.min(lonA, lonB);
+            const lonHigh = Math.max(lonA, lonB);
+            params = [
+                messageStatus.ENABLED, // status
+                latLow, latHigh,       // latitude
+                lonLow, lonHigh,       // longitude
+                Number(limit) | 0
+            ];
+        }
+
+        db.all(sql, params, (err, rows) => {
             callback(err, rows);
         });
     } catch (error) {
@@ -213,11 +273,11 @@ const getByParentUuid = function (db, parentUuid, callback) {
         let sql = `
         SELECT * FROM ${tableName}
         WHERE ${columnParentUuid} = ?
-        AND ${columnStatus} = '${messageStatus.ENABLED}'
+        AND ${columnStatus} = ?
         ORDER BY ${columnMessageCreateDateTime} DESC
         LIMIT 256;`;
 
-        db.all(sql, [parentUuid], (err, rows) => {
+        db.all(sql, [parentUuid, messageStatus.ENABLED], (err, rows) => {
             callback(err, rows);
         });
     } catch (error) {
@@ -358,6 +418,7 @@ module.exports = {
     getById,
     getByUserId,
     getByPlusCode,
+    getByBoundingBox,
     getByParentUuid,
     countView,
     countComment,
