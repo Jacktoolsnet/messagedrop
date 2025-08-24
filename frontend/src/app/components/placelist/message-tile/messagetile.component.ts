@@ -3,10 +3,10 @@ import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { GetMessageResponse } from '../../../interfaces/get-message-response';
 import { Message } from '../../../interfaces/message';
 import { Place } from '../../../interfaces/place';
-import { GeolocationService } from '../../../services/geolocation.service';
-import { NoteService } from '../../../services/note.service';
+import { MessageService } from '../../../services/message.service';
 
 @Component({
   selector: 'app-message-tile',
@@ -22,22 +22,27 @@ import { NoteService } from '../../../services/note.service';
 export class MessageTileComponent implements OnInit, OnDestroy {
   @Input() place!: Place;
   readonly placeMessages = signal<Message[]>([]);
-  readonly allPlaceMessagess = signal<Message[]>([]);
+  readonly allPlaceMessages = signal<Message[]>([]);
 
   constructor(
-    private noteService: NoteService,
-    private geolocationService: GeolocationService,
+    private messageService: MessageService,
     private matDialog: MatDialog
   ) { }
 
   ngOnInit(): void {
-    /*this.noteService.getNotesInBoundingBox(this.place.boundingBox!).then(notes => {
-      this.allPlaceNotes.set(notes);
-      const visibleNotes = notes
-        .filter(n => n.note?.trim() !== '')  // Nur Notizen mit Inhalt
-        .slice(0, 3);                        // Maximal 3 Notizen
-      this.placeNotes.set(visibleNotes);
-    });*/
+    this.messageService.getByBoundingBox(this.place.boundingBox, false)
+      .subscribe({
+        next: (response: GetMessageResponse) => {
+          if (response.status === 200) {
+            this.allPlaceMessages.set(this.messageService.mapRawMessages(response.rows));
+            const visibleMessages = this.allPlaceMessages()
+              .filter(m => m.message?.trim() !== '')  // Only messages with content
+              .slice(0, 3);                          // Maximum 3 messages
+            this.placeMessages.set(visibleMessages);
+          }
+        },
+        error: (err) => { }
+      });
   }
 
   ngOnDestroy(): void { }

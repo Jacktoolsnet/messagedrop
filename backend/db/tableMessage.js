@@ -233,7 +233,7 @@ const getByBoundingBox = function (db, latMin, lonMin, latMax, lonMax, callback)
                 messageStatus.ENABLED, // status
                 latLow, latHigh,       // latitude
                 lonA,                  // from lonMin to 180
-                lonBi                  // from -180 to lonMax
+                lonB                  // from -180 to lonMax
             ];
         } else {
             const lonLow = Math.min(lonA, lonB);
@@ -241,8 +241,7 @@ const getByBoundingBox = function (db, latMin, lonMin, latMax, lonMax, callback)
             params = [
                 messageStatus.ENABLED, // status
                 latLow, latHigh,       // latitude
-                lonLow, lonHigh,       // longitude
-                Number(limit) | 0
+                lonLow, lonHigh       // longitude
             ];
         }
 

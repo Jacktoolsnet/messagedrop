@@ -1,8 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, throwError } from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { BoundingBox } from '../interfaces/bounding-box';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
@@ -338,10 +339,11 @@ export class MessageService {
       });
   }
 
-  getByPlusForMarker(location: Location, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/get/pluscode/${location.plusCode}`;
+  getByBoundingBox(boundingBox: BoundingBox, showAlways: boolean = false): Observable<GetMessageResponse> {
+    const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;
+
     this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
+      showAlways,
       title: 'Message service',
       image: '',
       icon: '',
@@ -350,6 +352,7 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
+
     return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -372,26 +375,6 @@ export class MessageService {
             this.messagesSignal.update(messages => {
               return messages.map(m => m.id === message.id
                 ? { ...m, views: m.views + 1 }
-                : m
-              );
-            });
-          }
-        },
-        error: () => { }
-      });
-  }
-
-  countComment(message: Message) {
-    const url = `${environment.apiUrl}/message/countcomment/${message.id}`;
-
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.messagesSignal.update(messages => {
-              return messages.map(m => m.id === message.id
-                ? { ...m, commentsNumber: m.commentsNumber + 1 }
                 : m
               );
             });
