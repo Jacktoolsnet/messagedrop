@@ -34,19 +34,19 @@
 }
 
 <mat-menu #userMenu="matMenu">
+    @if (userService.isReady()) {
     <button mat-menu-item (click)="logout()">
-        @if (userService.isReady()) {
         <mat-icon class="material-symbols-outlined">lock</mat-icon>
-        }
         <span>Logout</span>
     </button>
+    }
 
+    @if (userService.isReady()) {
     <button mat-menu-item (click)="showUser()">
-        @if (userService.isReady()) {
         <mat-icon class="material-symbols-outlined">account_circle</mat-icon>
-        }
         <span>My user</span>
     </button>
+    }
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="editUserProfile()">
