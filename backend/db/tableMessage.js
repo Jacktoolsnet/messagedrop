@@ -74,21 +74,7 @@ const init = function (db) {
     }
 };
 
-const create = function (
-    db,
-    uuid,
-    parentUuid,
-    messageTyp,
-    latitude,
-    longitude,
-    plusCode,
-    message,
-    markerType,
-    style,
-    userId,
-    multimedia,
-    callback
-) {
+const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
     try {
         const insertSql = `
       INSERT INTO ${tableName} (
@@ -119,9 +105,9 @@ const create = function (
             plusCode,   // wird im SQL via UPPER(?) normalisiert
             message,
             markerType,
-            style,
+            style !== undefined ? style : '',
             userId,
-            multimedia && multimedia !== '' ? multimedia : null
+            multimedia !== '' ? multimedia : null
         ];
 
         db.run(insertSql, params, (err) => {
