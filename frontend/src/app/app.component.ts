@@ -542,7 +542,7 @@ export class AppComponent implements OnInit {
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { messages: this.userMessagesSignal(), location: this.mapService.getMapLocation() },
+            data: { location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: 'none',
             width: 'auto',
@@ -567,7 +567,7 @@ export class AppComponent implements OnInit {
           const dialogRef = this.messageListDialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
-            data: { messages: this.userMessagesSignal(), location: this.mapService.getMapLocation() },
+            data: { location: this.mapService.getMapLocation() },
             minWidth: '20vw',
             maxWidth: 'none',
             width: 'auto',
@@ -712,7 +712,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.messageListDialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { messages: messages, location: messages[0].location },
+      data: { location: messages[0].location },
       minWidth: '20vw',
       maxWidth: 'none',
       width: 'auto',
