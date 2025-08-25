@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, computed, effect, Inject, OnInit, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -64,6 +64,12 @@ export class NotelistComponent implements OnInit {
   ) {
     this.location = this.data.location;
     this.notesSignal = this.data.notesSignal;
+    effect(() => {
+      const msgs = this.notesSignal();   // <- reactive read
+      if (this.data.notesSignal) {
+        this.data.notesSignal.set(this.notesSignal());
+      }
+    });
   }
 
   ngOnInit(): void {

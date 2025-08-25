@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -21,8 +21,13 @@ import { NotelistComponent } from '../../notelist/notelist.component';
 })
 export class NoteTileComponent implements OnInit, OnDestroy {
   @Input() place!: Place;
-  readonly placeNotes = signal<Note[]>([]);
-  readonly allPlaceNotes = signal<Note[]>([]);
+  readonly allPlaceNotes: WritableSignal<Note[]> = signal<Note[]>([]);
+
+  readonly placeNotes = computed(() =>
+    this.allPlaceNotes()
+      .filter(n => n.note?.trim() !== '')
+      .slice(0, 3)
+  );
 
   constructor(
     private noteService: NoteService,
@@ -33,10 +38,6 @@ export class NoteTileComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.noteService.getNotesInBoundingBox(this.place.boundingBox!).then(notes => {
       this.allPlaceNotes.set(notes);
-      const visibleNotes = notes
-        .filter(n => n.note?.trim() !== '')  // Nur Notizen mit Inhalt
-        .slice(0, 3);                        // Maximal 3 Notizen
-      this.placeNotes.set(visibleNotes);
     });
   }
 
@@ -56,12 +57,6 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      const visibleNotes = this.allPlaceNotes()
-        .filter(n => n.note?.trim() !== '')
-        .slice(0, 3);
-
-      this.placeNotes.set(visibleNotes);
-    });
+    dialogRef.afterClosed().subscribe(() => { });
   }
 }

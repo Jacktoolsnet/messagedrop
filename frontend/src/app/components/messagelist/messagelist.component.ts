@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Inject, OnDestroy, OnInit, WritableSignal } from '@angular/core';
+import { Component, computed, effect, Inject, OnInit, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -51,7 +51,7 @@ import { MessageProfileComponent } from './message-profile/message-profile.compo
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
 })
-export class MessagelistComponent implements OnInit, OnDestroy {
+export class MessagelistComponent implements OnInit {
 
   readonly messagesSignal = this.messageService.messagesSignal;
   readonly filteredMessagesSignal = computed(() => {
@@ -92,16 +92,16 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     @Inject(MAT_DIALOG_DATA) public data: { location: Location, messageSignal: WritableSignal<Message[]> }
   ) {
     this.userProfile = this.userService.getProfile();
+    effect(() => {
+      const msgs = this.messagesSignal();   // <- reactive read
+      if (this.data.messageSignal) {
+        this.data.messageSignal.set(this.messagesSignal());
+      }
+    });
   }
 
   async ngOnInit() {
     await this.profileService.loadAllProfiles();
-  }
-
-  ngOnDestroy(): void {
-    if (this.data.messageSignal) {
-      this.data.messageSignal.set(this.messagesSignal());
-    }
   }
 
   getCommentBadge(uuid: string): number {

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -23,8 +23,13 @@ import { MessagelistComponent } from '../../messagelist/messagelist.component';
 
 export class MessageTileComponent implements OnInit, OnDestroy {
   @Input() place!: Place;
-  readonly placeMessages = signal<Message[]>([]);
-  readonly allPlaceMessages = signal<Message[]>([]);
+  readonly allPlaceMessages: WritableSignal<Message[]> = signal<Message[]>([]);
+
+  readonly placeMessages = computed(() =>
+    this.allPlaceMessages()
+      .filter(m => m.message?.trim() !== '')
+      .slice(0, 3)
+  );
 
   constructor(
     private messageService: MessageService,
@@ -38,10 +43,6 @@ export class MessageTileComponent implements OnInit, OnDestroy {
         next: (response: GetMessageResponse) => {
           if (response.status === 200) {
             this.allPlaceMessages.set(this.messageService.mapRawMessages(response.rows));
-            const visibleMessages = this.allPlaceMessages()
-              .filter(m => m.message?.trim() !== '')  // Only messages with content
-              .slice(0, 3);                          // Maximum 3 messages
-            this.placeMessages.set(visibleMessages);
           }
         },
         error: (err) => { }
@@ -62,12 +63,7 @@ export class MessageTileComponent implements OnInit, OnDestroy {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe(() => {
-      const visibleMessages = this.allPlaceMessages()
-        .filter(m => m.message?.trim() !== '')  // Only messages with content
-        .slice(0, 3);                          // Maximum 3 messages
-      this.placeMessages.set(visibleMessages);
-    });
+    dialogRef.afterClosed().subscribe(() => { });
   }
 
   ngOnDestroy(): void { }
