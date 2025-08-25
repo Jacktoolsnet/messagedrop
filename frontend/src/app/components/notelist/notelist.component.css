@@ -6,7 +6,7 @@
 /* === Dialog content: scroll if needed === */
 .mat-mdc-dialog-content {
   overflow-y: auto;
-  max-height: calc(90vh - 4rem);
+  max-height: calc(90vh - 0.5rem);
   width: 100%;
   box-sizing: border-box;
 }
