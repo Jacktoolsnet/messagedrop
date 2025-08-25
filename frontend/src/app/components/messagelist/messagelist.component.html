@@ -1,5 +1,5 @@
 <mat-dialog-content>
-    @if (messagesSignal && messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0) {
+    @if (messagesSignal().length === 0 && messageService.selectedMessagesSignal().length === 0) {
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
@@ -12,7 +12,7 @@
         </button>
     </div>
     }
-    @if (messagesSignal && messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) {
+    @if (messagesSignal().length !== 0 && messageService.selectedMessagesSignal().length === 0) {
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">

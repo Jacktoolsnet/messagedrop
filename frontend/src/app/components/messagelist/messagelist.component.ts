@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, computed, Inject, OnDestroy, OnInit, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -51,9 +51,9 @@ import { MessageProfileComponent } from './message-profile/message-profile.compo
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
 })
-export class MessagelistComponent implements OnInit {
+export class MessagelistComponent implements OnInit, OnDestroy {
 
-  readonly messagesSignal: WritableSignal<Message[]> | undefined;
+  readonly messagesSignal = this.messageService.messagesSignal;
   readonly filteredMessagesSignal = computed(() => {
     return this.messageService.messagesSignal();
   });
@@ -89,18 +89,19 @@ export class MessagelistComponent implements OnInit {
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { location: Location, messageSignal?: WritableSignal<Message[]> }
+    @Inject(MAT_DIALOG_DATA) public data: { location: Location, messageSignal: WritableSignal<Message[]> }
   ) {
     this.userProfile = this.userService.getProfile();
-    if (this.data.messageSignal) {
-      this.messagesSignal = this.data.messageSignal;
-    } else {
-      this.messagesSignal = this.messageService.messagesSignal;
-    }
   }
 
   async ngOnInit() {
     await this.profileService.loadAllProfiles();
+  }
+
+  ngOnDestroy(): void {
+    if (this.data.messageSignal) {
+      this.data.messageSignal.set(this.messagesSignal());
+    }
   }
 
   getCommentBadge(uuid: string): number {
