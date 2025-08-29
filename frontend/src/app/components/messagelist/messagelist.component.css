@@ -1,4 +1,3 @@
-/* === Host/global colors === */
 :host {
   color: var(--mat-app-text-color);
 }
@@ -11,16 +10,14 @@
   box-sizing: border-box;
 }
 
-/* === Empty state area === */
-.no-content {
-  display: block;
-  margin: auto;
-  padding-right: 3rem;
+no-content {
   justify-content: center;
   align-items: center;
+  margin: auto;
+  display: block;
+  padding-right: 3rem;
 }
 
-/* === Primary CTA button in empty state === */
 .first-button {
   width: 95%;
   max-width: 600px;
@@ -32,13 +29,11 @@
   gap: 0.5rem;
 }
 
-/* === Fixed toolbar on the right edge === */
 .toolbar {
   position: absolute;
   top: 0;
   right: 0;
   width: 3.5rem;
-  /* toolbar width */
   height: 100%;
   background-color: var(--mat-fab-foreground-color);
   z-index: 200;
@@ -48,7 +43,7 @@
 .content {
   /* layout sizing */
   width: auto;
-
+  max-width: 95vw;
   /* keep clear of the right toolbar globally */
   --toolbar-gap: 0.5rem;
   padding-top: 1rem;
@@ -56,7 +51,7 @@
 
   /* responsive columns */
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
   grid-auto-flow: row;
 
   /* gaps: directive reads rowGap for vertical math */
