@@ -7,7 +7,7 @@
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-            (click)="openNoteDialog()">
+            (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
             <span>Add first private note</span>
         </button>
     </div>

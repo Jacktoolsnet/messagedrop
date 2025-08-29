@@ -334,9 +334,7 @@ const deleteById = function (db, messageId, callback) {
     try {
         const sql = `DELETE FROM tableMessage WHERE id = ?;`;
         db.run(sql, [messageId], function (err) {
-            if (err) return callback(err);
-
-            callback(null);
+            return callback(err);
         });
     } catch (error) {
         callback(error);

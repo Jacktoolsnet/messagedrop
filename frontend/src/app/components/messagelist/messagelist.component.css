@@ -10,7 +10,7 @@
   box-sizing: border-box;
 }
 
-no-content {
+.no-content {
   justify-content: center;
   align-items: center;
   margin: auto;

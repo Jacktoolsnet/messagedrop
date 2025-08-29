@@ -187,6 +187,7 @@ export class AppComponent implements OnInit {
     effect(() => {
       if (this.userService.userSet()) {
         this.contactService.initContacts();
+        this.placeService.initPlaces();
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
@@ -194,7 +195,6 @@ export class AppComponent implements OnInit {
     effect(() => {
       if (this.contactService.contactsSet()) {
         this.socketioService.initSocket();
-        this.placeService.initPlaces();
       }
     });
 

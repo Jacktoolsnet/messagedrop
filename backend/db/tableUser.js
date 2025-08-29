@@ -76,8 +76,7 @@ const create = function (
         ];
 
         db.run(sql, params, function (err) {
-            if (err) return callback(err);
-            callback(null, { lastID: this.lastID, changes: this.changes });
+            return callback(err);
         });
     } catch (error) {
         callback(error);

@@ -52,6 +52,7 @@ export class PlaceService {
         this.ready = true;
       },
       error: (err) => {
+        console.error('Failed to load places', err);
         this._places.set([]);
         this.ready = true;
       }
