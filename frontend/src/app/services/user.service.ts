@@ -817,16 +817,8 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                       dialogRef.afterOpened().subscribe(e => { });
 
                       dialogRef.afterClosed().subscribe(() => {
-                        this.deleteUser(cryptedUser.id)
-                          .subscribe({
-                            next: () => {
-                              this.indexedDbService.clearAllData();
-                            },
-                            error: (err) => {
-                              this.indexedDbService.clearAllData();
-                            },
-                            complete: () => { }
-                          });
+                        this.openCreatePinDialog();
+                        this.indexedDbService.clearAllData();
                       });
                     } else {
                       const dialogRef = this.displayMessage.open(DisplayMessage, {
