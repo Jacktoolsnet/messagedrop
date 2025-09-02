@@ -1,11 +1,11 @@
 <div class="url-container">
-    <input type="text" [(ngModel)]="multimediaUrl" (input)="validateUrl()" placeholder="Enter multimedia url" />
+    <input type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()" placeholder="Enter multimedia url" />
     @if (!urlInvalid) {
     <button mat-icon-button (click)="onApplyClick()">
         <mat-icon>check</mat-icon>
     </button>
     } @else {
-    <button mat-icon-button (click)="onCancelClick()">
+    <button (click)="onCancelClick()">
         <mat-icon>cancel</mat-icon>
     </button>
     }

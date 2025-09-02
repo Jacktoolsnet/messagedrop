@@ -20,31 +20,49 @@
 }
 
 .url-container {
+    position: sticky;
+    z-index: 1000;
+    height: 4rem;
+    top: 0;
     display: flex;
-    border: 1px solid var(--mat-fab-small-container-color);
-    border-radius: 1rem;
+    align-items: center;
+    background-color: var(--mat-fab-foreground-color);
     overflow: hidden;
-    margin: 0.5rem;
-    min-height: 2.5rem;
-    background-color: var(--mat-fab-small-container-color);
+    min-height: 4rem;
+    width: 100%;
 }
 
-.url-container input[type="text"] {
+.url-container input[type="url"] {
+    border-radius: 1rem;
+    margin-left: 1rem;
     padding-left: 0.5rem;
     flex-grow: 1;
     border: none;
     outline: none;
     height: 2.5rem;
-    align-items: center;
+    min-width: 0;
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .url-container button {
+    margin-right: 1rem;
     color: var(--mat-fab-small-foreground-color);
     background-color: var(--mat-fab-small-container-color);
     border: none;
-    padding: 8px 12px;
-    cursor: pointer;
-    height: 2.5rem;
+    width: 3rem;
+    height: 2.6rem;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
 }
 
 .content {

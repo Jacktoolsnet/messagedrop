@@ -41,6 +41,7 @@ mat-card-actions.buttonbar {
 }
 
 .searchTerm-container input[type="search"] {
+    border-radius: 1rem;
     margin-left: 1rem;
     padding-left: 0.5rem;
     flex-grow: 1;
@@ -48,11 +49,14 @@ mat-card-actions.buttonbar {
     outline: none;
     height: 2.5rem;
     min-width: 0;
-    /* wichtig, damit es sich korrekt verkleinert */
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .searchTerm-container select {
-    height: 2.65rem;
+    height: 2.5rem;
     padding: 0 0.75rem;
     font-size: 1rem;
     background: var(--mat-fab-small-container-color);
@@ -68,14 +72,16 @@ mat-card-actions.buttonbar {
     background-color: var(--mat-fab-small-container-color);
     border: none;
     width: 3rem;
-    /* feste Breite */
-    height: 2.65rem;
+    height: 2.5rem;
     flex-shrink: 0;
-    /* verhindert, dass der Button kleiner wird */
     display: flex;
     align-items: center;
     justify-content: center;
     padding: 0;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
 }
 
 /* === CONTENT === */
