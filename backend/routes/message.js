@@ -6,6 +6,7 @@ const tableMessage = require('../db/tableMessage');
 const tableLike = require('../db/tableLike');
 const tableDislike = require('../db/tableDislike');
 const notify = require('../utils/notify');
+const metric = require('../middleware/metric');
 
 router.get('/get', [security.checkToken], function (req, res) {
   let response = { 'status': 0, 'rows': [] };
@@ -163,22 +164,29 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax', [security.checkTo
 }
 );
 
-router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
-  let response = { 'status': 0 };
-  if (undefined == req.body.parentMessageId) {
-    req.body.parentMessageId = 0;
-  }
-  tableMessage.create(req.database.db, req.body.uuid, req.body.parentUuid, req.body.messageTyp, req.body.latitude, req.body.longitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia.replace(/\'/g, "''"), function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      notify.placeSubscriptions(req.logger, req.database.db, req.body.latitude, req.body.longitude, req.body.messageUserId, req.body.message.replace(/\'/g, "''"));
-      response.status = 200;
+router.post('/create',
+  [
+    security.checkToken,
+    security.authenticate,
+    bodyParser.json({ type: 'application/json' }),
+    metric.count('message.create', { when: 'always', timezone: 'utc', amount: 1 })
+  ]
+  , function (req, res) {
+    let response = { 'status': 0 };
+    if (undefined == req.body.parentMessageId) {
+      req.body.parentMessageId = 0;
     }
-    res.status(response.status).json(response);
+    tableMessage.create(req.database.db, req.body.uuid, req.body.parentUuid, req.body.messageTyp, req.body.latitude, req.body.longitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia.replace(/\'/g, "''"), function (err) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        notify.placeSubscriptions(req.logger, req.database.db, req.body.latitude, req.body.longitude, req.body.messageUserId, req.body.message.replace(/\'/g, "''"));
+        response.status = 200;
+      }
+      res.status(response.status).json(response);
+    });
   });
-});
 
 router.post('/update', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
   let response = { 'status': 0 };

@@ -7,22 +7,30 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
 const geoTz = require('geo-tz');
+const metric = require('../middleware/metric');
 
-router.post('/create', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], async function (req, res) {
-  let response = { 'status': 0 };
-  let placeId = uuid.v4()
-  let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
-  tablePlace.create(req.database.db, placeId, req.body.userId, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-      response.placeId = placeId;
-    }
-    res.status(response.status).json(response);
+router.post('/create',
+  [
+    security.checkToken,
+    security.authenticate,
+    bodyParser.json({ type: 'application/json' }),
+    metric.count('place.create', { when: 'always', timezone: 'utc', amount: 1 })
+  ]
+  , async function (req, res) {
+    let response = { 'status': 0 };
+    let placeId = uuid.v4()
+    let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+    tablePlace.create(req.database.db, placeId, req.body.userId, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        response.status = 200;
+        response.placeId = placeId;
+      }
+      res.status(response.status).json(response);
+    });
   });
-});
 
 router.post('/update', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], async function (req, res) {
   let response = { 'status': 0 };
