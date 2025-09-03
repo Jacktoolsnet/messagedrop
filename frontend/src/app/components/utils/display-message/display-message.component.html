@@ -5,7 +5,7 @@
 
     @if (data.icon) {
     <div class="center">
-        <mat-icon aria-hidden="false" class="mat_icon">{{ data.icon }}</mat-icon>
+        <mat-icon aria-hidden="false" class="material-symbols-outlined mat_icon">{{ data.icon }}</mat-icon>
     </div>
     }
 
@@ -24,7 +24,7 @@
     }
 
     @if (showOk && data.button) {
-    <button mat-raised-button color="primary" (click)="dialogRef.close()">
+    <button mat-raised-button color="primary" (click)="dialogRef.close(true)">
         {{ data.button }}
     </button>
     }

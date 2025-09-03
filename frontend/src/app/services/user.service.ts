@@ -665,8 +665,10 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
       dialogRef.afterOpened().subscribe(e => { });
 
-      dialogRef.afterClosed().subscribe(() => {
-        this.openCreatePinDialog();
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          this.openCreatePinDialog();
+        }
       });
     }
   }
@@ -816,9 +818,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
                       dialogRef.afterOpened().subscribe(e => { });
 
-                      dialogRef.afterClosed().subscribe(() => {
-                        this.openCreatePinDialog();
+                      dialogRef.afterClosed().subscribe((result) => {
                         this.indexedDbService.clearAllData();
+                        if (result) {
+                          this.openCreatePinDialog();
+                        }
                       });
                     } else {
                       const dialogRef = this.displayMessage.open(DisplayMessage, {

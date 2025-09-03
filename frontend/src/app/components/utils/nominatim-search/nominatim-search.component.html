@@ -11,7 +11,7 @@
     </select>
 
     <button (click)="search()">
-        <mat-icon>search</mat-icon>
+        <mat-icon class="material-symbols-outlined">search</mat-icon>
     </button>
 </div>
 
@@ -20,7 +20,7 @@
         @for (place of nominatimPlaces; track place.place_id) {
         <mat-card class="item">
             <div class="avatar-box">
-                <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
+                <mat-icon class="material-symbols-outlined">{{ getIconForPlace(place) || 'location' }}</mat-icon>
                 @if (place.name) {
                 <span class="name">{{ place.name }}</span>
                 }

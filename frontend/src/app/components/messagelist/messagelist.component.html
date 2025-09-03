@@ -3,7 +3,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
@@ -16,7 +16,7 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
             <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Add"
                 (click)="!userService.isReady() ? userService.login(addMessagDialog.bind(this)) : addMessagDialog()">
@@ -30,7 +30,7 @@
                 @if (userProfile.base64Avatar) {
                 <img class="avatar" [src]="userProfile.base64Avatar" />
                 } @else {
-                <mat-icon>person</mat-icon>
+                <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
                 @if (userProfile.name) {
                 <span class="name">{{ userProfile.name }}</span>
@@ -43,7 +43,7 @@
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
                 <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar">
                 } @else {
-                <mat-icon>person</mat-icon>
+                <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
                 @if (profileService.getProfile(message.userId)?.name) {
                 <span class="name">{{ profileService.getProfile(message.userId)?.name }}</span>
@@ -84,11 +84,11 @@
                         matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
-                    <mat-icon>place</mat-icon>
+                    <mat-icon class="material-symbols-outlined">place</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Navigate to message location."
                     (click)="navigateToMessageLocation(message)">
-                    <mat-icon>assistant_direction</mat-icon>
+                    <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
                 </button>
                 @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
@@ -122,7 +122,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
@@ -135,11 +135,11 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_add"
                 (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
-                <mat-icon>add_comment</mat-icon>
+                <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
             </button>
         </div>
 
@@ -150,7 +150,7 @@
                 @if (userProfile.base64Avatar) {
                 <img class="avatar" [src]="userProfile.base64Avatar" />
                 } @else {
-                <mat-icon>person</mat-icon>
+                <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
                 @if (userProfile.name) {
                 <span class="name">{{ userProfile.name }}</span>
@@ -163,7 +163,7 @@
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
                 <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar">
                 } @else {
-                <mat-icon>person</mat-icon>
+                <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
                 @if (profileService.getProfile(message.userId)?.name) {
                 <span class="name">{{ profileService.getProfile(message.userId)?.name }}</span>
@@ -204,11 +204,11 @@
                         matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
-                    <mat-icon>place</mat-icon>
+                    <mat-icon class="material-symbols-outlined">place</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Navigate to message location."
                     (click)="navigateToMessageLocation(message)">
-                    <mat-icon>assistant_direction</mat-icon>
+                    <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
                 </button>
                 @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"

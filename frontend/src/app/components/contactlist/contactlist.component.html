@@ -3,7 +3,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [matMenuTriggerFor]="connectionMenu">
@@ -14,7 +14,7 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
                 [matMenuTriggerFor]="connectionMenu">
@@ -33,7 +33,7 @@
                 <span class="name">{{ contact.name }}</span>
                 }
                 } @else {
-                <mat-icon>person</mat-icon>
+                <mat-icon class="material-symbols-outlined">person</mat-icon>
                 <span class="name">Unnamed</span>
                 }
             </mat-expansion-panel-header>

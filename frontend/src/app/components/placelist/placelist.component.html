@@ -3,7 +3,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" (click)="addPlace()">
@@ -14,7 +14,7 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
+                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
             </button>
             <button class="button_add" mat-mini-fab color="primary" aria-label="Add" (click)="addPlace()">
                 <mat-icon class="material-symbols-outlined">add_location</mat-icon>
@@ -26,7 +26,7 @@
                 @if (place.base64Avatar) {
                 <img class="avatar" [src]="place.base64Avatar" />
                 } @else {
-                <mat-icon>{{ place.icon || 'location' }}</mat-icon>
+                <mat-icon class="material-symbols-outlined">{{ place.icon || 'location' }}</mat-icon>
                 }
                 @if (place.name) {
                 <span class="name">{{ place.name }}</span>

@@ -12,15 +12,15 @@
     <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.themeMode"
         (change)="setThemeMode($event.value)" class="theme-toggle-group" exclusive aria-label="Theme mode toggle">
         <mat-button-toggle value="light">
-            <mat-icon>light_mode</mat-icon>
+            <mat-icon class="material-symbols-outlined">light_mode</mat-icon>
             Light
         </mat-button-toggle>
         <mat-button-toggle value="dark">
-            <mat-icon>dark_mode</mat-icon>
+            <mat-icon class="material-symbols-outlined">dark_mode</mat-icon>
             Dark
         </mat-button-toggle>
         <mat-button-toggle value="system">
-            <mat-icon>settings</mat-icon>
+            <mat-icon class="material-symbols-outlined">settings</mat-icon>
             System
         </mat-button-toggle>
     </mat-button-toggle-group>

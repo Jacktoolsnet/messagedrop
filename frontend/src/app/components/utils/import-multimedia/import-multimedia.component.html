@@ -2,11 +2,11 @@
     <input type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()" placeholder="Enter multimedia url" />
     @if (!urlInvalid) {
     <button mat-icon-button (click)="onApplyClick()">
-        <mat-icon>check</mat-icon>
+        <mat-icon class="material-symbols-outlined">check</mat-icon>
     </button>
     } @else {
     <button (click)="onCancelClick()">
-        <mat-icon>cancel</mat-icon>
+        <mat-icon class="material-symbols-outlined">cancel</mat-icon>
     </button>
     }
 </div>
@@ -16,7 +16,7 @@
     <div class="multimedia_container" [innerHTML]="safeHtml"></div>
     <div class="center">
         <button mat-mini-fab color="primary" class="upload-button" (click)="clearContent()">
-            <mat-icon>delete</mat-icon>
+            <mat-icon class="material-symbols-outlined">delete</mat-icon>
         </button>
     </div>
     } @else {

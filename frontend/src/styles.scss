@@ -34,7 +34,7 @@ html,
 body {
   height: 100%;
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 /* === SNACKBAR STYLES === */
@@ -390,4 +390,51 @@ body {
 @font-face {
   font-family: 'Cookie';
   src: url('./assets/fonts/Cookie.ttf');
+}
+
+/* Variable Roboto (normal) */
+@font-face {
+  font-family: "Roboto";
+  src: url("/assets/fonts/RobotoVariableFont.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  /* volle Gewichtsachse */
+  font-stretch: 75% 125%;
+  /* Breitenachse (wdth) – anpassen, falls nötig */
+  font-style: normal;
+  font-display: swap;
+}
+
+/* Variable Roboto (italic) */
+@font-face {
+  font-family: "Roboto";
+  src: url("/assets/fonts/RobotoItalicVariableFont.ttf") format("truetype-variations");
+  font-weight: 100 900;
+  font-stretch: 75% 125%;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* Material Symbols Outlined */
+@font-face {
+  font-family: "Material Symbols Outlined";
+  font-style: normal;
+  font-weight: 100 700;
+  src: url('./assets/fonts/MaterialSymbolsOutlined.ttf');
+  font-display: swap;
+}
+
+.material-symbols-outlined {
+  font-family: "Material Symbols Outlined";
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px;
+  line-height: 1;
+  display: inline-block;
+  letter-spacing: normal;
+  text-transform: none;
+  white-space: nowrap;
+  direction: ltr;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
