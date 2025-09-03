@@ -63,6 +63,7 @@ export class UserService {
   private tokenRenewalTimeout: any = null;
 
   private ready: boolean = false;
+  private blocked: boolean = false;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -116,9 +117,11 @@ export class UserService {
       type: UserType.USER
     };
     this.ready = false;
+    this.blocked = false;
   }
 
   getPinHash(pin: string, showAlways: boolean = false): Observable<GetPinHashResponse> {
+    this.blocked = true;
     let url = `${environment.apiUrl}/user/hashpin`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
@@ -148,6 +151,7 @@ export class UserService {
     this.startJwtRenewal();
     this.ready = true;
     this._userSet.set(true);
+    this.blocked = false;
   }
 
   async initUser(createUserResponse: CreateUserResponse, pinHash: string) {
@@ -191,6 +195,7 @@ export class UserService {
 
                 dialogRef.afterClosed().subscribe(() => {
                   // Optional: Aktionen nach Schließen
+                  this.blocked = false;
                 });
               });
           }
@@ -221,6 +226,7 @@ export class UserService {
 
           dialogRef.afterClosed().subscribe(() => {
             // Optional: Aktionen nach Schließen
+            this.blocked = false;
           });
         }
       });
@@ -228,6 +234,10 @@ export class UserService {
 
   isReady(): boolean {
     return this.ready;
+  }
+
+  isBlocked(): boolean {
+    return this.blocked;
   }
 
   getUser(): User {
@@ -684,7 +694,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
     dialogRef.afterOpened().subscribe(e => { });
 
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (data: any) => {
-
       const encrypted = await this.cryptoService.encrypt(
         this.serverService.getCryptoPublicKey()!,
         data
@@ -692,6 +701,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
       this.getPinHash(encrypted).subscribe({
         next: (getPinHashResponse: GetPinHashResponse) => {
+          this.blocked = true;
           this.getUser().pinHash = getPinHashResponse.pinHash;
 
           this.createUser().subscribe({
@@ -724,12 +734,13 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
               dialogRef.afterClosed().subscribe(() => {
                 // Optional: Aktionen nach Schließen
+                this.blocked = false;
               });
             },
             complete: () => { }
           });
         },
-        error: (err) => { },
+        error: (err) => { this.blocked = false; },
         complete: () => { }
       });
     });
@@ -792,6 +803,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                         verticalPosition: 'top',
                         duration: 3000
                       });
+                      this.blocked = false;
                     } else if (err.status === 404) {
                       const dialogRef = this.displayMessage.open(DisplayMessage, {
                         panelClass: '',
@@ -819,6 +831,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                       dialogRef.afterOpened().subscribe(e => { });
 
                       dialogRef.afterClosed().subscribe((result) => {
+                        this.blocked = false;
                         this.indexedDbService.clearAllData();
                         if (result) {
                           this.openCreatePinDialog();
@@ -846,7 +859,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
                       dialogRef.afterOpened().subscribe(e => { });
 
-                      dialogRef.afterClosed().subscribe(() => { });
+                      dialogRef.afterClosed().subscribe(() => {
+                        this.blocked = false;
+                      });
                     }
                   }
                 });

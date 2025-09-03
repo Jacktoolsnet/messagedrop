@@ -4,7 +4,11 @@
     (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
 
-@if (!userService.isReady()) {
+@if (userService.isBlocked()) {
+<button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="Wait">
+    <mat-icon aria-hidden="false" class="material-symbols-outlined">hourglass_top</mat-icon>
+</button>
+} @else if (!userService.isReady()) {
 <button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile"
     (click)="userService.login()">
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
