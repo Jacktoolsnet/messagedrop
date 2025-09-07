@@ -25,6 +25,14 @@
         </mat-button-toggle>
     </mat-button-toggle-group>
 
+
+    <mat-chip-set class="version-chipset">
+        <mat-chip appearance="outlined" color="primary" disableRipple>
+            Version {{ versionInfo.semver }}-{{ versionInfo.build }}-{{ versionInfo.commit }}-{{ versionInfo.timestamp
+            }}
+        </mat-chip>
+    </mat-chip-set>
+
     <mat-dialog-actions>
         <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
         <button mat-button mat-dialog-close [mat-dialog-close]="appSettings">
