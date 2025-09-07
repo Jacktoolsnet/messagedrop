@@ -66,5 +66,7 @@ export class MessageTileComponent implements OnInit, OnDestroy {
     dialogRef.afterClosed().subscribe(() => { });
   }
 
-  ngOnDestroy(): void { }
+  ngOnDestroy(): void {
+    this.allPlaceMessages.set([]);
+  }
 }

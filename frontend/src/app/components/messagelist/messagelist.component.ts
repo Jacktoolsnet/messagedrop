@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, Inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, computed, effect, Inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -53,7 +53,7 @@ import { MessageProfileComponent } from './message-profile/message-profile.compo
 })
 export class MessagelistComponent implements OnInit {
 
-  readonly messagesSignal = this.messageService.messagesSignal;
+  readonly messagesSignal = signal<Message[]>([]);
   readonly filteredMessagesSignal = computed(() => {
     return this.messageService.messagesSignal();
   });
@@ -95,7 +95,9 @@ export class MessagelistComponent implements OnInit {
     effect(() => {
       const msgs = this.messagesSignal();   // <- reactive read
       if (this.data.messageSignal) {
-        this.data.messageSignal.set(this.messagesSignal());
+        this.messagesSignal.set(this.data.messageSignal());
+      } else {
+        this.messagesSignal.set(this.messageService.messagesSignal());
       }
     });
   }
