@@ -55,7 +55,7 @@ export class MessagelistComponent implements OnInit {
 
   readonly messagesSignal = signal<Message[]>([]);
   readonly filteredMessagesSignal = computed(() => {
-    return this.messageService.messagesSignal();
+    return this.messagesSignal();
   });
   readonly selectedMessagesSignal = this.messageService.selectedMessagesSignal;
   readonly commentsSignal = computed(() => {
@@ -93,7 +93,6 @@ export class MessagelistComponent implements OnInit {
   ) {
     this.userProfile = this.userService.getProfile();
     effect(() => {
-      const msgs = this.messagesSignal();   // <- reactive read
       if (this.data.messageSignal) {
         this.messagesSignal.set(this.data.messageSignal());
       } else {
