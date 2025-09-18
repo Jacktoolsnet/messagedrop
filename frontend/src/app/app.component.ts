@@ -47,7 +47,6 @@ import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
 import { ContactService } from './services/contact.service';
-import { CryptoService } from './services/crypto.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
@@ -113,7 +112,6 @@ export class AppComponent implements OnInit {
     public placeService: PlaceService,
     public contactService: ContactService,
     private geolocationService: GeolocationService,
-    private cryptoService: CryptoService,
     private messageService: MessageService,
     private socketioService: SocketioService,
     private airQualityService: AirQualityService,
@@ -134,9 +132,10 @@ export class AppComponent implements OnInit {
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
-    effect(() => {
+    effect(async () => {
       if (this.serverService.serverSet()) {
         if (this.serverService.isReady()) {
+          await this.appService.loadAppSettings();
           // Init the map
           this.mapService.initMap();
         }
@@ -175,7 +174,7 @@ export class AppComponent implements OnInit {
       if (this.mapService.mapSet()) {
         // Fly to position if user alrady allowed location.
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-          if (result.state === 'granted') {
+          if (result.state === 'granted' && this.appService.getAppSettings().detectLocationOnStart) {
             this.getCurrentPosition();
           } else {
             this.updateDataForLocation(this.mapService.getMapLocation(), true);
@@ -209,7 +208,6 @@ export class AppComponent implements OnInit {
 
 
   async initApp() {
-    this.appService.loadAppSettings();
     // Shared Content
     effect(() => {
       const content = this.sharedContentService.getSharedContentSignal()();
@@ -760,10 +758,8 @@ export class AppComponent implements OnInit {
   }
 
   public editAppSettings() {
-    let appSettings: AppSettings = this.appService.getAppSettings();
-
     const dialogRef = this.userProfileDialog.open(AppSettingsComponent, {
-      data: { appSettings: appSettings },
+      data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',

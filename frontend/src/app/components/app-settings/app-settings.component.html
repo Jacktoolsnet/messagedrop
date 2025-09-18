@@ -25,6 +25,51 @@
         </mat-button-toggle>
     </mat-button-toggle-group>
 
+    @if(showDetectLocationOnStart){
+    <div class="toggle-row">
+        <mat-slide-toggle id="toggle-detect-location-on-start" color="primary"
+            [checked]="appSettings.detectLocationOnStart" (change)="setDetectLocationOnStart($event.checked)"
+            aria-label="Get location on app start">
+            Determine location on app start
+        </mat-slide-toggle>
+    </div>
+    }
+
+    <div class="toggle-row">
+        <mat-slide-toggle id="toggle-show-pinterest-content" color="primary"
+            [checked]="appSettings.showPinterestContent" (change)="setShowPinterestContent($event.checked)"
+            aria-label="Show Pinterest content">
+            Show Pinterest content
+        </mat-slide-toggle>
+    </div>
+
+    <div class="toggle-row">
+        <mat-slide-toggle id="toggle-show-spotify-content" color="primary" [checked]="appSettings.showSpotifyContent"
+            (change)="setShowSpotifyContent($event.checked)" aria-label="Show Spotify content">
+            Show Spotify content
+        </mat-slide-toggle>
+    </div>
+
+    <div class="toggle-row">
+        <mat-slide-toggle id="toggle-show-tenor-content" color="primary" [checked]="appSettings.showTenorContent"
+            (change)="setShowTenorContent($event.checked)" aria-label="Show Tenor content">
+            Show Tenor content
+        </mat-slide-toggle>
+    </div>
+
+    <div class="toggle-row">
+        <mat-slide-toggle id="toggle-show-tiktok-content" color="primary" [checked]="appSettings.showTikTokContent"
+            (change)="setShowTikTokContent($event.checked)" aria-label="Show TikTok content">
+            Show TikTok content
+        </mat-slide-toggle>
+    </div>
+
+    <div class="toggle-row">
+        <mat-slide-toggle id="toggle-show-youtube-content" color="primary" [checked]="appSettings.showYoutubeContent"
+            (change)="setShowYoutubeContent($event.checked)" aria-label="Show YouTube content">
+            Show YouTube content
+        </mat-slide-toggle>
+    </div>
 
     <mat-chip-set class="version-chipset">
         <mat-chip appearance="outlined" color="primary" disableRipple>

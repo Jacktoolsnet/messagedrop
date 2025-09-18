@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
@@ -31,7 +32,8 @@ import { AppService } from '../../services/app.service';
     MatSelectModule,
     MatFormFieldModule,
     MatButtonToggleModule,
-    MatChipsModule
+    MatChipsModule,
+    MatSlideToggleModule
   ],
   templateUrl: './app-settings.component.html',
   styleUrl: './app-settings.component.css'
@@ -53,7 +55,8 @@ export class AppSettingsComponent {
     'violet',
     'yellow'
   ];
-  public appSettings: AppSettings = { defaultTheme: 'azure', themeMode: 'system' };
+  public appSettings: AppSettings;
+  public showDetectLocationOnStart: boolean = false;
 
   constructor(
     private appService: AppService,
@@ -62,6 +65,9 @@ export class AppSettingsComponent {
     @Inject(MAT_DIALOG_DATA) public data: { appSettings: AppSettings }
   ) {
     this.appSettings = this.data.appSettings;
+    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+      this.showDetectLocationOnStart = result.state === 'granted';
+    });
   }
 
   onAbortClick(): void {
@@ -76,6 +82,30 @@ export class AppSettingsComponent {
   setThemeMode(mode: 'light' | 'dark' | 'system') {
     this.appSettings.themeMode = mode;
     this.appService.setTheme(this.appSettings);
+  }
+
+  setDetectLocationOnStart(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, detectLocationOnStart: enabled };
+  }
+
+  setShowYoutubeContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, showYoutubeContent: enabled };
+  }
+
+  setShowPinterestContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, showPinterestContent: enabled };
+  }
+
+  setShowSpotifyContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, showSpotifyContent: enabled };
+  }
+
+  setShowTikTokContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, showTikTokContent: enabled };
+  }
+
+  setShowTenorContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, showTenorContent: enabled };
   }
 
 }

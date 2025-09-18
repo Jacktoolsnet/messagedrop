@@ -8,39 +8,50 @@ import { IndexedDbService } from './indexed-db.service';
 })
 export class AppService {
   private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
-  private appSettings: AppSettings = { defaultTheme: 'azure', themeMode: 'system' };
+  private appSettings: AppSettings | undefined;
   private notificationAction?: NotificationAction;
 
   constructor(
     private indexedDbService: IndexedDbService
   ) { }
 
+  // Irgendwo oben im Service:
+  private readonly defaultAppSettings: AppSettings = {
+    defaultTheme: 'azure',
+    themeMode: 'system',
+    detectLocationOnStart: false,
+    showYoutubeContent: false,
+    showPinterestContent: false,
+    showSpotifyContent: false,
+    showTikTokContent: false,
+    showTenorContent: false
+  };
+
   public setAppSettings(newAppSettings: AppSettings): void {
-    this.indexedDbService.setSetting('appSettings', JSON.stringify(newAppSettings)).then(() => {
-      this.appSettings = newAppSettings;
+    const merged = { ...this.defaultAppSettings, ...newAppSettings };
+    this.indexedDbService.setSetting('appSettings', JSON.stringify(merged)).then(() => {
+      this.appSettings = merged;
       this.setTheme(this.appSettings);
     });
   }
 
   public getAppSettings(): AppSettings {
     if (!this.appSettings) {
-      this.appSettings = { defaultTheme: 'azure', themeMode: 'system' };
+      this.appSettings = { ...this.defaultAppSettings };
     }
     return this.appSettings;
   }
 
   async loadAppSettings(): Promise<void> {
     try {
-      const settings = JSON.parse(await this.indexedDbService.getSetting('appSettings'));
-      if (settings) {
-        this.appSettings = settings;
-      } else {
-        this.appSettings = { defaultTheme: 'azure', themeMode: 'system' };
-      }
-    } catch (error) {
-      this.appSettings = { defaultTheme: 'azure', themeMode: 'system' };
+      const raw = await this.indexedDbService.getSetting('appSettings');
+      const parsed = raw ? JSON.parse(raw) as Partial<AppSettings> : null;
+      this.appSettings = { ...this.defaultAppSettings, ...(parsed ?? {}) };
+    } catch {
+      this.appSettings = { ...this.defaultAppSettings };
     }
     this.setTheme(this.appSettings);
+    console.log('App settings loaded:', this.appSettings);
   }
 
   // Notification-Daten
