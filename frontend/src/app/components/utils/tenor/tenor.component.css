@@ -57,17 +57,19 @@
 }
 
 .url-container input[type="search"] {
-    margin-top: 0.5rem;
     margin-left: 1rem;
     flex-grow: 1;
     border: none;
     outline: none;
     height: 2.5rem;
     align-items: center;
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
 }
 
 .url-container button {
-    margin-top: 0.5rem;
     margin-right: 1rem;
     color: var(--mat-fab-small-foreground-color);
     background-color: var(--mat-fab-small-container-color);
@@ -75,4 +77,8 @@
     padding: 8px 12px;
     cursor: pointer;
     height: 2.5rem;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
 }

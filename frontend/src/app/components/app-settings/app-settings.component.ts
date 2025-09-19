@@ -88,24 +88,24 @@ export class AppSettingsComponent {
     this.appSettings = { ...this.appSettings, detectLocationOnStart: enabled };
   }
 
-  setShowYoutubeContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, showYoutubeContent: enabled };
+  setAllowYoutubeContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, allowYoutubeContent: enabled };
   }
 
-  setShowPinterestContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, showPinterestContent: enabled };
+  setAllowPinterestContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, allowPinterestContent: enabled };
   }
 
-  setShowSpotifyContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, showSpotifyContent: enabled };
+  setAllowSpotifyContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, allowSpotifyContent: enabled };
   }
 
-  setShowTikTokContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, showTikTokContent: enabled };
+  setAllowTikTokContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, allowTikTokContent: enabled };
   }
 
-  setShowTenorContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, showTenorContent: enabled };
+  setAllowTenorContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, allowTenorContent: enabled };
   }
 
 }

@@ -1,5 +1,6 @@
 <div class="url-container">
     <input type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()" placeholder="Enter multimedia url" />
+
     @if (!urlInvalid) {
     <button mat-icon-button (click)="onApplyClick()">
         <mat-icon class="material-symbols-outlined">check</mat-icon>
@@ -11,6 +12,13 @@
     }
 </div>
 
+<!-- dezenter Hinweis, falls URL zu deaktivierter Plattform gehört -->
+@if (disabledReason) {
+<div class="disabled-hint">
+    {{ disabledReason }}
+</div>
+}
+
 <mat-dialog-content class="full-width">
     @if (safeHtml !== undefined) {
     <div class="multimedia_container" [innerHTML]="safeHtml"></div>
@@ -21,12 +29,19 @@
     </div>
     } @else {
     <div class="content">
-        <h2>Supported Platforms</h2>
+        <h2>Choose supported Platforms</h2>
+
         <div class="platform-tile-container">
-            <div class="platform-tile">YouTube</div>
-            <div class="platform-tile">Spotify</div>
-            <div class="platform-tile">TikTok</div>
-            <div class="platform-tile">Pinterest</div>
+            @for (p of platforms; track p.key) {
+            <div class="platform-tile" [class.enabled]="p.enabled">
+                <div class="platform-header">
+                    <div class="platform-name">{{ p.name }}</div>
+                    <mat-slide-toggle [checked]="p.enabled" (change)="onTogglePlatform(p, $event.checked)"
+                        aria-label="Enable {{p.name}}">
+                    </mat-slide-toggle>
+                </div>
+            </div>
+            }
         </div>
     </div>
     }

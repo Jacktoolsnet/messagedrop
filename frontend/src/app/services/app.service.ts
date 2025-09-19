@@ -20,11 +20,11 @@ export class AppService {
     defaultTheme: 'azure',
     themeMode: 'system',
     detectLocationOnStart: false,
-    showYoutubeContent: false,
-    showPinterestContent: false,
-    showSpotifyContent: false,
-    showTikTokContent: false,
-    showTenorContent: false
+    allowYoutubeContent: false,
+    allowPinterestContent: false,
+    allowSpotifyContent: false,
+    allowTikTokContent: false,
+    allowTenorContent: false
   };
 
   public setAppSettings(newAppSettings: AppSettings): void {
