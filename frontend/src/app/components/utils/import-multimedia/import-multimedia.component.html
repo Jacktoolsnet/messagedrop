@@ -29,8 +29,6 @@
     </div>
     } @else {
     <div class="content">
-        <h2>Choose supported Platforms</h2>
-
         <div class="platform-tile-container">
             @for (p of platforms; track p.key) {
             <div class="platform-tile" [class.enabled]="p.enabled">

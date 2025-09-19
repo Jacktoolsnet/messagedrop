@@ -118,18 +118,24 @@
     transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-/* Hinweis unter der URL-Zeile */
 .disabled-hint {
-    padding: 0.5rem 1rem;
-    margin-top: 0.25rem;
+    display: block;
+    width: 95%;
+    box-sizing: border-box;
+    text-align: center;
+
+    padding: 0.5rem;
     font-size: 0.9rem;
     opacity: 0.9;
+
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    hyphens: auto;
 }
 
-/* Plattform-Tiles moderner */
 .platform-tile {
     border-radius: 1rem;
-    padding: 1rem;
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);

@@ -38,3 +38,39 @@
     font-size: 0.75rem;
     margin-bottom: 1rem;
 }
+
+/* Re-use deines Tile-Stils, Toggle unter Text */
+.platform-tile.activation {
+    border-radius: 1rem;
+    padding: 1rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    margin: 0.5rem 0;
+}
+
+.platform-tile.activation:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px var(--mat-card-outlined-outline-color);
+}
+
+.platform-header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.platform-name {
+    font-weight: 600;
+    font-size: 1.05rem;
+    text-align: center;
+}
+
+.platform-note {
+    margin-top: 0.25rem;
+    font-size: 0.85rem;
+    opacity: 0.85;
+    text-align: center;
+}

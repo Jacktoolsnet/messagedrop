@@ -1,7 +1,9 @@
+<!-- Wenn Plattform erlaubt => bestehenden Inhalt zeigen -->
+@if (isPlatformEnabled) {
 @if (multimedia?.type === 'tenor') {
 <div class="media_block">
     <div class="multimedia_container">
-        <img class="multimedia_image" [src]="multimedia!.url">
+        <img class="multimedia_image" [src]="multimedia!.url" />
     </div>
     @if (multimedia?.attribution !== '') {
     <a class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
@@ -17,5 +19,20 @@
         {{ multimedia?.attribution }}
     </a>
     }
+</div>
+}
+} @else {
+<!-- Activation Tile, wenn Plattform (noch) deaktiviert -->
+<div class="platform-tile activation">
+    <div class="platform-header">
+        <div class="platform-name">Activate external content from {{ platformName }}</div>
+        <mat-slide-toggle [checked]="false" (change)="onTogglePlatform($event.checked)"
+            aria-label="Enable {{ platformName }}">
+            Enable {{ platformName }}
+        </mat-slide-toggle>
+    </div>
+    <div class="platform-note">
+        You can change this anytime in App settings.
+    </div>
 </div>
 }
