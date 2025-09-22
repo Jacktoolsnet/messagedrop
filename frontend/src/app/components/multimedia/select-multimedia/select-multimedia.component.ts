@@ -23,10 +23,7 @@ export class SelectMultimediaComponent {
   constructor(
     private appService: AppService,
     private tenorDialog: MatDialog,
-    private youtubeDialog: MatDialog,
-    private tiktokDialog: MatDialog,
-    private pinterestDialog: MatDialog,
-    private spotifyDialog: MatDialog,
+    private multimediaDialog: MatDialog,
     public dialogRef: MatDialogRef<SelectMultimediaComponent>,
   ) {
     this.showTenor = this.appService.getAppSettings().allowTenorContent;
@@ -54,7 +51,7 @@ export class SelectMultimediaComponent {
   }
 
   public openImportMultimediaDialog(): void {
-    const dialogRef = this.pinterestDialog.open(ImportMultimediaComponent, {
+    const dialogRef = this.multimediaDialog.open(ImportMultimediaComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},

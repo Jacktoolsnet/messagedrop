@@ -56,6 +56,7 @@
 }
 
 .platform-header {
+    padding-top: 1.25rem;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -63,14 +64,39 @@
 }
 
 .platform-name {
+    padding-top: 1.25rem;
     font-weight: 600;
-    font-size: 1.05rem;
+    font-size: 1.5rem;
     text-align: center;
 }
 
 .platform-note {
-    margin-top: 0.25rem;
-    font-size: 0.85rem;
-    opacity: 0.85;
+    padding-top: 1.25rem;
+    font-size: 1.0rem;
     text-align: center;
+}
+
+.platform-note .platform-link {
+    /* Nimmt die Primary-Farbe aus dem aktiven Material-Theme */
+    color: var(--mat-sys-primary, var(--mdc-theme-primary, #3f51b5));
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1px;
+}
+
+.platform-note .platform-link:hover {
+    opacity: 0.85;
+    text-decoration-thickness: 2px;
+}
+
+.platform-note .platform-link:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+.platform-note .platform-link:visited {
+    /* Meist gleiche Farbe sinnvoll; kein „Lila“ im Dark Mode */
+    color: var(--mat-sys-primary, var(--mdc-theme-primary, #3f51b5));
+    opacity: 0.9;
 }

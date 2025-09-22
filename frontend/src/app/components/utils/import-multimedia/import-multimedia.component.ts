@@ -72,12 +72,13 @@ export class ImportMultimediaComponent {
 
   private getPlatformFromUrl(url: string): PlatformKey | undefined {
     try {
+      console.log('Parsing URL', url);
       const u = new URL(url.toLowerCase());
       const h = u.hostname;
-      if (h.includes('youtube.com') || h === 'youtu.be') return 'youtube';
+      if (h.includes('youtube.com') || h.includes('youtu.be')) return 'youtube';
       if (h.includes('spotify.com')) return 'spotify';
       if (h.includes('tiktok.com')) return 'tiktok';
-      if (h.includes('pinterest.com') || h === 'pin.it') return 'pinterest';
+      if (h.includes('pinterest.com') || h.includes('pin.it')) return 'pinterest';
     } catch { /* ignore parse errors */ }
     return undefined;
   }

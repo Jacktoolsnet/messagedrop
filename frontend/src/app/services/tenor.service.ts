@@ -82,7 +82,6 @@ export class TenorService {
 
     const base = `${environment.apiUrl}/tenor/search/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}/${encodeURIComponent(searchTerm)}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
-    console.log('searchGifs', url);
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Tenor service',

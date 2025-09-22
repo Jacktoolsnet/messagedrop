@@ -1,41 +1,51 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 
-type PlatformKey = 'tenor' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
+type PlatformKey = 'tenor' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest' | 'notsupported';
 type SettingsKey =
   | 'allowTenorContent'
   | 'allowYoutubeContent'
   | 'allowSpotifyContent'
   | 'allowTikTokContent'
-  | 'allowPinterestContent';
+  | 'allowPinterestContent'
+  | 'notSupported';
 
 @Component({
   selector: 'app-showmultimedia',
-  imports: [CommonModule, MatSlideToggleModule],
+  imports: [
+    CommonModule,
+    MatSlideToggleModule
+  ],
   templateUrl: './showmultimedia.component.html',
   styleUrl: './showmultimedia.component.css'
 })
-export class ShowmultimediaComponent {
+export class ShowmultimediaComponent implements OnInit, OnChanges {
   @Input() multimedia: Multimedia | undefined;
+
+  termsLinks?: { terms: string; privacy: string };
 
   safeUrl: SafeResourceUrl | undefined; // falls du mal iframe-URLs brauchst
   safeHtml: SafeHtml | undefined;
 
   // Aktivierungs-Logik
-  isPlatformEnabled = true;
-  platformKey?: PlatformKey;
+  isPlatformEnabled = false;
+  platformKey: PlatformKey = 'notsupported';
   platformName = '';
-  settingsKey?: SettingsKey;
+  settingsKey: SettingsKey = 'notSupported';
 
   constructor(
     private sanitizer: DomSanitizer,
     private appService: AppService
   ) { }
+
+  ngOnInit(): void {
+    this.detectPlatformAndStatus();
+  }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['multimedia']) {
@@ -53,6 +63,7 @@ export class ShowmultimediaComponent {
 
   private detectPlatformAndStatus(): void {
     this.platformKey = this.detectPlatform(this.multimedia);
+    this.termsLinks = this.getTermsLinks(this.platformKey);
 
     const map: Record<PlatformKey, { name: string; key: SettingsKey }> = {
       tenor: { name: 'Tenor', key: 'allowTenorContent' },
@@ -60,6 +71,7 @@ export class ShowmultimediaComponent {
       spotify: { name: 'Spotify', key: 'allowSpotifyContent' },
       tiktok: { name: 'TikTok', key: 'allowTikTokContent' },
       pinterest: { name: 'Pinterest', key: 'allowPinterestContent' },
+      notsupported: { name: 'not supported', key: 'notSupported' }
     };
 
     if (this.platformKey) {
@@ -71,14 +83,14 @@ export class ShowmultimediaComponent {
       this.isPlatformEnabled = !!(s as any)[def.key];
     } else {
       // Unbekannte Plattformen nicht blocken
-      this.isPlatformEnabled = true;
+      this.isPlatformEnabled = false;
       this.platformName = '';
-      this.settingsKey = undefined;
+      this.settingsKey = 'notSupported';
     }
   }
 
-  private detectPlatform(m?: Multimedia): PlatformKey | undefined {
-    if (!m) return undefined;
+  private detectPlatform(m?: Multimedia): PlatformKey {
+    if (!m) return 'notsupported';
     if (m.type === 'tenor') return 'tenor';
 
     const raw = (m.sourceUrl || m.url || '').toLowerCase();
@@ -90,7 +102,7 @@ export class ShowmultimediaComponent {
       if (h.includes('tiktok.com')) return 'tiktok';
       if (h.includes('pinterest.com') || h === 'pin.it') return 'pinterest';
     } catch { /* ignore parse errors */ }
-    return undefined;
+    return 'notsupported';
   }
 
   onTogglePlatform(enabled: boolean): void {
@@ -106,5 +118,38 @@ export class ShowmultimediaComponent {
     this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(
       this.multimedia?.oembed?.html ?? ''
     );
+  }
+
+  private getTermsLinks(p: PlatformKey): { terms: string; privacy: string } {
+    switch (p) {
+      case 'youtube':
+        return {
+          terms: 'https://www.youtube.com/t/terms',
+          privacy: 'https://policies.google.com/privacy'
+        };
+      case 'spotify':
+        return {
+          terms: 'https://www.spotify.com/legal/end-user-agreement/',
+          privacy: 'https://www.spotify.com/legal/privacy-policy/'
+        };
+      case 'tiktok':
+        return {
+          terms: 'https://www.tiktok.com/legal/terms-of-service',
+          privacy: 'https://www.tiktok.com/legal/privacy-policy'
+        };
+      case 'pinterest':
+        return {
+          terms: 'https://policy.pinterest.com/terms-of-service',
+          privacy: 'https://policy.pinterest.com/privacy-policy'
+        };
+      case 'tenor':
+        // Tenor gehört zu Google – allgemeine Google-Policies nutzen:
+        return {
+          terms: 'https://policies.google.com/terms',
+          privacy: 'https://policies.google.com/privacy'
+        };
+      default:
+        return { terms: '', privacy: '' };
+    }
   }
 }

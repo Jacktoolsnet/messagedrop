@@ -56,7 +56,8 @@
             <mat-card-content
                 (click)="userService.isReady() && this.userService.getUser().id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
-                    <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
+                    <app-showmultimedia (click)="$event.stopPropagation()"
+                        [multimedia]="message.multimedia"></app-showmultimedia>
                     @if (message.message) {
                     <app-showmessage [message]="message.translatedMessage ?? message.message"
                         [style]="message.style"></app-showmessage>
@@ -176,7 +177,8 @@
             <mat-card-content
                 (click)="userService.isReady() && this.userService.getUser().id == message.userId ? editMessage(message) : {}">
                 <div class="message-content">
-                    <app-showmultimedia [multimedia]="message.multimedia"></app-showmultimedia>
+                    <app-showmultimedia (click)="$event.stopPropagation()"
+                        [multimedia]="message.multimedia"></app-showmultimedia>
                     @if (message.message) {
                     <app-showmessage [message]="message.translatedMessage ?? message.message"
                         [style]="message.style"></app-showmessage>
