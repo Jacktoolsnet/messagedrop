@@ -23,6 +23,7 @@ const geoStatistic = require('./routes/geostatistic');
 const weather = require('./routes/weather');
 const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
+const tenor = require('./routes/tenor');
 const notfound = require('./routes/notfound');
 const cors = require('cors')
 const helmet = require('helmet');
@@ -282,6 +283,7 @@ app.use('/nominatim', nominatim);
 app.use('/openai', openAi);
 app.use('/place', place);
 app.use('/statistic', statistic);
+app.use('/tenor', tenor);
 app.use('/translate', translateLimit, translate);
 app.use('/user', userLimit, user);
 app.use('/utils', utils);

@@ -12,7 +12,9 @@ export class TenorService {
 
   httpOptions = {
     headers: new HttpHeaders({
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'X-API-Authorization': `${environment.apiToken}`,
+      withCredentials: 'true'
     })
   };
 
@@ -33,21 +35,6 @@ export class TenorService {
   }
 
   /**
-   * Constructs a URL with query parameters.
-   * 
-   * @param baseUrl - The base URL to which query parameters will be appended.
-   * @param map - A map containing key-value pairs of query parameters.
-   * @returns A string representing the complete URL with encoded query parameters.
-   */
-  private createUrl(baseUrl: string, map: Map<string, string>): string {
-    let result = baseUrl + "?";
-    map.forEach((value, key) => {
-      result += `${encodeURIComponent(key)}=${encodeURIComponent(value)}&`;
-    });
-    return result.slice(0, -1);
-  }
-
-  /**
    * Fetches a list of featured GIFs from the Tenor API.
    * 
    * @param next - A string representing the pagination token for the next set of results. 
@@ -59,20 +46,10 @@ export class TenorService {
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
   getFeaturedGifs(next: string, showAlways: boolean = true): Observable<any> {
-    let parameters: Map<string, string> = new Map();
-    parameters.set('key', environment.tenor_api_key);
-    parameters.set('client_key', environment.tenor_client_key);
-    parameters.set('country', this.userService.getUser().language);
-    parameters.set('locale', this.userService.getUser().locale.replace('-', '_'));
-    parameters.set('media_filter', 'gif')
-    parameters.set('ar_range', 'standard');
-    parameters.set('contentfilter', 'low');
-    parameters.set('limit', '30');
-    if (next != '') {
-      parameters.set('pos', next);
-    }
 
-    let url: string = this.createUrl(`${environment.tenor_base_url}/featured`, parameters);
+    const base = `${environment.apiUrl}/tenor/featured/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}`;
+    const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
+
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Tenor service',
@@ -102,21 +79,10 @@ export class TenorService {
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
   searchGifs(searchTerm: string, next: string, showAlways: boolean = true): Observable<any> {
-    let parameters: Map<string, string> = new Map();
-    parameters.set('key', environment.tenor_api_key);
-    parameters.set('client_key', environment.tenor_client_key);
-    parameters.set('q', searchTerm);
-    parameters.set('country', this.userService.getUser().language);
-    parameters.set('locale', this.userService.getUser().locale.replace('-', '_'));
-    parameters.set('media_filter', 'gif')
-    parameters.set('ar_range', 'standard');
-    parameters.set('contentfilter', 'low');
-    parameters.set('limit', '30');
-    if (next != '') {
-      parameters.set('pos', next);
-    }
 
-    let url: string = this.createUrl(`${environment.tenor_base_url}/search`, parameters);
+    const base = `${environment.apiUrl}/tenor/search/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}/${encodeURIComponent(searchTerm)}`;
+    const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
+    console.log('searchGifs', url);
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Tenor service',

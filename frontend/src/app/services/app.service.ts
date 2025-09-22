@@ -51,7 +51,6 @@ export class AppService {
       this.appSettings = { ...this.defaultAppSettings };
     }
     this.setTheme(this.appSettings);
-    console.log('App settings loaded:', this.appSettings);
   }
 
   // Notification-Daten

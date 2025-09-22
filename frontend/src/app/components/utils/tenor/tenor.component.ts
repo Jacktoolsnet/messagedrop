@@ -48,8 +48,8 @@ export class TenorComponent {
     this.tensorService.getFeaturedGifs(this.nextFeatured).subscribe({
       next: tensorResponse => {
         this.results = [];
-        this.results.push(...tensorResponse.results);
-        this.nextFeatured = tensorResponse.next;
+        this.results.push(...tensorResponse.data.results);
+        this.nextFeatured = tensorResponse.data.next;
         this.nextSearch = '';
       },
       error: (err) => { },
@@ -61,8 +61,8 @@ export class TenorComponent {
     this.tensorService.searchGifs(this.searchterm.value, this.nextSearch).subscribe({
       next: tensorResponse => {
         this.results = [];
-        this.results.push(...tensorResponse.results);
-        this.nextSearch = tensorResponse.next;
+        this.results.push(...tensorResponse.data.results);
+        this.nextSearch = tensorResponse.data.next;
         this.nextFeatured = '';
       },
       error: (err) => { },
