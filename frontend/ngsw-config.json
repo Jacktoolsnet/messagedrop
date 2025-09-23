@@ -11,7 +11,10 @@
           "/index.html",
           "/manifest.webmanifest",
           "/*.css",
-          "/*.js"
+          "/*.js",
+          "/assets/fonts/MaterialSymbolsOutlined.ttf",
+          "/assets/fonts/RobotoVariableFont.ttf",
+          "/assets/fonts/RobotoItalicVariableFont.ttf"
         ]
       }
     },

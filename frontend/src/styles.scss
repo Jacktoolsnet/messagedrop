@@ -69,327 +69,522 @@ body {
 /* === FONTS === */
 @font-face {
   font-family: 'DancingScript';
-  src: url('./assets/fonts/DancingScript.ttf');
+  src: url('/assets/fonts/DancingScript.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Pacifico';
-  src: url('./assets/fonts/Pacifico.ttf');
+  src: url('/assets/fonts/Pacifico.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Caveat';
-  src: url('./assets/fonts/Caveat.ttf');
+  src: url('/assets/fonts/Caveat.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'HachiMaruPop';
-  src: url('./assets/fonts/HachiMaruPop.ttf');
+  src: url('/assets/fonts/HachiMaruPop.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Miniver';
-  src: url('./assets/fonts/Miniver.ttf');
+  src: url('/assets/fonts/Miniver.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'CraftyGirls';
-  src: url('./assets/fonts/CraftyGirls.ttf');
+  src: url('/assets/fonts/CraftyGirls.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SedgwickAveDisplay';
-  src: url('./assets/fonts/SedgwickAveDisplay.ttf');
+  src: url('/assets/fonts/SedgwickAveDisplay.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'OvertheRainbow';
-  src: url('./assets/fonts/OvertheRainbow.ttf');
+  src: url('/assets/fonts/OvertheRainbow.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'LoveYaLikeASister';
-  src: url('./assets/fonts/LoveYaLikeASister.ttf');
+  src: url('/assets/fonts/LoveYaLikeASister.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SedgwickAve';
-  src: url('./assets/fonts/SedgwickAve.ttf');
+  src: url('/assets/fonts/SedgwickAve.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'MrDafoe';
-  src: url('./assets/fonts/MrDafoe.ttf');
+  src: url('/assets/fonts/MrDafoe.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'GochiHand';
-  src: url('./assets/fonts/GochiHand.ttf');
+  src: url('/assets/fonts/GochiHand.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'RockSalt';
-  src: url('./assets/fonts/RockSalt.ttf');
+  src: url('/assets/fonts/RockSalt.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'GloriaHallelujah';
-  src: url('./assets/fonts/GloriaHallelujah.ttf');
+  src: url('/assets/fonts/GloriaHallelujah.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'KaushanScript';
-  src: url('./assets/fonts/KaushanScript.ttf');
+  src: url('/assets/fonts/KaushanScript.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'LuckiestGuy';
-  src: url('./assets/fonts/LuckiestGuy.ttf');
+  src: url('/assets/fonts/LuckiestGuy.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Zeyada';
-  src: url('./assets/fonts/Zeyada.ttf');
+  src: url('/assets/fonts/Zeyada.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Kalam';
-  src: url('./assets/fonts/Kalam.ttf');
+  src: url('/assets/fonts/Kalam.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Yellowtail';
-  src: url('./assets/fonts/Yellowtail.ttf');
+  src: url('/assets/fonts/Yellowtail.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'IndieFlower';
-  src: url('./assets/fonts/IndieFlower.ttf');
+  src: url('/assets/fonts/IndieFlower.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'PermanentMarker';
-  src: url('./assets/fonts/PermanentMarker.ttf');
+  src: url('/assets/fonts/PermanentMarker.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Satisfy';
-  src: url('./assets/fonts/Satisfy.ttf');
+  src: url('/assets/fonts/Satisfy.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'ShadowsIntoLight';
-  src: url('./assets/fonts/ShadowsIntoLight.ttf');
+  src: url('/assets/fonts/ShadowsIntoLight.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'AbrilFatface';
-  src: url('./assets/fonts/AbrilFatface.ttf');
+  src: url('/assets/fonts/AbrilFatface.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Almendra';
-  src: url('./assets/fonts/Almendra.ttf');
+  src: url('/assets/fonts/Almendra.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'AmaticSC';
-  src: url('./assets/fonts/AmaticSC.ttf');
+  src: url('/assets/fonts/AmaticSC.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Anton';
-  src: url('./assets/fonts/Anton.ttf');
+  src: url('/assets/fonts/Anton.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Audiowide';
-  src: url('./assets/fonts/Audiowide.ttf');
+  src: url('/assets/fonts/Audiowide.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Bangers';
-  src: url('./assets/fonts/Bangers.ttf');
+  src: url('/assets/fonts/Bangers.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'BebasNeue';
-  src: url('./assets/fonts/BebasNeue.ttf');
+  src: url('/assets/fonts/BebasNeue.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'BlackOpsOne';
-  src: url('./assets/fonts/BlackOpsOne.ttf');
+  src: url('/assets/fonts/BlackOpsOne.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
-  font-family: 'BriemHand.ttf';
-  src: url('./assets/fonts/BriemHand.ttf');
+  font-family: 'BriemHand';
+  src: url('/assets/fonts/BriemHand.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'BungeeShade';
-  src: url('./assets/fonts/BungeeShade.ttf');
+  src: url('/assets/fonts/BungeeShade.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'BungeeSpice';
-  src: url('./assets/fonts/BungeeSpice.ttf');
+  src: url('/assets/fonts/BungeeSpice.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Cinzel';
-  src: url('./assets/fonts/Cinzel.ttf');
+  src: url('/assets/fonts/Cinzel.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Creepster';
-  src: url('./assets/fonts/Creepster.ttf');
+  src: url('/assets/fonts/Creepster.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'FjallaOne';
-  src: url('./assets/fonts/FjallaOne.ttf');
+  src: url('/assets/fonts/FjallaOne.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'FrederickatheGreat';
-  src: url('./assets/fonts/FrederickatheGreat.ttf');
+  src: url('/assets/fonts/FrederickatheGreat.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Jaro';
-  src: url('./assets/fonts/Jaro.ttf');
+  src: url('/assets/fonts/Jaro.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Jersey10';
-  src: url('./assets/fonts/Jersey10.ttf');
+  src: url('/assets/fonts/Jersey10.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Jersey15';
-  src: url('./assets/fonts/Jersey15.ttf');
+  src: url('/assets/fonts/Jersey15.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Jersey25';
-  src: url('./assets/fonts/Jersey25.ttf');
+  src: url('/assets/fonts/Jersey25.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'JosefinSans';
-  src: url('./assets/fonts/JosefinSans.ttf');
+  src: url('/assets/fonts/JosefinSans.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Knewave';
-  src: url('./assets/fonts/Knewave.ttf');
+  src: url('/assets/fonts/Knewave.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Lemon';
-  src: url('./assets/fonts/Lemon.ttf');
+  src: url('/assets/fonts/Lemon.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'LilitaOne';
-  src: url('./assets/fonts/LilitaOne.ttf');
+  src: url('/assets/fonts/LilitaOne.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'MadimiOne';
-  src: url('./assets/fonts/MadimiOne.ttf');
+  src: url('/assets/fonts/MadimiOne.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Micro5Charted';
-  src: url('./assets/fonts/Micro5Charted.ttf');
+  src: url('/assets/fonts/Micro5Charted.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Micro5';
-  src: url('./assets/fonts/Micro5.ttf');
+  src: url('/assets/fonts/Micro5.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Monoton';
-  src: url('./assets/fonts/Monoton.ttf');
+  src: url('/assets/fonts/Monoton.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Montserrat';
-  src: url('./assets/fonts/Montserrat.ttf');
+  src: url('/assets/fonts/Montserrat.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Nosifer';
-  src: url('./assets/fonts/Nosifer.ttf');
+  src: url('/assets/fonts/Nosifer.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Orbitron';
-  src: url('./assets/fonts/Orbitron.ttf');
+  src: url('/assets/fonts/Orbitron.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Oswald';
-  src: url('./assets/fonts/Oswald.ttf');
+  src: url('/assets/fonts/Oswald.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'PlayfairDisplay';
-  src: url('./assets/fonts/PlayfairDisplay.ttf');
+  src: url('/assets/fonts/PlayfairDisplay.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'PoetsenOne';
-  src: url('./assets/fonts/PoetsenOne.ttf');
+  src: url('/assets/fonts/PoetsenOne.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'RubikMonoOne';
-  src: url('./assets/fonts/RubikMonoOne.ttf');
+  src: url('/assets/fonts/RubikMonoOne.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'RubikMoonrocks';
-  src: url('./assets/fonts/RubikMoonrocks.ttf');
+  src: url('/assets/fonts/RubikMoonrocks.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'RubikScribble';
-  src: url('./assets/fonts/RubikScribble.ttf');
+  src: url('/assets/fonts/RubikScribble.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SedanSC';
-  src: url('./assets/fonts/SedanSC.ttf');
+  src: url('/assets/fonts/SedanSC.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Sixtyfour';
-  src: url('./assets/fonts/Sixtyfour.ttf');
+  src: url('/assets/fonts/Sixtyfour.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'SpecialElite';
-  src: url('./assets/fonts/SpecialElite.ttf');
+  src: url('/assets/fonts/SpecialElite.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'UbuntuSansMono';
-  src: url('./assets/fonts/UbuntuSansMono.ttf');
+  src: url('/assets/fonts/UbuntuSansMono.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Allura';
-  src: url('./assets/fonts/Allura.ttf');
+  src: url('/assets/fonts/Allura.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 @font-face {
   font-family: 'Cookie';
-  src: url('./assets/fonts/Cookie.ttf');
+  src: url('/assets/fonts/Cookie.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
 }
 
 /* Variable Roboto (normal) */
@@ -397,9 +592,7 @@ body {
   font-family: "Roboto";
   src: url("/assets/fonts/RobotoVariableFont.ttf") format("truetype-variations");
   font-weight: 100 900;
-  /* volle Gewichtsachse */
   font-stretch: 75% 125%;
-  /* Breitenachse (wdth) – anpassen, falls nötig */
   font-style: normal;
   font-display: swap;
 }
@@ -419,7 +612,7 @@ body {
   font-family: "Material Symbols Outlined";
   font-style: normal;
   font-weight: 100 700;
-  src: url('./assets/fonts/MaterialSymbolsOutlined.ttf');
+  src: url('/assets/fonts/MaterialSymbolsOutlined.ttf');
   font-display: swap;
 }
 
