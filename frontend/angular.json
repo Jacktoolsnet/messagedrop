@@ -8,7 +8,57 @@
   "projects": {
     "frontend": {
       "projectType": "application",
-      "schematics": {},
+      "schematics": {
+        "@schematics/angular:component": {
+          "type": "component",
+          "skipTests": false,
+          "inlineTemplate": false,
+          "inlineStyle": false,
+          "style": "css",
+          "flat": false
+        },
+        "@schematics/angular:service": {
+          "type": "service",
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:pipe": {
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:directive": {
+          "type": "directive",
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:guard": {
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:interceptor": {
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:resolver": {
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:module": {
+          "type": "module",
+          "skipTests": false,
+          "flat": false
+        },
+        "@schematics/angular:class": {
+          "type": "class",
+          "skipTests": false
+        },
+        "@schematics/angular:interface": {
+          "type": "interface"
+        },
+        "@schematics/angular:enum": {
+          "type": "enum"
+        }
+      },
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",

@@ -166,6 +166,7 @@
 /* === Message content inside cards === */
 .message-content {
   font-size: 0.9rem;
+  padding-top: 1.5rem;
   margin-top: 1.25rem;
   /* breathing room under the overlapping badge */
   margin-bottom: 1.5rem;

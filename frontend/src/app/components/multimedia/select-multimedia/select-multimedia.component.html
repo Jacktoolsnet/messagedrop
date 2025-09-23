@@ -5,9 +5,8 @@
         <span>Add from Tenor</span>
     </button>
     } @else {
-    <button (click)="enableTenor()" mat-stroked-button class="button_default" color="primary" aria-label="Enable Tenor">
-        <span>Enable Tenor content</span>
-    </button>
+    <app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
+    </app-enable-external-content>
     }
 
     <button (click)="openImportMultimediaDialog()" mat-flat-button class="button_default" color="primary">

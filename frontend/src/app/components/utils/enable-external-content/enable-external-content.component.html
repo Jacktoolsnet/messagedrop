@@ -1,0 +1,20 @@
+<div class="platform-tile activation">
+    <div class="platform-header">
+        <div class="platform-name">Activate external content from {{ platformName }}</div>
+
+        <mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)"
+            aria-label="Enable {{ platformName }}">
+            Enable {{ platformName }}
+        </mat-slide-toggle>
+    </div>
+
+    <div class="platform-note">
+        By enabling, you allow loading content from {{ platformName }} and agree to the provider’s
+        <a class="platform-link" [href]="termsUrl" target="_blank" rel="noopener"
+            (click)="$event.stopPropagation()">Terms</a>
+        and
+        <a class="platform-link" [href]="privacyUrl" target="_blank" rel="noopener"
+            (click)="$event.stopPropagation()">Privacy Policy</a>.
+        This may send your IP address and usage data to {{ platformName }}.
+    </div>
+</div>

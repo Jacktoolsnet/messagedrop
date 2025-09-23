@@ -1,0 +1,73 @@
+/* Tile darf nie breiter werden als sein Container */
+.platform-tile.activation {
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin-top: 1rem;
+    /* Falls extrem lange Tokens drin sind (z. B. ohne Leerzeichen) */
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    /* Fallback */
+}
+
+/* Header auf volle Breite und flex-Shrink erlauben */
+.platform-header {
+    display: flex;
+    flex-direction: column;
+    /* Text oben, Toggle darunter */
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.platform-header>* {
+    min-width: 0;
+    /* verhindert, dass Kinder overflowen */
+}
+
+/* Titel & Hinweis: immer umbrechen */
+.platform-name,
+.platform-note {
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    /* Fallback für ältere Browser */
+    hyphens: auto;
+    /* hübschere Trennungen, wenn erlaubt */
+    max-width: 100%;
+    text-align: center;
+}
+
+/* mat-slide-toggle: Label darf umbrechen und nicht overflowen */
+.platform-header .mat-mdc-slide-toggle,
+.platform-header .mat-mdc-slide-toggle .mdc-label {
+    max-width: 100%;
+    white-space: normal;
+}
+
+/* Links: Haupttextfarbe, bold, immer unterstrichen – auch im Hover/Visited */
+.platform-link,
+.platform-link:hover,
+.platform-link:focus,
+.platform-link:active,
+.platform-link:visited,
+.platform-link:focus-visible {
+    color: var(--mat-app-text-color) !important;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 2px;
+    outline: none;
+    /* optional: Fokusrahmen entfernen */
+}
+
+/* Mini-Typo-Tuning für ganz kleine Screens */
+@media (max-width: 420px) {
+    .platform-name {
+        font-size: 1rem;
+    }
+
+    .platform-note {
+        font-size: 0.85rem;
+    }
+}

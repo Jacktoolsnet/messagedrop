@@ -6,7 +6,7 @@
         <img class="multimedia_image" [src]="multimedia!.url" />
     </div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
+    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank">
         {{ multimedia?.attribution }}
     </a>
     }
@@ -15,7 +15,7 @@
 <div class="media_block">
     <div class="oembed_container" [innerHTML]="safeHtml"></div>
     @if (multimedia?.attribution !== '') {
-    <a class="attribution_link" [href]="multimedia?.sourceUrl" target="_blank">
+    <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank">
         {{ multimedia?.attribution }}
     </a>
     }
@@ -23,23 +23,20 @@
 }
 } @else {
 <!-- Activation Tile, wenn Plattform (noch) deaktiviert -->
-<div class="platform-tile activation">
-    <div class="platform-name">External content</div>
-    <div class="platform-note">
-        By enabling, you allow loading content from {{ platformName }} and agree to the provider’s
-        @if (termsLinks?.terms && termsLinks?.privacy) {
-        <a class="platform-link" [href]="termsLinks?.terms" target="_blank" rel="noopener">Terms</a> and
-        <a class="platform-link" [href]="termsLinks?.privacy" target="_blank" rel="noopener">Privacy Policy</a>.
-        } @else {
-        Terms and Privacy Policy.
-        }
-        This may send your IP address and usage data to {{ platformName }}.
-    </div>
-    <div class="platform-header">
-        <mat-slide-toggle [checked]="false" (change)="onTogglePlatform($event.checked)"
-            aria-label="Enable {{ platformName }}">
-            Enable {{ platformName }}
-        </mat-slide-toggle>
-    </div>
-</div>
+@if(multimedia?.type === 'youtube') {
+<app-enable-external-content [platform]="'youtube'" (enabledChange)="onEnabledChange($event)">
+</app-enable-external-content>
+} @else if(multimedia?.type === 'spotify') {
+<app-enable-external-content [platform]="'spotify'" (enabledChange)="onEnabledChange($event)">
+</app-enable-external-content>
+} @else if(multimedia?.type === 'pinterest') {
+<app-enable-external-content [platform]="'pinterest'" (enabledChange)="onEnabledChange($event)">
+</app-enable-external-content>
+} @else if(multimedia?.type === 'tiktok') {
+<app-enable-external-content [platform]="'tiktok'" (enabledChange)="onEnabledChange($event)">
+</app-enable-external-content>
+} @else if(multimedia?.type === 'tenor') {
+<app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
+</app-enable-external-content>
+}
 }

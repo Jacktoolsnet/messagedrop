@@ -37,35 +37,35 @@
 
     <div class="toggle-row">
         <mat-slide-toggle id="toggle-show-pinterest-content" color="primary"
-            [checked]="appSettings.allowPinterestContent" (change)="setAllowPinterestContent($event.checked)"
+            [checked]="appSettings.enablePinterestContent" (change)="setAllowPinterestContent($event.checked)"
             aria-label="Allow Pinterest content">
             Allow Pinterest content
         </mat-slide-toggle>
     </div>
 
     <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-spotify-content" color="primary" [checked]="appSettings.allowSpotifyContent"
+        <mat-slide-toggle id="toggle-show-spotify-content" color="primary" [checked]="appSettings.enableSpotifyContent"
             (change)="setAllowSpotifyContent($event.checked)" aria-label="Allow Spotify content">
             Allow Spotify content
         </mat-slide-toggle>
     </div>
 
     <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-tenor-content" color="primary" [checked]="appSettings.allowTenorContent"
+        <mat-slide-toggle id="toggle-show-tenor-content" color="primary" [checked]="appSettings.enableTenorContent"
             (change)="setAllowTenorContent($event.checked)" aria-label="Allow Tenor content">
             Allow Tenor content
         </mat-slide-toggle>
     </div>
 
     <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-tiktok-content" color="primary" [checked]="appSettings.allowTikTokContent"
+        <mat-slide-toggle id="toggle-show-tiktok-content" color="primary" [checked]="appSettings.enableTikTokContent"
             (change)="setAllowTikTokContent($event.checked)" aria-label="Allow TikTok content">
             Allow TikTok content
         </mat-slide-toggle>
     </div>
 
     <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-youtube-content" color="primary" [checked]="appSettings.allowYoutubeContent"
+        <mat-slide-toggle id="toggle-show-youtube-content" color="primary" [checked]="appSettings.enableYoutubeContent"
             (change)="setAllowYoutubeContent($event.checked)" aria-label="Allow YouTube content">
             Allow YouTube content
         </mat-slide-toggle>

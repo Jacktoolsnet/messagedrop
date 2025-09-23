@@ -2,9 +2,9 @@ export interface AppSettings {
     defaultTheme: string,
     themeMode: 'light' | 'dark' | 'system',
     detectLocationOnStart: boolean,
-    allowPinterestContent: boolean,
-    allowSpotifyContent: boolean,
-    allowTenorContent: boolean,
-    allowTikTokContent: boolean,
-    allowYoutubeContent: boolean
+    enablePinterestContent: boolean,
+    enableSpotifyContent: boolean,
+    enableTenorContent: boolean,
+    enableTikTokContent: boolean,
+    enableYoutubeContent: boolean
 }
