@@ -250,8 +250,6 @@ export class OembedService {
     return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://www.youtube.com/oembed')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
       .pipe(
         map((response: GetOembedResponse) => {
-          response.result.html = response.result.html?.replace(/width="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');
-          response.result.html = response.result.html?.replace(/height="\d+"/g, '"');
           return response;
         }),
       )
@@ -261,7 +259,7 @@ export class OembedService {
   }
 
   public getTikTokEmbedCode(videoId: string): string {
-    return `<iframe width= "100%" style="aspect-ratio: 16 / 9; resize: both; border: none;" src="https://www.tiktok.com/player/v1/${videoId}" allow="fullscreen" title="test"></iframe>`
+    return `<iframe width= "auto" style="aspect-ratio: 16 / 9; resize: both; border: none;" src="https://www.tiktok.com/player/v1/${videoId}" allow="fullscreen" title="test"></iframe>`
   }
 
   public getTikTokVmEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
@@ -275,8 +273,6 @@ export class OembedService {
     return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://www.pinterest.com/oembed.json')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
       .pipe(
         map((response: GetOembedResponse) => {
-          response.result.html = response.result.html?.replace(/width="\d+"/g, `style="width: ${response.result.width}; max-width: 100%; height: ${response.result.height! + 70}; aspect-ratio: ${response.result.width} / ${response.result.height!}; resize: both;"`);
-          response.result.html = response.result.html?.replace(/height="\d+"/g, '"');
           return response;
         }),
       )

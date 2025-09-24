@@ -82,3 +82,21 @@
     border-top-right-radius: 1rem;
     border-bottom-right-radius: 1rem;
 }
+
+.platform-tile-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 1rem;
+    padding: 1rem;
+}
+
+.platform-tile {
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}

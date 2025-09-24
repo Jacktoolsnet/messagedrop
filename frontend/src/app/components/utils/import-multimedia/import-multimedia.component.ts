@@ -93,7 +93,7 @@ export class ImportMultimediaComponent {
         break;
     }
 
-    if (!plattformEnabled) {
+    if (platform && !plattformEnabled) {
       this.urlInvalid = true;
       this.safeHtml = undefined;
       this.disabledReason = `This platform (${platform}) is currently disabled. Enable it below to continue.`;

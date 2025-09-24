@@ -13,7 +13,7 @@
 </div>
 
 <!-- dezenter Hinweis, falls URL zu deaktivierter Plattform gehört -->
-@if (disabledReason) {
+@if (disabledReason !== '') {
 <div class="disabled-hint">
     {{ disabledReason }}
 </div>

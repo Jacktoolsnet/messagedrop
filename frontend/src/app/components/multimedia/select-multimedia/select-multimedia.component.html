@@ -1,13 +1,8 @@
 <div class="button_container">
-    @if (showTenor) {
     <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary"
         aria-label="Add from Tenor">
         <span>Add from Tenor</span>
     </button>
-    } @else {
-    <app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
-    </app-enable-external-content>
-    }
 
     <button (click)="openImportMultimediaDialog()" mat-flat-button class="button_default" color="primary">
         <span>Add multimedia content</span>

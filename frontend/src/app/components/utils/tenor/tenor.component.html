@@ -1,3 +1,4 @@
+@if (showTenor) {
 <div class="url-container">
     <input #searchInput type="search" enterKeyHint="search" [formControl]="searchterm" (keyup.enter)="search()"
         placeholder="Search in Tenor" />
@@ -27,3 +28,11 @@
     </div>
     }
 </mat-dialog-content>
+} @else {
+<div class="platform-tile-container">
+    <div class="platform-tile">
+        <app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
+        </app-enable-external-content>
+    </div>
+</div>
+}
