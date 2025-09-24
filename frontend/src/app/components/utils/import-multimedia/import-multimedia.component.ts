@@ -6,12 +6,11 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
+import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
 
 type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
 type SettingsKey =
@@ -39,7 +38,7 @@ interface Platform {
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSlideToggleModule
+    EnableExternalContentComponent
   ],
   templateUrl: './import-multimedia.component.html',
   styleUrl: './import-multimedia.component.css'
@@ -51,28 +50,16 @@ export class ImportMultimediaComponent {
   safeHtml: SafeHtml | undefined;
   disabledReason: string = '';
 
-  platforms: Platform[] = [
-    { key: 'youtube', name: 'YouTube', icon: 'smart_display', enabled: false, settingsKey: 'allowYoutubeContent' },
-    { key: 'spotify', name: 'Spotify', icon: 'library_music', enabled: false, settingsKey: 'allowSpotifyContent' },
-    { key: 'tiktok', name: 'TikTok', icon: 'music_video', enabled: false, settingsKey: 'allowTikTokContent' },
-    { key: 'pinterest', name: 'Pinterest', icon: 'push_pin', enabled: false, settingsKey: 'allowPinterestContent' },
-  ];
-
   constructor(
     public dialogRef: MatDialogRef<ImportMultimediaComponent>,
     private oembedService: OembedService,
     private sanitizer: DomSanitizer,
     private appService: AppService,
     @Inject(MAT_DIALOG_DATA) public data: {}
-  ) {
-    // einmalige Initialisierung aus AppSettings
-    const s = this.appService.getAppSettings();
-    this.platforms = this.platforms.map(p => ({ ...p, enabled: !!(s as any)[p.settingsKey] }));
-  }
+  ) { }
 
   private getPlatformFromUrl(url: string): PlatformKey | undefined {
     try {
-      console.log('Parsing URL', url);
       const u = new URL(url.toLowerCase());
       const h = u.hostname;
       if (h.includes('youtube.com') || h.includes('youtu.be')) return 'youtube';
@@ -89,39 +76,38 @@ export class ImportMultimediaComponent {
     this.multimedia = undefined;
 
     const platform = this.getPlatformFromUrl(this.multimediaUrl);
-    if (platform) {
-      const p = this.platforms.find(x => x.key === platform)!;
-      if (!p.enabled) {
-        this.urlInvalid = true;
-        this.disabledReason = `This platform (${p.name}) is currently disabled. Enable it below to continue.`;
-        return;
-      }
+    let plattformEnabled = false;
+
+    switch (platform) {
+      case 'pinterest':
+        plattformEnabled = this.appService.getAppSettings().enablePinterestContent;
+        break;
+      case 'spotify':
+        plattformEnabled = this.appService.getAppSettings().enableSpotifyContent;
+        break;
+      case 'tiktok':
+        plattformEnabled = this.appService.getAppSettings().enableTikTokContent;
+        break;
+      case 'youtube':
+        plattformEnabled = this.appService.getAppSettings().enableYoutubeContent;
+        break;
+    }
+
+    if (!plattformEnabled) {
+      this.urlInvalid = true;
+      this.safeHtml = undefined;
+      this.disabledReason = `This platform (${platform}) is currently disabled. Enable it below to continue.`;
+      return;
     }
 
     // OEmbed nur, wenn Plattform erlaubt (oder unbekannt)
     this.multimedia = await this.oembedService.getObjectFromUrl(this.multimediaUrl) as Multimedia;
     if (this.multimedia) {
+      this.disabledReason = '';
       this.urlInvalid = false;
       this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia.oembed?.html ?? '');
     } else {
       this.urlInvalid = true;
-    }
-  }
-
-  onTogglePlatform(p: Platform, enabled: boolean): void {
-    p.enabled = enabled;
-
-    const current = this.appService.getAppSettings();
-    const updated: AppSettings = {
-      ...current,
-      [p.settingsKey]: enabled
-    } as AppSettings;
-
-    this.appService.setAppSettings(updated);
-
-    // Falls der Nutzer zuerst URL eingibt und dann aktiviert:
-    if (enabled && this.multimediaUrl) {
-      this.validateUrl();
     }
   }
 
@@ -143,5 +129,9 @@ export class ImportMultimediaComponent {
     } else {
       this.dialogRef.close();
     }
+  }
+
+  async onEnabledChange(enabled: boolean): Promise<void> {
+    this.validateUrl();
   }
 }

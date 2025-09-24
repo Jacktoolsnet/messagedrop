@@ -27,9 +27,9 @@ export class AppService {
     enableTenorContent: false
   };
 
-  public setAppSettings(newAppSettings: AppSettings): void {
+  async setAppSettings(newAppSettings: AppSettings): Promise<void> {
     const merged = { ...this.defaultAppSettings, ...newAppSettings };
-    this.indexedDbService.setSetting('appSettings', JSON.stringify(merged)).then(() => {
+    await this.indexedDbService.setSetting('appSettings', JSON.stringify(merged)).then(() => {
       this.appSettings = merged;
       this.setTheme(this.appSettings);
     });

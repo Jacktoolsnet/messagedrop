@@ -3,7 +3,6 @@
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    margin-top: 1rem;
     /* Falls extrem lange Tokens drin sind (z. B. ohne Leerzeichen) */
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -39,8 +38,18 @@
 }
 
 /* mat-slide-toggle: Label darf umbrechen und nicht overflowen */
-.platform-header .mat-mdc-slide-toggle,
-.platform-header .mat-mdc-slide-toggle .mdc-label {
+.platform-header {
+    max-width: 100%;
+    white-space: normal;
+}
+
+.mat-mdc-slide-toggle {
+    max-width: 100%;
+    white-space: normal;
+    margin: 1rem;
+}
+
+.mat-mdc-slide-toggle {
     max-width: 100%;
     white-space: normal;
 }

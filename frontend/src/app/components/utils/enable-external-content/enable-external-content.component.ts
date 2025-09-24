@@ -57,12 +57,12 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
     this.enabled = this.checkedOverride ?? current;
   }
 
-  onToggle(enabled: boolean): void {
+  async onToggle(enabled: boolean): Promise<void> {
     this.enabled = enabled;
 
     const current = this.appService.getAppSettings();
     const updated: AppSettings = { ...current, [this.settingsKey]: enabled } as AppSettings;
-    this.appService.setAppSettings(updated);
+    await this.appService.setAppSettings(updated);
 
     this.enabledChange.emit(enabled);
   }

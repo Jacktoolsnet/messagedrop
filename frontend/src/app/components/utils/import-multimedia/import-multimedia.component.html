@@ -27,20 +27,25 @@
             <mat-icon class="material-symbols-outlined">delete</mat-icon>
         </button>
     </div>
-    } @else {
+    }
     <div class="content">
         <div class="platform-tile-container">
-            @for (p of platforms; track p.key) {
-            <div class="platform-tile" [class.enabled]="p.enabled">
-                <div class="platform-header">
-                    <div class="platform-name">{{ p.name }}</div>
-                    <mat-slide-toggle [checked]="p.enabled" (change)="onTogglePlatform(p, $event.checked)"
-                        aria-label="Enable {{p.name}}">
-                    </mat-slide-toggle>
-                </div>
+            <div class="platform-tile">
+                <app-enable-external-content [platform]="'pinterest'" (enabledChange)="onEnabledChange($event)">
+                </app-enable-external-content>
             </div>
-            }
+            <div class="platform-tile">
+                <app-enable-external-content [platform]="'spotify'" (enabledChange)="onEnabledChange($event)">
+                </app-enable-external-content>
+            </div>
+            <div class="platform-tile">
+                <app-enable-external-content [platform]="'tiktok'" (enabledChange)="onEnabledChange($event)">
+                </app-enable-external-content>
+            </div>
+            <div class="platform-tile">
+                <app-enable-external-content [platform]="'youtube'" (enabledChange)="onEnabledChange($event)">
+                </app-enable-external-content>
+            </div>
         </div>
     </div>
-    }
 </mat-dialog-content>
