@@ -113,11 +113,6 @@
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
-.platform-tile:hover {
-    transform: scale(1.02);
-    transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-}
-
 .disabled-hint {
     display: block;
     width: 95%;

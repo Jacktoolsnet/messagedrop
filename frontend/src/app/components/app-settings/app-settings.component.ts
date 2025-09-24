@@ -14,6 +14,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
+import { EnableExternalContentComponent } from '../utils/enable-external-content/enable-external-content.component';
+import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 
 
 @Component({
@@ -33,7 +35,9 @@ import { AppService } from '../../services/app.service';
     MatFormFieldModule,
     MatButtonToggleModule,
     MatChipsModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    EnableExternalContentComponent,
+    EnableLocationComponent
   ],
   templateUrl: './app-settings.component.html',
   styleUrl: './app-settings.component.css'
@@ -77,35 +81,43 @@ export class AppSettingsComponent {
   setTheme(themeName: string): void {
     this.appSettings.defaultTheme = themeName;
     this.appService.setTheme(this.appSettings);
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setThemeMode(mode: 'light' | 'dark' | 'system') {
     this.appSettings.themeMode = mode;
     this.appService.setTheme(this.appSettings);
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setDetectLocationOnStart(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, detectLocationOnStart: enabled };
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowYoutubeContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableYoutubeContent: enabled };
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowPinterestContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enablePinterestContent: enabled };
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowSpotifyContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableSpotifyContent: enabled };
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowTikTokContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableTikTokContent: enabled };
+    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowTenorContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableTenorContent: enabled };
+    this.appService.setAppSettings(this.appSettings);
   }
 
 }

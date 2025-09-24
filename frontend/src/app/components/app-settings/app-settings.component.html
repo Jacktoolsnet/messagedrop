@@ -25,50 +25,32 @@
         </mat-button-toggle>
     </mat-button-toggle-group>
 
-    @if(showDetectLocationOnStart){
-    <div class="toggle-row">
-        <mat-slide-toggle id="toggle-detect-location-on-start" color="primary"
-            [checked]="appSettings.detectLocationOnStart" (change)="setDetectLocationOnStart($event.checked)"
-            aria-label="Get location on app start">
-            Determine location on app start
-        </mat-slide-toggle>
-    </div>
-    }
-
-    <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-pinterest-content" color="primary"
-            [checked]="appSettings.enablePinterestContent" (change)="setAllowPinterestContent($event.checked)"
-            aria-label="Allow Pinterest content">
-            Allow Pinterest content
-        </mat-slide-toggle>
-    </div>
-
-    <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-spotify-content" color="primary" [checked]="appSettings.enableSpotifyContent"
-            (change)="setAllowSpotifyContent($event.checked)" aria-label="Allow Spotify content">
-            Allow Spotify content
-        </mat-slide-toggle>
-    </div>
-
-    <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-tenor-content" color="primary" [checked]="appSettings.enableTenorContent"
-            (change)="setAllowTenorContent($event.checked)" aria-label="Allow Tenor content">
-            Allow Tenor content
-        </mat-slide-toggle>
-    </div>
-
-    <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-tiktok-content" color="primary" [checked]="appSettings.enableTikTokContent"
-            (change)="setAllowTikTokContent($event.checked)" aria-label="Allow TikTok content">
-            Allow TikTok content
-        </mat-slide-toggle>
-    </div>
-
-    <div class="toggle-row">
-        <mat-slide-toggle id="toggle-show-youtube-content" color="primary" [checked]="appSettings.enableYoutubeContent"
-            (change)="setAllowYoutubeContent($event.checked)" aria-label="Allow YouTube content">
-            Allow YouTube content
-        </mat-slide-toggle>
+    <div class="platform-tile-container">
+        @if(showDetectLocationOnStart){
+        <div class="platform-tile">
+            <app-enable-location (enabledChange)="setDetectLocationOnStart($event)"></app-enable-location>
+        </div>
+        }
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'pinterest'" (enabledChange)="setAllowPinterestContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'spotify'" (enabledChange)="setAllowSpotifyContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'tenor'" (enabledChange)="setAllowTenorContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'tiktok'" (enabledChange)="setAllowTikTokContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'youtube'" (enabledChange)="setAllowYoutubeContent($event)">
+            </app-enable-external-content>
+        </div>
     </div>
 
     <mat-chip-set class="version-chipset">

@@ -94,19 +94,28 @@ h4 {
     width: 100%;
 }
 
-.version-chipset {
-    margin-top: 1rem;
-    /* Abstand nach oben */
+.version-chipset mat-chip {
     width: 100%;
-    /* volle Breite */
-    display: flex;
-    /* Chips nehmen komplette Breite */
-    justify-content: center;
-    /* oder: flex-start / flex-end */
+    text-align: center;
+    display: inline;
 }
 
-.version-chipset mat-chip {
-    flex: 1;
-    /* Chip dehnt sich auf volle Breite */
-    justify-content: center;
+.platform-tile-container {
+    display: grid;
+    grid-template-columns: repeat(1fr);
+    gap: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+    width: 100%;
+}
+
+.platform-tile {
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }

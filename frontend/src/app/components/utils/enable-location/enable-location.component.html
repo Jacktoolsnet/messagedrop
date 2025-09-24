@@ -1,0 +1,14 @@
+<div class="platform-header">
+    <div class="platform-name">Allow device location on app start</div>
+
+    <mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)" aria-label="Enable location on app start">
+        Get location on app start
+    </mat-slide-toggle>
+</div>
+
+<div class="platform-note">
+    By enabling, you allow the app to access your device location when the app starts. The location is used to provide
+    nearby content and is not continuously tracked. Where possible, processing happens on your device; minimal data may
+    be sent to our service only to deliver the feature you request (e.g., local weather). You can revoke permission
+    anytime.
+</div>
