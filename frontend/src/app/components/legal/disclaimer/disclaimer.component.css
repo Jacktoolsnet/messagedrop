@@ -1,0 +1,78 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
+/* Dialog sizing & scrolling */
+.mat-mdc-dialog-content.content {
+    max-height: 85vh;
+    min-width: min(320px, 90vw);
+    max-width: 90vw;
+    overflow: auto;
+    box-sizing: border-box;
+    padding-bottom: 0.5rem;
+}
+
+/* Typography & sections */
+.last-updated {
+    margin: 0 0 0.5rem 0;
+    opacity: 0.85;
+}
+
+.block+.block {
+    margin-top: 1rem;
+}
+
+.h {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+ul {
+    margin: 0.25rem 0 0.5rem 1.1rem;
+}
+
+ul li {
+    margin: 0.15rem 0;
+}
+
+em {
+    font-style: italic;
+}
+
+/* Links: main text color, bold, always underlined; wrap gracefully */
+.link,
+.link:hover,
+.link:focus,
+.link:active,
+.link:visited,
+.link:focus-visible {
+    color: var(--mat-app-text-color) !important;
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    text-decoration-thickness: 1.5px;
+    outline: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+/* Consent area */
+.consent {
+    margin-top: 1rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid var(--mat-card-outlined-outline-color);
+}
+
+.mat-mdc-slide-toggle .mdc-label {
+    white-space: normal;
+    max-width: 100%;
+}
+
+/* Small screens */
+@media (max-width: 420px) {
+    .h {
+        font-size: 0.95rem;
+    }
+}

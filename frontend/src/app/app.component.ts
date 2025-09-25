@@ -15,6 +15,8 @@ import { ContactlistComponent } from './components/contactlist/contactlist.compo
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
+import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
+import { LegalNoticeComponent } from './components/legal/legal-notice/legal-notice.component';
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
@@ -126,6 +128,8 @@ export class AppComponent implements OnInit {
     public contactListDialog: MatDialog,
     public userProfileDialog: MatDialog,
     public appSettingsDialog: MatDialog,
+    public legalNoticeDialog: MatDialog,
+    public disclaimerDialog: MatDialog,
     public displayMessage: MatDialog,
     public sharedContentDialog: MatDialog,
     public nominatimSearchDialog: MatDialog,
@@ -754,6 +758,38 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
+    });
+  }
+
+  public showLegalNotice() {
+    const dialogRef = this.legalNoticeDialog.open(LegalNoticeComponent, {
+      data: {},
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  public showDisclaimer() {
+    const dialogRef = this.disclaimerDialog.open(DisclaimerComponent, {
+      data: {},
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
     });
   }
 

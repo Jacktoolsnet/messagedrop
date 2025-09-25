@@ -1,0 +1,53 @@
+import { CommonModule } from '@angular/common';
+import { Component, OnInit, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { AppSettings } from '../../../interfaces/app-settings';
+import { AppService } from '../../../services/app.service';
+
+@Component({
+  selector: 'app-disclaimer',
+  standalone: true,
+  imports: [
+    CommonModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatButtonModule,
+    MatSlideToggleModule
+  ],
+  templateUrl: './disclaimer.component.html',
+  styleUrl: './disclaimer.component.css'
+})
+export class DisclaimerComponent implements OnInit {
+  accepted = false;
+
+  private dialogRef = inject(MatDialogRef<DisclaimerComponent>);
+  private app = inject(AppService);
+
+  ngOnInit(): void {
+    // falls bereits zugestimmt wurde, Toggle vorbefüllen
+    const settings = this.app.getAppSettings();
+    this.accepted = !!settings?.consentSettings?.disclaimer;
+  }
+
+  onToggle(val: boolean) {
+    this.accepted = val;
+  }
+
+  onAccept() {
+    const current = this.app.getAppSettings();
+    const updated: AppSettings = {
+      ...current,
+      consents: { ...(current?.consentSettings ?? {}), disclaimer: true }
+    } as AppSettings;
+
+    this.app.setAppSettings(updated);
+    this.dialogRef.close(true);
+  }
+
+  onDecline() {
+    this.dialogRef.close(false);
+  }
+}

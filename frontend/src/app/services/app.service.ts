@@ -24,7 +24,11 @@ export class AppService {
     enablePinterestContent: false,
     enableSpotifyContent: false,
     enableTikTokContent: false,
-    enableTenorContent: false
+    enableTenorContent: false,
+    consentSettings: {
+      disclaimer: false,
+      privacyPolicy: false
+    }
   };
 
   async setAppSettings(newAppSettings: AppSettings): Promise<void> {

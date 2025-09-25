@@ -1,3 +1,5 @@
+import { ConsentSettings } from "./consent-settings.interface";
+
 export interface AppSettings {
     defaultTheme: string,
     themeMode: 'light' | 'dark' | 'system',
@@ -6,5 +8,6 @@ export interface AppSettings {
     enableSpotifyContent: boolean,
     enableTenorContent: boolean,
     enableTikTokContent: boolean,
-    enableYoutubeContent: boolean
+    enableYoutubeContent: boolean,
+    consentSettings: ConsentSettings
 }
