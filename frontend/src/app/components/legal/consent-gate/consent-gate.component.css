@@ -1,0 +1,48 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
+/* Vollflächig, zentriert */
+.gate {
+    width: auto;
+    height: 100dvh;
+    display: grid;
+    place-items: center;
+    padding: 2rem;
+    background: var(--mdc-elevated-card-container-color, transparent);
+}
+
+/* Zentrale Karte */
+.card {
+    width: auto;
+    background: var(--mat-card-filled-container-color);
+    color: var(--mat-app-text-color);
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px var(--mat-card-outlined-outline-color);
+    padding: 1rem;
+    margin-inline: auto;
+}
+
+
+.material-symbols-outlined {
+    font-size: 32px;
+    line-height: 1;
+}
+
+.welcome {
+    font-weight: 800;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.title {
+    font-weight: 800;
+    font-size: 1rem;
+    margin-bottom: 0.25rem;
+}
+
+.subtitle {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}

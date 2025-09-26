@@ -10,7 +10,7 @@ import { NetworkService } from './network.service';
 })
 export class ServerService {
 
-  private _serverSet = signal(false);
+  private _serverSet = signal(0);
   readonly serverSet = this._serverSet.asReadonly();
 
   private ready: boolean = false;
@@ -42,13 +42,13 @@ export class ServerService {
             this.signingPublicKey = connectResponse.signingPublicKey;
             this.ready = true;
             this.failed = false;
-            this._serverSet.set(true);
+            this._serverSet.update(trigger => trigger + 1);
           }
         },
         error: (err) => {
           this.ready = false;
           this.failed = true;
-          this._serverSet.set(false)
+          this._serverSet.update(trigger => trigger + 1)
         },
         complete: () => { }
       });

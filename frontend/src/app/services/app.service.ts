@@ -1,12 +1,19 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
+import { ConsentKey } from '../interfaces/consent-settings.interface';
 import { NotificationAction } from '../interfaces/notification-action';
 import { IndexedDbService } from './indexed-db.service';
 
 @Injectable({
   providedIn: 'root'
 })
+
 export class AppService {
+  private settingsReady = false;
+  private consentCompleted = false;
+  private _settingsSet = signal(0);
+  readonly settingsSet = this._settingsSet.asReadonly();
+
   private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private appSettings: AppSettings | undefined;
   private notificationAction?: NotificationAction;
@@ -31,11 +38,21 @@ export class AppService {
     }
   };
 
+  public isSettingsReady(): boolean {
+    return this.settingsReady;
+  }
+
+  public isConsentCompleted(): boolean {
+    return this.consentCompleted;
+  }
+
   async setAppSettings(newAppSettings: AppSettings): Promise<void> {
     const merged = { ...this.defaultAppSettings, ...newAppSettings };
     await this.indexedDbService.setSetting('appSettings', JSON.stringify(merged)).then(() => {
       this.appSettings = merged;
       this.setTheme(this.appSettings);
+      this.chekConsentCompleted();
+      this._settingsSet.update(trigger => trigger + 1);
     });
   }
 
@@ -54,7 +71,14 @@ export class AppService {
     } catch {
       this.appSettings = { ...this.defaultAppSettings };
     }
+    this.settingsReady = true;
+    this.chekConsentCompleted();
+    this._settingsSet.update(trigger => trigger + 1);
     this.setTheme(this.appSettings);
+  }
+
+  public chekConsentCompleted(required: ConsentKey[] = ['disclaimer']) {
+    this.consentCompleted = required.some(k => this.appSettings?.consentSettings[k]);
   }
 
   // Notification-Daten

@@ -40,7 +40,7 @@ const userMarker = leaflet.icon({
 })
 export class MapService {
 
-  private _mapSet = signal(false);
+  private _mapSet = signal(0);
   readonly mapSet = this._mapSet.asReadonly();
 
   private map: any;
@@ -61,7 +61,7 @@ export class MapService {
 
   public initMap() {
     this.ready = true;
-    this._mapSet.set(true);
+    this._mapSet.update(trigger => trigger + 1);
   }
 
   public initMapEvents(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
@@ -115,7 +115,7 @@ export class MapService {
     this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ffdbb5", weight: 1 }).addTo(this.map);
     this.drawSearchRectange(this.location);
 
-    this._mapSet.set(true);
+    this._mapSet.update(trigger => trigger + 1);
   }
 
   isReady(): boolean {

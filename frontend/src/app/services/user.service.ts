@@ -28,7 +28,7 @@ import { ServerService } from './server.service';
   providedIn: 'root'
 })
 export class UserService {
-  private _userSet = signal(false);
+  private _userSet = signal(0);
   readonly userSet = this._userSet.asReadonly();
 
   private user: User = {
@@ -150,7 +150,7 @@ export class UserService {
     this.loadProfile();
     this.startJwtRenewal();
     this.ready = true;
-    this._userSet.set(true);
+    this._userSet.update(trigger => trigger + 1);
     this.blocked = false;
   }
 

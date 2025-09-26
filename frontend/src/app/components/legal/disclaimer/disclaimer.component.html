@@ -152,16 +152,11 @@
         <p>We may amend this disclaimer at any time. The currently published version applies.</p>
     </section>
 
-    <div class="consent">
-        <mat-slide-toggle [checked]="accepted" (change)="onToggle($event.checked)" aria-label="Accept disclaimer">
-            I have read and accept this Disclaimer.
-        </mat-slide-toggle>
-    </div>
+
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-button (click)="onDecline()">Abort</button>
-    <button mat-flat-button color="primary" [disabled]="!accepted" (click)="onAccept()">
-        Apply
-    </button>
+    <mat-slide-toggle [checked]="accepted" (change)="onToggle($event.checked)" aria-label="Accept disclaimer">
+        I have read and accept this Disclaimer.
+    </mat-slide-toggle>
 </mat-dialog-actions>

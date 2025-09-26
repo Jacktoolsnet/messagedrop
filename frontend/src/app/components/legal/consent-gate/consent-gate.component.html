@@ -1,0 +1,23 @@
+<div class="gate" role="region" aria-label="Action required: missing consents">
+    <div class="card" role="dialog" aria-modal="true" aria-labelledby="consent-title">
+        <div class="head">
+            <div class="titles">
+                <div class="welcome">Welcome to MessageDrop 👋</div>
+                <div id="consent-title" class="title">Before we start</div>
+                <div class="subtitle">
+                    Please review and accept the following items so we can show the map and all features.
+                </div>
+            </div>
+        </div>
+
+        <button type="button" mat-flat-button (click)="review('disclaimer')">
+            <mat-icon class="material-symbols-outlined">
+                {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box' }}
+            </mat-icon>
+            Disclaimer
+        </button>
+
+        <div class="actions">
+        </div>
+    </div>
+</div>

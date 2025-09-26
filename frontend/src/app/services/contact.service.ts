@@ -26,7 +26,7 @@ import { UserService } from './user.service';
 export class ContactService {
 
   private _contacts = signal<Contact[]>([]);
-  private _contactsSet = signal(false);
+  private _contactsSet = signal(0);
   readonly contactsSet = this._contactsSet.asReadonly();
   private ready: boolean = false;
 
@@ -218,7 +218,7 @@ export class ContactService {
           })
           this.updateContactProfile();
           this.ready = true;
-          this._contactsSet.set(true);
+          this._contactsSet.update(trigger => trigger + 1);
         },
         error: (err) => {
           if (err.status === 404) {
@@ -227,7 +227,7 @@ export class ContactService {
           } else {
             this.ready = false;
           }
-          this._contactsSet.set(false);
+          this._contactsSet.update(trigger => trigger + 1);
         },
         complete: () => { }
       });

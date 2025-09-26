@@ -15,6 +15,7 @@ import { ContactlistComponent } from './components/contactlist/contactlist.compo
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
+import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { LegalNoticeComponent } from './components/legal/legal-notice/legal-notice.component';
 import { MapComponent } from './components/map/map.component';
@@ -67,6 +68,7 @@ import { WeatherService } from './services/weather.service';
 @Component({
   selector: 'app-root',
   imports: [
+    ConsentGateComponent,
     MatBadgeModule,
     CommonModule,
     RouterOutlet,
@@ -102,7 +104,7 @@ export class AppComponent implements OnInit {
   constructor(
     private titleService: Title,
     private metaService: Meta,
-    private appService: AppService,
+    public appService: AppService,
     public networkService: NetworkService,
     private sharedContentService: SharedContentService,
     private indexedDbService: IndexedDbService,
@@ -136,46 +138,62 @@ export class AppComponent implements OnInit {
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
-    effect(() => {
-      if (this.serverService.serverSet()) {
-        if (this.serverService.isReady()) {
-          // Init the map
-          this.mapService.initMap();
-        }
-        if (this.serverService.isFailed()) {
-          const dialogRef = this.displayMessage.open(DisplayMessage, {
-            panelClass: '',
-            closeOnNavigation: false,
-            data: {
-              showAlways: true,
-              title: 'Oops! Our server went on a coffee break...',
-              image: '',
-              icon: 'cloud_off',
-              message: `Apparently, our backend needed some “me time”.
-              
-              Don’t worry, we sent a carrier pigeon to bring it back.`,
-              button: 'Retry...',
-              delay: 10000,
-              showSpinner: false
-            },
-            maxWidth: '90vw',
-            maxHeight: '90vh',
-            hasBackdrop: false,
-            autoFocus: false
-          });
-
-          dialogRef.afterOpened().subscribe(e => { });
-
-          dialogRef.afterClosed().subscribe(() => {
-            // Notification Action
-            this.handleNotification();
-          });
-        }
+    effect(async () => {
+      const triggered = this.appService.settingsSet(); // <-- track changes
+      this.appService.chekConsentCompleted();
+      if (this.appService.isConsentCompleted()) {
+        // Clear cache
+        this.indexedDbService.deleteSetting('nominatimSelectedPlace')
+        this.indexedDbService.deleteSetting('nominatimSearch')
+        // Check network
+        this.networkService.init();
+        // Init the server connection
+        this.serverService.init();
+      } else {
+        this.logout();
       }
     });
 
     effect(() => {
-      if (this.mapService.mapSet()) {
+      const triggered = this.serverService.serverSet(); // <-- track changes
+      if (this.serverService.isReady() && this.appService.isConsentCompleted()) {
+        // Init the map
+        this.mapService.initMap();
+      }
+      if (this.serverService.isFailed()) {
+        const dialogRef = this.displayMessage.open(DisplayMessage, {
+          panelClass: '',
+          closeOnNavigation: false,
+          data: {
+            showAlways: true,
+            title: 'Oops! Our server went on a coffee break...',
+            image: '',
+            icon: 'cloud_off',
+            message: `Apparently, our backend needed some “me time”.
+              
+              Don’t worry, we sent a carrier pigeon to bring it back.`,
+            button: 'Retry...',
+            delay: 10000,
+            showSpinner: false
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: false,
+          autoFocus: false
+        });
+
+        dialogRef.afterOpened().subscribe(e => { });
+
+        dialogRef.afterClosed().subscribe(() => {
+          // Notification Action
+          this.handleNotification();
+        });
+      }
+    });
+
+    effect(() => {
+      const triggered = this.mapService.mapSet(); // <-- track changes
+      if (this.appService.isConsentCompleted()) {
         // Fly to position if user alrady allowed location.
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted' && this.appService.getAppSettings().detectLocationOnStart) {
@@ -188,21 +206,23 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      if (this.userService.userSet()) {
+      const triggered = this.userService.userSet(); // <-- track changes
+      if (this.appService.isConsentCompleted()) {
         this.contactService.initContacts();
         this.placeService.initPlaces();
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
     });
 
     effect(() => {
-      if (this.contactService.contactsSet()) {
+      const triggered = this.contactService.contactsSet(); // <-- track changes
+      if (this.appService.isConsentCompleted()) {
         this.socketioService.initSocket();
       }
     });
 
     effect(() => {
-      if (this.messageService.messageSet()) {
+      const triggered = this.messageService.messageSet(); // <-- track changes
+      if (this.appService.isConsentCompleted()) {
         this.createMarkerLocations();
       }
     });
@@ -210,7 +230,7 @@ export class AppComponent implements OnInit {
     // Shared Content
     effect(() => {
       const content = this.sharedContentService.getSharedContentSignal()();
-      if (content) {
+      if (content && this.appService.isConsentCompleted()) {
         this.handleSharedContent(content);
       }
     });
@@ -222,13 +242,6 @@ export class AppComponent implements OnInit {
 
   async initApp() {
     await this.appService.loadAppSettings();
-    // Clear cache
-    this.indexedDbService.deleteSetting('nominatimSelectedPlace')
-    this.indexedDbService.deleteSetting('nominatimSearch')
-    // Check network
-    this.networkService.init();
-    // Init the server connection
-    this.serverService.init();
   }
 
   public ngOnInit(): void {
@@ -264,7 +277,7 @@ export class AppComponent implements OnInit {
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();
-    this.updateDataForLocation(this.mapService.getMapLocation(), true);
+    this.messageService.setMessages([]);
   }
 
   private async handleSharedContent(content: SharedContent) {
@@ -391,7 +404,6 @@ export class AppComponent implements OnInit {
       }
       // Messages
       this.messageService.getByPlusCode(location);
-      this.createMarkerLocations();
     }
   }
 
@@ -784,7 +796,7 @@ export class AppComponent implements OnInit {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
-      disableClose: true,
+      disableClose: false,
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true

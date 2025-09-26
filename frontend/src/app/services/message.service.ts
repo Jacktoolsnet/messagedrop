@@ -26,7 +26,7 @@ export class MessageService {
   readonly commentsSignals = new Map<string, WritableSignal<Message[]>>();
   readonly commentCountsSignal = signal<Record<string, number>>({});
 
-  private _messageSet = signal(false);
+  private _messageSet = signal(0);
   readonly messageSet = this._messageSet.asReadonly();
 
   private commentCounts: Record<string, number> = {};
@@ -328,13 +328,13 @@ export class MessageService {
           const mappedMessages = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
           this.messagesSignal.set(mappedMessages);
 
-          this._messageSet.set(true);
+          this._messageSet.update(trigger => trigger + 1);
         },
         error: () => {
           // Fehlerfall: Location trotzdem aktualisieren, Messages leeren
           this.lastSearchedLocation = plusCode;
           this.messagesSignal.set([]);
-          this._messageSet.set(true);
+          this._messageSet.update(trigger => trigger + 1);
         }
       });
   }
