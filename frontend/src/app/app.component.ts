@@ -136,10 +136,9 @@ export class AppComponent implements OnInit {
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
-    effect(async () => {
+    effect(() => {
       if (this.serverService.serverSet()) {
         if (this.serverService.isReady()) {
-          await this.appService.loadAppSettings();
           // Init the map
           this.mapService.initMap();
         }
@@ -168,7 +167,8 @@ export class AppComponent implements OnInit {
           dialogRef.afterOpened().subscribe(e => { });
 
           dialogRef.afterClosed().subscribe(() => {
-            this.initApp();
+            // Notification Action
+            this.handleNotification();
           });
         }
       }
@@ -207,11 +207,6 @@ export class AppComponent implements OnInit {
       }
     });
 
-    this.initApp();
-  }
-
-
-  async initApp() {
     // Shared Content
     effect(() => {
       const content = this.sharedContentService.getSharedContentSignal()();
@@ -219,8 +214,14 @@ export class AppComponent implements OnInit {
         this.handleSharedContent(content);
       }
     });
+
+    this.initApp();
     // Notification Action
     this.handleNotification();
+  }
+
+  async initApp() {
+    await this.appService.loadAppSettings();
     // Clear cache
     this.indexedDbService.deleteSetting('nominatimSelectedPlace')
     this.indexedDbService.deleteSetting('nominatimSearch')
@@ -765,6 +766,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.legalNoticeDialog.open(LegalNoticeComponent, {
       data: {},
       closeOnNavigation: true,
+      autoFocus: false,
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true
@@ -781,6 +783,8 @@ export class AppComponent implements OnInit {
     const dialogRef = this.disclaimerDialog.open(DisclaimerComponent, {
       data: {},
       closeOnNavigation: true,
+      autoFocus: false,
+      disableClose: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true
