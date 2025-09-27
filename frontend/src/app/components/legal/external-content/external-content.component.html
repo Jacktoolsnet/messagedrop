@@ -1,1 +1,28 @@
-<p>external-content works!</p>
+<h2 mat-dialog-title>External content settings</h2>
+<mat-dialog-content>
+    <div class="platform-tile-container">
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'pinterest'" (enabledChange)="setAllowPinterestContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'spotify'" (enabledChange)="setAllowSpotifyContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'tenor'" (enabledChange)="setAllowTenorContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'tiktok'" (enabledChange)="setAllowTikTokContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
+            <app-enable-external-content [platform]="'youtube'" (enabledChange)="setAllowYoutubeContent($event)">
+            </app-enable-external-content>
+        </div>
+    </div>
+
+    <mat-dialog-actions>
+        <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">Close</button>
+    </mat-dialog-actions>

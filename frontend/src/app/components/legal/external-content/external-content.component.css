@@ -1,0 +1,121 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
+::ng-deep mat-dialog-content {
+    max-height: unset !important;
+    overflow: visible !important;
+    display: block;
+}
+
+::ng-deep mat-dialog-container {
+    display: flex;
+    flex-direction: column;
+    max-height: 95vh;
+}
+
+h4 {
+    padding: 0.5rem;
+}
+
+.button-area {
+    position: relative;
+    display: block;
+    border-radius: 1rem;
+    margin-top: 1.5rem;
+    padding: 1.5rem;
+    background-color: var(--mat-option-selected-state-layer-color);
+    box-shadow: 0 4px 12px var(--mat-select-focused-arrow-color);
+}
+
+.sample-style {
+    margin: auto;
+    width: 100%;
+    height: 3rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.button-style {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(50%, 50%);
+}
+
+.full-width {
+    width: 100%;
+}
+
+.theme-select {
+    min-width: 200px;
+    max-width: 100%;
+    width: 100%;
+}
+
+.theme-toggle-group {
+    width: 100%;
+    min-height: 2rem;
+    display: flex;
+    justify-content: space-between;
+
+    ::ng-deep .mat-button-toggle {
+        flex: 1 1 0;
+    }
+
+    ::ng-deep .mat-button-toggle-button {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1rem;
+        text-transform: none;
+        gap: 0.25rem;
+    }
+
+    ::ng-deep .mat-icon {
+        font-size: 1.5rem;
+    }
+}
+
+/* Slide toggle row */
+.toggle-row {
+    display: block;
+    width: 100%;
+    margin-top: 1rem;
+    /* gewünschter Abstand nach oben */
+}
+
+/* Falls du den Toggle über die ganze Breite möchtest */
+.toggle-row mat-slide-toggle {
+    width: 100%;
+}
+
+.version-chipset mat-chip {
+    width: 100%;
+    text-align: center;
+    display: inline;
+}
+
+.platform-tile-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    justify-content: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    width: auto;
+}
+
+.platform-tile {
+    border-radius: 1rem;
+    padding: 1rem;
+    text-align: center;
+    font-weight: 500;
+    font-size: 1.05rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}

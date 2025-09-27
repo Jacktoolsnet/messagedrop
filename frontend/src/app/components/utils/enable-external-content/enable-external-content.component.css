@@ -1,3 +1,8 @@
+:host {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    line-height: 1.35;
+}
+
 /* Tile darf nie breiter werden als sein Container */
 .platform-tile.activation {
     width: 100%;

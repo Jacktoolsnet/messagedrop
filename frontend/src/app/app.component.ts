@@ -17,6 +17,7 @@ import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
+import { ExternalContentComponent } from './components/legal/external-content/external-content.component';
 import { LegalNoticeComponent } from './components/legal/legal-notice/legal-notice.component';
 import { PrivacyPolicyComponent } from './components/legal/privacy-policy/privacy-policy.component';
 import { TermsOfServiceComponent } from './components/legal/terms-of-service/terms-of-service.component';
@@ -33,7 +34,6 @@ import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
-import { AppSettings } from './interfaces/app-settings';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
@@ -125,22 +125,6 @@ export class AppComponent implements OnInit {
     private weatherService: WeatherService,
     private geoStatisticService: GeoStatisticService,
     private snackBar: MatSnackBar,
-    public checkPinDialog: MatDialog,
-    public messageDialog: MatDialog,
-    public noteDialog: MatDialog,
-    public messageListDialog: MatDialog,
-    public placeListDialog: MatDialog,
-    public contactListDialog: MatDialog,
-    public userProfileDialog: MatDialog,
-    public appSettingsDialog: MatDialog,
-    public legalNoticeDialog: MatDialog,
-    public disclaimerDialog: MatDialog,
-    public privacyPolicyDialog: MatDialog,
-    public termsOfServiceDialog: MatDialog,
-    public thirdPartyLicensesDialog: MatDialog,
-    public displayMessage: MatDialog,
-    public sharedContentDialog: MatDialog,
-    public nominatimSearchDialog: MatDialog,
     public dialog: MatDialog,
     private platformLocation: PlatformLocation
   ) {
@@ -167,7 +151,7 @@ export class AppComponent implements OnInit {
         this.mapService.initMap();
       }
       if (this.serverService.isFailed()) {
-        const dialogRef = this.displayMessage.open(DisplayMessage, {
+        const dialogRef = this.dialog.open(DisplayMessage, {
           panelClass: '',
           closeOnNavigation: false,
           data: {
@@ -304,7 +288,7 @@ export class AppComponent implements OnInit {
       }
     }
 
-    const dialogRef = this.sharedContentDialog.open(SharedContentComponent, {
+    const dialogRef = this.dialog.open(SharedContentComponent, {
       data: { multimedia, location },
       closeOnNavigation: true,
       minWidth: '20vw',
@@ -338,7 +322,7 @@ export class AppComponent implements OnInit {
   }
 
   public getCurrentPosition() {
-    const dialogRef = this.displayMessage.open(DisplayMessage, {
+    const dialogRef = this.dialog.open(DisplayMessage, {
       panelClass: '',
       closeOnNavigation: false,
       data: {
@@ -483,7 +467,7 @@ export class AppComponent implements OnInit {
     };
     this.sharedContentService.addSharedContentToMessage(message);
 
-    const dialogRef = this.messageDialog.open(EditMessageComponent, {
+    const dialogRef = this.dialog.open(EditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
@@ -526,7 +510,7 @@ export class AppComponent implements OnInit {
       }
     };
     this.sharedContentService.addSharedContentToNote(note);
-    const dialogRef = this.noteDialog.open(EditNoteComponent, {
+    const dialogRef = this.dialog.open(EditNoteComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
@@ -560,7 +544,7 @@ export class AppComponent implements OnInit {
         next: (getMessageResponse) => {
           const allMessages: Message[] = this.messageService.mapRawMessages(getMessageResponse.rows);
           this.messageService.setMessages(allMessages.filter(msg => !msg.parentUuid))
-          const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+          const dialogRef = this.dialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { location: this.mapService.getMapLocation() },
@@ -585,7 +569,7 @@ export class AppComponent implements OnInit {
         },
         error: (err) => {
           this.messageService.clearMessages();
-          const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+          const dialogRef = this.dialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { location: this.mapService.getMapLocation() },
@@ -615,7 +599,7 @@ export class AppComponent implements OnInit {
 
   public openUserNoteListDialog(): void {
     this.noteService.loadNotes().then(notes => {
-      const dialogRef = this.messageListDialog.open(NotelistComponent, {
+      const dialogRef = this.dialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
         data: { location: this.mapService.getMapLocation(), notesSignal: this.noteService.getNotesSignal() },
@@ -640,7 +624,7 @@ export class AppComponent implements OnInit {
   }
 
   public openPlaceListDialog(): void {
-    const dialogRef = this.placeListDialog.open(PlacelistComponent, {
+    const dialogRef = this.dialog.open(PlacelistComponent, {
       panelClass: 'PalceListDialog',
       closeOnNavigation: true,
       data: {},
@@ -677,7 +661,7 @@ export class AppComponent implements OnInit {
   }
 
   public openContactListDialog(): void {
-    const dialogRef = this.contactListDialog.open(ContactlistComponent, {
+    const dialogRef = this.dialog.open(ContactlistComponent, {
       panelClass: 'ContactListDialog',
       closeOnNavigation: true,
       data: {},
@@ -730,7 +714,7 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerMessageListDialog(messages: Message[]) {
-    const dialogRef = this.messageListDialog.open(MessagelistComponent, {
+    const dialogRef = this.dialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { location: messages[0].location },
@@ -757,7 +741,7 @@ export class AppComponent implements OnInit {
 
   public openMarkerNoteListDialog(notes: Note[]) {
     const notesSignal = signal<Note[]>(notes);
-    const dialogRef = this.messageListDialog.open(NotelistComponent, {
+    const dialogRef = this.dialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { location: this.mapService.getMapLocation(), notesSignal: notesSignal },
@@ -781,7 +765,7 @@ export class AppComponent implements OnInit {
   }
 
   public showLegalNotice() {
-    const dialogRef = this.legalNoticeDialog.open(LegalNoticeComponent, {
+    const dialogRef = this.dialog.open(LegalNoticeComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -799,7 +783,7 @@ export class AppComponent implements OnInit {
   }
 
   public showDisclaimer() {
-    const dialogRef = this.disclaimerDialog.open(DisclaimerComponent, {
+    const dialogRef = this.dialog.open(DisclaimerComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -818,7 +802,7 @@ export class AppComponent implements OnInit {
   }
 
   public showPrivacyPolicy() {
-    const dialogRef = this.privacyPolicyDialog.open(PrivacyPolicyComponent, {
+    const dialogRef = this.dialog.open(PrivacyPolicyComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -837,7 +821,7 @@ export class AppComponent implements OnInit {
   }
 
   public showTermsOfService() {
-    const dialogRef = this.termsOfServiceDialog.open(TermsOfServiceComponent, {
+    const dialogRef = this.dialog.open(TermsOfServiceComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -856,7 +840,7 @@ export class AppComponent implements OnInit {
   }
 
   public showLicenses() {
-    const dialogRef = this.thirdPartyLicensesDialog.open(ThirdPartyLicensesComponent, {
+    const dialogRef = this.dialog.open(ThirdPartyLicensesComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -875,29 +859,41 @@ export class AppComponent implements OnInit {
   }
 
   public editAppSettings() {
-    const dialogRef = this.userProfileDialog.open(AppSettingsComponent, {
+    const dialogRef = this.dialog.open(AppSettingsComponent, {
       data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
+      width: '800px',
       maxWidth: '90vw',
       autoFocus: false,
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe(() => { });
+  }
+
+  public editExternalContentSettings() {
+    const dialogRef = this.dialog.open(ExternalContentComponent, {
+      data: { appSettings: this.appService.getAppSettings() },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      hasBackdrop: true
     });
 
-    dialogRef.afterClosed().subscribe((newAppSettings: AppSettings) => {
-      if (newAppSettings) {
-        this.appService.setAppSettings(newAppSettings);
-      }
-    });
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe(() => { });
   }
 
   public editUserProfile() {
     let profile: Profile = this.userService.getProfile()
 
-    const dialogRef = this.userProfileDialog.open(UserProfileComponent, {
+    const dialogRef = this.dialog.open(UserProfileComponent, {
       data: {},
       closeOnNavigation: true,
       maxHeight: '90vh',
@@ -1002,7 +998,7 @@ export class AppComponent implements OnInit {
           dialogRef.afterClosed().subscribe();
         },
         error: (err) => {
-          const dialogRef = this.displayMessage.open(DisplayMessage, {
+          const dialogRef = this.dialog.open(DisplayMessage, {
             panelClass: '',
             closeOnNavigation: false,
             data: {
@@ -1052,7 +1048,7 @@ export class AppComponent implements OnInit {
           dialogRef.afterClosed().subscribe();
         },
         error: (err) => {
-          const dialogRef = this.displayMessage.open(DisplayMessage, {
+          const dialogRef = this.dialog.open(DisplayMessage, {
             data: {
               showAlways: true,
               title: this.networkService.getErrorTitle(err.status),
@@ -1107,7 +1103,7 @@ export class AppComponent implements OnInit {
   }
 
   private showGeoStatisticError(message: string) {
-    const dialogRef = this.displayMessage.open(DisplayMessage, {
+    const dialogRef = this.dialog.open(DisplayMessage, {
       panelClass: '',
       closeOnNavigation: false,
       data: {
@@ -1137,7 +1133,7 @@ export class AppComponent implements OnInit {
 
   async showNominatimSearchDialog() {
     let searchValues: string = await this.indexedDbService.getSetting('nominatimSearch');
-    const dialogRef = this.nominatimSearchDialog.open(NominatimSearchComponent, {
+    const dialogRef = this.dialog.open(NominatimSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { location: this.mapService.getMapLocation(), searchValues: undefined != searchValues ? JSON.parse(searchValues) : undefined },

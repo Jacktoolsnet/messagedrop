@@ -1,50 +1,45 @@
-/* Tile darf nie breiter als sein Container werden */
+:host {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    line-height: 1.35;
+}
+
+/* Tile darf nie breiter werden als sein Container */
 .platform-tile.activation {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    margin-top: 1rem;
-    border-radius: 1rem;
-    padding: 1rem;
-    color: var(--mat-app-text-color);
-    background-color: var(--mat-card-filled-container-color);
-    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-    transition: transform 0.15s ease, box-shadow 0.15s ease;
+    /* Falls extrem lange Tokens drin sind (z. B. ohne Leerzeichen) */
     overflow-wrap: anywhere;
-    /* lange Tokens umbrechen */
     word-break: break-word;
     /* Fallback */
 }
 
+/* Header auf volle Breite und flex-Shrink erlauben */
 .platform-header {
     display: flex;
     flex-direction: column;
-    /* Überschrift oben, Toggle darunter */
+    /* Text oben, Toggle darunter */
     align-items: center;
-    /* für links: flex-start */
     gap: 0.5rem;
     width: 100%;
 }
 
 .platform-header>* {
     min-width: 0;
+    /* verhindert, dass Kinder overflowen */
 }
 
-/* verhindert Overflow durch Kinder */
-
+/* Titel & Hinweis: immer umbrechen */
 .platform-name,
 .platform-note {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
+    /* Fallback für ältere Browser */
     hyphens: auto;
+    /* hübschere Trennungen, wenn erlaubt */
     max-width: 100%;
     text-align: center;
-}
-
-.platform-name {
-    font-weight: 600;
-    font-size: 1.05rem;
 }
 
 .mat-mdc-slide-toggle {
@@ -58,13 +53,13 @@
     white-space: normal;
 }
 
-/* Link: Haupttextfarbe, bold, immer unterstrichen – in allen Zuständen */
-.policy-link,
-.policy-link:hover,
-.policy-link:focus,
-.policy-link:active,
-.policy-link:visited,
-.policy-link:focus-visible {
+/* Links: Haupttextfarbe, bold, immer unterstrichen – auch im Hover/Visited */
+.platform-link,
+.platform-link:hover,
+.platform-link:focus,
+.platform-link:active,
+.platform-link:visited,
+.platform-link:focus-visible {
     color: var(--mat-app-text-color) !important;
     font-weight: 700;
     text-decoration: underline;

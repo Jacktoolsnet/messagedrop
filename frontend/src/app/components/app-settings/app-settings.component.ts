@@ -14,7 +14,6 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
-import { EnableExternalContentComponent } from '../utils/enable-external-content/enable-external-content.component';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 
 
@@ -36,7 +35,6 @@ import { EnableLocationComponent } from "../utils/enable-location/enable-locatio
     MatButtonToggleModule,
     MatChipsModule,
     MatSlideToggleModule,
-    EnableExternalContentComponent,
     EnableLocationComponent
   ],
   templateUrl: './app-settings.component.html',
@@ -74,7 +72,7 @@ export class AppSettingsComponent {
     });
   }
 
-  onAbortClick(): void {
+  onCloseClick(): void {
     this.dialogRef.close();
   }
 
@@ -92,31 +90,6 @@ export class AppSettingsComponent {
 
   setDetectLocationOnStart(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, detectLocationOnStart: enabled };
-    this.appService.setAppSettings(this.appSettings);
-  }
-
-  setAllowYoutubeContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableYoutubeContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
-  }
-
-  setAllowPinterestContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enablePinterestContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
-  }
-
-  setAllowSpotifyContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableSpotifyContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
-  }
-
-  setAllowTikTokContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableTikTokContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
-  }
-
-  setAllowTenorContent(enabled: boolean): void {
-    this.appSettings = { ...this.appSettings, enableTenorContent: enabled };
     this.appService.setAppSettings(this.appSettings);
   }
 
