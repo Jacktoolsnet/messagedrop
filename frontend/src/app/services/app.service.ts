@@ -1,6 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
-import { ConsentKey } from '../interfaces/consent-settings.interface';
 import { NotificationAction } from '../interfaces/notification-action';
 import { IndexedDbService } from './indexed-db.service';
 
@@ -78,8 +77,12 @@ export class AppService {
     this.setTheme(this.appSettings);
   }
 
-  public chekConsentCompleted(required: ConsentKey[] = ['disclaimer']) {
-    this.consentCompleted = required.some(k => this.appSettings?.consentSettings[k]);
+  public chekConsentCompleted() {
+    this.consentCompleted = (
+      this.appSettings?.consentSettings.disclaimer === true
+      && this.appSettings?.consentSettings.privacyPolicy === true
+      && this.appSettings?.consentSettings.termsOfService === true
+    );
   }
 
   // Notification-Daten

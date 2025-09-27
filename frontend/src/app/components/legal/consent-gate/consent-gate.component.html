@@ -10,11 +10,30 @@
             </div>
         </div>
 
-        <button type="button" mat-flat-button (click)="review('disclaimer')">
+        <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')">
+            <mat-icon class="material-symbols-outlined">
+                {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
+                'check_box'}}
+            </mat-icon>
+            Privacy Policy {{ !appService.getAppSettings().consentSettings.privacyPolicy ? '(review and accept)' :
+            '(accepted)'}}
+        </button>
+
+        <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')">
+            <mat-icon class="material-symbols-outlined">
+                {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
+                'check_box'}}
+            </mat-icon>
+            Terms of Service {{ !appService.getAppSettings().consentSettings.termsOfService ? '(review and accept)' :
+            '(accepted)'}}
+        </button>
+
+        <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')">
             <mat-icon class="material-symbols-outlined">
                 {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box' }}
             </mat-icon>
-            Disclaimer
+            Disclaimer {{ !appService.getAppSettings().consentSettings.disclaimer ? '(review and accept)' :
+            '(accepted)'}}
         </button>
 
         <div class="actions">

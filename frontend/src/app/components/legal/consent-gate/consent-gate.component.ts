@@ -8,6 +8,8 @@ import { Subscription } from 'rxjs';
 import { ConsentKey } from '../../../interfaces/consent-settings.interface';
 import { AppService } from '../../../services/app.service';
 import { DisclaimerComponent } from '../disclaimer/disclaimer.component';
+import { PrivacyPolicyComponent } from '../privacy-policy/privacy-policy.component';
+import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.component';
 
 
 @Component({
@@ -58,29 +60,48 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
     const map: Record<string, string> = {
       disclaimer: 'Disclaimer',
       privacyPolicy: 'Privacy Policy',
+      termsOfService: 'Terms of Service'
     };
     if (map[k]) return map[k];
     return k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
   }
 
   review(key: ConsentKey): void {
+    if (key === 'privacyPolicy') {
+      this.dialog.open(PrivacyPolicyComponent, {
+        closeOnNavigation: true,
+        autoFocus: false,
+        disableClose: false,
+        maxHeight: '90vh',
+        width: '800px',
+        maxWidth: '90vw',
+        hasBackdrop: true
+      }).afterClosed().subscribe(() => this.computeMissing());
+      return;
+    }
+    if (key === 'termsOfService') {
+      this.dialog.open(TermsOfServiceComponent, {
+        closeOnNavigation: true,
+        autoFocus: false,
+        disableClose: false,
+        maxHeight: '90vh',
+        width: '800px',
+        maxWidth: '90vw',
+        hasBackdrop: true
+      }).afterClosed().subscribe(() => this.computeMissing());
+      return;
+    }
     if (key === 'disclaimer') {
       this.dialog.open(DisclaimerComponent, {
         closeOnNavigation: true,
         autoFocus: false,
         disableClose: false,
         maxHeight: '90vh',
+        width: '800px',
         maxWidth: '90vw',
         hasBackdrop: true
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
-    /* if (key === 'privacyPolicy') {
-      // Bis eine eigene Privacy-Consent-Komponente existiert:
-      window.open('/privacy', '_blank', 'noopener');
-      // Nach Rückkehr kann Nutzer "Accept all" drücken; alternativ später Privacy-Dialog bauen.
-      return;
-    }*/
-    // Weitere Consents (z. B. openStreetMap) könnten hier eigene Dialoge öffnen
   }
 }

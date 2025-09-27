@@ -20,9 +20,6 @@
 .license-text {
     white-space: pre-wrap;
     word-break: break-word;
-    /* scrollt schön im Dialog */
     overflow: auto;
     padding: .75rem;
-    border-radius: 12px;
-    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
 }
