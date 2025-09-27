@@ -1,0 +1,25 @@
+<h1 mat-dialog-title>Third-Party Licenses</h1>
+
+<div mat-dialog-content>
+    @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p class="muted">Loading licenses…</p>
+    }
+
+    @if (error()) {
+    <div class="error" role="alert">
+        <p>Could not load the license file.</p>
+        <button mat-stroked-button (click)="reload()">Retry</button>
+    </div>
+    }
+
+    @if (!loading() && !error()) {
+    <pre class="license-text" [textContent]="text()" aria-label="Third-party licenses"></pre>
+    }
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="openInNewTab()" [disabled]="loading() || error()">Open in new tab</button>
+    <button mat-stroked-button (click)="download()" [disabled]="loading() || error()">Download</button>
+    <button mat-button color="primary" (click)="close()">Close</button>
+</div>

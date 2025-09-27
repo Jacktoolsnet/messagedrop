@@ -18,6 +18,9 @@ import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { LegalNoticeComponent } from './components/legal/legal-notice/legal-notice.component';
+import { PrivacyPolicyComponent } from './components/legal/privacy-policy/privacy-policy.component';
+import { TermsOfServiceComponent } from './components/legal/terms-of-service/terms-of-service.component';
+import { ThirdPartyLicensesComponent } from './components/legal/third-party-licenses/third-party-licenses.component';
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
@@ -132,6 +135,9 @@ export class AppComponent implements OnInit {
     public appSettingsDialog: MatDialog,
     public legalNoticeDialog: MatDialog,
     public disclaimerDialog: MatDialog,
+    public privacyPolicyDialog: MatDialog,
+    public termsOfServiceDialog: MatDialog,
+    public thirdPartyLicensesDialog: MatDialog,
     public displayMessage: MatDialog,
     public sharedContentDialog: MatDialog,
     public nominatimSearchDialog: MatDialog,
@@ -780,6 +786,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       autoFocus: false,
       maxHeight: '90vh',
+      width: '800px',
       maxWidth: '90vw',
       hasBackdrop: true
     });
@@ -798,8 +805,66 @@ export class AppComponent implements OnInit {
       autoFocus: false,
       disableClose: false,
       maxHeight: '90vh',
+      width: '800px',
       maxWidth: '90vw',
       hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  public showPrivacyPolicy() {
+    const dialogRef = this.privacyPolicyDialog.open(PrivacyPolicyComponent, {
+      data: {},
+      closeOnNavigation: true,
+      autoFocus: false,
+      disableClose: false,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  public showTermsOfService() {
+    const dialogRef = this.termsOfServiceDialog.open(TermsOfServiceComponent, {
+      data: {},
+      closeOnNavigation: true,
+      autoFocus: false,
+      disableClose: false,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => {
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+    });
+  }
+
+  public showLicenses() {
+    const dialogRef = this.thirdPartyLicensesDialog.open(ThirdPartyLicensesComponent, {
+      data: {},
+      closeOnNavigation: true,
+      autoFocus: false,
+      disableClose: false,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      hasBackdrop: true,
     });
 
     dialogRef.afterOpened().subscribe(e => {

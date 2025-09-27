@@ -1,0 +1,28 @@
+:host {
+    color: var(--mat-app-text-color);
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    line-height: 1.35;
+}
+
+.muted {
+    margin: .5rem 0 0;
+    opacity: .7;
+}
+
+.error {
+    margin-top: .5rem;
+    padding: .75rem;
+    border-radius: 10px;
+    border: 1px solid #f3c2c2;
+    background: #fff1f1;
+}
+
+.license-text {
+    white-space: pre-wrap;
+    word-break: break-word;
+    /* scrollt schön im Dialog */
+    overflow: auto;
+    padding: .75rem;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, currentColor 10%, transparent);
+}

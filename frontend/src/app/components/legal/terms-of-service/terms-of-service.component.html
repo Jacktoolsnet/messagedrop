@@ -1,0 +1,19 @@
+<h2 mat-dialog-title>Terms of Service</h2>
+
+<mat-dialog-content class="content">
+    <p class="last-updated"><em>Last updated: 25 Sep 2025</em></p>
+
+    <section class="block">
+        <h3 class="h">Working on it</h3>
+        <p>
+            Comming soon...
+        </p>
+    </section>
+
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <mat-slide-toggle [checked]="accepted" (change)="onToggle($event.checked)" aria-label="Accept Terms of Service">
+        I have read and accept this Terms of Service.
+    </mat-slide-toggle>
+</mat-dialog-actions>

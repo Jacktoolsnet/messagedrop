@@ -34,7 +34,8 @@ export class AppService {
     enableTenorContent: false,
     consentSettings: {
       disclaimer: false,
-      privacyPolicy: false
+      privacyPolicy: false,
+      termsOfService: false
     }
   };
 
