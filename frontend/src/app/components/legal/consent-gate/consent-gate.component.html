@@ -10,6 +10,16 @@
             </div>
         </div>
 
+        <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')">
+            <mat-icon class="material-symbols-outlined">
+                {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
+                'check_box'}}
+            </mat-icon>
+            Terms of Service {{ !appService.getAppSettings().consentSettings.termsOfService ? '(review and accept)'
+            :
+            '(accepted)'}}
+        </button>
+
         <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')">
             <mat-icon class="material-symbols-outlined">
                 {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
@@ -19,24 +29,26 @@
             '(accepted)'}}
         </button>
 
-        <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')">
-            <mat-icon class="material-symbols-outlined">
-                {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
-                'check_box'}}
-            </mat-icon>
-            Terms of Service {{ !appService.getAppSettings().consentSettings.termsOfService ? '(review and accept)' :
-            '(accepted)'}}
-        </button>
-
         <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')">
             <mat-icon class="material-symbols-outlined">
-                {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box' }}
+                {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box'
+                }}
             </mat-icon>
             Disclaimer {{ !appService.getAppSettings().consentSettings.disclaimer ? '(review and accept)' :
             '(accepted)'}}
         </button>
 
-        <div class="actions">
+        <div class="head">
+            <div class="titles">
+                <div id="consent-title" class="title">Optional</div>
+                <div class="subtitle">
+                    You can change the settings whenever you like.
+                </div>
+            </div>
         </div>
+        <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
+            <mat-icon class="material-symbols-outlined">public</mat-icon>
+            Edit external content settings
+        </button>
     </div>
 </div>

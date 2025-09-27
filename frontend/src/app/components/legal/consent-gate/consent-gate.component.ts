@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { ConsentKey } from '../../../interfaces/consent-settings.interface';
 import { AppService } from '../../../services/app.service';
 import { DisclaimerComponent } from '../disclaimer/disclaimer.component';
+import { ExternalContentComponent } from '../external-content/external-content.component';
 import { PrivacyPolicyComponent } from '../privacy-policy/privacy-policy.component';
 import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.component';
 
@@ -15,7 +16,12 @@ import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.co
 @Component({
   selector: 'app-consent-gate',
   standalone: true,
-  imports: [CommonModule, MatIconModule, MatButtonModule, MatChipsModule],
+  imports: [
+    CommonModule,
+    MatIconModule,
+    MatButtonModule,
+    MatChipsModule
+  ],
   templateUrl: './consent-gate.component.html',
   styleUrl: './consent-gate.component.css'
 })
@@ -103,5 +109,21 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
+  }
+
+  public editExternalContentSettings() {
+    const dialogRef = this.dialog.open(ExternalContentComponent, {
+      data: { appSettings: this.appService.getAppSettings() },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      autoFocus: false,
+      hasBackdrop: true
+    });
+
+    dialogRef.afterOpened().subscribe(e => { });
+
+    dialogRef.afterClosed().subscribe(() => { });
   }
 }

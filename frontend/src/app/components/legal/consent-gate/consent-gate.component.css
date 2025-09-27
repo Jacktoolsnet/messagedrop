@@ -2,27 +2,24 @@
     color: var(--mat-app-text-color);
 }
 
-/* Vollflächig, zentriert */
 .gate {
-    width: auto;
-    height: 100dvh;
+    height: auto;
+    width: 800px;
+    margin: auto;
+    max-width: 90vw;
     display: grid;
     place-items: center;
     padding: 2rem;
     background: var(--mdc-elevated-card-container-color, transparent);
 }
 
-/* Zentrale Karte */
 .card {
-    width: auto;
     background: var(--mat-card-filled-container-color);
     color: var(--mat-app-text-color);
     border-radius: 1rem;
     box-shadow: 0 10px 30px var(--mat-card-outlined-outline-color);
     padding: 1rem;
-    margin-inline: auto;
 }
-
 
 .material-symbols-outlined {
     font-size: 32px;

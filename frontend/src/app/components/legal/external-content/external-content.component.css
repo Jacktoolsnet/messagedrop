@@ -2,16 +2,14 @@
     color: var(--mat-app-text-color);
 }
 
-::ng-deep mat-dialog-content {
-    max-height: unset !important;
-    overflow: visible !important;
-    display: block;
-}
-
-::ng-deep mat-dialog-container {
-    display: flex;
-    flex-direction: column;
-    max-height: 95vh;
+/* Dialog sizing & scrolling */
+.mat-mdc-dialog-content.content {
+    max-height: 85vh;
+    min-width: min(320px, 90vw);
+    max-width: 90vw;
+    overflow: auto;
+    box-sizing: border-box;
+    padding-bottom: 0.5rem;
 }
 
 h4 {

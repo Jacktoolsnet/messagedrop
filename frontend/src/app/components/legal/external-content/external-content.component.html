@@ -1,5 +1,6 @@
 <h2 mat-dialog-title>External content settings</h2>
-<mat-dialog-content>
+
+<mat-dialog-content class="content">
     <div class="platform-tile-container">
         <div class="platform-tile">
             <app-enable-external-content [platform]="'pinterest'" (enabledChange)="setAllowPinterestContent($event)">
@@ -22,7 +23,8 @@
             </app-enable-external-content>
         </div>
     </div>
+</mat-dialog-content>
 
-    <mat-dialog-actions>
-        <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">Close</button>
-    </mat-dialog-actions>
+<mat-dialog-actions>
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">Close</button>
+</mat-dialog-actions>
