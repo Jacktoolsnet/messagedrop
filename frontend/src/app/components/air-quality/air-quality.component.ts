@@ -412,7 +412,8 @@ export class AirQualityComponent implements OnInit {
   };
 
   onTileClick(tile: any): void {
-    if (tile.value == null || tile.value === 0) return;
+    tile.minMax.min
+    if ((tile.minMax.min == null || tile.minMax.min === 0) && (tile.minMax.max == null || tile.minMax.max === 0)) return;
     this.allTileValues = this.getAllTileValues();
     this.allKeys = this.getAllCategoryKeys(); // Alle verfügbaren Keys sammeln
     this.tileIndex = this.allKeys.findIndex(k => k === tile.key);

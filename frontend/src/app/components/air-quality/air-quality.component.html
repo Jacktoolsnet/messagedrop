@@ -71,10 +71,13 @@
     <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="category-toggle-group"
         [value]="selectedCategory" (change)="onCategoryToggle($event.value)" multiple="false">
 
-        <mat-button-toggle *ngFor="let category of categoryModes" [value]="category"
-            matTooltip="{{ getCategoryLabel(category) }}">
-            <mat-icon class="material-symbols-outlined">{{ getCategoryIcon(category) }}</mat-icon>
+        @for (category of categoryModes; track category) {
+        <mat-button-toggle [value]="category" [matTooltip]="getCategoryLabel(category)">
+            <mat-icon class="material-symbols-outlined">
+                {{ getCategoryIcon(category) }}
+            </mat-icon>
         </mat-button-toggle>
+        }
 
     </mat-button-toggle-group>
     }
