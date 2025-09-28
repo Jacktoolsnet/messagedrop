@@ -183,8 +183,11 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       const triggered = this.mapService.mapSet(); // <-- track changes
-      if (this.appService.isConsentCompleted()) {
-        // Fly to position if user alrady allowed location.
+      if (this.appService.isConsentCompleted() && triggered === 1) {
+        /**
+         * Only on app init.
+         * Fly to position if user alrady allowed location.
+         */
         navigator.permissions.query({ name: 'geolocation' }).then((result) => {
           if (result.state === 'granted' && this.appService.getAppSettings().detectLocationOnStart) {
             this.getCurrentPosition();
