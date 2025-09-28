@@ -183,16 +183,28 @@ export class MessagelistComponent implements OnInit {
     }
   }
 
-  public disableMessage(message: Message) {
-    const dialogRef = this.dialog.open(BlockMessageComponent, {
-      closeOnNavigation: true,
-      hasBackdrop: true
-    });
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.messageService.disableMessage(message);
-      }
-    });
+  public disableMessageAfterLoginClick(message: Message) {
+    this.clickedMessage = message;
+    this.userService.login(this.disableMessage.bind(this))
+  }
+
+  public disableMessageClick(message: Message) {
+    this.clickedMessage = message;
+    this.dislikeMessage();
+  }
+
+  public disableMessage() {
+    if (undefined != this.clickedMessage) {
+      const dialogRef = this.dialog.open(BlockMessageComponent, {
+        closeOnNavigation: true,
+        hasBackdrop: true
+      });
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.messageService.disableMessage(this.clickedMessage!);
+        }
+      });
+    }
   }
 
   public deleteMessage(message: Message) {

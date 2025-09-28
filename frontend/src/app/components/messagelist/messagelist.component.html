@@ -106,7 +106,8 @@
                 </button>
                 }
                 @if (this.userService.getUser().id != message.userId) {
-                <button mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Block message"
+                    (click)="!userService.isReady() ? disableMessageAfterLoginClick(message) : disableMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
                 </button>
                 }
@@ -227,7 +228,8 @@
                 </button>
                 }
                 @if (this.userService.getUser().id != message.userId) {
-                <button mat-mini-fab color="secondary" aria-label="Block message" (click)="disableMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Block message"
+                    (click)="!userService.isReady() ? disableMessageAfterLoginClick(message) : disableMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">visibility_off</mat-icon>
                 </button>
                 }
