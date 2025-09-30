@@ -102,7 +102,6 @@ export class MessagelistComponent implements OnInit {
   }
 
   async ngOnInit() {
-    console.log(this.userService.getUser());
     await this.profileService.loadAllProfiles();
   }
 
@@ -196,55 +195,79 @@ export class MessagelistComponent implements OnInit {
     });
   }
 
-  public deleteMessage(message: Message) {
-    const dialogRef = this.dialog.open(DeleteMessageComponent, {
-      closeOnNavigation: true,
-      hasBackdrop: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (!result) return;
-
-      const selected = this.messageService.selectedMessagesSignal();
-
-      // 1. Löschen
-      this.messageService.deleteMessage(message);
-
-      // 2. Prüfen, ob in der aktuellen Ebene noch Comments da sind
-      const parentUuid = message.parentUuid;
-      if (!parentUuid) return; // Root → nichts zu tun
-
-      const commentsSignal = this.messageService.getCommentsSignalForMessage(parentUuid);
-      const remainingComments = commentsSignal().filter(c => c.id !== message.id);
-
-      if (remainingComments.length === 0) {
-        // Eine Ebene zurückgehen
-        const newSelected = [...selected];
-        newSelected.pop();
-        this.messageService.selectedMessagesSignal.set(newSelected);
-      }
-    });
+  public deleteMessageAfterLoginClick(message: Message) {
+    this.clickedMessage = message;
+    this.userService.login(this.deleteMessage.bind(this))
   }
 
-  public editMessage(message: Message) {
-    if (message.multimedia.type !== MultimediaType.UNDEFINED) {
-      this.sharedContentService.addSharedContentToMessage(message);
+  public deleteMessageClick(message: Message) {
+    this.clickedMessage = message;
+    this.deleteMessage();
+  }
+
+  public deleteMessage() {
+    if (this.clickedMessage) {
+      const dialogRef = this.dialog.open(DeleteMessageComponent, {
+        closeOnNavigation: true,
+        hasBackdrop: true
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (!result) return;
+
+        const selected = this.messageService.selectedMessagesSignal();
+
+        // 1. Löschen
+        this.messageService.deleteMessage(this.clickedMessage!);
+
+        // 2. Prüfen, ob in der aktuellen Ebene noch Comments da sind
+        const parentUuid = this.clickedMessage!.parentUuid;
+        if (!parentUuid) return; // Root → nichts zu tun
+
+        const commentsSignal = this.messageService.getCommentsSignalForMessage(parentUuid);
+        const remainingComments = commentsSignal().filter(c => c.id !== this.clickedMessage!.id);
+
+        if (remainingComments.length === 0) {
+          // Eine Ebene zurückgehen
+          const newSelected = [...selected];
+          newSelected.pop();
+          this.messageService.selectedMessagesSignal.set(newSelected);
+        }
+      });
     }
+  }
 
-    const dialogRef = this.messageDialog.open(EditMessageComponent, {
-      panelClass: '',
-      data: { mode: message.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message },
-      closeOnNavigation: true,
-      minWidth: '20vw',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      hasBackdrop: true,
-      autoFocus: false
-    });
+  public editMessageAfterLoginClick(message: Message) {
+    this.clickedMessage = message;
+    this.userService.login(this.editMessage.bind(this))
+  }
 
-    dialogRef.afterClosed().subscribe(() => {
-      this.messageService.updateMessage(message);
-    });
+  public editMessageClick(message: Message) {
+    this.clickedMessage = message;
+    this.editMessage();
+  }
+
+  public editMessage() {
+    if (this.clickedMessage) {
+      if (this.clickedMessage.multimedia.type !== MultimediaType.UNDEFINED) {
+        this.sharedContentService.addSharedContentToMessage(this.clickedMessage);
+      }
+
+      const dialogRef = this.messageDialog.open(EditMessageComponent, {
+        panelClass: '',
+        data: { mode: this.clickedMessage.parentId == null ? this.mode.EDIT_PUBLIC_MESSAGE : this.mode.EDIT_COMMENT, message: this.clickedMessage },
+        closeOnNavigation: true,
+        minWidth: '20vw',
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.messageService.updateMessage(this.clickedMessage!);
+      });
+    }
   }
 
   public editMessageUserProfile(message: Message) {

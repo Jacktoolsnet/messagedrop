@@ -54,7 +54,7 @@
             }
 
             <mat-card-content
-                (click)="userService.isReady() && this.userService.getUser().id == message.userId ? editMessage(message) : {}">
+                (click)="!userService.isReady() && this.userService.getUser().id == message.userId ? editMessageAfterLoginClick(message) : editMessageClick(message)">>
                 <div class="message-content">
                     <app-showmultimedia (click)="$event.stopPropagation()"
                         [multimedia]="message.multimedia"></app-showmultimedia>
@@ -98,10 +98,12 @@
                 </button>
                 }
                 @if (this.userService.getUser().id == message.userId) {
-                <button mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Edit message"
+                    (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Delete message"
+                    (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
                 }
@@ -175,7 +177,7 @@
             }
 
             <mat-card-content
-                (click)="userService.isReady() && this.userService.getUser().id == message.userId ? editMessage(message) : {}">
+                (click)="!userService.isReady() && this.userService.getUser().id == message.userId ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                 <div class="message-content">
                     <app-showmultimedia (click)="$event.stopPropagation()"
                         [multimedia]="message.multimedia"></app-showmultimedia>
@@ -219,10 +221,12 @@
                 </button>
                 }
                 @if (this.userService.getUser().id == message.userId) {
-                <button mat-mini-fab color="secondary" aria-label="Edit message" (click)="editMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Edit message"
+                    (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">>
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Delete message" (click)="deleteMessage(message)">
+                <button mat-mini-fab color="secondary" aria-label="Delete message"
+                    (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
                 }

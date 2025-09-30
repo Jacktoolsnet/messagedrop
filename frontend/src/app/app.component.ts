@@ -139,6 +139,8 @@ export class AppComponent implements OnInit {
         this.networkService.init();
         // Init the server connection
         this.serverService.init();
+        // Get user id if avaliable
+        this.userService.initUserId();
       } else {
         this.logout();
       }
@@ -270,7 +272,6 @@ export class AppComponent implements OnInit {
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();
-    this.messageService.setMessages([]);
   }
 
   private async handleSharedContent(content: SharedContent) {

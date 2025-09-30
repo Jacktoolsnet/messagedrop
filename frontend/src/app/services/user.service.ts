@@ -118,6 +118,7 @@ export class UserService {
     };
     this.ready = false;
     this.blocked = false;
+    this.initUserId();
   }
 
   getPinHash(pin: string, showAlways: boolean = false): Observable<GetPinHashResponse> {
@@ -152,6 +153,13 @@ export class UserService {
     this.ready = true;
     this._userSet.update(trigger => trigger + 1);
     this.blocked = false;
+  }
+
+  async initUserId() {
+    let user = await this.indexedDbService.getUser();
+    if (user) {
+      this.user.id = user.id;
+    }
   }
 
   async initUser(createUserResponse: CreateUserResponse, pinHash: string) {
