@@ -109,7 +109,7 @@
                 }
                 @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="dsaReportMessage(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">gavel</mat-icon>
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">flag</mat-icon>
                 </button>
                 }
             </mat-card-actions>
@@ -232,7 +232,7 @@
                 }
                 @if (this.userService.getUser().id != message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="dsaReportMessage(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">gavel</mat-icon>
+                    <mat-icon aria-hidden="false" class="material-symbols-outlined">flag</mat-icon>
                 </button>
                 }
             </mat-card-actions>

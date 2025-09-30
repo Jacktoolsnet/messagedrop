@@ -7,5 +7,5 @@ export interface CreateDsaNotice {
     reasonText: string;                // kurze, nachvollziehbare Begründung
     reporterEmail: string;             // Kontakt für Rückfragen/Ergebnis
     reporterName?: string;             // optional
-    truthAffirmation: true;            // Bestätigung "nach bestem Wissen"
+    truthAffirmation: boolean;            // Bestätigung "nach bestem Wissen"
 }
