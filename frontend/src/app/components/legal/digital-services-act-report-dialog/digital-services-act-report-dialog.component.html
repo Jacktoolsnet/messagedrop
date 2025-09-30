@@ -1,0 +1,80 @@
+<h2 mat-dialog-title>Report illegal content (DSA)</h2>
+
+<mat-dialog-content>
+    <form [formGroup]="form" class="dialog-grid" aria-describedby="report-help">
+        <p id="report-help" class="muted">
+            Please provide a short explanation and your contact email so we can notify you about the decision.
+        </p>
+
+        <div class="row">
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Content ID</mat-label>
+                <input matInput formControlName="contentId" readonly>
+                <mat-hint>This identifier is filled automatically.</mat-hint>
+            </mat-form-field>
+        </div>
+
+        @if (data.reportedContentUrl) {
+        <div class="row">
+            <mat-form-field appearance="outline" class="w-full">
+                <mat-label>Content link (optional)</mat-label>
+                <input matInput [value]="data.reportedContentUrl" readonly>
+            </mat-form-field>
+        </div>
+        }
+
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Category</mat-label>
+            <mat-select formControlName="category" required>
+                @for (c of categories; track c.value) {
+                <mat-option [value]="c.value">{{ c.label }}</mat-option>
+                }
+            </mat-select>
+            @if (form.controls.category.touched && form.controls.category.invalid) {
+            <mat-hint class="text-warn">Please choose a category.</mat-hint>
+            }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="w-full">
+            <mat-label>Why is this content illegal?</mat-label>
+            <textarea matInput formControlName="reasonText" rows="6"
+                placeholder="Describe the issue and provide any relevant facts or references..."></textarea>
+            @if (form.controls.reasonText.touched && form.controls.reasonText.hasError('required')) {
+            <mat-hint class="text-warn">A short explanation is required.</mat-hint>
+            }
+            @if (form.controls.reasonText.hasError('minlength')) {
+            <mat-hint class="text-warn">Please provide at least 10 characters.</mat-hint>
+            }
+        </mat-form-field>
+
+        <div class="row two-cols">
+            <mat-form-field appearance="outline">
+                <mat-label>Your email</mat-label>
+                <input matInput type="email" formControlName="reporterEmail" placeholder="you@example.com" required>
+                @if (form.controls.reporterEmail.touched && form.controls.reporterEmail.invalid) {
+                <mat-hint class="text-warn">A valid email is required.</mat-hint>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Your name (optional)</mat-label>
+                <input matInput formControlName="reporterName" placeholder="Jane Doe">
+            </mat-form-field>
+        </div>
+
+        <mat-checkbox formControlName="truthAffirmation" required>
+            I declare that the information provided is accurate to the best of my knowledge.
+        </mat-checkbox>
+
+        @if (errorMsg) {
+        <div class="error" role="alert">{{ errorMsg }}</div>
+        }
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-button (click)="cancel()" [disabled]="submitting">Cancel</button>
+    <button mat-flat-button color="primary" (click)="submit()" [disabled]="submitting || form.invalid" cdkFocusInitial>
+        @if (!submitting) { Submit report } @else { Submitting… }
+    </button>
+</mat-dialog-actions>

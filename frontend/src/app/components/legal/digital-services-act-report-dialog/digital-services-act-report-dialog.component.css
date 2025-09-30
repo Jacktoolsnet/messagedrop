@@ -1,0 +1,57 @@
+:host {
+    display: block;
+    color: var(--mat-app-text-color);
+}
+
+.dialog-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    max-width: 720px;
+    width: 100%;
+}
+
+.row {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+}
+
+.two-cols {
+    grid-template-columns: 1fr 1fr;
+}
+
+.w-full {
+    width: 100%;
+}
+
+.muted {
+    margin: 0 0 .5rem 0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+.text-warn {
+    color: var(--mdc-sys-color-error, #d32f2f);
+}
+
+.error {
+    margin-top: .5rem;
+    padding: .5rem .75rem;
+    border-radius: .5rem;
+    background: color-mix(in oklab, #d32f2f 12%, transparent);
+    color: #b71c1c;
+    border: 1px solid color-mix(in oklab, #b71c1c 35%, transparent);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+    .two-cols {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Material fine-tuning */
+.mat-mdc-form-field {
+    --mdc-outlined-text-field-container-shape: 12px;
+}

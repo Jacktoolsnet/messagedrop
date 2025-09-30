@@ -24,9 +24,9 @@ import { SharedContentService } from '../../services/shared-content.service';
 import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
+import { DigitalServicesActReportDialogComponent } from '../legal/digital-services-act-report-dialog/digital-services-act-report-dialog.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { BlockMessageComponent } from './block-message/block-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
 
@@ -102,6 +102,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   async ngOnInit() {
+    console.log(this.userService.getUser());
     await this.profileService.loadAllProfiles();
   }
 
@@ -183,28 +184,16 @@ export class MessagelistComponent implements OnInit {
     }
   }
 
-  public disableMessageAfterLoginClick(message: Message) {
-    this.clickedMessage = message;
-    this.userService.login(this.disableMessage.bind(this))
-  }
-
-  public disableMessageClick(message: Message) {
-    this.clickedMessage = message;
-    this.dislikeMessage();
-  }
-
-  public disableMessage() {
-    if (undefined != this.clickedMessage) {
-      const dialogRef = this.dialog.open(BlockMessageComponent, {
-        closeOnNavigation: true,
-        hasBackdrop: true
-      });
-      dialogRef.afterClosed().subscribe(result => {
-        if (result) {
-          this.messageService.disableMessage(this.clickedMessage!);
-        }
-      });
-    }
+  public dsaReportMessage(message: Message) {
+    const dialogRef = this.dialog.open(DigitalServicesActReportDialogComponent, {
+      data: { reportedMessage: message },
+      closeOnNavigation: true,
+      autoFocus: false,
+      maxHeight: '90vh',
+      width: '800px',
+      maxWidth: '90vw',
+      hasBackdrop: true
+    });
   }
 
   public deleteMessage(message: Message) {
