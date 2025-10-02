@@ -1,4 +1,4 @@
-import { CommonModule, DatePipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, Inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
@@ -29,8 +29,7 @@ import { DigitalServicesActService } from '../../../services/digital-services-ac
     MatCheckboxModule,
     MatButtonModule,
     MatTabsModule,
-    MatIconModule,
-    DatePipe
+    MatIconModule
   ],
   templateUrl: './digital-services-act-report-dialog.component.html',
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
