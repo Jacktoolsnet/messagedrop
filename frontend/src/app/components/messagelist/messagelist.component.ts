@@ -185,7 +185,7 @@ export class MessagelistComponent implements OnInit {
 
   public dsaReportMessage(message: Message) {
     const dialogRef = this.dialog.open(DigitalServicesActReportDialogComponent, {
-      data: { reportedMessage: message },
+      data: { reportedContent: message, reportedContentType: 'public message' },
       closeOnNavigation: true,
       autoFocus: false,
       maxHeight: '90vh',

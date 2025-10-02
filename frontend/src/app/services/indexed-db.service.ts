@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
-import { v4 as uuidv4 } from 'uuid';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
@@ -486,7 +485,7 @@ export class IndexedDbService {
    */
   async saveNote(note: Note): Promise<string> {
     const db = await this.openDB();
-    const key = uuidv4();
+    const key = crypto.randomUUID();
     const noteWithMeta: Note = {
       ...note,
       id: key,

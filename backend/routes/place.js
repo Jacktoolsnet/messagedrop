@@ -2,7 +2,7 @@ const express = require('express');
 const { getEncryptionPublicKey } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
-const uuid = require('uuid');
+const crypto = require('crypto');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
@@ -18,7 +18,7 @@ router.post('/create',
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
-    let placeId = uuid.v4()
+    let placeId = crypto.randomUUID();
     let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
     tablePlace.create(req.database.db, placeId, req.body.userId, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
       if (err) {

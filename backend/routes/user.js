@@ -5,7 +5,6 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
-const uuid = require('uuid');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
@@ -93,7 +92,7 @@ router.post('/create',
     let response = { 'status': 0 };
 
     // Create userId
-    let userId = uuid.v4();
+    let userId = crypto.randomUUID();
 
     // generate crypto key
     const cryptoKeyPair = await subtle.generateKey(

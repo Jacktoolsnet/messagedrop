@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const uuid = require('uuid');
+const crypto = require('crypto');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableConnect = require('../db/tableConnect');
@@ -14,7 +14,7 @@ router.post('/create',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    let connectId = uuid.v4();
+    let connectId = crypto.randomUUID();
     tableConnect.create(req.database.db, connectId, req.body.userId, req.body.hint, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.signature, function (err) {
       if (err) {
         response.status = 500;

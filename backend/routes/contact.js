@@ -2,7 +2,7 @@ const express = require('express');
 const { getEncryptionPublicKey } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
-const uuid = require('uuid');
+const crypto = require('crypto');
 const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const tableContact = require('../db/tableContact');
@@ -17,7 +17,7 @@ router.post('/create',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    let contactId = uuid.v4()
+    let contactId = crypto.randomUUID();
     tableContact.create(req.database.db, contactId, req.body.userId, req.body.contactUserId, req.body.hint, req.body.contactUserSigningPublicKey, req.body.contactUserEncryptionPublicKey, function (err) {
       if (err) {
         response.status = 500;

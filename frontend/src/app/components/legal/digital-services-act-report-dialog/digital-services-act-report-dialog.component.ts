@@ -40,14 +40,14 @@ export class DigitalServicesActReportDialogComponent {
 
   // robuste Content-ID-Ermittlung
   private readonly contentIdSig = signal<string>(
-    (this.data.reportedMessage as any)?.uuid ??
-    (this.data.reportedMessage as any)?.id ??
+    (this.data.reportedContent as any)?.uuid ??
+    (this.data.reportedContent as any)?.id ??
     ''
   );
 
   // kompakte Preview
   readonly preview = computed(() => {
-    const m: any = this.data.reportedMessage ?? {};
+    const m: any = this.data.reportedContent ?? {};
     return {
       text: m.text ?? m.content ?? m.message ?? '',
       author: m.userId ?? m.userName ?? m.author ?? ''
@@ -92,11 +92,11 @@ export class DigitalServicesActReportDialogComponent {
   }
 
   readonly createdDate = computed(() =>
-    this.normalizeUnix((this.data.reportedMessage as any)?.createDateTime)
+    this.normalizeUnix((this.data.reportedContent as any)?.createDateTime)
   );
 
   readonly deletedDate = computed(() =>
-    this.normalizeUnix((this.data.reportedMessage as any)?.deleteDateTime)
+    this.normalizeUnix((this.data.reportedContent as any)?.deleteDateTime)
   );
 
   readonly autoDeleteLabel = computed(() => {
