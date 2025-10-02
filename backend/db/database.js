@@ -12,9 +12,16 @@ const tablePlace = require('./tablePlace');
 const tableGeoStatistic = require('./tableGeoStatistic');
 const tableWeatherHistory = require('./tableWeatherHistory');
 const tableAirQuality = require('./tableAirQuality');
-const tableNominatimCache = require('./tableNominatimCache.js');
+const tableNominatimCache = require('./tableNominatimCache');
 const tableWeather = require('./tableWeather');
 const tableGeoSearch = require('./tableGeoSearch')
+const tableDsaSignal = require('./tableDsaSignal');
+const tableDsaNotice = require('./tableDsaNotice');
+const tableDsaEvidence = require('./tableDsaEvidence');
+const tableDsaDecision = require('./tableDsaDecision');
+const tableDsaAppeal = require('./tableDsaAppeal');
+const tableDsaNotification = require('./tableDsaNotification');
+const tableDsaAuditLog = require('./tableDsaAuditLog');
 
 class Database {
 
@@ -47,6 +54,13 @@ class Database {
         tableNominatimCache.init(this.db);
         tableWeather.init(this.db);
         tableGeoSearch.init(this.db)
+        tableDsaSignal.init(this.db);
+        tableDsaNotice.init(this.db);
+        tableDsaEvidence.init(this.db);
+        tableDsaDecision.init(this.db);
+        tableDsaAppeal.init(this.db);
+        tableDsaNotification.init(this.db);
+        tableDsaAuditLog.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers(logger);
