@@ -4,9 +4,10 @@ const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 const { getEncryptionPublicJwk, getSigningPublicJwk } = require('../utils/keyStore');
 
+router.use(security.checkToken);
+
 router.get('/',
     [
-        security.checkToken,
         metric.count('clientconnect', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {

@@ -21,9 +21,10 @@ async function getWorldBankIndicator(countryAlpha3, indicator, years) {
         }));
 }
 
+router.use(security.checkToken);
+
 router.get('/:pluscode/:latitude/:longitude/:years',
     [
-        security.checkToken,
         metric.count('geostatistic.get', { when: 'always', timezone: 'utc', amount: 1 })
     ], async (req, res) => {
         let response = { status: 0 };

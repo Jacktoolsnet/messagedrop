@@ -5,9 +5,10 @@ const axios = require('axios');
 const airQualityCache = require('../db/tableAirQuality');
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.get('/:pluscode/:latitude/:longitude/:days',
     [
-        security.checkToken,
         metric.count('airquality', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {

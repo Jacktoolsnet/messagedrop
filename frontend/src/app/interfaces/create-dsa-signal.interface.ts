@@ -1,14 +1,11 @@
 import { DsaNoticeCategory } from './dsa-notice-category.interface';
 import { DsaNoticeType } from './dsa-notice-type.interface';
 
-export interface CreateDsaNotice {
+export interface CreateDsaSignal {
     contentId: string;                 // interne ID des Posts/Pins
     contentType: DsaNoticeType;
     content: string;
     contentUrl?: string;               // optional (SPA kann leer sein)
     category: DsaNoticeCategory;
-    reasonText: string;                // kurze, nachvollziehbare Begründung
-    email: string;             // Kontakt für Rückfragen/Ergebnis
-    name?: string;             // optional
-    truthAffirmation: boolean;         // Bestätigung "nach bestem Wissen"
+    reasonText: string;
 }

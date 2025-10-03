@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const { checkToken } = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
 
 // DB-Tabellen
@@ -7,8 +8,7 @@ const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
 
 const router = express.Router();
-
-// router.use(authenticateOptionalUser); // optional: anonym weiterhin erlaubt
+router.use(checkToken);
 
 /* ------------------------------ Rate Limits ------------------------------ */
 const signalLimiter = rateLimit({

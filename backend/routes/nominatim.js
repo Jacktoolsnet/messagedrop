@@ -6,9 +6,10 @@ const tableNominatimCache = require('../db/tableNominatimCache.js');
 const tableGeoSearch = require('../db/tableGeoSearch')
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.get('/countryCode/:pluscode/:latitude/:longitude',
     [
-        security.checkToken,
         metric.count('nominatim.countrycode', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
@@ -56,7 +57,6 @@ router.get('/countryCode/:pluscode/:latitude/:longitude',
 
 router.get('/search/:searchTerm/:limit',
     [
-        security.checkToken,
         metric.count('nominatim.search', { when: 'always', timezone: 'utc', amount: 1 })
     ], async (req, res) => {
         let response = { status: 0 };
@@ -110,7 +110,6 @@ router.get('/search/:searchTerm/:limit',
 
 router.get('/noboundedsearch/:searchTerm/:limit/:viewbox',
     [
-        security.checkToken,
         metric.count('nominatim.noboundedsearch', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
@@ -166,7 +165,6 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox',
 
 router.get('/boundedsearch/:searchTerm/:limit/:viewbox',
     [
-        security.checkToken,
         metric.count('nominatim.boundedsearch', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {

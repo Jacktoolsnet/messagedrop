@@ -3,7 +3,9 @@ const axios = require('axios');
 const router = express.Router();
 const security = require('../middleware/security');
 
-router.get('/resolve/:url', [security.checkToken], function (req, res) {
+router.use(security.checkToken);
+
+router.get('/resolve/:url', function (req, res) {
     let response = { 'status': 0 };
     axios.get(req.params.url, { maxRedirects: 0, validateStatus: null })
         .then(axiosResponse => {
@@ -29,7 +31,7 @@ router.get('/resolve/:url', [security.checkToken], function (req, res) {
         });
 });
 
-router.get('/oembed/:provider/:url', [security.checkToken], function (req, res) {
+router.get('/oembed/:provider/:url', function (req, res) {
     let response = { 'status': 0 };
     axios.get(`${req.params.provider}?url=${req.params.url}&format=json`, { maxRedirects: 0, validateStatus: null })
         .then(axiosResponse => {

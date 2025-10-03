@@ -6,9 +6,10 @@ const OpenAI = require('openai')
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.post('/moderate',
   [
-    security.checkToken,
     security.authenticate,
     bodyParser.json({ type: 'application/json' }),
     metric.count('openai.moderate', { when: 'always', timezone: 'utc', amount: 1 })

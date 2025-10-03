@@ -6,9 +6,10 @@ const bodyParser = require('body-parser');
 const tableConnect = require('../db/tableConnect');
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.post('/create',
   [
-    security.checkToken,
     security.authenticate, bodyParser.json({ type: 'application/json' }),
     metric.count('connect.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -29,7 +30,6 @@ router.post('/create',
 
 router.get('/get/:connectId',
   [
-    security.checkToken,
     security.authenticate
   ]
   , function (req, res) {
@@ -52,7 +52,6 @@ router.get('/get/:connectId',
 
 router.get('/delete/:connectId',
   [
-    security.checkToken,
     security.authenticate
   ]
   , function (req, res) {

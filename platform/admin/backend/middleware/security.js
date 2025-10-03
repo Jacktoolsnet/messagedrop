@@ -68,7 +68,7 @@ function requireRole(...allowed) {
  */
 function checkToken(req, res, next) {
   const headerToken = req.headers['x-api-authorization'];
-  if (!process.env.TOKEN || headerToken !== process.env.TOKEN) {
+  if (!process.env.ADMIN_TOKEN || headerToken !== process.env.ADMIN_TOKEN) {
     return res.sendStatus(403);
   }
   next();

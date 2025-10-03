@@ -46,11 +46,13 @@ function fillMissing(from, to, rows) {
 
 // ===== Endpoints =====
 
+router.use(security.checkToken);
+
 /**
  * GET /statistic/keys
  * Liefert alle verfügbaren Metric-Keys als Array
  */
-router.get('/keys', [security.checkToken], (req, res) => {
+router.get('/keys', (req, res) => {
   stats.getKeys(req.database.db, (err, keys) => {
     if (err) return res.status(500).json({ status: 500, error: err.message });
     res.json({ status: 200, keys });
@@ -69,7 +71,7 @@ router.get('/keys', [security.checkToken], (req, res) => {
  *  - Maximal 365 Tage
  *  - Default: 30 Tage
  */
-router.get('/series/:key', [security.checkToken], (req, res) => {
+router.get('/series/:key', (req, res) => {
   const key = String(req.params.key || '').trim();
   if (!key) return res.status(400).json({ status: 400, error: 'Key required' });
 
@@ -126,7 +128,7 @@ router.get('/series/:key', [security.checkToken], (req, res) => {
  * (Optional) mehrere Keys in einem Call
  * GET /statistic/series?keys=a,b&period=3m&fill=true
  */
-router.get('/series', [security.checkToken], (req, res) => {
+router.get('/series', (req, res) => {
   const rawKeys = String(req.query.keys || '').trim();
   if (!rawKeys) return res.status(400).json({ status: 400, error: 'keys query param required' });
   const keys = rawKeys.split(',').map(k => k.trim()).filter(Boolean);

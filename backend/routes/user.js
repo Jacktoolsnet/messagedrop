@@ -10,27 +10,33 @@ const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
 
-router.get('/get', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0, 'rows': [] };
-  tableUser.getAll(req.database.db, function (err, rows) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      if (!rows || rows.length == 0) {
-        response.status = 404;
-      } else {
-        rows.forEach((row) => {
-          response.rows.push(row);
-        });
-        response.status = 200;
-      }
-    }
-    res.status(response.status).json(response);
-  });
-});
+router.use(security.checkToken);
 
-router.get('/get/:userId', [security.checkToken], function (req, res) {
+router.get('/get',
+  [
+    security.authenticate
+  ]
+  , function (req, res) {
+    let response = { 'status': 0, 'rows': [] };
+    tableUser.getAll(req.database.db, function (err, rows) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        if (!rows || rows.length == 0) {
+          response.status = 404;
+        } else {
+          rows.forEach((row) => {
+            response.rows.push(row);
+          });
+          response.status = 200;
+        }
+      }
+      res.status(response.status).json(response);
+    });
+  });
+
+router.get('/get/:userId', function (req, res) {
   let response = { 'status': 0 };
   tableUser.getById(req.database.db, req.params.userId, function (err, row) {
     if (err) {
@@ -49,40 +55,43 @@ router.get('/get/:userId', [security.checkToken], function (req, res) {
   });
 });
 
-router.post('/hashpin', [security.checkToken, bodyParser.json({ type: 'application/json' })], async function (req, res) {
-  let response = { 'status': 0 };
+router.post('/hashpin',
+  [
+    bodyParser.json({ type: 'application/json' })
+  ]
+  , async function (req, res) {
+    let response = { 'status': 0 };
 
-  const pin = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(req.body.pin));
+    const pin = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(req.body.pin));
 
-  if (!pin || typeof pin !== 'string' || pin.length !== 6) {
-    response.status = 400;
-    response.error = 'Invalid PIN';
-    return res.status(400).json(response);
-  }
+    if (!pin || typeof pin !== 'string' || pin.length !== 6) {
+      response.status = 400;
+      response.error = 'Invalid PIN';
+      return res.status(400).json(response);
+    }
 
-  try {
-    crypto.scrypt(pin, process.env.PIN_SALT, 64, (err, derivedKey) => {
-      if (err) {
-        response.status = 500;
-        response.error = 'Hashing failed';
-        return res.status(500).json(response);
-      }
+    try {
+      crypto.scrypt(pin, process.env.PIN_SALT, 64, (err, derivedKey) => {
+        if (err) {
+          response.status = 500;
+          response.error = 'Hashing failed';
+          return res.status(500).json(response);
+        }
 
-      response.status = 200;
-      response.pinHash = derivedKey.toString('hex');
-      return res.status(200).json(response);
-    });
-  } catch (err) {
-    response.status = 500;
-    response.error = 'Hashing failed';
-    return res.status(500).json(err);
-  }
+        response.status = 200;
+        response.pinHash = derivedKey.toString('hex');
+        return res.status(200).json(response);
+      });
+    } catch (err) {
+      response.status = 500;
+      response.error = 'Hashing failed';
+      return res.status(500).json(err);
+    }
 
-});
+  });
 
 router.post('/create',
   [
-    security.checkToken,
     bodyParser.json({ type: 'application/json' }),
     metric.count('user.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -138,7 +147,6 @@ router.post('/create',
 
 router.post('/confirm',
   [
-    security.checkToken,
     bodyParser.json({ type: 'application/json' }),
     metric.count('user.confirm', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -263,7 +271,7 @@ router.post('/confirm',
 
   });
 
-router.get('/clean', [security.checkToken], function (req, res) {
+router.get('/clean', function (req, res) {
   let response = { 'status': 0 };
   tableUser.clean(req.database.db, function (err) {
     if (err) {
@@ -278,7 +286,6 @@ router.get('/clean', [security.checkToken], function (req, res) {
 
 router.get('/delete/:userId',
   [
-    security.checkToken,
     security.authenticate,
     metric.count('user.delete', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -295,42 +302,55 @@ router.get('/delete/:userId',
     });
   });
 
-router.get('/renewjwt', [security.checkToken, security.authenticate], (req, res) => {
-  const secret = process.env.JWT_SECRET;
-  const token = jwt.sign(
-    { userId: req.jwtUser.id },
-    secret,
-    { expiresIn: '1h' }
-  );
+router.get('/renewjwt',
+  [
+    security.authenticate
+  ]
+  , (req, res) => {
+    const secret = process.env.JWT_SECRET;
+    const token = jwt.sign(
+      { userId: req.jwtUser.id },
+      secret,
+      { expiresIn: '1h' }
+    );
 
-  res.json({ status: 200, token });
-});
-
-router.post('/subscribe', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
-  let response = { 'status': 0 };
-  tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+    res.json({ status: 200, token });
   });
-});
 
-router.get('/unsubscribe/:userId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableUser.unsubscribe(req.database.db, req.params.userId, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+router.post('/subscribe',
+  [
+    security.authenticate,
+    bodyParser.json({ type: 'application/json' })
+  ]
+  , function (req, res) {
+    let response = { 'status': 0 };
+    tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        response.status = 200;
+      }
+      res.status(response.status).json(response);
+    });
   });
-});
+
+router.get('/unsubscribe/:userId',
+  [
+    security.authenticate
+  ]
+  , function (req, res) {
+    let response = { 'status': 0 };
+    tableUser.unsubscribe(req.database.db, req.params.userId, function (err) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        response.status = 200;
+      }
+      res.status(response.status).json(response);
+    });
+  });
 
 
 module.exports = router

@@ -8,7 +8,9 @@ const tableDislike = require('../db/tableDislike');
 const notify = require('../utils/notify');
 const metric = require('../middleware/metric');
 
-router.get('/get', [security.checkToken], function (req, res) {
+router.use(security.checkToken);
+
+router.get('/get', function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableMessage.getAll(req.database.db, function (err, rows) {
     if (err) {
@@ -28,7 +30,7 @@ router.get('/get', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/get/id/:messageId', [security.checkToken], function (req, res) {
+router.get('/get/id/:messageId', function (req, res) {
   let response = { 'status': 0 };
   tableMessage.getById(req.database.db, req.params.messageId, function (err, row) {
     if (err) {
@@ -47,7 +49,7 @@ router.get('/get/id/:messageId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
+router.get('/get/userId/:userId', function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableMessage.getByUserId(req.database.db, req.params.userId, function (err, rows) {
     if (err) {
@@ -67,7 +69,7 @@ router.get('/get/userId/:userId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/get/comment/:parentUuid', [security.checkToken], function (req, res) {
+router.get('/get/comment/:parentUuid', function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableMessage.getByParentUuid(req.database.db, req.params.parentUuid, function (err, rows) {
     if (err) {
@@ -87,7 +89,7 @@ router.get('/get/comment/:parentUuid', [security.checkToken], function (req, res
   });
 });
 
-router.get('/get/pluscode/:plusCode', [security.checkToken], function (req, res) {
+router.get('/get/pluscode/:plusCode', function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   // It is not allowed to get all messages with this route.
   if (req.params.plusCode.length < 2 || req.params.plusCode.length > 11) {
@@ -121,7 +123,7 @@ router.get('/get/pluscode/:plusCode', [security.checkToken], function (req, res)
   }
 });
 
-router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax', [security.checkToken], function (req, res) {
+router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax', function (req, res) {
   let response = { status: 0, rows: [] };
 
   // Parse params to numbers
@@ -166,7 +168,6 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax', [security.checkTo
 
 router.post('/create',
   [
-    security.checkToken,
     security.authenticate,
     bodyParser.json({ type: 'application/json' }),
     metric.count('message.create', { when: 'always', timezone: 'utc', amount: 1 })
@@ -188,20 +189,25 @@ router.post('/create',
     });
   });
 
-router.post('/update', [security.checkToken, security.authenticate, bodyParser.json({ type: 'application/json' })], function (req, res) {
-  let response = { 'status': 0 };
-  tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia.replace(/\'/g, "''"), function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+router.post('/update',
+  [
+    security.authenticate,
+    bodyParser.json({ type: 'application/json' })
+  ],
+  function (req, res) {
+    let response = { 'status': 0 };
+    tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia.replace(/\'/g, "''"), function (err) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        response.status = 200;
+      }
+      res.status(response.status).json(response);
+    });
   });
-});
 
-router.get('/clean/public', [security.checkToken], function (req, res) {
+router.get('/clean/public', function (req, res) {
   let response = { 'status': 0 };
   tableMessage.cleanPublic(req.database.db, function (err) {
     if (err) {
@@ -214,7 +220,7 @@ router.get('/clean/public', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/disable/:messageId', [security.checkToken], function (req, res) {
+router.get('/disable/:messageId', function (req, res) {
   let response = { 'status': 0 };
   tableMessage.disableMessage(req.database.db, req.params.messageId, function (err) {
     if (err) {
@@ -227,7 +233,7 @@ router.get('/disable/:messageId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/enable/:messageId', [security.checkToken], function (req, res) {
+router.get('/enable/:messageId', function (req, res) {
   let response = { 'status': 0 };
   tableMessage.enableMessage(req.database.db, req.params.messageId, function (err) {
     if (err) {
@@ -240,52 +246,64 @@ router.get('/enable/:messageId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/delete/:messageId', [security.checkToken, security.authenticate], function (req, res) {
-  let response = { 'status': 0 };
-  tableMessage.deleteById(req.database.db, req.params.messageId, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+router.get('/delete/:messageId',
+  [
+    security.authenticate
+  ]
+  , function (req, res) {
+    let response = { 'status': 0 };
+    tableMessage.deleteById(req.database.db, req.params.messageId, function (err) {
+      if (err) {
+        response.status = 500;
+        response.error = err;
+      } else {
+        response.status = 200;
+      }
+      res.status(response.status).json(response);
+    });
   });
-});
 
 // Like-Toggle
-router.get('/like/:messageUuid/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
-  const messageUuid = String(req.params.messageUuid);
-  const userId = String(req.params.userId);
-  if (!messageUuid || !userId) {
-    return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
-  }
+router.get('/like/:messageUuid/by/:userId',
+  [
+    security.authenticate
+  ]
+  , (req, res) => {
+    const messageUuid = String(req.params.messageUuid);
+    const userId = String(req.params.userId);
+    if (!messageUuid || !userId) {
+      return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
+    }
 
-  tableLike.toggleLike(req.database.db, messageUuid, userId, (err, result) => {
-    if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
+    tableLike.toggleLike(req.database.db, messageUuid, userId, (err, result) => {
+      if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
 
-    // result enthält: liked, likes, dislikedByUser, dislikes
-    res.status(200).json({ status: 200, ...result });
+      // result enthält: liked, likes, dislikedByUser, dislikes
+      res.status(200).json({ status: 200, ...result });
+    });
   });
-});
 
 // Dislike-Toggle
-router.get('/dislike/:messageUuid/by/:userId', [security.checkToken, security.authenticate], (req, res) => {
-  const messageUuid = String(req.params.messageUuid);
-  const userId = String(req.params.userId);
-  if (!messageUuid || !userId) {
-    return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
-  }
+router.get('/dislike/:messageUuid/by/:userId',
+  [
+    security.authenticate
+  ]
+  , (req, res) => {
+    const messageUuid = String(req.params.messageUuid);
+    const userId = String(req.params.userId);
+    if (!messageUuid || !userId) {
+      return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
+    }
 
-  tableDislike.toggleDislike(req.database.db, messageUuid, userId, (err, result) => {
-    if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
+    tableDislike.toggleDislike(req.database.db, messageUuid, userId, (err, result) => {
+      if (err) return res.status(500).json({ status: 500, error: err.message || String(err) });
 
-    // result enthält: disliked, dislikes, likedByUser, likes
-    res.status(200).json({ status: 200, ...result });
+      // result enthält: disliked, dislikes, likedByUser, likes
+      res.status(200).json({ status: 200, ...result });
+    });
   });
-});
 
-router.get('/countview/:messageId', [security.checkToken], function (req, res) {
+router.get('/countview/:messageId', function (req, res) {
   let response = { 'status': 0 };
   tableMessage.countView(req.database.db, req.params.messageId, function (err, row) {
     if (err) {
@@ -298,7 +316,7 @@ router.get('/countview/:messageId', [security.checkToken], function (req, res) {
   });
 });
 
-router.get('/countcomment/:parentMessageId', [security.checkToken], function (req, res) {
+router.get('/countcomment/:parentMessageId', function (req, res) {
   let response = { 'status': 0 };
   tableMessage.countComment(req.database.db, req.params.parentMessageId, function (err, row) {
     if (err) {

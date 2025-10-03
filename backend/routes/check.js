@@ -4,9 +4,10 @@ const security = require('../middleware/security');
 const bodyParser = require('body-parser');
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.post('/',
   [
-    security.checkToken,
     bodyParser.json({ type: 'application/json' }),
     metric.count('check', { when: 'always', timezone: 'utc', amount: 1 })
   ]

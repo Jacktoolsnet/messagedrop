@@ -4,9 +4,10 @@ const security = require('../middleware/security');
 const axios = require('axios');
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.get('/featured/:country/:locale',
     [
-        security.checkToken,
         metric.count('tenor.featured', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
@@ -42,7 +43,6 @@ router.get('/featured/:country/:locale',
 
 router.get('/featured/:country/:locale/:next',
     [
-        security.checkToken,
         metric.count('tenor.featured', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
@@ -79,7 +79,6 @@ router.get('/featured/:country/:locale/:next',
 
 router.get('/search/:country/:locale/:searchTerm',
     [
-        security.checkToken,
         metric.count('tenor.search', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
@@ -115,7 +114,6 @@ router.get('/search/:country/:locale/:searchTerm',
 
 router.get('/search/:country/:locale/:searchTerm/:next',
     [
-        security.checkToken,
         metric.count('tenor.search', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {

@@ -5,9 +5,10 @@ const axios = require('axios');
 const tableWeather = require('../db/tableWeather');
 const metric = require('../middleware/metric');
 
+router.use(security.checkToken);
+
 router.get('/:locale/:pluscode/:latitude/:longitude/:days',
     [
-        security.checkToken,
         metric.count('weather', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
@@ -63,7 +64,6 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days',
 
 router.get('/history/:pluscode/:latitude/:longitude/:years',
     [
-        security.checkToken,
         metric.count('weather.history', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {

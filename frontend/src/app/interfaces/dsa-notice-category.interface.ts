@@ -1,4 +1,5 @@
 export type DsaNoticeCategory =
+    | ''
     | 'copyright'   // Copyright / IP infringement
     | 'hate'        // Hate speech / incitement
     | 'terror'      // Terrorism content

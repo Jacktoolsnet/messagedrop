@@ -1,63 +1,101 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { inject, Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
-import { CreateDsaAppeal } from '../interfaces/create-dsa-appeal.interface';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { catchError, Observable, throwError } from 'rxjs';
+import { environment } from '../../environments/environment';
+
+import { NetworkService } from './network.service';
+
+// deine Interfaces (ggf. Pfade anpassen)
 import { CreateDsaNotice } from '../interfaces/create-dsa-notice.interface';
-import { DsaNoticeStatus } from '../interfaces/dsa-notice-status.interface';
-import { DsaNotice } from '../interfaces/dsa-notice.interface';
-import { DsaTransparencySummary } from '../interfaces/dsa-transparency-summary.interface';
+import { CreateDsaSignal } from '../interfaces/create-dsa-signal.interface';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class DigitalServicesActService {
-  private readonly http = inject(HttpClient);
-  private readonly base = '/api/dsa';
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-API-Authorization': `${environment.apiToken}`,
+      withCredentials: 'true' // bleibt wie bei dir (auch wenn es hier eigentlich nicht in headers gehört)
+    })
+  };
 
-  // ---- Notice & Action ----
+  constructor(
+    private http: HttpClient,
+    private snackBar: MatSnackBar,
+    private networkService: NetworkService
+  ) { }
 
-  /** Meldung (Notice) erstellen – vom Dialog aufgerufen */
-  createNotice(dto: CreateDsaNotice): Observable<{ id: string }> {
-    return this.http.post<{ id: string }>(`${this.base}/notices`, dto);
-  }
-
-  /** Einzelne Notice abrufen (für Admin/Moderation-UI) */
-  getNotice(id: string): Observable<DsaNotice> {
-    return this.http.get<DsaNotice>(`${this.base}/notices/${encodeURIComponent(id)}`);
+  private handleError(error: HttpErrorResponse) {
+    return throwError(() => error);
   }
 
   /**
-   * Notices listen – optional nach Status filtern und pagination anwenden.
-   * Beispiel: listNotices({ status: 'UNDER_REVIEW', limit: 50, offset: 0 })
+   * Quick-Report (Signal) absenden
+   * POST {apiUrl}/dsa/signals
    */
-  listNotices(opts?: {
-    status?: DsaNoticeStatus | DsaNoticeStatus[];
-    limit?: number;
-    offset?: number;
-  }): Observable<DsaNotice[]> {
-    let params = new HttpParams();
+  submitSignal(payload: CreateDsaSignal): Observable<{ id: string }> {
+    const url = `${environment.apiUrl}/digitalserviceact/signals`;
 
-    if (opts?.status) {
-      // Mehrfachstatus unterstützen
-      const statuses = Array.isArray(opts.status) ? opts.status : [opts.status];
-      statuses.forEach(s => params = params.append('status', s));
-    }
-    if (typeof opts?.limit === 'number') params = params.set('limit', String(opts.limit));
-    if (typeof opts?.offset === 'number') params = params.set('offset', String(opts.offset));
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
+      title: 'DSA',
+      image: '',
+      icon: '',
+      message: 'Sending quick report…',
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
 
-    return this.http.get<DsaNotice[]>(`${this.base}/notices`, { params });
+    const body = {
+      contentId: payload.contentId,
+      contentUrl: payload.contentUrl,
+      category: payload.category,
+      reasonText: payload.reasonText,
+      reportedContentType: payload.contentType,
+      reportedContent: payload.content
+    };
+
+    return this.http.post<{ id: string }>(url, body, this.httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
-  // ---- Interne Beschwerde (Appeal) ----
+  /**
+   * Formale DSA-Notice absenden
+   * POST {apiUrl}/dsa/notices
+   */
+  submitNotice(payload: CreateDsaNotice): Observable<{ id: string }> {
+    const url = `${environment.apiUrl}/digitalserviceact/notices`;
 
-  /** Interne Beschwerde gegen eine Entscheidung einreichen */
-  submitInternalAppeal(dto: CreateDsaAppeal): Observable<{ id: string }> {
-    return this.http.post<{ id: string }>(`${this.base}/appeals`, dto);
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
+      title: 'DSA',
+      image: '',
+      icon: '',
+      message: 'Submitting DSA notice…',
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    // Body entsprechend unserer Backend-Route (alle Felder optional außer contentId)
+    const body: any = {
+      contentId: payload.contentId,
+      contentUrl: payload.contentUrl,
+      category: payload.category,
+      reasonText: payload.reasonText,
+      reporterEmail: payload.email,
+      reporterName: payload.name,
+      truthAffirmation: payload.truthAffirmation,
+      reportedContentType: payload.contentType,
+      reportedContent: payload.content
+    };
+
+    return this.http.post<{ id: string }>(url, body, this.httpOptions)
+      .pipe(catchError(this.handleError));
   }
 
-  // ---- Transparenz ----
-
-  /** Kompakte Kennzahlen für Transparenzberichte */
-  getTransparencySummary(period?: string): Observable<DsaTransparencySummary> {
-    const params = period ? new HttpParams().set('period', period) : undefined;
-    return this.http.get<DsaTransparencySummary>(`${this.base}/transparency/summary`, { params });
-  }
 }
