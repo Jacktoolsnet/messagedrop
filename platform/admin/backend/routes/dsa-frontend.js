@@ -43,7 +43,6 @@ router.post('/signals', signalLimiter, (req, res) => {
 
     const id = crypto.randomUUID();
     const now = Date.now();
-    console.log(req.body);
     const {
         contentId,
         contentUrl,
