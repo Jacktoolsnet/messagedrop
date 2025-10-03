@@ -48,7 +48,6 @@ async function forwardPost(path, body, reqHeaders) {
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, async (req, res) => {
     try {
-        console.log(req.body);
         const resp = await forwardPost('/signals', req.body, req.headers);
         res.status(resp.status).json(resp.data);
     } catch (err) {

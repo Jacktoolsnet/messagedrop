@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 
+import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
 import { DigitalServicesActService } from '../../../services/digital-services-act.service';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
@@ -50,6 +51,24 @@ export class DigitalServicesActReportDialogComponent {
     this.data?.message?.uuid ?? this.data?.message?.id ?? ''
   );
 
+  readonly formalForm = this.fb.group({
+    contentId: [{ value: this.contentIdSig(), disabled: true }],
+    category: ['' as '' | DsaNoticeCategory],
+    reasonText: [''],
+    reporterEmail: ['', [Validators.email, Validators.maxLength(254)]], // <- optional + valid
+    reporterName: [''],
+    truthAffirmation: [false]
+  });
+
+  get formalEmailCtrl() {
+    return this.formalForm.get('reporterEmail') as FormControl;
+  }
+
+  get isFormalEmailInvalid(): boolean {
+    const v = (this.formalEmailCtrl?.value || '').trim();
+    return !!v && this.formalEmailCtrl?.invalid === true;
+  }
+
   readonly categories: { value: DsaNoticeCategory; label: string }[] = [
     { value: 'copyright', label: 'Copyright / IP infringement' },
     { value: 'hate', label: 'Hate speech / incitement' },
@@ -64,16 +83,6 @@ export class DigitalServicesActReportDialogComponent {
     contentId: [{ value: this.contentIdSig(), disabled: true }],
     category: ['' as '' | DsaNoticeCategory],
     reasonText: ['']
-  });
-
-  /** Formal DSA report – ohne Pflichtfelder */
-  readonly formalForm = this.fb.group({
-    contentId: [{ value: this.contentIdSig(), disabled: true }],
-    category: ['' as '' | DsaNoticeCategory],
-    reasonText: [''],
-    reporterEmail: [this.data?.reporterEmail ?? ''],
-    reporterName: [this.data?.reporterName ?? ''],
-    truthAffirmation: [false]
   });
 
   submitting = false;
@@ -99,20 +108,20 @@ export class DigitalServicesActReportDialogComponent {
       if (this.activeTabIndex === 0) {
         // QUICK REPORT
         const raw = this.quickForm.getRawValue();
-        await this.dsa.submitSignal({
+        await firstValueFrom(this.dsa.submitSignal({
           contentId,
           contentUrl,
           category: raw.category || '',
           reasonText: raw.reasonText || '',
           contentType,
           content: contentSnapshot
-        });
+        }));
 
         this.showSuccess('signal');
       } else {
         // FORMAL NOTICE
         const raw = this.formalForm.getRawValue();
-        await this.dsa.submitNotice({
+        await firstValueFrom(this.dsa.submitNotice({
           contentId,
           contentUrl,
           category: raw.category || '',
@@ -122,7 +131,7 @@ export class DigitalServicesActReportDialogComponent {
           truthAffirmation: !!raw.truthAffirmation,
           contentType,
           content: contentSnapshot
-        });
+        }));
 
         this.showSuccess('notice');
       }

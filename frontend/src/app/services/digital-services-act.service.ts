@@ -59,7 +59,7 @@ export class DigitalServicesActService {
       reportedContent: payload.content
     };
 
-    console.log(body);
+    console.log(url)
     return this.http.post<{ id: string }>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError));
   }

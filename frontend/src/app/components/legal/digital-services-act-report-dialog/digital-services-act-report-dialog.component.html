@@ -79,7 +79,9 @@
                 <div class="row two-cols">
                     <mat-form-field appearance="outline" class="half">
                         <mat-label>Your email (optional)</mat-label>
-                        <input matInput formControlName="reporterEmail" type="email" autocomplete="email" />
+                        <input matInput formControlName="reporterEmail" type="email" inputmode="email"
+                            autocomplete="email" />
+
                         <mat-hint align="start">
                             {{
                             (formalForm.get('reporterEmail')?.value || '').trim()
@@ -87,6 +89,10 @@
                             : 'We can only notify you if you provide an email.'
                             }}
                         </mat-hint>
+
+                        <mat-error *ngIf="isFormalEmailInvalid">
+                            Please enter a valid email address or leave this field empty.
+                        </mat-error>
                     </mat-form-field>
 
                     <mat-form-field appearance="outline">
@@ -109,7 +115,9 @@
 
 <mat-dialog-actions align="end">
     <button mat-button (click)="cancel()" [disabled]="submitting">Cancel</button>
-    <button mat-flat-button color="primary" (click)="submit()" [disabled]="submitting" cdkFocusInitial>
-        @if (!submitting) { Submit } @else { Submitting… }
+    <button color="primary" mat-flat-button (click)="submit()"
+        [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">
+        <mat-icon class="material-symbols-outlined">send</mat-icon>
+        Submit
     </button>
 </mat-dialog-actions>
