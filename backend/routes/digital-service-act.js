@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const router = express.Router();
 
 router.use(security.checkToken);
+router.use(express.json({ limit: '1mb' }));
 
 /* -------------------------------- Rate Limits ------------------------------- */
 const signalLimiter = rateLimit({
@@ -27,7 +28,6 @@ const noticeLimiter = rateLimit({
 /* --------------------------------- Helper ---------------------------------- */
 async function forwardPost(path, body, reqHeaders) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
-    console.log(body);
     const headers = {
         'content-type': 'application/json',
         'x-api-authorization': process.env.ADMIN_TOKEN,
@@ -48,6 +48,7 @@ async function forwardPost(path, body, reqHeaders) {
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, async (req, res) => {
     try {
+        console.log(req.body);
         const resp = await forwardPost('/signals', req.body, req.headers);
         res.status(resp.status).json(resp.data);
     } catch (err) {

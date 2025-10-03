@@ -17,9 +17,9 @@ export class DigitalServicesActService {
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'X-API-Authorization': `${environment.apiToken}`,
-      withCredentials: 'true' // bleibt wie bei dir (auch wenn es hier eigentlich nicht in headers gehört)
-    })
+      'X-API-Authorization': `${environment.apiToken}`
+    }),
+    withCredentials: true
   };
 
   constructor(
@@ -59,6 +59,7 @@ export class DigitalServicesActService {
       reportedContent: payload.content
     };
 
+    console.log(body);
     return this.http.post<{ id: string }>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
