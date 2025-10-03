@@ -4,7 +4,6 @@ const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
 const crypto = require('crypto');
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const tableContact = require('../db/tableContact');
 const notify = require('../utils/notify');
 const metric = require('../middleware/metric');
@@ -13,7 +12,8 @@ router.use(security.checkToken);
 
 router.post('/create',
   [
-    security.authenticate, bodyParser.json({ type: 'application/json' }),
+    security.authenticate,
+    express.json({ type: 'application/json' }),
     metric.count('contact.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {
@@ -35,7 +35,7 @@ router.post('/create',
 router.post('/update/name',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
@@ -60,7 +60,7 @@ router.post('/update/name',
 router.post('/update/message',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('contact.update.message', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {
@@ -151,7 +151,7 @@ router.get('/get/userId/:userId',
 router.get('/subscribe/:contactId',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , function (req, res) {
     let response = { 'status': 0 };

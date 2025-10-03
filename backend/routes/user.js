@@ -6,7 +6,6 @@ const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
 
@@ -57,7 +56,7 @@ router.get('/get/:userId', function (req, res) {
 
 router.post('/hashpin',
   [
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
@@ -92,7 +91,7 @@ router.post('/hashpin',
 
 router.post('/create',
   [
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('user.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , async function (req, res) {
@@ -147,7 +146,7 @@ router.post('/create',
 
 router.post('/confirm',
   [
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('user.confirm', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , async function (req, res) {
@@ -320,7 +319,7 @@ router.get('/renewjwt',
 router.post('/subscribe',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , function (req, res) {
     let response = { 'status': 0 };

@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
 
 router.post('/',
   [
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('check', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {

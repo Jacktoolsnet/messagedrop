@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const tableMessage = require('../db/tableMessage');
 const tableLike = require('../db/tableLike');
 const tableDislike = require('../db/tableDislike');
@@ -169,7 +168,7 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax', function (req, re
 router.post('/create',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('message.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {
@@ -192,7 +191,7 @@ router.post('/create',
 router.post('/update',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ],
   function (req, res) {
     let response = { 'status': 0 };

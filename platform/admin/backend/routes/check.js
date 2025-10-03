@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 
 router.post('/',
   [
     security.checkToken,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , function (req, res) {
     if (undefined === req.database) {

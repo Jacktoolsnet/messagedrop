@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const crypto = require('crypto');
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const tableConnect = require('../db/tableConnect');
 const metric = require('../middleware/metric');
 
@@ -10,7 +9,8 @@ router.use(security.checkToken);
 
 router.post('/create',
   [
-    security.authenticate, bodyParser.json({ type: 'application/json' }),
+    security.authenticate,
+    express.json({ type: 'application/json' }),
     metric.count('connect.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {

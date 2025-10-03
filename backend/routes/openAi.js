@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const OpenAI = require('openai')
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const metric = require('../middleware/metric');
@@ -11,7 +10,7 @@ router.use(security.checkToken);
 router.post('/moderate',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('openai.moderate', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {

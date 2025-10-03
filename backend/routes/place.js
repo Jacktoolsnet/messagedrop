@@ -4,7 +4,6 @@ const cryptoUtil = require('../utils/cryptoUtils');
 const router = express.Router();
 const crypto = require('crypto');
 const security = require('../middleware/security');
-const bodyParser = require('body-parser');
 const tablePlace = require('../db/tablePlace');
 const geoTz = require('geo-tz');
 const metric = require('../middleware/metric');
@@ -14,7 +13,7 @@ router.use(security.checkToken);
 router.post('/create',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' }),
+    express.json({ type: 'application/json' }),
     metric.count('place.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , async function (req, res) {
@@ -36,7 +35,7 @@ router.post('/create',
 router.post('/update',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
@@ -126,7 +125,7 @@ router.get('/get/userId/:userId',
 router.get('/subscribe/:placeId',
   [
     security.authenticate,
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , function (req, res) {
     let response = { 'status': 0 };
@@ -176,7 +175,7 @@ router.get('/delete/:placeId',
 
 router.get('/timezone/:latitude/:longitude',
   [
-    bodyParser.json({ type: 'application/json' })
+    express.json({ type: 'application/json' })
   ]
   , function (req, res) {
     let response = { 'status': 0 };
