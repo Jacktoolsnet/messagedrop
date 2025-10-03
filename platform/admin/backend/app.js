@@ -10,37 +10,14 @@ const database = new Database();
 const root = require('./routes/root');
 const check = require('./routes/check');
 const clientConnect = require('./routes/client-connect');
-const openAi = require('./routes/openAi');
-const statistic = require('./routes/statistic');
-const user = require('./routes/user');
-const connect = require('./routes/connect');
-const contact = require('./routes/contact');
-const message = require('./routes/message');
-const place = require('./routes/place');
-const translate = require('./routes/translate');
-const utils = require('./routes/utils');
-const geoStatistic = require('./routes/geostatistic');
-const weather = require('./routes/weather');
-const airQualtiy = require('./routes/air-quality');
-const nominatim = require('./routes/nominatim');
-const tenor = require('./routes/tenor');
+const dsaFrontend = require('./routes/dsa-frontend');
+const dsaBackend = require('./routes/dsa-backend');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
-
-// Tables for cronjobs
-const tableUser = require('./db/tableUser');
-const tableConnect = require('./db/tableConnect');
-const tableMessage = require('./db/tableMessage')
-const tableGeoStatistic = require('./db/tableGeoStatistic');
-const tableWeatherHistory = require('./db/tableWeatherHistory');
-const tableAirQuality = require('./db/tableAirQuality');
-const tableNominatimCache = require('./db/tableNominatimCache.js');
-const tableWeather = require('./db/tableWeather');
-const tableGeoSearch = require('./db/tableGeoSearch')
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -70,7 +47,7 @@ const logFormat = winston.format.combine(
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/info-%DATE%.log',
+  filename: 'logs/admin-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
@@ -79,7 +56,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/error-%DATE%.log',
+  filename: 'logs/admin-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
@@ -117,7 +94,7 @@ const io = new Server(server, {
   pingTimeout: 30000,
   allowEIO3: false,
   cors: {
-    origin: [process.env.ORIGIN],
+    origin: [process.env.ADMIN_ORIGIN],
     credentials: true
   }
 });
@@ -152,8 +129,8 @@ const onConnection = (socket) => {
   });
 
   // Eigentliche Handler laden
-  userHandlers(io, socket);
-  contactHandlers(io, socket);
+  // userHandlers(io, socket);
+  // contactHandlers(io, socket);
 };
 
 // Socket.io: neue Verbindung
@@ -198,7 +175,7 @@ app.use(bearerToken());
 /*
 Enable cors for all routes.
 */
-const allowedOrigins = process.env.ORIGIN?.split(',').map(o => o.trim()) || [];
+const allowedOrigins = process.env.ADMIN_ORIGIN?.split(',').map(o => o.trim()) || [];
 
 const corsOptions = {
   origin: function (origin, callback) {
@@ -214,79 +191,19 @@ const corsOptions = {
 }
 app.use(cors(corsOptions))
 
+app.use(express.json({ limit: '1mb' }));
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
 
-// Route ratelimit
-const translateLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    error: 'Too many translate requests, please try again after 15 minutes.'
-  }
-})
-
-const userLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  limit: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    error: 'Too many user requests, please try again after a minute.'
-  }
-})
-
-const geoStatisticLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  limit: 10, // Limit each IP to 10 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    error: 'Too many weather requests, please try again after a minute.'
-  }
-})
-
-const airQualtiyLimit = rateLimit({
-  windowMs: 100 * 60 * 1000, // 1 minutes
-  limit: 10, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    error: 'Too many weather requests, please try again after a minute.'
-  }
-})
-
-const weatherLimit = rateLimit({
-  windowMs: 100 * 60 * 1000, // 15 minutes
-  limit: 10, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
-  message: {
-    error: 'Too many weather requests, please try again after a minute.'
-  }
-})
-
 // ROUTES
 app.use('/', root);
-app.use('/airquality', airQualtiyLimit, airQualtiy);
 app.use('/check', check);
 app.use('/clientconnect', clientConnect);
-app.use('/connect', connect);
-app.use('/contact', contact);
-app.use('/geostatistic', geoStatisticLimit, geoStatistic);
-app.use('/message', message);
-app.use('/nominatim', nominatim);
-app.use('/openai', openAi);
-app.use('/place', place);
-app.use('/statistic', statistic);
-app.use('/tenor', tenor);
-app.use('/translate', translateLimit, translate);
-app.use('/user', userLimit, user);
-app.use('/utils', utils);
-app.use('/weather', weatherLimit, weather);
+
+// DSA
+app.use('/dsa/frontend', dsaFrontend);
+app.use('/dsa/backend', dsaBackend);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));
@@ -294,7 +211,7 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 (async () => {
   try {
     await generateOrLoadKeypairs();
-    server.listen(process.env.PORT, () => {
+    server.listen(process.env.ADMIN_PORT, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);
@@ -305,84 +222,3 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
     process.exit(1);
   }
 })();
-
-// Cron
-// ┌────────────── second (optional)
-// │ ┌──────────── minute
-// │ │ ┌────────── hour
-// │ │ │ ┌──────── day of month
-// │ │ │ │ ┌────── month
-// │ │ │ │ │ ┌──── day of week
-// │ │ │ │ │ │
-// │ │ │ │ │ │
-// * * * * * *
-
-// Clean users every hour at minute 0
-cron.schedule('0 * * * *', () => {
-  tableUser.clean(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
-
-// Clean connect every hour at minute 0
-cron.schedule('0 * * * *', () => {
-  tableConnect.clean(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
-
-// Clean messages clsevery 5 minutes
-cron.schedule('*/5 * * * *', () => {
-  tableMessage.cleanPublic(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
-
-// Clean short cached data.
-cron.schedule('*/1 * * * *', () => {
-  tableAirQuality.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableWeather.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
-
-// Clean long cached data.
-cron.schedule('5 0 * * *', () => {
-  tableGeoStatistic.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableWeatherHistory.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableNominatimCache.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableGeoSearch.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
-
