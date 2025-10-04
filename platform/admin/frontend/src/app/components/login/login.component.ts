@@ -25,9 +25,7 @@ export class LoginComponent {
   username = '';
   password = '';
 
-  constructor(private authService: AuthService) {
-    console.log("login called")
-  }
+  constructor(private authService: AuthService) { }
 
   onSubmit() {
     this.authService.login({

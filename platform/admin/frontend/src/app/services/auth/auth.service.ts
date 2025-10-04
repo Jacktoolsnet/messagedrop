@@ -49,11 +49,13 @@ export class AuthService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (response) => {
+          console.log('login')
           localStorage.setItem('admin_token', response.token);
           this._isLoggedIn.set(true);
-          this.router.navigate(['/']); // Startseite
+          this.router.navigate(['/dashboard']);
         },
         error: () => {
+          console.log('lgin_error')
           this._isLoggedIn.set(false);
         }
       });

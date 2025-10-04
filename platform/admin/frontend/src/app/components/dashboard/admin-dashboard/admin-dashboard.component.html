@@ -1,0 +1,23 @@
+<mat-toolbar color="primary">
+    <span style="flex: 1; text-align: center;">Dashboard</span>
+    <span>{{ username() }} ({{ role() }})</span>
+    <button mat-icon-button (click)="logout()" aria-label="Logout">
+        <mat-icon>logout</mat-icon>
+    </button>
+</mat-toolbar>
+
+<div class="dashboard-grid">
+    <mat-card class="dashboard-tile">
+        <mat-icon class="tile-icon">group</mat-icon>
+        <h3>Users</h3>
+        <p>All users up to date</p>
+        <button mat-raised-button color="accent" routerLink="/users">Manage</button>
+    </mat-card>
+
+    <mat-card class="dashboard-tile">
+        <mat-icon class="tile-icon">gavel</mat-icon>
+        <h3>Digital Services Act</h3>
+        <p>3 open reports</p>
+        <button mat-raised-button color="accent" routerLink="/dsa">Open</button>
+    </mat-card>
+</div>
