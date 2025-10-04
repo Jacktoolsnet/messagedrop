@@ -1,5 +1,6 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
+const tableUser = require('./tableUser');
 const tableDsaSignal = require('./tableDsaSignal');
 const tableDsaNotice = require('./tableDsaNotice');
 const tableDsaEvidence = require('./tableDsaEvidence');
@@ -24,6 +25,7 @@ class Database {
             logger.error(err.message);
           }
         });
+        tableUser.init(this.db);
         tableDsaSignal.init(this.db);
         tableDsaNotice.init(this.db);
         tableDsaEvidence.init(this.db);

@@ -18,7 +18,7 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Admin Frontend",
+            "name": "ADMIN Frontend",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}/platform/admin/frontend",

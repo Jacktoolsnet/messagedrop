@@ -12,6 +12,7 @@ const check = require('./routes/check');
 const clientConnect = require('./routes/client-connect');
 const dsaFrontend = require('./routes/dsa-frontend');
 const dsaBackend = require('./routes/dsa-backend');
+const user = require('./routes/user');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -200,6 +201,7 @@ app.use(headerMW())
 app.use('/', root);
 app.use('/check', check);
 app.use('/clientconnect', clientConnect);
+app.use('/user', user);
 
 // DSA
 app.use('/dsa/frontend', dsaFrontend);
