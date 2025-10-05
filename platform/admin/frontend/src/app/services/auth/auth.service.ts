@@ -51,6 +51,12 @@ export class AuthService {
         },
         error: () => {
           console.log('lgin_error')
+          this.snackBar.open('Login failed. Please check your credentials.', undefined, {
+            duration: 1000,
+            panelClass: ['snack-error'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
           this._isLoggedIn.set(false);
         }
       });
