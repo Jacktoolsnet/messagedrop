@@ -14,6 +14,9 @@ export class AuthService {
   private _isLoggedIn = signal(false);
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
 
+  readonly username = signal<string | null>(null);
+  readonly role = signal<string | null>(null);
+
   private readonly baseUrl = `${environment.apiUrl}/user`;
   private get token() {
     return localStorage.getItem('admin_token');
@@ -52,6 +55,7 @@ export class AuthService {
           console.log('login')
           localStorage.setItem('admin_token', response.token);
           this._isLoggedIn.set(true);
+          this.loadUserInfo();
           this.router.navigate(['/dashboard']);
         },
         error: () => {
@@ -72,5 +76,25 @@ export class AuthService {
    */
   hasToken(): boolean {
     return !!this.token;
+  }
+
+  loadUserInfo() {
+    const token = localStorage.getItem('admin_token');
+    if (!token) return;
+
+    this.http.get<{ username: string; role: string }>(`${this.baseUrl}/me`, {
+      headers: new HttpHeaders({
+        Authorization: `Bearer ${token}`
+      })
+    }).subscribe({
+      next: (data) => {
+        this.username.set(data.username);
+        this.role.set(data.role);
+      },
+      error: (error) => {
+        this.username.set(null);
+        this.role.set(null);
+      }
+    });
   }
 }

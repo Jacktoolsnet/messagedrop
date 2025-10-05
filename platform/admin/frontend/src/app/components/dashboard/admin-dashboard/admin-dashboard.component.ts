@@ -1,4 +1,4 @@
-import { Component, signal } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -20,10 +20,16 @@ import { AuthService } from '../../../services/auth/auth.service';
   styleUrls: ['./admin-dashboard.component.scss']
 })
 export class AdminDashboardComponent {
-  username = signal('admin');
-  role = signal('root');
 
   constructor(private authService: AuthService, private router: Router) { }
+
+  get username() {
+    return this.authService.username;
+  }
+
+  get role() {
+    return this.authService.role;
+  }
 
   logout() {
     this.authService.logout();

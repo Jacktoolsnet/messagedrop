@@ -180,4 +180,10 @@ router.delete('/:id', authMiddleware, (req, res) => {
     });
 });
 
+router.get('/me', authMiddleware, (req, res) => {
+    // Payload aus dem JWT wurde bereits durch die Middleware in req.user gesetzt
+    const { userId, username, role } = req.user;
+    res.json({ userId, username, role });
+});
+
 module.exports = router;

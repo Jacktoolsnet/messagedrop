@@ -1,8 +1,18 @@
 <mat-toolbar color="primary">
-    <span style="flex: 1; text-align: center;">Dashboard</span>
+    <!-- Home-Button links -->
+    <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
+        <mat-icon class="material-symbols-outlined">home</mat-icon>
+    </button>
+
+    <!-- Titel zentriert -->
+    <span style="flex: 1; text-align: center; font-size: 1.5rem; font-weight: 500;">
+        Dashboard
+    </span>
+
+    <!-- Username + Logout rechts -->
     <span>{{ username() }} ({{ role() }})</span>
     <button mat-icon-button (click)="logout()" aria-label="Logout">
-        <mat-icon>logout</mat-icon>
+        <mat-icon class="material-symbols-outlined">logout</mat-icon>
     </button>
 </mat-toolbar>
 
