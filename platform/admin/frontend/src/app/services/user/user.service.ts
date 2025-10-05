@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
@@ -15,16 +15,6 @@ export class UserService {
   readonly users = this._users.asReadonly();
 
   private readonly baseUrl = `${environment.apiUrl}/user`;
-  private readonly token = localStorage.getItem('admin_token');
-
-  private get httpOptions() {
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${this.token}`
-      })
-    };
-  }
 
   constructor(
     private http: HttpClient,
@@ -42,7 +32,7 @@ export class UserService {
   }
 
   loadUsers() {
-    this.http.get<User[]>(this.baseUrl, this.httpOptions)
+    this.http.get<User[]>(this.baseUrl)
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (users) => this._users.set(users),
@@ -51,17 +41,17 @@ export class UserService {
   }
 
   createUser(payload: CreateUserPayload) {
-    return this.http.post<{ id: string }>(this.baseUrl, payload, this.httpOptions)
+    return this.http.post<{ id: string }>(this.baseUrl, payload)
       .pipe(catchError(this.handleError));
   }
 
   updateUser(id: string, payload: UpdateUserPayload) {
-    return this.http.put<{ updated: boolean }>(`${this.baseUrl}/${id}`, payload, this.httpOptions)
+    return this.http.put<{ updated: boolean }>(`${this.baseUrl}/${id}`, payload)
       .pipe(catchError(this.handleError));
   }
 
   deleteUser(id: string) {
-    return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/${id}`, this.httpOptions)
+    return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/${id}`)
       .pipe(catchError(this.handleError));
   }
 }

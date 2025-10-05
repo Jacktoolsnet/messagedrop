@@ -11,9 +11,8 @@ const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
  * Login-Route
  */
 router.post('/login', async (req, res) => {
-    const { username, password } = req.body;
     const db = req.database.db;
-
+    const { username, password } = req.body;
     const envUser = process.env.ADMIN_ROOT_USER;
     const envPass = process.env.ADMIN_ROOT_PASSWORD;
 
@@ -61,14 +60,40 @@ const authMiddleware = (req, res, next) => {
 
 /**
  * GET /user - Liste aller User
+ * - admin/root: alle Nutzer
+ * - sonst: nur der eigene Nutzer
  */
 router.get('/', authMiddleware, (req, res) => {
     const db = req.database.db;
+    const { role, userId, username } = req.user;
 
-    tableUser.list(db, {}, (err, users) => {
-        if (err) return res.status(500).json({ message: 'DB error' });
-        res.json(users);
+    const stripUser = (u) => u && ({
+        id: u.id,
+        username: u.username,
+        role: u.role,
+        createdAt: u.createdAt
     });
+
+    const isAdminOrRoot = role === 'admin' || role === 'root';
+
+    if (isAdminOrRoot) {
+        // volle Liste (ohne Passwort-Hash zurückgeben!)
+        tableUser.list(db, {}, (err, users) => {
+            if (err) return res.status(500).json({ message: 'DB error' });
+            res.json(users.map(stripUser));
+        });
+    } else {
+        // nur eigenen User zurückgeben
+        tableUser.getById(db, userId, (err, u) => {
+            if (err) return res.status(500).json({ message: 'DB error' });
+            if (u) return res.json([stripUser(u)]);
+            // Fallback, falls Token userId ausnahmsweise nicht matcht
+            tableUser.getByUsername(db, username, (err2, u2) => {
+                if (err2) return res.status(500).json({ message: 'DB error' });
+                res.json(u2 ? [stripUser(u2)] : []); // leer, wenn nicht gefunden
+            });
+        });
+    }
 });
 
 /**

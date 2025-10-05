@@ -14,15 +14,20 @@
 </mat-toolbar>
 
 <div class="page">
+    @if (isAdminOrRoot()){
     <div class="user-header">
         <h2>All Users</h2>
-        @if (isAdminOrRoot()) {
         <button mat-flat-button color="primary" (click)="openCreateUserDialog()">
             <mat-icon>person_add</mat-icon>
             Add User
         </button>
-        }
     </div>
+    } @else {
+    <div class="user-header">
+        <h2>My User</h2>
+    </div>
+    }
+
 
     <!-- === User Tiles === -->
     <div class="tiles-container">

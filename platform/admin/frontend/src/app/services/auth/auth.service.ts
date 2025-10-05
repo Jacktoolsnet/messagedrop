@@ -22,15 +22,6 @@ export class AuthService {
     return localStorage.getItem('admin_token');
   }
 
-  private get httpOptions() {
-    return {
-      headers: new HttpHeaders({
-        'Content-Type': 'application/json',
-        ...(this.token ? { 'Authorization': `Bearer ${this.token}` } : {})
-      })
-    };
-  }
-
   constructor(
     private http: HttpClient,
     private router: Router,
@@ -48,7 +39,7 @@ export class AuthService {
   }
 
   login(data: LoginRequest) {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data, this.httpOptions)
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data)
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (response) => {
