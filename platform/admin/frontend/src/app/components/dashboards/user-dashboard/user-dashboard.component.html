@@ -1,7 +1,7 @@
 <mat-toolbar color="primary">
     <!-- Home-Button -->
     <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
-        <mat-icon class="material-symbols-outlined">group</mat-icon>
+        <mat-icon>group</mat-icon>
     </button>
 
     <!-- Titel zentriert -->
@@ -9,31 +9,44 @@
         User Management
     </span>
 
-    <!-- Benutzername und Zurück -->
+    <!-- Benutzername + Zurück -->
     <span>{{ username() }} ({{ role() }})</span>
-    <button mat-icon-button (click)="goBack()" aria-label="Back">
-        <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
-    </button>
 </mat-toolbar>
 
-<!-- === User Tiles === -->
-<div class="tiles-container">
-    @for (user of users(); track user.id) {
-    <div class="tile">
-        <mat-icon class="tile-icon material-symbols-outlined">person</mat-icon>
-        <div class="tile-info">
-            <div class="username">{{ user.username }}</div>
-            <div class="role">{{ user.role }}</div>
-        </div>
-        <div class="tile-actions">
-            <!-- Platz für Edit/Delete-Buttons etc. -->
-            <button mat-icon-button color="primary" aria-label="Edit">
-                <mat-icon>edit</mat-icon>
-            </button>
-            <button mat-icon-button color="warn" aria-label="Delete">
-                <mat-icon>delete</mat-icon>
-            </button>
-        </div>
+<div class="page">
+    <div class="user-header">
+        <h2>All Users</h2>
+        @if (isAdminOrRoot()) {
+        <button mat-flat-button color="primary" (click)="openCreateUserDialog()">
+            <mat-icon>person_add</mat-icon>
+            Add User
+        </button>
+        }
     </div>
-    }
+
+    <!-- === User Tiles === -->
+    <div class="tiles-container">
+        @for (user of users(); track user.id) {
+        <mat-card class="tile">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar">
+                    <mat-icon>person</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">{{ user.username }}</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">{{ user.role }}</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-actions align="end">
+                <button mat-stroked-button color="primary" aria-label="Edit">
+                    <mat-icon>edit</mat-icon>
+                    Edit
+                </button>
+                <button mat-stroked-button color="warn" aria-label="Delete">
+                    <mat-icon>delete</mat-icon>
+                    Delete
+                </button>
+            </mat-card-actions>
+        </mat-card>
+        }
+    </div>
 </div>

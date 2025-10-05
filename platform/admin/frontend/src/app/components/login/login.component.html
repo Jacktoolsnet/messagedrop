@@ -1,10 +1,18 @@
-<div class="login-container">
-    <mat-card>
+<div class="login-page">
+    <mat-card class="login-card">
         <mat-card-header>
+            <div mat-card-avatar class="brand-avatar">
+                <!-- Dein Logo (optional). Fällt automatisch auf Icon zurück, wenn nicht geladen -->
+                <img src="assets/images/logo.jpg" alt="Messagedrop"
+                    onerror="this.style.display='none'; this.nextElementSibling?.classList.remove('hidden');" />
+                <mat-icon class="fallback hidden">admin_panel_settings</mat-icon>
+            </div>
             <mat-card-title>Messagedrop Administration</mat-card-title>
+            <mat-card-subtitle>Sign in to continue</mat-card-subtitle>
         </mat-card-header>
+
         <mat-card-content>
-            <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+            <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="form">
                 <mat-form-field appearance="outline" class="full-width">
                     <mat-label>Username</mat-label>
                     <input matInput type="text" [(ngModel)]="username" name="username" required />
@@ -18,12 +26,12 @@
                 <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
                     Login
                 </button>
-            </form>
 
-            <p class="info">
-                Diese Seite ist nur für interne Zwecke gedacht.<br />
-                <a href="https://messagedrop.de" target="_blank">Zu Messagedrop</a>
-            </p>
+                <p class="info">
+                    Diese Seite ist nur für interne Zwecke gedacht.<br />
+                    <a href="https://messagedrop.de" target="_blank" rel="noopener">Zu Messagedrop</a>
+                </p>
+            </form>
         </mat-card-content>
     </mat-card>
 </div>

@@ -1,7 +1,7 @@
 <mat-toolbar color="primary">
     <!-- Home-Button links -->
     <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
-        <mat-icon class="material-symbols-outlined">home</mat-icon>
+        <mat-icon>home</mat-icon>
     </button>
 
     <!-- Titel zentriert -->
@@ -12,22 +12,46 @@
     <!-- Username + Logout rechts -->
     <span>{{ username() }} ({{ role() }})</span>
     <button mat-icon-button (click)="logout()" aria-label="Logout">
-        <mat-icon class="material-symbols-outlined">logout</mat-icon>
+        <mat-icon>logout</mat-icon>
     </button>
 </mat-toolbar>
 
-<div class="dashboard-grid">
-    <mat-card class="dashboard-tile">
-        <mat-icon class="tile-icon">group</mat-icon>
-        <h3>Users</h3>
-        <p>All users up to date</p>
-        <button mat-raised-button color="accent" routerLink="/dashboard/user">Manage</button>
-    </mat-card>
+<div class="page">
+    <div class="tiles-container">
+        <!-- Users -->
+        <mat-card class="tile" appearance="raised">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar">
+                    <mat-icon>group</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Users</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">All users up to date</mat-card-subtitle>
+            </mat-card-header>
 
-    <mat-card class="dashboard-tile">
-        <mat-icon class="tile-icon">gavel</mat-icon>
-        <h3>Digital Services Act</h3>
-        <p>3 open reports</p>
-        <button mat-raised-button color="accent" routerLink="/dsa">Open</button>
-    </mat-card>
+            <mat-card-actions align="end">
+                <button mat-stroked-button color="primary" routerLink="/dashboard/user">
+                    <mat-icon>open_in_new</mat-icon>
+                    Manage
+                </button>
+            </mat-card-actions>
+        </mat-card>
+
+        <!-- Digital Services Act -->
+        <mat-card class="tile" appearance="raised">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar">
+                    <mat-icon>gavel</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Digital Services Act</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">3 open reports</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-actions align="end">
+                <button mat-stroked-button color="primary" routerLink="/dashboard/dsa">
+                    <mat-icon>open_in_new</mat-icon>
+                    Open
+                </button>
+            </mat-card-actions>
+        </mat-card>
+    </div>
 </div>
