@@ -10,7 +10,8 @@ import { User } from '../../../interfaces/user.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { UserService } from '../../../services/user/user.service';
 import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
-import { CreateUserComponent } from '../../user/create-user.component';
+import { CreateUserComponent } from '../../user/create-user/create-user.component';
+import { EditUserComponent, EditUserData } from '../../user/edit-user/edit-user.component';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -92,5 +93,27 @@ export class UserDashboardComponent {
   canDelete(user: User): boolean {
     const me = this.username();
     return this.isAdminOrRoot() && !!me && user.username !== me;
+  }
+
+  isSelf(user: User): boolean {
+    return user.username === this.username();
+  }
+
+  canEdit(user: User): boolean {
+    return this.isAdminOrRoot() || this.isSelf(user);
+  }
+
+  openEditUserDialog(user: User) {
+    const isAdminOrRoot = this.isAdminOrRoot();
+    const data: EditUserData = {
+      user,
+      canChangeUsername: isAdminOrRoot,
+      canChangeRole: isAdminOrRoot,
+      isSelf: this.isSelf(user)
+    };
+    const ref = this.dialog.open(EditUserComponent, { data });
+    ref.afterClosed().subscribe((updated) => {
+      if (updated) this.userService.loadUsers();
+    });
   }
 }

@@ -1,4 +1,5 @@
 export interface UpdateUserPayload {
-    role?: string;
+    username?: string;
     password?: string;
+    role?: 'moderator' | 'admin' | 'root'; // je nach deinem Modell
 }

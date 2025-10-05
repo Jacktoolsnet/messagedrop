@@ -37,10 +37,12 @@
             </mat-card-header>
 
             <mat-card-actions align="end">
-                <button mat-stroked-button color="primary" aria-label="Edit">
+                @if (canEdit(user)) {
+                <button mat-stroked-button color="primary" aria-label="Edit" (click)="openEditUserDialog(user)">
                     <mat-icon>edit</mat-icon>
                     Edit
                 </button>
+                }
 
                 @if (canDelete(user)) {
                 <button mat-stroked-button color="warn" aria-label="Delete" (click)="confirmDelete(user)">

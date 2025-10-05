@@ -7,8 +7,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from "@angular/material/icon";
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { CreateUserPayload } from '../../interfaces/create-user-payload.interface';
-import { UserService } from '../../services/user/user.service';
+import { CreateUserPayload } from '../../../interfaces/create-user-payload.interface';
+import { UserService } from '../../../services/user/user.service';
 
 @Component({
   selector: 'app-create-user',

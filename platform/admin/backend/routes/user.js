@@ -98,46 +98,72 @@ router.post('/', authMiddleware, async (req, res) => {
     });
 });
 
+
 /**
  * PUT /user/:id - User aktualisieren
- * - Root/Admin dürfen Rolle und Passwort für alle ändern
- * - Normale User dürfen nur ihr eigenes Passwort ändern
+ * - Root/Admin: dürfen username, role, password für alle ändern
+ * - Normale User: dürfen nur ihr eigenes password ändern
  */
 router.put('/:id', authMiddleware, async (req, res) => {
     const db = req.database.db;
     const { id } = req.params;
-    const { role, password } = req.body;
+    let { username, role, password } = req.body || {};
 
-    if (!role && !password) {
+    // basic normalize
+    if (typeof username === 'string') username = username.trim();
+    if (typeof role === 'string') role = role.trim();
+    if (typeof password === 'string') password = password.trim();
+
+    if (!username && !role && !password) {
         return res.status(400).json({ message: 'Nothing to update' });
     }
 
-    tableUser.getById(db, id, async (err, user) => {
-        if (err || !user) return res.status(404).json({ message: 'User not found' });
+    tableUser.getById(db, id, async (err, target) => {
+        if (err) return res.status(500).json({ message: 'DB error' });
+        if (!target) return res.status(404).json({ message: 'User not found' });
 
-        // === Berechtigungen prüfen ===
         const requesterRole = req.user.role;
         const requesterId = req.user.userId;
+        const isAdminOrRoot = requesterRole === 'admin' || requesterRole === 'root';
+        const isSelf = requesterId === id || req.user.username === target.username;
 
-        // normale User dürfen nur ihr eigenes Passwort ändern
-        if (requesterRole !== 'admin' && requesterRole !== 'root') {
-            if (requesterId !== id) {
+        // Normale User: nur eigenes Passwort
+        if (!isAdminOrRoot) {
+            if (!isSelf) {
                 return res.status(403).json({ message: 'You cannot update other users' });
             }
-            if (role) {
-                return res.status(403).json({ message: 'You cannot change your role' });
+            if (username || role) {
+                return res.status(403).json({ message: 'You cannot change username or role' });
             }
-            // an dieser Stelle: normaler User + eigenes Passwort -> OK
+            if (!password) {
+                return res.status(400).json({ message: 'Nothing to update' });
+            }
         }
 
+        // Für Admin/Root: validiere role/username
+        const allowedRoles = new Set(['moderator', 'admin', 'root']);
         const updates = [];
         const params = [];
 
-        if (role && (requesterRole === 'admin' || requesterRole === 'root')) {
+        // Username ändern (nur admin/root)
+        if (isAdminOrRoot && username && username !== target.username) {
+            if (username.length < 3) {
+                return res.status(400).json({ message: 'Username must be at least 3 characters' });
+            }
+            updates.push('username = ?');
+            params.push(username);
+        }
+
+        // Rolle ändern (nur admin/root)
+        if (isAdminOrRoot && role && role !== target.role) {
+            if (!allowedRoles.has(role)) {
+                return res.status(400).json({ message: 'Invalid role' });
+            }
             updates.push('role = ?');
             params.push(role);
         }
 
+        // Passwort ändern (admin/root für jeden; normale nur self)
         if (password) {
             const hashed = await bcrypt.hash(password, 12);
             updates.push('password = ?');
@@ -149,11 +175,16 @@ router.put('/:id', authMiddleware, async (req, res) => {
         }
 
         params.push(id);
-
         const sql = `UPDATE ${tableUser.tableName} SET ${updates.join(', ')} WHERE id = ?`;
 
         db.run(sql, params, function (err) {
-            if (err) return res.status(500).json({ message: 'Update failed' });
+            if (err) {
+                // UNIQUE constraint (username schon vergeben)
+                if (err.code === 'SQLITE_CONSTRAINT' || ('' + err.message).includes('UNIQUE')) {
+                    return res.status(409).json({ message: 'Username already exists' });
+                }
+                return res.status(500).json({ message: 'Update failed' });
+            }
             res.json({ updated: true });
         });
     });

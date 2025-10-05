@@ -1,0 +1,42 @@
+<div class="dialog-wrap">
+    <div class="dialog-header">
+        <div class="avatar">
+            <mat-icon>manage_accounts</mat-icon>
+        </div>
+        <div class="titles">
+            <h2>Edit User</h2>
+            <p *ngIf="!isSelf">Change user details</p>
+            <p *ngIf="isSelf">Change your password</p>
+        </div>
+    </div>
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="edit-user-form">
+        <!-- Username (nur Admin/Root) -->
+        <mat-form-field appearance="outline" class="full" *ngIf="canChangeUsername">
+            <mat-label>Username</mat-label>
+            <input matInput formControlName="username" />
+            <mat-error *ngIf="form.controls.username.invalid">Username is required (min 3 chars)</mat-error>
+        </mat-form-field>
+
+        <!-- Password (immer sichtbar: Admin/Root können auch PW setzen; normale User nur ihr eigenes) -->
+        <mat-form-field appearance="outline" class="full">
+            <mat-label>New Password (optional)</mat-label>
+            <input matInput type="password" formControlName="password" />
+        </mat-form-field>
+
+        <!-- Rolle (nur Admin/Root) -->
+        <mat-form-field appearance="outline" class="full" *ngIf="canChangeRole">
+            <mat-label>Role</mat-label>
+            <mat-select formControlName="role">
+                <mat-option value="moderator">Moderator</mat-option>
+                <mat-option value="admin">Admin</mat-option>
+                <mat-option value="root">Root</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <div class="dialog-actions">
+            <button type="button" mat-stroked-button (click)="cancel()">Cancel</button>
+            <button type="submit" mat-raised-button color="primary" [disabled]="form.invalid">Save</button>
+        </div>
+    </form>
+</div>
