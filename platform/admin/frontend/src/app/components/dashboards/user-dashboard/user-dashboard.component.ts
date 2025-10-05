@@ -3,10 +3,13 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
+import { User } from '../../../interfaces/user.interface';
 import { AuthService } from '../../../services/auth/auth.service';
 import { UserService } from '../../../services/user/user.service';
+import { ConfirmDialogComponent } from '../../shared/confirm-dialog.component';
 import { CreateUserComponent } from '../../user/create-user.component';
 
 @Component({
@@ -25,6 +28,7 @@ import { CreateUserComponent } from '../../user/create-user.component';
 })
 export class UserDashboardComponent {
   private dialog = inject(MatDialog);
+  private snack = inject(MatSnackBar);
   private router = inject(Router);
   private userService = inject(UserService);
   private authService = inject(AuthService);
@@ -47,7 +51,46 @@ export class UserDashboardComponent {
       });
   }
 
+  confirmDelete(user: User) {
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete user?',
+        message: `Do you really want to delete “${user.username}”? This cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        warn: true
+      }
+    });
+
+    ref.afterClosed().subscribe(confirmed => {
+      if (!confirmed) return;
+
+      this.userService.deleteUser(user.id).subscribe({
+        next: (res) => {
+          if (res?.deleted) {
+            this.snack.open(`User “${user.username}” deleted.`, 'OK', { duration: 2500 });
+            this.userService.loadUsers(); // refresh
+          } else {
+            this.snack.open('Delete failed.', 'OK', { duration: 2500 });
+          }
+        },
+        error: (err) => {
+          if (err?.status === 403) {
+            this.snack.open('Insufficient permissions to delete users.', 'OK', { duration: 3000 });
+          } else {
+            this.snack.open('Backend error while deleting user.', 'OK', { duration: 3000 });
+          }
+        }
+      });
+    });
+  }
+
   isAdminOrRoot(): boolean {
     return ['admin', 'root'].includes(this.role()!);
+  }
+
+  canDelete(user: User): boolean {
+    const me = this.username();
+    return this.isAdminOrRoot() && !!me && user.username !== me;
   }
 }

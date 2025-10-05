@@ -41,10 +41,13 @@
                     <mat-icon>edit</mat-icon>
                     Edit
                 </button>
-                <button mat-stroked-button color="warn" aria-label="Delete">
+
+                @if (canDelete(user)) {
+                <button mat-stroked-button color="warn" aria-label="Delete" (click)="confirmDelete(user)">
                     <mat-icon>delete</mat-icon>
                     Delete
                 </button>
+                }
             </mat-card-actions>
         </mat-card>
         }
