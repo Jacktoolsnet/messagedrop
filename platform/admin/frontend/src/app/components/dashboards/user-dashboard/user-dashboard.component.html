@@ -1,0 +1,39 @@
+<mat-toolbar color="primary">
+    <!-- Home-Button -->
+    <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
+        <mat-icon class="material-symbols-outlined">group</mat-icon>
+    </button>
+
+    <!-- Titel zentriert -->
+    <span style="flex: 1; text-align: center; font-size: 1.5rem; font-weight: 500;">
+        User Management
+    </span>
+
+    <!-- Benutzername und Zurück -->
+    <span>{{ username() }} ({{ role() }})</span>
+    <button mat-icon-button (click)="goBack()" aria-label="Back">
+        <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+    </button>
+</mat-toolbar>
+
+<!-- === User Tiles === -->
+<div class="tiles-container">
+    @for (user of users(); track user.id) {
+    <div class="tile">
+        <mat-icon class="tile-icon material-symbols-outlined">person</mat-icon>
+        <div class="tile-info">
+            <div class="username">{{ user.username }}</div>
+            <div class="role">{{ user.role }}</div>
+        </div>
+        <div class="tile-actions">
+            <!-- Platz für Edit/Delete-Buttons etc. -->
+            <button mat-icon-button color="primary" aria-label="Edit">
+                <mat-icon>edit</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" aria-label="Delete">
+                <mat-icon>delete</mat-icon>
+            </button>
+        </div>
+    </div>
+    }
+</div>

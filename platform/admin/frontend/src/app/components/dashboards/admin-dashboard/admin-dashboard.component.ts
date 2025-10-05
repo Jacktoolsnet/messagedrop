@@ -31,6 +31,10 @@ export class AdminDashboardComponent {
     return this.authService.role;
   }
 
+  goToUserDashboard() {
+    this.router.navigate(['/dashboard/user']);
+  }
+
   logout() {
     this.authService.logout();
   }
