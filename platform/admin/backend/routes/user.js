@@ -1,113 +1,98 @@
+// routes/user.js
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+
 const tableUser = require('../db/tableUser');
+const { requireAdminJwt, requireRole } = require('../middleware/security');
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
+const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/';
+const ADMIN_AUD = process.env.ADMIN_AUD || 'messagedrop-admin';
 
-/**
- * Login-Route
- */
+// Helpers
+const stripUser = (u) => u && ({ id: u.id, username: u.username, role: u.role, createdAt: u.createdAt });
+const isAdminOrRoot = (roles) => (Array.isArray(roles) ? roles : []).some(r => r === 'admin' || r === 'root');
+
+// ======================= LOGIN (ohne Guard) =======================
 router.post('/login', async (req, res) => {
-    const db = req.database.db;
-    const { username, password } = req.body;
+    const db = req.database?.db;
+    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+
+    const { username, password } = req.body || {};
     const envUser = process.env.ADMIN_ROOT_USER;
-    const envPass = process.env.ADMIN_ROOT_PASSWORD;
-
-    // === Root-User Login ===
-    if (username === envUser && password === envPass) {
-        const token = jwt.sign({ userId: 'root', username, role: 'root' }, ADMIN_JWT_SECRET, { expiresIn: '2h' });
-        return res.json({ token });
-    }
-
-    // === Normaler User ===
-    tableUser.getByUsername(db, username, async (err, user) => {
-        if (err || !user) return res.status(401).json({ message: 'Invalid login' });
-
-        const match = await bcrypt.compare(password, user.password);
-        if (!match) return res.status(401).json({ message: 'Invalid login' });
-
-        const token = jwt.sign({
-            userId: user.id,
-            username: user.username,
-            role: user.role
-        }, ADMIN_JWT_SECRET, { expiresIn: '2h' });
-
-        res.json({ token });
-    });
-});
-
-/**
- * Auth-Middleware (einfach gehalten)
- */
-const authMiddleware = (req, res, next) => {
-    const auth = req.headers.authorization;
-    if (!auth || !auth.startsWith('Bearer ')) {
-        return res.status(401).json({ message: 'Missing token' });
-    }
+    const envPass = process.env.ADMIN_ROOT_PASSWORD || process.env.ADMIN_ROOT_PASSWORT; // Fallback
 
     try {
-        const token = auth.split(' ')[1];
-        const payload = jwt.verify(token, ADMIN_JWT_SECRET);
-        req.user = payload;
-        next();
-    } catch (err) {
-        return res.status(401).json({ message: 'Invalid token' });
+        // Root via ENV
+        if (username === envUser && password === envPass) {
+            const token = jwt.sign(
+                { sub: 'root', username, role: 'root', roles: ['root'] },
+                ADMIN_JWT_SECRET,
+                { expiresIn: '2h', issuer: ADMIN_ISS, audience: ADMIN_AUD }
+            );
+            return res.json({ token });
+        }
+
+        // Normale User
+        tableUser.getByUsername(db, username, async (err, user) => {
+            if (err || !user) return res.status(401).json({ message: 'Invalid login' });
+            const match = await bcrypt.compare(password, user.password);
+            if (!match) return res.status(401).json({ message: 'Invalid login' });
+
+            const token = jwt.sign(
+                { sub: user.id, username: user.username, role: user.role, roles: [user.role] },
+                ADMIN_JWT_SECRET,
+                { expiresIn: '2h', issuer: ADMIN_ISS, audience: ADMIN_AUD }
+            );
+            res.json({ token });
+        });
+    } catch (_e) {
+        res.status(500).json({ message: 'login_failed' });
     }
-};
+});
 
-/**
- * GET /user - Liste aller User
- * - admin/root: alle Nutzer
- * - sonst: nur der eigene Nutzer
- */
-router.get('/', authMiddleware, (req, res) => {
-    const db = req.database.db;
-    const { role, userId, username } = req.user;
+// Ab hier: Admin-JWT Pflicht
+router.use(requireAdminJwt);
 
-    const stripUser = (u) => u && ({
-        id: u.id,
-        username: u.username,
-        role: u.role,
-        createdAt: u.createdAt
-    });
+// ======================= GET /user =======================
+// admin/root: alle; sonst: nur eigener
+router.get('/', (req, res) => {
+    const db = req.database?.db;
+    if (!db) return res.status(500).json({ message: 'database_unavailable' });
 
-    const isAdminOrRoot = role === 'admin' || role === 'root';
+    const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
+    const sub = req.admin?.sub;
+    const uname = req.admin?.username;
 
-    if (isAdminOrRoot) {
-        // volle Liste (ohne Passwort-Hash zurückgeben!)
+    if (isAdminOrRoot(roles)) {
         tableUser.list(db, {}, (err, users) => {
             if (err) return res.status(500).json({ message: 'DB error' });
             res.json(users.map(stripUser));
         });
     } else {
-        // nur eigenen User zurückgeben
-        tableUser.getById(db, userId, (err, u) => {
+        tableUser.getById(db, sub, (err, u) => {
             if (err) return res.status(500).json({ message: 'DB error' });
             if (u) return res.json([stripUser(u)]);
-            // Fallback, falls Token userId ausnahmsweise nicht matcht
-            tableUser.getByUsername(db, username, (err2, u2) => {
+            tableUser.getByUsername(db, uname, (err2, u2) => {
                 if (err2) return res.status(500).json({ message: 'DB error' });
-                res.json(u2 ? [stripUser(u2)] : []); // leer, wenn nicht gefunden
+                res.json(u2 ? [stripUser(u2)] : []);
             });
         });
     }
 });
 
-/**
- * POST /user - Neuen User anlegen (nur für admin & root)
- */
-router.post('/', authMiddleware, async (req, res) => {
-    const db = req.database.db;
+// ======================= POST /user =======================
+// nur admin/root
+router.post('/', requireRole('admin', 'root'), async (req, res) => {
+    const db = req.database?.db;
+    if (!db) return res.status(500).json({ message: 'database_unavailable' });
 
-    // Berechtigung prüfen
-    if (req.user.role !== 'admin' && req.user.role !== 'root') {
-        return res.status(403).json({ message: 'Insufficient permissions' });
-    }
-
-    const { username, password, role = 'moderator' } = req.body;
+    let { username, password, role = 'moderator' } = req.body || {};
+    username = typeof username === 'string' ? username.trim() : '';
+    password = typeof password === 'string' ? password.trim() : '';
 
     if (!username || !password) {
         return res.status(400).json({ message: 'Missing username or password' });
@@ -118,23 +103,25 @@ router.post('/', authMiddleware, async (req, res) => {
     const createdAt = Date.now();
 
     tableUser.create(db, id, username, hashed, role, createdAt, (err, result) => {
-        if (err) return res.status(500).json({ message: 'Could not create user' });
-        res.status(201).json(result);
+        if (err) {
+            const msg = String(err.message || '');
+            if (err.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
+                return res.status(409).json({ message: 'Username already exists' });
+            }
+            return res.status(500).json({ message: 'Could not create user' });
+        }
+        res.status(201).json(result); // { id }
     });
 });
 
+// ======================= PUT /user/:id =======================
+// admin/root: username/role/password; normaler User: nur eigenes password
+router.put('/:id', async (req, res) => {
+    const db = req.database?.db;
+    if (!db) return res.status(500).json({ message: 'database_unavailable' });
 
-/**
- * PUT /user/:id - User aktualisieren
- * - Root/Admin: dürfen username, role, password für alle ändern
- * - Normale User: dürfen nur ihr eigenes password ändern
- */
-router.put('/:id', authMiddleware, async (req, res) => {
-    const db = req.database.db;
     const { id } = req.params;
     let { username, role, password } = req.body || {};
-
-    // basic normalize
     if (typeof username === 'string') username = username.trim();
     if (typeof role === 'string') role = role.trim();
     if (typeof password === 'string') password = password.trim();
@@ -143,103 +130,79 @@ router.put('/:id', authMiddleware, async (req, res) => {
         return res.status(400).json({ message: 'Nothing to update' });
     }
 
+    const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
+    const isAdminRoot = isAdminOrRoot(roles);
+    const isSelf = req.admin?.sub === id;
+
     tableUser.getById(db, id, async (err, target) => {
         if (err) return res.status(500).json({ message: 'DB error' });
         if (!target) return res.status(404).json({ message: 'User not found' });
 
-        const requesterRole = req.user.role;
-        const requesterId = req.user.userId;
-        const isAdminOrRoot = requesterRole === 'admin' || requesterRole === 'root';
-        const isSelf = requesterId === id || req.user.username === target.username;
-
-        // Normale User: nur eigenes Passwort
-        if (!isAdminOrRoot) {
-            if (!isSelf) {
-                return res.status(403).json({ message: 'You cannot update other users' });
-            }
-            if (username || role) {
-                return res.status(403).json({ message: 'You cannot change username or role' });
-            }
-            if (!password) {
-                return res.status(400).json({ message: 'Nothing to update' });
-            }
+        if (!isAdminRoot) {
+            // normaler User: nur eigenes Passwort
+            if (!isSelf) return res.status(403).json({ message: 'You cannot update other users' });
+            if (username || role) return res.status(403).json({ message: 'You cannot change username or role' });
+            if (!password) return res.status(400).json({ message: 'Nothing to update' });
         }
 
-        // Für Admin/Root: validiere role/username
         const allowedRoles = new Set(['moderator', 'admin', 'root']);
-        const updates = [];
-        const params = [];
+        const fields = {};
 
-        // Username ändern (nur admin/root)
-        if (isAdminOrRoot && username && username !== target.username) {
-            if (username.length < 3) {
-                return res.status(400).json({ message: 'Username must be at least 3 characters' });
-            }
-            updates.push('username = ?');
-            params.push(username);
+        if (isAdminRoot && username && username !== target.username) {
+            if (username.length < 3) return res.status(400).json({ message: 'Username must be at least 3 characters' });
+            fields.username = username;
         }
 
-        // Rolle ändern (nur admin/root)
-        if (isAdminOrRoot && role && role !== target.role) {
-            if (!allowedRoles.has(role)) {
-                return res.status(400).json({ message: 'Invalid role' });
-            }
-            updates.push('role = ?');
-            params.push(role);
+        if (isAdminRoot && role && role !== target.role) {
+            if (!allowedRoles.has(role)) return res.status(400).json({ message: 'Invalid role' });
+            fields.role = role;
         }
 
-        // Passwort ändern (admin/root für jeden; normale nur self)
         if (password) {
             const hashed = await bcrypt.hash(password, 12);
-            updates.push('password = ?');
-            params.push(hashed);
+            fields.passwordHash = hashed;
         }
 
-        if (updates.length === 0) {
+        if (Object.keys(fields).length === 0) {
             return res.status(403).json({ message: 'Nothing to update or insufficient permissions' });
         }
 
-        params.push(id);
-        const sql = `UPDATE ${tableUser.tableName} SET ${updates.join(', ')} WHERE id = ?`;
-
-        db.run(sql, params, function (err) {
-            if (err) {
-                // UNIQUE constraint (username schon vergeben)
-                if (err.code === 'SQLITE_CONSTRAINT' || ('' + err.message).includes('UNIQUE')) {
+        tableUser.update(db, id, fields, (e, ok) => {
+            if (e) {
+                const msg = String(e.message || '');
+                if (e.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
                     return res.status(409).json({ message: 'Username already exists' });
                 }
                 return res.status(500).json({ message: 'Update failed' });
             }
+            if (!ok) return res.status(404).json({ message: 'User not found' });
             res.json({ updated: true });
         });
     });
 });
 
-/**
- * DELETE /user/:id - User löschen (nur root & admin)
- */
-router.delete('/:id', authMiddleware, (req, res) => {
-    const db = req.database.db;
+// ======================= DELETE /user/:id =======================
+// nur admin/root; self-delete blockieren
+router.delete('/:id', requireRole('admin', 'root'), (req, res) => {
+    const db = req.database?.db;
+    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+
     const { id } = req.params;
-
-    // Nur root oder admin dürfen löschen
-    const requesterRole = req.user.role;
-
-    if (requesterRole !== 'admin' && requesterRole !== 'root') {
-        return res.status(403).json({ message: 'Insufficient permissions to delete users' });
+    if (req.admin?.sub === id) {
+        return res.status(400).json({ message: 'You cannot delete your own account.' });
     }
 
-    const sql = `DELETE FROM ${tableUser.tableName} WHERE id = ?`;
-    db.run(sql, [id], function (err) {
+    tableUser.deleteById(db, id, (err, ok) => {
         if (err) return res.status(500).json({ message: 'Delete failed' });
+        if (!ok) return res.status(404).json({ message: 'User not found' });
         res.json({ deleted: true });
     });
 });
 
-router.get('/me', authMiddleware, (req, res) => {
-    // Payload aus dem JWT wurde bereits durch die Middleware in req.user gesetzt
-    const { userId, username, role } = req.user;
-    res.json({ userId, username, role });
+// ======================= GET /user/me =======================
+router.get('/me', (req, res) => {
+    const { sub: userId, username, role, roles } = req.admin || {};
+    res.json({ userId, username, role, roles });
 });
 
 module.exports = router;

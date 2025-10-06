@@ -218,6 +218,43 @@ const updateStatus = function (db, id, newStatus, updatedAt, callBack) {
     });
 };
 
+/**
+ * Stats für Notices.
+ * - total: Anzahl aller Notices
+ * - open: Anzahl aller Notices mit status != 'DECIDED' (oder NULL)
+ * - byStatus: Map { STATUS -> count }
+ * @param {import('sqlite3').Database} db
+ * @param {(err: any, result?: { total:number, open:number, byStatus: Record<string,number> }) => void} callBack
+ */
+const stats = function (db, callBack) {
+    const sqlByStatus = `
+    SELECT COALESCE(${columnStatus}, 'UNKNOWN') AS status, COUNT(*) AS cnt
+    FROM ${tableName}
+    GROUP BY COALESCE(${columnStatus}, 'UNKNOWN')
+  `;
+    const sqlTotals = `
+    SELECT 
+      COUNT(*) AS total,
+      SUM(CASE WHEN ${columnStatus} IS NULL OR ${columnStatus} <> 'DECIDED' THEN 1 ELSE 0 END) AS open
+    FROM ${tableName}
+  `;
+    db.all(sqlByStatus, [], (err, rows) => {
+        if (err) return callBack(err);
+        const byStatus = {};
+        for (const r of rows || []) {
+            byStatus[r.status] = Number(r.cnt) || 0;
+        }
+        db.get(sqlTotals, [], (err2, agg) => {
+            if (err2) return callBack(err2);
+            callBack(null, {
+                total: Number(agg?.total || 0),
+                open: Number(agg?.open || 0),
+                byStatus
+            });
+        });
+    });
+};
+
 module.exports = {
     tableName,
     columns: {
@@ -239,5 +276,6 @@ module.exports = {
     create,
     getById,
     list,
-    updateStatus
+    updateStatus,
+    stats
 };

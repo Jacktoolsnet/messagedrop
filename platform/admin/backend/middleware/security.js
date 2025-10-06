@@ -50,10 +50,10 @@ function requireAdminJwt(req, res, next) {
 
 /**
  * RBAC-Guard: erlaubt nur bestimmte Rollen.
- * Standard: moderator|legal|admin
+ * Standard: moderator|legal|admin|root
  */
 function requireRole(...allowed) {
-  const allowedSet = allowed.length ? allowed : ['moderator', 'legal', 'admin'];
+  const allowedSet = allowed.length ? allowed : ['moderator', 'legal', 'admin', 'root'];
   return (req, res, next) => {
     const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
     const ok = roles.some(r => allowedSet.includes(r));

@@ -1,4 +1,4 @@
-// tableUser.js
+// db/tableUser.js
 const tableName = 'tableUser';
 
 // === Spalten definieren ===
@@ -12,20 +12,20 @@ const columnCreatedAt = 'createdAt';  // INTEGER NOT NULL (unix ms)
 const init = function (db) {
     try {
         const sql = `
-        CREATE TABLE IF NOT EXISTS ${tableName} (
-            ${columnId} TEXT PRIMARY KEY NOT NULL,
-            ${columnUsername} TEXT UNIQUE NOT NULL,
-            ${columnPassword} TEXT NOT NULL,
-            ${columnRole} TEXT NOT NULL DEFAULT 'moderator',
-            ${columnCreatedAt} INTEGER NOT NULL
-        );
-        CREATE INDEX IF NOT EXISTS idx_user_username
-          ON ${tableName}(${columnUsername});
-        CREATE INDEX IF NOT EXISTS idx_user_role
-          ON ${tableName}(${columnRole});
-        CREATE INDEX IF NOT EXISTS idx_user_createdAt_desc
-          ON ${tableName}(${columnCreatedAt} DESC);
-        `;
+      CREATE TABLE IF NOT EXISTS ${tableName} (
+        ${columnId} TEXT PRIMARY KEY NOT NULL,
+        ${columnUsername} TEXT UNIQUE NOT NULL,
+        ${columnPassword} TEXT NOT NULL,
+        ${columnRole} TEXT NOT NULL DEFAULT 'moderator',
+        ${columnCreatedAt} INTEGER NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_user_username
+        ON ${tableName}(${columnUsername});
+      CREATE INDEX IF NOT EXISTS idx_user_role
+        ON ${tableName}(${columnRole});
+      CREATE INDEX IF NOT EXISTS idx_user_createdAt_desc
+        ON ${tableName}(${columnCreatedAt} DESC);
+    `;
         db.exec(sql, (err) => {
             if (err) throw err;
         });
@@ -46,14 +46,14 @@ const init = function (db) {
  */
 const create = function (db, id, username, passwordHash, role, createdAt, callBack) {
     const stmt = `
-      INSERT INTO ${tableName} (
-        ${columnId},
-        ${columnUsername},
-        ${columnPassword},
-        ${columnRole},
-        ${columnCreatedAt}
-      ) VALUES (?, ?, ?, ?, ?)
-    `;
+    INSERT INTO ${tableName} (
+      ${columnId},
+      ${columnUsername},
+      ${columnPassword},
+      ${columnRole},
+      ${columnCreatedAt}
+    ) VALUES (?, ?, ?, ?, ?)
+  `;
     const params = [id, username, passwordHash, role, createdAt];
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
@@ -62,11 +62,6 @@ const create = function (db, id, username, passwordHash, role, createdAt, callBa
 };
 
 // === GET: User nach ID ===
-/**
- * @param {import('sqlite3').Database} db
- * @param {string} id
- * @param {(err: any, row?: any) => void} callBack
- */
 const getById = function (db, id, callBack) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnId} = ? LIMIT 1`;
     db.get(sql, [id], (err, row) => {
@@ -76,11 +71,6 @@ const getById = function (db, id, callBack) {
 };
 
 // === GET: User nach Username ===
-/**
- * @param {import('sqlite3').Database} db
- * @param {string} username
- * @param {(err: any, row?: any) => void} callBack
- */
 const getByUsername = function (db, username, callBack) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnUsername} = ? LIMIT 1`;
     db.get(sql, [username], (err, row) => {
@@ -92,11 +82,7 @@ const getByUsername = function (db, username, callBack) {
 // === LIST: User auflisten ===
 /**
  * @param {import('sqlite3').Database} db
- * @param {{
- *  role?: string,
- *  limit?: number,
- *  offset?: number
- * }} [opts]
+ * @param {{ role?: string, limit?: number, offset?: number }} [opts]
  * @param {(err: any, rows?: any[]) => void} callBack
  */
 const list = function (db, opts, callBack) {
@@ -118,6 +104,57 @@ const list = function (db, opts, callBack) {
     });
 };
 
+// === UPDATE: dynamisch Felder setzen ===
+/**
+ * @param {import('sqlite3').Database} db
+ * @param {string} id
+ * @param {{ username?: string, role?: string, passwordHash?: string }} fields
+ * @param {(err: any, ok?: boolean) => void} callBack
+ */
+const update = function (db, id, fields, callBack) {
+    const updates = [];
+    const params = [];
+
+    if (typeof fields.username === 'string') {
+        updates.push(`${columnUsername} = ?`);
+        params.push(fields.username);
+    }
+    if (typeof fields.role === 'string') {
+        updates.push(`${columnRole} = ?`);
+        params.push(fields.role);
+    }
+    if (typeof fields.passwordHash === 'string') {
+        updates.push(`${columnPassword} = ?`);
+        params.push(fields.passwordHash);
+    }
+
+    if (updates.length === 0) {
+        // nichts zu tun
+        return process.nextTick(() => callBack(null, false));
+    }
+
+    params.push(id);
+    const sql = `UPDATE ${tableName} SET ${updates.join(', ')} WHERE ${columnId} = ?`;
+    db.run(sql, params, function (err) {
+        if (err) return callBack(err);
+        callBack(null, this.changes > 0);
+    });
+};
+
+// === DELETE: nach ID ===
+/**
+ * @param {import('sqlite3').Database} db
+ * @param {string} id
+ * @param {(err: any, ok?: boolean) => void} callBack
+ */
+const deleteById = function (db, id, callBack) {
+    const sql = `DELETE FROM ${tableName} WHERE ${columnId} = ?`;
+    db.run(sql, [id], function (err) {
+        if (err) return callBack(err);
+        callBack(null, this.changes > 0);
+    });
+};
+
 module.exports = {
     tableName,
     columns: {
@@ -131,5 +168,7 @@ module.exports = {
     create,
     getById,
     getByUsername,
-    list
+    list,
+    update,
+    deleteById
 };

@@ -2,6 +2,7 @@ const express = require('express');
 const crypto = require('crypto');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 
+const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
 const tableDecision = require('../db/tableDsaDecision');
 const tableEvidence = require('../db/tableDsaEvidence');
@@ -9,7 +10,7 @@ const tableNotification = require('../db/tableDsaNotification');
 const tableAudit = require('../db/tableDsaAuditLog');
 
 const router = express.Router();
-router.use(requireAdminJwt, requireRole()); // default: moderator|legal|admin
+router.use(requireAdminJwt, requireRole('moderator', 'legal', 'admin', 'root'));
 
 function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
@@ -187,6 +188,28 @@ router.get('/audit/:entityType/:entityId', (req, res) => {
             res.json(rows);
         }
     );
+});
+
+/** -------------------- STATS: NOTICES -------------------- **/
+router.get('/stats/notices', (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    tableNotice.stats(_db, (err, result) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        res.json(result); // { total, open, byStatus }
+    });
+});
+
+/** -------------------- STATS: SIGNALS -------------------- **/
+router.get('/stats/signals', (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    tableSignal.stats(_db, (err, result) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        res.json(result); // { total, last24h, byType }
+    });
 });
 
 module.exports = router;

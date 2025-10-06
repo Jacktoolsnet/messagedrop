@@ -150,6 +150,42 @@ const list = function (db, opts, callBack) {
     });
 };
 
+/**
+ * Stats für Signals.
+ * - total: Anzahl aller Signals
+ * - last24h: Anzahl der letzten 24 Stunden
+ * - byType: Map { reportedContentType -> count }
+ * @param {import('sqlite3').Database} db
+ * @param {(err: any, result?: { total:number, last24h:number, byType: Record<string,number> }) => void} callBack
+ */
+const stats = function (db, callBack) {
+    const sqlTotal = `SELECT COUNT(*) AS total FROM ${tableName}`;
+    const sqlByType = `
+    SELECT ${columnReportedContentType} AS type, COUNT(*) AS cnt
+    FROM ${tableName}
+    GROUP BY ${columnReportedContentType}
+  `;
+    const since = Date.now() - 24 * 60 * 60 * 1000;
+    const sql24h = `SELECT COUNT(*) AS cnt FROM ${tableName} WHERE ${columnCreatedAt} >= ?`;
+
+    db.get(sqlTotal, [], (e1, t) => {
+        if (e1) return callBack(e1);
+        db.all(sqlByType, [], (e2, rows) => {
+            if (e2) return callBack(e2);
+            const byType = {};
+            for (const r of rows || []) byType[r.type || 'UNKNOWN'] = Number(r.cnt) || 0;
+            db.get(sql24h, [since], (e3, r24) => {
+                if (e3) return callBack(e3);
+                callBack(null, {
+                    total: Number(t?.total || 0),
+                    last24h: Number(r24?.cnt || 0),
+                    byType
+                });
+            });
+        });
+    });
+};
+
 module.exports = {
     tableName,
     columns: {
@@ -165,5 +201,6 @@ module.exports = {
     init,
     create,
     getById,
-    list
+    list,
+    stats
 };
