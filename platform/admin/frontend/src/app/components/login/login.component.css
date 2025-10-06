@@ -1,14 +1,18 @@
-/* === Theme Tokens (Match zum Dashboard) === */
+/* === Theme Tokens (Login) === */
 :host {
+    color-scheme: light dark;
+    /* hilft Browser-UI (Autofill, etc.) */
     --primary: #05a51d;
-    /* deine Grün-Primary */
+
+    /* Light */
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
-    --card: rgba(255, 255, 255, 0.9);
+    --card: rgba(255, 255, 255, 0.94);
     --text: #1f2937;
     --muted: #6b7280;
-    --border: rgba(0, 0, 0, 0.06);
+    --border: rgba(0, 0, 0, 0.08);
+    --outline: color-mix(in srgb, var(--text) 28%, transparent);
 
     display: block;
     min-height: 100dvh;
@@ -16,13 +20,15 @@
 
 @media (prefers-color-scheme: dark) {
     :host {
-        --bg-gradient-start: #0c1a12;
-        --bg-gradient-end: #0f2217;
-        --surface: #0b1410;
-        --card: rgba(12, 20, 16, 0.86);
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --border: rgba(255, 255, 255, 0.08);
+        /* Dark: knackiger Kontrast & weniger Glas */
+        --bg-gradient-start: #06130a;
+        --bg-gradient-end: #0b1d12;
+        --surface: #0d1510;
+        --card: rgba(18, 26, 21, 0.97);
+        --text: #e8f5ee;
+        --muted: #a6b7b0;
+        --border: rgba(255, 255, 255, 0.10);
+        --outline: color-mix(in srgb, var(--text) 35%, transparent);
     }
 }
 
@@ -41,7 +47,10 @@
     border-radius: 16px;
     background: var(--card);
     border: 1px solid var(--border);
-    box-shadow: 0 16px 40px rgba(2, 8, 20, 0.14);
+    /* leicht kräftiger Shadow für Dark Mode */
+    box-shadow:
+        0 18px 50px rgba(2, 8, 20, 0.22),
+        0 2px 6px rgba(2, 8, 20, 0.10);
     animation: fadeUp .45s ease forwards;
     transform: translateY(10px);
     opacity: 0;
@@ -62,14 +71,13 @@
     }
 }
 
-/* === Logo / Avatar-Blase === */
+/* === Logo / Avatar === */
 .brand-avatar {
     background: color-mix(in srgb, var(--primary) 14%, transparent);
     display: inline-grid;
     place-items: center;
     border-radius: 50%;
     overflow: hidden;
-    /* verhindert Clipping */
 
     img {
         width: 100%;
@@ -90,7 +98,7 @@
     }
 }
 
-/* === Form === */
+/* === Form Layout === */
 .form {
     display: grid;
     gap: 0.9rem;
@@ -102,6 +110,9 @@
     button[type="submit"] {
         width: 100%;
         margin-top: .25rem;
+        background: var(--primary) !important;
+        color: #fff !important;
+        box-shadow: 0 6px 16px rgba(5, 165, 29, 0.25);
     }
 
     .info {
@@ -122,6 +133,52 @@
     }
 }
 
+/* === Material Form Field – bessere Sichtbarkeit im Dark Mode === */
+/* Outline-Farben */
+.login-card .mdc-text-field--outlined .mdc-notched-outline__leading,
+.login-card .mdc-text-field--outlined .mdc-notched-outline__notch,
+.login-card .mdc-text-field--outlined .mdc-notched-outline__trailing {
+    border-color: var(--outline) !important;
+}
+
+.login-card .mdc-text-field--outlined.mdc-text-field--hover .mdc-notched-outline__leading,
+.login-card .mdc-text-field--outlined.mdc-text-field--hover .mdc-notched-outline__notch,
+.login-card .mdc-text-field--outlined.mdc-text-field--hover .mdc-notched-outline__trailing {
+    border-color: color-mix(in srgb, var(--text) 45%, transparent) !important;
+}
+
+.login-card .mdc-text-field--focused .mdc-notched-outline__leading,
+.login-card .mdc-text-field--focused .mdc-notched-outline__notch,
+.login-card .mdc-text-field--focused .mdc-notched-outline__trailing {
+    border-color: var(--primary) !important;
+}
+
+/* Label & Input-Farben */
+.login-card .mdc-floating-label {
+    color: color-mix(in srgb, var(--text) 70%, transparent) !important;
+}
+
+.login-card .mdc-text-field--focused .mdc-floating-label {
+    color: var(--primary) !important;
+}
+
+.login-card .mat-mdc-input-element {
+    color: var(--text) !important;
+    caret-color: var(--primary);
+}
+
+/* Field-Background (leicht getönt, nur bei Bedarf) */
+.login-card .mat-mdc-text-field-wrapper {
+    border-radius: 12px;
+    background: color-mix(in srgb, var(--surface) 86%, transparent);
+}
+
+/* Helper-/Fehlermeldungen */
+.login-card .mat-mdc-form-field-subscript-wrapper,
+.login-card .mat-mdc-form-field-error {
+    color: color-mix(in srgb, var(--text) 70%, transparent);
+}
+
 /* === Motion === */
 @keyframes fadeUp {
     from {
@@ -133,4 +190,17 @@
         transform: translateY(0);
         opacity: 1;
     }
+}
+
+/* === Extras: sichtbarer Focus & Autofill === */
+button:focus-visible,
+input:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+input:-webkit-autofill {
+    -webkit-text-fill-color: var(--text);
+    transition: background-color 9999s ease-out;
 }

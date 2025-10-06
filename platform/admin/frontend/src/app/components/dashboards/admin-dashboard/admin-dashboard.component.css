@@ -1,15 +1,21 @@
-/* ==== Theme Tokens (Light/Dark) – passend zum Login (Grün) ==== */
+/* ==== Theme Tokens (Light/Dark) – konsistent zum Login ==== */
 :host {
+    color-scheme: light dark;
     --primary: #05a51d;
-    /* Brand-Grün wie im Login */
+
+    /* Light */
     --bg-gradient-start: #eafde8;
-    /* helle Grün-Verläufe */
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
-    --card: rgba(255, 255, 255, 0.90);
+    --card: rgba(255, 255, 255, 0.94);
     --text: #1f2937;
     --muted: #6b7280;
-    --border: rgba(0, 0, 0, 0.06);
+    --border: rgba(0, 0, 0, 0.08);
+
+    /* Semantic */
+    --accent: #16a34a;
+    /* grünlicher Akzent */
+    --warn: #ef4444;
 
     display: block;
     min-height: 100%;
@@ -19,18 +25,20 @@
 
 @media (prefers-color-scheme: dark) {
     :host {
-        --bg-gradient-start: #0c1a12;
-        /* dunkles Grün */
-        --bg-gradient-end: #0f2217;
-        --surface: #0b1410;
-        --card: rgba(12, 20, 16, 0.86);
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --border: rgba(255, 255, 255, 0.08);
+        /* Dark – etwas knackiger für bessere Lesbarkeit */
+        --bg-gradient-start: #06130a;
+        --bg-gradient-end: #0b1d12;
+        --surface: #0d1510;
+        --card: rgba(18, 26, 21, 0.97);
+        --text: #e8f5ee;
+        --muted: #a6b7b0;
+        --border: rgba(255, 255, 255, 0.10);
+        --accent: #22c55e;
+        --warn: #f87171;
     }
 }
 
-/* ==== Toolbar (modern, sticky, subtle glass) ==== */
+/* ==== Toolbar (glass + dezente Tiefe) ==== */
 mat-toolbar {
     position: sticky;
     top: 0;
@@ -41,6 +49,13 @@ mat-toolbar {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     border-bottom: 1px solid var(--border);
     font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+
+    .toolbar-title {
+        margin-inline: auto;
+        font-size: 1.5rem;
+        font-weight: 600;
+        letter-spacing: .2px;
+    }
 }
 
 @media (prefers-color-scheme: dark) {
@@ -57,7 +72,7 @@ mat-toolbar {
     padding: 1.5rem 1rem 2.5rem;
 }
 
-/* Header über dem Grid */
+/* Header über dem Grid (Buttons rechts) */
 .user-header {
     display: flex;
     align-items: center;
@@ -67,12 +82,12 @@ mat-toolbar {
 
     h2 {
         margin: 0;
-        font-weight: 600;
+        font-weight: 700;
         letter-spacing: .2px;
     }
 }
 
-/* ==== Grid (zentriert, feste Tile-Breiten) ==== */
+/* ==== Grid (zentriert, gleich hohe Tiles) ==== */
 .tiles-container {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 320px));
@@ -80,28 +95,50 @@ mat-toolbar {
     justify-content: center;
     /* zentriere Spalten */
     gap: 1.25rem;
+    align-items: stretch;
 }
 
 /* ==== Tile / Card ==== */
 .tile {
+    /* Grundlayout für gleich hohe Karten */
+    display: grid;
+    grid-template-rows: auto 1fr auto;
+    /* Header / Body / Actions */
     border-radius: 16px;
     background: var(--card);
     border: 1px solid var(--border);
     box-shadow: 0 10px 30px rgba(2, 8, 20, 0.06);
     overflow: hidden;
+
+    /* Micro-Interaction */
     transform: translateY(6px);
     opacity: 0;
     animation: fadeUp .48s ease forwards;
-    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+    transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        border-color .18s ease,
+        background .18s ease;
 
     &:hover {
         transform: translateY(0) scale(1.01);
         box-shadow: 0 16px 36px rgba(2, 8, 20, 0.12);
         border-color: color-mix(in srgb, var(--primary) 22%, var(--border));
     }
+
+    /* spürbarer Fokus (Tastatur) */
+    &:focus-within {
+        outline: 2px solid color-mix(in srgb, var(--primary) 55%, transparent);
+        outline-offset: 2px;
+    }
+
+    /* „Pressed“ Feeling */
+    &:active {
+        transform: translateY(2px) scale(0.998);
+    }
 }
 
-/* CSS-Stagger */
+/* Stagger (einfach) */
 .tile:nth-child(1) {
     animation-delay: 40ms;
 }
@@ -129,14 +166,22 @@ mat-toolbar {
 /* Card Header / Avatar */
 mat-card-header {
     padding: 16px 16px 0 16px;
+    gap: 12px;
 }
 
 .avatar {
+    width: 44px;
+    height: 44px;
+    min-width: 44px;
     background: color-mix(in srgb, var(--primary) 14%, transparent);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent);
+    position: relative;
+    /* für Badge */
+    box-shadow: 0 2px 8px rgba(2, 8, 20, 0.10);
 }
 
 .avatar mat-icon {
@@ -150,13 +195,19 @@ mat-card-header {
 
 /* Titel/Untertitel */
 .tile-title {
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: .2px;
 }
 
 .tile-subtitle {
-    opacity: .8;
+    opacity: .85;
     color: var(--muted);
+}
+
+/* Body (falls du Inhalte zwischen Header/Actions einfügst) */
+mat-card-content {
+    padding: 12px 16px;
+    color: var(--text);
 }
 
 /* Actions */
@@ -164,6 +215,25 @@ mat-card-actions {
     padding: 0 16px 16px;
     display: flex;
     gap: .5rem;
+    justify-content: flex-end;
+}
+
+button[mat-stroked-button] {
+    border-color: color-mix(in srgb, var(--text) 20%, transparent);
+}
+
+button[mat-stroked-button]:hover {
+    border-color: var(--primary);
+}
+
+button[mat-stroked-button] mat-icon {
+    margin-right: .35rem;
+}
+
+/* MatBadge: Dark-Mode-Kontrast minimal pushen */
+.avatar .mat-badge-content {
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(2, 8, 20, 0.2);
 }
 
 /* Buttons / Focus sichtbar */
