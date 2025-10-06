@@ -1,15 +1,16 @@
+// db/tableDsaSignal.js
 const tableName = 'tableDsaSignal';
 
-const columnId = 'id';                                   // TEXT PK (uuid) -> wird extern erzeugt
-const columnContentId = 'contentId';                     // TEXT NOT NULL (z. B. message.uuid)
+const columnId = 'id';                                   // TEXT PK (uuid)
+const columnContentId = 'contentId';                     // TEXT NOT NULL
 const columnContentUrl = 'contentUrl';                   // TEXT NULL
 const columnCategory = 'category';                       // TEXT NULL (frei, z. B. 'hate', 'privacy')
 const columnReasonText = 'reasonText';                   // TEXT NULL
-const columnReportedContentType = 'reportedContentType'; // TEXT NOT NULL (z. B. 'public message')
-const columnReportedContent = 'reportedContent';         // TEXT NOT NULL (JSON-String der Originalnachricht)
+const columnReportedContentType = 'reportedContentType'; // TEXT NOT NULL
+const columnReportedContent = 'reportedContent';         // TEXT NOT NULL (JSON-String)
 const columnCreatedAt = 'createdAt';                     // INTEGER NOT NULL (unix ms)
 
-// === INIT: create table + indexes ===
+// === INIT ===
 const init = function (db) {
     try {
         const sql = `
@@ -23,15 +24,14 @@ const init = function (db) {
         ${columnReportedContent} TEXT NOT NULL,
         ${columnCreatedAt} INTEGER NOT NULL
       );
-
       CREATE INDEX IF NOT EXISTS idx_dsa_signal_contentId
         ON ${tableName}(${columnContentId});
-
       CREATE INDEX IF NOT EXISTS idx_dsa_signal_createdAt_desc
         ON ${tableName}(${columnCreatedAt} DESC);
-
       CREATE INDEX IF NOT EXISTS idx_dsa_signal_reported_type
         ON ${tableName}(${columnReportedContentType});
+      CREATE INDEX IF NOT EXISTS idx_dsa_signal_category
+        ON ${tableName}(${columnCategory});
     `;
         db.exec(sql, (err) => {
             if (err) throw err;
@@ -41,20 +41,8 @@ const init = function (db) {
     }
 };
 
-
 /**
  * Insert a quick report signal.
- * Alle Felder werden explizit übergeben; Validierung erfolgt in der Route.
- * @param {import('sqlite3').Database} db
- * @param {string} id                             // UUID (extern erzeugt)
- * @param {string} contentId                      // ID des gemeldeten Inhalts
- * @param {string|null} contentUrl                // optionaler Permalink/Deep-Link
- * @param {string|null} category                  // optional (z. B. 'hate', 'privacy')
- * @param {string|null} reasonText                // optionaler Freitext
- * @param {string} reportedContentType            // z. B. 'public message'
- * @param {string} reportedContentJson            // JSON-String der Originalnachricht (bereits serialisiert)
- * @param {number} createdAt                      // Unix ms
- * @param {(err: any, row?: { id: string }) => void} callBack
  */
 const create = function (
     db,
@@ -80,7 +68,6 @@ const create = function (
       ${columnCreatedAt}
     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
-
     const params = [
         id,
         contentId,
@@ -91,19 +78,13 @@ const create = function (
         reportedContentJson,
         createdAt
     ];
-
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
         callBack(null, { id });
     });
 };
 
-/**
- * Get a signal by id (Rohdaten, reportedContent bleibt JSON-String).
- * @param {import('sqlite3').Database} db
- * @param {string} id
- * @param {(err: any, row?: any) => void} callBack
- */
+/** Get by id */
 const getById = function (db, id, callBack) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnId} = ? LIMIT 1`;
     db.get(sql, [id], (err, row) => {
@@ -113,15 +94,14 @@ const getById = function (db, id, callBack) {
 };
 
 /**
- * List signals (optional filter + pagination). Rohdaten zurückgeben.
- * @param {import('sqlite3').Database} db
- * @param {{
- *  contentId?: string,
- *  reportedContentType?: string,
- *  limit?: number,
- *  offset?: number
- * }} [opts]
- * @param {(err: any, rows?: any[]) => void} callBack
+ * List signals (optional filters + pagination).
+ * Supported filters:
+ *  - contentId
+ *  - reportedContentType
+ *  - category
+ *  - since (createdAt >= since)
+ *  - q (LIKE over reasonText, contentId, reportedContent)
+ *  - limit, offset
  */
 const list = function (db, opts, callBack) {
     const where = [];
@@ -135,13 +115,26 @@ const list = function (db, opts, callBack) {
         where.push(`${columnReportedContentType} = ?`);
         params.push(opts.reportedContentType);
     }
+    if (opts?.category) {
+        where.push(`${columnCategory} = ?`);
+        params.push(opts.category);
+    }
+    if (Number.isFinite(opts?.since)) {
+        where.push(`${columnCreatedAt} >= ?`);
+        params.push(opts.since);
+    }
+    if (opts?.q) {
+        const q = `%${opts.q}%`;
+        where.push(`(${columnReasonText} LIKE ? OR ${columnContentId} LIKE ? OR ${columnReportedContent} LIKE ?)`);
+        params.push(q, q, q);
+    }
 
     let sql = `SELECT * FROM ${tableName}`;
     if (where.length) sql += ` WHERE ${where.join(' AND ')}`;
     sql += ` ORDER BY ${columnCreatedAt} DESC`;
 
-    const limit = Number.isFinite(opts?.limit) ? opts.limit : 100;
-    const offset = Number.isFinite(opts?.offset) ? opts.offset : 0;
+    const limit = Number.isFinite(opts?.limit) ? Math.max(1, opts.limit) : 100;
+    const offset = Number.isFinite(opts?.offset) ? Math.max(0, opts.offset) : 0;
     sql += ` LIMIT ${limit} OFFSET ${offset}`;
 
     db.all(sql, params, (err, rows) => {
@@ -150,14 +143,16 @@ const list = function (db, opts, callBack) {
     });
 };
 
-/**
- * Stats für Signals.
- * - total: Anzahl aller Signals
- * - last24h: Anzahl der letzten 24 Stunden
- * - byType: Map { reportedContentType -> count }
- * @param {import('sqlite3').Database} db
- * @param {(err: any, result?: { total:number, last24h:number, byType: Record<string,number> }) => void} callBack
- */
+/** Delete (hard) by id */
+const remove = function (db, id, callBack) {
+    const sql = `DELETE FROM ${tableName} WHERE ${columnId} = ?`;
+    db.run(sql, [id], function (err) {
+        if (err) return callBack(err);
+        callBack(null, this.changes > 0);
+    });
+};
+
+/** Stats */
 const stats = function (db, callBack) {
     const sqlTotal = `SELECT COUNT(*) AS total FROM ${tableName}`;
     const sqlByType = `
@@ -202,5 +197,6 @@ module.exports = {
     create,
     getById,
     list,
+    remove,
     stats
 };

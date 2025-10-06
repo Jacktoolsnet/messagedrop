@@ -212,4 +212,182 @@ router.get('/stats/signals', (req, res) => {
     });
 });
 
+/* ----------------------------- Signals ----------------------------- */
+
+/**
+ * GET /signals
+ * Optional Query:
+ *  - type: reportedContentType
+ *  - category: frei (z. B. 'hate', 'privacy')
+ *  - contentId: exakte ID-Suche
+ *  - since: unix ms (createdAt >= since)
+ *  - q: LIKE über reasonText/contentId/reportedContent
+ *  - limit, offset
+ */
+router.get('/signals', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const opts = {
+        contentId: req.query.contentId ? String(req.query.contentId) : undefined,
+        reportedContentType: req.query.type ? String(req.query.type) : undefined,
+        category: req.query.category ? String(req.query.category) : undefined,
+        since: req.query.since ? Number(req.query.since) : undefined,
+        q: req.query.q ? String(req.query.q) : undefined,
+        limit: asNum(req.query.limit, 100),
+        offset: asNum(req.query.offset, 0)
+    };
+
+    tableSignal.list(_db, opts, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        res.json(rows);
+    });
+});
+
+/**
+ * GET /signals/:id
+ */
+router.get('/signals/:id', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    tableSignal.getById(_db, String(req.params.id), (err, row) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!row) return res.status(404).json({ error: 'not_found' });
+        res.json(row);
+    });
+});
+
+/**
+ * POST /signals/:id/promote
+ * - erzeugt ein Notice (Status: RECEIVED)
+ * - audit: signal:promote, notice:create
+ * - **löscht** das Signal + audit: signal:delete (mit Snapshot)
+ */
+router.post('/signals/:id/promote', (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const signalId = String(req.params.id);
+    const now = Date.now();
+
+    tableSignal.getById(_db, signalId, (err, sig) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!sig) return res.status(404).json({ error: 'signal_not_found' });
+
+        // Notice aus Signal bauen
+        const noticeId = crypto.randomUUID();
+        const status = 'RECEIVED';
+
+        const contentId = sig.contentId;
+        const contentUrl = sig.contentUrl ?? null;
+        const category = sig.category ?? null;
+        const reasonText = sig.reasonText ?? null;
+        const reporterEmail = null;
+        const reporterName = null;
+        const truthAffirmation = null;
+        const reportedContentType = sig.reportedContentType;
+        const reportedContentJson = sig.reportedContent;
+
+        tableNotice.create(
+            _db,
+            noticeId,
+            contentId,
+            contentUrl,
+            category,
+            reasonText,
+            reporterEmail,
+            reporterName,
+            truthAffirmation,
+            reportedContentType,
+            reportedContentJson,
+            status,
+            now,
+            now,
+            (err2) => {
+                if (err2) return res.status(500).json({ error: 'db_error', detail: err2.message });
+
+                // Audit: Signal → promote
+                const auditId1 = crypto.randomUUID();
+                tableAudit.create(
+                    _db, auditId1, 'signal', signalId, 'promote',
+                    `admin:${req.admin?.sub || 'unknown'}`, now,
+                    JSON.stringify({ noticeId }),
+                    () => { }
+                );
+
+                // Audit: Notice → create
+                const auditId2 = crypto.randomUUID();
+                tableAudit.create(
+                    _db, auditId2, 'notice', noticeId, 'create',
+                    `admin:${req.admin?.sub || 'unknown'}`, now,
+                    JSON.stringify({ source: 'signal', signalId }),
+                    () => { }
+                );
+
+                // **Signal löschen** (hard) + Audit mit Snapshot
+                tableSignal.remove(_db, signalId, (err3, ok) => {
+                    if (err3) {
+                        // Nicht fatal – Notice existiert bereits; wir loggen Fehler im Audit
+                        const auditIdErr = crypto.randomUUID();
+                        tableAudit.create(
+                            _db, auditIdErr, 'signal', signalId, 'delete_failed',
+                            `admin:${req.admin?.sub || 'unknown'}`, now,
+                            JSON.stringify({ noticeId, error: err3.message }),
+                            () => { }
+                        );
+                        return res.status(201).json({ noticeId, removed: false });
+                    }
+                    if (!ok) {
+                        return res.status(201).json({ noticeId, removed: false });
+                    }
+
+                    const auditId3 = crypto.randomUUID();
+                    tableAudit.create(
+                        _db, auditId3, 'signal', signalId, 'delete',
+                        `admin:${req.admin?.sub || 'unknown'}`, now,
+                        JSON.stringify({ reason: 'promoted_to_notice', snapshot: sig }),
+                        () => { }
+                    );
+
+                    res.status(201).json({ noticeId, removed: true });
+                });
+            }
+        );
+    });
+});
+
+/**
+ * DELETE /signals/:id
+ * - Hard delete + Audit (inkl. optionalem reason aus Body)
+ */
+router.delete('/signals/:id', (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const id = String(req.params.id);
+    const reason = (req.body && typeof req.body.reason === 'string') ? req.body.reason : 'dismissed_by_admin';
+    const now = Date.now();
+
+    // Für Audit Snapshot holen
+    tableSignal.getById(_db, id, (e1, sig) => {
+        if (e1) return res.status(500).json({ error: 'db_error', detail: e1.message });
+        if (!sig) return res.status(404).json({ error: 'not_found' });
+
+        tableSignal.remove(_db, id, (e2, ok) => {
+            if (e2) return res.status(500).json({ error: 'db_error', detail: e2.message });
+            if (!ok) return res.status(404).json({ error: 'not_found' });
+
+            // Audit: Signal delete + Snapshot
+            const auditId = crypto.randomUUID();
+            tableAudit.create(
+                _db, auditId, 'signal', id, 'delete',
+                `admin:${req.admin?.sub || 'unknown'}`, now,
+                JSON.stringify({ reason, snapshot: sig }),
+                () => { }
+            );
+
+            res.json({ deleted: true });
+        });
+    });
+});
+
 module.exports = router;
