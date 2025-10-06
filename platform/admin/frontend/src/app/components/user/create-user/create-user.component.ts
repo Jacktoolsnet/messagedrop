@@ -14,7 +14,7 @@ import { UserService } from '../../../services/user/user.service';
   selector: 'app-create-user',
   standalone: true,
   templateUrl: './create-user.component.html',
-  styleUrls: ['./create-user.component.scss'],
+  styleUrls: ['./create-user.component.css'],
   imports: [
     CommonModule,
     ReactiveFormsModule,

@@ -1,0 +1,38 @@
+<mat-toolbar color="primary">
+    <!-- Home -->
+    <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
+        <mat-icon>home</mat-icon>
+    </button>
+
+    <!-- Titel -->
+    <span style="flex: 1; text-align: center; font-size: 1.5rem; font-weight: 500;">
+        Digital Services Act
+    </span>
+
+    <!-- User-->
+    <span>{{ username() }} ({{ role() }})</span>
+</mat-toolbar>
+
+<div class="page">
+    <div class="tiles-container">
+        @for (tile of tiles; track tile.title) {
+        <mat-card class="tile" appearance="raised">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar" [matBadge]="tile.count || 0" matBadgeOverlap="false"
+                    matBadgeColor="warn" [matBadgeHidden]="!(tile.count && tile.count > 0)">
+                    <mat-icon>{{ tile.icon }}</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">{{ tile.title }}</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">{{ tile.subtitle }}</mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-actions align="end">
+                <button mat-stroked-button color="primary" [routerLink]="tile.route">
+                    <mat-icon>open_in_new</mat-icon>
+                    Open
+                </button>
+            </mat-card-actions>
+        </mat-card>
+        }
+    </div>
+</div>

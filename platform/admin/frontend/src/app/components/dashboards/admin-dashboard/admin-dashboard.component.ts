@@ -17,10 +17,10 @@ import { AuthService } from '../../../services/auth/auth.service';
     MatToolbarModule
   ],
   templateUrl: './admin-dashboard.component.html',
-  styleUrls: ['./admin-dashboard.component.scss']
+  styleUrls: ['./admin-dashboard.component.css']
 })
 export class AdminDashboardComponent {
-    ;
+  ;
   private router = inject(Router);
   private authService = inject(AuthService);
 

@@ -32,7 +32,7 @@ export interface EditUserData {
     MatIconModule
   ],
   templateUrl: './edit-user.component.html',
-  styleUrls: ['./edit-user.component.scss']
+  styleUrls: ['./edit-user.component.css']
 })
 export class EditUserComponent {
   private dialogRef = inject(MatDialogRef<EditUserComponent, boolean>);

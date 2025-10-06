@@ -17,7 +17,7 @@ import { EditUserComponent, EditUserData } from '../../user/edit-user/edit-user.
   selector: 'app-user-dashboard',
   standalone: true,
   templateUrl: './user-dashboard.component.html',
-  styleUrls: ['./user-dashboard.component.scss'],
+  styleUrls: ['./user-dashboard.component.css'],
   imports: [
     RouterLink,
     MatToolbarModule,
