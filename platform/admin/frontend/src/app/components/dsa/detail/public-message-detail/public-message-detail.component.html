@@ -1,0 +1,114 @@
+<mat-card class="pm-card">
+    <mat-card-header>
+        <div mat-card-avatar class="avatar">
+            <mat-icon>{{ providerIcon() }}</mat-icon>
+        </div>
+        <mat-card-title>Public Message</mat-card-title>
+        <mat-card-subtitle>
+            <mat-chip-set>
+                <mat-chip color="primary" selected>
+                    {{ data.source | titlecase }}
+                </mat-chip>
+                <mat-chip>{{ providerLabel() }}</mat-chip>
+                @if (data.category) {
+                <mat-chip>{{ data.category }}</mat-chip>
+                }
+                @if (data.status) {
+                <mat-chip [ngClass]="{ status: true }">{{ data.status }}</mat-chip>
+                }
+            </mat-chip-set>
+        </mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content class="pm-content">
+        <!-- Media -->
+        @if (mediaKind() === 'iframe' && embedUrl()) {
+        <div class="embed-outer" matTooltip="Embedded media">
+            <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
+        </div>
+        }
+        @if (mediaKind() === 'image' && imageUrl()) {
+        <div class="image-outer" matTooltip="Image/GIF">
+            <img [src]="imageUrl()!" alt="media" />
+        </div>
+        }
+
+        <!-- Text Message -->
+        @if (msg()?.message) {
+        <div class="message" [attr.style]="msg()?.style || null">
+            {{ msg()?.message }}
+        </div>
+        }
+
+        <!-- Meta -->
+        <div class="meta">
+            @if (data.reasonText) {
+            <div class="kv">
+                <mat-icon>report</mat-icon>
+                <span><strong>Reason:</strong> {{ data.reasonText }}</span>
+            </div>
+            } @else {
+            <div class="kv">
+                <mat-icon>report</mat-icon>
+                <span><strong>Reason:</strong> No reason provided.</span>
+            </div>
+            }
+            <div class="kv">
+                <mat-icon>schedule</mat-icon>
+                <span>
+                    <strong>Created:</strong>
+                    {{ (data.createdAt || msg()?.createDateTime) | date:'medium' }}
+                </span>
+            </div>
+            @if (msg()?.deleteDateTime) {
+            <div class="kv">
+                <mat-icon>hourglass_bottom</mat-icon>
+                <span>
+                    <strong>Expires:</strong>
+                    {{ msg()?.deleteDateTime | date:'medium' }}
+                </span>
+            </div>
+            }
+            @if (msg()?.location?.plusCode) {
+            <div class="kv">
+                <mat-icon>place</mat-icon>
+                <span><strong>Plus Code:</strong> {{ msg()?.location?.plusCode }}</span>
+            </div>
+            }
+            <div class="counters">
+                <span><mat-icon>visibility</mat-icon> {{ msg()?.views || 0 }}</span>
+                <span><mat-icon>thumb_up</mat-icon> {{ msg()?.likes || 0 }}</span>
+                <span><mat-icon>thumb_down</mat-icon> {{ msg()?.dislikes || 0 }}</span>
+            </div>
+            <div class="kv">
+                <mat-icon>fingerprint</mat-icon>
+                <span><strong>User:</strong> {{ msg()?.userId }}</span>
+            </div>
+            <div class="kv">
+                <mat-icon>link</mat-icon>
+                <span class="truncate" [matTooltip]="sourceUrl() || ''">
+                    <strong>Source:</strong> {{ sourceUrl() || '—' }}
+                </span>
+            </div>
+        </div>
+    </mat-card-content>
+
+    <mat-divider />
+
+    <mat-card-actions align="end">
+        @if (sourceUrl()) {
+        <button mat-stroked-button (click)="openContentUrl()">
+            <mat-icon>open_in_new</mat-icon>
+            Open external content
+        </button>
+        }
+        <button mat-raised-button color="primary" (click)="close()">
+            <mat-icon>close</mat-icon>
+            Close
+        </button>
+    </mat-card-actions>
+</mat-card>

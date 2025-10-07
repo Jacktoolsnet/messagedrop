@@ -20,6 +20,7 @@ import { DsaSignal } from '../../../../interfaces/dsa-signal.interface';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
+import { PublicMessageDetailComponent } from '../../detail/public-message-detail/public-message-detail.component';
 
 
 @Component({
@@ -112,15 +113,21 @@ export class SignalsComponent {
   }
 
   openDetail(s: DsaSignal) {
-    // Hier simpel in-place (kannst auch Dialog nehmen)
-    // Für Demo: kurzer Snack mit Info + optional Router-Link
-    this.snack.open(`Signal ${s.id} — ${s.reportedContentType}`, 'View JSON', { duration: 4000 })
-      .onAction().subscribe(() => {
-        // navigate to a detail route if you create one later:
-        // this.router.navigate(['/dashboard/dsa/signals', s.id]);
-        // oder einfach neuen Tab mit contentUrl:
-        if (s.contentUrl) window.open(s.contentUrl, '_blank');
-      });
+    this.dialog.open(PublicMessageDetailComponent, {
+      data: {
+        source: 'signal',
+        reportedContent: s.reportedContent, // JSON-String aus DB
+        contentUrl: s.contentUrl,
+        category: s.category,
+        reasonText: s.reasonText,
+        createdAt: s.createdAt,
+        status: undefined
+      },
+      panelClass: 'mdp-dialog-xl',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      autoFocus: false
+    });
   }
 
   promote(s: DsaSignal) {

@@ -1,0 +1,218 @@
+:host {
+    /* Brand-Tokens */
+    --primary: #05a51d;
+    --bg-gradient-start: #eafde8;
+    --bg-gradient-end: #bff7c4;
+    --surface: #ffffff;
+    --card: rgba(255, 255, 255, 0.94);
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: rgba(0, 0, 0, 0.06);
+
+    display: block;
+    /* Fallback für Dialog-Höhe */
+    max-height: 90vh;
+    /* etwas größere Basistypo */
+    font-size: 16px;
+    line-height: 1.55;
+}
+
+@media (prefers-color-scheme: dark) {
+    :host {
+        --bg-gradient-start: #0c1a12;
+        --bg-gradient-end: #0f2217;
+        --surface: #0b1410;
+        --card: rgba(12, 20, 16, 0.90);
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: rgba(255, 255, 255, 0.08);
+    }
+}
+
+/* Card als Spalte, Content scrollt */
+.pm-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    box-shadow: 0 16px 40px rgba(2, 8, 20, 0.14);
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    max-height: 90vh;
+}
+
+/* Header: mehr Luft, größere Titel/Icons */
+mat-card-header {
+    padding: 20px 22px 0 22px;
+}
+
+mat-card-title {
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: .2px;
+    color: var(--text);
+}
+
+mat-card-subtitle {
+    color: var(--muted);
+    font-size: 1rem;
+    margin-top: .15rem;
+}
+
+/* Avatar/Icon größer + runder */
+.avatar {
+    background: color-mix(in srgb, var(--primary) 16%, transparent);
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    width: 44px;
+    height: 44px;
+}
+
+.avatar mat-icon {
+    color: var(--primary);
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    line-height: 28px;
+}
+
+/* Chips etwas größer und „pilliger“ */
+mat-chip-set {
+    gap: 8px;
+}
+
+.mat-mdc-standard-chip {
+    --mdc-chip-container-height: 34px;
+    --mdc-chip-label-text-size: 0.95rem;
+    border-radius: 999px;
+    padding: 0 10px;
+}
+
+mat-chip.status {
+    background: color-mix(in srgb, var(--primary) 15%, transparent);
+    color: var(--text);
+}
+
+/* Nur der Content scrollt, mit mehr Innenabstand */
+.pm-content {
+    overflow: auto;
+    overscroll-behavior: contain;
+    padding: 16px 22px 18px;
+}
+
+/* Media-Container mit mehr Abstand und runder */
+.embed-outer,
+.image-outer {
+    position: relative;
+    width: 100%;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    box-shadow: 0 10px 26px rgba(2, 8, 20, 0.10);
+    margin: 10px 0 16px;
+    max-height: 60vh;
+    /* Safety-Limit für sehr hohe Medien */
+}
+
+.embed-outer {
+    aspect-ratio: 16 / 9;
+}
+
+.embed-outer iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.image-outer img {
+    display: block;
+    width: 100%;
+    height: auto;
+}
+
+/* Message-Text etwas größer + mehr Luft, respektiert inline style */
+.message {
+    font-size: 1.06rem;
+    line-height: 1.65;
+    color: var(--text);
+    word-break: break-word;
+    margin: 6px 0 16px;
+    padding: 0 2px;
+}
+
+/* Meta-Bereich mit größeren Icons und mehr Abständen */
+.meta {
+    display: grid;
+    gap: 12px;
+    color: var(--muted);
+
+    .kv {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+    }
+
+    .truncate {
+        max-width: 100%;
+        display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: bottom;
+    }
+
+    .counters {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        color: var(--text);
+        margin-top: 4px;
+
+        span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: color-mix(in srgb, var(--primary) 10%, transparent);
+            border: 1px solid var(--border);
+            font-size: .98rem;
+        }
+
+        mat-icon {
+            font-size: 20px;
+            /* minimal kleiner als KV-Icons */
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+        }
+    }
+}
+
+/* Divider mit etwas Luft */
+mat-divider {
+    margin: 6px 0 2px;
+}
+
+/* Actions: mehr Abstand + größere Buttons */
+mat-card-actions {
+    padding: 10px 16px 16px;
+    display: flex;
+    gap: 10px;
+}
+
+button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 58%, transparent);
+    outline-offset: 3px;
+    border-radius: 10px;
+}
