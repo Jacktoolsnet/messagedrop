@@ -80,9 +80,61 @@
                     }
                 </div>
 
-                @if (s.reasonText) {
-                <div class="reason">{{ s.reasonText }}</div>
-                }
+                <!-- Message -->
+                <div class="snippet">
+                    <div class="snippet-header">
+                        <mat-icon>text_snippet</mat-icon>
+                        <span>Message</span>
+                        <span class="spacer"></span>
+                        <button mat-icon-button matTooltip="Translate to German" (click)="translateMessage(s)"
+                            [disabled]="!getMessage(s)">
+                            <mat-icon>translate</mat-icon>
+                        </button>
+                    </div>
+
+                    @if (getMessage(s); as m) {
+                    <div class="snippet-text">{{ m }}</div>
+                    @if (translatedMessage(s.id)) {
+                    <div class="snippet-translation">
+                        <mat-icon>g_translate</mat-icon>
+                        {{ translatedMessage(s.id) }}
+                    </div>
+                    }
+                    } @else {
+                    <div class="placeholder">
+                        <mat-icon>info</mat-icon>
+                        Message not provided
+                    </div>
+                    }
+                </div>
+
+                <!-- Reason -->
+                <div class="snippet">
+                    <div class="snippet-header">
+                        <mat-icon>report</mat-icon>
+                        <span>Reason</span>
+                        <span class="spacer"></span>
+                        <button mat-icon-button matTooltip="Translate to German" (click)="translateReason(s)"
+                            [disabled]="!s.reasonText">
+                            <mat-icon>translate</mat-icon>
+                        </button>
+                    </div>
+
+                    @if (s.reasonText) {
+                    <div class="snippet-text">{{ s.reasonText }}</div>
+                    @if (translatedReason(s.id)) {
+                    <div class="snippet-translation">
+                        <mat-icon>g_translate</mat-icon>
+                        {{ translatedReason(s.id) }}
+                    </div>
+                    }
+                    } @else {
+                    <div class="placeholder">
+                        <mat-icon>info</mat-icon>
+                        Reason not provided
+                    </div>
+                    }
+                </div>
             </mat-card-content>
 
             <mat-card-actions align="end">

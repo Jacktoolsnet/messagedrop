@@ -28,7 +28,7 @@
     "body-parser": "^1.20.2",
     "compression": "^1.8.0",
     "cors": "^2.8.5",
-    "deepl-node": "^1.11.0",
+    "deepl-node": "^1.19.1",
     "dotenv": "^16.4.5",
     "express": "^5.0.1",
     "express-bearer-token": "^3.0.0",

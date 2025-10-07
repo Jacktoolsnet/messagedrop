@@ -6,20 +6,15 @@
         <mat-card-title>Public Message</mat-card-title>
         <mat-card-subtitle>
             <mat-chip-set>
-                <mat-chip color="primary" selected>
-                    {{ data.source | titlecase }}
-                </mat-chip>
+                <mat-chip color="primary" selected>{{ data.source | titlecase }}</mat-chip>
                 <mat-chip>{{ providerLabel() }}</mat-chip>
-                @if (data.category) {
-                <mat-chip>{{ data.category }}</mat-chip>
-                }
-                @if (data.status) {
-                <mat-chip [ngClass]="{ status: true }">{{ data.status }}</mat-chip>
-                }
+                @if (data.category) { <mat-chip>{{ data.category }}</mat-chip> }
+                @if (data.status) { <mat-chip class="status">{{ data.status }}</mat-chip> }
             </mat-chip-set>
         </mat-card-subtitle>
     </mat-card-header>
 
+    <!-- Content scrollt -->
     <mat-card-content class="pm-content">
         <!-- Media -->
         @if (mediaKind() === 'iframe' && embedUrl()) {
@@ -33,44 +28,82 @@
         }
         @if (mediaKind() === 'image' && imageUrl()) {
         <div class="image-outer" matTooltip="Image/GIF">
-            <img [src]="imageUrl()!" alt="media" />
+            <img [src]="imageUrl()!" alt="media">
         </div>
         }
 
-        <!-- Text Message -->
-        @if (msg()?.message) {
-        <div class="message" [attr.style]="msg()?.style || null">
-            {{ msg()?.message }}
+        <!-- SECTION: Message -->
+        <div class="snippet">
+            <div class="snippet-header">
+                <mat-icon>text_snippet</mat-icon>
+                <span>Message</span>
+                <span class="spacer"></span>
+                <button mat-icon-button matTooltip="Translate to German" (click)="translateMessage()"
+                    [disabled]="!msg()?.message || loadingMsg()">
+                    <mat-icon>{{ loadingMsg() ? 'hourglass_top' : 'translate' }}</mat-icon>
+                </button>
+            </div>
+
+            @if (msg()?.message) {
+            <div class="snippet-text" [attr.style]="msg()?.style || null">
+                {{ msg()?.message }}
+            </div>
+            @if (tMsg()) {
+            <div class="snippet-translation">
+                <mat-icon>g_translate</mat-icon>
+                {{ tMsg() }}
+            </div>
+            }
+            } @else {
+            <div class="placeholder">
+                <mat-icon>info</mat-icon>
+                Message not provided
+            </div>
+            }
         </div>
-        }
+
+        <!-- SECTION: Reason -->
+        <div class="snippet">
+            <div class="snippet-header">
+                <mat-icon>report</mat-icon>
+                <span>Reason</span>
+                <span class="spacer"></span>
+                <button mat-icon-button matTooltip="Translate to German" (click)="translateReason()"
+                    [disabled]="!data.reasonText || loadingReason()">
+                    <mat-icon>{{ loadingReason() ? 'hourglass_top' : 'translate' }}</mat-icon>
+                </button>
+            </div>
+
+            @if (data.reasonText) {
+            <div class="snippet-text">
+                {{ data.reasonText }}
+            </div>
+            @if (tReason()) {
+            <div class="snippet-translation">
+                <mat-icon>g_translate</mat-icon>
+                {{ tReason() }}
+            </div>
+            }
+            } @else {
+            <div class="placeholder">
+                <mat-icon>info</mat-icon>
+                Reason not provided
+            </div>
+            }
+        </div>
 
         <!-- Meta -->
         <div class="meta">
-            @if (data.reasonText) {
-            <div class="kv">
-                <mat-icon>report</mat-icon>
-                <span><strong>Reason:</strong> {{ data.reasonText }}</span>
-            </div>
-            } @else {
-            <div class="kv">
-                <mat-icon>report</mat-icon>
-                <span><strong>Reason:</strong> No reason provided.</span>
-            </div>
-            }
             <div class="kv">
                 <mat-icon>schedule</mat-icon>
                 <span>
-                    <strong>Created:</strong>
-                    {{ (data.createdAt || msg()?.createDateTime) | date:'medium' }}
+                    <strong>Created:</strong> {{ (data.createdAt || msg()?.createDateTime) | date:'medium' }}
                 </span>
             </div>
             @if (msg()?.deleteDateTime) {
             <div class="kv">
                 <mat-icon>hourglass_bottom</mat-icon>
-                <span>
-                    <strong>Expires:</strong>
-                    {{ msg()?.deleteDateTime | date:'medium' }}
-                </span>
+                <span><strong>Expires:</strong> {{ msg()?.deleteDateTime | date:'medium' }}</span>
             </div>
             }
             @if (msg()?.location?.plusCode) {
@@ -103,12 +136,12 @@
         @if (sourceUrl()) {
         <button mat-stroked-button (click)="openContentUrl()">
             <mat-icon>open_in_new</mat-icon>
-            Open external content
+            Original öffnen
         </button>
         }
         <button mat-raised-button color="primary" (click)="close()">
             <mat-icon>close</mat-icon>
-            Close
+            Schließen
         </button>
     </mat-card-actions>
 </mat-card>

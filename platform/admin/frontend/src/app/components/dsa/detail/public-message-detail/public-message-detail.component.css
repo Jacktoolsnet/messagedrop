@@ -1,5 +1,4 @@
 :host {
-    /* Brand-Tokens */
     --primary: #05a51d;
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
@@ -10,26 +9,27 @@
     --border: rgba(0, 0, 0, 0.06);
 
     display: block;
-    /* Fallback für Dialog-Höhe */
     max-height: 90vh;
-    /* etwas größere Basistypo */
+    /* Dialog-Deckel */
     font-size: 16px;
     line-height: 1.55;
 }
 
 @media (prefers-color-scheme: dark) {
     :host {
-        --bg-gradient-start: #0c1a12;
-        --bg-gradient-end: #0f2217;
-        --surface: #0b1410;
-        --card: rgba(12, 20, 16, 0.90);
-        --text: #e5e7eb;
-        --muted: #9ca3af;
-        --border: rgba(255, 255, 255, 0.08);
+        /* Dark – etwas knackiger für bessere Lesbarkeit */
+        --bg-gradient-start: #06130a;
+        --bg-gradient-end: #0b1d12;
+        --surface: #0d1510;
+        --card: rgba(18, 26, 21, 0.97);
+        --text: #e8f5ee;
+        --muted: #a6b7b0;
+        --border: rgba(255, 255, 255, 0.10);
+        --accent: #22c55e;
+        --warn: #f87171;
     }
 }
 
-/* Card als Spalte, Content scrollt */
 .pm-card {
     background: var(--card);
     border: 1px solid var(--border);
@@ -41,7 +41,6 @@
     max-height: 90vh;
 }
 
-/* Header: mehr Luft, größere Titel/Icons */
 mat-card-header {
     padding: 20px 22px 0 22px;
 }
@@ -49,7 +48,6 @@ mat-card-header {
 mat-card-title {
     font-weight: 700;
     font-size: 1.35rem;
-    letter-spacing: .2px;
     color: var(--text);
 }
 
@@ -59,7 +57,6 @@ mat-card-subtitle {
     margin-top: .15rem;
 }
 
-/* Avatar/Icon größer + runder */
 .avatar {
     background: color-mix(in srgb, var(--primary) 16%, transparent);
     display: grid;
@@ -72,12 +69,8 @@ mat-card-subtitle {
 .avatar mat-icon {
     color: var(--primary);
     font-size: 28px;
-    width: 28px;
-    height: 28px;
-    line-height: 28px;
 }
 
-/* Chips etwas größer und „pilliger“ */
 mat-chip-set {
     gap: 8px;
 }
@@ -94,14 +87,14 @@ mat-chip.status {
     color: var(--text);
 }
 
-/* Nur der Content scrollt, mit mehr Innenabstand */
+/* nur Content scrollt */
 .pm-content {
     overflow: auto;
     overscroll-behavior: contain;
     padding: 16px 22px 18px;
 }
 
-/* Media-Container mit mehr Abstand und runder */
+/* Media */
 .embed-outer,
 .image-outer {
     position: relative;
@@ -112,7 +105,6 @@ mat-chip.status {
     box-shadow: 0 10px 26px rgba(2, 8, 20, 0.10);
     margin: 10px 0 16px;
     max-height: 60vh;
-    /* Safety-Limit für sehr hohe Medien */
 }
 
 .embed-outer {
@@ -133,17 +125,86 @@ mat-chip.status {
     height: auto;
 }
 
-/* Message-Text etwas größer + mehr Luft, respektiert inline style */
-.message {
-    font-size: 1.06rem;
-    line-height: 1.65;
-    color: var(--text);
-    word-break: break-word;
-    margin: 6px 0 16px;
-    padding: 0 2px;
+/* Sektionen (Message/Reason) */
+.snippet {
+    margin-top: .9rem;
+    padding-top: .65rem;
+    border-top: 1px solid var(--border);
 }
 
-/* Meta-Bereich mit größeren Icons und mehr Abständen */
+.snippet-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    color: var(--muted);
+
+    mat-icon {
+        font-size: 22px;
+        width: 22px;
+        height: 22px;
+        line-height: 22px;
+    }
+}
+
+.snippet-text {
+    margin: .25rem 0 .5rem;
+    white-space: pre-wrap;
+    word-break: break-word;
+    color: var(--text, #1f2937);
+}
+
+/* Stelle sicher, dass Text im Content-Bereich immer deine Token-Farbe nutzt */
+.pm-content,
+.pm-content * {
+    color: var(--text);
+}
+
+/* Übersetzungsbox: explizit Textfarbe + besserer Kontrast */
+.snippet-translation {
+    margin-bottom: 1rem;
+    color: var(--text);
+    /* ⬅️ wichtig */
+    background: color-mix(in srgb, var(--primary) 10%, transparent);
+    border-left: 3px solid var(--primary);
+    border-radius: 10px;
+    padding: .6rem .8rem;
+    display: flex;
+    gap: .5rem;
+    align-items: flex-start;
+
+    mat-icon {
+        color: var(--primary);
+        /* Icon hebt sich ab */
+        font-size: 20px;
+        margin-top: 2px;
+    }
+}
+
+/* Optional: im Dark Mode den Hintergrund etwas kräftiger machen */
+@media (prefers-color-scheme: dark) {
+    .snippet-translation {
+        background: color-mix(in srgb, var(--primary) 18%, transparent);
+        border-left-color: color-mix(in srgb, var(--primary) 70%, #ffffff);
+    }
+}
+
+/* Placeholder bleibt dezent in beiden Modi */
+.placeholder {
+    color: var(--muted);
+}
+
+.placeholder {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    color: #9ca3af;
+    font-style: italic;
+
+    mat-icon {
+        font-size: 20px;
+    }
+}
+
 .meta {
     display: grid;
     gap: 12px;
@@ -191,7 +252,6 @@ mat-chip.status {
 
         mat-icon {
             font-size: 20px;
-            /* minimal kleiner als KV-Icons */
             width: 20px;
             height: 20px;
             line-height: 20px;
@@ -199,20 +259,16 @@ mat-chip.status {
     }
 }
 
-/* Divider mit etwas Luft */
 mat-divider {
     margin: 6px 0 2px;
 }
 
-/* Actions: mehr Abstand + größere Buttons */
 mat-card-actions {
     padding: 10px 16px 16px;
     display: flex;
     gap: 10px;
 }
 
-button:focus-visible {
-    outline: 2px solid color-mix(in srgb, var(--primary) 58%, transparent);
-    outline-offset: 3px;
-    border-radius: 10px;
+.spacer {
+    flex: 1 1 auto;
 }

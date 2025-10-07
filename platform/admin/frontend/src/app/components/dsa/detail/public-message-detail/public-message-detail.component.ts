@@ -6,11 +6,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Multimedia } from '../../../../interfaces/multimedia.interface';
 import { PublicMessageDetailData } from '../../../../interfaces/public-message-detail-data.interface';
 import { PublicMessage } from '../../../../interfaces/public-message.interface';
+import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 
 @Component({
   selector: 'app-public-message-detail',
@@ -23,11 +25,15 @@ import { PublicMessage } from '../../../../interfaces/public-message.interface';
   templateUrl: './public-message-detail.component.html',
   styleUrls: ['./public-message-detail.component.css']
 })
+
 export class PublicMessageDetailComponent {
   private ref = inject(MatDialogRef<PublicMessageDetailComponent>);
   private sanitizer = inject(DomSanitizer);
+  private snack = inject(MatSnackBar);
+  private translator = inject(TranslateService);
   protected data = inject<PublicMessageDetailData>(MAT_DIALOG_DATA);
 
+  // Inhalt
   msg = signal<PublicMessage | null>(null);
   providerIcon = signal<string>('article');
   providerLabel = signal<string>('Text');
@@ -35,13 +41,19 @@ export class PublicMessageDetailComponent {
   embedUrl = signal<SafeResourceUrl | null>(null);
   imageUrl = signal<string | null>(null);
 
-  /** Sicht-/Nutzbare Original-URL (contentUrl > sourceUrl > url) */
+  // Original-Quelle sichtbar?
   readonly sourceUrl = computed(() => {
     const m = this.msg();
     const d = this.data;
     const u = d?.contentUrl || m?.multimedia?.sourceUrl || m?.multimedia?.url;
     return (u && u.trim()) ? u : null;
   });
+
+  // Übersetzen-State
+  tMsg = signal<string | null>(null);
+  tReason = signal<string | null>(null);
+  loadingMsg = signal(false);
+  loadingReason = signal(false);
 
   ngOnInit() {
     const raw = typeof this.data.reportedContent === 'string'
@@ -50,86 +62,89 @@ export class PublicMessageDetailComponent {
 
     if (!raw) return;
     this.msg.set(raw);
-    const { multimedia } = raw;
+    const type = (raw.multimedia?.type || 'undefined').toLowerCase();
 
-    const type = (multimedia?.type || 'undefined').toLowerCase();
     this.providerIcon.set(this.iconFor(type));
     this.providerLabel.set(this.labelFor(type));
 
-    // Media Entscheidung
     switch (type) {
       case 'youtube': {
-        const id = this.getYouTubeId(multimedia);
+        const id = this.getYouTubeId(raw.multimedia);
         if (id) {
-          const url = `https://www.youtube.com/embed/${id}`;
-          this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+          this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${id}`));
           this.mediaKind.set('iframe');
-        } else {
-          this.mediaKind.set('none');
         }
         break;
       }
       case 'spotify': {
-        const embed = this.buildSpotifyEmbed(multimedia);
+        const embed = this.buildSpotifyEmbed(raw.multimedia);
         if (embed) {
           this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(embed));
           this.mediaKind.set('iframe');
-        } else {
-          this.mediaKind.set('none');
         }
         break;
       }
       case 'tiktok': {
-        const id = this.getTikTokId(multimedia);
+        const id = this.getTikTokId(raw.multimedia);
         if (id) {
-          const url = `https://www.tiktok.com/embed/v2/${id}`;
-          this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+          this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`));
           this.mediaKind.set('iframe');
-        } else {
-          this.mediaKind.set('none');
         }
         break;
       }
-      case 'tenor': {
-        // GIF
-        const url = multimedia.url || multimedia.sourceUrl;
-        if (url) {
-          this.imageUrl.set(url);
-          this.mediaKind.set('image');
-        } else {
-          this.mediaKind.set('none');
-        }
-        break;
-      }
+      case 'tenor':
       case 'image': {
-        const url = multimedia.url || multimedia.sourceUrl;
+        const url = raw.multimedia.url || raw.multimedia.sourceUrl;
         if (url) {
           this.imageUrl.set(url);
           this.mediaKind.set('image');
-        } else {
-          this.mediaKind.set('none');
         }
         break;
       }
-      case 'undefined':
       default:
         this.mediaKind.set('none');
-        break;
     }
   }
 
+  // Actions
   close() { this.ref.close(); }
-
   openContentUrl() {
     const url = this.sourceUrl();
     if (url) window.open(url, '_blank', 'noopener');
   }
 
-  // --- helpers ---
+  translateMessage() {
+    const text = this.msg()?.message?.trim();
+    if (!text) {
+      this.snack.open('No message to translate.', 'OK', { duration: 2000 });
+      return;
+    }
+    this.loadingMsg.set(true);
+    this.translator.translateToGerman(text).subscribe({
+      next: (t) => this.tMsg.set(t),
+      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 }),
+      complete: () => this.loadingMsg.set(false)
+    });
+  }
+
+  translateReason() {
+    const text = this.data.reasonText?.trim();
+    if (!text) {
+      this.snack.open('No reason to translate.', 'OK', { duration: 2000 });
+      return;
+    }
+    this.loadingReason.set(true);
+    this.translator.translateToGerman(text).subscribe({
+      next: (t) => this.tReason.set(t),
+      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 }),
+      complete: () => this.loadingReason.set(false)
+    });
+  }
+
+  // Helpers
   private safeParse(json: string): PublicMessage | null {
     try { return JSON.parse(json); } catch { return null; }
   }
-
   private iconFor(type: string): string {
     switch (type) {
       case 'youtube': return 'smart_display';
@@ -150,17 +165,13 @@ export class PublicMessageDetailComponent {
       default: return 'Text';
     }
   }
-
   private getYouTubeId(mm: Multimedia): string | null {
-    // 1) contentId bevorzugen (kann '?si=' enthalten)
     if (mm.contentId) return mm.contentId.split('?')[0];
-    // 2) aus oembed.html extrahieren
     const html = mm.oembed?.html as string | undefined;
     if (html) {
       const m = html.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
       if (m?.[1]) return m[1];
     }
-    // 3) aus sourceUrl oder url extrahieren
     const src = mm.sourceUrl || mm.url || '';
     const watch = src.match(/[?&]v=([a-zA-Z0-9_-]+)/);
     if (watch?.[1]) return watch[1];
@@ -170,28 +181,19 @@ export class PublicMessageDetailComponent {
     if (embed?.[1]) return embed[1];
     return null;
   }
-
   private buildSpotifyEmbed(mm: Multimedia): string | null {
-    // Wenn contentId vorhanden: versuchen als track/episode/playlist zu nutzen
-    if (mm.contentId) {
-      // Simple Heuristik: Track-ID hat meist 22 Zeichen, wir bauen ein generisches Embed
-      return `https://open.spotify.com/embed/${mm.contentId}`; // contentId darf 'track/XYZ' oder nur 'XYZ' sein
-    }
+    if (mm.contentId) return `https://open.spotify.com/embed/${mm.contentId}`;
     const src = mm.sourceUrl || mm.url;
     if (!src) return null;
-    // Replace open -> embed
     if (src.includes('open.spotify.com')) {
       return src.replace('open.spotify.com/', 'open.spotify.com/embed/');
     }
     return null;
   }
-
   private getTikTokId(mm: Multimedia): string | null {
     const src = mm.sourceUrl || mm.url || '';
-    // https://www.tiktok.com/@user/video/1234567890
     const m = src.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
     if (m?.[1]) return m[1];
-    // Kurzform: https://vm.tiktok.com/XXXX/ (kein direkter ID-Zugriff) -> kein Embed
     return mm.contentId || null;
   }
 }

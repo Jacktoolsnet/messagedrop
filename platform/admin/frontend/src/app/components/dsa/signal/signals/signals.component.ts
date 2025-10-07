@@ -19,6 +19,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { DsaSignal } from '../../../../interfaces/dsa-signal.interface';
 import { AuthService } from '../../../../services/auth/auth.service';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 import { PublicMessageDetailComponent } from '../../detail/public-message-detail/public-message-detail.component';
 
@@ -52,6 +53,48 @@ export class SignalsComponent {
   private fb = inject(FormBuilder);
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  private translate = inject(TranslateService);
+
+  // Übersetzungen im Speicher (id -> Text)
+  private tMsg = signal<Record<string, string>>({});
+  private tReason = signal<Record<string, string>>({});
+
+  translatedMessage(id: string): string | null { return this.tMsg()[id] ?? null; }
+  translatedReason(id: string): string | null { return this.tReason()[id] ?? null; }
+
+  /** Extrahiert "message" aus reportedContent (JSON). */
+  getMessage(s: DsaSignal): string | null {
+    try {
+      const obj = JSON.parse(s.reportedContent || '{}');
+      return (obj?.message && String(obj.message).trim()) ? String(obj.message) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  translateMessage(s: DsaSignal) {
+    const msg = this.getMessage(s);
+    if (!msg) {
+      this.snack.open('No message to translate.', 'OK', { duration: 2000 });
+      return;
+    }
+    this.translate.translateToGerman(msg).subscribe({
+      next: text => this.tMsg.update(m => ({ ...m, [s.id]: text })),
+      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 })
+    });
+  }
+
+  translateReason(s: DsaSignal) {
+    const r = s.reasonText?.trim();
+    if (!r) {
+      this.snack.open('No reason to translate.', 'OK', { duration: 2000 });
+      return;
+    }
+    this.translate.translateToGerman(r).subscribe({
+      next: text => this.tReason.update(m => ({ ...m, [s.id]: text })),
+      error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 })
+    });
+  }
 
   get username() { return this.auth.username; }
   get role() { return this.auth.role; }

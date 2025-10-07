@@ -9,6 +9,7 @@ const Database = require('./db/database');
 const database = new Database();
 const root = require('./routes/root');
 const check = require('./routes/check');
+const translate = require('./routes/translate');
 const clientConnect = require('./routes/client-connect');
 const dsaFrontend = require('./routes/dsa-frontend');
 const dsaBackend = require('./routes/dsa-backend');
@@ -202,6 +203,7 @@ app.use('/', root);
 app.use('/check', check);
 app.use('/clientconnect', clientConnect);
 app.use('/user', user);
+app.use('/translate', translate);
 
 // DSA
 app.use('/dsa/frontend', dsaFrontend);
