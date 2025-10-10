@@ -21,7 +21,7 @@ import { AuthService } from '../../../../services/auth/auth.service';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
-import { PublicMessageDetailComponent } from '../../detail/public-message-detail/public-message-detail.component';
+import { SignalDetailComponent } from '../signal-detail/signal-detail.component';
 
 
 @Component({
@@ -142,7 +142,7 @@ export class SignalsComponent {
       type: f.type || undefined,
       category: f.category || undefined,
       q: f.q || undefined,
-      since: this.sinceFromRange(f.range || '7d'),
+      since: this.sinceFromRange(f.range || 'all'),
       limit: 50,
       offset: 0
     }).subscribe(items => {
@@ -156,7 +156,7 @@ export class SignalsComponent {
   }
 
   openDetail(s: DsaSignal) {
-    this.dialog.open(PublicMessageDetailComponent, {
+    this.dialog.open(SignalDetailComponent, {
       data: {
         source: 'signal',
         reportedContent: s.reportedContent, // JSON-String aus DB

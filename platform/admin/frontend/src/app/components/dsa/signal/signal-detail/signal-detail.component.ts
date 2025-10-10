@@ -15,19 +15,19 @@ import { PublicMessage } from '../../../../interfaces/public-message.interface';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 
 @Component({
-  selector: 'app-public-message-detail',
+  selector: 'app-signal-detail',
   standalone: true,
   imports: [
     CommonModule, DatePipe,
     MatDialogModule, MatIconModule, MatButtonModule,
     MatChipsModule, MatDividerModule, MatTooltipModule, MatCardModule
   ],
-  templateUrl: './public-message-detail.component.html',
-  styleUrls: ['./public-message-detail.component.css']
+  templateUrl: './signal-detail.component.html',
+  styleUrls: ['./signal-detail.component.css']
 })
 
-export class PublicMessageDetailComponent {
-  private ref = inject(MatDialogRef<PublicMessageDetailComponent>);
+export class SignalDetailComponent {
+  private ref = inject(MatDialogRef<SignalDetailComponent>);
   private sanitizer = inject(DomSanitizer);
   private snack = inject(MatSnackBar);
   private translator = inject(TranslateService);

@@ -1,0 +1,149 @@
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back to DSA dashboard">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+
+    <span class="toolbar-title">Notices</span>
+
+    <button mat-stroked-button (click)="reload()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+    </button>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+
+    <!-- Filter -->
+    <div class="filter-row">
+        <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select [formControl]="filterForm.controls.status" multiple>
+                @for (s of statuses; track s) {
+                <mat-option [value]="s">{{ s }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Type</mat-label>
+            <mat-select [formControl]="filterForm.controls.reportedContentType">
+                <mat-option value="">All</mat-option>
+                <mat-option value="public_message">Public message</mat-option>
+                <mat-option value="comment">Comment</mat-option>
+                <mat-option value="profile">Profile</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <input matInput [formControl]="filterForm.controls.category" placeholder="e.g. hate, privacy" />
+        </mat-form-field>
+
+        <mat-form-field class="grow" appearance="outline">
+            <mat-label>Search</mat-label>
+            <input matInput [formControl]="filterForm.controls.q" placeholder="reason, contentId …" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Range</mat-label>
+            <mat-select [formControl]="filterForm.controls.range">
+                <mat-option value="24h">Last 24h</mat-option>
+                <mat-option value="7d">Last 7 days</mat-option>
+                <mat-option value="30d">Last 30 days</mat-option>
+                <mat-option value="all">All</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <!-- Liste -->
+    <div class="tiles-container">
+        @for (n of notices(); track trackById($index, n)) {
+        <mat-card class="tile">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar">
+                    <span class="avatar-badged" [matBadge]="statusLabel(n.status)" matBadgePosition="below after"
+                        matBadgeOverlap="false" matBadgeColor="primary">
+                        <mat-icon>{{ statusIcon(n.status) }}</mat-icon>
+                    </span>
+                </div>
+                <mat-card-title class="tile-title">
+                    {{ n.reportedContentType }}
+                </mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">
+                    {{ n.category || 'uncategorized' }} • {{ n.createdAt | date: 'medium' }}
+                </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="meta-row">
+                    <span class="meta">
+                        <mat-icon>fingerprint</mat-icon>
+                        {{ n.contentId }}
+                    </span>
+                    @if (n.contentUrl) {
+                    <a [href]="n.contentUrl" target="_blank" rel="noopener">
+                        <mat-icon>open_in_new</mat-icon>
+                        Open content
+                    </a>
+                    }
+                </div>
+
+                <!-- Message Preview -->
+                @if (getMessagePreview(n); as preview) {
+                @if (preview.length > 0) {
+                <div class="snippet">
+                    <mat-icon>text_snippet</mat-icon>
+                    <div class="t">{{ preview }}</div>
+                </div>
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>text_snippet</mat-icon>
+                    No message provided
+                </div>
+                }
+                }
+
+                <!-- Reason -->
+                @if (n.reasonText) {
+                <div class="snippet">
+                    <mat-icon>forum</mat-icon>
+                    <div class="t">{{ n.reasonText }}</div>
+                </div>
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>forum</mat-icon>
+                    No reason given
+                </div>
+                }
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+                @if (n.status !== 'UNDER_REVIEW') {
+                <button mat-stroked-button (click)="setStatus(n, 'UNDER_REVIEW')">
+                    <mat-icon>manage_search</mat-icon>
+                    Under review
+                </button>
+                }
+                @if (n.status !== 'DECIDED') {
+                <button mat-raised-button color="primary" (click)="openDetail(n)">
+                    <mat-icon>gavel</mat-icon>
+                    Decide
+                </button>
+                }
+            </mat-card-actions>
+        </mat-card>
+        }
+    </div>
+
+    <!-- Empty-State -->
+    @if (!loading() && notices().length === 0) {
+    <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <div>No notices for the selected filters.</div>
+    </div>
+    }
+</div>

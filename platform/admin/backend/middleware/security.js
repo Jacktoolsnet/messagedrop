@@ -67,12 +67,14 @@ function requireRole(...allowed) {
  * → nutzt x-api-authorization Header
  */
 function checkToken(req, res, next) {
-  const headerToken = req.headers['x-api-authorization'];
-  if (!process.env.ADMIN_TOKEN || headerToken !== process.env.ADMIN_TOKEN) {
-    return res.sendStatus(403);
+  const authHeader = req.headers['x-api-authorization'];
+  const token = authHeader
+  if (undefined === process.env.TOKEN || process.env.TOKEN === '' || (token !== process.env.ADMIN_TOKEN && token !== process.env.BACKEND_TOKEN)) {
+    res.sendStatus(403);
+  } else {
+    next();
   }
-  next();
-}
+};
 
 module.exports = {
   authenticateOptionalUser,

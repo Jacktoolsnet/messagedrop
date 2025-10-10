@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PublicMessageDetailComponent } from './public-message-detail.component';
+import { SignalDetailComponent } from './signal-detail.component';
 
 describe('PublicMessageDetailComponent', () => {
-  let component: PublicMessageDetailComponent;
-  let fixture: ComponentFixture<PublicMessageDetailComponent>;
+  let component: SignalDetailComponent;
+  let fixture: ComponentFixture<SignalDetailComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [PublicMessageDetailComponent]
+      imports: [SignalDetailComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(PublicMessageDetailComponent);
+    fixture = TestBed.createComponent(SignalDetailComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

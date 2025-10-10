@@ -1,19 +1,24 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, forkJoin, Observable, of } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+
 import { DsaSignal } from '../../../interfaces/dsa-signal.interface';
 import { ListSignalsParams } from '../../../interfaces/list-signals-params.interface';
 import { NoticeStats } from '../../../interfaces/notice-stats.interface';
 import { PromoteResult } from '../../../interfaces/promote-result.interface';
 import { SignalStats } from '../../../interfaces/signal-stats.interface';
 
+import { DsaNoticeFilters } from '../../../interfaces/dsa-notice-filters.interface';
+import { DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
+import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
+
 @Injectable({ providedIn: 'root' })
 export class DsaService {
   private readonly baseUrl = `${environment.apiUrl}/dsa/backend`;
 
-  /** Signals für das Dashboard */
+  /** Dashboard-Stats-Loading */
   readonly loading = signal(false);
   readonly noticeStats = signal<NoticeStats | null>(null);
   readonly signalStats = signal<SignalStats | null>(null);
@@ -23,7 +28,93 @@ export class DsaService {
     private snack: MatSnackBar
   ) { }
 
-  /** Einzelabruf: Notices */
+  /* =======================
+   *  NOTICES (new / ergänzt)
+   * ======================= */
+
+  /** Liste der Notices mit Server-Parametern + optionalem Client-Filter */
+  listNotices(filters: DsaNoticeFilters): Observable<DsaNotice[]> {
+    let params = new HttpParams();
+
+    // Server versteht: status (multi), contentId, type (= reportedContentType), limit, offset
+    if (filters.status) {
+      const arr = Array.isArray(filters.status) ? filters.status : [filters.status];
+      arr.forEach(s => params = params.append('status', s));
+    }
+    if (filters.contentId) params = params.set('contentId', filters.contentId);
+    if (filters.reportedContentType) params = params.set('type', filters.reportedContentType);
+    if (typeof filters.limit === 'number') params = params.set('limit', String(filters.limit));
+    if (typeof filters.offset === 'number') params = params.set('offset', String(filters.offset));
+
+    return this.http.get<DsaNotice[]>(`${this.baseUrl}/notices`, { params }).pipe(
+      // Clientseitig zusätzlich filtern (category, q, range)
+      map(rows => this.applyNoticeClientFilters(rows ?? [], filters)),
+      catchError(err => {
+        this.snack.open('Could not load notices.', 'OK', { duration: 3000 });
+        return of([]);
+      })
+    );
+  }
+
+  /** Einzelabruf einer Notice */
+  getNoticeById(id: string): Observable<DsaNotice> {
+    return this.http.get<DsaNotice>(`${this.baseUrl}/notices/${id}`).pipe(
+      catchError(err => {
+        this.snack.open('Could not load notice.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  /** Status einer Notice ändern (PATCH /notices/:id/status) */
+  patchNoticeStatus(id: string, status: DsaNoticeStatus): Observable<{ ok: boolean }> {
+    return this.http.patch<{ ok: boolean }>(`${this.baseUrl}/notices/${id}/status`, { status }).pipe(
+      catchError(err => {
+        this.snack.open('Could not update notice status.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  /** Clientseitiger Zusatzfilter (category, q, range) */
+  private applyNoticeClientFilters(rows: DsaNotice[], f: DsaNoticeFilters): DsaNotice[] {
+    let out = rows;
+
+    // Zeitraum
+    if (f.range && f.range !== 'all') {
+      const now = Date.now();
+      const delta =
+        f.range === '24h' ? 24 * 60 * 60 * 1000 :
+          f.range === '7d' ? 7 * 24 * 60 * 60 * 1000 :
+            f.range === '30d' ? 30 * 24 * 60 * 60 * 1000 : 0;
+      if (delta > 0) {
+        const since = now - delta;
+        out = out.filter(n => (n.createdAt ?? 0) >= since);
+      }
+    }
+
+    // Kategorie
+    if (f.category && f.category.trim().length) {
+      const needle = f.category.toLowerCase();
+      out = out.filter(n => (n.category || '').toLowerCase().includes(needle));
+    }
+
+    // Volltext light (reasonText, contentId)
+    if (f.q && f.q.trim().length) {
+      const q = f.q.toLowerCase();
+      out = out.filter(n =>
+        (n.reasonText || '').toLowerCase().includes(q) ||
+        (n.contentId || '').toLowerCase().includes(q)
+      );
+    }
+
+    return out;
+  }
+
+  /* =======================
+   *  STATS
+   * ======================= */
+
   loadNoticeStats(): void {
     this.loading.set(true);
     this.http.get<NoticeStats>(`${this.baseUrl}/stats/notices`)
@@ -40,7 +131,6 @@ export class DsaService {
       });
   }
 
-  /** Einzelabruf: Signals */
   loadSignalStats(): void {
     this.loading.set(true);
     this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)
@@ -57,7 +147,6 @@ export class DsaService {
       });
   }
 
-  /** Beide parallel laden (für Dashboard-Initialisierung) */
   loadAllStats(): void {
     this.loading.set(true);
     forkJoin({
@@ -74,6 +163,10 @@ export class DsaService {
       this.loading.set(false);
     });
   }
+
+  /* =======================
+   *  SIGNALS (bestehend)
+   * ======================= */
 
   listSignals(params: ListSignalsParams): Observable<DsaSignal[]> {
     let hp = new HttpParams();
@@ -108,7 +201,6 @@ export class DsaService {
   }
 
   deleteSignal(id: string, reason?: string) {
-    // Angular v20 unterstützt body bei DELETE
     return this.http.delete<{ deleted: boolean }>(
       `${this.baseUrl}/signals/${id}`,
       { body: reason ? { reason } : undefined }

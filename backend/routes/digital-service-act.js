@@ -2,6 +2,7 @@ const express = require('express');
 const security = require('../middleware/security');
 const axios = require('axios');
 const rateLimit = require('express-rate-limit');
+const tableMessage = require('../db/tableMessage');
 
 const router = express.Router();
 
@@ -43,11 +44,31 @@ async function forwardPost(path, body, reqHeaders) {
     return resp;
 }
 
+function disableLocallyIfPossible(req) {
+    return new Promise((resolve) => {
+        try {
+            const db = req.database?.db;
+            const contentId = req.body?.contentId;
+            if (!db || !contentId) return resolve(false);
+
+            tableMessage.disableMessage(db, contentId, (err) => {
+                if (err) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
+        } catch {
+            resolve(false);
+        }
+    });
+}
+
 /* --------------------------------- Routes ---------------------------------- */
 
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, async (req, res) => {
     try {
+        await disableLocallyIfPossible(req);
         const resp = await forwardPost('/signals', req.body, req.headers);
         res.status(resp.status).json(resp.data);
     } catch (err) {
@@ -58,11 +79,39 @@ router.post('/signals', signalLimiter, async (req, res) => {
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
 router.post('/notices', noticeLimiter, async (req, res) => {
     try {
+        await disableLocallyIfPossible(req);
         const resp = await forwardPost('/notices', req.body, req.headers);
         res.status(resp.status).json(resp.data);
     } catch (err) {
         res.status(502).json({ error: 'bad_gateway', detail: err.message });
     }
+});
+
+
+router.get('/disable/publicmessage/:messageId', function (req, res) {
+    let response = { 'status': 0 };
+    tableMessage.disableMessage(req.database.db, req.params.messageId, function (err) {
+        if (err) {
+            response.status = 500;
+            response.error = err;
+        } else {
+            response.status = 200;
+        }
+        res.status(response.status).json(response);
+    });
+});
+
+router.get('/enable/publicmessage/:messageId', function (req, res) {
+    let response = { 'status': 0 };
+    tableMessage.enableMessage(req.database.db, req.params.messageId, function (err) {
+        if (err) {
+            response.status = 500;
+            response.error = err;
+        } else {
+            response.status = 200;
+        }
+        res.status(response.status).json(response);
+    });
 });
 
 router.get('/health', (_req, res) => res.json({ ok: true, adminBase: `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend` }));

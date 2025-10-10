@@ -19,6 +19,23 @@ function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
 /** Health */
 router.get('/health', (_req, res) => res.json({ ok: true, service: 'dsa-backend' }));
 
+/* ----------------------------- Helper ----------------------------- */
+async function enablePublicMessage(messageId) {
+    const url = `${process.env.BASE_URL}:${process.env.PORT}/digitalserviceact/enable/publicmessage/${encodeURIComponent(messageId)}`;
+    const res = await fetch(url, {
+        method: 'GET',
+        headers: {
+            'X-API-Authorization': process.env.BACKEND_TOKEN,
+            'Accept': 'application/json'
+        }
+    });
+    let json = null;
+    try { json = await res.json(); } catch { /* noop */ }
+    const ok = res.ok && (json?.status === 200 || json?.ok === true);
+    return { ok, status: res.status, json };
+}
+
+
 /* ----------------------------- Notices ----------------------------- */
 router.get('/notices', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
@@ -368,9 +385,22 @@ router.delete('/signals/:id', (req, res) => {
     const now = Date.now();
 
     // Für Audit Snapshot holen
-    tableSignal.getById(_db, id, (e1, sig) => {
+    tableSignal.getById(_db, id, async (e1, sig) => {
         if (e1) return res.status(500).json({ error: 'db_error', detail: e1.message });
         if (!sig) return res.status(404).json({ error: 'not_found' });
+
+        try {
+            const resp = await enablePublicMessage(String(sig.contentId));
+            if (!resp.ok) {
+                return res.status(502).json({
+                    error: 'enable_failed',
+                    upstreamStatus: resp.status,
+                    upstream: resp.json
+                });
+            }
+        } catch (e) {
+            return res.status(502).json({ error: 'enable_failed', detail: String(e?.message || e) });
+        }
 
         tableSignal.remove(_db, id, (e2, ok) => {
             if (e2) return res.status(500).json({ error: 'db_error', detail: e2.message });
