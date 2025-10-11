@@ -215,14 +215,14 @@ const getByBoundingBox = function (db, latMin, lonMin, latMax, lonMax, callback)
             SELECT *
             FROM ${tableName}
             WHERE ${columnParentUuid} IS NULL
-                AND ${columnStatus} = ?
-                AND ${columnLatitude} BETWEEN ? AND ?
-                AND (
+            AND ${columnStatus} = ?
+            AND ${columnLatitude} BETWEEN ? AND ?
+            AND (
                 ${crossesAntiMeridian
                 ? `(${columnLongitude} BETWEEN ? AND 180) OR (${columnLongitude} BETWEEN -180 AND ?)`
                 : `${columnLongitude} BETWEEN ? AND ?`
             }
-                )
+            )
             ORDER BY ${columnMessageCreateDateTime} DESC
             LIMIT 256;
             `;
@@ -305,7 +305,7 @@ const disableMessage = function (db, messageId, callback) {
         let sql = `
         UPDATE ${tableName}
         SET ${columnStatus} = '${messageStatus.DISABLED}' 
-        WHERE ${columnMessageId} = ?;`;
+        WHERE ${columnUuid} = ?;`;
 
         db.run(sql, [messageId], (err) => {
             callback(err);
@@ -320,7 +320,7 @@ const enableMessage = function (db, messageId, callback) {
         let sql = `
         UPDATE ${tableName}
         SET ${columnStatus} = '${messageStatus.ENABLED}' 
-        WHERE ${columnMessageId} = ?;`;
+        WHERE ${columnUuid} = ?;`;
 
         db.run(sql, [messageId], (err) => {
             callback(err);

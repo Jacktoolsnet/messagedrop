@@ -13,7 +13,6 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
-import { DecisionDialogComponent } from '../decision-dialog/decision-dialog.component';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -73,32 +72,6 @@ export class NoticeDetailComponent {
 
   close(ok = false) {
     this.ref.close(ok);
-  }
-
-  /** Status setzen (PATCH) */
-  setStatus(next: DsaNoticeStatus) {
-    if (next === this.status()) return;
-    this.dsa.patchNoticeStatus(this.notice().id, next).subscribe({
-      next: () => {
-        this.status.set(next);
-        this.notice.update(n => ({ ...n!, status: next, updatedAt: Date.now() }));
-      }
-    });
-  }
-
-  /** Entscheidung erfassen (ändert Status → DECIDED) */
-  decide(n: DsaNotice): void {
-    const ref = this.dialog.open(DecisionDialogComponent, {
-      data: { noticeId: n.id },
-      width: 'min(700px, 96vw)',
-      maxHeight: '90vh',
-      panelClass: 'md-dialog-rounded'
-    });
-
-    ref.afterClosed().subscribe((saved) => {
-      if (saved) {
-      }
-    });
   }
 
   /** Übersetzung via Admin-Backend (/translate/DE/:value) */

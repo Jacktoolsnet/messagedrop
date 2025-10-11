@@ -10,16 +10,6 @@
                 <mat-chip class="status" [ngClass]="status()">{{ status() }}</mat-chip>
             </mat-chip-set>
             <div class="actions">
-                @if(status() !=='UNDER_REVIEW' && status() !=='DECIDED') {
-                <button mat-stroked-button (click)="setStatus('UNDER_REVIEW')">
-                    <mat-icon>rule</mat-icon> Review
-                </button>
-                }
-                @if (status() !=='DECIDED') {
-                <button mat-raised-button color="primary" (click)="decide(notice())">
-                    <mat-icon>gavel</mat-icon> Decide
-                </button>
-                }
             </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const axios = require('axios');
 const { checkToken } = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
 
@@ -9,6 +10,18 @@ const tableNotice = require('../db/tableDsaNotice');
 
 const router = express.Router();
 router.use(checkToken);
+
+/* ---------------------- Minimaler Make-Notifier (axios) ---------------------- */
+function notifyMake(title, text) {
+    const url = process.env.MAKE_DSA_WEBHOOK_URL;
+    const apiKey = process.env.MAKE_API_KEY;
+    if (!url || !apiKey) return;
+
+    // fire-and-forget: nicht awaiten, Fehler nur loggen
+    axios.post(url, { title, text }, {
+        headers: { 'x-make-apikey': apiKey }
+    }).catch(() => { });
+}
 
 /* ------------------------------ Rate Limits ------------------------------ */
 const signalLimiter = rateLimit({
@@ -71,6 +84,11 @@ router.post('/signals', signalLimiter, (req, res) => {
         (err, row) => {
             if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
             res.status(201).json(row); // { id }
+            // Make-Push (sehr knapp gehalten)
+            notifyMake(
+                'New Signal',
+                `Type: ${reportedContentType}\nContentId: ${contentId}\nCategory: ${category || '-'}\nReason: ${reasonText || '-'}`
+            );
         }
     );
 });
@@ -122,6 +140,11 @@ router.post('/notices', noticeLimiter, (req, res) => {
         (err, row) => {
             if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
             res.status(201).json(row); // { id }
+            // Make-Push (kurz & bündig)
+            notifyMake(
+                'New Notice',
+                `Status: ${status}\nType: ${reportedContentType}\nContentId: ${contentId}\nReporter: ${reporterName || '-'} (${reporterEmail || '-'})\nCategory: ${category || '-'}`
+            );
         }
     );
 });
