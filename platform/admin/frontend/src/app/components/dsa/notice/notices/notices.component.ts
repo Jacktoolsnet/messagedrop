@@ -57,13 +57,18 @@ export class NoticesComponent implements OnInit, OnDestroy {
   protected notices = signal<DsaNotice[]>([]);
   protected statuses = DSA_NOTICE_STATUSES;
 
+  // „Offene“ Stati = Arbeitsvorrat
+  private readonly OPEN_STATUSES: DsaNoticeStatus[] = [
+    'RECEIVED', 'UNDER_REVIEW'
+  ];
+
   /** Filter-Form – Status (multi), Type, Category, Q, Range */
   protected filterForm = this.fb.nonNullable.group({
-    status: [[] as DsaNoticeStatus[]],
+    status: [this.OPEN_STATUSES as DsaNoticeStatus[]],
     reportedContentType: [''],
     category: [''],
     q: [''],
-    range: ['24h' as DsaNoticeRange]
+    range: ['all' as DsaNoticeRange]
   });
 
   private subs: Subscription[] = [];
@@ -169,26 +174,6 @@ export class NoticesComponent implements OnInit, OnDestroy {
       RECEIVED: { label: 'Received', icon: 'mark_email_unread', class: 'status-received' },
       UNDER_REVIEW: { label: 'Under review', icon: 'manage_search', class: 'status-under-review' },
       DECIDED: { label: 'Decided', icon: 'gavel', class: 'status-decided' },
-      REJECTED: {
-        label: '',
-        icon: '',
-        class: ''
-      },
-      WITHDRAWN: {
-        label: '',
-        icon: '',
-        class: ''
-      },
-      NEEDS_INFO: {
-        label: '',
-        icon: '',
-        class: ''
-      },
-      ESCALATED: {
-        label: '',
-        icon: '',
-        class: ''
-      }
     };
 
   statusLabel(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.label ?? s; }

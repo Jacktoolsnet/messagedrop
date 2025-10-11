@@ -1,20 +1,12 @@
 export type DsaNoticeStatus =
     | 'RECEIVED'
     | 'UNDER_REVIEW'
-    | 'DECIDED'
-    | 'REJECTED'
-    | 'WITHDRAWN'
-    | 'NEEDS_INFO'
-    | 'ESCALATED';
+    | 'DECIDED';
 
 export const DSA_NOTICE_STATUSES: ReadonlyArray<DsaNoticeStatus> = [
     'RECEIVED',
     'UNDER_REVIEW',
-    'DECIDED',
-    'REJECTED',
-    'WITHDRAWN',
-    'NEEDS_INFO',
-    'ESCALATED'
+    'DECIDED'
 ] as const;
 
 export function isDsaNoticeStatus(v: unknown): v is DsaNoticeStatus {
