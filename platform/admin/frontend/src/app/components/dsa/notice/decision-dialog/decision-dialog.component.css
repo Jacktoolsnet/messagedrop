@@ -1,0 +1,43 @@
+:host {
+    --primary: #05a51d;
+}
+
+h2[mat-dialog-title] {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+
+    mat-icon {
+        color: var(--primary);
+    }
+}
+
+.content {
+    max-height: 60vh;
+    overflow: auto;
+    padding-top: .25rem;
+}
+
+.form {
+    display: grid;
+    gap: .9rem;
+
+    .row {
+        display: grid;
+        gap: .75rem;
+        grid-template-columns: 1fr 1fr;
+
+        @media (max-width: 720px) {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    .full {
+        width: 100%;
+    }
+}
+
+.opt-icon {
+    margin-right: .5rem;
+    vertical-align: middle;
+}

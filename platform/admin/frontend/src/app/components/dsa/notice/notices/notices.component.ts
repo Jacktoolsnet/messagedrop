@@ -22,6 +22,7 @@ import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { DecisionDialogComponent } from '../decision-dialog/decision-dialog.component';
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
 
 @Component({
@@ -126,7 +127,7 @@ export class NoticesComponent implements OnInit, OnDestroy {
   }
 
   /** Detail öffnen (Dialog – Placeholder; Komponente liefern wir im nächsten Schritt) */
-  openDetail(n: DsaNotice) {
+  detail(n: DsaNotice) {
     const ref = this.dialog.open(NoticeDetailComponent, {
       data: n,                             // ganzen Datensatz reinreichen
       width: 'auto',
@@ -193,4 +194,21 @@ export class NoticesComponent implements OnInit, OnDestroy {
   statusLabel(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.label ?? s; }
   statusIcon(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.icon ?? 'help'; }
   statusClass(s: string) { const k = s as DsaNoticeStatus; return this.STATUS_META[k]?.class ?? 'status-default'; }
+
+  /** Entscheidung erfassen (ändert Status → DECIDED) */
+  decide(n: DsaNotice): void {
+    const ref = this.dialog.open(DecisionDialogComponent, {
+      data: { noticeId: n.id },
+      width: 'min(700px, 96vw)',
+      maxHeight: '90vh',
+      panelClass: 'md-dialog-rounded'
+    });
+
+    ref.afterClosed().subscribe((saved) => {
+      if (saved) {
+        // Nach dem Speichern Liste aktualisieren (oder gezielt nur dieses Item)
+        this.reload();
+      }
+    });
+  }
 }

@@ -122,14 +122,18 @@
             </mat-card-content>
 
             <mat-card-actions align="end">
-                @if (n.status !== 'UNDER_REVIEW') {
+                <button mat-stroked-button (click)="detail(n)">
+                    <mat-icon>info</mat-icon>
+                    Details
+                </button>
+                @if (n.status !== 'UNDER_REVIEW' && n.status !== 'DECIDED') {
                 <button mat-stroked-button (click)="setStatus(n, 'UNDER_REVIEW')">
                     <mat-icon>manage_search</mat-icon>
                     Under review
                 </button>
                 }
                 @if (n.status !== 'DECIDED') {
-                <button mat-raised-button color="primary" (click)="openDetail(n)">
+                <button mat-raised-button color="primary" (click)="decide(n)">
                     <mat-icon>gavel</mat-icon>
                     Decide
                 </button>

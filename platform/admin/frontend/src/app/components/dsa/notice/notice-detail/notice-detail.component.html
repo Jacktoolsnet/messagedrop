@@ -2,9 +2,7 @@
     <!-- Header -->
     <div class="dialog-header">
         <div class="left">
-            <button mat-icon-button mat-dialog-close aria-label="Close">
-                <mat-icon>close</mat-icon>
-            </button>
+            <mat-icon>infos</mat-icon>
             <h3>Notice Detail</h3>
         </div>
         <div class="right">
@@ -15,9 +13,8 @@
                 <button mat-stroked-button (click)="setStatus('UNDER_REVIEW')" [disabled]="status()==='UNDER_REVIEW'">
                     <mat-icon>rule</mat-icon> Under review
                 </button>
-                <button mat-raised-button color="primary" (click)="setStatus('DECIDED')"
-                    [disabled]="status()==='DECIDED'">
-                    <mat-icon>gavel</mat-icon> Mark decided
+                <button mat-raised-button color="primary" (click)="decide(notice())" [disabled]="status()==='DECIDED'">
+                    <mat-icon>gavel</mat-icon> Decided
                 </button>
             </div>
         </div>

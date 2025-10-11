@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
@@ -13,6 +13,7 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { DecisionDialogComponent } from '../decision-dialog/decision-dialog.component';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
@@ -35,8 +36,7 @@ type TranslationState = {
     MatChipsModule,
     MatDividerModule,
     MatTabsModule,
-    MatTooltipModule,
-    // PublicMessageDetailComponent
+    MatTooltipModule
   ],
   templateUrl: './notice-detail.component.html',
   styleUrls: ['./notice-detail.component.css']
@@ -46,7 +46,7 @@ export class NoticeDetailComponent {
   private data = inject<DsaNotice>(MAT_DIALOG_DATA);
   private dsa = inject(DsaService);
   private http = inject(HttpClient);
-  // private dialog = inject(MatDialog);
+  private dialog = inject(MatDialog);
 
   notice = signal<DsaNotice>(this.data);
   status = signal<DsaNoticeStatus>(this.data.status as DsaNoticeStatus);
@@ -86,16 +86,20 @@ export class NoticeDetailComponent {
     });
   }
 
-  /** reported content in separatem Dialog öffnen (falls du deine PublicMessageDetailComponent nutzt) */
-  // openContentDetail() {
-  //   const content = this.contentObj();
-  //   if (!content) return;
-  //   this.dialog.open(PublicMessageDetailComponent, {
-  //     data: { publicMessage: content },
-  //     width: 'min(860px, 96vw)',
-  //     maxHeight: '90vh'
-  //   });
-  // }
+  /** Entscheidung erfassen (ändert Status → DECIDED) */
+  decide(n: DsaNotice): void {
+    const ref = this.dialog.open(DecisionDialogComponent, {
+      data: { noticeId: n.id },
+      width: 'min(700px, 96vw)',
+      maxHeight: '90vh',
+      panelClass: 'md-dialog-rounded'
+    });
+
+    ref.afterClosed().subscribe((saved) => {
+      if (saved) {
+      }
+    });
+  }
 
   /** Übersetzung via Admin-Backend (/translate/DE/:value) */
   translateToGerman(kind: 'reason' | 'message') {

@@ -211,4 +211,24 @@ export class DsaService {
       })
     );
   }
+
+  // dsa.service.ts (in der Klasse DsaService ergänzen)
+  createDecision(
+    noticeId: string,
+    payload: {
+      outcome: 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
+      legalBasis: string | null;
+      tosBasis: string | null;
+      automatedUsed: boolean;
+      statement: string | null;
+    }
+  ) {
+    return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/decision`, payload)
+      .pipe(
+        catchError(err => {
+          this.snack.open('Could not create decision.', 'OK', { duration: 3000 });
+          throw err;
+        })
+      );
+  }
 }
