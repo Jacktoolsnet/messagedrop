@@ -129,7 +129,7 @@
                 @if (n.status !== 'UNDER_REVIEW' && n.status !== 'DECIDED') {
                 <button mat-stroked-button (click)="setStatus(n, 'UNDER_REVIEW')">
                     <mat-icon>manage_search</mat-icon>
-                    Under review
+                    Review
                 </button>
                 }
                 @if (n.status !== 'DECIDED') {
