@@ -1,33 +1,23 @@
 :host {
+    color-scheme: light;
+    /* immer hell */
     --primary: #05a51d;
+
+    /* Light palette */
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
     --card: rgba(255, 255, 255, 0.94);
     --text: #1f2937;
     --muted: #6b7280;
-    --border: rgba(0, 0, 0, 0.06);
+    --border: rgba(0, 0, 0, 0.08);
+    --outline: color-mix(in srgb, var(--text) 28%, transparent);
 
     display: block;
     max-height: 90vh;
     /* Dialog-Deckel */
     font-size: 16px;
     line-height: 1.55;
-}
-
-@media (prefers-color-scheme: dark) {
-    :host {
-        /* Dark – etwas knackiger für bessere Lesbarkeit */
-        --bg-gradient-start: #06130a;
-        --bg-gradient-end: #0b1d12;
-        --surface: #0d1510;
-        --card: rgba(18, 26, 21, 0.97);
-        --text: #e8f5ee;
-        --muted: #a6b7b0;
-        --border: rgba(255, 255, 255, 0.10);
-        --accent: #22c55e;
-        --warn: #f87171;
-    }
 }
 
 .pm-card {
@@ -180,13 +170,6 @@ mat-chip.status {
     }
 }
 
-/* Optional: im Dark Mode den Hintergrund etwas kräftiger machen */
-@media (prefers-color-scheme: dark) {
-    .snippet-translation {
-        background: color-mix(in srgb, var(--primary) 18%, transparent);
-        border-left-color: color-mix(in srgb, var(--primary) 70%, #ffffff);
-    }
-}
 
 /* Placeholder bleibt dezent in beiden Modi */
 .placeholder {

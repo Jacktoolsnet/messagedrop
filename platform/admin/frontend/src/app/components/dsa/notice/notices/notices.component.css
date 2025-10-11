@@ -1,8 +1,9 @@
 :host {
-    color-scheme: light dark;
+    color-scheme: light;
+    /* immer hell */
     --primary: #05a51d;
 
-    /* Light */
+    /* Light palette */
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
@@ -10,11 +11,7 @@
     --text: #1f2937;
     --muted: #6b7280;
     --border: rgba(0, 0, 0, 0.08);
-
-    /* Semantic */
-    --accent: #16a34a;
-    /* grünlicher Akzent */
-    --warn: #ef4444;
+    --outline: color-mix(in srgb, var(--text) 28%, transparent);
 
     --status-rec-bg: #fff1f2;
     --status-rec-fg: #b91c1c;
@@ -44,33 +41,6 @@
     left: 50% !important;
     /* horizontal mittig */
     transform: translate(-50%, 0) !important;
-}
-
-@media (prefers-color-scheme: dark) {
-    :host {
-        /* Dark – etwas knackiger für bessere Lesbarkeit */
-        --bg-gradient-start: #06130a;
-        --bg-gradient-end: #0b1d12;
-        --surface: #0d1510;
-        --card: rgba(18, 26, 21, 0.97);
-        --text: #e8f5ee;
-        --muted: #a6b7b0;
-        --border: rgba(255, 255, 255, 0.10);
-        --accent: #22c55e;
-        --warn: #f87171;
-        --status-rec-bg: #2a1114;
-        --status-rec-fg: #fecaca;
-        --status-rec-bd: #7f1d1d;
-        --status-ur-bg: #231a0a;
-        --status-ur-fg: #fcd34d;
-        --status-ur-bd: #92400e;
-        --status-dec-bg: #0d1f18;
-        --status-dec-fg: #6ee7b7;
-        --status-dec-bd: #065f46;
-        --status-def-bg: #161a2e;
-        --status-def-fg: #c7d2fe;
-        --status-def-bd: #312e81;
-    }
 }
 
 .status-received {
@@ -111,13 +81,6 @@ mat-toolbar {
         margin-inline: auto;
         font-size: 1.35rem;
         font-weight: 600;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    mat-toolbar {
-        background: rgba(12, 20, 16, 0.82);
-        color: var(--text);
     }
 }
 

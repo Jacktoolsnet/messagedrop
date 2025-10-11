@@ -1,10 +1,10 @@
-/* === Theme Tokens (Login) === */
+/* === Force Light Theme (Login) === */
 :host {
-    color-scheme: light dark;
-    /* hilft Browser-UI (Autofill, etc.) */
+    color-scheme: light;
+    /* immer hell */
     --primary: #05a51d;
 
-    /* Light */
+    /* Light palette */
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
@@ -16,20 +16,6 @@
 
     display: block;
     min-height: 100dvh;
-}
-
-@media (prefers-color-scheme: dark) {
-    :host {
-        /* Dark: knackiger Kontrast & weniger Glas */
-        --bg-gradient-start: #06130a;
-        --bg-gradient-end: #0b1d12;
-        --surface: #0d1510;
-        --card: rgba(18, 26, 21, 0.97);
-        --text: #e8f5ee;
-        --muted: #a6b7b0;
-        --border: rgba(255, 255, 255, 0.10);
-        --outline: color-mix(in srgb, var(--text) 35%, transparent);
-    }
 }
 
 /* === Page Background === */
@@ -47,10 +33,9 @@
     border-radius: 16px;
     background: var(--card);
     border: 1px solid var(--border);
-    /* leicht kräftiger Shadow für Dark Mode */
     box-shadow:
-        0 18px 50px rgba(2, 8, 20, 0.22),
-        0 2px 6px rgba(2, 8, 20, 0.10);
+        0 18px 50px rgba(2, 8, 20, 0.18),
+        0 2px 6px rgba(2, 8, 20, 0.08);
     animation: fadeUp .45s ease forwards;
     transform: translateY(10px);
     opacity: 0;
@@ -133,8 +118,7 @@
     }
 }
 
-/* === Material Form Field – bessere Sichtbarkeit im Dark Mode === */
-/* Outline-Farben */
+/* === Material Form Field (Outline/Labels) === */
 .login-card .mdc-text-field--outlined .mdc-notched-outline__leading,
 .login-card .mdc-text-field--outlined .mdc-notched-outline__notch,
 .login-card .mdc-text-field--outlined .mdc-notched-outline__trailing {
@@ -153,7 +137,6 @@
     border-color: var(--primary) !important;
 }
 
-/* Label & Input-Farben */
 .login-card .mdc-floating-label {
     color: color-mix(in srgb, var(--text) 70%, transparent) !important;
 }
@@ -167,13 +150,11 @@
     caret-color: var(--primary);
 }
 
-/* Field-Background (leicht getönt, nur bei Bedarf) */
 .login-card .mat-mdc-text-field-wrapper {
     border-radius: 12px;
     background: color-mix(in srgb, var(--surface) 86%, transparent);
 }
 
-/* Helper-/Fehlermeldungen */
 .login-card .mat-mdc-form-field-subscript-wrapper,
 .login-card .mat-mdc-form-field-error {
     color: color-mix(in srgb, var(--text) 70%, transparent);
@@ -192,7 +173,7 @@
     }
 }
 
-/* === Extras: sichtbarer Focus & Autofill === */
+/* === Focus & Autofill === */
 button:focus-visible,
 input:focus-visible {
     outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);

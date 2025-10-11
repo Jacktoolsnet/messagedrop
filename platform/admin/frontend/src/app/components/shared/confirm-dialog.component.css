@@ -1,9 +1,10 @@
+/* === Force Light Theme (Confirm Dialog) === */
 :host {
-    color-scheme: light dark;
-    /* hilft Browser-UI (Autofill, etc.) */
+    color-scheme: light;
+    /* immer hell */
     --primary: #05a51d;
 
-    /* Light */
+    /* Light palette */
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
@@ -14,20 +15,7 @@
     --outline: color-mix(in srgb, var(--text) 28%, transparent);
 }
 
-@media (prefers-color-scheme: dark) {
-    :host {
-        /* Dark: knackiger Kontrast & weniger Glas */
-        --bg-gradient-start: #06130a;
-        --bg-gradient-end: #0b1d12;
-        --surface: #0d1510;
-        --card: rgba(18, 26, 21, 0.97);
-        --text: #e8f5ee;
-        --muted: #a6b7b0;
-        --border: rgba(255, 255, 255, 0.10);
-        --outline: color-mix(in srgb, var(--text) 35%, transparent);
-    }
-}
-
+/* === Dialog Container === */
 .confirm-wrap {
     width: min(420px, 92vw);
     background: var(--card);
@@ -36,24 +24,29 @@
     box-shadow: 0 16px 40px rgba(2, 8, 20, 0.14);
     padding: 16px;
     animation: fadeIn .25s ease;
+    color: var(--text);
 }
 
+/* Warn-Modus */
 .confirm-wrap.warn .avatar {
     background: rgba(244, 67, 54, .14);
-    /* leichtes Warnrot */
+    /* sanftes Warnrot */
+    border-color: rgba(244, 67, 54, .25);
 }
 
+/* Header */
 .head {
     display: grid;
     grid-template-columns: auto 1fr;
-    gap: .75rem;
+    gap: .85rem;
     align-items: center;
     margin-bottom: .5rem;
 }
 
+/* Avatar/Icon */
 .avatar {
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     background: color-mix(in srgb, var(--primary) 14%, transparent);
     display: grid;
@@ -61,15 +54,16 @@
     border: 1px solid var(--border);
 
     mat-icon {
-        width: 24px;
-        height: 24px;
-        line-height: 24px;
-        font-size: 24px;
-        /* verhindert Clipping */
+        width: 26px;
+        height: 26px;
+        line-height: 26px;
+        font-size: 26px;
         color: currentColor;
+        /* übernimmt Textfarbe */
     }
 }
 
+/* Titel/Untertitel */
 .titles {
     h3 {
         margin: 0;
@@ -78,18 +72,43 @@
     }
 
     p {
-        margin: 2px 0 0;
+        margin: 4px 0 0;
         color: var(--muted);
     }
 }
 
+/* Aktionen */
 .actions {
     display: flex;
     justify-content: flex-end;
-    gap: .5rem;
-    margin-top: .75rem;
+    gap: .6rem;
+    margin-top: .85rem;
+
+    /* Buttons leicht veredeln */
+    button[mat-stroked-button] {
+        border-color: var(--outline);
+    }
+
+    button[mat-raised-button].mat-warn {
+        box-shadow: 0 6px 16px rgba(244, 67, 54, .18);
+    }
+
+    button[mat-raised-button].mat-primary,
+    button[color="primary"] {
+        background: var(--primary);
+        color: #fff;
+        box-shadow: 0 6px 16px rgba(5, 165, 29, 0.22);
+    }
 }
 
+/* Fokus klar sichtbar */
+button:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 60%, transparent);
+    outline-offset: 2px;
+    border-radius: 10px;
+}
+
+/* Motion */
 @keyframes fadeIn {
     from {
         opacity: 0;

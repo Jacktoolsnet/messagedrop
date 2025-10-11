@@ -1,10 +1,10 @@
 /* greift auf dieselben Tokens wie die Dashboards zu */
 :host {
-    color-scheme: light dark;
-    /* hilft Browser-UI (Autofill, etc.) */
+    color-scheme: light;
+    /* immer hell */
     --primary: #05a51d;
 
-    /* Light */
+    /* Light palette */
     --bg-gradient-start: #eafde8;
     --bg-gradient-end: #bff7c4;
     --surface: #ffffff;
@@ -13,20 +13,6 @@
     --muted: #6b7280;
     --border: rgba(0, 0, 0, 0.08);
     --outline: color-mix(in srgb, var(--text) 28%, transparent);
-}
-
-@media (prefers-color-scheme: dark) {
-    :host {
-        /* Dark: knackiger Kontrast & weniger Glas */
-        --bg-gradient-start: #06130a;
-        --bg-gradient-end: #0b1d12;
-        --surface: #0d1510;
-        --card: rgba(18, 26, 21, 0.97);
-        --text: #e8f5ee;
-        --muted: #a6b7b0;
-        --border: rgba(255, 255, 255, 0.10);
-        --outline: color-mix(in srgb, var(--text) 35%, transparent);
-    }
 }
 
 /* z. B. in styles.scss (global) */

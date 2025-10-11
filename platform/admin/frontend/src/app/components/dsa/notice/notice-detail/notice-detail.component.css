@@ -1,23 +1,19 @@
 :host {
-    /* Tokens wie im Dashboard/Signals */
+    color-scheme: light;
+    /* immer hell */
     --primary: #05a51d;
+
+    /* Light palette */
+    --bg-gradient-start: #eafde8;
+    --bg-gradient-end: #bff7c4;
+    --surface: #ffffff;
+    --card: rgba(255, 255, 255, 0.94);
     --text: #1f2937;
     --muted: #6b7280;
-    --border: rgba(0, 0, 0, .08);
-    --card: rgba(255, 255, 255, .94);
-    --surface: #fff;
-    color: var(--text);
+    --border: rgba(0, 0, 0, 0.08);
+    --outline: color-mix(in srgb, var(--text) 28%, transparent);
 }
 
-@media (prefers-color-scheme: dark) {
-    :host {
-        --text: #e8f5ee;
-        --muted: #a6b7b0;
-        --border: rgba(255, 255, 255, .12);
-        --card: rgba(18, 26, 21, .97);
-        --surface: #0d1510;
-    }
-}
 
 /* Dialog Rahmen */
 .dialog-shell {
@@ -259,24 +255,5 @@ mat-chip.status {
     &.DECIDED {
         background: #e6ffef;
         color: #0f6a3c;
-    }
-}
-
-@media (prefers-color-scheme: dark) {
-    mat-chip.status {
-        &.RECEIVED {
-            background: rgba(10, 80, 150, .25);
-            color: #b9d9ff;
-        }
-
-        &.UNDER_REVIEW {
-            background: rgba(180, 110, 10, .25);
-            color: #ffdca8;
-        }
-
-        &.DECIDED {
-            background: rgba(20, 150, 80, .25);
-            color: #b7f7d3;
-        }
     }
 }
