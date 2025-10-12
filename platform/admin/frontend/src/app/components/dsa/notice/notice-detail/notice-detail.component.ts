@@ -13,6 +13,7 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { DecisionSummaryComponent } from "../decision/decision-summary/decision-summary.component";
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
@@ -37,7 +38,8 @@ type TranslationState = {
     MatDividerModule,
     MatTabsModule,
     MatTooltipModule,
-    EvidenceListComponent
+    EvidenceListComponent,
+    DecisionSummaryComponent
   ],
   templateUrl: './notice-detail.component.html',
   styleUrls: ['./notice-detail.component.css']

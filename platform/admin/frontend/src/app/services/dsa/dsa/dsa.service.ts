@@ -10,6 +10,7 @@ import { NoticeStats } from '../../../interfaces/notice-stats.interface';
 import { PromoteResult } from '../../../interfaces/promote-result.interface';
 import { SignalStats } from '../../../interfaces/signal-stats.interface';
 
+import { DsaDecision } from '../../../interfaces/dsa-decision.interface';
 import { DsaEvidence } from '../../../interfaces/dsa-evidence.interface';
 import { DsaNoticeFilters } from '../../../interfaces/dsa-notice-filters.interface';
 import { DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
@@ -253,6 +254,10 @@ export class DsaService {
           throw err;
         })
       );
+  }
+
+  getDecisionForNotice(noticeId: string) {
+    return this.http.get<DsaDecision | null>(`${this.baseUrl}/notices/${noticeId}/decision`);
   }
 
 }

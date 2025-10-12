@@ -89,6 +89,26 @@ router.patch('/notices/:id/status', (req, res) => {
     });
 });
 
+/**
+ * GET /dsa/backend/notices/:id/decision
+ * Liefert die Entscheidung (falls vorhanden) zu einer Notice.
+ */
+router.get('/notices/:id/decision', (req, res) => {
+    const _db = req.database?.db;
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const noticeId = req.params.id;
+    if (!noticeId) return res.status(400).json({ error: 'missing_notice_id' });
+
+    const tableDecision = require('../db/tableDsaDecision');
+
+    tableDecision.getByNoticeId(_db, noticeId, (err, row) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!row) return res.status(404).json({ error: 'decision_not_found' });
+        res.json(row);
+    });
+});
+
 /* ---------------------------- Decisions ---------------------------- */
 router.post('/notices/:id/decision', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });

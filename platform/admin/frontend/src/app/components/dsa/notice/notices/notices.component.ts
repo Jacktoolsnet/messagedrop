@@ -22,7 +22,7 @@ import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { MatDialog } from '@angular/material/dialog';
 import { RouterLink } from '@angular/router';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
-import { DecisionDialogComponent } from '../decision-dialog/decision-dialog.component';
+import { DecisionDialogComponent } from '../decision/decision-dialog/decision-dialog.component';
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
 
 @Component({

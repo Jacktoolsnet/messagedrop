@@ -1,0 +1,46 @@
+<div class="summary-card">
+    @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    }
+
+    @if (!loading() && decision(); as d) {
+    <div class="badges">
+        <span class="chip" [ngClass]="outcomeColor">{{ outcomeLabel }}</span>
+        @if (d.automatedUsed) {
+        <span class="chip chip-auto">
+            <mat-icon>smart_toy</mat-icon>
+            Automated tools used
+        </span>
+        }
+    </div>
+
+    <div class="kv-grid">
+        <div class="k">Decided at</div>
+        <div class="v">{{ d.decidedAt | date: 'medium' }}</div>
+
+        <div class="k">Decided by</div>
+        <div class="v mono">{{ d.decidedBy || '—' }}</div>
+
+        <div class="k">Legal basis</div>
+        <div class="v">{{ d.legalBasis || '—' }}</div>
+
+        <div class="k">ToS basis</div>
+        <div class="v">{{ d.tosBasis || '—' }}</div>
+    </div>
+
+    @if (d.statement) {
+    <div class="section">
+        <div class="section-title">
+            <mat-icon>notes</mat-icon>
+            <span>Reasoning</span>
+        </div>
+        <div class="statement">{{ d.statement }}</div>
+    </div>
+    }
+    } @else if (!loading()) {
+    <div class="no-decision">
+        <mat-icon>info</mat-icon>
+        <span>No decision recorded yet.</span>
+    </div>
+    }
+</div>
