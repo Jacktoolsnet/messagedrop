@@ -10,6 +10,7 @@ import { NoticeStats } from '../../../interfaces/notice-stats.interface';
 import { PromoteResult } from '../../../interfaces/promote-result.interface';
 import { SignalStats } from '../../../interfaces/signal-stats.interface';
 
+import { DsaEvidence } from '../../../interfaces/dsa-evidence.interface';
 import { DsaNoticeFilters } from '../../../interfaces/dsa-notice-filters.interface';
 import { DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
@@ -231,4 +232,27 @@ export class DsaService {
         })
       );
   }
+
+  /** Get all evidence entries for a given notice */
+  getEvidenceForNotice(noticeId: string) {
+    return this.http.get<DsaEvidence[]>(`${this.baseUrl}/notices/${noticeId}/evidence`)
+      .pipe(
+        catchError(err => {
+          this.snack.open('Could not load evidence.', 'OK', { duration: 3000 });
+          return of([]);
+        })
+      );
+  }
+
+  /** Add new evidence entry to a notice */
+  addEvidence(noticeId: string, data: { type: string; url?: string | null; hash?: string | null }) {
+    return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence`, data)
+      .pipe(
+        catchError(err => {
+          this.snack.open('Could not add evidence.', 'OK', { duration: 3000 });
+          throw err;
+        })
+      );
+  }
+
 }

@@ -1,0 +1,60 @@
+<div class="evidence-header">
+    <h3>
+        <mat-icon>folder_shared</mat-icon>
+        Evidence
+    </h3>
+    <button mat-raised-button color="primary" (click)="openAdd()">
+        <mat-icon>add</mat-icon>
+        Add evidence
+    </button>
+</div>
+
+@if (loading()) {
+<div class="skeleton">
+    <div class="skeleton-row"></div>
+    <div class="skeleton-row"></div>
+</div>
+}
+
+@if (!loading() && items().length === 0) {
+<div class="empty">
+    <mat-icon>inventory_2</mat-icon>
+    <div>No evidence yet.</div>
+</div>
+}
+
+@for (e of items(); track e.id) {
+<mat-card class="ev-card">
+    <div class="row">
+        <div class="left">
+            <mat-icon class="type" aria-hidden="true">
+                {{ e.type === 'file' ? 'attach_file' : (e.type === 'hash' ? 'fingerprint' : 'link') }}
+            </mat-icon>
+        </div>
+        <div class="mid">
+            <div class="line">
+                <span class="label">Type</span>
+                <span class="value">{{ e.type }}</span>
+            </div>
+            @if (e.url) {
+            <div class="line">
+                <span class="label">URL</span>
+                <a class="value link" [href]="e.url" target="_blank" rel="noopener">
+                    {{ e.url }}
+                    <mat-icon inline>open_in_new</mat-icon>
+                </a>
+            </div>
+            }
+            @if (e.hash) {
+            <div class="line">
+                <span class="label">Hash</span>
+                <code class="mono">{{ e.hash }}</code>
+            </div>
+            }
+        </div>
+        <div class="right">
+            <div class="ts">{{ e.addedAt | date:'medium' }}</div>
+        </div>
+    </div>
+</mat-card>
+}

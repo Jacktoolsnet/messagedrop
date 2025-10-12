@@ -1,0 +1,36 @@
+<h2 mat-dialog-title>Add evidence</h2>
+
+<div mat-dialog-content class="content">
+    <form (ngSubmit)="submit()" [formGroup]="form" class="form">
+        <mat-form-field appearance="outline">
+            <mat-label>Type</mat-label>
+            <mat-select formControlName="type">
+                <mat-option value="url">URL</mat-option>
+                <mat-option value="hash">Hash / digest</mat-option>
+                <mat-option value="file" disabled>File (coming soon)</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        @if (form.controls.type.value === 'url') {
+        <mat-form-field appearance="outline">
+            <mat-label>Evidence URL</mat-label>
+            <input matInput formControlName="url" placeholder="https://…" />
+        </mat-form-field>
+        }
+
+        @if (form.controls.type.value === 'hash') {
+        <mat-form-field appearance="outline">
+            <mat-label>Hash</mat-label>
+            <input matInput formControlName="hash" placeholder="sha256:…" />
+        </mat-form-field>
+        }
+    </form>
+</div>
+
+<div mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="close()" [disabled]="saving()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="submit()" [disabled]="saving()">
+        <mat-icon>save</mat-icon>
+        Save
+    </button>
+</div>

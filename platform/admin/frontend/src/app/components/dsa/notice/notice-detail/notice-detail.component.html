@@ -154,6 +154,18 @@
                     </div>
                 </div>
             </mat-tab>
+
+            <mat-tab label="Evidence">
+                <app-evidence-list [noticeId]="notice().id"></app-evidence-list>
+            </mat-tab>
+
+            <!--mat-tab label="Decision">
+                <app-decision-summary [noticeId]="notice().id"></app-decision-summary>
+            </mat-tab>
+
+            <mat-tab label="Audit">
+                <app-audit-log [noticeId]="notice().id"></app-notice-audit-log>
+            </mat-tab-->
         </mat-tab-group>
     </div>
 

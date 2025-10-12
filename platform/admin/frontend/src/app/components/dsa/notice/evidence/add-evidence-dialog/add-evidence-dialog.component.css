@@ -1,0 +1,16 @@
+:host {
+    display: block;
+}
+
+.content {
+    max-width: 560px;
+}
+
+.form {
+    display: grid;
+    gap: .9rem;
+}
+
+mat-dialog-content {
+    padding-top: .5rem !important;
+}
