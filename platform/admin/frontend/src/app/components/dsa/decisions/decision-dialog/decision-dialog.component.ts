@@ -12,7 +12,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { map, startWith, Subject, takeUntil } from 'rxjs';
-import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
+import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 
 export type DecisionOutcome = 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
 

@@ -13,8 +13,8 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
 import { AuditLogComponent } from "../audit-log/audit-log.component";
-import { DecisionSummaryComponent } from "../decision/decision-summary/decision-summary.component";
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst

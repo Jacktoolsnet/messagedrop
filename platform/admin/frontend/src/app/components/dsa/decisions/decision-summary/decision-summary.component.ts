@@ -3,8 +3,8 @@ import { Component, Input, OnChanges, SimpleChanges, inject, signal } from '@ang
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { DsaDecision } from '../../../../../interfaces/dsa-decision.interface';
-import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
+import { DsaDecision } from '../../../../interfaces/dsa-decision.interface';
+import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 
 @Component({
   selector: 'app-decision-summary',
