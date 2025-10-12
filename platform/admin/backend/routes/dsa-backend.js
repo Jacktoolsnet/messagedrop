@@ -440,4 +440,26 @@ router.delete('/signals/:id', (req, res) => {
     });
 });
 
+// dsa-backend routes (Ausschnitt)
+router.get('/audit', (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const opts = {
+        entityType: asString(req.query.entityType),    // 'notice' | 'signal' | ...
+        action: asString(req.query.action),           // 'create' | 'status_change' | ...
+        actor: asString(req.query.actor),             // optional
+        since: asNum(req.query.since, null),          // unix ms
+        until: asNum(req.query.until, null),          // unix ms
+        q: asString(req.query.q),                     // LIKE über actor/entityId/action
+        limit: asNum(req.query.limit, 100),
+        offset: asNum(req.query.offset, 0)
+    };
+
+    tableAudit.search(_db, opts, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        res.json(rows);
+    });
+});
+
 module.exports = router;

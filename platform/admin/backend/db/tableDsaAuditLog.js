@@ -1,15 +1,16 @@
+// db/tableDsaAuditLog.js
 const tableName = 'tableDsaAuditLog';
 
-// === Column Names ===
-const columnId = 'id';             // TEXT PK (uuid) -> extern erzeugt
-const columnEntityType = 'entityType'; // TEXT NOT NULL: 'signal' | 'notice' | 'decision' | 'appeal' | 'notification' | 'other'
-const columnEntityId = 'entityId'; // TEXT NOT NULL: ID der betroffenen Entität (z. B. tableDsaNotice.id)
-const columnAction = 'action';     // TEXT NOT NULL: 'create' | 'update' | 'status_change' | 'notify' | 'delete' | ...
-const columnActor = 'actor';       // TEXT NOT NULL: 'system' | 'user:<id>' | 'admin:<id>' | ...
-const columnAt = 'at';             // INTEGER NOT NULL (unix ms)
-const columnDetailsJson = 'detailsJson'; // TEXT NULL – serialisierte Zusatzinfos
+// Columns
+const columnId = 'id';
+const columnEntityType = 'entityType';
+const columnEntityId = 'entityId';
+const columnAction = 'action';
+const columnActor = 'actor';
+const columnAt = 'at';
+const columnDetailsJson = 'detailsJson';
 
-// === INIT: create table + indexes ===
+// INIT
 const init = function (db) {
     try {
         const sql = `
@@ -22,13 +23,10 @@ const init = function (db) {
         ${columnAt} INTEGER NOT NULL,
         ${columnDetailsJson} TEXT DEFAULT NULL
       );
-
       CREATE INDEX IF NOT EXISTS idx_dsa_audit_entity
         ON ${tableName}(${columnEntityType}, ${columnEntityId});
-
       CREATE INDEX IF NOT EXISTS idx_dsa_audit_at_desc
         ON ${tableName}(${columnAt} DESC);
-
       CREATE INDEX IF NOT EXISTS idx_dsa_audit_action
         ON ${tableName}(${columnAction});
     `;
@@ -38,20 +36,7 @@ const init = function (db) {
     }
 };
 
-// ——— Helpers ———
-
-/**
- * Audit-Event schreiben (alle Parameter explizit; Validierung erfolgt in der Route).
- * @param {import('sqlite3').Database} db
- * @param {string} id
- * @param {string} entityType
- * @param {string} entityId
- * @param {string} action
- * @param {string} actor
- * @param {number} at
- * @param {string|null} detailsJson
- * @param {(err: any, row?: { id: string }) => void} callBack
- */
+// CREATE
 const create = function (
     db,
     id,
@@ -74,21 +59,14 @@ const create = function (
       ${columnDetailsJson}
     ) VALUES (?, ?, ?, ?, ?, ?, ?)
   `;
-
     const params = [id, entityType, entityId, action, actor, at, detailsJson];
-
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
         callBack(null, { id });
     });
 };
 
-/**
- * Ein Audit-Event per ID.
- * @param {import('sqlite3').Database} db
- * @param {string} id
- * @param {(err: any, row?: any) => void} callBack
- */
+// GET BY ID
 const getById = function (db, id, callBack) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnId} = ? LIMIT 1`;
     db.get(sql, [id], (err, row) => {
@@ -97,46 +75,24 @@ const getById = function (db, id, callBack) {
     });
 };
 
-/**
- * Liste aller Audit-Events zu einer Entität (mit Pagination).
- * @param {import('sqlite3').Database} db
- * @param {{
- *  entityType: string,
- *  entityId: string,
- *  limit?: number,
- *  offset?: number
- * }} opts
- * @param {(err: any, rows?: any[]) => void} callBack
- */
+// LIST BY ENTITY
 const listByEntity = function (db, opts, callBack) {
     let sql = `
-    SELECT * FROM ${tableName}
+    SELECT *
+      FROM ${tableName}
      WHERE ${columnEntityType} = ? AND ${columnEntityId} = ?
      ORDER BY ${columnAt} DESC
   `;
     const limit = Number.isFinite(opts?.limit) ? opts.limit : 200;
     const offset = Number.isFinite(opts?.offset) ? opts.offset : 0;
     sql += ` LIMIT ${limit} OFFSET ${offset}`;
-
     db.all(sql, [opts.entityType, opts.entityId], (err, rows) => {
         if (err) return callBack(err);
         callBack(null, rows);
     });
 };
 
-/**
- * Freie Suche/Listing (optional filterbar nach action/actor/time range).
- * @param {import('sqlite3').Database} db
- * @param {{
- *  action?: string,
- *  actor?: string,
- *  fromAt?: number,
- *  toAt?: number,
- *  limit?: number,
- *  offset?: number
- * }} [opts]
- * @param {(err: any, rows?: any[]) => void} callBack
- */
+// SIMPLE LIST (rückwärtskompatibel)
 const list = function (db, opts, callBack) {
     const where = [];
     const params = [];
@@ -172,6 +128,59 @@ const list = function (db, opts, callBack) {
     });
 };
 
+// NEW: ADVANCED SEARCH (entityType, action, actor, since/until, q)
+const search = function (db, opts, callBack) {
+    const where = [];
+    const params = [];
+
+    if (opts?.entityType) {
+        where.push(`${columnEntityType} = ?`);
+        params.push(opts.entityType);
+    }
+    if (opts?.action) {
+        where.push(`${columnAction} = ?`);
+        params.push(opts.action);
+    }
+    if (opts?.actor) {
+        where.push(`${columnActor} = ?`);
+        params.push(opts.actor);
+    }
+    if (Number.isFinite(opts?.since)) {
+        where.push(`${columnAt} >= ?`);
+        params.push(opts.since);
+    }
+    if (Number.isFinite(opts?.until)) {
+        where.push(`${columnAt} <= ?`);
+        params.push(opts.until);
+    }
+    if (opts?.q) {
+        where.push(`(${columnActor} LIKE ? OR ${columnEntityId} LIKE ? OR ${columnAction} LIKE ?)`);
+        params.push(`%${opts.q}%`, `%${opts.q}%`, `%${opts.q}%`);
+    }
+
+    let sql = `
+    SELECT ${columnId} AS id,
+           ${columnEntityType} AS entityType,
+           ${columnEntityId} AS entityId,
+           ${columnAction} AS action,
+           ${columnActor} AS actor,
+           ${columnAt} AS createdAt,
+           ${columnDetailsJson} AS detailsJson
+      FROM ${tableName}
+  `;
+    if (where.length) sql += ` WHERE ${where.join(' AND ')}`;
+    sql += ` ORDER BY ${columnAt} DESC`;
+
+    const limit = Number.isFinite(opts?.limit) ? opts.limit : 100;
+    const offset = Number.isFinite(opts?.offset) ? opts.offset : 0;
+    sql += ` LIMIT ${limit} OFFSET ${offset}`;
+
+    db.all(sql, params, (err, rows) => {
+        if (err) return callBack(err);
+        callBack(null, rows || []);
+    });
+};
+
 module.exports = {
     tableName,
     columns: {
@@ -187,5 +196,6 @@ module.exports = {
     create,
     getById,
     listByEntity,
-    list
+    list,
+    search
 };

@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { AdminDashboardComponent } from './components/dashboards/admin-dashboard/admin-dashboard.component';
 import { DsaDashboardComponent } from './components/dashboards/dsa-dashboard/dsa-dashboard.component';
 import { UserDashboardComponent } from './components/dashboards/user-dashboard/user-dashboard.component';
+import { AuditsComponent } from './components/dsa/audits/audits.component';
 import { DecisionsComponent } from './components/dsa/decisions/decisions/decisions.component';
 import { NoticesComponent } from './components/dsa/notice/notices/notices.component';
 import { SignalsComponent } from './components/dsa/signal/signals/signals.component';
@@ -38,6 +39,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/decisions',
         component: DecisionsComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/dsa/audits',
+        component: AuditsComponent,
         canActivate: [authGuard]
     },
     { path: '**', redirectTo: '' }

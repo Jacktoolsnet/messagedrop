@@ -70,7 +70,7 @@ export class DsaDashboardComponent {
     { key: 'evidence', title: 'Evidence', subtitle: 'Upload & manage proofs', icon: 'folder_shared', route: '/dashboard/dsa/evidence' },
     { key: 'notifications', title: 'Notifications', subtitle: 'Notify stakeholders', icon: 'notifications', route: '/dashboard/dsa/notifications' },
     { key: 'appeals', title: 'Appeals', subtitle: 'Handle appeals', icon: 'feedback', route: '/dashboard/dsa/appeals' },
-    { key: 'audit', title: 'Audit Log', subtitle: 'Trace all actions', icon: 'history', route: '/dashboard/dsa/audit-log' },
+    { key: 'audit', title: 'Audit Log', subtitle: 'Trace all actions', icon: 'history', route: '/dashboard/dsa/audits' },
     { key: 'transparency', title: 'Transparency', subtitle: 'Public stats & reports', icon: 'insights', route: '/dashboard/dsa/transparency' }
   ];
 

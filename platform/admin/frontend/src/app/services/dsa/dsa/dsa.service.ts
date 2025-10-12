@@ -16,6 +16,7 @@ import { DsaEvidence } from '../../../interfaces/dsa-evidence.interface';
 import { DsaNoticeFilters } from '../../../interfaces/dsa-notice-filters.interface';
 import { DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
+import { ListAuditParams } from '../../../interfaces/list-audit-params.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -303,6 +304,24 @@ export class DsaService {
         throw err;
       })
     );
+  }
+
+  // services/dsa.service.ts
+  listAudit(params: ListAuditParams) {
+    let hp = new HttpParams();
+    if (params.entityType) hp = hp.set('entityType', params.entityType);
+    if (params.action) hp = hp.set('action', params.action);
+    if (params.since) hp = hp.set('since', String(params.since));
+    if (params.q) hp = hp.set('q', params.q);
+    if (params.limit) hp = hp.set('limit', String(params.limit));
+    if (params.offset) hp = hp.set('offset', String(params.offset));
+    return this.http.get<DsaAuditEntry[]>(`${this.baseUrl}/audit`, { params: hp })
+      .pipe(
+        catchError(err => {
+          this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
+          return of([]);
+        })
+      );
   }
 
 }
