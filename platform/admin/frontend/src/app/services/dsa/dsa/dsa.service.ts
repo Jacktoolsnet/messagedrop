@@ -291,4 +291,18 @@ export class DsaService {
     );
   }
 
+  notifyStakeholder(noticeId: string, payload: {
+    channel: string;
+    subject: string;
+    message: string;
+    sendEmail?: boolean;
+  }) {
+    return this.http.post(`${this.baseUrl}/notices/${noticeId}/notify`, payload).pipe(
+      catchError(err => {
+        this.snack.open('Could not send notification.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
 }

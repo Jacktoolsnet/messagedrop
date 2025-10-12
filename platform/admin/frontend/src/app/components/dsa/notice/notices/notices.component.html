@@ -126,16 +126,25 @@
                     <mat-icon>info</mat-icon>
                     Details
                 </button>
+
                 @if (n.status !== 'UNDER_REVIEW' && n.status !== 'DECIDED') {
                 <button mat-stroked-button (click)="setStatus(n, 'UNDER_REVIEW')">
                     <mat-icon>manage_search</mat-icon>
                     Review
                 </button>
                 }
+
                 @if (n.status !== 'DECIDED') {
                 <button mat-raised-button color="primary" (click)="decide(n)">
                     <mat-icon>gavel</mat-icon>
                     Decide
+                </button>
+                }
+
+                @if (n.status === 'DECIDED') {
+                <button mat-raised-button color="accent" (click)="notify(n)">
+                    <mat-icon>notifications_active</mat-icon>
+                    Notify
                 </button>
                 }
             </mat-card-actions>

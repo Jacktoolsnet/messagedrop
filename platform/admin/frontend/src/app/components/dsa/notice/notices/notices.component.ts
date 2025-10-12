@@ -24,6 +24,7 @@ import { RouterLink } from '@angular/router';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { DecisionDialogComponent } from '../decision/decision-dialog/decision-dialog.component';
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
+import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component';
 
 @Component({
   selector: 'app-notices',
@@ -193,6 +194,23 @@ export class NoticesComponent implements OnInit, OnDestroy {
       if (saved) {
         // Nach dem Speichern Liste aktualisieren (oder gezielt nur dieses Item)
         this.reload();
+      }
+    });
+  }
+
+  /** Benachrichtigung senden (öffnet NotifyDialog) */
+  notify(n: DsaNotice): void {
+    const ref = this.dialog.open(NotifyDialogComponent, {
+      data: { noticeId: n.id },
+      width: 'min(600px, 96vw)',
+      maxHeight: '90vh',
+      panelClass: 'md-dialog-rounded'
+    });
+
+    ref.afterClosed().subscribe(sent => {
+      if (sent) {
+        this.snack.open('Notification sent.', 'OK', { duration: 2500 });
+        this.reload(); // optional – falls z. B. Audit neu geladen werden soll
       }
     });
   }

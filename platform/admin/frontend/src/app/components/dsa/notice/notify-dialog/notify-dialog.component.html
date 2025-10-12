@@ -1,1 +1,41 @@
-<p>notify-dialog works!</p>
+<h2 mat-dialog-title>
+    <mat-icon>notifications_active</mat-icon>
+    Send Notification
+</h2>
+
+<mat-dialog-content class="content">
+    <form [formGroup]="form">
+        <mat-form-field appearance="outline" class="full">
+            <mat-label>Recipient</mat-label>
+            <mat-select formControlName="channel">
+                @for (c of channels; track c.value) {
+                <mat-option [value]="c.value">{{ c.label }}</mat-option>
+                }
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+            <mat-label>Subject</mat-label>
+            <input matInput formControlName="subject" maxlength="120" />
+            <mat-hint align="end">{{ form.controls.subject.value.length || 0 }}/120</mat-hint>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full">
+            <mat-label>Message</mat-label>
+            <textarea matInput formControlName="message" rows="5" maxlength="2000"></textarea>
+            <mat-hint align="end">{{ form.controls.message.value.length || 0 }}/2000</mat-hint>
+        </mat-form-field>
+
+        <mat-slide-toggle formControlName="sendEmail">
+            Also send via email
+        </mat-slide-toggle>
+    </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+    <button mat-stroked-button (click)="close()">Cancel</button>
+    <button mat-flat-button color="primary" (click)="send()" [disabled]="sending()">
+        <mat-icon>send</mat-icon>
+        Send
+    </button>
+</mat-dialog-actions>
