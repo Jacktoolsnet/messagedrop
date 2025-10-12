@@ -43,14 +43,12 @@ export class AuthService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (response) => {
-          console.log('login')
           localStorage.setItem('admin_token', response.token);
           this._isLoggedIn.set(true);
           this.loadUserInfo();
           this.router.navigate(['/dashboard']);
         },
         error: () => {
-          console.log('lgin_error')
           this.snackBar.open('Login failed. Please check your credentials.', undefined, {
             duration: 1000,
             panelClass: ['snack-error'],

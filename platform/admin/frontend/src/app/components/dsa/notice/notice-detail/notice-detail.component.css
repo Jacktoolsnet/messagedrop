@@ -17,7 +17,7 @@
 
 /* Dialog Rahmen */
 .dialog-shell {
-    width: min(860px, 96vw);
+    min-width: 96vw;
     max-height: 90vh;
     /* <= wichtig */
     display: grid;

@@ -1,1 +1,107 @@
-<p>decisions works!</p>
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back to DSA">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">Decisions</span>
+    <button mat-stroked-button (click)="reload()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+    </button>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+    <!-- Filter -->
+    <div class="filter-row">
+        <mat-form-field appearance="outline">
+            <mat-label>Type</mat-label>
+            <mat-select [formControl]="filtersForm.controls.reportedContentType">
+                <mat-option value="">All</mat-option>
+                <mat-option value="public message">Public message</mat-option>
+                <mat-option value="comment">Comment</mat-option>
+                <mat-option value="profile">Profile</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Category</mat-label>
+            <input matInput [formControl]="filtersForm.controls.category" placeholder="e.g. hate, privacy" />
+        </mat-form-field>
+
+        <mat-form-field class="grow" appearance="outline">
+            <mat-label>Search</mat-label>
+            <input matInput [formControl]="filtersForm.controls.q" placeholder="contentId, reason, text …" />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Range</mat-label>
+            <mat-select [formControl]="filtersForm.controls.range">
+                <mat-option value="7d">Last 7 days</mat-option>
+                <mat-option value="30d">Last 30 days</mat-option>
+                <mat-option value="all">All</mat-option>
+            </mat-select>
+        </mat-form-field>
+    </div>
+
+    <!-- Liste -->
+    <div class="tiles-container">
+        @for (n of items(); track trackById($index, n)) {
+        <mat-card class="tile">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar">
+                    <mat-icon>gavel</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">
+                    {{ n.reportedContentType }}
+                </mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">
+                    decided • {{ n.updatedAt || n.createdAt | date:'medium' }}
+                </mat-card-subtitle>
+            </mat-card-header>
+
+            <mat-card-content>
+                <div class="meta-row">
+                    <span class="meta">
+                        <mat-icon>fingerprint</mat-icon>
+                        {{ n.contentId }}
+                    </span>
+                    @if (n.contentUrl) {
+                    <a [href]="n.contentUrl" target="_blank" rel="noopener">
+                        <mat-icon>open_in_new</mat-icon>
+                        Open content
+                    </a>
+                    }
+                </div>
+
+                @if (preview(n); as p) {
+                @if (p.length > 0) {
+                <div class="preview">{{ p }}</div>
+                } @else {
+                <div class="placeholder">
+                    <mat-icon>translate</mat-icon>
+                    No textual preview available
+                </div>
+                }
+                }
+            </mat-card-content>
+
+            <mat-card-actions align="end">
+                <button mat-raised-button color="primary" (click)="openSummary(n)">
+                    <mat-icon>visibility</mat-icon>
+                    Summary
+                </button>
+            </mat-card-actions>
+        </mat-card>
+        }
+    </div>
+
+    @if (!loading() && items().length === 0) {
+    <div class="empty-state">
+        <mat-icon>inbox</mat-icon>
+        <div>No decisions found for your filters.</div>
+    </div>
+    }
+</div>

@@ -43,7 +43,6 @@ export class AuditLogComponent implements OnChanges {
     this.loading.set(true);
     this.dsa.getAuditForNotice(this.noticeId).subscribe({
       next: rows => {
-        console.log(rows)
         const sorted = (rows || []).slice().sort((a, b) => b.createdAt - a.createdAt);
         this.items.set(sorted);
         this.loading.set(false);

@@ -53,7 +53,6 @@ function disableLocallyIfPossible(req) {
 
             tableMessage.disableMessage(db, contentId, (err) => {
                 if (err) {
-                    console.log(err)
                     return resolve(false);
                 }
                 resolve(true);
