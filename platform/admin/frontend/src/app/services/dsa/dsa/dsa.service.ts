@@ -10,6 +10,7 @@ import { NoticeStats } from '../../../interfaces/notice-stats.interface';
 import { PromoteResult } from '../../../interfaces/promote-result.interface';
 import { SignalStats } from '../../../interfaces/signal-stats.interface';
 
+import { DsaAuditEntry } from '../../../interfaces/dsa-audit-entry.interface';
 import { DsaDecision } from '../../../interfaces/dsa-decision.interface';
 import { DsaEvidence } from '../../../interfaces/dsa-evidence.interface';
 import { DsaNoticeFilters } from '../../../interfaces/dsa-notice-filters.interface';
@@ -258,6 +259,36 @@ export class DsaService {
 
   getDecisionForNotice(noticeId: string) {
     return this.http.get<DsaDecision | null>(`${this.baseUrl}/notices/${noticeId}/decision`);
+  }
+
+  // Helper (z. B. oben in der Datei außerhalb der Klasse)
+  safeParseDetails(input: any): Record<string, unknown> | null {
+    if (!input) return null;
+    if (typeof input === 'object') return input as Record<string, unknown>;
+    if (typeof input === 'string') {
+      try { return JSON.parse(input) as Record<string, unknown>; }
+      catch { return { _raw: input }; }
+    }
+    return null;
+  }
+
+  // dsa.service.ts
+  getAuditForNotice(noticeId: string): Observable<DsaAuditEntry[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/audit/notice/${noticeId}`).pipe(
+      map(rows => (rows || []).map(e => ({
+        id: String(e.id),
+        entityType: String(e.entityType),
+        entityId: String(e.entityId),
+        action: String(e.action),
+        actor: String(e.actor),
+        createdAt: Number(e.createdAt ?? e.at ?? Date.now()),   // <- at -> createdAt
+        details: this.safeParseDetails(e.details ?? e.detailsJson)   // <- parse detailsJson
+      }) as DsaAuditEntry)),
+      catchError(err => {
+        this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
+        return of([]);
+      })
+    );
   }
 
 }

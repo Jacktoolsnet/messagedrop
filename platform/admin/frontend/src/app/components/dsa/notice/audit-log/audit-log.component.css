@@ -1,0 +1,248 @@
+:host {
+    --primary: #05a51d;
+    --text: #1f2937;
+    --muted: #6b7280;
+    --border: rgba(0, 0, 0, .08);
+    --card: rgba(255, 255, 255, .94);
+    --pill-rec: #f59e0b;
+    /* received */
+    --pill-rev: #0ea5e9;
+    /* under review */
+    --pill-deci: #22c55e;
+    /* decided */
+    color: var(--text);
+    display: block;
+}
+
+/* Timeline Layout */
+.timeline {
+    display: grid;
+    gap: 12px;
+}
+
+.item {
+    display: grid;
+    grid-template-columns: 56px 1fr;
+    gap: 12px;
+    align-items: stretch;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: var(--card);
+    box-shadow: 0 6px 16px rgba(2, 8, 20, 0.06);
+}
+
+/* Avatar/Icon links */
+.avatar {
+    width: 26px;
+    height: 26px;
+    min-width: 26px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1px solid color-mix(in srgb, var(--primary) 20%, transparent);
+    background: color-mix(in srgb, var(--primary) 12%, transparent);
+}
+
+.avatar mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    line-height: 20px;
+    color: var(--primary);
+}
+
+/* Body & Headline-Zeile (Typ + Datum in einer Linie, vertikal zentriert) */
+.body {
+    display: grid;
+    gap: 10px;
+}
+
+.headline {
+    display: flex;
+    align-items: center;
+    /* vertikal zentriert */
+    gap: 10px;
+    min-height: 28px;
+}
+
+.type-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 1;
+    font-weight: 600;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: #fff;
+    color: var(--text);
+}
+
+.spacer {
+    flex: 1 1 auto;
+}
+
+.ts {
+    color: var(--muted);
+    font-size: .95rem;
+}
+
+/* Meta & Details (KV-Tabellen hübsch alignen) */
+.meta,
+.details {
+    display: grid;
+    gap: 6px;
+}
+
+.kv {
+    display: flex;
+    align-items: center;
+    /* vertikal zentriert */
+    gap: 10px;
+    min-height: 22px;
+    /* sorgt für ruhige Zeilenhöhe */
+}
+
+.k {
+    width: 140px;
+    color: var(--muted);
+    font-weight: 500;
+    flex: 0 0 140px;
+}
+
+.v {
+    flex: 1 1 auto;
+    display: inline-flex;
+    align-items: center;
+    /* Pill/Icons/Text zentrieren */
+    gap: 8px;
+    min-height: 22px;
+}
+
+/* Mono-Style für IDs etc. */
+.mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+/* Status-Pills */
+.pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-weight: 600;
+    border: 1px solid var(--border);
+    background: #fff;
+}
+
+.pill-received {
+    background: color-mix(in srgb, var(--pill-rec) 12%, #fff);
+    border-color: color-mix(in srgb, var(--pill-rec) 30%, #fff);
+    color: #8a5a00;
+}
+
+.pill-under-review {
+    background: color-mix(in srgb, var(--pill-rev) 12%, #fff);
+    border-color: color-mix(in srgb, var(--pill-rev) 30%, #fff);
+    color: #084c63;
+}
+
+.pill-decided {
+    background: color-mix(in srgb, var(--pill-deci) 12%, #fff);
+    border-color: color-mix(in srgb, var(--pill-deci) 30%, #fff);
+    color: #065f46;
+}
+
+/* Action-Chips (Headline) */
+.chip-ok {
+    background: #ecfdf5;
+    border-color: #bbf7d0;
+    color: #065f46;
+}
+
+.chip-change {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: #1e3a8a;
+}
+
+.chip-info {
+    background: #f5f3ff;
+    border-color: #ddd6fe;
+    color: #3730a3;
+}
+
+.chip-notify {
+    background: #fef3c7;
+    border-color: #fde68a;
+    color: #92400e;
+}
+
+.chip-warn {
+    background: #fee2e2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.chip-default {
+    background: #f3f4f6;
+    border-color: #e5e7eb;
+    color: #374151;
+}
+
+/* JSON-Fallback hübsch */
+pre.json {
+    margin: 6px 0 0;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #f9fafb;
+    color: #111827;
+    font-size: .9rem;
+    overflow: auto;
+}
+
+/* Empty-State */
+.empty {
+    padding: 2.5rem 1rem;
+    text-align: center;
+    color: var(--muted);
+    display: grid;
+    justify-items: center;
+    gap: .5rem;
+}
+
+.empty mat-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    line-height: 56px;
+    color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
+    filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
+}
+
+/* Responsiv etwas lockerer */
+@media (max-width: 720px) {
+    .k {
+        width: 110px;
+        flex-basis: 110px;
+    }
+
+    .item {
+        grid-template-columns: 48px 1fr;
+    }
+
+    .avatar {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+    }
+
+    .avatar mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+    }
+}

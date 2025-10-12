@@ -1,0 +1,73 @@
+@if (loading()) {
+<mat-progress-bar mode="indeterminate" />
+} @else {
+<div class="timeline">
+    @for (e of items(); track trackById($index, e)) {
+    <div class="item">
+        <!-- Avatar/Icon -->
+        <div class="avatar">
+            <mat-icon>{{ actionIcon(e.action) }}</mat-icon>
+        </div>
+
+        <!-- Body -->
+        <div class="body">
+            <!-- Headline: Icon (links), Action/Typ & Datum in einer Zeile -->
+            <div class="headline">
+                <span class="type-chip" [ngClass]="actionChipClass(e.action)">
+                    {{ actionLabel(e.action) }}
+                </span>
+                <span class="spacer"></span>
+                <span class="ts">{{ e.createdAt | date:'medium' }}</span>
+            </div>
+
+            <!-- Basis-Metadaten (KV-Gruppe) -->
+            <div class="meta">
+                <div class="kv">
+                    <div class="k">Actor</div>
+                    <div class="v mono">{{ e.actor }}</div>
+                </div>
+                <div class="kv">
+                    <div class="k">Entity</div>
+                    <div class="v mono">{{ e.entityType }} • {{ e.entityId }}</div>
+                </div>
+                <div class="kv">
+                    <div class="k">ID</div>
+                    <div class="v mono">{{ e.id }}</div>
+                </div>
+            </div>
+
+            <!-- Details -->
+            @let rows = detailsRows(e);
+            @if (rows && rows.length > 0) {
+            <div class="details">
+                @for (r of rows; track r.k) {
+                <div class="kv">
+                    <div class="k">{{ r.k }}</div>
+                    <div class="v">
+                        @if (r.k === 'Changed to') {
+                        <span class="pill" [ngClass]="statusPillClass(r.v)">{{ r.v }}</span>
+                        } @else {
+                        {{ r.v }}
+                        }
+                    </div>
+                </div>
+                }
+            </div>
+            } @else {
+            @let json = prettyJson(e);
+            @if (json) {
+            <pre class="json">{{ json }}</pre>
+            }
+            }
+        </div>
+    </div>
+    }
+
+    @if (!loading() && items().length === 0) {
+    <div class="empty">
+        <mat-icon>inbox</mat-icon>
+        <div>No audit entries yet.</div>
+    </div>
+    }
+</div>
+}

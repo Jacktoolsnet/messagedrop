@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { AuditTimelineComponent } from './audit-timeline.component';
+import { AuditLogComponent } from './audit-log.component';
 
 describe('AuditTimelineComponent', () => {
-  let component: AuditTimelineComponent;
-  let fixture: ComponentFixture<AuditTimelineComponent>;
+  let component: AuditLogComponent;
+  let fixture: ComponentFixture<AuditLogComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [AuditTimelineComponent]
+      imports: [AuditLogComponent]
     })
-    .compileComponents();
+      .compileComponents();
 
-    fixture = TestBed.createComponent(AuditTimelineComponent);
+    fixture = TestBed.createComponent(AuditLogComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

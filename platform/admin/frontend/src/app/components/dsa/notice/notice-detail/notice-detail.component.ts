@@ -13,6 +13,7 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { AuditLogComponent } from "../audit-log/audit-log.component";
 import { DecisionSummaryComponent } from "../decision/decision-summary/decision-summary.component";
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 
@@ -39,7 +40,8 @@ type TranslationState = {
     MatTabsModule,
     MatTooltipModule,
     EvidenceListComponent,
-    DecisionSummaryComponent
+    DecisionSummaryComponent,
+    AuditLogComponent
   ],
   templateUrl: './notice-detail.component.html',
   styleUrls: ['./notice-detail.component.css']
