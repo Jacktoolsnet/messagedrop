@@ -7,6 +7,7 @@ const rateLimit = require('express-rate-limit');
 // DB-Tabellen
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
+const tableAudit = require('../db/tableDsaAuditLog');
 
 const router = express.Router();
 router.use(checkToken);
@@ -99,7 +100,29 @@ router.post('/signals', signalLimiter, (req, res) => {
         now,
         (err, row) => {
             if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-            res.status(201).json({ id: row?.id ?? id, token, statusUrl });
+            const responsePayload = { id: row?.id ?? id, token, statusUrl };
+
+            tableAudit.create(
+                _db,
+                crypto.randomUUID(),
+                'signal',
+                id,
+                'create',
+                `public:${req.ip || 'unknown'}`,
+                now,
+                JSON.stringify({
+                    statusUrl,
+                    token,
+                    contentId,
+                    category,
+                    reasonText,
+                    reportedContentType,
+                    userAgent: req.headers['user-agent'] || null
+                }),
+                () => { }
+            );
+
+            res.status(201).json(responsePayload);
             // Make-Push (sehr knapp gehalten)
             notifyMake(
                 'New Signal',
@@ -160,7 +183,32 @@ router.post('/notices', noticeLimiter, (req, res) => {
         now,
         (err, row) => {
             if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-            res.status(201).json({ id: row?.id ?? id, token, statusUrl });
+            const responsePayload = { id: row?.id ?? id, token, statusUrl };
+
+            tableAudit.create(
+                _db,
+                crypto.randomUUID(),
+                'notice',
+                id,
+                'create',
+                `public:${req.ip || 'unknown'}`,
+                now,
+                JSON.stringify({
+                    statusUrl,
+                    token,
+                    contentId,
+                    category,
+                    reasonText,
+                    reporterEmail,
+                    reporterName,
+                    reportedContentType,
+                    truthAffirmation,
+                    userAgent: req.headers['user-agent'] || null
+                }),
+                () => { }
+            );
+
+            res.status(201).json(responsePayload);
             // Make-Push (kurz & bündig)
             notifyMake(
                 'New Notice',
