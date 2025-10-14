@@ -1,0 +1,259 @@
+:host {
+  --primary: #05a51d;
+  --bg: linear-gradient(135deg, #f4fdf2, #c8f7d0);
+  --surface: rgba(255, 255, 255, 0.95);
+  --border: rgba(0, 0, 0, 0.08);
+  --text: #1f2937;
+  display: block;
+  min-height: 100%;
+  background: var(--bg);
+  color: var(--text);
+}
+
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-title {
+  font-weight: 600;
+  font-size: 1.3rem;
+  margin-left: 0.75rem;
+}
+
+.spacer {
+  flex: 1 1 auto;
+}
+
+.range-chips {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  margin-right: 0.5rem;
+}
+
+.range-chips .mat-mdc-chip-option {
+  min-height: 32px;
+  line-height: 32px;
+  border-radius: 999px;
+  user-select: none;
+}
+
+.range-chips .mat-mdc-chip-selected {
+  background: rgba(5, 165, 29, 0.18) !important;
+  color: var(--primary) !important;
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, transparent);
+}
+
+mat-progress-bar {
+  position: sticky;
+  top: 64px;
+  z-index: 9;
+}
+
+.page {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 1.2rem;
+  display: grid;
+  gap: 1.5rem;
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.metric-card {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(2, 8, 20, 0.08);
+  padding: 1.1rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.metric-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.metric-title mat-icon {
+  color: var(--primary);
+}
+
+.metric-value {
+  font-size: 2.2rem;
+  font-weight: 700;
+}
+
+.metric-subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.metric-note {
+  color: #4b5563;
+  font-size: 0.9rem;
+}
+
+.pill-row,
+.pill-column {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.pill-column {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+mat-chip {
+  background: rgba(5, 165, 29, 0.16);
+  color: var(--text);
+  font-weight: 500;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.chart-card {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(2, 8, 20, 0.08);
+  padding: 1rem 1.25rem;
+  display: grid;
+  gap: 0.75rem;
+  min-height: 320px;
+}
+
+.chart-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+  font-size: 1.05rem;
+}
+
+.chart-header mat-icon {
+  color: var(--primary);
+}
+
+.chart-container {
+  position: relative;
+  width: 100%;
+  height: 240px;
+}
+
+.categories mat-card {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  box-shadow: 0 12px 32px rgba(2, 8, 20, 0.08);
+  padding: 1rem 1.25rem;
+}
+
+.categories h4 {
+  margin: 0 0 0.5rem 0;
+  font-weight: 600;
+}
+
+.category-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.reports {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.reports-header {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.reports-header h3 {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 600;
+}
+
+.reports-header mat-icon {
+  color: var(--primary);
+}
+
+.table-wrapper {
+  overflow-x: auto;
+  border-radius: 16px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+table {
+  width: 100%;
+  min-width: 720px;
+}
+
+th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.report-title {
+  font-weight: 600;
+}
+
+.report-desc {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.empty-reports {
+  padding: 2rem 1rem;
+  text-align: center;
+  color: #6b7280;
+  display: grid;
+  gap: 0.5rem;
+  justify-items: center;
+}
+
+.empty-reports mat-icon {
+  font-size: 48px;
+  color: #9ca3af;
+}
+
+.file-actions button mat-icon,
+.download-btn mat-icon {
+  margin-right: 0.35rem;
+}
+
+@media (max-width: 720px) {
+  .range-field {
+    width: 140px;
+  }
+
+  .chart-container {
+    height: 220px;
+  }
+}

@@ -17,6 +17,8 @@ import { DsaNoticeFilters } from '../../../interfaces/dsa-notice-filters.interfa
 import { DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { ListAuditParams } from '../../../interfaces/list-audit-params.interface';
+import { TransparencyStats } from '../../../interfaces/transparency-stats.interface';
+import { TransparencyReport } from '../../../interfaces/transparency-report.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -67,6 +69,38 @@ export class DsaService {
     } as const).pipe(
       catchError(err => {
         this.snack.open('Could not download evidence.', 'OK', { duration: 3000 });
+        return throwError(() => err);
+      })
+    );
+  }
+
+  getTransparencyStats(range: string): Observable<TransparencyStats> {
+    const params = new HttpParams().set('range', range);
+    return this.http.get<TransparencyStats>(`${this.baseUrl}/transparency/stats`, { params }).pipe(
+      catchError(err => {
+        this.snack.open('Could not load transparency stats.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  listTransparencyReports(range: string): Observable<TransparencyReport[]> {
+    const params = new HttpParams().set('range', range);
+    return this.http.get<TransparencyReport[]>(`${this.baseUrl}/transparency/reports`, { params }).pipe(
+      catchError(err => {
+        this.snack.open('Could not load transparency reports.', 'OK', { duration: 3000 });
+        return of([]);
+      })
+    );
+  }
+
+  downloadTransparencyReport(id: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.baseUrl}/transparency/reports/${id}/download`, {
+      observe: 'response',
+      responseType: 'blob'
+    } as const).pipe(
+      catchError(err => {
+        this.snack.open('Could not download report.', 'OK', { duration: 3000 });
         return throwError(() => err);
       })
     );

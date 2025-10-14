@@ -50,6 +50,202 @@ function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
 
+const dayMs = 24 * 60 * 60 * 1000;
+
+function resolveRange(range = '90d', now = Date.now()) {
+    const map = {
+        '30d': { label: 'Last 30 days', days: 30 },
+        '90d': { label: 'Last 90 days', days: 90 },
+        '365d': { label: 'Last 12 months', days: 365 },
+        '7d': { label: 'Last 7 days', days: 7 }
+    };
+    if (range === 'all') {
+        return { from: null, label: 'All time', value: 'all' };
+    }
+    const entry = map[range] || map['90d'];
+    return {
+        from: now - entry.days * dayMs,
+        label: entry.label,
+        value: range
+    };
+}
+
+function dbAll(dbInstance, sql, params = []) {
+    return new Promise((resolve, reject) => {
+        dbInstance.all(sql, params, (err, rows) => {
+            if (err) return reject(err);
+            resolve(rows || []);
+        });
+    });
+}
+
+async function buildTransparencyStats(dbInstance, range) {
+    const now = Date.now();
+    const rangeInfo = resolveRange(range, now);
+    const from = rangeInfo.from;
+
+    const noticeWhere = from ? 'WHERE createdAt >= ?' : '';
+    const decisionWhere = from ? 'WHERE decidedAt >= ?' : '';
+    const signalWhere = from ? 'WHERE createdAt >= ?' : '';
+
+    const notices = await dbAll(
+        dbInstance,
+        `SELECT id, status, category, reportedContentType, createdAt FROM tableDsaNotice ${noticeWhere}`,
+        from ? [from] : []
+    );
+
+    const decisions = await dbAll(
+        dbInstance,
+        `SELECT noticeId, outcome, automatedUsed, decidedAt FROM tableDsaDecision ${decisionWhere}`,
+        from ? [from] : []
+    );
+
+    const signals = await dbAll(
+        dbInstance,
+        `SELECT category, reportedContentType, createdAt FROM tableDsaSignal ${signalWhere}`,
+        from ? [from] : []
+    );
+
+    const aggregate = (rows, key) => {
+        const result = {};
+        for (const row of rows) {
+            let value = row[key];
+            if (value === null || value === undefined || value === '') {
+                value = 'Unspecified';
+            }
+            value = String(value);
+            result[value] = (result[value] || 0) + 1;
+        }
+        return result;
+    };
+
+    const topEntries = (record, limit = 6) => {
+        return Object.entries(record)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, limit)
+            .map(([category, count]) => ({ category, count }));
+    };
+
+    const noticeByStatus = aggregate(notices, 'status');
+    const noticeByType = aggregate(notices, 'reportedContentType');
+    const noticeCategories = aggregate(notices, 'category');
+
+    const decisionByOutcome = aggregate(decisions, 'outcome');
+    const decisionAutomated = decisions.reduce((acc, cur) => {
+        const flag = Number(cur.automatedUsed) === 1 ? 'automated' : 'manual';
+        acc[flag] = (acc[flag] || 0) + 1;
+        return acc;
+    }, { automated: 0, manual: 0 });
+
+    const noticeMap = new Map();
+    for (const n of notices) {
+        noticeMap.set(n.id, n);
+    }
+
+    let totalDecisionDelay = 0;
+    let decisionSamples = 0;
+    for (const decision of decisions) {
+        const notice = noticeMap.get(decision.noticeId);
+        if (notice && Number.isFinite(notice.createdAt) && Number.isFinite(decision.decidedAt)) {
+            const delay = Number(decision.decidedAt) - Number(notice.createdAt);
+            if (delay >= 0) {
+                totalDecisionDelay += delay;
+                decisionSamples += 1;
+            }
+        }
+    }
+
+    const avgDecisionTimeMs = decisionSamples > 0 ? Math.round(totalDecisionDelay / decisionSamples) : 0;
+
+    const trendMap = new Map();
+    const bumpTrend = (month, field) => {
+        if (!trendMap.has(month)) {
+            trendMap.set(month, { month, notices: 0, decisions: 0 });
+        }
+        trendMap.get(month)[field] += 1;
+    };
+
+    for (const notice of notices) {
+        const month = new Date(Number(notice.createdAt)).toISOString().slice(0, 7);
+        bumpTrend(month, 'notices');
+    }
+    for (const decision of decisions) {
+        const month = new Date(Number(decision.decidedAt)).toISOString().slice(0, 7);
+        bumpTrend(month, 'decisions');
+    }
+
+    const trend = Array.from(trendMap.values()).sort((a, b) => a.month.localeCompare(b.month));
+
+    const signalByType = aggregate(signals, 'reportedContentType');
+    const signalCategories = aggregate(signals, 'category');
+
+    return {
+        range: {
+            from,
+            to: now,
+            label: rangeInfo.label
+        },
+        notices: {
+            total: notices.length,
+            byStatus: noticeByStatus,
+            byType: noticeByType,
+            topCategories: topEntries(noticeCategories)
+        },
+        decisions: {
+            total: decisions.length,
+            byOutcome: decisionByOutcome,
+            avgDecisionTimeMs,
+            automated: {
+                automated: decisionAutomated.automated || 0,
+                manual: decisionAutomated.manual || 0
+            }
+        },
+        signals: {
+            total: signals.length,
+            byType: signalByType,
+            topCategories: topEntries(signalCategories)
+        },
+        trend
+    };
+}
+
+function buildTransparencyCsv(stats) {
+    const lines = [
+        '"Metric","Value"',
+        `"Range","${stats.range.label}"`,
+        `"Total Notices","${stats.notices.total}"`,
+        `"Total Decisions","${stats.decisions.total}"`,
+        `"Average Decision Time","${stats.decisions.avgDecisionTimeMs}"`
+    ];
+
+    lines.push('"Notices by Status","count"');
+    for (const [key, value] of Object.entries(stats.notices.byStatus || {})) {
+        lines.push(`"${key}","${value}"`);
+    }
+
+    lines.push('"Decision Outcomes","count"');
+    for (const [key, value] of Object.entries(stats.decisions.byOutcome || {})) {
+        lines.push(`"${key}","${value}"`);
+    }
+
+    lines.push('"Top Notice Categories","count"');
+    for (const entry of stats.notices.topCategories || []) {
+        lines.push(`"${entry.category}","${entry.count}"`);
+    }
+
+    lines.push('"Signals by Type","count"');
+    for (const [key, value] of Object.entries(stats.signals.byType || {})) {
+        lines.push(`"${key}","${value}"`);
+    }
+
+    lines.push('"Trend Month","Notices","Decisions"');
+    for (const entry of stats.trend || []) {
+        lines.push(`"${entry.month}","${entry.notices}","${entry.decisions}"`);
+    }
+
+    return lines.join('\n');
+}
+
 /** Health */
 router.get('/health', (_req, res) => res.json({ ok: true, service: 'dsa-backend' }));
 
@@ -344,6 +540,93 @@ router.get('/stats/signals', (req, res) => {
         if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
         res.json(result); // { total, last24h, byType }
     });
+});
+
+/* -------------------------- Transparency -------------------------- */
+router.get('/transparency/stats', async (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    try {
+        const range = String(req.query.range || '90d');
+        const stats = await buildTransparencyStats(_db, range);
+        res.json(stats);
+    } catch (err) {
+        res.status(500).json({ error: 'db_error', detail: err instanceof Error ? err.message : String(err) });
+    }
+});
+
+const transparencyPresets = [
+    { id: 'last-30-days', title: 'Transparency report (last 30 days)', range: '30d' },
+    { id: 'last-90-days', title: 'Transparency report (last 90 days)', range: '90d' },
+    { id: 'year-to-date', title: 'Transparency report (last 12 months)', range: '365d' }
+];
+
+router.get('/transparency/reports', (req, res) => {
+    const now = Date.now();
+    const requestedRange = String(req.query.range || '90d');
+
+    const reports = transparencyPresets.map((preset) => {
+        const info = resolveRange(preset.range, now);
+        return {
+            id: preset.id,
+            title: preset.title,
+            description: null,
+            format: 'csv',
+            generatedAt: now,
+            sizeBytes: null,
+            period: {
+                from: info.from,
+                to: now,
+                label: info.label
+            },
+            rangeKey: preset.range
+        };
+    });
+
+    // ensure requested range is present as first entry
+    if (!reports.some(r => r.rangeKey === requestedRange)) {
+        const info = resolveRange(requestedRange, now);
+        reports.unshift({
+            id: `custom-${requestedRange}`,
+            title: `Transparency report (${info.label})`,
+            description: null,
+            format: 'csv',
+            generatedAt: now,
+            sizeBytes: null,
+            period: {
+                from: info.from,
+                to: now,
+                label: info.label
+            },
+            rangeKey: requestedRange
+        });
+    }
+
+    res.json(reports);
+});
+
+router.get('/transparency/reports/:id/download', async (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const preset = transparencyPresets.find(p => p.id === req.params.id);
+    const rangeKey = preset?.range || (req.params.id.startsWith('custom-') ? req.params.id.replace('custom-', '') : null);
+    if (!rangeKey) {
+        return res.status(404).json({ error: 'report_not_found' });
+    }
+
+    try {
+        const stats = await buildTransparencyStats(_db, rangeKey);
+        const csv = buildTransparencyCsv(stats);
+        const filename = `transparency-${req.params.id}-${new Date().toISOString().slice(0, 10)}.csv`;
+
+        res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+        res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+        res.send(csv);
+    } catch (err) {
+        res.status(500).json({ error: 'report_generation_failed', detail: err instanceof Error ? err.message : String(err) });
+    }
 });
 
 /* ----------------------------- Signals ----------------------------- */

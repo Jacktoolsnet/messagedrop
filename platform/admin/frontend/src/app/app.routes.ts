@@ -7,6 +7,7 @@ import { DecisionsComponent } from './components/dsa/decisions/decisions/decisio
 import { EvidencesComponent } from './components/dsa/evidences/evidences.component';
 import { NoticesComponent } from './components/dsa/notice/notices/notices.component';
 import { SignalsComponent } from './components/dsa/signal/signals/signals.component';
+import { TransparencyComponent } from './components/dsa/transparency/transparency.component';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './guards/auth/auth-guard';
 
@@ -45,6 +46,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/evidence',
         component: EvidencesComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/dsa/transparency',
+        component: TransparencyComponent,
         canActivate: [authGuard]
     },
     {

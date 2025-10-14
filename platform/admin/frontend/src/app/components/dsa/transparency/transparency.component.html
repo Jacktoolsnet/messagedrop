@@ -1,0 +1,200 @@
+<mat-toolbar>
+  <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">Transparency</span>
+  <span class="spacer"></span>
+  <mat-chip-listbox class="range-chips" [value]="filterForm.controls.range.value" (change)="onRangeChange($event)" aria-label="Select range">
+    @for (opt of rangeOptions; track opt.value) {
+    <mat-chip-option [value]="opt.value">
+      {{ opt.label }}
+    </mat-chip-option>
+    }
+  </mat-chip-listbox>
+</mat-toolbar>
+
+@if (loadingStats()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page" *ngIf="stats() as data">
+  <section class="metrics">
+    <mat-card class="metric-card">
+      <div class="metric-title">
+        <mat-icon>flag</mat-icon>
+        Notices
+      </div>
+      <div class="metric-value">{{ data.notices.total | number }}</div>
+      <div class="metric-subtitle">Total cases {{ data.range.label }}</div>
+      <div class="pill-row">
+        @for (entry of toEntries(data.notices.byStatus); track entry.key) {
+        <mat-chip>
+          {{ entry.key }}: {{ entry.value }}
+        </mat-chip>
+        }
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-title">
+        <mat-icon>check_circle</mat-icon>
+        Decisions
+      </div>
+      <div class="metric-value">{{ data.decisions.total | number }}</div>
+      <div class="metric-subtitle">Average resolution {{ formatDuration(data.decisions.avgDecisionTimeMs) }}</div>
+      <div class="pill-row">
+        @for (entry of toEntries(data.decisions.byOutcome); track entry.key) {
+        <mat-chip>
+          {{ labelForOutcome(entry.key) }}: {{ entry.value }}
+        </mat-chip>
+        }
+      </div>
+      <div class="metric-note">
+        Automated review: {{ automatedShare(data) }}
+      </div>
+    </mat-card>
+
+    <mat-card class="metric-card">
+      <div class="metric-title">
+        <mat-icon>notifications</mat-icon>
+        Signals
+      </div>
+      <div class="metric-value">{{ data.signals.total | number }}</div>
+      <div class="metric-subtitle">Reported quick signals</div>
+      <div class="pill-row">
+        @for (entry of toEntries(data.signals.byType); track entry.key) {
+        <mat-chip>
+          {{ entry.key }}: {{ entry.value }}
+        </mat-chip>
+        }
+      </div>
+    </mat-card>
+  </section>
+
+  <section class="charts-grid">
+    <mat-card class="chart-card">
+      <div class="chart-header">
+        <mat-icon>bar_chart</mat-icon>
+        Notices by status
+      </div>
+      <div class="chart-container">
+        <canvas #statusChart></canvas>
+      </div>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <div class="chart-header">
+        <mat-icon>pie_chart</mat-icon>
+        Decision outcomes
+      </div>
+      <div class="chart-container">
+        <canvas #decisionChart></canvas>
+      </div>
+    </mat-card>
+
+    <mat-card class="chart-card">
+      <div class="chart-header">
+        <mat-icon>show_chart</mat-icon>
+        Monthly trend
+      </div>
+      <div class="chart-container">
+        <canvas #trendChart></canvas>
+      </div>
+    </mat-card>
+  </section>
+
+  <section class="categories">
+    <mat-card>
+      <div class="chart-header">
+        <mat-icon>category</mat-icon>
+        Top categories
+      </div>
+      <div class="category-grid">
+        <div>
+          <h4>Notices</h4>
+          <div class="pill-column">
+            @for (entry of data.notices.topCategories; track entry.category) {
+            <mat-chip>
+              {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
+            </mat-chip>
+            }
+          </div>
+        </div>
+        <div>
+          <h4>Signals</h4>
+          <div class="pill-column">
+            @for (entry of data.signals.topCategories; track entry.category) {
+            <mat-chip>
+              {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
+            </mat-chip>
+            }
+          </div>
+        </div>
+      </div>
+    </mat-card>
+  </section>
+
+  <section class="reports">
+    <div class="reports-header">
+      <h3>
+        <mat-icon>description</mat-icon>
+        Transparency reports
+      </h3>
+      @if (loadingReports()) {
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+    </div>
+
+    <div class="table-wrapper" *ngIf="reports().length > 0; else emptyReports">
+      <table mat-table [dataSource]="reports()" class="mat-elevation-z1">
+        <ng-container matColumnDef="title">
+          <th mat-header-cell *matHeaderCellDef>Title</th>
+          <td mat-cell *matCellDef="let report">
+            <div class="report-title">{{ report.title }}</div>
+            <div class="report-desc" *ngIf="report.description">{{ report.description }}</div>
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="period">
+          <th mat-header-cell *matHeaderCellDef>Period</th>
+          <td mat-cell *matCellDef="let report">
+            {{ report.period.label }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="format">
+          <th mat-header-cell *matHeaderCellDef>Format</th>
+          <td mat-cell *matCellDef="let report">
+            {{ report.format?.toUpperCase() }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="generatedAt">
+          <th mat-header-cell *matHeaderCellDef>Generated</th>
+          <td mat-cell *matCellDef="let report">
+            {{ formatDateTime(report.generatedAt) }}
+          </td>
+        </ng-container>
+
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let report">
+            <button mat-stroked-button color="primary" (click)="downloadReport(report)">
+              <mat-icon>download</mat-icon>
+              Download
+            </button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="reportColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: reportColumns;"></tr>
+      </table>
+    </div>
+    <ng-template #emptyReports>
+      <div class="empty-reports">
+        <mat-icon>inventory_2</mat-icon>
+        <p>No generated reports yet for {{ data.range.label }}.</p>
+      </div>
+    </ng-template>
+  </section>
+</div>
