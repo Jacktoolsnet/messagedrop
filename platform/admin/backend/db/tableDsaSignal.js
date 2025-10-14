@@ -117,6 +117,14 @@ const getById = function (db, id, callBack) {
     });
 };
 
+const getByPublicToken = function (db, token, callBack) {
+    const sql = `SELECT * FROM ${tableName} WHERE ${columnPublicToken} = ? LIMIT 1`;
+    db.get(sql, [token], (err, row) => {
+        if (err) return callBack(err);
+        callBack(null, row);
+    });
+};
+
 /**
  * List signals (optional filters + pagination).
  * Supported filters:
@@ -222,6 +230,7 @@ module.exports = {
     init,
     create,
     getById,
+    getByPublicToken,
     list,
     remove,
     stats

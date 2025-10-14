@@ -8,10 +8,12 @@ import { EvidencesComponent } from './components/dsa/evidences/evidences.compone
 import { NoticesComponent } from './components/dsa/notice/notices/notices.component';
 import { SignalsComponent } from './components/dsa/signal/signals/signals.component';
 import { TransparencyComponent } from './components/dsa/transparency/transparency.component';
+import { PublicStatusComponent } from './components/public-status/public-status.component';
 import { LoginComponent } from './components/login/login.component';
 import { authGuard } from './guards/auth/auth-guard';
 
 export const routes: Routes = [
+    { path: 'status/:token', component: PublicStatusComponent },
     { path: '', component: LoginComponent },
     {
         path: 'dashboard',

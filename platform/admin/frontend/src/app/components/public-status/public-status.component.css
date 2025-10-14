@@ -1,0 +1,148 @@
+:host {
+  display: block;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f4fdf2, #d0f6d8);
+  color: var(--mat-app-text-color);
+  padding: 0 1rem;
+}
+
+.page {
+  margin: 0 auto;
+  padding: 1.5rem;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+}
+
+.summary-card mat-card-header .avatar,
+.avatar {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--mdc-theme-primary) 18%, transparent);
+}
+
+.avatar mat-icon {
+  color: var(--mdc-theme-primary);
+}
+
+.avatar.decision {
+  background: color-mix(in srgb, var(--mdc-theme-secondary) 18%, transparent);
+}
+
+.avatar.timeline {
+  background: color-mix(in srgb, var(--mdc-theme-tertiary, #0ea5e9) 18%, transparent);
+}
+
+.summary-grid {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.label {
+  font-size: 0.85rem;
+  letter-spacing: 0.02em;
+  color: rgba(0, 0, 0, 0.6);
+  text-transform: uppercase;
+  display: block;
+}
+
+.statement {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.evidence-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.evidence-entry {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.evidence-entry .info {
+  flex: 1 1 240px;
+}
+
+.evidence-entry .title {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 600;
+}
+
+.evidence-entry .meta {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.evidence-entry .actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.detail pre {
+  background: rgba(15, 23, 42, 0.05);
+  padding: 0.5rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  overflow: auto;
+}
+
+.muted {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.error-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.5rem;
+}
+
+.error-card mat-icon {
+  font-size: 36px;
+  color: #f87171;
+}
+
+.loading {
+  max-width: 420px;
+  margin: 4rem auto;
+  display: grid;
+  gap: 0.75rem;
+  text-align: center;
+}
+
+.loading p {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+@media print {
+  :host {
+    background: #fff;
+  }
+
+  .actions {
+    display: none;
+  }
+
+  mat-card {
+    box-shadow: none !important;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+  }
+}

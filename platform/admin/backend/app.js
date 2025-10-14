@@ -14,6 +14,7 @@ const clientConnect = require('./routes/client-connect');
 const dsaFrontend = require('./routes/dsa-frontend');
 const dsaBackend = require('./routes/dsa-backend');
 const user = require('./routes/user');
+const publicStatus = require('./routes/public-status');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -211,6 +212,9 @@ app.use('/translate', translate);
 // DSA
 app.use('/dsa/frontend', dsaFrontend);
 app.use('/dsa/backend', dsaBackend);
+
+// Public status endpoints
+app.use('/public', publicStatus);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));
