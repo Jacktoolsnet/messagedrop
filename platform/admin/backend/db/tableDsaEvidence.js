@@ -9,6 +9,8 @@ const columnNoticeId = 'noticeId';     // TEXT NOT NULL, FK -> tableDsaNotice(id
 const columnType = 'type';             // TEXT NOT NULL: 'screenshot' | 'url' | 'hash' | 'file' | ...
 const columnUrl = 'url';               // TEXT NULL (z. B. S3-Link, CDN-URL)
 const columnHash = 'hash';             // TEXT NULL (z. B. SHA-256)
+const columnFileName = 'fileName';     // TEXT NULL (Originaldateiname)
+const columnFilePath = 'filePath';     // TEXT NULL (Serverpfad)
 const columnAddedAt = 'addedAt';       // INTEGER NOT NULL (unix ms)
 
 // === INIT: create table + indexes ===
@@ -23,6 +25,8 @@ const init = function (db) {
         ${columnType} TEXT NOT NULL,
         ${columnUrl} TEXT DEFAULT NULL,
         ${columnHash} TEXT DEFAULT NULL,
+        ${columnFileName} TEXT DEFAULT NULL,
+        ${columnFilePath} TEXT DEFAULT NULL,
         ${columnAddedAt} INTEGER NOT NULL,
         CONSTRAINT fk_${tableName}_notice
           FOREIGN KEY (${columnNoticeId})
@@ -40,8 +44,23 @@ const init = function (db) {
       CREATE INDEX IF NOT EXISTS idx_dsa_evidence_type
         ON ${tableName}(${columnType});
     `;
-        db.exec(sql, (err) => {
-            if (err) throw err;
+        db.serialize(() => {
+            db.exec(sql, (err) => {
+                if (err) throw err;
+            });
+
+            // Backfill missing columns when table already existed
+            db.exec(`
+              ALTER TABLE ${tableName} ADD COLUMN ${columnFileName} TEXT DEFAULT NULL;
+            `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
+
+            db.exec(`
+              ALTER TABLE ${tableName} ADD COLUMN ${columnFilePath} TEXT DEFAULT NULL;
+            `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
         });
     } catch (err) {
         throw err;
@@ -61,7 +80,7 @@ const init = function (db) {
  * @param {number} addedAt       // Unix ms
  * @param {(err: any, row?: { id: string }) => void} callBack
  */
-const create = function (db, id, noticeId, type, url, hash, addedAt, callBack) {
+const create = function (db, id, noticeId, type, url, hash, fileName, filePath, addedAt, callBack) {
     const stmt = `
     INSERT INTO ${tableName} (
       ${columnId},
@@ -69,11 +88,13 @@ const create = function (db, id, noticeId, type, url, hash, addedAt, callBack) {
       ${columnType},
       ${columnUrl},
       ${columnHash},
+      ${columnFileName},
+      ${columnFilePath},
       ${columnAddedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
-    const params = [id, noticeId, type, url, hash, addedAt];
+    const params = [id, noticeId, type, url, hash, fileName, filePath, addedAt];
 
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
@@ -135,6 +156,8 @@ module.exports = {
         type: columnType,
         url: columnUrl,
         hash: columnHash,
+        fileName: columnFileName,
+        filePath: columnFilePath,
         addedAt: columnAddedAt
     },
     init,

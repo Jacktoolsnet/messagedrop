@@ -1,7 +1,7 @@
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, forkJoin, map, Observable, of } from 'rxjs';
+import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 
 import { DsaSignal } from '../../../interfaces/dsa-signal.interface';
@@ -56,6 +56,18 @@ export class DsaService {
       catchError(err => {
         this.snack.open('Could not load notices.', 'OK', { duration: 3000 });
         return of([]);
+      })
+    );
+  }
+
+  downloadEvidence(evidenceId: string): Observable<HttpResponse<Blob>> {
+    return this.http.get(`${this.baseUrl}/evidence/${evidenceId}/download`, {
+      observe: 'response',
+      responseType: 'blob'
+    } as const).pipe(
+      catchError(err => {
+        this.snack.open('Could not download evidence.', 'OK', { duration: 3000 });
+        return throwError(() => err);
       })
     );
   }
@@ -248,8 +260,34 @@ export class DsaService {
   }
 
   /** Add new evidence entry to a notice */
-  addEvidence(noticeId: string, data: { type: string; url?: string | null; hash?: string | null }) {
-    return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence`, data)
+  addEvidence(
+    noticeId: string,
+    data: { type: 'url' | 'hash' | 'file'; url?: string | null; hash?: string | null; file?: File | null }
+  ) {
+    if (data.type === 'file') {
+      if (!data.file) {
+        return throwError(() => new Error('file_required'));
+      }
+      const form = new FormData();
+      form.append('type', 'file');
+      form.append('file', data.file);
+      if (data.hash) form.append('hash', data.hash);
+      return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence`, form)
+        .pipe(
+          catchError(err => {
+            this.snack.open('Could not add evidence.', 'OK', { duration: 3000 });
+            throw err;
+          })
+        );
+    }
+
+    const body = {
+      type: data.type,
+      url: data.url ?? null,
+      hash: data.hash ?? null
+    };
+
+    return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence`, body)
       .pipe(
         catchError(err => {
           this.snack.open('Could not add evidence.', 'OK', { duration: 3000 });

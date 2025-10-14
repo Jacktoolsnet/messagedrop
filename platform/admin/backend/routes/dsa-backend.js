@@ -1,5 +1,8 @@
 const express = require('express');
 const crypto = require('crypto');
+const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 
 const tableSignal = require('../db/tableDsaSignal');
@@ -11,6 +14,37 @@ const tableAudit = require('../db/tableDsaAuditLog');
 
 const router = express.Router();
 router.use(requireAdminJwt, requireRole('moderator', 'legal', 'admin', 'root'));
+
+const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
+fs.mkdirSync(evidenceUploadDir, { recursive: true });
+
+const allowedMime = new Set([
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml'
+]);
+
+const storage = multer.diskStorage({
+    destination: (_req, _file, cb) => cb(null, evidenceUploadDir),
+    filename: (_req, file, cb) => {
+        const unique = `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`;
+        cb(null, unique);
+    }
+});
+
+const upload = multer({
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 },
+    fileFilter: (_req, file, cb) => {
+        if (file.mimetype.startsWith('image/') || allowedMime.has(file.mimetype)) {
+            return cb(null, true);
+        }
+        cb(new Error('unsupported_file_type'));
+    }
+});
 
 function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
@@ -148,24 +182,64 @@ router.post('/notices/:id/decision', (req, res) => {
 router.post('/notices/:id/evidence', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
 
-    const id = crypto.randomUUID();
-    const addedAt = Date.now();
-    const type = String(req.body?.type || 'url');
-    const url = asString(req.body?.url);
-    const hash = asString(req.body?.hash);
+    upload.single('file')(req, res, (uploadErr) => {
+        if (uploadErr) {
+            if (uploadErr.code === 'LIMIT_FILE_SIZE') {
+                return res.status(400).json({ error: 'file_too_large', maxBytes: 5 * 1024 * 1024 });
+            }
+            return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+        }
 
-    tableEvidence.create(_db, id, req.params.id, type, url, hash, addedAt, (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        const id = crypto.randomUUID();
+        const addedAt = Date.now();
 
-        const auditId = crypto.randomUUID();
-        tableAudit.create(
-            _db, auditId, 'notice', req.params.id, 'evidence_add',
-            `admin:${req.admin?.sub || 'unknown'}`, addedAt,
-            JSON.stringify({ evidenceId: id, type }),
-            () => { }
+        const hasFile = !!req.file;
+        const type = hasFile ? 'file' : String(req.body?.type || 'url');
+        const url = hasFile ? null : asString(req.body?.url);
+        const hash = asString(req.body?.hash);
+
+        if (type === 'url' && !url) {
+            return res.status(400).json({ error: 'url_required' });
+        }
+        if (type === 'hash' && !hash) {
+            return res.status(400).json({ error: 'hash_required' });
+        }
+        if (type === 'file' && !hasFile) {
+            return res.status(400).json({ error: 'file_required' });
+        }
+
+        const fileName = hasFile ? req.file.originalname : null;
+        const storedName = hasFile ? req.file.filename : null;
+
+        tableEvidence.create(
+            _db,
+            id,
+            req.params.id,
+            type,
+            url,
+            hash,
+            fileName,
+            storedName,
+            addedAt,
+            (err, row) => {
+                if (err) {
+                    if (hasFile) {
+                        fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
+                    }
+                    return res.status(500).json({ error: 'db_error', detail: err.message });
+                }
+
+                const auditId = crypto.randomUUID();
+                tableAudit.create(
+                    _db, auditId, 'notice', req.params.id, 'evidence_add',
+                    `admin:${req.admin?.sub || 'unknown'}`, addedAt,
+                    JSON.stringify({ evidenceId: id, type }),
+                    () => { }
+                );
+
+                res.status(201).json(row);
+            }
         );
-
-        res.status(201).json(row);
     });
 });
 
@@ -180,6 +254,29 @@ router.get('/notices/:id/evidence', (req, res) => {
             res.json(rows);
         }
     );
+});
+
+router.get('/evidence/:id/download', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    tableEvidence.getById(_db, String(req.params.id), (err, row) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!row || row.type !== 'file' || !row.filePath) {
+            return res.status(404).json({ error: 'file_not_found' });
+        }
+
+        const safeFile = path.basename(row.filePath);
+        const fileOnDisk = path.join(evidenceUploadDir, safeFile);
+
+        fs.access(fileOnDisk, fs.constants.R_OK, (accessErr) => {
+            if (accessErr) return res.status(404).json({ error: 'file_not_found' });
+            res.download(fileOnDisk, row.fileName || safeFile, (downloadErr) => {
+                if (downloadErr && !res.headersSent) {
+                    res.status(500).json({ error: 'download_failed' });
+                }
+            });
+        });
+    });
 });
 
 /* --------------------------- Notifications --------------------------- */

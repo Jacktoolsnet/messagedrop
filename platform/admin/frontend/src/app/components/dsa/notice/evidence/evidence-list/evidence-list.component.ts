@@ -9,6 +9,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaEvidence } from '../../../../../interfaces/dsa-evidence.interface';
 import { DsaService } from '../../../../../services/dsa/dsa/dsa.service';
 import { AddEvidenceDialogComponent } from '../add-evidence-dialog/add-evidence-dialog.component';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-evidence-list',
@@ -48,6 +49,15 @@ export class EvidenceListComponent implements OnInit, OnChanges {
     });
   }
 
+  labelForType(type: string): string {
+    switch (type) {
+      case 'file': return 'File upload';
+      case 'url': return 'External URL';
+      case 'hash': return 'Hash digest';
+      default: return type;
+    }
+  }
+
   openAdd(): void {
     const ref = this.dialog.open(AddEvidenceDialogComponent, {
       data: { noticeId: this.noticeId },
@@ -65,5 +75,44 @@ export class EvidenceListComponent implements OnInit, OnChanges {
     }
     const ok = this.clipboard.copy(url);
     this.snack.open(ok ? 'URL copied to clipboard.' : 'Copy failed.', 'OK', { duration: 2000 });
+  }
+
+  downloadFile(e: DsaEvidence): void {
+    if (e.type !== 'file') return;
+    this.dsa.downloadEvidence(e.id).subscribe({
+      next: (response: HttpResponse<Blob>) => {
+        const blob = response.body;
+        if (!blob) {
+          this.snack.open('Empty file received.', 'OK', { duration: 2500 });
+          return;
+        }
+        const filename = this.resolveFilename(response, e.fileName || 'evidence');
+        const url = window.URL.createObjectURL(blob);
+        const anchor = document.createElement('a');
+        anchor.href = url;
+        anchor.download = filename;
+        document.body.appendChild(anchor);
+        anchor.click();
+        document.body.removeChild(anchor);
+        window.URL.revokeObjectURL(url);
+      },
+      error: () => {
+        this.snack.open('Could not download evidence.', 'OK', { duration: 3000 });
+      }
+    });
+  }
+
+  private resolveFilename(response: HttpResponse<Blob>, fallback: string): string {
+    const disposition = response.headers.get('Content-Disposition');
+    if (!disposition) return fallback;
+    const match = /filename\*?=(?:UTF-8'')?\"?([^\";]+)/i.exec(disposition);
+    if (match?.[1]) {
+      try {
+        return decodeURIComponent(match[1].replace(/\"/g, ''));
+      } catch {
+        return match[1].replace(/\"/g, '');
+      }
+    }
+    return fallback;
   }
 }

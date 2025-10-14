@@ -34,9 +34,27 @@
         <div class="mid">
             <div class="line">
                 <span class="label">Type</span>
-                <span class="value">{{ e.type }}</span>
+                <span class="value">{{ labelForType(e.type) }}</span>
             </div>
-            @if (e.url) {
+            @if (e.type === 'file') {
+            <div class="line file-line">
+                <span class="label">File</span>
+                <div class="value file-block">
+                    <span class="file-name" [title]="e.fileName || 'download'">
+                        <mat-icon class="file-icon" aria-hidden="true">description</mat-icon>
+                        {{ e.fileName || 'Download' }}
+                    </span>
+                    <div class="file-actions">
+                        <button mat-stroked-button color="primary" class="download-btn" type="button"
+                            (click)="downloadFile(e)">
+                            <mat-icon>download</mat-icon>
+                            Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+            }
+            @if (e.type === 'url' && e.url) {
             <div class="line url-line">
                 <span class="label">URL</span>
                 <div class="value url-block">

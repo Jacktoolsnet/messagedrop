@@ -9,8 +9,51 @@
 .form {
     display: grid;
     gap: .9rem;
+    margin-top: 1rem;
 }
 
 mat-dialog-content {
-    padding-top: .5rem !important;
+    padding-top: 1rem !important;
+}
+
+.file-upload {
+    display: grid;
+    gap: .6rem;
+}
+
+.upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    color: #2563eb;
+    cursor: pointer;
+    font-weight: 500;
+}
+
+.upload-label mat-icon {
+    font-size: 24px;
+}
+
+.file-upload input[type="file"] {
+    display: none;
+}
+
+.file-info {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    font-size: .9rem;
+}
+
+.file-info mat-icon {
+    font-size: 20px;
+    color: #10b981;
+}
+
+.file-info.muted mat-icon {
+    color: #6b7280;
+}
+
+.file-info.muted span {
+    color: #6b7280;
 }

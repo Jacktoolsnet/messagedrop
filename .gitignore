@@ -138,3 +138,6 @@ environment*
 # keys
 backend/keys
 *.enc
+
+# admin backend uploads
+platform/admin/backend/uploads/
