@@ -9,6 +9,8 @@ const columnReasonText = 'reasonText';                   // TEXT NULL
 const columnReportedContentType = 'reportedContentType'; // TEXT NOT NULL
 const columnReportedContent = 'reportedContent';         // TEXT NOT NULL (JSON-String)
 const columnCreatedAt = 'createdAt';                     // INTEGER NOT NULL (unix ms)
+const columnPublicToken = 'publicToken';                 // TEXT NULL (Status-Token)
+const columnPublicTokenCreatedAt = 'publicTokenCreatedAt'; // INTEGER NULL
 
 // === INIT ===
 const init = function (db) {
@@ -22,7 +24,9 @@ const init = function (db) {
         ${columnReasonText} TEXT DEFAULT NULL,
         ${columnReportedContentType} TEXT NOT NULL,
         ${columnReportedContent} TEXT NOT NULL,
-        ${columnCreatedAt} INTEGER NOT NULL
+        ${columnCreatedAt} INTEGER NOT NULL,
+        ${columnPublicToken} TEXT DEFAULT NULL,
+        ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_dsa_signal_contentId
         ON ${tableName}(${columnContentId});
@@ -33,8 +37,22 @@ const init = function (db) {
       CREATE INDEX IF NOT EXISTS idx_dsa_signal_category
         ON ${tableName}(${columnCategory});
     `;
-        db.exec(sql, (err) => {
-            if (err) throw err;
+        db.serialize(() => {
+            db.exec(sql, (err) => {
+                if (err) throw err;
+            });
+
+            db.exec(`
+          ALTER TABLE ${tableName} ADD COLUMN ${columnPublicToken} TEXT DEFAULT NULL;
+        `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
+
+            db.exec(`
+          ALTER TABLE ${tableName} ADD COLUMN ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL;
+        `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
         });
     } catch (err) {
         throw err;
@@ -54,6 +72,8 @@ const create = function (
     reportedContentType,
     reportedContentJson,
     createdAt,
+    publicToken,
+    publicTokenCreatedAt,
     callBack
 ) {
     const stmt = `
@@ -65,8 +85,10 @@ const create = function (
       ${columnReasonText},
       ${columnReportedContentType},
       ${columnReportedContent},
-      ${columnCreatedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      ${columnCreatedAt},
+      ${columnPublicToken},
+      ${columnPublicTokenCreatedAt}
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
     const params = [
         id,
@@ -76,7 +98,9 @@ const create = function (
         reasonText,
         reportedContentType,
         reportedContentJson,
-        createdAt
+        createdAt,
+        publicToken,
+        publicTokenCreatedAt
     ];
     db.run(stmt, params, function (err) {
         if (err) return callBack(err);
@@ -191,7 +215,9 @@ module.exports = {
         reasonText: columnReasonText,
         reportedContentType: columnReportedContentType,
         reportedContent: columnReportedContent,
-        createdAt: columnCreatedAt
+        createdAt: columnCreatedAt,
+        publicToken: columnPublicToken,
+        publicTokenCreatedAt: columnPublicTokenCreatedAt
     },
     init,
     create,

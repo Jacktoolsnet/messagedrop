@@ -704,6 +704,9 @@ router.post('/signals/:id/promote', (req, res) => {
         const reportedContentType = sig.reportedContentType;
         const reportedContentJson = sig.reportedContent;
 
+        const noticeToken = sig.publicToken || crypto.randomBytes(24).toString('base64url');
+        const noticeTokenCreatedAt = sig.publicTokenCreatedAt || now;
+
         tableNotice.create(
             _db,
             noticeId,
@@ -719,6 +722,8 @@ router.post('/signals/:id/promote', (req, res) => {
             status,
             now,
             now,
+            noticeToken,
+            noticeTokenCreatedAt,
             (err2) => {
                 if (err2) return res.status(500).json({ error: 'db_error', detail: err2.message });
 

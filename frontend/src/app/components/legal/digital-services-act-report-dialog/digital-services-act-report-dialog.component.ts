@@ -12,8 +12,9 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
-import { DigitalServicesActService } from '../../../services/digital-services-act.service';
+import { DigitalServicesActService, DsaSubmissionResponse } from '../../../services/digital-services-act.service';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
+import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-dialog.component';
 
 @Component({
   selector: 'app-digital-services-act-report-dialog',
@@ -108,7 +109,7 @@ export class DigitalServicesActReportDialogComponent {
       if (this.activeTabIndex === 0) {
         // QUICK REPORT
         const raw = this.quickForm.getRawValue();
-        await firstValueFrom(this.dsa.submitSignal({
+        const response: DsaSubmissionResponse = await firstValueFrom(this.dsa.submitSignal({
           contentId,
           contentUrl,
           category: raw.category || '',
@@ -117,11 +118,11 @@ export class DigitalServicesActReportDialogComponent {
           content: contentSnapshot
         }));
 
-        this.showSuccess('signal');
+        this.showSuccess('signal', response?.statusUrl ?? null, response?.token ?? null);
       } else {
         // FORMAL NOTICE
         const raw = this.formalForm.getRawValue();
-        await firstValueFrom(this.dsa.submitNotice({
+        const response: DsaSubmissionResponse = await firstValueFrom(this.dsa.submitNotice({
           contentId,
           contentUrl,
           category: raw.category || '',
@@ -133,7 +134,7 @@ export class DigitalServicesActReportDialogComponent {
           content: contentSnapshot
         }));
 
-        this.showSuccess('notice');
+        this.showSuccess('notice', response?.statusUrl ?? null, response?.token ?? null, raw.reporterEmail || '');
       }
     } catch (e: any) {
       this.errorMsg = e?.error?.message ?? 'Submitting failed. Please try again.';
@@ -186,7 +187,25 @@ export class DigitalServicesActReportDialogComponent {
     return dialogRef;
   }
 
-  private showSuccess(kind: 'signal' | 'notice') {
+  private showSuccess(kind: 'signal' | 'notice', statusUrl?: string | null, token?: string | null, reporterEmail?: string | null) {
+    if (statusUrl || token) {
+      const dialogRef = this.matDialog.open(DsaStatusLinkDialogComponent, {
+        data: {
+          kind,
+          statusUrl: statusUrl ?? null,
+          token: token ?? null,
+          reporterEmail: reporterEmail ?? null
+        },
+        width: 'min(540px, 95vw)',
+        autoFocus: false
+      });
+
+      dialogRef.afterClosed().subscribe(() => {
+        this.dialogRef.close({ created: true });
+      });
+      return;
+    }
+
     if (kind === 'signal') {
       this.openDisplayMessage({
         title: 'Report sent',
@@ -197,8 +216,7 @@ export class DigitalServicesActReportDialogComponent {
       return;
     }
 
-    // kind === 'notice'
-    const email = (this.formalForm.getRawValue().reporterEmail || '').trim();
+    const email = (reporterEmail || '').trim();
     const message = email
       ? 'Your DSA notice was submitted successfully. We will contact you via email after the review.'
       : 'Your DSA notice was submitted successfully. If you would like to receive updates, please provide an email address next time.';

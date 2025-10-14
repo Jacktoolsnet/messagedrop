@@ -1,0 +1,51 @@
+:host {
+  display: block;
+  color: var(--mat-app-text-color);
+}
+
+h2[mat-dialog-title] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0 0 0.75rem 0;
+}
+
+h2[mat-dialog-title] mat-icon {
+  color: var(--mdc-theme-primary, currentColor);
+}
+
+.dialog-content {
+  display: grid;
+  gap: 1rem;
+  max-width: 520px;
+}
+
+.primary {
+  font-weight: 600;
+  margin: 0;
+}
+
+.secondary {
+  margin: 0;
+}
+
+.link-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  border: 1px solid var(--mdc-theme-outline, rgba(0, 0, 0, 0.12));
+  background: color-mix(in srgb, var(--mdc-theme-primary, #1976d2) 8%, transparent);
+}
+
+.link-text {
+  flex: 1 1 auto;
+  word-break: break-word;
+  font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+mat-dialog-actions {
+  padding: 1rem 0;
+  gap: 0.5rem;
+}

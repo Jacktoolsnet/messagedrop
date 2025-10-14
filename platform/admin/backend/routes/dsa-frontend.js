@@ -11,6 +11,17 @@ const tableNotice = require('../db/tableDsaNotice');
 const router = express.Router();
 router.use(checkToken);
 
+const statusBaseUrl = (process.env.PUBLIC_STATUS_BASE_URL || '').replace(/\/+$/, '') || null;
+
+function generateStatusToken() {
+    return crypto.randomBytes(24).toString('base64url');
+}
+
+function buildStatusUrl(token) {
+    if (!token || !statusBaseUrl) return null;
+    return `${statusBaseUrl}/${token}`;
+}
+
 /* ---------------------- Minimaler Make-Notifier (axios) ---------------------- */
 function notifyMake(title, text) {
     const url = process.env.MAKE_DSA_WEBHOOK_URL;
@@ -71,6 +82,9 @@ router.post('/signals', signalLimiter, (req, res) => {
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
     catch { reportedContentJson = JSON.stringify({ _error: 'stringify_failed' }); }
 
+    const token = generateStatusToken();
+    const statusUrl = buildStatusUrl(token);
+
     tableSignal.create(
         _db,
         id,
@@ -81,9 +95,11 @@ router.post('/signals', signalLimiter, (req, res) => {
         toStringOrNull(reportedContentType),
         reportedContentJson,
         now,
+        token,
+        now,
         (err, row) => {
             if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-            res.status(201).json(row); // { id }
+            res.status(201).json({ id: row?.id ?? id, token, statusUrl });
             // Make-Push (sehr knapp gehalten)
             notifyMake(
                 'New Signal',
@@ -122,6 +138,9 @@ router.post('/notices', noticeLimiter, (req, res) => {
 
     const status = 'RECEIVED';
 
+    const token = generateStatusToken();
+    const statusUrl = buildStatusUrl(token);
+
     tableNotice.create(
         _db,
         id,
@@ -137,9 +156,11 @@ router.post('/notices', noticeLimiter, (req, res) => {
         status,
         now,
         now,
+        token,
+        now,
         (err, row) => {
             if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-            res.status(201).json(row); // { id }
+            res.status(201).json({ id: row?.id ?? id, token, statusUrl });
             // Make-Push (kurz & bündig)
             notifyMake(
                 'New Notice',

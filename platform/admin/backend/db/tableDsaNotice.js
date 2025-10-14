@@ -14,6 +14,8 @@ const columnReportedContent = 'reportedContent';         // TEXT NOT NULL (JSON-
 const columnStatus = 'status';                           // TEXT NOT NULL
 const columnCreatedAt = 'createdAt';                     // INTEGER NOT NULL (unix ms)
 const columnUpdatedAt = 'updatedAt';                     // INTEGER NOT NULL (unix ms)
+const columnPublicToken = 'publicToken';                 // TEXT NULL (Status-Token)
+const columnPublicTokenCreatedAt = 'publicTokenCreatedAt'; // INTEGER NULL
 
 // === INIT: create table + indexes ===
 const init = function (db) {
@@ -32,7 +34,9 @@ const init = function (db) {
         ${columnReportedContent} TEXT NOT NULL,
         ${columnStatus} TEXT NOT NULL,                    -- 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | ...
         ${columnCreatedAt} INTEGER NOT NULL,
-        ${columnUpdatedAt} INTEGER NOT NULL
+        ${columnUpdatedAt} INTEGER NOT NULL,
+        ${columnPublicToken} TEXT DEFAULT NULL,
+        ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL
       );
 
       CREATE INDEX IF NOT EXISTS idx_dsa_notice_contentId
@@ -47,8 +51,22 @@ const init = function (db) {
       CREATE INDEX IF NOT EXISTS idx_dsa_notice_updatedAt_desc
         ON ${tableName}(${columnUpdatedAt} DESC);
     `;
-        db.exec(sql, (err) => {
-            if (err) throw err;
+        db.serialize(() => {
+            db.exec(sql, (err) => {
+                if (err) throw err;
+            });
+
+            db.exec(`
+          ALTER TABLE ${tableName} ADD COLUMN ${columnPublicToken} TEXT DEFAULT NULL;
+        `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
+
+            db.exec(`
+          ALTER TABLE ${tableName} ADD COLUMN ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL;
+        `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
         });
     } catch (err) {
         throw err;
@@ -91,6 +109,8 @@ const create = function (
     status,
     createdAt,
     updatedAt,
+    publicToken,
+    publicTokenCreatedAt,
     callBack
 ) {
     const stmt = `
@@ -107,8 +127,10 @@ const create = function (
       ${columnReportedContent},
       ${columnStatus},
       ${columnCreatedAt},
-      ${columnUpdatedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ${columnUpdatedAt},
+      ${columnPublicToken},
+      ${columnPublicTokenCreatedAt}
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
 
     const params = [
@@ -124,7 +146,9 @@ const create = function (
         reportedContentJson,
         status,
         createdAt,
-        updatedAt
+        updatedAt,
+        publicToken,
+        publicTokenCreatedAt
     ];
 
     db.run(stmt, params, function (err) {
@@ -270,7 +294,9 @@ module.exports = {
         reportedContent: columnReportedContent,
         status: columnStatus,
         createdAt: columnCreatedAt,
-        updatedAt: columnUpdatedAt
+        updatedAt: columnUpdatedAt,
+        publicToken: columnPublicToken,
+        publicTokenCreatedAt: columnPublicTokenCreatedAt
     },
     init,
     create,

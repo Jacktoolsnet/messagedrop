@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>
+  Report sent successfully
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <p class="primary">{{ primaryText }}</p>
+  <p class="secondary">{{ secondaryText }}</p>
+
+  @if (data.statusUrl) {
+  <div class="link-box" title="Status URL">
+    <span class="link-text">{{ data.statusUrl }}</span>
+  </div>
+  } @else if (data.token) {
+  <div class="link-box" title="Status token">
+    <span class="link-text">Token: {{ data.token }}</span>
+  </div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-stroked-button color="primary" class="copy-btn" (click)="copy()">
+    <mat-icon class="material-symbols-outlined">content_copy</mat-icon>
+    Copy link
+  </button>
+  <button mat-flat-button color="primary" (click)="close()">Close</button>
+</mat-dialog-actions>

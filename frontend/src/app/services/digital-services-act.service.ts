@@ -10,6 +10,12 @@ import { NetworkService } from './network.service';
 import { CreateDsaNotice } from '../interfaces/create-dsa-notice.interface';
 import { CreateDsaSignal } from '../interfaces/create-dsa-signal.interface';
 
+export interface DsaSubmissionResponse {
+  id: string;
+  token?: string | null;
+  statusUrl?: string | null;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -36,7 +42,7 @@ export class DigitalServicesActService {
    * Quick-Report (Signal) absenden
    * POST {apiUrl}/dsa/signals
    */
-  submitSignal(payload: CreateDsaSignal): Observable<{ id: string }> {
+  submitSignal(payload: CreateDsaSignal): Observable<DsaSubmissionResponse> {
     const url = `${environment.apiUrl}/digitalserviceact/signals`;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -59,7 +65,7 @@ export class DigitalServicesActService {
       reportedContent: payload.content
     };
 
-    return this.http.post<{ id: string }>(url, body, this.httpOptions)
+    return this.http.post<DsaSubmissionResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 
@@ -67,7 +73,7 @@ export class DigitalServicesActService {
    * Formale DSA-Notice absenden
    * POST {apiUrl}/dsa/notices
    */
-  submitNotice(payload: CreateDsaNotice): Observable<{ id: string }> {
+  submitNotice(payload: CreateDsaNotice): Observable<DsaSubmissionResponse> {
     const url = `${environment.apiUrl}/digitalserviceact/notices`;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -94,7 +100,7 @@ export class DigitalServicesActService {
       reportedContent: payload.content
     };
 
-    return this.http.post<{ id: string }>(url, body, this.httpOptions)
+    return this.http.post<DsaSubmissionResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 
