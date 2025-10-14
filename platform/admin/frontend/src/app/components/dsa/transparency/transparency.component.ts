@@ -81,7 +81,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
 
   ngOnInit(): void {
     const initialRange = this.filterForm.controls.range.value;
-    this.loadStats(initialRange, { renderCharts: false });
+    this.loadStats(initialRange);
     this.loadReports(initialRange);
   }
 
@@ -96,7 +96,11 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     this.viewReady = true;
     if (this.lastStats) {
-      queueMicrotask(() => this.renderCharts(this.lastStats!));
+      setTimeout(() => {
+        if (this.lastStats) {
+          this.renderCharts(this.lastStats);
+        }
+      });
     }
   }
 
@@ -104,7 +108,7 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
     this.destroyCharts();
   }
 
-  private loadStats(range: string, opts: { renderCharts?: boolean } = {}): void {
+  private loadStats(range: string): void {
     this.loadingStats.set(true);
     this.dsa.getTransparencyStats(range).subscribe({
       next: (data) => {
@@ -112,7 +116,11 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
         this.lastStats = data;
         this.loadingStats.set(false);
         if (this.viewReady) {
-          this.renderCharts(data);
+          setTimeout(() => {
+            if (this.viewReady) {
+              this.renderCharts(data);
+            }
+          });
         }
       },
       error: () => {
