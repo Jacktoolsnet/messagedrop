@@ -1,0 +1,127 @@
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">Evidence</span>
+    <span class="spacer"></span>
+    <button mat-stroked-button color="primary" (click)="reload()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+    </button>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+    <form class="filter-row" [formGroup]="filterForm" novalidate>
+        <mat-form-field appearance="outline">
+            <mat-label>Status</mat-label>
+            <mat-select formControlName="status" multiple>
+                <mat-option [value]="status" *ngFor="let status of statuses">
+                    {{ statusLabel(status) }}
+                </mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Range</mat-label>
+            <mat-select formControlName="range">
+                <mat-option value="24h">Last 24h</mat-option>
+                <mat-option value="7d">Last 7 days</mat-option>
+                <mat-option value="30d">Last 30 days</mat-option>
+                <mat-option value="all">All</mat-option>
+            </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+            <mat-label>Content ID</mat-label>
+            <input matInput formControlName="contentId" autocomplete="off" placeholder="Search by content id" />
+        </mat-form-field>
+
+        <mat-form-field class="grow" appearance="outline">
+            <mat-label>Search</mat-label>
+            <input matInput formControlName="q" autocomplete="off"
+                placeholder="Reason text, category, reporter…" />
+        </mat-form-field>
+    </form>
+
+    <div class="layout">
+        <div class="left-column">
+            <div class="list-header">
+                <mat-icon>gavel</mat-icon>
+                Notices
+            </div>
+
+            <div class="notice-list">
+                @if (!loading() && notices().length === 0) {
+                <div class="empty">
+                    <mat-icon>inventory_2</mat-icon>
+                    <p>No notices match the current filter.</p>
+                </div>
+                }
+
+                @for (n of notices(); track n.id) {
+                <mat-card class="notice-card" [class.selected]="isSelected(n)" (click)="selectNotice(n)">
+                    <div class="head">
+                        <div class="title" title="{{ n.contentId || 'No content id' }}">
+                            {{ n.contentId || 'No content id' }}
+                        </div>
+                        <div class="head-right">
+                            @if (isSelected(n)) {
+                            <span class="active-pill">
+                                <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
+                                Active
+                            </span>
+                            }
+                            <div class="status-pill" [ngClass]="statusClass(n.status)">
+                                <mat-icon aria-hidden="true">{{ statusIcon(n.status) }}</mat-icon>
+                                <span>{{ statusLabel(n.status) }}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="meta">
+                        <span>
+                            <mat-icon aria-hidden="true">event</mat-icon>
+                            {{ n.createdAt | date:'medium' }}
+                        </span>
+                        <span>
+                            <mat-icon aria-hidden="true">update</mat-icon>
+                            {{ n.updatedAt | date:'medium' }}
+                        </span>
+                    </div>
+
+                    @if (n.category) {
+                    <div class="category">
+                        <mat-icon aria-hidden="true">category</mat-icon>
+                        {{ n.category }}
+                    </div>
+                    }
+
+                    <p class="preview">{{ noticePreview(n) }}</p>
+
+                    <div class="actions">
+                        <button mat-stroked-button color="primary" (click)="openNoticeDetail(n, $event)">
+                            <mat-icon>open_in_new</mat-icon>
+                            Open notice
+                        </button>
+                    </div>
+                </mat-card>
+                }
+            </div>
+        </div>
+
+        <div class="right-column">
+            @if (selectedNotice(); as current) {
+            <app-evidence-list [noticeId]="current.id"></app-evidence-list>
+            } @else {
+            <div class="placeholder">
+                <mat-icon>folder_open</mat-icon>
+                <p>Select a notice to view and add evidence.</p>
+            </div>
+            }
+        </div>
+    </div>
+</div>

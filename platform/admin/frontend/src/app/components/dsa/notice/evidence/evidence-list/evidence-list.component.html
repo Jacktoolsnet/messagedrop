@@ -37,12 +37,22 @@
                 <span class="value">{{ e.type }}</span>
             </div>
             @if (e.url) {
-            <div class="line">
+            <div class="line url-line">
                 <span class="label">URL</span>
-                <a class="value link" [href]="e.url" target="_blank" rel="noopener">
-                    {{ e.url }}
-                    <mat-icon inline>open_in_new</mat-icon>
-                </a>
+                <div class="value url-block">
+                    <span class="url-text" [title]="e.url">{{ e.url }}</span>
+                    <div class="url-actions">
+                        <a mat-stroked-button color="primary" class="open-btn" [href]="e.url" target="_blank"
+                            rel="noopener">
+                            <mat-icon>open_in_new</mat-icon>
+                            Open
+                        </a>
+                        <button mat-stroked-button color="accent" type="button" (click)="copyUrl(e.url)">
+                            <mat-icon>content_copy</mat-icon>
+                            Copy
+                        </button>
+                    </div>
+                </div>
             </div>
             }
             @if (e.hash) {

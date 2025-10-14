@@ -108,10 +108,45 @@
     color: var(--text);
 }
 
-.link {
+.url-line {
+    align-items: flex-start;
+}
+
+.url-block {
+    display: grid;
+    gap: .5rem;
+}
+
+.url-text {
+    max-width: 100%;
+    display: inline-block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    word-break: break-all;
+}
+
+.url-actions {
     display: inline-flex;
-    align-items: center;
-    gap: .25rem;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.url-actions button mat-icon,
+.open-btn mat-icon {
+    margin-right: .35rem;
+}
+
+@media (max-width: 600px) {
+    .url-text {
+        max-width: 100%;
+        white-space: normal;
+        word-break: break-all;
+    }
+
+    .url-actions {
+        width: 100%;
+    }
 }
 
 .mono {

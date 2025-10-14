@@ -1,5 +1,6 @@
+import { Clipboard } from '@angular/cdk/clipboard';
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, inject, signal } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
@@ -16,18 +17,25 @@ import { AddEvidenceDialogComponent } from '../add-evidence-dialog/add-evidence-
   templateUrl: './evidence-list.component.html',
   styleUrls: ['./evidence-list.component.css']
 })
-export class EvidenceListComponent implements OnInit {
+export class EvidenceListComponent implements OnInit, OnChanges {
   @Input({ required: true }) noticeId!: string;
 
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
   private dialog = inject(MatDialog);
+  private clipboard = inject(Clipboard);
 
   loading = signal(false);
   items = signal<DsaEvidence[]>([]);
 
   ngOnInit(): void {
     this.load();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['noticeId'] && !changes['noticeId'].isFirstChange()) {
+      this.load();
+    }
   }
 
   load(): void {
@@ -48,5 +56,14 @@ export class EvidenceListComponent implements OnInit {
       panelClass: 'md-dialog-rounded'
     });
     ref.afterClosed().subscribe(ok => { if (ok) this.load(); });
+  }
+
+  copyUrl(url?: string | null): void {
+    if (!url) {
+      this.snack.open('No URL to copy.', 'OK', { duration: 2000 });
+      return;
+    }
+    const ok = this.clipboard.copy(url);
+    this.snack.open(ok ? 'URL copied to clipboard.' : 'Copy failed.', 'OK', { duration: 2000 });
   }
 }
