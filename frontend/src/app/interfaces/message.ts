@@ -20,7 +20,7 @@ export interface Message {
     comments: Message[],
     commentsNumber: number,
     status: string,
+    dsaStatusToken?: string,
     userId: string
     multimedia: Multimedia
 }
-

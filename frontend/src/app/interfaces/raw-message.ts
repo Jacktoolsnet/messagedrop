@@ -18,9 +18,9 @@ export interface RawMessage {
     dislikes: number,
     commentsNumber: number,
     status: string,
+    dsaStatusToken?: string,
     userId: string,
     likedByUser?: boolean,
     dislikedByUser?: boolean
     multimedia: string
 }
-

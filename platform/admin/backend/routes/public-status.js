@@ -8,10 +8,41 @@ const tableSignal = require('../db/tableDsaSignal');
 const tableDecision = require('../db/tableDsaDecision');
 const tableEvidence = require('../db/tableDsaEvidence');
 const tableAudit = require('../db/tableDsaAuditLog');
+const tableAppeal = require('../db/tableDsaAppeal');
+const multer = require('multer');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
 const router = express.Router();
+router.use(express.json({ limit: '2mb' }));
+
+const allowedMime = new Set([
+  'application/pdf',
+  'image/png',
+  'image/jpeg',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml'
+]);
+
+const storage = multer.diskStorage({
+  destination: (_req, _file, cb) => cb(null, evidenceUploadDir),
+  filename: (_req, file, cb) => {
+    const unique = `${Date.now()}-${crypto.randomUUID()}${path.extname(file.originalname)}`;
+    cb(null, unique);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: { fileSize: 5 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    if (file.mimetype.startsWith('image/') || allowedMime.has(file.mimetype)) {
+      return cb(null, true);
+    }
+    cb(new Error('unsupported_file_type'));
+  }
+});
 
 function db(req) {
   return req.database?.db;
@@ -53,6 +84,9 @@ router.get('/status/:token', async (req, res) => {
       const evidence = await new Promise((resolve, reject) => {
         tableEvidence.listByNotice(_db, { noticeId: notice.id }, (err, rows) => err ? reject(err) : resolve(rows || []));
       });
+      const appeals = decision ? await new Promise((resolve, reject) => {
+        tableAppeal.listByDecision(_db, { decisionId: decision.id }, (err, rows) => err ? reject(err) : resolve(rows || []));
+      }) : [];
       const audit = await new Promise((resolve, reject) => {
         tableAudit.listByEntity(_db, { entityType: 'notice', entityId: notice.id, limit: 200, offset: 0 }, (err, rows) => err ? reject(err) : resolve(rows || []));
       });
@@ -80,6 +114,15 @@ router.get('/status/:token', async (req, res) => {
           hash: ev.hash,
           fileName: ev.fileName,
           addedAt: ev.addedAt
+        })),
+        appeals: (appeals || []).map(ap => ({
+          id: ap.id,
+          filedBy: ap.filedBy,
+          filedAt: ap.filedAt,
+          arguments: ap.arguments,
+          outcome: ap.outcome,
+          resolvedAt: ap.resolvedAt,
+          reviewer: ap.reviewer
         })),
         audit: audit.map(entry => ({
           id: entry.id,
@@ -110,6 +153,7 @@ router.get('/status/:token', async (req, res) => {
     return res.json({
       entityType: 'signal',
       signal,
+      appeals: [],
       audit: audit.map(entry => ({
         id: entry.id,
         action: entry.action,
@@ -121,6 +165,110 @@ router.get('/status/:token', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: 'db_error', detail: err.message });
   }
+});
+
+router.post('/status/:token/appeals', async (req, res) => {
+  const token = String(req.params.token || '').trim();
+  const _db = db(req);
+  if (!_db || !token) return res.status(400).json({ error: 'invalid_token' });
+
+  try {
+    const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
+    if (!notice) return res.status(404).json({ error: 'not_found' });
+
+    const decision = await toPromise(tableDecision.getByNoticeId, _db, notice.id);
+    if (!decision) return res.status(409).json({ error: 'decision_pending' });
+
+    const argsText = String(req.body?.arguments || '').trim();
+    if (!argsText) return res.status(400).json({ error: 'arguments_required' });
+
+    const filedBy = String(req.body?.contact || req.body?.filedBy || 'anonymous').trim() || 'anonymous';
+    const now = Date.now();
+    const id = crypto.randomUUID();
+
+    await toPromise(tableAppeal.create, _db, id, decision.id, filedBy, now, argsText, null, null, null);
+
+    tableAudit.create(
+      _db,
+      crypto.randomUUID(),
+      'notice',
+      notice.id,
+      'appeal_create',
+      `public:${req.ip || 'unknown'}`,
+      now,
+      JSON.stringify({ token, appealId: id, filedBy }),
+      () => { }
+    );
+
+    res.status(201).json({ id });
+  } catch (err) {
+    res.status(500).json({ error: 'db_error', detail: err.message });
+  }
+});
+
+router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
+  upload.single('file')(req, res, async (uploadErr) => {
+    const token = String(req.params.token || '').trim();
+    const appealId = String(req.params.appealId || '').trim();
+    const _db = db(req);
+
+    if (!_db || !token || !appealId) {
+      return res.status(400).json({ error: 'invalid_request' });
+    }
+
+    if (uploadErr) {
+      if (uploadErr.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'file_too_large' });
+      return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+    }
+
+    const file = req.file;
+    if (!file) return res.status(400).json({ error: 'file_required' });
+
+    try {
+      const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
+      if (!notice) return res.status(404).json({ error: 'not_found' });
+
+      const appeals = await new Promise((resolve, reject) => {
+        tableAppeal.getById(_db, appealId, (err, row) => err ? reject(err) : resolve(row));
+      });
+
+      if (!appeals) return res.status(404).json({ error: 'appeal_not_found' });
+
+      const id = crypto.randomUUID();
+      const now = Date.now();
+
+      tableEvidence.create(
+        _db,
+        id,
+        notice.id,
+        'appeal_file',
+        null,
+        null,
+        file.originalname,
+        file.filename,
+        now,
+        (err) => {
+          if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+
+          tableAudit.create(
+            _db,
+            crypto.randomUUID(),
+            'notice',
+            notice.id,
+            'appeal_evidence',
+            `public:${req.ip || 'unknown'}`,
+            now,
+            JSON.stringify({ token, appealId, evidenceId: id, fileName: file.originalname }),
+            () => { }
+          );
+
+          res.status(201).json({ id });
+        }
+      );
+    } catch (err) {
+      res.status(500).json({ error: 'db_error', detail: err.message });
+    }
+  });
 });
 
 router.get('/status/:token/evidence/:id', async (req, res) => {

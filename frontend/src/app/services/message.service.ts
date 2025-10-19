@@ -110,6 +110,7 @@ export class MessageService {
       comments: [],
       commentsNumber: raw.commentsNumber,
       status: raw.status,
+      dsaStatusToken: raw.dsaStatusToken,
       userId: raw.userId,
       multimedia: JSON.parse(raw.multimedia)
     };

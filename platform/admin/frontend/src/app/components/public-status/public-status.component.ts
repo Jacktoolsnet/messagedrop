@@ -11,7 +11,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivatedRoute } from '@angular/router';
-import { PublicStatusAuditEntry, PublicStatusEvidence, PublicStatusResponse, PublicStatusService } from '../../services/public-status.service';
+import { PublicStatusAppeal, PublicStatusAuditEntry, PublicStatusEvidence, PublicStatusResponse, PublicStatusService } from '../../services/public-status.service';
 
 interface MappedAuditEntry extends PublicStatusAuditEntry {
   detailsObj: Record<string, unknown> | null;
@@ -46,6 +46,7 @@ export class PublicStatusComponent implements OnInit {
   readonly error = signal<string | null>(null);
   readonly status = signal<PublicStatusResponse | null>(null);
   readonly auditEntries = signal<MappedAuditEntry[]>([]);
+  readonly appeals = signal<PublicStatusAppeal[]>([]);
 
   private currentToken: string | null = null;
 
@@ -94,6 +95,7 @@ export class PublicStatusComponent implements OnInit {
           ...entry,
           detailsObj: this.parseDetails(entry.details)
         })));
+        this.appeals.set(data.appeals ?? []);
         this.loading.set(false);
       },
       error: (err) => {

@@ -32,6 +32,16 @@ export interface PublicStatusDecision {
   statement?: string | null;
 }
 
+export interface PublicStatusAppeal {
+  id: string;
+  filedBy: string;
+  filedAt: number;
+  arguments: string;
+  outcome?: string | null;
+  resolvedAt?: number | null;
+  reviewer?: string | null;
+}
+
 export interface PublicStatusNotice {
   id: string;
   contentId: string;
@@ -65,6 +75,7 @@ export interface PublicStatusResponse {
   signal?: PublicStatusSignal;
   decision?: PublicStatusDecision | null;
   evidence?: PublicStatusEvidence[];
+  appeals?: PublicStatusAppeal[];
   audit: PublicStatusAuditEntry[];
 }
 

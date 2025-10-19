@@ -32,6 +32,8 @@ const columnCommentsNumber = 'commentsNumber';
 const columnStatus = 'status';
 const columnUserId = 'userId';
 const columnMultimedia = 'multimedia';
+const columnDsaStatusToken = 'dsaStatusToken';
+const columnDsaStatusTokenCreatedAt = 'dsaStatusTokenCreatedAt';
 
 const init = function (db) {
     try {
@@ -56,6 +58,8 @@ const init = function (db) {
             ${columnStatus} TEXT NOT NULL DEFAULT '${messageStatus.ENABLED}',
             ${columnUserId} TEXT NOT NULL,
             ${columnMultimedia} TEXT DEFAULT NULL,
+            ${columnDsaStatusToken} TEXT DEFAULT NULL,
+            ${columnDsaStatusTokenCreatedAt} INTEGER DEFAULT NULL,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
@@ -88,13 +92,15 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
         ${columnPlusCode},
         ${columnMessage},
         ${columnMarkerType},
-        ${columnStyle},
-        ${columnUserId},
-        ${columnMultimedia}
-      ) VALUES (
-        ?, ?, ?, strftime('%s','now'), strftime('%s','now','+30 days'),
-        ?, ?, UPPER(?), ?, ?, ?, ?, ?
-      );`;
+      ${columnStyle},
+      ${columnUserId},
+      ${columnMultimedia},
+      ${columnDsaStatusToken},
+      ${columnDsaStatusTokenCreatedAt}
+    ) VALUES (
+      ?, ?, ?, strftime('%s','now'), strftime('%s','now','+30 days'),
+      ?, ?, UPPER(?), ?, ?, ?, ?, ?, NULL, NULL
+    );`;
 
         const params = [
             uuid,
@@ -300,6 +306,19 @@ const countComment = function (db, messageId, callback) {
     }
 };
 
+const setDsaStatusToken = function (db, uuid, token, createdAt, callback) {
+    try {
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnDsaStatusToken} = ?, ${columnDsaStatusTokenCreatedAt} = ?
+        WHERE ${columnUuid} = ?;
+        `;
+        db.run(sql, [token, createdAt, uuid], (err) => callback(err || null));
+    } catch (error) {
+        callback(error);
+    }
+};
+
 const disableMessage = function (db, messageId, callback) {
     try {
         let sql = `
@@ -406,5 +425,6 @@ module.exports = {
     countView,
     countComment,
     deleteById,
-    cleanPublic
+    cleanPublic,
+    setDsaStatusToken
 }

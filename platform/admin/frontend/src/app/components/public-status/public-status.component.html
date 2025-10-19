@@ -131,6 +131,29 @@
   </mat-card>
   }
 
+  @if (appeals().length > 0) {
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar class="avatar decision">
+        <mat-icon class="material-symbols-outlined">gavel</mat-icon>
+      </div>
+      <mat-card-title>Appeals</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <mat-list>
+        @for (appeal of appeals(); track appeal.id) {
+        <mat-list-item>
+          <div matListItemTitle>Filed {{ appeal.filedAt | date:'medium' }}</div>
+          <div matListItemLine>Status: {{ appeal.outcome || 'pending' }}</div>
+          <div matListItemLine>{{ appeal.arguments }}</div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+        }
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+  }
+
   <mat-card>
     <mat-card-header>
       <div mat-card-avatar class="avatar timeline">

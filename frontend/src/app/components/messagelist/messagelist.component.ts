@@ -25,6 +25,7 @@ import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
 import { DigitalServicesActReportDialogComponent } from '../legal/digital-services-act-report-dialog/digital-services-act-report-dialog.component';
+import { DsaCaseDialogComponent } from '../legal/digital-services-act-report-dialog/dsa-case-dialog/dsa-case-dialog.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
@@ -197,11 +198,19 @@ export class MessagelistComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (!result?.created) return;
 
-      this.removeMessageLocally(message);
-      this.snackBar.open('The content was hidden and removed from the view.', 'OK', {
-        duration: 3000,
-        verticalPosition: 'top'
-      });
+      if (result?.token) {
+        this.flagMessageLocally(message, result.token);
+        this.snackBar.open('The content was hidden and marked for review.', 'OK', {
+          duration: 3000,
+          verticalPosition: 'top'
+        });
+      } else {
+        this.removeMessageLocally(message);
+        this.snackBar.open('The content was hidden and removed from the view.', 'OK', {
+          duration: 3000,
+          verticalPosition: 'top'
+        });
+      }
     });
   }
 
@@ -267,6 +276,29 @@ export class MessagelistComponent implements OnInit {
     }
 
     this.messageService.selectedMessagesSignal.update(selected => selected.filter(m => m.uuid !== message.uuid));
+  }
+
+  private flagMessageLocally(message: Message, token: string) {
+    const mutate = (m: Message) => m.uuid === message.uuid ? { ...m, status: 'disabled', dsaStatusToken: token } : m;
+
+    this.messageService.messagesSignal.update(messages => messages.map(mutate));
+    this.messageService.selectedMessagesSignal.update(selected => selected.map(mutate));
+
+    if (message.parentUuid) {
+      const commentsSignal = this.messageService.getCommentsSignalForMessage(message.parentUuid);
+      commentsSignal.set(commentsSignal().map(mutate));
+    }
+  }
+
+  public openDsaStatus(message: Message) {
+    if (!message.dsaStatusToken) return;
+    this.dialog.open(DsaCaseDialogComponent, {
+      data: { token: message.dsaStatusToken, message },
+      maxHeight: '90vh',
+      width: '720px',
+      maxWidth: '95vw',
+      autoFocus: false
+    });
   }
 
   public editMessageAfterLoginClick(message: Message) {

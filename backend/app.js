@@ -25,6 +25,7 @@ const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
 const tenor = require('./routes/tenor');
 const digitalServiceAct = require('./routes/digital-service-act');
+const dsaStatus = require('./routes/dsa-status');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -278,6 +279,7 @@ app.use('/clientconnect', clientConnect);
 app.use('/connect', connect);
 app.use('/contact', contact);
 app.use('/digitalserviceact', digitalServiceAct);
+app.use('/dsa', dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, geoStatistic);
 app.use('/message', message);
 app.use('/nominatim', nominatim);
@@ -387,4 +389,3 @@ cron.schedule('5 0 * * *', () => {
     }
   });
 });
-

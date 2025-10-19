@@ -1,0 +1,75 @@
+:host {
+  display: block;
+  color: var(--mat-app-text-color);
+}
+
+.dialog-content {
+  display: grid;
+  gap: 1rem;
+  min-width: min(680px, 95vw);
+}
+
+mat-card {
+  display: block;
+}
+
+dl {
+  margin: 0;
+  display: grid;
+  gap: 0.5rem;
+}
+
+dt {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+dd {
+  margin: 0;
+}
+
+.statement {
+  white-space: pre-wrap;
+}
+
+.appeal-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.appeal-form button {
+  justify-self: flex-start;
+}
+
+.upload {
+  margin-top: 1rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.upload button {
+  justify-self: flex-start;
+}
+
+.list-actions {
+  margin-top: 0.5rem;
+}
+
+.error-card {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.error-card mat-icon {
+  color: #f87171;
+}
+
+.loading {
+  padding: 1.5rem 0;
+  display: grid;
+  gap: 0.75rem;
+  text-align: center;
+}

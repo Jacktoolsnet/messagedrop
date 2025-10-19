@@ -1,0 +1,150 @@
+<h2 mat-dialog-title>
+  <mat-icon class="material-symbols-outlined">flag</mat-icon>
+  Moderation status
+</h2>
+
+<mat-dialog-content class="dialog-content" *ngIf="!loading(); else loadingTpl">
+  @if (error()) {
+  <mat-card class="error-card">
+    <mat-icon class="material-symbols-outlined">error</mat-icon>
+    <div>
+      <h3>We could not load the latest information.</h3>
+      <p>{{ error() }}</p>
+    </div>
+  </mat-card>
+  } @else {
+  @if (status(); as caseData) {
+    <mat-card>
+      <mat-card-title>Case summary</mat-card-title>
+      <mat-card-content>
+        <dl>
+          <div>
+            <dt>Status</dt>
+            <dd>{{ caseData.notice?.status || 'RECEIVED' }}</dd>
+          </div>
+          <div>
+            <dt>Content ID</dt>
+            <dd>{{ caseData.notice?.contentId || caseData.signal?.contentId }}</dd>
+          </div>
+          <div>
+            <dt>Submitted</dt>
+            <dd>{{ (caseData.notice?.createdAt || caseData.signal?.createdAt) | date:'medium' }}</dd>
+          </div>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+
+    @if (caseData.decision; as decision) {
+    <mat-card>
+      <mat-card-title>Decision</mat-card-title>
+      <mat-card-content>
+        <dl>
+          <div>
+            <dt>Outcome</dt>
+            <dd>{{ decision.outcome }}</dd>
+          </div>
+          <div>
+            <dt>Reviewed on</dt>
+            <dd>{{ decision.decidedAt | date:'medium' }}</dd>
+          </div>
+          <div *ngIf="decision.statement">
+            <dt>Statement</dt>
+            <dd class="statement">{{ decision.statement }}</dd>
+          </div>
+        </dl>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    @if (evidence().length > 0) {
+    <mat-card>
+      <mat-card-title>Evidence collected</mat-card-title>
+      <mat-card-content>
+        <mat-list>
+          @for (ev of evidence(); track ev.id) {
+          <mat-list-item>
+            <div matListItemTitle>{{ ev.fileName || ev.url || ev.hash || ev.type }}</div>
+            <div matListItemLine>{{ ev.addedAt | date:'medium' }}</div>
+            <div class="list-actions" *ngIf="ev.type === 'file'">
+              <button mat-stroked-button color="primary" (click)="download(ev)">
+                <mat-icon class="material-symbols-outlined">download</mat-icon>
+                Download
+              </button>
+            </div>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+    }
+
+    <mat-card>
+      <mat-card-title>Submit an appeal</mat-card-title>
+      <mat-card-content>
+        <form [formGroup]="appealForm" (ngSubmit)="submitAppeal()" class="appeal-form">
+          <mat-form-field appearance="outline">
+            <mat-label>Your explanation</mat-label>
+            <textarea matInput rows="4" formControlName="arguments" required></textarea>
+            <mat-hint align="end">Minimum 20 characters</mat-hint>
+            @if (appealForm.controls.arguments.invalid && appealForm.controls.arguments.touched) {
+            <mat-error>
+              Please describe why you believe this decision should be reviewed.
+            </mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Contact email (optional)</mat-label>
+            <input matInput formControlName="contact" type="email" placeholder="you@example.com" />
+            @if (appealForm.controls.contact.invalid && appealForm.controls.contact.touched) {
+            <mat-error>Please enter a valid email address.</mat-error>
+            }
+          </mat-form-field>
+
+          <button mat-flat-button color="primary" type="submit" [disabled]="submitting()">
+            <mat-icon class="material-symbols-outlined">send</mat-icon>
+            Submit appeal
+          </button>
+        </form>
+
+        <div class="upload" *ngIf="lastCreatedAppealId">
+          <h4>Upload supporting evidence</h4>
+          <input type="file" (change)="onFileSelected($event)" />
+          <button mat-stroked-button color="primary" (click)="uploadEvidence()" [disabled]="uploading()">
+            <mat-icon class="material-symbols-outlined">upload</mat-icon>
+            Upload file
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    @if (appeals().length > 0) {
+    <mat-card>
+      <mat-card-title>Submitted appeals</mat-card-title>
+      <mat-card-content>
+        <mat-list>
+          @for (appeal of appeals(); track appeal.id) {
+          <mat-list-item>
+            <div matListItemTitle>Filed {{ appeal.filedAt | date:'medium' }}</div>
+            <div matListItemLine>Status: {{ appeal.outcome || 'pending' }}</div>
+            <div matListItemLine class="statement">{{ appeal.arguments }}</div>
+          </mat-list-item>
+          }
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+    }
+  }
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-flat-button color="primary" (click)="close()">Close</button>
+</mat-dialog-actions>
+
+<ng-template #loadingTpl>
+  <div class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading status…</p>
+  </div>
+</ng-template>

@@ -70,6 +70,17 @@ router.post('/signals', signalLimiter, async (req, res) => {
     try {
         await disableLocallyIfPossible(req);
         const resp = await forwardPost('/signals', req.body, req.headers);
+
+        if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
+            tableMessage.setDsaStatusToken(
+                req.database.db,
+                req.body.contentId,
+                resp.data.token,
+                Date.now(),
+                () => { }
+            );
+        }
+
         res.status(resp.status).json(resp.data);
     } catch (err) {
         res.status(502).json({ error: 'bad_gateway', detail: err.message });
@@ -81,6 +92,17 @@ router.post('/notices', noticeLimiter, async (req, res) => {
     try {
         await disableLocallyIfPossible(req);
         const resp = await forwardPost('/notices', req.body, req.headers);
+
+        if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
+            tableMessage.setDsaStatusToken(
+                req.database.db,
+                req.body.contentId,
+                resp.data.token,
+                Date.now(),
+                () => { }
+            );
+        }
+
         res.status(resp.status).json(resp.data);
     } catch (err) {
         res.status(502).json({ error: 'bad_gateway', detail: err.message });
