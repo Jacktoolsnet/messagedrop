@@ -193,6 +193,16 @@ export class MessagelistComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true
     });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (!result?.created) return;
+
+      this.removeMessageLocally(message);
+      this.snackBar.open('The content was hidden and removed from the view.', 'OK', {
+        duration: 3000,
+        verticalPosition: 'top'
+      });
+    });
   }
 
   public deleteMessageAfterLoginClick(message: Message) {
@@ -235,6 +245,28 @@ export class MessagelistComponent implements OnInit {
         }
       });
     }
+  }
+
+  private removeMessageLocally(message: Message) {
+    const isRootMessage = this.messageService.messagesSignal().some(m => m.uuid === message.uuid);
+
+    if (isRootMessage) {
+      this.messageService.messagesSignal.update(messages => messages.filter(m => m.uuid !== message.uuid));
+      this.messageService.selectedMessagesSignal.update(selected => selected.filter(m => m.uuid !== message.uuid));
+      return;
+    }
+
+    if (message.parentUuid) {
+      const commentsSignal = this.messageService.getCommentsSignalForMessage(message.parentUuid);
+      commentsSignal.set(commentsSignal().filter(c => c.uuid !== message.uuid));
+
+      this.messageService.commentCountsSignal.update(counts => ({
+        ...counts,
+        [message.parentUuid!]: Math.max((counts[message.parentUuid!] || 0) - 1, 0)
+      }));
+    }
+
+    this.messageService.selectedMessagesSignal.update(selected => selected.filter(m => m.uuid !== message.uuid));
   }
 
   public editMessageAfterLoginClick(message: Message) {
