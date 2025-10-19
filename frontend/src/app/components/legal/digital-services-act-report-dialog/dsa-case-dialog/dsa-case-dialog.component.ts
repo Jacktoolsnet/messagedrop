@@ -1,19 +1,23 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, Inject, OnInit, signal, computed } from '@angular/core';
+import { Component, computed, Inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatCardModule } from '@angular/material/card';
+import { MatChipsModule } from '@angular/material/chips';
+import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatListModule } from '@angular/material/list';
-import { DsaStatusService } from '../../../../services/dsa-status.service';
-import { DsaStatusResponse } from '../../../../interfaces/dsa-status-response.interface';
-import { DsaStatusEvidence } from '../../../../interfaces/dsa-status-evidence.interface';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTabsModule } from '@angular/material/tabs';
+import { firstValueFrom } from 'rxjs';
+import { environment } from '../../../../../environments/environment';
 import { DsaStatusAppeal } from '../../../../interfaces/dsa-status-appeal.interface';
+import { DsaStatusEvidence } from '../../../../interfaces/dsa-status-evidence.interface';
+import { DsaStatusResponse } from '../../../../interfaces/dsa-status-response.interface';
 import { Message } from '../../../../interfaces/message';
+import { DsaStatusService } from '../../../../services/dsa-status.service';
 
 @Component({
   selector: 'app-dsa-case-dialog',
@@ -28,6 +32,8 @@ import { Message } from '../../../../interfaces/message';
     ReactiveFormsModule,
     MatProgressBarModule,
     MatListModule,
+    MatTabsModule,
+    MatChipsModule,
     DatePipe,
     MatSnackBarModule
   ],
@@ -35,6 +41,17 @@ import { Message } from '../../../../interfaces/message';
   styleUrl: './dsa-case-dialog.component.css'
 })
 export class DsaCaseDialogComponent implements OnInit {
+  private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024;
+  private static readonly MAX_TOTAL_SIZE = 10 * 1024 * 1024;
+  private static readonly ALLOWED_TYPES = new Set([
+    'application/pdf',
+    'image/png',
+    'image/jpeg',
+    'image/gif',
+    'image/webp',
+    'image/svg+xml'
+  ]);
+
   readonly loading = signal(true);
   readonly submitting = signal(false);
   readonly uploading = signal(false);
@@ -43,14 +60,16 @@ export class DsaCaseDialogComponent implements OnInit {
 
   readonly appeals = computed<DsaStatusAppeal[]>(() => this.status()?.appeals ?? []);
   readonly evidence = computed<DsaStatusEvidence[]>(() => this.status()?.evidence ?? []);
+  readonly attachments = signal<File[]>([]);
+  readonly attachmentsSize = computed(() => this.attachments().reduce((sum, file) => sum + file.size, 0));
+  readonly attachmentsSizeLabel = computed(() => this.formatBytes(this.attachmentsSize()));
 
   readonly appealForm = this.fb.nonNullable.group({
     arguments: ['', [Validators.required, Validators.minLength(20)]],
     contact: ['', [Validators.email, Validators.maxLength(320)]]
   });
 
-  selectedFile: File | null = null;
-  lastCreatedAppealId: string | null = null;
+  readonly publicStatusUrl = computed(() => this.buildPublicStatusUrl(this.data.token));
 
   constructor(
     private readonly fb: FormBuilder,
@@ -82,55 +101,93 @@ export class DsaCaseDialogComponent implements OnInit {
     });
   }
 
-  submitAppeal(): void {
+  async submitAppeal(): Promise<void> {
     if (this.appealForm.invalid) {
       this.appealForm.markAllAsTouched();
       return;
     }
-    this.submitting.set(true);
-    this.service.createAppeal(this.data.token, this.appealForm.getRawValue()).subscribe({
-      next: ({ id }) => {
-        this.snack.open('Appeal submitted successfully.', 'OK', { duration: 3000, verticalPosition: 'top' });
-        this.lastCreatedAppealId = id;
-        this.appealForm.reset();
-        this.loadStatus();
-        this.submitting.set(false);
-      },
-      error: (err) => {
-        const msg = err?.error?.error === 'decision_pending'
-          ? 'A decision has not been finalised yet. Appeals are only possible afterwards.'
-          : 'Could not submit the appeal. Please try again later.';
-        this.snack.open(msg, 'OK', { duration: 4000, verticalPosition: 'top' });
-        this.submitting.set(false);
-      }
-    });
-  }
 
-  onFileSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.selectedFile = file;
-  }
-
-  uploadEvidence(): void {
-    if (!this.selectedFile || !this.lastCreatedAppealId) {
-      this.snack.open('Please select a file after submitting your appeal.', 'OK', { duration: 3000, verticalPosition: 'top' });
+    if (this.attachmentsSize() > DsaCaseDialogComponent.MAX_TOTAL_SIZE) {
+      this.snack.open('Files exceed the total limit of 10 MB.', 'OK', { duration: 4000, verticalPosition: 'top' });
       return;
     }
-    this.uploading.set(true);
-    this.service.uploadAppealEvidence(this.data.token, this.lastCreatedAppealId, this.selectedFile).subscribe({
-      next: () => {
-        this.snack.open('File uploaded successfully.', 'OK', { duration: 3000, verticalPosition: 'top' });
-        this.selectedFile = null;
-        this.lastCreatedAppealId = null;
-        this.uploading.set(false);
-        this.loadStatus();
-      },
-      error: () => {
-        this.snack.open('Could not upload the file.', 'OK', { duration: 4000, verticalPosition: 'top' });
-        this.uploading.set(false);
+
+    this.submitting.set(true);
+    try {
+      const { id } = await firstValueFrom(this.service.createAppeal(this.data.token, this.appealForm.getRawValue()));
+
+      let uploadIssue = false;
+      if (id && this.attachments().length > 0) {
+        uploadIssue = !(await this.uploadAttachments(id));
       }
-    });
+
+      const successMessage = uploadIssue
+        ? 'Appeal submitted but some files failed to upload.'
+        : 'Appeal submitted successfully.';
+
+      this.snack.open(successMessage, 'OK', { duration: 3500, verticalPosition: 'top' });
+      if (!uploadIssue) {
+        this.appealForm.reset();
+        this.attachments.set([]);
+      }
+      this.loadStatus();
+    } catch (err: any) {
+      const msg = err?.error?.error === 'decision_pending'
+        ? 'A decision has not been finalised yet. Appeals are only possible afterwards.'
+        : 'Could not submit the appeal. Please try again later.';
+      this.snack.open(msg, 'OK', { duration: 4000, verticalPosition: 'top' });
+    } finally {
+      this.submitting.set(false);
+      this.uploading.set(false);
+    }
+  }
+
+  onAttachmentsSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files ?? []);
+
+    if (!files.length) {
+      input.value = '';
+      return;
+    }
+
+    let rejected = false;
+    let message: string | null = null;
+    const currentFiles = [...this.attachments()];
+    let currentSize = this.attachmentsSize();
+
+    for (const file of files) {
+      if (!this.isAllowedFile(file)) {
+        rejected = true;
+        message = 'Only PDF or image files are allowed.';
+        continue;
+      }
+      if (file.size > DsaCaseDialogComponent.MAX_FILE_SIZE) {
+        rejected = true;
+        message = 'Each file must be at most 5 MB.';
+        continue;
+      }
+      if (currentSize + file.size > DsaCaseDialogComponent.MAX_TOTAL_SIZE) {
+        rejected = true;
+        message = 'Files exceed the total limit of 10 MB.';
+        continue;
+      }
+      currentSize += file.size;
+      currentFiles.push(file);
+    }
+
+    this.attachments.set(currentFiles);
+    input.value = '';
+
+    if (rejected && message) {
+      this.snack.open(message, 'OK', { duration: 4000, verticalPosition: 'top' });
+    }
+  }
+
+  removeAttachment(index: number): void {
+    const next = [...this.attachments()];
+    next.splice(index, 1);
+    this.attachments.set(next);
   }
 
   download(ev: DsaStatusEvidence): void {
@@ -155,6 +212,56 @@ export class DsaCaseDialogComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  openPublicStatus(): void {
+    const url = this.publicStatusUrl();
+    if (!url) return;
+    window.open(url, '_blank', 'noopener');
+  }
+
+  private async uploadAttachments(appealId: string): Promise<boolean> {
+    const files = this.attachments();
+    if (!files.length) return true;
+
+    this.uploading.set(true);
+    try {
+      for (const file of files) {
+        await firstValueFrom(this.service.uploadAppealEvidence(this.data.token, appealId, file));
+      }
+      return true;
+    } catch (err) {
+      console.error('Failed to upload some appeal evidence', err);
+      return false;
+    } finally {
+      this.uploading.set(false);
+    }
+  }
+
+  private isAllowedFile(file: File): boolean {
+    if (DsaCaseDialogComponent.ALLOWED_TYPES.has(file.type)) return true;
+    if (file.type.startsWith('image/')) return true;
+    const ext = file.name.split('.').pop()?.toLowerCase() ?? '';
+    return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'pdf'].includes(ext);
+  }
+
+  private buildPublicStatusUrl(token: string | null | undefined): string | null {
+    if (!token) return null;
+    const base = (environment.publicStatusBaseUrl || '').trim().replace(/\/+$/, '');
+    if (!base) return null;
+    return `${base}/${encodeURIComponent(token)}`;
+  }
+
+  formatBytes(bytes: number): string {
+    if (!bytes) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let value = bytes;
+    let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) {
+      value /= 1024;
+      unitIndex++;
+    }
+    return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   }
 
   private resolveFilename(disposition: string | null, fallback: string): string {
