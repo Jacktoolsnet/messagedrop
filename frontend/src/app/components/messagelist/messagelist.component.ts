@@ -30,6 +30,9 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
+import { DsaStatusService } from '../../services/dsa-status.service';
+
+type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 
 @Component({
   selector: 'app-messagelist',
@@ -53,6 +56,25 @@ import { MessageProfileComponent } from './message-profile/message-profile.compo
   styleUrl: './messagelist.component.css'
 })
 export class MessagelistComponent implements OnInit {
+
+  private static readonly DSA_NOTICE_STATUSES = new Set(['RECEIVED', 'UNDER_REVIEW', 'DECIDED']);
+  private static readonly STATUS_LABELS: Record<'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN', string> = {
+    RECEIVED: 'Notice received',
+    UNDER_REVIEW: 'Under review',
+    DECIDED: 'Decision available',
+    UNKNOWN: 'Status unavailable'
+  };
+  private static readonly STATUS_CLASS_SUFFIX: Record<'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN', string> = {
+    RECEIVED: 'received',
+    UNDER_REVIEW: 'under-review',
+    DECIDED: 'decided',
+    UNKNOWN: 'unknown'
+  };
+
+  private static readonly DSA_UNKNOWN: 'UNKNOWN' = 'UNKNOWN';
+
+  private readonly dsaStatusCache = signal<Record<string, ResolvedDsaStatus>>({});
+  private readonly pendingDsaTokens = new Set<string>();
 
   readonly messagesSignal = signal<Message[]>([]);
   readonly filteredMessagesSignal = computed(() => {
@@ -90,6 +112,7 @@ export class MessagelistComponent implements OnInit {
     public messageDialog: MatDialog,
     public dialog: MatDialog,
     private snackBar: MatSnackBar,
+    private readonly dsaStatusService: DsaStatusService,
     @Inject(MAT_DIALOG_DATA) public data: { location: Location, messageSignal: WritableSignal<Message[]> }
   ) {
     this.userProfile = this.userService.getProfile();
@@ -99,6 +122,30 @@ export class MessagelistComponent implements OnInit {
       } else {
         this.messagesSignal.set(this.messageService.messagesSignal());
       }
+    });
+
+    effect(() => {
+      const tokens = new Set<string>();
+
+      for (const msg of this.filteredMessagesSignal()) {
+        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+          tokens.add(msg.dsaStatusToken);
+        }
+      }
+
+      for (const msg of this.selectedMessagesSignal()) {
+        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+          tokens.add(msg.dsaStatusToken);
+        }
+      }
+
+      for (const msg of this.commentsSignal()) {
+        if (msg.status === 'disabled' && msg.dsaStatusToken) {
+          tokens.add(msg.dsaStatusToken);
+        }
+      }
+
+      tokens.forEach(token => this.ensureDsaStatusLoaded(token));
     });
   }
 
@@ -292,6 +339,7 @@ export class MessagelistComponent implements OnInit {
 
   public openDsaStatus(message: Message) {
     if (!message.dsaStatusToken) return;
+    this.ensureDsaStatusLoaded(message.dsaStatusToken);
     this.dialog.open(DsaCaseDialogComponent, {
       data: { token: message.dsaStatusToken, message },
       maxHeight: '90vh',
@@ -299,6 +347,61 @@ export class MessagelistComponent implements OnInit {
       maxWidth: '95vw',
       autoFocus: false
     });
+  }
+
+  public getDsaStatusButtonClass(message: Message): Record<string, boolean> {
+    const status = this.resolveDsaStatus(message);
+    const suffix = MessagelistComponent.STATUS_CLASS_SUFFIX[status] ?? MessagelistComponent.STATUS_CLASS_SUFFIX.UNKNOWN;
+    return {
+      'dsa-status-button': true,
+      [`dsa-status-${suffix}`]: true
+    };
+  }
+
+  public getDsaStatusAriaLabel(message: Message): string {
+    const status = this.resolveDsaStatus(message);
+    return `Moderation status: ${MessagelistComponent.STATUS_LABELS[status] ?? MessagelistComponent.STATUS_LABELS.UNKNOWN}`;
+  }
+
+  private resolveDsaStatus(message: Message): ResolvedDsaStatus {
+    if (!message.dsaStatusToken) return MessagelistComponent.DSA_UNKNOWN;
+    return this.dsaStatusCache()[message.dsaStatusToken] ?? MessagelistComponent.DSA_UNKNOWN;
+  }
+
+  private ensureDsaStatusLoaded(token: string): void {
+    if (!token) return;
+    const snapshot = this.dsaStatusCache();
+    if (Object.prototype.hasOwnProperty.call(snapshot, token)) return;
+    if (this.pendingDsaTokens.has(token)) return;
+
+    this.pendingDsaTokens.add(token);
+    this.dsaStatusService.getStatus(token).subscribe({
+      next: resp => {
+        const rawStatus = resp.notice?.status ?? (resp.entityType === 'signal' ? 'RECEIVED' : undefined);
+        const status = this.normalizeDsaStatus(rawStatus);
+        this.dsaStatusCache.update(map => ({
+          ...map,
+          [token]: status
+        }));
+      },
+      error: () => {
+        this.dsaStatusCache.update(map => ({
+          ...map,
+          [token]: MessagelistComponent.DSA_UNKNOWN
+        }));
+      },
+      complete: () => {
+        this.pendingDsaTokens.delete(token);
+      }
+    });
+  }
+
+  private normalizeDsaStatus(status: string | null | undefined): ResolvedDsaStatus {
+    if (!status) return MessagelistComponent.DSA_UNKNOWN;
+    const upper = status.toUpperCase();
+    return MessagelistComponent.DSA_NOTICE_STATUSES.has(upper)
+      ? upper as ResolvedDsaStatus
+      : MessagelistComponent.DSA_UNKNOWN;
   }
 
   public editMessageAfterLoginClick(message: Message) {

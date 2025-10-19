@@ -202,6 +202,56 @@ button,
   margin-top: auto;
 }
 
+.buttonbar .dsa-status-button {
+  margin-left: auto;
+  color: #fff;
+  --mdc-fab-icon-color: currentColor;
+  --mdc-fab-container-shape: 14px;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+  transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+}
+
+.buttonbar .dsa-status-button:hover,
+.buttonbar .dsa-status-button:focus-visible {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.28);
+  filter: brightness(1.05);
+}
+
+.buttonbar .dsa-status-button:active {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: 0 3px 12px rgba(0, 0, 0, 0.24);
+}
+
+.buttonbar .dsa-status-button.dsa-status-received {
+  background: linear-gradient(135deg, #ffb74d, #fb8c00);
+  --mdc-fab-container-color: #fb8c00;
+  --mdc-fab-hover-container-color: #f57c00;
+  --mdc-fab-pressed-container-color: #ef6c00;
+}
+
+.buttonbar .dsa-status-button.dsa-status-under-review {
+  background: linear-gradient(135deg, #ff7043, #f15a24);
+  --mdc-fab-container-color: #f15a24;
+  --mdc-fab-hover-container-color: #e64a19;
+  --mdc-fab-pressed-container-color: #d84315;
+}
+
+.buttonbar .dsa-status-button.dsa-status-decided {
+  background: linear-gradient(135deg, #ef5350, #c62828);
+  --mdc-fab-container-color: #c62828;
+  --mdc-fab-hover-container-color: #b71c1c;
+  --mdc-fab-pressed-container-color: #b71c1c;
+}
+
+.buttonbar .dsa-status-button.dsa-status-unknown {
+  background: linear-gradient(135deg, #9e9e9e, #616161);
+  --mdc-fab-container-color: #757575;
+  --mdc-fab-hover-container-color: #616161;
+  --mdc-fab-pressed-container-color: #424242;
+}
+
 /* === Floating action buttons (back/add) === */
 .button_back {
   position: absolute;
