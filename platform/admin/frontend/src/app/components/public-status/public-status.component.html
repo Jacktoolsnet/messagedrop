@@ -140,16 +140,38 @@
       <mat-card-title>Appeals</mat-card-title>
     </mat-card-header>
     <mat-card-content>
-      <mat-list>
+      <div class="appeals-list">
         @for (appeal of appeals(); track appeal.id) {
-        <mat-list-item>
-          <div matListItemTitle>Filed {{ appeal.filedAt | date:'medium' }}</div>
-          <div matListItemLine>Status: {{ appeal.outcome || 'pending' }}</div>
-          <div matListItemLine>{{ appeal.arguments }}</div>
-        </mat-list-item>
-        <mat-divider></mat-divider>
+        <section class="appeal-tile">
+          <header>
+            <div class="meta">
+              <span class="label">Appeal</span>
+              <span>Filed {{ appeal.filedAt | date:'medium' }}</span>
+            </div>
+            <span class="status" [ngClass]="{ resolved: appeal.resolvedAt, open: !appeal.resolvedAt }">
+              {{ formatAppealOutcome(appeal.outcome) }}
+            </span>
+          </header>
+
+          <div class="body">
+            <h4>Arguments</h4>
+            <p>{{ appeal.arguments }}</p>
+          </div>
+
+          @if (appeal.resolvedAt) {
+          <footer>
+            <div class="meta decision">
+              <span class="label">Decision</span>
+              <span>Resolved {{ appeal.resolvedAt | date:'medium' }}</span>
+              @if (appeal.reviewer) {
+              <span>Reviewer: {{ appeal.reviewer }}</span>
+              }
+            </div>
+          </footer>
+          }
+        </section>
         }
-      </mat-list>
+      </div>
     </mat-card-content>
   </mat-card>
   }

@@ -107,6 +107,71 @@
   color: rgba(0, 0, 0, 0.54);
 }
 
+.appeals-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.appeal-tile {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 14px;
+  padding: 1rem;
+  display: grid;
+  gap: 0.75rem;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.appeal-tile header,
+.appeal-tile footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.appeal-tile .meta {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.68);
+}
+
+.appeal-tile .meta .label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: rgba(4, 120, 87, 0.8);
+}
+
+.appeal-tile .status {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  background: rgba(5, 150, 105, 0.12);
+  color: #047857;
+}
+
+.appeal-tile .status.open {
+  background: rgba(255, 193, 7, 0.18);
+  color: #b45309;
+}
+
+.appeal-tile .body h4 {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.appeal-tile .body p {
+  margin: 0;
+  white-space: pre-wrap;
+  color: rgba(0, 0, 0, 0.82);
+}
+
 .error-card {
   display: flex;
   align-items: center;

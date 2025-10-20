@@ -142,6 +142,22 @@ export class PublicStatusComponent implements OnInit {
     }
   }
 
+  formatAppealOutcome(outcome: string | undefined | null): string {
+    if (!outcome) return 'Pending';
+    switch (outcome.toUpperCase()) {
+      case 'UPHELD':
+        return 'Decision upheld';
+      case 'REVISED':
+        return 'Decision revised';
+      case 'PARTIAL':
+        return 'Partially revised';
+      case 'WITHDRAWN':
+        return 'Withdrawn';
+      default:
+        return outcome;
+    }
+  }
+
   print(): void {
     window.print();
   }
