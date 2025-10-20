@@ -311,19 +311,44 @@ router.patch('/notices/:id/status', (req, res) => {
 
     const newStatus = String(req.body?.status || 'UNDER_REVIEW');
     const updatedAt = Date.now();
+    const noticeId = String(req.params.id);
 
-    tableNotice.updateStatus(_db, req.params.id, newStatus, updatedAt, (err, ok) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!ok) return res.status(404).json({ error: 'not_found' });
+    tableNotice.getById(_db, noticeId, (lookupErr, noticeRow) => {
+        if (lookupErr) return res.status(500).json({ error: 'db_error', detail: lookupErr.message });
+        if (!noticeRow) return res.status(404).json({ error: 'not_found' });
 
-        // Audit
-        const auditId = crypto.randomUUID();
-        tableAudit.create(
-            _db, auditId, 'notice', req.params.id, 'status_change',
-            `admin:${req.admin?.sub || 'unknown'}`, updatedAt, JSON.stringify({ status: newStatus }),
-            () => { }
-        );
-        res.json({ ok: true });
+        tableNotice.updateStatus(_db, noticeId, newStatus, updatedAt, (err, ok) => {
+            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+            if (!ok) return res.status(404).json({ error: 'not_found' });
+
+            // Audit
+            const auditId = crypto.randomUUID();
+            tableAudit.create(
+                _db, auditId, 'notice', noticeId, 'status_change',
+                `admin:${req.admin?.sub || 'unknown'}`, updatedAt, JSON.stringify({ status: newStatus }),
+                () => { }
+            );
+
+            if (noticeRow.status !== newStatus && newStatus === 'UNDER_REVIEW') {
+                void notifyContentOwner(req, {
+                    type: 'notice',
+                    event: 'notice_under_review',
+                    contentId: noticeRow.contentId,
+                    category: noticeRow.category,
+                    reasonText: noticeRow.reasonText,
+                    reportedContentType: noticeRow.reportedContentType,
+                    caseId: noticeId,
+                    statusUrl: buildStatusUrl(noticeRow.publicToken),
+                    includeExcerpt: true,
+                    title: 'DSA notice under review',
+                    bodySegments: [
+                        `Your DSA case #${noticeId} is now under review by our moderation team.`
+                    ]
+                });
+            }
+
+            res.json({ ok: true });
+        });
     });
 });
 

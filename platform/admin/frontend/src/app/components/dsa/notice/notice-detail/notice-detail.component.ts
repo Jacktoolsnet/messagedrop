@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -46,7 +46,7 @@ type TranslationState = {
   templateUrl: './notice-detail.component.html',
   styleUrls: ['./notice-detail.component.css']
 })
-export class NoticeDetailComponent {
+export class NoticeDetailComponent implements OnInit {
   private ref = inject(MatDialogRef<NoticeDetailComponent, boolean>);
   private data = inject<DsaNotice>(MAT_DIALOG_DATA);
   private dsa = inject(DsaService);
@@ -55,6 +55,7 @@ export class NoticeDetailComponent {
 
   notice = signal<DsaNotice>(this.data);
   status = signal<DsaNoticeStatus>(this.data.status as DsaNoticeStatus);
+  private autoStatusApplied = false;
 
   // reportedContent kommt aus der DB als JSON-String → parsen
   contentObj = computed<any>(() => {
@@ -78,6 +79,10 @@ export class NoticeDetailComponent {
 
   close(ok = false) {
     this.ref.close(ok);
+  }
+
+  ngOnInit(): void {
+    this.ensureUnderReview();
   }
 
   /** Übersetzung via Admin-Backend (/translate/DE/:value) */
@@ -129,5 +134,23 @@ export class NoticeDetailComponent {
   externalLink(): string | null {
     const c = this.contentObj();
     return this.notice().contentUrl || c?.multimedia?.sourceUrl || null;
+  }
+
+  private ensureUnderReview(): void {
+    const current = this.notice();
+    if (!current || this.autoStatusApplied) return;
+
+    if ((current.status || '').toUpperCase() === 'RECEIVED') {
+      this.autoStatusApplied = true;
+      this.dsa.patchNoticeStatus(current.id, 'UNDER_REVIEW').subscribe({
+        next: () => {
+          this.status.set('UNDER_REVIEW');
+          this.notice.update(n => ({ ...n, status: 'UNDER_REVIEW', updatedAt: Date.now() }));
+        },
+        error: () => {
+          this.autoStatusApplied = false;
+        }
+      });
+    }
   }
 }
