@@ -229,4 +229,55 @@ router.patch('/mark-read', [security.authenticate], (req, res) => {
     );
 });
 
+router.patch('/mark-unread', [security.authenticate], (req, res) => {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+        return res.status(401).json({ status: 401, error: 'unauthorized' });
+    }
+
+    const uuids = Array.isArray(req.body?.uuids)
+        ? req.body.uuids.filter((value) => typeof value === 'string' && value.trim() !== '')
+        : [];
+
+    if (uuids.length === 0) {
+        return res.status(400).json({ status: 400, error: 'invalid_request' });
+    }
+
+    tableNotification.markManyAsUnread(
+        req.database.db,
+        userId,
+        uuids,
+        (err) => {
+            if (err) {
+                return res.status(500).json({
+                    status: 500,
+                    error: err.message || 'failed_to_mark_notifications'
+                });
+            }
+
+            tableNotification.getByUuids(
+                req.database.db,
+                uuids,
+                (fetchErr, updated) => {
+                    if (fetchErr) {
+                        return res.status(500).json({
+                            status: 500,
+                            error: fetchErr.message || 'failed_to_fetch_notifications'
+                        });
+                    }
+
+                    const filtered = updated.filter((item) => item && item.userId === userId);
+                    const lookup = new Map(filtered.map(item => [item.uuid, item]));
+                    const ordered = uuids.map(uuid => lookup.get(uuid)).filter(Boolean);
+
+                    return res.status(200).json({
+                        status: 200,
+                        rows: ordered
+                    });
+                }
+            );
+        }
+    );
+});
+
 module.exports = router;

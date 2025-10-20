@@ -42,36 +42,36 @@
 
     @if (selectedNotification(); as detail) {
     <div class="detail-view">
-      <div class="detail-tile detail-header">
-        <div class="detail-header__status">
-          @if (detail.metadata?.dsa?.caseId) {
+      <div class="detail-tile-grid">
+        <div class="detail-tile detail-meta-item detail-meta-case">
           <span class="detail-meta-item__label">Case ID</span>
-          <span class="detail-meta-item__value">{{ detail.metadata?.dsa?.caseId }}</span>
-          }
+          <span class="detail-meta-item__value">
+            {{ detail.metadata?.dsa?.caseId ?? 'n/a' }}
+          </span>
+        </div>
+        <div class="detail-tile detail-meta-item detail-meta-actions">
+          <span class="detail-meta-item__label">Actions</span>
+          <div class="detail-actions" role="group" aria-label="Case actions">
+            @if (detail.metadata?.dsa?.statusUrl) {
+            <button mat-icon-button color="primary" matTooltip="Open case details"
+              (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
+              <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+            </button>
+            }
+            <button mat-icon-button color="accent"
+              [matTooltip]="detail.status === 'unread' ? 'Mark as read' : 'Mark as unread'"
+              (click)="detail.status === 'unread' ? markNotificationAsRead(detail, $event) : markNotificationAsUnread(detail, $event)"
+              aria-label="Toggle read state">
+              <mat-icon class="material-symbols-outlined">
+                {{ detail.status === 'unread' ? 'done_all' : 'mark_email_unread' }}
+              </mat-icon>
+            </button>
+          </div>
         </div>
       </div>
-      <div class="detail-tile detail-meta-item">
-        <span class="detail-meta-item__label">Actions</span>
-        <div class="detail-actions" role="group" aria-label="Case actions">
-          @if (detail.metadata?.dsa?.statusUrl) {
-          <button mat-icon-button color="primary" matTooltip="Open case details"
-            (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
-            <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
-          </button>
-          }
-          <button mat-icon-button color="accent"
-            [matTooltip]="detail.status === 'unread' ? 'Mark as read' : 'Mark as unread'"
-            (click)="detail.status === 'unread' ? markNotificationAsRead(detail, $event) : markNotificationAsUnread(detail, $event)"
-            aria-label="Toggle read state">
-            <mat-icon class="material-symbols-outlined">
-              {{ detail.status === 'unread' ? 'done_all' : 'mark_email_unread' }}
-            </mat-icon>
-          </button>
-        </div>
-      </div>
-
       <div class="detail-tile detail-body">
-        {{ detail.body }}
+        <span class="detail-meta-item__label">Message</span>
+        <span class="detail-meta-item__value">{{ detail.body }}</span>
       </div>
 
       <div class="detail-tile-grid">

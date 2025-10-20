@@ -253,6 +253,31 @@ const markManyAsRead = function (db, userId, uuids, callback) {
     }
 };
 
+const markManyAsUnread = function (db, userId, uuids, callback) {
+    try {
+        if (!Array.isArray(uuids) || uuids.length === 0) {
+            return callback(null, 0);
+        }
+
+        const placeholders = uuids.map(() => '?').join(',');
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnStatus} = '${notificationStatus.UNREAD}',
+            ${columnReadAt} = NULL
+        WHERE ${columnUserId} = ?
+        AND ${columnUuid} IN (${placeholders});`;
+
+        db.run(sql, [userId, ...uuids], function (err) {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, this.changes);
+        });
+    } catch (error) {
+        callback(error);
+    }
+};
+
 module.exports = {
     tableName,
     notificationStatus,
@@ -263,5 +288,6 @@ module.exports = {
     getByUuids,
     countByUserIdAndStatus,
     markAsRead,
-    markManyAsRead
+    markManyAsRead,
+    markManyAsUnread
 };

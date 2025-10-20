@@ -51,16 +51,13 @@ export class SystemMessageDialogComponent implements OnInit {
         return;
       }
 
-      if (current === null) {
-        this.selectedNotification.set(items[0] ?? null);
-        return;
-      }
-
-      const updated = items.find(item => item.uuid === current.uuid);
-      if (updated) {
-        this.selectedNotification.set(updated);
-      } else {
-        this.selectedNotification.set(items[0] ?? null);
+      if (current !== null) {
+        const updated = items.find(item => item.uuid === current.uuid);
+        if (updated) {
+          this.selectedNotification.set(updated);
+        } else {
+          this.selectedNotification.set(null);
+        }
       }
     });
   }
@@ -97,6 +94,14 @@ export class SystemMessageDialogComponent implements OnInit {
     await this.systemNotificationService.markAsRead([notification.uuid]);
   }
 
+  async markNotificationAsUnread(notification: SystemNotification, event?: MouseEvent): Promise<void> {
+    event?.stopPropagation();
+    if (notification.status === 'unread') {
+      return;
+    }
+    await this.systemNotificationService.markAsUnread([notification.uuid]);
+  }
+
   openStatusLink(url?: string | null, event?: MouseEvent): void {
     event?.stopPropagation();
     if (!url) {
@@ -105,16 +110,8 @@ export class SystemMessageDialogComponent implements OnInit {
     window.open(url, '_blank', 'noopener');
   }
 
-  getSummary(notification: SystemNotification): string {
-    if (notification.metadata?.reasonText) {
-      return notification.metadata.reasonText;
-    }
-    const body = notification.body || '';
-    return body.length > 90 ? `${body.slice(0, 87)}…` : body;
-  }
-
-  getStatusDisplay(notification: SystemNotification): string {
-    return notification.status === 'unread' ? 'New' : 'Viewed';
+  backToList(): void {
+    this.selectedNotification.set(null);
   }
 
   close(): void {

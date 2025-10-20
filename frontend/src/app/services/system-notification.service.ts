@@ -151,6 +151,57 @@ export class SystemNotificationService {
       await this.refreshUnreadCount();
       return updated;
     } catch (error) {
+      if (error instanceof HttpErrorResponse && error.status === 404) {
+        await this.loadNotifications(this.filterSig());
+        await this.refreshUnreadCount();
+        return [];
+      }
+      const message = this.resolveErrorMessage(error);
+      this.snackBar.open(message, 'OK', { duration: 3000 });
+      throw error;
+    }
+  }
+
+  async markAsUnread(uuids: string[]): Promise<SystemNotification[]> {
+    if (!this.userService.isReady() || uuids.length === 0) {
+      return [];
+    }
+
+    const url = `${environment.apiUrl}/notification/mark-unread`;
+    const options = { ...this.httpOptions };
+    const body = { uuids };
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
+      title: 'System messages',
+      image: '',
+      icon: '',
+      message: 'Updating message status…',
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    try {
+      const response = await firstValueFrom(this.http.patch<NotificationListResponse>(url, body, options));
+      const updated = response.rows ?? [];
+
+      if (updated.length > 0) {
+        const updatesMap = new Map(updated.map(item => [item.uuid, item]));
+        const currentFilter = this.filterSig();
+
+        this.notificationsSig.update(current => {
+          const next = current.map(item => updatesMap.get(item.uuid) ?? item);
+          if (currentFilter === 'read') {
+            return next.filter(item => item.status === 'read');
+          }
+          return next;
+        });
+      }
+
+      await this.refreshUnreadCount();
+      return updated;
+    } catch (error) {
       const message = this.resolveErrorMessage(error);
       this.snackBar.open(message, 'OK', { duration: 3000 });
       throw error;
