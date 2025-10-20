@@ -63,7 +63,7 @@
               (click)="detail.status === 'unread' ? markNotificationAsRead(detail, $event) : markNotificationAsUnread(detail, $event)"
               aria-label="Toggle read state">
               <mat-icon class="material-symbols-outlined">
-                {{ detail.status === 'unread' ? 'done_all' : 'mark_email_unread' }}
+                {{ detail.status === 'unread' ? 'mark_email_read' : 'mark_email_unread' }}
               </mat-icon>
             </button>
           </div>
@@ -129,7 +129,7 @@
           @if (notification.status === 'unread') {
           <button mat-icon-button color="accent" matTooltip="Mark as read"
             (click)="markNotificationAsRead(notification, $event)" aria-label="Mark as read">
-            <mat-icon class="material-symbols-outlined">done_all</mat-icon>
+            <mat-icon class="material-symbols-outlined">drafts</mat-icon>
           </button>
           } @else {
           <button mat-icon-button color="accent" matTooltip="Mark as unread"

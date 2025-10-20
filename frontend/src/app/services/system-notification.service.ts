@@ -116,9 +116,9 @@ export class SystemNotificationService {
       return [];
     }
 
-    const url = `${environment.apiUrl}/notification/mark-read`;
+    const url = `${environment.apiUrl}/notification/mark`;
     const options = { ...this.httpOptions };
-    const body = { uuids };
+    const body = { uuids, status: 'read' };
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
@@ -167,9 +167,9 @@ export class SystemNotificationService {
       return [];
     }
 
-    const url = `${environment.apiUrl}/notification/mark-unread`;
+    const url = `${environment.apiUrl}/notification/mark`;
     const options = { ...this.httpOptions };
-    const body = { uuids };
+    const body = { uuids, status: 'unread' };
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,

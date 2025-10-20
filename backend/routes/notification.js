@@ -178,7 +178,7 @@ router.get('/count/unread/:userId', [security.authenticate], (req, res) => {
     );
 });
 
-router.patch('/mark-read', [security.authenticate], (req, res) => {
+function handleMarkStatus(req, res, targetStatus) {
     const userId = getAuthenticatedUserId(req);
     if (!userId) {
         return res.status(401).json({ status: 401, error: 'unauthorized' });
@@ -192,7 +192,11 @@ router.patch('/mark-read', [security.authenticate], (req, res) => {
         return res.status(400).json({ status: 400, error: 'invalid_request' });
     }
 
-    tableNotification.markManyAsRead(
+    const markFn = targetStatus === tableNotification.notificationStatus.UNREAD
+        ? tableNotification.markManyAsUnread
+        : tableNotification.markManyAsRead;
+
+    markFn(
         req.database.db,
         userId,
         uuids,
@@ -227,57 +231,26 @@ router.patch('/mark-read', [security.authenticate], (req, res) => {
             );
         }
     );
+}
+
+router.patch('/mark-read', [security.authenticate], (req, res) => {
+    handleMarkStatus(req, res, tableNotification.notificationStatus.READ);
 });
 
 router.patch('/mark-unread', [security.authenticate], (req, res) => {
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-        return res.status(401).json({ status: 401, error: 'unauthorized' });
-    }
+    handleMarkStatus(req, res, tableNotification.notificationStatus.UNREAD);
+});
 
-    const uuids = Array.isArray(req.body?.uuids)
-        ? req.body.uuids.filter((value) => typeof value === 'string' && value.trim() !== '')
-        : [];
+router.patch('/mark', [security.authenticate], (req, res) => {
+    const requestedStatus = typeof req.body?.status === 'string'
+        ? req.body.status.toLowerCase()
+        : tableNotification.notificationStatus.READ;
 
-    if (uuids.length === 0) {
-        return res.status(400).json({ status: 400, error: 'invalid_request' });
-    }
+    const targetStatus = requestedStatus === tableNotification.notificationStatus.UNREAD
+        ? tableNotification.notificationStatus.UNREAD
+        : tableNotification.notificationStatus.READ;
 
-    tableNotification.markManyAsUnread(
-        req.database.db,
-        userId,
-        uuids,
-        (err) => {
-            if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    error: err.message || 'failed_to_mark_notifications'
-                });
-            }
-
-            tableNotification.getByUuids(
-                req.database.db,
-                uuids,
-                (fetchErr, updated) => {
-                    if (fetchErr) {
-                        return res.status(500).json({
-                            status: 500,
-                            error: fetchErr.message || 'failed_to_fetch_notifications'
-                        });
-                    }
-
-                    const filtered = updated.filter((item) => item && item.userId === userId);
-                    const lookup = new Map(filtered.map(item => [item.uuid, item]));
-                    const ordered = uuids.map(uuid => lookup.get(uuid)).filter(Boolean);
-
-                    return res.status(200).json({
-                        status: 200,
-                        rows: ordered
-                    });
-                }
-            );
-        }
-    );
+    handleMarkStatus(req, res, targetStatus);
 });
 
 module.exports = router;
