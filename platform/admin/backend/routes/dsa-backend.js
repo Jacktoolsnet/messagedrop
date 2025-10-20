@@ -4,6 +4,7 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
+const { notifyContentOwner } = require('../utils/notifyContentOwner');
 
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
@@ -52,6 +53,12 @@ function asString(v) { return (v === undefined || v === null) ? null : String(v)
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
 
 const dayMs = 24 * 60 * 60 * 1000;
+const statusBaseUrl = (process.env.PUBLIC_STATUS_BASE_URL || '').replace(/\/+$/, '') || null;
+
+function buildStatusUrl(token) {
+    if (!token || !statusBaseUrl) return null;
+    return `${statusBaseUrl}/${token}`;
+}
 
 function resolveRange(range = '90d', now = Date.now()) {
     const map = {
@@ -881,6 +888,22 @@ router.post('/signals/:id/promote', (req, res) => {
                         () => { }
                     );
 
+                    void notifyContentOwner(req, {
+                        type: 'notice',
+                        event: 'signal_promoted',
+                        contentId,
+                        caseId: noticeId,
+                        category,
+                        reasonText,
+                        reportedContentType,
+                        statusUrl: buildStatusUrl(noticeToken),
+                        bodySegments: [
+                            'We escalated a DSA signal into a formal notice for your message.'
+                        ],
+                        includeExcerpt: true,
+                        title: 'DSA notice opened'
+                    });
+
                     res.status(201).json({ noticeId, removed: true });
                 });
             }
@@ -930,6 +953,26 @@ router.delete('/signals/:id', (req, res) => {
                 JSON.stringify({ reason, snapshot: sig }),
                 () => { }
             );
+
+            const readableReason = reason === 'dismissed_by_admin'
+                ? 'Dismissed by moderation team'
+                : reason;
+
+            void notifyContentOwner(req, {
+                type: 'signal',
+                event: 'signal_dismissed',
+                contentId: sig.contentId,
+                category: sig.category,
+                reasonText: readableReason,
+                reportedContentType: sig.reportedContentType,
+                includeExcerpt: true,
+                title: 'DSA signal resolved',
+                caseId: id,
+                bodySegments: [
+                    `We reviewed DSA signal Case #${id} and did not find a violation of our policies.`,
+                    'Your message has been made visible again.'
+                ]
+            });
 
             res.json({ deleted: true });
         });

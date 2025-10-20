@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const axios = require('axios');
 const { checkToken } = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
+const { notifyContentOwner } = require('../utils/notifyContentOwner');
 
 // DB-Tabellen
 const tableSignal = require('../db/tableDsaSignal');
@@ -21,118 +22,6 @@ function generateStatusToken() {
 function buildStatusUrl(token) {
     if (!token || !statusBaseUrl) return null;
     return `${statusBaseUrl}/${token}`;
-}
-
-function truncate(text, maxLength = 160) {
-    if (typeof text !== 'string' || text.length <= maxLength) {
-        return text || '';
-    }
-    return `${text.slice(0, maxLength - 1)}…`;
-}
-
-async function notifyContentOwner(req, notification) {
-    const { contentId, type } = notification || {};
-    if (!contentId || !process.env.BASE_URL || !process.env.PORT || !process.env.BACKEND_TOKEN) {
-        return false;
-    }
-
-    const baseUrl = `${process.env.BASE_URL}:${process.env.PORT}`;
-    const headers = {
-        'X-API-Authorization': process.env.BACKEND_TOKEN,
-        'Accept': 'application/json'
-    };
-
-    try {
-        const messageResp = await axios.get(
-            `${baseUrl}/message/get/uuid/${encodeURIComponent(contentId)}`,
-            {
-                headers,
-                timeout: 5000,
-                validateStatus: () => true
-            }
-        );
-
-        if (messageResp.status !== 200 || messageResp.data?.status !== 200 || !messageResp.data?.message) {
-            return false;
-        }
-
-        const message = messageResp.data.message;
-        if (!message?.userId) {
-            return false;
-        }
-
-        const kindLabel = type === 'signal' ? 'quick report (signal)' : 'formal DSA notice';
-        const excerpt = truncate(message.message || '', 180);
-
-        const bodySegments = [`We received a ${kindLabel} about one of your messages.`];
-        if (excerpt) {
-            bodySegments.push(`Message excerpt: "${excerpt}"`);
-        }
-        if (notification.category) {
-            bodySegments.push(`Category: ${notification.category}`);
-        }
-        if (notification.reasonText) {
-            bodySegments.push(`Reason provided: ${notification.reasonText}`);
-        }
-        if (notification.statusUrl) {
-            bodySegments.push('You can review the case via the status page.');
-        }
-
-        const metadata = {
-            contentId: message.uuid,
-            messageId: message.id,
-            category: notification.category ?? null,
-            reasonText: notification.reasonText ?? null,
-            reportedContentType: notification.reportedContentType ?? null,
-            dsa: {
-                type,
-                caseId: notification.caseId ?? null,
-                token: notification.token ?? null,
-                statusUrl: notification.statusUrl ?? null
-            }
-        };
-
-        const payload = {
-            userId: message.userId,
-            title: type === 'signal' ? 'New DSA signal' : 'New DSA notice',
-            body: bodySegments.join(' '),
-            category: 'dsa',
-            source: 'digital-service-act',
-            metadata
-        };
-
-        const response = await axios.post(
-            `${baseUrl}/notification/create`,
-            payload,
-            {
-                headers,
-                timeout: 5000,
-                validateStatus: () => true
-            }
-        );
-
-        if (response.status >= 200 && response.status < 300) {
-            return true;
-        }
-
-        req.logger?.warn?.('Notification creation returned non-2xx', {
-            status: response.status,
-            type,
-            contentId
-        });
-        return false;
-    } catch (error) {
-        if (req.logger?.warn) {
-            req.logger.warn('Failed to send system notification to uploader', {
-                error: error.message,
-                type,
-                contentId
-            });
-        } else {
-            console.warn('Failed to send system notification to uploader', error.message);
-        }
-        return false;
-    }
 }
 
 /* ---------------------- Minimaler Make-Notifier (axios) ---------------------- */

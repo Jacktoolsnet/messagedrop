@@ -212,11 +212,11 @@
 }
 
 .detail-meta-case {
-  flex: 1 1 auto;
+  flex: 2 1 min(320px, 100%);
 }
 .detail-meta-actions {
   align-items: flex-start;
-  flex: 0 0 auto;
+  flex: 0 1 200px;
 }
 
 .detail-tile-grid {
@@ -257,5 +257,11 @@
 
   .detail-tile-grid {
     flex-direction: column;
+  }
+
+  .detail-meta-case,
+  .detail-meta-actions,
+  .detail-meta-item {
+    flex: 1 1 100%;
   }
 }

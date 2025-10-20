@@ -123,7 +123,7 @@
         </div>
         <div matListItemMeta class="notification-item__actions">
           <button mat-icon-button color="primary" matTooltip="View details"
-            (click)="$event.stopPropagation(); selectNotification(notification)" aria-label="View details">
+            (click)="openStatusLink(notification.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
             <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
           </button>
           @if (notification.status === 'unread') {

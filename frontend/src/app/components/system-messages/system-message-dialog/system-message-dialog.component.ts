@@ -44,20 +44,13 @@ export class SystemMessageDialogComponent implements OnInit {
       const items = this.notifications();
       const current = this.selectedNotification();
 
-      if (!items || items.length === 0) {
-        if (current !== null) {
-          this.selectedNotification.set(null);
-        }
+      if (!items || items.length === 0 || !current) {
         return;
       }
 
-      if (current !== null) {
-        const updated = items.find(item => item.uuid === current.uuid);
-        if (updated) {
-          this.selectedNotification.set(updated);
-        } else {
-          this.selectedNotification.set(null);
-        }
+      const updated = items.find(item => item.uuid === current.uuid);
+      if (updated && updated !== current) {
+        this.selectedNotification.set(updated);
       }
     });
   }
@@ -82,7 +75,16 @@ export class SystemMessageDialogComponent implements OnInit {
   async selectNotification(notification: SystemNotification): Promise<void> {
     this.selectedNotification.set(notification);
     if (notification.status === 'unread') {
-      await this.systemNotificationService.markAsRead([notification.uuid]);
+      try {
+        const updated = await this.systemNotificationService.markAsRead([notification.uuid]);
+        if (updated?.length) {
+          this.selectedNotification.set(updated[0]);
+        } else {
+          this.selectedNotification.set({ ...notification, status: 'read' });
+        }
+      } catch {
+        this.selectedNotification.set(notification);
+      }
     }
   }
 
@@ -91,7 +93,16 @@ export class SystemMessageDialogComponent implements OnInit {
     if (notification.status !== 'unread') {
       return;
     }
-    await this.systemNotificationService.markAsRead([notification.uuid]);
+    try {
+      const updated = await this.systemNotificationService.markAsRead([notification.uuid]);
+      if (updated?.length) {
+        this.selectedNotification.set(updated[0]);
+      } else {
+        this.selectedNotification.set({ ...notification, status: 'read' });
+      }
+    } catch {
+      this.selectedNotification.set(notification);
+    }
   }
 
   async markNotificationAsUnread(notification: SystemNotification, event?: MouseEvent): Promise<void> {
@@ -99,7 +110,16 @@ export class SystemMessageDialogComponent implements OnInit {
     if (notification.status === 'unread') {
       return;
     }
-    await this.systemNotificationService.markAsUnread([notification.uuid]);
+    try {
+      const updated = await this.systemNotificationService.markAsUnread([notification.uuid]);
+      if (updated?.length) {
+        this.selectedNotification.set(updated[0]);
+      } else {
+        this.selectedNotification.set({ ...notification, status: 'unread' });
+      }
+    } catch {
+      this.selectedNotification.set(notification);
+    }
   }
 
   openStatusLink(url?: string | null, event?: MouseEvent): void {
