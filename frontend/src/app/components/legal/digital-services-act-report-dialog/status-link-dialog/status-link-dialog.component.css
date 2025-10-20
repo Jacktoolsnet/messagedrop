@@ -44,8 +44,3 @@ h2[mat-dialog-title] mat-icon {
   word-break: break-word;
   font-family: 'Roboto Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
 }
-
-mat-dialog-actions {
-  padding: 1rem 0;
-  gap: 0.5rem;
-}

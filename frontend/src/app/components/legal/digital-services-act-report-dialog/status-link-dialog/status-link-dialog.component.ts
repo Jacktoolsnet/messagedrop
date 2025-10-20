@@ -56,6 +56,14 @@ export class DsaStatusLinkDialogComponent {
     }
   }
 
+  openInBrowser(): void {
+    const url = this.data.statusUrl;
+    if (!url) {
+      return;
+    }
+    window.open(url, '_blank', 'noopener');
+  }
+
   close(): void {
     this.dialogRef.close(true);
   }

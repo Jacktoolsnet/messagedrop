@@ -9,6 +9,10 @@
   @if (data.statusUrl) {
   <div class="link-box" title="Status URL">
     <span class="link-text">{{ data.statusUrl }}</span>
+    <button mat-icon-button color="primary" matTooltip="Open in browser"
+      (click)="openInBrowser()" aria-label="Open in browser">
+      <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+    </button>
   </div>
   } @else if (data.token) {
   <div class="link-box" title="Status token">
