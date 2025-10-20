@@ -15,6 +15,7 @@ const tableAirQuality = require('./tableAirQuality');
 const tableNominatimCache = require('./tableNominatimCache');
 const tableWeather = require('./tableWeather');
 const tableGeoSearch = require('./tableGeoSearch');
+const tableNotification = require('./tableNotification');
 
 class Database {
 
@@ -47,6 +48,7 @@ class Database {
         tableNominatimCache.init(this.db);
         tableWeather.init(this.db);
         tableGeoSearch.init(this.db);
+        tableNotification.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers(logger);
@@ -256,6 +258,13 @@ class Database {
     --    Falls andere Abfragen stark auf createDateTime sortieren, kann das helfen.
     CREATE INDEX IF NOT EXISTS idx_msg_created_desc
       ON tableMessage(createDateTime DESC);
+
+    -- Notifications: quick lookups per user & status
+    CREATE INDEX IF NOT EXISTS idx_notification_user_status_created
+      ON tableNotification(userId, status, createdAt DESC);
+
+    CREATE INDEX IF NOT EXISTS idx_notification_user_created
+      ON tableNotification(userId, createdAt DESC);
   `;
 
     this.db.exec(sql, (err) => {

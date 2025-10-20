@@ -26,6 +26,7 @@ const nominatim = require('./routes/nominatim');
 const tenor = require('./routes/tenor');
 const digitalServiceAct = require('./routes/digital-service-act');
 const dsaStatus = require('./routes/dsa-status');
+const notification = require('./routes/notification');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -271,6 +272,16 @@ const weatherLimit = rateLimit({
   }
 })
 
+const notificationLimit = rateLimit({
+  windowMs: 1 * 60 * 1000, // 1 minute
+  limit: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    error: 'Too many notification requests, please slow down.'
+  }
+})
+
 // ROUTES
 app.use('/', root);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
@@ -282,6 +293,7 @@ app.use('/digitalserviceact', digitalServiceAct);
 app.use('/dsa', dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, geoStatistic);
 app.use('/message', message);
+app.use('/notification', notificationLimit, notification);
 app.use('/nominatim', nominatim);
 app.use('/openai', openAi);
 app.use('/place', place);

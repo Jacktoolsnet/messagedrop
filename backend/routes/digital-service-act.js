@@ -3,6 +3,8 @@ const security = require('../middleware/security');
 const axios = require('axios');
 const rateLimit = require('express-rate-limit');
 const tableMessage = require('../db/tableMessage');
+const tableNotification = require('../db/tableNotification');
+const crypto = require('crypto');
 
 const router = express.Router();
 
@@ -63,6 +65,96 @@ function disableLocallyIfPossible(req) {
     });
 }
 
+function truncate(text, maxLength = 160) {
+    if (typeof text !== 'string' || text.length <= maxLength) {
+        return text || '';
+    }
+    return `${text.slice(0, maxLength - 1)}…`;
+}
+
+function createNotificationForMessage(req, type, resp) {
+    return new Promise((resolve) => {
+        try {
+            const db = req.database?.db;
+            const contentId = req.body?.contentId;
+
+            if (!db || !contentId) {
+                return resolve(false);
+            }
+
+            const sql = `
+                SELECT id, uuid, message, userId
+                FROM tableMessage
+                WHERE uuid = ?
+                LIMIT 1;
+            `;
+
+            db.get(sql, [contentId], (err, row) => {
+                if (err || !row) {
+                    return resolve(false);
+                }
+
+                const description = type === 'signals'
+                    ? 'We forwarded a DSA quick report regarding your content.'
+                    : 'We forwarded a formal DSA notice regarding your content.';
+
+                const bodyParts = [description];
+                const excerpt = truncate(row.message, 180);
+                if (excerpt) {
+                    bodyParts.push(`Excerpt: "${excerpt}"`);
+                }
+                if (req.body?.reasonText) {
+                    bodyParts.push(`Reason: ${req.body.reasonText}`);
+                }
+
+                const metadata = {
+                    contentId: row.uuid,
+                    messageId: row.id,
+                    dsa: {
+                        type,
+                        caseId: resp?.data?.id ?? null,
+                        token: resp?.data?.token ?? null,
+                        statusUrl: resp?.data?.statusUrl ?? null
+                    }
+                };
+
+                if (req.body?.reasonText) {
+                    metadata.reasonText = req.body.reasonText;
+                }
+                if (req.body?.category) {
+                    metadata.category = req.body.category;
+                }
+                if (req.body?.reportedContentType) {
+                    metadata.reportedContentType = req.body.reportedContentType;
+                }
+
+                tableNotification.create(
+                    db,
+                    {
+                        uuid: crypto.randomUUID(),
+                        userId: row.userId,
+                        title: type === 'signals' ? 'DSA signal submitted' : 'DSA notice submitted',
+                        body: bodyParts.join(' '),
+                        category: 'dsa',
+                        source: 'digital-service-act',
+                        metadata
+                    },
+                    (createErr) => {
+                        if (createErr && req.logger) {
+                            req.logger.error('Failed to store DSA notification', {
+                                error: createErr.message || createErr
+                            });
+                        }
+                        resolve(!createErr);
+                    }
+                );
+            });
+        } catch {
+            resolve(false);
+        }
+    });
+}
+
 /* --------------------------------- Routes ---------------------------------- */
 
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
@@ -80,6 +172,8 @@ router.post('/signals', signalLimiter, async (req, res) => {
                 () => { }
             );
         }
+
+        await createNotificationForMessage(req, 'signals', resp);
 
         res.status(resp.status).json(resp.data);
     } catch (err) {
@@ -102,6 +196,8 @@ router.post('/notices', noticeLimiter, async (req, res) => {
                 () => { }
             );
         }
+
+        await createNotificationForMessage(req, 'notices', resp);
 
         res.status(resp.status).json(resp.data);
     } catch (err) {

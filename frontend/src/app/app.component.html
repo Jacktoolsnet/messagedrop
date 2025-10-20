@@ -19,7 +19,10 @@
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab aria-label="User Profile"
     (click)="{}">
-    <mat-icon aria-hidden="false" matBadge="{{0 | shortNumber}}" matBadgeColor="primary"
+    <mat-icon aria-hidden="false"
+        matBadge="{{ unreadSystemNotificationCount() | shortNumber }}"
+        [matBadgeHidden]="!hasUnreadSystemNotifications()"
+        matBadgeColor="primary"
         class="material-symbols-outlined">person</mat-icon>
 </button>
 }
@@ -59,6 +62,16 @@
     <button mat-menu-item (click)="editUserProfile()">
         <mat-icon class="material-symbols-outlined">badge</mat-icon>
         <span>My profile</span>
+    </button>
+    }
+
+    @if (userService.isReady()) {
+    <button mat-menu-item (click)="openSystemMessages()">
+        <mat-icon class="material-symbols-outlined"
+            [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
+            [matBadgeHidden]="!hasUnreadSystemNotifications()"
+            matBadgeColor="primary">notifications</mat-icon>
+        <span>System messages</span>
     </button>
     }
 

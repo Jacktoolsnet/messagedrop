@@ -31,6 +31,7 @@ import { SharedContentComponent } from './components/shared-content/shared-conte
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
+import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -65,6 +66,7 @@ import { PlaceService } from './services/place.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SocketioService } from './services/socketio.service';
+import { SystemNotificationService } from './services/system-notification.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
 
@@ -103,6 +105,8 @@ export class AppComponent implements OnInit {
       msg => msg.userId === this.userService.getUser().id
     )
   );
+  readonly unreadSystemNotificationCount = this.systemNotificationService.getUnreadCountSignal();
+  readonly hasUnreadSystemNotifications = computed(() => this.unreadSystemNotificationCount() > 0);
 
   constructor(
     private titleService: Title,
@@ -118,6 +122,7 @@ export class AppComponent implements OnInit {
     private oembedService: OembedService,
     public placeService: PlaceService,
     public contactService: ContactService,
+    public systemNotificationService: SystemNotificationService,
     private geolocationService: GeolocationService,
     private messageService: MessageService,
     private socketioService: SocketioService,
@@ -205,6 +210,13 @@ export class AppComponent implements OnInit {
       if (this.appService.isConsentCompleted()) {
         this.contactService.initContacts();
         this.placeService.initPlaces();
+        if (this.userService.isReady()) {
+          void this.systemNotificationService.refreshUnreadCount();
+        } else {
+          this.systemNotificationService.reset();
+        }
+      } else {
+        this.systemNotificationService.reset();
       }
     });
 
@@ -272,6 +284,7 @@ export class AppComponent implements OnInit {
     this.placeService.logout();
     this.contactService.logout();
     this.noteService.logout();
+    this.systemNotificationService.reset();
   }
 
   private async handleSharedContent(content: SharedContent) {
@@ -314,6 +327,7 @@ export class AppComponent implements OnInit {
     if (notificationAction) {
       this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
       // z. B. Navigation starten, Dialog öffnen, etc.
+      void this.systemNotificationService.refreshUnreadCount();
     }
   }
 
@@ -539,6 +553,25 @@ export class AppComponent implements OnInit {
         this.noteService.addNote(data.note);
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
+    });
+  }
+
+  public openSystemMessages(): void {
+    if (!this.userService.isReady()) {
+      return;
+    }
+
+    const dialogRef = this.dialog.open(SystemMessageDialogComponent, {
+      closeOnNavigation: true,
+      minWidth: '320px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      void this.systemNotificationService.refreshUnreadCount();
     });
   }
 
