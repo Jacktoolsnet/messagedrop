@@ -26,30 +26,45 @@
     <div class="notifications-wrapper">
       <div class="notification-list">
         @if (notifications().length === 0 && !loading()) {
-        <div class="empty-state">
-          No system messages in this view.
-        </div>
+          <div class="empty-state">
+            No system messages in this view.
+          </div>
         } @else {
-        <mat-nav-list>
-          @for (notification of notifications(); track trackByUuid($index, notification)) {
-          <a mat-list-item (click)="selectNotification(notification)"
-            [class.active]="selectedNotification()?.uuid === notification.uuid">
-            <mat-icon class="material-symbols-outlined" matListIcon>
-              {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}
-            </mat-icon>
-            <span matLine>{{ notification.title }}</span>
-            <span matLine class="secondary">
-              {{ (notification.createdAt * 1000) | date : 'short' }}
-            </span>
-            @if (notification.status === 'unread') {
-            <button mat-icon-button matTooltip="Mark as read" matListItemMeta
-              (click)="markNotificationAsRead(notification, $event)">
-              <mat-icon class="material-symbols-outlined">done</mat-icon>
-            </button>
+          <mat-nav-list>
+            @for (notification of notifications(); track trackByUuid($index, notification)) {
+              <a mat-list-item
+                 class="notification-item"
+                 (click)="selectNotification(notification)"
+                 [class.active]="selectedNotification()?.uuid === notification.uuid">
+                <mat-icon class="material-symbols-outlined"
+                          matListItemIcon>
+                  {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}
+                </mat-icon>
+                <div matLine class="notification-item__title">
+                  <span>{{ notification.title }}</span>
+                  <span class="notification-item__timestamp">
+                    {{ (notification.createdAt * 1000) | date : 'short' }}
+                  </span>
+                </div>
+                <div matLine class="notification-item__summary">
+                  {{ getSummary(notification) }}
+                </div>
+                <div matListItemMeta class="notification-item__actions">
+                  <button mat-button color="primary"
+                          (click)="$event.stopPropagation(); selectNotification(notification)">
+                    <mat-icon class="material-symbols-outlined" aria-hidden="true">visibility</mat-icon>
+                    View details
+                  </button>
+                  <button mat-stroked-button color="accent"
+                          [disabled]="notification.status !== 'unread'"
+                          (click)="markNotificationAsRead(notification, $event)">
+                    <mat-icon class="material-symbols-outlined" aria-hidden="true">done_all</mat-icon>
+                    Mark as read
+                  </button>
+                </div>
+              </a>
             }
-          </a>
-          }
-        </mat-nav-list>
+          </mat-nav-list>
         }
       </div>
 
@@ -86,21 +101,10 @@
         </button>
         }
 
-        <div class="notification-detail__actions">
-          @if (detail.status === 'unread') {
-          <button mat-raised-button color="primary" (click)="markCurrentAsRead()">
-            Mark as read
-          </button>
-          } @else {
-          <span class="notification-detail__info">
-            Already marked as read.
-          </span>
-          }
-        </div>
         } @else {
-        <div class="empty-state">
-          Select a system message to see details.
-        </div>
+          <div class="empty-state">
+            Select a system message to see details.
+          </div>
         }
       </div>
     </div>

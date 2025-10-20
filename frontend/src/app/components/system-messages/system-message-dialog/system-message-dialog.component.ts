@@ -97,20 +97,24 @@ export class SystemMessageDialogComponent implements OnInit {
     await this.systemNotificationService.markAsRead([notification.uuid]);
   }
 
-  async markCurrentAsRead(): Promise<void> {
-    const current = this.selectedNotification();
-    if (!current || current.status !== 'unread') {
-      return;
-    }
-    await this.systemNotificationService.markAsRead([current.uuid]);
-  }
-
   openStatusLink(url?: string | null, event?: MouseEvent): void {
     event?.stopPropagation();
     if (!url) {
       return;
     }
     window.open(url, '_blank', 'noopener');
+  }
+
+  getSummary(notification: SystemNotification): string {
+    if (notification.metadata?.reasonText) {
+      return notification.metadata.reasonText;
+    }
+    const body = notification.body || '';
+    return body.length > 90 ? `${body.slice(0, 87)}…` : body;
+  }
+
+  getStatusDisplay(notification: SystemNotification): string {
+    return notification.status === 'unread' ? 'New' : 'Viewed';
   }
 
   close(): void {
