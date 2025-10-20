@@ -63,6 +63,25 @@ function disableLocallyIfPossible(req) {
     });
 }
 
+function enableLocallyIfPossible(req) {
+    return new Promise((resolve) => {
+        try {
+            const db = req.database?.db;
+            const contentId = req.body?.contentId;
+            if (!db || !contentId) return resolve(false);
+
+            tableMessage.enableMessage(db, contentId, (err) => {
+                if (err) {
+                    return resolve(false);
+                }
+                resolve(true);
+            });
+        } catch {
+            resolve(false);
+        }
+    });
+}
+
 /* --------------------------------- Routes ---------------------------------- */
 
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
