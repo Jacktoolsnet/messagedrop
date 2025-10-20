@@ -253,4 +253,33 @@ router.patch('/mark', [security.authenticate], (req, res) => {
     handleMarkStatus(req, res, targetStatus);
 });
 
+router.delete('/delete', [security.authenticate], (req, res) => {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+        return res.status(401).json({ status: 401, error: 'unauthorized' });
+    }
+
+    const uuids = Array.isArray(req.body?.uuids)
+        ? req.body.uuids.filter((value) => typeof value === 'string' && value.trim() !== '')
+        : [];
+
+    if (uuids.length === 0) {
+        return res.status(400).json({ status: 400, error: 'invalid_request' });
+    }
+
+    tableNotification.deleteMany(req.database.db, userId, uuids, (err, changes) => {
+        if (err) {
+            return res.status(500).json({
+                status: 500,
+                error: err.message || 'failed_to_delete_notifications'
+            });
+        }
+
+        return res.status(200).json({
+            status: 200,
+            deleted: changes || 0
+        });
+    });
+});
+
 module.exports = router;

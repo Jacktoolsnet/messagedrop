@@ -278,6 +278,29 @@ const markManyAsUnread = function (db, userId, uuids, callback) {
     }
 };
 
+const deleteMany = function (db, userId, uuids, callback) {
+    try {
+        if (!Array.isArray(uuids) || uuids.length === 0) {
+            return callback(null, 0);
+        }
+
+        const placeholders = uuids.map(() => '?').join(',');
+        const sql = `
+        DELETE FROM ${tableName}
+        WHERE ${columnUserId} = ?
+        AND ${columnUuid} IN (${placeholders});`;
+
+        db.run(sql, [userId, ...uuids], function (err) {
+            if (err) {
+                return callback(err);
+            }
+            callback(null, this.changes);
+        });
+    } catch (error) {
+        callback(error);
+    }
+};
+
 module.exports = {
     tableName,
     notificationStatus,
@@ -289,5 +312,6 @@ module.exports = {
     countByUserIdAndStatus,
     markAsRead,
     markManyAsRead,
-    markManyAsUnread
+    markManyAsUnread,
+    deleteMany
 };

@@ -122,6 +122,22 @@ export class SystemMessageDialogComponent implements OnInit {
     }
   }
 
+  async deleteNotification(notification: SystemNotification, event?: MouseEvent): Promise<void> {
+    event?.stopPropagation();
+    const uuid = notification.uuid;
+    try {
+      const deleted = await this.systemNotificationService.deleteNotifications([uuid]);
+      if (deleted > 0) {
+        const current = this.selectedNotification();
+        if (current?.uuid === uuid) {
+          this.selectedNotification.set(null);
+        }
+      }
+    } catch {
+      // error already surfaced via snackbar
+    }
+  }
+
   openStatusLink(url?: string | null, event?: MouseEvent): void {
     event?.stopPropagation();
     if (!url) {

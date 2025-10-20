@@ -208,6 +208,43 @@ export class SystemNotificationService {
     }
   }
 
+  async deleteNotifications(uuids: string[]): Promise<number> {
+    if (!this.userService.isReady() || uuids.length === 0) {
+      return 0;
+    }
+
+    const url = `${environment.apiUrl}/notification/delete`;
+    const options = { ...this.httpOptions };
+    const body = { uuids };
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: false,
+      title: 'System messages',
+      image: '',
+      icon: 'delete',
+      message: 'Removing system message…',
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    try {
+      const response = await firstValueFrom(this.http.delete<{ status: number; deleted: number }>(url, { ...options, body }));
+      const deleted = response.deleted ?? 0;
+
+      if (deleted > 0) {
+        this.notificationsSig.update(current => current.filter(item => !uuids.includes(item.uuid)));
+        await this.refreshUnreadCount();
+      }
+
+      return deleted;
+    } catch (error) {
+      const message = this.resolveErrorMessage(error);
+      this.snackBar.open(message, 'OK', { duration: 3000 });
+      throw error;
+    }
+  }
+
   async refreshUnreadCount(): Promise<number> {
     if (!this.userService.isReady()) {
       this.unreadCountSig.set(0);
