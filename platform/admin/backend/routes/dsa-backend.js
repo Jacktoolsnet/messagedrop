@@ -273,6 +273,27 @@ async function enablePublicMessage(messageId) {
     return { ok, status: res.status, json };
 }
 
+function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed }) {
+    const verdict = outcome.replace(/_/g, ' ').toLowerCase();
+    return {
+        type: 'notice',
+        event: 'notice_decided',
+        contentId: notice?.contentId,
+        category: notice?.category,
+        reasonText: notice?.reasonText,
+        reportedContentType: notice?.reportedContentType,
+        caseId: noticeId,
+        statusUrl: buildStatusUrl(notice?.publicToken),
+        includeExcerpt: true,
+        title: 'DSA decision available',
+        bodySegments: [
+            `We completed the review for DSA case #${noticeId}.`,
+            `Outcome: ${verdict}.`,
+            `Process type: ${automatedUsed ? 'automated' : 'manual'}.`
+        ]
+    };
+}
+
 
 /* ----------------------------- Notices ----------------------------- */
 router.get('/notices', (req, res) => {

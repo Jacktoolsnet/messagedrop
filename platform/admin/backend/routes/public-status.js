@@ -10,11 +10,19 @@ const tableEvidence = require('../db/tableDsaEvidence');
 const tableAudit = require('../db/tableDsaAuditLog');
 const tableAppeal = require('../db/tableDsaAppeal');
 const multer = require('multer');
+const { notifyContentOwner } = require('../utils/notifyContentOwner');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
 const router = express.Router();
 router.use(express.json({ limit: '2mb' }));
+
+const statusBaseUrl = (process.env.PUBLIC_STATUS_BASE_URL || '').replace(/\/+$/, '') || null;
+
+function buildStatusUrl(token) {
+  if (!token || !statusBaseUrl) return null;
+  return `${statusBaseUrl}/${token}`;
+}
 
 const allowedMime = new Set([
   'application/pdf',
@@ -199,6 +207,23 @@ router.post('/status/:token/appeals', async (req, res) => {
       JSON.stringify({ token, appealId: id, filedBy }),
       () => { }
     );
+
+    void notifyContentOwner(req, {
+      type: 'notice',
+      event: 'notice_appeal_submitted',
+      contentId: notice.contentId,
+      category: notice.category,
+      reasonText: notice.reasonText,
+      reportedContentType: notice.reportedContentType,
+      caseId: notice.id,
+      statusUrl: buildStatusUrl(notice.publicToken),
+      includeExcerpt: true,
+      title: 'DSA appeal received',
+      bodySegments: [
+        `We received an appeal for DSA case #${notice.id}.`,
+        `Filed by: ${filedBy || 'anonymous'}.`
+      ]
+    });
 
     res.status(201).json({ id });
   } catch (err) {
