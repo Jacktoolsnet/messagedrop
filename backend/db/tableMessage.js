@@ -167,6 +167,22 @@ const getById = function (db, messageId, callback) {
     }
 };
 
+const getByUuid = function (db, uuid, callback) {
+    try {
+        const sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnUuid} = ?
+        LIMIT 1;
+        `;
+
+        db.get(sql, [uuid], (err, row) => {
+            callback(err, row);
+        });
+    } catch (error) {
+        throw error;
+    }
+};
+
 const getByUserId = function (db, userId, callback) {
     try {
         let sql = `
@@ -418,6 +434,7 @@ module.exports = {
     enableMessage,
     getAll,
     getById,
+    getByUuid,
     getByUserId,
     getByPlusCode,
     getByBoundingBox,

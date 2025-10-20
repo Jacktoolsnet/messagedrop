@@ -48,6 +48,25 @@ router.get('/get/id/:messageId', function (req, res) {
   });
 });
 
+router.get('/get/uuid/:messageUuid', function (req, res) {
+  let response = { 'status': 0 };
+  tableMessage.getByUuid(req.database.db, req.params.messageUuid, function (err, row) {
+    if (err) {
+      response.status = 500;
+      response.error = err;
+    } else {
+      if (!row) {
+        response.message = {};
+        response.status = 404;
+      } else {
+        response.message = row;
+        response.status = 200;
+      }
+    }
+    res.status(response.status).json(response);
+  });
+});
+
 router.get('/get/userId/:userId', function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableMessage.getByUserId(req.database.db, req.params.userId, function (err, rows) {
