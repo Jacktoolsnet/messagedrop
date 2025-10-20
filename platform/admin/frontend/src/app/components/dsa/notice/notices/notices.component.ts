@@ -121,17 +121,6 @@ export class NoticesComponent implements OnInit, OnDestroy {
     this.load();
   }
 
-  /** Status ändern (z. B. UNDER_REVIEW) */
-  setStatus(n: DsaNotice, status: DsaNoticeStatus): void {
-    this.dsa.patchNoticeStatus(n.id, status).subscribe({
-      next: () => {
-        this.snack.open(`Status set to ${status.replace('_', ' ').toLowerCase()}`, 'OK', { duration: 2000 });
-        this.load();
-      },
-      error: () => this.snack.open('Could not update status.', 'OK', { duration: 3000 })
-    });
-  }
-
   /** Detail öffnen (Dialog – Placeholder; Komponente liefern wir im nächsten Schritt) */
   detail(n: DsaNotice) {
     const ref = this.dialog.open(NoticeDetailComponent, {
