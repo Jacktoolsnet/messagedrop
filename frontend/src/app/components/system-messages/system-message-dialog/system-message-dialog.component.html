@@ -1,6 +1,22 @@
-<h2 mat-dialog-title>System messages</h2>
+<h2 mat-dialog-title>
+  @if (selectedNotification(); as detail) {
+  <div class="dialog-title">
+    <button mat-icon-button class="back-button" (click)="backToList()" aria-label="Back to system messages">
+      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+    </button>
+    <span class="dialog-title__text">{{ detail.title }}</span>
+  </div>
+  } @else {
+  <div class="dialog-title">
+    <mat-icon class="material-symbols-outlined dialog-title__icon" aria-hidden="true">inbox</mat-icon>
+    <span class="dialog-title__text">System messages</span>
+  </div>
+  }
+</h2>
+
 <mat-dialog-content>
   <div class="dialog-content">
+    @if (!selectedNotification()) {
     <div class="filter-group">
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="filter-toggle-group" exclusive
         [value]="currentFilter()" (change)="handleFilterChange($event)" aria-label="Filter system messages">
@@ -18,98 +34,118 @@
         </mat-button-toggle>
       </mat-button-toggle-group>
     </div>
+    }
 
     @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     }
 
-    <div class="notifications-wrapper">
-      <div class="notification-list">
-        @if (notifications().length === 0 && !loading()) {
-          <div class="empty-state">
-            No system messages in this view.
-          </div>
-        } @else {
-          <mat-nav-list>
-            @for (notification of notifications(); track trackByUuid($index, notification)) {
-              <a mat-list-item
-                 class="notification-item"
-                 (click)="selectNotification(notification)"
-                 [class.active]="selectedNotification()?.uuid === notification.uuid">
-                <mat-icon class="material-symbols-outlined"
-                          matListItemIcon>
-                  {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}
-                </mat-icon>
-                <div matLine class="notification-item__title">
-                  <span>{{ notification.title }}</span>
-                  <span class="notification-item__timestamp">
-                    {{ (notification.createdAt * 1000) | date : 'short' }}
-                  </span>
-                </div>
-                <div matLine class="notification-item__summary">
-                  {{ getSummary(notification) }}
-                </div>
-                <div matListItemMeta class="notification-item__actions">
-                  <button mat-button color="primary"
-                          (click)="$event.stopPropagation(); selectNotification(notification)">
-                    <mat-icon class="material-symbols-outlined" aria-hidden="true">visibility</mat-icon>
-                    View details
-                  </button>
-                  <button mat-stroked-button color="accent"
-                          [disabled]="notification.status !== 'unread'"
-                          (click)="markNotificationAsRead(notification, $event)">
-                    <mat-icon class="material-symbols-outlined" aria-hidden="true">done_all</mat-icon>
-                    Mark as read
-                  </button>
-                </div>
-              </a>
-            }
-          </mat-nav-list>
-        }
-      </div>
-
-      <div class="notification-detail">
-        @if (selectedNotification(); as detail) {
-        <div class="notification-detail__header">
-          <h3>{{ detail.title }}</h3>
-          <span class="notification-status" [class.unread]="detail.status === 'unread'"
-            [class.read]="detail.status === 'read'" [class.archived]="detail.status === 'archived'">
-            {{ detail.status }}
-          </span>
-        </div>
-
-        <div class="notification-detail__meta">
-          <span>Received {{ (detail.createdAt * 1000) | date : 'medium' }}</span>
-          @if (detail.readAt) {
-          <span>Read {{ (detail.readAt * 1000) | date : 'medium' }}</span>
+    @if (selectedNotification(); as detail) {
+    <div class="detail-view">
+      <div class="detail-tile detail-header">
+        <div class="detail-header__status">
+          @if (detail.metadata?.dsa?.caseId) {
+          <span class="detail-meta-item__label">Case ID</span>
+          <span class="detail-meta-item__value">{{ detail.metadata?.dsa?.caseId }}</span>
           }
         </div>
+      </div>
+      <div class="detail-tile detail-meta-item">
+        <span class="detail-meta-item__label">Actions</span>
+        <div class="detail-actions" role="group" aria-label="Case actions">
+          @if (detail.metadata?.dsa?.statusUrl) {
+          <button mat-icon-button color="primary" matTooltip="Open case details"
+            (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
+            <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+          </button>
+          }
+          <button mat-icon-button color="accent"
+            [matTooltip]="detail.status === 'unread' ? 'Mark as read' : 'Mark as unread'"
+            (click)="detail.status === 'unread' ? markNotificationAsRead(detail, $event) : markNotificationAsUnread(detail, $event)"
+            aria-label="Toggle read state">
+            <mat-icon class="material-symbols-outlined">
+              {{ detail.status === 'unread' ? 'done_all' : 'mark_email_unread' }}
+            </mat-icon>
+          </button>
+        </div>
+      </div>
 
-        <p class="notification-detail__body">
-          {{ detail.body }}
-        </p>
+      <div class="detail-tile detail-body">
+        {{ detail.body }}
+      </div>
 
+      <div class="detail-tile-grid">
         @if (detail.metadata?.reasonText) {
-        <p class="notification-detail__reason">
-          Reason: {{ detail.metadata?.reasonText }}
-        </p>
+        <div class="detail-tile detail-meta-item">
+          <span class="detail-meta-item__label">Reason</span>
+          <span class="detail-meta-item__value">{{ detail.metadata?.reasonText }}</span>
+        </div>
         }
-
-        @if (detail.metadata?.dsa?.statusUrl) {
-        <button mat-stroked-button color="primary" (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)">
-          View case details
-        </button>
+        @if (detail.metadata?.category) {
+        <div class="detail-tile detail-meta-item">
+          <span class="detail-meta-item__label">Category</span>
+          <span class="detail-meta-item__value">{{ detail.metadata?.category }}</span>
+        </div>
         }
-
-        } @else {
-          <div class="empty-state">
-            Select a system message to see details.
+        @if (detail.metadata?.reportedContentType) {
+        <div class="detail-tile detail-meta-item">
+          <span class="detail-meta-item__label">Content type</span>
+          <span class="detail-meta-item__value">{{ detail.metadata?.reportedContentType }}</span>
+        </div>
+        }
+        <div class="detail-tile detail-meta-item detail-meta-status">
+          <span class="detail-meta-item__label">Status</span>
+          <div class="detail-status-wrapper">
+            <span class="detail-status detail-status-text" [class.unread-text]="detail.status === 'unread'">
+              {{ detail.status | titlecase }}
+            </span>
+            <span class="detail-meta-item__note">{{ (detail.createdAt * 1000) | date : 'medium' }}</span>
           </div>
-        }
+        </div>
       </div>
     </div>
+    } @else {
+    <mat-nav-list class="notification-list">
+      @if (notifications().length === 0 && !loading()) {
+      <div class="empty-state">
+        No system messages in this view.
+      </div>
+      } @else {
+      @for (notification of notifications(); track trackByUuid($index, notification)) {
+      <a mat-list-item class="notification-item" (click)="selectNotification(notification)"
+        [class.active]="selectedNotification()?.uuid === notification.uuid">
+        <mat-icon class="material-symbols-outlined" matListItemIcon>
+          {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}
+        </mat-icon>
+        <div matLine class="notification-item__title">{{ notification.title }}</div>
+        <div matLine class="notification-item__timestamp">
+          {{ (notification.createdAt * 1000) | date : 'medium' }}
+        </div>
+        <div matListItemMeta class="notification-item__actions">
+          <button mat-icon-button color="primary" matTooltip="View details"
+            (click)="$event.stopPropagation(); selectNotification(notification)" aria-label="View details">
+            <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+          </button>
+          @if (notification.status === 'unread') {
+          <button mat-icon-button color="accent" matTooltip="Mark as read"
+            (click)="markNotificationAsRead(notification, $event)" aria-label="Mark as read">
+            <mat-icon class="material-symbols-outlined">done_all</mat-icon>
+          </button>
+          } @else {
+          <button mat-icon-button color="accent" matTooltip="Mark as unread"
+            (click)="markNotificationAsUnread(notification, $event)" aria-label="Mark as unread">
+            <mat-icon class="material-symbols-outlined">mark_email_unread</mat-icon>
+          </button>
+          }
+        </div>
+      </a>
+      }
+      }
+    </mat-nav-list>
+    }
   </div>
 </mat-dialog-content>
+
 <mat-dialog-actions align="end">
   <button mat-button (click)="close()">Close</button>
 </mat-dialog-actions>
