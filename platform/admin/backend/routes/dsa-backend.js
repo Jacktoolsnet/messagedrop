@@ -397,6 +397,10 @@ router.post('/notices/:id/decision', (req, res) => {
                 // Status -> DECIDED
                 tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
 
+                if (outcome === 'NO_ACTION') {
+                    enablePublicMessage(req.params.id).then(() => { }).catch(() => { });
+                }
+
                 // Audit
                 const auditId = crypto.randomUUID();
                 tableAudit.create(
