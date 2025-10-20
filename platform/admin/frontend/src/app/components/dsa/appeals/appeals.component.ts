@@ -53,7 +53,8 @@ export class AppealsComponent implements OnInit {
     this.dsa.loadAppealStats();
   }
 
-  setStatus(status: AppealStatusFilter): void {
+  setStatus(status: AppealStatusFilter | null): void {
+    if (!status) return;
     if (this.statusFilter() === status) return;
     this.statusFilter.set(status);
     this.load();
