@@ -397,8 +397,8 @@ router.post('/notices/:id/decision', (req, res) => {
                 // Status -> DECIDED
                 tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
 
-                if (outcome === 'NO_ACTION') {
-                    enablePublicMessage(req.params.id).then(() => { }).catch(() => { });
+                if (outcome === 'NO_ACTION' && noticeRow?.contentId) {
+                    enablePublicMessage(noticeRow.contentId).catch(() => { });
                 }
 
                 // Audit
@@ -410,23 +410,12 @@ router.post('/notices/:id/decision', (req, res) => {
                     () => { }
                 );
 
-                void notifyContentOwner(req, {
-                    type: 'notice',
-                    event: 'notice_decided',
-                    contentId: noticeRow.contentId,
-                    category: noticeRow.category,
-                    reasonText: noticeRow.reasonText,
-                    reportedContentType: noticeRow.reportedContentType,
-                    caseId: req.params.id,
-                    statusUrl: buildStatusUrl(noticeRow.publicToken),
-                    includeExcerpt: true,
-                    title: 'DSA decision available',
-                    bodySegments: [
-                        `We completed the review for DSA case #${req.params.id}.`,
-                        `Outcome: ${outcome.replace(/_/g, ' ').toLowerCase()}.`,
-                        `Process type: ${automatedUsed ? 'automated' : 'manual'}.`
-                    ]
-                });
+                void notifyContentOwner(req, buildDecisionNotification({
+                    notice: noticeRow,
+                    noticeId: req.params.id,
+                    outcome,
+                    automatedUsed
+                }));
 
                 res.status(201).json(row); // { id }
             }
