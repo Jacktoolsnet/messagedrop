@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, Inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, Inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -51,6 +51,11 @@ export class DsaCaseDialogComponent implements OnInit {
     'image/webp',
     'image/svg+xml'
   ]);
+  private static readonly NOTICE_STATUS_LABELS: Record<string, string> = {
+    RECEIVED: 'Received',
+    UNDER_REVIEW: 'Under review',
+    DECIDED: 'Decided'
+  };
 
   readonly loading = signal(true);
   readonly submitting = signal(false);
@@ -63,6 +68,36 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly attachments = signal<File[]>([]);
   readonly attachmentsSize = computed(() => this.attachments().reduce((sum, file) => sum + file.size, 0));
   readonly attachmentsSizeLabel = computed(() => this.formatBytes(this.attachmentsSize()));
+  readonly activeTab = signal(0);
+  readonly notice = computed(() => this.status()?.notice ?? null);
+  readonly signalCase = computed(() => this.status()?.signal ?? null);
+  readonly isNotice = computed(() => this.status()?.entityType === 'notice' && !!this.notice());
+  readonly isSignal = computed(() => this.status()?.entityType === 'signal' && !!this.signalCase());
+  readonly canSubmitAppeal = computed(() => this.isNotice() && !!this.status()?.decision);
+  readonly summaryStatusLabel = computed(() => {
+    if (this.isNotice()) {
+      return this.formatNoticeStatus(this.notice()?.status);
+    }
+    if (this.isSignal()) {
+      return 'Signal received';
+    }
+    return '—';
+  });
+  readonly summaryContentId = computed(() =>
+    this.notice()?.contentId ??
+    this.signalCase()?.contentId ??
+    this.data.message?.uuid ??
+    '—'
+  );
+  readonly summarySubmittedAt = computed(() =>
+    this.notice()?.createdAt ??
+    this.signalCase()?.createdAt ??
+    null
+  );
+  readonly signalCategory = computed(() => this.signalCase()?.category ?? null);
+  readonly signalReason = computed(() => this.signalCase()?.reasonText ?? null);
+  readonly signalContentType = computed(() => this.signalCase()?.reportedContentType ?? null);
+  readonly signalContentUrl = computed(() => this.signalCase()?.contentUrl ?? null);
 
   readonly appealForm = this.fb.nonNullable.group({
     arguments: ['', [Validators.required, Validators.minLength(20)]],
@@ -81,6 +116,11 @@ export class DsaCaseDialogComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadStatus();
+    effect(() => {
+      if (!this.canSubmitAppeal() && this.activeTab() !== 0) {
+        this.activeTab.set(0);
+      }
+    });
   }
 
   loadStatus(): void {
@@ -262,6 +302,12 @@ export class DsaCaseDialogComponent implements OnInit {
       unitIndex++;
     }
     return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+  }
+
+  formatNoticeStatus(status: string | null | undefined): string {
+    if (!status) return '—';
+    const label = DsaCaseDialogComponent.NOTICE_STATUS_LABELS[status.toUpperCase()];
+    return label ?? status;
   }
 
   private resolveFilename(disposition: string | null, fallback: string): string {

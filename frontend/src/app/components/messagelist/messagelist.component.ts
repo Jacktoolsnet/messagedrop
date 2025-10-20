@@ -17,6 +17,7 @@ import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Profile } from '../../interfaces/profile';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
+import { DsaStatusService } from '../../services/dsa-status.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
@@ -30,7 +31,6 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
-import { DsaStatusService } from '../../services/dsa-status.service';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 
@@ -343,7 +343,7 @@ export class MessagelistComponent implements OnInit {
     this.dialog.open(DsaCaseDialogComponent, {
       data: { token: message.dsaStatusToken, message },
       maxHeight: '90vh',
-      width: '720px',
+      minWidth: '700px',
       maxWidth: '95vw',
       autoFocus: false
     });
