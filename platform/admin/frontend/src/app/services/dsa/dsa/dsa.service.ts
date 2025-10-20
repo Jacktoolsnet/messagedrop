@@ -9,6 +9,7 @@ import { ListSignalsParams } from '../../../interfaces/list-signals-params.inter
 import { NoticeStats } from '../../../interfaces/notice-stats.interface';
 import { PromoteResult } from '../../../interfaces/promote-result.interface';
 import { SignalStats } from '../../../interfaces/signal-stats.interface';
+import { AppealStats } from '../../../interfaces/appeal-stats.interface';
 
 import { DsaAuditEntry } from '../../../interfaces/dsa-audit-entry.interface';
 import { DsaDecision } from '../../../interfaces/dsa-decision.interface';
@@ -19,6 +20,8 @@ import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { ListAuditParams } from '../../../interfaces/list-audit-params.interface';
 import { TransparencyStats } from '../../../interfaces/transparency-stats.interface';
 import { TransparencyReport } from '../../../interfaces/transparency-report.interface';
+import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
+import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -28,6 +31,7 @@ export class DsaService {
   readonly loading = signal(false);
   readonly noticeStats = signal<NoticeStats | null>(null);
   readonly signalStats = signal<SignalStats | null>(null);
+  readonly appealStats = signal<AppealStats | null>(null);
 
   constructor(
     private http: HttpClient,
@@ -181,6 +185,22 @@ export class DsaService {
       });
   }
 
+  loadAppealStats(): void {
+    this.loading.set(true);
+    this.http.get<AppealStats>(`${this.baseUrl}/stats/appeals`)
+      .pipe(
+        catchError(err => {
+          this.snack.open('Could not load appeal stats.', 'OK', { duration: 3000 });
+          this.loading.set(false);
+          return of(null);
+        })
+      )
+      .subscribe(res => {
+        if (res) this.appealStats.set(res);
+        this.loading.set(false);
+      });
+  }
+
   loadSignalStats(): void {
     this.loading.set(true);
     this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)
@@ -203,11 +223,14 @@ export class DsaService {
       notices: this.http.get<NoticeStats>(`${this.baseUrl}/stats/notices`)
         .pipe(catchError(() => of(null))),
       signals: this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)
+        .pipe(catchError(() => of(null))),
+      appeals: this.http.get<AppealStats>(`${this.baseUrl}/stats/appeals`)
         .pipe(catchError(() => of(null)))
-    }).subscribe(({ notices, signals }) => {
+    }).subscribe(({ notices, signals, appeals }) => {
       if (notices) this.noticeStats.set(notices);
       if (signals) this.signalStats.set(signals);
-      if (!notices || !signals) {
+      if (appeals) this.appealStats.set(appeals);
+      if (!notices || !signals || !appeals) {
         this.snack.open('Some DSA stats could not be loaded.', 'OK', { duration: 3000 });
       }
       this.loading.set(false);
@@ -232,6 +255,32 @@ export class DsaService {
         this.snack.open('Could not load signals.', 'OK', { duration: 3000 });
         return of([]);
       }));
+  }
+
+  listAppeals(params: ListAppealsParams = {}): Observable<DsaAppeal[]> {
+    let hp = new HttpParams();
+    if (params.status) hp = hp.set('status', params.status);
+    if (params.noticeId) hp = hp.set('noticeId', params.noticeId);
+    if (params.outcome) hp = hp.set('outcome', params.outcome);
+    if (typeof params.limit === 'number') hp = hp.set('limit', String(params.limit));
+    if (typeof params.offset === 'number') hp = hp.set('offset', String(params.offset));
+
+    return this.http.get<DsaAppeal[]>(`${this.baseUrl}/appeals`, { params: hp }).pipe(
+      catchError(err => {
+        this.snack.open('Could not load appeals.', 'OK', { duration: 3000 });
+        return of([]);
+      })
+    );
+  }
+
+  resolveAppeal(appealId: string, payload: { outcome: string | null; reviewer?: string | null }) {
+    return this.http.patch<{ ok: boolean }>(`${this.baseUrl}/appeals/${encodeURIComponent(appealId)}/resolution`, payload)
+      .pipe(
+        catchError(err => {
+          this.snack.open('Could not update appeal.', 'OK', { duration: 3000 });
+          throw err;
+        })
+      );
   }
 
   getSignalById(id: string): Observable<DsaSignal> {

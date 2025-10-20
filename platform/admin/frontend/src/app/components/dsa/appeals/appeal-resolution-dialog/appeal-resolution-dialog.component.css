@@ -1,0 +1,5 @@
+.resolution-form {
+  display: grid;
+  gap: 1rem;
+  width: min(420px, 90vw);
+}

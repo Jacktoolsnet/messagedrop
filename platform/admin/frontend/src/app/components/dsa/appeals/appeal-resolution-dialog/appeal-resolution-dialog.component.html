@@ -1,0 +1,24 @@
+<h2 mat-dialog-title>Resolve appeal</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="resolution-form" (ngSubmit)="submit()">
+    <mat-form-field appearance="outline">
+      <mat-label>Outcome</mat-label>
+      <mat-select formControlName="outcome" required>
+        @for (option of outcomes; track option.value) {
+        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Reviewer (optional)</mat-label>
+      <input matInput formControlName="reviewer" placeholder="Jane Doe" />
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="submit" (click)="submit()">Save</button>
+</mat-dialog-actions>

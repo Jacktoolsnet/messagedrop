@@ -173,6 +173,28 @@ const updateResolution = function (db, id, outcome, resolvedAt, reviewer, callBa
     });
 };
 
+/**
+ * Liefert aggregierte Statistiken (total, open, resolved).
+ * Open = kein resolvedAt hinterlegt.
+ */
+const stats = function (db, callBack) {
+    const sql = `
+    SELECT
+      COUNT(*) AS total,
+      SUM(CASE WHEN ${columnResolvedAt} IS NULL THEN 1 ELSE 0 END) AS open,
+      SUM(CASE WHEN ${columnResolvedAt} IS NOT NULL THEN 1 ELSE 0 END) AS resolved
+    FROM ${tableName}
+  `;
+    db.get(sql, [], (err, row) => {
+        if (err) return callBack(err);
+        callBack(null, {
+            total: row?.total ?? 0,
+            open: row?.open ?? 0,
+            resolved: row?.resolved ?? 0
+        });
+    });
+};
+
 module.exports = {
     tableName,
     columns: {
@@ -189,5 +211,6 @@ module.exports = {
     create,
     getById,
     listByDecision,
-    updateResolution
+    updateResolution,
+    stats
 };

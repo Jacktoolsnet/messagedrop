@@ -61,6 +61,7 @@ export class DsaDashboardComponent {
   readonly loading = this.dsa.loading;
   readonly noticeStats = this.dsa.noticeStats;
   readonly signalStats = this.dsa.signalStats;
+  readonly appealStats = this.dsa.appealStats;
 
   // Kacheln
   tiles: DsaTile[] = [
@@ -83,6 +84,8 @@ export class DsaDashboardComponent {
       case 'notices':
         // offene = alles außer DECIDED
         return this.noticeStats()?.open ?? 0;
+      case 'appeals':
+        return this.appealStats()?.open ?? 0;
       default:
         return 0; // für die anderen später erweitern
     }
@@ -97,6 +100,7 @@ export class DsaDashboardComponent {
     switch (tile.key) {
       case 'notices': return 'warn';     // offene Reports = rot/warn
       case 'signals': return 'primary';  // 24h-Signals = primär
+      case 'appeals': return 'accent';
       default: return 'primary';
     }
   };

@@ -8,6 +8,7 @@ const { requireAdminJwt, requireRole } = require('../middleware/security');
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
 const tableDecision = require('../db/tableDsaDecision');
+const tableAppeal = require('../db/tableDsaAppeal');
 const tableEvidence = require('../db/tableDsaEvidence');
 const tableNotification = require('../db/tableDsaNotification');
 const tableAudit = require('../db/tableDsaAuditLog');
@@ -374,6 +375,104 @@ router.post('/notices/:id/decision', (req, res) => {
     );
 });
 
+/* ----------------------------- Appeals ----------------------------- */
+router.get('/appeals', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const status = String(req.query?.status || 'open').toLowerCase();
+    const noticeId = asString(req.query?.noticeId);
+    const outcome = asString(req.query?.outcome);
+    const limit = asNum(req.query?.limit, 100);
+    const offset = asNum(req.query?.offset, 0);
+
+    const whereParts = [];
+    const params = [];
+
+    if (status === 'open') {
+        whereParts.push('ap.resolvedAt IS NULL');
+    } else if (status === 'resolved') {
+        whereParts.push('ap.resolvedAt IS NOT NULL');
+    }
+
+    if (noticeId) {
+        whereParts.push('dec.noticeId = ?');
+        params.push(noticeId);
+    }
+
+    if (outcome) {
+        whereParts.push('ap.outcome = ?');
+        params.push(outcome);
+    }
+
+    const where = whereParts.length ? `WHERE ${whereParts.join(' AND ')}` : '';
+
+    const sql = `
+      SELECT
+        ap.id,
+        ap.decisionId,
+        ap.filedBy,
+        ap.filedAt,
+        ap.arguments,
+        ap.outcome,
+        ap.resolvedAt,
+        ap.reviewer,
+        dec.noticeId,
+        dec.outcome AS decisionOutcome,
+        dec.decidedAt AS decisionDecidedAt,
+        no.status AS noticeStatus,
+        no.contentId AS noticeContentId,
+        no.category AS noticeCategory,
+        no.reasonText AS noticeReason,
+        no.reportedContentType AS noticeContentType
+      FROM tableDsaAppeal ap
+      INNER JOIN tableDsaDecision dec ON dec.id = ap.decisionId
+      INNER JOIN tableDsaNotice no ON no.id = dec.noticeId
+      ${where}
+      ORDER BY ap.filedAt DESC
+      LIMIT ?
+      OFFSET ?
+    `;
+
+    params.push(limit);
+    params.push(offset);
+
+    _db.all(sql, params, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        res.json(rows || []);
+    });
+});
+
+router.patch('/appeals/:id/resolution', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const appealId = String(req.params.id || '').trim();
+    if (!appealId) return res.status(400).json({ error: 'invalid_appeal_id' });
+
+    const outcome = asString(req.body?.outcome);
+    const reviewer = asString(req.body?.reviewer) || `admin:${req.admin?.sub || 'unknown'}`;
+    const resolvedAt = outcome ? Date.now() : null;
+
+    tableAppeal.updateResolution(_db, appealId, outcome, resolvedAt, reviewer, (err, ok) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!ok) return res.status(404).json({ error: 'appeal_not_found' });
+
+        const auditId = crypto.randomUUID();
+        tableAudit.create(
+            _db,
+            auditId,
+            'appeal',
+            appealId,
+            'appeal_resolve',
+            `admin:${req.admin?.sub || 'unknown'}`,
+            resolvedAt ?? Date.now(),
+            JSON.stringify({ outcome, reviewer }),
+            () => { }
+        );
+
+        res.json({ ok: true });
+    });
+});
+
 /* ----------------------------- Evidence ----------------------------- */
 router.post('/notices/:id/evidence', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
@@ -528,6 +627,17 @@ router.get('/stats/notices', (req, res) => {
     tableNotice.stats(_db, (err, result) => {
         if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
         res.json(result); // { total, open, byStatus }
+    });
+});
+
+/** -------------------- STATS: APPEALS -------------------- **/
+router.get('/stats/appeals', (req, res) => {
+    const _db = db(req);
+    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    tableAppeal.stats(_db, (err, result) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        res.json(result);
     });
 });
 

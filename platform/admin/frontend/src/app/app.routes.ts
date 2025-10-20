@@ -5,6 +5,7 @@ import { UserDashboardComponent } from './components/dashboards/user-dashboard/u
 import { AuditsComponent } from './components/dsa/audits/audits.component';
 import { DecisionsComponent } from './components/dsa/decisions/decisions/decisions.component';
 import { EvidencesComponent } from './components/dsa/evidences/evidences.component';
+import { AppealsComponent } from './components/dsa/appeals/appeals.component';
 import { NoticesComponent } from './components/dsa/notice/notices/notices.component';
 import { SignalsComponent } from './components/dsa/signal/signals/signals.component';
 import { TransparencyComponent } from './components/dsa/transparency/transparency.component';
@@ -38,6 +39,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/notices',
         component: NoticesComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/dsa/appeals',
+        component: AppealsComponent,
         canActivate: [authGuard]
     },
     {
