@@ -100,8 +100,7 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly signalContentUrl = computed(() => this.signalCase()?.contentUrl ?? null);
 
   readonly appealForm = this.fb.nonNullable.group({
-    arguments: ['', [Validators.required, Validators.minLength(20)]],
-    contact: ['', [Validators.email, Validators.maxLength(320)]]
+    arguments: ['', [Validators.required, Validators.minLength(20)]]
   });
 
   readonly publicStatusUrl = computed(() => this.buildPublicStatusUrl(this.data.token));
@@ -169,6 +168,9 @@ export class DsaCaseDialogComponent implements OnInit {
       if (!uploadIssue) {
         this.appealForm.reset();
         this.attachments.set([]);
+        if (this.activeTab() !== 0) {
+          this.activeTab.set(0);
+        }
       }
       this.loadStatus();
     } catch (err: any) {

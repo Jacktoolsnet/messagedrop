@@ -172,14 +172,6 @@
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Contact email (optional)</mat-label>
-            <input matInput formControlName="contact" type="email" placeholder="you@example.com" />
-            @if (appealForm.controls.contact.invalid && appealForm.controls.contact.touched) {
-            <mat-error>Please enter a valid email address.</mat-error>
-            }
-          </mat-form-field>
-
           <div class="file-upload">
             <input #evidenceInput id="appeal-evidence-input" type="file" multiple
               (change)="onAttachmentsSelected($event)" accept=".pdf,image/*" hidden />
