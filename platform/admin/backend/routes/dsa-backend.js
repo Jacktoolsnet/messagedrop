@@ -450,6 +450,7 @@ router.patch('/appeals/:id/resolution', (req, res) => {
 
     const outcome = asString(req.body?.outcome);
     const reviewer = asString(req.body?.reviewer) || `admin:${req.admin?.sub || 'unknown'}`;
+    const reason = asString(req.body?.reason);
     const resolvedAt = outcome ? Date.now() : null;
 
     tableAppeal.updateResolution(_db, appealId, outcome, resolvedAt, reviewer, (err, ok) => {
@@ -465,7 +466,7 @@ router.patch('/appeals/:id/resolution', (req, res) => {
             'appeal_resolve',
             `admin:${req.admin?.sub || 'unknown'}`,
             resolvedAt ?? Date.now(),
-            JSON.stringify({ outcome, reviewer }),
+            JSON.stringify({ outcome, reviewer, reason }),
             () => { }
         );
 

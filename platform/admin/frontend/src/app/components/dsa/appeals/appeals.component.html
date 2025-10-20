@@ -11,17 +11,6 @@
     <mat-button-toggle value="all">All</mat-button-toggle>
   </mat-button-toggle-group>
 
-  <mat-form-field appearance="outline" class="search-field">
-    <mat-label>Search</mat-label>
-    <input matInput [value]="searchTerm()" (input)="onSearch($any($event.target).value)" placeholder="Search appeals" />
-    @if (searchTerm()) {
-    <button mat-icon-button matSuffix type="button" aria-label="Clear search" (click)="clearSearch()">
-      <mat-icon>close</mat-icon>
-    </button>
-    }
-    <mat-icon matSuffix>search</mat-icon>
-  </mat-form-field>
-
   <button mat-icon-button aria-label="Refresh" (click)="refresh()">
     <mat-icon>refresh</mat-icon>
   </button>
@@ -29,66 +18,68 @@
 
 <mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
 
-<div class="content">
-  @if (!loading() && filteredAppeals().length === 0) {
-  <div class="empty-state">
-    <mat-icon>sentiment_satisfied</mat-icon>
-    <p>No appeals found for the selected filters.</p>
+<div class="page">
+  <div class="tiles-container">
+    @if (!loading() && appeals().length === 0) {
+    <div class="empty-state">
+      <mat-icon>sentiment_satisfied</mat-icon>
+      <p>No appeals found for the selected filter.</p>
+    </div>
+    }
+
+    @for (appeal of appeals(); track trackById($index, appeal)) {
+    <mat-card class="appeal-card tile" appearance="raised">
+      <mat-card-header>
+        <div mat-card-avatar class="avatar">
+          <mat-icon>feedback</mat-icon>
+        </div>
+        <mat-card-title>
+          Appeal for content {{ appeal.noticeContentId || '—' }}
+        </mat-card-title>
+        <mat-card-subtitle>
+          Filed by {{ appeal.filedBy || 'anonymous' }} · {{ appeal.filedAt | date: 'medium' }}
+        </mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <mat-chip-set>
+          <mat-chip [ngClass]="isOpen(appeal) ? 'chip-open' : 'chip-resolved'">
+            {{ isOpen(appeal) ? 'Open appeal' : 'Resolved' }}
+          </mat-chip>
+          @if (appeal.noticeStatus) {
+          <mat-chip>{{ appeal.noticeStatus }}</mat-chip>
+          }
+          @if (appeal.decisionOutcome) {
+          <mat-chip>{{ appeal.decisionOutcome }}</mat-chip>
+          }
+        </mat-chip-set>
+
+        <div class="arguments">
+          <h4>Arguments</h4>
+          <p>{{ appeal.arguments }}</p>
+        </div>
+
+        @if (!isOpen(appeal)) {
+        <div class="resolution-info">
+          <mat-icon>task_alt</mat-icon>
+          <span>Resolved {{ appeal.resolvedAt | date: 'medium' }} · Outcome: {{ outcomeLabel(appeal) }}</span>
+        </div>
+        }
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button color="primary" type="button" (click)="openNotice(appeal)">
+          <mat-icon>open_in_new</mat-icon>
+          Open notice
+        </button>
+        @if (isOpen(appeal)) {
+        <button mat-stroked-button color="accent" type="button" (click)="resolveAppeal(appeal)">
+          <mat-icon>done_all</mat-icon>
+          Resolve appeal
+        </button>
+        }
+      </mat-card-actions>
+    </mat-card>
+    }
   </div>
-  }
-
-  @for (appeal of filteredAppeals(); track trackById($index, appeal)) {
-  <mat-card class="appeal-card" appearance="outlined">
-    <mat-card-header>
-      <div mat-card-avatar class="avatar">
-        <mat-icon>feedback</mat-icon>
-      </div>
-      <mat-card-title>
-        Appeal for content {{ appeal.noticeContentId || '—' }}
-      </mat-card-title>
-      <mat-card-subtitle>
-        Filed by {{ appeal.filedBy || 'anonymous' }} · {{ appeal.filedAt | date: 'medium' }}
-      </mat-card-subtitle>
-    </mat-card-header>
-
-    <mat-card-content>
-      <mat-chip-set>
-        <mat-chip [ngClass]="isOpen(appeal) ? 'chip-open' : 'chip-resolved'">
-          {{ isOpen(appeal) ? 'Open appeal' : 'Resolved' }}
-        </mat-chip>
-        @if (appeal.noticeStatus) {
-        <mat-chip>{{ appeal.noticeStatus }}</mat-chip>
-        }
-        @if (appeal.decisionOutcome) {
-        <mat-chip>{{ appeal.decisionOutcome }}</mat-chip>
-        }
-      </mat-chip-set>
-
-      <div class="arguments">
-        <h4>Arguments</h4>
-        <p>{{ appeal.arguments }}</p>
-      </div>
-
-      @if (!isOpen(appeal)) {
-      <div class="resolution-info">
-        <mat-icon>task_alt</mat-icon>
-        <span>Resolved {{ appeal.resolvedAt | date: 'medium' }} · Outcome: {{ outcomeLabel(appeal) }}</span>
-      </div>
-      }
-    </mat-card-content>
-
-    <mat-card-actions align="end">
-      <button mat-button color="primary" type="button" (click)="openNotice(appeal)">
-        <mat-icon>open_in_new</mat-icon>
-        Open notice
-      </button>
-      @if (isOpen(appeal)) {
-      <button mat-stroked-button color="accent" type="button" (click)="resolveAppeal(appeal)">
-        <mat-icon>done_all</mat-icon>
-        Resolve appeal
-      </button>
-      }
-    </mat-card-actions>
-  </mat-card>
-  }
 </div>

@@ -273,7 +273,7 @@ export class DsaService {
     );
   }
 
-  resolveAppeal(appealId: string, payload: { outcome: string | null; reviewer?: string | null }) {
+  resolveAppeal(appealId: string, payload: { outcome: string | null; reviewer?: string | null; reason?: string | null }) {
     return this.http.patch<{ ok: boolean }>(`${this.baseUrl}/appeals/${encodeURIComponent(appealId)}/resolution`, payload)
       .pipe(
         catchError(err => {

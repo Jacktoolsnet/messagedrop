@@ -9,6 +9,7 @@ import { MatSelectModule } from '@angular/material/select';
 export interface AppealResolutionData {
   outcome: string | null;
   reviewer?: string | null;
+  reason?: string | null;
 }
 
 @Component({
@@ -27,6 +28,7 @@ export interface AppealResolutionData {
 })
 export class AppealResolutionDialogComponent {
   private readonly fb = inject(FormBuilder);
+  private lastAutoReason: string | null = null;
   readonly outcomes = [
     { value: 'UPHELD', label: 'Decision upheld' },
     { value: 'REVISED', label: 'Decision revised' },
@@ -34,21 +36,56 @@ export class AppealResolutionDialogComponent {
     { value: 'WITHDRAWN', label: 'Withdrawn' }
   ];
 
+  private readonly standardTexts: Record<string, string> = {
+    UPHELD: 'We reviewed the case and confirm that the original decision remains valid.',
+    REVISED: 'After reviewing the appeal we have revised the original decision accordingly.',
+    PARTIAL: 'The appeal is partially upheld. We adjusted the decision where appropriate.',
+    WITHDRAWN: 'The appeal has been withdrawn. No further action is required.'
+  };
+
   readonly form = this.fb.nonNullable.group({
     outcome: ['', Validators.required],
-    reviewer: ['']
+    reviewer: [''],
+    reason: ['']
   });
 
   constructor(
     private readonly dialogRef: MatDialogRef<AppealResolutionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { defaultOutcome?: string | null; reviewer?: string | null }
+    @Inject(MAT_DIALOG_DATA) public data: { defaultOutcome?: string | null; reviewer?: string | null; reason?: string | null }
   ) {
     if (data?.defaultOutcome) {
       this.form.patchValue({ outcome: data.defaultOutcome });
+      const template = this.standardTexts[data.defaultOutcome] ?? '';
+      if (!data?.reason) {
+        this.form.patchValue({ reason: template });
+        this.lastAutoReason = template;
+      }
     }
     if (data?.reviewer) {
       this.form.patchValue({ reviewer: data.reviewer });
     }
+    if (data?.reason) {
+      this.form.patchValue({ reason: data.reason });
+      this.lastAutoReason = data.reason;
+    }
+
+    if (!this.form.controls.outcome.value) {
+      const first = this.outcomes[0]?.value;
+      if (first) {
+        const template = this.standardTexts[first] ?? '';
+        this.form.patchValue({ outcome: first, reason: template });
+        this.lastAutoReason = template;
+      }
+    }
+
+    this.form.controls.outcome.valueChanges.subscribe(value => {
+      const std = value ? this.standardTexts[value] ?? '' : '';
+      const current = this.form.controls.reason.value ?? '';
+      if (!current || current === this.lastAutoReason) {
+        this.form.controls.reason.setValue(std);
+        this.lastAutoReason = std;
+      }
+    });
   }
 
   submit(): void {
@@ -59,7 +96,8 @@ export class AppealResolutionDialogComponent {
     const value = this.form.getRawValue();
     this.dialogRef.close({
       outcome: value.outcome,
-      reviewer: value.reviewer?.trim() || null
+      reviewer: value.reviewer?.trim() || null,
+      reason: value.reason?.trim() || null
     } as AppealResolutionData);
   }
 

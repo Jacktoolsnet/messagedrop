@@ -1,23 +1,22 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
-import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatIconModule } from '@angular/material/icon';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatCardModule } from '@angular/material/card';
-import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 
-import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
-import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
-import { AppealResolutionDialogComponent, AppealResolutionData } from './appeal-resolution-dialog/appeal-resolution-dialog.component';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
+import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { AuthService } from '../../../services/auth/auth.service';
+import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
+import { AppealResolutionData, AppealResolutionDialogComponent } from './appeal-resolution-dialog/appeal-resolution-dialog.component';
 
 type AppealStatusFilter = 'open' | 'resolved' | 'all';
 
@@ -32,8 +31,6 @@ type AppealStatusFilter = 'open' | 'resolved' | 'all';
     MatIconModule,
     MatButtonModule,
     MatButtonToggleModule,
-    MatFormFieldModule,
-    MatInputModule,
     MatCardModule,
     MatProgressBarModule,
     MatChipsModule
@@ -45,26 +42,11 @@ export class AppealsComponent implements OnInit {
   private readonly dsa = inject(DsaService);
   private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly auth = inject(AuthService);
 
   readonly loading = signal(false);
   readonly appeals = signal<DsaAppeal[]>([]);
   readonly statusFilter = signal<AppealStatusFilter>('open');
-  readonly searchTerm = signal('');
-
-  readonly filteredAppeals = computed(() => {
-    const q = this.searchTerm().trim().toLowerCase();
-    if (!q) return this.appeals();
-    return this.appeals().filter(ap => {
-      return [
-        ap.noticeContentId,
-        ap.noticeCategory,
-        ap.filedBy,
-        ap.arguments,
-        ap.outcome,
-        ap.decisionOutcome
-      ].some(field => field ? field.toLowerCase().includes(q) : false);
-    });
-  });
 
   ngOnInit(): void {
     this.load();
@@ -75,14 +57,6 @@ export class AppealsComponent implements OnInit {
     if (this.statusFilter() === status) return;
     this.statusFilter.set(status);
     this.load();
-  }
-
-  onSearch(value: string): void {
-    this.searchTerm.set(value);
-  }
-
-  clearSearch(): void {
-    this.searchTerm.set('');
   }
 
   load(): void {
@@ -119,12 +93,12 @@ export class AppealsComponent implements OnInit {
 
   resolveAppeal(appeal: DsaAppeal): void {
     const ref = this.dialog.open(AppealResolutionDialogComponent, {
-      width: 'min(420px, 95vw)',
+      maxWidth: '95vw',
       maxHeight: '90vh',
       autoFocus: false,
       data: {
         defaultOutcome: appeal.outcome ?? 'UPHELD',
-        reviewer: appeal.reviewer || undefined
+        reviewer: appeal.reviewer || this.auth.username() || undefined
       }
     });
 
