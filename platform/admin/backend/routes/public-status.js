@@ -241,7 +241,7 @@ router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
         _db,
         id,
         notice.id,
-        'appeal_file',
+        'file',
         null,
         null,
         file.originalname,

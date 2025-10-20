@@ -312,6 +312,22 @@ export class DsaCaseDialogComponent implements OnInit {
     return label ?? status;
   }
 
+  formatAppealOutcome(outcome: string | null | undefined): string {
+    if (!outcome) return 'Pending';
+    switch (outcome.toUpperCase()) {
+      case 'UPHELD':
+        return 'Decision upheld';
+      case 'REVISED':
+        return 'Decision revised';
+      case 'PARTIAL':
+        return 'Partially revised';
+      case 'WITHDRAWN':
+        return 'Withdrawn';
+      default:
+        return outcome;
+    }
+  }
+
   private resolveFilename(disposition: string | null, fallback: string): string {
     if (!disposition) return fallback;
     const match = /filename\*?=(?:UTF-8'')?"?([^";]+)/i.exec(disposition);

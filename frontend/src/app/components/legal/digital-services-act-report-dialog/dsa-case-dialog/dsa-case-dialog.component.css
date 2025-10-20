@@ -54,6 +54,76 @@ dd {
   gap: 1rem;
 }
 
+.appeals-stack {
+  display: grid;
+  gap: 1rem;
+}
+
+.appeal-block {
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.7);
+  display: grid;
+  gap: 0.75rem;
+}
+
+.appeal-block header,
+.appeal-block footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.appeal-meta,
+.decision-meta {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-size: 0.9rem;
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.appeal-meta .label,
+.decision-meta .label {
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  color: rgba(5, 69, 36, 0.8);
+}
+
+.status-chip {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.status-chip.open {
+  background: rgba(255, 193, 7, 0.18);
+  color: #b45309;
+}
+
+.status-chip.resolved {
+  background: rgba(5, 150, 105, 0.18);
+  color: #047857;
+}
+
+.appeal-content h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.appeal-content p {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
 .list-actions {
   margin-top: 0.5rem;
 }
@@ -142,4 +212,33 @@ mat-card.tile-card mat-card-content {
   :host ::ng-deep .case-tabs .mat-mdc-tab-header-pagination {
     display: flex;
   }
+}
+.appeal-block.evidence-block {
+  gap: 0.5rem;
+}
+
+.evidence-meta {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+
+.evidence-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.evidence-actions button,
+.evidence-actions a[mat-stroked-button] {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.hash-value {
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.7);
 }

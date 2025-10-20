@@ -13,7 +13,8 @@
     </div>
   </mat-card>
   } @else {
-  <mat-tab-group disableRipple class="case-tabs" [selectedIndex]="activeTab()" (selectedIndexChange)="activeTab.set($event)">
+  <mat-tab-group disableRipple class="case-tabs" [selectedIndex]="activeTab()"
+    (selectedIndexChange)="activeTab.set($event)">
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon class="material-symbols-outlined">info</mat-icon>
@@ -104,25 +105,44 @@
           @if (isNotice() && evidence().length > 0) {
           <mat-card class="tile-card">
             <mat-card-title>Evidence collected</mat-card-title>
-            <mat-card-content>
-              <mat-list>
-                @for (ev of evidence(); track ev.id) {
-                <mat-list-item>
-                  <div matListItemTitle>{{ ev.fileName || ev.url || ev.hash || ev.type }}</div>
-                  @if (ev.addedAt) {
-                  <div matListItemLine>{{ ev.addedAt | date:'medium' }}</div>
-                  }
-                  @if (ev.type === 'file') {
-                  <div class="list-actions">
-                    <button mat-stroked-button color="primary" (click)="download(ev)">
-                      <mat-icon class="material-symbols-outlined">download</mat-icon>
-                      Download
-                    </button>
+            <mat-card-content class="appeals-stack">
+              @for (ev of evidence(); track ev.id) {
+              <section class="appeal-block evidence-block">
+                <header>
+                  <div class="appeal-meta">
+                    <span class="label">Evidence</span>
+                    <span>{{ ev.fileName || ev.url || ev.hash || ev.type }}</span>
                   </div>
-                  }
-                </mat-list-item>
+                  <div class="status-chip">
+                    {{ ev.type === 'file' ? 'File' : ev.type === 'url' ? 'Link' : ev.type }}
+                  </div>
+                </header>
+
+                @if (ev.addedAt) {
+                <div class="evidence-meta">
+                  Added {{ ev.addedAt | date:'medium' }}
+                </div>
                 }
-              </mat-list>
+
+                <div class="evidence-actions">
+                  @if (ev.type === 'file') {
+                  <button mat-stroked-button color="primary" type="button" (click)="download(ev)">
+                    <mat-icon class="material-symbols-outlined">download</mat-icon>
+                    Download file
+                  </button>
+                  }
+                  @if (ev.type === 'url' && ev.url) {
+                  <a mat-stroked-button color="primary" [href]="ev.url" target="_blank" rel="noopener" role="button">
+                    <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+                    Open link
+                  </a>
+                  }
+                  @if (ev.type === 'hash' && ev.hash) {
+                  <span class="hash-value">Hash: {{ ev.hash }}</span>
+                  }
+                </div>
+              </section>
+              }
             </mat-card-content>
           </mat-card>
           }
@@ -130,16 +150,37 @@
           @if (isNotice() && appeals().length > 0) {
           <mat-card class="tile-card">
             <mat-card-title>Submitted appeals</mat-card-title>
-            <mat-card-content>
-              <mat-list>
-                @for (appeal of appeals(); track appeal.id) {
-                <mat-list-item>
-                  <div matListItemTitle>Filed {{ appeal.filedAt | date:'medium' }}</div>
-                  <div matListItemLine>Status: {{ appeal.outcome || 'pending' }}</div>
-                  <div matListItemLine class="statement">{{ appeal.arguments }}</div>
-                </mat-list-item>
+            <mat-card-content class="appeals-stack">
+              @for (appeal of appeals(); track appeal.id) {
+              <section class="appeal-block">
+                <header>
+                  <div class="appeal-meta">
+                    <span class="label">Appeal</span>
+                    <span>Filed {{ appeal.filedAt | date:'medium' }}</span>
+                  </div>
+                  <div class="status-chip" [ngClass]="{ 'resolved': !!appeal.resolvedAt, 'open': !appeal.resolvedAt }">
+                    {{ formatAppealOutcome(appeal.outcome) }}
+                  </div>
+                </header>
+
+                <div class="appeal-content">
+                  <h4>Arguments</h4>
+                  <p>{{ appeal.arguments }}</p>
+                </div>
+
+                @if (appeal.resolvedAt) {
+                <footer>
+                  <div class="decision-meta">
+                    <span class="label">Decision</span>
+                    <span>Resolved {{ appeal.resolvedAt | date:'medium' }}</span>
+                    @if (appeal.reviewer) {
+                    <span>Reviewer: {{ appeal.reviewer }}</span>
+                    }
+                  </div>
+                </footer>
                 }
-              </mat-list>
+              </section>
+              }
             </mat-card-content>
           </mat-card>
           }
