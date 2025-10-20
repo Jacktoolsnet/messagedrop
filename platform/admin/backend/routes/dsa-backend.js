@@ -384,27 +384,50 @@ router.post('/notices/:id/decision', (req, res) => {
     const automatedUsed = req.body?.automatedUsed ? 1 : 0;
     const statement = asString(req.body?.statement);
 
-    tableDecision.create(
-        _db, id, req.params.id, outcome, legalBasis, tosBasis, automatedUsed,
-        `admin:${req.admin?.sub || 'unknown'}`, decidedAt, statement,
-        (err, row) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+    tableNotice.getById(_db, req.params.id, (lookupErr, noticeRow) => {
+        if (lookupErr) return res.status(500).json({ error: 'db_error', detail: lookupErr.message });
+        if (!noticeRow) return res.status(404).json({ error: 'notice_not_found' });
 
-            // Status -> DECIDED
-            tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
+        tableDecision.create(
+            _db, id, req.params.id, outcome, legalBasis, tosBasis, automatedUsed,
+            `admin:${req.admin?.sub || 'unknown'}`, decidedAt, statement,
+            (err, row) => {
+                if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
 
-            // Audit
-            const auditId = crypto.randomUUID();
-            tableAudit.create(
-                _db, auditId, 'decision', id, 'create',
-                `admin:${req.admin?.sub || 'unknown'}`, decidedAt,
-                JSON.stringify({ noticeId: req.params.id, outcome }),
-                () => { }
-            );
+                // Status -> DECIDED
+                tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
 
-            res.status(201).json(row); // { id }
-        }
-    );
+                // Audit
+                const auditId = crypto.randomUUID();
+                tableAudit.create(
+                    _db, auditId, 'decision', id, 'create',
+                    `admin:${req.admin?.sub || 'unknown'}`, decidedAt,
+                    JSON.stringify({ noticeId: req.params.id, outcome }),
+                    () => { }
+                );
+
+                void notifyContentOwner(req, {
+                    type: 'notice',
+                    event: 'notice_decided',
+                    contentId: noticeRow.contentId,
+                    category: noticeRow.category,
+                    reasonText: noticeRow.reasonText,
+                    reportedContentType: noticeRow.reportedContentType,
+                    caseId: req.params.id,
+                    statusUrl: buildStatusUrl(noticeRow.publicToken),
+                    includeExcerpt: true,
+                    title: 'DSA decision available',
+                    bodySegments: [
+                        `We completed the review for DSA case #${req.params.id}.`,
+                        `Outcome: ${outcome.replace(/_/g, ' ').toLowerCase()}.`,
+                        `Process type: ${automatedUsed ? 'automated' : 'manual'}.`
+                    ]
+                });
+
+                res.status(201).json(row); // { id }
+            }
+        );
+    });
 });
 
 /* ----------------------------- Appeals ----------------------------- */
