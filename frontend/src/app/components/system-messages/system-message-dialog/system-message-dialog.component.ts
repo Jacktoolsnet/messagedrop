@@ -2,13 +2,15 @@ import { CommonModule } from '@angular/common';
 import { Component, effect, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { SystemNotification, SystemNotificationFilter } from '../../../interfaces/system-notification';
 import { SystemNotificationService } from '../../../services/system-notification.service';
+import { DeleteSystemNotificationComponent } from '../delete-system-notification/delete-system-notification.component';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-system-message-dialog',
@@ -38,7 +40,8 @@ export class SystemMessageDialogComponent implements OnInit {
 
   constructor(
     private readonly systemNotificationService: SystemNotificationService,
-    private readonly dialogRef: MatDialogRef<SystemMessageDialogComponent>
+    private readonly dialogRef: MatDialogRef<SystemMessageDialogComponent>,
+    private readonly dialog: MatDialog
   ) {
     effect(() => {
       const items = this.notifications();
@@ -72,15 +75,14 @@ export class SystemMessageDialogComponent implements OnInit {
     await this.systemNotificationService.loadNotifications(nextFilter);
   }
 
-  async selectNotification(notification: SystemNotification): Promise<void> {
+  async selectNotification(notification: SystemNotification, event?: MouseEvent): Promise<void> {
+    event?.stopPropagation();
     this.selectedNotification.set(notification);
     if (notification.status === 'unread') {
       try {
         const updated = await this.systemNotificationService.markAsRead([notification.uuid]);
         if (updated?.length) {
           this.selectedNotification.set(updated[0]);
-        } else {
-          this.selectedNotification.set({ ...notification, status: 'read' });
         }
       } catch {
         this.selectedNotification.set(notification);
@@ -96,12 +98,12 @@ export class SystemMessageDialogComponent implements OnInit {
     try {
       const updated = await this.systemNotificationService.markAsRead([notification.uuid]);
       if (updated?.length) {
-        this.selectedNotification.set(updated[0]);
-      } else {
-        this.selectedNotification.set({ ...notification, status: 'read' });
+        if (this.selectedNotification()?.uuid === notification.uuid) {
+          this.selectedNotification.set(updated[0]);
+        }
       }
     } catch {
-      this.selectedNotification.set(notification);
+      // no-op: snackbar handled in service
     }
   }
 
@@ -113,17 +115,28 @@ export class SystemMessageDialogComponent implements OnInit {
     try {
       const updated = await this.systemNotificationService.markAsUnread([notification.uuid]);
       if (updated?.length) {
-        this.selectedNotification.set(updated[0]);
-      } else {
-        this.selectedNotification.set({ ...notification, status: 'unread' });
+        if (this.selectedNotification()?.uuid === notification.uuid) {
+          this.selectedNotification.set(updated[0]);
+        }
       }
     } catch {
-      this.selectedNotification.set(notification);
+      // no-op: snackbar handled in service
     }
   }
 
-  async deleteNotification(notification: SystemNotification, event?: MouseEvent): Promise<void> {
+  async confirmDelete(notification: SystemNotification, event?: MouseEvent): Promise<void> {
     event?.stopPropagation();
+    const dialogRef = this.dialog.open(DeleteSystemNotificationComponent, {
+      width: '320px'
+    });
+
+    const confirmed = await firstValueFrom(dialogRef.afterClosed());
+    if (confirmed) {
+      await this.deleteNotification(notification);
+    }
+  }
+
+  private async deleteNotification(notification: SystemNotification): Promise<void> {
     const uuid = notification.uuid;
     try {
       const deleted = await this.systemNotificationService.deleteNotifications([uuid]);

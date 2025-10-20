@@ -65,6 +65,10 @@
                 {{ detail.status === 'unread' ? 'mark_email_read' : 'mark_email_unread' }}
               </mat-icon>
             </button>
+            <button mat-icon-button color="warn" matTooltip="Delete message"
+              (click)="confirmDelete(detail, $event)" aria-label="Delete message">
+              <mat-icon class="material-symbols-outlined">delete</mat-icon>
+            </button>
           </div>
         </div>
       </div>
@@ -111,7 +115,7 @@
       </div>
       } @else {
       @for (notification of notifications(); track trackByUuid($index, notification)) {
-      <a mat-list-item class="notification-item" (click)="selectNotification(notification)"
+      <a mat-list-item class="notification-item" (click)="selectNotification(notification, $event)"
         [class.active]="selectedNotification()?.uuid === notification.uuid">
         <mat-icon class="material-symbols-outlined" matListItemIcon>
           {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}
@@ -121,14 +125,16 @@
           {{ (notification.createdAt * 1000) | date : 'medium' }}
         </div>
         <div matListItemMeta class="notification-item__actions">
-          <button mat-icon-button color="primary" matTooltip="View details"
+          @if (notification.metadata?.dsa?.statusUrl) {
+          <button mat-icon-button color="primary" matTooltip="Open case details"
             (click)="openStatusLink(notification.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
             <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
           </button>
+          }
           @if (notification.status === 'unread') {
           <button mat-icon-button color="accent" matTooltip="Mark as read"
             (click)="markNotificationAsRead(notification, $event)" aria-label="Mark as read">
-            <mat-icon class="material-symbols-outlined">drafts</mat-icon>
+            <mat-icon class="material-symbols-outlined">mark_email_read</mat-icon>
           </button>
           } @else {
           <button mat-icon-button color="accent" matTooltip="Mark as unread"
@@ -136,6 +142,10 @@
             <mat-icon class="material-symbols-outlined">mark_email_unread</mat-icon>
           </button>
           }
+          <button mat-icon-button color="warn" matTooltip="Delete message"
+            (click)="confirmDelete(notification, $event)" aria-label="Delete message">
+            <mat-icon class="material-symbols-outlined">delete</mat-icon>
+          </button>
         </div>
       </a>
       }
