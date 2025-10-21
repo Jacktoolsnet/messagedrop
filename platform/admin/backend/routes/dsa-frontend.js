@@ -4,6 +4,7 @@ const axios = require('axios');
 const { checkToken } = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
+const { notifyReporter } = require('../utils/notifyReporter');
 
 // DB-Tabellen
 const tableSignal = require('../db/tableDsaSignal');
@@ -165,6 +166,9 @@ router.post('/notices', noticeLimiter, (req, res) => {
         reportedContent
     } = req.body || {};
 
+    const normalizedReporterEmail = toStringOrNull(reporterEmail);
+    const normalizedReporterName = toStringOrNull(reporterName);
+
     if (!contentId) return res.status(400).json({ error: 'contentId is required' });
 
     let reportedContentJson = 'null';
@@ -183,8 +187,8 @@ router.post('/notices', noticeLimiter, (req, res) => {
         toStringOrNull(contentUrl),
         toStringOrNull(category),
         toStringOrNull(reasonText),
-        toStringOrNull(reporterEmail),
-        toStringOrNull(reporterName),
+        normalizedReporterEmail,
+        normalizedReporterName,
         toInt01OrNull(truthAffirmation),
         toStringOrNull(reportedContentType),
         reportedContentJson,
@@ -230,6 +234,19 @@ router.post('/notices', noticeLimiter, (req, res) => {
                 reasonText,
                 reportedContentType,
                 token,
+                statusUrl
+            });
+            void notifyReporter(req, {
+                event: 'notice_received',
+                notice: {
+                    id: responsePayload.id,
+                    reporterEmail: normalizedReporterEmail,
+                    reporterName: normalizedReporterName,
+                    contentId: contentId ? String(contentId) : null,
+                    category: category ? String(category) : null,
+                    reasonText: reasonText ? String(reasonText) : null,
+                    publicToken: token
+                },
                 statusUrl
             });
             // Make-Push (kurz & bündig)

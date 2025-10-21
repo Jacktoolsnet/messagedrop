@@ -11,6 +11,7 @@ const tableAudit = require('../db/tableDsaAuditLog');
 const tableAppeal = require('../db/tableDsaAppeal');
 const multer = require('multer');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
+const { notifyReporter } = require('../utils/notifyReporter');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
@@ -223,6 +224,21 @@ router.post('/status/:token/appeals', async (req, res) => {
         `We received an appeal for DSA case #${notice.id}.`,
         `Filed by: ${filedBy || 'anonymous'}.`
       ]
+    });
+    void notifyReporter(req, {
+      event: 'notice_appeal_submitted',
+      notice: {
+        id: notice.id,
+        reporterEmail: notice.reporterEmail,
+        reporterName: notice.reporterName,
+        contentId: notice.contentId,
+        category: notice.category,
+        reasonText: notice.reasonText,
+        publicToken: notice.publicToken,
+        reportedContentType: notice.reportedContentType
+      },
+      statusUrl: buildStatusUrl(notice.publicToken),
+      extras: { appealFiledBy: filedBy }
     });
 
     res.status(201).json({ id });

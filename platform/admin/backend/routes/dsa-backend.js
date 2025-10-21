@@ -5,6 +5,7 @@ const fs = require('fs');
 const multer = require('multer');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
+const { notifyReporter } = require('../utils/notifyReporter');
 
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
@@ -294,6 +295,20 @@ function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed })
     };
 }
 
+function buildReporterNotice(notice) {
+    if (!notice) return null;
+    return {
+        id: notice.id ?? null,
+        reporterEmail: notice.reporterEmail ?? null,
+        reporterName: notice.reporterName ?? null,
+        contentId: notice.contentId ?? null,
+        category: notice.category ?? null,
+        reasonText: notice.reasonText ?? null,
+        publicToken: notice.publicToken ?? null,
+        reportedContentType: notice.reportedContentType ?? null
+    };
+}
+
 function formatAppealOutcomeLabel(outcome) {
     if (!outcome) return 'Pending';
     const normalized = String(outcome).toUpperCase();
@@ -401,6 +416,7 @@ router.patch('/notices/:id/status', (req, res) => {
             );
 
             if (noticeRow.status !== newStatus && newStatus === 'UNDER_REVIEW') {
+                const reporterNotice = buildReporterNotice(noticeRow);
                 void notifyContentOwner(req, {
                     type: 'notice',
                     event: 'notice_under_review',
@@ -416,6 +432,14 @@ router.patch('/notices/:id/status', (req, res) => {
                         `Your DSA case #${noticeId} is now under review by our moderation team.`
                     ]
                 });
+
+                if (reporterNotice) {
+                    void notifyReporter(req, {
+                        event: 'notice_under_review',
+                        notice: reporterNotice,
+                        statusUrl: buildStatusUrl(noticeRow.publicToken)
+                    });
+                }
             }
 
             res.json({ ok: true });
@@ -487,6 +511,16 @@ router.post('/notices/:id/decision', (req, res) => {
                     outcome,
                     automatedUsed
                 }));
+
+                void notifyReporter(req, {
+                    event: 'notice_decided',
+                    notice: buildReporterNotice(noticeRow),
+                    statusUrl: buildStatusUrl(noticeRow.publicToken),
+                    extras: {
+                        decisionOutcome: outcome,
+                        statement
+                    }
+                });
 
                 res.status(201).json(row); // { id }
             }
@@ -634,6 +668,17 @@ router.patch('/appeals/:id/resolution', (req, res) => {
                     if (notification) {
                         void notifyContentOwner(req, notification);
                     }
+
+                    void notifyReporter(req, {
+                        event: 'notice_appeal_decided',
+                        notice: buildReporterNotice(noticeRow),
+                        statusUrl: buildStatusUrl(noticeRow.publicToken),
+                        extras: {
+                            appealOutcome: appealRow?.outcome || outcome,
+                            decisionOutcome: decisionRow.outcome,
+                            reason: reasonText
+                        }
+                    });
                 });
             });
         });
@@ -1061,6 +1106,21 @@ router.post('/signals/:id/promote', (req, res) => {
                         ],
                         includeExcerpt: true,
                         title: 'DSA notice opened'
+                    });
+
+                    void notifyReporter(req, {
+                        event: 'notice_received',
+                        notice: {
+                            id: noticeId,
+                            reporterEmail: reporterEmail,
+                            reporterName: reporterName,
+                            contentId,
+                            category,
+                            reasonText,
+                            publicToken: noticeToken,
+                            reportedContentType
+                        },
+                        statusUrl: buildStatusUrl(noticeToken)
                     });
 
                     res.status(201).json({ noticeId, removed: true });
