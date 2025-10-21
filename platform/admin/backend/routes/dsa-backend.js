@@ -294,6 +294,56 @@ function buildDecisionNotification({ notice, noticeId, outcome, automatedUsed })
     };
 }
 
+function formatAppealOutcomeLabel(outcome) {
+    if (!outcome) return 'Pending';
+    const normalized = String(outcome).toUpperCase();
+    switch (normalized) {
+        case 'UPHELD':
+            return 'Decision upheld';
+        case 'REVISED':
+            return 'Decision revised';
+        case 'PARTIAL':
+            return 'Partially revised';
+        case 'WITHDRAWN':
+            return 'Appeal withdrawn';
+        default:
+            return outcome;
+    }
+}
+
+function buildAppealResolutionNotification({ notice, appeal, decisionOutcome, reason }) {
+    if (!notice?.contentId) return null;
+
+    const noticeId = notice.id;
+    const segments = [
+        `We reviewed the appeal for DSA case #${noticeId}.`,
+        `Appeal outcome: ${formatAppealOutcomeLabel(appeal?.outcome)}.`
+    ];
+
+    if (decisionOutcome) {
+        const readableDecision = decisionOutcome.replace(/_/g, ' ').toLowerCase();
+        segments.push(`Original decision: ${readableDecision}.`);
+    }
+
+    if (reason) {
+        segments.push(reason);
+    }
+
+    return {
+        type: 'notice',
+        event: 'notice_appeal_decided',
+        contentId: notice.contentId,
+        category: notice.category,
+        reasonText: notice.reasonText,
+        reportedContentType: notice.reportedContentType,
+        caseId: noticeId,
+        statusUrl: buildStatusUrl(notice.publicToken),
+        includeExcerpt: true,
+        title: 'DSA appeal outcome',
+        bodySegments: segments
+    };
+}
+
 
 /* ----------------------------- Notices ----------------------------- */
 router.get('/notices', (req, res) => {
@@ -540,6 +590,53 @@ router.patch('/appeals/:id/resolution', (req, res) => {
         );
 
         res.json({ ok: true });
+
+        if (!outcome || !resolvedAt) {
+            return;
+        }
+
+        const reasonText = typeof reason === 'string' && reason.trim().length > 0 ? reason.trim() : null;
+
+        tableAppeal.getById(_db, appealId, (appealErr, appealRow) => {
+            if (appealErr || !appealRow?.decisionId) {
+                req.logger?.warn?.('Failed to load appeal for notification', { appealId, error: appealErr?.message });
+                return;
+            }
+
+            tableDecision.getById(_db, appealRow.decisionId, (decisionErr, decisionRow) => {
+                if (decisionErr || !decisionRow?.noticeId) {
+                    req.logger?.warn?.('Failed to load decision for appeal notification', {
+                        appealId,
+                        decisionId: appealRow.decisionId,
+                        error: decisionErr?.message
+                    });
+                    return;
+                }
+
+                tableNotice.getById(_db, decisionRow.noticeId, (noticeErr, noticeRow) => {
+                    if (noticeErr || !noticeRow) {
+                        req.logger?.warn?.('Failed to load notice for appeal notification', {
+                            appealId,
+                            decisionId: decisionRow.id,
+                            noticeId: decisionRow.noticeId,
+                            error: noticeErr?.message
+                        });
+                        return;
+                    }
+
+                    const notification = buildAppealResolutionNotification({
+                        notice: noticeRow,
+                        appeal: appealRow,
+                        decisionOutcome: decisionRow.outcome,
+                        reason: reasonText
+                    });
+
+                    if (notification) {
+                        void notifyContentOwner(req, notification);
+                    }
+                });
+            });
+        });
     });
 });
 
