@@ -212,6 +212,7 @@ router.post('/notices', noticeLimiter, (req, res) => {
                 JSON.stringify({
                     statusUrl,
                     token,
+                    status,
                     contentId,
                     category,
                     reasonText,

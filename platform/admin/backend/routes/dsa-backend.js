@@ -433,7 +433,10 @@ router.patch('/notices/:id/status', (req, res) => {
             const auditId = crypto.randomUUID();
             tableAudit.create(
                 _db, auditId, 'notice', noticeId, 'status_change',
-                `admin:${req.admin?.sub || 'unknown'}`, updatedAt, JSON.stringify({ status: newStatus }),
+                `admin:${req.admin?.sub || 'unknown'}`, updatedAt, JSON.stringify({
+                    status: newStatus,
+                    previousStatus: noticeRow.status
+                }),
                 () => { }
             );
 
@@ -526,6 +529,23 @@ router.post('/notices/:id/decision', (req, res) => {
                     JSON.stringify({ noticeId: req.params.id, outcome }),
                     () => { }
                 );
+
+                if (noticeRow.status !== 'DECIDED') {
+                    tableAudit.create(
+                        _db,
+                        crypto.randomUUID(),
+                        'notice',
+                        req.params.id,
+                        'status_change',
+                        `admin:${req.admin?.sub || 'unknown'}`,
+                        decidedAt,
+                        JSON.stringify({
+                            status: 'DECIDED',
+                            previousStatus: noticeRow.status
+                        }),
+                        () => { }
+                    );
+                }
 
                 void notifyContentOwner(req, buildDecisionNotification({
                     notice: noticeRow,

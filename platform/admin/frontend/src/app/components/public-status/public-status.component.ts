@@ -15,6 +15,7 @@ import { PublicStatusAppeal, PublicStatusAuditEntry, PublicStatusEvidence, Publi
 
 interface MappedAuditEntry extends PublicStatusAuditEntry {
   detailsObj: Record<string, unknown> | null;
+  synthetic?: boolean;
 }
 
 @Component({
@@ -91,10 +92,7 @@ export class PublicStatusComponent implements OnInit {
     this.service.getStatus(token).subscribe({
       next: (data) => {
         this.status.set(data);
-        this.auditEntries.set((data.audit || []).map(entry => ({
-          ...entry,
-          detailsObj: this.parseDetails(entry.details)
-        })));
+        this.auditEntries.set(this.buildAuditEntries(data));
         this.appeals.set(data.appeals ?? []);
         this.loading.set(false);
       },
@@ -110,7 +108,14 @@ export class PublicStatusComponent implements OnInit {
 
   parseDetails(details: unknown): Record<string, unknown> | null {
     if (!details) return null;
-    if (typeof details === 'object' && !Array.isArray(details)) return details as Record<string, unknown>;
+    if (typeof details === 'string') {
+      try {
+        return JSON.parse(details) as Record<string, unknown>;
+      } catch {
+        return { raw: details };
+      }
+    }
+    if (typeof details === 'object' && !Array.isArray(details)) return { ...(details as Record<string, unknown>) };
     return null;
   }
 
@@ -130,8 +135,8 @@ export class PublicStatusComponent implements OnInit {
     switch (action) {
       case 'status_change': {
         const details = entry.detailsObj;
-        const previous = this.extractDetailStatus(details, ['oldStatus', 'previous', 'from', 'statusFrom']);
-        const next = this.extractDetailStatus(details, ['newStatus', 'status', 'to', 'statusTo']);
+        const previous = this.extractDetailStatus(details, ['previousStatus', 'oldStatus', 'previous', 'from', 'statusFrom']);
+        const next = this.extractDetailStatus(details, ['status', 'newStatus', 'to', 'statusTo']);
         if (previous && next) {
           return `Status changed from ${this.formatStatus(previous)} to ${this.formatStatus(next)}`;
         }
@@ -143,6 +148,13 @@ export class PublicStatusComponent implements OnInit {
       case 'decision_created':
       case 'decision_recorded':
         return 'Decision recorded';
+      case 'create': {
+        const initial = this.extractDetailStatus(entry.detailsObj, ['status', 'initialStatus']);
+        if (initial) {
+          return `Notice created (status ${this.formatStatus(initial)})`;
+        }
+        return 'Notice created';
+      }
       default:
         const readable = rawAction.replace(/_/g, ' ').toLowerCase();
         return readable.replace(/\b\w/g, (letter) => letter.toUpperCase()) || 'Event';
@@ -231,6 +243,111 @@ export class PublicStatusComponent implements OnInit {
       }
     }
     return null;
+  }
+
+  private buildAuditEntries(response: PublicStatusResponse): MappedAuditEntry[] {
+    const rawEntries = (response.audit || []).filter(entry => (entry.action || '').toLowerCase() !== 'status_view');
+    const mapped = rawEntries.map(entry => this.mapAuditEntry(entry));
+    const withSynthetic = this.addSyntheticStatusEntries(response, mapped);
+    const normalized = this.ensureStatusHistory(response, withSynthetic);
+    return normalized.sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  private mapAuditEntry(entry: PublicStatusAuditEntry): MappedAuditEntry {
+    return {
+      ...entry,
+      detailsObj: this.parseDetails(entry.details)
+    };
+  }
+
+  private addSyntheticStatusEntries(response: PublicStatusResponse, entries: MappedAuditEntry[]): MappedAuditEntry[] {
+    if (response.entityType !== 'notice') return entries.slice();
+    const noticeEntries = entries.slice();
+    const decision = response.decision;
+    if (decision && Number.isFinite(decision.decidedAt)) {
+      const hasDecidedChange = noticeEntries.some(e => {
+        if ((e.action || '').toLowerCase() !== 'status_change') return false;
+        const next = this.extractDetailStatus(e.detailsObj, ['status', 'newStatus', 'to', 'statusTo']);
+        return next?.toUpperCase() === 'DECIDED';
+      });
+      if (!hasDecidedChange) {
+        const previousStatus = this.resolveStatusBefore(decision.decidedAt, noticeEntries);
+        const syntheticDetails = {
+          status: 'DECIDED',
+          previousStatus
+        };
+        noticeEntries.push({
+          id: `synthetic-status-${decision.id}`,
+          action: 'status_change',
+          actor: decision.decidedBy || 'system',
+          createdAt: decision.decidedAt,
+          details: syntheticDetails,
+          detailsObj: { ...syntheticDetails },
+          synthetic: true
+        });
+      }
+    }
+    return noticeEntries;
+  }
+
+  private ensureStatusHistory(response: PublicStatusResponse, entries: MappedAuditEntry[]): MappedAuditEntry[] {
+    if (response.entityType !== 'notice') return entries.slice();
+
+    const clone = entries.map(entry => ({
+      ...entry,
+      detailsObj: entry.detailsObj ? { ...entry.detailsObj } : null,
+      details: entry.detailsObj ? { ...entry.detailsObj } : entry.details
+    }));
+
+    const statusEntries = clone
+      .filter(entry => (entry.action || '').toLowerCase() === 'status_change')
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    let currentStatus = this.resolveInitialStatus(clone);
+
+    for (const entry of statusEntries) {
+      const details = entry.detailsObj ?? {};
+      const nextStatus = this.extractDetailStatus(details, ['status', 'newStatus', 'to', 'statusTo']);
+      const previousStatus = this.extractDetailStatus(details, ['previousStatus', 'oldStatus', 'previous', 'from', 'statusFrom']);
+
+      if (!previousStatus && currentStatus) {
+        details['previousStatus'] = currentStatus;
+      }
+      if (!details['status'] && nextStatus) {
+        details['status'] = nextStatus;
+      }
+
+      entry.detailsObj = { ...details };
+      entry.details = { ...details };
+
+      if (nextStatus) {
+        currentStatus = nextStatus;
+      }
+    }
+
+    return clone;
+  }
+
+  private resolveInitialStatus(entries: MappedAuditEntry[]): string {
+    const creationEntry = entries
+      .filter(entry => (entry.action || '').toLowerCase() === 'create')
+      .sort((a, b) => a.createdAt - b.createdAt)[0];
+    const initial = this.extractDetailStatus(creationEntry?.detailsObj, ['status', 'initialStatus']);
+    return initial || 'RECEIVED';
+  }
+
+  private resolveStatusBefore(timestamp: number, entries: MappedAuditEntry[]): string {
+    const statusEntries = entries
+      .filter(entry => (entry.action || '').toLowerCase() === 'status_change')
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    let currentStatus = this.resolveInitialStatus(entries);
+    for (const entry of statusEntries) {
+      if (entry.createdAt >= timestamp) break;
+      const nextStatus = this.extractDetailStatus(entry.detailsObj, ['status', 'newStatus', 'to', 'statusTo']);
+      if (nextStatus) currentStatus = nextStatus;
+    }
+    return currentStatus;
   }
 
   private resolveFilename(disposition: string | null, fallback: string): string {
