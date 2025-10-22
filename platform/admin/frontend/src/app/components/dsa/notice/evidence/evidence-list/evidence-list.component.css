@@ -156,33 +156,6 @@
     justify-content: flex-end;
 }
 
-@media (max-width: 600px) {
-    .row {
-        grid-template-columns: 1fr;
-    }
-
-    .url-text {
-        max-width: 100%;
-        white-space: normal;
-        word-break: break-all;
-    }
-
-    .file-block {
-        width: 100%;
-    }
-
-    .file-name {
-        max-width: 100%;
-        white-space: normal;
-        word-break: break-word;
-    }
-
-    .action-buttons {
-        margin-left: 0;
-        justify-content: flex-start;
-    }
-}
-
 .mono {
     font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
     background: #f8fafc;
