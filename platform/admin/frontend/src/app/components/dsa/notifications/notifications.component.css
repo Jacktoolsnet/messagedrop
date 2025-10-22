@@ -199,6 +199,57 @@ mat-progress-bar {
   font-size: 0.92rem;
 }
 
+.notice-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.summary-text {
+  color: var(--muted);
+  font-size: 0.92rem;
+  flex: 1 1 auto;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  border: 1px solid transparent;
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.status-received {
+  background: #fff1f2;
+  color: #b91c1c;
+  border-color: #fecaca;
+}
+
+.status-under-review {
+  background: #fffbeb;
+  color: #b45309;
+  border-color: #fcd34d;
+}
+
+.status-decided {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+
+.status-default {
+  background: #eef2ff;
+  color: #3730a3;
+  border-color: #c7d2fe;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;
