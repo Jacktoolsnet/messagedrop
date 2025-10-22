@@ -49,8 +49,10 @@
   <div class="layout">
     <div class="left-column">
       <div class="list-header">
-        <mat-icon>gavel</mat-icon>
-        Notices
+        <div class="badge">
+          <mat-icon aria-hidden="true">gavel</mat-icon>
+          Notices
+        </div>
       </div>
 
       <div class="notice-list">
@@ -113,22 +115,23 @@
     </div>
 
     <div class="right-column">
-      @if (selectedNotice(); as notice) {
-        <div class="notice-summary">
-          <span class="status-pill" [ngClass]="statusClass(notice.status)">
-            <mat-icon aria-hidden="true">{{ statusIcon(notice.status) }}</mat-icon>
-            {{ statusLabel(notice.status) }}
-          </span>
-          <span class="summary-text">{{ noticePreview(notice) }}</span>
-        </div>
-      }
-
       @if (notificationsLoading()) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       }
 
       @if (selectedNotice() && notifications().length > 0) {
         <div class="notification-list">
+          <div class="notification-list-header">
+            <div class="badge">
+              <mat-icon aria-hidden="true">notifications</mat-icon>
+              Notifications
+            </div>
+            <button mat-stroked-button color="primary" type="button" class="add-button" (click)="openNewNotificationDialog(selectedNotice()!)">
+              <mat-icon aria-hidden="true">add</mat-icon>
+              Add notification
+            </button>
+          </div>
+
           @for (notification of notifications(); track trackNotification($index, notification)) {
             <mat-card class="notification-card" [class.failed]="notification.meta?.success === false">
               <div class="notification-head">
@@ -168,8 +171,7 @@
               </div>
 
               <div class="actions">
-                <button mat-stroked-button color="primary" type="button" *ngIf="isEmail(notification)"
-                  (click)="resend(notification)">
+                <button mat-stroked-button color="primary" type="button" (click)="resend(notification)">
                   <mat-icon>send</mat-icon>
                   Resend
                 </button>

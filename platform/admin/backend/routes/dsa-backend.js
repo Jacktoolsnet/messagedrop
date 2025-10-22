@@ -3,6 +3,7 @@ const crypto = require('crypto');
 const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
+const axios = require('axios');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
@@ -923,46 +924,121 @@ router.post('/notifications/:id/resend', async (req, res) => {
         return res.status(409).json({ error: 'notification_failed_initially' });
     }
 
-    if (mapped.channel !== 'email') {
+    const actor = `admin:${req.admin?.sub || 'unknown'}`;
+    const baseMeta = mapped.meta || {};
+    const payload = mapped.payload || {};
+    const resentAt = Date.now();
+    let resendSuccess = false;
+    let meta = null;
+
+    if (mapped.channel === 'email') {
+        const mail = payload.mail || payload;
+        const to = mail.to || payload.to;
+        const subject = mail.subject || payload.subject;
+        const text = mail.text || payload.text;
+        const html = mail.html || payload.html;
+        const from = mail.from || payload.from || undefined;
+
+        if (!to || !subject || (!text && !html)) {
+            return res.status(400).json({ error: 'invalid_mail_payload' });
+        }
+
+        const result = await sendMail({ to, subject, text, html, from, logger: req.logger });
+        resendSuccess = result.success;
+        meta = {
+            source: 'resend',
+            resentAt,
+            success: result.success,
+            event: baseMeta?.event || payload.event || null,
+            error: result.success ? null : String(result.error?.message || result.error || 'unknown_error'),
+            provider: result.info ? { messageId: result.info.messageId ?? result.info?.response ?? null } : null,
+            resendOf: notificationId
+        };
+
+        await recordNotification(_db, {
+            noticeId: mapped.noticeId ?? null,
+            decisionId: mapped.decisionId ?? null,
+            stakeholder: mapped.stakeholder || 'reporter',
+            channel: 'email',
+            payload: { to, subject, text, html, from, event: payload.event || baseMeta?.event || null },
+            meta,
+            sentAt: resentAt,
+            auditActor: actor
+        });
+    } else if (mapped.channel === 'inapp') {
+        const destination = payload.destination;
+        const title = payload.title || 'DSA update';
+        const body = payload.body || ''; 
+        const metadata = payload.metadata || {};
+
+        if (!destination || !body) {
+            return res.status(400).json({ error: 'invalid_inapp_payload' });
+        }
+
+        if (!process.env.BASE_URL || !process.env.PORT || !process.env.BACKEND_TOKEN) {
+            return res.status(500).json({ error: 'notification_service_unavailable' });
+        }
+
+        const deliveryPayload = {
+            userId: destination,
+            title,
+            body,
+            category: 'dsa',
+            source: 'digital-service-act',
+            metadata
+        };
+
+        try {
+            const response = await axios.post(
+                `${process.env.BASE_URL}:${process.env.PORT}/notification/create`,
+                deliveryPayload,
+                {
+                    headers: {
+                        'X-API-Authorization': process.env.BACKEND_TOKEN,
+                        'Accept': 'application/json'
+                    },
+                    timeout: 5000,
+                    validateStatus: () => true
+                }
+            );
+
+            resendSuccess = response.status >= 200 && response.status < 300;
+            meta = {
+                source: 'resend',
+                resentAt,
+                success: resendSuccess,
+                event: baseMeta?.event || payload.event || null,
+                responseStatus: response.status,
+                error: resendSuccess ? null : JSON.stringify(response.data || null),
+                resendOf: notificationId
+            };
+        } catch (err) {
+            resendSuccess = false;
+            meta = {
+                source: 'resend',
+                resentAt,
+                success: false,
+                event: baseMeta?.event || payload.event || null,
+                error: String(err?.message || err),
+                resendOf: notificationId
+            };
+        }
+
+        await recordNotification(_db, {
+            noticeId: mapped.noticeId ?? null,
+            decisionId: mapped.decisionId ?? null,
+            stakeholder: mapped.stakeholder || 'uploader',
+            channel: 'inapp',
+            payload: { ...payload, event: payload.event || baseMeta?.event || null },
+            meta,
+            sentAt: resentAt,
+            auditActor: actor
+        });
+    } else {
         return res.status(400).json({ error: 'resend_not_supported', channel: mapped.channel });
     }
 
-    const payload = mapped.payload || {};
-    const mail = payload.mail || payload;
-    const to = mail.to || payload.to;
-    const subject = mail.subject || payload.subject;
-    const text = mail.text || payload.text;
-    const html = mail.html || payload.html;
-    const from = mail.from || payload.from || undefined;
-
-    if (!to || !subject || (!text && !html)) {
-        return res.status(400).json({ error: 'invalid_mail_payload' });
-    }
-
-    const result = await sendMail({ to, subject, text, html, from, logger: req.logger });
-
-    const meta = {
-        source: 'resend',
-        resentAt: Date.now(),
-        success: result.success,
-        event: mapped.meta?.event || payload.event || null,
-        error: result.success ? null : String(result.error?.message || result.error || 'unknown_error'),
-        provider: result.info ? { messageId: result.info.messageId ?? result.info?.response ?? null } : null,
-        resendOf: notificationId
-    };
-
-    await recordNotification(_db, {
-        noticeId: mapped.noticeId ?? null,
-        decisionId: mapped.decisionId ?? null,
-        stakeholder: mapped.stakeholder || 'reporter',
-        channel: 'email',
-        payload: { to, subject, text, html, from, event: payload.event || mapped.meta?.event || null },
-        meta,
-        sentAt: meta.resentAt,
-        auditActor: `admin:${req.admin?.sub || 'unknown'}`
-    });
-
-    res.json({ success: result.success });
+    res.json({ success: resendSuccess });
 });
 
 /* ------------------------------- Audit ------------------------------- */

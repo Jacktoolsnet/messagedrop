@@ -267,6 +267,22 @@ export class DsaService {
     );
   }
 
+  createNotification(payload: {
+    noticeId?: string | null;
+    decisionId?: string | null;
+    stakeholder: string;
+    channel: string;
+    payload: any;
+    meta?: any;
+  }): Observable<{ id: string }> {
+    return this.http.post<{ id: string }>(`${this.baseUrl}/notifications`, payload).pipe(
+      catchError(err => {
+        this.snack.open('Could not create notification.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
   loadSignalStats(): void {
     this.loading.set(true);
     this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)

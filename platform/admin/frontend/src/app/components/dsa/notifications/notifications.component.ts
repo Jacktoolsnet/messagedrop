@@ -22,6 +22,7 @@ import { DsaNoticeFilters, DsaNoticeRange } from '../../../interfaces/dsa-notice
 import { DSA_NOTICE_STATUSES, DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
+import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
 
 type NoticeStatusMeta = {
   label: string;
@@ -199,6 +200,42 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       minWidth: '96vw',
       maxHeight: '90vh',
       panelClass: 'md-dialog-rounded'
+    });
+  }
+
+  openNewNotificationDialog(notice: DsaNotice): void {
+    const ref = this.dialog.open(NotificationDialogComponent, {
+      width: '520px',
+      data: {
+        notice
+      },
+      autoFocus: false,
+      disableClose: true,
+      panelClass: 'md-dialog-rounded'
+    });
+
+    ref.afterClosed().subscribe((result: { stakeholder: string; channel: string; payload: any } | undefined) => {
+      if (!result) return;
+      const payload = {
+        ...result.payload,
+        event: result.payload?.event || null
+      };
+      this.notificationsLoading.set(true);
+      this.dsa.createNotification({
+        noticeId: notice.id,
+        stakeholder: result.stakeholder,
+        channel: result.channel,
+        payload
+      }).subscribe({
+        next: () => {
+          this.snack.open('Notification queued.', 'OK', { duration: 2000 });
+          this.fetchNotifications(notice.id, true);
+        },
+        error: () => {
+          this.notificationsLoading.set(false);
+          this.snack.open('Could not create notification.', 'OK', { duration: 3000 });
+        }
+      });
     });
   }
 

@@ -1,0 +1,45 @@
+<h2 mat-dialog-title>
+  <mat-icon aria-hidden="true">add_alert</mat-icon>
+  Add Notification
+</h2>
+
+<form [formGroup]="form" class="dialog-content" (ngSubmit)="submit()">
+  <mat-form-field appearance="outline">
+    <mat-label>Stakeholder</mat-label>
+    <mat-select formControlName="stakeholder" required>
+      <mat-option value="reporter">Reporter</mat-option>
+      <mat-option value="uploader">Uploader</mat-option>
+      <mat-option value="other">Other</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Channel</mat-label>
+    <mat-select formControlName="channel" required>
+      <mat-option value="email">Email</mat-option>
+      <mat-option value="inapp">In-App</mat-option>
+      <mat-option value="webhook">Webhook</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" *ngIf="channel === 'email'">
+    <mat-label>Subject</mat-label>
+    <input matInput formControlName="subject" placeholder="Enter subject" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Message</mat-label>
+    <textarea matInput formControlName="body" rows="4" placeholder="Enter message" required></textarea>
+    <mat-hint>Will be delivered to the selected stakeholder.</mat-hint>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline">
+    <mat-label>Event (optional)</mat-label>
+    <input matInput formControlName="event" placeholder="Custom event identifier" />
+  </mat-form-field>
+
+  <div class="dialog-actions">
+    <button mat-button type="button" (click)="cancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit">Create</button>
+  </div>
+</form>
