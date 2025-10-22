@@ -124,6 +124,31 @@ export class PublicStatusComponent implements OnInit {
     }
   }
 
+  formatAuditAction(entry: MappedAuditEntry): string {
+    const rawAction = entry.action || '';
+    const action = rawAction.toLowerCase();
+    switch (action) {
+      case 'status_change': {
+        const details = entry.detailsObj;
+        const previous = this.extractDetailStatus(details, ['oldStatus', 'previous', 'from', 'statusFrom']);
+        const next = this.extractDetailStatus(details, ['newStatus', 'status', 'to', 'statusTo']);
+        if (previous && next) {
+          return `Status changed from ${this.formatStatus(previous)} to ${this.formatStatus(next)}`;
+        }
+        if (next) {
+          return `Status changed to ${this.formatStatus(next)}`;
+        }
+        return 'Status updated';
+      }
+      case 'decision_created':
+      case 'decision_recorded':
+        return 'Decision recorded';
+      default:
+        const readable = rawAction.replace(/_/g, ' ').toLowerCase();
+        return readable.replace(/\b\w/g, (letter) => letter.toUpperCase()) || 'Event';
+    }
+  }
+
   formatOutcome(outcome: string | undefined | null): string {
     if (!outcome) return '—';
     const key = outcome.toUpperCase();
@@ -195,6 +220,17 @@ export class PublicStatusComponent implements OnInit {
         this.snack.open('Could not download the file.', 'OK', { duration: 3000 });
       }
     });
+  }
+
+  private extractDetailStatus(details: Record<string, unknown> | null | undefined, keys: string[]): string | null {
+    if (!details) return null;
+    for (const key of keys) {
+      const value = details[key];
+      if (value !== undefined && value !== null && value !== '') {
+        return String(value);
+      }
+    }
+    return null;
   }
 
   private resolveFilename(disposition: string | null, fallback: string): string {

@@ -7,27 +7,6 @@
     display: block;
 }
 
-.evidence-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: .75rem;
-    margin: .5rem 0 1rem;
-}
-
-.evidence-header h3 {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    margin: 0;
-    font-weight: 600;
-    letter-spacing: .2px;
-}
-
-.evidence-header mat-icon {
-    color: var(--primary);
-}
-
 .skeleton {
     display: grid;
     gap: .5rem;

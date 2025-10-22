@@ -42,16 +42,17 @@
 
         <mat-form-field class="grow" appearance="outline">
             <mat-label>Search</mat-label>
-            <input matInput formControlName="q" autocomplete="off"
-                placeholder="Reason text, category, reporter…" />
+            <input matInput formControlName="q" autocomplete="off" placeholder="Reason text, category, reporter…" />
         </mat-form-field>
     </form>
 
     <div class="layout">
         <div class="left-column">
             <div class="list-header">
-                <mat-icon>gavel</mat-icon>
-                Notices
+                <div class="badge">
+                    <mat-icon aria-hidden="true">gavel</mat-icon>
+                    Notices
+                </div>
             </div>
 
             <div class="notice-list">
@@ -115,7 +116,17 @@
 
         <div class="right-column">
             @if (selectedNotice(); as current) {
-            <app-evidence-list [noticeId]="current.id"></app-evidence-list>
+            <div class="evidence-header">
+                <div class="badge">
+                    <mat-icon aria-hidden="true">folder_open</mat-icon>
+                    Evidence
+                </div>
+                <button mat-stroked-button color="primary" type="button" (click)="evidenceList.openAdd()">
+                    <mat-icon aria-hidden="true">add</mat-icon>
+                    Add evidence
+                </button>
+            </div>
+            <app-evidence-list #evidenceList [noticeId]="current.id"></app-evidence-list>
             } @else {
             <div class="placeholder">
                 <mat-icon>folder_open</mat-icon>

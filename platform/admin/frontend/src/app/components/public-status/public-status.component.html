@@ -186,15 +186,15 @@
     <mat-card-content>
       <mat-list>
         @for (entry of auditEntries(); track entry.id) {
-        <mat-list-item>
-          <div matListItemTitle>{{ entry.action }}</div>
+        <mat-list-item class="timeline-entry">
+          <div matListItemTitle>{{ formatAuditAction(entry) }}</div>
           <div matListItemLine>on {{ entry.createdAt | date:'medium' }}</div>
           <div matListItemLine class="muted">by {{ entry.actor }}</div>
           <div class="detail" *ngIf="entry.detailsObj as details">
             <pre>{{ details | json }}</pre>
           </div>
         </mat-list-item>
-        <mat-divider></mat-divider>
+        <mat-divider class="timeline-divider"></mat-divider>
         }
       </mat-list>
     </mat-card-content>

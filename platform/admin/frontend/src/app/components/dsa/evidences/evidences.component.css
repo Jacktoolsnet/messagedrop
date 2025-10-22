@@ -77,20 +77,35 @@ mat-progress-bar {
 .right-column {
     flex: 1 1 420px;
     min-width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .list-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+}
+
+.list-header .badge {
+    background: rgba(5, 165, 29, 0.18);
+    color: #04730f;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    color: var(--muted);
+    gap: 0.4rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
 }
 
 .notice-list {
     display: grid;
-    gap: 0.85rem;
+    gap: 1rem;
+    margin-top: 0.5rem;
 }
 
 .notice-card {
@@ -234,6 +249,31 @@ mat-progress-bar {
 .actions {
     display: flex;
     justify-content: flex-end;
+}
+
+.evidence-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 0;
+}
+
+.evidence-header .badge {
+    background: rgba(5, 165, 29, 0.18);
+    color: #04730f;
+    font-weight: 600;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.evidence-header button mat-icon {
+    margin-right: 0.35rem;
 }
 
 .actions button mat-icon {
