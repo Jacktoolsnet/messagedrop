@@ -14,6 +14,8 @@ const tableAppeal = require('../db/tableDsaAppeal');
 const tableEvidence = require('../db/tableDsaEvidence');
 const tableNotification = require('../db/tableDsaNotification');
 const tableAudit = require('../db/tableDsaAuditLog');
+const { recordNotification } = require('../utils/recordNotification');
+const { sendMail } = require('../utils/mailer');
 
 const router = express.Router();
 router.use(requireAdminJwt, requireRole('moderator', 'legal', 'admin', 'root'));
@@ -356,6 +358,25 @@ function buildAppealResolutionNotification({ notice, appeal, decisionOutcome, re
         includeExcerpt: true,
         title: 'DSA appeal outcome',
         bodySegments: segments
+    };
+}
+
+function parseJsonField(raw) {
+    if (raw === null || raw === undefined) return null;
+    if (typeof raw === 'object') return raw;
+    try {
+        return JSON.parse(raw);
+    } catch {
+        return { _raw: raw };
+    }
+}
+
+function mapNotificationRow(row) {
+    if (!row) return null;
+    return {
+        ...row,
+        payload: parseJsonField(row.payload),
+        meta: parseJsonField(row.meta)
     };
 }
 
@@ -790,17 +811,24 @@ router.get('/evidence/:id/download', (req, res) => {
 router.post('/notifications', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
 
-    const id = crypto.randomUUID();
     const sentAt = Date.now();
     const noticeId = asString(req.body?.noticeId);
     const decisionId = asString(req.body?.decisionId);
     const stakeholder = String(req.body?.stakeholder || 'reporter'); // reporter|uploader|other
     const channel = String(req.body?.channel || 'inapp');            // email|inapp|webhook
-    const payloadJson = JSON.stringify(req.body?.payload ?? {});
-    const metaJson = req.body?.meta ? JSON.stringify(req.body.meta) : null;
+    const payload = req.body?.payload ?? {};
+    const meta = req.body?.meta ?? {};
 
-    tableNotification.create(_db, id, noticeId, decisionId, stakeholder, channel, sentAt, payloadJson, metaJson, (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+    recordNotification(_db, {
+        noticeId,
+        decisionId,
+        stakeholder,
+        channel,
+        payload,
+        meta,
+        sentAt
+    }).then((id) => {
+        if (!id) return res.status(500).json({ error: 'db_error' });
 
         const entityType = decisionId ? 'decision' : 'notice';
         const entityId = decisionId || noticeId || 'unknown';
@@ -813,8 +841,136 @@ router.post('/notifications', (req, res) => {
             () => { }
         );
 
-        res.status(201).json(row);
+        res.status(201).json({ id });
     });
+});
+
+router.get('/notifications', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const opts = {
+        noticeId: asString(req.query.noticeId ?? undefined) || undefined,
+        decisionId: asString(req.query.decisionId ?? undefined) || undefined,
+        channel: asString(req.query.channel ?? undefined) || undefined,
+        stakeholder: asString(req.query.stakeholder ?? undefined) || undefined,
+        limit: asNum(req.query.limit, 200),
+        offset: asNum(req.query.offset, 0)
+    };
+
+    tableNotification.list(_db, opts, (err, rows) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+
+        const mapped = (rows || []).map(mapNotificationRow);
+        const q = asString(req.query.q);
+        const filtered = q
+            ? mapped.filter((row) => {
+                const needle = q.toLowerCase();
+                const payloadText = JSON.stringify(row.payload || {}).toLowerCase();
+                const metaText = JSON.stringify(row.meta || {}).toLowerCase();
+                return (row.stakeholder || '').toLowerCase().includes(needle) ||
+                    (row.channel || '').toLowerCase().includes(needle) ||
+                    payloadText.includes(needle) ||
+                    metaText.includes(needle);
+            })
+            : mapped;
+
+        if (String(req.query.format || '').toLowerCase() === 'csv') {
+            const header = 'id,sentAt,stakeholder,channel,noticeId,decisionId,status,event\n';
+            const lines = filtered.map((row) => {
+                const status = row.meta?.success === false ? 'failed' : 'sent';
+                const event = row.meta?.event || row.payload?.event || '';
+                return [
+                    row.id,
+                    row.sentAt,
+                    row.stakeholder,
+                    row.channel,
+                    row.noticeId || '',
+                    row.decisionId || '',
+                    status,
+                    event
+                ].map(value => `"${String(value ?? '').replace(/"/g, '""')}"`).join(',');
+            });
+            const csv = header + lines.join('\n');
+            res.setHeader('Content-Type', 'text/csv');
+            res.setHeader('Content-Disposition', 'attachment; filename="dsa-notifications.csv"');
+            return res.send(csv);
+        }
+
+        res.json(filtered);
+    });
+});
+
+router.get('/notifications/:id', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    tableNotification.getById(_db, String(req.params.id), (err, row) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!row) return res.status(404).json({ error: 'not_found' });
+        res.json(mapNotificationRow(row));
+    });
+});
+
+router.post('/notifications/:id/resend', async (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const notificationId = String(req.params.id);
+
+    const row = await new Promise((resolve, reject) => {
+        tableNotification.getById(_db, notificationId, (err, value) => {
+            if (err) return reject(err);
+            resolve(value || null);
+        });
+    }).catch((error) => {
+        res.status(500).json({ error: 'db_error', detail: error.message });
+        return null;
+    });
+    if (row === null) return; // response already sent above
+    if (!row) return res.status(404).json({ error: 'not_found' });
+
+    const mapped = mapNotificationRow(row);
+    if ((mapped.meta?.success === false) && req.body?.skipFailed === true) {
+        return res.status(409).json({ error: 'notification_failed_initially' });
+    }
+
+    if (mapped.channel !== 'email') {
+        return res.status(400).json({ error: 'resend_not_supported', channel: mapped.channel });
+    }
+
+    const payload = mapped.payload || {};
+    const mail = payload.mail || payload;
+    const to = mail.to || payload.to;
+    const subject = mail.subject || payload.subject;
+    const text = mail.text || payload.text;
+    const html = mail.html || payload.html;
+    const from = mail.from || payload.from || undefined;
+
+    if (!to || !subject || (!text && !html)) {
+        return res.status(400).json({ error: 'invalid_mail_payload' });
+    }
+
+    const result = await sendMail({ to, subject, text, html, from, logger: req.logger });
+
+    const meta = {
+        source: 'resend',
+        resentAt: Date.now(),
+        success: result.success,
+        event: mapped.meta?.event || payload.event || null,
+        error: result.success ? null : String(result.error?.message || result.error || 'unknown_error'),
+        provider: result.info ? { messageId: result.info.messageId ?? result.info?.response ?? null } : null,
+        resendOf: notificationId
+    };
+
+    await recordNotification(_db, {
+        noticeId: mapped.noticeId ?? null,
+        decisionId: mapped.decisionId ?? null,
+        stakeholder: mapped.stakeholder || 'reporter',
+        channel: 'email',
+        payload: { to, subject, text, html, from, event: payload.event || mapped.meta?.event || null },
+        meta,
+        sentAt: meta.resentAt
+    });
+
+    res.json({ success: result.success });
 });
 
 /* ------------------------------- Audit ------------------------------- */

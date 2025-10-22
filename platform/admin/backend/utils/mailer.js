@@ -63,15 +63,15 @@ async function sendMail({ to, subject, text, html, from, logger }) {
     };
 
     try {
-        await transport.sendMail(payload);
-        return true;
+        const info = await transport.sendMail(payload);
+        return { success: true, info };
     } catch (err) {
         if (logger?.warn) {
             logger.warn('Failed to send mail', { to, subject, error: err.message });
         } else {
             console.warn('Failed to send mail', { to, subject, error: err.message });
         }
-        return false;
+        return { success: false, error: err };
     }
 }
 

@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { recordNotification } = require('./recordNotification');
 
 function truncate(text, maxLength = 160) {
     if (typeof text !== 'string' || text.length <= maxLength) {
@@ -87,7 +88,7 @@ async function notifyContentOwner(req, notification) {
             }
         };
 
-        const payload = {
+        const deliveryPayload = {
             userId: message.userId,
             title: notification.title || (type === 'signal' ? 'New DSA signal' : 'DSA update'),
             body: notification.body || segments.join(' '),
@@ -98,7 +99,7 @@ async function notifyContentOwner(req, notification) {
 
         const response = await axios.post(
             `${baseUrl}/notification/create`,
-            payload,
+            deliveryPayload,
             {
                 headers,
                 timeout: 5000,
@@ -106,7 +107,33 @@ async function notifyContentOwner(req, notification) {
             }
         );
 
-        if (response.status >= 200 && response.status < 300) {
+        const success = response.status >= 200 && response.status < 300;
+
+        const db = req?.database?.db;
+        if (db) {
+            const stakeholder = 'uploader';
+            const recordPayload = {
+                destination: message.userId,
+                title: deliveryPayload?.title,
+                body: deliveryPayload?.body,
+                metadata
+            };
+            const meta = {
+                event,
+                responseStatus: response.status,
+                success
+            };
+            void recordNotification(db, {
+                noticeId: notification.type === 'notice' ? notification.caseId ?? null : null,
+                decisionId: notification.type === 'decision' ? notification.caseId ?? null : null,
+                stakeholder,
+                channel: 'inapp',
+                payload: recordPayload,
+                meta
+            });
+        }
+
+        if (success) {
             return true;
         }
 
@@ -118,6 +145,22 @@ async function notifyContentOwner(req, notification) {
         });
         return false;
     } catch (error) {
+        const db = req?.database?.db;
+        if (db) {
+            void recordNotification(db, {
+                noticeId: notification.type === 'notice' ? notification.caseId ?? null : null,
+                decisionId: notification.type === 'decision' ? notification.caseId ?? null : null,
+                stakeholder: 'uploader',
+                channel: 'inapp',
+                payload: notification,
+                meta: {
+                    event: notification.event || notification.type,
+                    success: false,
+                    error: String(error?.message || error)
+                }
+            });
+        }
+
         if (req.logger?.warn) {
             req.logger.warn('Failed to send system notification to uploader', {
                 error: error.message,
@@ -134,4 +177,3 @@ async function notifyContentOwner(req, notification) {
 module.exports = {
     notifyContentOwner
 };
-

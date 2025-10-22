@@ -1,0 +1,247 @@
+<mat-toolbar>
+  <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">Notifications</span>
+  <span class="spacer"></span>
+  <button mat-stroked-button color="primary" type="button" (click)="reload()">
+    <mat-icon>refresh</mat-icon>
+    Refresh
+  </button>
+</mat-toolbar>
+
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+  <form class="filter-row" [formGroup]="filterForm" novalidate>
+    <mat-form-field appearance="outline">
+      <mat-label>Status</mat-label>
+      <mat-select formControlName="status" multiple>
+        <mat-option [value]="status" *ngFor="let status of statuses">
+          {{ statusLabel(status) }}
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Range</mat-label>
+      <mat-select formControlName="range">
+        <mat-option value="24h">Last 24h</mat-option>
+        <mat-option value="7d">Last 7 days</mat-option>
+        <mat-option value="30d">Last 30 days</mat-option>
+        <mat-option value="all">All</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Content ID</mat-label>
+      <input matInput formControlName="contentId" autocomplete="off" placeholder="Search by content id" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="grow">
+      <mat-label>Search</mat-label>
+      <input matInput formControlName="q" autocomplete="off" placeholder="Reason, category, keywords" />
+    </mat-form-field>
+  </form>
+
+  <div class="layout">
+    <div class="left-column">
+      <div class="list-header">
+        <mat-icon>gavel</mat-icon>
+        Notices
+      </div>
+
+      <div class="notice-list">
+        @if (emptyNotices()) {
+          <div class="empty">
+            <mat-icon>inventory_2</mat-icon>
+            <p>No notices found for the selected filters.</p>
+          </div>
+        }
+
+        @for (notice of notices(); track trackNotice($index, notice)) {
+          <mat-card class="notice-card" [class.selected]="isSelected(notice)" (click)="selectNotice(notice)">
+            <div class="head">
+              <div class="title" [matTooltip]="notice.contentId || 'No content id'">
+                {{ notice.contentId || 'No content id' }}
+              </div>
+              <div class="head-right">
+                @if (isSelected(notice)) {
+                  <span class="active-pill">
+                    <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
+                    Active
+                  </span>
+                }
+                <span class="status-pill" [ngClass]="statusClass(notice.status)">
+                  <mat-icon aria-hidden="true">{{ statusIcon(notice.status) }}</mat-icon>
+                  {{ statusLabel(notice.status) }}
+                </span>
+              </div>
+            </div>
+
+            <div class="meta">
+              <span>
+                <mat-icon aria-hidden="true">event</mat-icon>
+                {{ notice.createdAt | date:'medium' }}
+              </span>
+              <span>
+                <mat-icon aria-hidden="true">update</mat-icon>
+                {{ notice.updatedAt | date:'medium' }}
+              </span>
+            </div>
+
+            @if (notice.category) {
+              <div class="category">
+                <mat-icon aria-hidden="true">category</mat-icon>
+                {{ notice.category }}
+              </div>
+            }
+
+            <p class="preview">{{ noticePreview(notice) }}</p>
+
+            <div class="actions">
+              <button mat-stroked-button color="primary" type="button" (click)="openNoticeDetail(notice, $event)">
+                <mat-icon>open_in_new</mat-icon>
+                Open notice
+              </button>
+            </div>
+          </mat-card>
+        }
+      </div>
+    </div>
+
+    <div class="right-column">
+      @if (selectedNotice(); as notice) {
+        <mat-card class="notifications-card">
+          <mat-card-header>
+            <mat-card-title>Notifications for case #{{ notice.id }}</mat-card-title>
+            <mat-card-subtitle>
+              {{ notice.reportedContentType || '—' }} · {{ statusLabel(notice.status) }}
+            </mat-card-subtitle>
+          </mat-card-header>
+
+          <mat-card-content>
+            <div class="notice-summary">
+              <mat-chip class="status-pill" [ngClass]="statusClass(notice.status)">
+                <mat-icon>{{ statusIcon(notice.status) }}</mat-icon>
+                {{ statusLabel(notice.status) }}
+              </mat-chip>
+              <span>{{ noticePreview(notice) }}</span>
+            </div>
+
+            <div class="notification-filters">
+              <mat-form-field appearance="outline">
+                <mat-label>Stakeholder</mat-label>
+                <mat-select [ngModel]="stakeholderFilter()" (ngModelChange)="setStakeholder($event)">
+                  <mat-option value="all">All</mat-option>
+                  <mat-option value="reporter">Reporter</mat-option>
+                  <mat-option value="uploader">Uploader</mat-option>
+                  <mat-option value="other">Other</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Channel</mat-label>
+                <mat-select [ngModel]="channelFilter()" (ngModelChange)="setChannel($event)">
+                  <mat-option value="all">All</mat-option>
+                  <mat-option value="email">Email</mat-option>
+                  <mat-option value="inapp">In-App</mat-option>
+                  <mat-option value="webhook">Webhook</mat-option>
+                </mat-select>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="search-field">
+                <mat-label>Search notifications</mat-label>
+                <input matInput [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)"
+                  placeholder="Event, payload, error" />
+                <button mat-icon-button matSuffix aria-label="Clear" *ngIf="searchTerm()" (click)="onSearch('')">
+                  <mat-icon>close</mat-icon>
+                </button>
+              </mat-form-field>
+
+              <button mat-stroked-button color="primary" type="button" (click)="resetNotificationFilters()">
+                <mat-icon>filter_alt_off</mat-icon>
+                Reset
+              </button>
+            </div>
+
+            @if (notificationsLoading()) {
+              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+            }
+
+            @if (emptyNotifications()) {
+              <div class="card-empty">
+                <mat-icon>notifications_off</mat-icon>
+                <p>No notifications for this notice with the current filters.</p>
+              </div>
+            } @else {
+              <table mat-table [dataSource]="filteredNotifications()" class="notifications-table">
+                <ng-container matColumnDef="sentAt">
+                  <th mat-header-cell *matHeaderCellDef>Sent</th>
+                  <td mat-cell *matCellDef="let row">{{ row.sentAt | date:'medium' }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="stakeholder">
+                  <th mat-header-cell *matHeaderCellDef>Stakeholder</th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-chip-set>
+                      <mat-chip appearance="outlined">{{ row.stakeholder }}</mat-chip>
+                    </mat-chip-set>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="channel">
+                  <th mat-header-cell *matHeaderCellDef>Channel</th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-chip appearance="outlined" color="primary">
+                      <mat-icon inline>{{ channelIcon(row) }}</mat-icon>
+                      {{ row.channel }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="event">
+                  <th mat-header-cell *matHeaderCellDef>Event</th>
+                  <td mat-cell *matCellDef="let row">{{ eventLabel(row) }}</td>
+                </ng-container>
+
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef>Status</th>
+                  <td mat-cell *matCellDef="let row">
+                    <mat-chip [color]="statusColor(row)">
+                      {{ row.meta?.success === false ? 'Failed' : 'Sent' }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef></th>
+                  <td mat-cell *matCellDef="let row">
+                    <button mat-icon-button type="button" aria-label="Copy payload" (click)="copyPayload(row)">
+                      <mat-icon>content_copy</mat-icon>
+                    </button>
+                    <button mat-icon-button type="button" color="accent" aria-label="Resend notification"
+                      *ngIf="isEmail(row)" (click)="resend(row)">
+                      <mat-icon>send</mat-icon>
+                    </button>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+                  [class.row-failed]="row.meta?.success === false"></tr>
+              </table>
+            }
+          </mat-card-content>
+        </mat-card>
+      } @else {
+        <mat-card class="placeholder-card">
+          <mat-icon>touch_app</mat-icon>
+          <p>Select a notice to view its notifications.</p>
+        </mat-card>
+      }
+    </div>
+  </div>
+</div>

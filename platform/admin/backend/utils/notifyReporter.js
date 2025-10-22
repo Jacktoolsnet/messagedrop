@@ -1,4 +1,5 @@
 const { sendMail } = require('./mailer');
+const { recordNotification } = require('./recordNotification');
 
 function isValidEmail(value) {
     if (typeof value !== 'string') return false;
@@ -123,12 +124,38 @@ async function notifyReporter(req, { event, notice, statusUrl, extras = {} }) {
     const emailContent = buildEmail({ event, notice, statusUrl: resolvedStatusUrl, extras });
     if (!emailContent) return false;
 
-    return sendMail({
+    const result = await sendMail({
         to: email,
         subject: emailContent.subject,
         text: emailContent.text,
         logger: req?.logger
     });
+
+    const db = req?.database?.db;
+    const meta = {
+        event,
+        success: result.success,
+        error: result.error ? String(result.error?.message || result.error) : null,
+        provider: result.info ? { messageId: result.info.messageId ?? result.info?.response ?? null } : null
+    };
+
+    if (db) {
+        void recordNotification(db, {
+            noticeId: notice.id ?? null,
+            stakeholder: 'reporter',
+            channel: 'email',
+            payload: {
+                to: email,
+                subject: emailContent.subject,
+                text: emailContent.text,
+                statusUrl: resolvedStatusUrl,
+                extras
+            },
+            meta
+        });
+    }
+
+    return result.success;
 }
 
 module.exports = {

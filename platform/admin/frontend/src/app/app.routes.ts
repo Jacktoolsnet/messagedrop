@@ -11,6 +11,7 @@ import { SignalsComponent } from './components/dsa/signal/signals/signals.compon
 import { TransparencyComponent } from './components/dsa/transparency/transparency.component';
 import { PublicStatusComponent } from './components/public-status/public-status.component';
 import { LoginComponent } from './components/login/login.component';
+import { NotificationsComponent } from './components/dsa/notifications/notifications.component';
 import { authGuard } from './guards/auth/auth-guard';
 
 export const routes: Routes = [
@@ -19,6 +20,11 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         component: AdminDashboardComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/dsa/notifications',
+        component: NotificationsComponent,
         canActivate: [authGuard]
     },
     {

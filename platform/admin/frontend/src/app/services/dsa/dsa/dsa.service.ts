@@ -22,6 +22,7 @@ import { TransparencyStats } from '../../../interfaces/transparency-stats.interf
 import { TransparencyReport } from '../../../interfaces/transparency-report.interface';
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
+import { DsaNotification, ListNotificationsParams } from '../../../interfaces/dsa-notification.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -199,6 +200,71 @@ export class DsaService {
         if (res) this.appealStats.set(res);
         this.loading.set(false);
       });
+  }
+
+  /* =======================
+   *  NOTIFICATIONS
+   * ======================= */
+
+  listNotifications(params: ListNotificationsParams = {}): Observable<DsaNotification[]> {
+    let httpParams = new HttpParams()
+      .set('limit', String(params.limit ?? 200))
+      .set('offset', String(params.offset ?? 0));
+    if (params.noticeId) httpParams = httpParams.set('noticeId', params.noticeId);
+    if (params.decisionId) httpParams = httpParams.set('decisionId', params.decisionId);
+    if (params.stakeholder) httpParams = httpParams.set('stakeholder', params.stakeholder);
+    if (params.channel) httpParams = httpParams.set('channel', params.channel);
+    if (params.q) httpParams = httpParams.set('q', params.q);
+
+    return this.http.get<DsaNotification[]>(`${this.baseUrl}/notifications`, { params: httpParams }).pipe(
+      catchError(err => {
+        this.snack.open('Could not load notifications.', 'OK', { duration: 3000 });
+        return of([]);
+      })
+    );
+  }
+
+  getNotificationById(id: string): Observable<DsaNotification> {
+    return this.http.get<DsaNotification>(`${this.baseUrl}/notifications/${encodeURIComponent(id)}`).pipe(
+      catchError(err => {
+        this.snack.open('Could not load notification.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  resendNotification(id: string): Observable<{ success: boolean }> {
+    return this.http.post<{ success: boolean }>(`${this.baseUrl}/notifications/${encodeURIComponent(id)}/resend`, {}).pipe(
+      catchError(err => {
+        const msg = err?.error?.error === 'resend_not_supported'
+          ? 'Resending is not supported for this channel.'
+          : 'Could not resend notification.';
+        this.snack.open(msg, 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
+  }
+
+  exportNotifications(params: ListNotificationsParams = {}): Observable<Blob> {
+    let httpParams = new HttpParams()
+      .set('format', 'csv')
+      .set('limit', String(params.limit ?? 500))
+      .set('offset', String(params.offset ?? 0));
+    if (params.noticeId) httpParams = httpParams.set('noticeId', params.noticeId);
+    if (params.decisionId) httpParams = httpParams.set('decisionId', params.decisionId);
+    if (params.stakeholder) httpParams = httpParams.set('stakeholder', params.stakeholder);
+    if (params.channel) httpParams = httpParams.set('channel', params.channel);
+    if (params.q) httpParams = httpParams.set('q', params.q);
+
+    return this.http.get(`${this.baseUrl}/notifications`, {
+      params: httpParams,
+      responseType: 'blob'
+    }).pipe(
+      catchError(err => {
+        this.snack.open('Could not export notifications.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
   }
 
   loadSignalStats(): void {
