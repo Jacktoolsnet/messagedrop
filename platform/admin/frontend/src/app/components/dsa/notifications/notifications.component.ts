@@ -12,7 +12,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subscription, debounceTime, distinctUntilChanged, map } from 'rxjs';
@@ -29,9 +28,6 @@ type NoticeStatusMeta = {
   icon: string;
   class: string;
 };
-
-type StakeholderFilter = 'all' | 'reporter' | 'uploader' | 'other';
-type ChannelFilter = 'all' | 'email' | 'inapp' | 'webhook';
 
 @Component({
   selector: 'app-dsa-notifications',
@@ -51,7 +47,6 @@ type ChannelFilter = 'all' | 'email' | 'inapp' | 'webhook';
     MatProgressBarModule,
     MatCardModule,
     MatChipsModule,
-    MatTableModule,
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule
@@ -73,40 +68,8 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   readonly selectedNotice = signal<DsaNotice | null>(null);
   readonly notifications = signal<DsaNotification[]>([]);
 
-  readonly stakeholderFilter = signal<StakeholderFilter>('all');
-  readonly channelFilter = signal<ChannelFilter>('all');
-  readonly searchTerm = signal('');
-
-  readonly filteredNotifications = computed(() => {
-    let rows = this.notifications();
-    const stakeholder = this.stakeholderFilter();
-    const channel = this.channelFilter();
-    const search = this.searchTerm().trim().toLowerCase();
-
-    if (stakeholder !== 'all') {
-      rows = rows.filter(row => row.stakeholder.toLowerCase() === stakeholder);
-    }
-    if (channel !== 'all') {
-      rows = rows.filter(row => row.channel.toLowerCase() === channel);
-    }
-    if (search.length) {
-      rows = rows.filter(row => {
-        const haystack = [
-          row.channel,
-          row.stakeholder,
-          row.meta?.event,
-          row.meta?.error,
-          JSON.stringify(row.payload ?? {}),
-          JSON.stringify(row.meta ?? {})
-        ].join(' ').toLowerCase();
-        return haystack.includes(search);
-      });
-    }
-    return rows;
-  });
-
   readonly emptyNotices = computed(() => !this.loading() && this.notices().length === 0);
-  readonly emptyNotifications = computed(() => !this.notificationsLoading() && this.filteredNotifications().length === 0);
+  readonly emptyNotifications = computed(() => !this.notificationsLoading() && this.notifications().length === 0);
 
   readonly filterForm = this.fb.nonNullable.group({
     status: this.fb.nonNullable.control<DsaNoticeStatus[]>(['UNDER_REVIEW', 'DECIDED']),
@@ -156,24 +119,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   isSelected(notice: DsaNotice): boolean {
     return this.selectedNotice()?.id === notice.id;
-  }
-
-  setStakeholder(filter: StakeholderFilter | null): void {
-    this.stakeholderFilter.set((filter ?? 'all') as StakeholderFilter);
-  }
-
-  setChannel(filter: ChannelFilter | null): void {
-    this.channelFilter.set((filter ?? 'all') as ChannelFilter);
-  }
-
-  onSearch(value: string): void {
-    this.searchTerm.set(value || '');
-  }
-
-  resetNotificationFilters(): void {
-    this.stakeholderFilter.set('all');
-    this.channelFilter.set('all');
-    this.searchTerm.set('');
   }
 
   statusLabel(status: string): string {
@@ -321,14 +266,15 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   private syncSelection(rows: DsaNotice[]): void {
     const current = this.selectedNotice();
-    if (current && rows.some(row => row.id === current.id)) {
+    if (!current) {
+      this.notifications.set([]);
       return;
     }
-    const next = rows.length > 0 ? rows[0] : null;
-    this.selectedNotice.set(next);
-    if (!next) {
-      this.notifications.set([]);
+    if (rows.some(row => row.id === current.id)) {
+      return;
     }
+    this.selectedNotice.set(null);
+    this.notifications.set([]);
   }
 
   private toFilters(): DsaNoticeFilters {

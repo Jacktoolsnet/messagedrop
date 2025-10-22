@@ -113,134 +113,71 @@
     </div>
 
     <div class="right-column">
-      @if (selectedNotice(); as notice) {
-        <mat-card class="notifications-card">
-          <mat-card-header>
-            <mat-card-title>Notifications for case #{{ notice.id }}</mat-card-title>
-            <mat-card-subtitle>
-              {{ notice.reportedContentType || '—' }} · {{ statusLabel(notice.status) }}
-            </mat-card-subtitle>
-          </mat-card-header>
+      @if (notificationsLoading()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
 
-          <mat-card-content>
-            <div class="notice-summary">
-              <mat-chip class="status-pill" [ngClass]="statusClass(notice.status)">
-                <mat-icon>{{ statusIcon(notice.status) }}</mat-icon>
-                {{ statusLabel(notice.status) }}
-              </mat-chip>
-              <span>{{ noticePreview(notice) }}</span>
-            </div>
-
-            <div class="notification-filters">
-              <mat-form-field appearance="outline">
-                <mat-label>Stakeholder</mat-label>
-                <mat-select [ngModel]="stakeholderFilter()" (ngModelChange)="setStakeholder($event)">
-                  <mat-option value="all">All</mat-option>
-                  <mat-option value="reporter">Reporter</mat-option>
-                  <mat-option value="uploader">Uploader</mat-option>
-                  <mat-option value="other">Other</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Channel</mat-label>
-                <mat-select [ngModel]="channelFilter()" (ngModelChange)="setChannel($event)">
-                  <mat-option value="all">All</mat-option>
-                  <mat-option value="email">Email</mat-option>
-                  <mat-option value="inapp">In-App</mat-option>
-                  <mat-option value="webhook">Webhook</mat-option>
-                </mat-select>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline" class="search-field">
-                <mat-label>Search notifications</mat-label>
-                <input matInput [ngModel]="searchTerm()" (ngModelChange)="onSearch($event)"
-                  placeholder="Event, payload, error" />
-                <button mat-icon-button matSuffix aria-label="Clear" *ngIf="searchTerm()" (click)="onSearch('')">
-                  <mat-icon>close</mat-icon>
-                </button>
-              </mat-form-field>
-
-              <button mat-stroked-button color="primary" type="button" (click)="resetNotificationFilters()">
-                <mat-icon>filter_alt_off</mat-icon>
-                Reset
-              </button>
-            </div>
-
-            @if (notificationsLoading()) {
-              <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-            }
-
-            @if (emptyNotifications()) {
-              <div class="card-empty">
-                <mat-icon>notifications_off</mat-icon>
-                <p>No notifications for this notice with the current filters.</p>
+      @if (selectedNotice() && notifications().length > 0) {
+        <div class="notification-list">
+          @for (notification of notifications(); track trackNotification($index, notification)) {
+            <mat-card class="notification-card" [class.failed]="notification.meta?.success === false">
+              <div class="notification-head">
+                <div class="badge">
+                  <mat-icon aria-hidden="true">{{ channelIcon(notification) }}</mat-icon>
+                  <span>{{ notification.channel }}</span>
+                </div>
+                <span class="sent-at">{{ notification.sentAt | date:'medium' }}</span>
               </div>
-            } @else {
-              <table mat-table [dataSource]="filteredNotifications()" class="notifications-table">
-                <ng-container matColumnDef="sentAt">
-                  <th mat-header-cell *matHeaderCellDef>Sent</th>
-                  <td mat-cell *matCellDef="let row">{{ row.sentAt | date:'medium' }}</td>
-                </ng-container>
 
-                <ng-container matColumnDef="stakeholder">
-                  <th mat-header-cell *matHeaderCellDef>Stakeholder</th>
-                  <td mat-cell *matCellDef="let row">
-                    <mat-chip-set>
-                      <mat-chip appearance="outlined">{{ row.stakeholder }}</mat-chip>
-                    </mat-chip-set>
-                  </td>
-                </ng-container>
+              <div class="meta-line">
+                <mat-icon aria-hidden="true">person</mat-icon>
+                <span>{{ notification.stakeholder }}</span>
+              </div>
 
-                <ng-container matColumnDef="channel">
-                  <th mat-header-cell *matHeaderCellDef>Channel</th>
-                  <td mat-cell *matCellDef="let row">
-                    <mat-chip appearance="outlined" color="primary">
-                      <mat-icon inline>{{ channelIcon(row) }}</mat-icon>
-                      {{ row.channel }}
-                    </mat-chip>
-                  </td>
-                </ng-container>
+              <div class="meta-line">
+                <mat-icon aria-hidden="true">event</mat-icon>
+                <span>{{ eventLabel(notification) }}</span>
+              </div>
 
-                <ng-container matColumnDef="event">
-                  <th mat-header-cell *matHeaderCellDef>Event</th>
-                  <td mat-cell *matCellDef="let row">{{ eventLabel(row) }}</td>
-                </ng-container>
+              @if (notification.meta?.error) {
+                <div class="meta-line error">
+                  <mat-icon aria-hidden="true">error</mat-icon>
+                  <span>{{ notification.meta?.error }}</span>
+                </div>
+              }
 
-                <ng-container matColumnDef="status">
-                  <th mat-header-cell *matHeaderCellDef>Status</th>
-                  <td mat-cell *matCellDef="let row">
-                    <mat-chip [color]="statusColor(row)">
-                      {{ row.meta?.success === false ? 'Failed' : 'Sent' }}
-                    </mat-chip>
-                  </td>
-                </ng-container>
+              <div class="payload">
+                <div class="payload-header">
+                  <span>Payload preview</span>
+                  <button mat-button type="button" (click)="copyPayload(notification)">
+                    <mat-icon>content_copy</mat-icon>
+                    Copy JSON
+                  </button>
+                </div>
+                <pre>{{ notification.payload | json }}</pre>
+              </div>
 
-                <ng-container matColumnDef="actions">
-                  <th mat-header-cell *matHeaderCellDef></th>
-                  <td mat-cell *matCellDef="let row">
-                    <button mat-icon-button type="button" aria-label="Copy payload" (click)="copyPayload(row)">
-                      <mat-icon>content_copy</mat-icon>
-                    </button>
-                    <button mat-icon-button type="button" color="accent" aria-label="Resend notification"
-                      *ngIf="isEmail(row)" (click)="resend(row)">
-                      <mat-icon>send</mat-icon>
-                    </button>
-                  </td>
-                </ng-container>
-
-                <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-                <tr mat-row *matRowDef="let row; columns: displayedColumns;"
-                  [class.row-failed]="row.meta?.success === false"></tr>
-              </table>
-            }
-          </mat-card-content>
-        </mat-card>
+              <div class="actions">
+                <button mat-stroked-button color="primary" type="button" *ngIf="isEmail(notification)"
+                  (click)="resend(notification)">
+                  <mat-icon>send</mat-icon>
+                  Resend
+                </button>
+              </div>
+            </mat-card>
+          }
+        </div>
       } @else {
-        <mat-card class="placeholder-card">
-          <mat-icon>touch_app</mat-icon>
-          <p>Select a notice to view its notifications.</p>
-        </mat-card>
+        <div class="placeholder-card">
+          <mat-icon>notifications_none</mat-icon>
+          <p>
+            @if (selectedNotice()) {
+              No notifications for this notice.
+            } @else {
+              Select a notice to view its notifications.
+            }
+          </p>
+        </div>
       }
     </div>
   </div>
