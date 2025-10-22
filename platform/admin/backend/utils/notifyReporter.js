@@ -140,7 +140,10 @@ async function notifyReporter(req, { event, notice, statusUrl, extras = {} }) {
     };
 
     if (db) {
-        void recordNotification(db, {
+        const actor = req?.admin?.sub
+            ? `admin:${req.admin.sub}`
+            : (req?.user?.sub ? `user:${req.user.sub}` : `public:${req.ip || 'unknown'}`);
+        await recordNotification(db, {
             noticeId: notice.id ?? null,
             stakeholder: 'reporter',
             channel: 'email',
@@ -151,7 +154,9 @@ async function notifyReporter(req, { event, notice, statusUrl, extras = {} }) {
                 statusUrl: resolvedStatusUrl,
                 extras
             },
-            meta
+            meta,
+            sentAt: Date.now(),
+            auditActor: actor
         });
     }
 

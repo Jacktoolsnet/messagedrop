@@ -1,5 +1,6 @@
 const crypto = require('crypto');
 const tableNotification = require('../db/tableDsaNotification');
+const tableAudit = require('../db/tableDsaAuditLog');
 
 function safeStringify(obj) {
     try {
@@ -16,7 +17,9 @@ function recordNotification(db, {
     channel = 'inapp',
     payload = {},
     meta = null,
-    sentAt = Date.now()
+    sentAt = Date.now(),
+    auditActor = 'system:notifications',
+    auditEvent = 'notification_send'
 }) {
     if (!db) return Promise.resolve(null);
 
@@ -35,7 +38,28 @@ function recordNotification(db, {
             sentAt,
             payloadJson,
             metaJson,
-            (err) => resolve(err ? null : id)
+            (err) => {
+                if (err) {
+                    console.error('Failed to persist notification record', err.message || err);
+                    return resolve(null);
+                }
+
+                const entityType = noticeId ? 'notice' : (decisionId ? 'decision' : 'notification');
+                const entityId = noticeId || decisionId || id;
+                const auditDetails = safeStringify({ notificationId: id, stakeholder, channel, meta });
+
+                tableAudit.create(
+                    db,
+                    crypto.randomUUID(),
+                    entityType,
+                    entityId,
+                    auditEvent,
+                    auditActor,
+                    sentAt,
+                    auditDetails,
+                    () => resolve(id)
+                );
+            }
         );
     });
 }

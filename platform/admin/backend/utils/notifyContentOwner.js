@@ -123,13 +123,15 @@ async function notifyContentOwner(req, notification) {
                 responseStatus: response.status,
                 success
             };
-            void recordNotification(db, {
+            await recordNotification(db, {
                 noticeId: notification.type === 'notice' ? notification.caseId ?? null : null,
                 decisionId: notification.type === 'decision' ? notification.caseId ?? null : null,
                 stakeholder,
                 channel: 'inapp',
                 payload: recordPayload,
-                meta
+                meta,
+                sentAt: Date.now(),
+                auditActor: 'system:messagedrop'
             });
         }
 
@@ -147,7 +149,7 @@ async function notifyContentOwner(req, notification) {
     } catch (error) {
         const db = req?.database?.db;
         if (db) {
-            void recordNotification(db, {
+            await recordNotification(db, {
                 noticeId: notification.type === 'notice' ? notification.caseId ?? null : null,
                 decisionId: notification.type === 'decision' ? notification.caseId ?? null : null,
                 stakeholder: 'uploader',
@@ -157,7 +159,9 @@ async function notifyContentOwner(req, notification) {
                     event: notification.event || notification.type,
                     success: false,
                     error: String(error?.message || error)
-                }
+                },
+                sentAt: Date.now(),
+                auditActor: 'system:messagedrop'
             });
         }
 

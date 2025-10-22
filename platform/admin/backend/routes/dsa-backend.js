@@ -808,7 +808,7 @@ router.get('/evidence/:id/download', (req, res) => {
 });
 
 /* --------------------------- Notifications --------------------------- */
-router.post('/notifications', (req, res) => {
+router.post('/notifications', async (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
 
     const sentAt = Date.now();
@@ -818,31 +818,22 @@ router.post('/notifications', (req, res) => {
     const channel = String(req.body?.channel || 'inapp');            // email|inapp|webhook
     const payload = req.body?.payload ?? {};
     const meta = req.body?.meta ?? {};
+    const actor = `admin:${req.admin?.sub || 'unknown'}`;
 
-    recordNotification(_db, {
+    const id = await recordNotification(_db, {
         noticeId,
         decisionId,
         stakeholder,
         channel,
         payload,
         meta,
-        sentAt
-    }).then((id) => {
-        if (!id) return res.status(500).json({ error: 'db_error' });
-
-        const entityType = decisionId ? 'decision' : 'notice';
-        const entityId = decisionId || noticeId || 'unknown';
-
-        const auditId = crypto.randomUUID();
-        tableAudit.create(
-            _db, auditId, entityType, entityId, 'notify',
-            `admin:${req.admin?.sub || 'unknown'}`, sentAt,
-            JSON.stringify({ stakeholder, channel }),
-            () => { }
-        );
-
-        res.status(201).json({ id });
+        sentAt,
+        auditActor: actor
     });
+
+    if (!id) return res.status(500).json({ error: 'db_error' });
+
+    res.status(201).json({ id });
 });
 
 router.get('/notifications', (req, res) => {
@@ -967,7 +958,8 @@ router.post('/notifications/:id/resend', async (req, res) => {
         channel: 'email',
         payload: { to, subject, text, html, from, event: payload.event || mapped.meta?.event || null },
         meta,
-        sentAt: meta.resentAt
+        sentAt: meta.resentAt,
+        auditActor: `admin:${req.admin?.sub || 'unknown'}`
     });
 
     res.json({ success: result.success });

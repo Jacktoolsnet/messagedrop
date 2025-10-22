@@ -78,8 +78,6 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     q: this.fb.control<string>('')
   });
 
-  readonly displayedColumns = ['sentAt', 'stakeholder', 'channel', 'event', 'status', 'actions'];
-
   private readonly statusMeta: Record<DsaNoticeStatus, NoticeStatusMeta> = {
     RECEIVED: { label: 'Received', icon: 'mark_email_unread', class: 'status-received' },
     UNDER_REVIEW: { label: 'Under review', icon: 'manage_search', class: 'status-under-review' },

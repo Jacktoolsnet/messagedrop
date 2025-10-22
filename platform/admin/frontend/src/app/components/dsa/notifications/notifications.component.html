@@ -113,6 +113,16 @@
     </div>
 
     <div class="right-column">
+      @if (selectedNotice(); as notice) {
+        <div class="notice-summary">
+          <span class="status-pill" [ngClass]="statusClass(notice.status)">
+            <mat-icon aria-hidden="true">{{ statusIcon(notice.status) }}</mat-icon>
+            {{ statusLabel(notice.status) }}
+          </span>
+          <span class="summary-text">{{ noticePreview(notice) }}</span>
+        </div>
+      }
+
       @if (notificationsLoading()) {
         <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       }
