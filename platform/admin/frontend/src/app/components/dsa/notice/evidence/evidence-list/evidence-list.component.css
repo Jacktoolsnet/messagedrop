@@ -56,9 +56,9 @@
 
 .row {
     display: grid;
-    grid-template-columns: auto 1fr auto;
+    grid-template-columns: auto 1fr;
     gap: .75rem;
-    align-items: center;
+    align-items: start;
 }
 
 .left {
@@ -97,7 +97,8 @@
     color: var(--text);
 }
 
-.url-line {
+.file-container,
+.url-container {
     align-items: flex-start;
 }
 
@@ -113,17 +114,6 @@
     overflow: hidden;
     text-overflow: ellipsis;
     word-break: break-all;
-}
-
-.url-actions {
-    display: inline-flex;
-    gap: .5rem;
-    flex-wrap: wrap;
-}
-
-.url-actions button mat-icon,
-.open-btn mat-icon {
-    margin-right: .35rem;
 }
 
 .file-block {
@@ -144,25 +134,37 @@
     color: var(--muted);
 }
 
-.file-actions {
-    display: inline-flex;
-    gap: .5rem;
-    flex-wrap: wrap;
-}
-
-.download-btn mat-icon {
+.action-buttons button mat-icon,
+.action-buttons .open-btn mat-icon {
     margin-right: .35rem;
 }
 
+.action-line {
+    align-items: center;
+}
+
+.action-label {
+    min-width: 76px;
+    color: var(--muted);
+}
+
+.action-buttons {
+    display: inline-flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+    margin-left: auto;
+    justify-content: flex-end;
+}
+
 @media (max-width: 600px) {
+    .row {
+        grid-template-columns: 1fr;
+    }
+
     .url-text {
         max-width: 100%;
         white-space: normal;
         word-break: break-all;
-    }
-
-    .url-actions {
-        width: 100%;
     }
 
     .file-block {
@@ -175,8 +177,9 @@
         word-break: break-word;
     }
 
-    .file-actions {
-        width: 100%;
+    .action-buttons {
+        margin-left: 0;
+        justify-content: flex-start;
     }
 }
 
@@ -190,4 +193,8 @@
 .ts {
     color: var(--muted);
     font-size: .9rem;
+}
+
+.received-line .value {
+    font-weight: 500;
 }

@@ -26,51 +26,59 @@
                 <span class="value">{{ labelForType(e.type) }}</span>
             </div>
             @if (e.type === 'file') {
-            <div class="line file-line">
+            <div class="line file-container">
                 <span class="label">File</span>
                 <div class="value file-block">
                     <span class="file-name" [title]="e.fileName || 'download'">
-                        <mat-icon class="file-icon" aria-hidden="true">description</mat-icon>
                         {{ e.fileName || 'Download' }}
                     </span>
-                    <div class="file-actions">
-                        <button mat-stroked-button color="primary" class="download-btn" type="button"
-                            (click)="downloadFile(e)">
-                            <mat-icon>download</mat-icon>
-                            Download
-                        </button>
-                    </div>
                 </div>
             </div>
             }
             @if (e.type === 'url' && e.url) {
-            <div class="line url-line">
+            <div class="line url-container">
                 <span class="label">URL</span>
                 <div class="value url-block">
                     <span class="url-text" [title]="e.url">{{ e.url }}</span>
-                    <div class="url-actions">
-                        <a mat-stroked-button color="primary" class="open-btn" [href]="e.url" target="_blank"
-                            rel="noopener">
-                            <mat-icon>open_in_new</mat-icon>
-                            Open
-                        </a>
-                        <button mat-stroked-button color="accent" type="button" (click)="copyUrl(e.url)">
-                            <mat-icon>content_copy</mat-icon>
-                            Copy
-                        </button>
-                    </div>
                 </div>
             </div>
             }
+
             @if (e.hash) {
             <div class="line">
                 <span class="label">Hash</span>
                 <code class="mono">{{ e.hash }}</code>
             </div>
             }
-        </div>
-        <div class="right">
-            <div class="ts">{{ e.addedAt | date:'medium' }}</div>
+            <div class="line received-line">
+                <span class="label">Received</span>
+                <span class="value ts">{{ e.addedAt | date:'medium' }}</span>
+            </div>
+            @if (e.type === 'file' || (e.type === 'url' && e.url)) {
+            <div class="line action-line">
+                <span class="label action-label">Actions</span>
+                <div class="value action-buttons">
+                    @if (e.type === 'file') {
+                    <button mat-stroked-button color="primary" class="download-btn" type="button"
+                        (click)="downloadFile(e)">
+                        <mat-icon>download</mat-icon>
+                        Download
+                    </button>
+                    }
+                    @if (e.type === 'url' && e.url) {
+                    <a mat-stroked-button color="primary" class="open-btn" [href]="e.url" target="_blank"
+                        rel="noopener">
+                        <mat-icon>open_in_new</mat-icon>
+                        Open
+                    </a>
+                    <button mat-stroked-button color="accent" type="button" (click)="copyUrl(e.url)">
+                        <mat-icon>content_copy</mat-icon>
+                        Copy
+                    </button>
+                    }
+                </div>
+            </div>
+            }
         </div>
     </div>
 </mat-card>
