@@ -205,22 +205,34 @@ pre.json {
 }
 
 /* Empty-State */
-.empty {
+.empty-state {
     padding: 2.5rem 1rem;
     text-align: center;
     color: var(--muted);
     display: grid;
     justify-items: center;
-    gap: .5rem;
+    gap: .75rem;
+
+    mat-icon {
+        width: 56px;
+        height: 56px;
+        line-height: 56px;
+        font-size: 56px;
+        color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
+        filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
+    }
 }
 
-.empty mat-icon {
-    font-size: 56px;
-    width: 56px;
-    height: 56px;
-    line-height: 56px;
-    color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
-    filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
+@keyframes fadeUp {
+    from {
+        transform: translateY(12px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
 }
 
 /* Responsiv etwas lockerer */
