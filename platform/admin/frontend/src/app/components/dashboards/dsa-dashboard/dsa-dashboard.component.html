@@ -22,7 +22,7 @@
 <div class="page">
     <div class="tiles-container">
         @for (tile of tiles; track trackByKey($index, tile)) {
-        <mat-card class="tile" appearance="raised">
+        <mat-card class="tile" appearance="raised" [routerLink]="tile.route">
             <mat-card-header>
                 <div mat-card-avatar class="avatar" [matBadge]="badgeCount(tile)" matBadgeOverlap="false"
                     [matBadgeColor]="badgeColor(tile)" [matBadgeHidden]="!showBadge(tile)">
@@ -33,12 +33,6 @@
                 <mat-card-subtitle class="tile-subtitle">{{ tile.subtitle }}</mat-card-subtitle>
             </mat-card-header>
 
-            <mat-card-actions align="end">
-                <button mat-stroked-button color="primary" [routerLink]="tile.route">
-                    <mat-icon>open_in_new</mat-icon>
-                    Open
-                </button>
-            </mat-card-actions>
         </mat-card>
         }
     </div>
