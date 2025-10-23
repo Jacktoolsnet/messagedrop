@@ -274,7 +274,6 @@ mat-progress-bar {
   place-items: center;
   gap: 0.5rem;
   padding: 2rem;
-  background: rgba(255, 255, 255, 0.8);
   border: 1px dashed var(--border);
   border-radius: 16px;
   color: var(--muted);
@@ -282,11 +281,12 @@ mat-progress-bar {
 
 .empty mat-icon {
   font-size: 48px;
-  width: 48px;
-  height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  font-size: 56px;
+  color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
+  filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
 }
 
 .placeholder {
@@ -296,19 +296,18 @@ mat-progress-bar {
   padding: 2rem 1.5rem;
   border: 1px dashed var(--border);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.8);
   color: var(--muted);
   text-align: center;
   min-height: 220px;
 }
 
 .placeholder mat-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  font-size: 56px;
+  color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
+  filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
 }
 
 .placeholder-text {

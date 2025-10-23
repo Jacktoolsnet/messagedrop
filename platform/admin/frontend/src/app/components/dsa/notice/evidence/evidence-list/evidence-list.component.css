@@ -37,6 +37,8 @@
     display: grid;
     justify-items: center;
     gap: .5rem;
+    border: none;
+    background: transparent;
 }
 
 .empty mat-icon {

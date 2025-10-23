@@ -288,16 +288,16 @@ mat-progress-bar {
     text-align: center;
     color: var(--muted);
     padding: 2rem 1rem;
-    border: 1px dashed color-mix(in srgb, var(--muted) 35%, transparent);
-    border-radius: 12px;
-    background: rgba(255, 255, 255, 0.5);
 }
 
 .empty mat-icon,
 .placeholder mat-icon {
-    font-size: 48px;
-    height: 48px;
-    width: 48px;
+    width: 56px;
+    height: 56px;
+    line-height: 56px;
+    font-size: 56px;
+    color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
+    filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
 }
 
 .placeholder {

@@ -22,8 +22,10 @@
   <div class="tiles-container">
     @if (!loading() && appeals().length === 0) {
     <div class="empty-state">
-      <mat-icon>sentiment_satisfied</mat-icon>
-      <p>No appeals found for the selected filter.</p>
+      <mat-icon>inbox</mat-icon>
+      <div class="empty-state-text">
+        No appeals found for the selected filter.
+      </div>
     </div>
     }
 
