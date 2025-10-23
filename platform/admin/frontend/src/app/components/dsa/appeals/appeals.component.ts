@@ -22,6 +22,7 @@ import { EvidenceListComponent } from '../notice/evidence/evidence-list/evidence
 import { DecisionSummaryComponent } from '../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../notice/appeals/notice-appeals.component';
 import { AppealResolutionData, AppealResolutionDialogComponent } from './appeal-resolution-dialog/appeal-resolution-dialog.component';
+import { DecisionDialogComponent, DecisionDialogResult } from '../decisions/decision-dialog/decision-dialog.component';
 
 type AppealStatusFilter = 'open' | 'resolved' | 'all';
 
@@ -125,14 +126,50 @@ export class AppealsComponent implements OnInit {
 
     ref.afterClosed().subscribe((result: AppealResolutionData | null) => {
       if (!result) return;
-      this.dsa.resolveAppeal(appeal.id, result).subscribe({
-        next: () => {
-          this.snack.open('Appeal updated.', 'OK', { duration: 2000 });
-          this.load();
-          this.dsa.loadAppealStats();
-        },
-        error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
-      });
+      if (result.outcome === 'REVISED') {
+        const dref = this.dialog.open<DecisionDialogComponent, { noticeId: string }, DecisionDialogResult | false>(DecisionDialogComponent, {
+          data: { noticeId: appeal.noticeId },
+          width: 'min(700px, 96vw)',
+          maxHeight: '90vh',
+          panelClass: 'md-dialog-rounded'
+        });
+
+        dref.afterClosed().subscribe((dec) => {
+          if (!dec || !dec.saved) return;
+          // Sichtbarkeit setzen entsprechend Outcome
+          const cid = (appeal.noticeContentId || '').trim();
+          if (cid) {
+            const visible = dec.outcome === 'NO_ACTION';
+            this.dsa.setPublicMessageVisibility(cid, visible).subscribe({ next: () => { }, error: () => { } });
+          }
+          // Appeal als REVISED auflösen
+          this.dsa.resolveAppeal(appeal.id, {
+            outcome: 'REVISED',
+            reviewer: result.reviewer || null,
+            reason: result.reason || null
+          }).subscribe({
+            next: () => {
+              this.snack.open('Appeal resolved and decision revised.', 'OK', { duration: 2000 });
+              this.load();
+              this.dsa.loadAppealStats();
+              // rechte Seite aktualisieren
+              if (this.selectedAppeal()?.id === appeal.id) {
+                this.selectAppeal(appeal);
+              }
+            },
+            error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
+          });
+        });
+      } else {
+        this.dsa.resolveAppeal(appeal.id, result).subscribe({
+          next: () => {
+            this.snack.open('Appeal updated.', 'OK', { duration: 2000 });
+            this.load();
+            this.dsa.loadAppealStats();
+          },
+          error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
+        });
+      }
     });
   }
 

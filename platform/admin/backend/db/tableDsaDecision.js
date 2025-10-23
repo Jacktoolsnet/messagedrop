@@ -2,7 +2,7 @@ const tableName = 'tableDsaDecision';
 
 // === Column Names ===
 const columnId = 'id';                  // TEXT PK (uuid) -> extern erzeugt
-const columnNoticeId = 'noticeId';      // TEXT NOT NULL, FK -> tableDsaNotice(id), UNIQUE
+const columnNoticeId = 'noticeId';      // TEXT NOT NULL, FK -> tableDsaNotice(id)
 const columnOutcome = 'outcome';        // TEXT NOT NULL ('REMOVE' | 'DISABLE' | 'RESTRICT' | 'NO_ACTION' | 'DEMONETIZE' | 'ACCOUNT_ACTION')
 const columnLegalBasis = 'legalBasis';  // TEXT NULL (z. B. Gesetz/Paragraph)
 const columnTosBasis = 'tosBasis';      // TEXT NULL (z. B. AGB-Klausel)
@@ -19,7 +19,7 @@ const init = function (db) {
 
       CREATE TABLE IF NOT EXISTS ${tableName} (
         ${columnId} TEXT PRIMARY KEY NOT NULL,
-        ${columnNoticeId} TEXT NOT NULL UNIQUE,
+        ${columnNoticeId} TEXT NOT NULL,
         ${columnOutcome} TEXT NOT NULL,
         ${columnLegalBasis} TEXT DEFAULT NULL,
         ${columnTosBasis} TEXT DEFAULT NULL,
@@ -119,7 +119,7 @@ const create = function (
  * @param {(err: any, row?: any) => void} callBack
  */
 const getByNoticeId = function (db, noticeId, callBack) {
-    const sql = `SELECT * FROM ${tableName} WHERE ${columnNoticeId} = ? LIMIT 1`;
+    const sql = `SELECT * FROM ${tableName} WHERE ${columnNoticeId} = ? ORDER BY ${columnDecidedAt} DESC LIMIT 1`;
     db.get(sql, [noticeId], (err, row) => {
         if (err) return callBack(err);
         callBack(null, row);
