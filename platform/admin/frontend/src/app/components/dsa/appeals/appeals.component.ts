@@ -11,6 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
@@ -52,6 +53,7 @@ export class AppealsComponent implements OnInit {
   private readonly snack = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly auth = inject(AuthService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   readonly loading = signal(false);
   readonly appeals = signal<DsaAppeal[]>([]);
@@ -63,6 +65,9 @@ export class AppealsComponent implements OnInit {
 
   // Parsed content of selected notice
   contentObj = signal<any | null>(null);
+  mediaKind = signal<'iframe' | 'image' | 'none'>('none');
+  embedUrl = signal<SafeResourceUrl | null>(null);
+  imageUrl = signal<string | null>(null);
 
   ngOnInit(): void {
     this.load();
@@ -100,6 +105,7 @@ export class AppealsComponent implements OnInit {
       next: (notice: DsaNotice) => {
         this.selectedNotice.set(notice);
         this.contentObj.set(this.safeParse(notice.reportedContent));
+        this.updateMediaFromContent();
       },
       error: () => this.snack.open('Could not load notice detail.', 'OK', { duration: 3000 }),
       complete: () => this.rightLoading.set(false)
@@ -174,5 +180,85 @@ export class AppealsComponent implements OnInit {
         },
         error: () => this.makingScreenshot.set(false)
       });
+  }
+
+  private updateMediaFromContent(): void {
+    const c = this.contentObj();
+    this.embedUrl.set(null);
+    this.imageUrl.set(null);
+    this.mediaKind.set('none');
+    const mm = c?.multimedia;
+    const type = (mm?.type || '').toLowerCase();
+    if (!type) { this.mediaKind.set('none'); return; }
+
+    if (type === 'youtube') {
+      const id = this.getYouTubeId(mm);
+      if (id) {
+        this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.youtube.com/embed/${id}`));
+        this.mediaKind.set('iframe');
+      }
+      return;
+    }
+
+    if (type === 'spotify') {
+      const url = this.buildSpotifyEmbed(mm);
+      if (url) {
+        this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(url));
+        this.mediaKind.set('iframe');
+      }
+      return;
+    }
+
+    if (type === 'tiktok') {
+      const id = this.getTikTokId(mm);
+      if (id) {
+        this.embedUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(`https://www.tiktok.com/embed/v2/${id}`));
+        this.mediaKind.set('iframe');
+      }
+      return;
+    }
+
+    if (type === 'tenor' || type === 'image') {
+      const url = mm?.url || mm?.sourceUrl;
+      if (url) {
+        this.imageUrl.set(url);
+        this.mediaKind.set('image');
+      }
+      return;
+    }
+  }
+
+  private getYouTubeId(mm: any): string | null {
+    if (mm?.contentId) return String(mm.contentId).split('?')[0];
+    const html: string | undefined = mm?.oembed?.html;
+    if (html) {
+      const m = html.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+      if (m?.[1]) return m[1];
+    }
+    const src = String(mm?.sourceUrl || mm?.url || '');
+    const watch = src.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+    if (watch?.[1]) return watch[1];
+    const shorts = src.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
+    if (shorts?.[1]) return shorts[1];
+    const embed = src.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
+    if (embed?.[1]) return embed[1];
+    return null;
+  }
+
+  private buildSpotifyEmbed(mm: any): string | null {
+    if (mm?.contentId) return `https://open.spotify.com/embed/${mm.contentId}`;
+    const src: string | undefined = mm?.sourceUrl || mm?.url;
+    if (!src) return null;
+    if (src.includes('open.spotify.com')) {
+      return src.replace('open.spotify.com/', 'open.spotify.com/embed/');
+    }
+    return null;
+  }
+
+  private getTikTokId(mm: any): string | null {
+    const src = String(mm?.sourceUrl || mm?.url || '');
+    const m = src.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
+    if (m?.[1]) return m[1];
+    return mm?.contentId || null;
   }
 }

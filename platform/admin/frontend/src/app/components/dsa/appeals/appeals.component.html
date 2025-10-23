@@ -137,7 +137,7 @@
               <div class="bubble">{{ c.message }}</div>
               <mat-divider class="sp"></mat-divider>
               }
-              <div class="meta">
+              <div class="section">
                 <div class="kv">
                   <div class="k">Content ID</div>
                   <div class="v mono">{{ selectedNotice()!.contentId }}</div>
@@ -161,6 +161,21 @@
                 </div>
                 }
               </div>
+
+              @if (mediaKind() === 'iframe' && embedUrl()) {
+              <div class="embed">
+                <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                        allowfullscreen></iframe>
+              </div>
+              }
+
+              @if (mediaKind() === 'image' && imageUrl()) {
+              <div class="tenor-wrap">
+                <img [src]="imageUrl()!" alt="media">
+              </div>
+              }
 
               @if (hasExternalLink()) {
               <div class="block-actions">
