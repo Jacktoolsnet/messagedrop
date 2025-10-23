@@ -18,155 +18,170 @@
 
     <!-- Body (Tabs) -->
     <div class="dialog-body">
-        <mat-tab-group animationDuration="250ms">
-            <!-- Overview -->
-            <mat-tab label="Overview">
-                <div class="section">
-                    <div class="kv">
-                        <div class="k">ID</div>
-                        <div class="v mono">{{ notice().id }}</div>
+        <div class="tiles-grid">
+            <section class="tile">
+                <h3 class="tile-title">Overview</h3>
+                <div class="tile-body">
+                    <div class="section">
+                        <div class="kv">
+                            <div class="k">ID</div>
+                            <div class="v mono">{{ notice().id }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Created</div>
+                            <div class="v">{{ notice().createdAt | date:'medium' }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Type</div>
+                            <div class="v">{{ notice().reportedContentType }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Category</div>
+                            <div class="v">{{ notice().category || '—' }}</div>
+                        </div>
                     </div>
-                    <div class="kv">
-                        <div class="k">Created</div>
-                        <div class="v">{{ notice().createdAt | date:'medium' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">Type</div>
-                        <div class="v">{{ notice().reportedContentType }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">Category</div>
-                        <div class="v">{{ notice().category || '—' }}</div>
-                    </div>
-                </div>
 
-                <div class="block">
-                    <h4><mat-icon>flag</mat-icon> Reason (original)</h4>
-                    @if (notice().reasonText) {
-                    <div class="bubble">{{ notice().reasonText }}</div>
-                    <div class="i18n-row">
-                        <button mat-stroked-button (click)="translateToGerman('reason')"
-                            [disabled]="reasonI18n().loading">
-                            <mat-icon>translate</mat-icon>
-                            @if (reasonI18n().loading) { Translating… } @else { Translate to German }
-                        </button>
-                    </div>
-                    @if (reasonI18n().translated) {
-                    <div class="translation">
-                        <mat-icon>g_translate</mat-icon>
-                        <div class="t">{{ reasonI18n().translated }}</div>
-                    </div>
-                    }
-                    } @else {
-                    <div class="placeholder"><mat-icon>info</mat-icon> No reason provided.</div>
-                    }
-                </div>
-            </mat-tab>
-
-            <!-- Content -->
-            <mat-tab label="Content">
-                <div class="block">
-                    <h4><mat-icon>article</mat-icon> Reported content</h4>
-
-                    @if (contentObj(); as c) {
-                    <div class="bubble">
-                        @if (c.message) {
-                        <div class="msg">{{ c.message }}</div>
+                    <div class="block">
+                        <h4><mat-icon>flag</mat-icon> Reason (original)</h4>
+                        @if (notice().reasonText) {
+                        <div class="bubble">{{ notice().reasonText }}</div>
                         <div class="i18n-row">
-                            <button mat-stroked-button (click)="translateToGerman('message')"
-                                [disabled]="messageI18n().loading">
+                            <button mat-stroked-button (click)="translateToGerman('reason')"
+                                [disabled]="reasonI18n().loading">
                                 <mat-icon>translate</mat-icon>
-                                @if (messageI18n().loading) { Translating… } @else { Translate to German }
+                                @if (reasonI18n().loading) { Translating… } @else { Translate to German }
                             </button>
                         </div>
-                        @if (messageI18n().translated) {
+                        @if (reasonI18n().translated) {
                         <div class="translation">
                             <mat-icon>g_translate</mat-icon>
-                            <div class="t">{{ messageI18n().translated }}</div>
+                            <div class="t">{{ reasonI18n().translated }}</div>
                         </div>
                         }
-                        <mat-divider class="sp"></mat-divider>
+                        } @else {
+                        <div class="placeholder"><mat-icon>info</mat-icon> No reason provided.</div>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <section class="tile">
+                <h3 class="tile-title">Content</h3>
+                <div class="tile-body">
+                    <div class="block">
+                        <h4><mat-icon>article</mat-icon> Reported content</h4>
+
+                        @if (contentObj(); as c) {
+                        <div class="bubble">
+                            @if (c.message) {
+                            <div class="msg">{{ c.message }}</div>
+                            <div class="i18n-row">
+                                <button mat-stroked-button (click)="translateToGerman('message')"
+                                    [disabled]="messageI18n().loading">
+                                    <mat-icon>translate</mat-icon>
+                                    @if (messageI18n().loading) { Translating… } @else { Translate to German }
+                                </button>
+                            </div>
+                            @if (messageI18n().translated) {
+                            <div class="translation">
+                                <mat-icon>g_translate</mat-icon>
+                                <div class="t">{{ messageI18n().translated }}</div>
+                            </div>
+                            }
+                            <mat-divider class="sp"></mat-divider>
+                            }
+
+                            <div class="meta">
+                                <div class="kv">
+                                    <div class="k">Content ID</div>
+                                    <div class="v mono">{{ notice().contentId }}</div>
+                                </div>
+                                @if (c.userId) {
+                                <div class="kv">
+                                    <div class="k">User</div>
+                                    <div class="v mono">{{ c.userId }}</div>
+                                </div>
+                                }
+                                @if (c.location?.plusCode) {
+                                <div class="kv">
+                                    <div class="k">PlusCode</div>
+                                    <div class="v mono">{{ c.location.plusCode }}</div>
+                                </div>
+                                }
+                                @if (c.multimedia?.type) {
+                                <div class="kv">
+                                    <div class="k">Media</div>
+                                    <div class="v">{{ c.multimedia.type }}</div>
+                                </div>
+                                }
+                            </div>
+                        </div>
+
+                        <!-- Media Preview -->
+                        @if (youtubeEmbedHtml(); as yth) {
+                        <div class="embed" [innerHTML]="yth"></div>
+                        } @else if (tenorGifUrl(); as gif) {
+                        <div class="tenor-wrap"><img [src]="gif" alt="tenor gif" /></div>
                         }
 
-                        <div class="meta">
-                            <div class="kv">
-                                <div class="k">Content ID</div>
-                                <div class="v mono">{{ notice().contentId }}</div>
-                            </div>
-                            @if (c.userId) {
-                            <div class="kv">
-                                <div class="k">User</div>
-                                <div class="v mono">{{ c.userId }}</div>
-                            </div>
-                            }
-                            @if (c.location?.plusCode) {
-                            <div class="kv">
-                                <div class="k">PlusCode</div>
-                                <div class="v mono">{{ c.location.plusCode }}</div>
-                            </div>
-                            }
-                            @if (c.multimedia?.type) {
-                            <div class="kv">
-                                <div class="k">Media</div>
-                                <div class="v">{{ c.multimedia.type }}</div>
-                            </div>
-                            }
+                        <!-- Open original -->
+                        @if (hasExternalLink()) {
+                        <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank" rel="noopener">
+                            <mat-icon>open_in_new</mat-icon> Open original
+                        </a>
+                        }
+                        } @else {
+                        <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
+                        }
+                    </div>
+                </div>
+            </section>
+
+            <section class="tile">
+                <h3 class="tile-title">Metadata</h3>
+                <div class="tile-body">
+                    <div class="section">
+                        <div class="kv">
+                            <div class="k">Reporter name</div>
+                            <div class="v">{{ notice().reporterName || '—' }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Reporter email</div>
+                            <div class="v">{{ notice().reporterEmail || '—' }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Truth affirmation</div>
+                            <div class="v">{{ notice().truthAffirmation ? 'Yes' : '—' }}</div>
+                        </div>
+                        <div class="kv">
+                            <div class="k">Updated</div>
+                            <div class="v">{{ notice().updatedAt | date:'medium' }}</div>
                         </div>
                     </div>
-
-                    <!-- Media Preview -->
-                    @if (youtubeEmbedHtml(); as yth) {
-                    <div class="embed" [innerHTML]="yth"></div>
-                    } @else if (tenorGifUrl(); as gif) {
-                    <div class="tenor-wrap"><img [src]="gif" alt="tenor gif" /></div>
-                    }
-
-                    <!-- Open original -->
-                    @if (hasExternalLink()) {
-                    <a class="external" [href]="externalLink()!" target="_blank" rel="noopener">
-                        <mat-icon>open_in_new</mat-icon> Open original
-                    </a>
-                    }
-                    } @else {
-                    <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
-                    }
                 </div>
-            </mat-tab>
+            </section>
 
-            <!-- Metadata -->
-            <mat-tab label="Metadata">
-                <div class="section">
-                    <div class="kv">
-                        <div class="k">Reporter name</div>
-                        <div class="v">{{ notice().reporterName || '—' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">Reporter email</div>
-                        <div class="v">{{ notice().reporterEmail || '—' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">Truth affirmation</div>
-                        <div class="v">{{ notice().truthAffirmation ? 'Yes' : '—' }}</div>
-                    </div>
-                    <div class="kv">
-                        <div class="k">Updated</div>
-                        <div class="v">{{ notice().updatedAt | date:'medium' }}</div>
-                    </div>
+            <section class="tile">
+                <h3 class="tile-title">Evidence</h3>
+                <div class="tile-body">
+                    <app-evidence-list [noticeId]="notice().id"></app-evidence-list>
                 </div>
-            </mat-tab>
+            </section>
 
-            <mat-tab label="Evidence">
-                <app-evidence-list [noticeId]="notice().id"></app-evidence-list>
-            </mat-tab>
+            <section class="tile">
+                <h3 class="tile-title">Decision summary</h3>
+                <div class="tile-body">
+                    <app-decision-summary [noticeId]="notice().id"></app-decision-summary>
+                </div>
+            </section>
 
-            <mat-tab label="Decision summary">
-                <app-decision-summary [noticeId]="notice().id"></app-decision-summary>
-            </mat-tab>
-
-            <mat-tab label="Auditlog">
-                <app-audit-log [noticeId]="notice().id"></app-audit-log>
-            </mat-tab>
-        </mat-tab-group>
+            <section class="tile">
+                <h3 class="tile-title">Appeals</h3>
+                <div class="tile-body">
+                    <app-notice-appeals [noticeId]="notice().id"></app-notice-appeals>
+                </div>
+            </section>
+        </div>
     </div>
 
     <!-- Footer -->

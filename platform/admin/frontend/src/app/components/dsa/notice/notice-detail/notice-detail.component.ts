@@ -1,20 +1,17 @@
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
-import { MatTabsModule } from '@angular/material/tabs';
-import { MatTooltipModule } from '@angular/material/tooltip';
-
-import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
-import { AuditLogComponent } from "../audit-log/audit-log.component";
+import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
@@ -37,11 +34,9 @@ type TranslationState = {
     MatIconModule,
     MatChipsModule,
     MatDividerModule,
-    MatTabsModule,
-    MatTooltipModule,
     EvidenceListComponent,
     DecisionSummaryComponent,
-    AuditLogComponent
+    NoticeAppealsComponent
   ],
   templateUrl: './notice-detail.component.html',
   styleUrls: ['./notice-detail.component.css']

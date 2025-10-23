@@ -1,0 +1,60 @@
+<div class="appeals">
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  }
+
+  @if (!loading() && appeals().length === 0) {
+    <div class="placeholder">
+      <mat-icon>info</mat-icon>
+      <span>No appeals filed for this notice.</span>
+    </div>
+  }
+
+  @if (!loading() && appeals().length > 0) {
+    <div class="appeal-list">
+      @for (appeal of appeals(); track trackById($index, appeal)) {
+        <div class="appeal-card">
+          <div class="head">
+            <mat-icon class="head-icon">gavel</mat-icon>
+            <div class="labels">
+              <div class="filed-by">{{ appeal.filedBy || 'Unknown filer' }}</div>
+              <div class="filed-at">{{ appeal.filedAt | date:'medium' }}</div>
+            </div>
+            <mat-chip appearance="outlined" class="outcome" [ngClass]="outcomeClass(appeal)">
+              {{ outcomeLabel(appeal) }}
+            </mat-chip>
+          </div>
+
+          @if (appeal.arguments) {
+            <div class="arguments">
+              {{ appeal.arguments }}
+            </div>
+          }
+
+          <div class="meta">
+            <div class="kv">
+              <div class="k">Decision</div>
+              <div class="v">{{ formatOutcome(appeal.decisionOutcome) }}</div>
+            </div>
+            <div class="kv">
+              <div class="k">Status</div>
+              <div class="v">
+                @if (isResolved(appeal) && appeal.resolvedAt) {
+                  Resolved {{ appeal.resolvedAt | date:'medium' }}
+                } @else {
+                  Awaiting review
+                }
+              </div>
+            </div>
+            @if (appeal.reviewer) {
+              <div class="kv">
+                <div class="k">Reviewer</div>
+                <div class="v">{{ appeal.reviewer }}</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
