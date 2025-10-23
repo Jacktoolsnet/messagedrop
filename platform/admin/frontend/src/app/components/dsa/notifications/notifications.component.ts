@@ -14,6 +14,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { Subscription, debounceTime, distinctUntilChanged, map } from 'rxjs';
 
 import { DsaNotification } from '../../../interfaces/dsa-notification.interface';
@@ -50,7 +51,8 @@ type NoticeStatusMeta = {
     MatChipsModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatButtonToggleModule
   ],
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.css']
@@ -73,7 +75,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   readonly emptyNotifications = computed(() => !this.notificationsLoading() && this.notifications().length === 0);
 
   readonly filterForm = this.fb.nonNullable.group({
-    status: this.fb.nonNullable.control<DsaNoticeStatus[]>(['UNDER_REVIEW', 'DECIDED']),
+    status: this.fb.nonNullable.control<DsaNoticeStatus>('RECEIVED'),
     range: this.fb.nonNullable.control<DsaNoticeRange>('30d'),
     contentId: this.fb.control<string>(''),
     q: this.fb.control<string>('')
@@ -108,6 +110,17 @@ export class NotificationsComponent implements OnInit, OnDestroy {
 
   reload(): void {
     this.loadNotices();
+  }
+
+  statusFilter(): DsaNoticeStatus {
+    return this.filterForm.controls.status.value;
+  }
+
+  setStatus(status: DsaNoticeStatus | null): void {
+    if (!status) return;
+    const control = this.filterForm.controls.status;
+    if (control.value === status) return;
+    control.setValue(status);
   }
 
   selectNotice(notice: DsaNotice): void {
@@ -315,7 +328,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   private toFilters(): DsaNoticeFilters {
     const raw = this.filterForm.getRawValue();
     return {
-      status: raw.status?.length ? raw.status : undefined,
+      status: raw.status ? [raw.status] : undefined,
       range: raw.range || '30d',
       contentId: raw.contentId?.trim() || undefined,
       q: raw.q?.trim() || undefined,
