@@ -108,6 +108,16 @@
     padding: 0;
 }
 
+.tile-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: .5rem;
+}
+
+.tile-actions mat-icon {
+    margin-right: .35rem;
+}
+
 /* Footer */
 .dialog-footer {
     display: flex;
@@ -179,8 +189,17 @@
         word-break: break-word;
     }
 
-    .i18n-row {
+    .i18n-row,
+    .block-actions {
         margin-top: .5rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: .5rem;
+    }
+
+    .i18n-row mat-icon,
+    .block-actions mat-icon {
+        margin-right: .35rem;
     }
 
     .translation {

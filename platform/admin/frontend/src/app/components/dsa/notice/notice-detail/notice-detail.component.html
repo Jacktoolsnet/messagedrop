@@ -75,13 +75,13 @@
                         <div class="bubble">
                             @if (c.message) {
                             <div class="msg">{{ c.message }}</div>
-                            <div class="i18n-row">
-                                <button mat-stroked-button (click)="translateToGerman('message')"
-                                    [disabled]="messageI18n().loading">
-                                    <mat-icon>translate</mat-icon>
-                                    @if (messageI18n().loading) { Translating… } @else { Translate to German }
-                                </button>
-                            </div>
+                        <div class="i18n-row">
+                            <button mat-stroked-button (click)="translateToGerman('message')"
+                                [disabled]="messageI18n().loading">
+                                <mat-icon>translate</mat-icon>
+                                @if (messageI18n().loading) { Translating… } @else { Translate to German }
+                            </button>
+                        </div>
                             @if (messageI18n().translated) {
                             <div class="translation">
                                 <mat-icon>g_translate</mat-icon>
@@ -126,9 +126,12 @@
 
                         <!-- Open original -->
                         @if (hasExternalLink()) {
-                        <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank" rel="noopener">
-                            <mat-icon>open_in_new</mat-icon> Open original
-                        </a>
+                        <div class="block-actions">
+                            <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank"
+                                rel="noopener">
+                                <mat-icon>open_in_new</mat-icon> Open original
+                            </a>
+                        </div>
                         }
                         } @else {
                         <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
@@ -164,14 +167,27 @@
             <section class="tile">
                 <h3 class="tile-title">Evidence</h3>
                 <div class="tile-body">
-                    <app-evidence-list [noticeId]="notice().id"></app-evidence-list>
+                    <div class="tile-actions">
+                        <button mat-stroked-button color="primary" type="button" (click)="openAddEvidence()">
+                            <mat-icon>add</mat-icon>
+                            Add evidence
+                        </button>
+                    </div>
+                    <app-evidence-list #evidenceList [noticeId]="notice().id"></app-evidence-list>
                 </div>
             </section>
 
             <section class="tile">
                 <h3 class="tile-title">Decision summary</h3>
                 <div class="tile-body">
-                    <app-decision-summary [noticeId]="notice().id"></app-decision-summary>
+                    <div class="tile-actions">
+                        <button mat-stroked-button color="accent" type="button" (click)="openDecisionDialog()"
+                            [disabled]="status() === 'DECIDED'">
+                            <mat-icon>gavel</mat-icon>
+                            Decide
+                        </button>
+                    </div>
+                    <app-decision-summary #decisionSummary [noticeId]="notice().id"></app-decision-summary>
                 </div>
             </section>
 

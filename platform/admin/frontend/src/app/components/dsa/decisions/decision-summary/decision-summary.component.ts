@@ -50,6 +50,10 @@ export class DecisionSummaryComponent implements OnChanges {
     });
   }
 
+  refresh(): void {
+    this.fetchDecision();
+  }
+
   private mapOutcome(o?: string): string {
     switch (o) {
       case 'REMOVE_CONTENT': return 'Remove content';

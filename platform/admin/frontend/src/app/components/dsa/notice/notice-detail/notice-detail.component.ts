@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
-import { Component, computed, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal, ViewChild } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -10,6 +10,7 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { DecisionDialogComponent } from '../../decisions/decision-dialog/decision-dialog.component';
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
@@ -48,6 +49,12 @@ export class NoticeDetailComponent implements OnInit {
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
 
+  @ViewChild('evidenceList')
+  private evidenceList?: EvidenceListComponent;
+
+  @ViewChild('decisionSummary')
+  private decisionSummary?: DecisionSummaryComponent;
+
   notice = signal<DsaNotice>(this.data);
   status = signal<DsaNoticeStatus>(this.data.status as DsaNoticeStatus);
   private autoStatusApplied = false;
@@ -74,6 +81,27 @@ export class NoticeDetailComponent implements OnInit {
 
   close(ok = false) {
     this.ref.close(ok);
+  }
+
+  openAddEvidence(): void {
+    this.evidenceList?.openAdd();
+  }
+
+  openDecisionDialog(): void {
+    const ref = this.dialog.open(DecisionDialogComponent, {
+      data: { noticeId: this.notice().id },
+      width: 'min(700px, 96vw)',
+      maxHeight: '90vh',
+      panelClass: 'md-dialog-rounded'
+    });
+
+    ref.afterClosed().subscribe((saved) => {
+      if (!saved) return;
+
+      this.status.set('DECIDED');
+      this.notice.update(n => n ? ({ ...n, status: 'DECIDED', updatedAt: Date.now() }) : n);
+      this.decisionSummary?.refresh();
+    });
   }
 
   ngOnInit(): void {
