@@ -9,13 +9,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatDividerModule } from '@angular/material/divider';
 import { RouterLink } from '@angular/router';
 
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { AuthService } from '../../../services/auth/auth.service';
-import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
+import { EvidenceListComponent } from '../notice/evidence/evidence-list/evidence-list.component';
+import { DecisionSummaryComponent } from '../decisions/decision-summary/decision-summary.component';
+import { NoticeAppealsComponent } from '../notice/appeals/notice-appeals.component';
 import { AppealResolutionData, AppealResolutionDialogComponent } from './appeal-resolution-dialog/appeal-resolution-dialog.component';
 
 type AppealStatusFilter = 'open' | 'resolved' | 'all';
@@ -33,7 +37,12 @@ type AppealStatusFilter = 'open' | 'resolved' | 'all';
     MatButtonToggleModule,
     MatCardModule,
     MatProgressBarModule,
-    MatChipsModule
+    MatChipsModule,
+    MatTooltipModule,
+    MatDividerModule,
+    EvidenceListComponent,
+    DecisionSummaryComponent,
+    NoticeAppealsComponent
   ],
   templateUrl: './appeals.component.html',
   styleUrls: ['./appeals.component.css']
@@ -47,6 +56,13 @@ export class AppealsComponent implements OnInit {
   readonly loading = signal(false);
   readonly appeals = signal<DsaAppeal[]>([]);
   readonly statusFilter = signal<AppealStatusFilter>('open');
+  readonly selectedAppeal = signal<DsaAppeal | null>(null);
+  readonly selectedNotice = signal<DsaNotice | null>(null);
+  readonly rightLoading = signal(false);
+  makingScreenshot = signal(false);
+
+  // Parsed content of selected notice
+  contentObj = signal<any | null>(null);
 
   ngOnInit(): void {
     this.load();
@@ -77,18 +93,16 @@ export class AppealsComponent implements OnInit {
     return !appeal.resolvedAt;
   }
 
-  openNotice(appeal: DsaAppeal): void {
+  selectAppeal(appeal: DsaAppeal): void {
+    this.selectedAppeal.set(appeal);
+    this.rightLoading.set(true);
     this.dsa.getNoticeById(appeal.noticeId).subscribe({
       next: (notice: DsaNotice) => {
-        this.dialog.open(NoticeDetailComponent, {
-          data: notice,
-          width: 'auto',
-          maxWidth: '96vw',
-          maxHeight: '90vh',
-          panelClass: 'md-dialog-rounded'
-        });
+        this.selectedNotice.set(notice);
+        this.contentObj.set(this.safeParse(notice.reportedContent));
       },
-      error: () => this.snack.open('Could not load notice detail.', 'OK', { duration: 3000 })
+      error: () => this.snack.open('Could not load notice detail.', 'OK', { duration: 3000 }),
+      complete: () => this.rightLoading.set(false)
     });
   }
 
@@ -123,5 +137,42 @@ export class AppealsComponent implements OnInit {
 
   trackById(_index: number, appeal: DsaAppeal) {
     return appeal.id;
+  }
+
+  isSelected(a: DsaAppeal): boolean {
+    return this.selectedAppeal()?.id === a.id;
+  }
+
+  // Helpers
+  private safeParse(json: string | null | undefined): any {
+    if (!json) return null;
+    try { return JSON.parse(json); } catch { return null; }
+  }
+
+  hasExternalLink(): boolean {
+    const n = this.selectedNotice();
+    const c = this.contentObj();
+    return !!(n?.contentUrl || c?.multimedia?.sourceUrl);
+  }
+
+  externalLink(): string | null {
+    const n = this.selectedNotice();
+    const c = this.contentObj();
+    return n?.contentUrl || c?.multimedia?.sourceUrl || null;
+  }
+
+  addScreenshotEvidence(): void {
+    const n = this.selectedNotice();
+    const url = this.externalLink();
+    if (!n || !url || this.makingScreenshot()) return;
+    this.makingScreenshot.set(true);
+    this.dsa.addEvidenceScreenshot(n.id, { url, fullPage: true, viewport: { width: 1280, height: 800 } })
+      .subscribe({
+        next: () => {
+          this.makingScreenshot.set(false);
+          this.snack.open('Screenshot added as evidence.', 'OK', { duration: 2000 });
+        },
+        error: () => this.makingScreenshot.set(false)
+      });
   }
 }

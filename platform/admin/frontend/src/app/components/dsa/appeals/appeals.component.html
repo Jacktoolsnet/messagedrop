@@ -17,72 +17,183 @@
   </button>
 </mat-toolbar>
 
-<mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 
 <div class="page">
-  <div class="tiles-container">
-    @if (!loading() && appeals().length === 0) {
-    <div class="empty-state">
-      <mat-icon>inbox</mat-icon>
-      <div class="empty-state-text">
-        No appeals found for the selected filter.
+  <div class="layout">
+    <div class="left-column">
+      <div class="list-header">
+        <div class="badge">
+          <mat-icon aria-hidden="true">feedback</mat-icon>
+          Appeals
+        </div>
+      </div>
+
+      @if (!loading() && appeals().length === 0) {
+      <div class="empty">
+        <mat-icon>inventory_2</mat-icon>
+        <p>No appeals found for the selected filter.</p>
+      </div>
+      }
+
+      <div class="notice-list">
+        @for (appeal of appeals(); track trackById($index, appeal)) {
+        <mat-card class="notice-card" [class.selected]="isSelected(appeal)"
+                  (click)="selectAppeal(appeal)" tabindex="0" (keydown.enter)="selectAppeal(appeal)">
+          <div class="head">
+            <div class="title" [matTooltip]="appeal.noticeContentId || 'No content id'">
+              {{ appeal.noticeContentId || 'No content id' }}
+            </div>
+            <div class="head-right">
+              @if (isSelected(appeal)) {
+              <span class="active-pill">
+                <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
+                Active
+              </span>
+              }
+              <span class="status-pill" [ngClass]="isOpen(appeal) ? 'status-open' : 'status-resolved'">
+                <mat-icon aria-hidden="true">{{ isOpen(appeal) ? 'pending' : 'task_alt' }}</mat-icon>
+                {{ isOpen(appeal) ? 'Open' : 'Resolved' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="meta">
+            <span>
+              <mat-icon aria-hidden="true">event</mat-icon>
+              {{ appeal.filedAt | date:'medium' }}
+            </span>
+            @if (appeal.resolvedAt) {
+            <span>
+              <mat-icon aria-hidden="true">update</mat-icon>
+              {{ appeal.resolvedAt | date:'medium' }}
+            </span>
+            }
+          </div>
+
+          <div class="actions">
+            @if (isOpen(appeal)) {
+            <button mat-stroked-button color="accent" type="button" (click)="$event.stopPropagation(); resolveAppeal(appeal)">
+              <mat-icon>done_all</mat-icon>
+              Resolve appeal
+            </button>
+            }
+          </div>
+        </mat-card>
+        }
       </div>
     </div>
-    }
 
-    @for (appeal of appeals(); track trackById($index, appeal)) {
-    <mat-card class="appeal-card tile" appearance="raised">
-      <mat-card-header>
-        <div mat-card-avatar class="avatar">
-          <mat-icon>feedback</mat-icon>
+    <div class="right-column">
+      @if (rightLoading()) {
+        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      }
+
+      @if (selectedAppeal() && selectedNotice()) {
+      <div class="summary-header">
+        <div class="badge">
+          <mat-icon aria-hidden="true">article</mat-icon>
+          Notice
         </div>
-        <mat-card-title>
-          Appeal for content {{ appeal.noticeContentId || '—' }}
-        </mat-card-title>
-        <mat-card-subtitle>
-          Filed by {{ appeal.filedBy || 'anonymous' }} · {{ appeal.filedAt | date: 'medium' }}
-        </mat-card-subtitle>
-      </mat-card-header>
+      </div>
+      <div class="summary-grid">
+        <section class="tile">
+          <h3 class="tile-title">Overview</h3>
+          <div class="tile-body">
+            <div class="section">
+              <div class="kv"><div class="k">ID</div><div class="v mono">{{ selectedNotice()!.id }}</div></div>
+              <div class="kv"><div class="k">Created</div><div class="v">{{ selectedNotice()!.createdAt | date:'medium' }}</div></div>
+              <div class="kv"><div class="k">Type</div><div class="v">{{ selectedNotice()!.reportedContentType }}</div></div>
+              <div class="kv"><div class="k">Category</div><div class="v">{{ selectedNotice()!.category || '—' }}</div></div>
+              <div class="kv"><div class="k">Status</div><div class="v">{{ selectedNotice()!.status }}</div></div>
+            </div>
+          </div>
+        </section>
 
-      <mat-card-content>
-        <mat-chip-set>
-          <mat-chip [ngClass]="isOpen(appeal) ? 'chip-open' : 'chip-resolved'">
-            {{ isOpen(appeal) ? 'Open appeal' : 'Resolved' }}
-          </mat-chip>
-          @if (appeal.noticeStatus) {
-          <mat-chip>{{ appeal.noticeStatus }}</mat-chip>
-          }
-          @if (appeal.decisionOutcome) {
-          <mat-chip>{{ appeal.decisionOutcome }}</mat-chip>
-          }
-        </mat-chip-set>
+        <section class="tile">
+          <h3 class="tile-title">Content</h3>
+          <div class="tile-body">
+            @if (contentObj(); as c) {
+            <div class="block">
+              @if (c.message) {
+              <div class="bubble">{{ c.message }}</div>
+              <mat-divider class="sp"></mat-divider>
+              }
+              <div class="meta">
+                <div class="kv"><div class="k">Content ID</div><div class="v mono">{{ selectedNotice()!.contentId }}</div></div>
+                @if (c.userId) {
+                <div class="kv"><div class="k">User</div><div class="v mono">{{ c.userId }}</div></div>
+                }
+                @if (c.location?.plusCode) {
+                <div class="kv"><div class="k">PlusCode</div><div class="v mono">{{ c.location.plusCode }}</div></div>
+                }
+                @if (c.multimedia?.type) {
+                <div class="kv"><div class="k">Media</div><div class="v">{{ c.multimedia.type }}</div></div>
+                }
+              </div>
 
-        <div class="arguments">
-          <h4>Arguments</h4>
-          <p>{{ appeal.arguments }}</p>
+              @if (hasExternalLink()) {
+              <div class="block-actions">
+                <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank" rel="noopener">
+                  <mat-icon>open_in_new</mat-icon>
+                  Open original
+                </a>
+                <button mat-stroked-button type="button" (click)="addScreenshotEvidence()" [disabled]="makingScreenshot()">
+                  <mat-icon>photo_camera</mat-icon>
+                  Add to evidence
+                </button>
+              </div>
+              }
+            </div>
+            } @else {
+            <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
+            }
+          </div>
+        </section>
+
+        <section class="tile">
+          <h3 class="tile-title">Metadata</h3>
+          <div class="tile-body">
+            <div class="section">
+              <div class="kv"><div class="k">Reporter name</div><div class="v">{{ selectedNotice()!.reporterName || '—' }}</div></div>
+              <div class="kv"><div class="k">Reporter email</div><div class="v">{{ selectedNotice()!.reporterEmail || '—' }}</div></div>
+              <div class="kv"><div class="k">Truth affirmation</div><div class="v">{{ selectedNotice()!.truthAffirmation ? 'Yes' : '—' }}</div></div>
+              <div class="kv"><div class="k">Updated</div><div class="v">{{ selectedNotice()!.updatedAt | date:'medium' }}</div></div>
+            </div>
+          </div>
+        </section>
+
+        <section class="tile">
+          <h3 class="tile-title">Evidence</h3>
+          <div class="tile-body">
+            <app-evidence-list [noticeId]="selectedNotice()!.id"></app-evidence-list>
+          </div>
+        </section>
+
+        <section class="tile">
+          <h3 class="tile-title">Decision summary</h3>
+          <div class="tile-body">
+            <app-decision-summary [noticeId]="selectedNotice()!.id"></app-decision-summary>
+          </div>
+        </section>
+
+        <section class="tile">
+          <h3 class="tile-title">Appeals</h3>
+          <div class="tile-body">
+            <app-notice-appeals [noticeId]="selectedNotice()!.id"></app-notice-appeals>
+          </div>
+        </section>
+      </div>
+      } @else {
+      <div class="placeholder empty">
+        <mat-icon>notifications_none</mat-icon>
+        <div class="placeholder-text">
+          Select an appeal to view its summary.
         </div>
-
-        @if (!isOpen(appeal)) {
-        <div class="resolution-info">
-          <mat-icon>task_alt</mat-icon>
-          <span>Resolved {{ appeal.resolvedAt | date: 'medium' }} · Outcome: {{ outcomeLabel(appeal) }}</span>
-        </div>
-        }
-      </mat-card-content>
-
-      <mat-card-actions align="end">
-        <button mat-button color="primary" type="button" (click)="openNotice(appeal)">
-          <mat-icon>open_in_new</mat-icon>
-          Open notice
-        </button>
-        @if (isOpen(appeal)) {
-        <button mat-stroked-button color="accent" type="button" (click)="resolveAppeal(appeal)">
-          <mat-icon>done_all</mat-icon>
-          Resolve appeal
-        </button>
-        }
-      </mat-card-actions>
-    </mat-card>
-    }
+      </div>
+      }
+    </div>
   </div>
 </div>
