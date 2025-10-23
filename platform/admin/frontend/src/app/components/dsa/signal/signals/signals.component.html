@@ -54,8 +54,15 @@
         @for (s of signals(); track trackById($index, s)) {
         <mat-card class="tile" (click)="openDetail(s)" tabindex="0" (keydown.enter)="openDetail(s)">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="isNew(s) ? 'new' : ''" [matBadgeHidden]="!isNew(s)">
-                    <mat-icon>info</mat-icon>
+                <div mat-card-avatar class="avatar">
+                    <span class="avatar-badged"
+                          [matBadge]="isNew(s) ? 'new' : ''"
+                          [matBadgeHidden]="!isNew(s)"
+                          matBadgePosition="below after"
+                          matBadgeOverlap="false"
+                          matBadgeColor="primary">
+                        <mat-icon>info</mat-icon>
+                    </span>
                 </div>
                 <mat-card-title class="tile-title">
                     {{ s.reportedContentType }}

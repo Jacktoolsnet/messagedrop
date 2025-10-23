@@ -114,6 +114,15 @@ mat-card-header {
     color: var(--primary);
 }
 
+/* Badge mittig unter dem Icon – analog zu Notices */
+:host ::ng-deep .avatar-badged .mat-badge-content {
+    top: auto !important;
+    bottom: -1rem !important;
+    right: auto !important;
+    left: 50% !important;
+    transform: translate(-50%, 0) !important;
+}
+
 /* Body */
 mat-card-content {
     padding: 12px 16px;
