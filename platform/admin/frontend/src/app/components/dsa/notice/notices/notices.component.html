@@ -60,7 +60,7 @@
     <!-- Liste -->
     <div class="tiles-container">
         @for (n of notices(); track trackById($index, n)) {
-        <mat-card class="tile">
+        <mat-card class="tile" (click)="detail(n)" tabindex="0" (keydown.enter)="detail(n)">
             <mat-card-header>
                 <div mat-card-avatar class="avatar">
                     <span class="avatar-badged" [matBadge]="statusLabel(n.status)" matBadgePosition="below after"
@@ -83,62 +83,13 @@
                         {{ n.contentId }}
                     </span>
                     @if (n.contentUrl) {
-                    <a [href]="n.contentUrl" target="_blank" rel="noopener">
+                    <a [href]="n.contentUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
                         <mat-icon>open_in_new</mat-icon>
                         Open content
                     </a>
                     }
                 </div>
-
-                <!-- Message Preview -->
-                @if (getMessagePreview(n); as preview) {
-                @if (preview.length > 0) {
-                <div class="snippet">
-                    <mat-icon>text_snippet</mat-icon>
-                    <div class="t">{{ preview }}</div>
-                </div>
-                } @else {
-                <div class="placeholder">
-                    <mat-icon>text_snippet</mat-icon>
-                    No message provided
-                </div>
-                }
-                }
-
-                <!-- Reason -->
-                @if (n.reasonText) {
-                <div class="snippet">
-                    <mat-icon>forum</mat-icon>
-                    <div class="t">{{ n.reasonText }}</div>
-                </div>
-                } @else {
-                <div class="placeholder">
-                    <mat-icon>forum</mat-icon>
-                    No reason given
-                </div>
-                }
             </mat-card-content>
-
-            <mat-card-actions align="end">
-                <button mat-stroked-button (click)="detail(n)">
-                    <mat-icon>info</mat-icon>
-                    Details
-                </button>
-
-                @if (n.status !== 'DECIDED') {
-                <button mat-raised-button color="primary" (click)="decide(n)">
-                    <mat-icon>gavel</mat-icon>
-                    Decide
-                </button>
-                }
-
-                @if (n.status === 'DECIDED') {
-                <button mat-raised-button color="accent" (click)="notify(n)">
-                    <mat-icon>notifications_active</mat-icon>
-                    Notify
-                </button>
-                }
-            </mat-card-actions>
         </mat-card>
         }
     </div>
