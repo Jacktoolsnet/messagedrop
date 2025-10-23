@@ -5,6 +5,7 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -36,6 +37,7 @@ import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component'
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -59,13 +61,9 @@ export class NoticesComponent implements OnInit, OnDestroy {
   protected statuses = DSA_NOTICE_STATUSES;
 
   // „Offene“ Stati = Arbeitsvorrat
-  private readonly OPEN_STATUSES: DsaNoticeStatus[] = [
-    'RECEIVED', 'UNDER_REVIEW'
-  ];
-
   /** Filter-Form – Status (multi), Type, Category, Q, Range */
   protected filterForm = this.fb.nonNullable.group({
-    status: [this.OPEN_STATUSES as DsaNoticeStatus[]],
+    status: this.fb.nonNullable.control<DsaNoticeStatus>('RECEIVED'),
     reportedContentType: [''],
     category: [''],
     q: [''],
@@ -97,7 +95,7 @@ export class NoticesComponent implements OnInit, OnDestroy {
   private toFilters(): DsaNoticeFilters {
     const v = this.filterForm.getRawValue();
     return {
-      status: (v.status?.length ? v.status : undefined),
+      status: v.status ? [v.status] : undefined,
       reportedContentType: v.reportedContentType || undefined,
       category: v.category || undefined,
       q: v.q || undefined,
@@ -119,6 +117,17 @@ export class NoticesComponent implements OnInit, OnDestroy {
 
   reload(): void {
     this.load();
+  }
+
+  statusFilter(): DsaNoticeStatus {
+    return this.filterForm.controls.status.value;
+  }
+
+  setStatus(status: DsaNoticeStatus | null): void {
+    if (!status) return;
+    const control = this.filterForm.controls.status;
+    if (control.value === status) return;
+    control.setValue(status);
   }
 
   /** Detail öffnen (Dialog – Placeholder; Komponente liefern wir im nächsten Schritt) */

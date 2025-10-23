@@ -4,6 +4,13 @@
     </button>
 
     <span class="toolbar-title">Notices</span>
+    <span class="spacer"></span>
+
+    <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
+        @for (s of statuses; track s) {
+        <mat-button-toggle [value]="s">{{ statusLabel(s) }}</mat-button-toggle>
+        }
+    </mat-button-toggle-group>
 
     <button mat-stroked-button (click)="reload()">
         <mat-icon>refresh</mat-icon>
@@ -19,15 +26,6 @@
 
     <!-- Filter -->
     <div class="filter-row">
-        <mat-form-field appearance="outline">
-            <mat-label>Status</mat-label>
-            <mat-select [formControl]="filterForm.controls.status" multiple>
-                @for (s of statuses; track s) {
-                <mat-option [value]="s">{{ s }}</mat-option>
-                }
-            </mat-select>
-        </mat-form-field>
-
         <mat-form-field appearance="outline">
             <mat-label>Type</mat-label>
             <mat-select [formControl]="filterForm.controls.reportedContentType">

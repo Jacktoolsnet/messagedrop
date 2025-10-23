@@ -76,12 +76,33 @@ mat-toolbar {
     color: #1f2937;
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
     border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: .75rem;
 
     .toolbar-title {
-        margin-inline: auto;
         font-size: 1.35rem;
         font-weight: 600;
+        margin: 0;
     }
+}
+
+.spacer {
+    flex: 1 1 auto;
+}
+
+.status-toggle {
+    background: rgba(5, 165, 29, 0.12);
+    border-radius: 999px;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-button {
+    padding: 0.3rem 0.9rem;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-checked {
+    background: rgba(5, 165, 29, 0.2);
+    color: #04730f;
 }
 
 .page {
@@ -93,7 +114,7 @@ mat-toolbar {
 /* Filter-Zeile */
 .filter-row {
     display: grid;
-    grid-template-columns: 160px 160px 1fr 140px auto;
+    grid-template-columns: 160px 160px 1fr 140px;
     gap: .75rem;
     align-items: center;
     margin: .75rem 0 1.25rem;
