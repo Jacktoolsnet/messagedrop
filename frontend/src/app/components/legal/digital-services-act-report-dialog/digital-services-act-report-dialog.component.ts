@@ -71,10 +71,10 @@ export class DigitalServicesActReportDialogComponent {
   }
 
   readonly categories: { value: DsaNoticeCategory; label: string }[] = [
-    { value: 'copyright', label: 'Copyright / IP infringement' },
-    { value: 'hate', label: 'Hate speech / incitement' },
-    { value: 'terror', label: 'Terrorism content' },
     { value: 'privacy', label: 'Privacy / personal data' },
+    { value: 'hate', label: 'Hate speech / incitement' },
+    { value: 'copyright', label: 'Copyright / IP infringement' },
+    { value: 'terror', label: 'Terrorism content' },
     { value: 'other', label: 'Other illegal content' }
   ];
 

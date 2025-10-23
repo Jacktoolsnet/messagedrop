@@ -38,9 +38,9 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   submitting = signal(false);
 
   outcomes: { value: DecisionOutcome; label: string; icon: string }[] = [
-    { value: 'REMOVE_CONTENT', label: 'Remove content', icon: 'delete_forever' },
-    { value: 'RESTRICT', label: 'Restrict / mask', icon: 'visibility_off' },
     { value: 'NO_ACTION', label: 'No action', icon: 'check_circle' },
+    { value: 'RESTRICT', label: 'Restrict / mask', icon: 'visibility_off' },
+    { value: 'REMOVE_CONTENT', label: 'Remove content', icon: 'delete_forever' },
     { value: 'FORWARD_TO_AUTHORITY', label: 'Forward to authority', icon: 'gavel' }
   ];
 
@@ -61,12 +61,11 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   ];
   reasoningTemplates = [
     {
-      label: 'Clear Terms of Service violation',
-      desc: 'Obvious ToS violation → remove content',
-      text: `After careful assessment, this content was found to clearly and seriously violate our Terms of Service.
-It includes material or behavior that is explicitly prohibited under our platform rules.
-To protect users and maintain a safe environment, the content has been permanently removed.
-The decision was reviewed manually and logged for transparency purposes.`
+      label: 'No action – compliant content',
+      desc: 'No violation found',
+      text: `Following a detailed review, the content does not appear to violate applicable law or our Terms of Service.
+It remains visible to the public, as it falls within the boundaries of acceptable expression.
+No enforcement measures were taken. The case is documented and closed.`
     },
     {
       label: 'Context-sensitive restriction',
@@ -76,11 +75,12 @@ To minimize potential impact while preserving informational value, access has be
 The user has been informed of this restriction and may appeal if they believe it was applied in error.`
     },
     {
-      label: 'No action – compliant content',
-      desc: 'No violation found',
-      text: `Following a detailed review, the content does not appear to violate applicable law or our Terms of Service.
-It remains visible to the public, as it falls within the boundaries of acceptable expression.
-No enforcement measures were taken. The case is documented and closed.`
+      label: 'Clear Terms of Service violation',
+      desc: 'Obvious ToS violation → remove content',
+      text: `After careful assessment, this content was found to clearly and seriously violate our Terms of Service.
+It includes material or behavior that is explicitly prohibited under our platform rules.
+To protect users and maintain a safe environment, the content has been permanently removed.
+The decision was reviewed manually and logged for transparency purposes.`
     },
     {
       label: 'Forwarded to competent authority',
