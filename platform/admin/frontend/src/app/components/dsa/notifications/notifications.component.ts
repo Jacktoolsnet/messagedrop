@@ -227,27 +227,58 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       panelClass: 'md-dialog-rounded'
     });
 
-    ref.afterClosed().subscribe((result: { stakeholder: string; channel: string; payload: any } | undefined) => {
+    ref.afterClosed().subscribe((result: { stakeholder: 'reporter'|'uploader'|'other'; subject?: string; body: string; event?: string; otherEmail?: string } | undefined) => {
       if (!result) return;
-      const payload = {
-        ...result.payload,
-        event: result.payload?.event || null
-      };
-      this.notificationsLoading.set(true);
-      this.dsa.createNotification({
-        noticeId: notice.id,
-        stakeholder: result.stakeholder,
-        channel: result.channel,
-        payload
-      }).subscribe({
-        next: () => {
-          this.snack.open('Notification queued.', 'OK', { duration: 2000 });
-          this.fetchNotifications(notice.id, true);
-        },
-        error: () => {
-          this.notificationsLoading.set(false);
-          this.snack.open('Could not create notification.', 'OK', { duration: 3000 });
+
+      const tasks: Array<Promise<any>> = [];
+      const base = { noticeId: notice.id } as const;
+      const body = (result.body || '').trim();
+      const event = (result.event || '').trim() || null;
+      const subject = (result.subject || 'DSA update').trim();
+
+      if (result.stakeholder === 'reporter') {
+        // Immer In-App, zusätzlich E-Mail wenn vorhanden
+        tasks.push(this.dsa.createNotification({
+          ...base,
+          stakeholder: 'reporter',
+          channel: 'inapp',
+          payload: { body, event }
+        }).toPromise());
+
+        if ((notice.reporterEmail || '').trim().length > 0) {
+          tasks.push(this.dsa.createNotification({
+            ...base,
+            stakeholder: 'reporter',
+            channel: 'email',
+            payload: { subject, body, event, to: notice.reporterEmail }
+          }).toPromise());
         }
+      } else if (result.stakeholder === 'uploader') {
+        // Nur In-App
+        tasks.push(this.dsa.createNotification({
+          ...base,
+          stakeholder: 'uploader',
+          channel: 'inapp',
+          payload: { body, event }
+        }).toPromise());
+      } else {
+        // Other: E-Mail an die angegebene Adresse
+        const to = (result.otherEmail || '').trim();
+        tasks.push(this.dsa.createNotification({
+          ...base,
+          stakeholder: 'other',
+          channel: 'email',
+          payload: { subject, body, event, to }
+        }).toPromise());
+      }
+
+      this.notificationsLoading.set(true);
+      Promise.allSettled(tasks).then(() => {
+        this.snack.open('Notification queued.', 'OK', { duration: 2000 });
+        this.fetchNotifications(notice.id, true);
+      }).catch(() => {
+        this.notificationsLoading.set(false);
+        this.snack.open('Could not create notification.', 'OK', { duration: 3000 });
       });
     });
   }

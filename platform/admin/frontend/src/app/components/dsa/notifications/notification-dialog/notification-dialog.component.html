@@ -13,16 +13,16 @@
     </mat-select>
   </mat-form-field>
 
+  <!-- Für "other" freie E-Mail-Adresse angeben -->
+  @if (isOther()) {
   <mat-form-field appearance="outline">
-    <mat-label>Channel</mat-label>
-    <mat-select formControlName="channel" required>
-      <mat-option value="email">Email</mat-option>
-      <mat-option value="inapp">In-App</mat-option>
-      <mat-option value="webhook">Webhook</mat-option>
-    </mat-select>
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="otherEmail" placeholder="name@example.com" required />
   </mat-form-field>
+  }
 
-  <mat-form-field appearance="outline" *ngIf="channel === 'email'">
+  <!-- Subject immer anzeigen -->
+  <mat-form-field appearance="outline">
     <mat-label>Subject</mat-label>
     <input matInput formControlName="subject" placeholder="Enter subject" />
   </mat-form-field>

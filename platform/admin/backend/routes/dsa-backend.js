@@ -1052,6 +1052,44 @@ router.post('/notifications', async (req, res) => {
 
     if (!id) return res.status(500).json({ error: 'db_error' });
 
+    // Optional immediate delivery for email notifications
+    try {
+        if (channel === 'email') {
+            const mail = payload.mail || payload;
+            const to = mail.to || payload.to;
+            const subject = mail.subject || payload.subject || 'DSA update';
+            const text = mail.text || payload.text || (payload.body || '');
+            const html = mail.html || payload.html || undefined;
+            const from = mail.from || payload.from || undefined;
+
+            if (to && subject && (text || html)) {
+                const result = await sendMail({ to, subject, text, html, from, logger: req.logger });
+                const deliveredMeta = {
+                    source: 'create',
+                    sentAt: Date.now(),
+                    success: result.success,
+                    event: meta?.event || payload.event || null,
+                    error: result.success ? null : String(result.error?.message || result.error || 'unknown_error'),
+                    provider: result.info ? { messageId: result.info.messageId ?? result.info?.response ?? null } : null,
+                    createOf: id
+                };
+                await recordNotification(_db, {
+                    noticeId: noticeId ?? null,
+                    decisionId: decisionId ?? null,
+                    stakeholder,
+                    channel: 'email',
+                    payload: { to, subject, text, html, from, event: payload.event || meta?.event || null },
+                    meta: deliveredMeta,
+                    sentAt: Date.now(),
+                    auditActor: actor
+                });
+            }
+        }
+    } catch (e) {
+        // Do not fail the API request if delivery attempt fails; UI can use Resend flow.
+        req.logger?.warn?.('Immediate email delivery failed on create', { error: String(e?.message || e) });
+    }
+
     res.status(201).json({ id });
 });
 

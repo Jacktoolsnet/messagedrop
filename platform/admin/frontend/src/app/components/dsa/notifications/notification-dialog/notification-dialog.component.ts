@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -39,14 +39,26 @@ export class NotificationDialogComponent {
 
   readonly form = this.fb.nonNullable.group({
     stakeholder: this.fb.nonNullable.control<'reporter' | 'uploader' | 'other'>('reporter', Validators.required),
-    channel: this.fb.nonNullable.control<'email' | 'inapp' | 'webhook'>('email', Validators.required),
     subject: this.fb.control<string>(''),
     body: this.fb.control<string>('', Validators.required),
-    event: this.fb.control<string>('')
+    event: this.fb.control<string>(''),
+    otherEmail: this.fb.control<string>('')
   });
 
-  get channel() {
-    return this.form.get('channel')?.value;
+  // Reporter kann E-Mail bekommen, wenn vorhanden; Uploader nur InApp; Other benötigt E-Mail-Adresse
+  private stakeholderSig = signal<'reporter' | 'uploader' | 'other'>(this.form.controls.stakeholder.value);
+  canEmailReporter = computed(() => !!(this.data?.notice?.reporterEmail));
+  isReporter = computed(() => this.stakeholderSig() === 'reporter');
+  isUploader = computed(() => this.stakeholderSig() === 'uploader');
+  isOther = computed(() => this.stakeholderSig() === 'other');
+
+  constructor() {
+    // Sync the reactive-form control to a signal so computed() values update in the template
+    this.form.controls.stakeholder.valueChanges.subscribe(v => {
+      if (v === 'reporter' || v === 'uploader' || v === 'other') {
+        this.stakeholderSig.set(v);
+      }
+    });
   }
 
   cancel(): void {
@@ -61,16 +73,22 @@ export class NotificationDialogComponent {
     }
 
     const value = this.form.getRawValue();
-    const payload: any = { body: value.body, event: value.event || undefined };
-
-    if (value.channel === 'email') {
-      payload.subject = value.subject?.trim() || 'DSA update';
+    // Validierung: Other braucht eine E-Mail
+    if (value.stakeholder === 'other') {
+      const email = (value.otherEmail || '').trim();
+      const emailOk = /.+@.+\..+/.test(email);
+      if (!emailOk) {
+        this.snack.open('Please provide a valid email address.', 'OK', { duration: 2500 });
+        return;
+      }
     }
 
     this.dialogRef.close({
       stakeholder: value.stakeholder,
-      channel: value.channel,
-      payload
+      subject: (value.subject || '').trim(),
+      body: (value.body || '').trim(),
+      event: (value.event || '').trim(),
+      otherEmail: (value.otherEmail || '').trim()
     });
   }
 }
