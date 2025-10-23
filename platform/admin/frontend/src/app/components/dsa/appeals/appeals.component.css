@@ -127,6 +127,26 @@ mat-toolbar {
   margin-top: 0.5rem;
 }
 
+/* Left-side empty placeholder (match notifications) */
+.empty {
+  display: grid;
+  place-items: center;
+  gap: 0.5rem;
+  padding: 2rem;
+  border: 1px dashed var(--border);
+  border-radius: 16px;
+  color: var(--muted);
+}
+
+.empty mat-icon {
+  font-size: 56px;
+  width: 56px;
+  height: 56px;
+  line-height: 56px;
+  color: color-mix(in srgb, var(--primary) 80%, #9aa2ff);
+  filter: drop-shadow(0 6px 18px rgba(2, 8, 20, 0.18));
+}
+
 .notice-card {
   border-radius: 16px;
   border: 1px solid var(--border);
@@ -280,6 +300,7 @@ mat-toolbar {
   text-align: center;
   color: var(--muted);
   padding: 2rem 1rem;
+  margin-top: 0.5rem; /* align with left list header */
 }
 
 .placeholder.empty mat-icon {

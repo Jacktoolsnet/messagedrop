@@ -347,6 +347,11 @@ mat-progress-bar {
   min-height: 220px;
 }
 
+/* Align right placeholder icon with left list header icon height */
+.right-column .placeholder {
+  margin-top: 0.5rem; /* match .list-header padding-top */
+}
+
 .placeholder mat-icon {
   width: 56px;
   height: 56px;
