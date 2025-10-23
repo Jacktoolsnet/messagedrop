@@ -808,6 +808,12 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
     const viewport = req.body?.viewport || {};
     const width = Number.isFinite(Number(viewport.width)) ? Number(viewport.width) : 1280;
     const height = Number.isFinite(Number(viewport.height)) ? Number(viewport.height) : 800;
+    const waitSelector = asString(req.body?.waitSelector); // optional: CSS selector to wait for
+    const elementSelector = asString(req.body?.elementSelector); // optional: screenshot a specific element
+    const clickSelectors = Array.isArray(req.body?.clickSelectors) ? req.body.clickSelectors.filter(s => typeof s === 'string') : [];
+    const delayMs = Number.isFinite(Number(req.body?.delayMs)) ? Number(req.body.delayMs) : 0;
+    const cookies = Array.isArray(req.body?.cookies) ? req.body.cookies : null; // [{ name, value, domain, path }]
+    const acceptLanguage = asString(req.body?.acceptLanguage) || 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7';
 
     if (!rawUrl) return res.status(400).json({ error: 'url_required' });
 
@@ -858,10 +864,90 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
             args: ['--no-sandbox', '--disable-dev-shm-usage'],
             headless: true
         });
-        const context = await browser.newContext({ viewport: { width, height } });
+        const context = await browser.newContext({
+            viewport: { width, height },
+            locale: 'de-DE',
+            userAgent: 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119 Safari/537.36',
+        });
+
+        if (cookies && cookies.length) {
+            try {
+                await context.addCookies(cookies.map(c => ({
+                    name: String(c.name),
+                    value: String(c.value),
+                    domain: c.domain ? String(c.domain) : u.hostname,
+                    path: c.path ? String(c.path) : '/',
+                    httpOnly: Boolean(c.httpOnly ?? false),
+                    secure: Boolean(c.secure ?? true),
+                    sameSite: c.sameSite || 'Lax'
+                })));
+            } catch { /* ignore cookie errors */ }
+        }
+
+        await context.setExtraHTTPHeaders({ 'Accept-Language': acceptLanguage });
         const page = await context.newPage();
-        await page.goto(u.toString(), { waitUntil: 'networkidle', timeout: 20000 });
-        await page.screenshot({ path: outPath, fullPage });
+        await page.goto(u.toString(), { waitUntil: 'networkidle', timeout: 25000 });
+
+        // Optional explicit wait for a selector that indicates main content
+        if (waitSelector) {
+            try { await page.waitForSelector(waitSelector, { timeout: 5000 }); } catch { /* ignore */ }
+        }
+
+        // Best-effort: try to accept cookie banners (common button texts), also in iframes
+        const tryAcceptConsent = async () => {
+            const labels = [
+                /alle akzeptieren/i,
+                /ich stimme zu/i,
+                /akzeptieren/i,
+                /accept all/i,
+                /i agree/i,
+                /accept/i
+            ];
+            const frames = page.frames();
+            for (const frame of frames) {
+                for (const re of labels) {
+                    try {
+                        const btnByRole = frame.getByRole ? frame.getByRole('button', { name: re }) : null;
+                        if (btnByRole && await btnByRole.count().catch(() => 0)) {
+                            await btnByRole.first().click({ timeout: 1500 }).catch(() => { });
+                        }
+                        const byText = frame.locator ? frame.locator(`text=${re.source.replace(/\//g, '')}`) : null;
+                        if (byText && await byText.count().catch(() => 0)) {
+                            await byText.first().click({ timeout: 1500 }).catch(() => { });
+                        }
+                    } catch { /* ignore */ }
+                }
+            }
+        };
+
+        await tryAcceptConsent();
+
+        // Optional explicit clicks provided by client
+        for (const sel of clickSelectors) {
+            try {
+                // Click within main page and all frames
+                await page.locator(sel).first().click({ timeout: 1500 }).catch(() => { });
+                for (const frame of page.frames()) {
+                    await frame.locator(sel).first().click({ timeout: 1500 }).catch(() => { });
+                }
+            } catch { /* ignore */ }
+        }
+
+        if (delayMs > 0 && delayMs < 10000) {
+            await page.waitForTimeout(delayMs);
+        }
+
+        if (elementSelector) {
+            try {
+                const el = page.locator(elementSelector).first();
+                await el.waitFor({ timeout: 5000 }).catch(() => { });
+                await el.screenshot({ path: outPath });
+            } catch {
+                await page.screenshot({ path: outPath, fullPage });
+            }
+        } else {
+            await page.screenshot({ path: outPath, fullPage });
+        }
         await context.close();
     } catch (err) {
         if (browser) try { await browser.close(); } catch { }
