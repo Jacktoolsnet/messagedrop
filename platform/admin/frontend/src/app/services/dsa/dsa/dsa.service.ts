@@ -1,4 +1,4 @@
-import { HttpClient, HttpParams, HttpResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs';
@@ -411,6 +411,24 @@ export class DsaService {
           throw err;
         })
       );
+  }
+
+  setPublicMessageVisibility(contentId: string, visible: boolean) {
+    const trimmed = contentId?.trim();
+    if (!trimmed) return of({ status: 0 });
+
+    const headers = new HttpHeaders({
+      'X-API-Authorization': environment.apiToken
+    });
+    const path = visible ? 'enable' : 'disable';
+    const url = `${environment.apiUrl}/dsa/${path}/publicmessage/${encodeURIComponent(trimmed)}`;
+
+    return this.http.get<{ status: number }>(url, { headers }).pipe(
+      catchError(err => {
+        this.snack.open('Could not update message visibility.', 'OK', { duration: 3000 });
+        throw err;
+      })
+    );
   }
 
   /** Get all evidence entries for a given notice */

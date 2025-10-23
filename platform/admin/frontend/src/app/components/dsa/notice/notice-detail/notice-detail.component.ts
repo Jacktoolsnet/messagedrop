@@ -10,7 +10,7 @@ import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
-import { DecisionDialogComponent } from '../../decisions/decision-dialog/decision-dialog.component';
+import { DecisionDialogComponent, DecisionDialogResult, DecisionOutcome } from '../../decisions/decision-dialog/decision-dialog.component';
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
@@ -88,19 +88,33 @@ export class NoticeDetailComponent implements OnInit {
   }
 
   openDecisionDialog(): void {
-    const ref = this.dialog.open(DecisionDialogComponent, {
+    const ref = this.dialog.open<DecisionDialogComponent, { noticeId: string }, DecisionDialogResult | false>(DecisionDialogComponent, {
       data: { noticeId: this.notice().id },
       width: 'min(700px, 96vw)',
       maxHeight: '90vh',
       panelClass: 'md-dialog-rounded'
     });
 
-    ref.afterClosed().subscribe((saved) => {
-      if (!saved) return;
+    ref.afterClosed().subscribe((result) => {
+      if (!result || !result.saved) return;
+
+      const outcome = result.outcome;
 
       this.status.set('DECIDED');
       this.notice.update(n => n ? ({ ...n, status: 'DECIDED', updatedAt: Date.now() }) : n);
       this.decisionSummary?.refresh();
+      this.syncContentVisibility(outcome);
+    });
+  }
+
+  private syncContentVisibility(outcome: DecisionOutcome): void {
+    const contentId = this.notice().contentId;
+    if (!contentId) return;
+
+    const visible = outcome === 'NO_ACTION';
+    this.dsa.setPublicMessageVisibility(contentId, visible).subscribe({
+      next: () => { },
+      error: () => { }
     });
   }
 

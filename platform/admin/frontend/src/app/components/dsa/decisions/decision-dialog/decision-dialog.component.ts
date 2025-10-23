@@ -15,6 +15,7 @@ import { map, startWith, Subject, takeUntil } from 'rxjs';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 
 export type DecisionOutcome = 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
+export type DecisionDialogResult = { saved: boolean; outcome: DecisionOutcome };
 
 @Component({
   selector: 'app-add-decision-dialog',
@@ -31,7 +32,7 @@ export class DecisionDialogComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private dsa = inject(DsaService);
   private snack = inject(MatSnackBar);
-  private ref = inject(MatDialogRef<DecisionDialogComponent>);
+  private ref = inject(MatDialogRef<DecisionDialogComponent, DecisionDialogResult | false>);
   data = inject<{ noticeId: string }>(MAT_DIALOG_DATA);
 
   private destroy$ = new Subject<void>();
@@ -208,7 +209,7 @@ The content may remain temporarily restricted pending further evaluation.`
     }).subscribe({
       next: () => {
         this.snack.open('Decision saved.', 'OK', { duration: 2500 });
-        this.ref.close(true);
+        this.ref.close({ saved: true, outcome });
       },
       error: () => {
         this.snack.open('Failed to save decision.', 'OK', { duration: 3500 });
