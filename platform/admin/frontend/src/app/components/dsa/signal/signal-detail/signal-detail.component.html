@@ -136,12 +136,22 @@
         @if (sourceUrl()) {
         <button mat-stroked-button (click)="openContentUrl()">
             <mat-icon>open_in_new</mat-icon>
-            Original öffnen
+            Open original
+        </button>
+        }
+        @if (data.source === 'signal') {
+        <button mat-raised-button color="warn" (click)="dismissSignal()" [disabled]="actionBusy()">
+            <mat-icon>delete</mat-icon>
+            Dismiss
+        </button>
+        <button mat-raised-button color="primary" (click)="promoteSignal()" [disabled]="actionBusy()">
+            <mat-icon>upgrade</mat-icon>
+            Promote
         </button>
         }
         <button mat-raised-button color="primary" (click)="close()">
             <mat-icon>close</mat-icon>
-            Schließen
+            Close
         </button>
     </mat-card-actions>
 </mat-card>

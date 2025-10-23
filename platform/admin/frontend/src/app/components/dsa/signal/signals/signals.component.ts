@@ -156,9 +156,10 @@ export class SignalsComponent {
   }
 
   openDetail(s: DsaSignal) {
-    this.dialog.open(SignalDetailComponent, {
+    const ref = this.dialog.open(SignalDetailComponent, {
       data: {
         source: 'signal',
+        signalId: s.id,
         reportedContent: s.reportedContent, // JSON-String aus DB
         contentUrl: s.contentUrl,
         category: s.category,
@@ -171,6 +172,7 @@ export class SignalsComponent {
       maxHeight: '90vh',
       autoFocus: false
     });
+    ref.afterClosed().subscribe(() => this.reload());
   }
 
   promote(s: DsaSignal) {

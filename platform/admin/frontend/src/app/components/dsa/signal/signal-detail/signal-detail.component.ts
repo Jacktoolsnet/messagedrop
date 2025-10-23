@@ -3,7 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -13,6 +13,8 @@ import { Multimedia } from '../../../../interfaces/multimedia.interface';
 import { PublicMessageDetailData } from '../../../../interfaces/public-message-detail-data.interface';
 import { PublicMessage } from '../../../../interfaces/public-message.interface';
 import { TranslateService } from '../../../../services/translate-service/translate-service.service';
+import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 
 @Component({
   selector: 'app-signal-detail',
@@ -28,9 +30,11 @@ import { TranslateService } from '../../../../services/translate-service/transla
 
 export class SignalDetailComponent {
   private ref = inject(MatDialogRef<SignalDetailComponent>);
+  private dialog = inject(MatDialog);
   private sanitizer = inject(DomSanitizer);
   private snack = inject(MatSnackBar);
   private translator = inject(TranslateService);
+  private dsa = inject(DsaService);
   protected data = inject<PublicMessageDetailData>(MAT_DIALOG_DATA);
 
   // Inhalt
@@ -54,6 +58,7 @@ export class SignalDetailComponent {
   tReason = signal<string | null>(null);
   loadingMsg = signal(false);
   loadingReason = signal(false);
+  actionBusy = signal(false);
 
   ngOnInit() {
     const raw = typeof this.data.reportedContent === 'string'
@@ -111,6 +116,53 @@ export class SignalDetailComponent {
   openContentUrl() {
     const url = this.sourceUrl();
     if (url) window.open(url, '_blank', 'noopener');
+  }
+
+  promoteSignal() {
+    if (this.data.source !== 'signal' || !this.data.signalId) {
+      this.snack.open('No signal id available.', 'OK', { duration: 2000 });
+      return;
+    }
+    if (this.actionBusy()) return;
+    this.actionBusy.set(true);
+    this.dsa.promoteSignal(this.data.signalId).subscribe({
+      next: () => {
+        this.snack.open('Signal promoted to Notice.', 'OK', { duration: 3000 });
+        this.ref.close(true);
+      },
+      error: () => {
+        this.actionBusy.set(false);
+      }
+    });
+  }
+
+  dismissSignal() {
+    if (this.data.source !== 'signal' || !this.data.signalId) {
+      this.snack.open('No signal id available.', 'OK', { duration: 2000 });
+      return;
+    }
+    const ref = this.dialog.open(ConfirmDialogComponent, {
+      data: {
+        title: 'Delete Signal?',
+        message: 'This signal will be deleted permanently.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel',
+        warn: true
+      }
+    });
+
+    ref.afterClosed().subscribe(ok => {
+      if (!ok) return;
+      if (this.actionBusy()) return;
+      this.actionBusy.set(true);
+      this.dsa.deleteSignal(this.data.signalId!).subscribe({
+        next: () => {
+          this.snack.open('Signal deleted.', 'OK', { duration: 2500 });
+          this.ref.close(true);
+        },
+        error: () => this.actionBusy.set(false)
+      });
+    });
   }
 
   translateMessage() {

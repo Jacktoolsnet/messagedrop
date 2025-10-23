@@ -52,7 +52,7 @@
     <!-- Liste -->
     <div class="tiles-container">
         @for (s of signals(); track trackById($index, s)) {
-        <mat-card class="tile">
+        <mat-card class="tile" (click)="openDetail(s)" tabindex="0" (keydown.enter)="openDetail(s)">
             <mat-card-header>
                 <div mat-card-avatar class="avatar" [matBadge]="isNew(s) ? 'new' : ''" [matBadgeHidden]="!isNew(s)">
                     <mat-icon>info</mat-icon>
@@ -73,84 +73,13 @@
                     </span>
 
                     @if (s.contentUrl) {
-                    <a [href]="s.contentUrl" target="_blank" rel="noopener">
+                    <a [href]="s.contentUrl" target="_blank" rel="noopener" (click)="$event.stopPropagation()">
                         <mat-icon>open_in_new</mat-icon>
                         Open content
                     </a>
                     }
                 </div>
-
-                <!-- Message -->
-                <div class="snippet">
-                    <div class="snippet-header">
-                        <mat-icon>text_snippet</mat-icon>
-                        <span>Message</span>
-                        <span class="spacer"></span>
-                        <button mat-icon-button matTooltip="Translate to German" (click)="translateMessage(s)"
-                            [disabled]="!getMessage(s)">
-                            <mat-icon>translate</mat-icon>
-                        </button>
-                    </div>
-
-                    @if (getMessage(s); as m) {
-                    <div class="snippet-text">{{ m }}</div>
-                    @if (translatedMessage(s.id)) {
-                    <div class="snippet-translation">
-                        <mat-icon>g_translate</mat-icon>
-                        {{ translatedMessage(s.id) }}
-                    </div>
-                    }
-                    } @else {
-                    <div class="placeholder">
-                        <mat-icon>info</mat-icon>
-                        Message not provided
-                    </div>
-                    }
-                </div>
-
-                <!-- Reason -->
-                <div class="snippet">
-                    <div class="snippet-header">
-                        <mat-icon>report</mat-icon>
-                        <span>Reason</span>
-                        <span class="spacer"></span>
-                        <button mat-icon-button matTooltip="Translate to German" (click)="translateReason(s)"
-                            [disabled]="!s.reasonText">
-                            <mat-icon>translate</mat-icon>
-                        </button>
-                    </div>
-
-                    @if (s.reasonText) {
-                    <div class="snippet-text">{{ s.reasonText }}</div>
-                    @if (translatedReason(s.id)) {
-                    <div class="snippet-translation">
-                        <mat-icon>g_translate</mat-icon>
-                        {{ translatedReason(s.id) }}
-                    </div>
-                    }
-                    } @else {
-                    <div class="placeholder">
-                        <mat-icon>info</mat-icon>
-                        Reason not provided
-                    </div>
-                    }
-                </div>
             </mat-card-content>
-
-            <mat-card-actions align="end">
-                <button mat-stroked-button (click)="openDetail(s)">
-                    <mat-icon>visibility</mat-icon>
-                    Details
-                </button>
-                <button mat-raised-button color="warn" (click)="dismiss(s)">
-                    <mat-icon>delete</mat-icon>
-                    Dismiss
-                </button>
-                <button mat-raised-button color="primary" (click)="promote(s)">
-                    <mat-icon>upgrade</mat-icon>
-                    Promote
-                </button>
-            </mat-card-actions>
         </mat-card>
         }
     </div>
