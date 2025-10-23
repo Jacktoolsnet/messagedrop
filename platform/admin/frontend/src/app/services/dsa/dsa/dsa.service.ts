@@ -479,6 +479,23 @@ export class DsaService {
       );
   }
 
+  /** Capture server-side screenshot and attach as file evidence */
+  addEvidenceScreenshot(
+    noticeId: string,
+    payload: { url: string; fullPage?: boolean; viewport?: { width?: number; height?: number } }
+  ) {
+    return this.http.post<{ id: string }>(`${this.baseUrl}/notices/${noticeId}/evidence/screenshot`, payload)
+      .pipe(
+        catchError(err => {
+          const msg = err?.error?.error === 'screenshot_unavailable'
+            ? 'Screenshot service not available on server.'
+            : 'Could not create screenshot evidence.';
+          this.snack.open(msg, 'OK', { duration: 3000 });
+          throw err;
+        })
+      );
+  }
+
   getDecisionForNotice(noticeId: string) {
     return this.http.get<DsaDecision | null>(`${this.baseUrl}/notices/${noticeId}/decision`);
   }

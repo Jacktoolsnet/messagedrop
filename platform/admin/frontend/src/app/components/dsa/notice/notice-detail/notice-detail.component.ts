@@ -6,6 +6,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { environment } from '../../../../../environments/environment';
 import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
@@ -48,6 +49,8 @@ export class NoticeDetailComponent implements OnInit {
   private dsa = inject(DsaService);
   private http = inject(HttpClient);
   private dialog = inject(MatDialog);
+  private snack = inject(MatSnackBar);
+  makingScreenshot = signal(false);
 
   @ViewChild('evidenceList')
   private evidenceList?: EvidenceListComponent;
@@ -171,6 +174,21 @@ export class NoticeDetailComponent implements OnInit {
   externalLink(): string | null {
     const c = this.contentObj();
     return this.notice().contentUrl || c?.multimedia?.sourceUrl || null;
+  }
+
+  addScreenshotEvidence(): void {
+    const url = this.externalLink();
+    if (!url || this.makingScreenshot()) return;
+    this.makingScreenshot.set(true);
+    this.dsa.addEvidenceScreenshot(this.notice().id, { url, fullPage: true, viewport: { width: 1280, height: 800 } })
+      .subscribe({
+        next: () => {
+          this.makingScreenshot.set(false);
+          this.evidenceList?.load();
+          this.snack.open('Screenshot added as evidence.', 'OK', { duration: 2500 });
+        },
+        error: () => this.makingScreenshot.set(false)
+      });
   }
 
   private ensureUnderReview(): void {

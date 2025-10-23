@@ -124,13 +124,18 @@
                         <div class="tenor-wrap"><img [src]="gif" alt="tenor gif" /></div>
                         }
 
-                        <!-- Open original -->
+                        <!-- Open original + Add to evidence (screenshot) -->
                         @if (hasExternalLink()) {
                         <div class="block-actions">
                             <a mat-stroked-button class="external" [href]="externalLink()!" target="_blank"
                                 rel="noopener">
                                 <mat-icon>open_in_new</mat-icon> Open original
                             </a>
+                            <button mat-stroked-button class="external" type="button"
+                                    (click)="addScreenshotEvidence()" [disabled]="makingScreenshot()">
+                                <mat-icon>photo_camera</mat-icon>
+                                Add to evidence
+                            </button>
                         </div>
                         }
                         } @else {

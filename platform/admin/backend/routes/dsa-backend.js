@@ -792,6 +792,118 @@ router.post('/notices/:id/evidence', (req, res) => {
     });
 });
 
+/**
+ * POST /notices/:id/evidence/screenshot
+ * Body: { url: string; fullPage?: boolean; viewport?: { width?: number; height?: number } }
+ * Captures a server-side screenshot of the given URL and stores it as file-evidence.
+ * Notes:
+ *  - Requires Playwright (or Playwright Chromium) to be installed in the backend runtime.
+ *  - Applies basic SSRF protections (scheme/http(s), disallow local/priv ranges, localhost).
+ */
+router.post('/notices/:id/evidence/screenshot', async (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+
+    const rawUrl = asString(req.body?.url);
+    const fullPage = Boolean(req.body?.fullPage ?? true);
+    const viewport = req.body?.viewport || {};
+    const width = Number.isFinite(Number(viewport.width)) ? Number(viewport.width) : 1280;
+    const height = Number.isFinite(Number(viewport.height)) ? Number(viewport.height) : 800;
+
+    if (!rawUrl) return res.status(400).json({ error: 'url_required' });
+
+    let u;
+    try { u = new URL(rawUrl); } catch { return res.status(400).json({ error: 'invalid_url' }); }
+    if (!/^https?:$/.test(u.protocol)) {
+        return res.status(400).json({ error: 'unsupported_scheme' });
+    }
+    const hostLc = u.hostname.toLowerCase();
+    // naive SSRF guards (IP-literals and localhost names)
+    const isPrivateIp = (host) => {
+        // IPv4 patterns only (basic). IPv6 localhost also blocked.
+        if (host === 'localhost' || host === '::1') return true;
+        const m = host.match(/^(\d+)\.(\d+)\.(\d+)\.(\d+)$/);
+        if (!m) return false;
+        const a = m.slice(1).map(n => Number(n));
+        if (a[0] === 10) return true;
+        if (a[0] === 127) return true;
+        if (a[0] === 169 && a[1] === 254) return true; // link-local
+        if (a[0] === 192 && a[1] === 168) return true;
+        if (a[0] === 172 && a[1] >= 16 && a[1] <= 31) return true;
+        return false;
+    };
+    if (isPrivateIp(hostLc)) {
+        return res.status(400).json({ error: 'blocked_destination' });
+    }
+
+    // Lazy-load Playwright. Try full package then chromium-only.
+    let pw;
+    try {
+        pw = require('playwright');
+    } catch (_e1) {
+        try {
+            pw = require('playwright-chromium');
+        } catch (_e2) {
+            return res.status(501).json({ error: 'screenshot_unavailable', detail: 'playwright not installed' });
+        }
+    }
+
+    const now = Date.now();
+    const id = crypto.randomUUID();
+    const storedName = `${now}-${id}.png`;
+    const outPath = path.join(evidenceUploadDir, storedName);
+
+    let browser;
+    try {
+        browser = await pw.chromium.launch({
+            args: ['--no-sandbox', '--disable-dev-shm-usage'],
+            headless: true
+        });
+        const context = await browser.newContext({ viewport: { width, height } });
+        const page = await context.newPage();
+        await page.goto(u.toString(), { waitUntil: 'networkidle', timeout: 20000 });
+        await page.screenshot({ path: outPath, fullPage });
+        await context.close();
+    } catch (err) {
+        if (browser) try { await browser.close(); } catch { }
+        // cleanup any partial file
+        fs.promises.unlink(outPath).catch(() => { });
+        return res.status(502).json({ error: 'screenshot_failed', detail: err?.message || String(err) });
+    }
+
+    try { await browser.close(); } catch { }
+
+    // Store as file evidence
+    const fileName = `screenshot-${u.hostname}.png`;
+    const addedAt = now;
+    tableEvidence.create(
+        _db,
+        id,
+        req.params.id,
+        'file',
+        null,
+        null,
+        fileName,
+        storedName,
+        addedAt,
+        (err, row) => {
+            if (err) {
+                fs.promises.unlink(outPath).catch(() => { });
+                return res.status(500).json({ error: 'db_error', detail: err.message });
+            }
+
+            const auditId = crypto.randomUUID();
+            tableAudit.create(
+                _db, auditId, 'notice', req.params.id, 'evidence_add',
+                `admin:${req.admin?.sub || 'unknown'}`, addedAt,
+                JSON.stringify({ evidenceId: id, type: 'file', origin: 'screenshot', url: u.toString() }),
+                () => { }
+            );
+
+            res.status(201).json(row);
+        }
+    );
+});
+
 router.get('/notices/:id/evidence', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
 
