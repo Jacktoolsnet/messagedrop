@@ -18,12 +18,29 @@ mat-toolbar {
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+    display: flex;
+    align-items: center;
+    gap: .75rem;
 }
 
 .toolbar-title {
     font-weight: 600;
     font-size: 1.3rem;
     margin-left: 0.5rem;
+}
+
+.status-toggle {
+    background: rgba(5, 165, 29, 0.12);
+    border-radius: 999px;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-button {
+    padding: 0.3rem 0.9rem;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-checked {
+    background: rgba(5, 165, 29, 0.2);
+    color: #04730f;
 }
 
 .spacer {
@@ -46,7 +63,7 @@ mat-progress-bar {
 
 .filter-row {
     display: grid;
-    grid-template-columns: 200px 160px 220px 1fr;
+    grid-template-columns: 160px 220px 1fr;
     gap: 0.75rem;
     align-items: center;
 }

@@ -2,6 +2,7 @@ import { CommonModule, DatePipe } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -38,6 +39,7 @@ type NoticeStatusMeta = {
     MatToolbarModule,
     MatIconModule,
     MatButtonModule,
+    MatButtonToggleModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
@@ -67,7 +69,7 @@ export class EvidencesComponent implements OnInit, OnDestroy {
   };
 
   readonly filterForm = this.fb.nonNullable.group({
-    status: this.fb.nonNullable.control<DsaNoticeStatus[]>(['UNDER_REVIEW', 'DECIDED']),
+    status: this.fb.nonNullable.control<DsaNoticeStatus>('RECEIVED'),
     range: this.fb.nonNullable.control<DsaNoticeRange>('30d'),
     contentId: this.fb.control<string>(''),
     q: this.fb.control<string>(''),
@@ -94,6 +96,17 @@ export class EvidencesComponent implements OnInit, OnDestroy {
 
   reload(): void {
     this.load();
+  }
+
+  statusFilter(): DsaNoticeStatus {
+    return this.filterForm.controls.status.value;
+  }
+
+  setStatus(status: DsaNoticeStatus | null): void {
+    if (!status) return;
+    const control = this.filterForm.controls.status;
+    if (control.value === status) return;
+    control.setValue(status);
   }
 
   selectNotice(notice: DsaNotice): void {
@@ -179,7 +192,7 @@ export class EvidencesComponent implements OnInit, OnDestroy {
   private toFilters(): DsaNoticeFilters {
     const raw = this.filterForm.getRawValue();
     return {
-      status: raw.status?.length ? raw.status : undefined,
+      status: raw.status ? [raw.status] : undefined,
       contentId: raw.contentId?.trim() || undefined,
       q: raw.q?.trim() || undefined,
       range: raw.range || '30d',

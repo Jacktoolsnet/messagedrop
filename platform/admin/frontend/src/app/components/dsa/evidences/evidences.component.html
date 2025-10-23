@@ -4,6 +4,11 @@
     </button>
     <span class="toolbar-title">Evidence</span>
     <span class="spacer"></span>
+    <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
+        @for (status of statuses; track status) {
+        <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
+        }
+    </mat-button-toggle-group>
     <button mat-stroked-button color="primary" (click)="reload()">
         <mat-icon>refresh</mat-icon>
         Refresh
@@ -16,15 +21,6 @@
 
 <div class="page">
     <form class="filter-row" [formGroup]="filterForm" novalidate>
-        <mat-form-field appearance="outline">
-            <mat-label>Status</mat-label>
-            <mat-select formControlName="status" multiple>
-                <mat-option [value]="status" *ngFor="let status of statuses">
-                    {{ statusLabel(status) }}
-                </mat-option>
-            </mat-select>
-        </mat-form-field>
-
         <mat-form-field appearance="outline">
             <mat-label>Range</mat-label>
             <mat-select formControlName="range">
