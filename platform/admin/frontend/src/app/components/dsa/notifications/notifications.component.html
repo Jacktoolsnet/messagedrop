@@ -180,15 +180,15 @@
           }
         </div>
       } @else {
-        <div class="placeholder-card">
+        <div class="placeholder empty">
           <mat-icon>notifications_none</mat-icon>
-          <p>
+          <div class="placeholder-text">
             @if (selectedNotice()) {
               No notifications for this notice.
             } @else {
               Select a notice to view its notifications.
             }
-          </p>
+          </div>
         </div>
       }
     </div>
