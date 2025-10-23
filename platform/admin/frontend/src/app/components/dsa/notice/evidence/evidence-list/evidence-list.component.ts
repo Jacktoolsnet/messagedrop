@@ -28,6 +28,7 @@ export class EvidenceListComponent implements OnInit, OnChanges {
 
   loading = signal(false);
   items = signal<DsaEvidence[]>([]);
+  busy = signal<Record<string, boolean>>({});
 
   ngOnInit(): void {
     this.load();
@@ -47,6 +48,26 @@ export class EvidenceListComponent implements OnInit, OnChanges {
       error: () => this.snack.open('Could not load evidence.', 'OK', { duration: 3000 }),
       complete: () => this.loading.set(false)
     });
+  }
+
+  isBusy(id: string): boolean {
+    return !!this.busy()[id];
+  }
+
+  addScreenshotFromUrl(e: DsaEvidence): void {
+    if (e.type !== 'url' || !e.url) return;
+    if (!this.noticeId) return;
+    if (this.isBusy(e.id)) return;
+    this.busy.update(m => ({ ...m, [e.id]: true }));
+    this.dsa.addEvidenceScreenshot(this.noticeId, { url: e.url, fullPage: true, viewport: { width: 1280, height: 800 } })
+      .subscribe({
+        next: () => {
+          this.snack.open('Screenshot added.', 'OK', { duration: 2000 });
+          this.load();
+        },
+        error: () => { /* error snackbar handled in service */ },
+        complete: () => this.busy.update(m => ({ ...m, [e.id]: false }))
+      });
   }
 
   labelForType(type: string): string {

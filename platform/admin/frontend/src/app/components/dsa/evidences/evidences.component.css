@@ -286,12 +286,7 @@ mat-progress-bar {
     color: var(--muted);
 }
 
-.preview {
-    margin: 0;
-    font-size: 0.95rem;
-    line-height: 1.45;
-    color: var(--text);
-}
+
 
 .actions {
     display: flex;

@@ -132,16 +132,7 @@ export class EvidencesComponent implements OnInit, OnDestroy {
     return meta?.class ?? 'status-default';
   }
 
-  noticePreview(n: DsaNotice): string {
-    const obj = this.safeParse(n.reportedContent);
-    const candidates = [
-      obj?.message,
-      obj?.multimedia?.title,
-      obj?.multimedia?.description
-    ].map(v => (typeof v === 'string' ? v.trim() : ''));
-    const first = candidates.find(v => !!v);
-    return first || 'No description available.';
-  }
+  // preview text removed from UI
 
   openNoticeDetail(n: DsaNotice, event?: Event): void {
     event?.stopPropagation();

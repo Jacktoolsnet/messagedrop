@@ -75,6 +75,10 @@
                         <mat-icon>content_copy</mat-icon>
                         Copy
                     </button>
+                    <button mat-stroked-button type="button" (click)="addScreenshotFromUrl(e)" [disabled]="isBusy(e.id)">
+                        <mat-icon>photo_camera</mat-icon>
+                        Add screenshot
+                    </button>
                     }
                 </div>
             </div>
