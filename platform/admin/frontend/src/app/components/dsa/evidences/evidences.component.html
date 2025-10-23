@@ -97,7 +97,7 @@
                     </div>
                     }
 
-                    
+
 
                     <div class="actions">
                         <button mat-stroked-button color="primary" (click)="openNoticeDetail(n, $event)">
@@ -124,10 +124,12 @@
             </div>
             <app-evidence-list #evidenceList [noticeId]="current.id"></app-evidence-list>
             } @else {
+            @if (!loading() && notices().length !== 0) {
             <div class="placeholder">
                 <mat-icon>folder_open</mat-icon>
                 <p>Select a notice to view and add evidence.</p>
             </div>
+            }
             }
         </div>
     </div>

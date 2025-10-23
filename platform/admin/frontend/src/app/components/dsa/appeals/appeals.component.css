@@ -138,6 +138,8 @@ mat-toolbar {
   color: var(--muted);
 }
 
+.left-column .empty { margin-top: 0.5rem; }
+
 .empty mat-icon {
   font-size: 56px;
   width: 56px;

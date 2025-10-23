@@ -178,6 +178,7 @@
       </div>
       } @else {
       <div class="placeholder empty">
+        @if(!emptyNotices()){
         <mat-icon>notifications_none</mat-icon>
         <div class="placeholder-text">
           @if (selectedNotice()) {
@@ -186,6 +187,7 @@
           Select a notice to view its notifications.
           }
         </div>
+        }
       </div>
       }
     </div>

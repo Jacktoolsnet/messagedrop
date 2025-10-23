@@ -344,12 +344,18 @@ mat-progress-bar {
   border-radius: 16px;
   color: var(--muted);
   text-align: center;
-  min-height: 220px;
 }
 
 /* Align right placeholder icon with left list header icon height */
 .right-column .placeholder {
-  margin-top: 0.5rem; /* match .list-header padding-top */
+  margin-top: 0.5rem;
+  /* match .list-header padding-top */
+}
+
+/* Align left placeholder as well */
+.left-column .empty {
+  margin-top: 0.5rem;
+  /* match .list-header padding-top */
 }
 
 .placeholder mat-icon {

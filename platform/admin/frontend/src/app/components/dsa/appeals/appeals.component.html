@@ -18,7 +18,7 @@
 </mat-toolbar>
 
 @if (loading()) {
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
 <div class="page">
@@ -40,8 +40,8 @@
 
       <div class="notice-list">
         @for (appeal of appeals(); track trackById($index, appeal)) {
-        <mat-card class="notice-card" [class.selected]="isSelected(appeal)"
-                  (click)="selectAppeal(appeal)" tabindex="0" (keydown.enter)="selectAppeal(appeal)">
+        <mat-card class="notice-card" [class.selected]="isSelected(appeal)" (click)="selectAppeal(appeal)" tabindex="0"
+          (keydown.enter)="selectAppeal(appeal)">
           <div class="head">
             <div class="title" [matTooltip]="appeal.noticeContentId || 'No content id'">
               {{ appeal.noticeContentId || 'No content id' }}
@@ -75,7 +75,8 @@
 
           <div class="actions">
             @if (isOpen(appeal)) {
-            <button mat-stroked-button color="accent" type="button" (click)="$event.stopPropagation(); resolveAppeal(appeal)">
+            <button mat-stroked-button color="accent" type="button"
+              (click)="$event.stopPropagation(); resolveAppeal(appeal)">
               <mat-icon>done_all</mat-icon>
               Resolve appeal
             </button>
@@ -88,7 +89,7 @@
 
     <div class="right-column">
       @if (rightLoading()) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       }
 
       @if (selectedAppeal() && selectedNotice()) {
@@ -103,11 +104,26 @@
           <h3 class="tile-title">Overview</h3>
           <div class="tile-body">
             <div class="section">
-              <div class="kv"><div class="k">ID</div><div class="v mono">{{ selectedNotice()!.id }}</div></div>
-              <div class="kv"><div class="k">Created</div><div class="v">{{ selectedNotice()!.createdAt | date:'medium' }}</div></div>
-              <div class="kv"><div class="k">Type</div><div class="v">{{ selectedNotice()!.reportedContentType }}</div></div>
-              <div class="kv"><div class="k">Category</div><div class="v">{{ selectedNotice()!.category || '—' }}</div></div>
-              <div class="kv"><div class="k">Status</div><div class="v">{{ selectedNotice()!.status }}</div></div>
+              <div class="kv">
+                <div class="k">ID</div>
+                <div class="v mono">{{ selectedNotice()!.id }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Created</div>
+                <div class="v">{{ selectedNotice()!.createdAt | date:'medium' }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Type</div>
+                <div class="v">{{ selectedNotice()!.reportedContentType }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Category</div>
+                <div class="v">{{ selectedNotice()!.category || '—' }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Status</div>
+                <div class="v">{{ selectedNotice()!.status }}</div>
+              </div>
             </div>
           </div>
         </section>
@@ -122,15 +138,27 @@
               <mat-divider class="sp"></mat-divider>
               }
               <div class="meta">
-                <div class="kv"><div class="k">Content ID</div><div class="v mono">{{ selectedNotice()!.contentId }}</div></div>
+                <div class="kv">
+                  <div class="k">Content ID</div>
+                  <div class="v mono">{{ selectedNotice()!.contentId }}</div>
+                </div>
                 @if (c.userId) {
-                <div class="kv"><div class="k">User</div><div class="v mono">{{ c.userId }}</div></div>
+                <div class="kv">
+                  <div class="k">User</div>
+                  <div class="v mono">{{ c.userId }}</div>
+                </div>
                 }
                 @if (c.location?.plusCode) {
-                <div class="kv"><div class="k">PlusCode</div><div class="v mono">{{ c.location.plusCode }}</div></div>
+                <div class="kv">
+                  <div class="k">PlusCode</div>
+                  <div class="v mono">{{ c.location.plusCode }}</div>
+                </div>
                 }
                 @if (c.multimedia?.type) {
-                <div class="kv"><div class="k">Media</div><div class="v">{{ c.multimedia.type }}</div></div>
+                <div class="kv">
+                  <div class="k">Media</div>
+                  <div class="v">{{ c.multimedia.type }}</div>
+                </div>
                 }
               </div>
 
@@ -140,7 +168,8 @@
                   <mat-icon>open_in_new</mat-icon>
                   Open original
                 </a>
-                <button mat-stroked-button type="button" (click)="addScreenshotEvidence()" [disabled]="makingScreenshot()">
+                <button mat-stroked-button type="button" (click)="addScreenshotEvidence()"
+                  [disabled]="makingScreenshot()">
                   <mat-icon>photo_camera</mat-icon>
                   Add to evidence
                 </button>
@@ -157,10 +186,22 @@
           <h3 class="tile-title">Metadata</h3>
           <div class="tile-body">
             <div class="section">
-              <div class="kv"><div class="k">Reporter name</div><div class="v">{{ selectedNotice()!.reporterName || '—' }}</div></div>
-              <div class="kv"><div class="k">Reporter email</div><div class="v">{{ selectedNotice()!.reporterEmail || '—' }}</div></div>
-              <div class="kv"><div class="k">Truth affirmation</div><div class="v">{{ selectedNotice()!.truthAffirmation ? 'Yes' : '—' }}</div></div>
-              <div class="kv"><div class="k">Updated</div><div class="v">{{ selectedNotice()!.updatedAt | date:'medium' }}</div></div>
+              <div class="kv">
+                <div class="k">Reporter name</div>
+                <div class="v">{{ selectedNotice()!.reporterName || '—' }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Reporter email</div>
+                <div class="v">{{ selectedNotice()!.reporterEmail || '—' }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Truth affirmation</div>
+                <div class="v">{{ selectedNotice()!.truthAffirmation ? 'Yes' : '—' }}</div>
+              </div>
+              <div class="kv">
+                <div class="k">Updated</div>
+                <div class="v">{{ selectedNotice()!.updatedAt | date:'medium' }}</div>
+              </div>
             </div>
           </div>
         </section>
@@ -187,12 +228,14 @@
         </section>
       </div>
       } @else {
+      @if (!loading() && appeals().length !== 0) {
       <div class="placeholder empty">
         <mat-icon>notifications_none</mat-icon>
         <div class="placeholder-text">
           Select an appeal to view its summary.
         </div>
       </div>
+      }
       }
     </div>
   </div>
