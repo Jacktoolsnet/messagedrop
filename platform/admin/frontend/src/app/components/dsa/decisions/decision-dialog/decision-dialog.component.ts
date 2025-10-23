@@ -115,6 +115,7 @@ The content may remain temporarily restricted pending further evaluation.`
 
   selectedLegalDesc: string | null = null;
   selectedTosDesc: string | null = null;
+  selectedTemplate = '';
 
   ngOnInit(): void {
     // Seed comboboxes from form (if there were prefilled values)
@@ -139,6 +140,14 @@ The content may remain temporarily restricted pending further evaluation.`
     // Initialize descriptions on open
     this.selectedLegalDesc = this.lookupDesc(this.legalBases, this.legalCtrl.value || '');
     this.selectedTosDesc = this.lookupDesc(this.tosClauses, this.tosCtrl.value || '');
+
+    if (!this.form.get('statement')?.value && this.form.get('outcome')?.value === 'NO_ACTION') {
+      const defaultTemplate = this.reasoningTemplates[0]?.label;
+      if (defaultTemplate) {
+        this.selectedTemplate = defaultTemplate;
+        this.applyTemplate(defaultTemplate, true);
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -172,10 +181,16 @@ The content may remain temporarily restricted pending further evaluation.`
   }
 
   onTemplateChange(label: string) {
+    this.applyTemplate(label);
+  }
+
+  private applyTemplate(label: string, silent = false) {
     const tpl = this.reasoningTemplates.find(t => t.label === label);
     if (!tpl) return;
     this.form.get('statement')?.setValue(tpl.text); // visible immediately
-    this.snack.open('Reasoning template applied.', 'OK', { duration: 1800 });
+    if (!silent) {
+      this.snack.open('Reasoning template applied.', 'OK', { duration: 1800 });
+    }
   }
 
   close(): void { this.ref.close(false); }
