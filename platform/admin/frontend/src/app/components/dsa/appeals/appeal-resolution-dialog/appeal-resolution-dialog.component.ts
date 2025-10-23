@@ -31,16 +31,12 @@ export class AppealResolutionDialogComponent {
   private lastAutoReason: string | null = null;
   readonly outcomes = [
     { value: 'UPHELD', label: 'Decision upheld' },
-    { value: 'REVISED', label: 'Decision revised' },
-    { value: 'PARTIAL', label: 'Partially revised' },
-    { value: 'WITHDRAWN', label: 'Withdrawn' }
+    { value: 'REVISED', label: 'Decision revised' }
   ];
 
   private readonly standardTexts: Record<string, string> = {
     UPHELD: 'We reviewed the case and confirm that the original decision remains valid.',
-    REVISED: 'After reviewing the appeal we have revised the original decision accordingly.',
-    PARTIAL: 'The appeal is partially upheld. We adjusted the decision where appropriate.',
-    WITHDRAWN: 'The appeal has been withdrawn. No further action is required.'
+    REVISED: 'After reviewing the appeal we have revised the original decision accordingly.'
   };
 
   readonly form = this.fb.nonNullable.group({
