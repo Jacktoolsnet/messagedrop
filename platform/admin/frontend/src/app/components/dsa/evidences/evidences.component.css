@@ -30,17 +30,36 @@ mat-toolbar {
 }
 
 .status-toggle {
-    background: rgba(5, 165, 29, 0.12);
+    display: inline-flex;
+    align-items: center;
     border-radius: 999px;
+    padding: 2px;
+    border: 1px solid rgba(5, 165, 29, 0.25);
+    background: transparent;
+    height: 36px;
 }
 
 .status-toggle ::ng-deep .mat-button-toggle-button {
-    padding: 0.3rem 0.9rem;
+    padding: 0 1rem;
+    height: 32px;
+    line-height: 32px;
+    border-radius: 999px !important;
+    background: transparent !important;
+    color: inherit;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-button .mat-button-toggle-label-content {
+    line-height: 32px;
+    padding: 0;
 }
 
 .status-toggle ::ng-deep .mat-button-toggle-checked {
-    background: rgba(5, 165, 29, 0.2);
-    color: #04730f;
+    background: rgba(5, 165, 29, 0.2) !important;
+    color: #04730f !important;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-checked .mat-button-toggle-label-content {
+    color: #04730f !important;
 }
 
 .spacer {
