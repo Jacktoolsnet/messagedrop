@@ -4,7 +4,7 @@
     </button>
     <span class="toolbar-title">Evidence</span>
     <span class="spacer"></span>
-    <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
+    <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
         @for (status of statuses; track status) {
         <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
         }

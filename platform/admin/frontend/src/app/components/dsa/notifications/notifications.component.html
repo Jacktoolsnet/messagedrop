@@ -4,7 +4,7 @@
   </button>
   <span class="toolbar-title">Notifications</span>
   <span class="spacer"></span>
-  <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
+  <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
     @for (status of statuses; track status) {
     <mat-button-toggle [value]="status">{{ statusLabel(status) }}</mat-button-toggle>
     }
@@ -16,7 +16,7 @@
 </mat-toolbar>
 
 @if (loading()) {
-  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
 <div class="page">
@@ -53,139 +53,140 @@
 
       <div class="notice-list">
         @if (emptyNotices()) {
-          <div class="empty">
-            <mat-icon>inventory_2</mat-icon>
-            <p>No notices found for the selected filters.</p>
-          </div>
+        <div class="empty">
+          <mat-icon>inventory_2</mat-icon>
+          <p>No notices found for the selected filters.</p>
+        </div>
         }
 
         @for (notice of notices(); track trackNotice($index, notice)) {
-          <mat-card class="notice-card" [class.selected]="isSelected(notice)" (click)="selectNotice(notice)">
-            <div class="head">
-              <div class="title" [matTooltip]="notice.contentId || 'No content id'">
-                {{ notice.contentId || 'No content id' }}
-              </div>
-              <div class="head-right">
-                @if (isSelected(notice)) {
-                  <span class="active-pill">
-                    <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
-                    Active
-                  </span>
-                }
-                <span class="status-pill" [ngClass]="statusClass(notice.status)">
-                  <mat-icon aria-hidden="true">{{ statusIcon(notice.status) }}</mat-icon>
-                  {{ statusLabel(notice.status) }}
-                </span>
-              </div>
+        <mat-card class="notice-card" [class.selected]="isSelected(notice)" (click)="selectNotice(notice)">
+          <div class="head">
+            <div class="title" [matTooltip]="notice.contentId || 'No content id'">
+              {{ notice.contentId || 'No content id' }}
             </div>
-
-            <div class="meta">
-              <span>
-                <mat-icon aria-hidden="true">event</mat-icon>
-                {{ notice.createdAt | date:'medium' }}
+            <div class="head-right">
+              @if (isSelected(notice)) {
+              <span class="active-pill">
+                <mat-icon aria-hidden="true">radio_button_checked</mat-icon>
+                Active
               </span>
-              <span>
-                <mat-icon aria-hidden="true">update</mat-icon>
-                {{ notice.updatedAt | date:'medium' }}
+              }
+              <span class="status-pill" [ngClass]="statusClass(notice.status)">
+                <mat-icon aria-hidden="true">{{ statusIcon(notice.status) }}</mat-icon>
+                {{ statusLabel(notice.status) }}
               </span>
             </div>
+          </div>
 
-            @if (notice.category) {
-              <div class="category">
-                <mat-icon aria-hidden="true">category</mat-icon>
-                {{ notice.category }}
-              </div>
-            }
+          <div class="meta">
+            <span>
+              <mat-icon aria-hidden="true">event</mat-icon>
+              {{ notice.createdAt | date:'medium' }}
+            </span>
+            <span>
+              <mat-icon aria-hidden="true">update</mat-icon>
+              {{ notice.updatedAt | date:'medium' }}
+            </span>
+          </div>
 
-            <p class="preview">{{ noticePreview(notice) }}</p>
+          @if (notice.category) {
+          <div class="category">
+            <mat-icon aria-hidden="true">category</mat-icon>
+            {{ notice.category }}
+          </div>
+          }
 
-            <div class="actions">
-              <button mat-stroked-button color="primary" type="button" (click)="openNoticeDetail(notice, $event)">
-                <mat-icon>open_in_new</mat-icon>
-                Open notice
-              </button>
-            </div>
-          </mat-card>
+          <p class="preview">{{ noticePreview(notice) }}</p>
+
+          <div class="actions">
+            <button mat-stroked-button color="primary" type="button" (click)="openNoticeDetail(notice, $event)">
+              <mat-icon>open_in_new</mat-icon>
+              Open notice
+            </button>
+          </div>
+        </mat-card>
         }
       </div>
     </div>
 
     <div class="right-column">
       @if (notificationsLoading()) {
-        <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
       }
 
       @if (selectedNotice() && notifications().length > 0) {
-        <div class="notification-list">
-          <div class="notification-list-header">
+      <div class="notification-list">
+        <div class="notification-list-header">
+          <div class="badge">
+            <mat-icon aria-hidden="true">notifications</mat-icon>
+            Notifications
+          </div>
+          <button mat-stroked-button color="primary" type="button" class="add-button"
+            (click)="openNewNotificationDialog(selectedNotice()!)">
+            <mat-icon aria-hidden="true">add</mat-icon>
+            Add notification
+          </button>
+        </div>
+
+        @for (notification of notifications(); track trackNotification($index, notification)) {
+        <mat-card class="notification-card" [class.failed]="notification.meta?.success === false">
+          <div class="notification-head">
             <div class="badge">
-              <mat-icon aria-hidden="true">notifications</mat-icon>
-              Notifications
+              <mat-icon aria-hidden="true">{{ channelIcon(notification) }}</mat-icon>
+              <span>{{ notification.channel }}</span>
             </div>
-            <button mat-stroked-button color="primary" type="button" class="add-button" (click)="openNewNotificationDialog(selectedNotice()!)">
-              <mat-icon aria-hidden="true">add</mat-icon>
-              Add notification
+            <span class="sent-at">{{ notification.sentAt | date:'medium' }}</span>
+          </div>
+
+          <div class="meta-line">
+            <mat-icon aria-hidden="true">person</mat-icon>
+            <span>{{ notification.stakeholder }}</span>
+          </div>
+
+          <div class="meta-line">
+            <mat-icon aria-hidden="true">event</mat-icon>
+            <span>{{ eventLabel(notification) }}</span>
+          </div>
+
+          @if (notification.meta?.error) {
+          <div class="meta-line error">
+            <mat-icon aria-hidden="true">error</mat-icon>
+            <span>{{ notification.meta?.error }}</span>
+          </div>
+          }
+
+          <div class="payload">
+            <div class="payload-header">
+              <span>Payload preview</span>
+              <button mat-button type="button" (click)="copyPayload(notification)">
+                <mat-icon>content_copy</mat-icon>
+                Copy JSON
+              </button>
+            </div>
+            <pre>{{ notification.payload | json }}</pre>
+          </div>
+
+          <div class="actions">
+            <button mat-stroked-button color="primary" type="button" (click)="resend(notification)">
+              <mat-icon>send</mat-icon>
+              Resend
             </button>
           </div>
-
-          @for (notification of notifications(); track trackNotification($index, notification)) {
-            <mat-card class="notification-card" [class.failed]="notification.meta?.success === false">
-              <div class="notification-head">
-                <div class="badge">
-                  <mat-icon aria-hidden="true">{{ channelIcon(notification) }}</mat-icon>
-                  <span>{{ notification.channel }}</span>
-                </div>
-                <span class="sent-at">{{ notification.sentAt | date:'medium' }}</span>
-              </div>
-
-              <div class="meta-line">
-                <mat-icon aria-hidden="true">person</mat-icon>
-                <span>{{ notification.stakeholder }}</span>
-              </div>
-
-              <div class="meta-line">
-                <mat-icon aria-hidden="true">event</mat-icon>
-                <span>{{ eventLabel(notification) }}</span>
-              </div>
-
-              @if (notification.meta?.error) {
-                <div class="meta-line error">
-                  <mat-icon aria-hidden="true">error</mat-icon>
-                  <span>{{ notification.meta?.error }}</span>
-                </div>
-              }
-
-              <div class="payload">
-                <div class="payload-header">
-                  <span>Payload preview</span>
-                  <button mat-button type="button" (click)="copyPayload(notification)">
-                    <mat-icon>content_copy</mat-icon>
-                    Copy JSON
-                  </button>
-                </div>
-                <pre>{{ notification.payload | json }}</pre>
-              </div>
-
-              <div class="actions">
-                <button mat-stroked-button color="primary" type="button" (click)="resend(notification)">
-                  <mat-icon>send</mat-icon>
-                  Resend
-                </button>
-              </div>
-            </mat-card>
+        </mat-card>
+        }
+      </div>
+      } @else {
+      <div class="placeholder empty">
+        <mat-icon>notifications_none</mat-icon>
+        <div class="placeholder-text">
+          @if (selectedNotice()) {
+          No notifications for this notice.
+          } @else {
+          Select a notice to view its notifications.
           }
         </div>
-      } @else {
-        <div class="placeholder empty">
-          <mat-icon>notifications_none</mat-icon>
-          <div class="placeholder-text">
-            @if (selectedNotice()) {
-              No notifications for this notice.
-            } @else {
-              Select a notice to view its notifications.
-            }
-          </div>
-        </div>
+      </div>
       }
     </div>
   </div>

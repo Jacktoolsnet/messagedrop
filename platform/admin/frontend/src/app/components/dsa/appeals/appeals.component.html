@@ -5,7 +5,7 @@
 
   <span class="toolbar-title">Appeals</span>
 
-  <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
+  <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
     <mat-button-toggle value="open">Open</mat-button-toggle>
     <mat-button-toggle value="resolved">Resolved</mat-button-toggle>
     <mat-button-toggle value="all">All</mat-button-toggle>

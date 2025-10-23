@@ -37,29 +37,40 @@ mat-toolbar {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  padding: 2px;
+  padding: 3px;
   border: 1px solid rgba(5, 165, 29, 0.25);
   background: transparent;
-  height: 36px;
+  gap: 2px;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle {
+  border: none;
+  border-radius: 999px !important;
 }
 
 .status-toggle ::ng-deep .mat-button-toggle-button {
-  padding: 0 1rem;
-  height: 32px;
-  line-height: 32px;
+  padding: 0 1.1rem;
+  min-height: 32px;
   border-radius: 999px !important;
   background: transparent !important;
   color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .status-toggle ::ng-deep .mat-button-toggle-button .mat-button-toggle-label-content {
-  line-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  line-height: 28px;
   padding: 0;
 }
 
 .status-toggle ::ng-deep .mat-button-toggle-checked {
-  background: rgba(5, 165, 29, 0.2) !important;
+  background: rgba(5, 165, 29, 0.18) !important;
   color: #04730f !important;
+  box-shadow: inset 0 0 0 1px rgba(5, 165, 29, 0.25);
 }
 
 .status-toggle ::ng-deep .mat-button-toggle-checked .mat-button-toggle-label-content {
