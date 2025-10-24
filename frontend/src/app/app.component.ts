@@ -28,10 +28,10 @@ import { MessagelistComponent } from './components/messagelist/messagelist.compo
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
+import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { DeleteUserComponent } from './components/user/delete-user/delete-user.component';
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
-import { SystemMessageDialogComponent } from './components/system-messages/system-message-dialog/system-message-dialog.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -563,11 +563,12 @@ export class AppComponent implements OnInit {
 
     const dialogRef = this.dialog.open(SystemMessageDialogComponent, {
       closeOnNavigation: true,
-      minWidth: '320px',
-      maxWidth: '90vw',
+      minHeight: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true,
-      autoFocus: false
+      minWidth: '90vw',
+      maxWidth: '90vw',
+      autoFocus: false,
+      hasBackdrop: true
     });
 
     dialogRef.afterClosed().subscribe(() => {

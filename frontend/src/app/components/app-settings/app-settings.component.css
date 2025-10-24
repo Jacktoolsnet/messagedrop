@@ -78,20 +78,8 @@ h4 {
 
     ::ng-deep .mat-icon {
         font-size: 1.5rem;
+        padding-right: 0.25rem;
     }
-}
-
-/* Slide toggle row */
-.toggle-row {
-    display: block;
-    width: 100%;
-    margin-top: 1rem;
-    /* gewünschter Abstand nach oben */
-}
-
-/* Falls du den Toggle über die ganze Breite möchtest */
-.toggle-row mat-slide-toggle {
-    width: 100%;
 }
 
 .version-chipset mat-chip {

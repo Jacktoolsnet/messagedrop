@@ -3,12 +3,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 @Component({
-  selector: 'app-delete-system-notification',
+  selector: 'app-delete-all-system-notification',
   standalone: true,
   imports: [MatButtonModule, MatDialogTitle, MatDialogContent, MatDialogActions, MatDialogClose],
-  templateUrl: './delete-system-notification.component.html',
-  styleUrl: './delete-system-notification.component.css'
+  templateUrl: './delete-all-system-notification.component.html',
+  styleUrl: './delete-all-system-notification.component.css'
 })
-export class DeleteSystemNotificationComponent {
-  constructor(public dialogRef: MatDialogRef<DeleteSystemNotificationComponent>) { }
+export class DeleteAllSystemNotificationComponent {
+  constructor(public dialogRef: MatDialogRef<DeleteAllSystemNotificationComponent>) { }
 }

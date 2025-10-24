@@ -7,10 +7,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { firstValueFrom } from 'rxjs';
 import { SystemNotification, SystemNotificationFilter } from '../../../interfaces/system-notification';
 import { SystemNotificationService } from '../../../services/system-notification.service';
+import { DeleteAllSystemNotificationComponent } from '../delete-all-system-notification/delete-all-system-notification.component';
 import { DeleteSystemNotificationComponent } from '../delete-system-notification/delete-system-notification.component';
-import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-system-message-dialog',
@@ -73,6 +74,10 @@ export class SystemMessageDialogComponent implements OnInit {
     }
     this.selectedNotification.set(null);
     await this.systemNotificationService.loadNotifications(nextFilter);
+  }
+
+  async reloadNotifications(): Promise<void> {
+    await this.systemNotificationService.loadNotifications(this.currentFilter());
   }
 
   async selectNotification(notification: SystemNotification, event?: MouseEvent): Promise<void> {
@@ -146,6 +151,34 @@ export class SystemMessageDialogComponent implements OnInit {
           this.selectedNotification.set(null);
         }
       }
+    } catch {
+      // error already surfaced via snackbar
+    }
+  }
+
+  async confirmDeleteAll(event?: MouseEvent): Promise<void> {
+    event?.stopPropagation();
+    const dialogRef = this.dialog.open(DeleteAllSystemNotificationComponent, {
+      width: '320px'
+    });
+
+    const confirmed = await firstValueFrom(dialogRef.afterClosed());
+    if (confirmed) {
+      await this.deleteAllNotification();
+    }
+  }
+
+  private async deleteAllNotification(): Promise<void> {
+    try {
+      this.notifications().forEach(async (notif) => {
+        const deleted = await this.systemNotificationService.deleteNotifications([notif.uuid]);
+        if (deleted > 0) {
+          const current = this.selectedNotification();
+          if (current?.uuid === notif.uuid) {
+            this.selectedNotification.set(null);
+          }
+        }
+      });
     } catch {
       // error already surfaced via snackbar
     }

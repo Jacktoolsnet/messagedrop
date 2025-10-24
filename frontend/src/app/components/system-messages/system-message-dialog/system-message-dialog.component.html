@@ -8,6 +8,9 @@
   </div>
   } @else {
   <div class="dialog-title">
+    <button mat-icon-button class="back-button" (click)="reloadNotifications()" aria-label="Back to system messages">
+      <mat-icon class="material-symbols-outlined">refresh</mat-icon>
+    </button>
     <span class="dialog-title__text">System messages</span>
   </div>
   }
@@ -65,8 +68,8 @@
                 {{ detail.status === 'unread' ? 'mark_email_read' : 'mark_email_unread' }}
               </mat-icon>
             </button>
-            <button mat-icon-button color="warn" matTooltip="Delete message"
-              (click)="confirmDelete(detail, $event)" aria-label="Delete message">
+            <button mat-icon-button color="warn" matTooltip="Delete message" (click)="confirmDelete(detail, $event)"
+              aria-label="Delete message">
               <mat-icon class="material-symbols-outlined">delete</mat-icon>
             </button>
           </div>
@@ -142,8 +145,8 @@
             <mat-icon class="material-symbols-outlined">mark_email_unread</mat-icon>
           </button>
           }
-          <button mat-icon-button color="warn" matTooltip="Delete message"
-            (click)="confirmDelete(notification, $event)" aria-label="Delete message">
+          <button mat-icon-button color="warn" matTooltip="Delete message" (click)="confirmDelete(notification, $event)"
+            aria-label="Delete message">
             <mat-icon class="material-symbols-outlined">delete</mat-icon>
           </button>
         </div>
@@ -156,5 +159,11 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
+  @if (!selectedNotification()) {
+  <button mat-button color="warn" matTooltip="Delete all" (click)="confirmDeleteAll($event)" aria-label="Delete all">
+    Delete all
+    <mat-icon class="material-symbols-outlined">delete_sweep</mat-icon>
+  </button>
+  }
   <button mat-button (click)="close()">Close</button>
 </mat-dialog-actions>
