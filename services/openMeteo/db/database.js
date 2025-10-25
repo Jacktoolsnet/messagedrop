@@ -1,6 +1,8 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-// const tableUser = require('./tableUser');
+
+const tableAirQuality = require('./tableAirQuality');
+const tableWeather = require('./tableWeather');
 
 class Database {
 
@@ -18,7 +20,8 @@ class Database {
             logger.error(err.message);
           }
         });
-        // tableUser.init(this.db);
+        tableAirQuality.init(this.db);
+        tableWeather.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers(logger);

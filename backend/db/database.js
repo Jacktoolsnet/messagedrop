@@ -9,9 +9,7 @@ const tableLike = require('./tableLike');
 const tableDislike = require('./tableDislike');
 const tablePlace = require('./tablePlace');
 const tableWeatherHistory = require('./tableWeatherHistory');
-const tableAirQuality = require('./tableAirQuality');
 const tableNominatimCache = require('./tableNominatimCache');
-const tableWeather = require('./tableWeather');
 const tableGeoSearch = require('./tableGeoSearch');
 const tableNotification = require('./tableNotification');
 const tableGeoStatistic = require('./tableGeoStatistic');
@@ -42,9 +40,7 @@ class Database {
         tablePlace.init(this.db);
         tableGeoStatistic.init(this.db);
         tableWeatherHistory.init(this.db);
-        tableAirQuality.init(this.db);
         tableNominatimCache.init(this.db);
-        tableWeather.init(this.db);
         tableGeoSearch.init(this.db);
         tableNotification.init(this.db);
 

@@ -1,133 +1,81 @@
+// routes/weather.proxy.js
 const express = require('express');
 const router = express.Router();
-const security = require('../middleware/security');
 const axios = require('axios');
-const tableWeather = require('../db/tableWeather');
+const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 
+// Axios-Client für Upstream
+const client = axios.create({
+    baseURL: `${process.env.OPENMETEO_BASE_URL}:${process.env.OPENMETEO_PORT}/weather`,
+    timeout: 15_000,
+    validateStatus: () => true, // wir geben Statuscodes transparent weiter
+    headers: {
+        'content-type': 'application/json',
+        'x-api-authorization': process.env.BACKEND_TOKEN
+    }
+});
+
+// Eingehende Requests wie bisher absichern
 router.use(security.checkToken);
 
-router.get('/:locale/:pluscode/:latitude/:longitude/:days',
-    [
-        metric.count('weather', { when: 'always', timezone: 'utc', amount: 1 })
-    ]
-    , async (req, res) => {
-        const db = req.database.db;
-        const { locale, pluscode, latitude, longitude, days } = req.params;
-        const reducedPluscode = pluscode.substring(0, 8); // ≈100m Genauigkeit
-        const cacheKey = `${reducedPluscode}_${locale.toLowerCase().slice(0, 2)}`;
-        const maxAgeMs = 60 * 60 * 1000; // 1 Stunde
+// GET /weather/:locale/:pluscode/:latitude/:longitude/:days
+router.get('/:locale/:pluscode/:latitude/:longitude/:days', [
+    metric.count('weather', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res) => {
+    const { locale, pluscode, latitude, longitude, days } = req.params;
 
-        tableWeather.getWeatherData(db, cacheKey, async (err, row) => {
-            if (err) { }
+    try {
+        // Pfad im OpenMeteo-Service ggf. anpassen (z. B. '/openmeteo/weather/...').
+        const url = `/${encodeURIComponent(locale)}/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}/${encodeURIComponent(days)}`;
 
-            const lastUpdate = row?.lastUpdate ? new Date(row.lastUpdate) : null;
-            const isFresh = lastUpdate && Date.now() - lastUpdate.getTime() < maxAgeMs;
-
-            if (row && isFresh) {
-                return res.status(200).json({
-                    status: 200,
-                    data: JSON.parse(row.weatherData)
-                });
-            }
-
-            try {
-                const url = 'https://api.open-meteo.com/v1/forecast';
-                const params = {
-                    latitude,
-                    longitude,
-                    current_weather: true,
-                    hourly: 'temperature_2m,precipitation_probability,precipitation,uv_index,pressure_msl,windspeed_10m',
-                    daily: 'sunrise,sunset,temperature_2m_max,temperature_2m_min',
-                    forecast_days: days,
-                    timezone: 'auto',
-                    language: locale.toLowerCase().slice(0, 2)
-                };
-                const weatherRes = await axios.get(url, { params });
-
-                const dataString = JSON.stringify(weatherRes.data);
-                tableWeather.setWeatherData(db, cacheKey, dataString, (err) => { });
-
-                res.status(200).json({
-                    status: 200,
-                    data: weatherRes.data
-                });
-            } catch (err) {
-                const status = 500;
-                res.status(status).json({
-                    status,
-                    error: err
-                });
-            }
+        const upstream = await client.get(url, {
+            params: req.query, // Querystrings mit durchreichen (z. B. flags)
+            headers: {
+                'x-forwarded-host': req.get('host'),
+                'x-forwarded-proto': req.protocol,
+            },
         });
-    });
 
-router.get('/history/:pluscode/:latitude/:longitude/:years',
-    [
-        metric.count('weather.history', { when: 'always', timezone: 'utc', amount: 1 })
-    ]
-    , async (req, res) => {
-        let response = { status: 0 };
-        const db = req.database.db;
+        res.status(upstream.status).json(upstream.data);
+    } catch (err) {
+        console.error('[weather.proxy] upstream error:', err?.message || err);
+        const isAxios = !!err?.isAxiosError;
+        const status = isAxios ? (err.response?.status || 502) : 500;
+        const payload = isAxios
+            ? (err.response?.data || { status, error: 'Upstream request failed' })
+            : { status, error: 'Internal server error' };
+        res.status(status).json(payload);
+    }
+});
 
-        try {
-            const { pluscode, latitude, longitude, years } = req.params;
+// GET /weather/history/:pluscode/:latitude/:longitude/:years
+router.get('/history/:pluscode/:latitude/:longitude/:years', [
+    metric.count('weather.history', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res) => {
+    const { pluscode, latitude, longitude, years } = req.params;
 
-            const endDate = new Date();
-            const startDate = new Date();
-            startDate.setFullYear(endDate.getFullYear() - years);
+    try {
+        const url = `/history/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}/${encodeURIComponent(years)}`;
 
-            const reducedPluscode = pluscode.substring(0, 8); // ≈100m Genauigkeit
-            const cacheKey = `${reducedPluscode}_${years}`;
+        const upstream = await client.get(url, {
+            params: req.query,
+            headers: {
+                'x-forwarded-host': req.get('host'),
+                'x-forwarded-proto': req.protocol,
+            },
+        });
 
-            const cachedData = await new Promise((resolve, reject) => {
-                tableWeatherHistory.getHistoryData(db, cacheKey, (err, row) => {
-                    if (err) return reject(err);
-                    resolve(row);
-                });
-            });
-
-            if (cachedData) {
-                response.status = 200;
-                response.data = JSON.parse(cachedData.historyData);
-                return res.status(200).json(response);
-            }
-
-            const url = 'https://archive-api.open-meteo.com/v1/archive';
-            const params = {
-                latitude,
-                longitude,
-                start_date: startDate.toISOString().split('T')[0],
-                end_date: endDate.toISOString().split('T')[0],
-                temperature_2m_mean: 'true',
-                precipitation_sum: 'true',
-                timezone: 'auto'
-            };
-
-            const weatherRes = await axios.get(url, { params });
-            const historyData = weatherRes.data;
-
-            await new Promise((resolve, reject) => {
-                tableWeatherHistory.setHistoryData(
-                    db,
-                    cacheKey,
-                    JSON.stringify(historyData),
-                    (err) => {
-                        if (err) return reject(err);
-                        resolve();
-                    }
-                );
-            });
-
-            response.status = 200;
-            response.data = historyData;
-            res.status(200).json(response);
-
-        } catch (err) {
-            response.status = err.response?.status || 500;
-            response.error = err.response?.data || err.message || 'Request failed';
-            res.status(response.status).json(response);
-        }
-    });
+        res.status(upstream.status).json(upstream.data);
+    } catch (err) {
+        console.error('[weather.proxy.history] upstream error:', err?.message || err);
+        const isAxios = !!err?.isAxiosError;
+        const status = isAxios ? (err.response?.status || 502) : 500;
+        const payload = isAxios
+            ? (err.response?.data || { status, error: 'Upstream request failed' })
+            : { status, error: 'Internal server error' };
+        res.status(status).json(payload);
+    }
+});
 
 module.exports = router;

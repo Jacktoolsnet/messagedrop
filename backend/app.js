@@ -39,9 +39,7 @@ const tableConnect = require('./db/tableConnect');
 const tableMessage = require('./db/tableMessage')
 const tableGeoStatistic = require('./db/tableGeoStatistic');
 const tableWeatherHistory = require('./db/tableWeatherHistory');
-const tableAirQuality = require('./db/tableAirQuality');
 const tableNominatimCache = require('./db/tableNominatimCache.js');
-const tableWeather = require('./db/tableWeather');
 const tableGeoSearch = require('./db/tableGeoSearch')
 
 // ExpressJs
@@ -253,7 +251,7 @@ const geoStatisticLimit = rateLimit({
 
 const airQualtiyLimit = rateLimit({
   windowMs: 100 * 60 * 1000, // 1 minutes
-  limit: 10, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
+  limit: 50, // Limit each IP to 50 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: {
@@ -263,7 +261,7 @@ const airQualtiyLimit = rateLimit({
 
 const weatherLimit = rateLimit({
   windowMs: 100 * 60 * 1000, // 15 minutes
-  limit: 10, // Limit each IP to 3 requests per `window` (here, per 15 minutes)
+  limit: 500, // Limit each IP to 50 requests per `window` (here, per 15 minutes)
   standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
   message: {
@@ -352,21 +350,6 @@ cron.schedule('0 * * * *', () => {
 // Clean messages clsevery 5 minutes
 cron.schedule('*/5 * * * *', () => {
   tableMessage.cleanPublic(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
-
-// Clean short cached data.
-cron.schedule('*/1 * * * *', () => {
-  tableAirQuality.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableWeather.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
     }

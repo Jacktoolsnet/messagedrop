@@ -1,91 +1,58 @@
+// routes/airQuality.proxy.js
 const express = require('express');
 const router = express.Router();
-const security = require('../middleware/security');
 const axios = require('axios');
-const airQualityCache = require('../db/tableAirQuality');
 const metric = require('../middleware/metric');
+const security = require('../middleware/security');
 
+// Ein eigenes Axios-Client mit BaseURL + Backend-Token
+const client = axios.create({
+    baseURL: `${process.env.OPENMETEO_BASE_URL}:${process.env.OPENMETEO_PORT}/airquality`,
+    timeout: 15_000,
+    // wir wollen Fehlerstatus manuell durchreichen
+    validateStatus: () => true,
+    headers: {
+        'content-type': 'application/json',
+        'x-api-authorization': process.env.BACKEND_TOKEN
+    }
+});
+
+// Eingehende Requests weiterhin per App-Token absichern
 router.use(security.checkToken);
 
-router.get('/:pluscode/:latitude/:longitude/:days',
-    [
-        metric.count('airquality', { when: 'always', timezone: 'utc', amount: 1 })
-    ]
-    , async (req, res) => {
-        const db = req.database.db;
-        const { pluscode, latitude, longitude, days } = req.params;
-        const response = { status: 0 };
+// GET /airquality/:pluscode/:latitude/:longitude/:days  (alter Pfad beibehalten)
+router.get('/:pluscode/:latitude/:longitude/:days', [
+    metric.count('airquality', { when: 'always', timezone: 'utc', amount: 1 })
+], async (req, res) => {
+    const { pluscode, latitude, longitude, days } = req.params;
 
-        try {
-            const reducedPluscode = pluscode.substring(0, 8); // ≈100m Genauigkeit
-            const cacheKey = `${reducedPluscode}`;
+    try {
+        // Wir proxien 1:1 an den neuen Service:
+        const url = `/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}/${encodeURIComponent(days)}`;
 
-            airQualityCache.getAirQualityData(db, cacheKey, async (err, row) => {
-                if (err) {
-                    response.status = 500;
-                    response.error = err;
-                    return res.status(response.status).json(response);
-                }
+        // Optional: Query/Headers aus der Original-Anfrage übernehmen (falls relevant)
+        const upstream = await client.get(url, {
+            params: req.query,
+            // falls du zusätzliche Forward-Header brauchst:
+            headers: {
+                'x-forwarded-host': req.get('host'),
+                'x-forwarded-proto': req.protocol,
+            },
+        });
 
-                if (row) {
-                    response.status = 200;
-                    response.data = JSON.parse(row.airQualityData);
-                    return res.status(200).json(response);
-                }
-
-                const hourlyParams = [
-                    'alder_pollen',
-                    'birch_pollen',
-                    'grass_pollen',
-                    'mugwort_pollen',
-                    'olive_pollen',
-                    'ragweed_pollen',
-                    'pm10',
-                    'pm2_5',
-                    'carbon_monoxide',
-                    'nitrogen_dioxide',
-                    'sulphur_dioxide',
-                    'ozone'
-                ].join(',');
-
-                const openMeteoUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&forecast_days=${days}&hourly=${hourlyParams}&timezone=auto`;
-
-                try {
-                    const apiResult = await axios.get(openMeteoUrl);
-                    if (!apiResult.data || Object.keys(apiResult.data).length === 0) {
-                        response.status = 204; // No content
-                        response.error = 'Empty data from Open-Meteo';
-                        return res.status(response.status).json(response);
-                    }
-
-                    response.status = 200;
-                    response.data = apiResult.data;
-
-                    airQualityCache.setAirQualityData(db, cacheKey, JSON.stringify(apiResult.data), (err) => {
-                        if (err) {
-                            console.warn('Cache write failed:', err);
-                        }
-                    });
-
-                    return res.status(200).json(response);
-                } catch (apiErr) {
-                    console.error('Axios error:', apiErr);
-                    if (apiErr.response?.status === 404) {
-                        response.status = 204; // No content
-                        response.error = 'No air quality data available for this location';
-                    } else {
-                        response.status = apiErr.response?.status || 500;
-                        response.error = apiErr.response?.data || 'Request to Open-Meteo failed';
-                    }
-                    return res.status(response.status).json(response);
-                }
-            });
-        } catch (err) {
-            console.error('Request error:', err);
-            response.status = 500;
-            response.error = 'Internal server error';
-            return res.status(response.status).json(response);
-        }
-    });
+        // Status & Body vom OpenMeteo-Service transparent weiterreichen
+        // (dein Service liefert bereits { status, data, error } – wir geben es unverändert aus)
+        res.status(upstream.status).json(upstream.data);
+    } catch (err) {
+        // Netzwerk-/Timeout-/Axios-Fehler
+        console.error('[airQuality.proxy] upstream error:', err?.message || err);
+        const isAxios = !!err?.isAxiosError;
+        const status = isAxios ? (err.response?.status || 502) : 500;
+        const payload = isAxios
+            ? (err.response?.data || { status, error: 'Upstream request failed' })
+            : { status, error: 'Internal server error' };
+        res.status(status).json(payload);
+    }
+});
 
 module.exports = router;

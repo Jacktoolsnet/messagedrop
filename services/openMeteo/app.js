@@ -9,11 +9,18 @@ const Database = require('./db/database');
 const database = new Database();
 const root = require('./routes/root');
 const check = require('./routes/check');
+const weather = require('./routes/weather');
+const airQualtiy = require('./routes/air-quality');
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
+
+// Table for crone jobs
+const tableAirQuality = require('./db/tableAirQuality');
+const tableWeather = require('./db/tableWeather');
+
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -43,7 +50,7 @@ const logFormat = winston.format.combine(
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-info-%DATE%.log',
+  filename: 'logs/openMeteo-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
@@ -52,7 +59,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-error-%DATE%.log',
+  filename: 'logs/openMeteo-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
@@ -168,6 +175,8 @@ app.use(headerMW())
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
+app.use('/airquality', airQualtiy);
+app.use('/weather', weather);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));
@@ -175,7 +184,7 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 (async () => {
   try {
     await generateOrLoadKeypairs();
-    server.listen(process.env.ADMIN_PORT, () => {
+    server.listen(process.env.OPENMETEO_PORT, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);
@@ -198,4 +207,17 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 // │ │ │ │ │ │
 // │ │ │ │ │ │
 // * * * * * *
-cron.schedule('5 0 * * *', () => { });
+// Clean short cached data.
+cron.schedule('*/1 * * * *', () => {
+  tableAirQuality.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableWeather.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+});
