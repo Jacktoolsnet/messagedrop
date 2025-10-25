@@ -175,7 +175,7 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 (async () => {
   try {
     await generateOrLoadKeypairs();
-    server.listen(process.env.ADMIN_PORT, () => {
+    server.listen(process.env.NOMINATIM_PORT, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);

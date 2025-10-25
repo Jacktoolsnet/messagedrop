@@ -49,8 +49,17 @@
             "type": "node"
         },
         {
-            "name": "OpenMeteo",
+            "name": "OpenMeteo-Service",
             "program": "${workspaceFolder}/services/openMeteo/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
+        },
+        {
+            "name": "Nominatim-Service",
+            "program": "${workspaceFolder}/services/nominatim/app.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"

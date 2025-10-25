@@ -9,7 +9,7 @@ class Database {
   }
 
   init(logger) {
-    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'openMeteo.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'nominatim.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
       if (err) {
         return;
       } else {
