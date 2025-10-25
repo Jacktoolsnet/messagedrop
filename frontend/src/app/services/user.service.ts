@@ -159,6 +159,7 @@ export class UserService {
     let user = await this.indexedDbService.getUser();
     if (user) {
       this.user.id = user.id;
+      this.loadProfile();
     }
   }
 

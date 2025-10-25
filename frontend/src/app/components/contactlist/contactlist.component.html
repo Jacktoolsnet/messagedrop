@@ -25,17 +25,12 @@
         @for (contact of contactsSignal(); track contact.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>
-                @if (contact.base64Avatar || contact.name) {
                 @if (contact.base64Avatar) {
                 <img class="avatar" [src]="contact.base64Avatar" />
-                }
-                @if (contact.name) {
-                <span class="name">{{ contact.name }}</span>
-                }
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
-                <span class="name">Unnamed</span>
                 }
+                <span class="name">{{ contact.name || 'Unnamed' }}</span>
             </mat-expansion-panel-header>
             <mat-card>
                 <mat-card-content (click)="openContactMessagDialog(contact)">

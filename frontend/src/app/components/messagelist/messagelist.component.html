@@ -32,11 +32,7 @@
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
-                @if (userProfile.name) {
-                <span class="name">{{ userProfile.name }}</span>
-                } @else {
-                <span class="name">Myself</span>
-                }
+                <span class="name">{{ userProfile.name || 'Myself' }}</span>
             </div>
             } @else {
             <div class="avatar-box" (click)="editMessageUserProfile(message)">
@@ -45,11 +41,7 @@
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
-                @if (profileService.getProfile(message.userId)?.name) {
-                <span class="name">{{ profileService.getProfile(message.userId)?.name }}</span>
-                } @else {
-                <span class="name">Unnamed</span>
-                }
+                <span class="name">{{ profileService.getProfile(message.userId)?.name || 'Unnamed' }}</span>
             </div>
             }
 
@@ -161,11 +153,7 @@
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
-                @if (userProfile.name) {
-                <span class="name">{{ userProfile.name }}</span>
-                } @else {
-                <span class="name">Myself</span>
-                }
+                <span class="name">{{ userProfile.name || 'Myself' }}</span>
             </div>
             } @else {
             <div class="avatar-box" (click)="editMessageUserProfile(message)">
@@ -174,11 +162,7 @@
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
-                @if (profileService.getProfile(message.userId)?.name) {
-                <span class="name">{{ profileService.getProfile(message.userId)?.name }}</span>
-                } @else {
-                <span class="name">Unnamed</span>
-                }
+                <span class="name">{{ profileService.getProfile(message.userId)?.name || 'Unnamed'}}</span>
             </div>
             }
 
