@@ -4,18 +4,17 @@ const tableUser = require('./tableUser');
 const tableConnect = require('./tableConnect');
 const tableContact = require('./tableContact');
 const tableContactMessage = require('./tableContactMessage');
-const tableStatistic = require('./tableStatistic');
 const tableMessage = require('./tableMessage');
 const tableLike = require('./tableLike');
 const tableDislike = require('./tableDislike');
 const tablePlace = require('./tablePlace');
-const tableGeoStatistic = require('./tableGeoStatistic');
 const tableWeatherHistory = require('./tableWeatherHistory');
 const tableAirQuality = require('./tableAirQuality');
 const tableNominatimCache = require('./tableNominatimCache');
 const tableWeather = require('./tableWeather');
 const tableGeoSearch = require('./tableGeoSearch');
 const tableNotification = require('./tableNotification');
+const tableGeoStatistic = require('./tableGeoStatistic');
 
 class Database {
 
@@ -37,7 +36,6 @@ class Database {
         tableConnect.init(this.db);
         tableContact.init(this.db);
         tableContactMessage.init(this.db);
-        tableStatistic.init(this.db);
         tableMessage.init(this.db);
         tableLike.init(this.db);
         tableDislike.init(this.db);

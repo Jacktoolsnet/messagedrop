@@ -8,7 +8,7 @@ router.use(security.checkToken);
 
 router.get('/',
     [
-        metric.count('clientconnect', { when: 'always', timezone: 'utc', amount: 1 })
+        metric.count('client.connect', { when: 'always', timezone: 'utc', amount: 1 })
     ]
     , async (req, res) => {
         let response = { 'status': 0 };

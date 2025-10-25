@@ -1,7 +1,7 @@
 {
-  "name": "messagedrop-admin-backend",
+  "name": "messagedrop-openmeteo-service",
   "version": "1.0.0",
-  "description": "Backend for messagedrop admin frontend.",
+  "description": "Backend service for Messagedrop to fetch weather data from OpenMeteo API",
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -23,28 +23,22 @@
   },
   "homepage": "https://github.com/Jacktoolsnet/messagedrop#readme",
   "dependencies": {
-    "axios": "^1.8.4",
+    "axios": "^1.12.2",
     "bcrypt": "^6.0.0",
-    "body-parser": "^1.20.2",
-    "compression": "^1.8.0",
+    "body-parser": "^2.2.0",
+    "compression": "^1.8.1",
     "cors": "^2.8.5",
-    "deepl-node": "^1.19.1",
-    "dotenv": "^16.4.5",
-    "express": "^5.0.1",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
     "express-bearer-token": "^3.0.0",
-    "express-rate-limit": "^7.5.0",
+    "express-rate-limit": "^8.1.0",
     "geo-tz": "^8.1.4",
-    "helmet": "^8.0.0",
+    "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^1.4.5-lts.1",
-    "node-cron": "^3.0.3",
-    "nodemailer": "^7.0.9",
-    "openai": "^4.86.2",
-    "playwright-chromium": "^1.56.1",
-    "socket.io": "^4.8.0",
+    "node-cron": "^4.2.1",
+    "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
-    "web-push": "^3.6.7",
-    "winston": "^3.14.2",
+    "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
   }
 }

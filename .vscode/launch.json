@@ -47,6 +47,15 @@
                 "<node_internals>/**"
             ],
             "type": "node"
+        },
+        {
+            "name": "OpenMeteo",
+            "program": "${workspaceFolder}/services/openMeteo/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
         }
     ]
 }

@@ -1,15 +1,6 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-const tableUser = require('./tableUser');
-const tableDsaSignal = require('./tableDsaSignal');
-const tableDsaNotice = require('./tableDsaNotice');
-const tableDsaEvidence = require('./tableDsaEvidence');
-const tableDsaDecision = require('./tableDsaDecision');
-const tableDsaAppeal = require('./tableDsaAppeal');
-const tableDsaNotification = require('./tableDsaNotification');
-const tableDsaAuditLog = require('./tableDsaAuditLog');
-const tableStatistic = require('./tableStatistic');
-
+// const tableUser = require('./tableUser');
 
 class Database {
 
@@ -27,15 +18,7 @@ class Database {
             logger.error(err.message);
           }
         });
-        tableUser.init(this.db);
-        tableDsaSignal.init(this.db);
-        tableDsaNotice.init(this.db);
-        tableDsaEvidence.init(this.db);
-        tableDsaDecision.init(this.db);
-        tableDsaAppeal.init(this.db);
-        tableDsaNotification.init(this.db);
-        tableDsaAuditLog.init(this.db);
-        tableStatistic.init(this.db);
+        // tableUser.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers(logger);

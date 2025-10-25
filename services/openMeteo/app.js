@@ -7,16 +7,8 @@ const loggerMw = require('./middleware/logger');
 const headerMW = require('./middleware/header')
 const Database = require('./db/database');
 const database = new Database();
-const tableStatistic = require('./db/tableStatistic');
 const root = require('./routes/root');
 const check = require('./routes/check');
-const translate = require('./routes/translate');
-const clientConnect = require('./routes/client-connect');
-const dsaFrontend = require('./routes/dsa-frontend');
-const dsaBackend = require('./routes/dsa-backend');
-const user = require('./routes/user');
-const publicStatus = require('./routes/public-status');
-const statistic = require('./routes/statistic');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -90,8 +82,6 @@ if (process.env.NODE_ENV !== 'production') {
  * Disable Apache proxymode in Plesk to avoid socket.io connection errors.
  */
 const { Server } = require('socket.io');
-const contactHandlers = require("./socketIo/contactHandlers");
-const userHandlers = require('./socketIo/userHandlers');
 const server = createServer(app);
 const io = new Server(server, {
   maxHttpBufferSize: 5.5 * 1024 * 1024,
@@ -134,8 +124,6 @@ const onConnection = (socket) => {
   });
 
   // Eigentliche Handler laden
-  // userHandlers(io, socket);
-  // contactHandlers(io, socket);
 };
 
 // Socket.io: neue Verbindung
@@ -207,18 +195,6 @@ app.use(headerMW())
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
-app.use('/clientconnect', clientConnect);
-app.use('/user', user);
-app.use('/translate', translate);
-app.use('/statistic', statistic);
-
-
-// DSA
-app.use('/dsa/frontend', dsaFrontend);
-app.use('/dsa/backend', dsaBackend);
-
-// Public status endpoints
-app.use('/public', publicStatus);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));
@@ -249,10 +225,4 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 // │ │ │ │ │ │
 // │ │ │ │ │ │
 // * * * * * *
-cron.schedule('5 0 * * *', () => {
-  tableStatistic.clean(database.db, (err) => {
-    if (err) {
-      logger.error(err);
-    }
-  });
-});
+cron.schedule('5 0 * * *', () => { });
