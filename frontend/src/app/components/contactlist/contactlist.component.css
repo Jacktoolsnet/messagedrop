@@ -1,6 +1,17 @@
 :host {
   color: var(--mat-app-text-color);
+  --avatar-h: 3rem;
+  /* Höhe der Avatar-Box */
+  --avatar-out: 1rem;
+  /* wie weit über den Rand hinausragen */
+  --msg-maxw: 85%;
+  /* max. Breite einer Chatzeile */
+  /* Basis: Material Outlined Card Outline als neutraler Rahmen */
+  --bubble-outline: var(--mat-card-outlined-outline-color);
+  /* zarter Shadow nutzt ebenfalls Material-Outline, bleibt dadurch theme-kohärent */
+  --bubble-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
 }
+
 
 /* Inhalt kann scrollen, wenn zu groß */
 .mat-mdc-dialog-content {
@@ -156,125 +167,164 @@ mat-expansion-panel-header .name {
 }
 
 .active-button {
-  background-color: var(--mat-select-focused-arrow-color);
-  color: var(--mat-pseudo-checkbox-full-selected-checkmark-color);
-}
-
-.inactiv-button {
-  background-color: var(--mdc-outlined-button-container-color);
-  color: var(--mdc-outlined-button-label-text-color);
+  color: var(--mat-app-text-color);
   border: 1px solid var(--mdc-outlined-button-outline-color);
 }
 
+.inactiv-button {
+  color: var(--mat-app-text-color);
+  border: 1px solid var(--mdc-outlined-button-outline-color);
+}
 
+/* === Grundlayout === */
 .message {
-  border-radius: 0.25rem;
-  display: flex;
-  flex-direction: column;
-  margin: 0 auto 1rem;
-  width: 90%;
-  max-width: 90%;
+  display: grid;
+  gap: 0.75rem;
+  margin: 1rem;
+  overflow: visible;
 }
 
-.message p {
-  border-radius: 1.15rem;
-  line-height: 1.25;
-  width: 100%;
-  padding: 0.5rem 0.5rem;
+/* === Jede BubbleRow ist ein Anker für Avatar + Bubble === */
+.bubble-row {
   position: relative;
-  word-wrap: break-word;
+  width: max-content;
+  max-width: var(--msg-maxw);
+  overflow: visible;
+  display: grid;
+  margin-top: 2rem;
 }
 
-.message p::before,
-.message p::after {
-  bottom: -0.1rem;
-  content: "";
-  height: 1rem;
-  position: absolute;
+/* Chat-Alignment */
+.bubble-row.them {
+  justify-self: start;
 }
 
-p.from-me {
-  align-self: flex-end;
-  background-color: var(--mat-fab-small-container-color);
+.bubble-row.me {
+  justify-self: end;
+}
+
+/* === Bubble-Styling ohne Hintergrundfarbe === */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bubble-outline: color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, var(--mat-app-text-color) 45%);
+    --bubble-shadow: 0 2px 8px color-mix(in srgb, var(--mat-card-outlined-outline-color) 50%, transparent);
+  }
+}
+
+/* Gemeinsames Bubble-Styling (ohne Hintergrund) */
+.bubble-row p.from-me,
+.bubble-row p.from-them {
+  background-color: var(--mat-card-filled-container-color);
+  color: var(--mat-app-text-color);
+  border: 1px solid var(--bubble-outline);
+  border-radius: 1.25rem;
+  padding: 0.75rem 1rem;
+  line-height: 1.4;
+  box-shadow: var(--bubble-shadow);
+  /* dezenter innerer Kontrast für bessere Kanten im Dark Theme */
+  box-shadow:
+    var(--bubble-shadow),
+    0 0 0 1px color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent) inset;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+/* Ausrichtung wie gehabt */
+.bubble-row p.from-me {
   text-align: right;
-  color: var(--mat-fab-small-foreground-color);
 }
 
-p.from-me::before {
-  border-bottom-left-radius: 0.8rem 0.7rem;
-  border-right: 1rem solid var(--mat-fab-small-container-color);
-  right: -0.35rem;
-  transform: translate(0, -0.1rem);
-}
-
-p.from-me::after {
-  background-color: var(--mat-card-elevated-container-color);
-  border-bottom-left-radius: 0.5rem;
-  right: -40px;
-  transform: translate(-30px, -2px);
-  width: 10px;
-}
-
-p[class^="from-"] {
-  margin: 0.5rem 0;
-  width: fit-content;
-}
-
-p.from-me~p.from-me {
-  margin: 0.25rem 0 0;
-}
-
-p.from-me~p.from-me:not(:last-child) {
-  margin: 0.25rem 0 0;
-}
-
-p.from-me~p.from-me:last-child {
-  margin-bottom: 0.5rem;
-}
-
-p.from-them {
-  align-items: flex-start;
-  background-color: var(--mat-tooltip-container-color);
+.bubble-row p.from-them {
   text-align: left;
-  color: var(--mat-tooltip-supporting-text-color)
 }
 
-p.from-them:before {
-  border-bottom-right-radius: 0.8rem 0.7rem;
-  border-left: 1rem solid var(--mat-tooltip-container-color);
-  left: -0.35rem;
-  transform: translate(0, -0.1rem);
+/* Optionales, materialiges Hover – nimmt Primary-Farbe, bleibt subtil */
+.bubble-row p.from-me:hover,
+.bubble-row p.from-them:hover {
+  border-color: color-mix(in srgb, var(--bubble-outline) 60%, var(--mat-primary-color) 40%);
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--mat-card-outlined-outline-color) 45%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--mat-primary-color) 25%, transparent) inset;
 }
 
-p.from-them::after {
-  background-color: var(--mat-card-elevated-container-color);
-  border-bottom-right-radius: 0.5rem;
-  left: 20px;
-  transform: translate(-30px, -2px);
-  width: 10px;
+/* === Avatar-Boxen === */
+.avatar-me,
+.avatar-them {
+  position: absolute;
+  z-index: 2;
+  height: var(--avatar-h);
+  padding: 0.25rem 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 1.5rem;
+  max-width: min(82%, 22rem);
+  overflow: hidden;
+  pointer-events: auto;
 }
 
-p[class^="from-"].emoji {
-  background: none;
-  font-size: 2.5rem;
+/* === Positionierungen === */
+/* them → links oben, halber Avatar über Bubble, 1rem nach außen */
+.bubble-row.them .avatar-them {
+  top: -1rem;
+  left: -1rem;
 }
 
-p[class^="from-"].emoji::before {
-  content: none;
+/* me → rechts unten, halber Avatar unter Bubble, 1rem nach außen */
+.bubble-row.me .avatar-me {
+  top: -1rem;
+  right: -1rem;
 }
 
-.no-tail::before {
-  display: none;
+/* === Avatar-Inhalt === */
+.avatar-me .avatar,
+.avatar-them .avatar {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
-.margin-b_none {
-  margin-bottom: 0 !important;
+.avatar-me mat-icon,
+.avatar-them mat-icon {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
 }
 
-.margin-b_one {
-  margin-bottom: 1rem !important;
+.avatar-me .name,
+.avatar-them .name {
+  min-width: 0;
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.margin-t_one {
-  margin-top: 1rem !important;
+/* === Responsive === */
+@media (max-width: 600px) {
+  :root {
+    --msg-maxw: 92%;
+  }
+
+  .avatar-me,
+  .avatar-them {
+    height: 2.5rem;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .avatar-me .avatar,
+  .avatar-them .avatar {
+    width: 2rem;
+    height: 2rem;
+  }
 }

@@ -42,54 +42,106 @@
                     <div class="message-content">
                         @if (contact.lastMessageFrom === 'contactUser') {
                         <div class="message">
+                            <!-- === USER === -->
                             @if (hasContent(contact.userMessage)) {
-                            <p class="from-me">
-                                @if (contact.userMessage.multimedia.type !== 'undefined') {
-                                <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
-                                }
-                                @if (contact.userMessage.message.trim() !== '') {
-                                <app-showmessage [message]="contact.userMessage.message"
-                                    [style]="contact.userMessage.style"></app-showmessage>
-                                }
-                            </p>
+                            <div class="bubble-row me">
+                                <div class="avatar-me">
+                                    @if (userService.getProfile().base64Avatar) {
+                                    <img class="avatar" [src]="userService.getProfile().base64Avatar" />
+                                    } @else {
+                                    <mat-icon class="material-symbols-outlined">person</mat-icon>
+                                    }
+                                    <span class="name">{{ userService.getProfile().name || 'Myself' }}</span>
+                                </div>
+
+                                <p class="from-me">
+                                    @if (contact.userMessage.multimedia.type !== 'undefined') {
+                                    <app-showmultimedia
+                                        [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                                    }
+                                    @if (contact.userMessage.message.trim() !== '') {
+                                    <app-showmessage [message]="contact.userMessage.message"
+                                        [style]="contact.userMessage.style"></app-showmessage>
+                                    }
+                                </p>
+                            </div>
                             }
+
+                            <!-- === CONTACT === -->
                             @if (hasContent(contact.contactUserMessage)) {
-                            <p class="from-them">
-                                @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
-                                <app-showmultimedia
-                                    [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
-                                }
-                                @if (contact.contactUserMessage.message.trim() !== '') {
-                                <app-showmessage [message]="contact.contactUserMessage.message"
-                                    [style]="contact.contactUserMessage.style"></app-showmessage>
-                                }
-                            </p>
+                            <div class="bubble-row them">
+                                <div class="avatar-them">
+                                    @if (contact.base64Avatar) {
+                                    <img class="avatar" [src]="contact.base64Avatar" />
+                                    } @else {
+                                    <mat-icon class="material-symbols-outlined">person</mat-icon>
+                                    }
+                                    <span class="name">{{ contact.name || 'Unnamed' }}</span>
+                                </div>
+
+                                <p class="from-them">
+                                    @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
+                                    <app-showmultimedia
+                                        [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                                    }
+                                    @if (contact.contactUserMessage.message.trim() !== '') {
+                                    <app-showmessage [message]="contact.contactUserMessage.message"
+                                        [style]="contact.contactUserMessage.style"></app-showmessage>
+                                    }
+                                </p>
+                            </div>
                             }
                         </div>
                         } @else if (contact.lastMessageFrom === 'user') {
                         <div class="message">
+                            <!-- === CONTACT === -->
                             @if (hasContent(contact.contactUserMessage)) {
-                            <p class="from-them">
-                                @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
-                                <app-showmultimedia
-                                    [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
-                                }
-                                @if (contact.contactUserMessage.message.trim() !== '') {
-                                <app-showmessage [message]="contact.contactUserMessage.message"
-                                    [style]="contact.contactUserMessage.style"></app-showmessage>
-                                }
-                            </p>
+                            <div class="bubble-row them">
+                                <div class="avatar-them">
+                                    @if (contact.base64Avatar) {
+                                    <img class="avatar" [src]="contact.base64Avatar" />
+                                    } @else {
+                                    <mat-icon class="material-symbols-outlined">person</mat-icon>
+                                    }
+                                    <span class="name">{{ contact.name || 'Unnamed' }}</span>
+                                </div>
+
+                                <p class="from-them">
+                                    @if (contact.contactUserMessage.multimedia.type !== 'undefined') {
+                                    <app-showmultimedia
+                                        [multimedia]="contact.contactUserMessage.multimedia"></app-showmultimedia>
+                                    }
+                                    @if (contact.contactUserMessage.message.trim() !== '') {
+                                    <app-showmessage [message]="contact.contactUserMessage.message"
+                                        [style]="contact.contactUserMessage.style"></app-showmessage>
+                                    }
+                                </p>
+                            </div>
                             }
+
+                            <!-- === USER === -->
                             @if (hasContent(contact.userMessage)) {
-                            <p class="from-me">
-                                @if (contact.userMessage.multimedia.type !== 'undefined') {
-                                <app-showmultimedia [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
-                                }
-                                @if (contact.userMessage.message.trim() !== '') {
-                                <app-showmessage [message]="contact.userMessage.message"
-                                    [style]="contact.userMessage.style"></app-showmessage>
-                                }
-                            </p>
+                            <div class="bubble-row me">
+                                <div class="avatar-me">
+                                    @if (userService.getProfile().base64Avatar) {
+                                    <img class="avatar" [src]="userService.getProfile().base64Avatar" />
+                                    } @else {
+                                    <mat-icon class="material-symbols-outlined">person</mat-icon>
+                                    }
+                                    <span class="name">{{ userService.getProfile().name || 'Myself' }}</span>
+                                </div>
+
+                                <p class="from-me">
+                                    @if (contact.userMessage.multimedia.type !== 'undefined') {
+                                    <app-showmultimedia
+                                        [multimedia]="contact.userMessage.multimedia"></app-showmultimedia>
+                                    }
+                                    @if (contact.userMessage.message.trim() !== '') {
+                                    <app-showmessage [message]="contact.userMessage.message"
+                                        [style]="contact.userMessage.style"></app-showmessage>
+                                    }
+                                </p>
+                            </div>
                             }
                         </div>
                         } @else {
