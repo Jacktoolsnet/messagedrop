@@ -69,11 +69,11 @@ export class MapService {
 
     this.map = leaflet.map('map', {
       center: [location.latitude, location.longitude],
-      zoom: 3
+      zoom: 3,
+      worldCopyJump: true
     });
 
-    //xthis.map.setMinZoom(3);
-    // this.map.setMaxZoom(19);
+    this.map.setMaxBounds([[-90, -180], [90, 180]]);
 
     this.map.on('click', (ev: any) => {
       this.drawCircleMarker = false;
@@ -105,6 +105,7 @@ export class MapService {
     let tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
+      noWrap: true,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     });
 
@@ -113,7 +114,7 @@ export class MapService {
     // Fire event to load first messagens
     this.location.plusCode = this.geolocationService.getPlusCode(0, 0);
     this.searchRectangle = leaflet.rectangle([[0, 0], [0, 0]], { color: "#ffdbb5", weight: 1 }).addTo(this.map);
-    this.drawSearchRectange(this.location);
+    // this.drawSearchRectange(this.location);
 
     this._mapSet.update(trigger => trigger + 1);
   }
@@ -145,6 +146,25 @@ export class MapService {
 
   public getMapLocation(): Location {
     return this.location;
+  }
+
+  private normalizeLon(lon: number): number {
+    // Wrap in [-180, 180]
+    return ((lon + 180) % 360 + 360) % 360 - 180;
+  }
+
+  public getVisibleMapBoundingBox(): BoundingBox {
+    const bounds = this.map?.getBounds();
+
+    const sw = bounds.getSouthWest();
+    const ne = bounds.getNorthEast();
+
+    const latMin = sw.lat;
+    const latMax = ne.lat;
+    const lonMin = this.normalizeLon(sw.lng);
+    const lonMax = this.normalizeLon(ne.lng);
+
+    return { latMin, lonMin, latMax, lonMax };
   }
 
   public flyTo(location: Location): void {

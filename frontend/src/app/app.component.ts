@@ -411,14 +411,14 @@ export class AppComponent implements OnInit {
         await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
       }
       // Messages
-      this.messageService.getByPlusCode(location);
+      this.messageService.getByVisibleMapBoundingBox();
     }
   }
 
   public handleMoveEndEvent(event: Location) {
     this.updateDataForLocation(event, false)
     this.setIsUserLocation()
-    this.mapService.drawSearchRectange(event);
+    // this.mapService.drawSearchRectange(event);
     this.mapService.setDrawCircleMarker(true);
     this.mapService.setCircleMarker(event);
     this.mapService.setDrawCircleMarker(false);
@@ -602,7 +602,7 @@ export class AppComponent implements OnInit {
 
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
-            this.messageService.getByPlusCode(this.mapService.getMapLocation());
+            this.messageService.getByVisibleMapBoundingBox();
           });
         },
         error: (err) => {
@@ -627,7 +627,6 @@ export class AppComponent implements OnInit {
 
           dialogRef.afterClosed().subscribe((data: any) => {
             this.messageService.clearSelectedMessages();
-            this.messageService.getByPlusCode(this.mapService.getMapLocation());
             this.updateDataForLocation(this.mapService.getMapLocation(), true);
           });
         },
@@ -772,7 +771,6 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe((data: any) => {
       this.messageService.clearSelectedMessages();
-      this.messageService.getByPlusCode(this.mapService.getMapLocation());
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }

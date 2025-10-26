@@ -340,6 +340,43 @@ export class MessageService {
       });
   }
 
+  getByVisibleMapBoundingBox(showAlways: boolean = false) {
+    const boundingBox: BoundingBox = this.mapService.getVisibleMapBoundingBox();
+    const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: 'Message service',
+      image: '',
+      icon: '',
+      message: `Loading message`,
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    return this.http.get<GetMessageResponse>(url, this.httpOptions)
+      .pipe(catchError(this.handleError))
+      .subscribe({
+        next: (getMessageResponse) => {
+          // lastSearchedLocation aktualisieren
+          this.lastSearchedLocation = this.geolocationService.getCenterOfBoundingBox(boundingBox).plusCode;
+
+          // Messages neu setzen
+          const mappedMessages = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
+          this.messagesSignal.set(mappedMessages);
+
+          this._messageSet.update(trigger => trigger + 1);
+        },
+        error: () => {
+          // Fehlerfall: Location trotzdem aktualisieren, Messages leeren
+          this.lastSearchedLocation = this.geolocationService.getCenterOfBoundingBox(boundingBox).plusCode;
+          this.messagesSignal.set([]);
+          this._messageSet.update(trigger => trigger + 1);
+        }
+      });
+  }
+
   getByBoundingBox(boundingBox: BoundingBox, showAlways: boolean = false): Observable<GetMessageResponse> {
     const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;
 
