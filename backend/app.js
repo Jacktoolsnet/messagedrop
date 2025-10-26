@@ -70,7 +70,7 @@ const logFormat = winston.format.combine(
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/info-%DATE%.log',
+  filename: 'logs/backend-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
@@ -79,7 +79,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/error-%DATE%.log',
+  filename: 'logs/backend-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',

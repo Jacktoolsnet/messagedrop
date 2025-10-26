@@ -14,6 +14,7 @@ const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
+const nominatim = require('./routes/nominatim');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -168,6 +169,7 @@ app.use(headerMW())
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
+app.use('/nominatim', nominatim);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));

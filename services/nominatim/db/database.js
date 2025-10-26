@@ -1,6 +1,8 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-// const tableUser = require('./tableUser');
+const tableNominatimCache = require('./tableNominatimCache');
+const tableGeoSearch = require('./tableGeoSearch');
+
 
 class Database {
 
@@ -18,7 +20,9 @@ class Database {
             logger.error(err.message);
           }
         });
-        // tableUser.init(this.db);
+
+        tableNominatimCache.init(this.db);
+        tableGeoSearch.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers(logger);

@@ -9,8 +9,6 @@ const tableLike = require('./tableLike');
 const tableDislike = require('./tableDislike');
 const tablePlace = require('./tablePlace');
 const tableWeatherHistory = require('./tableWeatherHistory');
-const tableNominatimCache = require('./tableNominatimCache');
-const tableGeoSearch = require('./tableGeoSearch');
 const tableNotification = require('./tableNotification');
 const tableGeoStatistic = require('./tableGeoStatistic');
 
@@ -40,8 +38,6 @@ class Database {
         tablePlace.init(this.db);
         tableGeoStatistic.init(this.db);
         tableWeatherHistory.init(this.db);
-        tableNominatimCache.init(this.db);
-        tableGeoSearch.init(this.db);
         tableNotification.init(this.db);
 
         // Trigger initialisieren
