@@ -412,7 +412,6 @@ export class AppComponent implements OnInit {
       this.markerLocations.clear()
       // notes from local device
       if (this.userService.isReady()) {
-        // await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
         await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
       }
       // Messages
@@ -443,9 +442,6 @@ export class AppComponent implements OnInit {
         break;
       case MarkerType.PRIVATE_NOTE:
         if (this.userService.isReady()) {
-          // this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())).then(notes => {
-          //  this.openMarkerNoteListDialog(event.notes);
-          //});
           this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(notes => {
             this.openMarkerNoteListDialog(event.notes);
           });
@@ -788,7 +784,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(NotelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
-      data: { location: this.mapService.getMapLocation(), notesSignal: notesSignal },
+      data: { location: notesSignal()[0].location, notesSignal: notesSignal },
       minWidth: '20vw',
       maxWidth: '95vw',
       width: 'auto',
