@@ -8,7 +8,7 @@ const security = require('../middleware/security');
 // Ein eigenes Axios-Client mit BaseURL + Backend-Token
 const client = axios.create({
     baseURL: `${process.env.OPENMETEO_BASE_URL}:${process.env.OPENMETEO_PORT}/airquality`,
-    timeout: 15_000,
+    timeout: 5000,
     // wir wollen Fehlerstatus manuell durchreichen
     validateStatus: () => true,
     headers: {
@@ -45,7 +45,7 @@ router.get('/:pluscode/:latitude/:longitude/:days', [
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
         // Netzwerk-/Timeout-/Axios-Fehler
-        console.error('[airQuality.proxy] upstream error:', err?.message || err);
+        req.logger.error('[airQuality.proxy] upstream error:', err?.message || err);
         const isAxios = !!err?.isAxiosError;
         const status = isAxios ? (err.response?.status || 502) : 500;
         const payload = isAxios

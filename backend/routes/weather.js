@@ -8,7 +8,7 @@ const metric = require('../middleware/metric');
 // Axios-Client für Upstream
 const client = axios.create({
     baseURL: `${process.env.OPENMETEO_BASE_URL}:${process.env.OPENMETEO_PORT}/weather`,
-    timeout: 15_000,
+    timeout: 5000,
     validateStatus: () => true, // wir geben Statuscodes transparent weiter
     headers: {
         'content-type': 'application/json',
@@ -39,7 +39,7 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', [
 
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        console.error('[weather.proxy] upstream error:', err?.message || err);
+        req.logger.error('[weather.proxy] upstream error:', err?.message || err);
         const isAxios = !!err?.isAxiosError;
         const status = isAxios ? (err.response?.status || 502) : 500;
         const payload = isAxios
@@ -68,7 +68,7 @@ router.get('/history/:pluscode/:latitude/:longitude/:years', [
 
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        console.error('[weather.proxy.history] upstream error:', err?.message || err);
+        req.logger.error('[weather.proxy.history] upstream error:', err?.message || err);
         const isAxios = !!err?.isAxiosError;
         const status = isAxios ? (err.response?.status || 502) : 500;
         const payload = isAxios
