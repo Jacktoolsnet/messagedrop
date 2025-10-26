@@ -13,7 +13,7 @@
 </button>
 } @else if (!userService.isReady()) {
 <button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile"
-    (click)="userService.login(loadNotesAfterLogin.bind(this))">
+    (click)="userService.login(loadLocalDataAfterLogin.bind(this))">
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
 </button>
 } @else {

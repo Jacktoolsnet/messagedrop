@@ -331,7 +331,7 @@ export class AppComponent implements OnInit {
     }
   }
 
-  public loadNotesAfterLogin(): void {
+  public loadLocalDataAfterLogin(): void {
     this.updateDataForLocation(this.mapService.getMapLocation(), true)
   }
 
