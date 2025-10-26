@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "Messagedrop Frontend",
+            "name": "Messagedrop-App",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}/frontend",
@@ -18,7 +18,7 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "ADMIN Frontend",
+            "name": "ADMIN-App",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}/platform/admin/frontend",
@@ -31,7 +31,7 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Backend",
+            "name": "Messagedrop-Service",
             "program": "${workspaceFolder}/backend/app.js",
             "request": "launch",
             "skipFiles": [
@@ -40,7 +40,7 @@
             "type": "node"
         },
         {
-            "name": "ADMIN Backend",
+            "name": "Admin-Service",
             "program": "${workspaceFolder}/platform/admin/backend/app.js",
             "request": "launch",
             "skipFiles": [
