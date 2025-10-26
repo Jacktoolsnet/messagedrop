@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const security = require('../middleware/security');
-const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
+// const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
 const tableGeoStatistic = require('../db/tableGeoStatistic');
 const tableWeatherHistory = require('../db/tableWeatherHistory');
 const metric = require('../middleware/metric');
@@ -33,7 +33,7 @@ router.get('/:pluscode/:latitude/:longitude/:years',
         try {
             const { pluscode, latitude, longitude, years } = req.params;
 
-            const nominatimData = await getCountryCodeFromNominatim(latitude, longitude);
+            const nominatimData = 'XX';// await getCountryCodeFromNominatim(latitude, longitude);
             const address = nominatimData.address;
             const countryAlpha2 = address?.country_code?.toUpperCase();
             if (!countryAlpha2) throw new Error('Country code not found');

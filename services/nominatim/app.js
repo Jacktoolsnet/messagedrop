@@ -16,6 +16,10 @@ const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const nominatim = require('./routes/nominatim');
 
+// Tables für Cron-Jobs
+const tableNominatimCache = require('./db/tableNominatimCache.js');
+const tableGeoSearch = require('./db/tableGeoSearch');
+
 // ExpressJs
 const { createServer } = require('node:http');
 const express = require('express');
@@ -200,4 +204,17 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 // │ │ │ │ │ │
 // │ │ │ │ │ │
 // * * * * * *
-cron.schedule('5 0 * * *', () => { });
+// Clean long cached data.
+cron.schedule('5 0 * * *', () => {
+  tableNominatimCache.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableGeoSearch.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+});

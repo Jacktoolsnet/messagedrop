@@ -39,8 +39,6 @@ const tableConnect = require('./db/tableConnect');
 const tableMessage = require('./db/tableMessage')
 const tableGeoStatistic = require('./db/tableGeoStatistic');
 const tableWeatherHistory = require('./db/tableWeatherHistory');
-const tableNominatimCache = require('./db/tableNominatimCache.js');
-const tableGeoSearch = require('./db/tableGeoSearch')
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -365,18 +363,6 @@ cron.schedule('5 0 * * *', () => {
   });
 
   tableWeatherHistory.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableNominatimCache.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableGeoSearch.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
     }
