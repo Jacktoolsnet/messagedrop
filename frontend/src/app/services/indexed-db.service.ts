@@ -579,21 +579,46 @@ export class IndexedDbService {
     });
   }
 
-  /**
-   * Retrieves all notes within a given bounding box, sorted by newest first.
-   * @param boundingBox The bounding box to filter notes.
-   * @returns Promise that resolves with an array of notes within the bounding box.
-   */
+  private normalizeLon(lon: number): number {
+    // Wrap in [-180, 180]
+    return ((lon + 180) % 360 + 360) % 360 - 180;
+  }
+
+  private inLatRange(lat: number, min: number, max: number): boolean {
+    const lo = Math.min(min, max);
+    const hi = Math.max(min, max);
+    return lat >= lo && lat <= hi;
+  }
+
+  private inLonRangeWithWrap(lon: number, lonMin: number, lonMax: number): boolean {
+    // Standardfall: keine Antimeridian-Überschreitung
+    if (lonMin <= lonMax) {
+      return lon >= lonMin && lon <= lonMax;
+    }
+    // Wrap-Fall: z. B. lonMin=170, lonMax=-170
+    // -> gültig, wenn lon >= 170 ODER lon <= -170
+    return lon >= lonMin || lon <= lonMax;
+  }
+
   async getNotesInBoundingBox(boundingBox: BoundingBox): Promise<Note[]> {
     const allNotes = await this.getAllNotes();
-    return allNotes
-      .filter(note =>
-        note.location.latitude >= boundingBox.latMin &&
-        note.location.latitude <= boundingBox.latMax &&
-        note.location.longitude >= boundingBox.lonMin &&
-        note.location.longitude <= boundingBox.lonMax
-      )
-      .sort((a, b) => b.timestamp - a.timestamp); // Newest first
+
+    // BBox normalisieren (nur Lons wrappen; Lats nur sortieren)
+    const latMin = Math.min(boundingBox.latMin, boundingBox.latMax);
+    const latMax = Math.max(boundingBox.latMin, boundingBox.latMax);
+    const lonMin = this.normalizeLon(boundingBox.lonMin);
+    const lonMax = this.normalizeLon(boundingBox.lonMax);
+
+    const result = allNotes
+      .filter(note => {
+        const lat = note.location.latitude;
+        const lon = this.normalizeLon(note.location.longitude);
+
+        if (!this.inLatRange(lat, latMin, latMax)) return false;
+        return this.inLonRangeWithWrap(lon, lonMin, lonMax);
+      })
+      .sort((a, b) => b.timestamp - a.timestamp); // newest first
+    return result;
   }
 
 }

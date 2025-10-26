@@ -13,16 +13,14 @@
 </button>
 } @else if (!userService.isReady()) {
 <button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile"
-    (click)="userService.login()">
+    (click)="userService.login(loadNotesAfterLogin.bind(this))">
     <mat-icon aria-hidden="false" class="material-symbols-outlined">lock_open</mat-icon>
 </button>
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab aria-label="User Profile"
     (click)="{}">
-    <mat-icon aria-hidden="false"
-        matBadge="{{ unreadSystemNotificationCount() | shortNumber }}"
-        [matBadgeHidden]="!hasUnreadSystemNotifications()"
-        matBadgeColor="primary"
+    <mat-icon aria-hidden="false" matBadge="{{ unreadSystemNotificationCount() | shortNumber }}"
+        [matBadgeHidden]="!hasUnreadSystemNotifications()" matBadgeColor="primary"
         class="material-symbols-outlined">person</mat-icon>
 </button>
 }
@@ -69,8 +67,7 @@
     <button mat-menu-item (click)="openSystemMessages()">
         <mat-icon class="material-symbols-outlined"
             [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
-            [matBadgeHidden]="!hasUnreadSystemNotifications()"
-            matBadgeColor="primary">notifications</mat-icon>
+            [matBadgeHidden]="!hasUnreadSystemNotifications()" matBadgeColor="primary">notifications</mat-icon>
         <span>System messages</span>
     </button>
     }

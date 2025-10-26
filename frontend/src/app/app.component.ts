@@ -331,6 +331,10 @@ export class AppComponent implements OnInit {
     }
   }
 
+  public loadNotesAfterLogin(): void {
+    this.updateDataForLocation(this.mapService.getMapLocation(), true)
+  }
+
   private setIsUserLocation(): void {
     if (this.userService.getUser().location.plusCode === this.mapService.getMapLocation().plusCode) {
       this.isUserLocation = true;
@@ -408,7 +412,8 @@ export class AppComponent implements OnInit {
       this.markerLocations.clear()
       // notes from local device
       if (this.userService.isReady()) {
-        await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
+        // await this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()));
+        await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
       }
       // Messages
       this.messageService.getByVisibleMapBoundingBox();
@@ -438,7 +443,10 @@ export class AppComponent implements OnInit {
         break;
       case MarkerType.PRIVATE_NOTE:
         if (this.userService.isReady()) {
-          this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())).then(notes => {
+          // this.noteService.filterByPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom())).then(notes => {
+          //  this.openMarkerNoteListDialog(event.notes);
+          //});
+          this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(notes => {
             this.openMarkerNoteListDialog(event.notes);
           });
         }
