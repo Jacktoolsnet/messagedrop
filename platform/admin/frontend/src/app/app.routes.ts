@@ -13,6 +13,7 @@ import { PublicStatusComponent } from './components/public-status/public-status.
 import { LoginComponent } from './components/login/login.component';
 import { NotificationsComponent } from './components/dsa/notifications/notifications.component';
 import { authGuard } from './guards/auth/auth-guard';
+import { StatisticComponent } from './components/statistic/statistic.component';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
@@ -20,6 +21,11 @@ export const routes: Routes = [
     {
         path: 'dashboard',
         component: AdminDashboardComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/statistic',
+        component: StatisticComponent,
         canActivate: [authGuard]
     },
     {

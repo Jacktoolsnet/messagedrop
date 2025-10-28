@@ -1,0 +1,24 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button routerLink="/dashboard" aria-label="Back to dashboard">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+  <span class="toolbar-title">Statistic</span>
+  <span class="spacer"></span>
+  <mat-button-toggle-group [value]="selectedRange()" (valueChange)="onRangeChange($event)">
+    @for (r of ranges; track r.value) {
+    <mat-button-toggle [value]="r.value">{{ r.label }}</mat-button-toggle>
+    }
+  </mat-button-toggle-group>
+</mat-toolbar>
+
+<div class="page">
+  <mat-card appearance="raised" class="placeholder">
+    <mat-card-header>
+      <mat-card-title>Statistics Overview</mat-card-title>
+      <mat-card-subtitle>Grundgerüst – Inhalte folgen</mat-card-subtitle>
+    </mat-card-header>
+    <div class="body">
+      <p>Hier werden später Kennzahlen und Graphen angezeigt.</p>
+    </div>
+  </mat-card>
+</div>

@@ -1,0 +1,109 @@
+/* ==== Theme Tokens (Light/Dark) – konsistent zum User-Dashboard ==== */
+:host {
+  color-scheme: light; /* immer hell */
+  --primary: #05a51d;
+
+  /* Light palette */
+  --bg-gradient-start: #eafde8;
+  --bg-gradient-end: #bff7c4;
+  --surface: #ffffff;
+  --card: rgba(255, 255, 255, 0.94);
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: rgba(0, 0, 0, 0.08);
+  --outline: color-mix(in srgb, var(--text) 28%, transparent);
+
+  display: block;
+  min-height: 100%;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text);
+}
+
+/* ==== Toolbar (glass + dezente Tiefe) ==== */
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.90);
+  color: #1f2937;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+
+  .toolbar-title {
+    margin-inline: auto;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: .2px;
+  }
+}
+
+/* ==== Page Container ==== */
+.page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
+}
+
+/* Toggle styling aligned with Evidence */
+.status-toggle {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+  padding: 3px;
+  border: 1px solid rgba(5, 165, 29, 0.25);
+  background: transparent;
+  gap: 2px;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle {
+  border: none;
+  border-radius: 999px !important;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-button {
+  padding: 0 1.1rem;
+  min-height: 32px;
+  border-radius: 999px !important;
+  background: transparent !important;
+  color: inherit;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-button .mat-button-toggle-label-content {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  line-height: 28px;
+  padding: 0;
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-checked {
+  background: rgba(5, 165, 29, 0.18) !important;
+  color: #04730f !important;
+  box-shadow: inset 0 0 0 1px rgba(5, 165, 29, 0.25);
+}
+
+.status-toggle ::ng-deep .mat-button-toggle-checked .mat-button-toggle-label-content {
+  color: #04730f !important;
+}
+
+.spacer { flex: 1 1 auto; }
+
+/* Card look */
+.placeholder {
+  max-width: 960px;
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(2, 8, 20, 0.06);
+}
+
+.body {
+  padding: 1rem;
+}
