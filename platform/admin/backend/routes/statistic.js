@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const statistic = require('../db/tableStatistic');
+const statisticSettings = require('../db/tableStatisticSettings');
 
 // ===== Helpers =====
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -82,6 +83,22 @@ function fillMissing(from, to, rows) {
 }
 
 // ===== Endpoints =====
+
+/** Settings: Admin-JWT protected (not static token) */
+router.get('/settings', [security.requireAdminJwt], (req, res) => {
+    statisticSettings.getAll(req.database.db, (err, rows) => {
+        if (err) return res.status(500).json({ status: 500, error: err.message });
+        res.json({ status: 200, settings: rows });
+    });
+});
+
+router.put('/settings', [security.requireAdminJwt], (req, res) => {
+    const items = Array.isArray(req.body?.settings) ? req.body.settings : [];
+    statisticSettings.upsertMany(req.database.db, items, (err) => {
+        if (err) return res.status(500).json({ status: 500, error: err.message });
+        res.json({ status: 200, ok: true });
+    });
+});
 
 router.use(security.checkToken);
 

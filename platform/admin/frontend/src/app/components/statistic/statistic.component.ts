@@ -9,6 +9,10 @@ import { StatisticService } from '../../services/statistic/statistic.service';
 import { StatisticRangePreset } from '../../interfaces/statistic-range-preset.type';
 import { MultiSeriesResponse } from '../../interfaces/statistic-multi-series-response.interface';
 import { StatisticKeyChartComponent } from './key-chart/statistic-key-chart.component';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { StatisticSettingsComponent } from './settings/statistic-settings.component';
+import { StatisticSettingsService } from '../../services/statistic/statistic-settings.service';
+import { StatisticKeySetting } from '../../interfaces/statistic-key-setting.interface';
 
 @Component({
   selector: 'app-statistic',
@@ -20,13 +24,16 @@ import { StatisticKeyChartComponent } from './key-chart/statistic-key-chart.comp
     MatButtonModule,
     MatCardModule,
     MatButtonToggleModule,
-    StatisticKeyChartComponent
+    StatisticKeyChartComponent,
+    MatDialogModule
   ],
   templateUrl: './statistic.component.html',
   styleUrls: ['./statistic.component.css']
 })
 
 export class StatisticComponent {
+  private readonly dialog = inject(MatDialog);
+  private readonly settingsApi = inject(StatisticSettingsService);
   private readonly stat = inject(StatisticService);
 
   readonly ranges = [
@@ -43,6 +50,7 @@ export class StatisticComponent {
   readonly loading = signal<boolean>(false);
   readonly hasKeys = computed(() => this.keys().length > 0);
   readonly lastSeries = signal<MultiSeriesResponse | null>(null);
+  readonly settings = signal<Record<string, StatisticKeySetting>>({});
 
   private readonly palette = [
     '#2563eb', // blue
@@ -66,6 +74,34 @@ export class StatisticComponent {
       const ks = this.keys();
       if (ks.length) this.loadSeries(ks, _r);
     });
+
+    // load settings initially and provide a refresh fn
+    const loadSettings = () => this.settingsApi.list().subscribe({
+      next: (res) => {
+        const map: Record<string, StatisticKeySetting> = {};
+        (res?.settings ?? []).forEach(s => { map[s.metricKey] = s; });
+        this.settings.set(map);
+      }
+    });
+    loadSettings();
+  }
+
+  openSettings(): void {
+    const ref = this.dialog.open(StatisticSettingsComponent, {
+      width: '1200px',
+      maxWidth: '98vw',
+      maxHeight: '95vh'
+    });
+    ref.afterClosed().subscribe(changed => { if (changed) {
+      // reload settings and also refresh data to reflect new order/colors/titles
+      this.settingsApi.list().subscribe({
+        next: (res) => {
+          const map: Record<string, StatisticKeySetting> = {};
+          (res?.settings ?? []).forEach(s => { map[s.metricKey] = s; });
+          this.settings.set(map);
+        }
+      });
+    }});
   }
 
   onRangeChange(v: string | null): void {
@@ -80,6 +116,9 @@ export class StatisticComponent {
   }
 
   colorFor(key: string): string {
+    // settings override
+    const cfg = this.settings()[key];
+    if (cfg?.color) return cfg.color;
     // stable hash -> palette index
     let h = 5381;
     for (let i = 0; i < key.length; i++) {
@@ -88,6 +127,16 @@ export class StatisticComponent {
     }
     const idx = Math.abs(h) % this.palette.length;
     return this.palette[idx];
+  }
+
+  titleFor(key: string): string { return this.settings()[key]?.displayName?.trim() || key; }
+  iconFor(key: string): string { return this.settings()[key]?.iconName?.trim() || 'insights'; }
+  orderedKeys(): string[] {
+    const ks = this.keys();
+    const map = this.settings();
+    const withOrder = ks.map(k => ({ k, o: map[k]?.sortOrder ?? Number.MAX_SAFE_INTEGER }));
+    withOrder.sort((a, b) => a.o - b.o || a.k.localeCompare(b.k));
+    return withOrder.map(x => x.k);
   }
 
   private loadKeys(): void {

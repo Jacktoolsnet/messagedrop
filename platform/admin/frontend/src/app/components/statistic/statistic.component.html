@@ -4,11 +4,15 @@
   </button>
   <span class="toolbar-title">Statistic</span>
   <span class="spacer"></span>
-  <mat-button-toggle-group class="status-toggle" [value]="selectedRange()" (valueChange)="onRangeChange($event)">
+  <mat-button-toggle-group [value]="selectedRange()" (valueChange)="onRangeChange($event)">
     @for (r of ranges; track r.value) {
     <mat-button-toggle [value]="r.value">{{ r.label }}</mat-button-toggle>
     }
   </mat-button-toggle-group>
+  <button mat-stroked-button color="primary" (click)="openSettings()" aria-label="Settings">
+    <mat-icon>settings</mat-icon>
+    Settings
+  </button>
   <button mat-stroked-button color="primary" (click)="reload()" aria-label="Refresh chart">
     <mat-icon>refresh</mat-icon>
     Refresh
@@ -18,21 +22,18 @@
 <div class="page">
   <div class="grid-charts">
     @if (!hasKeys()) {
-      <mat-card class="tile-chart" appearance="raised">
-        <div class="chart-placeholder">
-          <mat-icon aria-hidden="true">insights</mat-icon>
-          <span>No metrics available.</span>
-        </div>
-      </mat-card>
+    <mat-card class="tile-chart" appearance="raised">
+      <div class="chart-placeholder">
+        <mat-icon aria-hidden="true">insights</mat-icon>
+        <span>No metrics available.</span>
+      </div>
+    </mat-card>
     } @else {
-      @for (k of keys(); track k) {
-        <app-statistic-key-chart
-          [title]="k"
-          [points]="lastSeries()?.series?.[k]?.points ?? []"
-          [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'"
-          [color]="colorFor(k)">
-        </app-statistic-key-chart>
-      }
+    @for (k of orderedKeys(); track k) {
+    <app-statistic-key-chart [title]="titleFor(k)" [points]="lastSeries()?.series?.[k]?.points ?? []"
+      [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'" [color]="colorFor(k)">
+    </app-statistic-key-chart>
+    }
     }
   </div>
 </div>
