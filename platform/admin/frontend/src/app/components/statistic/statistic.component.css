@@ -49,6 +49,32 @@ mat-toolbar {
   padding: 1.5rem 1rem 2.5rem;
 }
 
+/* Chart grid: auto-fit tiles */
+.grid-charts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.tile-chart {
+  background: var(--card);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(2, 8, 20, 0.06);
+}
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  flex-wrap: wrap;
+  margin-bottom: .75rem;
+}
+
+.range-label {
+  color: var(--muted);
+}
+
 /* Toggle styling aligned with Evidence */
 .status-toggle {
   display: inline-flex;
@@ -107,3 +133,21 @@ mat-toolbar {
 .body {
   padding: 1rem;
 }
+
+.key-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: .5rem 1rem;
+  margin: .5rem 0 1rem;
+}
+
+/* Placeholder (used when no keys) */
+.chart-placeholder {
+  min-height: 220px;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  padding: 1rem;
+}
+
+.chart-placeholder mat-icon { color: color-mix(in srgb, var(--primary) 80%, #9aa2ff); }
