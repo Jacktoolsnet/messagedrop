@@ -41,6 +41,15 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
     }
   });
 
+  // Re-render when style/type inputs change
+  styleEffect = effect(() => {
+    const _c = this.color();
+    const _k = this.chartKind();
+    if (this.canvasRef) {
+      this.render();
+    }
+  });
+
   private render(): void {
     if (!this.canvasRef) return;
     const ctx = this.canvasRef.nativeElement.getContext('2d');
