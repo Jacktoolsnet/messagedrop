@@ -151,3 +151,23 @@ mat-toolbar {
 }
 
 .chart-placeholder mat-icon { color: color-mix(in srgb, var(--primary) 80%, #9aa2ff); }
+
+/* Focused single chart view */
+.focus-chart {
+  display: grid;
+  place-items: center;
+  padding: 1rem 0;
+  position: relative;
+}
+
+/* constrain focused chart width */
+.focus-chart app-statistic-key-chart {
+  width: 95vw;
+  max-width: 1200px;
+  display: block;
+}
+
+/* .focus-actions removed; header button handles clear */
+
+.chart-tile.selectable { cursor: pointer; }
+.chart-tile.selectable:focus-visible { outline: 2px solid color-mix(in srgb, var(--primary) 55%, transparent); outline-offset: 3px; }

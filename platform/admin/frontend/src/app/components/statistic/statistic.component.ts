@@ -51,6 +51,7 @@ export class StatisticComponent {
   readonly hasKeys = computed(() => this.keys().length > 0);
   readonly lastSeries = signal<MultiSeriesResponse | null>(null);
   readonly settings = signal<Record<string, StatisticKeySetting>>({});
+  readonly selectedKey = signal<string | null>(null);
 
   private readonly palette = [
     '#2563eb', // blue
@@ -92,16 +93,19 @@ export class StatisticComponent {
       maxWidth: '98vw',
       maxHeight: '95vh'
     });
-    ref.afterClosed().subscribe(changed => { if (changed) {
-      // reload settings and also refresh data to reflect new order/colors/titles
-      this.settingsApi.list().subscribe({
-        next: (res) => {
-          const map: Record<string, StatisticKeySetting> = {};
-          (res?.settings ?? []).forEach(s => { map[s.metricKey] = s; });
-          this.settings.set(map);
-        }
-      });
-    }});
+    ref.afterClosed().subscribe(changed => {
+      if (changed) {
+        // Reload settings, then refresh series to force chart re-rendering
+        this.settingsApi.list().subscribe({
+          next: (res) => {
+            const map: Record<string, StatisticKeySetting> = {};
+            (res?.settings ?? []).forEach(s => { map[s.metricKey] = s; });
+            this.settings.set(map);
+            this.reload();
+          }
+        });
+      }
+    });
   }
 
   onRangeChange(v: string | null): void {
@@ -137,6 +141,14 @@ export class StatisticComponent {
     const withOrder = ks.map(k => ({ k, o: map[k]?.sortOrder ?? Number.MAX_SAFE_INTEGER }));
     withOrder.sort((a, b) => a.o - b.o || a.k.localeCompare(b.k));
     return withOrder.map(x => x.k);
+  }
+
+  selectKey(key: string): void {
+    this.selectedKey.set(key);
+  }
+
+  clearSelection(): void {
+    this.selectedKey.set(null);
   }
 
   private loadKeys(): void {

@@ -22,6 +22,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
   readonly chartKind = input<Exclude<ChartType, 'radar' | 'polarArea' | 'scatter' | 'bubble'>>('line');
   readonly color = input<string>('#2563eb');
   readonly iconName = input<string>('insights');
+  readonly tall = input<boolean>(false);
 
   ngAfterViewInit(): void {
     this.render();

@@ -17,6 +17,10 @@
   min-height: 240px;
 }
 
+.chart-card.tall .chart-body {
+  min-height: 560px;
+}
+
 .chart-body canvas {
   position: absolute;
   inset: 0;
