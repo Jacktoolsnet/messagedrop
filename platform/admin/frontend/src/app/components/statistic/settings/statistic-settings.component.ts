@@ -97,4 +97,11 @@ export class StatisticSettingsComponent implements OnInit {
   }
 
   cancel(): void { this.ref.close(false); }
+
+  randomizeColors(): void {
+    const rand = () => '#' + Math.floor(Math.random() * 0xffffff).toString(16).padStart(6, '0');
+    const arr = [...this.rows()];
+    arr.forEach(r => r.color = rand());
+    this.rows.set(arr);
+  }
 }
