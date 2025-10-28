@@ -1,0 +1,40 @@
+<h2 mat-dialog-title>Statistic Settings</h2>
+
+<mat-dialog-content class="content" cdkDropList (cdkDropListDropped)="drop($event)">
+  @for (row of rows(); track row.metricKey; let i = $index) {
+  <mat-card class="row" cdkDrag>
+    <div class="left">
+      <div class="drag-handle" cdkDragHandle>
+        <mat-icon>drag_indicator</mat-icon>
+      </div>
+      <mat-icon class="preview-icon">{{ row.iconName || 'insights' }}</mat-icon>
+      <div class="meta">
+        <div class="key">{{ row.metricKey }}</div>
+        <div class="hint">Order: {{ row.sortOrder }}</div>
+      </div>
+    </div>
+    <div class="right">
+      <mat-form-field appearance="outline">
+        <mat-label>Title</mat-label>
+        <input matInput [(ngModel)]="row.displayName" placeholder="Shown title (optional)" />
+      </mat-form-field>
+      <mat-form-field appearance="outline">
+        <mat-label>Icon</mat-label>
+        <input matInput [(ngModel)]="row.iconName" placeholder="Material icon name (optional)" />
+      </mat-form-field>
+      <div class="color">
+        <input class="color-swatch" aria-label="Chart color" type="color" [(ngModel)]="row.color" />
+      </div>
+    </div>
+  </mat-card>
+  }
+  @if (!rows().length) {
+  <div class="empty">No metrics found.</div>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions>
+  <button mat-stroked-button (click)="cancel()"><mat-icon>close</mat-icon>Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()"><mat-icon>save</mat-icon>Save</button>
+
+</mat-dialog-actions>
