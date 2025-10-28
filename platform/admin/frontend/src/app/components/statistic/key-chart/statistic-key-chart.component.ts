@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
+import { MatIconModule } from '@angular/material/icon';
 import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
 import { SeriesPoint } from '../../../interfaces/statistic-series-point.interface';
 
@@ -8,7 +9,7 @@ Chart.register(...registerables);
 @Component({
   selector: 'app-statistic-key-chart',
   standalone: true,
-  imports: [MatCardModule],
+  imports: [MatCardModule, MatIconModule],
   templateUrl: './statistic-key-chart.component.html',
   styleUrls: ['./statistic-key-chart.component.css']
 })
@@ -20,6 +21,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
   readonly points = input<SeriesPoint[] | null>(null);
   readonly chartKind = input<Exclude<ChartType, 'radar' | 'polarArea' | 'scatter' | 'bubble'>>('line');
   readonly color = input<string>('#2563eb');
+  readonly iconName = input<string>('insights');
 
   ngAfterViewInit(): void {
     this.render();

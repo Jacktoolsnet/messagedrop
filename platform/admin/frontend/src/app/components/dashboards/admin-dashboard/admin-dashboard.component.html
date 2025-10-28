@@ -19,7 +19,7 @@
 <div class="page">
     <div class="tiles-container">
         <!-- Users -->
-        <mat-card class="tile" appearance="raised">
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/user" role="button" tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar">
                     <mat-icon>group</mat-icon>
@@ -27,17 +27,10 @@
                 <mat-card-title class="tile-title">Users</mat-card-title>
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
-
-            <mat-card-actions align="end">
-                <button mat-stroked-button color="primary" routerLink="/dashboard/user">
-                    <mat-icon>open_in_new</mat-icon>
-                    Manage
-                </button>
-            </mat-card-actions>
         </mat-card>
 
         <!-- Digital Services Act -->
-        <mat-card class="tile" appearance="raised">
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar">
                     <mat-icon>gavel</mat-icon>
@@ -45,17 +38,10 @@
                 <mat-card-title class="tile-title">Digital Services Act</mat-card-title>
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
-
-            <mat-card-actions align="end">
-                <button mat-stroked-button color="primary" routerLink="/dashboard/dsa">
-                    <mat-icon>open_in_new</mat-icon>
-                    Open
-                </button>
-            </mat-card-actions>
         </mat-card>
 
         <!-- Statistic -->
-        <mat-card class="tile" appearance="raised">
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/statistic" role="button" tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar">
                     <mat-icon>query_stats</mat-icon>
@@ -63,13 +49,6 @@
                 <mat-card-title class="tile-title">Statistic</mat-card-title>
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
-
-            <mat-card-actions align="end">
-                <button mat-stroked-button color="primary" routerLink="/dashboard/statistic">
-                    <mat-icon>open_in_new</mat-icon>
-                    Open
-                </button>
-            </mat-card-actions>
         </mat-card>
     </div>
 </div>

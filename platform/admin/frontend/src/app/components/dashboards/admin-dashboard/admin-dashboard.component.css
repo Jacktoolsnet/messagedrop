@@ -113,6 +113,16 @@ mat-toolbar {
     }
 }
 
+/* Make tiles act like buttons when routerLink is applied */
+.tile.clickable {
+    cursor: pointer;
+}
+
+.tile.clickable:focus-visible {
+    outline: 2px solid color-mix(in srgb, var(--primary) 55%, transparent);
+    outline-offset: 3px;
+}
+
 /* Stagger (einfach) */
 .tile:nth-child(1) {
     animation-delay: 40ms;

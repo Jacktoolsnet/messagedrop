@@ -31,7 +31,7 @@
     } @else {
     @for (k of orderedKeys(); track k) {
     <app-statistic-key-chart [title]="titleFor(k)" [points]="lastSeries()?.series?.[k]?.points ?? []"
-      [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'" [color]="colorFor(k)">
+      [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'" [color]="colorFor(k)" [iconName]="iconFor(k)">
     </app-statistic-key-chart>
     }
     }

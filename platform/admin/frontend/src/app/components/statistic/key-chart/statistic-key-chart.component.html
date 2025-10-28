@@ -1,7 +1,9 @@
 <div class="chart-card">
-  <div class="chart-header">{{ title() }}</div>
+  <div class="chart-header">
+    <mat-icon aria-hidden="true" class="header-icon">{{ iconName() || 'insights' }}</mat-icon>
+    <div class="header-title">{{ title() }}</div>
+  </div>
   <div class="chart-body">
     <canvas #canvas></canvas>
   </div>
 </div>
-
