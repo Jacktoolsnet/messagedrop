@@ -90,7 +90,7 @@ router.use(security.checkToken);
  * Liefert alle verfügbaren Metric-Keys als Array
  */
 router.get('/keys', (req, res) => {
-    stats.getKeys(req.database.db, (err, keys) => {
+    statistic.getKeys(req.database.db, (err, keys) => {
         if (err) return res.status(500).json({ status: 500, error: err.message });
         res.json({ status: 200, keys });
     });
@@ -140,7 +140,7 @@ router.get('/series/:key', (req, res) => {
         fromDate = addDays(toDate, -nDays + 1);
     }
 
-    stats.getRangeBetween(req.database.db, key, fromDate, toDate, (err, rows) => {
+    statistic.getRangeBetween(req.database.db, key, fromDate, toDate, (err, rows) => {
         if (err) return res.status(500).json({ status: 500, error: err.message });
 
         const doFill = String(fill ?? 'true').toLowerCase() === 'true';
@@ -201,7 +201,7 @@ router.get('/series', (req, res) => {
     const out = { status: 200, from: fromDate, to: toDate, series: {} };
 
     keys.forEach((key) => {
-        stats.getRangeBetween(db, key, fromDate, toDate, (err, rows) => {
+        statistic.getRangeBetween(db, key, fromDate, toDate, (err, rows) => {
             if (err) {
                 out.series[key] = { error: err.message };
             } else {
