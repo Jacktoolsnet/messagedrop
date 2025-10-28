@@ -44,6 +44,19 @@ export class StatisticComponent {
   readonly hasKeys = computed(() => this.keys().length > 0);
   readonly lastSeries = signal<MultiSeriesResponse | null>(null);
 
+  private readonly palette = [
+    '#2563eb', // blue
+    '#22c55e', // green
+    '#f59e0b', // amber
+    '#ef4444', // red
+    '#8b5cf6', // violet
+    '#06b6d4', // cyan
+    '#e11d48', // rose
+    '#0ea5e9', // sky
+    '#84cc16', // lime
+    '#f97316'  // orange
+  ];
+
   constructor() {
     // initial load
     this.loadKeys();
@@ -64,6 +77,17 @@ export class StatisticComponent {
   reload(): void {
     const ks = this.keys();
     if (ks.length) this.loadSeries(ks, this.selectedRange());
+  }
+
+  colorFor(key: string): string {
+    // stable hash -> palette index
+    let h = 5381;
+    for (let i = 0; i < key.length; i++) {
+      h = ((h << 5) + h) + key.charCodeAt(i); // djb2
+      h |= 0; // 32-bit
+    }
+    const idx = Math.abs(h) % this.palette.length;
+    return this.palette[idx];
   }
 
   private loadKeys(): void {

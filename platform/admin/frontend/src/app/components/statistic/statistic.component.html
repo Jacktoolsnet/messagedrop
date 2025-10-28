@@ -29,7 +29,8 @@
         <app-statistic-key-chart
           [title]="k"
           [points]="lastSeries()?.series?.[k]?.points ?? []"
-          [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'">
+          [chartKind]="selectedRange() === '1d' ? 'bar' : 'line'"
+          [color]="colorFor(k)">
         </app-statistic-key-chart>
       }
     }

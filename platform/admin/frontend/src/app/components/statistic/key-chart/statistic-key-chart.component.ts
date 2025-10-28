@@ -19,6 +19,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
   readonly title = input<string>('');
   readonly points = input<SeriesPoint[] | null>(null);
   readonly chartKind = input<Exclude<ChartType, 'radar' | 'polarArea' | 'scatter' | 'bubble'>>('line');
+  readonly color = input<string>('#2563eb');
 
   ngAfterViewInit(): void {
     this.render();
@@ -47,6 +48,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
     const data = pts.map(p => p.value);
 
     const kind = this.chartKind();
+    const color = this.color();
     const isLine = kind === 'line';
     const config: ChartConfiguration = {
       type: kind,
@@ -56,16 +58,16 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
           isLine ? {
             label: this.title() || 'Series',
             data,
-            borderColor: '#2563eb',
-            backgroundColor: '#2563eb33',
+            borderColor: color,
+            backgroundColor: color + '33',
             tension: 0.25,
             fill: true,
             pointRadius: 3
           } : {
             label: this.title() || 'Series',
             data,
-            backgroundColor: '#2563ebcc',
-            borderColor: '#2563eb'
+            backgroundColor: color + 'cc',
+            borderColor: color
           }
         ] as any
       },
