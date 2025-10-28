@@ -75,13 +75,13 @@
                         <div class="bubble">
                             @if (c.message) {
                             <div class="msg">{{ c.message }}</div>
-                        <div class="i18n-row">
-                            <button mat-stroked-button (click)="translateToGerman('message')"
-                                [disabled]="messageI18n().loading">
-                                <mat-icon>translate</mat-icon>
-                                @if (messageI18n().loading) { Translating… } @else { Translate to German }
-                            </button>
-                        </div>
+                            <div class="i18n-row">
+                                <button mat-stroked-button (click)="translateToGerman('message')"
+                                    [disabled]="messageI18n().loading">
+                                    <mat-icon>translate</mat-icon>
+                                    @if (messageI18n().loading) { Translating… } @else { Translate to German }
+                                </button>
+                            </div>
                             @if (messageI18n().translated) {
                             <div class="translation">
                                 <mat-icon>g_translate</mat-icon>
@@ -131,8 +131,8 @@
                                 rel="noopener">
                                 <mat-icon>open_in_new</mat-icon> Open original
                             </a>
-                            <button mat-stroked-button class="external" type="button"
-                                    (click)="addScreenshotEvidence()" [disabled]="makingScreenshot()">
+                            <button mat-stroked-button class="external" type="button" (click)="addScreenshotEvidence()"
+                                [disabled]="makingScreenshot()">
                                 <mat-icon>photo_camera</mat-icon>
                                 Add to evidence
                             </button>
@@ -207,6 +207,10 @@
 
     <!-- Footer -->
     <div class="dialog-footer">
+        <button mat-stroked-button (click)="openStatusPage()">
+            <mat-icon>open_in_new</mat-icon>
+            Open status
+        </button>
         <button mat-stroked-button (click)="close(false)">
             <mat-icon>close</mat-icon> Close
         </button>

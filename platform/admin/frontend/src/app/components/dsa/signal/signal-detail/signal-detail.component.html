@@ -140,6 +140,12 @@
         </button>
         }
         @if (data.source === 'signal') {
+        <button mat-stroked-button (click)="openStatusPage()">
+            <mat-icon>open_in_new</mat-icon>
+            Status
+        </button>
+        }
+        @if (data.source === 'signal') {
         <button mat-raised-button color="warn" (click)="dismissSignal()" [disabled]="actionBusy()">
             <mat-icon>delete</mat-icon>
             Dismiss

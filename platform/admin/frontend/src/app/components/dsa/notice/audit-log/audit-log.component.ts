@@ -57,6 +57,8 @@ export class AuditLogComponent implements OnChanges {
   // ---------- UI Helpers ----------
   actionIcon(a: string): string {
     switch ((a || '').toLowerCase()) {
+      case 'decision_create': return 'gavel';
+      case 'decision_change': return 'autorenew';
       case 'create': return 'add_circle';
       case 'status_change': return 'sync_alt';
       case 'evidence_add': return 'attach_file';
@@ -69,6 +71,8 @@ export class AuditLogComponent implements OnChanges {
 
   actionChipClass(a: string): string {
     switch ((a || '').toLowerCase()) {
+      case 'decision_create': return 'chip-primary';
+      case 'decision_change': return 'chip-change';
       case 'create': return 'chip-ok';
       case 'status_change': return 'chip-change';
       case 'evidence_add': return 'chip-info';
@@ -81,6 +85,8 @@ export class AuditLogComponent implements OnChanges {
 
   actionLabel(a: string): string {
     switch ((a || '').toLowerCase()) {
+      case 'decision_create': return 'Decision created';
+      case 'decision_change': return 'Decision revised';
       case 'create': return 'Created';
       case 'status_change': return 'Status changed';
       case 'evidence_add': return 'Evidence added';
@@ -126,6 +132,14 @@ export class AuditLogComponent implements OnChanges {
         const rows: Array<{ k: string; v: string }> = [];
         if ((d as any).outcome) rows.push({ k: 'Outcome', v: String((d as any).outcome) });
         if ((d as any).noticeId) rows.push({ k: 'Notice ID', v: String((d as any).noticeId) });
+        return rows.length ? rows : null;
+      }
+      case 'decision_create':
+      case 'decision_change': {
+        const rows: Array<{ k: string; v: string }> = [];
+        if ((d as any).outcome) rows.push({ k: 'Outcome', v: String((d as any).outcome) });
+        if ((d as any).previousOutcome) rows.push({ k: 'Previous', v: String((d as any).previousOutcome) });
+        if ((d as any).decisionId) rows.push({ k: 'Decision ID', v: String((d as any).decisionId) });
         return rows.length ? rows : null;
       }
       case 'evidence_add': {

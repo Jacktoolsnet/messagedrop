@@ -86,6 +86,15 @@ export class NoticeDetailComponent implements OnInit {
     this.ref.close(ok);
   }
 
+  openStatusPage(): void {
+    const id = this.notice().id;
+    this.dsa.getNoticeStatusUrl(id).subscribe({
+      next: (res) => {
+        if (res?.statusUrl) window.open(res.statusUrl, '_blank', 'noopener');
+      }
+    });
+  }
+
   openAddEvidence(): void {
     this.evidenceList?.openAdd();
   }

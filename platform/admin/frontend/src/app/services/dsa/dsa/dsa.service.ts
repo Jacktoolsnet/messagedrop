@@ -500,6 +500,24 @@ export class DsaService {
     return this.http.get<DsaDecision | null>(`${this.baseUrl}/notices/${noticeId}/decision`);
   }
 
+  getNoticeStatusUrl(noticeId: string) {
+    return this.http.get<{ statusUrl: string }>(`${this.baseUrl}/notices/${noticeId}/status-url`).pipe(
+      catchError(err => {
+        this.snack.open('Status page not available.', 'OK', { duration: 2000 });
+        throw err;
+      })
+    );
+  }
+
+  getSignalStatusUrl(signalId: string) {
+    return this.http.get<{ statusUrl: string }>(`${this.baseUrl}/signals/${signalId}/status-url`).pipe(
+      catchError(err => {
+        this.snack.open('Status page not available.', 'OK', { duration: 2000 });
+        throw err;
+      })
+    );
+  }
+
   // Helper (z. B. oben in der Datei außerhalb der Klasse)
   safeParseDetails(input: any): Record<string, unknown> | null {
     if (!input) return null;

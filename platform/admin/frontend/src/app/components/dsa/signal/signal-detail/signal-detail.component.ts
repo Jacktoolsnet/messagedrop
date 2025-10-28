@@ -12,8 +12,8 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { Multimedia } from '../../../../interfaces/multimedia.interface';
 import { PublicMessageDetailData } from '../../../../interfaces/public-message-detail-data.interface';
 import { PublicMessage } from '../../../../interfaces/public-message.interface';
-import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
+import { TranslateService } from '../../../../services/translate-service/translate-service.service';
 import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component';
 
 @Component({
@@ -116,6 +116,14 @@ export class SignalDetailComponent {
   openContentUrl() {
     const url = this.sourceUrl();
     if (url) window.open(url, '_blank', 'noopener');
+  }
+
+  openStatusPage() {
+    if (this.data.source === 'signal' && this.data.signalId) {
+      this.dsa.getSignalStatusUrl(this.data.signalId).subscribe({
+        next: (res) => { if (res?.statusUrl) window.open(res.statusUrl, '_blank', 'noopener'); }
+      });
+    }
   }
 
   promoteSignal() {

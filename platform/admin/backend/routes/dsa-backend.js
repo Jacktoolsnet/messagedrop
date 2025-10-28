@@ -414,6 +414,18 @@ router.get('/notices/:id', (req, res) => {
     });
 });
 
+// Public status URL for a notice
+router.get('/notices/:id/status-url', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    tableNotice.getById(_db, req.params.id, (err, row) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!row) return res.status(404).json({ error: 'not_found' });
+        const statusUrl = buildStatusUrl(row.publicToken);
+        if (!statusUrl) return res.status(404).json({ error: 'status_unavailable' });
+        res.json({ statusUrl });
+    });
+});
+
 router.patch('/notices/:id/status', (req, res) => {
     const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
 
@@ -508,7 +520,11 @@ router.post('/notices/:id/decision', (req, res) => {
         if (lookupErr) return res.status(500).json({ error: 'db_error', detail: lookupErr.message });
         if (!noticeRow) return res.status(404).json({ error: 'notice_not_found' });
 
-        tableDecision.create(
+        // Fetch previous decision (if any) to log a clear change event for timelines
+        tableDecision.getByNoticeId(_db, req.params.id, (prevErr, prevDecisionRow) => {
+            // ignore prevErr; just means no previous decision
+
+            tableDecision.create(
             _db, id, req.params.id, outcome, legalBasis, tosBasis, automatedUsed,
             `admin:${req.admin?.sub || 'unknown'}`, decidedAt, statement,
             (err, row) => {
@@ -527,6 +543,25 @@ router.post('/notices/:id/decision', (req, res) => {
                     _db, auditId, 'decision', id, 'create',
                     `admin:${req.admin?.sub || 'unknown'}`, decidedAt,
                     JSON.stringify({ noticeId: req.params.id, outcome }),
+                    () => { }
+                );
+
+                // Create a NOTICE-level audit entry so public status timeline reflects decision creation/changes
+                const noticeAuditAction = prevDecisionRow ? 'decision_change' : 'decision_create';
+                const noticeAuditDetails = {
+                    decisionId: id,
+                    outcome,
+                    previousOutcome: prevDecisionRow ? prevDecisionRow.outcome : null
+                };
+                tableAudit.create(
+                    _db,
+                    crypto.randomUUID(),
+                    'notice',
+                    req.params.id,
+                    noticeAuditAction,
+                    `admin:${req.admin?.sub || 'unknown'}`,
+                    decidedAt,
+                    JSON.stringify(noticeAuditDetails),
                     () => { }
                 );
 
@@ -567,6 +602,7 @@ router.post('/notices/:id/decision', (req, res) => {
                 res.status(201).json(row); // { id }
             }
         );
+        });
     });
 });
 
@@ -1472,6 +1508,18 @@ router.get('/signals/:id', (req, res) => {
         if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
         if (!row) return res.status(404).json({ error: 'not_found' });
         res.json(row);
+    });
+});
+
+// Public status URL for a signal
+router.get('/signals/:id/status-url', (req, res) => {
+    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    tableSignal.getById(_db, String(req.params.id), (err, row) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (!row) return res.status(404).json({ error: 'not_found' });
+        const statusUrl = buildStatusUrl(row.publicToken);
+        if (!statusUrl) return res.status(404).json({ error: 'status_unavailable' });
+        res.json({ statusUrl });
     });
 });
 
