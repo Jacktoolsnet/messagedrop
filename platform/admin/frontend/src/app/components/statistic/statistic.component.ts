@@ -13,6 +13,7 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { StatisticSettingsComponent } from './settings/statistic-settings.component';
 import { StatisticSettingsService } from '../../services/statistic/statistic-settings.service';
 import { StatisticKeySetting } from '../../interfaces/statistic-key-setting.interface';
+import { SeriesPoint } from '../../interfaces/statistic-series-point.interface';
 
 @Component({
   selector: 'app-statistic',
@@ -149,6 +150,47 @@ export class StatisticComponent {
 
   clearSelection(): void {
     this.selectedKey.set(null);
+  }
+
+  private aggregatePoints(points: SeriesPoint[], preset: '12m'|'6m'|'3m'|'1m'|'1w'|'1d'): SeriesPoint[] {
+    if (!points || points.length === 0) return [];
+    if (preset === '12m' || preset === '6m' || preset === '3m') {
+      // group by month YYYY-MM
+      const map = new Map<string, number>();
+      for (const p of points) {
+        const key = (p.date || '').slice(0, 7); // YYYY-MM
+        map.set(key, (map.get(key) || 0) + (p.value || 0));
+      }
+      const labels = Array.from(map.keys()).sort();
+      return labels.map(d => ({ date: d, value: map.get(d) || 0 }));
+    }
+    if (preset === '1m') {
+      // group by ISO week: YYYY-Www
+      const weekKey = (s: string) => {
+        const d = new Date(s + 'T00:00:00Z');
+        // ISO week calculation
+        const day = d.getUTCDay() || 7; // 1..7, Mon=1
+        d.setUTCDate(d.getUTCDate() + 4 - day);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        const week = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+        const ww = String(week).padStart(2, '0');
+        return `${d.getUTCFullYear()}-W${ww}`;
+      };
+      const map = new Map<string, number>();
+      for (const p of points) {
+        const key = weekKey(p.date);
+        map.set(key, (map.get(key) || 0) + (p.value || 0));
+      }
+      const labels = Array.from(map.keys()).sort();
+      return labels.map(d => ({ date: d, value: map.get(d) || 0 }));
+    }
+    // default: return as-is (daily)
+    return points;
+  }
+
+  getPointsFor(key: string): SeriesPoint[] {
+    const raw = this.lastSeries()?.series?.[key]?.points ?? [];
+    return this.aggregatePoints(raw as SeriesPoint[], this.selectedRange());
   }
 
   private loadKeys(): void {
