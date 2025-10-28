@@ -11,6 +11,7 @@ const columnReportedContent = 'reportedContent';         // TEXT NOT NULL (JSON-
 const columnCreatedAt = 'createdAt';                     // INTEGER NOT NULL (unix ms)
 const columnPublicToken = 'publicToken';                 // TEXT NULL (Status-Token)
 const columnPublicTokenCreatedAt = 'publicTokenCreatedAt'; // INTEGER NULL
+const columnDismissedAt = 'dismissedAt';                  // INTEGER NULL (soft delete)
 
 // === INIT ===
 const init = function (db) {
@@ -26,7 +27,8 @@ const init = function (db) {
         ${columnReportedContent} TEXT NOT NULL,
         ${columnCreatedAt} INTEGER NOT NULL,
         ${columnPublicToken} TEXT DEFAULT NULL,
-        ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL
+        ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL,
+        ${columnDismissedAt} INTEGER DEFAULT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_dsa_signal_contentId
         ON ${tableName}(${columnContentId});
@@ -50,6 +52,12 @@ const init = function (db) {
 
             db.exec(`
           ALTER TABLE ${tableName} ADD COLUMN ${columnPublicTokenCreatedAt} INTEGER DEFAULT NULL;
+        `, (err) => {
+                if (err && !/duplicate column/.test(err.message)) throw err;
+            });
+
+            db.exec(`
+          ALTER TABLE ${tableName} ADD COLUMN ${columnDismissedAt} INTEGER DEFAULT NULL;
         `, (err) => {
                 if (err && !/duplicate column/.test(err.message)) throw err;
             });
@@ -162,7 +170,10 @@ const list = function (db, opts, callBack) {
     }
 
     let sql = `SELECT * FROM ${tableName}`;
-    if (where.length) sql += ` WHERE ${where.join(' AND ')}`;
+    // Hide dismissed signals by default
+    const baseWhere = [`${columnDismissedAt} IS NULL`];
+    if (where.length) baseWhere.push(where.join(' AND '));
+    sql += ` WHERE ${baseWhere.join(' AND ')}`;
     sql += ` ORDER BY ${columnCreatedAt} DESC`;
 
     const limit = Number.isFinite(opts?.limit) ? Math.max(1, opts.limit) : 100;
@@ -179,6 +190,15 @@ const list = function (db, opts, callBack) {
 const remove = function (db, id, callBack) {
     const sql = `DELETE FROM ${tableName} WHERE ${columnId} = ?`;
     db.run(sql, [id], function (err) {
+        if (err) return callBack(err);
+        callBack(null, this.changes > 0);
+    });
+};
+
+/** Soft-dismiss (mark as dismissed, keep row for status page) */
+const dismiss = function (db, id, dismissedAt, callBack) {
+    const sql = `UPDATE ${tableName} SET ${columnDismissedAt} = ? WHERE ${columnId} = ?`;
+    db.run(sql, [dismissedAt, id], function (err) {
         if (err) return callBack(err);
         callBack(null, this.changes > 0);
     });
@@ -233,5 +253,6 @@ module.exports = {
     getByPublicToken,
     list,
     remove,
+    dismiss,
     stats
 };

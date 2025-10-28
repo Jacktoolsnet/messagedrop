@@ -1595,8 +1595,8 @@ router.post('/signals/:id/promote', (req, res) => {
                     () => { }
                 );
 
-                // **Signal löschen** (hard) + Audit mit Snapshot
-                tableSignal.remove(_db, signalId, (err3, ok) => {
+                // **Signal ausblenden** (soft dismiss) + Audit mit Snapshot
+                tableSignal.dismiss(_db, signalId, now, (err3, ok) => {
                     if (err3) {
                         // Nicht fatal – Notice existiert bereits; wir loggen Fehler im Audit
                         const auditIdErr = crypto.randomUUID();
@@ -1688,7 +1688,8 @@ router.delete('/signals/:id', (req, res) => {
             return res.status(502).json({ error: 'enable_failed', detail: String(e?.message || e) });
         }
 
-        tableSignal.remove(_db, id, (e2, ok) => {
+        // Soft-dismiss the signal to keep status page accessible via token
+        tableSignal.dismiss(_db, id, now, (e2, ok) => {
             if (e2) return res.status(500).json({ error: 'db_error', detail: e2.message });
             if (!ok) return res.status(404).json({ error: 'not_found' });
 
