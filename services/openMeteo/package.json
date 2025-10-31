@@ -4,6 +4,7 @@
   "description": "Backend service for Messagedrop to fetch weather data from OpenMeteo API",
   "main": "app.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -36,7 +37,6 @@
     "helmet": "^8.1.0",
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^4.2.1",
-    "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"

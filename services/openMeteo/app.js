@@ -23,7 +23,6 @@ const tableWeather = require('./db/tableWeather');
 
 
 // ExpressJs
-const { createServer } = require('node:http');
 const express = require('express');
 const app = express();
 
@@ -83,64 +82,7 @@ if (process.env.NODE_ENV !== 'production') {
   }));
 }
 
-/**
- * Socket.io
- * Disable Apache proxymode in Plesk to avoid socket.io connection errors.
- */
-const { Server } = require('socket.io');
-const server = createServer(app);
-const io = new Server(server, {
-  maxHttpBufferSize: 5.5 * 1024 * 1024,
-  pingInterval: 20000,
-  pingTimeout: 30000,
-  allowEIO3: false
-});
-
-const onConnection = (socket) => {
-  // Logger an den Socket hängen
-  socket.logger = logger.child({ socketId: socket.id });
-
-  // socket.logger.info(`Verbindung aufgebaut`);
-
-  socket.onAny((event, ...args) => {
-    // socket.logger.info(`[SOCKET EVENT] ${event}`, args);
-  });
-
-  // Globale Fehlerbehandlung für diesen Socket
-  socket.on('error', (err) => {
-    socket.logger.error('Socket-Fehler', {
-      message: err.message,
-      stack: err.stack
-    });
-  });
-
-  socket.on('disconnect', (reason) => {
-    // socket.logger.warn(`Verbindung getrennt: ${reason}`);
-  });
-
-  socket.on('connect_error', (err) => {
-    socket.logger.error('Verbindungsfehler', {
-      message: err.message,
-      stack: err.stack
-    });
-  });
-
-  // Eigentliche Handler laden
-};
-
-// Socket.io: neue Verbindung
-io.on("connection", onConnection);
-
-// Fehler beim Verbindungsaufbau (z. B. Auth-Probleme)
-io.engine.on("connection_error", (err) => {
-  logger.error('Engine-Fehler beim Verbindungsaufbau', {
-    ip: err.req?.socket?.remoteAddress,
-    url: err.req?.url,
-    code: err.code,
-    message: err.message,
-    context: err.context
-  });
-});
+// Hinweis: Socket.io entfernt. Läuft als normaler Express-Server.
 
 /*
 “Helmet” is a collection of nine smaller middleware functions that are used to set security-relevant HTTP headers.
@@ -184,7 +126,7 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 (async () => {
   try {
     await generateOrLoadKeypairs();
-    server.listen(process.env.OPENMETEO_PORT, () => {
+    const server = app.listen(process.env.OPENMETEO_PORT, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);
