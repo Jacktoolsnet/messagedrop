@@ -19,6 +19,20 @@ mat-toolbar {
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
     box-shadow: 0 4px 14px rgba(0, 0, 0, .12);
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+}
+
+/* Keep loading bar pinned below toolbar */
+mat-progress-bar {
+    position: sticky;
+    top: 64px; /* toolbar height on desktop */
+    z-index: 9;
+}
+
+@media (max-width: 599px) {
+    mat-progress-bar { top: 56px; } /* mobile toolbar height */
 }
 
 .toolbar-title {

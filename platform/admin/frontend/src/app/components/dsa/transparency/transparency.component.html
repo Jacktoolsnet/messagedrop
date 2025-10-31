@@ -4,13 +4,29 @@
   </button>
   <span class="toolbar-title">Transparency</span>
   <span class="spacer"></span>
-  <mat-chip-listbox class="range-chips" [value]="filterForm.controls.range.value" (change)="onRangeChange($event)" aria-label="Select range">
-    @for (opt of rangeOptions; track opt.value) {
-    <mat-chip-option [value]="opt.value">
-      {{ opt.label }}
-    </mat-chip-option>
-    }
-  </mat-chip-listbox>
+  <div class="desktop-controls">
+    <mat-chip-listbox class="range-chips" [value]="filterForm.controls.range.value" (change)="onRangeChange($event)" aria-label="Select range">
+      @for (opt of rangeOptions; track opt.value) {
+      <mat-chip-option [value]="opt.value">
+        {{ opt.label }}
+      </mat-chip-option>
+      }
+    </mat-chip-listbox>
+  </div>
+  <div class="mobile-controls">
+    <button mat-icon-button [matMenuTriggerFor]="transparencyMenu" aria-label="Transparency menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #transparencyMenu="matMenu">
+      <button mat-menu-item disabled>Range</button>
+      @for (opt of rangeOptions; track opt.value) {
+      <button mat-menu-item (click)="setRange(opt.value)">
+        <mat-icon>{{ filterForm.controls.range.value === opt.value ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+        <span>{{ opt.label }}</span>
+      </button>
+      }
+    </mat-menu>
+  </div>
 </mat-toolbar>
 
 @if (loadingStats()) {

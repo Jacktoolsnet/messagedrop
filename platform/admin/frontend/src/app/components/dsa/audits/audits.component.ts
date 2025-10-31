@@ -46,6 +46,10 @@ export class AuditsComponent implements OnInit {
   });
 
   ngOnInit(): void {
+    // ensure we start at top when opening the view
+    queueMicrotask(() => {
+      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch {}
+    });
     this.load();
     this.filterForm.valueChanges.pipe(debounceTime(250)).subscribe(() => this.load());
   }

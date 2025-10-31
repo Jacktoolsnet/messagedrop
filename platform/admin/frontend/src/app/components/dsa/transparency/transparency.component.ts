@@ -11,6 +11,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTableModule } from '@angular/material/table';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { RouterLink } from '@angular/router';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import annotationPlugin from 'chartjs-plugin-annotation';
@@ -40,7 +42,9 @@ type RangeOption = {
     MatProgressBarModule,
     MatChipsModule,
     MatTableModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatMenuModule,
+    MatDividerModule
   ],
   templateUrl: './transparency.component.html',
   styleUrl: './transparency.component.css'
@@ -87,6 +91,13 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
 
   onRangeChange(event: MatChipListboxChange): void {
     const range = event.value;
+    if (!range) return;
+    this.filterForm.controls.range.setValue(range, { emitEvent: false });
+    this.loadStats(range);
+    this.loadReports(range);
+  }
+
+  setRange(range: string): void {
     if (!range) return;
     this.filterForm.controls.range.setValue(range, { emitEvent: false });
     this.loadStats(range);

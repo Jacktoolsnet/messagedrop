@@ -32,6 +32,14 @@ mat-toolbar {
   flex: 1 1 auto;
 }
 
+/* Responsive toolbar controls: show chips on wide, menu on narrow */
+.desktop-controls { display: inline-flex; align-items: center; gap: .5rem; }
+.mobile-controls { display: none; }
+@media (max-width: 1200px) {
+  .desktop-controls { display: none; }
+  .mobile-controls { display: inline-flex; }
+}
+
 .range-chips {
   display: inline-flex;
   gap: 0.35rem;
