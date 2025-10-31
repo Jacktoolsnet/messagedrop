@@ -22,12 +22,22 @@ mat-toolbar {
   color: var(--text);
   box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
   gap: 1rem;
+  display: flex;
+  align-items: center;
 }
 
 .toolbar-title {
   font-size: 1.3rem;
   font-weight: 600;
   margin-inline: auto;
+}
+
+/* Responsive toolbar controls */
+.desktop-controls { display: inline-flex; align-items: center; gap: .5rem; }
+.mobile-controls { display: none; }
+@media (max-width: 1200px) {
+  .desktop-controls { display: none; }
+  .mobile-controls { display: inline-flex; }
 }
 
 .status-toggle {

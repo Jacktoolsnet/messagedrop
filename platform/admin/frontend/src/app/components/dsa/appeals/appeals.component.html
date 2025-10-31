@@ -5,16 +5,43 @@
 
   <span class="toolbar-title">Appeals</span>
   <span class="spacer"></span>
-  <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
-    <mat-button-toggle value="open">Open</mat-button-toggle>
-    <mat-button-toggle value="resolved">Resolved</mat-button-toggle>
-    <mat-button-toggle value="all">All</mat-button-toggle>
-  </mat-button-toggle-group>
+  <div class="desktop-controls">
+    <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
+      <mat-button-toggle value="open">Open</mat-button-toggle>
+      <mat-button-toggle value="resolved">Resolved</mat-button-toggle>
+      <mat-button-toggle value="all">All</mat-button-toggle>
+    </mat-button-toggle-group>
+    <button mat-stroked-button color="primary" type="button" (click)="refresh()">
+      <mat-icon>refresh</mat-icon>
+      Refresh
+    </button>
+  </div>
 
-  <button mat-stroked-button color="primary" type="button" (click)="refresh()">
-    <mat-icon>refresh</mat-icon>
-    Refresh
-  </button>
+  <div class="mobile-controls">
+    <button mat-icon-button [matMenuTriggerFor]="appealsMenu" aria-label="Appeals menu">
+      <mat-icon>more_vert</mat-icon>
+    </button>
+    <mat-menu #appealsMenu="matMenu">
+      <button mat-menu-item disabled>Status</button>
+      <button mat-menu-item (click)="setStatus('open')">
+        <mat-icon>{{ statusFilter() === 'open' ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+        <span>Open</span>
+      </button>
+      <button mat-menu-item (click)="setStatus('resolved')">
+        <mat-icon>{{ statusFilter() === 'resolved' ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+        <span>Resolved</span>
+      </button>
+      <button mat-menu-item (click)="setStatus('all')">
+        <mat-icon>{{ statusFilter() === 'all' ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+        <span>All</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="refresh()">
+        <mat-icon>refresh</mat-icon>
+        <span>Refresh</span>
+      </button>
+    </mat-menu>
+  </div>
 </mat-toolbar>
 
 @if (loading()) {

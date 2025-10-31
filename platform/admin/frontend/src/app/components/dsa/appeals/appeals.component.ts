@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatDividerModule } from '@angular/material/divider';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
@@ -34,6 +35,7 @@ type AppealStatusFilter = 'open' | 'resolved' | 'all';
     DatePipe,
     RouterLink,
     MatToolbarModule,
+    MatMenuModule,
     MatIconModule,
     MatButtonModule,
     MatButtonToggleModule,

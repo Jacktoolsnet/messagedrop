@@ -147,3 +147,7 @@ mat-toolbar {
     color: var(--muted);
     font-style: italic
 }
+
+.spacer {
+    flex: 1 1 auto;
+}
