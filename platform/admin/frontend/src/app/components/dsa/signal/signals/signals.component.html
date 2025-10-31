@@ -4,7 +4,7 @@
     </button>
 
     <span class="toolbar-title">Signals</span>
-
+    <span class="spacer"></span>
     <button mat-stroked-button (click)="reload()">
         <mat-icon>refresh</mat-icon>
         Refresh
@@ -55,12 +55,8 @@
         <mat-card class="tile" (click)="openDetail(s)" tabindex="0" (keydown.enter)="openDetail(s)">
             <mat-card-header>
                 <div mat-card-avatar class="avatar">
-                    <span class="avatar-badged"
-                          [matBadge]="isNew(s) ? 'new' : ''"
-                          [matBadgeHidden]="!isNew(s)"
-                          matBadgePosition="below after"
-                          matBadgeOverlap="false"
-                          matBadgeColor="primary">
+                    <span class="avatar-badged" [matBadge]="isNew(s) ? 'new' : ''" [matBadgeHidden]="!isNew(s)"
+                        matBadgePosition="below after" matBadgeOverlap="false" matBadgeColor="primary">
                         <mat-icon>info</mat-icon>
                     </span>
                 </div>

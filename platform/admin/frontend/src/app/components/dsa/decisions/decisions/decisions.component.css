@@ -24,9 +24,9 @@ mat-toolbar {
 }
 
 .toolbar-title {
-    margin-inline: auto;
     font-size: 1.35rem;
     font-weight: 600;
+    margin: 0;
 }
 
 .page {
@@ -189,4 +189,8 @@ mat-card-actions {
         transform: translateY(6px);
         opacity: 1;
     }
+}
+
+.spacer {
+    flex: 1 1 auto;
 }

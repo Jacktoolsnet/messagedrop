@@ -9,8 +9,6 @@
         Dashboard
     </span>
 
-    <!-- Username + Logout rechts -->
-    <span>{{ username() }} ({{ role() }})</span>
     <button mat-icon-button (click)="logout()" aria-label="Logout">
         <mat-icon>logout</mat-icon>
     </button>
@@ -41,7 +39,8 @@
         </mat-card>
 
         <!-- Statistic -->
-        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/statistic" role="button" tabindex="0">
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/statistic" role="button"
+            tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar">
                     <mat-icon>query_stats</mat-icon>

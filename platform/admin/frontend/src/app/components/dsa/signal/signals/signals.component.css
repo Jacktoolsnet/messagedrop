@@ -30,9 +30,9 @@ mat-toolbar {
     border-bottom: 1px solid var(--border);
 
     .toolbar-title {
-        margin-inline: auto;
         font-size: 1.35rem;
         font-weight: 600;
+        margin: 0;
     }
 }
 
