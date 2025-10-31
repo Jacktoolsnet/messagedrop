@@ -23,6 +23,14 @@ mat-toolbar {
     gap: .75rem;
 }
 
+/* Responsive toolbar controls */
+.desktop-controls { display: inline-flex; align-items: center; gap: .5rem; }
+.mobile-controls { display: none; }
+@media (max-width: 1200px) {
+    .desktop-controls { display: none; }
+    .mobile-controls { display: inline-flex; }
+}
+
 .toolbar-title {
     font-weight: 600;
     font-size: 1.3rem;
