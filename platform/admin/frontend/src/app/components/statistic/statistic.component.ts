@@ -10,6 +10,8 @@ import { StatisticRangePreset } from '../../interfaces/statistic-range-preset.ty
 import { MultiSeriesResponse } from '../../interfaces/statistic-multi-series-response.interface';
 import { StatisticKeyChartComponent } from './key-chart/statistic-key-chart.component';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { StatisticSettingsComponent } from './settings/statistic-settings.component';
 import { StatisticSettingsService } from '../../services/statistic/statistic-settings.service';
 import { StatisticKeySetting } from '../../interfaces/statistic-key-setting.interface';
@@ -26,7 +28,9 @@ import { SeriesPoint } from '../../interfaces/statistic-series-point.interface';
     MatCardModule,
     MatButtonToggleModule,
     StatisticKeyChartComponent,
-    MatDialogModule
+    MatDialogModule,
+    MatMenuModule,
+    MatDividerModule
   ],
   templateUrl: './statistic.component.html',
   styleUrls: ['./statistic.component.css']
@@ -113,6 +117,14 @@ export class StatisticComponent {
     if (!v) return;
     if (this.selectedRange() === v) return;
     this.selectedRange.set(v as any);
+  }
+
+  setRange(preset: string): void {
+    const allowed = new Set(['12m','6m','3m','1m','1w','1d']);
+    if (!allowed.has(preset)) return;
+    if (this.selectedRange() !== (preset as any)) {
+      this.selectedRange.set(preset as any);
+    }
   }
 
   reload(): void {

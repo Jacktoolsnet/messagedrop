@@ -122,6 +122,14 @@ mat-toolbar {
 
 .spacer { flex: 1 1 auto; }
 
+/* Responsive controls: show desktop group on wide, menu on narrow */
+.desktop-controls { display: inline-flex; align-items: center; gap: .5rem; }
+.mobile-controls { display: none; }
+@media (max-width: 1200px) {
+  .desktop-controls { display: none; }
+  .mobile-controls { display: inline-flex; }
+}
+
 /* Card look */
 .placeholder {
   max-width: 960px;
@@ -156,14 +164,25 @@ mat-toolbar {
 .focus-chart {
   display: grid;
   place-items: center;
-  padding: 1rem 0;
+  padding: .5rem 0;
   position: relative;
+  /* full-bleed centered across viewport to avoid left gap/right overflow */
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  overflow-x: clip;
 }
 
-/* constrain focused chart width */
+/* Dynamic toolbar height variable (desktop/mobile) */
+:host { --toolbar-h: 64px; }
+@media (max-width: 599px) { :host { --toolbar-h: 56px; } }
+
+/* constrain focused chart size */
 .focus-chart app-statistic-key-chart {
   width: 95vw;
-  max-width: 1200px;
+  max-width: 95vw;
+  height: calc(100dvh - var(--toolbar-h) - 5rem);
+  max-height: calc(100dvh - var(--toolbar-h) - 5rem);
   display: block;
 }
 
