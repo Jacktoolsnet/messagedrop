@@ -4,7 +4,7 @@
   </button>
 
   <span class="toolbar-title">Appeals</span>
-
+  <span class="spacer"></span>
   <mat-button-toggle-group [value]="statusFilter()" (valueChange)="setStatus($event)">
     <mat-button-toggle value="open">Open</mat-button-toggle>
     <mat-button-toggle value="resolved">Resolved</mat-button-toggle>
@@ -165,9 +165,9 @@
               @if (mediaKind() === 'iframe' && embedUrl()) {
               <div class="embed">
                 <iframe [src]="embedUrl()" title="Embedded content" loading="lazy"
-                        referrerpolicy="strict-origin-when-cross-origin"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                        allowfullscreen></iframe>
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowfullscreen></iframe>
               </div>
               }
 

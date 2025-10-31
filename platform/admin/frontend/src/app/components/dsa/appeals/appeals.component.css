@@ -138,7 +138,9 @@ mat-toolbar {
   color: var(--muted);
 }
 
-.left-column .empty { margin-top: 0.5rem; }
+.left-column .empty {
+  margin-top: 0.5rem;
+}
 
 .empty mat-icon {
   font-size: 56px;
@@ -248,9 +250,16 @@ mat-toolbar {
   font-size: 0.9rem;
 }
 
-.meta span { display: inline-flex; align-items: center; gap: .35rem; }
+.meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+}
 
-.actions { display: flex; justify-content: flex-end; }
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
 
 .summary-grid {
   display: grid;
@@ -258,8 +267,15 @@ mat-toolbar {
   grid-template-columns: 1fr;
 }
 
-.tile-title { margin: 0; padding: .9rem 1rem .4rem; font-weight: 600; }
-.tile-body { padding: .75rem 1rem 1rem; }
+.tile-title {
+  margin: 0;
+  padding: .9rem 1rem .4rem;
+  font-weight: 600;
+}
+
+.tile-body {
+  padding: .75rem 1rem 1rem;
+}
 
 .summary-header {
   display: flex;
@@ -282,17 +298,67 @@ mat-toolbar {
 }
 
 /* Reuse small helpers from notice detail look */
-.section { display: grid; grid-template-columns: 1fr; gap: .5rem; }
-.kv { display: grid; grid-template-columns: 160px 1fr; gap: .35rem .75rem; align-items: center; }
-.kv .k { color: var(--muted); }
-.kv .v { color: var(--text); }
-.kv .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
-.block { padding: .25rem 0; }
-.bubble { padding: .75rem .9rem; border: 1px solid var(--border); border-radius: 12px; background: color-mix(in srgb, var(--primary) 6%, transparent); color: var(--text); white-space: pre-wrap; word-break: break-word; }
-.block-actions { margin-top: .5rem; display: flex; justify-content: flex-end; gap: .5rem; }
-.block-actions mat-icon { margin-right: .35rem; }
-.placeholder { display: inline-flex; align-items: center; gap: .4rem; color: var(--muted); font-style: italic; }
-.sp { margin: .6rem 0; }
+.section {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .5rem;
+}
+
+.kv {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: .35rem .75rem;
+  align-items: center;
+}
+
+.kv .k {
+  color: var(--muted);
+}
+
+.kv .v {
+  color: var(--text);
+}
+
+.kv .mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+.block {
+  padding: .25rem 0;
+}
+
+.bubble {
+  padding: .75rem .9rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: color-mix(in srgb, var(--primary) 6%, transparent);
+  color: var(--text);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.block-actions {
+  margin-top: .5rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: .5rem;
+}
+
+.block-actions mat-icon {
+  margin-right: .35rem;
+}
+
+.placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.sp {
+  margin: .6rem 0;
+}
 
 /* Media embeds */
 .embed {
@@ -301,7 +367,12 @@ mat-toolbar {
   overflow: hidden;
   border: 1px solid var(--border);
 }
-.embed iframe { width: 100%; height: 320px; display: block; }
+
+.embed iframe {
+  width: 100%;
+  height: 320px;
+  display: block;
+}
 
 .tenor-wrap {
   margin-top: .5rem;
@@ -309,7 +380,12 @@ mat-toolbar {
   overflow: hidden;
   border: 1px solid var(--border);
 }
-.tenor-wrap img { display: block; width: 100%; height: auto; }
+
+.tenor-wrap img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
 
 /* Right-side empty placeholder styled like notifications */
 .placeholder.empty {
@@ -319,7 +395,8 @@ mat-toolbar {
   text-align: center;
   color: var(--muted);
   padding: 2rem 1rem;
-  margin-top: 0.5rem; /* align with left list header */
+  margin-top: 0.5rem;
+  /* align with left list header */
 }
 
 .placeholder.empty mat-icon {
@@ -430,24 +507,4 @@ mat-toolbar {
 .chip-resolved {
   background-color: rgba(5, 165, 29, 0.16);
   color: #04730f;
-}
-
-@media (max-width: 720px) {
-  mat-toolbar {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .toolbar-title {
-    width: 100%;
-    text-align: center;
-    margin-inline: 0;
-  }
-
-  .status-toggle {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .right-column, .left-column { flex: 1 1 100%; }
 }
