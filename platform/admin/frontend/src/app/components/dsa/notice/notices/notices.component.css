@@ -91,6 +91,14 @@ mat-toolbar {
     flex: 1 1 auto;
 }
 
+/* Responsive toolbar controls */
+.desktop-controls { display: inline-flex; align-items: center; gap: .5rem; }
+.mobile-controls { display: none; }
+@media (max-width: 1200px) {
+    .desktop-controls { display: none; }
+    .mobile-controls { display: inline-flex; }
+}
+
 .status-toggle {
     display: inline-flex;
     align-items: center;

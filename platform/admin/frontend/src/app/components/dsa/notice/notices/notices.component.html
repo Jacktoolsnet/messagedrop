@@ -6,16 +6,38 @@
     <span class="toolbar-title">Notices</span>
     <span class="spacer"></span>
 
-    <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
-        @for (s of statuses; track s) {
-        <mat-button-toggle [value]="s">{{ statusLabel(s) }}</mat-button-toggle>
-        }
-    </mat-button-toggle-group>
+    <div class="desktop-controls">
+        <mat-button-toggle-group class="status-toggle" [value]="statusFilter()" (valueChange)="setStatus($event)">
+            @for (s of statuses; track s) {
+            <mat-button-toggle [value]="s">{{ statusLabel(s) }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
 
-    <button mat-stroked-button (click)="reload()">
-        <mat-icon>refresh</mat-icon>
-        Refresh
-    </button>
+        <button mat-stroked-button (click)="reload()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+    </div>
+
+    <div class="mobile-controls">
+        <button mat-icon-button [matMenuTriggerFor]="noticeMenu" aria-label="Notices menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #noticeMenu="matMenu">
+            <button mat-menu-item disabled>Status</button>
+            @for (s of statuses; track s) {
+            <button mat-menu-item (click)="setStatus(s)">
+                <mat-icon>{{ statusFilter() === s ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ statusLabel(s) }}</span>
+            </button>
+            }
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="reload()">
+                <mat-icon>refresh</mat-icon>
+                <span>Refresh</span>
+            </button>
+        </mat-menu>
+    </div>
 </mat-toolbar>
 
 @if (loading()) {

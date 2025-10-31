@@ -13,6 +13,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatDividerModule } from '@angular/material/divider';
 import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 
 import { DsaNoticeFilters, DsaNoticeRange } from '../../../../interfaces/dsa-notice-filters.interface';
@@ -38,6 +40,8 @@ import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component'
     MatIconModule,
     MatButtonModule,
     MatButtonToggleModule,
+    MatMenuModule,
+    MatDividerModule,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
