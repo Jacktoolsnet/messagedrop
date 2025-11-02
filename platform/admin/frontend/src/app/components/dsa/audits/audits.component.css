@@ -49,14 +49,21 @@ mat-progress-bar {
 
 .filter-row {
     display: grid;
-    grid-template-columns: 180px 180px 160px 1fr;
+    /* Responsive columns: wrap fields as space allows */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: .75rem;
     align-items: center;
     margin: .75rem 0 1rem;
 }
 
-.filter-row .grow {
-    width: 100%
+/* Ensure Material fields fill their grid cell */
+.filter-row mat-form-field { width: 100%; }
+
+/* Keep search flexible but fully responsive */
+.filter-row .grow { width: 100% }
+
+@media (max-width: 480px) {
+    .filter-row { grid-template-columns: 1fr; }
 }
 
 .timeline {
