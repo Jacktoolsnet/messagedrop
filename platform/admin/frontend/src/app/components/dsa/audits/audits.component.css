@@ -95,6 +95,10 @@ mat-progress-bar {
     gap: .75rem
 }
 
+/* Ensure text next to avatar can shrink/wrap correctly */
+.left .head { flex: 1 1 auto; min-width: 0; }
+.head .meta { flex-wrap: wrap; }
+
 .avatar {
     width: 44px;
     height: 44px;
@@ -133,6 +137,14 @@ mat-progress-bar {
     width: 100%
 }
 
+/* Key-Value rows layout inside right column */
+.kv-list .head {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    align-items: start;
+    gap: .5rem;
+}
+
 .kv {
     display: grid;
     grid-template-columns: 120px 1fr;
@@ -147,6 +159,39 @@ mat-progress-bar {
 .v {
     color: var(--text);
     word-break: break-word
+}
+
+/* Responsive adjustments for small screens */
+@media (max-width: 900px) {
+    .row {
+        grid-template-columns: 1fr; /* Stack left and right */
+        padding: 10px 12px;
+        overflow: hidden; /* prevent visual overflow */
+    }
+    .left { align-items: flex-start; width: 100%; }
+    .right {
+        align-items: stretch;
+        justify-content: flex-start;
+        width: 100%;
+    }
+    /* Allow text to wrap and avoid overlap */
+    .head, .kv-list, .kv-list .head { min-width: 0; }
+    .head .title, .head .meta, .kv-list .title, .kv-list .meta { 
+        word-break: break-word; 
+        overflow-wrap: anywhere; 
+    }
+}
+
+@media (max-width: 768px) {
+    .avatar { width: 40px; height: 40px; }
+    .head .meta { flex-wrap: wrap; gap: .35rem; }
+    .kv-list { grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+}
+
+@media (max-width: 480px) {
+    .avatar { width: 36px; height: 36px; }
+    .head .meta { font-size: .85rem; }
+    .kv-list { grid-template-columns: 1fr; }
 }
 
 .empty {
