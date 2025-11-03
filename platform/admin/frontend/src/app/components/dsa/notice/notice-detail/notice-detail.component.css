@@ -76,6 +76,19 @@
     grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
 }
 
+/* Responsive: stack tiles and use smaller min width on narrow screens */
+@media (max-width: 1024px) {
+    .tiles-grid {
+        grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+    }
+}
+
+@media (max-width: 720px) {
+    .tiles-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
 .tile {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -147,6 +160,8 @@
 
         .v {
             color: var(--text);
+            word-break: break-word;
+            overflow-wrap: anywhere;
         }
 
         .mono {
@@ -157,6 +172,12 @@
     @media (max-width: 800px) {
         .kv {
             grid-template-columns: 140px 1fr;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .kv {
+            grid-template-columns: 110px 1fr;
         }
     }
 }
@@ -236,13 +257,20 @@
         .kv {
             display: flex;
             gap: .5rem;
+            flex-wrap: wrap;
+            align-items: flex-start;
 
             .k {
-                color: var(--muted)
+                color: var(--muted);
+                min-width: 110px;
             }
 
             .v {
-                color: var(--text)
+                color: var(--text);
+                flex: 1 1 auto;
+                min-width: 0;
+                word-break: break-word;
+                overflow-wrap: anywhere;
             }
         }
 
@@ -268,6 +296,10 @@
         height: 320px;
         display: block;
     }
+}
+
+@media (max-width: 480px) {
+    .embed iframe { height: 220px; }
 }
 
 .tenor-wrap {
