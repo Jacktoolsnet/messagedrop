@@ -1,4 +1,5 @@
 import { ApplicationConfig, isDevMode, LOCALE_ID } from '@angular/core';
+import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { provideRouter } from '@angular/router';
 
 import { provideHttpClient, withFetch, withInterceptors } from '@angular/common/http';
@@ -11,6 +12,7 @@ import { loadingInterceptor } from './interceptors/loading-interceptor';
 export const appConfig: ApplicationConfig = {
   providers: [
     { provide: LOCALE_ID, useValue: navigator.language },
+    { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } },
     provideHttpClient(
       withFetch(),
       withInterceptors([authInterceptor, loadingInterceptor])
@@ -25,4 +27,3 @@ export const appConfig: ApplicationConfig = {
 function withInterceptorsFrom(): import("@angular/common/http").HttpFeature<import("@angular/common/http").HttpFeatureKind> {
   throw new Error('Function not implemented.');
 }
-

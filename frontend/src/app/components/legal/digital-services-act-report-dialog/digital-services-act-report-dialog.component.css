@@ -81,6 +81,44 @@
     width: 100%;
 }
 
+/* Evidence tab */
+.evidence-grid {
+    display: grid;
+    gap: 1rem;
+    max-width: 720px;
+}
+
+.evidence-section {
+    border: 1px dashed color-mix(in oklab, var(--mat-card-outline-color, rgba(0,0,0,.12)) 50%, transparent);
+    border-radius: 12px;
+    padding: .75rem;
+}
+
+.section-title {
+    font-weight: 600;
+    margin: 0 0 .5rem 0;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+}
+
+.file-upload { display: grid; gap: .5rem; }
+.upload-label {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .5rem .75rem;
+    border-radius: 10px;
+    border: 1px solid var(--mat-card-outline-color, rgba(0,0,0,.12));
+    cursor: pointer;
+}
+.file-upload input[type="file"] { display: none; }
+
+.evidence-list { border-top: 1px solid var(--mat-card-outline-color, rgba(0,0,0,.12)); padding-top: .75rem; }
+.list-title { font-weight: 600; margin-bottom: .5rem; }
+.chips { display: flex; flex-wrap: wrap; gap: .5rem; }
+.chip-text { max-width: 60ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
 .row {
     display: grid;
     grid-template-columns: 1fr;

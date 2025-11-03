@@ -1,17 +1,13 @@
 <mat-toolbar color="primary">
     <!-- Home-Button links -->
-    <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
-        <mat-icon>home</mat-icon>
+    <button mat-icon-button (click)="logout()" aria-label="Dashboard Home">
+        <mat-icon>logout</mat-icon>
     </button>
 
     <!-- Titel zentriert -->
     <span class="toolbar-title">
         Dashboard
     </span>
-
-    <button mat-icon-button (click)="logout()" aria-label="Logout">
-        <mat-icon>logout</mat-icon>
-    </button>
 </mat-toolbar>
 
 <div class="page">

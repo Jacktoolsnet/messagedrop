@@ -104,4 +104,48 @@ export class DigitalServicesActService {
       .pipe(catchError(this.handleError));
   }
 
+  /** Attach evidence to a created notice */
+  addNoticeEvidence(
+    noticeId: string,
+    data: { type: 'file' | 'url' | 'hash'; url?: string | null; hash?: string | null; file?: File | null }
+  ): Observable<{ id: string }> {
+    const url = `${environment.apiUrl}/digitalserviceact/notices/${encodeURIComponent(noticeId)}/evidence`;
+    if (data.type === 'file' && data.file) {
+      const form = new FormData();
+      form.append('type', 'file');
+      form.append('file', data.file);
+      if (data.hash) form.append('hash', data.hash);
+      const headers = new HttpHeaders({ 'X-API-Authorization': `${environment.apiToken}` });
+      return this.http.post<{ id: string }>(url, form, { headers, withCredentials: true }).pipe(
+        catchError(this.handleError)
+      );
+    }
+    const body = { type: data.type, url: data.url ?? null, hash: data.hash ?? null } as const;
+    return this.http.post<{ id: string }>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  /** Attach evidence to a created signal */
+  addSignalEvidence(
+    signalId: string,
+    data: { type: 'file' | 'url' | 'hash'; url?: string | null; hash?: string | null; file?: File | null }
+  ): Observable<{ id: string }> {
+    const url = `${environment.apiUrl}/digitalserviceact/signals/${encodeURIComponent(signalId)}/evidence`;
+    if (data.type === 'file' && data.file) {
+      const form = new FormData();
+      form.append('type', 'file');
+      form.append('file', data.file);
+      if (data.hash) form.append('hash', data.hash);
+      const headers = new HttpHeaders({ 'X-API-Authorization': `${environment.apiToken}` });
+      return this.http.post<{ id: string }>(url, form, { headers, withCredentials: true }).pipe(
+        catchError(this.handleError)
+      );
+    }
+    const body = { type: data.type, url: data.url ?? null, hash: data.hash ?? null } as const;
+    return this.http.post<{ id: string }>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
 }

@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatChipsModule } from '@angular/material/chips';
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
@@ -29,7 +30,8 @@ import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-d
     MatSelectModule,
     MatCheckboxModule,
     MatButtonModule,
-    MatIconModule
+    MatIconModule,
+    MatChipsModule
   ],
   templateUrl: './digital-services-act-report-dialog.component.html',
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
@@ -90,6 +92,42 @@ export class DigitalServicesActReportDialogComponent {
   errorMsg = '';
   activeTabIndex = 0; // 0 = Quick, 1 = Formal
 
+  // Evidence tab state
+  readonly maxEvidenceBytes = 5 * 1024 * 1024;
+  evidenceItems = signal<Array<{ id: string; type: 'file' | 'url'; file?: File; url?: string }>>([]);
+  evidenceForm = this.fb.nonNullable.group({
+    url: ['']
+  });
+
+  removeEvidence(i: number): void {
+    const arr = [...this.evidenceItems()];
+    arr.splice(i, 1);
+    this.evidenceItems.set(arr);
+  }
+
+  addEvidenceUrl(): void {
+    const url = (this.evidenceForm.controls.url.value || '').trim();
+    if (!url) return;
+    this.evidenceItems.update(arr => [...arr, { id: crypto.randomUUID(), type: 'url', url }]);
+    this.evidenceForm.controls.url.setValue('');
+  }
+
+  onEvidenceFileChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const fileList = input.files;
+    if (!fileList || fileList.length === 0) return;
+    const items: Array<{ id: string; type: 'file'; file: File }> = [];
+    for (let i = 0; i < fileList.length; i++) {
+      const f = fileList.item(i)!;
+      if (f.size > this.maxEvidenceBytes) { continue; }
+      const okType = f.type === 'application/pdf' || f.type.startsWith('image/') || /\.(pdf|png|jpe?g|gif|webp)$/i.test(f.name);
+      if (!okType) { continue; }
+      items.push({ id: crypto.randomUUID(), type: 'file', file: f });
+    }
+    if (items.length) this.evidenceItems.update(arr => [...arr, ...items]);
+    input.value = '';
+  }
+
   // Helfer: formatiertes Datum
   asDateString(d: Date | null) {
     return d ? d.toLocaleString() : '—';
@@ -117,7 +155,8 @@ export class DigitalServicesActReportDialogComponent {
           contentType,
           content: contentSnapshot
         }));
-
+        // attach evidence to created signal, if any
+        await this.attachEvidenceAfterSubmit('signal', response?.id);
         this.showSuccess('signal', response?.statusUrl ?? null, response?.token ?? null);
       } else {
         // FORMAL NOTICE
@@ -133,7 +172,8 @@ export class DigitalServicesActReportDialogComponent {
           contentType,
           content: contentSnapshot
         }));
-
+        // attach evidence to created notice, if any
+        await this.attachEvidenceAfterSubmit('notice', response?.id);
         this.showSuccess('notice', response?.statusUrl ?? null, response?.token ?? null, raw.reporterEmail || '');
       }
     } catch (e: any) {
@@ -242,5 +282,30 @@ export class DigitalServicesActReportDialogComponent {
       icon: 'report_problem',
       closeParentalDialog: false
     });
+  }
+
+  private async attachEvidenceAfterSubmit(kind: 'signal' | 'notice', id?: string | null): Promise<void> {
+    const items = this.evidenceItems();
+    if (!id || items.length === 0) return;
+    // perform sequentially to simplify error handling
+    for (const item of items) {
+      try {
+        if (kind === 'notice') {
+          if (item.type === 'file' && item.file) {
+            await firstValueFrom(this.dsa.addNoticeEvidence(id, { type: 'file', file: item.file } as any));
+          } else if (item.type === 'url' && item.url) {
+            await firstValueFrom(this.dsa.addNoticeEvidence(id, { type: 'url', url: item.url } as any));
+          }
+        } else {
+          if (item.type === 'file' && item.file) {
+            await firstValueFrom(this.dsa.addSignalEvidence(id, { type: 'file', file: item.file } as any));
+          } else if (item.type === 'url' && item.url) {
+            await firstValueFrom(this.dsa.addSignalEvidence(id, { type: 'url', url: item.url } as any));
+          }
+        }
+      } catch {
+        // continue with others; individual errors are handled in service
+      }
+    }
   }
 }
