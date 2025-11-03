@@ -153,13 +153,13 @@
                     <div class="chips">
                         @for (e of evidenceItems(); track e.id; let i = $index) {
                         <mat-chip-row>
-                            <mat-icon>{{ e.type === 'file' ? 'description' : (e.type === 'url' ? 'link' : 'fingerprint') }}</mat-icon>
+                            <mat-icon matChipAvatar>{{ e.type === 'file' ? 'description' : 'link' }}</mat-icon>
                             <span class="chip-text">
                                 @if (e.type === 'file') { {{ e.file?.name }} }
                                 @if (e.type === 'url') { {{ e.url }} }
                             </span>
-                            <button matChipRemove (click)="removeEvidence(i)" aria-label="Remove">
-                                <mat-icon>close</mat-icon>
+                            <button mat-icon-button matChipRemove matChipTrailingIcon (click)="removeEvidence(i)" aria-label="Remove">
+                                <mat-icon>delete</mat-icon>
                             </button>
                         </mat-chip-row>
                         }

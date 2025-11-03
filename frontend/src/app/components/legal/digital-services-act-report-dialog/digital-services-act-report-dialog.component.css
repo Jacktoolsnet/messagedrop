@@ -119,6 +119,27 @@
 .chips { display: flex; flex-wrap: wrap; gap: .5rem; }
 .chip-text { max-width: 60ch; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
+/* Center content inside chips and align icons with text */
+.chips .mat-mdc-chip-row { align-items: center; }
+.chips .mat-mdc-chip-action-label { display: inline-flex; align-items: center; gap: .5rem; }
+.chips [matChipAvatar] { margin-right: .25rem; }
+.chips [matChipTrailingIcon] {
+  margin-left: .25rem;
+  align-self: center; /* vertical center within the chip */
+}
+
+/* Normalize icon-button size inside chips to avoid squashing/top sticking */
+.chips .mat-mdc-icon-button {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.chips .mat-mdc-icon-button .mat-mdc-button-touch-target { width: 28px; height: 28px; }
+.chips .mat-mdc-icon-button mat-icon { font-size: 20px; line-height: 1; }
+
 .row {
     display: grid;
     grid-template-columns: 1fr;
