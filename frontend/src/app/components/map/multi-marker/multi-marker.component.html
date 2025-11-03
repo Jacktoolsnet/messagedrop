@@ -1,10 +1,10 @@
 <mat-dialog-content>
   <button mat-stroked-button [mat-dialog-close]="{type: 'public_message', messages: data.messages}" matBadge="{{data.messages.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
-    <mat-icon class="material-symbols-outlined">speaker_notes</mat-icon>
+    <mat-icon>speaker_notes</mat-icon>
     Show messages
   </button>
   <button mat-stroked-button [mat-dialog-close]="{type: 'private_note', notes: data.notes}" matBadge="{{data.notes.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
-    <mat-icon class="material-symbols-outlined">clinical_notes</mat-icon>
+    <mat-icon>clinical_notes</mat-icon>
     Show notes
   </button>
 </mat-dialog-content>

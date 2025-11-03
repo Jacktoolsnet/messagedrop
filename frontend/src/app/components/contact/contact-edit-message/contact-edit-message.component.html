@@ -6,7 +6,7 @@
         } @else {
         <div class="oembed_container">
             <button mat-mini-fab color="primary" class="button_remove_multimedia" (click)="removeMultimedia()">
-                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+                <mat-icon>delete</mat-icon>
             </button>
             <app-showmultimedia class="oembed_container" [multimedia]="data.shortMessage.multimedia">
             </app-showmultimedia>
@@ -16,7 +16,7 @@
         @if (data.shortMessage.message === '') {
         <div class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
-                <mat-icon class="material-symbols-outlined">post_add</mat-icon>
+                <mat-icon>post_add</mat-icon>
                 <span>Add a text</span>
             </button>
         </div>
@@ -24,10 +24,10 @@
         <div class="oembed_container">
             <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message"
                 (click)="onNewFontClick()">
-                <mat-icon class="material-symbols-outlined">switch_access_shortcut</mat-icon>
+                <mat-icon>switch_access_shortcut</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
-                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+                <mat-icon>delete</mat-icon>
             </button>
             <p class="text" (click)="openTextDialog()" [style]="data.shortMessage.style">
                 {{ data.shortMessage.message }}

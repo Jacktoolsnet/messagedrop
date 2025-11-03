@@ -3,7 +3,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [matMenuTriggerFor]="connectionMenu">
@@ -28,7 +28,7 @@
                 @if (contact.base64Avatar) {
                 <img class="avatar" [src]="contact.base64Avatar" />
                 } @else {
-                <mat-icon class="material-symbols-outlined">person</mat-icon>
+                <mat-icon>person</mat-icon>
                 }
                 <span class="name">{{ contact.name || 'Unnamed' }}</span>
             </mat-expansion-panel-header>

@@ -27,7 +27,7 @@
         <!-- TAB 1: QUICK REPORT -->
         <mat-tab>
             <ng-template mat-tab-label>
-                <mat-icon class="material-symbols-outlined">flag</mat-icon>
+                <mat-icon>flag</mat-icon>
                 <span class="tab-label">Quick report</span>
             </ng-template>
 
@@ -54,7 +54,7 @@
         <!-- TAB 2: FORMAL DSA REPORT -->
         <mat-tab>
             <ng-template mat-tab-label>
-                <mat-icon class="material-symbols-outlined">gavel</mat-icon>
+                <mat-icon>gavel</mat-icon>
                 <span class="tab-label">Formal DSA report</span>
             </ng-template>
 
@@ -110,7 +110,7 @@
         <!-- TAB 3: EVIDENCE -->
         <mat-tab>
             <ng-template mat-tab-label>
-                <mat-icon class="material-symbols-outlined">attach_file</mat-icon>
+                <mat-icon>attach_file</mat-icon>
                 <span class="tab-label">Evidence</span>
             </ng-template>
 
@@ -178,7 +178,7 @@
     <button mat-button (click)="cancel()" [disabled]="submitting">Cancel</button>
     <button color="primary" mat-flat-button (click)="submit()"
         [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">
-        <mat-icon class="material-symbols-outlined">send</mat-icon>
+        <mat-icon>send</mat-icon>
         Submit
     </button>
 </mat-dialog-actions>

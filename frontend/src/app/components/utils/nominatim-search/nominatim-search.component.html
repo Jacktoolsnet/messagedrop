@@ -11,7 +11,7 @@
     </select>
 
     <button (click)="search()">
-        <mat-icon class="material-symbols-outlined">search</mat-icon>
+        <mat-icon>search</mat-icon>
     </button>
 </div>
 
@@ -20,7 +20,7 @@
         @for (place of nominatimPlaces; track place.place_id) {
         <mat-card class="item">
             <div class="avatar-box">
-                <mat-icon class="material-symbols-outlined">{{ getIconForPlace(place) || 'location' }}</mat-icon>
+                <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
                 @if (place.name) {
                 <span class="name">{{ place.name }}</span>
                 }
@@ -41,17 +41,17 @@
             <mat-card-actions class="buttonbar">
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
                     (click)="!userService.isReady() ? lgoinAndAddToMypPlaces(place) : addToMyPlaces(place)">
-                    <mat-icon class="material-symbols-outlined">add_location</mat-icon>
+                    <mat-icon>add_location</mat-icon>
                 </button>
 
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
                     (click)="flyTo(place)">
-                    <mat-icon class="material-symbols-outlined">place</mat-icon>
+                    <mat-icon>place</mat-icon>
                 </button>
 
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Navigate to place"
                     (click)="nominatimService.navigateToNominatimPlace(place)">
-                    <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
+                    <mat-icon>assistant_direction</mat-icon>
                 </button>
             </mat-card-actions>
         </mat-card>

@@ -3,7 +3,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
@@ -15,11 +15,11 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
             <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
                 (click)="openNoteDialog()">
-                <mat-icon [attr.aria-hidden]="false" class="material-symbols-outlined">add_notes</mat-icon>
+                <mat-icon [attr.aria-hidden]="false">add_notes</mat-icon>
             </button>
         </div>
 
@@ -34,17 +34,17 @@
             <mat-card-actions class="buttonbar">
                 @if (userService.isReady()) {
                 <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
-                    <mat-icon class="material-symbols-outlined">edit</mat-icon>
+                    <mat-icon>edit</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
-                    <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+                    <mat-icon>delete_forever</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
-                    <mat-icon class="material-symbols-outlined">place</mat-icon>
+                    <mat-icon>place</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
                     (click)="navigateToNoteLocation(note)">
-                    <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
+                    <mat-icon>assistant_direction</mat-icon>
                 </button>
                 }
             </mat-card-actions>
