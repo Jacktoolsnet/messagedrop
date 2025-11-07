@@ -151,9 +151,9 @@ export class SignalDetailComponent {
     }
     const ref = this.dialog.open(ConfirmDialogComponent, {
       data: {
-        title: 'Delete Signal?',
-        message: 'This signal will be deleted permanently.',
-        confirmText: 'Delete',
+        title: 'Dismiss Signal?',
+        message: 'This signal will be dismissed permanently.',
+        confirmText: 'Dismiss',
         cancelText: 'Cancel',
         warn: true
       }
