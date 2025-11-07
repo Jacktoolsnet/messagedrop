@@ -1,6 +1,6 @@
 :host {
   display: block;
-  color: var(--mat-app-text-color);
+  color: var(--mat-sys-color-on-surface);
 }
 
 .dialog-content {
@@ -15,11 +15,11 @@
 
 mat-card {
   display: block;
-  background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-sys-color-surface-container-highest);
+  color: var(--mat-sys-color-on-surface);
   border-radius: 1rem;
   padding: 1rem;
+  box-shadow: 0 4px 12px color-mix(in srgb, var(--mat-sys-color-shadow, rgba(0, 0, 0, 0.3)) 14%, transparent);
 }
 
 dl {
@@ -32,7 +32,7 @@ dt {
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mat-sys-color-on-surface-variant);
 }
 
 dd {
@@ -46,7 +46,7 @@ dd {
 .appeal-hint {
   margin: 0;
   font-size: 0.95rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--mat-sys-color-on-surface-variant);
 }
 
 .appeal-form {
@@ -60,10 +60,10 @@ dd {
 }
 
 .appeal-block {
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: 1px solid var(--mat-sys-color-outline-variant);
   border-radius: 12px;
   padding: 1rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--mat-sys-color-surface-container);
   display: grid;
   gap: 0.75rem;
 }
@@ -83,7 +83,7 @@ dd {
   gap: 0.5rem;
   align-items: center;
   font-size: 0.9rem;
-  color: rgba(0, 0, 0, 0.7);
+  color: var(--mat-sys-color-on-surface-variant);
 }
 
 .appeal-meta .label,
@@ -92,7 +92,7 @@ dd {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  color: rgba(5, 69, 36, 0.8);
+  color: var(--mat-sys-color-primary);
 }
 
 .status-chip {
@@ -104,13 +104,13 @@ dd {
 }
 
 .status-chip.open {
-  background: rgba(255, 193, 7, 0.18);
-  color: #b45309;
+  background: var(--mat-sys-color-secondary-container);
+  color: var(--mat-sys-color-on-secondary-container);
 }
 
 .status-chip.resolved {
-  background: rgba(5, 150, 105, 0.18);
-  color: #047857;
+  background: var(--mat-sys-color-primary-container);
+  color: var(--mat-sys-color-on-primary-container);
 }
 
 .appeal-content h4 {
@@ -135,7 +135,7 @@ dd {
 }
 
 .error-card mat-icon {
-  color: #f87171;
+  color: var(--mat-sys-color-error);
 }
 
 .loading {
@@ -164,7 +164,7 @@ dd {
 .file-upload-hint {
   margin: 0;
   font-size: 0.85rem;
-  color: rgba(0, 0, 0, 0.6);
+  color: var(--mat-sys-color-on-surface-variant);
 }
 
 /* URL input row in appeal form */
