@@ -90,4 +90,17 @@ router.post('/status/:token/appeals/:appealId/evidence', upload.single('file'), 
   }
 });
 
+// Forward adding URL evidence for an appeal (JSON body)
+router.post('/status/:token/appeals/:appealId/evidence/url', express.json({ limit: '1mb' }), async (req, res) => {
+  try {
+    const resp = await forwardPost(
+      `/status/${encodeURIComponent(req.params.token)}/appeals/${encodeURIComponent(req.params.appealId)}/evidence/url`,
+      req.body
+    );
+    res.status(resp.status).json(resp.data);
+  } catch (err) {
+    res.status(err.response?.status || 502).json(err.response?.data || { error: 'bad_gateway' });
+  }
+});
+
 module.exports = router;

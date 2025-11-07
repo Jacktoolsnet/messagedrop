@@ -23,7 +23,7 @@ export class DsaStatusService {
     });
   }
 
-  createAppeal(token: string, payload: { arguments: string; contact?: string }): Observable<{ id: string }> {
+  createAppeal(token: string, payload: { arguments: string; contact?: string; url?: string }): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${this.baseUrl}/${encodeURIComponent(token)}/appeals`, payload);
   }
 
@@ -31,5 +31,12 @@ export class DsaStatusService {
     const form = new FormData();
     form.append('file', file);
     return this.http.post<{ id: string }>(`${this.baseUrl}/${encodeURIComponent(token)}/appeals/${encodeURIComponent(appealId)}/evidence`, form);
+  }
+
+  uploadAppealUrlEvidence(token: string, appealId: string, url: string) {
+    return this.http.post<{ id: string }>(
+      `${this.baseUrl}/${encodeURIComponent(token)}/appeals/${encodeURIComponent(appealId)}/evidence/url`,
+      { url }
+    );
   }
 }

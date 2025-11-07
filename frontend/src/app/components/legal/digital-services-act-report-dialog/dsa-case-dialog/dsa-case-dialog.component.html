@@ -213,6 +213,17 @@
             }
           </mat-form-field>
 
+          <mat-form-field appearance="outline">
+            <mat-label>Optional link to supporting content</mat-label>
+            <input matInput type="url" formControlName="url" placeholder="https://example.com/context" />
+            <mat-hint align="start">Must start with http:// or https://</mat-hint>
+            @if (appealForm.controls.url.invalid && appealForm.controls.url.touched) {
+            <mat-error>
+              Please enter a valid URL starting with http(s)://
+            </mat-error>
+            }
+          </mat-form-field>
+
           <div class="file-upload">
             <input #evidenceInput id="appeal-evidence-input" type="file" multiple
               (change)="onAttachmentsSelected($event)" accept=".pdf,image/*" hidden />
@@ -233,8 +244,7 @@
             </mat-chip-set>
             }
             <p class="file-upload-hint">
-              PDF or image files, up to 5&nbsp;MB each (10&nbsp;MB total). Currently selected: {{ attachmentsSizeLabel()
-              }}.
+              PDF or image files, up to 5&nbsp;MB each (10&nbsp;MB total). You may also provide a link above. Currently selected: {{ attachmentsSizeLabel() }}.
             </p>
           </div>
         </form>

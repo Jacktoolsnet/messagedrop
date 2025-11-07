@@ -312,6 +312,70 @@ router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
   });
 });
 
+// Add URL evidence linked to an appeal (JSON body: { url: string })
+router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res) => {
+  const token = String(req.params.token || '').trim();
+  const appealId = String(req.params.appealId || '').trim();
+  const _db = db(req);
+  if (!_db || !token || !appealId) return res.status(400).json({ error: 'invalid_request' });
+
+  const rawUrl = String(req.body?.url || '').trim();
+  if (!rawUrl) return res.status(400).json({ error: 'url_required' });
+
+  // Basic validation: must be http(s) URL
+  let parsed;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    return res.status(400).json({ error: 'invalid_url' });
+  }
+  if (!/^https?:$/i.test(parsed.protocol)) return res.status(400).json({ error: 'invalid_url_protocol' });
+  if (rawUrl.length > 2000) return res.status(400).json({ error: 'url_too_long' });
+
+  try {
+    const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
+    if (!notice) return res.status(404).json({ error: 'not_found' });
+
+    const appeal = await new Promise((resolve, reject) => {
+      tableAppeal.getById(_db, appealId, (err, row) => err ? reject(err) : resolve(row));
+    });
+    if (!appeal) return res.status(404).json({ error: 'appeal_not_found' });
+
+    const id = crypto.randomUUID();
+    const now = Date.now();
+    tableEvidence.create(
+      _db,
+      id,
+      notice.id,
+      'url',
+      rawUrl,
+      null,
+      null,
+      null,
+      now,
+      (err) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+
+        tableAudit.create(
+          _db,
+          crypto.randomUUID(),
+          'notice',
+          notice.id,
+          'appeal_evidence',
+          `public:${req.ip || 'unknown'}`,
+          now,
+          JSON.stringify({ token, appealId, evidenceId: id, url: rawUrl }),
+          () => { }
+        );
+
+        return res.status(201).json({ id });
+      }
+    );
+  } catch (err) {
+    return res.status(500).json({ error: 'db_error', detail: err.message });
+  }
+});
+
 router.get('/status/:token/evidence/:id', async (req, res) => {
   const token = String(req.params.token || '').trim();
   const evidenceId = String(req.params.id || '').trim();

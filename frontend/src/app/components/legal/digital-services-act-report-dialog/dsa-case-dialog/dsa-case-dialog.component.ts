@@ -100,7 +100,8 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly signalContentUrl = computed(() => this.signalCase()?.contentUrl ?? null);
 
   readonly appealForm = this.fb.nonNullable.group({
-    arguments: ['', [Validators.required, Validators.minLength(20)]]
+    arguments: ['', [Validators.required, Validators.minLength(20)]],
+    url: ['', [Validators.pattern(/^https?:\/\/.+/i)]]
   });
 
   readonly publicStatusUrl = computed(() => this.buildPublicStatusUrl(this.data.token));
@@ -158,6 +159,17 @@ export class DsaCaseDialogComponent implements OnInit {
       let uploadIssue = false;
       if (id && this.attachments().length > 0) {
         uploadIssue = !(await this.uploadAttachments(id));
+      }
+
+      // If an evidence URL was provided, submit it as URL evidence
+      const urlVal = (this.appealForm.controls.url.value || '').trim();
+      if (id && urlVal) {
+        try {
+          await firstValueFrom(this.service.uploadAppealUrlEvidence(this.data.token, id, urlVal));
+        } catch (e) {
+          uploadIssue = true;
+          console.error('Failed to upload URL evidence', e);
+        }
       }
 
       const successMessage = uploadIssue
