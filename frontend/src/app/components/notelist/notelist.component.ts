@@ -82,8 +82,7 @@ export class NotelistComponent implements OnInit {
 
   flyTo(note: Note) {
     const location = { ...note.location, plusCode: this.geolocationService.getPlusCode(note.location.latitude, note.location.longitude) };
-    this.mapService.setCircleMarker(location);
-    this.mapService.setDrawCircleMarker(true);
+    this.mapService.setCircleMarker();
     this.mapService.flyTo(location);
     this.dialogRef.close();
   }

@@ -423,9 +423,7 @@ export class AppComponent implements OnInit {
     this.updateDataForLocation(event, false)
     this.setIsUserLocation()
     // this.mapService.drawSearchRectange(event);
-    this.mapService.setDrawCircleMarker(true);
-    this.mapService.setCircleMarker(event);
-    this.mapService.setDrawCircleMarker(false);
+    this.mapService.setCircleMarker();
   }
 
   public handleMarkerClickEvent(event: MarkerLocation) {

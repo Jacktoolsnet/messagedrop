@@ -190,8 +190,7 @@ export class MessagelistComponent implements OnInit {
 
   public flyTo(message: Message) {
     this.mapService.moveToWithZoom(message.location, 18);
-    this.mapService.setDrawCircleMarker(true);
-    this.mapService.setCircleMarker(message.location);
+    this.mapService.setCircleMarker();
     this.dialogRef.close();
   }
 

@@ -206,14 +206,16 @@ const dismiss = function (db, id, dismissedAt, callBack) {
 
 /** Stats */
 const stats = function (db, callBack) {
-    const sqlTotal = `SELECT COUNT(*) AS total FROM ${tableName}`;
+    const activePredicate = `${columnDismissedAt} IS NULL`;
+    const sqlTotal = `SELECT COUNT(*) AS total FROM ${tableName} WHERE ${activePredicate}`;
     const sqlByType = `
     SELECT ${columnReportedContentType} AS type, COUNT(*) AS cnt
     FROM ${tableName}
+    WHERE ${activePredicate}
     GROUP BY ${columnReportedContentType}
   `;
     const since = Date.now() - 24 * 60 * 60 * 1000;
-    const sql24h = `SELECT COUNT(*) AS cnt FROM ${tableName} WHERE ${columnCreatedAt} >= ?`;
+    const sql24h = `SELECT COUNT(*) AS cnt FROM ${tableName} WHERE ${activePredicate} AND ${columnCreatedAt} >= ?`;
 
     db.get(sqlTotal, [], (e1, t) => {
         if (e1) return callBack(e1);
