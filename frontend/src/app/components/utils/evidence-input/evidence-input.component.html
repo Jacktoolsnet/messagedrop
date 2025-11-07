@@ -5,13 +5,13 @@
       <mat-label>Add supporting link</mat-label>
       <mat-icon matPrefix class="material-symbols-outlined">link</mat-icon>
       <input matInput type="url" inputmode="url" autocomplete="url" [formControl]="form.controls.url"
-        placeholder="https://example.com/context"
-        (keydown.enter)="onAddUrl(); $event.preventDefault()" [disabled]="disabled()" />
-      <button mat-icon-button color="primary" matSuffix type="button"
-        (click)="onAddUrl()" [disabled]="disabled() || !(form.controls.url.value || '').trim()">
+        placeholder="https://example.com/context" (keydown.enter)="onAddUrl(); $event.preventDefault()"
+        [disabled]="disabled()" />
+      <button mat-icon-button color="primary" matSuffix type="button" (click)="onAddUrl()"
+        [disabled]="disabled() || !(form.controls.url.value || '').trim()">
         <mat-icon class="material-symbols-outlined">add_link</mat-icon>
       </button>
-      <mat-hint align="start">http(s):// or www.example.com • Press Enter to add</mat-hint>
+      <mat-hint align="start">http(s)://example.com • Press Enter to add</mat-hint>
     </mat-form-field>
 
     @if (urlItems().length > 0) {
