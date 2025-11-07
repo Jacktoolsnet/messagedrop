@@ -155,9 +155,10 @@ export class PublicStatusComponent implements OnInit {
         }
         return 'Notice created';
       }
-      default:
+      default: {
         const readable = rawAction.replace(/_/g, ' ').toLowerCase();
         return readable.replace(/\b\w/g, (letter) => letter.toUpperCase()) || 'Event';
+      }
     }
   }
 

@@ -1,3 +1,16 @@
+export interface NotificationPayload {
+  event?: string | null;
+  body?: string | null;
+  subject?: string | null;
+  to?: string | null;
+}
+
+export interface NotificationMeta {
+  success?: boolean;
+  event?: string | null;
+  error?: string | null;
+}
+
 export interface DsaNotification {
   id: string;
   noticeId: string | null;
@@ -5,13 +18,8 @@ export interface DsaNotification {
   stakeholder: 'reporter' | 'uploader' | 'other' | string;
   channel: 'email' | 'inapp' | 'webhook' | string;
   sentAt: number;
-  payload: any;
-  meta: {
-    success?: boolean;
-    event?: string | null;
-    error?: string | null;
-    [key: string]: any;
-  } | null;
+  payload: NotificationPayload | null;
+  meta: NotificationMeta | null;
 }
 
 export interface ListNotificationsParams {

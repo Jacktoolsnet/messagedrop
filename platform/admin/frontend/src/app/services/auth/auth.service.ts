@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
@@ -18,17 +18,13 @@ export class AuthService {
   readonly role = signal<string | null>(null);
 
   private readonly baseUrl = `${environment.apiUrl}/user`;
+  private readonly http = inject(HttpClient);
+  private readonly router = inject(Router);
+  private readonly snackBar = inject(MatSnackBar);
   private get token() {
     return localStorage.getItem('admin_token');
   }
-
-  constructor(
-    private http: HttpClient,
-    private router: Router,
-    private snackBar: MatSnackBar
-  ) { }
-
-  private handleError(error: any) {
+  private handleError = (error: unknown) => {
     this.snackBar.open('Login failed. Please check your credentials.', 'OK', {
       duration: 3000,
       panelClass: ['snack-error'],
@@ -36,7 +32,7 @@ export class AuthService {
       verticalPosition: 'top'
     });
     return throwError(() => error);
-  }
+  };
 
   login(data: LoginRequest) {
     return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data)
@@ -86,7 +82,7 @@ export class AuthService {
         this.username.set(data.username);
         this.role.set(data.role);
       },
-      error: (error) => {
+      error: () => {
         this.username.set(null);
         this.role.set(null);
       }

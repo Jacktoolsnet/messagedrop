@@ -1,3 +1,7 @@
+export interface MultimediaOembed {
+    html?: string | null;
+}
+
 export interface Multimedia {
     type: string; // 'youtube'|'tenor'|'spotify'|'tiktok'|'image'|'undefined'|...
     url: string;
@@ -6,5 +10,5 @@ export interface Multimedia {
     title?: string;
     description?: string;
     contentId?: string; // e.g. YouTube video id, Spotify id, TikTok id
-    oembed?: any;
+    oembed?: MultimediaOembed | null;
 }

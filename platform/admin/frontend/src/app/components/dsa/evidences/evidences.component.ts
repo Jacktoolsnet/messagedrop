@@ -24,11 +24,11 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { EvidenceListComponent } from '../notice/evidence/evidence-list/evidence-list.component';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 
-type NoticeStatusMeta = {
+interface NoticeStatusMeta {
   label: string;
   icon: string;
   class: string;
-};
+}
 
 @Component({
   selector: 'app-dsa-evidence',
@@ -195,14 +195,5 @@ export class EvidencesComponent implements OnInit, OnDestroy {
       offset: 0,
       sort: 'updatedAt_desc' as const
     };
-  }
-
-  private safeParse(json: string | null | undefined): any {
-    if (!json) return null;
-    try {
-      return JSON.parse(json);
-    } catch {
-      return null;
-    }
   }
 }

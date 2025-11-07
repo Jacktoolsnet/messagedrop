@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DsaAuditEntry } from '../../../../interfaces/dsa-audit-entry.interface';
-import { DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
+import { DsaNoticeStatus, isDsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 
 type KnownAction =
@@ -16,6 +16,11 @@ type KnownAction =
   | 'delete'
   | 'promote_to_notice'
   | string;
+
+interface DetailsRow {
+  k: string;
+  v: string;
+}
 
 @Component({
   selector: 'app-audit-log',
@@ -100,9 +105,9 @@ export class AuditLogComponent implements OnChanges {
   /** Für Statuswechsel: neuen Status aus details ziehen */
   getStatusChange(entry: DsaAuditEntry): DsaNoticeStatus | null {
     if ((entry.action || '').toLowerCase() !== 'status_change') return null;
-    const d = entry.details || {};
-    const s = (d as any).status ?? (d as any).newStatus;
-    return s ? String(s) as DsaNoticeStatus : null;
+    const details = this.asDetails(entry);
+    const status = this.detailValue(details, 'status') ?? this.detailValue(details, 'newStatus');
+    return status && isDsaNoticeStatus(status) ? status : null;
   }
 
   // nachher:
@@ -118,49 +123,48 @@ export class AuditLogComponent implements OnChanges {
   }
 
   /** Bekannte Details als Key/Value; sonst null (→ Fallback JSON) */
-  detailsRows(e: DsaAuditEntry): Array<{ k: string; v: string }> | null {
-    const d = e.details || {};
+  detailsRows(e: DsaAuditEntry): DetailsRow[] | null {
+    const details = this.asDetails(e);
     const lower = (e.action || '').toLowerCase() as KnownAction;
 
     switch (lower) {
       case 'status_change': {
-        const s = (d as any).status ?? (d as any).newStatus;
-        return s ? [{ k: 'Changed to', v: String(s) }] : null;
+        const status = this.detailValue(details, 'status') ?? this.detailValue(details, 'newStatus');
+        return status ? [{ k: 'Changed to', v: status }] : null;
       }
       case 'create': {
-        // z.B. Decision: { noticeId, outcome }
-        const rows: Array<{ k: string; v: string }> = [];
-        if ((d as any).outcome) rows.push({ k: 'Outcome', v: String((d as any).outcome) });
-        if ((d as any).noticeId) rows.push({ k: 'Notice ID', v: String((d as any).noticeId) });
-        return rows.length ? rows : null;
+        return this.rowsFrom(details, [
+          ['outcome', 'Outcome'],
+          ['noticeId', 'Notice ID']
+        ]);
       }
       case 'decision_create':
       case 'decision_change': {
-        const rows: Array<{ k: string; v: string }> = [];
-        if ((d as any).outcome) rows.push({ k: 'Outcome', v: String((d as any).outcome) });
-        if ((d as any).previousOutcome) rows.push({ k: 'Previous', v: String((d as any).previousOutcome) });
-        if ((d as any).decisionId) rows.push({ k: 'Decision ID', v: String((d as any).decisionId) });
-        return rows.length ? rows : null;
+        return this.rowsFrom(details, [
+          ['outcome', 'Outcome'],
+          ['previousOutcome', 'Previous'],
+          ['decisionId', 'Decision ID']
+        ]);
       }
       case 'evidence_add': {
-        const rows: Array<{ k: string; v: string }> = [];
-        if ((d as any).type) rows.push({ k: 'Type', v: String((d as any).type) });
-        if ((d as any).evidenceId) rows.push({ k: 'Evidence ID', v: String((d as any).evidenceId) });
-        return rows.length ? rows : null;
+        return this.rowsFrom(details, [
+          ['type', 'Type'],
+          ['evidenceId', 'Evidence ID']
+        ]);
       }
       case 'notify': {
-        const rows: Array<{ k: string; v: string }> = [];
-        if ((d as any).stakeholder) rows.push({ k: 'Stakeholder', v: String((d as any).stakeholder) });
-        if ((d as any).channel) rows.push({ k: 'Channel', v: String((d as any).channel) });
-        return rows.length ? rows : null;
+        return this.rowsFrom(details, [
+          ['stakeholder', 'Stakeholder'],
+          ['channel', 'Channel']
+        ]);
       }
       case 'promote_to_notice': {
-        if ((d as any).noticeId) return [{ k: 'Notice ID', v: String((d as any).noticeId) }];
-        return null;
+        const notice = this.detailValue(details, 'noticeId');
+        return notice ? [{ k: 'Notice ID', v: notice }] : null;
       }
       case 'delete': {
-        if ((d as any).reason) return [{ k: 'Reason', v: String((d as any).reason) }];
-        return null;
+        const reason = this.detailValue(details, 'reason');
+        return reason ? [{ k: 'Reason', v: reason }] : null;
       }
       default:
         return null;
@@ -175,4 +179,23 @@ export class AuditLogComponent implements OnChanges {
   }
 
   trackById(_i: number, e: DsaAuditEntry) { return e.id; }
+
+  private asDetails(entry: DsaAuditEntry): Record<string, unknown> {
+    return entry.details ?? {};
+  }
+
+  private detailValue(details: Record<string, unknown>, key: string): string | null {
+    const value = details[key];
+    if (value === undefined || value === null) return null;
+    return typeof value === 'string' ? value : String(value);
+  }
+
+  private rowsFrom(details: Record<string, unknown>, mapping: [string, string][]): DetailsRow[] | null {
+    const rows: DetailsRow[] = [];
+    for (const [key, label] of mapping) {
+      const value = this.detailValue(details, key);
+      if (value) rows.push({ k: label, v: value });
+    }
+    return rows.length ? rows : null;
+  }
 }

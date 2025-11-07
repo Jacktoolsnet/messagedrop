@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -28,7 +28,7 @@ import { ConfirmDialogComponent } from '../../../shared/confirm-dialog.component
   styleUrls: ['./signal-detail.component.css']
 })
 
-export class SignalDetailComponent {
+export class SignalDetailComponent implements OnInit {
   private ref = inject(MatDialogRef<SignalDetailComponent>);
   private dialog = inject(MatDialog);
   private sanitizer = inject(DomSanitizer);
@@ -227,7 +227,7 @@ export class SignalDetailComponent {
   }
   private getYouTubeId(mm: Multimedia): string | null {
     if (mm.contentId) return mm.contentId.split('?')[0];
-    const html = mm.oembed?.html as string | undefined;
+    const html = mm.oembed?.html ?? undefined;
     if (html) {
       const m = html.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
       if (m?.[1]) return m[1];

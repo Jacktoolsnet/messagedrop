@@ -24,6 +24,7 @@ import { DecisionSummaryComponent } from '../decisions/decision-summary/decision
 import { NoticeAppealsComponent } from '../notice/appeals/notice-appeals.component';
 import { AppealResolutionData, AppealResolutionDialogComponent } from './appeal-resolution-dialog/appeal-resolution-dialog.component';
 import { DecisionDialogComponent, DecisionDialogResult } from '../decisions/decision-dialog/decision-dialog.component';
+import { ReportedContentPayload, ReportedMultimedia } from '../../../interfaces/reported-content.interface';
 
 type AppealStatusFilter = 'open' | 'resolved' | 'all';
 
@@ -67,7 +68,7 @@ export class AppealsComponent implements OnInit {
   makingScreenshot = signal(false);
 
   // Parsed content of selected notice
-  contentObj = signal<any | null>(null);
+  contentObj = signal<ReportedContentPayload | null>(null);
   mediaKind = signal<'iframe' | 'image' | 'none'>('none');
   embedUrl = signal<SafeResourceUrl | null>(null);
   imageUrl = signal<string | null>(null);
@@ -146,19 +147,21 @@ export class AppealsComponent implements OnInit {
           const cid = (appeal.noticeContentId || '').trim();
           if (cid) {
             const visible = dec.outcome === 'NO_ACTION';
-            this.dsa.setPublicMessageVisibility(cid, visible).subscribe({ next: () => { }, error: () => { } });
+            this.dsa.setPublicMessageVisibility(cid, visible).subscribe({
+              error: () => this.snack.open('Could not update public visibility.', 'OK', { duration: 3000 })
+            });
           }
           // Appeal als REVISED auflösen
-            this.dsa.resolveAppeal(appeal.id, {
-              outcome: 'REVISED',
-              reviewer: result.reviewer || null,
-              reason: result.reason || null
-            }).subscribe({
-              next: () => {
-                this.snack.open('Appeal resolved and decision revised.', 'OK', { duration: 2000 });
-                this.load();
-                this.dsa.loadAppealStats();
-              },
+          this.dsa.resolveAppeal(appeal.id, {
+            outcome: 'REVISED',
+            reviewer: result.reviewer || null,
+            reason: result.reason || null
+          }).subscribe({
+            next: () => {
+              this.snack.open('Appeal resolved and decision revised.', 'OK', { duration: 2000 });
+              this.load();
+              this.dsa.loadAppealStats();
+            },
             error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
           });
         });
@@ -189,9 +192,14 @@ export class AppealsComponent implements OnInit {
   }
 
   // Helpers
-  private safeParse(json: string | null | undefined): any {
+  private safeParse(json: string | null | undefined): ReportedContentPayload | null {
     if (!json) return null;
-    try { return JSON.parse(json); } catch { return null; }
+    try {
+      const parsed = JSON.parse(json) as unknown;
+      return parsed && typeof parsed === 'object' ? parsed as ReportedContentPayload : null;
+    } catch {
+      return null;
+    }
   }
 
   hasExternalLink(): boolean {
@@ -227,7 +235,7 @@ export class AppealsComponent implements OnInit {
     this.imageUrl.set(null);
     this.mediaKind.set('none');
     const mm = c?.multimedia;
-    const type = (mm?.type || '').toLowerCase();
+    const type = (mm?.type ?? '').toLowerCase();
     if (!type) { this.mediaKind.set('none'); return; }
 
     if (type === 'youtube') {
@@ -267,14 +275,14 @@ export class AppealsComponent implements OnInit {
     }
   }
 
-  private getYouTubeId(mm: any): string | null {
+  private getYouTubeId(mm: ReportedMultimedia | null | undefined): string | null {
     if (mm?.contentId) return String(mm.contentId).split('?')[0];
-    const html: string | undefined = mm?.oembed?.html;
+    const html = mm?.oembed?.html ?? undefined;
     if (html) {
       const m = html.match(/youtube\.com\/embed\/([a-zA-Z0-9_-]+)/);
       if (m?.[1]) return m[1];
     }
-    const src = String(mm?.sourceUrl || mm?.url || '');
+    const src = String(mm?.sourceUrl ?? mm?.url ?? '');
     const watch = src.match(/[?&]v=([a-zA-Z0-9_-]+)/);
     if (watch?.[1]) return watch[1];
     const shorts = src.match(/youtube\.com\/shorts\/([a-zA-Z0-9_-]+)/);
@@ -284,9 +292,9 @@ export class AppealsComponent implements OnInit {
     return null;
   }
 
-  private buildSpotifyEmbed(mm: any): string | null {
+  private buildSpotifyEmbed(mm: ReportedMultimedia | null | undefined): string | null {
     if (mm?.contentId) return `https://open.spotify.com/embed/${mm.contentId}`;
-    const src: string | undefined = mm?.sourceUrl || mm?.url;
+    const src = mm?.sourceUrl ?? mm?.url;
     if (!src) return null;
     if (src.includes('open.spotify.com')) {
       return src.replace('open.spotify.com/', 'open.spotify.com/embed/');
@@ -294,8 +302,8 @@ export class AppealsComponent implements OnInit {
     return null;
   }
 
-  private getTikTokId(mm: any): string | null {
-    const src = String(mm?.sourceUrl || mm?.url || '');
+  private getTikTokId(mm: ReportedMultimedia | null | undefined): string | null {
+    const src = String(mm?.sourceUrl ?? mm?.url ?? '');
     const m = src.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
     if (m?.[1]) return m[1];
     return mm?.contentId || null;

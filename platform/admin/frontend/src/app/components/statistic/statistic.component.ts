@@ -50,7 +50,7 @@ export class StatisticComponent {
     { value: '1d', label: 'Today' },
   ] as const;
 
-  readonly selectedRange = signal<'12m' | '6m' | '3m' | '1m' | '1w' | '1d'>('1w');
+  readonly selectedRange = signal<StatisticRangePreset>('1w');
   readonly keys = signal<string[]>([]);
   readonly loading = signal<boolean>(false);
   readonly hasKeys = computed(() => this.keys().length > 0);
@@ -113,17 +113,17 @@ export class StatisticComponent {
     });
   }
 
-  onRangeChange(v: string | null): void {
+  onRangeChange(v: StatisticRangePreset | null): void {
     if (!v) return;
     if (this.selectedRange() === v) return;
-    this.selectedRange.set(v as any);
+    this.selectedRange.set(v);
   }
 
-  setRange(preset: string): void {
-    const allowed = new Set(['12m','6m','3m','1m','1w','1d']);
+  setRange(preset: StatisticRangePreset): void {
+    const allowed = new Set<StatisticRangePreset>(['12m', '6m', '3m', '1m', '1w', '1d']);
     if (!allowed.has(preset)) return;
-    if (this.selectedRange() !== (preset as any)) {
-      this.selectedRange.set(preset as any);
+    if (this.selectedRange() !== preset) {
+      this.selectedRange.set(preset);
     }
   }
 
@@ -164,7 +164,7 @@ export class StatisticComponent {
     this.selectedKey.set(null);
   }
 
-  private aggregatePoints(points: SeriesPoint[], preset: '12m'|'6m'|'3m'|'1m'|'1w'|'1d'): SeriesPoint[] {
+  private aggregatePoints(points: SeriesPoint[], preset: StatisticRangePreset): SeriesPoint[] {
     if (!points || points.length === 0) return [];
     if (preset === '12m' || preset === '6m' || preset === '3m') {
       // group by month YYYY-MM
@@ -176,7 +176,7 @@ export class StatisticComponent {
       const labels = Array.from(map.keys()).sort();
       return labels.map(d => ({ date: d, value: map.get(d) || 0 }));
     }
-    if (preset === '1m') {
+    if (preset === '1m' || preset === '30d') {
       // group by ISO week: YYYY-Www
       const weekKey = (s: string) => {
         const d = new Date(s + 'T00:00:00Z');

@@ -13,7 +13,7 @@ export interface PublicMessage {
     views?: number;
     likes?: number;
     dislikes?: number;
-    comments?: any[];
+    comments?: unknown[];
     commentsNumber?: number;
     status?: string;
     userId: string;

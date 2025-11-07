@@ -12,13 +12,13 @@ import { StatisticSettingsService } from '../../../services/statistic/statistic-
 import { StatisticService } from '../../../services/statistic/statistic.service';
 import { StatisticKeySetting } from '../../../interfaces/statistic-key-setting.interface';
 
-type Row = {
+interface Row {
   metricKey: string;
   displayName: string;
   iconName: string;
   color: string;
   sortOrder: number;
-};
+}
 
 @Component({
   selector: 'app-statistic-settings',

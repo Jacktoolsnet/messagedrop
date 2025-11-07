@@ -3,7 +3,7 @@ export type DsaNoticeStatus =
     | 'UNDER_REVIEW'
     | 'DECIDED';
 
-export const DSA_NOTICE_STATUSES: ReadonlyArray<DsaNoticeStatus> = [
+export const DSA_NOTICE_STATUSES: readonly DsaNoticeStatus[] = [
     'RECEIVED',
     'UNDER_REVIEW',
     'DECIDED'

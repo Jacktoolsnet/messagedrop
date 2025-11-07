@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { map } from 'rxjs';
 import { environment } from '../../../environments/environment';
+import { DeeplResponse } from '../../interfaces/deepl-response.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TranslateService {

@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
 import { StatisticRangePreset } from '../../interfaces/statistic-range-preset.type';
@@ -8,6 +8,7 @@ import { MultiSeriesResponse } from '../../interfaces/statistic-multi-series-res
 @Injectable({ providedIn: 'root' })
 export class StatisticService {
   private readonly baseUrl = `${environment.apiUrl}/statistic`;
+  private readonly http = inject(HttpClient);
 
   private get headers() {
     return new HttpHeaders({
@@ -15,8 +16,6 @@ export class StatisticService {
       'X-API-Authorization': environment.apiToken
     });
   }
-
-  constructor(private http: HttpClient) { }
 
   getKeys(): Observable<{ status: number; keys: string[] }> {
     return this.http.get<{ status: number; keys: string[] }>(`${this.baseUrl}/keys`, { headers: this.headers });

@@ -15,16 +15,17 @@ import { DecisionDialogComponent, DecisionDialogResult, DecisionOutcome } from '
 import { DecisionSummaryComponent } from '../../decisions/decision-summary/decision-summary.component';
 import { NoticeAppealsComponent } from '../appeals/notice-appeals.component';
 import { EvidenceListComponent } from "../evidence/evidence-list/evidence-list.component";
+import { ReportedContentPayload } from '../../../../interfaces/reported-content.interface';
 
 // Optional: wenn du die vorhandene PublicMessageDetailComponent nutzen willst
 // import { PublicMessageDetailComponent } from '../../../shared/public-message-detail/public-message-detail.component';
 
-type TranslationState = {
+interface TranslationState {
   text?: string;
   translated?: string;
   loading: boolean;
   error?: string;
-};
+}
 
 @Component({
   selector: 'app-notice-detail-dialog',
@@ -64,10 +65,14 @@ export class NoticeDetailComponent implements OnInit {
   private autoStatusApplied = false;
 
   // reportedContent kommt aus der DB als JSON-String → parsen
-  contentObj = computed<any>(() => {
+  contentObj = computed<ReportedContentPayload | null>(() => {
+    const payload = this.notice()?.reportedContent;
+    if (!payload) {
+      return null;
+    }
     try {
-      // @ts-ignore
-      return this.notice()?.reportedContent ? JSON.parse(this.notice()!.reportedContent as any) : null;
+      const parsed = JSON.parse(payload) as unknown;
+      return parsed && typeof parsed === 'object' ? parsed as ReportedContentPayload : null;
     } catch {
       return null;
     }
@@ -127,8 +132,9 @@ export class NoticeDetailComponent implements OnInit {
 
     const visible = outcome === 'NO_ACTION';
     this.dsa.setPublicMessageVisibility(contentId, visible).subscribe({
-      next: () => { },
-      error: () => { }
+      error: () => {
+        this.snack.open('Could not update public visibility.', 'OK', { duration: 3000 });
+      }
     });
   }
 

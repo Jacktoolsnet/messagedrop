@@ -23,10 +23,10 @@ import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 
 Chart.register(...registerables, annotationPlugin);
 
-type RangeOption = {
+interface RangeOption {
   value: string;
   label: string;
-};
+}
 
 @Component({
   selector: 'app-dsa-transparency',
@@ -80,8 +80,6 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   private charts: Chart[] = [];
   private viewReady = false;
   private lastStats: TransparencyStats | null = null;
-
-  constructor() { }
 
   ngOnInit(): void {
     const initialRange = this.filterForm.controls.range.value;
@@ -308,12 +306,12 @@ export class TransparencyComponent implements OnInit, AfterViewInit, OnDestroy {
   private resolveFilename(response: HttpResponse<Blob>, fallback: string): string {
     const disposition = response.headers.get('Content-Disposition');
     if (!disposition) return fallback;
-    const match = /filename\*?=(?:UTF-8'')?\"?([^\";]+)/i.exec(disposition);
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)/i.exec(disposition);
     if (match?.[1]) {
       try {
-        return decodeURIComponent(match[1].replace(/\"/g, ''));
+        return decodeURIComponent(match[1].replace(/"/g, ''));
       } catch {
-        return match[1].replace(/\"/g, '');
+        return match[1].replace(/"/g, '');
       }
     }
     return fallback;

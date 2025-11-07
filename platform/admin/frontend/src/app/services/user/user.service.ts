@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -15,13 +15,10 @@ export class UserService {
   readonly users = this._users.asReadonly();
 
   private readonly baseUrl = `${environment.apiUrl}/user`;
+  private readonly http = inject(HttpClient);
+  private readonly snackBar = inject(MatSnackBar);
 
-  constructor(
-    private http: HttpClient,
-    private snackBar: MatSnackBar
-  ) { }
-
-  private handleError(error: any) {
+  private handleError = (error: unknown) => {
     this.snackBar.open('Something went wrong.', 'OK', {
       duration: 3000,
       panelClass: ['snack-error'],
@@ -29,14 +26,13 @@ export class UserService {
       verticalPosition: 'top'
     });
     return throwError(() => error);
-  }
+  };
 
   loadUsers() {
     this.http.get<User[]>(this.baseUrl)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: (users) => this._users.set(users),
-        error: () => { }
+        next: (users) => this._users.set(users)
       });
   }
 

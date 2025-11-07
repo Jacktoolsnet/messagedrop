@@ -20,6 +20,7 @@ import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 import { DsaNoticeFilters, DsaNoticeRange } from '../../../../interfaces/dsa-notice-filters.interface';
 import { DSA_NOTICE_STATUSES, DsaNoticeStatus } from '../../../../interfaces/dsa-notice-status.type';
 import { DsaNotice } from '../../../../interfaces/dsa-notice.interface';
+import { ReportedContentPayload } from '../../../../interfaces/reported-content.interface';
 
 // Optional: Detail-Dialog erst später implementieren – Hook ist schon da
 import { MatDialog } from '@angular/material/dialog';
@@ -28,6 +29,8 @@ import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 import { DecisionDialogComponent } from '../../decisions/decision-dialog/decision-dialog.component';
 import { NoticeDetailComponent } from '../notice-detail/notice-detail.component';
 import { NotifyDialogComponent } from '../notify-dialog/notify-dialog.component';
+
+type NoticePreviewContent = ReportedContentPayload;
 
 @Component({
   selector: 'app-notices',
@@ -155,17 +158,23 @@ export class NoticesComponent implements OnInit, OnDestroy {
   /** Helper: reportedContent kurz aufbereiten */
   getMessagePreview(n: DsaNotice): string {
     const rc = this.safeParse(n.reportedContent);
-    // mögliche Felder aus deinem PublicMessage-Modell
-    const msg: string | undefined = rc?.message;
-    const title: string | undefined = rc?.multimedia?.title;
-    const desc: string | undefined = rc?.multimedia?.description;
-    return (msg || title || desc || '').toString().trim();
+    const candidates = [
+      typeof rc?.message === 'string' ? rc.message : undefined,
+      typeof rc?.multimedia?.title === 'string' ? rc.multimedia?.title : undefined,
+      typeof rc?.multimedia?.description === 'string' ? rc.multimedia?.description : undefined
+    ].filter((value): value is string => !!value && value.trim().length > 0);
+    return candidates[0] ?? '';
   }
 
   /** Helper: JSON sicher parsen */
-  private safeParse(json: string | undefined | null): any {
+  private safeParse(json: string | undefined | null): NoticePreviewContent | null {
     if (!json) return null;
-    try { return JSON.parse(json); } catch { return null; }
+    try {
+      const parsed = JSON.parse(json) as unknown;
+      return parsed && typeof parsed === 'object' ? parsed as NoticePreviewContent : null;
+    } catch {
+      return null;
+    }
   }
 
   /** trackBy */

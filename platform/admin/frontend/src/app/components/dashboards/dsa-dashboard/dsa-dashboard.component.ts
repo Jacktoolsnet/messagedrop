@@ -22,13 +22,13 @@ type TileKey =
   | 'audit'
   | 'transparency';
 
-type DsaTile = {
+interface DsaTile {
   key: TileKey;
   title: string;
   subtitle: string;
   icon: string;
   route: string;
-};
+}
 
 @Component({
   selector: 'app-dsa-dashboard',

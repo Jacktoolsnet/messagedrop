@@ -73,8 +73,8 @@
 
                         @if (contentObj(); as c) {
                         <div class="bubble">
-                            @if (c.message) {
-                            <div class="msg">{{ c.message }}</div>
+                            @if (c.message; as message) {
+                            <div class="msg">{{ message }}</div>
                             <div class="i18n-row">
                                 <button mat-stroked-button (click)="translateToGerman('message')"
                                     [disabled]="messageI18n().loading">
@@ -96,22 +96,22 @@
                                     <div class="k">Content ID</div>
                                     <div class="v mono">{{ notice().contentId }}</div>
                                 </div>
-                                @if (c.userId) {
+                                @if (c.userId; as userId) {
                                 <div class="kv">
                                     <div class="k">User</div>
-                                    <div class="v mono">{{ c.userId }}</div>
+                                    <div class="v mono">{{ userId }}</div>
                                 </div>
                                 }
-                                @if (c.location?.plusCode) {
+                                @if (c.location?.plusCode; as plusCode) {
                                 <div class="kv">
                                     <div class="k">PlusCode</div>
-                                    <div class="v mono">{{ c.location.plusCode }}</div>
+                                    <div class="v mono">{{ plusCode }}</div>
                                 </div>
                                 }
-                                @if (c.multimedia?.type) {
+                                @if (c.multimedia?.type; as mediaType) {
                                 <div class="kv">
                                     <div class="k">Media</div>
-                                    <div class="v">{{ c.multimedia.type }}</div>
+                                    <div class="v">{{ mediaType }}</div>
                                 </div>
                                 }
                             </div>

@@ -26,12 +26,23 @@ import { DSA_NOTICE_STATUSES, DsaNoticeStatus } from '../../../interfaces/dsa-no
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
+import { ReportedContentPayload } from '../../../interfaces/reported-content.interface';
 
-type NoticeStatusMeta = {
+interface NoticeStatusMeta {
   label: string;
   icon: string;
   class: string;
-};
+}
+
+interface NotificationDialogResult {
+  stakeholder: 'reporter' | 'uploader' | 'other';
+  subject?: string;
+  body: string;
+  event?: string;
+  otherEmail?: string;
+}
+
+type NoticeContentPreview = ReportedContentPayload;
 
 @Component({
   selector: 'app-dsa-notifications',
@@ -152,12 +163,12 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   noticePreview(notice: DsaNotice): string {
     const parsed = this.safeParse(notice.reportedContent);
     const candidates = [
-      parsed?.message,
-      parsed?.multimedia?.title,
-      parsed?.multimedia?.description,
-      notice.reasonText
-    ].map(v => (typeof v === 'string' ? v.trim() : ''));
-    return candidates.find(c => !!c) || 'No additional context available.';
+      typeof parsed?.message === 'string' ? parsed.message : undefined,
+      typeof parsed?.multimedia?.title === 'string' ? parsed.multimedia.title : undefined,
+      typeof parsed?.multimedia?.description === 'string' ? parsed.multimedia.description : undefined,
+      typeof notice.reasonText === 'string' ? notice.reasonText : undefined
+    ];
+    return candidates.find(text => !!text && text.trim().length > 0)?.trim() || 'No additional context available.';
   }
 
   channelIcon(notification: DsaNotification | null | undefined): string {
@@ -175,7 +186,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
   }
 
   eventLabel(notification: DsaNotification): string {
-    return notification.meta?.event || notification.payload?.event || '—';
+    return notification.meta?.event ?? notification.payload?.event ?? '—';
   }
 
   statusColor(notification: DsaNotification): 'warn' | 'accent' | 'primary' {
@@ -204,7 +215,9 @@ export class NotificationsComponent implements OnInit, OnDestroy {
           this.fetchNotifications(current.id);
         }
       },
-      error: () => { }
+      error: () => {
+        this.snack.open('Could not resend notification.', 'OK', { duration: 3000 });
+      }
     });
     this.subs.push(sub);
   }
@@ -231,10 +244,10 @@ export class NotificationsComponent implements OnInit, OnDestroy {
       panelClass: 'md-dialog-rounded'
     });
 
-    ref.afterClosed().subscribe((result: { stakeholder: 'reporter'|'uploader'|'other'; subject?: string; body: string; event?: string; otherEmail?: string } | undefined) => {
+    ref.afterClosed().subscribe((result: NotificationDialogResult | undefined) => {
       if (!result) return;
 
-      const tasks: Array<Promise<any>> = [];
+      const tasks: Promise<unknown>[] = [];
       const base = { noticeId: notice.id } as const;
       const body = (result.body || '').trim();
       const event = (result.event || '').trim() || null;
@@ -373,10 +386,11 @@ export class NotificationsComponent implements OnInit, OnDestroy {
     };
   }
 
-  private safeParse(json: string | null | undefined): any {
+  private safeParse(json: string | null | undefined): NoticeContentPreview | null {
     if (!json) return null;
     try {
-      return JSON.parse(json);
+      const parsed = JSON.parse(json) as unknown;
+      return parsed && typeof parsed === 'object' ? parsed as NoticeContentPreview : null;
     } catch {
       return null;
     }

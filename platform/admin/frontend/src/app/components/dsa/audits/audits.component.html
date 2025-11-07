@@ -61,7 +61,8 @@
     <!-- Timeline -->
     <div class="timeline">
         @for (e of items(); track trackById($index, e)) {
-        <div class="row" (click)="openEntity(e)">
+        <div class="row" role="button" tabindex="0" (click)="openEntity(e)" (keydown.enter)="openEntity(e)"
+            (keydown.space)="openEntity(e)">
             <div class="left">
                 <div class="avatar"><mat-icon>{{ iconForAction(e.action) }}</mat-icon></div>
                 <div class="head">

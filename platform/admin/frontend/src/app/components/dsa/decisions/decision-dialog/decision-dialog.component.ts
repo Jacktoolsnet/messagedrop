@@ -15,7 +15,10 @@ import { map, startWith, Subject, takeUntil } from 'rxjs';
 import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
 
 export type DecisionOutcome = 'REMOVE_CONTENT' | 'RESTRICT' | 'NO_ACTION' | 'FORWARD_TO_AUTHORITY';
-export type DecisionDialogResult = { saved: boolean; outcome: DecisionOutcome };
+export interface DecisionDialogResult {
+  saved: boolean;
+  outcome: DecisionOutcome;
+}
 
 @Component({
   selector: 'app-add-decision-dialog',

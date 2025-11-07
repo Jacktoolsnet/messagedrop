@@ -34,7 +34,7 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
 
   // Re-render when input points change
   pointsEffect = effect(() => {
-    const _ = this.points();
+    this.points();
     // defer until view is ready
     if (this.canvasRef) {
       this.render();
@@ -43,8 +43,8 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
 
   // Re-render when style/type inputs change
   styleEffect = effect(() => {
-    const _c = this.color();
-    const _k = this.chartKind();
+    this.color();
+    this.chartKind();
     if (this.canvasRef) {
       this.render();
     }
@@ -62,26 +62,28 @@ export class StatisticKeyChartComponent implements AfterViewInit, OnDestroy {
     const kind = this.chartKind();
     const color = this.color();
     const isLine = kind === 'line';
+    const datasets = isLine
+      ? [{
+        label: this.title() || 'Series',
+        data,
+        borderColor: color,
+        backgroundColor: `${color}33`,
+        tension: 0.25,
+        fill: true,
+        pointRadius: 3
+      }]
+      : [{
+        label: this.title() || 'Series',
+        data,
+        backgroundColor: `${color}cc`,
+        borderColor: color
+      }];
+
     const config: ChartConfiguration = {
       type: kind,
       data: {
         labels,
-        datasets: [
-          isLine ? {
-            label: this.title() || 'Series',
-            data,
-            borderColor: color,
-            backgroundColor: color + '33',
-            tension: 0.25,
-            fill: true,
-            pointRadius: 3
-          } : {
-            label: this.title() || 'Series',
-            data,
-            backgroundColor: color + 'cc',
-            borderColor: color
-          }
-        ] as any
+        datasets
       },
       options: {
         responsive: true,

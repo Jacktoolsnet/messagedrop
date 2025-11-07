@@ -126,12 +126,12 @@ export class EvidenceListComponent implements OnInit, OnChanges {
   private resolveFilename(response: HttpResponse<Blob>, fallback: string): string {
     const disposition = response.headers.get('Content-Disposition');
     if (!disposition) return fallback;
-    const match = /filename\*?=(?:UTF-8'')?\"?([^\";]+)/i.exec(disposition);
+    const match = /filename\*?=(?:UTF-8'')?"?([^";]+)/i.exec(disposition);
     if (match?.[1]) {
       try {
-        return decodeURIComponent(match[1].replace(/\"/g, ''));
+        return decodeURIComponent(match[1].replace(/"/g, ''));
       } catch {
-        return match[1].replace(/\"/g, '');
+        return match[1].replace(/"/g, '');
       }
     }
     return fallback;

@@ -1,4 +1,4 @@
-import { Component, Inject, inject, computed, signal } from '@angular/core';
+import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -15,6 +15,15 @@ export interface AppealResolutionData {
   outcome: string | null;
   reviewer?: string | null;
   reason?: string | null;
+}
+
+export interface AppealResolutionDialogData {
+  defaultOutcome?: string | null;
+  reviewer?: string | null;
+  reason?: string | null;
+  noticeId?: string;
+  noticeContentId?: string | null;
+  currentDecisionOutcome?: DecisionOutcome | null;
 }
 
 @Component({
@@ -37,6 +46,8 @@ export class AppealResolutionDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly snack = inject(MatSnackBar);
   private readonly dsa = inject(DsaService);
+  private readonly dialogRef = inject(MatDialogRef<AppealResolutionDialogComponent, AppealResolutionData | null>);
+  readonly data = inject<AppealResolutionDialogData | null>(MAT_DIALOG_DATA);
   private lastAutoReason: string | null = null;
   readonly outcomes = [
     { value: 'UPHELD', label: 'Decision upheld' },
@@ -63,14 +74,12 @@ export class AppealResolutionDialogComponent {
   isRevised = computed(() => this.form.controls.outcome.value === 'REVISED');
   decisionOutcomes: DecisionOutcome[] = ['NO_ACTION', 'RESTRICT', 'REMOVE_CONTENT', 'FORWARD_TO_AUTHORITY'];
 
-  constructor(
-    private readonly dialogRef: MatDialogRef<AppealResolutionDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { defaultOutcome?: string | null; reviewer?: string | null; reason?: string | null; noticeId?: string; noticeContentId?: string | null; currentDecisionOutcome?: DecisionOutcome | null }
-  ) {
+  constructor() {
+    const data = this.data;
     if (data?.defaultOutcome) {
       this.form.patchValue({ outcome: data.defaultOutcome });
       const template = this.standardTexts[data.defaultOutcome] ?? '';
-      if (!data?.reason) {
+      if (!data.reason) {
         this.form.patchValue({ reason: template });
         this.lastAutoReason = template;
       }
@@ -92,10 +101,8 @@ export class AppealResolutionDialogComponent {
       }
     }
 
-    // Filter decision outcomes to not include current decision outcome (if provided)
-    if (this.data?.currentDecisionOutcome) {
-      this.decisionOutcomes = this.decisionOutcomes.filter(o => o !== this.data!.currentDecisionOutcome);
-      // pick first allowed as default
+    if (data?.currentDecisionOutcome) {
+      this.decisionOutcomes = this.decisionOutcomes.filter(o => o !== data.currentDecisionOutcome);
       if (this.decisionOutcomes.length) {
         this.form.controls.decOutcome.setValue(this.decisionOutcomes[0]);
       }
@@ -135,10 +142,12 @@ export class AppealResolutionDialogComponent {
       }).subscribe({
         next: () => {
           // Update visible status depending on decision (NO_ACTION -> visible = true, others false)
-          const cid = (this.data.noticeContentId || '').trim();
+          const cid = (this.data?.noticeContentId ?? '').trim();
           if (cid) {
             const visible = value.decOutcome === 'NO_ACTION';
-            this.dsa.setPublicMessageVisibility(cid, visible).subscribe({ next: () => {}, error: () => {} });
+            this.dsa.setPublicMessageVisibility(cid, visible).subscribe({
+              error: () => this.snack.open('Could not update public visibility.', 'OK', { duration: 3000 })
+            });
           }
           this.snack.open('Decision revised.', 'OK', { duration: 2000 });
           closeWith();

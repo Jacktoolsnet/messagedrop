@@ -54,7 +54,12 @@ export class EditUserComponent {
   submit() {
     if (this.form.invalid) return;
 
-    const raw = this.form.getRawValue();
+    interface FormValue {
+      username: string;
+      password: string;
+      role: UpdateUserPayload['role'];
+    }
+    const raw = this.form.getRawValue() as FormValue;
     const payload: UpdateUserPayload = {};
 
     // nur setzen, wenn erlaubt und geändert
@@ -65,7 +70,7 @@ export class EditUserComponent {
       payload.password = raw.password.trim();
     }
     if (this.canChangeRole && raw.role !== this.user.role) {
-      payload.role = raw.role as any;
+      payload.role = raw.role;
     }
 
     if (Object.keys(payload).length === 0) {

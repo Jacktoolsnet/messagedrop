@@ -117,11 +117,16 @@ export class SignalsComponent {
     this.reload();
 
     // Reaktiv nach Filter-Änderung (kleines Debounce via setTimeout)
-    let t: any;
+    let timeoutHandle: ReturnType<typeof setTimeout> | undefined;
     effect(() => {
-      const f = this.filterForm.value;
-      clearTimeout(t);
-      t = setTimeout(() => this.reload(), 250);
+      const snapshot = JSON.stringify(this.filterForm.value);
+      if (timeoutHandle) {
+        clearTimeout(timeoutHandle);
+      }
+      timeoutHandle = setTimeout(() => {
+        void snapshot;
+        this.reload();
+      }, 250);
     });
   }
 

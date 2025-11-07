@@ -1,5 +1,5 @@
 import { HttpClient, HttpHeaders, HttpParams, HttpResponse } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, forkJoin, map, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../../../environments/environment';
@@ -22,7 +22,7 @@ import { TransparencyStats } from '../../../interfaces/transparency-stats.interf
 import { TransparencyReport } from '../../../interfaces/transparency-report.interface';
 import { DsaAppeal } from '../../../interfaces/dsa-appeal.interface';
 import { ListAppealsParams } from '../../../interfaces/list-appeals-params.interface';
-import { DsaNotification, ListNotificationsParams } from '../../../interfaces/dsa-notification.interface';
+import { DsaNotification, ListNotificationsParams, NotificationMeta, NotificationPayload } from '../../../interfaces/dsa-notification.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaService {
@@ -33,11 +33,8 @@ export class DsaService {
   readonly noticeStats = signal<NoticeStats | null>(null);
   readonly signalStats = signal<SignalStats | null>(null);
   readonly appealStats = signal<AppealStats | null>(null);
-
-  constructor(
-    private http: HttpClient,
-    private snack: MatSnackBar
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly snack = inject(MatSnackBar);
 
   /* =======================
    *  NOTICES (new / ergänzt)
@@ -60,7 +57,7 @@ export class DsaService {
     return this.http.get<DsaNotice[]>(`${this.baseUrl}/notices`, { params }).pipe(
       // Clientseitig zusätzlich filtern (category, q, range)
       map(rows => this.applyNoticeClientFilters(rows ?? [], filters)),
-      catchError(err => {
+      catchError(() => {
         this.snack.open('Could not load notices.', 'OK', { duration: 3000 });
         return of([]);
       })
@@ -92,7 +89,7 @@ export class DsaService {
   listTransparencyReports(range: string): Observable<TransparencyReport[]> {
     const params = new HttpParams().set('range', range);
     return this.http.get<TransparencyReport[]>(`${this.baseUrl}/transparency/reports`, { params }).pipe(
-      catchError(err => {
+      catchError(() => {
         this.snack.open('Could not load transparency reports.', 'OK', { duration: 3000 });
         return of([]);
       })
@@ -174,7 +171,7 @@ export class DsaService {
     this.loading.set(true);
     this.http.get<NoticeStats>(`${this.baseUrl}/stats/notices`)
       .pipe(
-        catchError(err => {
+        catchError(() => {
           this.snack.open('Could not load notice stats.', 'OK', { duration: 3000 });
           this.loading.set(false);
           return of(null);
@@ -190,7 +187,7 @@ export class DsaService {
     this.loading.set(true);
     this.http.get<AppealStats>(`${this.baseUrl}/stats/appeals`)
       .pipe(
-        catchError(err => {
+        catchError(() => {
           this.snack.open('Could not load appeal stats.', 'OK', { duration: 3000 });
           this.loading.set(false);
           return of(null);
@@ -217,7 +214,7 @@ export class DsaService {
     if (params.q) httpParams = httpParams.set('q', params.q);
 
     return this.http.get<DsaNotification[]>(`${this.baseUrl}/notifications`, { params: httpParams }).pipe(
-      catchError(err => {
+      catchError(() => {
         this.snack.open('Could not load notifications.', 'OK', { duration: 3000 });
         return of([]);
       })
@@ -272,8 +269,8 @@ export class DsaService {
     decisionId?: string | null;
     stakeholder: string;
     channel: string;
-    payload: any;
-    meta?: any;
+    payload: NotificationPayload;
+    meta?: NotificationMeta;
   }): Observable<{ id: string }> {
     return this.http.post<{ id: string }>(`${this.baseUrl}/notifications`, payload).pipe(
       catchError(err => {
@@ -287,7 +284,7 @@ export class DsaService {
     this.loading.set(true);
     this.http.get<SignalStats>(`${this.baseUrl}/stats/signals`)
       .pipe(
-        catchError(err => {
+        catchError(() => {
           this.snack.open('Could not load signal stats.', 'OK', { duration: 3000 });
           this.loading.set(false);
           return of(null);
@@ -333,7 +330,7 @@ export class DsaService {
     if (params.q) hp = hp.set('q', params.q);
 
     return this.http.get<DsaSignal[]>(`${this.baseUrl}/signals`, { params: hp })
-      .pipe(catchError(err => {
+      .pipe(catchError(() => {
         this.snack.open('Could not load signals.', 'OK', { duration: 3000 });
         return of([]);
       }));
@@ -348,7 +345,7 @@ export class DsaService {
     if (typeof params.offset === 'number') hp = hp.set('offset', String(params.offset));
 
     return this.http.get<DsaAppeal[]>(`${this.baseUrl}/appeals`, { params: hp }).pipe(
-      catchError(err => {
+      catchError(() => {
         this.snack.open('Could not load appeals.', 'OK', { duration: 3000 });
         return of([]);
       })
@@ -435,7 +432,7 @@ export class DsaService {
   getEvidenceForNotice(noticeId: string) {
     return this.http.get<DsaEvidence[]>(`${this.baseUrl}/notices/${noticeId}/evidence`)
       .pipe(
-        catchError(err => {
+        catchError(() => {
           this.snack.open('Could not load evidence.', 'OK', { duration: 3000 });
           return of([]);
         })
@@ -519,7 +516,7 @@ export class DsaService {
   }
 
   // Helper (z. B. oben in der Datei außerhalb der Klasse)
-  safeParseDetails(input: any): Record<string, unknown> | null {
+  safeParseDetails(input: unknown): Record<string, unknown> | null {
     if (!input) return null;
     if (typeof input === 'object') return input as Record<string, unknown>;
     if (typeof input === 'string') {
@@ -531,17 +528,20 @@ export class DsaService {
 
   // dsa.service.ts
   getAuditForNotice(noticeId: string): Observable<DsaAuditEntry[]> {
-    return this.http.get<any[]>(`${this.baseUrl}/audit/notice/${noticeId}`).pipe(
-      map(rows => (rows || []).map(e => ({
-        id: String(e.id),
-        entityType: String(e.entityType),
-        entityId: String(e.entityId),
-        action: String(e.action),
-        actor: String(e.actor),
-        createdAt: Number(e.createdAt ?? e.at ?? Date.now()),   // <- at -> createdAt
-        details: this.safeParseDetails(e.details ?? e.detailsJson)   // <- parse detailsJson
-      }) as DsaAuditEntry)),
-      catchError(err => {
+    return this.http.get<Record<string, unknown>[]>(`${this.baseUrl}/audit/notice/${noticeId}`).pipe(
+      map(rows => (rows || []).map((e) => {
+        const entry = e as Record<string, unknown>;
+        return {
+          id: String(entry['id']),
+          entityType: String(entry['entityType']),
+          entityId: String(entry['entityId']),
+          action: String(entry['action']),
+          actor: String(entry['actor']),
+          createdAt: Number((entry['createdAt'] ?? entry['at'] ?? Date.now())),
+          details: this.safeParseDetails(entry['details'] ?? entry['detailsJson'])
+        } as DsaAuditEntry;
+      })),
+      catchError(() => {
         this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
         return of([]);
       })
@@ -573,7 +573,7 @@ export class DsaService {
     if (params.offset) hp = hp.set('offset', String(params.offset));
     return this.http.get<DsaAuditEntry[]>(`${this.baseUrl}/audit`, { params: hp })
       .pipe(
-        catchError(err => {
+        catchError(() => {
           this.snack.open('Could not load audit log.', 'OK', { duration: 3000 });
           return of([]);
         })

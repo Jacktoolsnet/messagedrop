@@ -48,7 +48,11 @@ export class AuditsComponent implements OnInit {
   ngOnInit(): void {
     // ensure we start at top when opening the view
     queueMicrotask(() => {
-      try { window.scrollTo({ top: 0, left: 0, behavior: 'auto' }); } catch {}
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+      } catch (error) {
+        console.warn('Unable to reset scroll position', error);
+      }
     });
     this.load();
     this.filterForm.valueChanges.pipe(debounceTime(250)).subscribe(() => this.load());
@@ -103,24 +107,36 @@ export class AuditsComponent implements OnInit {
     }
   }
 
-  detailRows(e: DsaAuditEntry): Array<{ k: string; v: string }> {
-    const rows: Array<{ k: string; v: string }> = [
+  detailRows(e: DsaAuditEntry): { k: string; v: string }[] {
+    const rows: { k: string; v: string }[] = [
       { k: 'Actor', v: e.actor },
       { k: 'Entity', v: `${e.entityType} • ${e.entityId}` },
       { k: 'ID', v: e.id }
     ];
-    const d = e.details as any;
-    if (d && typeof d === 'object') {
-      // bekannte Felder hübsch benennen
-      if (typeof d.status === 'string') rows.push({ k: 'Changed to', v: d.status });
-      if (typeof d.newStatus === 'string') rows.push({ k: 'Changed to', v: d.newStatus });
-      if (typeof d.evidenceId === 'string') rows.push({ k: 'Evidence ID', v: d.evidenceId });
-      if (typeof d.type === 'string') rows.push({ k: 'Type', v: d.type });
-      if (typeof d.signalId === 'string') rows.push({ k: 'Signal ID', v: d.signalId });
-      if (typeof d.noticeId === 'string') rows.push({ k: 'Notice ID', v: d.noticeId });
-      if (typeof d.outcome === 'string') rows.push({ k: 'Outcome', v: d.outcome });
-    }
+    const details = this.asDetails(e);
+    const changed = this.detailValue(details, 'status') ?? this.detailValue(details, 'newStatus');
+    if (changed) rows.push({ k: 'Changed to', v: changed });
+    const evidenceId = this.detailValue(details, 'evidenceId');
+    if (evidenceId) rows.push({ k: 'Evidence ID', v: evidenceId });
+    const type = this.detailValue(details, 'type');
+    if (type) rows.push({ k: 'Type', v: type });
+    const signalId = this.detailValue(details, 'signalId');
+    if (signalId) rows.push({ k: 'Signal ID', v: signalId });
+    const noticeId = this.detailValue(details, 'noticeId');
+    if (noticeId) rows.push({ k: 'Notice ID', v: noticeId });
+    const outcome = this.detailValue(details, 'outcome');
+    if (outcome) rows.push({ k: 'Outcome', v: outcome });
     return rows;
+  }
+
+  private asDetails(entry: DsaAuditEntry): Record<string, unknown> {
+    return entry.details ?? {};
+  }
+
+  private detailValue(details: Record<string, unknown>, key: string): string | null {
+    const value = details[key];
+    if (value === undefined || value === null) return null;
+    return typeof value === 'string' ? value : String(value);
   }
 
   // Drill-down: Notice öffnen, wenn möglich

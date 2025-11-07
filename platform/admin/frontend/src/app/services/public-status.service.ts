@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -82,8 +82,7 @@ export interface PublicStatusResponse {
 @Injectable({ providedIn: 'root' })
 export class PublicStatusService {
   private readonly baseUrl = `${environment.apiUrl}/public/status`;
-
-  constructor(private http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   getStatus(token: string): Observable<PublicStatusResponse> {
     return this.http.get<PublicStatusResponse>(`${this.baseUrl}/${encodeURIComponent(token)}`);
