@@ -1,6 +1,6 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, effect, Inject, OnInit, signal } from '@angular/core';
-import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
@@ -14,6 +14,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
+import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../../../utils/evidence-input/evidence-input.component';
 import { environment } from '../../../../../environments/environment';
 import { DsaStatusAppeal } from '../../../../interfaces/dsa-status-appeal.interface';
 import { DsaStatusEvidence } from '../../../../interfaces/dsa-status-evidence.interface';
@@ -38,6 +39,7 @@ import { DsaStatusService } from '../../../../services/dsa-status.service';
     MatTabsModule,
     MatChipsModule,
     MatTooltipModule,
+    EvidenceInputComponent,
     DatePipe,
     MatSnackBarModule
   ],
@@ -74,9 +76,20 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly attachmentsSizeLabel = computed(() => this.formatBytes(this.attachmentsSize()));
   // Appeal URL evidence state
   readonly appealUrls = signal<string[]>([]);
-  readonly appealUrlForm = this.fb.nonNullable.group({
-    url: ['', this.urlOptionalValidator.bind(this)]
-  });
+  readonly appealUrlViews = computed<readonly EvidenceUrlItem[]>(() =>
+    this.appealUrls().map((url, index) => ({
+      id: `${index}`,
+      label: url,
+      tooltip: url
+    }))
+  );
+  readonly attachmentViews = computed<readonly EvidenceFileItem[]>(() =>
+    this.attachments().map((file, index) => ({
+      id: `${index}`,
+      label: `${file.name} · ${this.formatBytes(file.size)}`,
+      tooltip: `${file.name} · ${this.formatBytes(file.size)}`
+    }))
+  );
   readonly activeTab = signal(0);
   readonly notice = computed(() => this.status()?.notice ?? null);
   readonly signalCase = computed(() => this.status()?.signal ?? null);
@@ -162,14 +175,6 @@ export class DsaCaseDialogComponent implements OnInit {
 
     this.submitting.set(true);
     try {
-      // Move typed URL into the list if present
-      const rawTyped = (this.appealUrlForm.controls.url.value || '').trim();
-      const normalizedTyped = this.normalizeUrl(rawTyped);
-      if (normalizedTyped) {
-        this.appealUrls.update(arr => [...arr, normalizedTyped]);
-        this.appealUrlForm.controls.url.setValue('');
-      }
-
       const { id } = await firstValueFrom(this.service.createAppeal(this.data.token, this.appealForm.getRawValue()));
 
       let uploadIssue = false;
@@ -214,36 +219,17 @@ export class DsaCaseDialogComponent implements OnInit {
     }
   }
 
-  addAppealUrl(): void {
-    const raw = (this.appealUrlForm.controls.url.value || '').trim();
-    const normalized = this.normalizeUrl(raw);
-    if (!normalized) return;
-    const exists = this.appealUrls().some(u => u.toLowerCase() === normalized.toLowerCase());
+  onAppealUrlAdd(url: string): void {
+    const exists = this.appealUrls().some(u => u.toLowerCase() === url.toLowerCase());
     if (exists) {
       this.snack.open('This link is already added.', 'OK', { duration: 2500, verticalPosition: 'top' });
       return;
     }
-    this.appealUrls.update(arr => [...arr, normalized]);
-    this.appealUrlForm.controls.url.setValue('');
-    this.appealUrlForm.controls.url.markAsPristine();
-    this.appealUrlForm.controls.url.updateValueAndValidity({ emitEvent: false });
+    this.appealUrls.update(arr => [...arr, url]);
   }
 
-  removeAppealUrl(index: number): void {
-    const next = [...this.appealUrls()];
-    next.splice(index, 1);
-    this.appealUrls.set(next);
-  }
-
-  onAttachmentsSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const files = Array.from(input.files ?? []);
-
-    if (!files.length) {
-      input.value = '';
-      return;
-    }
-
+  onAttachmentsPicked(files: File[]): void {
+    if (!files?.length) return;
     let rejected = false;
     let message: string | null = null;
     const currentFiles = [...this.attachments()];
@@ -270,17 +256,33 @@ export class DsaCaseDialogComponent implements OnInit {
     }
 
     this.attachments.set(currentFiles);
-    input.value = '';
-
     if (rejected && message) {
       this.snack.open(message, 'OK', { duration: 4000, verticalPosition: 'top' });
     }
+  }
+
+  removeAppealUrl(index: number): void {
+    const next = [...this.appealUrls()];
+    next.splice(index, 1);
+    this.appealUrls.set(next);
+  }
+
+  onAppealUrlRemove(id: string): void {
+    const idx = Number(id);
+    if (Number.isNaN(idx)) return;
+    this.removeAppealUrl(idx);
   }
 
   removeAttachment(index: number): void {
     const next = [...this.attachments()];
     next.splice(index, 1);
     this.attachments.set(next);
+  }
+
+  onAttachmentRemove(id: string): void {
+    const idx = Number(id);
+    if (Number.isNaN(idx)) return;
+    this.removeAttachment(idx);
   }
 
   download(ev: DsaStatusEvidence): void {
@@ -345,28 +347,7 @@ export class DsaCaseDialogComponent implements OnInit {
     return `${base}/${encodeURIComponent(token)}`;
   }
 
-  private normalizeUrl(u: string): string | null {
-    if (!u) return null;
-    const trimmed = u.trim();
-    if (/^https?:\/\//i.test(trimmed)) return trimmed;
-    if (/^www\./i.test(trimmed) || /\.[a-z]{2,}(?:\/.+)?$/i.test(trimmed)) {
-      return `https://${trimmed}`;
-    }
-    return null;
-  }
-
   // Expose normalized URL to the template to drive disabled/error state
-  normalizedAppealUrl(): string | null {
-    const raw = (this.appealUrlForm.controls.url.value || '').trim();
-    return this.normalizeUrl(raw);
-  }
-
-  private urlOptionalValidator(control: AbstractControl): ValidationErrors | null {
-    const value = (control.value || '').trim();
-    if (!value) return null; // optional field
-    return this.normalizeUrl(value) ? null : { url: true };
-  }
-
   formatBytes(bytes: number): string {
     if (!bytes) return '0 B';
     const units = ['B', 'KB', 'MB', 'GB'];

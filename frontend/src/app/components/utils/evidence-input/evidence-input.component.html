@@ -1,0 +1,56 @@
+<div class="evidence-input">
+  @if (showUrl()) {
+  <div class="url-input">
+    <mat-form-field appearance="outline" class="w-full">
+      <mat-label>Add supporting link</mat-label>
+      <mat-icon matPrefix class="material-symbols-outlined">link</mat-icon>
+      <input matInput type="url" inputmode="url" autocomplete="url" [formControl]="form.controls.url"
+        placeholder="https://example.com/context"
+        (keydown.enter)="onAddUrl(); $event.preventDefault()" [disabled]="disabled()" />
+      <button mat-icon-button color="primary" matSuffix type="button"
+        (click)="onAddUrl()" [disabled]="disabled() || !(form.controls.url.value || '').trim()">
+        <mat-icon class="material-symbols-outlined">add_link</mat-icon>
+      </button>
+      <mat-hint align="start">http(s):// or www.example.com • Press Enter to add</mat-hint>
+    </mat-form-field>
+
+    @if (urlItems().length > 0) {
+    <mat-chip-set class="attachment-set">
+      @for (item of urlItems(); track item.id) {
+      <mat-chip removable (removed)="onUrlRemove(item.id)" [matTooltip]="item.tooltip ?? item.label">
+        <span class="chip-text">{{ item.label }}</span>
+        <mat-icon matChipRemove class="material-symbols-outlined">delete</mat-icon>
+      </mat-chip>
+      }
+    </mat-chip-set>
+    }
+  </div>
+  }
+
+  @if (showFiles()) {
+  <div class="file-input">
+    <div class="file-upload">
+      <input #fileInput type="file" multiple accept=".pdf,image/*" (change)="onFilesSelected($event)" hidden />
+      <button mat-stroked-button color="primary" type="button" (click)="fileInput.click()" [disabled]="disabled()">
+        <mat-icon class="material-symbols-outlined">attach_file</mat-icon>
+        Add supporting documents
+      </button>
+    </div>
+
+    @if (fileItems().length > 0) {
+    <mat-chip-set class="attachment-set">
+      @for (file of fileItems(); track file.id) {
+      <mat-chip removable (removed)="onFileRemove(file.id)" [matTooltip]="file.tooltip ?? file.label">
+        <span class="chip-text">{{ file.label }}</span>
+        <mat-icon matChipRemove class="material-symbols-outlined">delete</mat-icon>
+      </mat-chip>
+      }
+    </mat-chip-set>
+    }
+
+    @if (fileHint()) {
+    <p class="file-upload-hint">{{ fileHint() }}</p>
+    }
+  </div>
+  }
+</div>

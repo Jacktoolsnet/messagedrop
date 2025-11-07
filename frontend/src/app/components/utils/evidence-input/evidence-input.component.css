@@ -1,0 +1,24 @@
+.evidence-input {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.w-full {
+  width: 100%;
+}
+
+.attachment-set {
+  margin-top: 8px;
+}
+
+.file-upload {
+  display: inline-flex;
+  gap: 8px;
+}
+
+.file-upload-hint {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: rgba(0, 0, 0, 0.6);
+}

@@ -14,7 +14,13 @@
         @if (form.controls.type.value === 'url') {
         <mat-form-field appearance="outline">
             <mat-label>Evidence URL</mat-label>
-            <input matInput formControlName="url" placeholder="https://…" />
+            <mat-icon matPrefix>link</mat-icon>
+            <input matInput formControlName="url" placeholder="https://…"
+                   (keydown.enter)="submit(); $event.preventDefault()" />
+            <button mat-icon-button matSuffix type="button" (click)="submit()" aria-label="Add URL">
+                <mat-icon>add_link</mat-icon>
+            </button>
+            <mat-hint align="start">http(s):// or www.example.com</mat-hint>
         </mat-form-field>
         }
 

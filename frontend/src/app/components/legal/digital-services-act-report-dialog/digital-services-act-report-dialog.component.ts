@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -9,7 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { MatChipsModule } from '@angular/material/chips';
+import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../../utils/evidence-input/evidence-input.component';
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
@@ -31,7 +31,7 @@ import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-d
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    MatChipsModule
+    EvidenceInputComponent
   ],
   templateUrl: './digital-services-act-report-dialog.component.html',
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
@@ -95,38 +95,70 @@ export class DigitalServicesActReportDialogComponent {
   // Evidence tab state
   readonly maxEvidenceBytes = 5 * 1024 * 1024;
   evidenceItems = signal<Array<{ id: string; type: 'file' | 'url'; file?: File; url?: string }>>([]);
-  evidenceForm = this.fb.nonNullable.group({
-    url: ['']
-  });
 
-  removeEvidence(i: number): void {
-    const arr = [...this.evidenceItems()];
-    arr.splice(i, 1);
+  // Separate views like in the appeal UI
+  readonly evidenceUrlViews = computed<readonly EvidenceUrlItem[]>(() =>
+    this.evidenceItems()
+      .filter(e => e.type === 'url' && !!e.url)
+      .map(e => ({
+        id: e.id,
+        label: e.url ?? '',
+        tooltip: e.url ?? ''
+      }))
+  );
+
+  readonly evidenceFileViews = computed<readonly EvidenceFileItem[]>(() =>
+    this.evidenceItems()
+      .filter(e => e.type === 'file' && !!e.file)
+      .map(e => ({
+        id: e.id,
+        label: e.file ? `${e.file.name} · ${this.formatBytes(e.file.size)}` : 'File',
+        tooltip: e.file ? `${e.file.name} · ${this.formatBytes(e.file.size)}` : undefined
+      }))
+  );
+
+  evidenceFilesSizeLabel(): string {
+    const total = this.evidenceItems()
+      .filter(e => e.type === 'file' && !!e.file)
+      .reduce((sum, item) => sum + (item.file?.size ?? 0), 0);
+    return this.formatBytes(total);
+  }
+
+  removeEvidenceById(id: string): void {
+    const arr = this.evidenceItems().filter(e => e.id !== id);
     this.evidenceItems.set(arr);
   }
 
-  addEvidenceUrl(): void {
-    const raw = (this.evidenceForm.controls.url.value || '').trim();
-    const normalized = this.normalizeUrl(raw);
+  addEvidenceUrlFromInput(url: string): void {
+    const normalized = this.normalizeUrl(url);
     if (!normalized) return;
+    const exists = this.evidenceItems().some(e => e.type === 'url' && (e.url || '').toLowerCase() === normalized.toLowerCase());
+    if (exists) return;
     this.evidenceItems.update(arr => [...arr, { id: crypto.randomUUID(), type: 'url', url: normalized }]);
-    this.evidenceForm.controls.url.setValue('');
   }
 
-  onEvidenceFileChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const fileList = input.files;
-    if (!fileList || fileList.length === 0) return;
+  onEvidenceFilesPicked(files: File[]): void {
+    if (!files || files.length === 0) return;
     const items: Array<{ id: string; type: 'file'; file: File }> = [];
-    for (let i = 0; i < fileList.length; i++) {
-      const f = fileList.item(i)!;
+    for (const f of files) {
       if (f.size > this.maxEvidenceBytes) { continue; }
       const okType = f.type === 'application/pdf' || f.type.startsWith('image/') || /\.(pdf|png|jpe?g|gif|webp)$/i.test(f.name);
       if (!okType) { continue; }
       items.push({ id: crypto.randomUUID(), type: 'file', file: f });
     }
     if (items.length) this.evidenceItems.update(arr => [...arr, ...items]);
-    input.value = '';
+  }
+
+  formatBytes(bytes: number): string {
+    if (!bytes) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let value = bytes;
+    let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) {
+      value /= 1024;
+      unitIndex++;
+    }
+    return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   }
 
   // Helfer: formatiertes Datum
@@ -160,13 +192,6 @@ export class DigitalServicesActReportDialogComponent {
       } else {
         // FORMAL NOTICE
         const raw = this.formalForm.getRawValue();
-        // If a URL is typed but not added via the button, include it automatically
-        const typedUrl = (this.evidenceForm.controls.url.value || '').trim();
-        const normalizedUrl = this.normalizeUrl(typedUrl);
-        if (normalizedUrl) {
-          this.evidenceItems.update(arr => [...arr, { id: crypto.randomUUID(), type: 'url', url: normalizedUrl }]);
-          this.evidenceForm.controls.url.setValue('');
-        }
         const response: DsaSubmissionResponse = await firstValueFrom(this.dsa.submitNotice({
           contentId,
           contentUrl,

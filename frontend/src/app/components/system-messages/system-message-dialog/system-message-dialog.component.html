@@ -160,7 +160,7 @@
 
 <mat-dialog-actions align="end">
   @if (!selectedNotification()) {
-  <button mat-button color="warn" matTooltip="Delete all" (click)="confirmDeleteAll($event)" aria-label="Delete all">
+  <button mat-button color="warn" matTooltip="Delete all" (click)="confirmDeleteAll($event)" aria-label="Delete all" [disabled]="notifications().length === 0">
     Delete all
     <mat-icon class="material-symbols-outlined">delete_sweep</mat-icon>
   </button>

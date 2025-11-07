@@ -84,7 +84,15 @@ export class AddEvidenceDialogComponent {
     if (this.form.invalid || this.saving()) return;
     const { type, url, hash } = this.form.getRawValue();
     // einfache Validierung je nach Typ
-    if (type === 'url' && !url) { this.snack.open('Please provide an URL.', 'OK', { duration: 2500 }); return; }
+    if (type === 'url') {
+      const normalized = this.normalizeUrl((url || '').trim());
+      if (!normalized) {
+        this.snack.open('Please provide a valid URL (http(s):// or domain).', 'OK', { duration: 2500 });
+        return;
+      }
+      // write normalized back to form (for consistency)
+      this.form.controls.url.setValue(normalized);
+    }
     if (type === 'hash' && !hash) { this.snack.open('Please provide a hash.', 'OK', { duration: 2500 }); return; }
     if (type === 'file' && !this.selectedFile()) {
       this.snack.open('Please select a file.', 'OK', { duration: 2500 });
@@ -94,7 +102,7 @@ export class AddEvidenceDialogComponent {
     this.saving.set(true);
     this.dsa.addEvidence(this.data.noticeId, {
       type,
-      url: url || null,
+      url: type === 'url' ? (this.form.controls.url.value || null) : (url || null),
       hash: hash || null,
       file: this.selectedFile()
     }).subscribe({
@@ -107,5 +115,15 @@ export class AddEvidenceDialogComponent {
         this.saving.set(false);
       }
     });
+  }
+
+  private normalizeUrl(u: string): string | null {
+    if (!u) return null;
+    const trimmed = u.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (/^www\./i.test(trimmed) || /\.[a-z]{2,}(?:\/.+)?$/i.test(trimmed)) {
+      return `https://${trimmed}`;
+    }
+    return null;
   }
 }

@@ -167,6 +167,22 @@ dd {
   color: rgba(0, 0, 0, 0.6);
 }
 
+/* URL input row in appeal form */
+.url-upload {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.url-upload .url-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-end;
+}
+
+.url-upload .grow {
+  flex: 1 1 auto;
+}
+
 .attachment-set {
   display: flex;
   flex-wrap: wrap;
