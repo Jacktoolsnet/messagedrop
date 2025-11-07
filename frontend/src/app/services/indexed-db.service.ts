@@ -580,8 +580,12 @@ export class IndexedDbService {
   }
 
   private normalizeLon(lon: number): number {
-    // Wrap in [-180, 180]
-    return ((lon + 180) % 360 + 360) % 360 - 180;
+    const normalized = ((lon + 180) % 360 + 360) % 360 - 180;
+    const epsilon = 1e-9;
+    if (Math.abs(normalized + 180) < epsilon && lon > 0) {
+      return 180;
+    }
+    return Object.is(normalized, -0) ? 0 : normalized;
   }
 
   private inLatRange(lat: number, min: number, max: number): boolean {

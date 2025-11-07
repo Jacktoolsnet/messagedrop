@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, Observable, throwError } from 'rxjs';
+import { catchError, forkJoin, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { GetMessageResponse } from '../interfaces/get-message-response';
@@ -341,40 +341,52 @@ export class MessageService {
   }
 
   getByVisibleMapBoundingBox(showAlways: boolean = false) {
-    const boundingBox: BoundingBox = this.mapService.getVisibleMapBoundingBox();
-    const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;
+    const boundingBoxes = this.mapService.getVisibleMapBoundingBoxes();
+    if (boundingBoxes.length === 0) {
+      return;
+    }
 
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: 'Message service',
-      image: '',
-      icon: '',
-      message: `Loading message`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
+    const requests = boundingBoxes.map((boundingBox, index) =>
+      this.getByBoundingBox(boundingBox, showAlways && index === 0).pipe(
+        catchError(() => of(null))
+      )
+    );
 
-    return this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (getMessageResponse) => {
-          // lastSearchedLocation aktualisieren
-          this.lastSearchedLocation = this.geolocationService.getCenterOfBoundingBox(boundingBox).plusCode;
+    forkJoin(requests).subscribe({
+      next: (responses) => {
+        const successfulResponses = responses.filter((response): response is GetMessageResponse => response !== null);
 
-          // Messages neu setzen
-          const mappedMessages = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
-          this.messagesSignal.set(mappedMessages);
+        this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(
+          this.mapService.getMapLocation(),
+          this.mapService.getMapZoom()
+        );
 
-          this._messageSet.update(trigger => trigger + 1);
-        },
-        error: () => {
-          // Fehlerfall: Location trotzdem aktualisieren, Messages leeren
-          this.lastSearchedLocation = this.geolocationService.getCenterOfBoundingBox(boundingBox).plusCode;
+        if (successfulResponses.length === 0) {
           this.messagesSignal.set([]);
           this._messageSet.update(trigger => trigger + 1);
+          return;
         }
-      });
+
+        const uniqueMessages = new Map<number, RawMessage>();
+        successfulResponses.forEach(response => {
+          response.rows.forEach(raw => {
+            uniqueMessages.set(raw.id, raw);
+          });
+        });
+
+        const mappedMessages = Array.from(uniqueMessages.values()).map(raw => this.mapRawMessage(raw));
+        this.messagesSignal.set(mappedMessages);
+        this._messageSet.update(trigger => trigger + 1);
+      },
+      error: () => {
+        this.lastSearchedLocation = this.geolocationService.getPlusCodeBasedOnMapZoom(
+          this.mapService.getMapLocation(),
+          this.mapService.getMapZoom()
+        );
+        this.messagesSignal.set([]);
+        this._messageSet.update(trigger => trigger + 1);
+      }
+    });
   }
 
   getByBoundingBox(boundingBox: BoundingBox, showAlways: boolean = false): Observable<GetMessageResponse> {

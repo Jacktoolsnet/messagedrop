@@ -149,22 +149,96 @@ export class MapService {
   }
 
   private normalizeLon(lon: number): number {
-    // Wrap in [-180, 180]
-    return ((lon + 180) % 360 + 360) % 360 - 180;
+    const normalized = ((lon + 180) % 360 + 360) % 360 - 180;
+    const epsilon = 1e-9;
+    if (Math.abs(normalized + 180) < epsilon && lon > 0) {
+      return 180;
+    }
+    return Object.is(normalized, -0) ? 0 : normalized;
+  }
+
+  private clampLon(lon: number): number {
+    return Math.min(180, Math.max(-180, lon));
   }
 
   public getVisibleMapBoundingBox(): BoundingBox {
-    const bounds = this.map?.getBounds();
+    const boundingBoxes = this.getVisibleMapBoundingBoxes();
+    if (boundingBoxes.length === 0) {
+      return { latMin: -90, lonMin: -180, latMax: 90, lonMax: 180 };
+    }
 
+    if (boundingBoxes.length === 1) {
+      return boundingBoxes[0];
+    }
+
+    return {
+      latMin: boundingBoxes[0].latMin,
+      latMax: boundingBoxes[0].latMax,
+      lonMin: boundingBoxes[0].lonMin,
+      lonMax: boundingBoxes[1].lonMax
+    };
+  }
+
+  public getVisibleMapBoundingBoxes(): BoundingBox[] {
+    if (!this.map) {
+      return [];
+    }
+
+    const bounds = this.map.getBounds();
     const sw = bounds.getSouthWest();
     const ne = bounds.getNorthEast();
 
     const latMin = sw.lat;
     const latMax = ne.lat;
-    const lonMin = this.normalizeLon(sw.lng);
-    const lonMax = this.normalizeLon(ne.lng);
+    const lonMinRaw = sw.lng;
+    const lonMaxRaw = ne.lng;
 
-    return { latMin, lonMin, latMax, lonMax };
+    const worldSpan = 360;
+    const lonSpan = Math.abs(lonMaxRaw - lonMinRaw);
+    if (lonSpan >= worldSpan) {
+      return [{ latMin, latMax, lonMin: -180, lonMax: 180 }];
+    }
+
+    const lonMinWrapped = this.normalizeLon(lonMinRaw);
+    const lonMaxWrapped = this.normalizeLon(lonMaxRaw);
+    const exceedsWest = lonMinRaw < -180;
+    const exceedsEast = lonMaxRaw > 180;
+
+    if (exceedsWest && exceedsEast) {
+      return [{ latMin, latMax, lonMin: -180, lonMax: 180 }];
+    }
+
+    if (exceedsWest) {
+      return [{
+        latMin,
+        latMax,
+        lonMin: -180,
+        lonMax: this.clampLon(lonMaxRaw)
+      }];
+    }
+
+    if (exceedsEast) {
+      return [{
+        latMin,
+        latMax,
+        lonMin: this.clampLon(lonMinRaw),
+        lonMax: 180
+      }];
+    }
+
+    if (lonMinWrapped <= lonMaxWrapped) {
+      return [{
+        latMin,
+        latMax,
+        lonMin: lonMinWrapped,
+        lonMax: lonMaxWrapped
+      }];
+    }
+
+    return [
+      { latMin, latMax, lonMin: lonMinWrapped, lonMax: 180 },
+      { latMin, latMax, lonMin: -180, lonMax: lonMaxWrapped }
+    ];
   }
 
   public flyTo(location: Location): void {
