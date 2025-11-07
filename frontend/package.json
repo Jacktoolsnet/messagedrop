@@ -8,7 +8,8 @@
     "prebuild": "npm run gen:version",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "lint": "ng lint"
   },
   "private": true,
   "dependencies": {
@@ -51,8 +52,11 @@
     "@types/leaflet": "^1.9.20",
     "@types/luxon": "^3.6.2",
     "@types/qrcode": "^1.5.5",
+    "angular-eslint": "20.5.1",
+    "eslint": "^9.38.0",
     "jasmine": "^5.8.0",
     "jasmine-core": "^5.8.0",
-    "typescript": "^5.4.0"
+    "typescript": "^5.4.0",
+    "typescript-eslint": "8.46.2"
   }
 }
