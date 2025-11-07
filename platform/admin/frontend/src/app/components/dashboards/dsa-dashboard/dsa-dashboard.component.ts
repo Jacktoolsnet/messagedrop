@@ -1,11 +1,13 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, DestroyRef, inject } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { Router, RouterLink } from '@angular/router';
+import { NavigationEnd, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { filter, startWith } from 'rxjs';
 
 import { AuthService } from '../../../services/auth/auth.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
@@ -40,6 +42,7 @@ type DsaTile = {
     MatBadgeModule,
     MatProgressBarModule
   ],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './dsa-dashboard.component.html',
   styleUrls: ['./dsa-dashboard.component.css']
 })
@@ -47,6 +50,7 @@ export class DsaDashboardComponent {
   private router = inject(Router);
   private auth = inject(AuthService);
   private dsa = inject(DsaService);
+  private destroyRef = inject(DestroyRef);
 
   // Auth-Signals weiterreichen
   get username() { return this.auth.username; }
@@ -54,7 +58,7 @@ export class DsaDashboardComponent {
 
   // Lade beide Statistiken direkt beim Start
   constructor() {
-    this.dsa.loadAllStats();
+    this.refreshStatsOnEnter();
   }
 
   // Reactive Helpers
@@ -108,4 +112,13 @@ export class DsaDashboardComponent {
   goBack() { this.router.navigate(['/dashboard']); }
   logout() { this.auth.logout(); }
   trackByKey = (_: number, t: DsaTile) => t.key;
+
+  private refreshStatsOnEnter(): void {
+    this.router.events.pipe(
+      filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+      filter(event => event.urlAfterRedirects.startsWith('/dashboard/dsa')),
+      startWith(null),
+      takeUntilDestroyed(this.destroyRef)
+    ).subscribe(() => this.dsa.loadAllStats());
+  }
 }
