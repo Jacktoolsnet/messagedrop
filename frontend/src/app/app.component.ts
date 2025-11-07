@@ -429,12 +429,6 @@ export class AppComponent implements OnInit {
   }
 
   public handleMarkerClickEvent(event: MarkerLocation) {
-    let location: Location = {
-      latitude: event.location.latitude,
-      longitude: event.location.longitude,
-      plusCode: event.location.plusCode
-    }
-    //this.mapService.moveTo(location);
     switch (event.type) {
       case MarkerType.PUBLIC_MESSAGE:
         this.messageService.setMessages(event.messages)

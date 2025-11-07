@@ -53,7 +53,6 @@ export class MapService {
   private markerClickEvent!: EventEmitter<MarkerLocation>;
 
   private messageMarkers: leaflet.Marker[] = [];
-  private placeLocationRectangels = new Map<string, leaflet.Rectangle>();
 
   private ready: boolean = false;
 
@@ -96,9 +95,6 @@ export class MapService {
       } else {
         this.restoreUserMarker();
       }
-      this.location.latitude = this.map.getCenter().lat;
-      this.location.longitude = this.map.getCenter().lng;
-      this.location.plusCode = this.geolocationService.getPlusCode(this.map.getCenter().lat, this.map.getCenter().lng);
       moveEndEvent.emit(this.location);
     });
 
@@ -284,7 +280,7 @@ export class MapService {
   public setCircleMarker(location: Location) {
     this.circleMarker?.removeFrom(this.map);
     if (this.drawCircleMarker) {
-      this.circleMarker = leaflet.circleMarker([location.latitude, location.longitude]).addTo(this.map);
+      this.circleMarker = leaflet.circleMarker([this.location.latitude, this.location.longitude]).addTo(this.map);
     }
   }
 
