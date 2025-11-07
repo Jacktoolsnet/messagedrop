@@ -126,6 +126,27 @@ export class DigitalServicesActService {
     );
   }
 
+  /** Attach evidence using public token (no admin auth required) */
+  addNoticeEvidenceByToken(
+    token: string,
+    data: { type: 'file' | 'url' | 'hash'; url?: string | null; hash?: string | null; file?: File | null }
+  ): Observable<{ id: string }> {
+    const url = `${environment.apiUrl}/digitalserviceact/status/${encodeURIComponent(token)}/evidence`;
+    if (data.type === 'file' && data.file) {
+      const form = new FormData();
+      form.append('file', data.file);
+      if (data.hash) form.append('hash', data.hash);
+      const headers = new HttpHeaders({ 'X-API-Authorization': `${environment.apiToken}` });
+      return this.http.post<{ id: string }>(url, form, { headers, withCredentials: true }).pipe(
+        catchError(this.handleError)
+      );
+    }
+    const body = { type: data.type, url: data.url ?? null, hash: data.hash ?? null } as const;
+    return this.http.post<{ id: string }>(url, body, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   /** Attach evidence to a created signal */
   addSignalEvidence(
     signalId: string,

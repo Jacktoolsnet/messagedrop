@@ -312,6 +312,137 @@ router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
   });
 });
 
+// Add general evidence to a notice via public token (no appeal association)
+router.post('/status/:token/evidence', (req, res) => {
+  upload.single('file')(req, res, async (uploadErr) => {
+    const token = String(req.params.token || '').trim();
+    const _db = db(req);
+
+    if (!_db || !token) {
+      return res.status(400).json({ error: 'invalid_request' });
+    }
+
+    if (uploadErr) {
+      if (uploadErr.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'file_too_large' });
+      return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+    }
+
+    const hasFile = !!req.file;
+    const type = hasFile ? 'file' : String(req.body?.type || 'url');
+    const url = hasFile ? null : (req.body?.url ? String(req.body.url).trim() : null);
+    const hash = req.body?.hash ? String(req.body.hash) : null;
+
+    if (!hasFile) {
+      if (type === 'url') {
+        if (!url) return res.status(400).json({ error: 'url_required' });
+        try {
+          const parsed = new URL(url);
+          if (!/^https?:$/i.test(parsed.protocol)) return res.status(400).json({ error: 'invalid_url_protocol' });
+        } catch { return res.status(400).json({ error: 'invalid_url' }); }
+        if (url.length > 2000) return res.status(400).json({ error: 'url_too_long' });
+      } else if (type === 'hash') {
+        if (!hash) return res.status(400).json({ error: 'hash_required' });
+      } else {
+        return res.status(400).json({ error: 'unsupported_type' });
+      }
+    }
+
+    try {
+      const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
+      if (!notice) return res.status(404).json({ error: 'not_found' });
+
+      const id = crypto.randomUUID();
+      const now = Date.now();
+      const fileName = hasFile ? req.file.originalname : null;
+      const storedName = hasFile ? req.file.filename : null;
+
+      tableEvidence.create(
+        _db,
+        id,
+        notice.id,
+        type,
+        hasFile ? null : url,
+        hash,
+        fileName,
+        storedName,
+        now,
+        (err) => {
+          if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+
+          tableAudit.create(
+            _db,
+            crypto.randomUUID(),
+            'notice',
+            notice.id,
+            'evidence_add',
+            `public:${req.ip || 'unknown'}`,
+            now,
+            JSON.stringify({ token, evidenceId: id, type, url: url || undefined, fileName: fileName || undefined }),
+            () => { }
+          );
+
+          res.status(201).json({ id });
+        }
+      );
+    } catch (err) {
+      res.status(500).json({ error: 'db_error', detail: err.message });
+    }
+  });
+});
+
+// Add URL evidence via public token using a dedicated endpoint (no multipart)
+router.post('/status/:token/evidence/url', async (req, res) => {
+  const token = String(req.params.token || '').trim();
+  const _db = db(req);
+  if (!_db || !token) return res.status(400).json({ error: 'invalid_request' });
+
+  const rawUrl = String(req.body?.url || '').trim();
+  if (!rawUrl) return res.status(400).json({ error: 'url_required' });
+  try {
+    const parsed = new URL(rawUrl);
+    if (!/^https?:$/i.test(parsed.protocol)) return res.status(400).json({ error: 'invalid_url_protocol' });
+  } catch { return res.status(400).json({ error: 'invalid_url' }); }
+  if (rawUrl.length > 2000) return res.status(400).json({ error: 'url_too_long' });
+
+  try {
+    const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
+    if (!notice) return res.status(404).json({ error: 'not_found' });
+
+    const id = crypto.randomUUID();
+    const now = Date.now();
+    tableEvidence.create(
+      _db,
+      id,
+      notice.id,
+      'url',
+      rawUrl,
+      null,
+      null,
+      null,
+      now,
+      (err) => {
+        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+
+        tableAudit.create(
+          _db,
+          crypto.randomUUID(),
+          'notice',
+          notice.id,
+          'evidence_add',
+          `public:${req.ip || 'unknown'}`,
+          now,
+          JSON.stringify({ token, evidenceId: id, type: 'url', url: rawUrl }),
+          () => { }
+        );
+
+        res.status(201).json({ id });
+      }
+    );
+  } catch (err) {
+    res.status(500).json({ error: 'db_error', detail: err.message });
+  }
+});
+
 // Add URL evidence linked to an appeal (JSON body: { url: string })
 router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res) => {
   const token = String(req.params.token || '').trim();

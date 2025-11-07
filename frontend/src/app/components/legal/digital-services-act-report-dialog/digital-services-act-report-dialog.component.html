@@ -53,10 +53,10 @@
 
         <!-- TAB 2: FORMAL DSA REPORT -->
         <mat-tab>
-            <ng-template mat-tab-label>
-                <mat-icon>gavel</mat-icon>
-                <span class="tab-label">Formal DSA report</span>
-            </ng-template>
+          <ng-template mat-tab-label>
+            <mat-icon>gavel</mat-icon>
+            <span class="tab-label">Formal DSA report</span>
+          </ng-template>
 
             <div class="tab-explainer"></div>
 
@@ -104,68 +104,58 @@
                 <mat-checkbox formControlName="truthAffirmation">
                     I declare that the information provided is accurate to the best of my knowledge. (optional)
                 </mat-checkbox>
-            </form>
-        </mat-tab>
 
-        <!-- TAB 3: EVIDENCE -->
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <mat-icon>attach_file</mat-icon>
-                <span class="tab-label">Evidence</span>
-            </ng-template>
+                <!-- Evidence (only for notices) -->
+                <div class="tab-explainer" style="margin-top: 12px;">
+                    You can optionally attach evidence now. Files (images or PDF up to 5 MB) or URLs.
+                </div>
 
-            <div class="tab-explainer">
-                You can optionally attach evidence now. Files (images or PDF up to 5 MB) or URLs.
-                They will be linked to your {{ activeTabIndex===0 ? 'report' : 'notice' }} after submission.
-            </div>
-
-            <div class="evidence-grid">
-                <div class="evidence-section">
-                    <div class="section-title">Files</div>
-                    <div class="file-upload">
-                        <label class="upload-label" for="ev-file">
-                            <mat-icon>upload_file</mat-icon>
-                            <span>Select file(s)</span>
-                        </label>
-                        <input id="ev-file" type="file" (change)="onEvidenceFileChange($event)" accept=".pdf,image/*" multiple />
-                        <div class="muted">Allowed: PDF or images, each ≤ 5 MB</div>
+                <div class="evidence-grid">
+                    <div class="evidence-section">
+                        <div class="section-title">Files</div>
+                        <div class="file-upload">
+                            <label class="upload-label" for="ev-file-formal">
+                                <mat-icon>upload_file</mat-icon>
+                                <span>Select file(s)</span>
+                            </label>
+                            <input id="ev-file-formal" type="file" (change)="onEvidenceFileChange($event)" accept=".pdf,image/*" multiple />
+                            <div class="muted">Allowed: PDF or images, each ≤ 5 MB</div>
+                        </div>
                     </div>
-                </div>
 
-                <div class="evidence-section">
-                    <div class="section-title">Add by URL</div>
-                    <form [formGroup]="evidenceForm" class="row">
-                        <mat-form-field appearance="outline" class="w-full">
-                            <mat-label>Evidence URL</mat-label>
-                            <input matInput formControlName="url" placeholder="https://…" />
-                        </mat-form-field>
-                        <button mat-stroked-button type="button" (click)="addEvidenceUrl()">
-                            <mat-icon>add_link</mat-icon>
-                            Add URL
-                        </button>
-                    </form>
-                </div>
-
-                
-
-                <div class="evidence-list" *ngIf="evidenceItems().length > 0">
-                    <div class="list-title">Selected evidence</div>
-                    <div class="chips">
-                        @for (e of evidenceItems(); track e.id; let i = $index) {
-                        <mat-chip-row>
-                            <mat-icon matChipAvatar>{{ e.type === 'file' ? 'description' : 'link' }}</mat-icon>
-                            <span class="chip-text">
-                                @if (e.type === 'file') { {{ e.file?.name }} }
-                                @if (e.type === 'url') { {{ e.url }} }
-                            </span>
-                            <button mat-icon-button matChipRemove matChipTrailingIcon (click)="removeEvidence(i)" aria-label="Remove">
-                                <mat-icon>delete</mat-icon>
+                    <div class="evidence-section">
+                        <div class="section-title">Add by URL</div>
+                        <form [formGroup]="evidenceForm" class="row">
+                            <mat-form-field appearance="outline" class="w-full">
+                                <mat-label>Evidence URL</mat-label>
+                                <input matInput formControlName="url" placeholder="https://…" />
+                            </mat-form-field>
+                            <button mat-stroked-button type="button" (click)="addEvidenceUrl()">
+                                <mat-icon>add_link</mat-icon>
+                                Add URL
                             </button>
-                        </mat-chip-row>
-                        }
+                        </form>
+                    </div>
+
+                    <div class="evidence-list" *ngIf="evidenceItems().length > 0">
+                        <div class="list-title">Selected evidence</div>
+                        <div class="chips">
+                            @for (e of evidenceItems(); track e.id; let i = $index) {
+                            <mat-chip-row>
+                                <mat-icon matChipAvatar>{{ e.type === 'file' ? 'description' : 'link' }}</mat-icon>
+                                <span class="chip-text">
+                                    @if (e.type === 'file') { {{ e.file?.name }} }
+                                    @if (e.type === 'url') { {{ e.url }} }
+                                </span>
+                                <button mat-icon-button matChipRemove matChipTrailingIcon (click)="removeEvidence(i)" aria-label="Remove">
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </mat-chip-row>
+                            }
+                        </div>
                     </div>
                 </div>
-            </div>
+            </form>
         </mat-tab>
     </mat-tab-group>
 

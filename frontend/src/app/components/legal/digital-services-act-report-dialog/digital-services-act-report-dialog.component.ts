@@ -106,9 +106,10 @@ export class DigitalServicesActReportDialogComponent {
   }
 
   addEvidenceUrl(): void {
-    const url = (this.evidenceForm.controls.url.value || '').trim();
-    if (!url) return;
-    this.evidenceItems.update(arr => [...arr, { id: crypto.randomUUID(), type: 'url', url }]);
+    const raw = (this.evidenceForm.controls.url.value || '').trim();
+    const normalized = this.normalizeUrl(raw);
+    if (!normalized) return;
+    this.evidenceItems.update(arr => [...arr, { id: crypto.randomUUID(), type: 'url', url: normalized }]);
     this.evidenceForm.controls.url.setValue('');
   }
 
@@ -155,12 +156,17 @@ export class DigitalServicesActReportDialogComponent {
           contentType,
           content: contentSnapshot
         }));
-        // attach evidence to created signal, if any
-        await this.attachEvidenceAfterSubmit('signal', response?.id);
         this.showSuccess('signal', response?.statusUrl ?? null, response?.token ?? null);
       } else {
         // FORMAL NOTICE
         const raw = this.formalForm.getRawValue();
+        // If a URL is typed but not added via the button, include it automatically
+        const typedUrl = (this.evidenceForm.controls.url.value || '').trim();
+        const normalizedUrl = this.normalizeUrl(typedUrl);
+        if (normalizedUrl) {
+          this.evidenceItems.update(arr => [...arr, { id: crypto.randomUUID(), type: 'url', url: normalizedUrl }]);
+          this.evidenceForm.controls.url.setValue('');
+        }
         const response: DsaSubmissionResponse = await firstValueFrom(this.dsa.submitNotice({
           contentId,
           contentUrl,
@@ -172,8 +178,10 @@ export class DigitalServicesActReportDialogComponent {
           contentType,
           content: contentSnapshot
         }));
-        // attach evidence to created notice, if any
-        await this.attachEvidenceAfterSubmit('notice', response?.id);
+        // attach evidence to created notice (via public token), if any
+        await this.attachEvidenceAfterSubmit('notice', response?.id, response?.token || null);
+        // clear selected evidence after successful submission
+        this.evidenceItems.set([]);
         this.showSuccess('notice', response?.statusUrl ?? null, response?.token ?? null, raw.reporterEmail || '');
       }
     } catch (e: any) {
@@ -284,17 +292,19 @@ export class DigitalServicesActReportDialogComponent {
     });
   }
 
-  private async attachEvidenceAfterSubmit(kind: 'signal' | 'notice', id?: string | null): Promise<void> {
+  private async attachEvidenceAfterSubmit(kind: 'signal' | 'notice', id?: string | null, token?: string | null): Promise<void> {
     const items = this.evidenceItems();
     if (!id || items.length === 0) return;
     // perform sequentially to simplify error handling
     for (const item of items) {
       try {
         if (kind === 'notice') {
+          // Use public token route so no admin auth is required
+          if (!token) continue;
           if (item.type === 'file' && item.file) {
-            await firstValueFrom(this.dsa.addNoticeEvidence(id, { type: 'file', file: item.file } as any));
+            await firstValueFrom(this.dsa.addNoticeEvidenceByToken(token, { type: 'file', file: item.file } as any));
           } else if (item.type === 'url' && item.url) {
-            await firstValueFrom(this.dsa.addNoticeEvidence(id, { type: 'url', url: item.url } as any));
+            await firstValueFrom(this.dsa.addNoticeEvidenceByToken(token, { type: 'url', url: item.url } as any));
           }
         } else {
           if (item.type === 'file' && item.file) {
@@ -307,5 +317,16 @@ export class DigitalServicesActReportDialogComponent {
         // continue with others; individual errors are handled in service
       }
     }
+  }
+
+  private normalizeUrl(u: string): string | null {
+    if (!u) return null;
+    const trimmed = u.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    // If looks like a domain (has a dot) or starts with www., prefix https://
+    if (/^www\./i.test(trimmed) || /\.[a-z]{2,}(?:\/.+)?$/i.test(trimmed)) {
+      return `https://${trimmed}`;
+    }
+    return null;
   }
 }
