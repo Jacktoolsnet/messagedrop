@@ -51,6 +51,7 @@ export class NoticeDetailComponent implements OnInit {
   private dialog = inject(MatDialog);
   private snack = inject(MatSnackBar);
   makingScreenshot = signal(false);
+  private dirty = false;
 
   @ViewChild('evidenceList')
   private evidenceList?: EvidenceListComponent;
@@ -83,7 +84,7 @@ export class NoticeDetailComponent implements OnInit {
   isPublicMessage = computed(() => (this.notice()?.reportedContentType || '').toLowerCase().includes('public'));
 
   close(ok = false) {
-    this.ref.close(ok);
+    this.ref.close(ok || this.dirty);
   }
 
   openStatusPage(): void {
@@ -116,6 +117,7 @@ export class NoticeDetailComponent implements OnInit {
       this.notice.update(n => n ? ({ ...n, status: 'DECIDED', updatedAt: Date.now() }) : n);
       this.decisionSummary?.refresh();
       this.syncContentVisibility(outcome);
+      this.dirty = true;
     });
   }
 
@@ -210,6 +212,7 @@ export class NoticeDetailComponent implements OnInit {
         next: () => {
           this.status.set('UNDER_REVIEW');
           this.notice.update(n => ({ ...n, status: 'UNDER_REVIEW', updatedAt: Date.now() }));
+          this.dirty = true;
         },
         error: () => {
           this.autoStatusApplied = false;

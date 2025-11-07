@@ -87,7 +87,11 @@ export class AppealsComponent implements OnInit {
   load(): void {
     this.loading.set(true);
     this.dsa.listAppeals({ status: this.statusFilter() }).subscribe({
-      next: (rows: DsaAppeal[]) => this.appeals.set(rows ?? []),
+      next: (rows: DsaAppeal[]) => {
+        const list = rows ?? [];
+        this.appeals.set(list);
+        this.ensureSelectionIsValid(list);
+      },
       error: () => this.snack.open('Could not load appeals.', 'OK', { duration: 3000 }),
       complete: () => this.loading.set(false)
     });
@@ -145,20 +149,16 @@ export class AppealsComponent implements OnInit {
             this.dsa.setPublicMessageVisibility(cid, visible).subscribe({ next: () => { }, error: () => { } });
           }
           // Appeal als REVISED auflösen
-          this.dsa.resolveAppeal(appeal.id, {
-            outcome: 'REVISED',
-            reviewer: result.reviewer || null,
-            reason: result.reason || null
-          }).subscribe({
-            next: () => {
-              this.snack.open('Appeal resolved and decision revised.', 'OK', { duration: 2000 });
-              this.load();
-              this.dsa.loadAppealStats();
-              // rechte Seite aktualisieren
-              if (this.selectedAppeal()?.id === appeal.id) {
-                this.selectAppeal(appeal);
-              }
-            },
+            this.dsa.resolveAppeal(appeal.id, {
+              outcome: 'REVISED',
+              reviewer: result.reviewer || null,
+              reason: result.reason || null
+            }).subscribe({
+              next: () => {
+                this.snack.open('Appeal resolved and decision revised.', 'OK', { duration: 2000 });
+                this.load();
+                this.dsa.loadAppealStats();
+              },
             error: () => this.snack.open('Could not update appeal.', 'OK', { duration: 3000 })
           });
         });
@@ -299,5 +299,24 @@ export class AppealsComponent implements OnInit {
     const m = src.match(/tiktok\.com\/@[^/]+\/video\/(\d+)/);
     if (m?.[1]) return m[1];
     return mm?.contentId || null;
+  }
+
+  private ensureSelectionIsValid(list: DsaAppeal[]): void {
+    const currentId = this.selectedAppeal()?.id;
+    if (!currentId) return;
+    const stillExists = list.some(item => item.id === currentId);
+    if (!stillExists) {
+      this.clearSelection();
+    }
+  }
+
+  private clearSelection(): void {
+    this.selectedAppeal.set(null);
+    this.selectedNotice.set(null);
+    this.contentObj.set(null);
+    this.mediaKind.set('none');
+    this.embedUrl.set(null);
+    this.imageUrl.set(null);
+    this.rightLoading.set(false);
   }
 }
