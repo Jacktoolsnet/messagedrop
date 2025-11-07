@@ -1,16 +1,18 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, effect, Inject, OnInit, signal } from '@angular/core';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../../../environments/environment';
 import { DsaStatusAppeal } from '../../../../interfaces/dsa-status-appeal.interface';
@@ -29,11 +31,13 @@ import { DsaStatusService } from '../../../../services/dsa-status.service';
     MatIconModule,
     MatCardModule,
     MatInputModule,
+    MatFormFieldModule,
     ReactiveFormsModule,
     MatProgressBarModule,
     MatListModule,
     MatTabsModule,
     MatChipsModule,
+    MatTooltipModule,
     DatePipe,
     MatSnackBarModule
   ],
@@ -68,6 +72,11 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly attachments = signal<File[]>([]);
   readonly attachmentsSize = computed(() => this.attachments().reduce((sum, file) => sum + file.size, 0));
   readonly attachmentsSizeLabel = computed(() => this.formatBytes(this.attachmentsSize()));
+  // Appeal URL evidence state
+  readonly appealUrls = signal<string[]>([]);
+  readonly appealUrlForm = this.fb.nonNullable.group({
+    url: ['', this.urlOptionalValidator.bind(this)]
+  });
   readonly activeTab = signal(0);
   readonly notice = computed(() => this.status()?.notice ?? null);
   readonly signalCase = computed(() => this.status()?.signal ?? null);
@@ -100,8 +109,7 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly signalContentUrl = computed(() => this.signalCase()?.contentUrl ?? null);
 
   readonly appealForm = this.fb.nonNullable.group({
-    arguments: ['', [Validators.required, Validators.minLength(20)]],
-    url: ['', [Validators.pattern(/^https?:\/\/.+/i)]]
+    arguments: ['', [Validators.required, Validators.minLength(20)]]
   });
 
   readonly publicStatusUrl = computed(() => this.buildPublicStatusUrl(this.data.token));
@@ -154,6 +162,14 @@ export class DsaCaseDialogComponent implements OnInit {
 
     this.submitting.set(true);
     try {
+      // Move typed URL into the list if present
+      const rawTyped = (this.appealUrlForm.controls.url.value || '').trim();
+      const normalizedTyped = this.normalizeUrl(rawTyped);
+      if (normalizedTyped) {
+        this.appealUrls.update(arr => [...arr, normalizedTyped]);
+        this.appealUrlForm.controls.url.setValue('');
+      }
+
       const { id } = await firstValueFrom(this.service.createAppeal(this.data.token, this.appealForm.getRawValue()));
 
       let uploadIssue = false;
@@ -161,14 +177,15 @@ export class DsaCaseDialogComponent implements OnInit {
         uploadIssue = !(await this.uploadAttachments(id));
       }
 
-      // If an evidence URL was provided, submit it as URL evidence
-      const urlVal = (this.appealForm.controls.url.value || '').trim();
-      if (id && urlVal) {
-        try {
-          await firstValueFrom(this.service.uploadAppealUrlEvidence(this.data.token, id, urlVal));
-        } catch (e) {
-          uploadIssue = true;
-          console.error('Failed to upload URL evidence', e);
+      // Upload URL evidence entries (if any)
+      if (id && this.appealUrls().length > 0) {
+        for (const url of this.appealUrls()) {
+          try {
+            await firstValueFrom(this.service.uploadAppealUrlEvidence(this.data.token, id, url));
+          } catch (e) {
+            uploadIssue = true;
+            console.error('Failed to upload URL evidence', e);
+          }
         }
       }
 
@@ -180,6 +197,7 @@ export class DsaCaseDialogComponent implements OnInit {
       if (!uploadIssue) {
         this.appealForm.reset();
         this.attachments.set([]);
+        this.appealUrls.set([]);
         if (this.activeTab() !== 0) {
           this.activeTab.set(0);
         }
@@ -194,6 +212,27 @@ export class DsaCaseDialogComponent implements OnInit {
       this.submitting.set(false);
       this.uploading.set(false);
     }
+  }
+
+  addAppealUrl(): void {
+    const raw = (this.appealUrlForm.controls.url.value || '').trim();
+    const normalized = this.normalizeUrl(raw);
+    if (!normalized) return;
+    const exists = this.appealUrls().some(u => u.toLowerCase() === normalized.toLowerCase());
+    if (exists) {
+      this.snack.open('This link is already added.', 'OK', { duration: 2500, verticalPosition: 'top' });
+      return;
+    }
+    this.appealUrls.update(arr => [...arr, normalized]);
+    this.appealUrlForm.controls.url.setValue('');
+    this.appealUrlForm.controls.url.markAsPristine();
+    this.appealUrlForm.controls.url.updateValueAndValidity({ emitEvent: false });
+  }
+
+  removeAppealUrl(index: number): void {
+    const next = [...this.appealUrls()];
+    next.splice(index, 1);
+    this.appealUrls.set(next);
   }
 
   onAttachmentsSelected(event: Event): void {
@@ -304,6 +343,28 @@ export class DsaCaseDialogComponent implements OnInit {
     const base = (environment.publicStatusBaseUrl || '').trim().replace(/\/+$/, '');
     if (!base) return null;
     return `${base}/${encodeURIComponent(token)}`;
+  }
+
+  private normalizeUrl(u: string): string | null {
+    if (!u) return null;
+    const trimmed = u.trim();
+    if (/^https?:\/\//i.test(trimmed)) return trimmed;
+    if (/^www\./i.test(trimmed) || /\.[a-z]{2,}(?:\/.+)?$/i.test(trimmed)) {
+      return `https://${trimmed}`;
+    }
+    return null;
+  }
+
+  // Expose normalized URL to the template to drive disabled/error state
+  normalizedAppealUrl(): string | null {
+    const raw = (this.appealUrlForm.controls.url.value || '').trim();
+    return this.normalizeUrl(raw);
+  }
+
+  private urlOptionalValidator(control: AbstractControl): ValidationErrors | null {
+    const value = (control.value || '').trim();
+    if (!value) return null; // optional field
+    return this.normalizeUrl(value) ? null : { url: true };
   }
 
   formatBytes(bytes: number): string {

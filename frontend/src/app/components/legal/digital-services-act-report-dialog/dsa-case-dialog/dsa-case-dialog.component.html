@@ -213,16 +213,36 @@
             }
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Optional link to supporting content</mat-label>
-            <input matInput type="url" formControlName="url" placeholder="https://example.com/context" />
-            <mat-hint align="start">Must start with http:// or https://</mat-hint>
-            @if (appealForm.controls.url.invalid && appealForm.controls.url.touched) {
-            <mat-error>
-              Please enter a valid URL starting with http(s)://
-            </mat-error>
+          <div class="url-upload">
+            <form [formGroup]="appealUrlForm" class="url-row" (submit)="$event.preventDefault()">
+              <mat-form-field appearance="outline" class="grow">
+                <mat-label>Add supporting link</mat-label>
+                <mat-icon matPrefix class="material-symbols-outlined">link</mat-icon>
+                <input matInput type="url" autocomplete="url" inputmode="url" formControlName="url"
+                  placeholder="https://example.com/context"
+                  (keydown.enter)="addAppealUrl(); $event.preventDefault()" />
+                <button mat-icon-button color="primary" matSuffix type="button" (click)="addAppealUrl()"
+                  [disabled]="!normalizedAppealUrl() || submitting() || uploading()" aria-label="Add link">
+                  <mat-icon class="material-symbols-outlined">add_link</mat-icon>
+                </button>
+                <mat-hint align="start">http(s):// or www.example.com • Press Enter to add</mat-hint>
+                @if (appealUrlForm.controls.url.invalid && appealUrlForm.controls.url.touched) {
+                <mat-error>Enter a valid URL.</mat-error>
+                }
+              </mat-form-field>
+            </form>
+
+            @if (appealUrls().length > 0) {
+            <mat-chip-set class="attachment-set">
+              @for (u of appealUrls(); let idx = $index; track u + idx) {
+              <mat-chip removable (removed)="removeAppealUrl(idx)" matTooltip="{{ u }}">
+                <span class="chip-text">{{ u }}</span>
+                <mat-icon matChipRemove class="material-symbols-outlined">delete</mat-icon>
+              </mat-chip>
+              }
+            </mat-chip-set>
             }
-          </mat-form-field>
+          </div>
 
           <div class="file-upload">
             <input #evidenceInput id="appeal-evidence-input" type="file" multiple
@@ -238,13 +258,13 @@
                 <span class="chip-text">
                   {{ file.name }} · {{ formatBytes(file.size) }}
                 </span>
-                <mat-icon matChipRemove class="material-symbols-outlined">close</mat-icon>
+                <mat-icon matChipRemove class="material-symbols-outlined">delete</mat-icon>
               </mat-chip>
               }
             </mat-chip-set>
             }
             <p class="file-upload-hint">
-              PDF or image files, up to 5&nbsp;MB each (10&nbsp;MB total). You may also provide a link above. Currently selected: {{ attachmentsSizeLabel() }}.
+              PDF or image files, up to 5&nbsp;MB each (10&nbsp;MB total). You can also add one or more links above. Currently selected files: {{ attachmentsSizeLabel() }}.
             </p>
           </div>
         </form>
