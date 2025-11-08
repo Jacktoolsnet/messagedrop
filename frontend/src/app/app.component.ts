@@ -1,11 +1,11 @@
 import { CommonModule, PlatformLocation } from '@angular/common';
-import { Component, computed, effect, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
@@ -48,7 +48,6 @@ import { Note } from './interfaces/note';
 import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
-import { Profile } from './interfaces/profile';
 import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
@@ -89,17 +88,40 @@ import { WeatherService } from './services/weather.service';
 })
 
 export class AppComponent implements OnInit {
-  public locationReady: boolean = false;
+  locationReady = false;
   public myHistory: string[] = [];
-  public markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
-  private snackBarRef: any;
-  public isUserLocation: boolean = false;
-  public initWatchingPosition: boolean = false;
+  public markerLocations = new Map<string, MarkerLocation>();
+  private snackBarRef?: MatSnackBarRef<unknown>;
+  isUserLocation = false;
+  initWatchingPosition = false;
   public mode: typeof Mode = Mode;
-  public lastMarkerUpdate: number = 0;
-  public locationSubscriptionError: boolean = false;
-  public isPartOfPlace: boolean = false;
-  private showComponent: boolean = false;
+  lastMarkerUpdate = 0;
+  locationSubscriptionError = false;
+  isPartOfPlace = false;
+
+  private readonly titleService = inject(Title);
+  private readonly metaService = inject(Meta);
+  readonly appService = inject(AppService);
+  readonly networkService = inject(NetworkService);
+  private readonly sharedContentService = inject(SharedContentService);
+  private readonly indexedDbService = inject(IndexedDbService);
+  readonly serverService = inject(ServerService);
+  readonly userService = inject(UserService);
+  readonly mapService = inject(MapService);
+  readonly noteService = inject(NoteService);
+  private readonly oembedService = inject(OembedService);
+  readonly placeService = inject(PlaceService);
+  readonly contactService = inject(ContactService);
+  readonly systemNotificationService = inject(SystemNotificationService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly messageService = inject(MessageService);
+  private readonly socketioService = inject(SocketioService);
+  private readonly airQualityService = inject(AirQualityService);
+  private readonly weatherService = inject(WeatherService);
+  private readonly geoStatisticService = inject(GeoStatisticService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
+  private readonly platformLocation = inject(PlatformLocation);
   readonly userMessagesSignal = computed(() =>
     this.messageService.messagesSignal().filter(
       msg => msg.userId === this.userService.getUser().id
@@ -108,33 +130,9 @@ export class AppComponent implements OnInit {
   readonly unreadSystemNotificationCount = this.systemNotificationService.getUnreadCountSignal();
   readonly hasUnreadSystemNotifications = computed(() => this.unreadSystemNotificationCount() > 0);
 
-  constructor(
-    private titleService: Title,
-    private metaService: Meta,
-    public appService: AppService,
-    public networkService: NetworkService,
-    private sharedContentService: SharedContentService,
-    private indexedDbService: IndexedDbService,
-    public serverService: ServerService,
-    public userService: UserService,
-    public mapService: MapService,
-    public noteService: NoteService,
-    private oembedService: OembedService,
-    public placeService: PlaceService,
-    public contactService: ContactService,
-    public systemNotificationService: SystemNotificationService,
-    private geolocationService: GeolocationService,
-    private messageService: MessageService,
-    private socketioService: SocketioService,
-    private airQualityService: AirQualityService,
-    private weatherService: WeatherService,
-    private geoStatisticService: GeoStatisticService,
-    private snackBar: MatSnackBar,
-    public dialog: MatDialog,
-    private platformLocation: PlatformLocation
-  ) {
+  constructor() {
     effect(async () => {
-      const triggered = this.appService.settingsSet(); // <-- track changes
+      this.appService.settingsSet(); // <-- track changes
       this.appService.chekConsentCompleted();
       if (this.appService.isConsentCompleted()) {
         // Clear cache
@@ -152,7 +150,7 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      const triggered = this.serverService.serverSet(); // <-- track changes
+      this.serverService.serverSet(); // <-- track changes
       if (this.serverService.isReady() && this.appService.isConsentCompleted()) {
         // Init the map
         this.mapService.initMap();
@@ -166,9 +164,7 @@ export class AppComponent implements OnInit {
             title: 'Oops! Our server went on a coffee break...',
             image: '',
             icon: 'cloud_off',
-            message: `Apparently, our backend needed some “me time”.
-              
-              Don’t worry, we sent a carrier pigeon to bring it back.`,
+            message: 'Apparently, our backend needed some “me time”.\n\nDon’t worry, we sent a carrier pigeon to bring it back.',
             button: 'Retry...',
             delay: 10000,
             showSpinner: false
@@ -179,8 +175,6 @@ export class AppComponent implements OnInit {
           autoFocus: false
         });
 
-        dialogRef.afterOpened().subscribe(e => { });
-
         dialogRef.afterClosed().subscribe(() => {
           // Notification Action
           this.handleNotification();
@@ -189,8 +183,8 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      const triggered = this.mapService.mapSet(); // <-- track changes
-      if (this.appService.isConsentCompleted() && triggered === 1) {
+      const mapSetTrigger = this.mapService.mapSet(); // <-- track changes
+      if (this.appService.isConsentCompleted() && mapSetTrigger === 1) {
         /**
          * Only on app init.
          * Fly to position if user alrady allowed location.
@@ -206,7 +200,7 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      const triggered = this.userService.userSet(); // <-- track changes
+      this.userService.userSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.contactService.initContacts();
         this.placeService.initPlaces();
@@ -221,14 +215,14 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      const triggered = this.contactService.contactsSet(); // <-- track changes
+      this.contactService.contactsSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.socketioService.initSocket();
       }
     });
 
     effect(() => {
-      const triggered = this.messageService.messageSet(); // <-- track changes
+      this.messageService.messageSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.createMarkerLocations();
       }
@@ -268,7 +262,7 @@ export class AppComponent implements OnInit {
     this.metaService.updateTag({ name: 'twitter:title', content: 'MessageDrop' });
     this.metaService.updateTag({ name: 'twitter:description', content: 'Discover your world – smarter.' });
     // Handle back button
-    this.platformLocation.onPopState((event) => {
+    this.platformLocation.onPopState(() => {
       if (this.myHistory.length > 0) {
         this.myHistory.pop();
         window.history.pushState(this.myHistory, '', '');
@@ -326,7 +320,7 @@ export class AppComponent implements OnInit {
     const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
     if (notificationAction) {
       this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
-      // z. B. Navigation starten, Dialog öffnen, etc.
+      // z. B. Navigation starten, Dialog öffnen, etc.
       void this.systemNotificationService.refreshUnreadCount();
     }
   }
@@ -396,7 +390,6 @@ export class AppComponent implements OnInit {
               duration: 1000
             });
           }
-          this.snackBarRef.afterDismissed().subscribe(() => { });
         }
       });
     });
@@ -434,7 +427,7 @@ export class AppComponent implements OnInit {
         break;
       case MarkerType.PRIVATE_NOTE:
         if (this.userService.isReady()) {
-          this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(notes => {
+          this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
             this.openMarkerNoteListDialog(event.notes);
           });
         }
@@ -450,7 +443,7 @@ export class AppComponent implements OnInit {
   }
 
   async openMessagDialog(): Promise<void> {
-    let message: Message = {
+    const message: Message = {
       id: 0,
       uuid: crypto.randomUUID(),
       parentId: 0,
@@ -492,13 +485,13 @@ export class AppComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("messageDialog");
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data) {
+    dialogRef.afterClosed().subscribe((data: { mode: Mode, message: Message }) => {
+      if (data) {
         this.messageService.createMessage(data.message, this.userService.getUser());
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
@@ -506,7 +499,7 @@ export class AppComponent implements OnInit {
   }
 
   async openNoteDialog(): Promise<void> {
-    let note: Note = {
+    const note: Note = {
       id: '',
       location: this.mapService.getMapLocation(),
       note: '',
@@ -530,22 +523,21 @@ export class AppComponent implements OnInit {
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
       minWidth: '20vw',
       maxWidth: '90vw',
-      minHeight: '30vh',
       maxHeight: '90vh',
       hasBackdrop: true,
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("noteDialog");
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
+    dialogRef.afterClosed().subscribe((data: { mode: Mode, note: Note }) => {
       if (undefined !== data?.note) {
-        data.note.latitude = this.mapService.getMapLocation().latitude;
-        data.note.longitude = this.mapService.getMapLocation().longitude;
-        data.note.plusCode = this.mapService.getMapLocation().plusCode;
+        data.note.location.latitude = this.mapService.getMapLocation().latitude;
+        data.note.location.longitude = this.mapService.getMapLocation().longitude;
+        data.note.location.plusCode = this.mapService.getMapLocation().plusCode;
         this.noteService.addNote(data.note);
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       }
@@ -591,17 +583,17 @@ export class AppComponent implements OnInit {
             autoFocus: false
           });
 
-          dialogRef.afterOpened().subscribe(e => {
+          dialogRef.afterOpened().subscribe(() => {
             this.myHistory.push("userMessageList");
             window.history.replaceState(this.myHistory, '', '');
           });
 
-          dialogRef.afterClosed().subscribe((data: any) => {
+          dialogRef.afterClosed().subscribe(() => {
             this.messageService.clearSelectedMessages();
             this.messageService.getByVisibleMapBoundingBox();
           });
         },
-        error: (err) => {
+        error: () => {
           this.messageService.clearMessages();
           const dialogRef = this.dialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
@@ -616,22 +608,21 @@ export class AppComponent implements OnInit {
             autoFocus: false
           });
 
-          dialogRef.afterOpened().subscribe(e => {
+          dialogRef.afterOpened().subscribe(() => {
             this.myHistory.push("userMessageList");
             window.history.replaceState(this.myHistory, '', '');
           });
 
-          dialogRef.afterClosed().subscribe((data: any) => {
+          dialogRef.afterClosed().subscribe(() => {
             this.messageService.clearSelectedMessages();
             this.updateDataForLocation(this.mapService.getMapLocation(), true);
           });
-        },
-        complete: () => { }
+        }
       });
   }
 
   public openUserNoteListDialog(): void {
-    this.noteService.loadNotes().then(notes => {
+    this.noteService.loadNotes().then(() => {
       const dialogRef = this.dialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
@@ -645,12 +636,12 @@ export class AppComponent implements OnInit {
         autoFocus: false
       });
 
-      dialogRef.afterOpened().subscribe(e => {
+      dialogRef.afterOpened().subscribe(() => {
         this.myHistory.push("userNoteList");
         window.history.replaceState(this.myHistory, '', '');
       });
 
-      dialogRef.afterClosed().subscribe((data: any) => {
+      dialogRef.afterClosed().subscribe(() => {
         this.updateDataForLocation(this.mapService.getMapLocation(), true);
       });
     });
@@ -670,7 +661,7 @@ export class AppComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("placeList");
       window.history.replaceState(this.myHistory, '', '');
     });
@@ -683,9 +674,7 @@ export class AppComponent implements OnInit {
               if (simpleResponse.status === 200) {
                 this.placeService.saveAdditionalPlaceInfos(place);
               }
-            },
-            error: (err) => { },
-            complete: () => { }
+            }
           });
         });
       }
@@ -707,16 +696,11 @@ export class AppComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("contactList");
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: Place) => {
-      if (undefined != data) {
-
-      }
-    });
   }
 
   public openMarkerMultiDialog(messages: Message[], notes: Note[]) {
@@ -726,7 +710,7 @@ export class AppComponent implements OnInit {
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("multiMarker");
       window.history.replaceState(this.myHistory, '', '');
     });
@@ -760,12 +744,12 @@ export class AppComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("messageList");
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
+    dialogRef.afterClosed().subscribe(() => {
       this.messageService.clearSelectedMessages();
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
@@ -786,18 +770,18 @@ export class AppComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
+    dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("userNoteList");
       window.history.replaceState(this.myHistory, '', '');
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
+    dialogRef.afterClosed().subscribe(() => {
       this.updateDataForLocation(this.mapService.getMapLocation(), true);
     });
   }
 
   public showLegalNotice() {
-    const dialogRef = this.dialog.open(LegalNoticeComponent, {
+    this.dialog.open(LegalNoticeComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -805,17 +789,11 @@ export class AppComponent implements OnInit {
       width: '800px',
       maxWidth: '90vw',
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
     });
   }
 
   public showDisclaimer() {
-    const dialogRef = this.dialog.open(DisclaimerComponent, {
+    this.dialog.open(DisclaimerComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -824,17 +802,11 @@ export class AppComponent implements OnInit {
       width: '800px',
       maxWidth: '90vw',
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
     });
   }
 
   public showPrivacyPolicy() {
-    const dialogRef = this.dialog.open(PrivacyPolicyComponent, {
+    this.dialog.open(PrivacyPolicyComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -843,17 +815,11 @@ export class AppComponent implements OnInit {
       width: '800px',
       maxWidth: '90vw',
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
     });
   }
 
   public showTermsOfService() {
-    const dialogRef = this.dialog.open(TermsOfServiceComponent, {
+    this.dialog.open(TermsOfServiceComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -863,16 +829,10 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-    });
   }
 
   public showLicenses() {
-    const dialogRef = this.dialog.open(ThirdPartyLicensesComponent, {
+    this.dialog.open(ThirdPartyLicensesComponent, {
       data: {},
       closeOnNavigation: true,
       autoFocus: false,
@@ -882,16 +842,10 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-    });
   }
 
   public editAppSettings() {
-    const dialogRef = this.dialog.open(AppSettingsComponent, {
+    this.dialog.open(AppSettingsComponent, {
       data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
@@ -901,13 +855,10 @@ export class AppComponent implements OnInit {
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe(() => { });
   }
 
   public editExternalContentSettings() {
-    const dialogRef = this.dialog.open(ExternalContentComponent, {
+    this.dialog.open(ExternalContentComponent, {
       data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
@@ -916,15 +867,9 @@ export class AppComponent implements OnInit {
       autoFocus: false,
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe(() => { });
   }
 
   public editUserProfile() {
-    let profile: Profile = this.userService.getProfile()
-
     const dialogRef = this.dialog.open(UserProfileComponent, {
       data: {},
       closeOnNavigation: true,
@@ -933,10 +878,7 @@ export class AppComponent implements OnInit {
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       this.userService.saveProfile();
     });
   }
@@ -945,9 +887,6 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteUserComponent, {
       closeOnNavigation: true,
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -967,15 +906,14 @@ export class AppComponent implements OnInit {
                 });
               }
             },
-            error: (err) => {
+            error: () => {
               this.snackBarRef = this.snackBar.open("Oops, something went wrong. Please try again later.", undefined, {
                 panelClass: ['snack-warning'],
                 horizontalPosition: 'center',
                 verticalPosition: 'top',
                 duration: 2000
               });
-            },
-            complete: () => { }
+            }
           });
       }
     });
@@ -986,9 +924,6 @@ export class AppComponent implements OnInit {
       data: {},
       closeOnNavigation: true,
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -1011,7 +946,7 @@ export class AppComponent implements OnInit {
       )
       .subscribe({
         next: (weather) => {
-          const dialogRef = this.dialog.open(WeatherComponent, {
+          this.dialog.open(WeatherComponent, {
             data: { weather: weather, location: this.mapService.getMapLocation() },
             closeOnNavigation: true,
             minWidth: '90vw',
@@ -1023,14 +958,9 @@ export class AppComponent implements OnInit {
             hasBackdrop: true,
             autoFocus: false
           });
-
-          dialogRef.afterOpened().subscribe(e => {
-          });
-
-          dialogRef.afterClosed().subscribe();
         },
         error: (err) => {
-          const dialogRef = this.dialog.open(DisplayMessage, {
+          this.dialog.open(DisplayMessage, {
             panelClass: '',
             closeOnNavigation: false,
             data: {
@@ -1043,11 +973,6 @@ export class AppComponent implements OnInit {
             maxWidth: '90vw',
             maxHeight: '90vh',
             hasBackdrop: true
-          });
-
-          dialogRef.afterOpened().subscribe(e => { });
-
-          dialogRef.afterClosed().subscribe(() => {
           });
         }
       });
@@ -1064,7 +989,7 @@ export class AppComponent implements OnInit {
       )
       .subscribe({
         next: (airQualityData) => {
-          const dialogRef = this.dialog.open(AirQualityComponent, {
+          this.dialog.open(AirQualityComponent, {
             data: { airQuality: airQualityData },
             closeOnNavigation: true,
             minWidth: '90vw',
@@ -1076,11 +1001,9 @@ export class AppComponent implements OnInit {
             hasBackdrop: true,
             autoFocus: false
           });
-          dialogRef.afterOpened().subscribe();
-          dialogRef.afterClosed().subscribe();
         },
         error: (err) => {
-          const dialogRef = this.dialog.open(DisplayMessage, {
+          this.dialog.open(DisplayMessage, {
             data: {
               showAlways: true,
               title: this.networkService.getErrorTitle(err.status),
@@ -1093,7 +1016,6 @@ export class AppComponent implements OnInit {
             hasBackdrop: true,
             autoFocus: false
           });
-          dialogRef.afterClosed().subscribe();
         }
       });
   }
@@ -1109,7 +1031,7 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (response: GetGeoStatisticResponse) => {
           if (response.status === 200) {
-            const dialogRef = this.dialog.open(GeoStatisticComponent, {
+            this.dialog.open(GeoStatisticComponent, {
               data: { geoStatistic: response.result },
               closeOnNavigation: true,
               minWidth: '90vw',
@@ -1119,10 +1041,6 @@ export class AppComponent implements OnInit {
               maxHeight: '90vh',
               hasBackdrop: true
             });
-
-            dialogRef.afterOpened().subscribe(() => { });
-
-            dialogRef.afterClosed().subscribe(() => { });
           } else {
             // Bei Fehlerstatus trotzdem Fehlerdialog zeigen
             this.showGeoStatisticError('Unexpected response');
@@ -1135,7 +1053,7 @@ export class AppComponent implements OnInit {
   }
 
   private showGeoStatisticError(message: string) {
-    const dialogRef = this.dialog.open(DisplayMessage, {
+    this.dialog.open(DisplayMessage, {
       panelClass: '',
       closeOnNavigation: false,
       data: {
@@ -1153,18 +1071,10 @@ export class AppComponent implements OnInit {
       hasBackdrop: true,
       autoFocus: false
     });
-
-    dialogRef.afterOpened().subscribe(() => {
-      // Optional: Aktionen nach Öffnen
-    });
-
-    dialogRef.afterClosed().subscribe(() => {
-      // Optional: Aktionen nach Schließen
-    });
   }
 
   async showNominatimSearchDialog() {
-    let searchValues: string = await this.indexedDbService.getSetting('nominatimSearch');
+    const searchValues: string = await this.indexedDbService.getSetting('nominatimSearch');
     const dialogRef = this.dialog.open(NominatimSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -1177,8 +1087,6 @@ export class AppComponent implements OnInit {
       hasBackdrop: true,
       autoFocus: false
     });
-
-    dialogRef.afterOpened().subscribe(e => { });
 
     dialogRef.afterClosed().subscribe((result: {
       action: string,
@@ -1212,8 +1120,8 @@ export class AppComponent implements OnInit {
       if (this.mapService.getMapZoom() > 17) {
         center = message.location
       } else {
-        let plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(message.location, this.mapService.getMapZoom());
-        let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+        const plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(message.location, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
         center = {
           latitude: plusCodeArea.latitudeCenter,
           longitude: plusCodeArea.longitudeCenter,
@@ -1237,7 +1145,7 @@ export class AppComponent implements OnInit {
     // Process notes
     const notes = this.noteService.getNotesSignal()();
     notes.forEach((note) => {
-      let noteLocation: Location = {
+      const noteLocation: Location = {
         latitude: note.location.latitude,
         longitude: note.location.longitude,
         plusCode: note.location.plusCode
@@ -1245,8 +1153,8 @@ export class AppComponent implements OnInit {
       if (this.mapService.getMapZoom() > 17) {
         center = noteLocation;
       } else {
-        let plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(noteLocation, this.mapService.getMapZoom());
-        let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+        const plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(noteLocation, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
         center = {
           latitude: plusCodeArea.latitudeCenter,
           longitude: plusCodeArea.longitudeCenter,
