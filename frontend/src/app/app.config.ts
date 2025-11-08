@@ -24,6 +24,3 @@ export const appConfig: ApplicationConfig = {
       registrationStrategy: 'registerWhenStable:30000'
     })]
 };
-function withInterceptorsFrom(): import("@angular/common/http").HttpFeature<import("@angular/common/http").HttpFeatureKind> {
-  throw new Error('Function not implemented.');
-}

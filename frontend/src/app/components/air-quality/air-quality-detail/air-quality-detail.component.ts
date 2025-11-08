@@ -1,29 +1,27 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, SimpleChanges, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CategoryScale, Chart, ChartConfiguration, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
-import annotationPlugin from 'chartjs-plugin-annotation';
+import annotationPlugin, { AnnotationOptions, ScaleValue as AnnotationScaleValue } from 'chartjs-plugin-annotation';
+import { AirQualityTileValue } from '../../../interfaces/air-quality-tile-value';
 
 @Component({
   selector: 'app-air-quality-detail',
   standalone: true,
   imports: [
     CommonModule,
-    MatDialogModule,
-    FormsModule,
-    FormsModule
+    MatDialogModule
   ],
   templateUrl: './air-quality-detail.component.html',
   styleUrl: './air-quality-detail.component.css'
 })
 
-export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewInit {
-  @Input() tile!: any;
+export class AirQualityDetailComponent implements OnChanges, AfterViewInit {
+  @Input() tile: AirQualityTileValue | null = null;
   @Input() selectedDayIndex = 0;
   @Input() selectedHour = 0;
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
-  private chart!: Chart;
+  private chart: Chart | null = null;
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
@@ -33,14 +31,18 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
     Chart.register(CategoryScale, LinearScale, PointElement, LineElement, Filler, Title, Tooltip, LineController, annotationPlugin);
   }
 
-  ngOnInit(): void { }
-
   ngAfterViewInit(): void {
+    if (!this.chartCanvas?.nativeElement) {
+      return;
+    }
+
     this.chart = new Chart(this.chartCanvas.nativeElement, {
       type: this.lineChartType,
       data: this.chartData,
       options: this.chartOptions
     });
+
+    this.updateChart();
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -58,41 +60,47 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
   }
 
   updateChart(): void {
-    if (!this.tile?.values || !this.tile?.time) return;
+    if (!this.tile?.values || !this.tile?.time) {
+      return;
+    }
 
+    const tile = this.tile;
     const start = this.selectedDayIndex * 24;
     const end = start + 24;
-    const dayValues = this.tile.values.slice(start, end);
-    const dayLabels = this.tile.time.slice(start, end).map((t: string) => t.slice(11));
+    const dayValues = tile.values.slice(start, end);
+    const dayLabels = tile.time.slice(start, end).map((t: string) => t.slice(11));
 
-    const globalMin = Math.min(...this.tile.values);
-    const globalMax = Math.max(...this.tile.values);
+    const globalMin = Math.min(...tile.values);
+    const globalMax = Math.max(...tile.values);
 
     this.chartData = {
       labels: dayLabels,
       datasets: [{
-        label: this.tile.label,
+        label: tile.label,
         data: dayValues,
-        borderColor: this.tile.color,
+        borderColor: tile.color,
         backgroundColor: (ctx: ScriptableContext<'line'>) => {
-          const gradient = ctx.chart.ctx.createLinearGradient(0, 0, 0, ctx.chart.height);
-          gradient.addColorStop(0, this.tile.color);
+          const currentChart = ctx.chart;
+          const gradientHeight = currentChart.height ?? currentChart.canvas.height ?? 0;
+          const gradient = currentChart.ctx.createLinearGradient(0, 0, 0, gradientHeight);
+          gradient.addColorStop(0, tile.color);
           gradient.addColorStop(1, 'rgba(255,255,255,0.1)');
           return gradient;
         },
         fill: true,
         pointRadius: 4,
-        pointBackgroundColor: this.tile.color,
+        pointBackgroundColor: tile.color,
         tension: 0.3
       }]
     };
 
     const hour = this.selectedHour;
-    const hourLabel = dayLabels[hour] ?? `${hour}:00`;
+    const hourLabel = (dayLabels[hour] ?? `${hour}:00`).toString();
+    const hourLabelScale: AnnotationScaleValue = hourLabel;
     const value = dayValues[hour] ?? 0;
+    const annotationLabel = `${hourLabel}: ${value}${tile.unit}`;
 
     const isDark = document.body.classList.contains('dark');
-    const bgColor = isDark ? '#1e1e1e' : '#ffffff';
     const textColor = isDark ? '#ffffff' : '#000000';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
 
@@ -102,14 +110,14 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
       plugins: {
         tooltip: {
           callbacks: {
-            label: ctx => `${ctx.formattedValue} ${this.tile.unit}`,
+            label: ctx => `${ctx.formattedValue} ${tile.unit}`,
             title: ctx => this.getTimeLabel(ctx[0].dataIndex)
           }
         },
         legend: { display: false },
         title: {
           display: true,
-          text: this.tile.label,
+          text: tile.label,
           color: textColor,
           font: {
             size: 18,
@@ -124,16 +132,16 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
           annotations: {
             selectedHour: {
               type: 'line',
-              xMin: hourLabel,
-              xMax: hourLabel,
+              xMin: hourLabelScale,
+              xMax: hourLabelScale,
               yMin: value,
               yMax: value + 0.01,
-              borderColor: this.tile.color,
+              borderColor: tile.color,
               borderWidth: 3,
               label: {
                 display: true,
-                content: `${hourLabel}: ${value}${this.tile.unit}`,
-                backgroundColor: this.tile.color,
+                content: annotationLabel,
+                backgroundColor: tile.color,
                 color: '#000000',
                 position: 'start'
               }
@@ -167,7 +175,7 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
           max: globalMax,
           title: {
             display: true,
-            text: this.tile.unit,
+            text: tile.unit,
             color: textColor,
             font: {
               size: 14,
@@ -184,58 +192,92 @@ export class AirQualityDetailComponent implements OnInit, OnChanges, AfterViewIn
       }
     };
 
-    if (this.chart) {
-      this.chart.data = this.chartData; // <- wichtig!
-      this.chart.options = this.chartOptions;
-      this.chart.update();
+    const chart = this.chart;
+    if (!chart) {
+      return;
     }
+
+    chart.data = this.chartData;
+    chart.options = this.chartOptions;
+    chart.update();
+
   }
 
   getTimeLabel(hour: number): string {
-    const label = this.tile.time?.[this.selectedDayIndex * 24 + hour];
+    const label = this.tile?.time?.[this.selectedDayIndex * 24 + hour];
     return label?.slice(11) ?? `${hour}:00`;
   }
 
   getValueLabel(hour: number): string {
-    const value = this.tile.values?.[this.selectedDayIndex * 24 + hour];
-    return value != null ? `${value} ${this.tile.unit}` : '–';
+    const value = this.tile?.values?.[this.selectedDayIndex * 24 + hour];
+    return value != null && this.tile ? `${value} ${this.tile.unit}` : '–';
   }
 
   moveSelectedHourAnnotation(): void {
+    if (!this.chart || !this.tile) {
+      return;
+    }
+
+    const chart = this.chart;
+    const tile = this.tile;
     const hour = this.selectedHour;
-    const hourLabel = this.chartData.labels?.[hour] ?? `${hour}:00`;
+    const labels = Array.isArray(this.chartData.labels) ? this.chartData.labels : [];
+    const labelValue = labels?.[hour];
+    const hourLabel = (typeof labelValue === 'string' ? labelValue : `${hour}:00`).toString();
     const rawValue = this.chartData.datasets?.[0]?.data?.[hour];
-    const numericValue = typeof rawValue === 'number' ? rawValue : 0;
+    const numericValue = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0);
+    const labelText = `${hourLabel}: ${numericValue}${tile.unit}`;
 
-    const annotations = (this.chart.options.plugins?.annotation?.annotations ?? {}) as any;
+    const annotations = this.ensureAnnotationConfig();
+    const annotationKey = 'selectedHour';
+    const hourLabelScale: AnnotationScaleValue = hourLabel;
+    const existing = annotations[annotationKey];
 
-    if (!annotations.selectedHour) {
-      // Falls Annotation noch nicht da ist, einfach neu setzen
-      annotations.selectedHour = {
+    if (!existing) {
+      annotations[annotationKey] = {
         type: 'line',
-        xMin: hourLabel,
-        xMax: hourLabel,
+        xMin: hourLabelScale,
+        xMax: hourLabelScale,
         yMin: numericValue,
         yMax: numericValue + 0.01,
-        borderColor: this.tile.color,
+        borderColor: tile.color,
         borderWidth: 3,
         label: {
           display: true,
-          content: `${hourLabel}: ${numericValue}${this.tile.unit}`,
-          backgroundColor: this.tile.color,
+          content: labelText,
+          backgroundColor: tile.color,
           color: '#000',
           position: 'start'
         }
       };
     } else {
-      // Ansonsten aktualisieren
-      annotations.selectedHour.xMin = hourLabel;
-      annotations.selectedHour.xMax = hourLabel;
-      annotations.selectedHour.yMin = numericValue;
-      annotations.selectedHour.yMax = numericValue + 0.01;
-      annotations.selectedHour.label.content = `${hourLabel}: ${numericValue}${this.tile.unit}`;
+      existing.xMin = hourLabelScale;
+      existing.xMax = hourLabelScale;
+      existing.yMin = numericValue;
+      existing.yMax = numericValue + 0.01;
+      existing.label ??= {
+        display: true,
+        content: labelText,
+        backgroundColor: tile.color,
+        color: '#000',
+        position: 'start'
+      };
+      existing.label.content = labelText;
+      existing.label.backgroundColor = tile.color;
     }
 
-    this.chart.update('none');
+    chart.update('none');
+  }
+
+  private ensureAnnotationConfig(): Record<string, AnnotationOptions<'line'>> {
+    if (!this.chart) {
+      return {};
+    }
+    const plugins = (this.chart.options.plugins ??= {});
+    const annotationOptions = (plugins.annotation ??= { annotations: {} });
+    if (Array.isArray(annotationOptions.annotations) || !annotationOptions.annotations) {
+      annotationOptions.annotations = {};
+    }
+    return annotationOptions.annotations as Record<string, AnnotationOptions<'line'>>;
   }
 }

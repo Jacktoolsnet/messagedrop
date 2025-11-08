@@ -400,16 +400,14 @@ export class AppComponent implements OnInit {
   }
 
   private async updateDataForLocation(location: Location, forceSearch: boolean) {
-    if (this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom()) !== this.messageService.getLastSearchedLocation() || forceSearch) {
-      // Clear markerLocations
-      this.markerLocations.clear()
-      // notes from local device
-      if (this.userService.isReady()) {
-        await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      }
-      // Messages
-      this.messageService.getByVisibleMapBoundingBox();
+    // Clear markerLocations
+    this.markerLocations.clear()
+    // notes from local device
+    if (this.userService.isReady()) {
+      await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
     }
+    // Messages
+    this.messageService.getByVisibleMapBoundingBox();
   }
 
   public handleMoveEndEvent(event: Location) {
@@ -995,7 +993,7 @@ export class AppComponent implements OnInit {
             minWidth: '90vw',
             width: '90vw',
             maxWidth: '90vw',
-            height: 'auto',
+            height: '90vh',
             maxHeight: '90vh',
             hasBackdrop: true,
             autoFocus: false

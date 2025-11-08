@@ -1,12 +1,18 @@
+:host {
+    display: flex;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
 .chart-container {
     position: relative;
     width: 100%;
-    aspect-ratio: 16 / 9;
-    max-height: 70%;
+    height: 100%;
     min-height: 250px;
     display: flex;
     align-items: center;
     justify-content: center;
+    flex: 1 1 auto;
 }
 
 /* Das Chart selbst */
