@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Note } from '../interfaces/note';
 import { User } from '../interfaces/user';
@@ -10,7 +10,7 @@ import { IndexedDbService } from './indexed-db.service';
 export class NoteService {
   private notesSignal = signal<Note[]>([]);
 
-  constructor(private indexedDbService: IndexedDbService) { }
+  private readonly indexedDbService = inject(IndexedDbService);
 
   /** Zugriff auf die Notes als Signal */
   getNotesSignal() {

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
@@ -21,11 +21,9 @@ export class NominatimService {
     })
   };
 
-  constructor(
-    private geolocationService: GeolocationService,
-    private http: HttpClient,
-    private networkService: NetworkService
-  ) { }
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly http = inject(HttpClient);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -115,13 +113,14 @@ export class NominatimService {
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
     const url = `${environment.apiUrl}/nominatim/boundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
+    const description = bounded === 1 ? 'in defined area' : 'around your location';
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Searching location',
       image: '',
       icon: '',
-      message: `Searching for "${searchTerm}" in defined area`,
+      message: `Searching for "${searchTerm}" ${description}`,
       button: '',
       delay: 0,
       showSpinner: true

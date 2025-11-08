@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, firstValueFrom, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetOembedResponse } from '../interfaces/get-oembed-response';
@@ -8,15 +8,16 @@ import { Multimedia } from '../interfaces/multimedia';
 import { MultimediaType } from '../interfaces/multimedia-type';
 import { GeolocationService } from './geolocation.service';
 
+interface ResolveRedirectResponse {
+  result: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
 export class OembedService {
-
-  constructor(
-    private http: HttpClient,
-    private geolocationService: GeolocationService,
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly geolocationService = inject(GeolocationService);
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -30,16 +31,26 @@ export class OembedService {
     return throwError(() => error);
   }
 
-  public isLocation(obj: any): obj is Location {
-    return obj && typeof obj.latitude === 'number' && typeof obj.longitude === 'number' && typeof obj.plusCode === 'string';
+  public isLocation(obj: unknown): obj is Location {
+    if (typeof obj !== 'object' || obj === null) {
+      return false;
+    }
+    const candidate = obj as Partial<Location>;
+    return typeof candidate.latitude === 'number'
+      && typeof candidate.longitude === 'number'
+      && typeof candidate.plusCode === 'string';
   }
 
-  public isMultimedia(obj: any): obj is Multimedia {
-    return obj && typeof obj.sourceUrl === 'string' && 'type' in obj;
+  public isMultimedia(obj: unknown): obj is Multimedia {
+    if (typeof obj !== 'object' || obj === null) {
+      return false;
+    }
+    const candidate = obj as Partial<Multimedia>;
+    return typeof candidate.sourceUrl === 'string' && typeof candidate.type === 'string';
   }
 
-  resolveRedirectUrl(url: string): Observable<any> {
-    return this.http.get<any>(`${environment.apiUrl}/utils/resolve/${encodeURIComponent(url)}`, this.httpOptions)
+  resolveRedirectUrl(url: string): Observable<ResolveRedirectResponse> {
+    return this.http.get<ResolveRedirectResponse>(`${environment.apiUrl}/utils/resolve/${encodeURIComponent(url)}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -76,7 +87,7 @@ export class OembedService {
         const coordPatterns = [
           /@(-?\d+\.\d+),(-?\d+\.\d+)/,
           /!3d(-?\d+\.\d+)!4d(-?\d+\.\d+)/,
-          /\/place\/[^\/]*\/@(-?\d+\.\d+),(-?\d+\.\d+)/,
+          /\/place\/[^/]*\/@(-?\d+\.\d+),(-?\d+\.\d+)/,
         ];
 
         for (const pattern of coordPatterns) {
@@ -100,7 +111,9 @@ export class OembedService {
         currentUrl = response.result;
         attempts++;
       }
-    } catch (err) { }
+    } catch (err) {
+      console.error('Failed to resolve Google Maps location', err);
+    }
 
     return undefined;
   }
@@ -122,6 +135,7 @@ export class OembedService {
           oembed: response.result
         };
       } catch (error) {
+        console.error('Failed to load YouTube embed data', error);
         return undefined;
       }
     } else {
@@ -169,6 +183,7 @@ export class OembedService {
           return undefined;
         }
       } catch (error) {
+        console.error('Failed to resolve TikTok short URL', error);
         return undefined;
       }
     }
@@ -177,7 +192,7 @@ export class OembedService {
   }
 
   private async getPinterestMultimedia(url: string): Promise<Multimedia | undefined> {
-    const pinterestRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/.*-([^\/]+)/i;
+    const pinterestRegex = /pinterest\.[a-z]{2,3}(\.[a-z]{2,3})?\/pin\/.*-([^/]+)/i;
     const pinterestMatch = url.match(pinterestRegex);
     const pinterestShortRegex = /https:\/\/pin\.it\/([a-zA-Z0-9]+)/;
     const pinterestShortMatch = url.match(pinterestShortRegex);
@@ -196,6 +211,7 @@ export class OembedService {
           return await this.getPinterestMultimedia(resolvedUrl);
         }
       } catch (error) {
+        console.error('Failed to resolve Pinterest short URL', error);
         return undefined;
       }
     } else if (pinterestMatch && pinterestMatch[2]) {
@@ -215,6 +231,7 @@ export class OembedService {
           oembed: response.result
         };
       } catch (error) {
+        console.error('Failed to fetch Pinterest embed data', error);
         return undefined;
       }
     }
@@ -239,6 +256,7 @@ export class OembedService {
           oembed: response.result
         };
       } catch (error) {
+        console.error('Failed to load Spotify embed data', error);
         return undefined;
       }
     }
