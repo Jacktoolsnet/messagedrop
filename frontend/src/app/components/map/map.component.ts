@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, Output, inject } from '@angular/core';
 import { Location } from '../../interfaces/location';
 import { MarkerLocation } from '../../interfaces/marker-location';
 import { MapService } from '../../services/map.service';
@@ -13,18 +13,19 @@ import { UserService } from '../../services/user.service';
 })
 export class MapComponent implements AfterViewInit, OnChanges {
   // The members of location are used for change detection
-  @Input() lastMarkerUpdate: number = 0;
+  @Input() lastMarkerUpdate = 0;
   @Input() location: Location = { latitude: 0, longitude: 0, plusCode: '' };
   @Input() markerLocations: Map<string, MarkerLocation> = new Map<string, MarkerLocation>();
   @Output() clickEvent = new EventEmitter<Location>();
   @Output() moveEndEvent = new EventEmitter<Location>();
   @Output() markerClickEvent = new EventEmitter<MarkerLocation>();
 
-  ngOnChanges(changes: SimpleChanges) {
+  private readonly mapService = inject(MapService);
+  readonly userService = inject(UserService);
+
+  ngOnChanges(): void {
     this.mapService.createMarkers(this.markerLocations);
   }
-
-  constructor(private mapService: MapService, public userService: UserService) { }
 
   ngAfterViewInit(): void {
     this.initComponent();
@@ -38,5 +39,4 @@ export class MapComponent implements AfterViewInit, OnChanges {
   }
 
 }
-
 

@@ -22,7 +22,8 @@
   @if (profile.base64Avatar && profile.base64Avatar !== '') {
   <div class="avatar-area">
     <div class="center">
-      <img class="avatar" [src]="profile.base64Avatar" /><br />
+      <img class="avatar" [src]="profile.base64Avatar"
+        [attr.alt]="profile.name ? profile.name + ' avatar' : 'Profile avatar'" /><br />
     </div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">

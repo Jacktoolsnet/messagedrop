@@ -1,4 +1,4 @@
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogClose, MatDialogContent, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { FormsModule } from '@angular/forms';
@@ -29,7 +29,6 @@ import { Note } from '../../../interfaces/note';
     styleUrl: './multi-marker.component.css'
 })
 export class MultiMarkerComponent {
-    constructor(public dialogRef: MatDialogRef<MultiMarkerComponent>,
-        @Inject(MAT_DIALOG_DATA) public data: { messages: Message[], notes: Note[] }) {
-    }
+    readonly dialogRef = inject(MatDialogRef<MultiMarkerComponent>);
+    readonly data = inject<{ messages: Message[]; notes: Note[] }>(MAT_DIALOG_DATA);
 }

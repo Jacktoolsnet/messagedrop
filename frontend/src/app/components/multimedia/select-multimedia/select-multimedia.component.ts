@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { Multimedia } from '../../../interfaces/multimedia';
@@ -16,14 +16,11 @@ import { TenorComponent } from '../../utils/tenor/tenor.component';
 export class SelectMultimediaComponent {
   @Output() newMultimedia = new EventEmitter<Multimedia>();
 
-  constructor(
-    private tenorDialog: MatDialog,
-    private multimediaDialog: MatDialog,
-    public dialogRef: MatDialogRef<SelectMultimediaComponent>,
-  ) { }
+  private readonly matDialog = inject(MatDialog);
+  readonly dialogRef = inject(MatDialogRef<SelectMultimediaComponent>);
 
   public openTenorDialog(): void {
-    const dialogRef = this.tenorDialog.open(TenorComponent, {
+    const dialogRef = this.matDialog.open(TenorComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
@@ -34,17 +31,15 @@ export class SelectMultimediaComponent {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
-      if (undefined !== multimedia) {
+    dialogRef.afterClosed().subscribe((multimedia?: Multimedia) => {
+      if (multimedia) {
         this.newMultimedia.emit(multimedia);
       }
     });
   }
 
   public openImportMultimediaDialog(): void {
-    const dialogRef = this.multimediaDialog.open(ImportMultimediaComponent, {
+    const dialogRef = this.matDialog.open(ImportMultimediaComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
@@ -55,10 +50,8 @@ export class SelectMultimediaComponent {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((multimedia: Multimedia) => {
-      if (undefined !== multimedia) {
+    dialogRef.afterClosed().subscribe((multimedia?: Multimedia) => {
+      if (multimedia) {
         this.newMultimedia.emit(multimedia);
       }
     });

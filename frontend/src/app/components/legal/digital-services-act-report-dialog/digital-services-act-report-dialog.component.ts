@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject, computed, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -13,9 +13,17 @@ import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../..
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
+import { Message } from '../../../interfaces/message';
 import { DigitalServicesActService, DsaSubmissionResponse } from '../../../services/digital-services-act.service';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-dialog.component';
+
+interface DigitalServicesActReportDialogData {
+  message?: Partial<Message> | null;
+  contentUrl?: string;
+  reporterEmail?: string;
+  reporterName?: string;
+}
 
 @Component({
   selector: 'app-digital-services-act-report-dialog',
@@ -39,19 +47,16 @@ import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-d
 })
 export class DigitalServicesActReportDialogComponent {
 
-  // Wir verzichten auf ein externes Dialog-Interface.
-  // Erwartete Struktur: { message: any; contentUrl?: string; reporterEmail?: string; reporterName?: string }
-  constructor(
-    @Inject(MAT_DIALOG_DATA) public data: any,
-    private dialogRef: MatDialogRef<DigitalServicesActReportDialogComponent, { created: boolean }>,
-    private fb: FormBuilder,
-    private dsa: DigitalServicesActService,
-    private matDialog: MatDialog,
-  ) { }
+  private readonly dialogRef = inject(MatDialogRef<DigitalServicesActReportDialogComponent, { created: boolean }>);
+  private readonly dialogData = inject<DigitalServicesActReportDialogData>(MAT_DIALOG_DATA);
+  private readonly fb = inject(FormBuilder);
+  private readonly dsa = inject(DigitalServicesActService);
+  private readonly matDialog = inject(MatDialog);
+  readonly data = this.dialogData;
 
   // Content-ID robust aus der Message ziehen
   private readonly contentIdSig = signal<string>(
-    this.data?.message?.uuid ?? this.data?.message?.id ?? ''
+    String(this.data?.message?.uuid ?? this.data?.message?.id ?? '')
   );
 
   readonly formalForm = this.fb.group({
@@ -94,7 +99,7 @@ export class DigitalServicesActReportDialogComponent {
 
   // Evidence tab state
   readonly maxEvidenceBytes = 5 * 1024 * 1024;
-  evidenceItems = signal<Array<{ id: string; type: 'file' | 'url'; file?: File; url?: string }>>([]);
+  evidenceItems = signal<{ id: string; type: 'file' | 'url'; file?: File; url?: string }[]>([]);
 
   // Separate views like in the appeal UI
   readonly evidenceUrlViews = computed<readonly EvidenceUrlItem[]>(() =>
@@ -139,7 +144,7 @@ export class DigitalServicesActReportDialogComponent {
 
   onEvidenceFilesPicked(files: File[]): void {
     if (!files || files.length === 0) return;
-    const items: Array<{ id: string; type: 'file'; file: File }> = [];
+    const items: { id: string; type: 'file'; file: File }[] = [];
     for (const f of files) {
       if (f.size > this.maxEvidenceBytes) { continue; }
       const okType = f.type === 'application/pdf' || f.type.startsWith('image/') || /\.(pdf|png|jpe?g|gif|webp)$/i.test(f.name);
@@ -174,7 +179,7 @@ export class DigitalServicesActReportDialogComponent {
     try {
       const contentId = this.contentIdSig();
       const contentUrl = this.data?.contentUrl ?? '';
-      const contentSnapshot = this.data?.message ?? null;
+      const contentSnapshot = this.data?.message ? JSON.stringify(this.data.message) : '';
       const contentType = 'public message';
 
       if (this.activeTabIndex === 0) {
@@ -209,9 +214,12 @@ export class DigitalServicesActReportDialogComponent {
         this.evidenceItems.set([]);
         this.showSuccess('notice', response?.statusUrl ?? null, response?.token ?? null, raw.reporterEmail || '');
       }
-    } catch (e: any) {
-      this.errorMsg = e?.error?.message ?? 'Submitting failed. Please try again.';
-      this.showError(e);
+    } catch (error) {
+      const detail =
+        (error as { error?: { message?: string } })?.error?.message ??
+        'Submitting failed. Please try again.';
+      this.errorMsg = detail;
+      this.showError(error);
     } finally {
       this.submitting = false;
     }
@@ -244,10 +252,6 @@ export class DigitalServicesActReportDialogComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       autoFocus: false
-    });
-
-    dialogRef.afterOpened().subscribe(() => {
-      // optional: analytics/telemetry
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -302,11 +306,12 @@ export class DigitalServicesActReportDialogComponent {
     });
   }
 
-  private showError(e: any) {
+  private showError(error: unknown) {
+    const typed = error as { error?: { message?: string; detail?: string }; message?: string };
     const detail =
-      e?.error?.message ||
-      e?.error?.detail ||
-      e?.message ||
+      typed?.error?.message ||
+      typed?.error?.detail ||
+      typed?.message ||
       'Submitting failed. Please try again.';
     // Fehler: deutliches Warn-Icon, Dialog bleibt offen
     this.openDisplayMessage({
@@ -327,15 +332,15 @@ export class DigitalServicesActReportDialogComponent {
           // Use public token route so no admin auth is required
           if (!token) continue;
           if (item.type === 'file' && item.file) {
-            await firstValueFrom(this.dsa.addNoticeEvidenceByToken(token, { type: 'file', file: item.file } as any));
+            await firstValueFrom(this.dsa.addNoticeEvidenceByToken(token, { type: 'file', file: item.file }));
           } else if (item.type === 'url' && item.url) {
-            await firstValueFrom(this.dsa.addNoticeEvidenceByToken(token, { type: 'url', url: item.url } as any));
+            await firstValueFrom(this.dsa.addNoticeEvidenceByToken(token, { type: 'url', url: item.url }));
           }
         } else {
           if (item.type === 'file' && item.file) {
-            await firstValueFrom(this.dsa.addSignalEvidence(id, { type: 'file', file: item.file } as any));
+            await firstValueFrom(this.dsa.addSignalEvidence(id, { type: 'file', file: item.file }));
           } else if (item.type === 'url' && item.url) {
-            await firstValueFrom(this.dsa.addSignalEvidence(id, { type: 'url', url: item.url } as any));
+            await firstValueFrom(this.dsa.addSignalEvidence(id, { type: 'url', url: item.url }));
           }
         }
       } catch {

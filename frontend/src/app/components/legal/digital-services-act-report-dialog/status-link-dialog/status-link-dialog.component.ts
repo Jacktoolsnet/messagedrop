@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -22,27 +22,19 @@ export interface DsaStatusLinkDialogData {
   styleUrl: './status-link-dialog.component.css'
 })
 export class DsaStatusLinkDialogComponent {
-  readonly primaryText: string;
-  readonly secondaryText: string;
+  private readonly dialogRef = inject(MatDialogRef<DsaStatusLinkDialogComponent>);
+  private readonly snack = inject(MatSnackBar);
+  readonly data = inject<DsaStatusLinkDialogData>(MAT_DIALOG_DATA);
 
-  constructor(
-    private readonly dialogRef: MatDialogRef<DsaStatusLinkDialogComponent>,
-    private readonly snack: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: DsaStatusLinkDialogData
-  ) {
-    this.primaryText = data.kind === 'signal'
-      ? 'Your report was sent successfully.'
-      : 'Your notice was submitted successfully.';
+  readonly primaryText = this.data.kind === 'signal'
+    ? 'Your report was sent successfully.'
+    : 'Your notice was submitted successfully.';
 
-    if (data.kind === 'signal') {
-      this.secondaryText = 'Keep the link below to follow up on the review progress at any time.';
-    } else {
-      const hasEmail = (data.reporterEmail || '').trim().length > 0;
-      this.secondaryText = hasEmail
-        ? 'We will also try to reach out via email when the review is complete. You can check the latest status using this link.'
-        : 'If you want to keep track of the review, save this link. You can come back to it whenever you need the latest status.';
-    }
-  }
+  readonly secondaryText = this.data.kind === 'signal'
+    ? 'Keep the link below to follow up on the review progress at any time.'
+    : (this.data.reporterEmail || '').trim().length > 0
+      ? 'We will also try to reach out via email when the review is complete. You can check the latest status using this link.'
+      : 'If you want to keep track of the review, save this link. You can come back to it whenever you need the latest status.';
 
   async copy(): Promise<void> {
     const text = this.data.statusUrl || this.data.token;
@@ -51,7 +43,7 @@ export class DsaStatusLinkDialogComponent {
     try {
       await navigator.clipboard.writeText(text);
       this.snack.open('Link copied to clipboard.', 'OK', { duration: 2500 });
-    } catch (err) {
+    } catch {
       this.copyFallback(text as string);
     }
   }
@@ -78,7 +70,7 @@ export class DsaStatusLinkDialogComponent {
     try {
       document.execCommand('copy');
       this.snack.open('Link copied to clipboard.', 'OK', { duration: 2500 });
-    } catch (err) {
+    } catch {
       this.snack.open('Could not copy the link automatically. Please copy it manually.', 'OK', { duration: 4000 });
     } finally {
       document.body.removeChild(textarea);

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
 import { Multimedia } from '../../../interfaces/multimedia';
@@ -16,7 +16,7 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
   templateUrl: './showmultimedia.component.html',
   styleUrl: './showmultimedia.component.css'
 })
-export class ShowmultimediaComponent implements OnInit, OnChanges {
+export class ShowmultimediaComponent implements OnChanges {
   @Input() multimedia: Multimedia | undefined;
 
   termsLinks?: { terms: string; privacy: string };
@@ -27,13 +27,8 @@ export class ShowmultimediaComponent implements OnInit, OnChanges {
   // Aktivierungs-Logik
   isPlatformEnabled = false;
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    private appService: AppService
-  ) { }
-
-  ngOnInit(): void {
-  }
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly appService = inject(AppService);
 
   ngOnChanges(changes: SimpleChanges) {
     if ('multimedia' in changes) {

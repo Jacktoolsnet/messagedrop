@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -10,10 +10,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
-import { AppSettingsComponent } from '../../app-settings/app-settings.component';
 import { EnableExternalContentComponent } from '../../utils/enable-external-content/enable-external-content.component';
 
 @Component({
@@ -41,15 +39,11 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
 })
 export class ExternalContentComponent {
 
-  public appSettings: AppSettings;
-  constructor(
-    private appService: AppService,
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<AppSettingsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { appSettings: AppSettings }
-  ) {
-    this.appSettings = this.data.appSettings;
-  }
+  private readonly appService = inject(AppService);
+  private readonly dialogRef = inject(MatDialogRef<ExternalContentComponent>);
+  private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
+
+  public appSettings: AppSettings = this.dialogData.appSettings;
 
   onCloseClick(): void {
     this.dialogRef.close();

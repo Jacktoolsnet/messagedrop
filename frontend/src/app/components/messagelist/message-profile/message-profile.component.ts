@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -27,24 +27,18 @@ import { Profile } from '../../../interfaces/profile';
   styleUrl: './message-profile.component.css'
 })
 export class MessageProfileComponent {
-  public profile!: Profile;
-  public userId!: string;
-  private oriProfile: Profile;
+  private readonly snackBar = inject(MatSnackBar);
+  readonly dialogRef = inject(MatDialogRef<MessageProfileComponent>);
+  readonly data = inject<{ profile: Profile; userId: string }>(MAT_DIALOG_DATA);
 
-  constructor(
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<MessageProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { profile: Profile, userId: string }) {
-    if (data.profile) {
-      this.profile = data.profile;
-    } else {
-      this.profile = {
-        name: '',
-        base64Avatar: ''
-      };
-    }
+  public profile: Profile;
+  public userId: string;
+  private readonly oriProfile: Profile;
+
+  constructor() {
+    this.profile = this.data.profile ?? { name: '', base64Avatar: '' };
     this.oriProfile = structuredClone(this.profile);
-    this.userId = data.userId;
+    this.userId = this.data.userId;
   }
 
   onAbortClick(): void {
@@ -57,23 +51,28 @@ export class MessageProfileComponent {
     this.dialogRef.close();
   }
 
-  onFileSelected(event: any) {
-    const file: File = event.target.files[0];
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement | null;
+    const file = input?.files?.[0];
+    if (!file) {
+      return;
+    }
 
-    if (file) {
-      let reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = this.handleFile.bind(this);
-      reader.onerror = this.handleFileError.bind(this);
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = this.handleFile.bind(this);
+    reader.onerror = this.handleFileError.bind(this);
+  }
+
+  handleFile(event: ProgressEvent<FileReader>): void {
+    const result = event.target?.result;
+    if (typeof result === 'string') {
+      this.profile.base64Avatar = result;
     }
   }
 
-  handleFile(event: any) {
-    this.profile.base64Avatar = event.target.result;
-  }
-
-  handleFileError(event: any) {
-
+  handleFileError(): void {
+    this.snackBar.open('Could not read the selected file. Please try again.', 'OK', { duration: 2500 });
   }
 
   deleteAvatar() {

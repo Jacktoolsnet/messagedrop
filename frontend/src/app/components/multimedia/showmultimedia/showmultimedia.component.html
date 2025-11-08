@@ -3,7 +3,8 @@
 @if (multimedia?.type === 'tenor') {
 <div class="media_block">
     <div class="multimedia_container">
-        <img class="multimedia_image" [src]="multimedia!.url" />
+        <img class="multimedia_image" [src]="multimedia!.url"
+            [attr.alt]="multimedia?.title || 'Embedded media'" />
     </div>
     @if (multimedia?.attribution !== '') {
     <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank">

@@ -1,4 +1,4 @@
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
 import { PlaceService } from '../../../services/place.service';
 
@@ -13,10 +13,10 @@ export class DateTimeTileComponent implements OnInit, OnDestroy {
   time = '';
   date = '';
   week = '';
-  private timer: any;
+  private timer: ReturnType<typeof setInterval> | null = null;
   private locale = navigator.language || 'en';
 
-  constructor(private placeService: PlaceService) { }
+  private readonly placeService = inject(PlaceService);
 
   ngOnInit(): void {
     this.updateTime();
@@ -24,7 +24,10 @@ export class DateTimeTileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    clearInterval(this.timer);
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = null;
+    }
   }
 
   private updateTime() {

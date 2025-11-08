@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { ResetUserComponent } from '../../user/reset-user/reset-user.component';
 
 @Component({
@@ -21,9 +21,12 @@ import { ResetUserComponent } from '../../user/reset-user/reset-user.component';
 })
 
 export class CheckPinComponent {
-  pin: string = '';
-  pinLength: number = 6;
+  pin = '';
+  pinLength = 6;
   pinDisplay: string[] = ['', '', '', '', '', ''];
+
+  private readonly resetDialog = inject(MatDialog);
+  private readonly dialogRef = inject(MatDialogRef<CheckPinComponent>);
 
   @HostListener('document:keydown', ['$event'])
   handleKeyboardInput(event: KeyboardEvent): void {
@@ -35,12 +38,6 @@ export class CheckPinComponent {
       this.removeDigit();
     }
   }
-
-  constructor(
-    private resetDialog: MatDialog,
-    private dialogRef: MatDialogRef<CheckPinComponent>,
-    private snackBar: MatSnackBar
-  ) { }
 
   get currentPinIndex(): number {
     return this.pin.length;
@@ -59,7 +56,7 @@ export class CheckPinComponent {
     }
   }
 
-  showDigitTemporarily(index: number, isConfirming: boolean = false): void {
+  showDigitTemporarily(index: number): void {
     const displayArray = this.pinDisplay;
     const pin = this.pin;
     displayArray[index] = pin[index];
@@ -91,9 +88,6 @@ export class CheckPinComponent {
     const dialogRef = this.resetDialog.open(ResetUserComponent, {
       closeOnNavigation: true,
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(result => {

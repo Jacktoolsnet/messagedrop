@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
@@ -9,5 +9,5 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDi
   styleUrl: './block-message.component.css'
 })
 export class BlockMessageComponent {
-  constructor(public dialogRef: MatDialogRef<BlockMessageComponent>) { }
+  readonly dialogRef = inject(MatDialogRef<BlockMessageComponent>);
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, HostListener } from '@angular/core';
+import { Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -19,14 +19,18 @@ import { PinHintComponent } from '../pin-hint/pin-hint.component';
   templateUrl: './create-pin.component.html',
   styleUrl: './create-pin.component.css'
 })
-export class CreatePinComponent {
-  pin: string = '';
-  pinLength: number = 6;
-  confirmPin: string = '';
+export class CreatePinComponent implements OnDestroy {
+  pin = '';
+  pinLength = 6;
+  confirmPin = '';
   pinDisplay: string[] = ['', '', '', '', '', ''];
   confirmPinDisplay: string[] = ['', '', '', '', '', ''];
-  isConfirming: boolean = false;
+  isConfirming = false;
   private dialogClosed = false;
+
+  private readonly pinHintDialog = inject(MatDialog);
+  private readonly dialogRef = inject(MatDialogRef<CreatePinComponent>);
+  private readonly snackBar = inject(MatSnackBar);
 
   ngOnDestroy(): void {
     this.dialogClosed = true;
@@ -42,12 +46,6 @@ export class CreatePinComponent {
       this.removeDigit();
     }
   }
-
-  constructor(
-    private pinHintDialog: MatDialog,
-    private dialogRef: MatDialogRef<CreatePinComponent>,
-    private snackBar: MatSnackBar
-  ) { }
 
   get currentPinIndex(): number {
     return this.isConfirming ? this.confirmPin.length : this.pin.length;
@@ -90,7 +88,7 @@ export class CreatePinComponent {
     }
   }
 
-  showDigitTemporarily(index: number, isConfirming: boolean = false): void {
+  showDigitTemporarily(index: number, isConfirming = false): void {
     const displayArray = isConfirming ? this.confirmPinDisplay : this.pinDisplay;
     const pin = isConfirming ? this.confirmPin : this.pin;
     displayArray[index] = pin[index];
@@ -120,13 +118,9 @@ export class CreatePinComponent {
   }
 
   showPinHint(): void {
-    const dialogRef = this.pinHintDialog.open(PinHintComponent, {
+    this.pinHintDialog.open(PinHintComponent, {
       closeOnNavigation: true,
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe(result => { });
   }
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, Inject, OnInit, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -46,34 +46,28 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
   styleUrl: './notelist.component.css',
   standalone: true
 })
-export class NotelistComponent implements OnInit {
-  readonly hasNotes = computed(() => this.notesSignal().length > 0);
-  public user: User | undefined;
-  public notesSignal!: WritableSignal<Note[]>;
-  private location: Location;
+export class NotelistComponent {
+  private readonly dialogData = inject<{ location: Location; notesSignal: WritableSignal<Note[]> }>(MAT_DIALOG_DATA);
+  public readonly userService = inject(UserService);
+  private readonly noteService = inject(NoteService);
+  private readonly mapService = inject(MapService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly sharedContentService = inject(SharedContentService);
+  public readonly dialogRef = inject(MatDialogRef<NotelistComponent>);
+  public readonly dialog = inject(MatDialog);
 
-  constructor(
-    public userService: UserService,
-    private noteService: NoteService,
-    private mapService: MapService,
-    private geolocationService: GeolocationService,
-    private sharedContentService: SharedContentService,
-    public dialogRef: MatDialogRef<NotelistComponent>,
-    public dialog: MatDialog,
-    @Inject(MAT_DIALOG_DATA) public data: { location: Location, notesSignal: WritableSignal<Note[]> }
-  ) {
-    this.location = this.data.location;
-    this.notesSignal = this.data.notesSignal;
+  readonly hasNotes = computed(() => this.notesSignal().length > 0);
+  public user: User | undefined = this.userService.getUser();
+  public notesSignal: WritableSignal<Note[]> = this.dialogData.notesSignal;
+  private location: Location = this.dialogData.location;
+
+  constructor() {
     effect(() => {
-      const msgs = this.notesSignal();   // <- reactive read
-      if (this.data.notesSignal) {
-        this.data.notesSignal.set(this.notesSignal());
+      this.notesSignal();   // reactive read
+      if (this.dialogData.notesSignal) {
+        this.dialogData.notesSignal.set(this.notesSignal());
       }
     });
-  }
-
-  ngOnInit(): void {
-    this.user = this.userService.getUser();
   }
 
   goBack(): void {
@@ -118,7 +112,7 @@ export class NotelistComponent implements OnInit {
   }
 
   openNoteDialog(): void {
-    let note: Note = {
+    const note: Note = {
       id: '',
       location: this.location,
       note: '',

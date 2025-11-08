@@ -25,19 +25,22 @@
         </div>
         @for (message of filteredMessagesSignal(); track message.id) {
         <mat-card class="item" appMasonryItem>
-            @if (this.userService.getUser().id == message.userId) {
+            @if (this.userService.getUser().id === message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {
-                <img class="avatar" [src]="userProfile.base64Avatar" />
+                <img class="avatar" [src]="userProfile.base64Avatar"
+                    [attr.alt]="userProfile.name ? userProfile.name + ' avatar' : 'Profile avatar'" />
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
                 <span class="name">{{ userProfile.name || 'Myself' }}</span>
             </div>
             } @else {
-            <div class="avatar-box" (click)="editMessageUserProfile(message)">
+            <div class="avatar-box" role="button" tabindex="0" (click)="editMessageUserProfile(message)"
+                (keyup.enter)="editMessageUserProfile(message)" (keyup.space)="editMessageUserProfile(message)">
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
-                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar">
+                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
+                    [attr.alt]="(profileService.getProfile(message.userId)?.name || 'User') + ' avatar'">
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
@@ -45,8 +48,8 @@
             </div>
             }
 
-            <mat-card-content
-                (click)="!userService.isReady() && this.userService.getUser().id == message.userId ? editMessageAfterLoginClick(message) : editMessageClick(message)">>
+            <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
+                (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
                 <div class="message-content">
                     <app-showmultimedia (click)="$event.stopPropagation()"
                         [multimedia]="message.multimedia"></app-showmultimedia>
@@ -61,7 +64,7 @@
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
                     <mat-icon aria-hidden="false"
-                        matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
+                        matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Like message"
@@ -81,13 +84,13 @@
                     (click)="navigateToMessageLocation(message)">
                     <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
                 </button>
-                @if (this.userService.getUser().id != message.userId) {
+                @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">settings_account_box</mat-icon>
                 </button>
                 }
-                @if (this.userService.getUser().id == message.userId) {
+                @if (this.userService.getUser().id === message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
@@ -97,7 +100,7 @@
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
                 }
-                @if (this.userService.getUser().id != message.userId) {
+                @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="dsaReportMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">flag</mat-icon>
                 </button>
@@ -144,19 +147,22 @@
 
         @for (message of commentsSignal(); track message.id) {
         <mat-card class="item" appMasonryItem>
-            @if (this.userService.getUser().id == message.userId) {
+            @if (this.userService.getUser().id === message.userId) {
             <div class="avatar-box">
                 @if (userProfile.base64Avatar) {
-                <img class="avatar" [src]="userProfile.base64Avatar" />
+                <img class="avatar" [src]="userProfile.base64Avatar"
+                    [attr.alt]="userProfile.name ? userProfile.name + ' avatar' : 'Profile avatar'" />
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
                 <span class="name">{{ userProfile.name || 'Myself' }}</span>
             </div>
             } @else {
-            <div class="avatar-box" (click)="editMessageUserProfile(message)">
+            <div class="avatar-box" role="button" tabindex="0" (click)="editMessageUserProfile(message)"
+                (keyup.enter)="editMessageUserProfile(message)" (keyup.space)="editMessageUserProfile(message)">
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
-                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar">
+                <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
+                    [attr.alt]="(profileService.getProfile(message.userId)?.name || 'User') + ' avatar'">
                 } @else {
                 <mat-icon class="material-symbols-outlined">person</mat-icon>
                 }
@@ -164,8 +170,9 @@
             </div>
             }
 
-            <mat-card-content
-                (click)="!userService.isReady() && this.userService.getUser().id == message.userId ? editMessageAfterLoginClick(message) : editMessageClick(message)">
+            <mat-card-content role="button" tabindex="0"
+                (click)="onMessageCardActivate(message)" (keyup.enter)="onMessageCardActivate(message)"
+                (keyup.space)="onMessageCardActivate(message)">
                 <div class="message-content">
                     <app-showmultimedia (click)="$event.stopPropagation()"
                         [multimedia]="message.multimedia"></app-showmultimedia>
@@ -180,7 +187,7 @@
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined"
-                        matBadge="{{ getCommentBadge(message.uuid) == 0 ? '' : getCommentBadge(message.uuid)}}"
+                        matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Like message"
@@ -202,15 +209,15 @@
                     (click)="navigateToMessageLocation(message)">
                     <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
                 </button>
-                @if (this.userService.getUser().id != message.userId) {
+                @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">settings_account_box</mat-icon>
                 </button>
                 }
-                @if (this.userService.getUser().id == message.userId) {
+                @if (this.userService.getUser().id === message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
-                    (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">>
+                    (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Delete message"
@@ -218,7 +225,7 @@
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
                 </button>
                 }
-                @if (this.userService.getUser().id != message.userId) {
+                @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="dsaReportMessage(message)">
                     <mat-icon aria-hidden="false" class="material-symbols-outlined">flag</mat-icon>
                 </button>

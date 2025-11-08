@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, Inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -71,10 +71,24 @@ export class MessagelistComponent implements OnInit {
     UNKNOWN: 'unknown'
   };
 
-  private static readonly DSA_UNKNOWN: 'UNKNOWN' = 'UNKNOWN';
+  private static readonly DSA_UNKNOWN = 'UNKNOWN' as const;
 
   private readonly dsaStatusCache = signal<Record<string, ResolvedDsaStatus>>({});
   private readonly pendingDsaTokens = new Set<string>();
+
+  public readonly userService = inject(UserService);
+  public readonly messageService = inject(MessageService);
+  private readonly translateService = inject(TranslateService);
+  private readonly mapService = inject(MapService);
+  public readonly profileService = inject(ProfileService);
+  private readonly sharedContentService = inject(SharedContentService);
+  public readonly dialogRef = inject(MatDialogRef<MessagelistComponent>);
+  private readonly matDialog = inject(MatDialog);
+  public readonly messageDialog = this.matDialog;
+  public readonly dialog = this.matDialog;
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly dsaStatusService = inject(DsaStatusService);
+  readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);
 
   readonly messagesSignal = signal<Message[]>([]);
   readonly filteredMessagesSignal = computed(() => {
@@ -96,25 +110,13 @@ export class MessagelistComponent implements OnInit {
   );
 
   private clickedMessage: Message | undefined = undefined;
+
   public userProfile: Profile;
-  public likeButtonColor: string = 'secondary';
-  public dislikeButtonColor: string = 'secondary';
+  public likeButtonColor = 'secondary';
+  public dislikeButtonColor = 'secondary';
   public mode: typeof Mode = Mode;
 
-  constructor(
-    public userService: UserService,
-    public messageService: MessageService,
-    private translateService: TranslateService,
-    private mapService: MapService,
-    public profileService: ProfileService,
-    private sharedContentService: SharedContentService,
-    public dialogRef: MatDialogRef<any>,
-    public messageDialog: MatDialog,
-    public dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private readonly dsaStatusService: DsaStatusService,
-    @Inject(MAT_DIALOG_DATA) public data: { location: Location, messageSignal: WritableSignal<Message[]> }
-  ) {
+  constructor() {
     this.userProfile = this.userService.getProfile();
     effect(() => {
       if (this.data.messageSignal) {
@@ -196,6 +198,14 @@ export class MessagelistComponent implements OnInit {
 
   public navigateToMessageLocation(message: Message) {
     this.messageService.navigateToMessageLocation(message);
+  }
+
+  public onMessageCardActivate(message: Message): void {
+    if (!this.userService.isReady() && this.userService.getUser().id === message.userId) {
+      this.editMessageAfterLoginClick(message);
+      return;
+    }
+    this.editMessageClick(message);
   }
 
   public likeMessageAfterLoginClick(message: Message) {
@@ -450,7 +460,7 @@ export class MessagelistComponent implements OnInit {
       hasBackdrop: true
     });
 
-    dialogRef.afterClosed().subscribe(result => {
+    dialogRef.afterClosed().subscribe(() => {
       if (profile) {
         this.profileService.setProfile(message.userId, profile);
       }
@@ -514,16 +524,16 @@ export class MessagelistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (data?.message) {
-        this.messageService.createMessage(data.message, this.userService.getUser());
+    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+      if (result?.message) {
+        this.messageService.createMessage(result.message, this.userService.getUser());
       }
     });
   }
 
   public handleCommentAfterLoginClick(message: Message) {
     this.clickedMessage = message;
-    if (this.getCommentBadge(message.uuid) == 0) {
+    if (this.getCommentBadge(message.uuid) === 0) {
       this.userService.login(this.handleComment.bind(this))
     } else {
       this.handleComment();
@@ -603,9 +613,9 @@ export class MessagelistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (data?.message) {
-        this.messageService.createComment(data.message, this.userService.getUser());
+    dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+      if (result?.message) {
+        this.messageService.createComment(result.message, this.userService.getUser());
       }
     });
   }

@@ -1,5 +1,5 @@
 import { CommonModule, DatePipe } from '@angular/common';
-import { Component, computed, effect, Inject, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -121,19 +121,18 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly signalContentType = computed(() => this.signalCase()?.reportedContentType ?? null);
   readonly signalContentUrl = computed(() => this.signalCase()?.contentUrl ?? null);
 
+  private readonly service = inject(DsaStatusService);
+  private readonly fb = inject(FormBuilder);
+  private readonly snack = inject(MatSnackBar);
+  private readonly dialogRef = inject(MatDialogRef<DsaCaseDialogComponent>);
+  private readonly dialogData = inject<{ token: string; message: Message }>(MAT_DIALOG_DATA);
+  readonly data = this.dialogData;
+
   readonly appealForm = this.fb.nonNullable.group({
     arguments: ['', [Validators.required, Validators.minLength(20)]]
   });
 
   readonly publicStatusUrl = computed(() => this.buildPublicStatusUrl(this.data.token));
-
-  constructor(
-    private readonly fb: FormBuilder,
-    private readonly service: DsaStatusService,
-    private readonly snack: MatSnackBar,
-    private readonly dialogRef: MatDialogRef<DsaCaseDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { token: string; message: Message }
-  ) { }
 
   ngOnInit(): void {
     this.loadStatus();
@@ -208,8 +207,9 @@ export class DsaCaseDialogComponent implements OnInit {
         }
       }
       this.loadStatus();
-    } catch (err: any) {
-      const msg = err?.error?.error === 'decision_pending'
+    } catch (err) {
+      const typed = err as { error?: { error?: string } };
+      const msg = typed?.error?.error === 'decision_pending'
         ? 'A decision has not been finalised yet. Appeals are only possible afterwards.'
         : 'Could not submit the appeal. Please try again later.';
       this.snack.open(msg, 'OK', { duration: 4000, verticalPosition: 'top' });

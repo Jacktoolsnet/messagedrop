@@ -22,7 +22,8 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
-      <img class="avatar" [src]="data.place.base64Avatar" /><br />
+      <img class="avatar" [src]="data.place.base64Avatar"
+        [attr.alt]="data.place.name ? data.place.name + ' avatar' : 'Place avatar'" /><br />
     </div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">

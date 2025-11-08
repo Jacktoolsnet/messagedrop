@@ -9,7 +9,8 @@
     </div>
 </div>
 } @else {
-<div class="tile airQuality-tile" (click)="openAirQualityDetails()">
+<div class="tile airQuality-tile" role="button" tabindex="0" (click)="openAirQualityDetails()"
+    (keyup.enter)="openAirQualityDetails()" (keyup.space)="openAirQualityDetails()">
     <div class="tile-info">
         <mat-icon>{{ airQualityIcon }}</mat-icon>
         <div class="tile-content">

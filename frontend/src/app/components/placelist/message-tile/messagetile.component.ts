@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -31,11 +31,9 @@ export class MessageTileComponent implements OnInit, OnDestroy {
       .slice(0, 3)
   );
 
-  constructor(
-    private messageService: MessageService,
-    private geolocationService: GeolocationService,
-    private matDialog: MatDialog
-  ) { }
+  private readonly messageService = inject(MessageService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly matDialog = inject(MatDialog);
 
   ngOnInit(): void {
     this.messageService.getByBoundingBox(this.place.boundingBox, false)
@@ -45,12 +43,14 @@ export class MessageTileComponent implements OnInit, OnDestroy {
             this.allPlaceMessages.set(this.messageService.mapRawMessages(response.rows));
           }
         },
-        error: (err) => { }
+        error: () => {
+          this.allPlaceMessages.set([]);
+        }
       });
   }
 
   openMessageDialog(): void {
-    const dialogRef = this.matDialog.open(MessagelistComponent, {
+    this.matDialog.open(MessagelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
       data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!), messageSignal: this.allPlaceMessages },
@@ -62,8 +62,6 @@ export class MessageTileComponent implements OnInit, OnDestroy {
       hasBackdrop: true,
       autoFocus: false
     });
-
-    dialogRef.afterClosed().subscribe(() => { });
   }
 
   ngOnDestroy(): void {

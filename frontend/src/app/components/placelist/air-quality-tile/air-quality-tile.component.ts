@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { DateTime } from 'luxon';
@@ -17,16 +17,16 @@ import { AirQualityComponent } from '../../air-quality/air-quality.component';
   templateUrl: './air-quality-tile.component.html',
   styleUrl: './air-quality-tile.component.css'
 })
-export class AirQualityTileComponent implements OnInit, OnDestroy {
+export class AirQualityTileComponent implements OnInit {
   @Input() place!: Place;
 
   airQuality: AirQualityData | undefined;
   airQualityIcon: string | undefined;
   minMax: { min: number; max: number } | undefined;
-  label: string = '';
-  value: number = 0;
-  level: string = '';
-  dominantKey: string = '';
+  label = '';
+  value = 0;
+  level = '';
+  dominantKey = '';
 
   // --- Kategorien ---
   private readonly pollenKeys = [
@@ -78,12 +78,10 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
     ozone: 'filter_drama'
   };
 
-  public constructor(
-    private placeService: PlaceService,
-    private airQualityService: AirQualityService,
-    private geolocationService: GeolocationService,
-    private dialog: MatDialog
-  ) { }
+  private readonly placeService = inject(PlaceService);
+  private readonly airQualityService = inject(AirQualityService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly dialog = inject(MatDialog);
 
   ngOnInit(): void {
     if (this.place.datasets.airQualityDataset.data) {
@@ -97,8 +95,6 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
       this.getAirQuality();
     }
   }
-
-  ngOnDestroy(): void { }
 
   // --- Fetch + Update ---
   private getAirQuality() {
@@ -115,7 +111,12 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
           this.airQuality = airQuality;
           this.updateFromAirQuality();
         },
-        error: () => { }
+        error: () => {
+          this.airQuality = undefined;
+          this.value = 0;
+          this.level = '';
+          this.minMax = undefined;
+        }
       });
   }
 
@@ -165,7 +166,7 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
 
   private hasAnyTodayValue(key: string): boolean {
     if (!this.airQuality?.hourly?.time) return false;
-    const values = (this.airQuality.hourly as any)[key] as Array<number | null> | undefined;
+    const values = this.getHourlyArray(key);
     if (!Array.isArray(values)) return false;
 
     const currentDate = new Date().toISOString().split('T')[0];
@@ -181,7 +182,7 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
 
   // --- Werte + Min/Max ---
   private getHourlyValue(key: string): number {
-    if (!this.airQuality?.hourly?.time || !(key in (this.airQuality.hourly as any))) return 0;
+    if (!this.airQuality?.hourly?.time) return 0;
 
     const now = new Date();
     const currentDate = now.toISOString().split('T')[0];
@@ -192,18 +193,21 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
     if (baseIndex === -1) return 0;
 
     const hourIndex = baseIndex + currentHour;
-    const arr = (this.airQuality.hourly as any)[key] as Array<number | null>;
-    const value = arr?.[hourIndex];
+    const arr = this.getHourlyArray(key);
+    if (!arr) {
+      return 0;
+    }
+    const value = arr[hourIndex];
     return typeof value === 'number' ? value : 0;
   }
 
   private getHourlyMinMax(key: string): { min: number; max: number } {
-    if (!this.airQuality?.hourly?.time || !(key in (this.airQuality.hourly as any))) {
+    if (!this.airQuality?.hourly?.time) {
       return { min: 0, max: 0 };
     }
 
     const timeArray = this.airQuality.hourly.time;
-    const valuesArray = (this.airQuality.hourly as any)[key] as Array<number | null>;
+    const valuesArray = this.getHourlyArray(key);
     if (!Array.isArray(valuesArray)) return { min: 0, max: 0 };
 
     const currentDate = new Date().toISOString().split('T')[0];
@@ -262,7 +266,11 @@ export class AirQualityTileComponent implements OnInit, OnDestroy {
       hasBackdrop: true,
       autoFocus: false
     });
-    dialogRef.afterOpened().subscribe();
     dialogRef.afterClosed().subscribe();
+  }
+
+  private getHourlyArray(key: string): (number | null)[] | undefined {
+    const hourly = this.airQuality?.hourly as Record<string, (number | null)[] | undefined> | undefined;
+    return hourly?.[key];
   }
 }

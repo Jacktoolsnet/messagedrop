@@ -1,4 +1,5 @@
-<div class="tile" (click)="openMessageDialog()">
+<div class="tile" role="button" tabindex="0" (click)="openMessageDialog()"
+    (keyup.enter)="openMessageDialog()" (keyup.space)="openMessageDialog()">
     <div class="tile-header">
         <mat-icon class="material-symbols-outlined tile-icon">speaker_notes</mat-icon>
         <span class="tile-title">Messages</span>

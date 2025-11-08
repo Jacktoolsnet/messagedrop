@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -37,15 +37,15 @@ export class PlaceProfileComponent implements OnInit {
   private oriBase64Avatar: string | undefined = undefined;
   private oriIcon: string | undefined = undefined;
 
-  constructor(
-    public dialogRef: MatDialogRef<PlaceProfileComponent>,
-    private style: StyleService,
-    private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, place: Place }
-  ) {
-    this.oriName = data.place.name;
-    this.oriBase64Avatar = data.place.base64Avatar
-    this.oriIcon = data.place.icon;
+  readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
+  private readonly style = inject(StyleService);
+  private readonly snackBar = inject(MatSnackBar);
+  readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
+
+  constructor() {
+    this.oriName = this.data.place.name;
+    this.oriBase64Avatar = this.data.place.base64Avatar;
+    this.oriIcon = this.data.place.icon;
   }
 
   ngOnInit(): void {

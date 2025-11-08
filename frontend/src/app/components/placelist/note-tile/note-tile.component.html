@@ -1,4 +1,5 @@
-<div class="tile" (click)="openNoteDialog()">
+<div class="tile" role="button" tabindex="0" (click)="openNoteDialog()"
+    (keyup.enter)="openNoteDialog()" (keyup.space)="openNoteDialog()">
     <div class="tile-header">
         <mat-icon class="tile-icon">clinical_notes</mat-icon>
         <span class="tile-title">Private notes</span>

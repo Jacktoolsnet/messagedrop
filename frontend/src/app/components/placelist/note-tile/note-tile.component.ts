@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, Input, OnInit, signal, WritableSignal, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -19,7 +19,7 @@ import { NotelistComponent } from '../../notelist/notelist.component';
   templateUrl: './note-tile.component.html',
   styleUrl: './note-tile.component.css'
 })
-export class NoteTileComponent implements OnInit, OnDestroy {
+export class NoteTileComponent implements OnInit {
   @Input() place!: Place;
   readonly allPlaceNotes: WritableSignal<Note[]> = signal<Note[]>([]);
 
@@ -29,11 +29,9 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       .slice(0, 3)
   );
 
-  constructor(
-    private noteService: NoteService,
-    private geolocationService: GeolocationService,
-    private matDialog: MatDialog
-  ) { }
+  private readonly noteService = inject(NoteService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly matDialog = inject(MatDialog);
 
   ngOnInit(): void {
     this.noteService.getNotesInBoundingBox(this.place.boundingBox!).then(notes => {
@@ -41,10 +39,8 @@ export class NoteTileComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnDestroy(): void { }
-
   openNoteDialog(): void {
-    const dialogRef = this.matDialog.open(NotelistComponent, {
+    this.matDialog.open(NotelistComponent, {
       panelClass: 'NoteListDialog',
       closeOnNavigation: true,
       data: { location: this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox!), notesSignal: this.allPlaceNotes },
@@ -56,7 +52,5 @@ export class NoteTileComponent implements OnInit, OnDestroy {
       hasBackdrop: true,
       autoFocus: false
     });
-
-    dialogRef.afterClosed().subscribe(() => { });
   }
 }

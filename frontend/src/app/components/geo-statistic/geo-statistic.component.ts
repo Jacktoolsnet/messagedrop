@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, Inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
@@ -14,6 +14,9 @@ import {
 import { debounceTime, fromEvent, Subscription } from 'rxjs';
 import { GeoStatistic } from '../../interfaces/geo-statistic';
 type WorldBankKey = keyof GeoStatistic['worldBank'];
+type IndicatorCategory = 'economy' | 'social' | 'climate';
+interface IndicatorDefinition { key: string; label: string }
+interface CategoryColor { border: string; background: string; point: string }
 
 @Component({
   selector: 'app-geo-statistic',
@@ -31,7 +34,7 @@ type WorldBankKey = keyof GeoStatistic['worldBank'];
   templateUrl: './geo-statistic.component.html',
   styleUrl: './geo-statistic.component.css'
 })
-export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
+export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
 
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
   private chart!: Chart;
@@ -39,20 +42,22 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   private resizeObserver?: ResizeObserver;
   private windowResizeSub?: Subscription;
 
-  public geoStatistic: GeoStatistic | undefined;
-  selectedCategory = 'economy';
-  selectedIndicator: { key: string; label: string } | null = null;
-  currentIndicatorDescription: string = '';
+  private readonly dialogData = inject<{ geoStatistic: GeoStatistic }>(MAT_DIALOG_DATA);
+  readonly geoStatistic = this.dialogData.geoStatistic;
+
+  selectedCategory: IndicatorCategory = 'economy';
+  selectedIndicator: IndicatorDefinition | null = null;
+  currentIndicatorDescription = '';
   public isSmallScreen = false;
 
-  categories = [
+  readonly categories: readonly { value: IndicatorCategory; label: string }[] = [
     { value: 'economy', label: 'Economy' },
     { value: 'social', label: 'Social' },
     { value: 'climate', label: 'Environment' }
-  ];
+  ] as const;
 
   // Original complete map
-  fullIndicatorMap: { [key: string]: { key: string; label: string }[] } = {
+  private readonly fullIndicatorMap: Record<IndicatorCategory, IndicatorDefinition[]> = {
     economy: [
       { key: 'gdp', label: 'GDP (USD)' },
       { key: 'gdpPerCapita', label: 'GDP per Capita (USD)' },
@@ -81,7 +86,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     ]
   };
 
-  categoryColors: { [key: string]: { border: string; background: string; point: string } } = {
+  private readonly categoryColors: Record<IndicatorCategory, CategoryColor> = {
     economy: {
       border: '#2196F3',
       background: 'rgba(33, 150, 243, 0.3)',
@@ -99,7 +104,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   };
 
-  indicatorUnits: { [key: string]: string } = {
+  private readonly indicatorUnits: Record<string, string> = {
     gdp: 'USD',
     gdpPerCapita: 'USD per person',
     militaryExpenditure: 'USD',
@@ -123,19 +128,13 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   };
 
   // Filtered map (only those with available data)
-  indicatorMap: { [key: string]: { key: string; label: string }[] } = {};
+  indicatorMap: Partial<Record<IndicatorCategory, IndicatorDefinition[]>> = {};
 
-  lineChartType: ChartType = 'line';
+  private readonly lineChartType: ChartType = 'line';
   chartData: ChartConfiguration['data'] = { labels: [], datasets: [] };
   chartOptions: ChartConfiguration['options'] = {};
-  chartType: ChartType = 'line';
 
-  constructor(
-    public dialogRef: MatDialogRef<GeoStatisticComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { geoStatistic: GeoStatistic }
-  ) {
-    this.geoStatistic = data.geoStatistic;
-
+  constructor() {
     Chart.register(
       LineController,
       LineElement,
@@ -151,8 +150,6 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     // Build filtered indicators
     this.buildIndicatorMap();
   }
-
-  ngOnInit(): void { }
 
   ngAfterViewInit(): void {
     this.chart = new Chart(this.chartCanvas.nativeElement, {
@@ -193,17 +190,20 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   buildIndicatorMap() {
-    if (!this.geoStatistic) return;
-
     const weatherKeys = ['temperatureTrend', 'precipitationTrend'] as const;
-    const resultMap: { [key: string]: { key: string; label: string }[] } = {};
+    const resultMap: Partial<Record<IndicatorCategory, IndicatorDefinition[]>> = {};
 
-    Object.keys(this.fullIndicatorMap).forEach(category => {
+    (Object.keys(this.fullIndicatorMap) as IndicatorCategory[]).forEach((category) => {
       resultMap[category] = this.fullIndicatorMap[category].filter(indicator => {
-        const isWeatherKey = weatherKeys.includes(indicator.key as typeof weatherKeys[number]);
-        const data = isWeatherKey
-          ? (this.geoStatistic?.weatherHistory as any)[indicator.key]
-          : this.geoStatistic?.worldBank[indicator.key as WorldBankKey];
+        let data: { year: string; value: number | null }[] | undefined;
+        if (weatherKeys.includes(indicator.key as typeof weatherKeys[number])) {
+          data =
+            indicator.key === 'temperatureTrend'
+              ? this.geoStatistic.weatherHistory.temperatureTrend
+              : this.geoStatistic.weatherHistory.precipitationTrend;
+        } else {
+          data = this.geoStatistic.worldBank[indicator.key as WorldBankKey];
+        }
 
         return Array.isArray(data) && data.some(item => item?.value !== null && item?.value !== undefined);
       });
@@ -213,7 +213,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   setChartOptionsForIndicator(indicatorKey: string) {
-    const unit = this.indicatorUnits[indicatorKey] || '';
+    const unit = this.indicatorUnits[indicatorKey] ?? '';
     const locale = navigator.language;
     const allIndicators = Object.values(this.fullIndicatorMap).flat();
     const indicator = allIndicators.find(i => i.key === indicatorKey);
@@ -277,7 +277,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
         y: {
           ticks: {
             color: '#ccc',
-            callback: function (value) {
+            callback: (value: string | number) => {
               const num = typeof value === 'number' ? value : Number(value);
               let formatted = '';
               if (Math.abs(num) >= 1_000_000) {
@@ -328,7 +328,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getIndicatorDescription(key: string): string {
-    const descriptions: { [key: string]: string } = {
+    const descriptions: Record<string, string> = {
       gdp: 'Gross Domestic Product (GDP) represents the total value of all goods and services produced within a country.',
       gdpPerCapita: 'GDP per capita is the average economic output per person, calculated by dividing GDP by the total population.',
       militaryExpenditure: 'Total military spending in absolute terms, covering equipment, personnel, and operations.',
@@ -354,7 +354,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
     return descriptions[key] || 'No description available for this indicator.';
   }
 
-  getWrappedTextByWidth(text: string, canvasWidth: number, fontSize: number = 12): string[] {
+  getWrappedTextByWidth(text: string, canvasWidth: number, fontSize = 12): string[] {
     const approxCharPerLine = Math.floor(canvasWidth / (fontSize * 0.6));
     const words = text.split(' ');
     const lines: string[] = [];
@@ -375,7 +375,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   getTooltipText(key: string): string {
-    const tooltips: { [key: string]: string } = {
+    const tooltips: Record<string, string> = {
       gdp: 'Gross Domestic Product (GDP) in absolute USD over time.',
       gdpPerCapita: 'GDP divided by total population (USD per person).',
       militaryExpenditure: 'Total military spending in USD over time.',
@@ -401,7 +401,7 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   }
 
   onCategoryChange(newCategory: string) {
-    this.selectedCategory = newCategory;
+    this.selectedCategory = newCategory as IndicatorCategory;
     this.selectedIndicator = null;
     this.chartData = { labels: [], datasets: [] };  // Chart leeren
   }
@@ -409,7 +409,6 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
   onIndicatorSelect(indicator: { key: string; label: string }) {
     this.selectedIndicator = indicator;
     this.setChartOptionsForIndicator(indicator.key);
-    if (!this.geoStatistic) return;
 
     if (indicator.key === 'temperatureTrend' || indicator.key === 'precipitationTrend') {
       const trendData = indicator.key === 'temperatureTrend'
@@ -437,11 +436,10 @@ export class GeoStatisticComponent implements OnInit, AfterViewInit, OnDestroy {
         }]
       };
     } else {
-      const wb = this.geoStatistic.worldBank;
-      const series = wb[indicator.key as WorldBankKey];
-      const values = Array.isArray(series) ? series : [series];
-      const labels = values.map(v => v.year).reverse();
-      const data = values.map(v => v.value ?? 0).reverse();
+      const series = this.geoStatistic.worldBank[indicator.key as WorldBankKey];
+      const values = [...series].reverse();
+      const labels = values.map(v => v.year);
+      const data = values.map(v => v.value ?? 0);
       const colors = this.categoryColors[this.selectedCategory];
 
       this.chartData = {
