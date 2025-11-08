@@ -5,8 +5,6 @@ import { Injectable } from '@angular/core';
 })
 export class StyleService {
 
-  constructor() { }
-
   private getRandomNumber(from: number, to: number): number {
     return Math.floor(Math.random() * (to + 1)) + from;
   }

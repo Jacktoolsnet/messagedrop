@@ -1,6 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { Injectable, inject } from '@angular/core';
 import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -28,11 +27,8 @@ export class DigitalServicesActService {
     withCredentials: true
   };
 
-  constructor(
-    private http: HttpClient,
-    private snackBar: MatSnackBar,
-    private networkService: NetworkService
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -88,7 +84,7 @@ export class DigitalServicesActService {
     });
 
     // Body entsprechend unserer Backend-Route (alle Felder optional außer contentId)
-    const body: any = {
+    const body = {
       contentId: payload.contentId,
       contentUrl: payload.contentUrl,
       category: payload.category,

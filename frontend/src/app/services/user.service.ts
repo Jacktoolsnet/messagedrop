@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwPush } from '@angular/service-worker';
@@ -60,7 +60,7 @@ export class UserService {
     base64Avatar: ''
   };
 
-  private tokenRenewalTimeout: any = null;
+  private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
 
   private ready = false;
   private blocked = false;
@@ -73,18 +73,16 @@ export class UserService {
     })
   };
 
-  constructor(
-    private http: HttpClient,
-    private swPush: SwPush,
-    private indexedDbService: IndexedDbService,
-    private cryptoService: CryptoService,
-    private networkService: NetworkService,
-    private displayMessage: MatDialog,
-    private createPinDialog: MatDialog,
-    private checkPinDialog: MatDialog,
-    private serverService: ServerService,
-    private snackBar: MatSnackBar
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly swPush = inject(SwPush);
+  private readonly indexedDbService = inject(IndexedDbService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly networkService = inject(NetworkService);
+  private readonly displayMessage = inject(MatDialog);
+  private readonly createPinDialog = this.displayMessage;
+  private readonly checkPinDialog = this.displayMessage;
+  private readonly serverService = inject(ServerService);
+  private readonly snackBar = inject(MatSnackBar);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -527,11 +525,10 @@ export class UserService {
                 this.indexedDbService.setSetting('subscription', subscriptionJson);
               }
             },
-            error: (err) => {
+            error: () => {
               user.subscription = '';
               this.saveUser();
-            },
-            complete: () => { }
+            }
           });
       })
       .catch(err => {
@@ -700,12 +697,16 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
+    dialogRef.afterOpened().subscribe(() => { });
 
-    dialogRef.afterClosed().pipe(take(1)).subscribe(async (data: any) => {
+    dialogRef.afterClosed().pipe(take(1)).subscribe(async (pin: string | undefined) => {
+      if (!pin) {
+        this.blocked = false;
+        return;
+      }
       const encrypted = await this.cryptoService.encrypt(
         this.serverService.getCryptoPublicKey()!,
-        data
+        pin
       );
 
       this.getPinHash(encrypted).subscribe({
@@ -745,12 +746,10 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 // Optional: Aktionen nach Schließen
                 this.blocked = false;
               });
-            },
-            complete: () => { }
+            }
           });
         },
-        error: (err) => { this.blocked = false; },
-        complete: () => { }
+        error: () => { this.blocked = false; }
       });
     });
   }
@@ -763,9 +762,9 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
+    dialogRef.afterOpened().subscribe(() => { });
 
-    dialogRef.afterClosed().subscribe(async (data: any) => {
+    dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
       if (data === 'reset') {
         const cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
         if (cryptedUser) {
@@ -775,108 +774,112 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 this.indexedDbService.clearAllData();
                 this.openCreatePinDialog();
               },
-              error: (err) => {
+              error: () => {
                 this.indexedDbService.clearAllData();
                 this.openCreatePinDialog();
-              },
-              complete: () => { }
+              }
             });
         }
-      } else {
-        this.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
-          .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
-            this.getUser().pinHash = getPinHashResponse.pinHash;
-            const cryptedUser = await this.indexedDbService.getUser();
-            if (cryptedUser) {
-              this.confirmUser(getPinHashResponse.pinHash, cryptedUser)
-                .subscribe({
-                  next: (confirmUserResponse: ConfirmUserResponse) => {
-                    this.setUser(confirmUserResponse.user, confirmUserResponse.jwt);
-                    if (Notification.permission === "granted") {
-                      if (this.getUser().subscription !== '') {
-                        this.indexedDbService.setSetting('subscription', this.getUser().subscription);
-                      } else {
-                        this.indexedDbService.deleteSetting('subscription');
-                        this.registerSubscription(this.getUser());
-                      }
+        return;
+      }
+
+      if (!data) {
+        return;
+      }
+
+      this.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
+        .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
+          this.getUser().pinHash = getPinHashResponse.pinHash;
+          const cryptedUser = await this.indexedDbService.getUser();
+          if (cryptedUser) {
+            this.confirmUser(getPinHashResponse.pinHash, cryptedUser)
+              .subscribe({
+                next: (confirmUserResponse: ConfirmUserResponse) => {
+                  this.setUser(confirmUserResponse.user, confirmUserResponse.jwt);
+                  if (Notification.permission === "granted") {
+                    if (this.getUser().subscription !== '') {
+                      this.indexedDbService.setSetting('subscription', this.getUser().subscription);
+                    } else {
+                      this.indexedDbService.deleteSetting('subscription');
+                      this.registerSubscription(this.getUser());
                     }
-                    if (callback) {
-                      callback();
-                    }
-                  },
-                  error: (err) => {
-                    if (err.status === 401) {
-                      this.snackBar.open("Pin is not correct. Please try again.", undefined, {
-                        panelClass: ['snack-warning'],
-                        horizontalPosition: 'center',
-                        verticalPosition: 'top',
-                        duration: 3000
-                      });
-                      this.blocked = false;
-                    } else if (err.status === 404) {
-                      const dialogRef = this.displayMessage.open(DisplayMessage, {
-                        panelClass: '',
-                        closeOnNavigation: false,
-                        data: {
-                          showAlways: true,
-                          title: 'User not found',
-                          image: '',
-                          icon: 'person_remove',
-                          message: `Looks like this user has been inactive for a while. 
+                  }
+                  if (callback) {
+                    callback();
+                  }
+                },
+                error: (err) => {
+                  if (err.status === 401) {
+                    this.snackBar.open("Pin is not correct. Please try again.", undefined, {
+                      panelClass: ['snack-warning'],
+                      horizontalPosition: 'center',
+                      verticalPosition: 'top',
+                      duration: 3000
+                    });
+                    this.blocked = false;
+                  } else if (err.status === 404) {
+                    const dialogRef = this.displayMessage.open(DisplayMessage, {
+                      panelClass: '',
+                      closeOnNavigation: false,
+                      data: {
+                        showAlways: true,
+                        title: 'User not found',
+                        image: '',
+                        icon: 'person_remove',
+                        message: `Looks like this user has been inactive for a while. 
                           
                           To keep things clean and simple, users are automatically deleted after 90 days of inactivity.
                           
                           You can create a new one anytime — no signup, no hassle.`,
-                          button: 'Create new user',
-                          delay: 200,
-                          showSpinner: false
-                        },
-                        maxWidth: '90vw',
-                        maxHeight: '90vh',
-                        hasBackdrop: true,
-                        autoFocus: false
-                      });
+                        button: 'Create new user',
+                        delay: 200,
+                        showSpinner: false
+                      },
+                      maxWidth: '90vw',
+                      maxHeight: '90vh',
+                      hasBackdrop: true,
+                      autoFocus: false
+                    });
 
-                      dialogRef.afterOpened().subscribe(e => { });
+                    dialogRef.afterOpened().subscribe(() => { });
 
-                      dialogRef.afterClosed().subscribe((result) => {
-                        this.blocked = false;
-                        this.indexedDbService.clearAllData();
-                        if (result) {
-                          this.openCreatePinDialog();
-                        }
-                      });
-                    } else {
-                      const dialogRef = this.displayMessage.open(DisplayMessage, {
-                        panelClass: '',
-                        closeOnNavigation: false,
-                        data: {
-                          showAlways: true,
-                          title: 'Oops! Backend error!',
-                          image: '',
-                          icon: 'bug_report',
-                          message: 'Something went wrong. Please try again later.',
-                          button: 'Retry...',
-                          delay: 10000,
-                          showSpinner: false
-                        },
-                        maxWidth: '90vw',
-                        maxHeight: '90vh',
-                        hasBackdrop: true,
-                        autoFocus: false
-                      });
+                    dialogRef.afterClosed().subscribe((result) => {
+                      this.blocked = false;
+                      this.indexedDbService.clearAllData();
+                      if (result) {
+                        this.openCreatePinDialog();
+                      }
+                    });
+                  } else {
+                    const dialogRef = this.displayMessage.open(DisplayMessage, {
+                      panelClass: '',
+                      closeOnNavigation: false,
+                      data: {
+                        showAlways: true,
+                        title: 'Oops! Backend error!',
+                        image: '',
+                        icon: 'bug_report',
+                        message: 'Something went wrong. Please try again later.',
+                        button: 'Retry...',
+                        delay: 10000,
+                        showSpinner: false
+                      },
+                      maxWidth: '90vw',
+                      maxHeight: '90vh',
+                      hasBackdrop: true,
+                      autoFocus: false
+                    });
 
-                      dialogRef.afterOpened().subscribe(e => { });
+                    dialogRef.afterOpened().subscribe(() => { });
 
-                      dialogRef.afterClosed().subscribe(() => {
-                        this.blocked = false;
-                      });
-                    }
+                    dialogRef.afterClosed().subscribe(() => {
+                      this.blocked = false;
+                    });
                   }
-                });
-            }
-          });
-      }
+                }
+              });
+          }
+        });
     });
   }
 

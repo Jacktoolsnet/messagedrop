@@ -23,7 +23,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
 
   private chart: Chart<'line'> | null = null;
 
-  readonly lineChartType: 'line' = 'line';
+  readonly lineChartType = 'line' as const;
   chartOptions: ChartConfiguration<'line'>['options'] = {};
   chartData: ChartConfiguration<'line'>['data'] = { labels: [], datasets: [] };
 

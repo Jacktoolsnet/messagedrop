@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TranslateResponse } from '../interfaces/translate-response';
@@ -18,7 +18,8 @@ export class TranslateService {
     })
   };
 
-  constructor(private http: HttpClient, private networkService: NetworkService) { }
+  private readonly http = inject(HttpClient);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);

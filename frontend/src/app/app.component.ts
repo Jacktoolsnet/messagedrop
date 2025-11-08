@@ -1071,11 +1071,15 @@ export class AppComponent implements OnInit {
   }
 
   async showNominatimSearchDialog() {
-    const searchValues: string = await this.indexedDbService.getSetting('nominatimSearch');
+    const searchValues = await this.indexedDbService.getSetting<{
+      searchterm: string;
+      selectedRadius: number;
+      nominatimPlaces: NominatimPlace[];
+    }>('nominatimSearch');
     const dialogRef = this.dialog.open(NominatimSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      data: { location: this.mapService.getMapLocation(), searchValues: undefined != searchValues ? JSON.parse(searchValues) : undefined },
+      data: { location: this.mapService.getMapLocation(), searchValues: searchValues ?? undefined },
       minWidth: '20vw',
       width: '90vw',
       maxWidth: '90vw',
@@ -1095,10 +1099,10 @@ export class AppComponent implements OnInit {
       }
     }) => {
       if (result) {
-        this.indexedDbService.setSetting('nominatimSearch', JSON.stringify(result.searchValues));
+        this.indexedDbService.setSetting('nominatimSearch', result.searchValues);
         switch (result.action) {
           case 'saveSearch':
-            this.indexedDbService.setSetting('nominatimSelectedPlace', JSON.stringify(result.selectedPlace));
+            this.indexedDbService.setSetting('nominatimSelectedPlace', result.selectedPlace);
             break;
         }
       } else {

@@ -1,4 +1,4 @@
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
 import { Message } from '../interfaces/message';
 import { Multimedia } from '../interfaces/multimedia';
 import { Note } from '../interfaces/note';
@@ -13,8 +13,9 @@ export class SharedContentService {
 
   private broadcastChannel = new BroadcastChannel('shared-content');
   private sharedContentSignal = signal<SharedContent | null>(null);
+  private readonly oembedService = inject(OembedService);
 
-  constructor(private oembedService: OembedService) {
+  constructor() {
     this.broadcastChannel.addEventListener('message', (event) => {
       if (event.data?.type === 'shared' && event.data.content) {
         this.sharedContentSignal.set(event.data.content);
@@ -69,8 +70,6 @@ export class SharedContentService {
       const store = tx.objectStore(this.storeName);
       const request = store.delete(id);
       request.onsuccess = () => {
-        if (id === this.lastKey) {
-        }
         resolve();
       };
       request.onerror = () => reject(request.error);

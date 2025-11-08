@@ -211,10 +211,10 @@ export class PlacelistComponent {
       }
     };
     let nominatimPlace: NominatimPlace | undefined;
-    const selectedPlace = await this.indexedDbService.getSetting('nominatimSelectedPlace');
+    const selectedPlace = await this.indexedDbService.getSetting<NominatimPlace>('nominatimSelectedPlace');
     let isNearby = false;
     if (selectedPlace) {
-      nominatimPlace = JSON.parse(selectedPlace) as NominatimPlace;
+      nominatimPlace = selectedPlace;
       isNearby = this.geolocationService.areLocationsNear(
         this.mapService.getMapLocation(),
         this.nominatimService.getLocationFromNominatimPlace(nominatimPlace),

@@ -63,7 +63,7 @@ export class AppService {
 
   async loadAppSettings(): Promise<void> {
     try {
-      const raw = await this.indexedDbService.getSetting('appSettings');
+      const raw = await this.indexedDbService.getSetting<string>('appSettings');
       const parsed = raw ? JSON.parse(raw) as Partial<AppSettings> : null;
       this.appSettings = { ...this.defaultAppSettings, ...(parsed ?? {}) };
     } catch {

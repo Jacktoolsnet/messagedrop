@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
 import { catchError, throwError } from 'rxjs';
@@ -38,14 +38,12 @@ export class ContactService {
     })
   };
 
-  constructor(
-    private http: HttpClient,
-    private userService: UserService,
-    private indexedDbService: IndexedDbService,
-    private cryptoService: CryptoService,
-    private snackBar: MatSnackBar,
-    private networkService: NetworkService
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly userService = inject(UserService);
+  private readonly indexedDbService = inject(IndexedDbService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly networkService = inject(NetworkService);
 
   get contactsSignal() { return this._contacts.asReadonly(); }
 
@@ -228,8 +226,7 @@ export class ContactService {
             this.ready = false;
           }
           this._contactsSet.update(trigger => trigger + 1);
-        },
-        complete: () => { }
+        }
       });
   }
 
@@ -311,8 +308,7 @@ export class ContactService {
             this._contacts.update(contacts => [...contacts, contact]);
           }
         },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); },
-        complete: () => { }
+        error: (err) => { this.snackBar.open(err.message, 'OK'); }
       });
   }
 
@@ -337,9 +333,15 @@ export class ContactService {
         catchError(this.handleError)
       )
       .subscribe({
-        next: () => { },
-        error: (err) => { },
-        complete: () => { }
+        next: (response) => {
+          if (response.status !== 200) {
+            this.snackBar.open('Failed to update contact name.', 'OK');
+          }
+        },
+        error: (err) => {
+          const message = err?.message ?? 'Failed to update contact name.';
+          this.snackBar.open(message, 'OK');
+        }
       });
   }
 
@@ -374,8 +376,10 @@ export class ContactService {
           contact.lastMessageFrom = 'user';
           socketioService.sendShortMessageToContact(envelope);
         },
-        error: (err) => { },
-        complete: () => { }
+        error: (err) => {
+          const message = err?.message ?? 'Failed to send message.';
+          this.snackBar.open(message, 'OK');
+        }
       });
   }
 
@@ -441,8 +445,9 @@ export class ContactService {
           }
         },
         error: (err) => {
-        },
-        complete: () => { }
+          const message = err?.message ?? 'Failed to delete contact.';
+          this.snackBar.open(message, 'OK');
+        }
       });
   }
 
@@ -469,8 +474,10 @@ export class ContactService {
             this._contacts.set(this._contacts());
           }
         },
-        error: (err) => { },
-        complete: () => { }
+        error: (err) => {
+          const message = err?.message ?? 'Failed to subscribe.';
+          this.snackBar.open(message, 'OK');
+        }
       });
   }
 
@@ -498,8 +505,9 @@ export class ContactService {
           }
         },
         error: (err) => {
-        },
-        complete: () => { }
+          const message = err?.message ?? 'Failed to unsubscribe.';
+          this.snackBar.open(message, 'OK');
+        }
       });
   }
 }

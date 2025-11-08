@@ -11,32 +11,8 @@ import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { AppService } from '../../../services/app.service';
 import { TenorService } from '../../../services/tenor.service';
+import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
-
-interface TenorGifFormat {
-  url: string;
-}
-
-interface TenorMediaFormats {
-  gif: TenorGifFormat;
-}
-
-interface TenorResult {
-  id: string;
-  itemurl: string;
-  title: string;
-  content_description: string;
-  media_formats: TenorMediaFormats;
-}
-
-interface TenorApiData {
-  results: TenorResult[];
-  next: string;
-}
-
-interface TenorApiResponse {
-  data: TenorApiData;
-}
 
 @Component({
   selector: 'app-multimedia',

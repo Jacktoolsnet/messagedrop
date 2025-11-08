@@ -1,16 +1,13 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { DsaStatusAppeal } from '../interfaces/dsa-status-appeal.interface';
-import { DsaStatusEvidence } from '../interfaces/dsa-status-evidence.interface';
 import { DsaStatusResponse } from '../interfaces/dsa-status-response.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DsaStatusService {
   private readonly baseUrl = `${environment.apiUrl}/dsa/status`;
-
-  constructor(private http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   getStatus(token: string): Observable<DsaStatusResponse> {
     return this.http.get<DsaStatusResponse>(`${this.baseUrl}/${encodeURIComponent(token)}`);

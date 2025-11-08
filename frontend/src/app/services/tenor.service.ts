@@ -1,7 +1,8 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { TenorApiResponse } from '../interfaces/tenor-response';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
 
@@ -18,11 +19,9 @@ export class TenorService {
     })
   };
 
-  constructor(
-    private http: HttpClient,
-    private userService: UserService,
-    private networkService: NetworkService,
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly userService = inject(UserService);
+  private readonly networkService = inject(NetworkService);
 
   /**
    * Handles HTTP errors by wrapping the error in an observable.
@@ -45,7 +44,7 @@ export class TenorService {
    * passing query parameters such as API keys, user locale, and content filters.
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
-  getFeaturedGifs(next: string, showAlways = true): Observable<any> {
+  getFeaturedGifs(next: string, showAlways = true): Observable<TenorApiResponse> {
 
     const base = `${environment.apiUrl}/tenor/featured/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
@@ -60,7 +59,7 @@ export class TenorService {
       delay: 0,
       showSpinner: true
     });
-    return this.http.get<any>(url, this.httpOptions)
+    return this.http.get<TenorApiResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
@@ -78,7 +77,7 @@ export class TenorService {
    * passing query parameters such as API keys, user locale, and content filters.
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
-  searchGifs(searchTerm: string, next: string, showAlways = true): Observable<any> {
+  searchGifs(searchTerm: string, next: string, showAlways = true): Observable<TenorApiResponse> {
 
     const base = `${environment.apiUrl}/tenor/search/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}/${encodeURIComponent(searchTerm)}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
@@ -92,7 +91,7 @@ export class TenorService {
       delay: 0,
       showSpinner: true
     });
-    return this.http.get<any>(url, this.httpOptions)
+    return this.http.get<TenorApiResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )

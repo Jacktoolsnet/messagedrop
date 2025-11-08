@@ -12,8 +12,6 @@ export class GeolocationService {
 
   private watchID = 0;
 
-  constructor() { }
-
   public getPlusCode(latitude: number, longitude: number): string {
     const plusCode = OpenLocationCode.encode(latitude, longitude, 10);
     return plusCode || '';
@@ -86,8 +84,8 @@ export class GeolocationService {
     return plusCode;
   }
 
-  public getCurrentPosition(): Observable<any> {
-    return new Observable((observer) => {
+  public getCurrentPosition(): Observable<GeolocationPosition> {
+    return new Observable<GeolocationPosition>((observer) => {
       if ('geolocation' in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
@@ -104,8 +102,8 @@ export class GeolocationService {
     });
   }
 
-  public watchPosition(): Observable<any> {
-    return new Observable((observer) => {
+  public watchPosition(): Observable<GeolocationPosition> {
+    return new Observable<GeolocationPosition>((observer) => {
       if ('geolocation' in navigator) {
         this.watchID = navigator.geolocation.watchPosition(
           (position) => {
@@ -122,8 +120,8 @@ export class GeolocationService {
     });
   }
 
-  public clearWatch(): Observable<any> {
-    return new Observable((observer) => {
+  public clearWatch(): Observable<void> {
+    return new Observable<void>((observer) => {
       if ('geolocation' in navigator) {
         navigator.geolocation.clearWatch(this.watchID);
         observer.complete();
@@ -137,8 +135,6 @@ export class GeolocationService {
     const codeAlphabet = '23456789CFGHJMPQRVWX';
     const latitudeMax = 90;
     const longitudeMax = 180;
-    let gridRows = 9;
-    let gridColumns = 18;
     let latitudeLo = 0.0;
     let longitudeLo = 0.0;
     const pairResolutions: number[] = [20.0, 1.0, .05, .0025, .000125];
@@ -157,33 +153,23 @@ export class GeolocationService {
         case 0:
         case 1:
           gridSizeDegrees = pairResolutions[0];
-          gridRows = 9;
-          gridColumns = 18;
           break;
         case 2:
         case 3:
           gridSizeDegrees = pairResolutions[1];
-          gridRows = 20;
-          gridColumns = 20;
           break;
         case 4:
         case 5:
           gridSizeDegrees = pairResolutions[2];
-          gridRows = 20;
-          gridColumns = 20;
           break;
         case 6:
         case 7:
           gridSizeDegrees = pairResolutions[3];
-          gridRows = 20;
-          gridColumns = 20;
           break;
         case 8:
         case 9:
         case 10:
           gridSizeDegrees = pairResolutions[4];
-          gridRows = 20;
-          gridColumns = 20;
           break;
       }
       latPlaceValue = gridSizeDegrees;

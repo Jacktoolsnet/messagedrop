@@ -23,13 +23,16 @@ export class IndexedDbService {
   private placeStore = 'place';
   private noteStore = 'note';
 
-  private compress(value: any): string {
+  private compress<T>(value: T): string {
     return compressToUTF16(JSON.stringify(value));
   }
 
-  private decompress<T>(data: string): any | undefined {
+  private decompress<T>(data: string | undefined): T | undefined {
+    if (typeof data !== 'string') {
+      return undefined;
+    }
     try {
-      return JSON.parse(decompressFromUTF16(data)) as any;
+      return JSON.parse(decompressFromUTF16(data)) as T;
     } catch {
       return undefined;
     }
@@ -110,7 +113,7 @@ export class IndexedDbService {
    * @param value The value to store.
    * @returns Promise that resolves when the value is stored.
    */
-  async setSetting(key: string, value: any): Promise<void> {
+  async setSetting<T = unknown>(key: string, value: T): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
@@ -131,16 +134,16 @@ export class IndexedDbService {
    * @param key The setting key.
    * @returns Promise that resolves with the value or undefined if not found.
    */
-  async getSetting(key: string): Promise<any> {
+  async getSetting<T = unknown>(key: string): Promise<T | undefined> {
     const db = await this.openDB();
 
-    return new Promise<any>((resolve, reject) => {
+    return new Promise<T | undefined>((resolve, reject) => {
       const tx = db.transaction(this.settingStore, 'readonly');
       const store = tx.objectStore(this.settingStore);
       const request = store.get(key);
 
       request.onsuccess = () => {
-        resolve(this.decompress<any>(request.result));
+        resolve(this.decompress<T>(request.result));
       };
 
       request.onerror = () => {
@@ -201,7 +204,7 @@ export class IndexedDbService {
       const request = store.get('user');
 
       request.onsuccess = () => {
-        resolve(this.decompress<any>(request.result));
+        resolve(this.decompress<CryptedUser>(request.result));
       };
 
       request.onerror = () => {
@@ -236,7 +239,7 @@ export class IndexedDbService {
   async hasUser(): Promise<boolean> {
     const db = await this.openDB();
 
-    return new Promise<boolean>((resolve, reject) => {
+    return new Promise<boolean>((resolve) => {
       const tx = db.transaction(this.userStore, 'readonly');
       const store = tx.objectStore(this.userStore);
       const request = store.get('user');
@@ -284,7 +287,7 @@ export class IndexedDbService {
       const request = store.get(userId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<any>(request.result));
+        resolve(this.decompress<Profile>(request.result));
       };
 
       request.onerror = () => {
@@ -314,7 +317,10 @@ export class IndexedDbService {
 
           const map = new Map<string, Profile>();
           for (let i = 0; i < keys.length; i++) {
-            map.set(keys[i], this.decompress<any>(values[i]) as Profile);
+            const profile = this.decompress<Profile>(values[i]);
+            if (profile) {
+              map.set(keys[i], profile);
+            }
           }
 
           resolve(map);
@@ -383,7 +389,7 @@ export class IndexedDbService {
       const request = store.get(contactProfileId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<any>(request.result));
+        resolve(this.decompress<ContactProfile>(request.result));
       };
 
       request.onerror = () => {
@@ -448,7 +454,7 @@ export class IndexedDbService {
       const request = store.get(placeId);
 
       request.onsuccess = () => {
-        resolve(this.decompress<any>(request.result));
+        resolve(this.decompress<Place>(request.result));
       };
 
       request.onerror = () => {
@@ -532,11 +538,11 @@ export class IndexedDbService {
    */
   async getNote(id: string): Promise<Note | undefined> {
     const db = await this.openDB();
-    return new Promise((resolve, reject) => {
+    return new Promise<Note | undefined>((resolve, reject) => {
       const tx = db.transaction(this.noteStore, 'readonly');
       const store = tx.objectStore(this.noteStore);
       const request = store.get(id);
-      request.onsuccess = () => resolve(this.decompress<any>(request.result));
+      request.onsuccess = () => resolve(this.decompress<Note>(request.result));
       request.onerror = () => reject(request.error);
     });
   }
@@ -571,7 +577,10 @@ export class IndexedDbService {
         const compressedNotes = request.result as string[];
         const notes: Note[] = [];
         compressedNotes.forEach(compressedNote => {
-          notes.push(this.decompress<any>(compressedNote))
+          const note = this.decompress<Note>(compressedNote);
+          if (note) {
+            notes.push(note);
+          }
         })
         resolve(notes.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
       };

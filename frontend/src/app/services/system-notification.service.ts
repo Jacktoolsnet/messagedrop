@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -27,12 +27,10 @@ export class SystemNotificationService {
     withCredentials: true
   };
 
-  constructor(
-    private readonly http: HttpClient,
-    private readonly userService: UserService,
-    private readonly networkService: NetworkService,
-    private readonly snackBar: MatSnackBar
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly userService = inject(UserService);
+  private readonly networkService = inject(NetworkService);
+  private readonly snackBar = inject(MatSnackBar);
 
   getNotificationsSignal() {
     return this.notificationsSig.asReadonly();

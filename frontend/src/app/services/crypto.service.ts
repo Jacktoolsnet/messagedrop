@@ -10,9 +10,7 @@ export class CryptoService {
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Crypto_API
 
-  constructor() { }
-
-  async createHash(payload: any) {
+  async createHash(payload: string): Promise<string> {
     const payloadUint8 = new TextEncoder().encode(payload);
     const hashBuffer = await crypto.subtle.digest('SHA-256', payloadUint8);
     const hashArray = Array.from(new Uint8Array(hashBuffer));
@@ -66,7 +64,7 @@ export class CryptoService {
     return keypair;
   }
 
-  async createSignature(privateSigningKey: JsonWebKey, payload: any): Promise<string> {
+  async createSignature(privateSigningKey: JsonWebKey, payload: string): Promise<string> {
     let signature: ArrayBuffer = new ArrayBuffer(0);
     const payloadBuffer = Buffer.from(payload);
     const ecKeyImportParams: EcKeyImportParams = {
@@ -85,7 +83,7 @@ export class CryptoService {
     return JSON.stringify(Buffer.from(signature).toJSON());
   }
 
-  async verifySignature(signingPublicKey: JsonWebKey, payload: any, signature: ArrayBuffer): Promise<boolean> {
+  async verifySignature(signingPublicKey: JsonWebKey, payload: string, signature: ArrayBuffer): Promise<boolean> {
     let verified = false
     const payloadBuffer = Buffer.from(payload);
     const ecKeyImportParams: EcKeyImportParams = {
@@ -144,7 +142,7 @@ export class CryptoService {
     return await window.crypto.subtle.importKey('jwk', JSON.parse(decryptKeyAsString), algorithmIdentifier, true, ['encrypt', 'decrypt']);
   }
 
-  async encrypt(encryptionPublicKey: JsonWebKey, payload: any): Promise<string> {
+  async encrypt(encryptionPublicKey: JsonWebKey, payload: string): Promise<string> {
     const payloadBuffer = Buffer.from(payload);
     // Create the symmetrical key
     const algorithmIdentifier: AlgorithmIdentifier = {
@@ -161,14 +159,10 @@ export class CryptoService {
       },
       cryptoKey,
       payloadBuffer
-    ).catch((err) => {
-      return new ArrayBuffer(0);
-    });
+    ).catch(() => new ArrayBuffer(0));
 
     // Encrypt the symmetrical key
-    const encryptedKey = await this.encryptKey(encryptionPublicKey, symmetricalKey).catch((err) => {
-      return new ArrayBuffer(0);
-    });
+    const encryptedKey = await this.encryptKey(encryptionPublicKey, symmetricalKey).catch(() => new ArrayBuffer(0));
 
     // Put everything together
     const cryptoData: CryptoData = {
@@ -196,7 +190,7 @@ export class CryptoService {
       );
       const decoder = new TextDecoder('utf-8');
       return decoder.decode(decryptedPayload);
-    } catch (err) {
+    } catch {
       return "";
     }
   }
