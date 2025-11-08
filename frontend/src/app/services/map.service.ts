@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, signal } from '@angular/core';
+import { EventEmitter, Injectable, signal, inject } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
@@ -43,19 +43,19 @@ export class MapService {
   private _mapSet = signal(0);
   readonly mapSet = this._mapSet.asReadonly();
 
-  private map: any;
-  private userMarker: any;
-  private searchRectangle!: any;
-  private circleMarker: any;
+  private map?: leaflet.Map;
+  private userMarker?: leaflet.Marker;
+  private searchRectangle?: leaflet.Rectangle;
+  private circleMarker?: leaflet.CircleMarker;
   private location: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
-  private markerClickEvent!: EventEmitter<MarkerLocation>;
+  private markerClickEvent?: EventEmitter<MarkerLocation>;
 
   private messageMarkers: leaflet.Marker[] = [];
 
   private ready = false;
 
-  constructor(private geolocationService: GeolocationService) { }
+  private readonly geolocationService = inject(GeolocationService);
 
   public initMap() {
     this.ready = true;
@@ -74,21 +74,23 @@ export class MapService {
     this.map.setMaxBounds([[-90, -180], [90, 180]]);
     this.setCircleMarker();
 
-    this.map.on('click', (ev: any) => {
-      this.location.latitude = ev.latlng?.lat;
-      this.location.longitude = ev.latlng?.lng;
-      this.location.plusCode = this.geolocationService.getPlusCode(ev.latlng?.lat, ev.latlng?.lng);
+    this.map.on('click', (event: leaflet.LeafletMouseEvent) => {
+      this.location.latitude = event.latlng.lat;
+      this.location.longitude = event.latlng.lng;
+      this.location.plusCode = this.geolocationService.getPlusCode(event.latlng.lat, event.latlng.lng);
       clickEvent.emit(this.location);
     });
 
-    this.map.on('zoomstart', (ev: any) => {
-      this.circleMarker?.removeFrom(this.map);
+    this.map.on('zoomstart', () => {
+      if (this.map) {
+        this.circleMarker?.removeFrom(this.map);
+      } else {
+        this.circleMarker?.remove();
+      }
     });
 
-    this.map.on('zoomend', (ev: any) => { });
-
     // MoveEnd fires always.
-    this.map.on('moveend', (ev: any) => {
+    this.map.on('moveend', () => {
       if (this.getMapZoom() < 17) {
         this.removeUserMarker();
       } else {
@@ -118,7 +120,8 @@ export class MapService {
     return this.ready;
   }
 
-  public fitMapToBounds(boundingBox: BoundingBox, paddingX = 20, paddingY = 20) {
+  public fitMapToBounds(boundingBox: BoundingBox, paddingX = 20, paddingY = 20): void {
+    if (!this.map) return;
     const bounds = leaflet.latLngBounds(
       [boundingBox.latMin, boundingBox.lonMin],
       [boundingBox.latMax, boundingBox.lonMax]
@@ -237,12 +240,18 @@ export class MapService {
   }
 
   public flyTo(location: Location): void {
-    this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());
+    if (!this.map) {
+      return;
+    }
+    this.map.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map.getZoom());
   }
 
   public flyToWithZoom(location: Location, zoom: number): void {
-    this.map?.setZoom(zoom);
-    this.map?.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());
+    if (!this.map) {
+      return;
+    }
+    this.map.setZoom(zoom);
+    this.map.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map.getZoom());
   }
 
   public moveTo(location: Location): void {
@@ -250,91 +259,107 @@ export class MapService {
   }
 
   public moveToWithZoom(location: Location, zoom: number): void {
-    this.map?.setZoom(zoom);
-    this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude), this.map?.getZoom());
-  }
-
-  public setUserMarker(location: Location) {
-    if (undefined === this.userMarker) {
-      this.userMarker = leaflet.marker([location.latitude, location.longitude], { icon: userMarker, zIndexOffset: 0 }).addTo(this.map);
-    } else {
-      this.userMarker?.setLatLng([location.latitude, location.longitude]).update();
+    if (!this.map) {
+      return;
     }
+    this.map.setZoom(zoom);
+    this.map.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }
 
-  public restoreUserMarker() {
+  public setUserMarker(location: Location): void {
+    if (!this.map) {
+      return;
+    }
+    if (!this.userMarker) {
+      this.userMarker = leaflet.marker([location.latitude, location.longitude], { icon: userMarker, zIndexOffset: 0 }).addTo(this.map);
+      return;
+    }
+    this.userMarker.setLatLng([location.latitude, location.longitude]);
+  }
+
+  public restoreUserMarker(): void {
+    if (!this.map) {
+      return;
+    }
     this.userMarker?.addTo(this.map);
   }
 
-  public removeUserMarker() {
-    if (this.userMarker) {
-      this.userMarker.removeFrom(this.map);
-    }
+  public removeUserMarker(): void {
+    this.userMarker?.remove();
   }
 
-  public setCircleMarker() {
-    this.circleMarker?.removeFrom(this.map);
+  public setCircleMarker(): void {
+    if (!this.map) {
+      return;
+    }
+    this.circleMarker?.remove();
     this.circleMarker = leaflet.circleMarker([this.location.latitude, this.location.longitude]).addTo(this.map);
   }
 
-  public drawSearchRectange(location: Location) {
-    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
-    const bounds = [[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo], [plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]];
+  public drawSearchRectange(location: Location): void {
+    if (!this.map || !this.searchRectangle) {
+      return;
+    }
+    const zoom = this.map.getZoom();
+    const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, zoom);
+    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+    const bounds: leaflet.LatLngBoundsLiteral = [
+      [plusCodeArea.latitudeLo, plusCodeArea.longitudeLo],
+      [plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]
+    ];
     this.searchRectangle.setBounds(bounds);
   }
 
-  public getSearchRectangeCenter(location: Location): number[] {
-    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
-    const center: number[] = [(plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2, (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2];
+  public getSearchRectangeCenter(location: Location): [number, number] {
+    const zoom = this.map?.getZoom() ?? 3;
+    const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, zoom);
+    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+    const center: [number, number] = [
+      (plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2,
+      (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2
+    ];
     return center;
   }
 
-  public createMarkers(markerLocations: Map<string, MarkerLocation>) {
-    // remove pins
-    this.messageMarkers.forEach((marker) => {
-      marker.removeFrom(this.map)
-    });
-    this.messageMarkers.length = 0;
-    // create new markers
+  public createMarkers(markerLocations: Map<string, MarkerLocation>): void {
+    this.messageMarkers.forEach(marker => marker.remove());
+    this.messageMarkers = [];
+
     markerLocations.forEach((markerLocation) => {
-      switch (markerLocation.type) {
-        case MarkerType.PUBLIC_MESSAGE:
-          const markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: messageMarker, zIndexOffset: 20 })
-          markerForPublicMessage.on('click', ($event: leaflet.LeafletMouseEvent) => {
-            this.location = markerLocation.location;
-            this.setCircleMarker();
-            this.showDataFromMarker(markerLocation);
-          });
-          this.messageMarkers.push(markerForPublicMessage)
-          break;
-        case MarkerType.PRIVATE_NOTE:
-          const markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: noteMarker, zIndexOffset: 15 })
-          markerForPrivateNote.on('click', ($event: leaflet.LeafletMouseEvent) => {
-            this.location = markerLocation.location;
-            this.setCircleMarker();
-            this.showDataFromMarker(markerLocation);
-          });
-          this.messageMarkers.push(markerForPrivateNote)
-          break;
-        case MarkerType.MULTI:
-          const markerMulti: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: multiMarker, zIndexOffset: 5 })
-          markerMulti.on('click', ($event: leaflet.LeafletMouseEvent) => {
-            this.location = markerLocation.location;
-            this.setCircleMarker();
-            this.showDataFromMarker(markerLocation);
-          });
-          this.messageMarkers.push(markerMulti)
-          break;
+      const marker = this.createMarkerForType(markerLocation);
+      if (!marker) {
+        return;
       }
-    })
-    // add to map
-    if (undefined != this.map) {
-      this.messageMarkers?.forEach((marker) => marker.addTo(this.map));
+      marker.on('click', () => {
+        this.location = markerLocation.location;
+        this.setCircleMarker();
+        this.showDataFromMarker(markerLocation);
+      });
+      this.messageMarkers.push(marker);
+    });
+
+    if (this.map) {
+      const currentMap = this.map;
+      this.messageMarkers.forEach(marker => marker.addTo(currentMap));
+    }
+  }
+
+  private createMarkerForType(markerLocation: MarkerLocation): leaflet.Marker | null {
+    const latLng: [number, number] = [markerLocation.location.latitude, markerLocation.location.longitude];
+    switch (markerLocation.type) {
+      case MarkerType.PUBLIC_MESSAGE:
+        return leaflet.marker(latLng, { icon: messageMarker, zIndexOffset: 20 });
+      case MarkerType.PRIVATE_NOTE:
+        return leaflet.marker(latLng, { icon: noteMarker, zIndexOffset: 15 });
+      case MarkerType.MULTI:
+        return leaflet.marker(latLng, { icon: multiMarker, zIndexOffset: 5 });
+      default:
+        return null;
     }
   }
 
   private showDataFromMarker(markerLocation: MarkerLocation) {
-    this.markerClickEvent.emit(markerLocation);
+    this.markerClickEvent?.emit(markerLocation);
   }
 
 }

@@ -1,7 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { DisplayMessageConfig } from '../interfaces/display-message-config';
+
+interface LiteNetworkInformation {
+  effectiveType?: string;
+  saveData?: boolean;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +15,7 @@ export class NetworkService {
 
   private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
 
-  constructor(private displayMessage: MatDialog) { }
+  private readonly displayMessage = inject(MatDialog);
 
   online = true;
   private networkMessageMap = new Map<string, DisplayMessageConfig>();
@@ -18,7 +23,7 @@ export class NetworkService {
   init() {
     window.addEventListener('online', () => {
       this.online = true;
-      this.networkDialogRef?.close()
+      this.networkDialogRef?.close();
     });
     window.addEventListener('offline', () => {
       this.online = false;
@@ -40,15 +45,16 @@ export class NetworkService {
         hasBackdrop: false,
         autoFocus: false
       });
-
-      this.networkDialogRef?.afterOpened().subscribe(e => { });
-
-      this.networkDialogRef?.afterClosed().subscribe(() => { });
     });
   }
 
   isSlowConnection(): boolean {
-    const conn = (navigator as any).connection || (navigator as any).mozConnection || (navigator as any).webkitConnection;
+    const nav = navigator as Navigator & {
+      connection?: LiteNetworkInformation;
+      mozConnection?: LiteNetworkInformation;
+      webkitConnection?: LiteNetworkInformation;
+    };
+    const conn = nav.connection || nav.mozConnection || nav.webkitConnection;
 
     if (!conn) {
       // Browser did not support the api → assume as slow.
@@ -69,7 +75,7 @@ export class NetworkService {
 
   showLoadingDialog(url: string): MatDialogRef<DisplayMessage> | undefined {
     if (this.networkMessageMap.get(url)) {
-      return this.displayMessage?.open(DisplayMessage, {
+      return this.displayMessage.open(DisplayMessage, {
         panelClass: '',
         closeOnNavigation: false,
         data: this.networkMessageMap.get(url),
@@ -78,9 +84,8 @@ export class NetworkService {
         hasBackdrop: false,
         autoFocus: false
       });
-    } else {
-      return undefined
     }
+    return undefined;
   }
 
   isShowAlways(url: string): boolean {

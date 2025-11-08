@@ -145,13 +145,12 @@ export class MessageService {
         catchError(this.handleError)
       )
       .subscribe({
-        next: createMessageResponse => {
+        next: () => {
           this.messagesSignal.update(messages => [message, ...messages]);
           this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
         },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); },
-        complete: () => { }
-      })
+        error: (err) => { this.snackBar.open(err.message, 'OK'); }
+      });
   }
 
   public createComment(message: Message, user: User, showAlways = false) {
@@ -428,7 +427,9 @@ export class MessageService {
             });
           }
         },
-        error: () => { }
+        error: (err) => {
+          console.error('Failed to record message view', err);
+        }
       });
   }
 
@@ -451,10 +452,8 @@ export class MessageService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status === 200) {
-            // Messages-Array updaten
             this.messagesSignal.update(messages => messages.filter(m => m.id !== message.id));
 
-            // Selected-Messages stack reduzieren
             this.selectedMessagesSignal.update(selected => {
               const newSelected = [...selected];
               newSelected.pop();
@@ -462,7 +461,9 @@ export class MessageService {
             });
           }
         },
-        error: () => { }
+        error: (err) => {
+          this.snackBar.open(err.message ?? 'Failed to disable message.', 'OK');
+        }
       });
   }
 
@@ -489,13 +490,9 @@ export class MessageService {
           const isRootMessage = this.messagesSignal().some(m => m.id === message.id);
 
           if (isRootMessage) {
-            // Root-Nachricht löschen
             this.messagesSignal.update(messages => messages.filter(m => m.id !== message.id));
-
-            // Detailansicht zurücksetzen
             this.selectedMessagesSignal.set([]);
           } else {
-            // Kommentar löschen → Comments-Signal anpassen
             const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
             commentsSignal.set(commentsSignal().filter(c => c.id !== message.id));
 
@@ -504,10 +501,12 @@ export class MessageService {
               [message.parentUuid]: Math.max((counts[message.parentUuid] || 0) - 1, 0)
             }));
 
-            this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] - 1 < 0 ? 0 : this.commentCounts[message.parentUuid] - 1;
+            this.commentCounts[message.parentUuid] = Math.max((this.commentCounts[message.parentUuid] || 0) - 1, 0);
           }
         },
-        error: () => { }
+        error: (err) => {
+          this.snackBar.open(err.message ?? 'Failed to delete message.', 'OK');
+        }
       });
   }
 
