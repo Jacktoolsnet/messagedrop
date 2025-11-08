@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -26,17 +26,10 @@ import { Mode } from '../../../interfaces/mode';
   templateUrl: './connect.component.html',
   styleUrl: './connect.component.css'
 })
-export class ConnectComponent implements OnInit {
-  public connectId: String = '';
-
-  constructor(
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ConnectComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact, connectId: string }
-  ) { }
-
-  ngOnInit(): void {
-  }
+export class ConnectComponent {
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly dialogRef = inject(MatDialogRef<ConnectComponent>);
+  public readonly data = inject<{ mode: Mode; contact: Contact; connectId: string }>(MAT_DIALOG_DATA);
 
   onApplyClick(): void {
     this.dialogRef.close(this.data);

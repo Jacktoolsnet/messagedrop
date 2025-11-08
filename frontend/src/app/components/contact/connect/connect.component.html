@@ -1,4 +1,4 @@
-@if (data.mode == 'add_connect') {
+@if (data.mode === 'add_connect') {
 <h2 mat-dialog-title>Add a connection</h2>
 }
 
@@ -12,7 +12,7 @@
     Abort
   </button>
 
-  @if (data.connectId != '') {
+  @if (data.connectId !== '') {
   <button mat-button mat-dialog-close aria-label="Apply connection" (click)="onApplyClick()">
     Apply
   </button>

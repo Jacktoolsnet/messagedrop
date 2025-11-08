@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -7,19 +7,30 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
 import { TenorComponent } from '../../utils/tenor/tenor.component';
 import { TextComponent } from '../../utils/text/text.component';
+
+interface TenorDialogResult {
+  title?: string;
+  content_description?: string;
+  media_formats?: { gif?: { url: string } };
+  itemurl?: string;
+}
+
+interface TextDialogResult {
+  text: string;
+}
 
 @Component({
   selector: 'app-message',
@@ -40,26 +51,24 @@ import { TextComponent } from '../../utils/text/text.component';
   styleUrl: './contact-edit-message.component.css'
 })
 export class ContactEditMessageComponent implements OnInit {
-  safeHtml: SafeHtml | undefined = undefined;
-  showSaveHtml: boolean = false;
+  private readonly sanitizer = inject(DomSanitizer);
+  readonly userService = inject(UserService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly matDialog = inject(MatDialog);
+  readonly dialogRef = inject(MatDialogRef<ContactEditMessageComponent>);
+  private readonly style = inject(StyleService);
+  readonly data = inject<{ mode: Mode; contact: Contact; shortMessage: ShortMessage }>(MAT_DIALOG_DATA);
 
-  constructor(
-    private sanitizer: DomSanitizer,
-    public userService: UserService,
-    private snackBar: MatSnackBar,
-    private tenorDialog: MatDialog,
-    private textDialog: MatDialog,
-    public dialogRef: MatDialogRef<ContactEditMessageComponent>,
-    private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, contact: Contact, shortMessage: ShortMessage }
-  ) { }
+  safeHtml: SafeHtml | undefined = undefined;
+  showSaveHtml = false;
 
   ngOnInit(): void {
-    if (undefined != this.data.shortMessage.multimedia) {
-      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.shortMessage.multimedia?.oembed?.html ? this.data.shortMessage.multimedia?.oembed.html : '');
-      this.showSaveHtml = this.data.shortMessage.multimedia.type != MultimediaType.TENOR;
+    const multimedia = this.data.shortMessage.multimedia;
+    if (multimedia) {
+      this.updateSafeHtml();
+      this.showSaveHtml = multimedia.type !== MultimediaType.TENOR;
     }
-    this.data.shortMessage.style = this.userService.getProfile().defaultStyle!;
+    this.data.shortMessage.style = this.userService.getProfile().defaultStyle ?? this.data.shortMessage.style;
   }
 
   onApplyClick(): void {
@@ -75,7 +84,7 @@ export class ContactEditMessageComponent implements OnInit {
   }
 
   private getRandomFont(): void {
-    this.data.shortMessage.style = this.style.getRandomStyle()
+    this.data.shortMessage.style = this.style.getRandomStyle();
   }
 
   public showPolicy() {
@@ -83,7 +92,7 @@ export class ContactEditMessageComponent implements OnInit {
   }
 
   public openTenorDialog(): void {
-    const dialogRef = this.tenorDialog.open(TenorComponent, {
+    const tenorDialogRef = this.matDialog.open(TenorComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
@@ -94,47 +103,59 @@ export class ContactEditMessageComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data) {
-        this.data.shortMessage.multimedia.type = MultimediaType.TENOR
-        this.data.shortMessage.multimedia.attribution = 'Powered by Tenor';
-        this.data.shortMessage.multimedia.title = data.title;
-        this.data.shortMessage.multimedia.description = data.content_description;
-        this.data.shortMessage.multimedia.url = data.media_formats.gif.url;
-        this.data.shortMessage.multimedia.sourceUrl = data.itemurl;
+    tenorDialogRef.afterClosed().subscribe((result?: TenorDialogResult) => {
+      if (!result) {
+        return;
       }
+      const multimedia = this.data.shortMessage.multimedia;
+      if (!multimedia) {
+        return;
+      }
+      multimedia.type = MultimediaType.TENOR;
+      multimedia.attribution = 'Powered by Tenor';
+      multimedia.title = result.title ?? '';
+      multimedia.description = result.content_description ?? '';
+      multimedia.url = result.media_formats?.gif?.url ?? '';
+      multimedia.sourceUrl = result.itemurl ?? '';
+      this.updateSafeHtml();
+      this.showSaveHtml = false;
     });
   }
 
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.shortMessage.multimedia = newMultimedia;
-    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.shortMessage.multimedia?.oembed?.html ? this.data.shortMessage.multimedia?.oembed.html : '');
-    this.showSaveHtml = this.data.shortMessage.multimedia.type != MultimediaType.TENOR;
+    this.updateSafeHtml();
+    this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }
 
   public removeMultimedia(): void {
-    this.data.shortMessage.multimedia.type = MultimediaType.UNDEFINED
-    this.data.shortMessage.multimedia.attribution = '';
-    this.data.shortMessage.multimedia.title = '';
-    this.data.shortMessage.multimedia.description = '';
-    this.data.shortMessage.multimedia.url = '';
-    this.data.shortMessage.multimedia.sourceUrl = '';
+    const multimedia = this.data.shortMessage.multimedia;
+    if (!multimedia) {
+      return;
+    }
+    multimedia.type = MultimediaType.UNDEFINED;
+    multimedia.attribution = '';
+    multimedia.title = '';
+    multimedia.description = '';
+    multimedia.url = '';
+    multimedia.sourceUrl = '';
+    this.showSaveHtml = false;
+    this.safeHtml = undefined;
   }
 
   public openTextDialog(): void {
-    const dialogRef = this.textDialog.open(TextComponent, {
+    const textDialogRef = this.matDialog.open(TextComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { text: this.data.shortMessage.message },
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      this.data.shortMessage.message = data.text;
+    textDialogRef.afterClosed().subscribe((result?: TextDialogResult) => {
+      if (result?.text != null) {
+        this.data.shortMessage.message = result.text;
+      }
     });
   }
 
@@ -142,4 +163,8 @@ export class ContactEditMessageComponent implements OnInit {
     this.data.shortMessage.message = '';
   }
 
+  private updateSafeHtml(): void {
+    const html = this.data.shortMessage.multimedia?.oembed?.html ?? '';
+    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+  }
 }
