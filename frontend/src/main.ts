@@ -31,8 +31,8 @@ if ('serviceWorker' in navigator) {
     scope: '/',
     type: 'classic' // wichtig: nicht module!
   })
-    .then(() => { })
-    .catch(err => { });
+    .then(() => console.info('Share-handler service worker registered'))
+    .catch(err => console.warn('Failed to register share-handler service worker', err));
 }
 
 bootstrapApplication(AppComponent, appConfig)

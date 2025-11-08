@@ -6,33 +6,41 @@ import { RelatedUser } from '../interfaces/related-user';
 })
 export class RelatedUserService {
 
-  constructor() { }
-
   loadUser(userId: string): RelatedUser {
-    let relatedUserFromLocalStorage: any = JSON.parse(localStorage.getItem(userId) || '{}');
-    if (JSON.stringify(relatedUserFromLocalStorage) === '{}') {
-      relatedUserFromLocalStorage = {
+    const storedValue = localStorage.getItem(userId);
+    if (!storedValue) {
+      return {
         id: '',
         name: 'Unnamed user',
         publicEncryptionKey: undefined,
         publicSigningKey: undefined,
         base64Avatar: ''
-      }
-    } else {
-      relatedUserFromLocalStorage = {
-        id: undefined != relatedUserFromLocalStorage.id ? relatedUserFromLocalStorage.id : '',
-        publicEncryptionKey: undefined != relatedUserFromLocalStorage.publicEncryptionKey ? relatedUserFromLocalStorage.publicEncryptionKey : undefined,
-        publicSigningKey: undefined != relatedUserFromLocalStorage.publicSigningKey ? relatedUserFromLocalStorage.publicSigningKey : undefined,
-        name: undefined != relatedUserFromLocalStorage.name ? relatedUserFromLocalStorage.name : 'unnamed user',
-        base64Avatar: undefined != relatedUserFromLocalStorage.base64Avatar ? relatedUserFromLocalStorage.base64Avatar : ''
-      }
+      };
     }
-    return relatedUserFromLocalStorage;
+
+    try {
+      const parsed = JSON.parse(storedValue) as Partial<RelatedUser>;
+      return {
+        id: parsed.id ?? '',
+        publicEncryptionKey: parsed.publicEncryptionKey,
+        publicSigningKey: parsed.publicSigningKey,
+        name: parsed.name ?? 'unnamed user',
+        base64Avatar: parsed.base64Avatar ?? ''
+      };
+    } catch {
+      return {
+        id: '',
+        name: 'Unnamed user',
+        publicEncryptionKey: undefined,
+        publicSigningKey: undefined,
+        base64Avatar: ''
+      };
+    }
   }
 
-  saveUser(relatedUser: RelatedUser) {
-    if (undefined != relatedUser.id) {
-      localStorage.setItem(relatedUser.id, JSON.stringify(relatedUser))
+  saveUser(relatedUser: RelatedUser): void {
+    if (relatedUser.id) {
+      localStorage.setItem(relatedUser.id, JSON.stringify(relatedUser));
     }
   }
 }

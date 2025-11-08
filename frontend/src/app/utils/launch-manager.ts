@@ -16,6 +16,8 @@ export function registerLaunchHandler(injector: EnvironmentInjector) {
                     id: data.id
                 });
             });
-        } catch (e) { }
+        } catch (error) {
+            console.warn('Service worker push handling not available', error);
+        }
     });
 }

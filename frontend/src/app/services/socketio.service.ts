@@ -1,4 +1,4 @@
-import { ApplicationRef, Injectable } from '@angular/core';
+import { ApplicationRef, Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
@@ -13,13 +13,31 @@ import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { UserService } from './user.service';
 
+interface UserRoomPayload {
+  status: number;
+  type: string;
+  content?: unknown;
+}
+
+interface ProfileRequestPayload {
+  status: number;
+  contact: Contact;
+}
+
 @Injectable({
   providedIn: 'root',
 })
 
 export class SocketioService {
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly userService = inject(UserService);
+  private readonly contactService = inject(ContactService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly appRef = inject(ApplicationRef);
+
   private socket: Socket;
-  private ioConfig: SocketIoConfig = {
+  private readonly ioConfig: SocketIoConfig = {
     url: `${environment.apiUrl}`,
     options: {
       reconnection: true,
@@ -34,16 +52,12 @@ export class SocketioService {
   private ready = false;
   private joinedUserRoom = false;
 
-  constructor(
-    public dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private userService: UserService,
-    private contactService: ContactService,
-    private cryptoService: CryptoService,
-    private appRef: ApplicationRef
-  ) {
+  constructor() {
     this.socket = new Socket(this.ioConfig, this.appRef);
+    this.registerConnectionHandlers();
+  }
 
+  private registerConnectionHandlers(): void {
     this.socket.on("connect", () => {
       this.ready = this.socket.ioSocket.connected;
       /*this.snackBar.open('connect', '', {
@@ -54,19 +68,14 @@ export class SocketioService {
       });*/
     });
 
-    this.socket.on("connect_error", (err: any) => {
+    this.socket.on("connect_error", (error: Error) => {
+      console.error('Socket connection error', error);
       /*this.snackBar.open(err.message, "", {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
         verticalPosition: 'top',
         duration: 1000
       });*/
-      // the reason of the error, for example "xhr poll error"
-      // console.log(err.message);
-      // some additional description, for example the status code of the initial HTTP response
-      // console.log(err.description);
-      // some additional context, for example the XMLHttpRequest object
-      // console.log(err.context);
     });
 
     this.socket.on("disconnect", () => {
@@ -81,6 +90,7 @@ export class SocketioService {
 
     this.socket.on('reconnect_attempt', (attempt) => {
       this.ready = this.socket.ioSocket.connected;
+      console.info(`Socket reconnect attempt #${attempt}`);
       /*this.snackBar.open(`Reconnection attempt #${attempt}`, '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
@@ -108,7 +118,6 @@ export class SocketioService {
         duration: 1000
       });*/
     });
-
   }
 
   initSocket() {
@@ -116,7 +125,7 @@ export class SocketioService {
     this.initContacts();
   }
 
-  async initContacts() {
+  async initContacts(): Promise<void> {
     this.contactService.contactsSignal().forEach((contact: Contact) => {
       this.receiveShortMessage(contact);
     });
@@ -142,10 +151,10 @@ export class SocketioService {
     return this.joinedUserRoom;
   }
 
-  public initUserSocketEvents() {
+  public initUserSocketEvents(): void {
     // User room.
     this.socket.emit('user:joinUserRoom', this.userService.getUser().id);
-    this.socket.on(`${this.userService.getUser().id}`, (payload: { status: number, type: string, content: any }) => {
+    this.socket.on(`${this.userService.getUser().id}`, (payload: UserRoomPayload) => {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
@@ -162,8 +171,8 @@ export class SocketioService {
     });
   }
 
-  public requestProfileForContact() {
-    this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: { status: number, contact: Contact }) => {
+  public requestProfileForContact(): void {
+    this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: ProfileRequestPayload) => {
       this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.contact.hint!))
         .then((hint: string) => {
           if (hint !== '') {
@@ -175,9 +184,6 @@ export class SocketioService {
             data: { contact: payload.contact },
             closeOnNavigation: true,
             hasBackdrop: true
-          });
-
-          dialogRef.afterOpened().subscribe(e => {
           });
 
           dialogRef.afterClosed().subscribe(result => {
@@ -197,7 +203,7 @@ export class SocketioService {
     });
   }
 
-  public receiveProfileForContactEvent(contact: Contact) {
+  public receiveProfileForContactEvent(contact: Contact): void {
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
       if (payload.status == 200) {
         contact.name = payload.contact.name !== '' ? payload.contact.name : "Not set";

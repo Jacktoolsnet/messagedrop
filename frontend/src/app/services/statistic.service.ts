@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -16,7 +16,7 @@ export class StatisticService {
     })
   };
 
-  constructor(private http: HttpClient) { }
+  private readonly http = inject(HttpClient);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.

@@ -196,10 +196,6 @@ export class UserService {
                   autoFocus: false
                 });
 
-                dialogRef.afterOpened().subscribe(() => {
-                  // Optional: Aktionen nach Öffnen
-                });
-
                 dialogRef.afterClosed().subscribe(() => {
                   // Optional: Aktionen nach Schließen
                   this.blocked = false;
@@ -208,6 +204,7 @@ export class UserService {
           }
         },
         error: (err) => {
+          console.error('Failed to hash PIN', err);
           const dialogRef = this.displayMessage.open(DisplayMessage, {
             panelClass: '',
             closeOnNavigation: false,
@@ -227,14 +224,10 @@ export class UserService {
             autoFocus: false
           });
 
-          dialogRef.afterOpened().subscribe(() => {
-            // Optional: Aktionen nach Öffnen
-          });
-
-          dialogRef.afterClosed().subscribe(() => {
-            // Optional: Aktionen nach Schließen
-            this.blocked = false;
-          });
+        dialogRef.afterClosed().subscribe(() => {
+          // Optional: Aktionen nach Schließen
+          this.blocked = false;
+        });
         }
       });
   }
@@ -268,12 +261,12 @@ export class UserService {
       id: this.user.id,
       cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
     };
-    this.indexedDbService.setUser(cryptedUser).then(() => { });
+    await this.indexedDbService.setUser(cryptedUser);
   }
 
   async saveProfile() {
     if (this.profile) {
-      this.indexedDbService.setProfile(this.user.id, this.profile).then(() => { });
+      await this.indexedDbService.setProfile(this.user.id, this.profile);
     }
   }
 
@@ -359,18 +352,15 @@ export class UserService {
             autoFocus: false
           });
 
-          dialogRef.afterOpened().subscribe(() => {
-            // Optional: Aktionen nach Öffnen
-          });
-
-          dialogRef.afterClosed().subscribe(() => {
-            // Optional: Aktionen nach Schließen
-          });
-        }
-      },
-      error: (err) => {
-        this.logout();
-        const dialogRef = this.displayMessage.open(DisplayMessage, {
+        dialogRef.afterClosed().subscribe(() => {
+          this.blocked = false;
+        });
+      }
+    },
+    error: (err) => {
+      console.error('Failed to load user details', err);
+      this.logout();
+      const dialogRef = this.displayMessage.open(DisplayMessage, {
           panelClass: '',
           closeOnNavigation: false,
           data: {
@@ -389,12 +379,8 @@ export class UserService {
           autoFocus: false
         });
 
-        dialogRef.afterOpened().subscribe(() => {
-          // Optional: Aktionen nach Öffnen
-        });
-
         dialogRef.afterClosed().subscribe(() => {
-          // Optional: Aktionen nach Schließen
+          this.blocked = false;
         });
       }
     });
@@ -525,13 +511,15 @@ export class UserService {
                 this.indexedDbService.setSetting('subscription', subscriptionJson);
               }
             },
-            error: () => {
+            error: (err) => {
+              console.error('Failed to register subscription with backend', err);
               user.subscription = '';
               this.saveUser();
             }
           });
       })
       .catch(err => {
+        console.error('Push subscription request failed', err);
         user.subscription = '';
         this.saveUser();
       });
@@ -679,13 +667,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         autoFocus: false
       });
 
-      dialogRef.afterOpened().subscribe(e => { });
-
-      dialogRef.afterClosed().subscribe((result) => {
-        if (result) {
-          this.openCreatePinDialog();
-        }
-      });
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result) {
+        this.openCreatePinDialog();
+      }
+    });
     }
   }
 
@@ -696,9 +682,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       data: {},
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(() => { });
-
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (pin: string | undefined) => {
       if (!pin) {
         this.blocked = false;
@@ -719,6 +702,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
               this.initUser(createUserResponse, getPinHashResponse.pinHash);
             },
             error: (err) => {
+              console.error('User creation via createPinDialog failed', err);
               const dialogRef = this.displayMessage.open(DisplayMessage, {
                 panelClass: '',
                 closeOnNavigation: false,
@@ -738,18 +722,16 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 autoFocus: false
               });
 
-              dialogRef.afterOpened().subscribe(() => {
-                // Optional: Aktionen nach Öffnen
-              });
-
               dialogRef.afterClosed().subscribe(() => {
-                // Optional: Aktionen nach Schließen
                 this.blocked = false;
               });
             }
           });
         },
-        error: () => { this.blocked = false; }
+        error: (err) => {
+          console.error('getPinHash failed during create pin', err);
+          this.blocked = false;
+        }
       });
     });
   }
@@ -761,9 +743,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
       data: {},
       hasBackdrop: true
     });
-
-    dialogRef.afterOpened().subscribe(() => { });
-
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
       if (data === 'reset') {
         const cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
@@ -774,10 +753,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 this.indexedDbService.clearAllData();
                 this.openCreatePinDialog();
               },
-              error: () => {
-                this.indexedDbService.clearAllData();
-                this.openCreatePinDialog();
-              }
+            error: (err) => {
+              console.error('Failed to delete user during reset', err);
+              this.indexedDbService.clearAllData();
+              this.openCreatePinDialog();
+            }
             });
         }
         return;
@@ -809,6 +789,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                   }
                 },
                 error: (err) => {
+                  console.error('Confirm user failed during login', err);
                   if (err.status === 401) {
                     this.snackBar.open("Pin is not correct. Please try again.", undefined, {
                       panelClass: ['snack-warning'],
@@ -841,8 +822,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                       autoFocus: false
                     });
 
-                    dialogRef.afterOpened().subscribe(() => { });
-
                     dialogRef.afterClosed().subscribe((result) => {
                       this.blocked = false;
                       this.indexedDbService.clearAllData();
@@ -869,9 +848,6 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                       hasBackdrop: true,
                       autoFocus: false
                     });
-
-                    dialogRef.afterOpened().subscribe(() => { });
-
                     dialogRef.afterClosed().subscribe(() => {
                       this.blocked = false;
                     });

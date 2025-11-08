@@ -1,9 +1,34 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Weather } from '../interfaces/weather';
 import { NetworkService } from './network.service';
+
+interface WeatherApiResponse {
+  current_weather: {
+    temperature: number;
+    windspeed: number;
+    weathercode: number;
+    time: string;
+  };
+  hourly: {
+    time: string[];
+    temperature_2m: number[];
+    precipitation_probability: number[];
+    precipitation: number[];
+    uv_index: number[];
+    pressure_msl: number[];
+    windspeed_10m: number[];
+  };
+  daily: {
+    time: string[];
+    sunrise: string[];
+    sunset: string[];
+    temperature_2m_max: number[];
+    temperature_2m_min: number[];
+  };
+}
 
 @Injectable({
   providedIn: 'root'
@@ -17,10 +42,8 @@ export class WeatherService {
     })
   };
 
-  constructor(
-    private http: HttpClient,
-    private networkService: NetworkService
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -39,14 +62,14 @@ export class WeatherService {
       showSpinner: true
     });
 
-    return this.http.get<{ status: number, data: any }>(url, this.httpOptions)
+    return this.http.get<{ status: number; data: WeatherApiResponse }>(url, this.httpOptions)
       .pipe(
         map((res) => this.mapToWeather(res.data)),
         catchError(this.handleError)
       );
   }
 
-  private mapToWeather(data: any): Weather {
+  private mapToWeather(data: WeatherApiResponse): Weather {
     return {
       current: {
         temperature: data.current_weather.temperature,

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetClientConnect } from '../interfaces/get-client-connect';
@@ -26,7 +26,8 @@ export class ServerService {
     })
   };
 
-  constructor(private http: HttpClient, private networkService: NetworkService) { }
+  private readonly http = inject(HttpClient);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -34,24 +35,22 @@ export class ServerService {
   }
 
   init() {
-    this.connect()
-      .subscribe({
-        next: (connectResponse: GetClientConnect) => {
-          if (connectResponse.status === 200) {
-            this.cryptoPublicKey = connectResponse.cryptoPublicKey;
-            this.signingPublicKey = connectResponse.signingPublicKey;
-            this.ready = true;
-            this.failed = false;
-            this._serverSet.update(trigger => trigger + 1);
-          }
-        },
-        error: (err) => {
-          this.ready = false;
-          this.failed = true;
-          this._serverSet.update(trigger => trigger + 1)
-        },
-        complete: () => { }
-      });
+    this.connect().subscribe({
+      next: (connectResponse: GetClientConnect) => {
+        if (connectResponse.status === 200) {
+          this.cryptoPublicKey = connectResponse.cryptoPublicKey;
+          this.signingPublicKey = connectResponse.signingPublicKey;
+          this.ready = true;
+          this.failed = false;
+          this._serverSet.update(trigger => trigger + 1);
+        }
+      },
+      error: () => {
+        this.ready = false;
+        this.failed = true;
+        this._serverSet.update(trigger => trigger + 1);
+      }
+    });
   }
 
   connect(): Observable<GetClientConnect> {

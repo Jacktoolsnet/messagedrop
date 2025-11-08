@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Profile } from '../interfaces/profile';
 import { IndexedDbService } from './indexed-db.service';
 
@@ -9,9 +9,7 @@ export class ProfileService {
 
   private profiles = new Map<string, Profile>();
 
-  constructor(
-    private indexedDbService: IndexedDbService
-  ) { }
+  private readonly indexedDbService = inject(IndexedDbService);
 
   async loadAllProfiles(): Promise<void> {
     this.profiles = await this.indexedDbService.getAllProfilesAsMap();
@@ -19,7 +17,7 @@ export class ProfileService {
 
   setProfile(userId: string, profile: Profile) {
     this.profiles.set(userId, profile);
-    this.indexedDbService.setProfile(userId, profile)
+    this.indexedDbService.setProfile(userId, profile);
   }
 
   getProfile(userId: string): Profile | undefined {
@@ -28,6 +26,6 @@ export class ProfileService {
 
   deleteProfile(userId: string): void {
     this.profiles.delete(userId);
-    this.indexedDbService.deleteProfile(userId)
-  }
+    this.indexedDbService.deleteProfile(userId);
+}
 }

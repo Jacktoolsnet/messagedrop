@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { computed, Injectable, signal } from '@angular/core';
+import { computed, Injectable, inject, signal } from '@angular/core';
 import { DateTime } from 'luxon';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -31,11 +31,10 @@ export class PlaceService {
     })
   };
 
-  constructor(
-    private userService: UserService,
-    private indexedDbService: IndexedDbService,
-    private networkService: NetworkService,
-    private http: HttpClient) { }
+  private readonly userService = inject(UserService);
+  private readonly indexedDbService = inject(IndexedDbService);
+  private readonly networkService = inject(NetworkService);
+  private readonly http = inject(HttpClient);
 
   get getPlaces() { return this._places.asReadonly(); }
   get selectedPlace() { return this._selectedPlace.asReadonly(); }
@@ -241,7 +240,9 @@ export class PlaceService {
   removePlace(placeId: string): void {
     const updatedPlaces = this._places().filter(place => place.id !== placeId);
     this._places.set(updatedPlaces);
-    this.indexedDbService.deletePlace(placeId).catch(err => { });
+    this.indexedDbService.deletePlace(placeId).catch(err => {
+      console.error('Failed to delete place locally', err);
+    });
   }
 
   subscribe(place: Place, showAlways = false) {
@@ -315,7 +316,7 @@ export class PlaceService {
     return `${prefix} ${weekNumber}`;
   }
 
-  isDatasetExpired(dataset: Dataset<any> | undefined, expirationInMinutes = 60): boolean {
+  isDatasetExpired<T>(dataset: Dataset<T> | undefined, expirationInMinutes = 60): boolean {
     if (!dataset?.lastUpdate) return true;
 
     const last = typeof dataset.lastUpdate === 'string'
