@@ -6,13 +6,13 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class ShortNumberPipe implements PipeTransform {
 
-  transform(number: number, ...args: unknown[]): string | null {
-    if (isNaN(number)) return null; // will only work value is a number
-    if (number === null) return null;
-    if (number === 0) return null;
-    let abs = Math.abs(number);
+  transform(value: number | null | undefined): string | null {
+    if (value == null || Number.isNaN(value) || value === 0) {
+      return null;
+    }
+    let abs = Math.abs(value);
     const rounder = Math.pow(10, 1);
-    const isNegative = number < 0; // will also work for Negative numbers
+    const isNegative = value < 0;
     let key = '';
 
     const powers = [
@@ -23,12 +23,12 @@ export class ShortNumberPipe implements PipeTransform {
       { key: 'K', value: 1000 }
     ];
 
-    for (let i = 0; i < powers.length; i++) {
-      let reduced = abs / powers[i].value;
+    for (const power of powers) {
+      let reduced = abs / power.value;
       reduced = Math.round(reduced * rounder) / rounder;
       if (reduced >= 1) {
         abs = reduced;
-        key = powers[i].key;
+        key = power.key;
         break;
       }
     }

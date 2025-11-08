@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, signal, WritableSignal } from '@angular/core';
+import { Injectable, inject, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, forkJoin, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -41,13 +41,11 @@ export class MessageService {
     })
   };
 
-  constructor(
-    private snackBar: MatSnackBar,
-    private http: HttpClient,
-    private mapService: MapService,
-    private geolocationService: GeolocationService,
-    private networkService: NetworkService
-  ) { }
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly http = inject(HttpClient);
+  private readonly mapService = inject(MapService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);

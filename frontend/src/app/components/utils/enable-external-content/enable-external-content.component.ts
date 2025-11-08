@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
@@ -38,11 +38,10 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
   termsUrl = '';
   privacyUrl = '';
   private settingsKey!: SettingsKey;
-
-  constructor(private appService: AppService) { }
+  private readonly appService = inject(AppService);
 
   ngOnInit(): void { this.initFromSettings(); }
-  ngOnChanges(_c: SimpleChanges): void { this.initFromSettings(); }
+  ngOnChanges(): void { this.initFromSettings(); }
 
   private initFromSettings(): void {
     if (!this.platform) return;
@@ -52,8 +51,8 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
     this.termsUrl = meta.terms;
     this.privacyUrl = meta.privacy;
 
-    const s = this.appService.getAppSettings();
-    const current = !!(s as any)[this.settingsKey];
+    const settings = this.appService.getAppSettings();
+    const current = Boolean((settings as AppSettings)[this.settingsKey]);
     this.enabled = this.checkedOverride ?? current;
   }
 

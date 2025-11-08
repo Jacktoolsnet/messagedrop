@@ -56,11 +56,18 @@ mat-dialog-content {
     gap: 0.25rem;
     min-height: 140px;
     height: auto;
+    border: none;
+    cursor: pointer;
 }
 
 .tile:hover {
     transform: scale(1.02);
     transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.tile:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 4px;
 }
 
 .tile-grid {

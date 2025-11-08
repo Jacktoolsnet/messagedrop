@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -13,20 +13,6 @@ import { OembedService } from '../../../services/oembed.service';
 import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
 
 type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
-type SettingsKey =
-  | 'allowYoutubeContent'
-  | 'allowSpotifyContent'
-  | 'allowTikTokContent'
-  | 'allowPinterestContent';
-
-interface Platform {
-  key: PlatformKey;
-  name: string;
-  icon: string;     // Material Symbol
-  enabled: boolean;
-  settingsKey: SettingsKey;
-}
-
 @Component({
   selector: 'app-pinterest', // (optional) kannst du umbenennen, z.B. 'app-import-multimedia'
   standalone: true,
@@ -45,18 +31,15 @@ interface Platform {
 })
 export class ImportMultimediaComponent {
   multimediaUrl = '';
-  multimedia: Multimedia | undefined = undefined;
+  multimedia?: Multimedia;
   urlInvalid = true;
-  safeHtml: SafeHtml | undefined;
+  safeHtml?: SafeHtml;
   disabledReason = '';
 
-  constructor(
-    public dialogRef: MatDialogRef<ImportMultimediaComponent>,
-    private oembedService: OembedService,
-    private sanitizer: DomSanitizer,
-    private appService: AppService,
-    @Inject(MAT_DIALOG_DATA) public data: {}
-  ) { }
+  readonly dialogRef = inject(MatDialogRef<ImportMultimediaComponent>);
+  private readonly oembedService = inject(OembedService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly appService = inject(AppService);
 
   private getPlatformFromUrl(url: string): PlatformKey | undefined {
     try {
@@ -70,30 +53,30 @@ export class ImportMultimediaComponent {
     return undefined;
   }
 
-  async validateUrl() {
+  async validateUrl(): Promise<void> {
     this.disabledReason = '';
     this.safeHtml = undefined;
     this.multimedia = undefined;
 
     const platform = this.getPlatformFromUrl(this.multimediaUrl);
-    let plattformEnabled = false;
+    let platformEnabled = false;
 
     switch (platform) {
       case 'pinterest':
-        plattformEnabled = this.appService.getAppSettings().enablePinterestContent;
+        platformEnabled = this.appService.getAppSettings().enablePinterestContent;
         break;
       case 'spotify':
-        plattformEnabled = this.appService.getAppSettings().enableSpotifyContent;
+        platformEnabled = this.appService.getAppSettings().enableSpotifyContent;
         break;
       case 'tiktok':
-        plattformEnabled = this.appService.getAppSettings().enableTikTokContent;
+        platformEnabled = this.appService.getAppSettings().enableTikTokContent;
         break;
       case 'youtube':
-        plattformEnabled = this.appService.getAppSettings().enableYoutubeContent;
+        platformEnabled = this.appService.getAppSettings().enableYoutubeContent;
         break;
     }
 
-    if (platform && !plattformEnabled) {
+    if (platform && !platformEnabled) {
       this.urlInvalid = true;
       this.safeHtml = undefined;
       this.disabledReason = `This platform (${platform}) is currently disabled. Enable it below to continue.`;
@@ -132,6 +115,7 @@ export class ImportMultimediaComponent {
   }
 
   async onEnabledChange(enabled: boolean): Promise<void> {
-    this.validateUrl();
+    void enabled;
+    await this.validateUrl();
   }
 }

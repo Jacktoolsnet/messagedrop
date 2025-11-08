@@ -1,15 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Profile } from '../../../interfaces/profile';
-import { AppService } from '../../../services/app.service';
 import { StyleService } from '../../../services/style.service';
 import { UserService } from '../../../services/user.service';
 
@@ -37,14 +36,12 @@ export class UserProfileComponent {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
   private oriProfile: Profile;
 
-  constructor(
-    private appService: AppService,
-    public userService: UserService,
-    private styleService: StyleService,
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<UserProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: {}
-  ) {
+  readonly userService = inject(UserService);
+  private readonly styleService = inject(StyleService);
+  private readonly snackBar = inject(MatSnackBar);
+  readonly dialogRef = inject(MatDialogRef<UserProfileComponent>);
+
+  constructor() {
     this.oriProfile = structuredClone(this.userService.getProfile());
   }
 

@@ -21,7 +21,7 @@
     @if (!selectedTile) {
     <div class="tile-grid">
         @for (tile of tiles; track tile.type) {
-        <div class="tile" (click)="onTileClick(tile)"
+        <button type="button" class="tile" (click)="onTileClick(tile)"
             [style.color]="getTileColor(tile.type, getTileNumericValue(tile.type))">
             <div class="tile-title">{{ tile.label }}</div>
             <div class="tile-icon-wrapper">
@@ -34,7 +34,7 @@
             @if (tile.minMax) {
             <div class="tile-minmax">{{ tile.minMax.min }} - {{ tile.minMax.max }}</div>
             }
-        </div>
+        </button>
         }
     </div>
     }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,11 +15,30 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
 import { Place } from '../../../interfaces/place';
+import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
+import { SimpleStatusResponse } from '../../../interfaces/simple-status-response';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { MapService } from '../../../services/map.service';
 import { NominatimService } from '../../../services/nominatim.service';
 import { PlaceService } from '../../../services/place.service';
 import { UserService } from '../../../services/user.service';
+
+interface SearchValues {
+  searchterm: string;
+  selectedRadius: number;
+  nominatimPlaces: NominatimPlace[];
+}
+
+interface NominatimDialogData {
+  location: Location;
+  searchValues?: SearchValues;
+}
+
+interface NominatimSearchResponse {
+  result: NominatimPlace[];
+}
+
+type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
 
 @Component({
   selector: 'app-nominatim-search',
@@ -41,13 +60,13 @@ import { UserService } from '../../../services/user.service';
   templateUrl: './nominatim-search.component.html',
   styleUrl: './nominatim-search.component.css'
 })
-export class NominatimSearchComponent implements OnInit {
+export class NominatimSearchComponent {
 
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
-  searchterm: FormControl = new FormControl<string>("");
+  @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
+  readonly searchTerm = new FormControl('', { nonNullable: true });
 
-  selectedRadius = 0; // z. B. 1000 = 1km
-  radiusOptions = [
+  selectedRadius = 0; // z. B. 1000 = 1 km
+  readonly radiusOptions: readonly { value: number; label: string }[] = [
     { value: 0, label: 'Worldwide' },
     { value: 1000, label: '1 km' },
     { value: 2000, label: '2 km' },
@@ -61,31 +80,23 @@ export class NominatimSearchComponent implements OnInit {
 
   nominatimPlaces: NominatimPlace[] = [];
 
-  constructor(
-    public userService: UserService,
-    private placeService: PlaceService,
-    public nominatimService: NominatimService,
-    private geolocationService: GeolocationService,
-    private mapService: MapService,
-    public dialogRef: MatDialogRef<NominatimSearchComponent>,
-    private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: {
-      location: Location,
-      searchValues: {
-        searchterm: string,
-        selectedRadius: number,
-        nominatimPlaces: NominatimPlace[]
-      }
-    }
-  ) {
-    if (data.searchValues) {
-      this.searchterm.setValue(data.searchValues.searchterm);
-      this.selectedRadius = data.searchValues.selectedRadius;
-      this.nominatimPlaces = data.searchValues.nominatimPlaces;
+  readonly userService = inject(UserService);
+  readonly nominatimService = inject(NominatimService);
+  private readonly placeService = inject(PlaceService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly mapService = inject(MapService);
+  private readonly dialogRef = inject(MatDialogRef<NominatimSearchComponent>);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly data = inject<NominatimDialogData>(MAT_DIALOG_DATA);
+
+  constructor() {
+    const searchValues = this.data.searchValues;
+    if (searchValues) {
+      this.searchTerm.setValue(searchValues.searchterm);
+      this.selectedRadius = searchValues.selectedRadius;
+      this.nominatimPlaces = searchValues.nominatimPlaces;
     }
   }
-
-  ngOnInit(): void { }
 
   onSelectChange(event: Event): void {
     const selectElement = event.target as HTMLSelectElement;
@@ -93,53 +104,58 @@ export class NominatimSearchComponent implements OnInit {
   }
 
   search(): void {
-    this.searchInput.nativeElement.blur();
+    this.searchInput?.nativeElement.blur();
     this.nominatimPlaces = [];
-    const term = this.searchterm.value?.trim();
-    if (!term) return;
+    const term = this.searchTerm.value.trim();
+    if (!term) {
+      return;
+    }
 
     const limit = 50;
     const radius = Number(this.selectedRadius);
+    const location = this.data.location;
+
     if (radius === 0) {
       // Umkreissuche ohne Bound
       this.nominatimService.getNominatimPlaceBySearchTermWithViewbox(
         term,
-        this.data.location.latitude,
-        this.data.location.longitude,
+        location.latitude,
+        location.longitude,
         limit
       ).subscribe({
-        next: ((response) => {
-          this.nominatimPlaces = this.sortByDistance(
-            this.data.location.latitude,
-            this.data.location.longitude,
-            response.result
-          );
-        }),
-        error: ((err) => { })
+        next: (response) => this.handleSearchResponse(response, location),
+        error: (error) => this.handleSearchError(error)
       });
     } else {
       // Umkreissuche mit Bound
       this.nominatimService.getNominatimPlaceBySearchTermWithViewboxAndBounded(
         term,
-        this.data.location.latitude,
-        this.data.location.longitude,
+        location.latitude,
+        location.longitude,
         1,      // bounded = true
         limit,
         radius
       ).subscribe({
-        next: ((response) => {
-          this.nominatimPlaces = this.sortByDistance(
-            this.data.location.latitude,
-            this.data.location.longitude,
-            response.result
-          );
-        }),
-        error: ((err) => { })
+        next: (response) => this.handleSearchResponse(response, location),
+        error: (error) => this.handleSearchError(error)
       });
     }
   }
 
-  onApplyClick(result: any): void {
+  private handleSearchResponse(response: NominatimSearchResponse, location: Location): void {
+    this.nominatimPlaces = this.sortByDistance(
+      location.latitude,
+      location.longitude,
+      response.result
+    );
+  }
+
+  private handleSearchError(error: unknown): void {
+    console.error('Nominatim search failed', error);
+    this.snackBar.open('Search failed. Please try again later.', 'OK', { duration: 2000 });
+  }
+
+  onApplyClick(): void {
     this.dialogRef.close();
   }
 
@@ -186,13 +202,13 @@ export class NominatimSearchComponent implements OnInit {
     return `${formattedDistance} ${distance >= 1000 ? 'km' : 'm'}`;
   }
 
-  public flyTo(place: NominatimPlace) {
+  public flyTo(place: NominatimPlace): void {
     this.mapService.fitMapToBounds(this.nominatimService.getBoundingBoxFromNominatimPlace(place));
     const result = {
       action: 'saveSearch',
       selectedPlace: place,
       searchValues: {
-        searchterm: this.searchterm.value?.trim() || '',
+        searchterm: this.searchTerm.value.trim(),
         selectedRadius: this.selectedRadius,
         nominatimPlaces: this.nominatimPlaces
       }
@@ -200,11 +216,11 @@ export class NominatimSearchComponent implements OnInit {
     this.dialogRef.close(result);
   }
 
-  lgoinAndAddToMypPlaces(nominatimPlace: NominatimPlace) {
-    this.userService.login(() => this.addToMyPlaces(nominatimPlace))
+  loginAndAddToMyPlaces(nominatimPlace: NominatimPlace): void {
+    this.userService.login(() => this.addToMyPlaces(nominatimPlace));
   }
 
-  addToMyPlaces(nominatimPlace: NominatimPlace) {
+  addToMyPlaces(nominatimPlace: NominatimPlace): void {
     const place: Place = {
       id: '',
       userId: this.userService.getUser().id,
@@ -241,25 +257,36 @@ export class NominatimSearchComponent implements OnInit {
     place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
     place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
     this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-      next: (timezoneResponse: any) => {
-        if (timezoneResponse.status === 200) {
+      next: (response) => {
+        const timezoneResponse = response as TimezoneResponse;
+        if (timezoneResponse.status === 200 && timezoneResponse.timezone) {
           place.timezone = timezoneResponse.timezone;
           this.placeService.createPlace(place)
             .subscribe({
-              next: createPlaceResponse => {
+              next: (createPlaceResponse: CreatePlaceResponse) => {
                 if (createPlaceResponse.status === 200) {
                   place.id = createPlaceResponse.placeId;
                   this.placeService.saveAdditionalPlaceInfos(place);
                   this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
                 }
               },
-              error: (err) => { this.snackBar.open(err.message, 'OK'); },
-              complete: () => { }
+              error: (err) => this.handleCreatePlaceError(err)
             });
+        } else {
+          this.snackBar.open('Failed to resolve timezone for this place.', 'OK', { duration: 2000 });
         }
       },
-      error: (err) => { this.snackBar.open(err.message, 'OK'); },
-      complete: () => { }
+      error: (err) => this.handleTimezoneError(err)
     });
+  }
+
+  private handleCreatePlaceError(error: unknown): void {
+    console.error('Failed to create place', error);
+    this.snackBar.open('Creating the place failed. Please try again.', 'OK', { duration: 2000 });
+  }
+
+  private handleTimezoneError(error: unknown): void {
+    console.error('Timezone lookup failed', error);
+    this.snackBar.open('Unable to determine timezone.', 'OK', { duration: 2000 });
   }
 }

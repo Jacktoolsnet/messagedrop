@@ -1,4 +1,4 @@
 export interface NotificationAction {
     type: 'place' | 'contact' | string;
-    id?: string; // z. B. Pluscode bei place
+    id?: string; // z. B. Pluscode bei place
 }

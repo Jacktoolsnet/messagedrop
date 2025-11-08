@@ -1,6 +1,7 @@
 
-export interface GetUserResponse {
-    status: number,
-    rawUser: any
-}
+import { User } from './user';
 
+export interface GetUserResponse {
+    status: number;
+    rawUser: User;
+}

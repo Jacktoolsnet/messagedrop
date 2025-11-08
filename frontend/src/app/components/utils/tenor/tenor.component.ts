@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, ViewChild, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +12,31 @@ import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { AppService } from '../../../services/app.service';
 import { TenorService } from '../../../services/tenor.service';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
+
+interface TenorGifFormat {
+  url: string;
+}
+
+interface TenorMediaFormats {
+  gif: TenorGifFormat;
+}
+
+interface TenorResult {
+  id: string;
+  itemurl: string;
+  title: string;
+  content_description: string;
+  media_formats: TenorMediaFormats;
+}
+
+interface TenorApiData {
+  results: TenorResult[];
+  next: string;
+}
+
+interface TenorApiResponse {
+  data: TenorApiData;
+}
 
 @Component({
   selector: 'app-multimedia',
@@ -27,24 +52,22 @@ import { EnableExternalContentComponent } from "../enable-external-content/enabl
     EnableExternalContentComponent
   ],
   templateUrl: './tenor.component.html',
-  styleUrl: './tenor.component.css'
+  styleUrl: './tenor.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TenorComponent implements OnInit {
-  @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
+  @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
-  public searchterm: FormControl = new FormControl<string>("");
-  public lastSearchterm = '';
-  public nextFeatured = '';
-  public nextSearch = '';
-  public results: any[] = [];
-  public showTenor = false;
+  readonly searchControl = new FormControl('', { nonNullable: true });
+  lastSearchTerm = '';
+  nextFeatured = '';
+  nextSearch = '';
+  results: TenorResult[] = [];
+  showTenor = false;
 
-  constructor(
-    private appService: AppService,
-    public dialogRef: MatDialogRef<TenorComponent>,
-    private tensorService: TenorService,
-    @Inject(MAT_DIALOG_DATA) public data: {}
-  ) { }
+  private readonly appService = inject(AppService);
+  private readonly dialogRef = inject(MatDialogRef<TenorComponent>);
+  private readonly tenorService = inject(TenorService);
 
   ngOnInit(): void {
     this.showTenor = this.appService.getAppSettings().enableTenorContent;
@@ -56,46 +79,40 @@ export class TenorComponent implements OnInit {
   }
 
   tensorGetFeaturedGifs(): void {
-    this.tensorService.getFeaturedGifs(this.nextFeatured).subscribe({
-      next: tensorResponse => {
-        this.results = [];
-        this.results.push(...tensorResponse.data.results);
-        this.nextFeatured = tensorResponse.data.next;
-        this.nextSearch = '';
-      },
-      error: (err) => { },
-      complete: () => { }
+    this.tenorService.getFeaturedGifs(this.nextFeatured).subscribe({
+      next: (tensorResponse: TenorApiResponse) => this.updateResults(tensorResponse, 'featured'),
+      error: (error) => this.handleTenorError(error)
     });
   }
 
   tensorSearchGifs(): void {
-    this.tensorService.searchGifs(this.searchterm.value, this.nextSearch).subscribe({
-      next: tensorResponse => {
-        this.results = [];
-        this.results.push(...tensorResponse.data.results);
-        this.nextSearch = tensorResponse.data.next;
-        this.nextFeatured = '';
-      },
-      error: (err) => { },
-      complete: () => { }
+    const term = this.searchControl.value.trim();
+    if (!term) {
+      this.tensorGetFeaturedGifs();
+      return;
+    }
+
+    this.tenorService.searchGifs(term, this.nextSearch).subscribe({
+      next: (tensorResponse: TenorApiResponse) => this.updateResults(tensorResponse, 'search'),
+      error: (error) => this.handleTenorError(error)
     });
   }
 
   search(): void {
-    // Fokus entfernen → Tastatur schließt sich
-    this.searchInput.nativeElement.blur();
-    if (this.searchterm.value === '') {
+    this.searchInput?.nativeElement.blur();
+    const currentTerm = this.searchControl.value.trim();
+    if (!currentTerm) {
       this.tensorGetFeaturedGifs();
     } else {
-      if (this.searchterm.value !== this.lastSearchterm) {
-        this.lastSearchterm = this.searchterm.value;
+      if (currentTerm !== this.lastSearchTerm) {
+        this.lastSearchTerm = currentTerm;
         this.nextSearch = '';
       }
       this.tensorSearchGifs();
     }
   }
 
-  onApplyClick(result: any): void {
+  onApplyClick(result: TenorResult): void {
     const multimedia: Multimedia = {
       type: MultimediaType.TENOR,
       url: result.media_formats.gif.url,
@@ -120,5 +137,20 @@ export class TenorComponent implements OnInit {
     }
   }
 
-}
+  private updateResults(response: TenorApiResponse, mode: 'featured' | 'search'): void {
+    this.results = response.data.results;
+    if (mode === 'featured') {
+      this.nextFeatured = response.data.next;
+      this.nextSearch = '';
+    } else {
+      this.nextSearch = response.data.next;
+      this.nextFeatured = '';
+    }
+  }
 
+  private handleTenorError(error: unknown): void {
+    console.error('Tenor request failed', error);
+    this.results = [];
+  }
+
+}

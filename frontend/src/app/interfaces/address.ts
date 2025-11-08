@@ -12,5 +12,5 @@ export interface Address {
     country?: string;
     country_code?: string;
     hamlet?: string;
-    [key: string]: any;
+    [key: string]: string | undefined;
 }

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, ViewChild, OnInit } from '@angular/core';
+import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import QRCode from 'qrcode';
@@ -20,14 +20,16 @@ import QRCode from 'qrcode';
 export class QrcodeComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
-  constructor(@Inject(MAT_DIALOG_DATA) public data: { qrData: string }) { }
+  private readonly dialogData = inject<{ qrData: string }>(MAT_DIALOG_DATA);
 
   ngOnInit(): void {
-    QRCode.toCanvas(this.canvasRef.nativeElement, this.data.qrData, {
+    QRCode.toCanvas(this.canvasRef.nativeElement, this.dialogData.qrData, {
       width: 256,
       errorCorrectionLevel: 'M'
-    }, (error: any) => {
-      if (error) console.error(error);
+    }, (error?: Error | null) => {
+      if (error) {
+        console.error('Failed to render QR code', error);
+      }
     });
   }
 

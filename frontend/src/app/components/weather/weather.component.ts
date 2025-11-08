@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
@@ -13,6 +13,7 @@ import { Location } from '../../interfaces/location';
 import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
+import { WeatherTile, WeatherTileType } from './weather-tile.interface';
 
 @Component({
   selector: 'app-weather',
@@ -33,33 +34,21 @@ import { WeatherDetailComponent } from './weather-detail/weather-detail.componen
 })
 export class WeatherComponent implements OnInit {
 
-  weather: Weather | null = null;
-  location: Location;
-  tiles: {
-    type: string;
-    label: string;
-    icon: string;
-    value: string;
-    levelText: string;
-    minMax: { min: number, max: number }
-  }[] = [];
+  private readonly dialogData = inject<{ weather: Weather; location: Location }>(MAT_DIALOG_DATA);
+
+  weather: Weather | null = this.dialogData.weather;
+  location: Location = this.dialogData.location;
+  tiles: WeatherTile[] = [];
 
   selectedDayIndex = 0;
   selectedHour = 0;
 
-  selectedTile: any = null;
+  selectedTile: WeatherTile | null = null;
   tileIndex = 0;
 
   locationName$: Observable<string> | undefined;
 
-  constructor(
-    private nomatinService: NominatimService,
-    private dialogRef: MatDialogRef<WeatherComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { weather: Weather, location: Location }
-  ) {
-    this.weather = this.data.weather;
-    this.location = this.data.location;
-  }
+  private readonly nomatinService = inject(NominatimService);
 
   ngOnInit(): void {
     this.selectedHour = new Date().getHours();
@@ -67,8 +56,9 @@ export class WeatherComponent implements OnInit {
     this.updateTiles(true);
   }
 
-  onTileClick(tile: any): void {
-    if (tile.value == null || tile.value === 0) return;
+  onTileClick(tile: WeatherTile): void {
+    const numericValue = this.getTileNumericValue(tile.type);
+    if (numericValue == null || numericValue === 0) return;
     this.selectedTile = tile;
     this.tileIndex = this.tiles.findIndex(t => t.type === tile.type);
   }
@@ -133,17 +123,13 @@ export class WeatherComponent implements OnInit {
     }
 
     const make = (
-      type: string,
+      type: WeatherTileType,
       label: string,
       icon: string,
       value: string,
       levelText: string,
-      minMax: { min: number, max: number }
-    ) => ({ type, label, icon, value, levelText, minMax });
-
-    const timeList = hourly
-      .filter(h => h.time.startsWith(date))
-      .map(h => h.time);
+      minMax: { min: number; max: number }
+    ): WeatherTile => ({ type, label, icon, value, levelText, minMax });
 
     this.tiles = [
       make(
@@ -197,7 +183,7 @@ export class WeatherComponent implements OnInit {
     ];
   }
 
-  getTileNumericValue(type: string): number | null {
+  getTileNumericValue(type: WeatherTileType): number | null {
     const hourly = this.weather?.hourly;
     const date = this.weather?.daily[this.selectedDayIndex]?.date;
     if (!hourly || !date) return null;
@@ -220,7 +206,7 @@ export class WeatherComponent implements OnInit {
     }
   }
 
-  getTileColor(type: string, value: number | null): string {
+  getTileColor(type: WeatherTileType, value: number | null): string {
     if (value == null) return '';
     const isDarkMode = document.body.classList.contains('dark');
 
@@ -275,7 +261,7 @@ export class WeatherComponent implements OnInit {
     );
   }
 
-  getTileLevel(type: string, value: number): string {
+  getTileLevel(type: WeatherTileType, value: number): string {
     switch (type) {
       case 'temperature':
         if (value < 0) return 'Freezing';

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, OnInit, signal } from '@angular/core';
+import { Component, effect, OnInit, signal, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -33,17 +33,17 @@ import { DeleteSystemNotificationComponent } from '../delete-system-notification
 })
 export class SystemMessageDialogComponent implements OnInit {
 
+  private readonly systemNotificationService = inject(SystemNotificationService);
+  private readonly dialogRef = inject(MatDialogRef<SystemMessageDialogComponent>);
+  private readonly dialog = inject(MatDialog);
+
   readonly notifications = this.systemNotificationService.getNotificationsSignal();
   readonly currentFilter = this.systemNotificationService.getFilterSignal();
   readonly loading = this.systemNotificationService.getLoadingSignal();
 
   readonly selectedNotification = signal<SystemNotification | null>(null);
 
-  constructor(
-    private readonly systemNotificationService: SystemNotificationService,
-    private readonly dialogRef: MatDialogRef<SystemMessageDialogComponent>,
-    private readonly dialog: MatDialog
-  ) {
+  constructor() {
     effect(() => {
       const items = this.notifications();
       const current = this.selectedNotification();
@@ -80,7 +80,7 @@ export class SystemMessageDialogComponent implements OnInit {
     await this.systemNotificationService.loadNotifications(this.currentFilter());
   }
 
-  async selectNotification(notification: SystemNotification, event?: MouseEvent): Promise<void> {
+  async selectNotification(notification: SystemNotification, event?: Event): Promise<void> {
     event?.stopPropagation();
     this.selectedNotification.set(notification);
     if (notification.status === 'unread') {

@@ -1,4 +1,4 @@
-import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, Input, NgZone, OnDestroy, inject } from '@angular/core';
 
 @Directive({
   selector: '[appMasonryItem]',
@@ -20,8 +20,8 @@ export class MasonryItemDirective implements AfterViewInit, OnDestroy {
   private rafId?: number;
   private lastReflowAt = 0;
   private imgLoadListeners: (() => void)[] = [];
-
-  constructor(private el: ElementRef<HTMLElement>, private zone: NgZone) { }
+  private readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly zone = inject(NgZone);
 
   ngAfterViewInit(): void {
     this.zone.runOutsideAngular(() => {

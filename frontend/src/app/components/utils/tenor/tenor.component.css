@@ -26,6 +26,19 @@
     border-radius: 1rem;
 }
 
+.gif-button {
+    border: none;
+    padding: 0;
+    background: transparent;
+    width: 100%;
+    display: block;
+}
+
+.gif-button:focus-visible {
+    outline: 2px solid var(--mat-fab-small-container-color);
+    outline-offset: 2px;
+}
+
 
 @media (min-width: 768px) {
     .gallery {

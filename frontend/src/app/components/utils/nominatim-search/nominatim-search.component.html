@@ -1,5 +1,5 @@
 <div class="searchTerm-container">
-    <input #searchInput type="search" enterkeyhint="search" [formControl]="searchterm" (keyup.enter)="search()"
+    <input #searchInput type="search" enterkeyhint="search" [formControl]="searchTerm" (keyup.enter)="search()"
         placeholder="Search in OpenStreetMap">
 
     <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
@@ -40,7 +40,7 @@
 
             <mat-card-actions class="buttonbar">
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
-                    (click)="!userService.isReady() ? lgoinAndAddToMypPlaces(place) : addToMyPlaces(place)">
+                    (click)="!userService.isReady() ? loginAndAddToMyPlaces(place) : addToMyPlaces(place)">
                     <mat-icon>add_location</mat-icon>
                 </button>
 

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Buffer } from 'buffer';
 import { catchError, throwError } from 'rxjs';
@@ -26,13 +26,11 @@ export class ConnectService {
     })
   };
 
-  constructor(
-    private contactService: ContactService,
-    private cryptoService: CryptoService,
-    private http: HttpClient,
-    private snackBar: MatSnackBar,
-    private networkService: NetworkService
-  ) { }
+  private readonly contactService = inject(ContactService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly http = inject(HttpClient);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -82,10 +80,10 @@ export class ConnectService {
       .subscribe({
         next: getConnectResponse => {
           if (getConnectResponse.status === 200) {
-            const buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature))
+            const buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature));
             const signature = buffer.buffer.slice(
               buffer.byteOffset, buffer.byteOffset + buffer.byteLength
-            )
+            );
             // Informations from connect record.
             contact.contactUserId = getConnectResponse.connect.userId;
             contact.hint = getConnectResponse.connect.hint;
@@ -93,7 +91,7 @@ export class ConnectService {
             contact.contactUserSigningPublicKey = JSON.parse(getConnectResponse.connect.signingPublicKey);
             contact.contactSignature = signature;
             // For Development check equal. Change to not equal for production.
-            if (contact.contactUserId != contact.userId && contact.contactUserSigningPublicKey) {
+            if (contact.contactUserId !== contact.userId && contact.contactUserSigningPublicKey) {
               // Verify data
               this.cryptoService.verifySignature(contact.contactUserSigningPublicKey, contact.contactUserId, contact.contactSignature!)
                 .then((valid: boolean) => {
@@ -114,8 +112,10 @@ export class ConnectService {
             }
           }
         },
-        error: (err) => { this.snackBar.open(`Connect id not found.`, 'OK'); },
-        complete: () => { }
+        error: (error) => {
+          console.error('Failed to load connect record', error);
+          this.snackBar.open(`Connect id not found.`, 'OK');
+        }
       });
   }
 
@@ -137,11 +137,14 @@ export class ConnectService {
       )
       .subscribe({
         next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) { }
+          if (simpleStatusResponse.status !== 200) {
+            this.snackBar.open('Failed to delete connect record.', 'OK');
+          }
         },
-        error: (err) => {
-        },
-        complete: () => { }
+        error: (error) => {
+          console.error('Failed to delete connect', error);
+          this.snackBar.open('Unable to delete connect record.', 'OK');
+        }
       });
   }
 }

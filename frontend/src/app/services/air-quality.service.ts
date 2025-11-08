@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AirQualityData } from '../interfaces/air-quality-data';
@@ -17,10 +17,8 @@ export class AirQualityService {
     })
   };
 
-  constructor(
-    private http: HttpClient,
-    private networkService: NetworkService
-  ) { }
+  private readonly http = inject(HttpClient);
+  private readonly networkService = inject(NetworkService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);

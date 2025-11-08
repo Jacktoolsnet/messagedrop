@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, output, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -50,7 +50,7 @@ export class EvidenceInputComponent {
   readonly urlRemove = output<string>();
   readonly fileRemove = output<string>();
 
-  constructor(private readonly fb: FormBuilder) {}
+  private readonly fb = inject(FormBuilder);
 
   readonly form = this.fb.nonNullable.group({
     url: ['', [Validators.maxLength(2048)]]

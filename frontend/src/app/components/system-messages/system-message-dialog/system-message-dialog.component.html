@@ -118,7 +118,10 @@
       </div>
       } @else {
       @for (notification of notifications(); track trackByUuid($index, notification)) {
-      <a mat-list-item class="notification-item" (click)="selectNotification(notification, $event)"
+      <a mat-list-item class="notification-item" role="button" tabindex="0"
+        (click)="selectNotification(notification, $event)"
+        (keyup.enter)="selectNotification(notification, $event)"
+        (keyup.space)="selectNotification(notification, $event)"
         [class.active]="selectedNotification()?.uuid === notification.uuid">
         <mat-icon class="material-symbols-outlined" matListItemIcon>
           {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}

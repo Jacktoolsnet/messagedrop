@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -20,9 +20,8 @@ import { DisplayMessageConfig } from '../../../interfaces/display-message-config
 export class DisplayMessage implements OnInit {
   public showOk = false;
 
-  constructor(
-    public dialogRef: MatDialogRef<DisplayMessage>,
-    @Inject(MAT_DIALOG_DATA) public data: DisplayMessageConfig) { }
+  readonly dialogRef = inject(MatDialogRef<DisplayMessage>);
+  readonly data = inject<DisplayMessageConfig>(MAT_DIALOG_DATA);
 
   ngOnInit(): void {
     setTimeout(() => {

@@ -1,13 +1,13 @@
 @if (showTenor) {
 <div class="url-container">
-    <input #searchInput type="search" enterKeyHint="search" [formControl]="searchterm" (keyup.enter)="search()"
+    <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
         placeholder="Search in Tenor" />
 
     <button (click)="search()">
         @if (
-        (nextSearch === '' && searchterm.value !== '') ||
-        (searchterm.value !== lastSearchterm) ||
-        (searchterm.value === '')
+        (nextSearch === '' && searchControl.value !== '') ||
+        (searchControl.value !== lastSearchTerm) ||
+        (searchControl.value === '')
         ) {
         <mat-icon class="material-symbols-outlined">search</mat-icon>
         } @else {
@@ -22,7 +22,9 @@
     <div class="gallery">
         @for (result of results; track result.id) {
         <div>
-            <img [src]="result.media_formats.gif.url" alt="Gif" (click)="onApplyClick(result)" />
+            <button type="button" class="gif-button" (click)="onApplyClick(result)" aria-label="Select GIF">
+                <img [src]="result.media_formats.gif.url" alt="Gif result" />
+            </button>
         </div>
         }
     </div>

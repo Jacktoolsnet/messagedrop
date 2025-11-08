@@ -17,7 +17,8 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
-      <img class="avatar" [src]="userService.getProfile().base64Avatar" /><br />
+      <img class="avatar" [src]="userService.getProfile().base64Avatar"
+        [attr.alt]="userService.getProfile().name ? userService.getProfile().name + ' avatar' : 'Profile avatar'" /><br />
     </div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">

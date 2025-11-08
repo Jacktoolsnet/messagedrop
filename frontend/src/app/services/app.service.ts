@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { AppSettings } from '../interfaces/app-settings';
 import { NotificationAction } from '../interfaces/notification-action';
 import { IndexedDbService } from './indexed-db.service';
@@ -17,9 +17,7 @@ export class AppService {
   private appSettings: AppSettings | undefined;
   private notificationAction?: NotificationAction;
 
-  constructor(
-    private indexedDbService: IndexedDbService
-  ) { }
+  private readonly indexedDbService = inject(IndexedDbService);
 
   // Irgendwo oben im Service:
   private readonly defaultAppSettings: AppSettings = {
