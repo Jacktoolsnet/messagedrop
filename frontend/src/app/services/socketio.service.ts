@@ -31,8 +31,8 @@ export class SocketioService {
       withCredentials: true
     }
   };
-  private ready: boolean = false;
-  private joinedUserRoom: boolean = false;
+  private ready = false;
+  private joinedUserRoom = false;
 
   constructor(
     public dialog: MatDialog,
@@ -145,7 +145,7 @@ export class SocketioService {
   public initUserSocketEvents() {
     // User room.
     this.socket.emit('user:joinUserRoom', this.userService.getUser().id);
-    this.socket.on(`${this.userService.getUser().id}`, (payload: { status: number, type: String, content: any }) => {
+    this.socket.on(`${this.userService.getUser().id}`, (payload: { status: number, type: string, content: any }) => {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
@@ -227,7 +227,7 @@ export class SocketioService {
           messageSignatureBuffer.byteOffset, messageSignatureBuffer.byteOffset + messageSignatureBuffer.byteLength
         )
         this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, payload.envelope.userId, messageSignature)
-          .then((valid: Boolean) => {
+          .then((valid: boolean) => {
             if (valid) {
               contact.contactUserMessageVerified = true;
               if (payload.envelope.contactUserEncryptedMessage) {
@@ -238,7 +238,7 @@ export class SocketioService {
                       // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
                     } else {
-                      let errorMessage: ShortMessage = {
+                      const errorMessage: ShortMessage = {
                         message: 'Message cannot be decrypted!',
                         multimedia: {
                           type: MultimediaType.UNDEFINED,
@@ -259,7 +259,7 @@ export class SocketioService {
               }
             } else {
               contact.contactUserMessageVerified = false;
-              let errorMessage: ShortMessage = {
+              const errorMessage: ShortMessage = {
                 message: 'ignature could not be verified!',
                 multimedia: {
                   type: MultimediaType.UNDEFINED,

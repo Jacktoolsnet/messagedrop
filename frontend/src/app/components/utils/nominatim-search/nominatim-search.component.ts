@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -41,12 +41,12 @@ import { UserService } from '../../../services/user.service';
   templateUrl: './nominatim-search.component.html',
   styleUrl: './nominatim-search.component.css'
 })
-export class NominatimSearchComponent {
+export class NominatimSearchComponent implements OnInit {
 
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
   searchterm: FormControl = new FormControl<string>("");
 
-  selectedRadius: number = 0; // z. B. 1000 = 1km
+  selectedRadius = 0; // z. B. 1000 = 1km
   radiusOptions = [
     { value: 0, label: 'Worldwide' },
     { value: 1000, label: '1 km' },
@@ -188,7 +188,7 @@ export class NominatimSearchComponent {
 
   public flyTo(place: NominatimPlace) {
     this.mapService.fitMapToBounds(this.nominatimService.getBoundingBoxFromNominatimPlace(place));
-    let result = {
+    const result = {
       action: 'saveSearch',
       selectedPlace: place,
       searchValues: {
@@ -205,7 +205,7 @@ export class NominatimSearchComponent {
   }
 
   addToMyPlaces(nominatimPlace: NominatimPlace) {
-    let place: Place = {
+    const place: Place = {
       id: '',
       userId: this.userService.getUser().id,
       name: '',

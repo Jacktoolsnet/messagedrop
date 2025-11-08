@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { BoundingBox } from '../../../interfaces/bounding-box';
@@ -20,20 +20,18 @@ import { WeatherComponent } from '../../weather/weather.component';
   templateUrl: './weather-tile.component.html',
   styleUrl: './weather-tile.component.css'
 })
-export class WeatherTileComponent implements OnInit, OnDestroy {
+export class WeatherTileComponent implements OnInit {
   @Input() place!: Place;
 
   weather: Weather | undefined;
   weatherIcon: string | undefined;
   minMax: { min: number, max: number } | undefined;
 
-  public constructor(
-    private userService: UserService,
-    private placeService: PlaceService,
-    private weatherService: WeatherService,
-    private geolocationService: GeolocationService,
-    private dialog: MatDialog,
-  ) { }
+  private readonly userService = inject(UserService);
+  private readonly placeService = inject(PlaceService);
+  private readonly weatherService = inject(WeatherService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly dialog = inject(MatDialog);
 
   ngOnInit(): void {
     if (this.place.datasets.weatherDataset.data) {
@@ -49,12 +47,10 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void { }
-
   private getWeather() {
-    let boundingBox: BoundingBox | undefined = this.place.boundingBox;
+    const boundingBox: BoundingBox | undefined = this.place.boundingBox;
     if (boundingBox) {
-      let location: Location = this.geolocationService.getCenterOfBoundingBox(boundingBox)
+      const location: Location = this.geolocationService.getCenterOfBoundingBox(boundingBox);
       this.weatherService
         .getWeather(
           this.userService.getUser().language?.slice(0, 2) || 'de',
@@ -71,7 +67,11 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
             this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
             this.minMax = this.getHourlyMinMax('temperature');
           },
-          error: (err) => { }
+          error: () => {
+            this.weather = undefined;
+            this.weatherIcon = undefined;
+            this.minMax = undefined;
+          }
         });
     }
   }
@@ -114,8 +114,8 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
   }
 
   openWeatherDetails(): void {
-    let boundingBox: BoundingBox | undefined = this.place.boundingBox;
-    const dialogRef = this.dialog.open(WeatherComponent, {
+    const boundingBox: BoundingBox | undefined = this.place.boundingBox;
+    this.dialog.open(WeatherComponent, {
       data: { weather: this.weather, location: this.geolocationService.getCenterOfBoundingBox(boundingBox!) },
       closeOnNavigation: true,
       minWidth: '90vw',
@@ -127,11 +127,6 @@ export class WeatherTileComponent implements OnInit, OnDestroy {
       hasBackdrop: true,
       autoFocus: false
     });
-
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe();
   }
 
   getHourlyMinMax(field: 'temperature' | 'precipitationProbability' | 'precipitation' | 'wind' | 'pressure' | 'uvIndex'): { min: number, max: number } {

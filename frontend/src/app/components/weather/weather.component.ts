@@ -35,14 +35,14 @@ export class WeatherComponent implements OnInit {
 
   weather: Weather | null = null;
   location: Location;
-  tiles: Array<{
+  tiles: {
     type: string;
     label: string;
     icon: string;
     value: string;
     levelText: string;
     minMax: { min: number, max: number }
-  }> = [];
+  }[] = [];
 
   selectedDayIndex = 0;
   selectedHour = 0;
@@ -116,7 +116,7 @@ export class WeatherComponent implements OnInit {
       );
   }
 
-  private updateTiles(init: boolean = false): void {
+  private updateTiles(init = false): void {
     const date = this.weather?.daily[this.selectedDayIndex]?.date;
     const hour = this.selectedHour.toString().padStart(2, '0');
     const hourly = this.weather?.hourly;

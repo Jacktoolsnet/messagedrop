@@ -32,7 +32,7 @@ export class NominatimService {
     return throwError(() => error);
   }
 
-  getNominatimPlaceByLocation(location: Location, showAlways: boolean = false): Observable<GetNominatimAddressResponse> {
+  getNominatimPlaceByLocation(location: Location, showAlways = false): Observable<GetNominatimAddressResponse> {
     const url = `${environment.apiUrl}/nominatim/countryCode/${location.plusCode}/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
@@ -51,7 +51,7 @@ export class NominatimService {
       );
   }
 
-  getNominatimPlaceBySearchTerm(searchTerm: string, limit = 100, showAlways: boolean = false): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTerm(searchTerm: string, limit = 100, showAlways = false): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const encodedTerm = encodeURIComponent(searchTerm);
     const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}`;
 
@@ -71,7 +71,7 @@ export class NominatimService {
     );
   }
 
-  getNominatimPlaceBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000, showAlways: boolean = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000, showAlways = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
@@ -110,7 +110,7 @@ export class NominatimService {
     return boundingBox
   }
 
-  getNominatimPlaceBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 100, boxSize = 5000, showAlways: boolean = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
+  getNominatimPlaceBySearchTermWithViewboxAndBounded(searchTerm: string, latitude: number, longitude: number, bounded = 1, limit = 100, boxSize = 5000, showAlways = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
@@ -167,7 +167,7 @@ export class NominatimService {
   }
 
   getLocationFromNominatimPlace(place: NominatimPlace): Location {
-    let location: Location = {
+    const location: Location = {
       latitude: place.lat,
       longitude: place.lon,
       plusCode: this.geolocationService.getPlusCode(place.lat, place.lon)
@@ -204,7 +204,7 @@ export class NominatimService {
     }
   }
 
-  getFormattedAddress(place: NominatimPlace, joinWith: string = '\n'): string {
+  getFormattedAddress(place: NominatimPlace, joinWith = '\n'): string {
     const address = place.address;
     if (!address) return '';
 
@@ -225,7 +225,7 @@ export class NominatimService {
     return lines.join(joinWith);
   }
 
-  getFormattedStreet(place: NominatimPlace, joinWith: string = '\n'): string {
+  getFormattedStreet(place: NominatimPlace, joinWith = '\n'): string {
     const address = place.address;
     if (!address) return '';
 

@@ -12,7 +12,7 @@ export class NetworkService {
 
   constructor(private displayMessage: MatDialog) { }
 
-  online: boolean = true;
+  online = true;
   private networkMessageMap = new Map<string, DisplayMessageConfig>();
 
   init() {

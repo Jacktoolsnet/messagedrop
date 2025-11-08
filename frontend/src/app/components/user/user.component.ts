@@ -22,7 +22,7 @@ import { UserService } from '../../services/user.service';
 })
 export class UserComponent {
   private snackBarRef: any;
-  public connectHint: string = ``;
+  public connectHint = ``;
 
   constructor(
     public userService: UserService,

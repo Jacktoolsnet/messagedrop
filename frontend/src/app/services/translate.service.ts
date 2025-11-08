@@ -24,8 +24,8 @@ export class TranslateService {
     return throwError(() => error);
   }
 
-  public translate(value: string, language: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/translate/${language}/${value}`;
+  public translate(value: string, language: string, showAlways = false) {
+    const url = `${environment.apiUrl}/translate/${language}/${value}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Translate service',

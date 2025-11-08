@@ -13,8 +13,8 @@ export class ServerService {
   private _serverSet = signal(0);
   readonly serverSet = this._serverSet.asReadonly();
 
-  private ready: boolean = false;
-  private failed: boolean = false;
+  private ready = false;
+  private failed = false;
   private cryptoPublicKey: JsonWebKey | undefined;
   private signingPublicKey: JsonWebKey | undefined;
 

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -10,7 +10,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
-import { StyleService } from '../../../services/style.service';
 
 @Component({
   selector: 'app-place',
@@ -30,7 +29,7 @@ import { StyleService } from '../../../services/style.service';
   templateUrl: './place-profile.component.html',
   styleUrl: './place-profile.component.css'
 })
-export class PlaceProfileComponent implements OnInit {
+export class PlaceProfileComponent {
 
   private maxFileSize = 5 * 1024 * 1024; // 5MB
   private oriName: string | undefined = undefined;
@@ -38,7 +37,6 @@ export class PlaceProfileComponent implements OnInit {
   private oriIcon: string | undefined = undefined;
 
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
-  private readonly style = inject(StyleService);
   private readonly snackBar = inject(MatSnackBar);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
@@ -46,9 +44,6 @@ export class PlaceProfileComponent implements OnInit {
     this.oriName = this.data.place.name;
     this.oriBase64Avatar = this.data.place.base64Avatar;
     this.oriIcon = this.data.place.icon;
-  }
-
-  ngOnInit(): void {
   }
 
   onApplyClick(): void {

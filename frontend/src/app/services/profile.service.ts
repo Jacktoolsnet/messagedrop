@@ -7,7 +7,7 @@ import { IndexedDbService } from './indexed-db.service';
 })
 export class ProfileService {
 
-  private profiles: Map<string, Profile> = new Map();
+  private profiles = new Map<string, Profile>();
 
   constructor(
     private indexedDbService: IndexedDbService

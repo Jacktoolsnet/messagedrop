@@ -17,7 +17,7 @@ export class EnableLocationComponent implements OnInit {
   @Input() checkedOverride?: boolean;
 
   /** Optional: Privacy-Policy URL (default: '/privacy') */
-  @Input() privacyUrl: string = '/privacy';
+  @Input() privacyUrl = '/privacy';
 
   /** Emits when toggled */
   @Output() enabledChange = new EventEmitter<boolean>();

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild, OnInit } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import QRCode from 'qrcode';
@@ -17,7 +17,7 @@ import QRCode from 'qrcode';
   templateUrl: './qrcode.component.html',
   styleUrl: './qrcode.component.css'
 })
-export class QrcodeComponent {
+export class QrcodeComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
   constructor(@Inject(MAT_DIALOG_DATA) public data: { qrData: string }) { }

@@ -15,13 +15,13 @@ import { Profile } from '../interfaces/profile';
   providedIn: 'root'
 })
 export class IndexedDbService {
-  private dbName: string = 'MessageDrop';
-  private settingStore: string = 'setting';
-  private userStore: string = 'user';
-  private profileStore: string = 'profile';
-  private contactProfileStore: string = 'contactprofile';
-  private placeStore: string = 'place';
-  private noteStore: string = 'note';
+  private dbName = 'MessageDrop';
+  private settingStore = 'setting';
+  private userStore = 'user';
+  private profileStore = 'profile';
+  private contactProfileStore = 'contactprofile';
+  private placeStore = 'place';
+  private noteStore = 'note';
 
   private compress(value: any): string {
     return compressToUTF16(JSON.stringify(value));
@@ -569,7 +569,7 @@ export class IndexedDbService {
       const request = store.getAll();
       request.onsuccess = () => {
         const compressedNotes = request.result as string[];
-        let notes: Note[] = [];
+        const notes: Note[] = [];
         compressedNotes.forEach(compressedNote => {
           notes.push(this.decompress<any>(compressedNote))
         })

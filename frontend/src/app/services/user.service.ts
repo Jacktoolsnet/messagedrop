@@ -62,8 +62,8 @@ export class UserService {
 
   private tokenRenewalTimeout: any = null;
 
-  private ready: boolean = false;
-  private blocked: boolean = false;
+  private ready = false;
+  private blocked = false;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -121,9 +121,9 @@ export class UserService {
     this.initUserId();
   }
 
-  getPinHash(pin: string, showAlways: boolean = false): Observable<GetPinHashResponse> {
+  getPinHash(pin: string, showAlways = false): Observable<GetPinHashResponse> {
     this.blocked = true;
-    let url = `${environment.apiUrl}/user/hashpin`;
+    const url = `${environment.apiUrl}/user/hashpin`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -134,7 +134,7 @@ export class UserService {
       delay: 0,
       showSpinner: true
     });
-    let body = { pin: pin };
+    const body = { pin: pin };
     return this.http.post<GetPinHashResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
@@ -156,7 +156,7 @@ export class UserService {
   }
 
   async initUserId() {
-    let user = await this.indexedDbService.getUser();
+    const user = await this.indexedDbService.getUser();
     if (user) {
       this.user.id = user.id;
       this.loadProfile();
@@ -283,8 +283,8 @@ export class UserService {
     this.profile = await this.indexedDbService.getProfile(this.user.id)
   }
 
-  createUser(showAlways: boolean = true): Observable<CreateUserResponse> {
-    let url = `${environment.apiUrl}/user/create`;
+  createUser(showAlways = true): Observable<CreateUserResponse> {
+    const url = `${environment.apiUrl}/user/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -295,15 +295,15 @@ export class UserService {
       delay: 0,
       showSpinner: true
     });
-    let body = {};
+    const body = {};
     return this.http.post<CreateUserResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
-  confirmUser(pinHash: string, cryptedUser: CryptedUser, showAlways: boolean = true): Observable<ConfirmUserResponse> {
-    let url = `${environment.apiUrl}/user/confirm`;
+  confirmUser(pinHash: string, cryptedUser: CryptedUser, showAlways = true): Observable<ConfirmUserResponse> {
+    const url = `${environment.apiUrl}/user/confirm`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -314,7 +314,7 @@ export class UserService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       pinHash: pinHash,
       cryptedUser: cryptedUser,
     };
@@ -332,7 +332,7 @@ export class UserService {
   }
 
   private renewJwt(): void {
-    let url = `${environment.apiUrl}/user/renewjwt/`;
+    const url = `${environment.apiUrl}/user/renewjwt/`;
     this.http.get<{ token: string }>(url, this.httpOptions).subscribe({
       next: (res) => {
         if (res.token) {
@@ -419,8 +419,8 @@ export class UserService {
     }, delay);
   }
 
-  getUserById(userId: string, showAlways: boolean = false): Observable<GetUserResponse> {
-    let url = `${environment.apiUrl}/user/get/${userId}`;
+  getUserById(userId: string, showAlways = false): Observable<GetUserResponse> {
+    const url = `${environment.apiUrl}/user/get/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -437,8 +437,8 @@ export class UserService {
       );
   }
 
-  getUserMessages(user: User, showAlways: boolean = false): Observable<GetMessageResponse> {
-    let url = `${environment.apiUrl}/message/get/userId/${user.id}`;
+  getUserMessages(user: User, showAlways = false): Observable<GetMessageResponse> {
+    const url = `${environment.apiUrl}/message/get/userId/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -455,8 +455,8 @@ export class UserService {
       );
   }
 
-  deleteUser(userId: string, showAlways: boolean = false): Observable<SimpleStatusResponse> {
-    let url = `${environment.apiUrl}/user/delete/${userId}`;
+  deleteUser(userId: string, showAlways = false): Observable<SimpleStatusResponse> {
+    const url = `${environment.apiUrl}/user/delete/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -473,8 +473,8 @@ export class UserService {
       );
   }
 
-  subscribe(user: User, subscription: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/user/subscribe`;
+  subscribe(user: User, subscription: string, showAlways = false) {
+    const url = `${environment.apiUrl}/user/subscribe`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -485,7 +485,7 @@ export class UserService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'userId': user.id,
       'subscription': subscription,
     };
@@ -495,8 +495,8 @@ export class UserService {
       );
   }
 
-  unsubscribe(user: User, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/user/unsubscribe/${user.id}`;
+  unsubscribe(user: User, showAlways = false) {
+    const url = `${environment.apiUrl}/user/unsubscribe/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'User service',
@@ -518,7 +518,7 @@ export class UserService {
       serverPublicKey: environment.vapid_public_key
     })
       .then(subscription => {
-        let subscriptionJson = JSON.stringify(subscription);
+        const subscriptionJson = JSON.stringify(subscription);
         // Save subscription to user.
         this.subscribe(user, subscriptionJson)
           .subscribe({
@@ -541,8 +541,8 @@ export class UserService {
   }
 
   getLanguageForLocation(location: string): string {
-    let language: string = '';
-    let switchLocation: string = location.split('-').length === 2 ? location.split('-')[1].toUpperCase() : location.split('-')[0].toUpperCase();
+    let language = '';
+    const switchLocation: string = location.split('-').length === 2 ? location.split('-')[1].toUpperCase() : location.split('-')[0].toUpperCase();
     switch (switchLocation) {
       case 'AR':
         language = 'AR';
@@ -767,7 +767,7 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
 
     dialogRef.afterClosed().subscribe(async (data: any) => {
       if (data === 'reset') {
-        let cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
+        const cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
         if (cryptedUser) {
           this.deleteUser(cryptedUser.id)
             .subscribe({

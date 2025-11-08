@@ -27,8 +27,8 @@ export class OpenAiService {
     return throwError(() => error);
   }
 
-  public moderateMessage(message: Message, showAlways: boolean = false): Observable<any> {
-    let url = `${environment.apiUrl}/openai/moderate`;
+  public moderateMessage(message: Message, showAlways = false): Observable<any> {
+    const url = `${environment.apiUrl}/openai/moderate`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Moderation service',
@@ -39,7 +39,7 @@ export class OpenAiService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'message': message.message
     };
     return this.http.post<any>(url, body, this.httpOptions)

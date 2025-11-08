@@ -10,17 +10,17 @@ import { PlusCodeArea } from '../interfaces/plus-code-area';
 })
 export class GeolocationService {
 
-  private watchID: number = 0;
+  private watchID = 0;
 
   constructor() { }
 
   public getPlusCode(latitude: number, longitude: number): string {
-    let plusCode = OpenLocationCode.encode(latitude, longitude, 10);
+    const plusCode = OpenLocationCode.encode(latitude, longitude, 10);
     return plusCode || '';
   }
 
   public getLocationFromPlusCode(plusCode: string): Location {
-    let location: Location = {
+    const location: Location = {
       latitude: OpenLocationCode.decode(plusCode)?.latitudeCenter || 0,
       longitude: OpenLocationCode.decode(plusCode)?.longitudeCenter || 0,
       plusCode: plusCode
@@ -29,7 +29,7 @@ export class GeolocationService {
   }
 
   public getPlusCodeBasedOnMapZoom(location: Location, zoom: number): string {
-    let plusCode: string = '';
+    let plusCode = '';
     switch (zoom) {
       case 19:
       case 18:
@@ -58,7 +58,7 @@ export class GeolocationService {
   }
 
   public getGroupedPlusCodeBasedOnMapZoom(location: Location, zoom: number): string {
-    let plusCode: string = '';
+    let plusCode = '';
     switch (zoom) {
       case 19:
       case 18:
@@ -134,20 +134,20 @@ export class GeolocationService {
   }
 
   public getGridFromPlusCode(plusCode: string): PlusCodeArea {
-    let codeAlphabet: string = '23456789CFGHJMPQRVWX';
-    let latitudeMax: number = 90;
-    let longitudeMax: number = 180;
-    let gridRows: number = 9;
-    let gridColumns: number = 18;
-    let latitudeLo: number = 0.0;
-    let longitudeLo: number = 0.0;
-    let pairResolutions: number[] = [20.0, 1.0, .05, .0025, .000125];
-    let gridSizeDegrees: number = 0.0;
-    let latPlaceValue: number = 0.0;
-    let lngPlaceValue: number = 0.0;
-    let latitudeHi: number = 0.0;
-    let longitudeHi: number = 0.0;
-    let i: number = 0;
+    const codeAlphabet = '23456789CFGHJMPQRVWX';
+    const latitudeMax = 90;
+    const longitudeMax = 180;
+    let gridRows = 9;
+    let gridColumns = 18;
+    let latitudeLo = 0.0;
+    let longitudeLo = 0.0;
+    const pairResolutions: number[] = [20.0, 1.0, .05, .0025, .000125];
+    let gridSizeDegrees = 0.0;
+    let latPlaceValue = 0.0;
+    let lngPlaceValue = 0.0;
+    let latitudeHi = 0.0;
+    let longitudeHi = 0.0;
+    let i = 0;
 
     while (i < plusCode.length) {
       if (plusCode.charAt(i) == '+') {
@@ -188,9 +188,9 @@ export class GeolocationService {
       }
       latPlaceValue = gridSizeDegrees;
       lngPlaceValue = gridSizeDegrees;
-      let codeIndexRow: number = codeAlphabet.indexOf(plusCode.charAt(i));
+      const codeIndexRow: number = codeAlphabet.indexOf(plusCode.charAt(i));
       i += 1;
-      let codeIndexColumn: number = codeAlphabet.indexOf(plusCode.charAt(i));
+      const codeIndexColumn: number = codeAlphabet.indexOf(plusCode.charAt(i));
       switch (i) {
         case 1:
           latitudeLo += codeIndexRow * latPlaceValue - 90;
@@ -205,7 +205,7 @@ export class GeolocationService {
       i += 1;
     }
 
-    let plusCodeArea: PlusCodeArea = {
+    const plusCodeArea: PlusCodeArea = {
       latitudeLo,
       longitudeLo,
       latitudeHi,
@@ -254,7 +254,7 @@ export class GeolocationService {
     return { latMin, latMax, lonMin, lonMax };
   }
 
-  public areLocationsNear(loc1: Location, loc2: Location, maxDistanceMeters: number = 20): boolean {
+  public areLocationsNear(loc1: Location, loc2: Location, maxDistanceMeters = 20): boolean {
     const distance = this.getDistanceInMeters(
       loc1.latitude, loc1.longitude,
       loc2.latitude, loc2.longitude

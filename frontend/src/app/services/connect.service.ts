@@ -39,7 +39,7 @@ export class ConnectService {
   }
 
   createConnect(connect: Connect) {
-    let url = `${environment.apiUrl}/connect/create`;
+    const url = `${environment.apiUrl}/connect/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
       title: 'Connect service',
@@ -50,7 +50,7 @@ export class ConnectService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'userId': connect.userId,
       'hint': connect.hint,
       'signature': connect.signature,
@@ -63,8 +63,8 @@ export class ConnectService {
       );
   }
 
-  getById(connectId: string, contact: Contact, socketioService: SocketioService, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/connect/get/${connectId}`;
+  getById(connectId: string, contact: Contact, socketioService: SocketioService, showAlways = false) {
+    const url = `${environment.apiUrl}/connect/get/${connectId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Connect service',
@@ -82,8 +82,8 @@ export class ConnectService {
       .subscribe({
         next: getConnectResponse => {
           if (getConnectResponse.status === 200) {
-            let buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature))
-            var signature = buffer.buffer.slice(
+            const buffer = Buffer.from(JSON.parse(getConnectResponse.connect.signature))
+            const signature = buffer.buffer.slice(
               buffer.byteOffset, buffer.byteOffset + buffer.byteLength
             )
             // Informations from connect record.
@@ -96,7 +96,7 @@ export class ConnectService {
             if (contact.contactUserId != contact.userId && contact.contactUserSigningPublicKey) {
               // Verify data
               this.cryptoService.verifySignature(contact.contactUserSigningPublicKey, contact.contactUserId, contact.contactSignature!)
-                .then((valid: Boolean) => {
+                .then((valid: boolean) => {
                   if (valid) {
                     // Generate Id
                     this.contactService.createContact(contact, socketioService);
@@ -119,8 +119,8 @@ export class ConnectService {
       });
   }
 
-  deleteConnect(connect: Connect, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/connect/delete/${connect.id}`;
+  deleteConnect(connect: Connect, showAlways = false) {
+    const url = `${environment.apiUrl}/connect/delete/${connect.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Connect service',

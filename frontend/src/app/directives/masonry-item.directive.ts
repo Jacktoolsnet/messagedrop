@@ -19,7 +19,7 @@ export class MasonryItemDirective implements AfterViewInit, OnDestroy {
   private winResizeHandler?: () => void;
   private rafId?: number;
   private lastReflowAt = 0;
-  private imgLoadListeners: Array<() => void> = [];
+  private imgLoadListeners: (() => void)[] = [];
 
   constructor(private el: ElementRef<HTMLElement>, private zone: NgZone) { }
 

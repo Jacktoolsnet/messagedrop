@@ -137,8 +137,8 @@ export class OembedService {
 
     if (tiktokMatch && tiktokMatch[3]) {
       this.getTikTokEmbedCode(url)
-      let tiktokId = tiktokMatch[3];
-      let oembedHtml = this.getTikTokEmbedCode(tiktokId);
+      const tiktokId = tiktokMatch[3];
+      const oembedHtml = this.getTikTokEmbedCode(tiktokId);
       return {
         type: MultimediaType.TIKTOK,
         url: '',

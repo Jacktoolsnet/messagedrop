@@ -31,7 +31,7 @@ export class MessageService {
 
   private commentCounts: Record<string, number> = {};
 
-  private lastSearchedLocation: string = '';
+  private lastSearchedLocation = '';
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -82,7 +82,7 @@ export class MessageService {
   }
 
   public mapRawMessages(rawMessages: RawMessage[]): Message[] {
-    let messages: Message[] = [];
+    const messages: Message[] = [];
     rawMessages.forEach(rawMessage => messages.push(this.mapRawMessage(rawMessage)));
     return messages;
   }
@@ -116,8 +116,8 @@ export class MessageService {
     };
   }
 
-  createMessage(message: Message, user: User, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/message/create`;
+  createMessage(message: Message, user: User, showAlways = false) {
+    const url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Message service',
@@ -128,7 +128,7 @@ export class MessageService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       uuid: message.uuid,
       parentMessageId: message.parentId,
       parentUuid: message.parentUuid,
@@ -156,7 +156,7 @@ export class MessageService {
       })
   }
 
-  public createComment(message: Message, user: User, showAlways: boolean = false) {
+  public createComment(message: Message, user: User, showAlways = false) {
     const url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -201,7 +201,7 @@ export class MessageService {
       });
   }
 
-  updateMessage(message: Message, showAlways: boolean = false) {
+  updateMessage(message: Message, showAlways = false) {
     const url = `${environment.apiUrl}/message/update`;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -303,7 +303,7 @@ export class MessageService {
       });
   }
 
-  getByPlusCode(location: Location, showAlways: boolean = false) {
+  getByPlusCode(location: Location, showAlways = false) {
     const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
     const url = `${environment.apiUrl}/message/get/pluscode/${plusCode}`;
 
@@ -340,7 +340,7 @@ export class MessageService {
       });
   }
 
-  getByVisibleMapBoundingBox(showAlways: boolean = false) {
+  getByVisibleMapBoundingBox(showAlways = false) {
     const boundingBoxes = this.mapService.getVisibleMapBoundingBoxes();
     if (boundingBoxes.length === 0) {
       return;
@@ -389,7 +389,7 @@ export class MessageService {
     });
   }
 
-  getByBoundingBox(boundingBox: BoundingBox, showAlways: boolean = false): Observable<GetMessageResponse> {
+  getByBoundingBox(boundingBox: BoundingBox, showAlways = false): Observable<GetMessageResponse> {
     const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -410,7 +410,7 @@ export class MessageService {
   }
 
   navigateToMessageLocation(message: Message) {
-    let url: string = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.location.plusCode)}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.location.plusCode)}`;
     window.open(url, '_blank');
   }
 
@@ -434,7 +434,7 @@ export class MessageService {
       });
   }
 
-  disableMessage(message: Message, showAlways: boolean = false) {
+  disableMessage(message: Message, showAlways = false) {
     const url = `${environment.apiUrl}/message/disable/${message.id}`;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -468,7 +468,7 @@ export class MessageService {
       });
   }
 
-  deleteMessage(message: Message, showAlways: boolean = false) {
+  deleteMessage(message: Message, showAlways = false) {
     const url = `${environment.apiUrl}/message/delete/${message.id}`;
 
     this.networkService.setNetworkMessageConfig(url, {
@@ -513,7 +513,7 @@ export class MessageService {
       });
   }
 
-  public getCommentsForParentMessage(message: Message, showAlways: boolean = false) {
+  public getCommentsForParentMessage(message: Message, showAlways = false) {
     const url = `${environment.apiUrl}/message/get/comment/${message.uuid}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,

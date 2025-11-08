@@ -1,4 +1,4 @@
-import { Component, computed, Inject, OnInit, Signal } from '@angular/core';
+import { Component, computed, Signal, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -11,7 +11,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Mode } from '../../interfaces/mode';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
@@ -21,7 +21,6 @@ import { IndexedDbService } from '../../services/indexed-db.service';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
-import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { AirQualityTileComponent } from './air-quality-tile/air-quality-tile.component';
 import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
@@ -30,6 +29,8 @@ import { MessageTileComponent } from "./message-tile/messagetile.component";
 import { NoteTileComponent } from './note-tile/note-tile.component';
 import { PlaceProfileComponent } from './place-profile/place-profile.component';
 import { WeatherTileComponent } from './weather-tile/weather-tile.component';
+
+interface TimezoneResponse { status: number; timezone: string }
 
 @Component({
   selector: 'app-placelist',
@@ -55,57 +56,46 @@ import { WeatherTileComponent } from './weather-tile/weather-tile.component';
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'
 })
-export class PlacelistComponent implements OnInit {
-  placesSignal: Signal<Place[]>;
+export class PlacelistComponent {
+  private readonly indexedDbService = inject(IndexedDbService);
+  private readonly nominatimService = inject(NominatimService);
+  private readonly mapService = inject(MapService);
+  private readonly geolocationService = inject(GeolocationService);
+  private readonly placeService = inject(PlaceService);
+  readonly userService = inject(UserService);
+  readonly dialogRef = inject(MatDialogRef<PlacelistComponent>);
+  private readonly matDialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly dialogData = inject<unknown>(MAT_DIALOG_DATA);
 
+  readonly placesSignal: Signal<Place[]> = this.placeService.sortedPlacesSignal;
   readonly hasPlaces = computed(() => this.placesSignal().length > 0);
-  private placeToDelete!: Place
+  private placeToDelete?: Place;
   public mode: typeof Mode = Mode;
-  private snackBarRef: any;
-  public subscriptionError: boolean = false;
-
-  constructor(
-    private indexedDbService: IndexedDbService,
-    private nominatimService: NominatimService,
-    private mapService: MapService,
-    private geolocationService: GeolocationService,
-    private placeService: PlaceService,
-    public userService: UserService,
-    public dialogRef: MatDialogRef<PlacelistComponent>,
-    public placeDialog: MatDialog,
-    public dialog: MatDialog,
-    private snackBar: MatSnackBar,
-    private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: {}
-  ) {
-    this.placesSignal = this.placeService.sortedPlacesSignal;
-  }
-
-  ngOnInit(): void {
-  }
+  private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
+  public subscriptionError = false;
 
   public deletePlace(place: Place) {
     this.placeToDelete = place;
-    const dialogRef = this.dialog.open(DeletePlaceComponent, {
+    const dialogRef = this.matDialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
     dialogRef.afterClosed().subscribe(result => {
-      if (result && undefined != this.placeToDelete) {
-        this.placeService.deletePlace(this.placeToDelete.id)
+      if (result && this.placeToDelete) {
+        const target = this.placeToDelete;
+        this.placeService.deletePlace(target.id)
           .subscribe({
             next: (simpleStatusResponse) => {
               if (simpleStatusResponse.status === 200) {
-                this.placeService.removePlace(this.placeToDelete.id);
+                this.placeService.removePlace(target.id);
+                this.placeToDelete = undefined;
               }
             },
-            error: (err) => {
-            },
-            complete: () => { }
+            error: err => {
+              this.snackBar.open(err?.message ?? 'Could not delete the place.', 'OK', { duration: 3000 });
+            }
           });
       }
     });
@@ -113,14 +103,11 @@ export class PlacelistComponent implements OnInit {
 
   public editPlace(place: Place) {
 
-    const dialogRef = this.placeDialog.open(PlaceProfileComponent, {
+    const dialogRef = this.matDialog.open(PlaceProfileComponent, {
       panelClass: '',
       data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -131,8 +118,7 @@ export class PlacelistComponent implements OnInit {
               this.placeService.saveAdditionalPlaceInfos(place);
             }
           },
-          error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-          complete: () => { }
+          error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
         });
     });
   }
@@ -143,31 +129,30 @@ export class PlacelistComponent implements OnInit {
     }
     if (!place.subscribed && Notification.permission === "granted") {
       // subscribe to place
-      this.placeService.subscribe(place)
-        .subscribe({
-          next: (simpleStatusResponse) => {
-            if (simpleStatusResponse.status === 200) {
-              place.subscribed = true;
-              this.placeService.saveAdditionalPlaceInfos(place);
-            }
-          },
-          error: (err) => { },
-          complete: () => { }
-        });
+      this.placeService.subscribe(place).subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            place.subscribed = true;
+            this.placeService.saveAdditionalPlaceInfos(place);
+          }
+        },
+        error: err => {
+          this.snackBar.open(err?.message ?? 'Subscribing failed.', 'OK', { duration: 3000 });
+        }
+      });
     } else {
       // Unsubscribe from place.
-      this.placeService.unsubscribe(place)
-        .subscribe({
-          next: (simpleStatusResponse) => {
-            if (simpleStatusResponse.status === 200) {
-              place.subscribed = false;
-              this.placeService.saveAdditionalPlaceInfos(place);
-            }
-          },
-          error: (err) => {
-          },
-          complete: () => { }
-        });
+      this.placeService.unsubscribe(place).subscribe({
+        next: (simpleStatusResponse) => {
+          if (simpleStatusResponse.status === 200) {
+            place.subscribed = false;
+            this.placeService.saveAdditionalPlaceInfos(place);
+          }
+        },
+        error: err => {
+          this.snackBar.open(err?.message ?? 'Unsubscribing failed.', 'OK', { duration: 3000 });
+        }
+      });
     }
   }
 
@@ -193,8 +178,8 @@ export class PlacelistComponent implements OnInit {
     this.dialogRef.close();
   }
 
-  async addPlace() {
-    let place: Place = {
+  async addPlace(): Promise<void> {
+    const place: Place = {
       id: '',
       userId: this.userService.getUser().id,
       name: '',
@@ -225,40 +210,42 @@ export class PlacelistComponent implements OnInit {
         }
       }
     };
-    let nominatimPlace: NominatimPlace | undefined = undefined;
-    let selectedPlace: string = await this.indexedDbService.getSetting('nominatimSelectedPlace');
-    let isNearby: boolean = false;
+    let nominatimPlace: NominatimPlace | undefined;
+    const selectedPlace = await this.indexedDbService.getSetting('nominatimSelectedPlace');
+    let isNearby = false;
     if (selectedPlace) {
       nominatimPlace = JSON.parse(selectedPlace) as NominatimPlace;
-      isNearby = this.geolocationService.areLocationsNear(this.mapService.getMapLocation(), this.nominatimService.getLocationFromNominatimPlace(nominatimPlace), 50); // innerhalb 50 m
+      isNearby = this.geolocationService.areLocationsNear(
+        this.mapService.getMapLocation(),
+        this.nominatimService.getLocationFromNominatimPlace(nominatimPlace),
+        50
+      ); // innerhalb 50 m
     }
     if (!isNearby) {
       this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation(), true).subscribe({
-        next: ((nominatimAddressResponse: GetNominatimAddressResponse) => {
+        next: (nominatimAddressResponse: GetNominatimAddressResponse) => {
           if (nominatimAddressResponse.status === 200) {
             if (nominatimAddressResponse.nominatimPlace.error) {
               place.location = this.mapService.getMapLocation()
               place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([place.location.plusCode]);
               this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-                next: (timezoneResponse: any) => {
-                  if (timezoneResponse.status === 200) {
-                    place.timezone = timezoneResponse.timezone;
-                    this.placeService.createPlace(place)
-                      .subscribe({
-                        next: createPlaceResponse => {
-                          if (createPlaceResponse.status === 200) {
-                            place.id = createPlaceResponse.placeId;
-                            this.placeService.saveAdditionalPlaceInfos(place);
-                            this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                          }
-                        },
-                        error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                        complete: () => { }
-                      });
+                next: (timezoneResponse) => {
+                  const response = timezoneResponse as TimezoneResponse;
+                  if (response.status === 200 && response.timezone) {
+                    place.timezone = response.timezone;
+                    this.placeService.createPlace(place).subscribe({
+                      next: createPlaceResponse => {
+                        if (createPlaceResponse.status === 200) {
+                          place.id = createPlaceResponse.placeId;
+                          this.placeService.saveAdditionalPlaceInfos(place);
+                          this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                        }
+                      },
+                      error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                    });
                   }
                 },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                complete: () => { }
+                error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
               });
             } else {
               nominatimPlace = nominatimAddressResponse.nominatimPlace;
@@ -267,30 +254,30 @@ export class PlacelistComponent implements OnInit {
               place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
               place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
               this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-                next: (timezoneResponse: any) => {
-                  if (timezoneResponse.status === 200) {
-                    place.timezone = timezoneResponse.timezone;
-                    this.placeService.createPlace(place)
-                      .subscribe({
-                        next: createPlaceResponse => {
-                          if (createPlaceResponse.status === 200) {
-                            place.id = createPlaceResponse.placeId;
-                            this.placeService.saveAdditionalPlaceInfos(place);
-                            this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                          }
-                        },
-                        error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                        complete: () => { }
-                      });
+                next: (timezoneResponse) => {
+                  const response = timezoneResponse as TimezoneResponse;
+                  if (response.status === 200 && response.timezone) {
+                    place.timezone = response.timezone;
+                    this.placeService.createPlace(place).subscribe({
+                      next: createPlaceResponse => {
+                        if (createPlaceResponse.status === 200) {
+                          place.id = createPlaceResponse.placeId;
+                          this.placeService.saveAdditionalPlaceInfos(place);
+                          this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                        }
+                      },
+                      error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                    });
                   }
                 },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                complete: () => { }
+                error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
               });
             }
           }
-        }),
-        error: ((err) => { })
+        },
+        error: () => {
+          this.snackBar.open('Could not determine the current place.', 'OK', { duration: 3000 });
+        }
       });
     } else {
       if (nominatimPlace) {
@@ -299,25 +286,23 @@ export class PlacelistComponent implements OnInit {
         place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
         place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
         this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-          next: (timezoneResponse: any) => {
-            if (timezoneResponse.status === 200) {
-              place.timezone = timezoneResponse.timezone;
-              this.placeService.createPlace(place)
-                .subscribe({
-                  next: createPlaceResponse => {
-                    if (createPlaceResponse.status === 200) {
-                      place.id = createPlaceResponse.placeId;
-                      this.placeService.saveAdditionalPlaceInfos(place);
-                      this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
-                    }
-                  },
-                  error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                  complete: () => { }
-                });
+          next: (timezoneResponse) => {
+            const response = timezoneResponse as TimezoneResponse;
+            if (response.status === 200 && response.timezone) {
+              place.timezone = response.timezone;
+              this.placeService.createPlace(place).subscribe({
+                next: createPlaceResponse => {
+                  if (createPlaceResponse.status === 200) {
+                    place.id = createPlaceResponse.placeId;
+                    this.placeService.saveAdditionalPlaceInfos(place);
+                    this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                  }
+                },
+                error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+              });
             }
           },
-          error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-          complete: () => { }
+          error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
         });
       }
     }

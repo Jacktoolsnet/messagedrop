@@ -21,7 +21,7 @@ export class PlaceService {
 
   private _places = signal<Place[]>([]);
   private _selectedPlace = signal<Place | null>(null);
-  private ready: boolean = false;
+  private ready = false;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -114,8 +114,8 @@ export class PlaceService {
     return this.ready;
   }
 
-  createPlace(place: Place, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/create`;
+  createPlace(place: Place, showAlways = false) {
+    const url = `${environment.apiUrl}/place/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -126,7 +126,7 @@ export class PlaceService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'userId': place.userId,
       'name': place.name,
       'latMin': place.boundingBox?.latMin,
@@ -140,8 +140,8 @@ export class PlaceService {
       );
   }
 
-  updatePlace(place: Place, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/update`;
+  updatePlace(place: Place, showAlways = false) {
+    const url = `${environment.apiUrl}/place/update`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -152,7 +152,7 @@ export class PlaceService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'id': place.id,
       'name': place.name,
       'latMin': place.boundingBox?.latMin,
@@ -166,8 +166,8 @@ export class PlaceService {
       );
   }
 
-  getByUserId(userId: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/get/userId/${userId}`;
+  getByUserId(userId: string, showAlways = false) {
+    const url = `${environment.apiUrl}/place/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -184,8 +184,8 @@ export class PlaceService {
       );
   }
 
-  getById(placeId: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/get/${placeId}`;
+  getById(placeId: string, showAlways = false) {
+    const url = `${environment.apiUrl}/place/get/${placeId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -202,8 +202,8 @@ export class PlaceService {
       );
   }
 
-  getByUserIdAndName(userId: string, name: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
+  getByUserIdAndName(userId: string, name: string, showAlways = false) {
+    const url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -220,8 +220,8 @@ export class PlaceService {
       );
   }
 
-  deletePlace(placeId: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/delete/${placeId}`;
+  deletePlace(placeId: string, showAlways = false) {
+    const url = `${environment.apiUrl}/place/delete/${placeId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -244,8 +244,8 @@ export class PlaceService {
     this.indexedDbService.deletePlace(placeId).catch(err => { });
   }
 
-  subscribe(place: Place, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/subscribe/${place.id}`;
+  subscribe(place: Place, showAlways = false) {
+    const url = `${environment.apiUrl}/place/subscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -262,8 +262,8 @@ export class PlaceService {
       );
   }
 
-  unsubscribe(place: Place, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
+  unsubscribe(place: Place, showAlways = false) {
+    const url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',
@@ -280,8 +280,8 @@ export class PlaceService {
       );
   }
 
-  getTimezone(location: Location, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/place/timezone/${location.latitude}/${location.longitude}`;
+  getTimezone(location: Location, showAlways = false) {
+    const url = `${environment.apiUrl}/place/timezone/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Place service',

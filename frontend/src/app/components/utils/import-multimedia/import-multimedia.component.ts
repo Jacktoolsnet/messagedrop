@@ -44,11 +44,11 @@ interface Platform {
   styleUrl: './import-multimedia.component.css'
 })
 export class ImportMultimediaComponent {
-  multimediaUrl: string = '';
+  multimediaUrl = '';
   multimedia: Multimedia | undefined = undefined;
-  urlInvalid: boolean = true;
+  urlInvalid = true;
   safeHtml: SafeHtml | undefined;
-  disabledReason: string = '';
+  disabledReason = '';
 
   constructor(
     public dialogRef: MatDialogRef<ImportMultimediaComponent>,

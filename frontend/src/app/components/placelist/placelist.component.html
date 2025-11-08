@@ -24,7 +24,8 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 @if (place.base64Avatar) {
-                <img class="avatar" [src]="place.base64Avatar" />
+                <img class="avatar" [src]="place.base64Avatar"
+                    [attr.alt]="place.name ? place.name + ' avatar' : 'Place avatar'" />
                 } @else {
                 <mat-icon class="material-symbols-outlined">{{ place.icon || 'location' }}</mat-icon>
                 }

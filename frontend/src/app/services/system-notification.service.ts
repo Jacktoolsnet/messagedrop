@@ -66,7 +66,7 @@ export class SystemNotificationService {
     this.loadingSig.set(false);
   }
 
-  async loadNotifications(filter: SystemNotificationFilter = this.filterSig(), limit: number = 50, offset: number = 0): Promise<SystemNotification[]> {
+  async loadNotifications(filter: SystemNotificationFilter = this.filterSig(), limit = 50, offset = 0): Promise<SystemNotification[]> {
     if (!this.userService.isReady()) {
       this.notificationsSig.set([]);
       return [];

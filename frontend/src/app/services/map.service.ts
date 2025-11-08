@@ -53,7 +53,7 @@ export class MapService {
 
   private messageMarkers: leaflet.Marker[] = [];
 
-  private ready: boolean = false;
+  private ready = false;
 
   constructor(private geolocationService: GeolocationService) { }
 
@@ -97,7 +97,7 @@ export class MapService {
       moveEndEvent.emit(this.location);
     });
 
-    let tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    const tiles = leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       minZoom: 3,
       noWrap: true,
@@ -118,7 +118,7 @@ export class MapService {
     return this.ready;
   }
 
-  public fitMapToBounds(boundingBox: BoundingBox, paddingX: number = 20, paddingY: number = 20) {
+  public fitMapToBounds(boundingBox: BoundingBox, paddingX = 20, paddingY = 20) {
     const bounds = leaflet.latLngBounds(
       [boundingBox.latMin, boundingBox.lonMin],
       [boundingBox.latMax, boundingBox.lonMax]
@@ -278,14 +278,14 @@ export class MapService {
   }
 
   public drawSearchRectange(location: Location) {
-    let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
-    let bounds = [[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo], [plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]];
+    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
+    const bounds = [[plusCodeArea.latitudeLo, plusCodeArea.longitudeLo], [plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]];
     this.searchRectangle.setBounds(bounds);
   }
 
   public getSearchRectangeCenter(location: Location): number[] {
-    let plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
-    let center: number[] = [(plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2, (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2];
+    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(this.geolocationService.getPlusCodeBasedOnMapZoom(this.location, this.map?.getZoom()));
+    const center: number[] = [(plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2, (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2];
     return center;
   }
 
@@ -299,7 +299,7 @@ export class MapService {
     markerLocations.forEach((markerLocation) => {
       switch (markerLocation.type) {
         case MarkerType.PUBLIC_MESSAGE:
-          let markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: messageMarker, zIndexOffset: 20 })
+          const markerForPublicMessage: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: messageMarker, zIndexOffset: 20 })
           markerForPublicMessage.on('click', ($event: leaflet.LeafletMouseEvent) => {
             this.location = markerLocation.location;
             this.setCircleMarker();
@@ -308,7 +308,7 @@ export class MapService {
           this.messageMarkers.push(markerForPublicMessage)
           break;
         case MarkerType.PRIVATE_NOTE:
-          let markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: noteMarker, zIndexOffset: 15 })
+          const markerForPrivateNote: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: noteMarker, zIndexOffset: 15 })
           markerForPrivateNote.on('click', ($event: leaflet.LeafletMouseEvent) => {
             this.location = markerLocation.location;
             this.setCircleMarker();
@@ -317,7 +317,7 @@ export class MapService {
           this.messageMarkers.push(markerForPrivateNote)
           break;
         case MarkerType.MULTI:
-          let markerMulti: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: multiMarker, zIndexOffset: 5 })
+          const markerMulti: leaflet.Marker = leaflet.marker([markerLocation.location.latitude, markerLocation.location.longitude], { icon: multiMarker, zIndexOffset: 5 })
           markerMulti.on('click', ($event: leaflet.LeafletMouseEvent) => {
             this.location = markerLocation.location;
             this.setCircleMarker();

@@ -9,7 +9,8 @@
     </div>
 </div>
 } @else {
-<div class="tile weather-tile" (click)="openWeatherDetails()">
+<div class="tile weather-tile" role="button" tabindex="0" (click)="openWeatherDetails()"
+    (keyup.enter)="openWeatherDetails()" (keyup.space)="openWeatherDetails()">
     <div class="tile-info">
         <i class="wi wi-{{ weatherIcon }}"></i>
         <div class="tile-content">

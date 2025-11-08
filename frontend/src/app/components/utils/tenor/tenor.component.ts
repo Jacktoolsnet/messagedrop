@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Inject, ViewChild } from '@angular/core';
+import { Component, ElementRef, Inject, ViewChild, OnInit } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -29,13 +29,13 @@ import { EnableExternalContentComponent } from "../enable-external-content/enabl
   templateUrl: './tenor.component.html',
   styleUrl: './tenor.component.css'
 })
-export class TenorComponent {
+export class TenorComponent implements OnInit {
   @ViewChild('searchInput') searchInput!: ElementRef<HTMLInputElement>;
 
   public searchterm: FormControl = new FormControl<string>("");
-  public lastSearchterm: string = '';
-  public nextFeatured: string = '';
-  public nextSearch: string = '';
+  public lastSearchterm = '';
+  public nextFeatured = '';
+  public nextSearch = '';
   public results: any[] = [];
   public showTenor = false;
 
@@ -96,7 +96,7 @@ export class TenorComponent {
   }
 
   onApplyClick(result: any): void {
-    let multimedia: Multimedia = {
+    const multimedia: Multimedia = {
       type: MultimediaType.TENOR,
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,

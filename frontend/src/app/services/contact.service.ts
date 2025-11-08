@@ -28,7 +28,7 @@ export class ContactService {
   private _contacts = signal<Contact[]>([]);
   private _contactsSet = signal(0);
   readonly contactsSet = this._contactsSet.asReadonly();
-  private ready: boolean = false;
+  private ready = false;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -74,7 +74,7 @@ export class ContactService {
                 contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
               )
             }
-            let contact: Contact = {
+            const contact: Contact = {
               id: rawContact.id,
               userId: rawContact.userId,
               userEncryptedMessage: 'undefined' !== rawContact.userEncryptedMessage ? JSON.parse(rawContact.userEncryptedMessage) : undefined,
@@ -122,7 +122,7 @@ export class ContactService {
             };
             if (contact.userSignature) {
               this.cryptoService.verifySignature(this.userService.getUser().signingKeyPair.publicKey, contact.userId, contact.userSignature!)
-                .then((valid: Boolean) => {
+                .then((valid: boolean) => {
                   if (valid) {
                     contact.userMessageVerified = true;
                     if (contact.userEncryptedMessage) {
@@ -131,7 +131,7 @@ export class ContactService {
                           if (message !== '') {
                             contact.userMessage = JSON.parse(message);
                           } else {
-                            let errorMessage: ShortMessage = {
+                            const errorMessage: ShortMessage = {
                               message: 'Message cannot be decrypted!',
                               multimedia: {
                                 type: MultimediaType.UNDEFINED,
@@ -150,7 +150,7 @@ export class ContactService {
                     }
                   } else {
                     contact.userMessageVerified = false;
-                    let errorMessage: ShortMessage = {
+                    const errorMessage: ShortMessage = {
                       message: 'Signature could not be verified!',
                       multimedia: {
                         type: MultimediaType.UNDEFINED,
@@ -169,7 +169,7 @@ export class ContactService {
             }
             if (contact.contactUserSignature) {
               this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, contact.contactUserId, contact.contactUserSignature!)
-                .then((valid: Boolean) => {
+                .then((valid: boolean) => {
                   if (valid) {
                     contact.contactUserMessageVerified = true;
                     if (contact.contactUserEncryptedMessage) {
@@ -178,7 +178,7 @@ export class ContactService {
                           if (message !== '') {
                             contact.contactUserMessage = JSON.parse(message);
                           } else {
-                            let errorMessage: ShortMessage = {
+                            const errorMessage: ShortMessage = {
                               message: 'Message cannot be decrypted!',
                               multimedia: {
                                 type: MultimediaType.UNDEFINED,
@@ -197,7 +197,7 @@ export class ContactService {
                     }
                   } else {
                     contact.contactUserMessageVerified = false;
-                    let errorMessage: ShortMessage = {
+                    const errorMessage: ShortMessage = {
                       message: 'Signature could not be verified!',
                       multimedia: {
                         type: MultimediaType.UNDEFINED,
@@ -278,8 +278,8 @@ export class ContactService {
   }
 
   // We need a function from qrcode
-  createContact(contact: Contact, socketioService: SocketioService, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/create`;
+  createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -290,7 +290,7 @@ export class ContactService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'userId': contact.userId,
       'contactUserId': contact.contactUserId,
       'contactUserSigningPublicKey': JSON.stringify(contact.contactUserSigningPublicKey),
@@ -316,8 +316,8 @@ export class ContactService {
       });
   }
 
-  updateContactName(contact: Contact, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/update/name`;
+  updateContactName(contact: Contact, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/update/name`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -328,7 +328,7 @@ export class ContactService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'contactId': contact.id,
       'name': contact.name
     };
@@ -343,8 +343,8 @@ export class ContactService {
       });
   }
 
-  updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/update/message`;
+  updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/update/message`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -355,7 +355,7 @@ export class ContactService {
       delay: 0,
       showSpinner: true
     });
-    let body = {
+    const body = {
       'contactId': envelope.contactId,
       'userId': envelope.userId,
       'contactUserId': envelope.contactUserId,
@@ -379,8 +379,8 @@ export class ContactService {
       });
   }
 
-  getByUserId(userId: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/get/userId/${userId}`;
+  getByUserId(userId: string, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -397,8 +397,8 @@ export class ContactService {
       );
   }
 
-  getById(contactId: string, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/get/${contactId}`
+  getById(contactId: string, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/get/${contactId}`
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -415,8 +415,8 @@ export class ContactService {
       );
   }
 
-  deleteContact(contactToDelete: Contact, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
+  deleteContact(contactToDelete: Contact, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -446,8 +446,8 @@ export class ContactService {
       });
   }
 
-  subscribe(contact: Contact, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
+  subscribe(contact: Contact, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -474,8 +474,8 @@ export class ContactService {
       });
   }
 
-  unsubscribe(contact: Contact, showAlways: boolean = false) {
-    let url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
+  unsubscribe(contact: Contact, showAlways = false) {
+    const url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',

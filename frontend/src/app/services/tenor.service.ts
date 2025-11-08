@@ -45,7 +45,7 @@ export class TenorService {
    * passing query parameters such as API keys, user locale, and content filters.
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
-  getFeaturedGifs(next: string, showAlways: boolean = true): Observable<any> {
+  getFeaturedGifs(next: string, showAlways = true): Observable<any> {
 
     const base = `${environment.apiUrl}/tenor/featured/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
@@ -78,7 +78,7 @@ export class TenorService {
    * passing query parameters such as API keys, user locale, and content filters.
    * It then makes an HTTP GET request to the Tenor API and handles any errors using `handleError`.
    */
-  searchGifs(searchTerm: string, next: string, showAlways: boolean = true): Observable<any> {
+  searchGifs(searchTerm: string, next: string, showAlways = true): Observable<any> {
 
     const base = `${environment.apiUrl}/tenor/search/${this.userService.getUser().language}/${this.userService.getUser().locale.replace('-', '_')}/${encodeURIComponent(searchTerm)}`;
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
