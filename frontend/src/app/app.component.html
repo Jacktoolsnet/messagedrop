@@ -4,7 +4,7 @@
 @if (networkService.isOnline() && serverService.isReady()) {
 <app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()"
     [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)"
-    (moveEndEvent)="handleMoveEndEvent($event)" (markerClickEvent)="handleMarkerClickEvent($event)">
+    (moveEndEvent)="handleMoveEndEvent()" (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
 
 @if (userService.isBlocked()) {

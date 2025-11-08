@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -10,7 +10,6 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
@@ -40,7 +39,11 @@ import { EnableLocationComponent } from "../utils/enable-location/enable-locatio
   templateUrl: './app-settings.component.html',
   styleUrl: './app-settings.component.css'
 })
-export class AppSettingsComponent {
+export class AppSettingsComponent implements OnInit {
+  private readonly appService = inject(AppService);
+  private readonly dialogRef = inject(MatDialogRef<AppSettingsComponent>);
+  private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
+
   public versionInfo = APP_VERSION_INFO;
 
   public availableThemes = [
@@ -57,19 +60,20 @@ export class AppSettingsComponent {
     'violet',
     'yellow'
   ];
-  public appSettings: AppSettings;
-  public showDetectLocationOnStart: boolean = false;
+  public appSettings: AppSettings = this.dialogData.appSettings;
+  public showDetectLocationOnStart = false;
 
-  constructor(
-    private appService: AppService,
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<AppSettingsComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { appSettings: AppSettings }
-  ) {
-    this.appSettings = this.data.appSettings;
-    navigator.permissions.query({ name: 'geolocation' }).then((result) => {
-      this.showDetectLocationOnStart = result.state === 'granted';
-    });
+  ngOnInit(): void {
+    if ('permissions' in navigator && navigator.permissions?.query) {
+      navigator.permissions
+        .query({ name: 'geolocation' })
+        .then(result => {
+          this.showDetectLocationOnStart = result.state === 'granted';
+        })
+        .catch(() => {
+          this.showDetectLocationOnStart = false;
+        });
+    }
   }
 
   onCloseClick(): void {

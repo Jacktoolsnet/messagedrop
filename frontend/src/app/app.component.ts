@@ -193,7 +193,7 @@ export class AppComponent implements OnInit {
           if (result.state === 'granted' && this.appService.getAppSettings().detectLocationOnStart) {
             this.getCurrentPosition();
           } else {
-            this.updateDataForLocation(this.mapService.getMapLocation(), true);
+            this.updateDataForLocation();
           }
         });
       }
@@ -326,7 +326,7 @@ export class AppComponent implements OnInit {
   }
 
   public loadLocalDataAfterLogin(): void {
-    this.updateDataForLocation(this.mapService.getMapLocation(), true)
+    this.updateDataForLocation();
   }
 
   private setIsUserLocation(): void {
@@ -370,7 +370,7 @@ export class AppComponent implements OnInit {
           }
           this.mapService.setUserMarker(this.userService.getUser().location);
           this.mapService.moveToWithZoom(this.userService.getUser().location, 17);
-          this.updateDataForLocation(this.mapService.getMapLocation(), true);
+          this.updateDataForLocation();
         },
         error: (error) => {
           dialogRef.close();
@@ -399,7 +399,7 @@ export class AppComponent implements OnInit {
     });
   }
 
-  private async updateDataForLocation(location: Location, forceSearch: boolean) {
+  private async updateDataForLocation() {
     // Clear markerLocations
     this.markerLocations.clear()
     // notes from local device
@@ -410,9 +410,9 @@ export class AppComponent implements OnInit {
     this.messageService.getByVisibleMapBoundingBox();
   }
 
-  public handleMoveEndEvent(event: Location) {
-    this.updateDataForLocation(event, false)
-    this.setIsUserLocation()
+  public handleMoveEndEvent() {
+    this.updateDataForLocation();
+    this.setIsUserLocation();
     // this.mapService.drawSearchRectange(event);
     this.mapService.setCircleMarker();
   }
@@ -491,7 +491,7 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe((data: { mode: Mode, message: Message }) => {
       if (data) {
         this.messageService.createMessage(data.message, this.userService.getUser());
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        this.updateDataForLocation();
       }
     });
   }
@@ -537,7 +537,7 @@ export class AppComponent implements OnInit {
         data.note.location.longitude = this.mapService.getMapLocation().longitude;
         data.note.location.plusCode = this.mapService.getMapLocation().plusCode;
         this.noteService.addNote(data.note);
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        this.updateDataForLocation();
       }
     });
   }
@@ -613,7 +613,7 @@ export class AppComponent implements OnInit {
 
           dialogRef.afterClosed().subscribe(() => {
             this.messageService.clearSelectedMessages();
-            this.updateDataForLocation(this.mapService.getMapLocation(), true);
+            this.updateDataForLocation();
           });
         }
       });
@@ -640,7 +640,7 @@ export class AppComponent implements OnInit {
       });
 
       dialogRef.afterClosed().subscribe(() => {
-        this.updateDataForLocation(this.mapService.getMapLocation(), true);
+        this.updateDataForLocation();
       });
     });
   }
@@ -676,7 +676,7 @@ export class AppComponent implements OnInit {
           });
         });
       }
-      this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      this.updateDataForLocation();
     });
   }
 
@@ -749,7 +749,7 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterClosed().subscribe(() => {
       this.messageService.clearSelectedMessages();
-      this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      this.updateDataForLocation();
     });
   }
 
@@ -774,7 +774,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(() => {
-      this.updateDataForLocation(this.mapService.getMapLocation(), true);
+      this.updateDataForLocation();
     });
   }
 
@@ -895,7 +895,7 @@ export class AppComponent implements OnInit {
               if (simpleStatusResponse.status === 200) {
                 this.userService.logout();
                 this.indexedDbService.clearAllData();
-                this.updateDataForLocation(this.mapService.getMapLocation(), true)
+                this.updateDataForLocation();
                 this.snackBarRef = this.snackBar.open("User and related data were removed permanently.", undefined, {
                   panelClass: ['snack-success'],
                   horizontalPosition: 'center',
