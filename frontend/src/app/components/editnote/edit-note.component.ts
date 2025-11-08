@@ -1,4 +1,4 @@
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -20,6 +20,10 @@ import { SelectMultimediaComponent } from '../multimedia/select-multimedia/selec
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 
+interface TextDialogResult {
+  text: string;
+}
+
 @Component({
   selector: 'app-note',
   imports: [
@@ -39,31 +43,25 @@ import { TextComponent } from '../utils/text/text.component';
   styleUrl: './edit-note.component.css'
 })
 export class EditNoteComponent implements OnInit {
+  private readonly userService = inject(UserService);
+  private readonly sharedContentService = inject(SharedContentService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly matDialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  readonly dialogRef = inject(MatDialogRef<EditNoteComponent>);
+  private readonly style = inject(StyleService);
+  readonly data = inject<{ mode: Mode; note: Note }>(MAT_DIALOG_DATA);
+
   safeHtml: SafeHtml | undefined = undefined;
-  showSaveHtml: boolean = false;
+  showSaveHtml = false;
 
-  private oriNote: string | undefined = undefined;
-  private oriMultimedia: Multimedia | undefined = undefined;
-  private oriStyle: string | undefined = undefined;
-
-  constructor(
-    private userService: UserService,
-    private sharedContentService: SharedContentService,
-    private sanitizer: DomSanitizer,
-    private textDialog: MatDialog,
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<EditNoteComponent>,
-    private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, note: Note }
-  ) {
-    this.oriNote = this.data.note.note;
-    this.oriMultimedia = JSON.parse(JSON.stringify(this.data.note.multimedia));
-    this.oriStyle = this.data.note.style
-  }
+  private readonly oriNote: string | undefined = this.data.note.note;
+  private readonly oriMultimedia: Multimedia | undefined = structuredClone(this.data.note.multimedia);
+  private readonly oriStyle: string | undefined = this.data.note.style;
 
   ngOnInit(): void {
     if (!this.data.note.style) {
-      this.data.note.style = this.userService.getProfile().defaultStyle!;
+      this.data.note.style = this.userService.getProfile().defaultStyle ?? '';
     }
     this.applyNewMultimedia(this.data.note.multimedia);
   }
@@ -99,17 +97,19 @@ export class EditNoteComponent implements OnInit {
 
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.note.multimedia = newMultimedia;
-    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.note.multimedia?.oembed?.html ? this.data.note.multimedia?.oembed.html : '');
-    this.showSaveHtml = this.data.note.multimedia.type != MultimediaType.TENOR;
+    const html = newMultimedia?.oembed?.html ?? '';
+    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }
 
   public removeMultimedia(): void {
-    this.data.note.multimedia.type = MultimediaType.UNDEFINED
-    this.data.note.multimedia.attribution = '';
-    this.data.note.multimedia.title = '';
-    this.data.note.multimedia.description = '';
-    this.data.note.multimedia.url = '';
-    this.data.note.multimedia.sourceUrl = '';
+    const multimedia = this.data.note.multimedia;
+    multimedia.type = MultimediaType.UNDEFINED;
+    multimedia.attribution = '';
+    multimedia.title = '';
+    multimedia.description = '';
+    multimedia.url = '';
+    multimedia.sourceUrl = '';
     this.safeHtml = undefined;
     this.showSaveHtml = false;
     this.sharedContentService.deleteSharedContent('last');
@@ -118,18 +118,17 @@ export class EditNoteComponent implements OnInit {
   }
 
   public openTextDialog(): void {
-    const dialogRef = this.textDialog.open(TextComponent, {
+    const dialogRef = this.matDialog.open(TextComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { text: this.data.note.note },
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (data) {
-        this.data.note.note = data.text;
+    dialogRef.afterClosed().subscribe((result?: TextDialogResult) => {
+      if (result?.text != null) {
+        this.data.note.note = result.text;
       }
     });
   }

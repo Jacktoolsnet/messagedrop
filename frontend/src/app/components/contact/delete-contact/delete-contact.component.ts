@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
@@ -9,5 +9,5 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDi
   styleUrl: './delete-contact.component.css'
 })
 export class DeleteContactComponent {
-  constructor(public dialogRef: MatDialogRef<DeleteContactComponent>) { }
+  readonly dialogRef = inject(MatDialogRef<DeleteContactComponent>);
 }

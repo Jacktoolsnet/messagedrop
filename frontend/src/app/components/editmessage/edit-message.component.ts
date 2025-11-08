@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -22,6 +22,10 @@ import { SelectMultimediaComponent } from '../multimedia/select-multimedia/selec
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { TextComponent } from '../utils/text/text.component';
 
+interface TextDialogResult {
+  text: string;
+}
+
 @Component({
   selector: 'app-message',
   imports: [
@@ -42,29 +46,23 @@ import { TextComponent } from '../utils/text/text.component';
   styleUrl: './edit-message.component.css'
 })
 export class EditMessageComponent implements OnInit {
+  private readonly userService = inject(UserService);
+  private readonly sharedContentService = inject(SharedContentService);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly matDialog = inject(MatDialog);
+  private readonly messageService = inject(MessageService);
+  private readonly openAiService = inject(OpenAiService);
+  readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
+  private readonly style = inject(StyleService);
+  readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
+
   safeHtml: SafeHtml | undefined = undefined;
-  showSaveHtml: boolean = false;
+  showSaveHtml = false;
 
-  private oriMessage: string | undefined = undefined;
-  private oriMultimedia: Multimedia | undefined = undefined;
-  private oriStyle: string | undefined = undefined;
-
-  constructor(
-    private userService: UserService,
-    private sharedContentService: SharedContentService,
-    private sanitizer: DomSanitizer,
-    private snackBar: MatSnackBar,
-    private textDialog: MatDialog,
-    private messageService: MessageService,
-    private openAiService: OpenAiService,
-    public dialogRef: MatDialogRef<EditMessageComponent>,
-    private style: StyleService,
-    @Inject(MAT_DIALOG_DATA) public data: { mode: Mode, message: Message }
-  ) {
-    this.oriMessage = this.data.message.message;
-    this.oriMultimedia = JSON.parse(JSON.stringify(this.data.message.multimedia));
-    this.oriStyle = this.data.message.style
-  }
+  private readonly oriMessage: string | undefined = this.data.message.message;
+  private readonly oriMultimedia: Multimedia | undefined = structuredClone(this.data.message.multimedia);
+  private readonly oriStyle: string | undefined = this.data.message.style;
 
   ngOnInit(): void {
     this.applyNewMultimedia(this.data.message.multimedia);
@@ -91,8 +89,12 @@ export class EditMessageComponent implements OnInit {
                     this.snackBar.open(`Content will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
                   }
                 },
-                error: (err) => { },
-                complete: () => { }
+                error: () => {
+                  this.snackBar.open('Moderation failed. Please try again later.', 'OK', {
+                    horizontalPosition: 'center',
+                    verticalPosition: 'top'
+                  });
+                }
               });
           } else {
             this.data.message.userId = this.userService.getUser().id;
@@ -135,17 +137,19 @@ export class EditMessageComponent implements OnInit {
 
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.message.multimedia = newMultimedia;
-    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.data.message.multimedia?.oembed?.html ? this.data.message.multimedia?.oembed.html : '');
-    this.showSaveHtml = this.data.message.multimedia.type != MultimediaType.TENOR;
+    const html = newMultimedia?.oembed?.html ?? '';
+    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }
 
   public removeMultimedia(): void {
-    this.data.message.multimedia.type = MultimediaType.UNDEFINED
-    this.data.message.multimedia.attribution = '';
-    this.data.message.multimedia.title = '';
-    this.data.message.multimedia.description = '';
-    this.data.message.multimedia.url = '';
-    this.data.message.multimedia.sourceUrl = '';
+    const multimedia = this.data.message.multimedia;
+    multimedia.type = MultimediaType.UNDEFINED;
+    multimedia.attribution = '';
+    multimedia.title = '';
+    multimedia.description = '';
+    multimedia.url = '';
+    multimedia.sourceUrl = '';
     this.safeHtml = undefined;
     this.showSaveHtml = false;
     this.sharedContentService.deleteSharedContent('last');
@@ -154,20 +158,20 @@ export class EditMessageComponent implements OnInit {
   }
 
   public openTextDialog(): void {
-    const dialogRef = this.textDialog.open(TextComponent, {
+    const dialogRef = this.matDialog.open(TextComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { text: this.data.message.message },
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => { });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (data) {
-        this.data.message.message = data.text;
+    dialogRef.afterClosed().subscribe((result?: TextDialogResult) => {
+      if (result?.text != null) {
+        this.data.message.message = result.text;
         if (!this.data.message.style) {
-          this.data.message.style = this.userService.getProfile().defaultStyle!;
+          const defaultStyle = this.userService.getProfile().defaultStyle;
+          this.data.message.style = defaultStyle ?? this.data.message.style;
         }
       }
     });

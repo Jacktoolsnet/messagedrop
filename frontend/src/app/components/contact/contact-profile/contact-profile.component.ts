@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -29,21 +29,15 @@ import { SocketioService } from '../../../services/socketio.service';
   styleUrl: './contact-profile.component.css'
 })
 export class ContactProfileComponent {
-  public contact!: Contact;
-  public joinedUserRoom = false;
-  private maxFileSize = 5 * 1024 * 1024; // 5MB
-  private oriContact: Contact;
+  private readonly socketioService = inject(SocketioService);
+  private readonly snackBar = inject(MatSnackBar);
+  readonly dialogRef = inject(MatDialogRef<ContactProfileComponent>);
+  readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
 
-  constructor(
-    private socketioService: SocketioService,
-    private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ContactProfileComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { contact: Contact }
-  ) {
-    this.contact = this.data.contact;
-    this.oriContact = structuredClone(this.contact);
-    this.joinedUserRoom = this.socketioService.hasJoinedUserRoom();
-  }
+  public contact: Contact = this.data.contact;
+  public joinedUserRoom = this.socketioService.hasJoinedUserRoom();
+  private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly oriContact: Contact = structuredClone(this.contact);
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;

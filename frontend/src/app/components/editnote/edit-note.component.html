@@ -33,7 +33,10 @@
             <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <p class="text" (click)="openTextDialog()" [style]="data.note.style">{{ data.note.note }}</p>
+            <p class="text" role="button" tabindex="0" (click)="openTextDialog()"
+                (keyup.enter)="openTextDialog()" (keyup.space)="openTextDialog()" [style]="data.note.style">
+                {{ data.note.note }}
+            </p>
         </div>
         }
 

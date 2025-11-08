@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject, OnInit, Signal } from '@angular/core';
+import { Component, Signal, inject } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
 import { Envelope } from '../../interfaces/envelope';
@@ -33,6 +33,16 @@ import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
+interface ConnectDialogResult {
+  connectId?: string;
+}
+
+interface ContactEditMessageResult {
+  contact: Contact;
+  shortMessage: ShortMessage;
+  lastLocation?: Location;
+}
+
 @Component({
   selector: 'app-contactlist',
   imports: [
@@ -50,40 +60,27 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
   templateUrl: './contactlist.component.html',
   styleUrl: './contactlist.component.css'
 })
-export class ContactlistComponent implements OnInit {
-  private snackBarRef: any;
-  public contactsSignal: Signal<Contact[]>;
+export class ContactlistComponent {
+  private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
+  public readonly userService = inject(UserService);
+  public readonly socketioService = inject(SocketioService);
+  public readonly contactService = inject(ContactService);
+  private readonly connectService = inject(ConnectService);
+  private readonly cryptoService = inject(CryptoService);
+  private readonly oembedService = inject(OembedService);
+  private readonly sharedContentService = inject(SharedContentService);
+  private readonly style = inject(StyleService);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly matDialog = inject(MatDialog);
+  readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
+  readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
 
-  private contactToDelete!: Contact
+  private contactToDelete?: Contact;
   public mode: typeof Mode = Mode;
-  public subscriptionError: boolean = false;
-
-  constructor(
-    public userService: UserService,
-    public socketioService: SocketioService,
-    private connectService: ConnectService,
-    public contactService: ContactService,
-    private cryptoService: CryptoService,
-    private oembedService: OembedService,
-    private sharedContentService: SharedContentService,
-    public dialogRef: MatDialogRef<any>,
-    public contactMessageDialog: MatDialog,
-    public connectDialog: MatDialog,
-    public scannerDialog: MatDialog,
-    public qrDialog: MatDialog,
-    public dialog: MatDialog,
-    private style: StyleService,
-    private snackBar: MatSnackBar,
-    @Inject(MAT_DIALOG_DATA) public data: {}
-  ) {
-    this.contactsSignal = this.contactService.sortedContactsSignal;
-  }
-
-  ngOnInit(): void {
-  }
+  public subscriptionError = false;
 
   openConnectDialog(): void {
-    let contact: Contact = {
+    const contact: Contact = {
       id: "",
       userId: this.userService.getUser().id,
       contactUserId: '',
@@ -121,7 +118,7 @@ export class ContactlistComponent implements OnInit {
       userMessageVerified: false,
       contactUserMessageVerified: false
     };
-    const dialogRef = this.connectDialog.open(ConnectComponent, {
+    const dialogRef = this.matDialog.open(ConnectComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
@@ -133,18 +130,15 @@ export class ContactlistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (data?.connectId !== '') {
-        this.connectService.getById(data.connectId, contact, this.socketioService);
+    dialogRef.afterClosed().subscribe((result?: ConnectDialogResult) => {
+      if (result?.connectId) {
+        this.connectService.getById(result.connectId, contact, this.socketioService);
       }
     });
   }
 
   openScannerDialog(): void {
-    let contact: Contact = {
+    const contact: Contact = {
       id: "",
       userId: this.userService.getUser().id,
       contactUserId: '',
@@ -182,7 +176,7 @@ export class ContactlistComponent implements OnInit {
       userMessageVerified: false,
       contactUserMessageVerified: false
     };
-    const dialogRef = this.scannerDialog.open(ScannerComponent, {
+    const dialogRef = this.matDialog.open(ScannerComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
@@ -190,43 +184,34 @@ export class ContactlistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (data?.connectId && data?.connectId !== '') {
-        this.connectService.getById(data.connectId, contact, this.socketioService);
+    dialogRef.afterClosed().subscribe((result?: ConnectDialogResult) => {
+      if (result?.connectId) {
+        this.connectService.getById(result.connectId, contact, this.socketioService);
       }
     });
   }
 
   public deleteContact(contact: Contact) {
     this.contactToDelete = contact;
-    const dialogRef = this.dialog.open(DeleteContactComponent, {
+    const dialogRef = this.matDialog.open(DeleteContactComponent, {
       closeOnNavigation: true,
       hasBackdrop: true
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result && undefined != this.contactToDelete) {
+    dialogRef.afterClosed().subscribe((result?: boolean) => {
+      if (result && this.contactToDelete) {
         this.contactService.deleteContact(this.contactToDelete);
       }
     });
   }
 
   public editContact(contact: Contact) {
-    const dialogRef = this.dialog.open(ContactProfileComponent, {
+    const dialogRef = this.matDialog.open(ContactProfileComponent, {
       data: { contact: contact },
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true
-    });
-
-    dialogRef.afterOpened().subscribe(e => {
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -274,16 +259,14 @@ export class ContactlistComponent implements OnInit {
     const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
     let lastMultimedia: Multimedia | undefined = undefined;
     if (undefined != lastMultimediaContent) {
-      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent!.url) as Multimedia;
+      lastMultimedia = await this.oembedService.getObjectFromUrl(lastMultimediaContent.url) as Multimedia;
     }
     const lastLocationContent = await this.sharedContentService.getSharedContent('lastLocation');
     let lastLocation: Location | undefined = undefined;
     if (undefined != lastLocationContent) {
-      lastLocation = await this.oembedService.getObjectFromUrl(lastLocationContent!.url) as Location;
-      if (undefined != lastLocation) {
-      }
+      lastLocation = await this.oembedService.getObjectFromUrl(lastLocationContent.url) as Location;
     }
-    let shortMessage: ShortMessage = {
+    const shortMessage: ShortMessage = {
       message: '',
       style: '',
       multimedia: undefined != lastMultimedia ? lastMultimedia : {
@@ -296,7 +279,7 @@ export class ContactlistComponent implements OnInit {
         contentId: ''
       }
     };
-    const dialogRef = this.contactMessageDialog.open(ContactEditMessageComponent, {
+    const dialogRef = this.matDialog.open(ContactEditMessageComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_SHORT_MESSAGE, contact: contact, shortMessage: shortMessage, lastLocation: lastLocation },
@@ -307,31 +290,36 @@ export class ContactlistComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe(e => {
-    });
-
-    dialogRef.afterClosed().subscribe((data: any) => {
-      if (undefined !== data?.shortMessage) {
+    dialogRef.afterClosed().subscribe((result?: ContactEditMessageResult) => {
+      if (result?.shortMessage) {
         // Create the enveolope
-        let envelope: Envelope = {
-          contactId: data?.contact.id,
-          userId: data?.contact.userId,
-          contactUserId: data?.contact.contactUserId,
+        const envelope: Envelope = {
+          contactId: result.contact.id,
+          userId: result.contact.userId,
+          contactUserId: result.contact.contactUserId,
           messageSignature: '',
           userEncryptedMessage: '',
           contactUserEncryptedMessage: ''
         };
+        const contactEncryptionKey = result.contact.contactUserEncryptionPublicKey;
+        if (!contactEncryptionKey) {
+          this.snackBar.open('Contact does not provide an encryption key yet. Please retry later.', 'OK', {
+            duration: 2500
+          });
+          return;
+        }
+
         this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
           .then((signature: string) => {
             envelope.messageSignature = signature;
-            this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, JSON.stringify(data?.shortMessage))
+            this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, JSON.stringify(result.shortMessage))
               .then((encryptedMessage: string) => {
                 envelope.userEncryptedMessage = encryptedMessage;
-                this.cryptoService.encrypt(data?.contact.contactUserEncryptionPublicKey, JSON.stringify(data?.shortMessage))
+                this.cryptoService.encrypt(contactEncryptionKey, JSON.stringify(result.shortMessage))
                   .then((encryptedMessage: string) => {
                     envelope.contactUserEncryptedMessage = encryptedMessage;
                     // Envelope is ready
-                    this.contactService.updateContactMessage(envelope, data?.contact, data?.shortMessage, this.socketioService)
+                    this.contactService.updateContactMessage(envelope, result.contact, result.shortMessage, this.socketioService)
                   });
               });
           });
@@ -343,31 +331,34 @@ export class ContactlistComponent implements OnInit {
   }
 
   public shareConnectId(): void {
-    this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+    const user = this.userService.getUser();
+    const encryptionPublicKey = user.cryptoKeyPair?.publicKey ? JSON.stringify(user.cryptoKeyPair.publicKey) : '';
+    const signingPublicKey = user.signingKeyPair?.publicKey ? JSON.stringify(user.signingKeyPair.publicKey) : '';
+    this.cryptoService.createSignature(user.signingKeyPair.privateKey, user.id)
       .then((signature: string) => {
-        this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'No hint')
+        this.cryptoService.encrypt(user.cryptoKeyPair.publicKey, 'No hint')
           .then((encryptedHint: string) => {
-            let connect: Connect = {
+            const connect: Connect = {
               id: '',
-              userId: this.userService.getUser().id,
+              userId: user.id,
               hint: encryptedHint,
-              signature: signature,
-              encryptionPublicKey: JSON.stringify(this.userService.getUser().cryptoKeyPair?.publicKey!),
-              signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
+              signature,
+              encryptionPublicKey,
+              signingPublicKey
             };
             this.connectService.createConnect(connect)
               .subscribe({
                 next: createConnectResponse => {
                   if (createConnectResponse.status === 200) {
-                    connect.id = createConnectResponse.connectId;;
+                    connect.id = createConnectResponse.connectId;
 
                     if (navigator.share) {
                       navigator.share({
                         title: 'MessageDrop – Share Connect-ID',
                         text: connect.id
-                      })
-                        .then(() => { })
-                        .catch((err) => { });
+                      }).catch(() => {
+                        this.snackBar.open('Sharing was canceled.', 'OK', { duration: 2000 });
+                      });
                     } else {
                       navigator.clipboard.writeText(connect.id).then(() => {
                         this.snackBarRef = this.snackBar.open(
@@ -381,44 +372,41 @@ export class ContactlistComponent implements OnInit {
                     }
                   }
                 },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                complete: () => { }
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
               });
           });
       });
   }
 
   public openQrDialog() {
-    this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
+    const user = this.userService.getUser();
+    const encryptionPublicKey = user.cryptoKeyPair?.publicKey ? JSON.stringify(user.cryptoKeyPair.publicKey) : '';
+    const signingPublicKey = user.signingKeyPair?.publicKey ? JSON.stringify(user.signingKeyPair.publicKey) : '';
+    this.cryptoService.createSignature(user.signingKeyPair.privateKey, user.id)
       .then((signature: string) => {
-        this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, 'No hint')
+        this.cryptoService.encrypt(user.cryptoKeyPair.publicKey, 'No hint')
           .then((encryptedHint: string) => {
-            let connect: Connect = {
+            const connect: Connect = {
               id: '',
-              userId: this.userService.getUser().id,
+              userId: user.id,
               hint: encryptedHint,
-              signature: signature,
-              encryptionPublicKey: JSON.stringify(this.userService.getUser().cryptoKeyPair?.publicKey!),
-              signingPublicKey: JSON.stringify(this.userService.getUser().signingKeyPair?.publicKey!)
+              signature,
+              encryptionPublicKey,
+              signingPublicKey
             };
             this.connectService.createConnect(connect)
               .subscribe({
                 next: createConnectResponse => {
                   if (createConnectResponse.status === 200) {
                     connect.id = createConnectResponse.connectId;
-                    const dialogRef = this.dialog.open(QrcodeComponent, {
+                    this.matDialog.open(QrcodeComponent, {
                       closeOnNavigation: true,
                       hasBackdrop: true,
                       data: { qrData: createConnectResponse.connectId }
                     });
-
-                    dialogRef.afterOpened().subscribe({});
-
-                    dialogRef.afterClosed().subscribe({});
                   }
                 },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); },
-                complete: () => { }
+                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
               });
           });
       });

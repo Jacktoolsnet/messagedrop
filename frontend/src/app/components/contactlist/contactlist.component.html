@@ -26,7 +26,8 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 @if (contact.base64Avatar) {
-                <img class="avatar" [src]="contact.base64Avatar" />
+                <img class="avatar" [src]="contact.base64Avatar"
+                    [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
@@ -42,7 +43,8 @@
                             <div class="bubble-row me">
                                 <div class="avatar-me">
                                     @if (userService.getProfile().base64Avatar) {
-                                    <img class="avatar" [src]="userService.getProfile().base64Avatar" />
+                                    <img class="avatar" [src]="userService.getProfile().base64Avatar"
+                                        [attr.alt]="(userService.getProfile().name || 'My') + ' avatar'" />
                                     } @else {
                                     <mat-icon class="material-symbols-outlined">person</mat-icon>
                                     }
@@ -67,7 +69,8 @@
                             <div class="bubble-row them">
                                 <div class="avatar-them">
                                     @if (contact.base64Avatar) {
-                                    <img class="avatar" [src]="contact.base64Avatar" />
+                                    <img class="avatar" [src]="contact.base64Avatar"
+                                        [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
                                     } @else {
                                     <mat-icon class="material-symbols-outlined">person</mat-icon>
                                     }
@@ -94,7 +97,8 @@
                             <div class="bubble-row them">
                                 <div class="avatar-them">
                                     @if (contact.base64Avatar) {
-                                    <img class="avatar" [src]="contact.base64Avatar" />
+                                    <img class="avatar" [src]="contact.base64Avatar"
+                                        [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
                                     } @else {
                                     <mat-icon class="material-symbols-outlined">person</mat-icon>
                                     }
@@ -119,7 +123,8 @@
                             <div class="bubble-row me">
                                 <div class="avatar-me">
                                     @if (userService.getProfile().base64Avatar) {
-                                    <img class="avatar" [src]="userService.getProfile().base64Avatar" />
+                                    <img class="avatar" [src]="userService.getProfile().base64Avatar"
+                                        [attr.alt]="(userService.getProfile().name || 'My') + ' avatar'" />
                                     } @else {
                                     <mat-icon class="material-symbols-outlined">person</mat-icon>
                                     }

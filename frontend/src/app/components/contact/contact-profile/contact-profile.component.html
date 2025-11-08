@@ -18,7 +18,7 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
-      <img class="avatar" [src]="contact.base64Avatar" /><br />
+      <img class="avatar" [src]="contact.base64Avatar" [attr.alt]="contact.name ? contact.name + ' avatar' : 'Contact avatar'" /><br />
     </div>
     <div class="button-style">
   <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
