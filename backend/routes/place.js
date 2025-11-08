@@ -19,7 +19,7 @@ router.post('/create',
   , async function (req, res) {
     let response = { 'status': 0 };
     let placeId = crypto.randomUUID();
-    let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+    let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/'/g, "''"));
     tablePlace.create(req.database.db, placeId, req.body.userId, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
       if (err) {
         response.status = 500;
@@ -39,7 +39,7 @@ router.post('/update',
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
-    let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+    let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/'/g, "''"));
     tablePlace.update(req.database.db, req.body.id, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
       if (err) {
         response.status = 500;

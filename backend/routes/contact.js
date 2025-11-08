@@ -39,7 +39,8 @@ router.post('/update/name',
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
-    let cryptedName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/\'/g, "''"));
+    const sanitizedName = (req.body.name || '').replace(/'/g, "''");
+    const cryptedName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), sanitizedName);
     tableContact.updateName(req.database.db, req.body.contactId, JSON.stringify(cryptedName), function (err) {
       if (err) {
         response.status = 500;

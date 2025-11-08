@@ -294,7 +294,7 @@ const getByParentUuid = function (db, parentUuid, callback) {
 
 const countView = function (db, parentMessageId, callback) {
     try {
-        sql = `
+        const sql = `
         UPDATE ${tableName}
         SET ${columnViews} = ${columnViews} + 1
         WHERE ${columnMessageId} = ?;`
@@ -309,7 +309,7 @@ const countView = function (db, parentMessageId, callback) {
 
 const countComment = function (db, messageId, callback) {
     try {
-        sql = `
+        const sql = `
         UPDATE ${tableName}
         SET ${columnCommentsNumber} = ${columnCommentsNumber} + 1
         WHERE ${columnMessageId} = ?;`

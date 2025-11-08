@@ -126,10 +126,6 @@ const onConnection = (socket) => {
 
   // socket.logger.info(`Verbindung aufgebaut`);
 
-  socket.onAny((event, ...args) => {
-    // socket.logger.info(`[SOCKET EVENT] ${event}`, args);
-  });
-
   // Globale Fehlerbehandlung für diesen Socket
   socket.on('error', (err) => {
     socket.logger.error('Socket-Fehler', {
@@ -139,7 +135,7 @@ const onConnection = (socket) => {
   });
 
   socket.on('disconnect', (reason) => {
-    // socket.logger.warn(`Verbindung getrennt: ${reason}`);
+    socket.logger.info('Verbindung getrennt', { reason });
   });
 
   socket.on('connect_error', (err) => {
@@ -157,7 +153,7 @@ const onConnection = (socket) => {
 // Socket.io: neue Verbindung
 io.on("connection", onConnection);
 
-// Fehler beim Verbindungsaufbau (z. B. Auth-Probleme)
+// Fehler beim Verbindungsaufbau (z.B. Auth-Probleme)
 io.engine.on("connection_error", (err) => {
   logger.error('Engine-Fehler beim Verbindungsaufbau', {
     ip: err.req?.socket?.remoteAddress,

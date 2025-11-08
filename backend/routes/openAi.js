@@ -16,7 +16,7 @@ router.post('/moderate',
   , function (req, res) {
     openai.moderations.create({
       model: "omni-moderation-latest",
-      input: req.body.message.replace(/\'/g, "''"),
+      input: req.body.message.replace(/'/g, "''"),
     }).then(moderation => {
       res.status(200).json(moderation);
     }).catch(err => {

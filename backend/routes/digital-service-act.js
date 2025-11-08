@@ -31,14 +31,15 @@ const noticeLimiter = rateLimit({
 });
 
 /* --------------------------------- Helper ---------------------------------- */
-async function forwardPost(path, body, reqHeaders) {
+async function forwardPost(path, body, reqHeaders = {}) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
     const headers = {
         'content-type': 'application/json',
         'x-api-authorization': process.env.ADMIN_TOKEN,
     };
-    // Falls du das User-JWT mitgeben willst, einkommentieren:
-    // if (reqHeaders?.authorization) headers.authorization = reqHeaders.authorization;
+    if (reqHeaders?.authorization) {
+        headers.authorization = reqHeaders.authorization;
+    }
 
     const resp = await axios.post(url, body, {
         headers,
@@ -72,25 +73,6 @@ function disableLocallyIfPossible(req) {
             if (!db || !contentId) return resolve(false);
 
             tableMessage.disableMessage(db, contentId, (err) => {
-                if (err) {
-                    return resolve(false);
-                }
-                resolve(true);
-            });
-        } catch {
-            resolve(false);
-        }
-    });
-}
-
-function enableLocallyIfPossible(req) {
-    return new Promise((resolve) => {
-        try {
-            const db = req.database?.db;
-            const contentId = req.body?.contentId;
-            if (!db || !contentId) return resolve(false);
-
-            tableMessage.enableMessage(db, contentId, (err) => {
                 if (err) {
                     return resolve(false);
                 }

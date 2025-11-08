@@ -254,13 +254,15 @@ router.post('/confirm',
                 }
 
               } catch (err) {
-                esponse.status = 500;
-                response.error = 'Encrption failed';
+                response.status = 500;
+                response.error = 'Encryption failed';
+                req.logger?.error('user decrypt payload failed', { error: err?.message });
                 res.status(response.status).json(response);
               }
             } catch (err) {
               response.status = 500;
-              response.error = 'Encrption failed';
+              response.error = 'Encryption failed';
+              req.logger?.error('user decrypt crypto key failed', { error: err?.message });
               res.status(response.status).json(response);
             }
           }

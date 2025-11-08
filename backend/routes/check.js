@@ -11,16 +11,17 @@ router.post('/',
     metric.count('check', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {
+    let database_connection = 'not established';
     if (undefined === req.database) {
-      database_connection = 'not established'
+      database_connection = 'not established';
     } else {
       if (req.database.db.open) {
-        database_connection = 'established'
+        database_connection = 'established';
       } else {
-        database_connection = 'not established'
+        database_connection = 'not established';
       }
     }
-    let response = {
+    const response = {
       'token': 'ok',
       database_connection,
       'reqBody': req.body

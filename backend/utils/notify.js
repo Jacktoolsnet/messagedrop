@@ -20,7 +20,9 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
                         let placeName = '';
                         try {
                             placeName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
-                        } catch (ex) { }
+                        } catch (cryptoError) {
+                            logger.warn('Failed to decrypt place name', { error: cryptoError?.message });
+                        }
                         const payload = {
                             "notification": {
                                 "title": `Messagedrop @${placeName}`,
@@ -64,7 +66,9 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         let contactName = '';
                         try {
                             contactName = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(row.name));
-                        } catch (ex) { }
+                        } catch (cryptoError) {
+                            logger.warn('Failed to decrypt contact name', { error: cryptoError?.message });
+                        }
                         const payload = {
                             "notification": {
                                 "title": `New message from @${contactName}`,
@@ -101,7 +105,9 @@ function sendNotification(logger, subscription, payload) {
         );
         webpush
             .sendNotification(subscription, JSON.stringify(payload))
-            .then((result) => { })
+            .then(() => {
+                logger.info('webpush notification queued', { endpoint: subscription?.endpoint });
+            })
             .catch((error) => { logger.error(`webpush.sendNotification: ${error}`); });
     } catch (error) {
         logger.error(`sendNotification: ${error}`);

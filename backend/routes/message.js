@@ -20,6 +20,8 @@ function normalizeLon(lon) {
   return Object.is(normalized, -0) ? 0 : normalized;
 }
 
+const sanitizeSingleQuotes = (value) => String(value ?? '').replace(/'/g, "''");
+
 router.get('/get', function (req, res) {
   let response = { 'status': 0, 'rows': [] };
   tableMessage.getAll(req.database.db, function (err, rows) {
@@ -209,16 +211,37 @@ router.post('/create',
     if (undefined == req.body.parentMessageId) {
       req.body.parentMessageId = 0;
     }
-    tableMessage.create(req.database.db, req.body.uuid, req.body.parentUuid, req.body.messageTyp, req.body.latitude, req.body.longitude, req.body.plusCode, req.body.message.replace(/\'/g, "''"), req.body.markerType, req.body.style, req.body.messageUserId, req.body.multimedia.replace(/\'/g, "''"), function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        notify.placeSubscriptions(req.logger, req.database.db, req.body.latitude, req.body.longitude, req.body.messageUserId, req.body.message.replace(/\'/g, "''"));
-        response.status = 200;
+    tableMessage.create(
+      req.database.db,
+      req.body.uuid,
+      req.body.parentUuid,
+      req.body.messageTyp,
+      req.body.latitude,
+      req.body.longitude,
+      req.body.plusCode,
+      sanitizeSingleQuotes(req.body.message),
+      req.body.markerType,
+      req.body.style,
+      req.body.messageUserId,
+      sanitizeSingleQuotes(req.body.multimedia),
+      function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          notify.placeSubscriptions(
+            req.logger,
+            req.database.db,
+            req.body.latitude,
+            req.body.longitude,
+            req.body.messageUserId,
+            sanitizeSingleQuotes(req.body.message)
+          );
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
       }
-      res.status(response.status).json(response);
-    });
+    );
   });
 
 router.post('/update',
@@ -228,15 +251,21 @@ router.post('/update',
   ],
   function (req, res) {
     let response = { 'status': 0 };
-    tableMessage.update(req.database.db, req.body.id, req.body.message.replace(/\'/g, "''"), req.body.style, req.body.multimedia.replace(/\'/g, "''"), function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-      }
-      res.status(response.status).json(response);
-    });
+    tableMessage.update(
+      req.database.db,
+      req.body.id,
+      sanitizeSingleQuotes(req.body.message),
+      req.body.style,
+      sanitizeSingleQuotes(req.body.multimedia),
+      function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
+      });
   });
 
 router.get('/clean/public', function (req, res) {
@@ -337,7 +366,7 @@ router.get('/dislike/:messageUuid/by/:userId',
 
 router.get('/countview/:messageId', function (req, res) {
   let response = { 'status': 0 };
-  tableMessage.countView(req.database.db, req.params.messageId, function (err, row) {
+  tableMessage.countView(req.database.db, req.params.messageId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
@@ -350,7 +379,7 @@ router.get('/countview/:messageId', function (req, res) {
 
 router.get('/countcomment/:parentMessageId', function (req, res) {
   let response = { 'status': 0 };
-  tableMessage.countComment(req.database.db, req.params.parentMessageId, function (err, row) {
+  tableMessage.countComment(req.database.db, req.params.parentMessageId, function (err) {
     if (err) {
       response.status = 500;
       response.error = err;
