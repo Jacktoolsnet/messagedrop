@@ -34,7 +34,11 @@ router.get('/countryCode/:pluscode/:latitude/:longitude', async (req, res) => {
                 response.nominatimPlace = nominatimPlace;
 
                 // 3. Ergebnis in Cache speichern
-                tableNominatimCache.setNominatimCache(db, pluscode, JSON.stringify(nominatimPlace), (err) => { });
+                tableNominatimCache.setNominatimCache(db, pluscode, JSON.stringify(nominatimPlace), (cacheError) => {
+                    if (cacheError) {
+                        req.logger?.warn('Failed to cache nominatim country code', { pluscode, error: cacheError?.message });
+                    }
+                });
 
                 return res.status(200).json(response);
             } catch (err) {
@@ -81,7 +85,11 @@ router.get('/search/:searchTerm/:limit', async (req, res) => {
                 }
 
                 // 3. In den Cache schreiben
-                tableGeoSearch.setGeoSearchResult(db, searchTerm, JSON.stringify(result), () => { });
+                tableGeoSearch.setGeoSearchResult(db, searchTerm, JSON.stringify(result), (cacheError) => {
+                    if (cacheError) {
+                        req.logger?.warn('Failed to cache geo search result', { searchTerm, error: cacheError?.message });
+                    }
+                });
 
                 response.status = 200;
                 response.result = result;
@@ -133,7 +141,11 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', async (req, res) => {
                 }
 
                 // 3. Cache schreiben
-                tableGeoSearch.setGeoSearchResult(db, cacheKey, JSON.stringify(result), () => { });
+                tableGeoSearch.setGeoSearchResult(db, cacheKey, JSON.stringify(result), (cacheError) => {
+                    if (cacheError) {
+                        req.logger?.warn('Failed to cache geo search result', { cacheKey, error: cacheError?.message });
+                    }
+                });
                 response.status = 200;
                 response.result = result;
                 return res.status(200).json(response);
@@ -184,7 +196,11 @@ router.get('/boundedsearch/:searchTerm/:limit/:viewbox', async (req, res) => {
                 }
 
                 // 3. Cache schreiben
-                tableGeoSearch.setGeoSearchResult(db, cacheKey, JSON.stringify(result), () => { });
+                tableGeoSearch.setGeoSearchResult(db, cacheKey, JSON.stringify(result), (cacheError) => {
+                    if (cacheError) {
+                        req.logger?.warn('Failed to cache geo search result', { cacheKey, error: cacheError?.message });
+                    }
+                });
                 response.status = 200;
                 response.result = result;
                 return res.status(200).json(response);

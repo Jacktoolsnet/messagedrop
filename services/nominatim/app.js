@@ -12,7 +12,6 @@ const check = require('./routes/check');
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
-const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const nominatim = require('./routes/nominatim');
 
