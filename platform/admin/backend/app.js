@@ -21,7 +21,6 @@ const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
-const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 
 // ExpressJs
@@ -111,7 +110,7 @@ const onConnection = (socket) => {
   // socket.logger.info(`Verbindung aufgebaut`);
 
   socket.onAny((event, ...args) => {
-    // socket.logger.info(`[SOCKET EVENT] ${event}`, args);
+    socket.logger.debug('socket-event', { event, argsCount: args.length });
   });
 
   // Globale Fehlerbehandlung für diesen Socket
@@ -123,7 +122,7 @@ const onConnection = (socket) => {
   });
 
   socket.on('disconnect', (reason) => {
-    // socket.logger.warn(`Verbindung getrennt: ${reason}`);
+    socket.logger.info('Verbindung getrennt', { reason });
   });
 
   socket.on('connect_error', (err) => {
@@ -134,14 +133,14 @@ const onConnection = (socket) => {
   });
 
   // Eigentliche Handler laden
-  // userHandlers(io, socket);
-  // contactHandlers(io, socket);
+  userHandlers(io, socket);
+  contactHandlers(io, socket);
 };
 
 // Socket.io: neue Verbindung
 io.on("connection", onConnection);
 
-// Fehler beim Verbindungsaufbau (z. B. Auth-Probleme)
+// Fehler beim Verbindungsaufbau (z. B. Auth-Probleme)
 io.engine.on("connection_error", (err) => {
   logger.error('Engine-Fehler beim Verbindungsaufbau', {
     ip: err.req?.socket?.remoteAddress,

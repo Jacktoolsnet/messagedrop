@@ -15,12 +15,13 @@ router.get('/', [security.checkToken], async (req, res) => {
             return res.status(503).json(response);
         }
 
-        // Optional kannst du zusätzlich Informationen mitgeben (z. B. Algorithmusnamen)
+        // Optional kannst du zusätzlich Informationen mitgeben (z. B. Algorithmusnamen)
         response.status = 200;
         response.cryptoPublicKey = encryptionPublicKeyJwk;
         response.signingPublicKey = signingPublicKeyJwk;
         res.status(200).json(response);
     } catch (err) {
+        req.logger?.error('client-connect failed to load keys', { error: err?.message });
         response.status = 500;
         response.error = 'Serverfehler beim Key-Zugriff';
         res.status(500).json(response);

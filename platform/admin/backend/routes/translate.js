@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const security = require('../middleware/security');
 const deepl = require('deepl-node');
 const { requireAdminJwt } = require('../middleware/security');
 
-translator = new deepl.Translator(process.env.DEEPL_API_KEY);
+const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
 
 router.use(requireAdminJwt);
 
 router.get('/:language/:value', function (req, res) {
     let response = { 'status': 0 };
-    this.translator
+    translator
         .translateText(req.params.value, null, req.params.language)
         .then((result) => {
             response.status = 200;

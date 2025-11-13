@@ -881,10 +881,12 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
     let pw;
     try {
         pw = require('playwright');
-    } catch (_e1) {
+    } catch (playwrightError) {
+        req.logger?.warn('Falling back to playwright-chromium', { error: playwrightError?.message });
         try {
             pw = require('playwright-chromium');
-        } catch (_e2) {
+        } catch (chromiumError) {
+            req.logger?.error('Playwright not installed', { error: chromiumError?.message });
             return res.status(501).json({ error: 'screenshot_unavailable', detail: 'playwright not installed' });
         }
     }
@@ -986,13 +988,23 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
         }
         await context.close();
     } catch (err) {
-        if (browser) try { await browser.close(); } catch { }
+        if (browser) {
+            try {
+                await browser.close();
+            } catch (closeError) {
+                req.logger?.warn('playwright close failed', { error: closeError?.message });
+            }
+        }
         // cleanup any partial file
         fs.promises.unlink(outPath).catch(() => { });
         return res.status(502).json({ error: 'screenshot_failed', detail: err?.message || String(err) });
     }
 
-    try { await browser.close(); } catch { }
+    try {
+        await browser.close();
+    } catch (closeError) {
+        req.logger?.warn('playwright close failed', { error: closeError?.message });
+    }
 
     // Store as file evidence
     const fileName = `screenshot-${u.hostname}.png`;

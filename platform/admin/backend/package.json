@@ -46,5 +46,9 @@
     "web-push": "^3.6.7",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0"
   }
 }

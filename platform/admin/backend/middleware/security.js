@@ -43,7 +43,8 @@ function requireAdminJwt(req, res, next) {
     });
     req.admin = payload; // { sub, roles: [...] }
     next();
-  } catch (e) {
+  } catch (error) {
+    req.logger?.warn('Invalid admin token', { error: error?.message });
     return res.status(401).json({ error: 'invalid_admin_token' });
   }
 }

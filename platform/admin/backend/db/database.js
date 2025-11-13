@@ -15,17 +15,19 @@ const tableStatisticSettings = require('./tableStatisticSettings');
 class Database {
 
   constructor() {
-    this.db;
+    this.db = null;
+    this.logger = console;
   }
 
   init(logger) {
+    this.logger = logger ?? console;
     this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedropAdmin.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
       if (err) {
         return;
       } else {
-        this.db.run('PRAGMA foreign_keys = ON;', [], function (err) {
-          if (err) {
-            logger.error(err.message);
+        this.db.run('PRAGMA foreign_keys = ON;', [], (pragmaError) => {
+          if (pragmaError) {
+            this.logger.error(pragmaError.message);
           }
         });
         tableUser.init(this.db);
@@ -40,29 +42,29 @@ class Database {
         tableStatisticSettings.init(this.db);
 
         // Trigger initialisieren
-        this.initTriggers(logger);
+        this.initTriggers();
 
-        this.initIndexes(logger);
+        this.initIndexes();
 
-        logger.info('Connected to the messagedrop SQlite database.');
+        this.logger.info('Connected to the messagedrop SQlite database.');
       }
     });
   };
 
   close() {
-    this.db.close((err) => {
+    this.db?.close((err) => {
       if (err) {
         return;
       }
-      logger.info('Close the database connection.');
+      this.logger.info('Close the database connection.');
     });
   };
 
-  initTriggers(logger) {
+  initTriggers() {
 
   }
 
-  initIndexes(logger) {
+  initIndexes() {
 
   }
 

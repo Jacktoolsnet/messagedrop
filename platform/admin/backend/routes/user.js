@@ -49,7 +49,8 @@ router.post('/login', async (req, res) => {
             );
             res.json({ token });
         });
-    } catch (_e) {
+    } catch (error) {
+        req.logger?.error('Admin login failed', { error: error?.message });
         res.status(500).json({ message: 'login_failed' });
     }
 });

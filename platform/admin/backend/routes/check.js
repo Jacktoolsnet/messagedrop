@@ -8,19 +8,12 @@ router.post('/',
     express.json({ type: 'application/json' })
   ]
   , function (req, res) {
-    if (undefined === req.database) {
-      database_connection = 'not established'
-    } else {
-      if (req.database.db.open) {
-        database_connection = 'established'
-      } else {
-        database_connection = 'not established'
-      }
-    }
-    let response = {
-      'token': 'ok',
-      database_connection,
-      'reqBody': req.body
+    const isDbOpen = req.database?.db?.open === true;
+    const databaseConnection = isDbOpen ? 'established' : 'not established';
+    const response = {
+      token: 'ok',
+      database_connection: databaseConnection,
+      reqBody: req.body
     };
     res.status(200).json(response);
   });
