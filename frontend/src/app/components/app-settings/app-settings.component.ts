@@ -64,6 +64,7 @@ export class AppSettingsComponent implements OnInit {
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
+  public storagePersistenceWarning = '';
 
   ngOnInit(): void {
     if ('permissions' in navigator && navigator.permissions?.query) {
@@ -111,7 +112,7 @@ export class AppSettingsComponent implements OnInit {
     if (!targetState) {
       const confirmed = typeof window === 'undefined'
         ? true
-        : window.confirm('Das Deaktivieren kann dazu führen, dass der Browser gespeicherte Daten löscht. Möchtest du wirklich fortfahren?');
+        : window.confirm('Disabling may allow the browser to prune stored data. Do you really want to continue?');
       if (!confirmed) {
         event.source.checked = previousState;
         return;
@@ -129,6 +130,11 @@ export class AppSettingsComponent implements OnInit {
     } finally {
       this.storagePersistenceBusy = false;
       event.source.checked = this.appSettings.persistStorage;
+      if (targetState && !this.appSettings.persistStorage) {
+        this.storagePersistenceWarning = 'Persistent storage could not be granted by the browser.';
+      } else {
+        this.storagePersistenceWarning = '';
+      }
     }
   }
 

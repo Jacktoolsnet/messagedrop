@@ -36,20 +36,23 @@
             <div class="storage-persistence-header">
                 <mat-icon>inventory_2</mat-icon>
                 <div>
-                    <h3>Persistente Speicherung</h3>
-                    <p class="storage-persistence-subtitle">Schuetzt lokale Daten vor automatischem Aufraeumen.</p>
+                    <h3>Persistent storage</h3>
+                    <p class="storage-persistence-subtitle">Keeps local data safe from automatic cleanup.</p>
                 </div>
             </div>
             <p class="storage-persistence-note">
-                Wenn verfuegbar, fordern wir den Browser auf, IndexedDB-Daten dauerhaft zu behalten.
-                Ideal fuer Offline-Nutzung oder viele Nachrichten.
+                When available, we ask the browser to keep IndexedDB data permanently.
+                Ideal for offline usage or large message archives.
             </p>
             <mat-slide-toggle color="primary" [checked]="appSettings.persistStorage"
                 (change)="onStoragePersistenceToggle($event)" [disabled]="storagePersistenceBusy">
-                Lokale Daten schuetzen
+                Protect local data
             </mat-slide-toggle>
             @if(storagePersistenceBusy){
-            <small class="storage-persistence-hint">Einstellung wird uebernommen ...</small>
+            <small class="storage-persistence-hint">Applying preference ...</small>
+            }
+            @if(storagePersistenceWarning){
+            <p class="storage-persistence-warning">{{ storagePersistenceWarning }}</p>
             }
         </div>
         }

@@ -151,3 +151,9 @@ h4 {
     color: var(--mat-app-text-color);
     opacity: 0.8;
 }
+
+.storage-persistence-warning {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mat-form-field-error-text-color, #ba1a1a);
+}
