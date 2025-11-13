@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
@@ -62,6 +62,8 @@ export class AppSettingsComponent implements OnInit {
   ];
   public appSettings: AppSettings = this.dialogData.appSettings;
   public showDetectLocationOnStart = false;
+  public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
+  public storagePersistenceBusy = false;
 
   ngOnInit(): void {
     if ('permissions' in navigator && navigator.permissions?.query) {
@@ -95,6 +97,39 @@ export class AppSettingsComponent implements OnInit {
   setDetectLocationOnStart(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, detectLocationOnStart: enabled };
     this.appService.setAppSettings(this.appSettings);
+  }
+
+  async onStoragePersistenceToggle(event: MatSlideToggleChange): Promise<void> {
+    if (!this.storagePersistenceSupported) {
+      event.source.checked = false;
+      return;
+    }
+
+    const targetState = event.checked;
+    const previousState = this.appSettings.persistStorage ?? false;
+
+    if (!targetState) {
+      const confirmed = typeof window === 'undefined'
+        ? true
+        : window.confirm('Das Deaktivieren kann dazu führen, dass der Browser gespeicherte Daten löscht. Möchtest du wirklich fortfahren?');
+      if (!confirmed) {
+        event.source.checked = previousState;
+        return;
+      }
+    }
+
+    this.storagePersistenceBusy = true;
+
+    try {
+      const granted = await this.appService.updateStoragePersistencePreference(targetState);
+      this.appSettings = { ...this.appSettings, persistStorage: granted };
+      if (targetState && !granted) {
+        console.warn('Persistent storage could not be granted by the browser.');
+      }
+    } finally {
+      this.storagePersistenceBusy = false;
+      event.source.checked = this.appSettings.persistStorage;
+    }
   }
 
 }

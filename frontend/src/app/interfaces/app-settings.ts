@@ -4,6 +4,7 @@ export interface AppSettings {
     defaultTheme: string,
     themeMode: 'light' | 'dark' | 'system',
     detectLocationOnStart: boolean,
+    persistStorage: boolean,
     enablePinterestContent: boolean,
     enableSpotifyContent: boolean,
     enableTenorContent: boolean,

@@ -31,6 +31,28 @@
             <app-enable-location (enabledChange)="setDetectLocationOnStart($event)"></app-enable-location>
         </div>
         }
+        @if(storagePersistenceSupported){
+        <div class="platform-tile storage-persistence-tile">
+            <div class="storage-persistence-header">
+                <mat-icon>inventory_2</mat-icon>
+                <div>
+                    <h3>Persistente Speicherung</h3>
+                    <p class="storage-persistence-subtitle">Schuetzt lokale Daten vor automatischem Aufraeumen.</p>
+                </div>
+            </div>
+            <p class="storage-persistence-note">
+                Wenn verfuegbar, fordern wir den Browser auf, IndexedDB-Daten dauerhaft zu behalten.
+                Ideal fuer Offline-Nutzung oder viele Nachrichten.
+            </p>
+            <mat-slide-toggle color="primary" [checked]="appSettings.persistStorage"
+                (change)="onStoragePersistenceToggle($event)" [disabled]="storagePersistenceBusy">
+                Lokale Daten schuetzen
+            </mat-slide-toggle>
+            @if(storagePersistenceBusy){
+            <small class="storage-persistence-hint">Einstellung wird uebernommen ...</small>
+            }
+        </div>
+        }
     </div>
 
     <mat-chip-set class="version-chipset">

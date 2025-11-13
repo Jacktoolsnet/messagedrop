@@ -24,6 +24,7 @@ export class AppService {
     defaultTheme: 'azure',
     themeMode: 'system',
     detectLocationOnStart: false,
+    persistStorage: false,
     enableYoutubeContent: false,
     enablePinterestContent: false,
     enableSpotifyContent: false,
@@ -69,6 +70,7 @@ export class AppService {
     } catch {
       this.appSettings = { ...this.defaultAppSettings };
     }
+    await this.syncPersistentStorageState();
     this.settingsReady = true;
     this.chekConsentCompleted();
     this._settingsSet.update(trigger => trigger + 1);
@@ -139,4 +141,53 @@ export class AppService {
       this.openContactListDialog();
     }
   });*/
+
+  public isStoragePersistenceSupported(): boolean {
+    return this.storagePersistenceAvailable();
+  }
+
+  public async updateStoragePersistencePreference(enable: boolean): Promise<boolean> {
+    const granted = enable ? await this.requestPersistentStorage() : false;
+    const updatedSettings = { ...this.getAppSettings(), persistStorage: granted };
+    await this.setAppSettings(updatedSettings);
+    return granted;
+  }
+
+  private storagePersistenceAvailable(): boolean {
+    return typeof navigator !== 'undefined'
+      && !!navigator.storage
+      && typeof navigator.storage.persist === 'function'
+      && typeof navigator.storage.persisted === 'function';
+  }
+
+  private async syncPersistentStorageState(): Promise<void> {
+    if (!this.appSettings || !this.storagePersistenceAvailable()) {
+      if (this.appSettings) {
+        this.appSettings = { ...this.appSettings, persistStorage: false };
+      }
+      return;
+    }
+
+    try {
+      const persisted = await navigator.storage.persisted();
+      this.appSettings = { ...this.appSettings, persistStorage: persisted };
+    } catch {
+      this.appSettings = { ...this.appSettings, persistStorage: false };
+    }
+  }
+
+  private async requestPersistentStorage(): Promise<boolean> {
+    if (!this.storagePersistenceAvailable()) {
+      return false;
+    }
+
+    try {
+      if (await navigator.storage.persisted()) {
+        return true;
+      }
+      return await navigator.storage.persist();
+    } catch {
+      return false;
+    }
+  }
 }
