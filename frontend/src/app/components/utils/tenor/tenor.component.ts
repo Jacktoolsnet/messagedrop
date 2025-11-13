@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -44,6 +44,7 @@ export class TenorComponent implements OnInit {
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<TenorComponent>);
   private readonly tenorService = inject(TenorService);
+  private readonly cdRef = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     this.showTenor = this.appService.getAppSettings().enableTenorContent;
@@ -110,6 +111,7 @@ export class TenorComponent implements OnInit {
       this.tensorGetFeaturedGifs();
     } else {
       this.results = [];
+      this.cdRef.markForCheck();
     }
   }
 
@@ -122,11 +124,13 @@ export class TenorComponent implements OnInit {
       this.nextSearch = response.data.next;
       this.nextFeatured = '';
     }
+    this.cdRef.markForCheck();
   }
 
   private handleTenorError(error: unknown): void {
     console.error('Tenor request failed', error);
     this.results = [];
+    this.cdRef.markForCheck();
   }
 
 }
