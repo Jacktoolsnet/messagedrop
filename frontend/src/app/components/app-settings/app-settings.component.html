@@ -1,31 +1,42 @@
 <h2 mat-dialog-title>App settings</h2>
 <mat-dialog-content>
-    <mat-form-field appearance="fill" class="theme-select">
-        <mat-label>Theme</mat-label>
-        <mat-select [value]="appSettings.defaultTheme" (selectionChange)="setTheme($event.value)">
-            <mat-option *ngFor="let theme of availableThemes" [value]="theme">
-                {{ theme | titlecase }}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
-
-    <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.themeMode"
-        (change)="setThemeMode($event.value)" class="theme-toggle-group" exclusive aria-label="Theme mode toggle">
-        <mat-button-toggle value="light">
-            <mat-icon>light_mode</mat-icon>
-            Light
-        </mat-button-toggle>
-        <mat-button-toggle value="dark">
-            <mat-icon>dark_mode</mat-icon>
-            Dark
-        </mat-button-toggle>
-        <mat-button-toggle value="system">
-            <mat-icon>settings</mat-icon>
-            System
-        </mat-button-toggle>
-    </mat-button-toggle-group>
-
     <div class="platform-tile-container">
+        <div class="platform-tile theme-settings-tile">
+            <div class="theme-settings-header">
+                <mat-icon>palette</mat-icon>
+                <div>
+                    <h3>Theme & appearance</h3>
+                    <p class="theme-settings-subtitle">Choose colors and light/dark behavior.</p>
+                </div>
+            </div>
+
+            <mat-form-field appearance="fill" class="theme-select">
+                <mat-label>Theme</mat-label>
+                <mat-select [value]="appSettings.defaultTheme" (selectionChange)="setTheme($event.value)">
+                    <mat-option *ngFor="let theme of availableThemes" [value]="theme">
+                        {{ theme | titlecase }}
+                    </mat-option>
+                </mat-select>
+            </mat-form-field>
+
+            <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.themeMode"
+                (change)="setThemeMode($event.value)" class="theme-toggle-group" exclusive
+                aria-label="Theme mode toggle">
+                <mat-button-toggle value="light">
+                    <mat-icon>light_mode</mat-icon>
+                    Light
+                </mat-button-toggle>
+                <mat-button-toggle value="dark">
+                    <mat-icon>dark_mode</mat-icon>
+                    Dark
+                </mat-button-toggle>
+                <mat-button-toggle value="system">
+                    <mat-icon>settings</mat-icon>
+                    System
+                </mat-button-toggle>
+            </mat-button-toggle-group>
+        </div>
+
         @if(showDetectLocationOnStart){
         <div class="platform-tile">
             <app-enable-location (enabledChange)="setDetectLocationOnStart($event)"></app-enable-location>
