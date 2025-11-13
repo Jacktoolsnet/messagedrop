@@ -3,6 +3,7 @@ const router = express.Router();
 const security = require('../middleware/security');
 const axios = require('axios');
 const tableWeather = require('../db/tableWeather');
+const tableWeatherHistory = require('../db/tableWeatherHistory');
 
 router.use(security.checkToken);
 
@@ -14,7 +15,9 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', async (req, res) => 
     const maxAgeMs = 60 * 60 * 1000; // 1 Stunde
 
     tableWeather.getWeatherData(db, cacheKey, async (err, row) => {
-        if (err) { }
+        if (err) {
+            req.logger?.error('weather cache lookup failed', { cacheKey, error: err?.message });
+        }
 
         const lastUpdate = row?.lastUpdate ? new Date(row.lastUpdate) : null;
         const isFresh = lastUpdate && Date.now() - lastUpdate.getTime() < maxAgeMs;
@@ -41,17 +44,23 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', async (req, res) => 
             const weatherRes = await axios.get(url, { params });
 
             const dataString = JSON.stringify(weatherRes.data);
-            tableWeather.setWeatherData(db, cacheKey, dataString, (err) => { });
+            tableWeather.setWeatherData(db, cacheKey, dataString, (cacheError) => {
+                if (cacheError) {
+                    req.logger?.warn('weather cache update failed', { cacheKey, error: cacheError?.message });
+                }
+            });
 
             res.status(200).json({
                 status: 200,
                 data: weatherRes.data
             });
         } catch (err) {
-            const status = 500;
+            const status = err.response?.status || 500;
+            const errorBody = err.response?.data || err.message || 'Request failed';
+            req.logger?.error('weather fetch failed', { cacheKey, error: err?.message });
             res.status(status).json({
                 status,
-                error: err
+                error: errorBody
             });
         }
     });

@@ -14,12 +14,12 @@ const airQualtiy = require('./routes/air-quality');
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
-const rateLimit = require('express-rate-limit')
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 
 // Table for crone jobs
 const tableAirQuality = require('./db/tableAirQuality');
 const tableWeather = require('./db/tableWeather');
+const tableWeatherHistory = require('./db/tableWeatherHistory');
 
 
 // ExpressJs
@@ -158,6 +158,12 @@ cron.schedule('*/1 * * * *', () => {
   });
 
   tableWeather.cleanExpired(database.db, function (err) {
+    if (err) {
+      logger.error(err);
+    }
+  });
+
+  tableWeatherHistory.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
     }
