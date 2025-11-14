@@ -8,13 +8,13 @@ import { AppService } from '../../../services/app.service';
 type PlatformKey = 'tenor' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
 type SettingsKey = 'enableTenorContent' | 'enableYoutubeContent' | 'enableSpotifyContent' | 'enableTikTokContent' | 'enablePinterestContent';
 
-type PlatformMeta = {
+interface PlatformMeta {
   name: string;
   icon: string;
   settingsKey: SettingsKey;
   terms: string;
   privacy: string;
-};
+}
 
 const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
   tenor: { name: 'Tenor', icon: 'gif_box', settingsKey: 'enableTenorContent', terms: 'https://policies.google.com/terms', privacy: 'https://policies.google.com/privacy' },
