@@ -65,6 +65,15 @@
                 "<node_internals>/**"
             ],
             "type": "node"
+        },
+        {
+            "name": "SocketIO-Service",
+            "program": "${workspaceFolder}/services/socketio/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "type": "node"
         }
     ]
 }

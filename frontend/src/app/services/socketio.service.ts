@@ -38,7 +38,7 @@ export class SocketioService {
 
   private socket: Socket;
   private readonly ioConfig: SocketIoConfig = {
-    url: `${environment.apiUrl}`,
+    url: `${environment.socketIoUrl}`,
     options: {
       reconnection: true,
       reconnectionAttempts: Infinity,

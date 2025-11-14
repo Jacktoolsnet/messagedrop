@@ -1,0 +1,34 @@
+{
+  "name": "messagedrop-socket-service",
+  "version": "1.0.0",
+  "description": "Socket.IO gateway for messagedrop",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jacktoolsnet/messagedrop.git"
+  },
+  "keywords": [
+    "messagedrop",
+    "network",
+    "api",
+    "backend"
+  ],
+  "author": "JackTools.Net",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jacktoolsnet/messagedrop/issues"
+  },
+  "homepage": "https://github.com/Jacktoolsnet/messagedrop#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "helmet": "^8.1.0",
+    "socket.io": "^4.8.1",
+    "winston": "^3.18.3",
+    "winston-daily-rotate-file": "^5.0.0"
+  }
+}
