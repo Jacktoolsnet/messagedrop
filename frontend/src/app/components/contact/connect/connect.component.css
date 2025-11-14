@@ -7,17 +7,6 @@ button {
   margin-right: 8px;
 }
 
-input[type=text],
-select {
-  width: 100%;
-  padding: 12px 20px;
-  margin: 8px 0;
-  display: inline-block;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-sizing: border-box;
-}
-
 .file-input {
   display: none;
 }
@@ -45,4 +34,8 @@ select {
   z-index: 100;
   margin-bottom: 0.5rem;
   margin-right: 0.5rem;
+}
+
+.connect-input-field {
+  width: 100%;
 }

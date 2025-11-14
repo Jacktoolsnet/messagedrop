@@ -122,7 +122,7 @@ export class ContactlistComponent {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
-      minWidth: '20vw',
+      minWidth: '60vw',
       maxWidth: '90vw',
       height: 'auto',
       maxHeight: '90vh',

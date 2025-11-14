@@ -4,7 +4,15 @@
 
 <mat-dialog-content>
   <p>The connect id I like to import</p>
-  <input matInput type="text" maxlength="64" placeholder="The connect id." [(ngModel)]="data.connectId" />
+  <mat-form-field appearance="fill" class="connect-input-field">
+    <mat-label>Connect id</mat-label>
+    <input #connectIdInput matInput type="text" maxlength="64" placeholder="The connect id."
+      [(ngModel)]="data.connectId" />
+    <button mat-icon-button matSuffix type="button" aria-label="Paste from clipboard"
+      (click)="onPasteFromClipboard($event)">
+      <mat-icon>content_paste_go</mat-icon>
+    </button>
+  </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-actions>
