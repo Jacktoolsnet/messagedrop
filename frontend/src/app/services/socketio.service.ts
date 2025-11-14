@@ -172,7 +172,9 @@ export class SocketioService {
   }
 
   public requestProfileForContact(): void {
-    this.socket.on(`requestProfileForContact:${this.userService.getUser().id}`, (payload: ProfileRequestPayload) => {
+    const eventName = `requestProfileForContact:${this.userService.getUser().id}`;
+    this.socket.off(eventName);
+    this.socket.on(eventName, (payload: ProfileRequestPayload) => {
       this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.contact.hint!))
         .then((hint: string) => {
           if (hint !== '') {
