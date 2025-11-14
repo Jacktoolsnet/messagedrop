@@ -1,20 +1,21 @@
-<div class="platform-tile activation">
-    <div class="platform-header">
-        <div class="platform-name">Activate external content from {{ platformName }}</div>
-
-        <mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)"
-            aria-label="Enable {{ platformName }}">
-            Enable {{ platformName }}
-        </mat-slide-toggle>
-    </div>
-
-    <div class="platform-note">
-        By enabling, you allow loading content from {{ platformName }} and agree to the provider’s
-        <a class="platform-link" [href]="termsUrl" target="_blank" rel="noopener"
-            (click)="$event.stopPropagation()">Terms</a>
-        and
-        <a class="platform-link" [href]="privacyUrl" target="_blank" rel="noopener"
-            (click)="$event.stopPropagation()">Privacy Policy</a>.
-        This may send your IP address and usage data to {{ platformName }}.
+<div class="platform-header">
+    <mat-icon>{{ platformIcon }}</mat-icon>
+    <div class="platform-header-copy">
+        <h3 class="platform-name">External content: {{ platformName }}</h3>
+        <p class="platform-subtitle">Allow embeds, previews, and widgets from this provider.</p>
     </div>
 </div>
+
+<div class="platform-note">
+    By enabling, you allow loading content from {{ platformName }} and agree to the provider’s
+    <a class="platform-link" [href]="termsUrl" target="_blank" rel="noopener"
+        (click)="$event.stopPropagation()">Terms</a>
+    and
+    <a class="platform-link" [href]="privacyUrl" target="_blank" rel="noopener"
+        (click)="$event.stopPropagation()">Privacy Policy</a>.
+    This may send your IP address and usage data to {{ platformName }}.
+</div>
+
+<mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)" aria-label="Enable {{ platformName }}">
+    Enable {{ platformName }}
+</mat-slide-toggle>

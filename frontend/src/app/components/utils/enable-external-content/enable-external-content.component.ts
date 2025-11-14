@@ -1,24 +1,33 @@
 import { CommonModule } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatIconModule } from '@angular/material/icon';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 
 type PlatformKey = 'tenor' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
 type SettingsKey = 'enableTenorContent' | 'enableYoutubeContent' | 'enableSpotifyContent' | 'enableTikTokContent' | 'enablePinterestContent';
 
-const PLATFORM_META: Record<PlatformKey, { name: string; settingsKey: SettingsKey; terms: string; privacy: string }> = {
-  tenor: { name: 'Tenor', settingsKey: 'enableTenorContent', terms: 'https://policies.google.com/terms', privacy: 'https://policies.google.com/privacy' },
-  youtube: { name: 'YouTube', settingsKey: 'enableYoutubeContent', terms: 'https://www.youtube.com/t/terms', privacy: 'https://policies.google.com/privacy' },
-  spotify: { name: 'Spotify', settingsKey: 'enableSpotifyContent', terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
-  tiktok: { name: 'TikTok', settingsKey: 'enableTikTokContent', terms: 'https://www.tiktok.com/legal/terms-of-service', privacy: 'https://www.tiktok.com/legal/privacy-policy' },
-  pinterest: { name: 'Pinterest', settingsKey: 'enablePinterestContent', terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' }
+type PlatformMeta = {
+  name: string;
+  icon: string;
+  settingsKey: SettingsKey;
+  terms: string;
+  privacy: string;
+};
+
+const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
+  tenor: { name: 'Tenor', icon: 'gif_box', settingsKey: 'enableTenorContent', terms: 'https://policies.google.com/terms', privacy: 'https://policies.google.com/privacy' },
+  youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: 'enableYoutubeContent', terms: 'https://www.youtube.com/t/terms', privacy: 'https://policies.google.com/privacy' },
+  spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: 'enableSpotifyContent', terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
+  tiktok: { name: 'TikTok', icon: 'music_note', settingsKey: 'enableTikTokContent', terms: 'https://www.tiktok.com/legal/terms-of-service', privacy: 'https://www.tiktok.com/legal/privacy-policy' },
+  pinterest: { name: 'Pinterest', icon: 'push_pin', settingsKey: 'enablePinterestContent', terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' }
 };
 
 @Component({
   selector: 'app-enable-external-content',
   standalone: true,
-  imports: [CommonModule, MatSlideToggleModule],
+  imports: [CommonModule, MatSlideToggleModule, MatIconModule],
   templateUrl: './enable-external-content.component.html',
   styleUrl: './enable-external-content.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -35,6 +44,7 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
 
   enabled = false;
   platformName = '';
+  platformIcon = 'public';
   termsUrl = '';
   privacyUrl = '';
   private settingsKey!: SettingsKey;
@@ -47,6 +57,7 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
     if (!this.platform) return;
     const meta = PLATFORM_META[this.platform];
     this.platformName = meta.name;
+    this.platformIcon = meta.icon;
     this.settingsKey = meta.settingsKey;
     this.termsUrl = meta.terms;
     this.privacyUrl = meta.privacy;

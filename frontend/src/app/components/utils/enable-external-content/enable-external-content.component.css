@@ -1,58 +1,60 @@
 :host {
     line-height: 1.35;
-}
-
-/* Tile darf nie breiter werden als sein Container */
-.platform-tile.activation {
-    width: 100%;
-    max-width: 100%;
-    box-sizing: border-box;
-    /* Falls extrem lange Tokens drin sind (z. B. ohne Leerzeichen) */
-    overflow-wrap: anywhere;
-    word-break: break-word;
-    /* Fallback */
-}
-
-/* Header auf volle Breite und flex-Shrink erlauben */
-.platform-header {
     display: flex;
     flex-direction: column;
-    /* Text oben, Toggle darunter */
+    gap: 0.75rem;
+}
+
+.platform-header {
+    display: flex;
     align-items: center;
-    gap: 0.5rem;
-    width: 100%;
+    gap: 0.75rem;
+    text-align: left;
 }
 
-.platform-header>* {
-    min-width: 0;
-    /* verhindert, dass Kinder overflowen */
+.platform-header mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
 }
 
-/* Titel & Hinweis: immer umbrechen */
-.platform-name,
+.platform-header-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.platform-name {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mat-app-text-color);
+}
+
+.platform-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mat-card-subtitle-text-color);
+}
+
 .platform-note {
     white-space: normal;
     overflow-wrap: anywhere;
     word-break: break-word;
-    /* Fallback für ältere Browser */
     hyphens: auto;
-    /* hübschere Trennungen, wenn erlaubt */
-    max-width: 100%;
-    text-align: center;
+    margin: 0;
+    font-size: 0.9rem;
+    text-align: left;
+    color: var(--mat-card-subtitle-text-color);
 }
 
 .mat-mdc-slide-toggle {
     max-width: 100%;
     white-space: normal;
-    margin: 1rem;
+    margin: 0.25rem 0 0.5rem;
+    align-self: flex-start;
 }
 
-.mat-mdc-slide-toggle {
-    max-width: 100%;
-    white-space: normal;
-}
-
-/* Links: Haupttextfarbe, bold, immer unterstrichen – auch im Hover/Visited */
 .platform-link,
 .platform-link:hover,
 .platform-link:focus,
