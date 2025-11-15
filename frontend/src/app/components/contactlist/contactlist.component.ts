@@ -1,6 +1,5 @@
 import { CommonModule } from '@angular/common';
 import { Component, Signal, inject } from '@angular/core';
-import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -28,8 +27,7 @@ import { ConnectComponent } from '../contact/connect/connect.component';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ContactProfileComponent } from '../contact/contact-profile/contact-profile.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
-import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
-import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { ContactMessageChatroomComponent } from '../contact-message-chatroom/contact-message-chatroom.component';
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
@@ -46,9 +44,6 @@ interface ContactEditMessageResult {
 @Component({
   selector: 'app-contactlist',
   imports: [
-    ShowmessageComponent,
-    ShowmultimediaComponent,
-    MatBadgeModule,
     MatCardModule,
     CommonModule,
     MatButtonModule,
@@ -255,6 +250,29 @@ export class ContactlistComponent {
     this.contactService.setContacts(updatedContacts);
   }
 
+  openContactChatroom(contact: Contact): void {
+    const dialogRef = this.matDialog.open(ContactMessageChatroomComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      data: contact,
+      minWidth: 'min(600px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
+      height: '95vh',
+      maxHeight: '95vh',
+      autoFocus: false
+    });
+
+    const instance = dialogRef.componentInstance;
+    if (instance) {
+      const subscription = instance.composeMessage.subscribe((selectedContact) => {
+        dialogRef.close();
+        this.openContactMessagDialog(selectedContact);
+      });
+      dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
+    }
+  }
+
   async openContactMessagDialog(contact: Contact): Promise<void> {
     const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
     let lastMultimedia: Multimedia | undefined = undefined;
@@ -410,10 +428,6 @@ export class ContactlistComponent {
               });
           });
       });
-  }
-
-  hasContent(message?: ShortMessage): boolean {
-    return !!message && (message.message?.trim() !== '' || message.multimedia?.type !== 'undefined');
   }
 
 }

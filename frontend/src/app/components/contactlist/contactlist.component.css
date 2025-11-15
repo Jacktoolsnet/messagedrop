@@ -6,7 +6,6 @@
   /* wie weit über den Rand hinausragen */
   --msg-maxw: 85%;
   /* max. Breite einer Chatzeile */
-  --panel-max-h: max(4rem, calc(80vh - 6rem));
   /* Basis: Material Outlined Card Outline als neutraler Rahmen */
   --bubble-outline: var(--mat-card-outlined-outline-color);
   /* zarter Shadow nutzt ebenfalls Material-Outline, bleibt dadurch theme-kohärent */
@@ -69,19 +68,6 @@
   align-self: start;
 }
 
-/* === MESSAGE CONTENT === */
-.message-content {
-  font-size: 0.9rem;
-  margin-bottom: 1.5rem;
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-  max-height: var(--panel-max-h);
-  overflow-y: auto;
-  scrollbar-gutter: stable;
-  overscroll-behavior: contain;
-}
-
 /* === LISTEN UND BUTTONS === */
 .list {
   border-radius: 1.25rem;
@@ -98,6 +84,14 @@ button,
   justify-content: left;
   flex-wrap: wrap;
   margin-top: auto;
+}
+
+.chatroom-preview__content {
+  min-height: 4rem;
+  display: flex;
+  align-items: center;
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.95rem;
 }
 
 /* === BUTTON POSITIONIERUNGEN === */
@@ -179,158 +173,4 @@ mat-expansion-panel-header .name {
 .inactiv-button {
   color: var(--mat-app-text-color);
   border: 1px solid var(--mdc-outlined-button-outline-color);
-}
-
-/* === Grundlayout === */
-.message {
-  display: grid;
-  gap: 0.75rem;
-  margin: 1rem;
-  overflow: visible;
-  max-width: 95vw;
-}
-
-/* === Jede BubbleRow ist ein Anker für Avatar + Bubble === */
-.bubble-row {
-  position: relative;
-  width: 100%;
-  max-width: min(var(--msg-maxw), );
-  overflow: visible;
-  display: grid;
-  margin-top: 2rem;
-}
-
-/* Chat-Alignment */
-.bubble-row.them {
-  justify-self: start;
-}
-
-.bubble-row.me {
-  justify-self: end;
-}
-
-/* === Bubble-Styling ohne Hintergrundfarbe === */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bubble-outline: color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, var(--mat-app-text-color) 45%);
-    --bubble-shadow: 0 2px 8px color-mix(in srgb, var(--mat-card-outlined-outline-color) 50%, transparent);
-  }
-}
-
-/* Gemeinsames Bubble-Styling (ohne Hintergrund) */
-.bubble-row p.from-me,
-.bubble-row p.from-them {
-  background-color: var(--mat-card-filled-container-color);
-  color: var(--mat-app-text-color);
-  border: 1px solid var(--bubble-outline);
-  border-radius: 1.25rem;
-  padding: 0.75rem 1rem;
-  line-height: 1.4;
-  box-shadow: var(--bubble-shadow);
-  /* dezenter innerer Kontrast für bessere Kanten im Dark Theme */
-  box-shadow:
-    var(--bubble-shadow),
-    0 0 0 1px color-mix(in srgb, var(--mat-card-filled-container-color) 85%, transparent) inset;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-/* Ausrichtung wie gehabt */
-.bubble-row p.from-me {
-  text-align: right;
-}
-
-.bubble-row p.from-them {
-  text-align: left;
-}
-
-/* Optionales, materialiges Hover – nimmt Primary-Farbe, bleibt subtil */
-.bubble-row p.from-me:hover,
-.bubble-row p.from-them:hover {
-  border-color: color-mix(in srgb, var(--bubble-outline) 60%, var(--mat-primary-color) 40%);
-  box-shadow:
-    0 4px 12px color-mix(in srgb, var(--mat-card-outlined-outline-color) 45%, transparent),
-    0 0 0 1px color-mix(in srgb, var(--mat-primary-color) 25%, transparent) inset;
-}
-
-/* === Avatar-Boxen === */
-.avatar-me,
-.avatar-them {
-  position: absolute;
-  z-index: 2;
-  height: var(--avatar-h);
-  padding: 0.25rem 0.75rem;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-
-  color: var(--mat-card-subtitle-text-color);
-  background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  border-radius: 1.5rem;
-  max-width: min(82%, 22rem);
-  overflow: hidden;
-  pointer-events: auto;
-}
-
-/* === Positionierungen === */
-/* them → links oben, halber Avatar über Bubble, 1rem nach außen */
-.bubble-row.them .avatar-them {
-  top: -1rem;
-  left: -1rem;
-}
-
-/* me → rechts unten, halber Avatar unter Bubble, 1rem nach außen */
-.bubble-row.me .avatar-me {
-  top: -1rem;
-  right: -1rem;
-}
-
-/* === Avatar-Inhalt === */
-.avatar-me .avatar,
-.avatar-them .avatar {
-  flex: 0 0 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.avatar-me mat-icon,
-.avatar-them mat-icon {
-  flex: 0 0 2.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  font-size: 2rem;
-  display: grid;
-  place-items: center;
-  border-radius: 50%;
-}
-
-.avatar-me .name,
-.avatar-them .name {
-  min-width: 0;
-  font-size: 1rem;
-  font-weight: 500;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* === Responsive === */
-@media (max-width: 600px) {
-  :root {
-    --msg-maxw: 92%;
-  }
-
-  .avatar-me,
-  .avatar-them {
-    height: 2.5rem;
-    padding: 0.25rem 0.5rem;
-  }
-
-  .avatar-me .avatar,
-  .avatar-them .avatar {
-    width: 2rem;
-    height: 2rem;
-  }
 }
