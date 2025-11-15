@@ -266,7 +266,6 @@ export class ContactlistComponent {
     const instance = dialogRef.componentInstance;
     if (instance) {
       const subscription = instance.composeMessage.subscribe((selectedContact) => {
-        dialogRef.close();
         this.openContactMessagDialog(selectedContact);
       });
       dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
