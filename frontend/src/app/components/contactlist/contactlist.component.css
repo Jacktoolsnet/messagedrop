@@ -6,6 +6,7 @@
   /* wie weit über den Rand hinausragen */
   --msg-maxw: 85%;
   /* max. Breite einer Chatzeile */
+  --panel-max-h: max(4rem, calc(80vh - 6rem));
   /* Basis: Material Outlined Card Outline als neutraler Rahmen */
   --bubble-outline: var(--mat-card-outlined-outline-color);
   /* zarter Shadow nutzt ebenfalls Material-Outline, bleibt dadurch theme-kohärent */
@@ -75,6 +76,10 @@
   white-space: normal;
   overflow-wrap: break-word;
   word-break: break-word;
+  max-height: var(--panel-max-h);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
 /* === LISTEN UND BUTTONS === */
