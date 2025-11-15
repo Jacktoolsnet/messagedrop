@@ -182,13 +182,14 @@ mat-expansion-panel-header .name {
   gap: 0.75rem;
   margin: 1rem;
   overflow: visible;
+  max-width: 95vw;
 }
 
 /* === Jede BubbleRow ist ein Anker für Avatar + Bubble === */
 .bubble-row {
   position: relative;
-  width: max-content;
-  max-width: var(--msg-maxw);
+  width: 100%;
+  max-width: min(var(--msg-maxw), );
   overflow: visible;
   display: grid;
   margin-top: 2rem;

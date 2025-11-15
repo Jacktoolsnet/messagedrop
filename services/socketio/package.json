@@ -30,5 +30,8 @@
     "socket.io": "^4.8.1",
     "winston": "^3.18.3",
     "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.22.0"
   }
 }
