@@ -263,6 +263,7 @@ export class SocketioService {
                       // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
                     }
+                    this.contactService.refreshContact(contact.id);
                   });
               }
             } else {
@@ -283,6 +284,7 @@ export class SocketioService {
               contact.contactUserMessage = errorMessage;
               // contact.contactUserMessageStyle = payload.envelope.messageStyle;
               contact.lastMessageFrom = 'contactUser';
+              this.contactService.refreshContact(contact.id);
             }
           });
       }

@@ -274,6 +274,12 @@ export class ContactService {
     this._contacts.set(contacts);
   }
 
+  refreshContact(contactId: string) {
+    this._contacts.update((contacts) =>
+      contacts.map(contact => contact.id === contactId ? { ...contact } : contact)
+    );
+  }
+
   // We need a function from qrcode
   createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {
     const url = `${environment.apiUrl}/contact/create`;
@@ -374,6 +380,7 @@ export class ContactService {
           contact.userMessage = shortMessage;
           contact.userEncryptedMessage = JSON.parse(envelope.userEncryptedMessage);
           contact.lastMessageFrom = 'user';
+          this.refreshContact(contact.id);
           socketioService.sendShortMessageToContact(envelope);
         },
         error: (err) => {

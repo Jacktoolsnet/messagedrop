@@ -8,6 +8,7 @@
   min-height: 95vh;
   height: 95vh;
   max-height: 95vh;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
 }
@@ -40,6 +41,15 @@
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
   flex: 1;
+  padding-right: 1rem;
+}
+
+.chatroom-card__content--empty {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.95rem;
 }
 
 .message-content {

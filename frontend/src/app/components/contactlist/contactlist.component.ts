@@ -254,7 +254,7 @@ export class ContactlistComponent {
     const dialogRef = this.matDialog.open(ContactMessageChatroomComponent, {
       closeOnNavigation: true,
       hasBackdrop: true,
-      data: contact,
+      data: contact.id,
       minWidth: 'min(600px, 95vw)',
       maxWidth: '95vw',
       width: 'min(900px, 95vw)',
