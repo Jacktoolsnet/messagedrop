@@ -143,7 +143,19 @@ export class ContactlistComponent {
 
     dialogRef.afterClosed().subscribe((result?: boolean) => {
       if (result && this.contactToDelete) {
-        this.contactService.deleteContact(this.contactToDelete.id);
+          const targetId = this.contactToDelete.id;
+          this.contactService.deleteContact(targetId).subscribe({
+            next: () => {
+              const remaining = this.contactsSignal().filter(c => c.id !== targetId);
+              this.contactService.setContacts(remaining);
+              this.snackBar.open('Contact deleted', 'OK', { duration: 1500 });
+            },
+            error: (err) => {
+              const message = err?.message ?? 'Failed to delete contact.';
+              this.snackBar.open(message, 'OK');
+            }
+          });
+          this.contactToDelete = undefined;
       }
     });
   }
