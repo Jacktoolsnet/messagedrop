@@ -15,6 +15,7 @@ import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
+import { ContactMessageService } from '../../services/contact-message.service';
 import { ConnectService } from '../../services/connect.service';
 import { ContactService } from '../../services/contact.service';
 import { CryptoService } from '../../services/crypto.service';
@@ -67,6 +68,7 @@ export class ContactlistComponent {
   private readonly style = inject(StyleService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
+  private readonly contactMessageService = inject(ContactMessageService);
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
 
@@ -83,35 +85,8 @@ export class ContactlistComponent {
       subscribed: false,
       pinned: false,
       provided: false,
-      userMessage: {
-        message: '',
-        style: '',
-        multimedia: {
-          type: MultimediaType.UNDEFINED,
-          url: '',
-          sourceUrl: '',
-          attribution: '',
-          title: '',
-          description: '',
-          contentId: ''
-        }
-      },
-      contactUserMessage: {
-        message: '',
-        style: '',
-        multimedia: {
-          type: MultimediaType.UNDEFINED,
-          url: '',
-          sourceUrl: '',
-          attribution: '',
-          title: '',
-          description: '',
-          contentId: ''
-        }
-      },
       lastMessageFrom: '',
-      userMessageVerified: false,
-      contactUserMessageVerified: false
+      lastMessageAt: null
     };
     const dialogRef = this.matDialog.open(ConnectComponent, {
       panelClass: '',
@@ -141,35 +116,8 @@ export class ContactlistComponent {
       subscribed: false,
       pinned: false,
       provided: false,
-      userMessage: {
-        message: '',
-        style: '',
-        multimedia: {
-          type: MultimediaType.UNDEFINED,
-          url: '',
-          sourceUrl: '',
-          attribution: '',
-          title: '',
-          description: '',
-          contentId: ''
-        }
-      },
-      contactUserMessage: {
-        message: '',
-        style: '',
-        multimedia: {
-          type: MultimediaType.UNDEFINED,
-          url: '',
-          sourceUrl: '',
-          attribution: '',
-          title: '',
-          description: '',
-          contentId: ''
-        }
-      },
       lastMessageFrom: '',
-      userMessageVerified: false,
-      contactUserMessageVerified: false
+      lastMessageAt: null
     };
     const dialogRef = this.matDialog.open(ScannerComponent, {
       panelClass: '',
@@ -195,7 +143,7 @@ export class ContactlistComponent {
 
     dialogRef.afterClosed().subscribe((result?: boolean) => {
       if (result && this.contactToDelete) {
-        this.contactService.deleteContact(this.contactToDelete);
+        this.contactService.deleteContact(this.contactToDelete.id);
       }
     });
   }
@@ -266,13 +214,13 @@ export class ContactlistComponent {
     const instance = dialogRef.componentInstance;
     if (instance) {
       const subscription = instance.composeMessage.subscribe((selectedContact) => {
-        this.openContactMessagDialog(selectedContact);
+        this.openContactMessagDialog(selectedContact, instance);
       });
       dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
     }
   }
 
-  async openContactMessagDialog(contact: Contact): Promise<void> {
+  async openContactMessagDialog(contact: Contact, chatroomInstance?: { addOptimisticMessage?: (msg: ShortMessage) => void }): Promise<void> {
     const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
     let lastMultimedia: Multimedia | undefined = undefined;
     if (undefined != lastMultimediaContent) {
@@ -309,15 +257,6 @@ export class ContactlistComponent {
 
     dialogRef.afterClosed().subscribe((result?: ContactEditMessageResult) => {
       if (result?.shortMessage) {
-        // Create the enveolope
-        const envelope: Envelope = {
-          contactId: result.contact.id,
-          userId: result.contact.userId,
-          contactUserId: result.contact.contactUserId,
-          messageSignature: '',
-          userEncryptedMessage: '',
-          contactUserEncryptedMessage: ''
-        };
         const contactEncryptionKey = result.contact.contactUserEncryptionPublicKey;
         if (!contactEncryptionKey) {
           this.snackBar.open('Contact does not provide an encryption key yet. Please retry later.', 'OK', {
@@ -326,20 +265,36 @@ export class ContactlistComponent {
           return;
         }
 
-        this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, this.userService.getUser().id)
-          .then((signature: string) => {
-            envelope.messageSignature = signature;
-            this.cryptoService.encrypt(this.userService.getUser().cryptoKeyPair.publicKey, JSON.stringify(result.shortMessage))
-              .then((encryptedMessage: string) => {
-                envelope.userEncryptedMessage = encryptedMessage;
-                this.cryptoService.encrypt(contactEncryptionKey, JSON.stringify(result.shortMessage))
-                  .then((encryptedMessage: string) => {
-                    envelope.contactUserEncryptedMessage = encryptedMessage;
-                    // Envelope is ready
-                    this.contactService.updateContactMessage(envelope, result.contact, result.shortMessage, this.socketioService)
-                  });
-              });
+        this.contactMessageService.encryptMessageForContact(result.contact, result.shortMessage)
+          .then(({ encryptedMessage, signature }) => {
+            this.contactMessageService.send({
+              contactId: result.contact.id,
+              direction: 'user',
+              encryptedMessage,
+              signature
+            }).subscribe({
+              next: () => {
+                // Optional: show locally
+                if (chatroomInstance?.addOptimisticMessage) {
+                  chatroomInstance.addOptimisticMessage(result.shortMessage);
+                }
+                // Inform other user via socket
+                this.socketioService.sendShortMessageToContact({
+                  contactId: result.contact.id,
+                  userId: result.contact.userId,
+                  contactUserId: result.contact.contactUserId,
+                  messageSignature: signature,
+                  userEncryptedMessage: encryptedMessage,
+                  contactUserEncryptedMessage: encryptedMessage
+                } as Envelope);
+              },
+              error: (err) => {
+                const message = err?.message ?? 'Failed to send message.';
+                this.snackBar.open(message, 'OK');
+              }
+            });
           });
+
         this.sharedContentService.deleteSharedContent('last');
         this.sharedContentService.deleteSharedContent('lastMultimedia');
         this.sharedContentService.deleteSharedContent('lastLocation');

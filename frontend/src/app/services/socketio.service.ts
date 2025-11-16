@@ -237,12 +237,12 @@ export class SocketioService {
         this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, payload.envelope.userId, messageSignature)
           .then((valid: boolean) => {
             if (valid) {
-              contact.contactUserMessageVerified = true;
+              (contact as unknown as { contactUserMessageVerified?: boolean }).contactUserMessageVerified = true;
               if (payload.envelope.contactUserEncryptedMessage) {
                 this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
                   .then((message: string) => {
                     if (message !== '') {
-                      contact.contactUserMessage = JSON.parse(message);
+                      (contact as unknown as { contactUserMessage?: ShortMessage }).contactUserMessage = JSON.parse(message);
                       // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
                     } else {
@@ -258,8 +258,8 @@ export class SocketioService {
                           contentId: ''
                         },
                         style: ''
-                      }
-                      contact.contactUserMessage = errorMessage;
+                      };
+                      (contact as unknown as { contactUserMessage?: ShortMessage }).contactUserMessage = errorMessage;
                       // contact.contactUserMessageStyle = payload.envelope.messageStyle;
                       contact.lastMessageFrom = 'contactUser';
                     }
@@ -267,7 +267,7 @@ export class SocketioService {
                   });
               }
             } else {
-              contact.contactUserMessageVerified = false;
+              (contact as unknown as { contactUserMessageVerified?: boolean }).contactUserMessageVerified = false;
               const errorMessage: ShortMessage = {
                 message: 'ignature could not be verified!',
                 multimedia: {
@@ -280,8 +280,8 @@ export class SocketioService {
                   contentId: ''
                 },
                 style: ''
-              }
-              contact.contactUserMessage = errorMessage;
+              };
+              (contact as unknown as { contactUserMessage?: ShortMessage }).contactUserMessage = errorMessage;
               // contact.contactUserMessageStyle = payload.envelope.messageStyle;
               contact.lastMessageFrom = 'contactUser';
               this.contactService.refreshContact(contact.id);

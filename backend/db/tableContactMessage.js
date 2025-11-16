@@ -7,6 +7,7 @@ const columnEncryptedMessage = 'encryptedMessage';
 const columnSignature = 'signature';
 const columnCreatedAt = 'createdAt'; // ISO8601
 const columnReadAt = 'readAt';       // ISO8601 | NULL
+const columnStatus = 'status';       // sent | delivered | read
 
 const init = function (db) {
     const sql = `
@@ -16,6 +17,7 @@ const init = function (db) {
       ${columnDirection} TEXT NOT NULL CHECK (${columnDirection} IN ('user','contactUser')),
       ${columnEncryptedMessage} TEXT NOT NULL,
       ${columnSignature} TEXT NOT NULL,
+      ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read')),
       ${columnCreatedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
       ${columnReadAt} TEXT DEFAULT NULL,
       FOREIGN KEY (${columnContactId})
@@ -40,7 +42,8 @@ const init = function (db) {
     AFTER INSERT ON ${tableName}
     BEGIN
       UPDATE tableContact
-      SET lastMessageFrom = NEW.${columnDirection}
+      SET lastMessageFrom = NEW.${columnDirection},
+          lastMessageAt = NEW.${columnCreatedAt}
       WHERE id = NEW.${columnContactId};
     END;
   `;
@@ -53,15 +56,17 @@ const createMessage = function (db, {
     contactId,
     direction,     // 'user' | 'contactUser'
     encryptedMessage,
-    signature
+    signature,
+    status = 'sent',
+    createdAt // optional ISO, else default
 }, callback) {
     const sql = `
     INSERT INTO ${tableName}
       (${columnId}, ${columnContactId}, ${columnDirection},
-       ${columnEncryptedMessage}, ${columnSignature})
-    VALUES (?, ?, ?, ?, ?);
+       ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt})
+    VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')));
   `;
-    const params = [id, contactId, direction, encryptedMessage, signature];
+    const params = [id, contactId, direction, encryptedMessage, signature, status, createdAt ?? null];
     db.run(sql, params, (err) => callback(err));
 };
 
@@ -69,16 +74,29 @@ const createMessage = function (db, {
 const markAsRead = function (db, messageId, callback) {
     const sql = `
     UPDATE ${tableName}
-    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now'))
+    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now')),
+        ${columnStatus} = 'read'
     WHERE ${columnId} = ?;
   `;
     db.run(sql, [messageId], (err) => callback(err));
 };
 
+const markManyAsReadByContact = function (db, contactId, beforeIso, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now')),
+        ${columnStatus} = 'read'
+    WHERE ${columnContactId} = ?
+      AND ${columnReadAt} IS NULL
+      AND ${columnCreatedAt} <= COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now'));
+  `;
+    db.run(sql, [contactId, beforeIso ?? null], (err) => callback(err));
+};
+
 // Aktive Nachrichten (für UI):
 // - Ungelesen: immer zeigen
 // - Gelesen: nur zeigen, wenn readAt > now - 7 Tage
-const getActiveByContact = function (db, contactId, limit = 100, offset = 0, callback) {
+const getActiveByContact = function (db, contactId, limit = 100, offset = 0, beforeIso, callback) {
     const sql = `
     SELECT *
     FROM ${tableName}
@@ -87,10 +105,11 @@ const getActiveByContact = function (db, contactId, limit = 100, offset = 0, cal
         ${columnReadAt} IS NULL
         OR ${columnReadAt} > datetime('now','-7 days')
       )
+      AND (${columnCreatedAt} < COALESCE(?, datetime('now','+1 day')))
     ORDER BY ${columnCreatedAt} DESC
     LIMIT ? OFFSET ?;
   `;
-    db.all(sql, [contactId, limit, offset], (err, rows) => callback(err, rows));
+    db.all(sql, [contactId, beforeIso ?? null, limit, offset], (err, rows) => callback(err, rows));
 };
 
 // Unread Count pro Kontakt
@@ -117,7 +136,10 @@ module.exports = {
     init,
     createMessage,
     markAsRead,
+    markManyAsReadByContact,
     getActiveByContact,
     getUnreadCount,
     cleanupReadMessages,
+    columnContactId,
+    columnDirection,
 };

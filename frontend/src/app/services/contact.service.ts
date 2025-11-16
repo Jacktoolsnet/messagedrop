@@ -1,19 +1,13 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { computed, Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Buffer } from 'buffer';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
-import { Envelope } from '../interfaces/envelope';
-import { GetContactResponse } from '../interfaces/get-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
-import { MultimediaType } from '../interfaces/multimedia-type';
 import { RawContact } from '../interfaces/raw-contact';
-import { ShortMessage } from '../interfaces/short-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
@@ -22,9 +16,7 @@ import { UserService } from './user.service';
 @Injectable({
   providedIn: 'root'
 })
-
 export class ContactService {
-
   private _contacts = signal<Contact[]>([]);
   private _contactsSet = signal(0);
   readonly contactsSet = this._contactsSet.asReadonly();
@@ -41,7 +33,6 @@ export class ContactService {
   private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);
-  private readonly cryptoService = inject(CryptoService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly networkService = inject(NetworkService);
 
@@ -55,165 +46,8 @@ export class ContactService {
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
-          getContactsResponse.rows.forEach((rawContact: RawContact) => {
-            let userSignatureBuffer = undefined
-            let userSignature = undefined
-            if (rawContact.userSignature) {
-              userSignatureBuffer = Buffer.from(JSON.parse(rawContact.userSignature))
-              userSignature = userSignatureBuffer.buffer.slice(
-                userSignatureBuffer.byteOffset, userSignatureBuffer.byteOffset + userSignatureBuffer.byteLength
-              )
-            }
-            let contactUserSignatureBuffer = undefined;
-            let contactUserSignature = undefined;
-            if (rawContact.contactUserSignature) {
-              contactUserSignatureBuffer = Buffer.from(JSON.parse(rawContact.contactUserSignature))
-              contactUserSignature = contactUserSignatureBuffer.buffer.slice(
-                contactUserSignatureBuffer.byteOffset, contactUserSignatureBuffer.byteOffset + contactUserSignatureBuffer.byteLength
-              )
-            }
-            const contact: Contact = {
-              id: rawContact.id,
-              userId: rawContact.userId,
-              userEncryptedMessage: 'undefined' !== rawContact.userEncryptedMessage ? JSON.parse(rawContact.userEncryptedMessage) : undefined,
-              userSignature: userSignature,
-              contactUserId: rawContact.contactUserId,
-              contactUserSigningPublicKey: 'undefined' !== rawContact.contactUserSigningPublicKey ? JSON.parse(rawContact.contactUserSigningPublicKey) : undefined,
-              contactUserEncryptionPublicKey: 'undefined' !== rawContact.contactUserEncryptionPublicKey ? JSON.parse(rawContact.contactUserEncryptionPublicKey) : undefined,
-              contactUserEncryptedMessage: 'undefined' !== rawContact.contactUserEncryptedMessage ? JSON.parse(rawContact.contactUserEncryptedMessage) : undefined,
-              contactUserSignature: contactUserSignature,
-              subscribed: rawContact.subscribed,
-              pinned: false,
-              hint: rawContact.hint,
-              name: '',
-              base64Avatar: '',
-              lastMessageFrom: rawContact.lastMessageFrom,
-              userMessage: {
-                message: '',
-                multimedia: {
-                  type: MultimediaType.UNDEFINED,
-                  attribution: '',
-                  title: '',
-                  description: '',
-                  url: '',
-                  sourceUrl: '',
-                  contentId: ''
-                },
-                style: ''
-              },
-              contactUserMessage: {
-                message: '',
-                multimedia: {
-                  type: MultimediaType.UNDEFINED,
-                  attribution: '',
-                  title: '',
-                  description: '',
-                  url: '',
-                  sourceUrl: '',
-                  contentId: ''
-                },
-                style: ''
-              },
-              provided: false,
-              userMessageVerified: false,
-              contactUserMessageVerified: false
-            };
-            if (contact.userSignature) {
-              this.cryptoService.verifySignature(this.userService.getUser().signingKeyPair.publicKey, contact.userId, contact.userSignature!)
-                .then((valid: boolean) => {
-                  if (valid) {
-                    contact.userMessageVerified = true;
-                    if (contact.userEncryptedMessage) {
-                      this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, contact.userEncryptedMessage!)
-                        .then((message: string) => {
-                          if (message !== '') {
-                            contact.userMessage = JSON.parse(message);
-                          } else {
-                            const errorMessage: ShortMessage = {
-                              message: 'Message cannot be decrypted!',
-                              multimedia: {
-                                type: MultimediaType.UNDEFINED,
-                                attribution: '',
-                                title: '',
-                                description: '',
-                                url: '',
-                                sourceUrl: '',
-                                contentId: ''
-                              },
-                              style: ''
-                            }
-                            contact.userMessage = errorMessage;
-                          }
-                        });
-                    }
-                  } else {
-                    contact.userMessageVerified = false;
-                    const errorMessage: ShortMessage = {
-                      message: 'Signature could not be verified!',
-                      multimedia: {
-                        type: MultimediaType.UNDEFINED,
-                        attribution: '',
-                        title: '',
-                        description: '',
-                        url: '',
-                        sourceUrl: '',
-                        contentId: ''
-                      },
-                      style: ''
-                    }
-                    contact.contactUserMessage = errorMessage;
-                  }
-                });
-            }
-            if (contact.contactUserSignature) {
-              this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, contact.contactUserId, contact.contactUserSignature!)
-                .then((valid: boolean) => {
-                  if (valid) {
-                    contact.contactUserMessageVerified = true;
-                    if (contact.contactUserEncryptedMessage) {
-                      this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, contact.contactUserEncryptedMessage!)
-                        .then((message: string) => {
-                          if (message !== '') {
-                            contact.contactUserMessage = JSON.parse(message);
-                          } else {
-                            const errorMessage: ShortMessage = {
-                              message: 'Message cannot be decrypted!',
-                              multimedia: {
-                                type: MultimediaType.UNDEFINED,
-                                attribution: '',
-                                title: '',
-                                description: '',
-                                url: '',
-                                sourceUrl: '',
-                                contentId: ''
-                              },
-                              style: ''
-                            }
-                            contact.contactUserMessage = errorMessage;
-                          }
-                        });
-                    }
-                  } else {
-                    contact.contactUserMessageVerified = false;
-                    const errorMessage: ShortMessage = {
-                      message: 'Signature could not be verified!',
-                      multimedia: {
-                        type: MultimediaType.UNDEFINED,
-                        attribution: '',
-                        title: '',
-                        description: '',
-                        url: '',
-                        sourceUrl: '',
-                        contentId: ''
-                      },
-                      style: ''
-                    }
-                    contact.contactUserMessage = errorMessage;
-                  }
-                });
-            }
-            this._contacts.update(contacts => [...contacts, contact]);
-          })
+          const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
+          this._contacts.set(contacts);
           this.updateContactProfile();
           this.ready = true;
           this._contactsSet.update(trigger => trigger + 1);
@@ -235,11 +69,29 @@ export class ContactService {
     this._contacts.set([]);
   }
 
+  private mapRawContact(raw: RawContact): Contact {
+    return {
+      id: raw.id,
+      userId: raw.userId,
+      contactUserId: raw.contactUserId,
+      contactUserSigningPublicKey: raw.contactUserSigningPublicKey ? JSON.parse(raw.contactUserSigningPublicKey) : undefined,
+      contactUserEncryptionPublicKey: raw.contactUserEncryptionPublicKey ? JSON.parse(raw.contactUserEncryptionPublicKey) : undefined,
+      subscribed: raw.subscribed,
+      pinned: false,
+      hint: raw.hint ?? '',
+      name: raw.name ?? '',
+      base64Avatar: raw.base64Avatar ?? '',
+      provided: raw.provided ?? false,
+      lastMessageFrom: raw.lastMessageFrom ?? '',
+      lastMessageAt: raw.lastMessageAt ?? null
+    };
+  }
+
   private async updateContactProfile() {
     await Promise.all(this._contacts().map(async contact => {
       const profile = await this.indexedDbService.getContactProfile(contact.id);
-      contact.name = profile?.name || '';
-      contact.base64Avatar = profile?.base64Avatar || '';
+      contact.name = profile?.name || contact.name || '';
+      contact.base64Avatar = profile?.base64Avatar || contact.base64Avatar || '';
       contact.pinned = profile?.pinned || false;
     }));
     this._contacts.set(this._contacts());
@@ -280,7 +132,6 @@ export class ContactService {
     );
   }
 
-  // We need a function from qrcode
   createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {
     const url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {
@@ -308,7 +159,7 @@ export class ContactService {
         next: createContactResponse => {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
-            socketioService.receiveShortMessage(contact)
+            socketioService.receiveShortMessage(contact);
             this.saveAditionalContactInfos();
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
             this._contacts.update(contacts => [...contacts, contact]);
@@ -351,65 +202,8 @@ export class ContactService {
       });
   }
 
-  updateContactMessage(envelope: Envelope, contact: Contact, shortMessage: ShortMessage, socketioService: SocketioService, showAlways = false) {
-    const url = `${environment.apiUrl}/contact/update/message`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Sending message`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    const body = {
-      'contactId': envelope.contactId,
-      'userId': envelope.userId,
-      'contactUserId': envelope.contactUserId,
-      'userEncryptedMessage': envelope.userEncryptedMessage,
-      'contactUserEncryptedMessage': envelope.contactUserEncryptedMessage,
-      'messageSignature': envelope.messageSignature
-    };
-    this.http.post<boolean>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
-      .subscribe({
-        next: () => {
-          contact.userMessage = shortMessage;
-          contact.userEncryptedMessage = JSON.parse(envelope.userEncryptedMessage);
-          contact.lastMessageFrom = 'user';
-          this.refreshContact(contact.id);
-          socketioService.sendShortMessageToContact(envelope);
-        },
-        error: (err) => {
-          const message = err?.message ?? 'Failed to send message.';
-          this.snackBar.open(message, 'OK');
-        }
-      });
-  }
-
-  getByUserId(userId: string, showAlways = false) {
-    const url = `${environment.apiUrl}/contact/get/userId/${userId}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Loading contacts`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    return this.http.get<GetContactsResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
   getById(contactId: string, showAlways = false) {
-    const url = `${environment.apiUrl}/contact/get/${contactId}`
+    const url = `${environment.apiUrl}/contact/get/${contactId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: 'Contact service',
@@ -420,101 +214,46 @@ export class ContactService {
       delay: 0,
       showSpinner: true
     });
-    return this.http.get<GetContactResponse>(url, this.httpOptions)
+    return this.http.get(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  getByUserId(userId: string) {
+    const url = `${environment.apiUrl}/contact/get/userId/${userId}`;
+    return this.http.get<GetContactsResponse>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
   }
 
-  deleteContact(contactToDelete: Contact, showAlways = false) {
-    const url = `${environment.apiUrl}/contact/delete/${contactToDelete.id}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Deleting from contact`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
+  public deleteContact(contactId: string) {
+    const url = `${environment.apiUrl}/contact/delete/${contactId}`;
+    return this.http.get<boolean>(url, this.httpOptions)
       .pipe(
         catchError(this.handleError)
-      )
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this._contacts.update(contacts =>
-              contacts.filter(c => c.id !== contactToDelete.id)
-            );
-            this.indexedDbService.deleteContactProfile(contactToDelete.id);
-          }
-        },
-        error: (err) => {
-          const message = err?.message ?? 'Failed to delete contact.';
-          this.snackBar.open(message, 'OK');
-        }
-      });
+      );
   }
 
-  subscribe(contact: Contact, showAlways = false) {
+  public subscribe(contact: Contact) {
+    contact.subscribed = true;
     const url = `${environment.apiUrl}/contact/subscribe/${contact.id}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Subscribing to contact`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+    this.http.get<boolean>(url, this.httpOptions)
+      .pipe(catchError(this.handleError))
       .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            contact.subscribed = true;
-            this._contacts.set(this._contacts());
-          }
-        },
-        error: (err) => {
-          const message = err?.message ?? 'Failed to subscribe.';
-          this.snackBar.open(message, 'OK');
-        }
+        next: () => { contact.subscribed = true; },
+        error: (err) => { this.snackBar.open(err.message, 'OK'); }
       });
   }
 
-  unsubscribe(contact: Contact, showAlways = false) {
+  public unsubscribe(contact: Contact) {
+    contact.subscribed = false;
     const url = `${environment.apiUrl}/contact/unsubscribe/${contact.id}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: 'Contact service',
-      image: '',
-      icon: '',
-      message: `Unsubscribing from contact`,
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      )
+    this.http.get<boolean>(url, this.httpOptions)
+      .pipe(catchError(this.handleError))
       .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            contact.subscribed = false;
-            this._contacts.set(this._contacts());
-          }
-        },
-        error: (err) => {
-          const message = err?.message ?? 'Failed to unsubscribe.';
-          this.snackBar.open(message, 'OK');
-        }
+        next: () => { contact.subscribed = false; },
+        error: (err) => { this.snackBar.open(err.message, 'OK'); }
       });
   }
 }

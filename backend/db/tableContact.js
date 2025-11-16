@@ -2,17 +2,14 @@ const tableName = 'tableContact';
 
 const columnContactId = 'id';
 const columnUserId = 'userId';
-const columnUserEncryptedMessage = 'userEncryptedMessage';
-const columnUserSignature = 'userSignature';
 const columnContactUserId = 'contactUserId';
 const columnContactUserSigningPublicKey = "contactUserSigningPublicKey";
 const columnContactUserEncryptionPublicKey = 'contactUserEncryptionPublicKey';
-const columnContactUserEncryptedMessage = 'contactUserEncryptedMessage';
-const columnContactUserSignature = 'contactUserSignature';
 const columnSubscribed = 'subscribed';
 const columnHint = 'hint';
 const columnName = 'name';
 const columnLastMessageFrom = 'lastMessageFrom';
+const columnLastMessageAt = 'lastMessageAt';
 
 const init = function (db) {
     try {
@@ -20,17 +17,14 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
             ${columnUserId} TEXT DEFAULT NULL,
-            ${columnUserEncryptedMessage} TEXT DEFAULT NULL,
-            ${columnUserSignature} TEXT DEFAULT NULL,
             ${columnContactUserId} TEXT DEFAULT NULL,
             ${columnContactUserSigningPublicKey} TEXT NOT NULL,
             ${columnContactUserEncryptionPublicKey} TEXT NOT NULL,
-            ${columnContactUserEncryptedMessage} TEXT DEFAULT NULL,
-            ${columnContactUserSignature} TEXT DEFAULT NULL,
             ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
             ${columnHint} TEXT DEFAULT NULL,
             ${columnName} TEXT DEFAULT NULL,
             ${columnLastMessageFrom} TEXT DEFAULT '',
+            ${columnLastMessageAt} TEXT DEFAULT NULL,
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
@@ -97,41 +91,6 @@ const updateName = function (db, contactId, name, callback) {
         WHERE ${columnContactId} = ?;`;
 
         db.run(sql, [contactId], (err) => {
-            callback(err);
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const updateUserMessage = function (db, contactId, encryptedMessage, messageSignature, callback) {
-    try {
-        let sql = `
-        UPDATE ${tableName}
-        SET ${columnUserEncryptedMessage} = '${encryptedMessage}',
-        ${columnUserSignature} = '${messageSignature}',
-        ${columnLastMessageFrom} = 'user'
-        WHERE ${columnContactId} = ?;`;
-
-        db.run(sql, [contactId], (err) => {
-            callback(err);
-        });
-    } catch (error) {
-        throw error;
-    }
-};
-
-const updateContactUserMessage = function (db, userId, contactUserId, encryptedMessage, messageSignature, callback) {
-    try {
-        let sql = `
-        UPDATE ${tableName}
-        SET ${columnContactUserEncryptedMessage} = '${encryptedMessage}',
-        ${columnContactUserSignature} = '${messageSignature}',
-        ${columnLastMessageFrom} = 'contactUser'
-        WHERE ${columnUserId} = ?
-        AND ${columnContactUserId} = ?;`;
-
-        db.run(sql, [contactUserId, userId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -218,8 +177,6 @@ module.exports = {
     init,
     create,
     updateName,
-    updateUserMessage,
-    updateContactUserMessage,
     subscribe,
     unsubscribe,
     getById,

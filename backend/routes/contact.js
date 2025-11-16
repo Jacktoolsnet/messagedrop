@@ -53,40 +53,6 @@ router.post('/update/name',
     });
   });
 
-/**
- * Update my message in my contact.
- * Find the other contact (userID = contactUserId and contactUserID = userID) and set the contact message
- * Notify other User
- */
-router.post('/update/message',
-  [
-    security.authenticate,
-    express.json({ type: 'application/json' }),
-    metric.count('contact.update.message', { when: 'always', timezone: 'utc', amount: 1 })
-  ]
-  , function (req, res) {
-    let response = { 'status': 0 };
-    tableContact.updateUserMessage(req.database.db, req.body.contactId, req.body.userEncryptedMessage, req.body.messageSignature, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-        res.status(response.status);
-        res.json(response);
-      } else {
-        tableContact.updateContactUserMessage(req.database.db, req.body.userId, req.body.contactUserId, req.body.contactUserEncryptedMessage, req.body.messageSignature, function (err) {
-          if (err) {
-            response.status = 500;
-            response.error = err;
-          } else {
-            response.status = 200;
-            notify.contactSubscriptions(req.logger, req.database.db, req.body.userId, req.body.contactUserId, "New private message");
-          }
-          res.status(response.status).json(response);
-        });
-      }
-    });
-  });
-
 router.get('/get/:contactId',
   [
     security.authenticate

@@ -4,8 +4,7 @@
       <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
     @if (canCompose()) {
-    <button class="first-button" mat-mini-fab color="primary" aria-label="Create short message"
-      (click)="requestCompose()">
+    <button mat-mini-fab color="primary" aria-label="Create short message" (click)="requestCompose()">
       <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
     </button>
     }
@@ -14,9 +13,9 @@
   @if (contact(); as activeContact) {
   <mat-card-content #messageScroll class="chatroom-card__content" (click)="requestCompose()">
     <div class="message-content">
-      @if (activeContact.lastMessageFrom === 'contactUser') {
+      @for (msg of messages(); track msg.id; let last = $last) {
       <div class="message">
-        @if (hasContent(activeContact.userMessage)) {
+        @if (msg.direction === 'user') {
         <div class="bubble-row me">
           <div class="avatar-me">
             @if (profile.base64Avatar) {
@@ -28,91 +27,38 @@
           </div>
 
           <p class="from-me">
-            @if (activeContact.userMessage.multimedia.type !== 'undefined') {
-            <app-showmultimedia [multimedia]="activeContact.userMessage.multimedia"></app-showmultimedia>
+            @if (msg.payload?.multimedia?.type !== 'undefined') {
+            <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
             }
-            @if (activeContact.userMessage.message.trim() !== '') {
-            <app-showmessage [message]="activeContact.userMessage.message"
-              [style]="activeContact.userMessage.style"></app-showmessage>
+            @if (msg.payload?.message?.trim() !== '') {
+            <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
           </p>
         </div>
-        }
-
-        @if (hasContent(activeContact.contactUserMessage)) {
+        } @else {
         <div class="bubble-row them">
           <div class="avatar-them">
             @if (activeContact.base64Avatar) {
-            <img class="avatar" [src]="activeContact.base64Avatar"
-              [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
+            <img class="avatar" [src]="activeContact.base64Avatar" [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
             } @else {
             <mat-icon class="material-symbols-outlined">person</mat-icon>
             }
-            <span class="name">{{ activeContact.name || 'Unnamed' }}</span>
           </div>
 
           <p class="from-them">
-            @if (activeContact.contactUserMessage.multimedia.type !== 'undefined') {
-            <app-showmultimedia [multimedia]="activeContact.contactUserMessage.multimedia"></app-showmultimedia>
+            @if (msg.payload?.multimedia?.type !== 'undefined') {
+            <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
             }
-            @if (activeContact.contactUserMessage.message.trim() !== '') {
-            <app-showmessage [message]="activeContact.contactUserMessage.message"
-              [style]="activeContact.contactUserMessage.style"></app-showmessage>
+            @if (msg.payload?.message?.trim() !== '') {
+            <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
           </p>
         </div>
         }
       </div>
-      } @else if (activeContact.lastMessageFrom === 'user') {
-      <div class="message">
-        @if (hasContent(activeContact.contactUserMessage)) {
-        <div class="bubble-row them">
-          <div class="avatar-them">
-            @if (activeContact.base64Avatar) {
-            <img class="avatar" [src]="activeContact.base64Avatar"
-              [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
-            } @else {
-            <mat-icon class="material-symbols-outlined">person</mat-icon>
-            }
-            <span class="name">{{ activeContact.name || 'Unnamed' }}</span>
-          </div>
+      }
 
-          <p class="from-them">
-            @if (activeContact.contactUserMessage.multimedia.type !== 'undefined') {
-            <app-showmultimedia [multimedia]="activeContact.contactUserMessage.multimedia"></app-showmultimedia>
-            }
-            @if (activeContact.contactUserMessage.message.trim() !== '') {
-            <app-showmessage [message]="activeContact.contactUserMessage.message"
-              [style]="activeContact.contactUserMessage.style"></app-showmessage>
-            }
-          </p>
-        </div>
-        }
-
-        @if (hasContent(activeContact.userMessage)) {
-        <div class="bubble-row me">
-          <div class="avatar-me">
-            @if (profile.base64Avatar) {
-            <img class="avatar" [src]="profile.base64Avatar" [attr.alt]="(profile.name || 'My') + ' avatar'" />
-            } @else {
-            <mat-icon class="material-symbols-outlined">person</mat-icon>
-            }
-            <span class="name">{{ profile.name || 'Myself' }}</span>
-          </div>
-
-          <p class="from-me">
-            @if (activeContact.userMessage.multimedia.type !== 'undefined') {
-            <app-showmultimedia [multimedia]="activeContact.userMessage.multimedia"></app-showmultimedia>
-            }
-            @if (activeContact.userMessage.message.trim() !== '') {
-            <app-showmessage [message]="activeContact.userMessage.message"
-              [style]="activeContact.userMessage.style"></app-showmessage>
-            }
-          </p>
-        </div>
-        }
-      </div>
-      } @else {
+      @if (messages().length === 0) {
       <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false">
         <span>Create my first short message</span>
       </button>

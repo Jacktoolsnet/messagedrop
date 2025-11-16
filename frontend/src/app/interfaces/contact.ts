@@ -1,19 +1,16 @@
-import { CryptoData } from "./crypto-data";
-import { Envelope } from "./envelope";
-import { ShortMessage } from "./short-message";
-
 export interface Contact {
     id: string,
     userId: string,
+    // Legacy message fields retained as optional for compatibility; actual messages come from contactMessage service
     userSignature?: ArrayBuffer,
-    userMessage: ShortMessage,
-    userMessageVerified: boolean,
-    userEncryptedMessage?: CryptoData,
+    userMessage?: unknown,
+    userMessageVerified?: boolean,
+    userEncryptedMessage?: unknown,
     contactUserId: string,
     contactSignature?: ArrayBuffer,
-    contactUserMessage: ShortMessage,
-    contactUserMessageVerified: boolean,
-    contactUserEncryptedMessage?: CryptoData,
+    contactUserMessage?: unknown,
+    contactUserMessageVerified?: boolean,
+    contactUserEncryptedMessage?: unknown,
     contactUserSignature?: ArrayBuffer,
     contactUserSigningPublicKey?: JsonWebKey,
     contactUserEncryptionPublicKey?: JsonWebKey,
@@ -24,5 +21,5 @@ export interface Contact {
     pinned: boolean,
     provided: boolean,
     lastMessageFrom: string,
-    envelope?: Envelope
+    lastMessageAt?: string | null
 }
