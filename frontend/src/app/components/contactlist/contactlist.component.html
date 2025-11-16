@@ -26,14 +26,13 @@
         <mat-expansion-panel>
             <mat-expansion-panel-header>
                 @if (contact.base64Avatar) {
-                <img class="avatar" [src]="contact.base64Avatar"
-                    [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
+                <img class="avatar" [src]="contact.base64Avatar" [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
                 <span class="name">{{ contact.name || 'Unnamed' }}</span>
             </mat-expansion-panel-header>
-            <mat-card class="chatroom-preview">
+            <mat-card>
                 <mat-card-content class="chatroom-preview__content">
                     <p>Öffne das Chatfenster, um die Nachrichten dieser Verbindung zu sehen.</p>
                 </mat-card-content>
@@ -49,7 +48,7 @@
                     }
                     <button mat-mini-fab color="secondary" aria-label="Chatfenster öffnen"
                         (click)="openContactChatroom(contact)">
-                        <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
+                        <mat-icon class="material-symbols-outlined">forum</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
                         <mat-icon class="material-symbols-outlined">settings_account_box</mat-icon>

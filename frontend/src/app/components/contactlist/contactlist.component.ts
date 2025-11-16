@@ -15,8 +15,8 @@ import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
-import { ContactMessageService } from '../../services/contact-message.service';
 import { ConnectService } from '../../services/connect.service';
+import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { CryptoService } from '../../services/crypto.service';
 import { OembedService } from '../../services/oembed.service';
@@ -24,11 +24,11 @@ import { SharedContentService } from '../../services/shared-content.service';
 import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
+import { ContactMessageChatroomComponent } from '../contact-message-chatroom/contact-message-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ContactProfileComponent } from '../contact/contact-profile/contact-profile.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
-import { ContactMessageChatroomComponent } from '../contact-message-chatroom/contact-message-chatroom.component';
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
@@ -201,13 +201,13 @@ export class ContactlistComponent {
   openContactChatroom(contact: Contact): void {
     const dialogRef = this.matDialog.open(ContactMessageChatroomComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true,
       data: contact.id,
       minWidth: 'min(600px, 95vw)',
       maxWidth: '95vw',
-      width: 'min(900px, 95vw)',
-      height: '95vh',
+      width: 'auto',
       maxHeight: '95vh',
+      height: 'auto',
+      hasBackdrop: true,
       autoFocus: false
     });
 

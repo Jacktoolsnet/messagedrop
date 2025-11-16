@@ -1,18 +1,19 @@
-<mat-card class="chatroom-card">
-  <div class="chatroom-card__toolbar">
-    <button mat-mini-fab color="accent" aria-label="Close chatroom" (click)="closeChatroom()">
+<mat-card class="dialog">
+  <div class="toolbar">
+    <button class="button_back" mat-mini-fab color="accent" aria-label="Close chatroom" (click)="closeChatroom()">
       <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
     @if (canCompose()) {
-    <button mat-mini-fab color="primary" aria-label="Create short message" (click)="requestCompose()">
-      <mat-icon class="material-symbols-outlined">quick_phrases</mat-icon>
+    <button class="button_add" mat-mini-fab color="primary" aria-label="Create short message"
+      (click)="requestCompose()">
+      <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
     </button>
     }
   </div>
 
   @if (contact(); as activeContact) {
-  <mat-card-content #messageScroll class="chatroom-card__content" (click)="requestCompose()">
-    <div class="message-content">
+  <mat-card-content #messageScroll (click)="requestCompose()">
+    <div class="content">
       @for (msg of messages(); track msg.id; let last = $last) {
       <div class="message">
         @if (msg.direction === 'user') {
@@ -39,7 +40,8 @@
         <div class="bubble-row them">
           <div class="avatar-them">
             @if (activeContact.base64Avatar) {
-            <img class="avatar" [src]="activeContact.base64Avatar" [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
+            <img class="avatar" [src]="activeContact.base64Avatar"
+              [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
             } @else {
             <mat-icon class="material-symbols-outlined">person</mat-icon>
             }
@@ -60,7 +62,7 @@
 
       @if (messages().length === 0) {
       <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false">
-        <span>Create my first short message</span>
+        <span>Create my first message</span>
       </button>
       }
     </div>
