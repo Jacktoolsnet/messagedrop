@@ -173,6 +173,19 @@ const deleteById = function (db, contactId, callback) {
     }
 };
 
+const getByUserAndContactUser = function (db, userId, contactUserId, callback) {
+    try {
+        const sql = `
+        SELECT * FROM ${tableName}
+        WHERE ${columnUserId} = ?
+          AND ${columnContactUserId} = ?;
+      `;
+        db.get(sql, [userId, contactUserId], (err, row) => callback(err, row));
+    } catch (error) {
+        throw error;
+    }
+};
+
 module.exports = {
     init,
     create,
@@ -181,5 +194,6 @@ module.exports = {
     unsubscribe,
     getById,
     getByUserId,
-    deleteById
+    deleteById,
+    getByUserAndContactUser
 }

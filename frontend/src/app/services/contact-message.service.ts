@@ -20,6 +20,8 @@ interface SendMessagePayload {
   signature: string;
   status?: 'sent' | 'delivered' | 'read';
   createdAt?: string;
+  userId: string;
+  contactUserId: string;
 }
 
 @Injectable({

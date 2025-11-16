@@ -1,6 +1,7 @@
 const express = require('express');
 const crypto = require('crypto');
 const router = express.Router();
+const tableContact = require('../db/tableContact');
 
 const security = require('../middleware/security');
 const metric = require('../middleware/metric');
@@ -9,7 +10,7 @@ const tableContactMessage = require('../db/tableContactMessage');
 router.use(security.checkToken);
 
 const validateSendBody = (body) => {
-  const required = ['contactId', 'direction', 'encryptedMessage', 'signature'];
+  const required = ['contactId', 'direction', 'encryptedMessage', 'signature', 'userId', 'contactUserId'];
   const missing = required.filter((key) => body?.[key] === undefined || body?.[key] === null || body?.[key] === '');
   if (missing.length) {
     return `Missing fields: ${missing.join(', ')}`;
@@ -40,11 +41,14 @@ router.post('/send',
       signature,
       status = 'sent',
       createdAt,
-      id
+      id,
+      userId,
+      contactUserId
     } = req.body;
 
     const messageId = id || crypto.randomUUID();
 
+    // Store message for sender's contact
     tableContactMessage.createMessage(req.database.db, {
       id: messageId,
       contactId,
@@ -57,7 +61,21 @@ router.post('/send',
       if (err) {
         return res.status(500).json({ status: 500, error: err.message || err });
       }
-      return res.status(200).json({ status: 200, messageId });
+      // Try to find reciprocal contact and store mirrored message for recipient
+      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+        if (!lookupErr && reciprocal?.id) {
+          tableContactMessage.createMessage(req.database.db, {
+            id: crypto.randomUUID(),
+            contactId: reciprocal.id,
+            direction: 'contactUser',
+            encryptedMessage,
+            signature,
+            status: 'delivered',
+            createdAt
+          }, () => { /* ignore errors for mirror insert */ });
+        }
+        return res.status(200).json({ status: 200, messageId });
+      });
     });
   }
 );

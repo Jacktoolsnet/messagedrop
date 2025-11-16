@@ -281,6 +281,8 @@ export class ContactlistComponent {
           .then(({ encryptedMessage, signature }) => {
             this.contactMessageService.send({
               contactId: result.contact.id,
+              userId: result.contact.userId,
+              contactUserId: result.contact.contactUserId,
               direction: 'user',
               encryptedMessage,
               signature
