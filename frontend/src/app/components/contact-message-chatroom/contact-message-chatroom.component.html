@@ -1,9 +1,9 @@
-<mat-card class="dialog">
-  <div class="toolbar">
+<mat-card class="chatroom-card">
+  <div class="chatroom-card__toolbar">
     <button class="button_back" mat-mini-fab color="accent" aria-label="Close chatroom" (click)="closeChatroom()">
       <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
     </button>
-    @if (canCompose()) {
+    @if (messages().length !== 0) {
     <button class="button_add" mat-mini-fab color="primary" aria-label="Create short message"
       (click)="requestCompose()">
       <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
@@ -12,8 +12,8 @@
   </div>
 
   @if (contact(); as activeContact) {
-  <mat-card-content #messageScroll (click)="requestCompose()">
-    <div class="content">
+  <mat-card-content #messageScroll class="chatroom-card__content" (click)="requestCompose()">
+    <div class="message-content">
       @for (msg of messages(); track msg.id; let last = $last) {
       <div class="message">
         @if (msg.direction === 'user') {
