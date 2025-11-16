@@ -16,7 +16,8 @@ interface SendMessagePayload {
   id?: string;
   contactId: string;
   direction: 'user' | 'contactUser';
-  encryptedMessage: string;
+  encryptedMessageForUser: string;
+  encryptedMessageForContact: string;
   signature: string;
   status?: 'sent' | 'delivered' | 'read';
   createdAt?: string;
@@ -121,16 +122,21 @@ export class ContactMessageService {
     });
   }
 
-  async encryptMessageForContact(contact: Contact, message: ShortMessage): Promise<{ encryptedMessage: string; signature: string }> {
+  async encryptMessageForContact(contact: Contact, message: ShortMessage): Promise<{ encryptedMessageForUser: string; encryptedMessageForContact: string; signature: string }> {
     const plain = JSON.stringify(message);
     const signature = await this.cryptoService.createSignature(this.userService.getUser().signingKeyPair.privateKey, plain);
 
-    const encryptedMessage = await this.cryptoService.encrypt(
+    const encryptedMessageForUser = await this.cryptoService.encrypt(
+      this.userService.getUser().cryptoKeyPair.publicKey,
+      plain
+    );
+
+    const encryptedMessageForContact = await this.cryptoService.encrypt(
       contact.contactUserEncryptionPublicKey!,
       plain
     );
 
-    return { encryptedMessage, signature };
+    return { encryptedMessageForUser, encryptedMessageForContact, signature };
   }
 
   async decryptAndVerify(contact: Contact, msg: ContactMessage): Promise<ShortMessage | null> {
@@ -143,8 +149,11 @@ export class ContactMessageService {
 
       // Signatur prüfen
       const signatureBuffer = Buffer.from(JSON.parse(msg.signature));
+      const signingKey = msg.direction === 'user'
+        ? this.userService.getUser().signingKeyPair.publicKey
+        : contact.contactUserSigningPublicKey!;
       const valid = await this.cryptoService.verifySignature(
-        contact.contactUserSigningPublicKey!,
+        signingKey,
         decrypted,
         signatureBuffer
       );

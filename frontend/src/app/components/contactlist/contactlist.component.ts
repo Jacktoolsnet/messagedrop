@@ -304,13 +304,14 @@ export class ContactlistComponent {
         }
 
         this.contactMessageService.encryptMessageForContact(result.contact, result.shortMessage)
-          .then(({ encryptedMessage, signature }) => {
+          .then(({ encryptedMessageForUser, encryptedMessageForContact, signature }) => {
             this.contactMessageService.send({
               contactId: result.contact.id,
               userId: result.contact.userId,
               contactUserId: result.contact.contactUserId,
               direction: 'user',
-              encryptedMessage,
+              encryptedMessageForUser,
+              encryptedMessageForContact,
               signature
             }).subscribe({
               next: () => {
@@ -324,8 +325,8 @@ export class ContactlistComponent {
                   userId: result.contact.userId,
                   contactUserId: result.contact.contactUserId,
                   messageSignature: signature,
-                  userEncryptedMessage: encryptedMessage,
-                  contactUserEncryptedMessage: encryptedMessage
+                  userEncryptedMessage: encryptedMessageForUser,
+                  contactUserEncryptedMessage: encryptedMessageForContact
                 } as Envelope);
               },
               error: (err) => {

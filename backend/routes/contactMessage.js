@@ -10,7 +10,7 @@ const tableContactMessage = require('../db/tableContactMessage');
 router.use(security.checkToken);
 
 const validateSendBody = (body) => {
-  const required = ['contactId', 'direction', 'encryptedMessage', 'signature', 'userId', 'contactUserId'];
+  const required = ['contactId', 'direction', 'encryptedMessageForUser', 'encryptedMessageForContact', 'signature', 'userId', 'contactUserId'];
   const missing = required.filter((key) => body?.[key] === undefined || body?.[key] === null || body?.[key] === '');
   if (missing.length) {
     return `Missing fields: ${missing.join(', ')}`;
@@ -37,7 +37,8 @@ router.post('/send',
     const {
       contactId,
       direction,
-      encryptedMessage,
+      encryptedMessageForUser,
+      encryptedMessageForContact,
       signature,
       status = 'sent',
       createdAt,
@@ -53,7 +54,7 @@ router.post('/send',
       id: messageId,
       contactId,
       direction,
-      encryptedMessage,
+      encryptedMessage: encryptedMessageForUser,
       signature,
       status,
       createdAt
@@ -68,7 +69,7 @@ router.post('/send',
             id: crypto.randomUUID(),
             contactId: reciprocal.id,
             direction: 'contactUser',
-            encryptedMessage,
+            encryptedMessage: encryptedMessageForContact,
             signature,
             status: 'delivered',
             createdAt
@@ -95,10 +96,8 @@ router.get('/list/:contactId',
       if (err) {
         return res.status(500).json({ status: 500, error: err.message || err });
       }
-      if (!rows || rows.length === 0) {
-        return res.status(404).json({ status: 404, rows: [] });
-      }
-      return res.status(200).json({ status: 200, rows });
+      // Auch bei leeren Ergebnissen 200 zurückgeben, damit das Frontend sauber rendern kann
+      return res.status(200).json({ status: 200, rows: rows || [] });
     });
   }
 );

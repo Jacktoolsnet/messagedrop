@@ -43,6 +43,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   readonly composeMessage = output<Contact>();
   readonly messages = signal<{ id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[]>([]);
   readonly loading = signal<boolean>(false);
+  readonly loaded = signal<boolean>(false);
 
   private readonly scrollEffect = effect(() => {
     void this.messages();
@@ -70,7 +71,12 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       this.contactMessageService.liveMessages.set(null);
     });
 
-    this.loadMessages();
+    effect(() => {
+      const contact = this.contact();
+      if (contact && !this.loaded()) {
+        this.loadMessages();
+      }
+    });
     queueMicrotask(() => this.scrollToBottom());
   }
 
@@ -115,13 +121,13 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   private loadMessages(): void {
     const contact = this.contact();
-    if (!contact) return;
+    if (!contact || this.loaded()) return;
     this.loading.set(true);
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
           const decrypted: { id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[] = [];
-          for (const msg of res.rows) {
+          for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
             decrypted.push({
               id: msg.id,
@@ -135,11 +141,13 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           decrypted.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
           this.messages.set(decrypted);
           this.loading.set(false);
+          this.loaded.set(true);
           // mark as read on open
           this.contactMessageService.markAllRead(contact.id).subscribe();
         },
         error: () => {
           this.loading.set(false);
+          this.loaded.set(true);
         }
       });
   }
