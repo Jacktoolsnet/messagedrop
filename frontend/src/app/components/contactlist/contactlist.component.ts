@@ -1,11 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, Signal, inject } from '@angular/core';
+import { Component, Signal, effect, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
@@ -47,6 +48,7 @@ interface ContactEditMessageResult {
   imports: [
     MatCardModule,
     CommonModule,
+    MatBadgeModule,
     MatButtonModule,
     MatDialogContent,
     MatIcon,
@@ -71,10 +73,34 @@ export class ContactlistComponent {
   private readonly contactMessageService = inject(ContactMessageService);
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
+  readonly unreadCounts = signal<Record<string, number>>({});
 
   private contactToDelete?: Contact;
   public mode: typeof Mode = Mode;
   public subscriptionError = false;
+
+  constructor() {
+    effect(() => {
+      this.contactService.contactsSet();
+      const contacts = this.contactsSignal();
+      contacts.forEach(contact => {
+        this.contactMessageService.unreadCount(contact.id).subscribe({
+          next: (res) => {
+            this.unreadCounts.update((map: Record<string, number>) => ({ ...map, [contact.id]: res.unread ?? 0 }));
+            contact.unreadCount = res.unread ?? 0;
+          }
+        });
+      });
+    });
+  }
+
+  getUnreadBadge(contactId: string): string {
+    const count = this.unreadCounts()[contactId] ?? 0;
+    if (!count) {
+      return '';
+    }
+    return count > 99 ? '99+' : `${count}`;
+  }
 
   openConnectDialog(): void {
     const contact: Contact = {
@@ -143,19 +169,19 @@ export class ContactlistComponent {
 
     dialogRef.afterClosed().subscribe((result?: boolean) => {
       if (result && this.contactToDelete) {
-          const targetId = this.contactToDelete.id;
-          this.contactService.deleteContact(targetId).subscribe({
-            next: () => {
-              const remaining = this.contactsSignal().filter(c => c.id !== targetId);
-              this.contactService.setContacts(remaining);
-              this.snackBar.open('Contact deleted', 'OK', { duration: 1500 });
-            },
-            error: (err) => {
-              const message = err?.message ?? 'Failed to delete contact.';
-              this.snackBar.open(message, 'OK');
-            }
-          });
-          this.contactToDelete = undefined;
+        const targetId = this.contactToDelete.id;
+        this.contactService.deleteContact(targetId).subscribe({
+          next: () => {
+            const remaining = this.contactsSignal().filter(c => c.id !== targetId);
+            this.contactService.setContacts(remaining);
+            this.snackBar.open('Contact deleted', 'OK', { duration: 1500 });
+          },
+          error: (err) => {
+            const message = err?.message ?? 'Failed to delete contact.';
+            this.snackBar.open(message, 'OK');
+          }
+        });
+        this.contactToDelete = undefined;
       }
     });
   }

@@ -25,11 +25,15 @@
         @for (contact of contactsSignal(); track contact.id){
         <mat-expansion-panel>
             <mat-expansion-panel-header>
-                @if (contact.base64Avatar) {
-                <img class="avatar" [src]="contact.base64Avatar" [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
-                } @else {
-                <mat-icon>person</mat-icon>
-                }
+                <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
+                    [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true" matBadgeColor="warn">
+                    @if (contact.base64Avatar) {
+                    <img class="avatar" [src]="contact.base64Avatar"
+                        [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
+                    } @else {
+                    <mat-icon>person</mat-icon>
+                    }
+                </span>
                 <span class="name">{{ contact.name || 'Unnamed' }}</span>
             </mat-expansion-panel-header>
             <mat-card>
@@ -47,7 +51,8 @@
                     </button>
                     }
                     <button mat-mini-fab color="secondary" aria-label="Chatfenster öffnen"
-                        (click)="openContactChatroom(contact)">
+                        [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
+                        matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
                         <mat-icon class="material-symbols-outlined">forum</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">

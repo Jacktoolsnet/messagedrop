@@ -165,6 +165,15 @@ mat-expansion-panel-header .name {
   margin-left: 0.75rem;
 }
 
+.avatar-badge {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.75rem;
+  padding-bottom: 0.5rem;
+}
+
 .active-button {
   color: var(--mat-app-text-color);
   border: 1px solid var(--mdc-outlined-button-outline-color);

@@ -89,6 +89,13 @@ export class ContactMessageService {
     ).pipe(catchError(this.handleError));
   }
 
+  unreadCount(contactId: string) {
+    return this.http.get<{ status: number; unread: number }>(
+      `${environment.apiUrl}/contactMessage/unread/${contactId}`,
+      this.httpOptions
+    ).pipe(catchError(this.handleError));
+  }
+
   initLiveReceive(): void {
     // Already initialized
     if (this.socketioService.hasJoinedUserRoom()) {

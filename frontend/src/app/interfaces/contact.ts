@@ -22,4 +22,5 @@ export interface Contact {
     provided: boolean,
     lastMessageFrom: string,
     lastMessageAt?: string | null
+    unreadCount?: number
 }

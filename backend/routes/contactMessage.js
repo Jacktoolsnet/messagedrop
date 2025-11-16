@@ -103,6 +103,21 @@ router.get('/list/:contactId',
   }
 );
 
+// Unread count
+router.get('/unread/:contactId',
+  [
+    security.authenticate
+  ],
+  (req, res) => {
+    tableContactMessage.getUnreadCount(req.database.db, req.params.contactId, (err, cnt) => {
+      if (err) {
+        return res.status(500).json({ status: 500, error: err.message || err });
+      }
+      return res.status(200).json({ status: 200, unread: cnt });
+    });
+  }
+);
+
 // Mark messages as read: either by IDs or all (unread) up to timestamp for a contact
 router.post('/read',
   [
