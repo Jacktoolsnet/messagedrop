@@ -58,6 +58,11 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     if (!incoming || !contact || incoming.contactId !== contact.id) {
       return;
     }
+    // Skip duplicates
+    if (this.messages().some((m) => m.id === incoming.id)) {
+      this.contactMessageService.liveMessages.set(null);
+      return;
+    }
     const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
     this.messages.update(msgs => [...msgs, {
       id: incoming.id,
