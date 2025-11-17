@@ -58,15 +58,18 @@ const createMessage = function (db, {
     encryptedMessage,
     signature,
     status = 'sent',
-    createdAt // optional ISO, else default
+    createdAt, // optional ISO, else default
+    readAt // optional ISO, else default (only used for sender to avoid unread)
 }, callback) {
+    // Eigene Nachrichten gelten sofort als gelesen
+    const normalizedReadAt = readAt ?? (direction === 'user' ? new Date().toISOString() : null);
     const sql = `
     INSERT INTO ${tableName}
       (${columnId}, ${columnContactId}, ${columnDirection},
-       ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt})
-    VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')));
+       ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt})
+    VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?);
   `;
-    const params = [id, contactId, direction, encryptedMessage, signature, status, createdAt ?? null];
+    const params = [id, contactId, direction, encryptedMessage, signature, status, createdAt ?? null, normalizedReadAt];
     db.run(sql, params, (err) => callback(err));
 };
 
@@ -117,7 +120,9 @@ const getUnreadCount = function (db, contactId, callback) {
     const sql = `
     SELECT COUNT(*) AS cnt
     FROM ${tableName}
-    WHERE ${columnContactId} = ? AND ${columnReadAt} IS NULL;
+    WHERE ${columnContactId} = ?
+      AND ${columnReadAt} IS NULL
+      AND ${columnDirection} = 'contactUser';
   `;
     db.get(sql, [contactId], (err, row) => callback(err, row?.cnt ?? 0));
 };
