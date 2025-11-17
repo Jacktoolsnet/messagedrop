@@ -105,14 +105,11 @@ export class ContactMessageService {
     const eventName = `receiveShortMessage:${this.userService.getUser().id}`;
     // ensure no duplicate handlers
     this.socketioService.getSocket().off(eventName);
-    console.debug('[contact-message] register live socket listener', eventName);
     this.socketioService.getSocket().on(eventName, (payload: { status: number; envelope: Envelope; }) => {
-      console.debug('[contact-message] incoming socket payload', payload);
       if (payload?.status === 200 && payload.envelope) {
         // Map incoming message to the local contact by sender userId
         const contact = this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.envelope.userId);
         if (!contact) {
-          console.debug('[contact-message] no matching contact for incoming payload', payload.envelope.userId);
           return;
         }
         const msgId = (payload.envelope as unknown as { id?: string }).id ?? crypto.randomUUID();

@@ -60,7 +60,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       return;
     }
     const key = this.buildMessageKey(incoming.id, incoming.signature, incoming.encryptedMessage);
-    console.debug('[chatroom] live incoming', { key, id: incoming.id, contactId: incoming.contactId });
     const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
     if (!this.messageKeys.has(key)) {
       this.messageKeys.add(key);
@@ -73,8 +72,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         status: incoming.status
       }]);
       queueMicrotask(() => this.scrollToBottom());
-    } else {
-      console.debug('[chatroom] skipped duplicate live incoming', { key, id: incoming.id });
     }
     this.contactMessageService.liveMessages.set(null);
   }, { allowSignalWrites: true });
