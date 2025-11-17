@@ -149,13 +149,18 @@ export class ContactMessageService {
 
       // Signatur prüfen
       const signatureBuffer = Buffer.from(JSON.parse(msg.signature));
+      // Convert Buffer to ArrayBuffer for WebCrypto verify
+      const signatureArrayBuffer = signatureBuffer.buffer.slice(
+        signatureBuffer.byteOffset,
+        signatureBuffer.byteOffset + signatureBuffer.byteLength
+      );
       const signingKey = msg.direction === 'user'
         ? this.userService.getUser().signingKeyPair.publicKey
         : contact.contactUserSigningPublicKey!;
       const valid = await this.cryptoService.verifySignature(
         signingKey,
         decrypted,
-        signatureBuffer
+        signatureArrayBuffer
       );
       if (!valid) return null;
       return JSON.parse(decrypted) as ShortMessage;
