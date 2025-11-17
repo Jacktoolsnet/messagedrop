@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild, computed, effect, inject, output, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild, ViewChildren, QueryList, computed, effect, inject, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -36,6 +36,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
 
   @ViewChild('messageScroll') private messageScroll?: ElementRef<HTMLElement>;
+  @ViewChildren('messageRow') private messageRows?: QueryList<ElementRef<HTMLElement>>;
 
   readonly contact = computed(() =>
     this.contactService.sortedContactsSignal().find(contact => contact.id === this.contactId)
@@ -44,6 +45,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   readonly messages = signal<{ id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[]>([]);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
+  private scrolledToFirstUnread = false;
 
   private readonly scrollEffect = effect(() => {
     void this.messages();
@@ -104,6 +106,10 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     return !!message && (message.message?.trim() !== '' || message.multimedia?.type !== 'undefined');
   }
 
+  isUnread(message: { direction: 'user' | 'contactUser'; readAt?: string | null }): boolean {
+    return message.direction === 'contactUser' && !message.readAt;
+  }
+
   addOptimisticMessage(message: ShortMessage): void {
     const contact = this.contact();
     if (!contact) {
@@ -127,7 +133,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
-          console.log('Loaded contact messages:', res);
           const decrypted: { id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[] = [];
           for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
@@ -141,17 +146,37 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
             });
           }
           decrypted.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-          this.messages.set(decrypted);
-          this.loading.set(false);
-          this.loaded.set(true);
-          // mark as read on open
-          this.contactMessageService.markAllRead(contact.id).subscribe();
-        },
-        error: () => {
-          this.loading.set(false);
-          this.loaded.set(true);
-        }
-      });
+      this.messages.set(decrypted);
+      this.loading.set(false);
+      this.loaded.set(true);
+      queueMicrotask(() => this.scrollToFirstUnread());
+      // mark as read on open
+      this.contactMessageService.markAllRead(contact.id).subscribe();
+    },
+    error: () => {
+      this.loading.set(false);
+      this.loaded.set(true);
+    }
+  });
+}
+
+  private scrollToFirstUnread(): void {
+    if (this.scrolledToFirstUnread) {
+      return;
+    }
+    const rows = this.messageRows?.toArray() ?? [];
+    const target = rows.find((row, index) => {
+      const message = this.messages()[index];
+      return message && this.isUnread(message);
+    });
+    if (target?.nativeElement) {
+      target.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.scrolledToFirstUnread = true;
+      return;
+    }
+    // No unread found; keep old behavior
+    this.scrollToBottom();
+    this.scrolledToFirstUnread = true;
   }
 
   private scrollToBottom(): void {

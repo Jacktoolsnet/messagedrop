@@ -15,7 +15,7 @@
   <mat-card-content #messageScroll class="chatroom-card__content" (click)="requestCompose()">
     <div class="message-content">
       @for (msg of messages(); track msg.id; let last = $last) {
-      <div class="message">
+      <div class="message" #messageRow [class.message--unread]="isUnread(msg)">
         @if (msg.direction === 'user') {
         <div class="bubble-row me">
           <div class="avatar-me">

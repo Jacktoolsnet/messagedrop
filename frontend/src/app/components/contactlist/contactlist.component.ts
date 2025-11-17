@@ -256,6 +256,16 @@ export class ContactlistComponent {
       });
       dialogRef.afterClosed().subscribe(() => subscription.unsubscribe());
     }
+
+    dialogRef.afterClosed().subscribe(() => {
+      // Nach dem Schließen neu laden, damit Badge/Unread stimmen (MarkRead passiert im Chatroom)
+      this.contactMessageService.unreadCount(contact.id).subscribe({
+        next: (res) => {
+          this.unreadCounts.update((map: Record<string, number>) => ({ ...map, [contact.id]: res.unread ?? 0 }));
+          contact.unreadCount = res.unread ?? 0;
+        }
+      });
+    });
   }
 
   async openContactMessagDialog(contact: Contact, chatroomInstance?: { addOptimisticMessage?: (msg: ShortMessage) => void }): Promise<void> {
