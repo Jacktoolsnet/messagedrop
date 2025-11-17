@@ -68,6 +68,7 @@ import { SocketioService } from './services/socketio.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
+import { ContactMessageService } from './services/contact-message.service';
 
 @Component({
   selector: 'app-root',
@@ -116,6 +117,7 @@ export class AppComponent implements OnInit {
   private readonly geolocationService = inject(GeolocationService);
   private readonly messageService = inject(MessageService);
   private readonly socketioService = inject(SocketioService);
+  private readonly contactMessageService = inject(ContactMessageService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
@@ -129,6 +131,10 @@ export class AppComponent implements OnInit {
   );
   readonly unreadSystemNotificationCount = this.systemNotificationService.getUnreadCountSignal();
   readonly hasUnreadSystemNotifications = computed(() => this.unreadSystemNotificationCount() > 0);
+  readonly unreadContactCounts = signal<Record<string, number>>({});
+  readonly unreadContactsTotal = computed(() =>
+    Object.values(this.unreadContactCounts()).reduce((acc, val) => acc + (val || 0), 0)
+  );
 
   constructor() {
     effect(async () => {
@@ -215,6 +221,15 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
+      this.contactService.contactsSet(); // track changes for unread badge
+      if (this.appService.isConsentCompleted() && this.userService.isReady()) {
+        this.refreshContactUnreadCounts();
+      } else {
+        this.unreadContactCounts.set({});
+      }
+    });
+
+    effect(() => {
       this.contactService.contactsSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.socketioService.initSocket();
@@ -279,6 +294,33 @@ export class AppComponent implements OnInit {
     this.contactService.logout();
     this.noteService.logout();
     this.systemNotificationService.reset();
+  }
+
+  private refreshContactUnreadCounts(): void {
+    const contacts = this.contactService.sortedContactsSignal();
+    if (!contacts?.length) {
+      this.unreadContactCounts.set({});
+      return;
+    }
+    this.unreadContactCounts.set({});
+    contacts.forEach((contact) => {
+      this.contactMessageService.unreadCount(contact.id).subscribe({
+        next: (res) => {
+          this.unreadContactCounts.update((map) => ({ ...map, [contact.id]: res.unread ?? 0 }));
+        },
+        error: () => {
+          // best effort for badge; ignore errors
+        }
+      });
+    });
+  }
+
+  getContactsBadge(): string {
+    const total = this.unreadContactsTotal();
+    if (!total) {
+      return '';
+    }
+    return total > 99 ? '99+' : `${total}`;
   }
 
   private async handleSharedContent(content: SharedContent) {
