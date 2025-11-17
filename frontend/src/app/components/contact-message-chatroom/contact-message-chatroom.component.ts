@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, ViewChild, ViewChildren, QueryList, computed, effect, inject, output, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, QueryList, ViewChild, ViewChildren, computed, effect, inject, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
@@ -45,6 +45,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   readonly messages = signal<{ id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[]>([]);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
+  private readonly messageKeys = new Set<string>();
   private scrolledToFirstUnread = false;
 
   private readonly scrollEffect = effect(() => {
@@ -58,21 +59,23 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     if (!incoming || !contact || incoming.contactId !== contact.id) {
       return;
     }
-    // Skip duplicates
-    if (this.messages().some((m) => m.id === incoming.id)) {
-      this.contactMessageService.liveMessages.set(null);
-      return;
-    }
+    const key = this.buildMessageKey(incoming.id, incoming.signature, incoming.encryptedMessage);
+    console.debug('[chatroom] live incoming', { key, id: incoming.id, contactId: incoming.contactId });
     const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
-    this.messages.update(msgs => [...msgs, {
-      id: incoming.id,
-      direction: incoming.direction,
-      payload,
-      createdAt: incoming.createdAt,
-      readAt: incoming.readAt,
-      status: incoming.status
-    }]);
-    queueMicrotask(() => this.scrollToBottom());
+    if (!this.messageKeys.has(key)) {
+      this.messageKeys.add(key);
+      this.messages.update(msgs => [...msgs, {
+        id: incoming.id,
+        direction: incoming.direction,
+        payload,
+        createdAt: incoming.createdAt,
+        readAt: incoming.readAt,
+        status: incoming.status
+      }]);
+      queueMicrotask(() => this.scrollToBottom());
+    } else {
+      console.debug('[chatroom] skipped duplicate live incoming', { key, id: incoming.id });
+    }
     this.contactMessageService.liveMessages.set(null);
   }, { allowSignalWrites: true });
 
@@ -151,19 +154,19 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
             });
           }
           decrypted.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-      this.messages.set(decrypted);
-      this.loading.set(false);
-      this.loaded.set(true);
-      queueMicrotask(() => this.scrollToFirstUnread());
-      // mark as read on open
-      this.contactMessageService.markAllRead(contact.id).subscribe();
-    },
-    error: () => {
-      this.loading.set(false);
-      this.loaded.set(true);
-    }
-  });
-}
+          this.messages.set(decrypted);
+          this.loading.set(false);
+          this.loaded.set(true);
+          queueMicrotask(() => this.scrollToFirstUnread());
+          // mark as read on open
+          this.contactMessageService.markAllRead(contact.id).subscribe();
+        },
+        error: () => {
+          this.loading.set(false);
+          this.loaded.set(true);
+        }
+      });
+  }
 
   private scrollToFirstUnread(): void {
     if (this.scrolledToFirstUnread) {
@@ -190,5 +193,9 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       return;
     }
     container.scrollTop = container.scrollHeight;
+  }
+
+  private buildMessageKey(id: string, signature: string, cipher: string): string {
+    return `${id}|${signature}|${cipher}`;
   }
 }

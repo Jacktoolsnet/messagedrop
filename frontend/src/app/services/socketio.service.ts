@@ -222,11 +222,15 @@ export class SocketioService {
   }
 
   public sendShortMessageToContact(envelope: Envelope) {
+    console.debug('[socket] emit contact:newShortMessage', envelope);
     this.socket.emit('contact:newShortMessage', envelope);
   }
 
   public receiveShortMessage(contact: Contact) {
-    this.socket.on(`receiveShortMessage:${contact.userId}`, (payload: { status: number, envelope: Envelope }) => {
+    const eventName = `receiveShortMessage:${contact.userId}`;
+    this.socket.off(eventName);
+    this.socket.on(eventName, (payload: { status: number, envelope: Envelope }) => {
+      console.debug('[socket] receiveShortMessage legacy handler', { eventName, payload });
       if (payload.status == 200) {
         let messageSignatureBuffer = undefined;
         let messageSignature = undefined;

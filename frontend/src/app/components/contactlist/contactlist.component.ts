@@ -324,13 +324,14 @@ export class ContactlistComponent {
               encryptedMessageForContact,
               signature
             }).subscribe({
-              next: () => {
+              next: (res) => {
                 // Optional: show locally
                 if (chatroomInstance?.addOptimisticMessage) {
                   chatroomInstance.addOptimisticMessage(result.shortMessage);
                 }
                 // Inform other user via socket
                 this.socketioService.sendShortMessageToContact({
+                  id: res.mirrorMessageId ?? res.messageId,
                   contactId: result.contact.id,
                   userId: result.contact.userId,
                   contactUserId: result.contact.contactUserId,

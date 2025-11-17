@@ -74,6 +74,20 @@
   box-sizing: border-box;
 }
 
+.button_back {
+  position: absolute;
+  top: 1.5rem;
+  right: 0;
+  z-index: 100;
+}
+
+.button_add {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 0;
+  z-index: 100;
+}
+
 .first-button {
   margin-top: 1rem;
   margin-left: auto;

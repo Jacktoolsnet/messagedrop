@@ -48,6 +48,7 @@ router.post('/send',
     } = req.body;
 
     const messageId = id || crypto.randomUUID();
+    const mirrorMessageId = crypto.randomUUID();
 
     // Store message for sender's contact
     tableContactMessage.createMessage(req.database.db, {
@@ -66,7 +67,7 @@ router.post('/send',
       tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
         if (!lookupErr && reciprocal?.id) {
           tableContactMessage.createMessage(req.database.db, {
-            id: crypto.randomUUID(),
+            id: mirrorMessageId,
             contactId: reciprocal.id,
             direction: 'contactUser',
             encryptedMessage: encryptedMessageForContact,
@@ -75,7 +76,7 @@ router.post('/send',
             createdAt
           }, () => { /* ignore errors for mirror insert */ });
         }
-        return res.status(200).json({ status: 200, messageId });
+        return res.status(200).json({ status: 200, messageId, mirrorMessageId });
       });
     });
   }

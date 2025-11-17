@@ -11,6 +11,7 @@ import { CryptoService } from './crypto.service';
 import { UserService } from './user.service';
 import { SocketioService } from './socketio.service';
 import { Envelope } from '../interfaces/envelope';
+import { ContactService } from './contact.service';
 
 interface SendMessagePayload {
   id?: string;
@@ -33,6 +34,7 @@ export class ContactMessageService {
   private readonly cryptoService = inject(CryptoService);
   private readonly userService = inject(UserService);
   private readonly socketioService = inject(SocketioService);
+  private readonly contactService = inject(ContactService);
 
   readonly liveMessages = signal<ContactMessage | null>(null);
 
@@ -98,18 +100,25 @@ export class ContactMessageService {
   }
 
   initLiveReceive(): void {
-    // Already initialized
-    if (this.socketioService.hasJoinedUserRoom()) {
-      return;
-    }
     this.socketioService.initSocket();
     this.socketioService.initUserSocketEvents();
-    this.socketioService.getSocket().on(`receiveShortMessage:${this.userService.getUser().id}`, (payload: { status: number; envelope: Envelope; }) => {
+    const eventName = `receiveShortMessage:${this.userService.getUser().id}`;
+    // ensure no duplicate handlers
+    this.socketioService.getSocket().off(eventName);
+    console.debug('[contact-message] register live socket listener', eventName);
+    this.socketioService.getSocket().on(eventName, (payload: { status: number; envelope: Envelope; }) => {
+      console.debug('[contact-message] incoming socket payload', payload);
       if (payload?.status === 200 && payload.envelope) {
+        // Map incoming message to the local contact by sender userId
+        const contact = this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.envelope.userId);
+        if (!contact) {
+          console.debug('[contact-message] no matching contact for incoming payload', payload.envelope.userId);
+          return;
+        }
         const msgId = (payload.envelope as unknown as { id?: string }).id ?? crypto.randomUUID();
         const msg: ContactMessage = {
           id: msgId,
-          contactId: payload.envelope.contactId,
+          contactId: contact.id,
           direction: 'contactUser',
           encryptedMessage: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
           signature: payload.envelope.messageSignature,

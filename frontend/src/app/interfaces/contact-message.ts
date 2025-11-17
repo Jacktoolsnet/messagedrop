@@ -17,4 +17,5 @@ export interface ContactMessageListResponse {
 export interface ContactMessageSendResponse {
   status: number;
   messageId: string;
+  mirrorMessageId?: string;
 }
