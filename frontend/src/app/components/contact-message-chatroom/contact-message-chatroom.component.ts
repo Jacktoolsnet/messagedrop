@@ -50,33 +50,34 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     queueMicrotask(() => this.scrollToBottom());
   });
 
+  private readonly liveMessagesEffect = effect(async () => {
+    const incoming = this.contactMessageService.liveMessages();
+    const contact = this.contact();
+    if (!incoming || !contact || incoming.contactId !== contact.id) {
+      return;
+    }
+    const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
+    this.messages.update(msgs => [...msgs, {
+      id: incoming.id,
+      direction: incoming.direction,
+      payload,
+      createdAt: incoming.createdAt,
+      readAt: incoming.readAt,
+      status: incoming.status
+    }]);
+    queueMicrotask(() => this.scrollToBottom());
+    this.contactMessageService.liveMessages.set(null);
+  }, { allowSignalWrites: true });
+
+  private readonly loadMessagesEffect = effect(() => {
+    const contact = this.contact();
+    if (contact && !this.loaded()) {
+      this.loadMessages();
+    }
+  }, { allowSignalWrites: true });
+
   ngAfterViewInit(): void {
     this.contactMessageService.initLiveReceive();
-    effect(async () => {
-      const incoming = this.contactMessageService.liveMessages();
-      const contact = this.contact();
-      if (!incoming || !contact || incoming.contactId !== contact.id) {
-        return;
-      }
-      const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
-      this.messages.update(msgs => [...msgs, {
-        id: incoming.id,
-        direction: incoming.direction,
-        payload,
-        createdAt: incoming.createdAt,
-        readAt: incoming.readAt,
-        status: incoming.status
-      }]);
-      queueMicrotask(() => this.scrollToBottom());
-      this.contactMessageService.liveMessages.set(null);
-    });
-
-    effect(() => {
-      const contact = this.contact();
-      if (contact && !this.loaded()) {
-        this.loadMessages();
-      }
-    });
     queueMicrotask(() => this.scrollToBottom());
   }
 
@@ -126,6 +127,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
+          console.log('Loaded contact messages:', res);
           const decrypted: { id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[] = [];
           for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
