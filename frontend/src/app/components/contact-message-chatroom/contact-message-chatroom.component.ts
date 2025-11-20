@@ -120,7 +120,16 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     if (!deleted) {
       return;
     }
-    this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== deleted.messageId));
+    const contact = this.contact();
+    let removed = false;
+    this.messages.update((msgs) => {
+      const filtered = msgs.filter((msg) => msg.messageId !== deleted.messageId);
+      removed = filtered.length !== msgs.length;
+      return filtered;
+    });
+    if (removed && contact) {
+      this.contactMessageService.emitUnreadCountUpdate(contact.id);
+    }
     this.contactMessageService.deletedMessage.set(null);
   });
 
@@ -209,6 +218,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       }).subscribe({
         next: () => {
           this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== _message.messageId));
+          this.contactMessageService.emitUnreadCountUpdate(contact.id);
           if (scope === 'both') {
             this.socketioService.sendDeletedContactMessage({
               contactId: contact.id,

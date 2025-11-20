@@ -59,6 +59,7 @@ export class ContactMessageService {
   readonly liveMessages = signal<ContactMessage | null>(null);
   readonly updatedMessages = signal<ContactMessage | null>(null);
   readonly deletedMessage = signal<{ messageId: string } | null>(null);
+  readonly unreadCountUpdate = signal<{ contactId: string; unread: number } | null>(null);
 
   private readonly httpOptions = {
     headers: new HttpHeaders({
@@ -195,6 +196,17 @@ export class ContactMessageService {
     this.socketioService.getSocket().on(deleteEventName, (payload: { status: number; messageId?: string }) => {
       if (payload?.status === 200 && payload.messageId) {
         this.deletedMessage.set({ messageId: payload.messageId });
+      }
+    });
+  }
+
+  emitUnreadCountUpdate(contactId: string): void {
+    this.unreadCount(contactId).subscribe({
+      next: (res) => {
+        this.unreadCountUpdate.set({ contactId, unread: res.unread ?? 0 });
+      },
+      error: () => {
+        this.unreadCountUpdate.set({ contactId, unread: 0 });
       }
     });
   }

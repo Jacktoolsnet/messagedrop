@@ -92,6 +92,18 @@ export class ContactlistComponent {
         });
       });
     });
+
+    effect(() => {
+      const update = this.contactMessageService.unreadCountUpdate();
+      if (update) {
+        this.unreadCounts.update((map: Record<string, number>) => ({ ...map, [update.contactId]: update.unread }));
+        const contact = this.contactsSignal().find((c) => c.id === update.contactId);
+        if (contact) {
+          contact.unreadCount = update.unread;
+        }
+        this.contactMessageService.unreadCountUpdate.set(null);
+      }
+    });
   }
 
   getUnreadBadge(contactId: string): string {

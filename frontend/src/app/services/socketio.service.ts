@@ -297,7 +297,7 @@ export class SocketioService {
     this.socket.emit('contact:updateContactMessage', envelope);
   }
 
-  public sendDeletedContactMessage(payload: Envelope & { messageId: string }) {
+  public sendDeletedContactMessage(payload: { contactId: string; userId: string; contactUserId: string; messageId: string }) {
     this.socket.emit('contact:deleteContactMessage', payload);
   }
 
