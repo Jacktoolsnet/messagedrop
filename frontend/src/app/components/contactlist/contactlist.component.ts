@@ -268,7 +268,10 @@ export class ContactlistComponent {
     });
   }
 
-  async openContactMessagDialog(contact: Contact, chatroomInstance?: { addOptimisticMessage?: (msg: ShortMessage) => void }): Promise<void> {
+  async openContactMessagDialog(contact: Contact, chatroomInstance?: {
+    addOptimisticMessage?: (msg: ShortMessage) => string | undefined;
+    finalizeOptimisticMessage?: (temporaryId: string, serverId: string, sharedMessageId: string) => void;
+  }): Promise<void> {
     const lastMultimediaContent = await this.sharedContentService.getSharedContent('lastMultimedia');
     let lastMultimedia: Multimedia | undefined = undefined;
     if (undefined != lastMultimediaContent) {
@@ -315,6 +318,10 @@ export class ContactlistComponent {
 
         this.contactMessageService.encryptMessageForContact(result.contact, result.shortMessage)
           .then(({ encryptedMessageForUser, encryptedMessageForContact, signature }) => {
+            let tempMessageId: string | undefined;
+            if (chatroomInstance?.addOptimisticMessage) {
+              tempMessageId = chatroomInstance.addOptimisticMessage(result.shortMessage);
+            }
             this.contactMessageService.send({
               contactId: result.contact.id,
               userId: result.contact.userId,
@@ -325,11 +332,6 @@ export class ContactlistComponent {
               signature
             }).subscribe({
               next: (res) => {
-                // Optional: show locally
-                if (chatroomInstance?.addOptimisticMessage) {
-                  chatroomInstance.addOptimisticMessage(result.shortMessage);
-                }
-                // Inform other user via socket
                 this.socketioService.sendContactMessage({
                   id: res.mirrorMessageId ?? res.messageId,
                   messageId: res.sharedMessageId,
@@ -340,6 +342,9 @@ export class ContactlistComponent {
                   userEncryptedMessage: encryptedMessageForUser,
                   contactUserEncryptedMessage: encryptedMessageForContact
                 } as Envelope);
+                if (tempMessageId && chatroomInstance?.finalizeOptimisticMessage) {
+                  chatroomInstance.finalizeOptimisticMessage(tempMessageId, res.messageId, res.sharedMessageId);
+                }
               },
               error: (err) => {
                 const message = err?.message ?? 'Failed to send message.';

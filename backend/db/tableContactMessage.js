@@ -174,6 +174,23 @@ const updateMessageForContact = function (db, contactId, messageId, {
     db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, messageId, contactId], (err) => callback(err));
 };
 
+const deleteByMessageId = function (db, messageId, callback) {
+    const sql = `
+    DELETE FROM ${tableName}
+    WHERE ${columnMessageId} = ?;
+  `;
+    db.run(sql, [messageId], (err) => callback(err));
+};
+
+const deleteByContactAndMessageId = function (db, contactId, messageId, callback) {
+    const sql = `
+    DELETE FROM ${tableName}
+    WHERE ${columnMessageId} = ?
+      AND ${columnContactId} = ?;
+  `;
+    db.run(sql, [messageId, contactId], (err) => callback(err));
+};
+
 module.exports = {
     init,
     createMessage,
@@ -187,4 +204,6 @@ module.exports = {
     columnMessageId,
     updateMessageByMessageId,
     updateMessageForContact,
+    deleteByMessageId,
+    deleteByContactAndMessageId,
 };

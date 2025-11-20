@@ -137,6 +137,45 @@ router.post('/update',
   }
 );
 
+// Delete message(s)
+router.post('/delete',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.delete', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res) => {
+    const {
+      messageId,
+      contactId,
+      scope = 'single',
+      userId,
+      contactUserId
+    } = req.body ?? {};
+
+    if (!messageId || !contactId) {
+      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+    }
+
+    if (scope === 'both') {
+      tableContactMessage.deleteByMessageId(req.database.db, messageId, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
+        }
+        return res.status(200).json({ status: 200, messageId });
+      });
+      return;
+    }
+
+    tableContactMessage.deleteByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
+      if (err) {
+        return res.status(500).json({ status: 500, error: err.message || err });
+      }
+      return res.status(200).json({ status: 200, messageId });
+    });
+  }
+);
+
 // List messages (paged, optional before timestamp)
 router.get('/list/:contactId',
   [

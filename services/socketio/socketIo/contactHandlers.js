@@ -67,8 +67,29 @@ module.exports = (io, socket) => {
     });
   };
 
+  const deleteContactMessage = (payload) => {
+    const requiredFields = ['contactId', 'userId', 'contactUserId', 'messageId'];
+    const missing = requiredFields.filter((key) => payload?.[key] === undefined || payload?.[key] === null);
+    if (missing.length) {
+      emitError('contact:deleteContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+
+    io.to(payload.contactUserId).emit(`receiveDeletedContactMessage:${payload.contactUserId}`, {
+      status: 200,
+      messageId: payload.messageId
+    });
+
+    socket.emit('contact:deleteContactMessage:ack', {
+      status: 200,
+      contactId: payload.contactId,
+      messageId: payload.messageId
+    });
+  };
+
   socket.on('contact:requestProfile', requestProfile);
   socket.on('contact:provideUserProfile', provideUserProfile);
   socket.on('contact:newContactMessage', newContactMessage);
   socket.on('contact:updateContactMessage', updateContactMessage);
+  socket.on('contact:deleteContactMessage', deleteContactMessage);
 };

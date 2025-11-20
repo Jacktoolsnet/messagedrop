@@ -79,7 +79,8 @@
       }
 
       @if (messages().length === 0) {
-      <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false">
+      <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
+        (click)="requestCompose()">
         <span>Create my first message</span>
       </button>
       }

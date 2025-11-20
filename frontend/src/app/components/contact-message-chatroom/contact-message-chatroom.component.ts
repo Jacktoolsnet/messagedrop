@@ -5,16 +5,18 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { Contact } from '../../interfaces/contact';
-import { ShortMessage } from '../../interfaces/short-message';
+import { Envelope } from '../../interfaces/envelope';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
+import { ShortMessage } from '../../interfaces/short-message';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { SocketioService } from '../../services/socketio.service';
 import { UserService } from '../../services/user.service';
+import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
+import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
 type ChatroomMessage = {
   id: string;
@@ -113,6 +115,15 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactMessageService.updatedMessages.set(null);
   }, { allowSignalWrites: true });
 
+  private readonly deletedMessagesEffect = effect(() => {
+    const deleted = this.contactMessageService.deletedMessage();
+    if (!deleted) {
+      return;
+    }
+    this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== deleted.messageId));
+    this.contactMessageService.deletedMessage.set(null);
+  });
+
   ngAfterViewInit(): void {
     this.contactMessageService.initLiveReceive();
     queueMicrotask(() => this.scrollToBottom());
@@ -174,13 +185,47 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   }
 
   deleteMessage(_message: ChatroomMessage): void {
-    console.warn('Delete message not yet implemented');
-  }
-
-  addOptimisticMessage(message: ShortMessage): void {
     const contact = this.contact();
     if (!contact) {
       return;
+    }
+    const dialogRef = this.matDialog.open(DeleteContactMessageComponent, {
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((confirm?: boolean) => {
+      if (!confirm) {
+        return;
+      }
+      const scope = _message.direction === 'user' ? 'both' : 'single';
+      this.contactMessageService.deleteMessage({
+        messageId: _message.messageId,
+        contactId: contact.id,
+        scope,
+        userId: contact.userId,
+        contactUserId: contact.contactUserId
+      }).subscribe({
+        next: () => {
+          this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== _message.messageId));
+          if (scope === 'both') {
+            this.socketioService.sendDeletedContactMessage({
+              contactId: contact.id,
+              userId: contact.userId,
+              contactUserId: contact.contactUserId,
+              messageId: _message.messageId
+            } as Envelope & { messageId: string });
+          }
+        }
+      });
+    });
+  }
+
+  addOptimisticMessage(message: ShortMessage): string | undefined {
+    const contact = this.contact();
+    if (!contact) {
+      return undefined;
     }
     const now = new Date().toISOString();
     const messageId = crypto.randomUUID();
@@ -193,6 +238,15 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       status: 'sent'
     }]);
     queueMicrotask(() => this.scrollToBottom());
+    return messageId;
+  }
+
+  finalizeOptimisticMessage(tempMessageId: string, serverRecordId: string, sharedMessageId: string): void {
+    this.messages.update((msgs) =>
+      msgs.map((msg) =>
+        msg.messageId === tempMessageId ? { ...msg, id: serverRecordId, messageId: sharedMessageId } : msg
+      )
+    );
   }
 
   private loadMessages(): void {
