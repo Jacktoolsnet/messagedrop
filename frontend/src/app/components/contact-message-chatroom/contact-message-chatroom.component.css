@@ -168,10 +168,12 @@
 
 .bubble-row.me .button-me {
   justify-content: flex-end;
+  margin-right: -1rem;
 }
 
 .bubble-row.them .button-them {
   justify-content: flex-start;
+  margin-left: -1rem;
 }
 
 .message-actions {
@@ -179,12 +181,11 @@
   display: inline-flex;
   gap: 0.35rem;
   align-items: center;
+  border-radius: 1.5rem;
+  padding: 0.35rem 0.6rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  border-radius: 1.5rem;
-  padding: 0.5rem;
-  box-shadow: 0 2px 8px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
 }
 
 .message-actions button {
