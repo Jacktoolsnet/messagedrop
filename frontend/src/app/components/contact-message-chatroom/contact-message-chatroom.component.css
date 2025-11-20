@@ -130,8 +130,8 @@
   }
 }
 
-.bubble-row p.from-me,
-.bubble-row p.from-them {
+.bubble {
+  position: relative;
   background-color: var(--mat-card-filled-container-color);
   color: var(--mat-app-text-color);
   border: 1px solid var(--bubble-outline);
@@ -144,20 +144,51 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.bubble-row p.from-me {
+.bubble--me {
   text-align: right;
 }
 
-.bubble-row p.from-them {
+.bubble--them {
   text-align: left;
 }
 
-.bubble-row p.from-me:hover,
-.bubble-row p.from-them:hover {
+.bubble:hover,
+.bubble:focus-within {
   border-color: color-mix(in srgb, var(--bubble-outline) 60%, var(--mat-primary-color) 40%);
   box-shadow:
     0 4px 12px color-mix(in srgb, var(--mat-card-outlined-outline-color) 45%, transparent),
     0 0 0 1px color-mix(in srgb, var(--mat-primary-color) 25%, transparent) inset;
+}
+
+.message-actions-row {
+  margin-top: -1.75rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.bubble-row.me .button-me {
+  justify-content: flex-end;
+}
+
+.bubble-row.them .button-them {
+  justify-content: flex-start;
+}
+
+.message-actions {
+  z-index: 2;
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 1.5rem;
+  padding: 0.5rem;
+  box-shadow: 0 2px 8px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
+}
+
+.message-actions button {
+  margin: 0;
 }
 
 .avatar-me,
@@ -179,12 +210,12 @@
 }
 
 .bubble-row.them .avatar-them {
-  top: -1rem;
+  top: -2rem;
   left: -1rem;
 }
 
 .bubble-row.me .avatar-me {
-  top: -1rem;
+  top: -2rem;
   right: -1rem;
 }
 
