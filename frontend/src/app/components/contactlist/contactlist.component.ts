@@ -332,6 +332,7 @@ export class ContactlistComponent {
                 // Inform other user via socket
                 this.socketioService.sendShortMessageToContact({
                   id: res.mirrorMessageId ?? res.messageId,
+                  messageId: res.sharedMessageId,
                   contactId: result.contact.id,
                   userId: result.contact.userId,
                   contactUserId: result.contact.contactUserId,

@@ -15,6 +15,7 @@ import { ContactService } from './contact.service';
 
 interface SendMessagePayload {
   id?: string;
+  messageId?: string;
   contactId: string;
   direction: 'user' | 'contactUser';
   encryptedMessageForUser: string;
@@ -115,6 +116,7 @@ export class ContactMessageService {
         const msgId = (payload.envelope as unknown as { id?: string }).id ?? crypto.randomUUID();
         const msg: ContactMessage = {
           id: msgId,
+          messageId: payload.envelope.messageId ?? msgId,
           contactId: contact.id,
           direction: 'contactUser',
           encryptedMessage: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,

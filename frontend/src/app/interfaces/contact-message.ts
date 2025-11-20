@@ -1,5 +1,6 @@
 export interface ContactMessage {
   id: string;
+  messageId: string;
   contactId: string;
   direction: 'user' | 'contactUser';
   encryptedMessage: string;
@@ -18,4 +19,5 @@ export interface ContactMessageSendResponse {
   status: number;
   messageId: string;
   mirrorMessageId?: string;
+  sharedMessageId: string;
 }

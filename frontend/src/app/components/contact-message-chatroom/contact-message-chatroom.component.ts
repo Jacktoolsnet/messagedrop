@@ -42,7 +42,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactService.sortedContactsSignal().find(contact => contact.id === this.contactId)
   );
   readonly composeMessage = output<Contact>();
-  readonly messages = signal<{ id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[]>([]);
+  readonly messages = signal<{ id: string; messageId: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[]>([]);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
   private readonly messageKeys = new Set<string>();
@@ -65,6 +65,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       this.messageKeys.add(key);
       this.messages.update(msgs => [...msgs, {
         id: incoming.id,
+        messageId: incoming.messageId,
         direction: incoming.direction,
         payload,
         createdAt: incoming.createdAt,
@@ -121,8 +122,10 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       return;
     }
     const now = new Date().toISOString();
+    const messageId = crypto.randomUUID();
     this.messages.update((msgs) => [...msgs, {
-      id: `local-${crypto.randomUUID()}`,
+      id: `local-${messageId}`,
+      messageId,
       direction: 'user',
       payload: message,
       createdAt: now,
@@ -138,11 +141,17 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
-          const decrypted: { id: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[] = [];
+          const decrypted: { id: string; messageId: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[] = [];
           for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
+            const key = this.buildMessageKey(msg.id, msg.signature, msg.encryptedMessage);
+            if (this.messageKeys.has(key)) {
+              continue;
+            }
+            this.messageKeys.add(key);
             decrypted.push({
               id: msg.id,
+              messageId: msg.messageId,
               direction: msg.direction,
               payload,
               createdAt: msg.createdAt,

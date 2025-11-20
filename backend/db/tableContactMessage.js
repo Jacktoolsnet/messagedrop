@@ -1,6 +1,7 @@
 const tableName = 'tableContactMessage';
 
 const columnId = 'id';
+const columnMessageId = 'messageId';
 const columnContactId = 'contactId';
 const columnDirection = 'direction'; // 'user' | 'contactUser'
 const columnEncryptedMessage = 'encryptedMessage';
@@ -14,6 +15,7 @@ const init = function (db) {
     CREATE TABLE IF NOT EXISTS ${tableName} (
       ${columnId} TEXT PRIMARY KEY NOT NULL,
       ${columnContactId} TEXT NOT NULL,
+      ${columnMessageId} TEXT NOT NULL,
       ${columnDirection} TEXT NOT NULL CHECK (${columnDirection} IN ('user','contactUser')),
       ${columnEncryptedMessage} TEXT NOT NULL,
       ${columnSignature} TEXT NOT NULL,
@@ -28,6 +30,9 @@ const init = function (db) {
     -- Häufige Abfragen beschleunigen:
     CREATE INDEX IF NOT EXISTS idx_msg_contact_created
       ON ${tableName} (${columnContactId}, ${columnCreatedAt} DESC);
+
+    CREATE INDEX IF NOT EXISTS idx_msg_message_id
+      ON ${tableName} (${columnMessageId});
 
     -- Unread schnell zählen/finden:
     CREATE INDEX IF NOT EXISTS idx_msg_contact_unread
@@ -53,6 +58,7 @@ const init = function (db) {
 // Nachrichten-CRUD
 const createMessage = function (db, {
     id,            // uuid
+    messageId,     // shared uuid across sender/recipient copies
     contactId,
     direction,     // 'user' | 'contactUser'
     encryptedMessage,
@@ -65,11 +71,11 @@ const createMessage = function (db, {
     const normalizedReadAt = readAt ?? (direction === 'user' ? new Date().toISOString() : null);
     const sql = `
     INSERT INTO ${tableName}
-      (${columnId}, ${columnContactId}, ${columnDirection},
+      (${columnId}, ${columnContactId}, ${columnMessageId}, ${columnDirection},
        ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt})
-    VALUES (?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?);
+    VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?);
   `;
-    const params = [id, contactId, direction, encryptedMessage, signature, status, createdAt ?? null, normalizedReadAt];
+    const params = [id, contactId, messageId, direction, encryptedMessage, signature, status, createdAt ?? null, normalizedReadAt];
     db.run(sql, params, (err) => callback(err));
 };
 
@@ -147,4 +153,5 @@ module.exports = {
     cleanupReadMessages,
     columnContactId,
     columnDirection,
+    columnMessageId,
 };
