@@ -185,12 +185,16 @@
   padding: 0.35rem 0.6rem;
   color: var(--mat-card-subtitle-text-color);
   background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, transparent);
+  box-shadow:
+    0 4px 12px color-mix(in srgb, var(--mat-card-outlined-outline-color) 40%, transparent),
+    inset 0 0 0 1px color-mix(in srgb, #ffffff 25%, transparent);
 }
 
 .message-actions button {
   margin: 0;
 }
+
 
 .avatar-me,
 .avatar-them {

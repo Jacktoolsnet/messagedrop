@@ -27,6 +27,17 @@ interface SendMessagePayload {
   contactUserId: string;
 }
 
+interface UpdateMessagePayload {
+  messageId: string;
+  contactId: string;
+  encryptedMessageForUser: string;
+  encryptedMessageForContact: string;
+  signature: string;
+  status?: 'sent' | 'delivered' | 'read';
+  userId: string;
+  contactUserId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -38,6 +49,7 @@ export class ContactMessageService {
   private readonly contactService = inject(ContactService);
 
   readonly liveMessages = signal<ContactMessage | null>(null);
+  readonly updatedMessages = signal<ContactMessage | null>(null);
 
   private readonly httpOptions = {
     headers: new HttpHeaders({
@@ -72,6 +84,14 @@ export class ContactMessageService {
   send(payload: SendMessagePayload) {
     return this.http.post<ContactMessageSendResponse>(
       `${environment.apiUrl}/contactMessage/send`,
+      payload,
+      this.httpOptions
+    ).pipe(catchError(this.handleError));
+  }
+
+  updateMessage(payload: UpdateMessagePayload) {
+    return this.http.post<{ status: number; messageId: string }>(
+      `${environment.apiUrl}/contactMessage/update`,
       payload,
       this.httpOptions
     ).pipe(catchError(this.handleError));
@@ -126,6 +146,30 @@ export class ContactMessageService {
           readAt: null
         };
         this.liveMessages.set(msg);
+      }
+    });
+
+    const updateEventName = `receiveUpdatedContactMessage:${this.userService.getUser().id}`;
+    this.socketioService.getSocket().off(updateEventName);
+    this.socketioService.getSocket().on(updateEventName, (payload: { status: number; envelope: Envelope; }) => {
+      if (payload?.status === 200 && payload.envelope) {
+        const contact = this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.envelope.userId);
+        if (!contact) {
+          return;
+        }
+        const msgId = (payload.envelope as unknown as { id?: string }).id ?? crypto.randomUUID();
+        const msg: ContactMessage = {
+          id: msgId,
+          messageId: payload.envelope.messageId ?? msgId,
+          contactId: contact.id,
+          direction: 'contactUser',
+          encryptedMessage: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
+          signature: payload.envelope.messageSignature,
+          status: 'delivered',
+          createdAt: new Date().toISOString(),
+          readAt: null
+        };
+        this.updatedMessages.set(msg);
       }
     });
   }

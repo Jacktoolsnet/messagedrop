@@ -143,6 +143,37 @@ const cleanupReadMessages = function (db, callback) {
     db.run(sql, [], (err) => callback(err));
 };
 
+const updateMessageByMessageId = function (db, messageId, {
+    encryptedMessage,
+    signature,
+    status = 'sent'
+}, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnEncryptedMessage} = COALESCE(?, ${columnEncryptedMessage}),
+        ${columnSignature} = COALESCE(?, ${columnSignature}),
+        ${columnStatus} = COALESCE(?, ${columnStatus})
+    WHERE ${columnMessageId} = ?;
+  `;
+    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, messageId], (err) => callback(err));
+};
+
+const updateMessageForContact = function (db, contactId, messageId, {
+    encryptedMessage,
+    signature,
+    status = 'sent'
+}, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnEncryptedMessage} = COALESCE(?, ${columnEncryptedMessage}),
+        ${columnSignature} = COALESCE(?, ${columnSignature}),
+        ${columnStatus} = COALESCE(?, ${columnStatus})
+    WHERE ${columnMessageId} = ?
+      AND ${columnContactId} = ?;
+  `;
+    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, messageId, contactId], (err) => callback(err));
+};
+
 module.exports = {
     init,
     createMessage,
@@ -154,4 +185,6 @@ module.exports = {
     columnContactId,
     columnDirection,
     columnMessageId,
+    updateMessageByMessageId,
+    updateMessageForContact,
 };

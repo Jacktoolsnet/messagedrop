@@ -91,6 +91,52 @@ router.post('/send',
   }
 );
 
+// Update existing message (shared messageId)
+router.post('/update',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.update', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res) => {
+    const {
+      messageId,
+      contactId,
+      encryptedMessageForUser,
+      encryptedMessageForContact,
+      signature,
+      status = 'sent',
+      userId,
+      contactUserId
+    } = req.body ?? {};
+
+    if (!messageId || !contactId || !encryptedMessageForUser || !encryptedMessageForContact || !signature || !userId || !contactUserId) {
+      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+    }
+
+    tableContactMessage.updateMessageForContact(req.database.db, contactId, messageId, {
+      encryptedMessage: encryptedMessageForUser,
+      signature,
+      status
+    }, (err) => {
+      if (err) {
+        return res.status(500).json({ status: 500, error: err.message || err });
+      }
+
+      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+        if (!lookupErr && reciprocal?.id) {
+          tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
+            encryptedMessage: encryptedMessageForContact,
+            signature,
+            status
+          }, () => { /* best-effort */ });
+        }
+        return res.status(200).json({ status: 200, messageId });
+      });
+    });
+  }
+);
+
 // List messages (paged, optional before timestamp)
 router.get('/list/:contactId',
   [

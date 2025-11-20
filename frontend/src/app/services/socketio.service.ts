@@ -293,4 +293,8 @@ export class SocketioService {
     });
   }
 
+  public sendUpdatedContactMessage(envelope: Envelope) {
+    this.socket.emit('contact:updateContactMessage', envelope);
+  }
+
 }

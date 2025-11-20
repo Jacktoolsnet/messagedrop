@@ -47,7 +47,28 @@ module.exports = (io, socket) => {
     });
   };
 
+  const updateContactMessage = (payload) => {
+    const requiredFields = ['contactId', 'userId', 'contactUserId', 'messageId', 'messageSignature', 'userEncryptedMessage', 'contactUserEncryptedMessage'];
+    const missing = requiredFields.filter((key) => payload?.[key] === undefined || payload?.[key] === null);
+    if (missing.length) {
+      emitError('contact:updateContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+
+    io.to(payload.contactUserId).emit(`receiveUpdatedContactMessage:${payload.contactUserId}`, {
+      status: 200,
+      envelope: payload
+    });
+
+    socket.emit('contact:updateContactMessage:ack', {
+      status: 200,
+      contactId: payload.contactId,
+      messageSignature: payload.messageSignature
+    });
+  };
+
   socket.on('contact:requestProfile', requestProfile);
   socket.on('contact:provideUserProfile', provideUserProfile);
   socket.on('contact:newContactMessage', newContactMessage);
+  socket.on('contact:updateContactMessage', updateContactMessage);
 };

@@ -2,16 +2,29 @@ import { CommonModule } from '@angular/common';
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, QueryList, ViewChild, ViewChildren, computed, effect, inject, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { Contact } from '../../interfaces/contact';
 import { ShortMessage } from '../../interfaces/short-message';
+import { Mode } from '../../interfaces/mode';
+import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { SocketioService } from '../../services/socketio.service';
 import { UserService } from '../../services/user.service';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
+
+type ChatroomMessage = {
+  id: string;
+  messageId: string;
+  direction: 'user' | 'contactUser';
+  payload: ShortMessage | null;
+  createdAt: string;
+  readAt?: string | null;
+  status?: string;
+};
 
 @Component({
   selector: 'app-contact-message-chatroom',
@@ -32,6 +45,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
   private readonly contactMessageService = inject(ContactMessageService);
+  private readonly matDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<ContactMessageChatroomComponent>);
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
 
@@ -42,7 +56,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactService.sortedContactsSignal().find(contact => contact.id === this.contactId)
   );
   readonly composeMessage = output<Contact>();
-  readonly messages = signal<{ id: string; messageId: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[]>([]);
+  readonly messages = signal<ChatroomMessage[]>([]);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
   private readonly messageKeys = new Set<string>();
@@ -84,6 +98,21 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     }
   }, { allowSignalWrites: true });
 
+  private readonly updatedMessagesEffect = effect(async () => {
+    const updated = this.contactMessageService.updatedMessages();
+    const contact = this.contact();
+    if (!updated || !contact || updated.contactId !== contact.id) {
+      return;
+    }
+    const payload = await this.contactMessageService.decryptAndVerify(contact, updated);
+    this.messages.update((msgs) =>
+      msgs.map((msg) =>
+        msg.messageId === updated.messageId ? { ...msg, payload, status: updated.status } : msg
+      )
+    );
+    this.contactMessageService.updatedMessages.set(null);
+  }, { allowSignalWrites: true });
+
   ngAfterViewInit(): void {
     this.contactMessageService.initLiveReceive();
     queueMicrotask(() => this.scrollToBottom());
@@ -116,6 +145,38 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     return message.direction === 'contactUser' && !message.readAt;
   }
 
+  editMessage(message: ChatroomMessage): void {
+    const contact = this.contact();
+    if (!contact || message.direction !== 'user') {
+      return;
+    }
+    const initialPayload: ShortMessage = message.payload
+      ? { ...message.payload }
+      : this.createEmptyMessage();
+
+    const dialogRef = this.matDialog.open(ContactEditMessageComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: Mode.EDIT_SHORT_MESSAGE, contact, shortMessage: { ...initialPayload } },
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { shortMessage: ShortMessage }) => {
+      if (!result?.shortMessage) {
+        return;
+      }
+      void this.persistEditedMessage(contact, message, result.shortMessage);
+    });
+  }
+
+  deleteMessage(_message: ChatroomMessage): void {
+    console.warn('Delete message not yet implemented');
+  }
+
   addOptimisticMessage(message: ShortMessage): void {
     const contact = this.contact();
     if (!contact) {
@@ -141,7 +202,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
-          const decrypted: { id: string; messageId: string; direction: 'user' | 'contactUser'; payload: ShortMessage | null; createdAt: string; readAt?: string | null; status?: string }[] = [];
+          const decrypted: ChatroomMessage[] = [];
           for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
             const key = this.buildMessageKey(msg.id, msg.signature, msg.encryptedMessage);
@@ -203,5 +264,57 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   private buildMessageKey(id: string, signature: string, cipher: string): string {
     return `${id}|${signature}|${cipher}`;
+  }
+
+  private createEmptyMessage(): ShortMessage {
+    return {
+      message: '',
+      style: '',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        attribution: '',
+        title: '',
+        description: '',
+        url: '',
+        sourceUrl: '',
+        contentId: ''
+      }
+    };
+  }
+
+  private async persistEditedMessage(contact: Contact, message: ChatroomMessage, updatedPayload: ShortMessage): Promise<void> {
+    const { encryptedMessageForUser, encryptedMessageForContact, signature } =
+      await this.contactMessageService.encryptMessageForContact(contact, updatedPayload);
+
+    this.contactMessageService.updateMessage({
+      messageId: message.messageId,
+      contactId: contact.id,
+      encryptedMessageForUser,
+      encryptedMessageForContact,
+      signature,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId
+    }).subscribe({
+      next: () => {
+        this.messages.update((msgs) =>
+          msgs.map((msg) =>
+            msg.messageId === message.messageId ? { ...msg, payload: updatedPayload } : msg
+          )
+        );
+        this.socketioService.sendUpdatedContactMessage({
+          id: message.id,
+          messageId: message.messageId,
+          contactId: contact.id,
+          userId: contact.userId,
+          contactUserId: contact.contactUserId,
+          messageSignature: signature,
+          userEncryptedMessage: encryptedMessageForUser,
+          contactUserEncryptedMessage: encryptedMessageForContact
+        });
+      },
+      error: () => {
+        // optionally notify
+      }
+    });
   }
 }

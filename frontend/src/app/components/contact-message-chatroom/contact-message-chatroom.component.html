@@ -12,7 +12,7 @@
   </div>
 
   @if (contact(); as activeContact) {
-  <mat-card-content #messageScroll class="chatroom-card__content" (click)="requestCompose()">
+  <mat-card-content #messageScroll class="chatroom-card__content">
     <div class="message-content">
       @for (msg of messages(); track msg.id; let last = $last) {
       <div class="message" #messageRow [class.message--unread]="isUnread(msg)">
@@ -36,14 +36,14 @@
             }
           </div>
           <div class="message-actions-row button-me">
-              <div class="message-actions">
-                <button mat-mini-fab color="primary" aria-label="Edit message">
-                  <mat-icon class="material-symbols-outlined">edit</mat-icon>
-                </button>
-                <button mat-mini-fab color="warn" aria-label="Delete message">
-                  <mat-icon class="material-symbols-outlined">delete</mat-icon>
-                </button>
-              </div>
+            <div class="message-actions">
+              <button mat-mini-fab color="primary" aria-label="Edit message" (click)="editMessage(msg)">
+                <mat-icon class="material-symbols-outlined">edit</mat-icon>
+              </button>
+              <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
         } @else {
@@ -67,11 +67,11 @@
             }
           </div>
           <div class="message-actions-row button-them">
-              <div class="message-actions">
-                <button mat-mini-fab color="warn" aria-label="Delete message">
-                  <mat-icon class="material-symbols-outlined">delete</mat-icon>
-                </button>
-              </div>
+            <div class="message-actions">
+              <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              </button>
+            </div>
           </div>
         </div>
         }
