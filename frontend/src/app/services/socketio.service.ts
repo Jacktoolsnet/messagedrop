@@ -127,7 +127,7 @@ export class SocketioService {
 
   async initContacts(): Promise<void> {
     this.contactService.contactsSignal().forEach((contact: Contact) => {
-      this.receiveShortMessage(contact);
+      this.receiveContactMessage(contact);
     });
   }
 
@@ -221,12 +221,12 @@ export class SocketioService {
     });
   }
 
-  public sendShortMessageToContact(envelope: Envelope) {
-    this.socket.emit('contact:newShortMessage', envelope);
+  public sendContactMessage(envelope: Envelope) {
+    this.socket.emit('contact:newContactMessage', envelope);
   }
 
-  public receiveShortMessage(contact: Contact) {
-    const eventName = `receiveShortMessage:${contact.userId}`;
+  public receiveContactMessage(contact: Contact) {
+    const eventName = `receiveContactMessage:${contact.userId}`;
     this.socket.off(eventName);
     this.socket.on(eventName, (payload: { status: number, envelope: Envelope }) => {
       if (payload.status == 200) {

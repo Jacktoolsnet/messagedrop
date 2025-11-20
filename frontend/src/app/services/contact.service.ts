@@ -159,7 +159,7 @@ export class ContactService {
         next: createContactResponse => {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
-            socketioService.receiveShortMessage(contact);
+            socketioService.receiveContactMessage(contact);
             this.saveAditionalContactInfos();
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
             this._contacts.update(contacts => [...contacts, contact]);

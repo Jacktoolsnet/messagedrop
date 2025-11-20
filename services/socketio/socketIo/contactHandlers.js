@@ -26,21 +26,21 @@ module.exports = (io, socket) => {
     io.to(contact.userId).emit(`receiveProfileForContact:${contact.id}`, { status, contact });
   };
 
-  const newShortMessage = (envelope) => {
+  const newContactMessage = (envelope) => {
     const requiredFields = ['contactId', 'userId', 'contactUserId', 'messageSignature', 'userEncryptedMessage', 'contactUserEncryptedMessage'];
     const missing = requiredFields.filter((key) => envelope?.[key] === undefined || envelope?.[key] === null);
     if (missing.length) {
-      emitError('contact:newShortMessage', { envelope }, `missing fields: ${missing.join(', ')}`);
+      emitError('contact:newContactMessage', { envelope }, `missing fields: ${missing.join(', ')}`);
       return;
     }
 
-    io.to(envelope.contactUserId).emit(`receiveShortMessage:${envelope.contactUserId}`, {
+    io.to(envelope.contactUserId).emit(`receiveContactMessage:${envelope.contactUserId}`, {
       status: 200,
       envelope
     });
 
     // Sender bekommt eine kleine Bestätigung, damit der Client klar weiß, dass der Server weitergeleitet hat.
-    socket.emit('contact:newShortMessage:ack', {
+    socket.emit('contact:newContactMessage:ack', {
       status: 200,
       contactId: envelope.contactId,
       messageSignature: envelope.messageSignature
@@ -49,5 +49,5 @@ module.exports = (io, socket) => {
 
   socket.on('contact:requestProfile', requestProfile);
   socket.on('contact:provideUserProfile', provideUserProfile);
-  socket.on('contact:newShortMessage', newShortMessage);
+  socket.on('contact:newContactMessage', newContactMessage);
 };

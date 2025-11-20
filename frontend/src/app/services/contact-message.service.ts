@@ -103,7 +103,7 @@ export class ContactMessageService {
   initLiveReceive(): void {
     this.socketioService.initSocket();
     this.socketioService.initUserSocketEvents();
-    const eventName = `receiveShortMessage:${this.userService.getUser().id}`;
+    const eventName = `receiveContactMessage:${this.userService.getUser().id}`;
     // ensure no duplicate handlers
     this.socketioService.getSocket().off(eventName);
     this.socketioService.getSocket().on(eventName, (payload: { status: number; envelope: Envelope; }) => {

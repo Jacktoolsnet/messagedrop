@@ -330,7 +330,7 @@ export class ContactlistComponent {
                   chatroomInstance.addOptimisticMessage(result.shortMessage);
                 }
                 // Inform other user via socket
-                this.socketioService.sendShortMessageToContact({
+                this.socketioService.sendContactMessage({
                   id: res.mirrorMessageId ?? res.messageId,
                   messageId: res.sharedMessageId,
                   contactId: result.contact.id,
