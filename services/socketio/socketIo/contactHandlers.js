@@ -77,7 +77,8 @@ module.exports = (io, socket) => {
 
     io.to(payload.contactUserId).emit(`receiveDeletedContactMessage:${payload.contactUserId}`, {
       status: 200,
-      messageId: payload.messageId
+      messageId: payload.messageId,
+      statusLabel: 'deleted'
     });
 
     socket.emit('contact:deleteContactMessage:ack', {

@@ -123,9 +123,16 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     const contact = this.contact();
     let removed = false;
     this.messages.update((msgs) => {
-      const filtered = msgs.filter((msg) => msg.messageId !== deleted.messageId);
-      removed = filtered.length !== msgs.length;
-      return filtered;
+      let changed = false;
+      const next = msgs.map((msg) => {
+        if (msg.messageId === deleted.messageId) {
+          changed = true;
+          return { ...msg, status: 'deleted' };
+        }
+        return msg;
+      });
+      removed = changed;
+      return next;
     });
     if (removed && contact) {
       this.contactMessageService.emitUnreadCountUpdate(contact.id);

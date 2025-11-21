@@ -8,7 +8,7 @@ const columnEncryptedMessage = 'encryptedMessage';
 const columnSignature = 'signature';
 const columnCreatedAt = 'createdAt'; // ISO8601
 const columnReadAt = 'readAt';       // ISO8601 | NULL
-const columnStatus = 'status';       // sent | delivered | read
+const columnStatus = 'status';       // sent | delivered | read | deleted
 
 const init = function (db) {
     const sql = `
@@ -19,7 +19,7 @@ const init = function (db) {
       ${columnDirection} TEXT NOT NULL CHECK (${columnDirection} IN ('user','contactUser')),
       ${columnEncryptedMessage} TEXT NOT NULL,
       ${columnSignature} TEXT NOT NULL,
-      ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read')),
+      ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read','deleted')),
       ${columnCreatedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
       ${columnReadAt} TEXT DEFAULT NULL,
       FOREIGN KEY (${columnContactId})

@@ -171,6 +171,16 @@ router.post('/delete',
       if (err) {
         return res.status(500).json({ status: 500, error: err.message || err });
       }
+      // Mark reciprocal as deleted (if exists)
+      if (userId && contactUserId) {
+        tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+          if (!lookupErr && reciprocal?.id) {
+            tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
+              status: 'deleted'
+            }, () => { /* best-effort */ });
+          }
+        });
+      }
       return res.status(200).json({ status: 200, messageId });
     });
   }

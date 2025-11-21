@@ -193,7 +193,7 @@ export class ContactMessageService {
 
     const deleteEventName = `receiveDeletedContactMessage:${this.userService.getUser().id}`;
     this.socketioService.getSocket().off(deleteEventName);
-    this.socketioService.getSocket().on(deleteEventName, (payload: { status: number; messageId?: string }) => {
+    this.socketioService.getSocket().on(deleteEventName, (payload: { status: number; messageId?: string; statusLabel?: string }) => {
       if (payload?.status === 200 && payload.messageId) {
         this.deletedMessage.set({ messageId: payload.messageId });
       }
