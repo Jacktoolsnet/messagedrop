@@ -100,21 +100,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     }
   }, { allowSignalWrites: true });
 
-  private readonly updatedMessagesEffect = effect(async () => {
-    const updated = this.contactMessageService.updatedMessages();
-    const contact = this.contact();
-    if (!updated || !contact || updated.contactId !== contact.id) {
-      return;
-    }
-    const payload = await this.contactMessageService.decryptAndVerify(contact, updated);
-    this.messages.update((msgs) =>
-      msgs.map((msg) =>
-        msg.messageId === updated.messageId ? { ...msg, payload, status: updated.status } : msg
-      )
-    );
-    this.contactMessageService.updatedMessages.set(null);
-  }, { allowSignalWrites: true });
-
   private readonly deletedMessagesEffect = effect(() => {
     const deleted = this.contactMessageService.deletedMessage();
     if (!deleted) {
@@ -196,7 +181,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       if (!result?.shortMessage) {
         return;
       }
-      void this.persistEditedMessage(contact, message, result.shortMessage);
+      void this.sendAsNewMessage(contact, result.shortMessage);
     });
   }
 
@@ -353,28 +338,27 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     };
   }
 
-  private async persistEditedMessage(contact: Contact, message: ChatroomMessage, updatedPayload: ShortMessage): Promise<void> {
+  private async sendAsNewMessage(contact: Contact, payload: ShortMessage): Promise<void> {
+    const tempId = this.addOptimisticMessage(payload);
     const { encryptedMessageForUser, encryptedMessageForContact, signature } =
-      await this.contactMessageService.encryptMessageForContact(contact, updatedPayload);
+      await this.contactMessageService.encryptMessageForContact(contact, payload);
 
-    this.contactMessageService.updateMessage({
-      messageId: message.messageId,
+    this.contactMessageService.send({
       contactId: contact.id,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId,
+      direction: 'user',
       encryptedMessageForUser,
       encryptedMessageForContact,
-      signature,
-      userId: contact.userId,
-      contactUserId: contact.contactUserId
+      signature
     }).subscribe({
-      next: () => {
-        this.messages.update((msgs) =>
-          msgs.map((msg) =>
-            msg.messageId === message.messageId ? { ...msg, payload: updatedPayload } : msg
-          )
-        );
-        this.socketioService.sendUpdatedContactMessage({
-          id: message.id,
-          messageId: message.messageId,
+      next: (res) => {
+        if (tempId) {
+          this.finalizeOptimisticMessage(tempId, res.messageId, res.sharedMessageId);
+        }
+        this.socketioService.sendContactMessage({
+          id: res.mirrorMessageId ?? res.messageId,
+          messageId: res.sharedMessageId,
           contactId: contact.id,
           userId: contact.userId,
           contactUserId: contact.contactUserId,
@@ -384,7 +368,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         });
       },
       error: () => {
-        // optionally notify
+        // optionally notify user
       }
     });
   }
