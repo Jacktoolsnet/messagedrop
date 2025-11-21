@@ -372,4 +372,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       }
     });
   }
+
+  mapStatus(status?: string): string {
+    return this.contactMessageService.mapStatusIcon(status as ('sent' | 'delivered' | 'read' | 'deleted' | undefined));
+  }
 }

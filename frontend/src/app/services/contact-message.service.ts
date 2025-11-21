@@ -3,15 +3,15 @@ import { Injectable, inject, signal } from '@angular/core';
 import { Buffer } from 'buffer';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
-import { ContactMessage, ContactMessageListResponse, ContactMessageSendResponse } from '../interfaces/contact-message';
 import { Contact } from '../interfaces/contact';
-import { ShortMessage } from '../interfaces/short-message';
+import { ContactMessage, ContactMessageListResponse, ContactMessageSendResponse } from '../interfaces/contact-message';
 import { CryptoData } from '../interfaces/crypto-data';
-import { CryptoService } from './crypto.service';
-import { UserService } from './user.service';
-import { SocketioService } from './socketio.service';
 import { Envelope } from '../interfaces/envelope';
+import { ShortMessage } from '../interfaces/short-message';
 import { ContactService } from './contact.service';
+import { CryptoService } from './crypto.service';
+import { SocketioService } from './socketio.service';
+import { UserService } from './user.service';
 
 interface SendMessagePayload {
   id?: string;
@@ -60,6 +60,21 @@ export class ContactMessageService {
   readonly updatedMessages = signal<ContactMessage | null>(null);
   readonly deletedMessage = signal<{ messageId: string } | null>(null);
   readonly unreadCountUpdate = signal<{ contactId: string; unread: number } | null>(null);
+
+  mapStatusIcon(status?: 'sent' | 'delivered' | 'read' | 'deleted'): string {
+    switch (status) {
+      case 'read':
+        return 'visibility';
+      case 'delivered':
+        return 'download';
+      case 'deleted':
+        return 'delete';
+      case 'sent':
+        return 'upload';
+      default:
+        return 'schedule';
+    }
+  }
 
   private readonly httpOptions = {
     headers: new HttpHeaders({

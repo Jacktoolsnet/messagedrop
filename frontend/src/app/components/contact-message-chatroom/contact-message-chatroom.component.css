@@ -123,6 +123,32 @@
   justify-self: end;
 }
 
+.status-chip {
+  z-index: 2;
+  position: absolute;
+  top: -1.25rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 1.5rem;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  color: var(--mat-card-subtitle-text-color);
+  padding: 0.35rem 0.5rem;
+}
+
+.status-chip--me {
+  top: -1.5rem;
+  left: -1.5rem;
+}
+
+.status-chip--them {
+  top: -1.5rem;
+  right: -1.5rem;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bubble-outline: color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, var(--mat-app-text-color) 45%);
