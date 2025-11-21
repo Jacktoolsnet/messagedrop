@@ -301,4 +301,8 @@ export class SocketioService {
     this.socket.emit('contact:deleteContactMessage', payload);
   }
 
+  public sendReadContactMessage(payload: { contactId: string; userId: string; contactUserId: string; messageId: string }) {
+    this.socket.emit('contact:readContactMessage', payload);
+  }
+
 }

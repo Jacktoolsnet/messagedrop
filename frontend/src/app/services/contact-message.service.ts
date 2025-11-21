@@ -130,6 +130,14 @@ export class ContactMessageService {
     ).pipe(catchError(this.handleError));
   }
 
+  markReadBothCopies(payload: { messageId: string; contactId: string; userId: string; contactUserId: string }) {
+    return this.http.post<{ status: number; messageId: string }>(
+      `${environment.apiUrl}/contactMessage/status/read`,
+      payload,
+      this.httpOptions
+    ).pipe(catchError(this.handleError));
+  }
+
   markRead(messageIds: string[]) {
     return this.http.post<{ status: number; updated?: number }>(
       `${environment.apiUrl}/contactMessage/read`,
@@ -211,6 +219,23 @@ export class ContactMessageService {
     this.socketioService.getSocket().on(deleteEventName, (payload: { status: number; messageId?: string; statusLabel?: string }) => {
       if (payload?.status === 200 && payload.messageId) {
         this.deletedMessage.set({ messageId: payload.messageId });
+      }
+    });
+
+    const readEventName = `receiveMessageRead:${this.userService.getUser().id}`;
+    this.socketioService.getSocket().off(readEventName);
+    this.socketioService.getSocket().on(readEventName, (payload: { status: number; messageId?: string; contactId?: string }) => {
+      if (payload?.status === 200 && payload.messageId) {
+        this.updatedMessages.set({
+          id: payload.messageId,
+          messageId: payload.messageId,
+          contactId: payload.contactId ?? '',
+          direction: 'user',
+          encryptedMessage: '',
+          signature: '',
+          status: 'read',
+          createdAt: ''
+        } as ContactMessage);
       }
     });
   }

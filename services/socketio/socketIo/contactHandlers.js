@@ -88,9 +88,29 @@ module.exports = (io, socket) => {
     });
   };
 
+  const readContactMessage = (payload) => {
+    const requiredFields = ['contactId', 'userId', 'contactUserId', 'messageId'];
+    const missing = requiredFields.filter((key) => payload?.[key] === undefined || payload?.[key] === null);
+    if (missing.length) {
+      emitError('contact:readContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+    io.to(payload.contactUserId).emit(`receiveMessageRead:${payload.contactUserId}`, {
+      status: 200,
+      messageId: payload.messageId,
+      contactId: payload.contactId
+    });
+    socket.emit('contact:readContactMessage:ack', {
+      status: 200,
+      contactId: payload.contactId,
+      messageId: payload.messageId
+    });
+  };
+
   socket.on('contact:requestProfile', requestProfile);
   socket.on('contact:provideUserProfile', provideUserProfile);
   socket.on('contact:newContactMessage', newContactMessage);
   socket.on('contact:updateContactMessage', updateContactMessage);
   socket.on('contact:deleteContactMessage', deleteContactMessage);
+  socket.on('contact:readContactMessage', readContactMessage);
 };

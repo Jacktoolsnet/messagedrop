@@ -89,6 +89,9 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         status: incoming.status
       }]);
       queueMicrotask(() => this.scrollToBottom());
+      if (incoming.direction === 'contactUser') {
+        this.markAsRead(incoming.messageId, contact);
+      }
     }
     this.contactMessageService.liveMessages.set(null);
   }, { allowSignalWrites: true });
@@ -98,6 +101,25 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     if (contact && !this.loaded()) {
       this.loadMessages();
     }
+  }, { allowSignalWrites: true });
+
+  private readonly updatedMessagesEffect = effect(() => {
+    const updated = this.contactMessageService.updatedMessages();
+    if (!updated) {
+      return;
+    }
+    this.messages.update((msgs) =>
+      msgs.map((msg) =>
+        msg.messageId === updated.messageId
+          ? {
+            ...msg,
+            status: updated.status ?? msg.status,
+            readAt: updated.status === 'read' ? (msg.readAt ?? new Date().toISOString()) : msg.readAt
+          }
+          : msg
+      )
+    );
+    this.contactMessageService.updatedMessages.set(null);
   }, { allowSignalWrites: true });
 
   private readonly deletedMessagesEffect = effect(() => {
@@ -280,6 +302,10 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           this.messages.set(decrypted);
           this.loading.set(false);
           this.loaded.set(true);
+          // Mark newly visible incoming messages as read
+          decrypted
+            .filter((m) => m.direction === 'contactUser' && !m.readAt)
+            .forEach((m) => this.markAsRead(m.messageId, contact));
           queueMicrotask(() => this.scrollToFirstUnread());
           // mark as read on open
           this.contactMessageService.markAllRead(contact.id).subscribe();
@@ -320,6 +346,30 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   private buildMessageKey(id: string, signature: string, cipher: string): string {
     return `${id}|${signature}|${cipher}`;
+  }
+
+  private markAsRead(messageId: string, contact: Contact): void {
+    this.contactMessageService.markReadBothCopies({
+      messageId,
+      contactId: contact.id,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId
+    }).subscribe({
+      next: () => {
+        this.messages.update((msgs) =>
+          msgs.map((msg) =>
+            msg.messageId === messageId ? { ...msg, status: 'read', readAt: msg.readAt ?? new Date().toISOString() } : msg
+          )
+        );
+        this.contactMessageService.emitUnreadCountUpdate(contact.id);
+        this.socketioService.sendReadContactMessage({
+          contactId: contact.id,
+          userId: contact.userId,
+          contactUserId: contact.contactUserId,
+          messageId
+        });
+      }
+    });
   }
 
   private createEmptyMessage(): ShortMessage {

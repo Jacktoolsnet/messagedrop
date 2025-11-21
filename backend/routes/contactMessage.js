@@ -186,6 +186,33 @@ router.post('/delete',
   }
 );
 
+// Mark as read (both copies)
+router.post('/status/read',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.status.read', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res) => {
+    const { messageId, contactId, userId, contactUserId } = req.body ?? {};
+    if (!messageId || !contactId || !userId || !contactUserId) {
+      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+    }
+
+    tableContactMessage.markAsReadByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
+      if (err) {
+        return res.status(500).json({ status: 500, error: err.message || err });
+      }
+      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+        if (!lookupErr && reciprocal?.id) {
+          tableContactMessage.markAsReadByContactAndMessageId(req.database.db, reciprocal.id, messageId, () => { });
+        }
+        return res.status(200).json({ status: 200, messageId });
+      });
+    });
+  }
+);
+
 // List messages (paged, optional before timestamp)
 router.get('/list/:contactId',
   [

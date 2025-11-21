@@ -191,6 +191,17 @@ const deleteByContactAndMessageId = function (db, contactId, messageId, callback
     db.run(sql, [messageId, contactId], (err) => callback(err));
 };
 
+const markAsReadByContactAndMessageId = function (db, contactId, messageId, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnReadAt} = COALESCE(${columnReadAt}, strftime('%Y-%m-%dT%H:%M:%S','now')),
+        ${columnStatus} = 'read'
+    WHERE ${columnContactId} = ?
+      AND ${columnMessageId} = ?;
+  `;
+    db.run(sql, [contactId, messageId], (err) => callback(err));
+};
+
 module.exports = {
     init,
     createMessage,
@@ -206,4 +217,5 @@ module.exports = {
     updateMessageForContact,
     deleteByMessageId,
     deleteByContactAndMessageId,
+    markAsReadByContactAndMessageId,
 };
