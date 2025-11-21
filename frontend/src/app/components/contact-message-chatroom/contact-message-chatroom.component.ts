@@ -127,18 +127,11 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     if (!deleted) {
       return;
     }
-    const contact = this.contact();
+    const contact = deleted.contactId ? this.contactService.sortedContactsSignal().find((c) => c.id === deleted.contactId) : this.contact();
     let removed = false;
     this.messages.update((msgs) => {
-      let changed = false;
-      const next = msgs.map((msg) => {
-        if (msg.messageId === deleted.messageId) {
-          changed = true;
-          return { ...msg, status: 'deleted' };
-        }
-        return msg;
-      });
-      removed = changed;
+      const next = msgs.filter((msg) => msg.messageId !== deleted.messageId);
+      removed = next.length !== msgs.length;
       return next;
     });
     if (removed && contact) {

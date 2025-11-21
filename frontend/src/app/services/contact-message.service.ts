@@ -58,7 +58,7 @@ export class ContactMessageService {
 
   readonly liveMessages = signal<ContactMessage | null>(null);
   readonly updatedMessages = signal<ContactMessage | null>(null);
-  readonly deletedMessage = signal<{ messageId: string } | null>(null);
+  readonly deletedMessage = signal<{ messageId: string; contactId?: string } | null>(null);
   readonly unreadCountUpdate = signal<{ contactId: string; unread: number } | null>(null);
 
   mapStatusIcon(status?: 'sent' | 'delivered' | 'read' | 'deleted'): string {
@@ -187,6 +187,8 @@ export class ContactMessageService {
           readAt: null
         };
         this.liveMessages.set(msg);
+        // Ensure unread badge updates even if chatroom not open
+        this.emitUnreadCountUpdate(contact.id);
       }
     });
 
@@ -216,9 +218,13 @@ export class ContactMessageService {
 
     const deleteEventName = `receiveDeletedContactMessage:${this.userService.getUser().id}`;
     this.socketioService.getSocket().off(deleteEventName);
-    this.socketioService.getSocket().on(deleteEventName, (payload: { status: number; messageId?: string; statusLabel?: string }) => {
+    this.socketioService.getSocket().on(deleteEventName, (payload: { status: number; messageId?: string; statusLabel?: string; userId?: string }) => {
       if (payload?.status === 200 && payload.messageId) {
-        this.deletedMessage.set({ messageId: payload.messageId });
+        // Find contact by sender userId
+        const contact = payload.userId
+          ? this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.userId)
+          : undefined;
+        this.deletedMessage.set({ messageId: payload.messageId, contactId: contact?.id });
       }
     });
 
