@@ -52,6 +52,7 @@ import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
+import { ContactMessageService } from './services/contact-message.service';
 import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
@@ -68,7 +69,6 @@ import { SocketioService } from './services/socketio.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
-import { ContactMessageService } from './services/contact-message.service';
 
 @Component({
   selector: 'app-root',
@@ -113,11 +113,11 @@ export class AppComponent implements OnInit {
   private readonly oembedService = inject(OembedService);
   readonly placeService = inject(PlaceService);
   readonly contactService = inject(ContactService);
+  private readonly contactMessageService = inject(ContactMessageService);
   readonly systemNotificationService = inject(SystemNotificationService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly messageService = inject(MessageService);
   private readonly socketioService = inject(SocketioService);
-  private readonly contactMessageService = inject(ContactMessageService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
@@ -209,8 +209,11 @@ export class AppComponent implements OnInit {
       this.userService.userSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.contactService.initContacts();
-        this.placeService.initPlaces();
+        if (!this.placeService.isReady()) {
+          this.placeService.initPlaces();
+        }
         if (this.userService.isReady()) {
+          this.contactMessageService.initLiveReceive();
           void this.systemNotificationService.refreshUnreadCount();
         } else {
           this.systemNotificationService.reset();

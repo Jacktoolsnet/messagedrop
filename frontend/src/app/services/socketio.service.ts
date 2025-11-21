@@ -127,7 +127,7 @@ export class SocketioService {
 
   async initContacts(): Promise<void> {
     this.contactService.contactsSignal().forEach((contact: Contact) => {
-      this.receiveContactMessage(contact);
+      // legacy message flow removed; contact messages handled in ContactMessageService
     });
   }
 
@@ -225,73 +225,7 @@ export class SocketioService {
     this.socket.emit('contact:newContactMessage', envelope);
   }
 
-  public receiveContactMessage(contact: Contact) {
-    const eventName = `receiveContactMessage:${contact.userId}`;
-    this.socket.off(eventName);
-    this.socket.on(eventName, (payload: { status: number, envelope: Envelope }) => {
-      if (payload.status == 200) {
-        let messageSignatureBuffer = undefined;
-        let messageSignature = undefined;
-        messageSignatureBuffer = Buffer.from(JSON.parse(payload.envelope.messageSignature))
-        messageSignature = messageSignatureBuffer.buffer.slice(
-          messageSignatureBuffer.byteOffset, messageSignatureBuffer.byteOffset + messageSignatureBuffer.byteLength
-        )
-        this.cryptoService.verifySignature(contact.contactUserSigningPublicKey!, payload.envelope.userId, messageSignature)
-          .then((valid: boolean) => {
-            if (valid) {
-              (contact as unknown as { contactUserMessageVerified?: boolean }).contactUserMessageVerified = true;
-              if (payload.envelope.contactUserEncryptedMessage) {
-                this.cryptoService.decrypt(this.userService.getUser().cryptoKeyPair.privateKey, JSON.parse(payload.envelope.contactUserEncryptedMessage))
-                  .then((message: string) => {
-                    if (message !== '') {
-                      (contact as unknown as { contactUserMessage?: ShortMessage }).contactUserMessage = JSON.parse(message);
-                      // contact.contactUserMessageStyle = payload.envelope.messageStyle;
-                      contact.lastMessageFrom = 'contactUser';
-                    } else {
-                      const errorMessage: ShortMessage = {
-                        message: 'Message cannot be decrypted!',
-                        multimedia: {
-                          type: MultimediaType.UNDEFINED,
-                          attribution: '',
-                          title: '',
-                          description: '',
-                          url: '',
-                          sourceUrl: '',
-                          contentId: ''
-                        },
-                        style: ''
-                      };
-                      (contact as unknown as { contactUserMessage?: ShortMessage }).contactUserMessage = errorMessage;
-                      // contact.contactUserMessageStyle = payload.envelope.messageStyle;
-                      contact.lastMessageFrom = 'contactUser';
-                    }
-                    this.contactService.refreshContact(contact.id);
-                  });
-              }
-            } else {
-              (contact as unknown as { contactUserMessageVerified?: boolean }).contactUserMessageVerified = false;
-              const errorMessage: ShortMessage = {
-                message: 'ignature could not be verified!',
-                multimedia: {
-                  type: MultimediaType.UNDEFINED,
-                  attribution: '',
-                  title: '',
-                  description: '',
-                  url: '',
-                  sourceUrl: '',
-                  contentId: ''
-                },
-                style: ''
-              };
-              (contact as unknown as { contactUserMessage?: ShortMessage }).contactUserMessage = errorMessage;
-              // contact.contactUserMessageStyle = payload.envelope.messageStyle;
-              contact.lastMessageFrom = 'contactUser';
-              this.contactService.refreshContact(contact.id);
-            }
-          });
-      }
-    });
-  }
+  // Legacy receiveContactMessage is unused; live messaging handled by ContactMessageService
 
   public sendUpdatedContactMessage(envelope: Envelope) {
     this.socket.emit('contact:updateContactMessage', envelope);

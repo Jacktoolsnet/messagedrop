@@ -42,7 +42,10 @@ export class ContactService {
     return throwError(() => error);
   }
 
-  initContacts() {
+  initContacts(force = false) {
+    if (this.ready && !force) {
+      return;
+    }
     this.getByUserId(this.userService.getUser().id)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
@@ -159,7 +162,6 @@ export class ContactService {
         next: createContactResponse => {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
-            socketioService.receiveContactMessage(contact);
             this.saveAditionalContactInfos();
             this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
             this._contacts.update(contacts => [...contacts, contact]);

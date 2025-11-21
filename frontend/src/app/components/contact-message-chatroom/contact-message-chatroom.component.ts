@@ -93,7 +93,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         this.markAsRead(incoming.messageId, contact);
       }
     }
-    this.contactMessageService.liveMessages.set(null);
   }, { allowSignalWrites: true });
 
   private readonly loadMessagesEffect = effect(() => {

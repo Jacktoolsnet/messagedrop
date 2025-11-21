@@ -140,13 +140,13 @@
 }
 
 .status-chip--me {
-  top: -1.5rem;
-  left: -1.5rem;
+  top: -1.75rem;
+  left: -3rem;
 }
 
 .status-chip--them {
-  top: -1.5rem;
-  right: -1.5rem;
+  top: -1.75rem;
+  right: -3rem;
 }
 
 @media (prefers-color-scheme: dark) {

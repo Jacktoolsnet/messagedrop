@@ -165,8 +165,6 @@ export class ContactMessageService {
     this.socketioService.initSocket();
     this.socketioService.initUserSocketEvents();
     const eventName = `receiveContactMessage:${this.userService.getUser().id}`;
-    // ensure no duplicate handlers
-    this.socketioService.getSocket().off(eventName);
     this.socketioService.getSocket().on(eventName, (payload: { status: number; envelope: Envelope; }) => {
       if (payload?.status === 200 && payload.envelope) {
         // Map incoming message to the local contact by sender userId

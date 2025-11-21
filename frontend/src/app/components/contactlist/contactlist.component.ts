@@ -74,6 +74,7 @@ export class ContactlistComponent {
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
+  private readonly unreadLoaded = new Set<string>();
 
   private contactToDelete?: Contact;
   public mode: typeof Mode = Mode;
@@ -84,10 +85,14 @@ export class ContactlistComponent {
       this.contactService.contactsSet();
       const contacts = this.contactsSignal();
       contacts.forEach(contact => {
+        if (this.unreadLoaded.has(contact.id)) {
+          return;
+        }
         this.contactMessageService.unreadCount(contact.id).subscribe({
           next: (res) => {
             this.unreadCounts.update((map: Record<string, number>) => ({ ...map, [contact.id]: res.unread ?? 0 }));
             contact.unreadCount = res.unread ?? 0;
+            this.unreadLoaded.add(contact.id);
           }
         });
       });
