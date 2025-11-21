@@ -5,7 +5,6 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { Contact } from '../../interfaces/contact';
-import { Envelope } from '../../interfaces/envelope';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
@@ -156,7 +155,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   ngAfterViewInit(): void {
     this.contactMessageService.initLiveReceive();
-    queueMicrotask(() => this.scrollToBottom());
+    this.loadMessages(true);
   }
 
   get profile() {
@@ -173,9 +172,26 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   requestCompose(): void {
     const currentContact = this.contact();
-    if (currentContact) {
-      this.composeMessage.emit(currentContact);
+    if (!currentContact) {
+      return;
     }
+    const dialogRef = this.matDialog.open(ContactEditMessageComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { mode: Mode.ADD_SHORT_MESSAGE, contact: currentContact, shortMessage: { ...this.createEmptyMessage() } },
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result?: { shortMessage: ShortMessage }) => {
+      if (!result?.shortMessage) {
+        return;
+      }
+      void this.sendAsNewMessage(currentContact, result.shortMessage);
+    });
   }
 
   hasContent(message?: ShortMessage): boolean {
@@ -282,22 +298,23 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     );
   }
 
-  private loadMessages(): void {
+  private loadMessages(force = false): void {
     const contact = this.contact();
-    if (!contact || this.loaded()) return;
+    if (!contact) return;
     this.loading.set(true);
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
-          const decrypted: ChatroomMessage[] = [];
+          console.log('Loaded contact messages', res);
+          // Merge with already present (live/optimistic) messages so we do not drop them while loading
+          const merged = new Map<string, ChatroomMessage>(
+            this.messages().map((msg) => [msg.messageId, msg])
+          );
           for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
             const key = this.buildMessageKey(msg.id, msg.signature, msg.encryptedMessage);
-            if (this.messageKeys.has(key)) {
-              continue;
-            }
             this.messageKeys.add(key);
-            decrypted.push({
+            merged.set(msg.messageId, {
               id: msg.id,
               messageId: msg.messageId,
               direction: msg.direction,
@@ -307,12 +324,12 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
               status: msg.status
             });
           }
-          decrypted.sort((a, b) => a.createdAt.localeCompare(b.createdAt));
-          this.messages.set(decrypted);
+          const mergedMessages = Array.from(merged.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+          this.messages.set(mergedMessages);
           this.loading.set(false);
           this.loaded.set(true);
           // Mark newly visible incoming messages as read
-          decrypted
+          mergedMessages
             .filter((m) => m.direction === 'contactUser' && !m.readAt)
             .forEach((m) => this.markAsRead(m.messageId, contact));
           queueMicrotask(() => this.scrollToFirstUnread());
