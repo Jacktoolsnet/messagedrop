@@ -129,11 +129,26 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     }
     const contact = deleted.contactId ? this.contactService.sortedContactsSignal().find((c) => c.id === deleted.contactId) : this.contact();
     let removed = false;
-    this.messages.update((msgs) => {
-      const next = msgs.filter((msg) => msg.messageId !== deleted.messageId);
-      removed = next.length !== msgs.length;
-      return next;
-    });
+    if (deleted.remove) {
+      this.messages.update((msgs) => {
+        const next = msgs.filter((msg) => msg.messageId !== deleted.messageId);
+        removed = next.length !== msgs.length;
+        return next;
+      });
+    } else {
+      this.messages.update((msgs) => {
+        let changed = false;
+        const next = msgs.map((msg) => {
+          if (msg.messageId === deleted.messageId) {
+            changed = true;
+            return { ...msg, status: 'deleted' };
+          }
+          return msg;
+        });
+        removed = changed;
+        return next;
+      });
+    }
     if (removed && contact) {
       this.contactMessageService.emitUnreadCountUpdate(contact.id);
     }
@@ -226,13 +241,15 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         next: () => {
           this.messages.update((msgs) => msgs.filter((msg) => msg.messageId !== _message.messageId));
           this.contactMessageService.emitUnreadCountUpdate(contact.id);
-          if (scope === 'both') {
+          const remove = scope === 'both';
+          if (scope === 'both' || scope === 'single') {
             this.socketioService.sendDeletedContactMessage({
               contactId: contact.id,
               userId: contact.userId,
               contactUserId: contact.contactUserId,
-              messageId: _message.messageId
-            } as Envelope & { messageId: string });
+              messageId: _message.messageId,
+              remove
+            });
           }
         }
       });

@@ -79,7 +79,8 @@ module.exports = (io, socket) => {
       status: 200,
       messageId: payload.messageId,
       userId: payload.userId,
-      statusLabel: 'deleted'
+      statusLabel: 'deleted',
+      remove: !!payload.remove
     });
 
     socket.emit('contact:deleteContactMessage:ack', {
