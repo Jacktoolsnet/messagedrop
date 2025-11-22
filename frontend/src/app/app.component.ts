@@ -1,5 +1,6 @@
 import { CommonModule, PlatformLocation } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -85,7 +86,24 @@ import { WeatherService } from './services/weather.service';
     MatMenuModule
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css'
+  styleUrl: './app.component.css',
+  animations: [
+    trigger('badgePulse', [
+      transition('* => *', [
+        animate('1s ease-in-out', keyframes([
+          style({ transform: 'scale(1) rotate(0deg)', offset: 0 }),
+          style({ transform: 'scale(1.18) rotate(-10deg)', offset: 0.1 }),
+          style({ transform: 'scale(0.9) rotate(10deg)', offset: 0.2 }),
+          style({ transform: 'scale(1.16) rotate(-8deg)', offset: 0.3 }),
+          style({ transform: 'scale(0.94) rotate(8deg)', offset: 0.4 }),
+          style({ transform: 'scale(1.1) rotate(-6deg)', offset: 0.55 }),
+          style({ transform: 'scale(0.96) rotate(6deg)', offset: 0.7 }),
+          style({ transform: 'scale(1.04) rotate(-3deg)', offset: 0.85 }),
+          style({ transform: 'scale(1) rotate(0deg)', offset: 1 })
+        ]))
+      ])
+    ])
+  ]
 })
 
 export class AppComponent implements OnInit {
@@ -135,10 +153,12 @@ export class AppComponent implements OnInit {
   readonly unreadContactsTotal = computed(() =>
     Object.values(this.unreadContactCounts()).reduce((acc, val) => acc + (val || 0), 0)
   );
-  readonly animateUserBadge = signal<boolean>(false);
+  readonly unreadTotalAll = computed(() => this.unreadContactsTotal() + this.unreadSystemNotificationCount());
+  readonly animateUserBadgeTick = signal<number>(0);
   private lastUnreadTotal = 0;
   private badgeAnimationTimer?: ReturnType<typeof setTimeout>;
-  private badgeAnimationDelayTimer?: ReturnType<typeof setTimeout>;
+  private badgeAnimationRunning = false;
+  private lastLiveMessageId?: string;
 
   constructor() {
     effect(async () => {
@@ -258,24 +278,26 @@ export class AppComponent implements OnInit {
         this.lastUnreadTotal = 0;
         return;
       }
-      const total = this.unreadContactsTotal();
-      if (total > this.lastUnreadTotal) {
-        if (this.badgeAnimationDelayTimer) {
-          clearTimeout(this.badgeAnimationDelayTimer);
-        }
-        this.badgeAnimationDelayTimer = setTimeout(() => {
-          this.animateUserBadge.set(true);
-          if (this.badgeAnimationTimer) {
-            clearTimeout(this.badgeAnimationTimer);
-          }
-          this.badgeAnimationTimer = setTimeout(() => this.animateUserBadge.set(false), 1200);
-        }, 1000);
+      const total = this.unreadTotalAll();
+      if (total > this.lastUnreadTotal && !this.badgeAnimationRunning) {
+        this.triggerBadgeAnimation();
       }
       this.lastUnreadTotal = total;
       if (total === 0) {
         this.resetBadgeAnimation();
       }
-    });
+    }, { allowSignalWrites: true });
+
+    effect(() => {
+      const incoming = this.contactMessageService.liveMessages();
+      if (!incoming || !this.userService.isReady() || !this.appService.isConsentCompleted()) {
+        return;
+      }
+      if (incoming.id !== this.lastLiveMessageId && incoming.direction === 'contactUser') {
+        this.lastLiveMessageId = incoming.id;
+        this.triggerBadgeAnimation();
+      }
+    }, { allowSignalWrites: true });
 
     effect(() => {
       this.messageService.messageSet(); // <-- track changes
@@ -1265,14 +1287,22 @@ export class AppComponent implements OnInit {
   }
 
   private resetBadgeAnimation(): void {
-    this.animateUserBadge.set(false);
+    this.badgeAnimationRunning = false;
     if (this.badgeAnimationTimer) {
       clearTimeout(this.badgeAnimationTimer);
     }
-    if (this.badgeAnimationDelayTimer) {
-      clearTimeout(this.badgeAnimationDelayTimer);
-    }
     this.badgeAnimationTimer = undefined;
-    this.badgeAnimationDelayTimer = undefined;
+  }
+
+  private triggerBadgeAnimation(): void {
+    if (this.badgeAnimationRunning) {
+      return;
+    }
+    this.badgeAnimationRunning = true;
+    this.animateUserBadgeTick.update((n) => n + 1);
+    this.badgeAnimationTimer = setTimeout(() => {
+      this.badgeAnimationRunning = false;
+      this.badgeAnimationTimer = undefined;
+    }, 1100);
   }
 }
