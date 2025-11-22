@@ -62,6 +62,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   readonly loaded = signal<boolean>(false);
   private readonly messageKeys = new Set<string>();
   private scrolledToFirstUnread = false;
+  private visibilityObserver?: IntersectionObserver;
 
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
@@ -82,9 +83,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         readAt: incoming.readAt,
         status: incoming.status
       }, ...msgs]);
-      if (incoming.direction === 'contactUser') {
-        this.markAsRead(incoming.messageId, contact);
-      }
     }
   }, { allowSignalWrites: true });
 
@@ -94,6 +92,11 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       this.loadMessages();
     }
   }, { allowSignalWrites: true });
+
+  private readonly observeUnreadEffect = effect(() => {
+    void this.messages();
+    queueMicrotask(() => this.observeUnread());
+  });
 
   private readonly updatedMessagesEffect = effect(() => {
     const updated = this.contactMessageService.updatedMessages();
@@ -321,13 +324,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           this.messages.set(mergedMessages);
           this.loading.set(false);
           this.loaded.set(true);
-          // Mark newly visible incoming messages as read
-          mergedMessages
-            .filter((m) => m.direction === 'contactUser' && !m.readAt)
-            .forEach((m) => this.markAsRead(m.messageId, contact));
           queueMicrotask(() => this.scrollToFirstUnread());
-          // mark as read on open
-          this.contactMessageService.markAllRead(contact.id).subscribe();
         },
         error: () => {
           this.loading.set(false);
@@ -351,6 +348,46 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       return;
     }
     this.scrolledToFirstUnread = true;
+  }
+
+  private observeUnread(): void {
+    const container = this.messageScroll?.nativeElement;
+    if (!container) {
+      return;
+    }
+    if (!this.visibilityObserver) {
+      this.visibilityObserver = new IntersectionObserver((entries) => {
+        const contact = this.contact();
+        if (!contact) {
+          return;
+        }
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting) {
+            return;
+          }
+          const target = entry.target as HTMLElement;
+          const messageId = target.dataset['messageId'];
+          if (!messageId) {
+            return;
+          }
+          const message = this.messages().find((m) => m.messageId === messageId);
+          if (message && this.isUnread(message)) {
+            this.markAsRead(messageId, contact);
+            this.visibilityObserver?.unobserve(target);
+          }
+        });
+      }, { root: container, threshold: 0.6 });
+    }
+
+    const rows = this.messageRows?.toArray() ?? [];
+    rows.forEach((row, index) => {
+      const message = this.messages()[index];
+      if (message && this.isUnread(message)) {
+        this.visibilityObserver!.observe(row.nativeElement);
+      } else {
+        this.visibilityObserver?.unobserve(row.nativeElement);
+      }
+    });
   }
 
   private buildMessageKey(id: string, signature: string, cipher: string): string {
