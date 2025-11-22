@@ -417,6 +417,44 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     return `${id}|${signature}|${cipher}`;
   }
 
+  isNewDay(index: number): boolean {
+    const list = this.messages();
+    if (!list.length || index < 0 || index >= list.length) {
+      return false;
+    }
+    if (index === 0) {
+      return true;
+    }
+    const current = this.toDayKey(list[index].createdAt);
+    const previous = this.toDayKey(list[index - 1].createdAt);
+    return current !== previous;
+  }
+
+  formatDay(dateIso: string): string {
+    const date = new Date(dateIso);
+    const locale = typeof navigator !== 'undefined'
+      ? (navigator.languages?.[0] ?? navigator.language ?? 'en-US')
+      : 'en-US';
+    try {
+      return new Intl.DateTimeFormat(locale, {
+        weekday: 'short',
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+      }).format(date);
+    } catch {
+      return date.toLocaleDateString(locale);
+    }
+  }
+
+  private toDayKey(dateIso: string): string {
+    const d = new Date(dateIso);
+    const y = d.getFullYear();
+    const m = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    return `${y}-${m}-${day}`;
+  }
+
   private markAsRead(messageId: string, contact: Contact): void {
     this.contactMessageService.markReadBothCopies({
       messageId,

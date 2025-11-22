@@ -14,7 +14,14 @@
   @if (contact(); as activeContact) {
   <mat-card-content #messageScroll class="chatroom-card__content">
     <div class="message-content">
-      @for (msg of messages(); track msg.id; let last = $last) {
+      @for (msg of messages(); track msg.id; let last = $last; let idx = $index) {
+      @if (isNewDay(idx)) {
+      <div class="day-separator">
+        <span class="day-separator__line"></span>
+        <span class="day-separator__label">{{ formatDay(msg.createdAt) }}</span>
+        <span class="day-separator__line"></span>
+      </div>
+      }
       <div class="message" #messageRow [attr.data-message-id]="msg.messageId" [class.message--unread]="isUnread(msg)">
         @if (msg.direction === 'user') {
         <div class="bubble-row me">
