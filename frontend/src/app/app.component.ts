@@ -240,6 +240,14 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
+      const update = this.contactMessageService.unreadCountUpdate();
+      if (update) {
+        this.unreadContactCounts.update((map) => ({ ...map, [update.contactId]: update.unread }));
+        this.contactMessageService.unreadCountUpdate.set(null);
+      }
+    }, { allowSignalWrites: true });
+
+    effect(() => {
       this.messageService.messageSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         this.createMarkerLocations();
