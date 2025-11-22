@@ -135,6 +135,10 @@ export class AppComponent implements OnInit {
   readonly unreadContactsTotal = computed(() =>
     Object.values(this.unreadContactCounts()).reduce((acc, val) => acc + (val || 0), 0)
   );
+  readonly animateUserBadge = signal<boolean>(false);
+  private lastUnreadTotal = 0;
+  private badgeAnimationTimer?: ReturnType<typeof setTimeout>;
+  private badgeAnimationDelayTimer?: ReturnType<typeof setTimeout>;
 
   constructor() {
     effect(async () => {
@@ -229,6 +233,7 @@ export class AppComponent implements OnInit {
         this.refreshContactUnreadCounts();
       } else {
         this.unreadContactCounts.set({});
+        this.resetBadgeAnimation();
       }
     });
 
@@ -246,6 +251,31 @@ export class AppComponent implements OnInit {
         this.contactMessageService.unreadCountUpdate.set(null);
       }
     }, { allowSignalWrites: true });
+
+    effect(() => {
+      if (!this.userService.isReady() || !this.appService.isConsentCompleted()) {
+        this.resetBadgeAnimation();
+        this.lastUnreadTotal = 0;
+        return;
+      }
+      const total = this.unreadContactsTotal();
+      if (total > this.lastUnreadTotal) {
+        if (this.badgeAnimationDelayTimer) {
+          clearTimeout(this.badgeAnimationDelayTimer);
+        }
+        this.badgeAnimationDelayTimer = setTimeout(() => {
+          this.animateUserBadge.set(true);
+          if (this.badgeAnimationTimer) {
+            clearTimeout(this.badgeAnimationTimer);
+          }
+          this.badgeAnimationTimer = setTimeout(() => this.animateUserBadge.set(false), 1200);
+        }, 1000);
+      }
+      this.lastUnreadTotal = total;
+      if (total === 0) {
+        this.resetBadgeAnimation();
+      }
+    });
 
     effect(() => {
       this.messageService.messageSet(); // <-- track changes
@@ -305,6 +335,7 @@ export class AppComponent implements OnInit {
     this.contactService.logout();
     this.noteService.logout();
     this.systemNotificationService.reset();
+    this.resetBadgeAnimation();
   }
 
   private refreshContactUnreadCounts(): void {
@@ -1231,5 +1262,17 @@ export class AppComponent implements OnInit {
     });
     // Save last markerupdet to fire the angular change listener
     this.lastMarkerUpdate = new Date().getMilliseconds();
+  }
+
+  private resetBadgeAnimation(): void {
+    this.animateUserBadge.set(false);
+    if (this.badgeAnimationTimer) {
+      clearTimeout(this.badgeAnimationTimer);
+    }
+    if (this.badgeAnimationDelayTimer) {
+      clearTimeout(this.badgeAnimationDelayTimer);
+    }
+    this.badgeAnimationTimer = undefined;
+    this.badgeAnimationDelayTimer = undefined;
   }
 }

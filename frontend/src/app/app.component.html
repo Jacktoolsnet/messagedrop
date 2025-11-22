@@ -19,10 +19,10 @@
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab aria-label="User Profile"
     (click)="{}">
-    <mat-icon aria-hidden="false" matBadge="#"
-        [matBadgeHidden]="userService.isReady() && (unreadSystemNotificationCount() + unreadContactsTotal()) === 0"
-        [matBadgeSize]="(unreadSystemNotificationCount() + unreadContactsTotal()) > 0 ? 'small' : 'medium'"
-        matBadgeColor="primary">person</mat-icon>
+    <mat-icon aria-hidden="false" [class.person-badge-animate]="animateUserBadge()"
+        [matBadge]="(unreadSystemNotificationCount() + unreadContactsTotal()) > 0 ? (unreadSystemNotificationCount() + unreadContactsTotal() | shortNumber) : null"
+        [matBadgeHidden]="!userService.isReady() && (unreadSystemNotificationCount() + unreadContactsTotal()) > 0"
+        [matBadgeSize]="'medium'" matBadgeColor="primary">person</mat-icon>
 </button>
 }
 
