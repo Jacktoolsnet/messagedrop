@@ -113,6 +113,7 @@
   overflow: visible;
   display: grid;
   margin-top: 2rem;
+  min-width: min(100% - 1.5rem, 12rem);
 }
 
 .bubble-row.them {
@@ -141,12 +142,12 @@
 
 .status-chip--me {
   top: -1.75rem;
-  left: -1.75rem;
+  left: -0.75rem;
 }
 
 .status-chip--them {
   top: -1.75rem;
-  right: -1.75rem;
+  right: -0.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
