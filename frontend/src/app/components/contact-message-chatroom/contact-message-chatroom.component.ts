@@ -64,6 +64,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
+  private currentContactId?: string;
+  private lastLiveMessageId?: string;
 
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
@@ -84,6 +86,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         readAt: incoming.readAt,
         status: incoming.status
       }, ...msgs]);
+      this.lastLiveMessageId = incoming.id;
     }
   }, { allowSignalWrites: true });
 
@@ -301,6 +304,16 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private loadMessages(force = false): void {
     const contact = this.contact();
     if (!contact) return;
+    const newContact = this.currentContactId !== contact.id;
+    if (force || newContact) {
+      this.currentContactId = contact.id;
+      this.messageKeys.clear();
+      this.messages.set([]);
+      this.scrolledToFirstUnread = false;
+      this.readTrackingEnabled = false;
+      this.lastLiveMessageId = undefined;
+      this.loaded.set(false);
+    }
     this.loading.set(true);
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({

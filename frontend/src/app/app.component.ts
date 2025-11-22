@@ -268,7 +268,6 @@ export class AppComponent implements OnInit {
       const update = this.contactMessageService.unreadCountUpdate();
       if (update) {
         this.unreadContactCounts.update((map) => ({ ...map, [update.contactId]: update.unread }));
-        this.contactMessageService.unreadCountUpdate.set(null);
       }
     }, { allowSignalWrites: true });
 
