@@ -80,9 +80,8 @@
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             <div class="reaction-chip reaction-chip--them">
-              <button type="button" (click)="$event.stopPropagation()" [matMenuTriggerFor]="reactionMenu">
-                <span>{{ msg.reaction || '🙂' }}</span>
-              </button>
+              <span class="reaction-chip-menu" [matMenuTriggerFor]="reactionMenu" (click)="$event.stopPropagation()">{{
+                msg.reaction || '🙂' }}</span>
               <mat-menu #reactionMenu="matMenu" xPosition="before">
                 @for (r of reactions; track r) {
                 <button mat-menu-item class="reaction-menu-item" (click)="setReaction(msg, r)">
