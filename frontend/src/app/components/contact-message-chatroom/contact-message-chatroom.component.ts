@@ -68,7 +68,15 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private visibilityObserver?: IntersectionObserver;
   private currentContactId?: string;
   private lastLiveMessageId?: string;
-  readonly reactions: readonly string[] = ['😀', '😊', '😢', '❤️', '👍', '👎', '😐', '😂', '😮', '😡', '🙏', '👏'];
+  readonly reactions: readonly string[] = [
+    '😀', '😊', '😢', '❤️', '👍', '👎', '😐', '😂', '😮', '😡', '🙏', '👏',
+    '😴', '🤒', '😎', '🤯', '🤔', '😇',
+    '🍎', '🍔', '🍕', '🍣', '🍪', '🥐',
+    '🍉', '🍌', '🍇', '🍓', '🍍', '🥑',
+    '🏖️', '✈️', '🚗', '🚲', '🏠', '🎡',
+    '⚽', '🏀', '🎾', '🏓', '🏋️', '🚴',
+    '🎵', '🎉', '🎁', '💤'
+  ];
 
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
