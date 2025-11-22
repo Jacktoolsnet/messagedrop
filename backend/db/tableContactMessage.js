@@ -9,6 +9,7 @@ const columnSignature = 'signature';
 const columnCreatedAt = 'createdAt'; // ISO8601
 const columnReadAt = 'readAt';       // ISO8601 | NULL
 const columnStatus = 'status';       // sent | delivered | read | deleted
+const columnReaction = 'reaction';   // nullable TEXT emoji/keyword
 
 const init = function (db) {
     const sql = `
@@ -22,6 +23,7 @@ const init = function (db) {
       ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read','deleted')),
       ${columnCreatedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
       ${columnReadAt} TEXT DEFAULT NULL,
+      ${columnReaction} TEXT DEFAULT NULL,
       FOREIGN KEY (${columnContactId})
         REFERENCES tableContact (id)
         ON UPDATE CASCADE ON DELETE CASCADE
@@ -65,17 +67,18 @@ const createMessage = function (db, {
     signature,
     status = 'sent',
     createdAt, // optional ISO, else default
-    readAt // optional ISO, else default (only used for sender to avoid unread)
+    readAt, // optional ISO, else default (only used for sender to avoid unread)
+    reaction // optional
 }, callback) {
     // Eigene Nachrichten gelten sofort als gelesen
     const normalizedReadAt = readAt ?? (direction === 'user' ? new Date().toISOString() : null);
     const sql = `
     INSERT INTO ${tableName}
       (${columnId}, ${columnContactId}, ${columnMessageId}, ${columnDirection},
-       ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt})
-    VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?);
+       ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt}, ${columnReaction})
+    VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?, ?);
   `;
-    const params = [id, contactId, messageId, direction, encryptedMessage, signature, status, createdAt ?? null, normalizedReadAt];
+    const params = [id, contactId, messageId, direction, encryptedMessage, signature, status, createdAt ?? null, normalizedReadAt, reaction ?? null];
     db.run(sql, params, (err) => callback(err));
 };
 
@@ -146,32 +149,36 @@ const cleanupReadMessages = function (db, callback) {
 const updateMessageByMessageId = function (db, messageId, {
     encryptedMessage,
     signature,
-    status = 'sent'
+    status = 'sent',
+    reaction
 }, callback) {
     const sql = `
     UPDATE ${tableName}
     SET ${columnEncryptedMessage} = COALESCE(?, ${columnEncryptedMessage}),
         ${columnSignature} = COALESCE(?, ${columnSignature}),
-        ${columnStatus} = COALESCE(?, ${columnStatus})
+        ${columnStatus} = COALESCE(?, ${columnStatus}),
+        ${columnReaction} = COALESCE(?, ${columnReaction})
     WHERE ${columnMessageId} = ?;
   `;
-    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, messageId], (err) => callback(err));
+    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, reaction ?? null, messageId], (err) => callback(err));
 };
 
 const updateMessageForContact = function (db, contactId, messageId, {
     encryptedMessage,
     signature,
-    status = 'sent'
+    status = 'sent',
+    reaction
 }, callback) {
     const sql = `
     UPDATE ${tableName}
     SET ${columnEncryptedMessage} = COALESCE(?, ${columnEncryptedMessage}),
         ${columnSignature} = COALESCE(?, ${columnSignature}),
-        ${columnStatus} = COALESCE(?, ${columnStatus})
+        ${columnStatus} = COALESCE(?, ${columnStatus}),
+        ${columnReaction} = COALESCE(?, ${columnReaction})
     WHERE ${columnMessageId} = ?
       AND ${columnContactId} = ?;
   `;
-    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, messageId, contactId], (err) => callback(err));
+    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, reaction ?? null, messageId, contactId], (err) => callback(err));
 };
 
 const deleteByMessageId = function (db, messageId, callback) {
@@ -202,9 +209,29 @@ const markAsReadByContactAndMessageId = function (db, contactId, messageId, call
     db.run(sql, [contactId, messageId], (err) => callback(err));
 };
 
+const setReactionForContact = function (db, contactId, messageId, reaction, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnReaction} = ?
+    WHERE ${columnContactId} = ?
+      AND ${columnMessageId} = ?;
+  `;
+    db.run(sql, [reaction ?? null, contactId, messageId], (err) => callback(err));
+};
+
+const setReactionByMessageId = function (db, messageId, reaction, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnReaction} = ?
+    WHERE ${columnMessageId} = ?;
+  `;
+    db.run(sql, [reaction ?? null, messageId], (err) => callback(err));
+};
+
 module.exports = {
     init,
     createMessage,
+    columnReaction,
     markAsRead,
     markManyAsReadByContact,
     getActiveByContact,
@@ -218,4 +245,6 @@ module.exports = {
     deleteByMessageId,
     deleteByContactAndMessageId,
     markAsReadByContactAndMessageId,
+    setReactionForContact,
+    setReactionByMessageId,
 };

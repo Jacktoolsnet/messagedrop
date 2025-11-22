@@ -105,6 +105,7 @@
   overflow: visible;
   width: auto;
   max-width: calc(100% - 1.5rem);
+  position: relative;
 }
 
 .day-separator {
@@ -173,6 +174,15 @@
 .status-chip--them {
   top: -1.75rem;
   right: -0.75rem;
+}
+
+.reaction-chip {
+  margin-top: 0.25rem;
+}
+
+.reaction-menu--them {
+  left: -2.75rem;
+  bottom: -1.75rem;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -245,6 +255,42 @@
 
 .message-actions button {
   margin: 0;
+}
+
+.reaction-chip {
+  position: absolute;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 1.5rem;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  color: var(--mat-card-subtitle-text-color);
+  padding: 0.35rem 0.5rem;
+  font-size: 1rem;
+}
+
+.reaction-chip--me {
+  bottom: -1.75rem;
+  left: -0.75rem;
+}
+
+.reaction-chip--them {
+  bottom: -1.75rem;
+  right: -0.75rem;
+}
+
+.reaction-menu {
+  position: absolute;
+  top: 2.6rem;
+  left: -0.75rem;
+}
+
+.reaction-menu--them {
+  left: -0.75rem;
 }
 
 

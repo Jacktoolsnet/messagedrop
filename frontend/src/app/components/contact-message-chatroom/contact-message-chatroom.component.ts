@@ -3,7 +3,9 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, QueryLis
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDivider } from "@angular/material/divider";
 import { MatIcon } from '@angular/material/icon';
+import { MatMenuModule } from '@angular/material/menu';
 import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -25,6 +27,7 @@ type ChatroomMessage = {
   createdAt: string;
   readAt?: string | null;
   status?: string;
+  reaction?: string | null;
 };
 
 @Component({
@@ -34,8 +37,10 @@ type ChatroomMessage = {
     MatCardModule,
     MatButtonModule,
     MatIcon,
+    MatMenuModule,
     ShowmultimediaComponent,
-    ShowmessageComponent
+    ShowmessageComponent,
+    MatDivider
   ],
   templateUrl: './contact-message-chatroom.component.html',
   styleUrl: './contact-message-chatroom.component.css',
@@ -66,6 +71,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private visibilityObserver?: IntersectionObserver;
   private currentContactId?: string;
   private lastLiveMessageId?: string;
+  readonly reactions: readonly string[] = ['😀', '😊', '😢', '❤️', '👍', '👎'];
 
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
@@ -84,7 +90,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         payload,
         createdAt: incoming.createdAt,
         readAt: incoming.readAt,
-        status: incoming.status
+        status: incoming.status,
+        reaction: incoming.reaction
       }, ...msgs]);
       this.lastLiveMessageId = incoming.id;
     }
@@ -122,6 +129,21 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       )
     );
     this.contactMessageService.updatedMessages.set(null);
+  }, { allowSignalWrites: true });
+
+  private readonly reactionEffect = effect(() => {
+    const update = this.contactMessageService.reactionUpdate();
+    if (!update) {
+      return;
+    }
+    this.messages.update((msgs) =>
+      msgs.map((msg) =>
+        msg.messageId === update.messageId
+          ? { ...msg, reaction: update.reaction }
+          : msg
+      )
+    );
+    this.contactMessageService.reactionUpdate.set(null);
   }, { allowSignalWrites: true });
 
   private readonly deletedMessagesEffect = effect(() => {
@@ -334,7 +356,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
               payload,
               createdAt: msg.createdAt,
               readAt: msg.readAt,
-              status: msg.status
+              status: msg.status,
+              reaction: (msg as unknown as { reaction?: string | null }).reaction ?? null
             });
           }
           const mergedMessages = Array.from(merged.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -347,7 +370,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           this.loading.set(false);
           this.loaded.set(true);
         }
-    });
+      });
   }
 
   private scrollToFirstUnread(): void {
@@ -428,6 +451,43 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   private buildMessageKey(id: string, signature: string, cipher: string): string {
     return `${id}|${signature}|${cipher}`;
+  }
+
+  setReaction(message: ChatroomMessage, reaction: string | null): void {
+    const contact = this.contact();
+    if (!contact || !this.userService.isReady()) {
+      return;
+    }
+    this.messages.update((msgs) =>
+      msgs.map((msg) =>
+        msg.messageId === message.messageId ? { ...msg, reaction } : msg
+      )
+    );
+    this.contactMessageService.reactToMessage({
+      messageId: message.messageId,
+      contactId: contact.id,
+      reaction,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId
+    }).subscribe({
+      next: () => {
+        this.socketioService.sendReactionContactMessage({
+          contactId: contact.id,
+          userId: contact.userId,
+          contactUserId: contact.contactUserId,
+          messageId: message.messageId,
+          reaction
+        });
+      },
+      error: () => {
+        // rollback best-effort
+        this.messages.update((msgs) =>
+          msgs.map((msg) =>
+            msg.messageId === message.messageId ? { ...msg, reaction: message.reaction ?? null } : msg
+          )
+        );
+      }
+    });
   }
 
   isNewDay(index: number): boolean {

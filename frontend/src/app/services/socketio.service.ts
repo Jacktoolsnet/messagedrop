@@ -239,4 +239,8 @@ export class SocketioService {
     this.socket.emit('contact:readContactMessage', payload);
   }
 
+  public sendReactionContactMessage(payload: { contactId: string; userId: string; contactUserId: string; messageId: string; reaction: string | null }) {
+    this.socket.emit('contact:reactContactMessage', payload);
+  }
+
 }

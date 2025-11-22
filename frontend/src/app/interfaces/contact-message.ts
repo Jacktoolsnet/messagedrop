@@ -8,6 +8,7 @@ export interface ContactMessage {
   status: 'sent' | 'delivered' | 'read';
   createdAt: string;
   readAt?: string | null;
+  reaction?: string | null;
 }
 
 export interface ContactMessageListResponse {

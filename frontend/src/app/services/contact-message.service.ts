@@ -46,6 +46,14 @@ interface DeleteMessagePayload {
   contactUserId?: string;
 }
 
+interface ReactionPayload {
+  messageId: string;
+  contactId: string;
+  reaction: string | null;
+  userId: string;
+  contactUserId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -60,6 +68,7 @@ export class ContactMessageService {
   readonly updatedMessages = signal<ContactMessage | null>(null);
   readonly deletedMessage = signal<{ messageId: string; contactId?: string; remove?: boolean } | null>(null);
   readonly unreadCountUpdate = signal<{ contactId: string; unread: number } | null>(null);
+  readonly reactionUpdate = signal<{ messageId: string; contactId?: string; reaction: string | null } | null>(null);
 
   mapStatusIcon(status?: 'sent' | 'delivered' | 'read' | 'deleted'): string {
     switch (status) {
@@ -125,6 +134,14 @@ export class ContactMessageService {
   deleteMessage(payload: DeleteMessagePayload) {
     return this.http.post<{ status: number; messageId: string }>(
       `${environment.apiUrl}/contactMessage/delete`,
+      payload,
+      this.httpOptions
+    ).pipe(catchError(this.handleError));
+  }
+
+  reactToMessage(payload: ReactionPayload) {
+    return this.http.post<{ status: number; messageId: string; reaction: string | null }>(
+      `${environment.apiUrl}/contactMessage/reaction`,
       payload,
       this.httpOptions
     ).pipe(catchError(this.handleError));
@@ -224,6 +241,17 @@ export class ContactMessageService {
           ? this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.userId)
           : undefined;
         this.deletedMessage.set({ messageId: payload.messageId, contactId: contact?.id, remove: payload.remove });
+      }
+    });
+
+    const reactionEventName = `receiveContactMessageReaction:${this.userService.getUser().id}`;
+    this.socketioService.getSocket().off(reactionEventName);
+    this.socketioService.getSocket().on(reactionEventName, (payload: { status: number; messageId?: string; userId?: string; reaction?: string | null; contactId?: string }) => {
+      if (payload?.status === 200 && payload.messageId) {
+        const contact = payload.userId
+          ? this.contactService.sortedContactsSignal().find((c) => c.contactUserId === payload.userId)
+          : undefined;
+        this.reactionUpdate.set({ messageId: payload.messageId, contactId: contact?.id ?? payload.contactId, reaction: payload.reaction ?? null });
       }
     });
 

@@ -186,6 +186,33 @@ router.post('/delete',
   }
 );
 
+// React to a message (single reaction shared across both copies)
+router.post('/reaction',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.reaction', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res) => {
+    const { messageId, contactId, userId, contactUserId, reaction } = req.body ?? {};
+    if (!messageId || !contactId || !userId || !contactUserId) {
+      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+    }
+
+    tableContactMessage.setReactionForContact(req.database.db, contactId, messageId, reaction ?? null, (err) => {
+      if (err) {
+        return res.status(500).json({ status: 500, error: err.message || err });
+      }
+      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+        if (!lookupErr && reciprocal?.id) {
+          tableContactMessage.setReactionForContact(req.database.db, reciprocal.id, messageId, reaction ?? null, () => { /* best-effort */ });
+        }
+        return res.status(200).json({ status: 200, messageId, reaction: reaction ?? null });
+      });
+    });
+  }
+);
+
 // Mark as read (both copies)
 router.post('/status/read',
   [
