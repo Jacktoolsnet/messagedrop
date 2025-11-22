@@ -63,11 +63,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private readonly messageKeys = new Set<string>();
   private scrolledToFirstUnread = false;
 
-  private readonly scrollEffect = effect(() => {
-    void this.messages();
-    queueMicrotask(() => this.scrollToBottom());
-  });
-
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
     const contact = this.contact();
@@ -78,7 +73,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
     if (!this.messageKeys.has(key)) {
       this.messageKeys.add(key);
-      this.messages.update(msgs => [...msgs, {
+      this.messages.update(msgs => [{
         id: incoming.id,
         messageId: incoming.messageId,
         direction: incoming.direction,
@@ -86,8 +81,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         createdAt: incoming.createdAt,
         readAt: incoming.readAt,
         status: incoming.status
-      }]);
-      queueMicrotask(() => this.scrollToBottom());
+      }, ...msgs]);
       if (incoming.direction === 'contactUser') {
         this.markAsRead(incoming.messageId, contact);
       }
@@ -278,15 +272,14 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     }
     const now = new Date().toISOString();
     const messageId = crypto.randomUUID();
-    this.messages.update((msgs) => [...msgs, {
+    this.messages.update((msgs) => [{
       id: `local-${messageId}`,
       messageId,
       direction: 'user',
       payload: message,
       createdAt: now,
       status: 'sent'
-    }]);
-    queueMicrotask(() => this.scrollToBottom());
+    }, ...msgs]);
     return messageId;
   }
 
@@ -324,7 +317,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
               status: msg.status
             });
           }
-          const mergedMessages = Array.from(merged.values()).sort((a, b) => a.createdAt.localeCompare(b.createdAt));
+          const mergedMessages = Array.from(merged.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
           this.messages.set(mergedMessages);
           this.loading.set(false);
           this.loaded.set(true);
@@ -340,7 +333,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           this.loading.set(false);
           this.loaded.set(true);
         }
-      });
+    });
   }
 
   private scrollToFirstUnread(): void {
@@ -357,17 +350,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       this.scrolledToFirstUnread = true;
       return;
     }
-    // No unread found; keep old behavior
-    this.scrollToBottom();
     this.scrolledToFirstUnread = true;
-  }
-
-  private scrollToBottom(): void {
-    const container = this.messageScroll?.nativeElement;
-    if (!container) {
-      return;
-    }
-    container.scrollTop = container.scrollHeight;
   }
 
   private buildMessageKey(id: string, signature: string, cipher: string): string {
