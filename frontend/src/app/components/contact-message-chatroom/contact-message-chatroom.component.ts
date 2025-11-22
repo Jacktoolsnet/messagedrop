@@ -62,6 +62,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   readonly loaded = signal<boolean>(false);
   private readonly messageKeys = new Set<string>();
   private scrolledToFirstUnread = false;
+  private readTrackingEnabled = false;
   private visibilityObserver?: IntersectionObserver;
 
   private readonly liveMessagesEffect = effect(async () => {
@@ -94,7 +95,11 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   }, { allowSignalWrites: true });
 
   private readonly observeUnreadEffect = effect(() => {
-    // Temporarily disabled: read status changes are paused for scroll testing
+    void this.messages();
+    if (!this.readTrackingEnabled) {
+      return;
+    }
+    queueMicrotask(() => this.observeUnread());
   });
 
   private readonly updatedMessagesEffect = effect(() => {
@@ -355,15 +360,20 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       const top = target.nativeElement.offsetTop - container.offsetTop;
       container.scrollTop = Math.max(0, top);
       this.scrolledToFirstUnread = true;
+      this.readTrackingEnabled = true;
+      this.observeUnread();
       return;
     }
     // No unread; mark as done so we don't retry
     this.scrolledToFirstUnread = true;
+    this.readTrackingEnabled = true;
+    this.observeUnread();
   }
 
   private observeUnread(): void {
-    // Temporarily disabled: read status changes are paused for scroll testing
-    return;
+    if (!this.readTrackingEnabled) {
+      return;
+    }
     const container = this.messageScroll?.nativeElement;
     if (!container) {
       return;
@@ -408,8 +418,27 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   }
 
   private markAsRead(messageId: string, contact: Contact): void {
-    // Temporarily disabled: read status changes are paused for scroll testing
-    return;
+    this.contactMessageService.markReadBothCopies({
+      messageId,
+      contactId: contact.id,
+      userId: contact.userId,
+      contactUserId: contact.contactUserId
+    }).subscribe({
+      next: () => {
+        this.messages.update((msgs) =>
+          msgs.map((msg) =>
+            msg.messageId === messageId ? { ...msg, status: 'read', readAt: msg.readAt ?? new Date().toISOString() } : msg
+          )
+        );
+        this.contactMessageService.emitUnreadCountUpdate(contact.id);
+        this.socketioService.sendReadContactMessage({
+          contactId: contact.id,
+          userId: contact.userId,
+          contactUserId: contact.contactUserId,
+          messageId
+        });
+      }
+    });
   }
 
   private createEmptyMessage(): ShortMessage {
