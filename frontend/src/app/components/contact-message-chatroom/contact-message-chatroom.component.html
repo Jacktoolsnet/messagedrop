@@ -79,21 +79,8 @@
             @if (msg.payload?.message?.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
-            <div class="reaction-chip reaction-chip--them">
-              <span class="reaction-chip-menu" [matMenuTriggerFor]="reactionMenu" (click)="$event.stopPropagation()">{{
-                msg.reaction || '🙂' }}</span>
-              <mat-menu #reactionMenu="matMenu" xPosition="before">
-                @for (r of reactions; track r) {
-                <button mat-menu-item class="reaction-menu-item" (click)="setReaction(msg, r)">
-                  <span>{{ r }}</span>
-                </button>
-                }
-                <mat-divider></mat-divider>
-                <button mat-menu-item class="reaction-menu-item reaction-menu-item--delete"
-                  (click)="setReaction(msg, null)">
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </mat-menu>
+            <div class="reaction-chip reaction-chip--them" (click)="openReactionPicker(msg, $event)">
+              <span class="reaction-chip-menu">{{ msg.reaction || '😐' }}</span>
             </div>
           </div>
           <div class="message-actions-row button-them">

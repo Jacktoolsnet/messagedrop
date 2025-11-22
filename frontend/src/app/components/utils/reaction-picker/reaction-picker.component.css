@@ -1,0 +1,38 @@
+.reaction-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-width: 260px;
+}
+
+.reaction-grid {
+  display: grid;
+  grid-template-columns: repeat(6, minmax(2.25rem, 1fr));
+  gap: 0.4rem;
+  justify-items: center;
+}
+
+.reaction-grid button {
+  border: none;
+  background: transparent;
+  font-size: 1.6rem;
+  line-height: 1;
+  padding: 0.35rem;
+  cursor: pointer;
+  transition: transform 0.1s ease;
+}
+
+.reaction-grid button:hover,
+.reaction-grid button:focus-visible {
+  transform: scale(1.12);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.actions button {
+  min-width: 0;
+  padding: 0.25rem 0.5rem;
+}

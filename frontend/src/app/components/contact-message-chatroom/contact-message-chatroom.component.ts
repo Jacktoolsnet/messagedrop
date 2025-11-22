@@ -3,9 +3,7 @@ import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, QueryLis
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
-import { MatDivider } from "@angular/material/divider";
 import { MatIcon } from '@angular/material/icon';
-import { MatMenuModule } from '@angular/material/menu';
 import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -18,6 +16,7 @@ import { ContactEditMessageComponent } from '../contact/contact-edit-message/con
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
+import { ReactionPickerComponent } from '../utils/reaction-picker/reaction-picker.component';
 
 type ChatroomMessage = {
   id: string;
@@ -37,10 +36,8 @@ type ChatroomMessage = {
     MatCardModule,
     MatButtonModule,
     MatIcon,
-    MatMenuModule,
     ShowmultimediaComponent,
-    ShowmessageComponent,
-    MatDivider
+    ShowmessageComponent
   ],
   templateUrl: './contact-message-chatroom.component.html',
   styleUrl: './contact-message-chatroom.component.css',
@@ -71,7 +68,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private visibilityObserver?: IntersectionObserver;
   private currentContactId?: string;
   private lastLiveMessageId?: string;
-  readonly reactions: readonly string[] = ['😀', '😊', '😢', '❤️', '👍', '👎'];
+  readonly reactions: readonly string[] = ['😀', '😊', '😢', '❤️', '👍', '👎', '😐', '😂', '😮', '😡', '🙏', '👏'];
 
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
@@ -487,6 +484,23 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           )
         );
       }
+    });
+  }
+
+  openReactionPicker(message: ChatroomMessage, event: MouseEvent): void {
+    event.stopPropagation();
+    const dialogRef = this.matDialog.open(ReactionPickerComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { reactions: this.reactions, current: message.reaction },
+      maxWidth: '360px'
+    });
+
+    dialogRef.afterClosed().subscribe((result: string | null | undefined) => {
+      if (result === undefined) {
+        return;
+      }
+      this.setReaction(message, result);
     });
   }
 
