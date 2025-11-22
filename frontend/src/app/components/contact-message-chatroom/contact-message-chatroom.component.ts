@@ -94,8 +94,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   }, { allowSignalWrites: true });
 
   private readonly observeUnreadEffect = effect(() => {
-    void this.messages();
-    queueMicrotask(() => this.observeUnread());
+    // Temporarily disabled: read status changes are paused for scroll testing
   });
 
   private readonly updatedMessagesEffect = effect(() => {
@@ -324,7 +323,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           this.messages.set(mergedMessages);
           this.loading.set(false);
           this.loaded.set(true);
-          queueMicrotask(() => this.scrollToFirstUnread());
+          setTimeout(() => this.scrollToFirstUnread(), 0);
         },
         error: () => {
           this.loading.set(false);
@@ -338,19 +337,33 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       return;
     }
     const rows = this.messageRows?.toArray() ?? [];
-    const target = rows.find((row, index) => {
-      const message = this.messages()[index];
-      return message && this.isUnread(message);
-    });
-    if (target?.nativeElement) {
-      target.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!rows.length) {
+      return;
+    }
+    // Messages are sorted newest first; find the oldest unread (last in the list)
+    let target: ElementRef<HTMLElement> | undefined;
+    for (let i = rows.length - 1; i >= 0; i -= 1) {
+      const message = this.messages()[i];
+      if (message && this.isUnread(message)) {
+        target = rows[i];
+        break;
+      }
+    }
+    if (target?.nativeElement && this.messageScroll?.nativeElement) {
+      // Place the unread message fully in view (top aligned)
+      const container = this.messageScroll.nativeElement;
+      const top = target.nativeElement.offsetTop - container.offsetTop;
+      container.scrollTop = Math.max(0, top);
       this.scrolledToFirstUnread = true;
       return;
     }
+    // No unread; mark as done so we don't retry
     this.scrolledToFirstUnread = true;
   }
 
   private observeUnread(): void {
+    // Temporarily disabled: read status changes are paused for scroll testing
+    return;
     const container = this.messageScroll?.nativeElement;
     if (!container) {
       return;
@@ -395,27 +408,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   }
 
   private markAsRead(messageId: string, contact: Contact): void {
-    this.contactMessageService.markReadBothCopies({
-      messageId,
-      contactId: contact.id,
-      userId: contact.userId,
-      contactUserId: contact.contactUserId
-    }).subscribe({
-      next: () => {
-        this.messages.update((msgs) =>
-          msgs.map((msg) =>
-            msg.messageId === messageId ? { ...msg, status: 'read', readAt: msg.readAt ?? new Date().toISOString() } : msg
-          )
-        );
-        this.contactMessageService.emitUnreadCountUpdate(contact.id);
-        this.socketioService.sendReadContactMessage({
-          contactId: contact.id,
-          userId: contact.userId,
-          contactUserId: contact.contactUserId,
-          messageId
-        });
-      }
-    });
+    // Temporarily disabled: read status changes are paused for scroll testing
+    return;
   }
 
   private createEmptyMessage(): ShortMessage {
