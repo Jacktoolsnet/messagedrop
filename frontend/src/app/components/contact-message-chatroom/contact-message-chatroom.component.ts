@@ -16,7 +16,7 @@ import { ContactEditMessageComponent } from '../contact/contact-edit-message/con
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
-import { ReactionPickerComponent } from '../utils/reaction-picker/reaction-picker.component';
+import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
 
 type ChatroomMessage = {
   id: string;
@@ -497,7 +497,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   openReactionPicker(message: ChatroomMessage, event: MouseEvent): void {
     event.stopPropagation();
-    const dialogRef = this.matDialog.open(ReactionPickerComponent, {
+    const dialogRef = this.matDialog.open(EmoticonPickerComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: { reactions: this.reactions, current: message.reaction },

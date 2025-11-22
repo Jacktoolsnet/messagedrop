@@ -1,0 +1,20 @@
+<mat-dialog-content class="emoticon-picker">
+  <mat-tab-group>
+    @for (cat of categories; track cat.name) {
+    <mat-tab>
+      <ng-template mat-tab-label>{{ cat.icon }}</ng-template>
+      <div class="emoticon-grid">
+        @for (r of cat.items; track r) {
+        <button type="button" (click)="pick(r)">{{ r }}</button>
+        }
+      </div>
+    </mat-tab>
+    }
+  </mat-tab-group>
+</mat-dialog-content>
+<mat-dialog-actions align="end">
+  <button mat-icon-button color="warn" (click)="pick(null)" aria-label="Remove reaction">
+    <mat-icon>delete</mat-icon>
+  </button>
+  <button mat-button mat-dialog-close aria-label="Close">Close</button>
+</mat-dialog-actions>
