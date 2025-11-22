@@ -80,7 +80,21 @@
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             <div class="reaction-chip reaction-chip--them">
-              <span>{{ msg.reaction || '🙂' }}</span>
+              <button type="button" (click)="$event.stopPropagation()" [matMenuTriggerFor]="reactionMenu">
+                <span>{{ msg.reaction || '🙂' }}</span>
+              </button>
+              <mat-menu #reactionMenu="matMenu" xPosition="before">
+                @for (r of reactions; track r) {
+                <button mat-menu-item class="reaction-menu-item" (click)="setReaction(msg, r)">
+                  <span>{{ r }}</span>
+                </button>
+                }
+                <mat-divider></mat-divider>
+                <button mat-menu-item class="reaction-menu-item reaction-menu-item--delete"
+                  (click)="setReaction(msg, null)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </mat-menu>
             </div>
           </div>
           <div class="message-actions-row button-them">
@@ -89,22 +103,6 @@
                 <mat-icon class="material-symbols-outlined">delete</mat-icon>
               </button>
             </div>
-          </div>
-          <div class="reaction-menu reaction-menu--them">
-            <button mat-mini-fab aria-label="React" (click)="$event.stopPropagation()" [matMenuTriggerFor]="reactionMenu"
-              color="accent">
-              <mat-icon class="material-symbols-outlined">mood</mat-icon>
-            </button>
-            <mat-menu #reactionMenu="matMenu" xPosition="before">
-              <button mat-menu-item *ngFor="let r of reactions" (click)="setReaction(msg, r)">
-                <span>{{ r }}</span>
-              </button>
-              <mat-divider></mat-divider>
-              <button mat-menu-item (click)="setReaction(msg, null)">
-                <mat-icon>delete</mat-icon>
-                <span>Remove reaction</span>
-              </button>
-            </mat-menu>
           </div>
         </div>
         }

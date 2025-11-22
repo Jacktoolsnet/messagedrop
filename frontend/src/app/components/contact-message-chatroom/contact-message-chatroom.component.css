@@ -185,6 +185,24 @@
   bottom: -1.75rem;
 }
 
+.reaction-menu-item {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 1.5rem;
+  padding: 0.35rem 0.5rem;
+  box-sizing: border-box;
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border: 1px solid color-mix(in srgb, var(--mat-card-outlined-outline-color) 65%, transparent);
+  background-color: var(--mat-card-filled-container-color);
+}
+
+.reaction-menu-item--delete {
+  color: var(--mat-warn-500, #d32f2f);
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --bubble-outline: color-mix(in srgb, var(--mat-card-outlined-outline-color) 55%, var(--mat-app-text-color) 45%);
@@ -271,6 +289,8 @@
   color: var(--mat-card-subtitle-text-color);
   padding: 0.35rem 0.5rem;
   font-size: 1rem;
+  border: none;
+  cursor: default;
 }
 
 .reaction-chip--me {
@@ -282,17 +302,6 @@
   bottom: -1.75rem;
   right: -0.75rem;
 }
-
-.reaction-menu {
-  position: absolute;
-  top: 2.6rem;
-  left: -0.75rem;
-}
-
-.reaction-menu--them {
-  left: -0.75rem;
-}
-
 
 .avatar-me,
 .avatar-them {
