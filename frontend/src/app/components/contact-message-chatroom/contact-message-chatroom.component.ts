@@ -15,8 +15,8 @@ import { UserService } from '../../services/user.service';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
+import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
 type ChatroomMessage = {
   id: string;
@@ -521,7 +521,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { reactions: this.reactions, current: message.reaction },
-      maxWidth: '360px'
+      maxWidth: '95vw'
     });
 
     dialogRef.afterClosed().subscribe((result: string | null | undefined) => {

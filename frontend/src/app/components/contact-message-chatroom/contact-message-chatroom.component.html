@@ -44,7 +44,7 @@
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             <div class="reaction-chip reaction-chip--me">
-              <span>{{ msg.reaction || '🙂' }}</span>
+              <span>{{ msg.reaction || '🫥' }}</span>
             </div>
           </div>
           <div class="message-actions-row button-me">
@@ -80,7 +80,7 @@
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             <div class="reaction-chip reaction-chip--them" (click)="openReactionPicker(msg, $event)">
-              <span class="reaction-chip-menu">{{ msg.reaction || '😐' }}</span>
+              <span class="reaction-chip-menu">{{ msg.reaction || '🫥' }}</span>
             </div>
           </div>
           <div class="message-actions-row button-them">
