@@ -109,10 +109,35 @@ module.exports = (io, socket) => {
     });
   };
 
+  const reactContactMessage = (payload) => {
+    const requiredFields = ['contactId', 'userId', 'contactUserId', 'messageId'];
+    const missing = requiredFields.filter((key) => payload?.[key] === undefined || payload?.[key] === null);
+    if (missing.length) {
+      emitError('contact:reactContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+
+    io.to(payload.contactUserId).emit(`receiveContactMessageReaction:${payload.contactUserId}`, {
+      status: 200,
+      messageId: payload.messageId,
+      userId: payload.userId,
+      contactId: payload.contactId,
+      reaction: payload.reaction ?? null
+    });
+
+    socket.emit('contact:reactContactMessage:ack', {
+      status: 200,
+      contactId: payload.contactId,
+      messageId: payload.messageId,
+      reaction: payload.reaction ?? null
+    });
+  };
+
   socket.on('contact:requestProfile', requestProfile);
   socket.on('contact:provideUserProfile', provideUserProfile);
   socket.on('contact:newContactMessage', newContactMessage);
   socket.on('contact:updateContactMessage', updateContactMessage);
   socket.on('contact:deleteContactMessage', deleteContactMessage);
   socket.on('contact:readContactMessage', readContactMessage);
+  socket.on('contact:reactContactMessage', reactContactMessage);
 };
