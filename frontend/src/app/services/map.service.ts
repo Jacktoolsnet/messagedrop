@@ -1,4 +1,4 @@
-import { EventEmitter, Injectable, signal, inject } from '@angular/core';
+import { EventEmitter, inject, Injectable, signal } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
@@ -30,6 +30,13 @@ const multiMarker = leaflet.icon({
 
 const userMarker = leaflet.icon({
   iconUrl: 'assets/markers/user-marker.svg',
+
+  iconSize: [32, 40], // size of the icon
+  iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
+});
+
+const imageMarker = leaflet.icon({
+  iconUrl: 'assets/markers/image-marker.svg',
 
   iconSize: [32, 40], // size of the icon
   iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
@@ -351,6 +358,8 @@ export class MapService {
         return leaflet.marker(latLng, { icon: messageMarker, zIndexOffset: 20 });
       case MarkerType.PRIVATE_NOTE:
         return leaflet.marker(latLng, { icon: noteMarker, zIndexOffset: 15 });
+      case MarkerType.PRIVATE_IMAGE:
+        return leaflet.marker(latLng, { icon: imageMarker, zIndexOffset: 15 });
       case MarkerType.MULTI:
         return leaflet.marker(latLng, { icon: multiMarker, zIndexOffset: 5 });
       default:
