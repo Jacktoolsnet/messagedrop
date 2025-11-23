@@ -1,10 +1,20 @@
 <mat-dialog-content>
-  <button mat-stroked-button [mat-dialog-close]="{type: 'public_message', messages: data.messages}" matBadge="{{data.messages.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
+  <button mat-stroked-button [mat-dialog-close]="{type: 'public_message', messages: data.messages}"
+    matBadge="{{data.messages.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
     <mat-icon>speaker_notes</mat-icon>
     Show messages
   </button>
-  <button mat-stroked-button [mat-dialog-close]="{type: 'private_note', notes: data.notes}" matBadge="{{data.notes.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">
+  <button mat-stroked-button [mat-dialog-close]="{type: 'private_note', notes: data.notes}"
+    matBadge="{{data.notes.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
     <mat-icon>clinical_notes</mat-icon>
     Show notes
+  </button>
+  <button mat-stroked-button [mat-dialog-close]="{type: 'private_image', images: data.images}"
+    matBadge="{{data.images.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
+    <mat-icon>images</mat-icon>
+    Show images
   </button>
 </mat-dialog-content>

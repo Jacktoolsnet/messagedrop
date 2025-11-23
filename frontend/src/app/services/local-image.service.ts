@@ -1,9 +1,8 @@
-import { Injectable, signal } from '@angular/core';
-import {
-  ImageLocation,
-  ImageLocationSource,
-  LocalImageEntry,
-} from '../interfaces/local-image-entry';
+import { inject, Injectable, signal } from '@angular/core';
+import { BoundingBox } from '../interfaces/bounding-box';
+import { LocalImage } from '../interfaces/local-image';
+import { Location } from '../interfaces/location';
+import { IndexedDbService } from './indexed-db.service';
 
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
@@ -17,7 +16,15 @@ type FilePickerWindow = typeof window & {
 };
 
 @Injectable({ providedIn: 'root' })
-export class LocalImageFileService {
+export class LocalImageService {
+  private imagesSignal = signal<LocalImage[]>([]);
+
+  /** Zugriff auf die Images als Signal */
+  getImagesSignal() {
+    return this.imagesSignal.asReadonly();
+  }
+
+  private readonly indexedDbService = inject(IndexedDbService);
   readonly isSupportedSignal = signal<boolean>(this.detectSupport());
   readonly lastErrorSignal = signal<string | null>(null);
 
@@ -31,13 +38,8 @@ export class LocalImageFileService {
     return supported;
   }
 
-  async createImageEntryForOwner(
-    ownerId: string,
-    options?: {
-      fallbackLocation?: ImageLocation | null;
-      fallbackPlusCode?: string;
-    },
-  ): Promise<LocalImageEntry | null> {
+  async createImageEntryForOwner(fallbackLocation: Location,
+  ): Promise<LocalImage | null> {
     if (!this.isSupported()) {
       this.lastErrorSignal.set(
         'File System Access API is not supported in this browser or context.',
@@ -106,14 +108,13 @@ export class LocalImageFileService {
 
     // TODO: Parse EXIF metadata for capture date and GPS location.
     const exifCaptureDate: string | undefined = undefined;
-    const exifLocation: ImageLocation | null = null;
+    const exifLocation: Location | null = null;
 
-    const location = this.resolveLocation(exifLocation, options);
+    const location = this.resolveLocation(exifLocation, fallbackLocation);
     const now = Date.now();
 
-    const entry: LocalImageEntry = {
-      id: this.generateId(),
-      ownerId,
+    const entry: LocalImage = {
+      id: crypto.randomUUID(),
       handle,
       fileName: file.name,
       mimeType: file.type,
@@ -128,7 +129,7 @@ export class LocalImageFileService {
     return entry;
   }
 
-  async getImageUrl(entry: LocalImageEntry): Promise<string> {
+  async getImageUrl(entry: LocalImage): Promise<string> {
     const cached = this.objectUrlCache.get(entry.id);
     if (cached) {
       return cached;
@@ -153,7 +154,7 @@ export class LocalImageFileService {
     }
   }
 
-  revokeImageUrl(entry: LocalImageEntry): void {
+  revokeImageUrl(entry: LocalImage): void {
     const cached = this.objectUrlCache.get(entry.id);
     if (!cached) {
       return;
@@ -170,36 +171,12 @@ export class LocalImageFileService {
     this.objectUrlCache.clear();
   }
 
-  private resolveLocation(
-    exifLocation: ImageLocation | null,
-    options?: { fallbackLocation?: ImageLocation | null; fallbackPlusCode?: string },
-  ): ImageLocation | null {
+  private resolveLocation(exifLocation: Location | null, fallbackLocation: Location): Location {
     if (exifLocation) {
       return exifLocation;
+    } else {
+      return fallbackLocation;
     }
-
-    const fallbackLocation = options?.fallbackLocation ?? null;
-    if (fallbackLocation) {
-      const source: ImageLocationSource = fallbackLocation.source ?? 'entity';
-      const plusCode = fallbackLocation.plusCode ?? options?.fallbackPlusCode;
-
-      return {
-        ...fallbackLocation,
-        source,
-        plusCode,
-      };
-    }
-
-    if (options?.fallbackPlusCode) {
-      return {
-        lat: 0,
-        lon: 0,
-        source: 'manual',
-        plusCode: options.fallbackPlusCode,
-      };
-    }
-
-    return null;
   }
 
   private async ensureReadPermission(handle: FileSystemFileHandle): Promise<boolean> {
@@ -254,14 +231,6 @@ export class LocalImageFileService {
     return !!fsWindow.showOpenFilePicker && window.isSecureContext === true;
   }
 
-  private generateId(): string {
-    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-      return crypto.randomUUID();
-    }
-
-    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-  }
-
   private isAbortError(error: unknown): boolean {
     return (
       error instanceof DOMException ||
@@ -269,5 +238,11 @@ export class LocalImageFileService {
     )
       ? (error as DOMException).name === 'AbortError'
       : false;
+  }
+
+  async getimagesInBoundingBox(boundingBox: BoundingBox): Promise<LocalImage[]> {
+    const localImageEntry = await this.indexedDbService.getImagesInBoundingBox(boundingBox);
+    this.imagesSignal.set(localImageEntry);
+    return localImageEntry;
   }
 }

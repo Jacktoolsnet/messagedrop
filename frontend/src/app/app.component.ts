@@ -37,6 +37,7 @@ import { DisplayMessage } from './components/utils/display-message/display-messa
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
+import { LocalImage } from './interfaces/local-image';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
@@ -58,7 +59,7 @@ import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
-import { LocalImageFileService } from './services/local-image-file.service';
+import { LocalImageService } from './services/local-image.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NetworkService } from './services/network.service';
@@ -135,7 +136,7 @@ export class AppComponent implements OnInit {
   private readonly contactMessageService = inject(ContactMessageService);
   readonly systemNotificationService = inject(SystemNotificationService);
   private readonly geolocationService = inject(GeolocationService);
-  private readonly localImageFileService = inject(LocalImageFileService);
+  private readonly localImageService = inject(LocalImageService);
   private readonly messageService = inject(MessageService);
   private readonly socketioService = inject(SocketioService);
   private readonly airQualityService = inject(AirQualityService);
@@ -512,6 +513,7 @@ export class AppComponent implements OnInit {
     // notes from local device
     if (this.userService.isReady()) {
       await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      await this.localImageService.getimagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
     }
     // Messages
     this.messageService.getByVisibleMapBoundingBox();
@@ -537,8 +539,15 @@ export class AppComponent implements OnInit {
           });
         }
         break;
+      case MarkerType.PRIVATE_IMAGE:
+        if (this.userService.isReady()) {
+          this.localImageService.getimagesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
+            //this.openMarkerImageListDialog(event.images);
+          });
+        }
+        break;
       case MarkerType.MULTI:
-        this.openMarkerMultiDialog(event.messages, event.notes);
+        this.openMarkerMultiDialog(event.messages, event.notes, event.images);
         break;
     }
   }
@@ -650,7 +659,7 @@ export class AppComponent implements OnInit {
   }
 
   async openAddImageDialog(): Promise<void> {
-    if (!this.localImageFileService.isSupported()) {
+    if (!this.localImageService.isSupported()) {
       this.snackBar.open('File picker is not supported in this browser.', undefined, { duration: 4000 });
       return;
     }
@@ -659,18 +668,7 @@ export class AppComponent implements OnInit {
     const plusCode = this.geolocationService.getPlusCode(location.latitude, location.longitude) || location.plusCode;
 
     try {
-      const entry = await this.localImageFileService.createImageEntryForOwner(
-        this.userService.getUser().id,
-        {
-          fallbackLocation: {
-            lat: location.latitude,
-            lon: location.longitude,
-            source: 'entity',
-            plusCode
-          },
-          fallbackPlusCode: plusCode ?? undefined
-        }
-      );
+      const entry = await this.localImageService.createImageEntryForOwner(this.mapService.getMapLocation());
 
       if (!entry) {
         return;
@@ -763,7 +761,7 @@ export class AppComponent implements OnInit {
       });
   }
 
-  public openUserNoteListDialog(): void {
+  public openNoteListDialog(): void {
     this.noteService.loadNotes().then(() => {
       const dialogRef = this.dialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
@@ -845,9 +843,9 @@ export class AppComponent implements OnInit {
 
   }
 
-  public openMarkerMultiDialog(messages: Message[], notes: Note[]) {
+  public openMarkerMultiDialog(messages: Message[], notes: Note[], images: LocalImage[]) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages: messages, notes: notes },
+      data: { messages: messages, notes: notes, images: images },
       closeOnNavigation: true,
       hasBackdrop: true
     });
@@ -866,6 +864,9 @@ export class AppComponent implements OnInit {
             break
           case 'private_note':
             this.openMarkerNoteListDialog(result.notes);
+            break
+          case 'private_image':
+            //this.openMarkerImageListDialog(result.images);
             break
         }
       }
@@ -1278,6 +1279,7 @@ export class AppComponent implements OnInit {
           location: center,
           messages: [message],
           notes: [],
+          images: [],
           type: MarkerType.PUBLIC_MESSAGE
         });
       } else {
@@ -1316,10 +1318,47 @@ export class AppComponent implements OnInit {
           location: center,
           messages: [],
           notes: [note],
+          images: [],
           type: MarkerType.PRIVATE_NOTE
         });
       }
     });
+
+    // Process images
+    const images = this.localImageService.getImagesSignal()();
+    images.forEach((image) => {
+      const imageLocation: Location = {
+        latitude: image.location.latitude,
+        longitude: image.location.longitude,
+        plusCode: image.location.plusCode
+      };
+      if (this.mapService.getMapZoom() > 17) {
+        center = imageLocation;
+      } else {
+        const plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(imageLocation, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: plusCode
+        };
+      }
+      if (this.markerLocations.has(center.plusCode)) {
+        this.markerLocations.get(center.plusCode)!.images.push(image)
+        if (this.markerLocations.get(center.plusCode)?.type != MarkerType.PRIVATE_IMAGE) {
+          this.markerLocations.get(center.plusCode)!.type = MarkerType.MULTI;
+        }
+      } else {
+        this.markerLocations.set(center.plusCode, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [image],
+          type: MarkerType.PRIVATE_IMAGE
+        });
+      }
+    });
+
     // Save last markerupdet to fire the angular change listener
     this.lastMarkerUpdate = new Date().getMilliseconds();
   }

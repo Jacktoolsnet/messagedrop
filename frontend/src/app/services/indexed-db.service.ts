@@ -3,7 +3,7 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
-import { LocalImageEntry } from '../interfaces/local-image-entry';
+import { LocalImage } from '../interfaces/local-image';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
@@ -600,7 +600,7 @@ export class IndexedDbService {
    * Stores or updates a local image entry (including the file handle).
    * Returns the entry id to mirror the note API.
    */
-  async saveImage(image: LocalImageEntry): Promise<string> {
+  async saveImage(image: LocalImage): Promise<string> {
     const db = await this.openDB();
     return new Promise<string>((resolve, reject) => {
       const tx = db.transaction(this.imageStore, 'readwrite');
@@ -615,7 +615,7 @@ export class IndexedDbService {
   /**
    * Updates an existing local image entry and refreshes updatedAt.
    */
-  async updateImage(image: LocalImageEntry): Promise<void> {
+  async updateImage(image: LocalImage): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
@@ -631,13 +631,13 @@ export class IndexedDbService {
   /**
    * Retrieves a local image entry by ID.
    */
-  async getImage(id: string): Promise<LocalImageEntry | undefined> {
+  async getImage(id: string): Promise<LocalImage | undefined> {
     const db = await this.openDB();
-    return new Promise<LocalImageEntry | undefined>((resolve, reject) => {
+    return new Promise<LocalImage | undefined>((resolve, reject) => {
       const tx = db.transaction(this.imageStore, 'readonly');
       const store = tx.objectStore(this.imageStore);
       const request = store.get(id);
-      request.onsuccess = () => resolve(this.decompress<LocalImageEntry>(request.result));
+      request.onsuccess = () => resolve(this.decompress<LocalImage>(request.result));
       request.onerror = () => reject(request.error);
     });
   }
@@ -659,7 +659,7 @@ export class IndexedDbService {
   /**
    * Retrieves all local image entries, newest first.
    */
-  async getAllImages(): Promise<LocalImageEntry[]> {
+  async getAllImages(): Promise<LocalImage[]> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
       const tx = db.transaction(this.imageStore, 'readonly');
@@ -667,9 +667,9 @@ export class IndexedDbService {
       const request = store.getAll();
       request.onsuccess = () => {
         const compressedNotes = request.result as string[];
-        const localImages: LocalImageEntry[] = [];
+        const localImages: LocalImage[] = [];
         compressedNotes.forEach(compressedNote => {
-          const localImageEntry = this.decompress<LocalImageEntry>(compressedNote);
+          const localImageEntry = this.decompress<LocalImage>(compressedNote);
           if (localImageEntry) {
             localImages.push(localImageEntry);
           }
@@ -680,7 +680,7 @@ export class IndexedDbService {
     });
   }
 
-  private encodeImageEntry(entry: LocalImageEntry): StoredLocalImageMeta {
+  private encodeImageEntry(entry: LocalImage): StoredLocalImageMeta {
     const { handle, ...rest } = entry;
     return this.compress(rest);
   }
@@ -688,13 +688,13 @@ export class IndexedDbService {
   /**
    * Accepts compressed layout and legacy uncompressed LocalImageEntry.
    */
-  private decodeImageEntry(rawMeta: unknown, handle: unknown): LocalImageEntry | undefined {
+  private decodeImageEntry(rawMeta: unknown, handle: unknown): LocalImage | undefined {
     if (typeof rawMeta === 'string') {
-      const decoded = this.decompress<Omit<LocalImageEntry, 'handle'>>(rawMeta);
+      const decoded = this.decompress<Omit<LocalImage, 'handle'>>(rawMeta);
       if (decoded) {
         return {
           ...decoded,
-          handle: (handle as FileSystemFileHandle | undefined) ?? (decoded as LocalImageEntry).handle
+          handle: (handle as FileSystemFileHandle | undefined) ?? (decoded as LocalImage).handle
         };
       }
       return undefined;
@@ -702,9 +702,9 @@ export class IndexedDbService {
 
     // Legacy object formats
     if (rawMeta && typeof rawMeta === 'object') {
-      const typed = rawMeta as Partial<LocalImageEntry> & { meta?: string; handle?: FileSystemFileHandle };
+      const typed = rawMeta as Partial<LocalImage> & { meta?: string; handle?: FileSystemFileHandle };
       if (typed.meta && typed.handle) {
-        const decoded = this.decompress<LocalImageEntry>(typed.meta);
+        const decoded = this.decompress<LocalImage>(typed.meta);
         if (!decoded) {
           return undefined;
         }
@@ -714,7 +714,7 @@ export class IndexedDbService {
         };
       }
       if ('handle' in typed) {
-        return typed as LocalImageEntry;
+        return typed as LocalImage;
       }
     }
     return undefined;
@@ -758,6 +758,27 @@ export class IndexedDbService {
       .filter(note => {
         const lat = note.location.latitude;
         const lon = this.normalizeLon(note.location.longitude);
+
+        if (!this.inLatRange(lat, latMin, latMax)) return false;
+        return this.inLonRangeWithWrap(lon, lonMin, lonMax);
+      })
+      .sort((a, b) => b.timestamp - a.timestamp); // newest first
+    return result;
+  }
+
+  async getImagesInBoundingBox(boundingBox: BoundingBox): Promise<LocalImage[]> {
+    const allImages = await this.getAllImages();
+
+    // BBox normalisieren (nur Lons wrappen; Lats nur sortieren)
+    const latMin = Math.min(boundingBox.latMin, boundingBox.latMax);
+    const latMax = Math.max(boundingBox.latMin, boundingBox.latMax);
+    const lonMin = this.normalizeLon(boundingBox.lonMin);
+    const lonMax = this.normalizeLon(boundingBox.lonMax);
+
+    const result = allImages
+      .filter(localImageEntry => {
+        const lat = localImageEntry.location.latitude;
+        const lon = this.normalizeLon(localImageEntry.location.longitude);
 
         if (!this.inLatRange(lat, latMin, latMax)) return false;
         return this.inLonRangeWithWrap(lon, lonMin, lonMax);
