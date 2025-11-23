@@ -96,7 +96,7 @@ export class ImagelistComponent implements OnDestroy {
             .getImageUrl(image)
             .then(url => this.imageUrls.update(map => ({ ...map, [image.id]: url })))
             .catch(() => {
-              // error already handled inside service
+              this.imageUrls.update(map => ({ ...map, [image.id]: 'NOT_FOUND' }));
             });
         }
       });
