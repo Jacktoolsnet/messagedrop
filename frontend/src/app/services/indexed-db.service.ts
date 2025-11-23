@@ -3,6 +3,7 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
+import { ImageOwnerType, LocalImageEntry } from '../interfaces/local-image-entry';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
@@ -16,12 +17,14 @@ import { Profile } from '../interfaces/profile';
 })
 export class IndexedDbService {
   private dbName = 'MessageDrop';
+  private dbVersion = 2;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
   private contactProfileStore = 'contactprofile';
   private placeStore = 'place';
   private noteStore = 'note';
+  private localImageStore = 'localImage';
 
   private compress<T>(value: T): string {
     return compressToUTF16(JSON.stringify(value));
@@ -51,7 +54,7 @@ export class IndexedDbService {
    */
   private openDB(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
-      const request = indexedDB.open(this.dbName, 1);
+      const request = indexedDB.open(this.dbName, this.dbVersion);
 
       request.onupgradeneeded = (event) => {
         const db = (event.target as IDBOpenDBRequest).result;
@@ -72,6 +75,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.noteStore)) {
           db.createObjectStore(this.noteStore);
+        }
+        if (!db.objectStoreNames.contains(this.localImageStore)) {
+          db.createObjectStore(this.localImageStore);
         }
       };
 
@@ -586,6 +592,101 @@ export class IndexedDbService {
       };
       request.onerror = () => reject(request.error);
     });
+  }
+
+  /**
+   * Stores or updates a local image entry (including the file handle).
+   * Returns the entry id to mirror the note API.
+   */
+  async saveImageEntry(entry: LocalImageEntry): Promise<string> {
+    const db = await this.openDB();
+    const entryToSave: LocalImageEntry = {
+      ...entry,
+      updatedAt: Date.now()
+    };
+
+    return new Promise<string>((resolve, reject) => {
+      const tx = db.transaction(this.localImageStore, 'readwrite');
+      const store = tx.objectStore(this.localImageStore);
+      const request = store.put(entryToSave, entryToSave.id);
+      request.onsuccess = () => resolve(entryToSave.id);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Updates an existing local image entry and refreshes updatedAt.
+   */
+  async updateImageEntry(entry: LocalImageEntry): Promise<void> {
+    const db = await this.openDB();
+    const entryToSave: LocalImageEntry = {
+      ...entry,
+      updatedAt: Date.now()
+    };
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.localImageStore, 'readwrite');
+      const store = tx.objectStore(this.localImageStore);
+      const request = store.put(entryToSave, entryToSave.id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves a local image entry by ID.
+   */
+  async getImageEntry(id: string): Promise<LocalImageEntry | undefined> {
+    const db = await this.openDB();
+    return new Promise<LocalImageEntry | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.localImageStore, 'readonly');
+      const store = tx.objectStore(this.localImageStore);
+      const request = store.get(id);
+      request.onsuccess = () => resolve(request.result as LocalImageEntry | undefined);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Deletes a local image entry by ID.
+   */
+  async deleteImageEntry(id: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.localImageStore, 'readwrite');
+      const store = tx.objectStore(this.localImageStore);
+      const request = store.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves all local image entries, newest first.
+   */
+  async getAllImageEntries(): Promise<LocalImageEntry[]> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.localImageStore, 'readonly');
+      const store = tx.objectStore(this.localImageStore);
+      const request = store.getAll();
+      request.onsuccess = () => {
+        const entries = (request.result as LocalImageEntry[]) ?? [];
+        resolve(entries.sort((a, b) => b.updatedAt - a.updatedAt));
+      };
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves all image entries for a specific owner.
+   */
+  async getImageEntriesForOwner(
+    ownerType: ImageOwnerType,
+    ownerId: string
+  ): Promise<LocalImageEntry[]> {
+    const all = await this.getAllImageEntries();
+    return all.filter(entry => entry.ownerType === ownerType && entry.ownerId === ownerId);
   }
 
   private normalizeLon(lon: number): number {
