@@ -23,7 +23,7 @@
         <mat-card class="item" appMasonryItem>
             <mat-card-content>
                 <div class="message-content">
-                    <!-- Hier das Bild anzeigen-->
+                    <img [src]="getImage(image)" [alt]="image.fileName" class="image-preview" />
                 </div>
             </mat-card-content>
             <mat-card-actions class="buttonbar">

@@ -90,4 +90,10 @@ export class ImagelistComponent {
     });
   }
 
+  async getImage(localImage: LocalImage): Promise<string> {
+    let url = await this.localImageService.getImageUrl(localImage);
+    console.log(url);
+    return url;
+  }
+
 }
