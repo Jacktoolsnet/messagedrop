@@ -41,8 +41,7 @@ export class LocalImageService {
     return supported;
   }
 
-  async createImageEntryForOwner(fallbackLocation: Location,
-  ): Promise<LocalImage | null> {
+  async createImageEntryForOwner(fallbackLocation: Location): Promise<LocalImage | null> {
     if (!this.isSupported()) {
       this.lastErrorSignal.set(
         'File System Access API is not supported in this browser or context.',
@@ -256,13 +255,13 @@ export class LocalImageService {
       const lon = typeof gpsData?.longitude === "number" ? gpsData.longitude : undefined;
       const location =
         lat !== undefined &&
-        lon !== undefined &&
-        this.isValidGps({ lat, lon })
+          lon !== undefined &&
+          this.isValidGps({ lat, lon })
           ? {
-              latitude: lat,
-              longitude: lon,
-              plusCode: this.geoLocationService.getPlusCode(lat, lon),
-            }
+            latitude: lat,
+            longitude: lon,
+            plusCode: this.geoLocationService.getPlusCode(lat, lon),
+          }
           : undefined;
 
       if (captureDate || location) {
