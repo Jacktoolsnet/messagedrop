@@ -55,6 +55,9 @@ export class ImagelistComponent implements OnDestroy {
   public readonly dialog = inject(MatDialog);
 
   readonly hasNotes = computed(() => this.imagesSignal().length > 0);
+  readonly sortedImages = computed(() =>
+    [...this.imagesSignal()].sort((a, b) => this.getSortTime(b) - this.getSortTime(a))
+  );
   public user: User | undefined = this.userService.getUser();
   public imagesSignal: WritableSignal<LocalImage[]> = this.dialogData.imagesSignal;
   private location: Location = this.dialogData.location;
@@ -62,8 +65,8 @@ export class ImagelistComponent implements OnDestroy {
   private previousImages = new Map<string, LocalImage>();
 
   constructor() {
+    // keep dialogData in sync without reshuffling; sorting is read-only via computed
     effect(() => {
-      this.imagesSignal();   // reactive read
       if (this.dialogData.imagesSignal) {
         this.dialogData.imagesSignal.set(this.imagesSignal());
       }
@@ -129,6 +132,14 @@ export class ImagelistComponent implements OnDestroy {
   getImageUrl(imageId: string): string | undefined {
     console.log('Getting image URL for', imageId, this.imageUrls()[imageId]);
     return this.imageUrls()[imageId];
+  }
+
+  /**
+   * Sort key: prefer EXIF/lastModified captureDate if available, otherwise import timestamp.
+   */
+  private getSortTime(image: LocalImage): number {
+    const parsed = image.exifCaptureDate ? Date.parse(image.exifCaptureDate) : NaN;
+    return Number.isFinite(parsed) ? parsed : image.timestamp;
   }
 
   ngOnDestroy(): void {

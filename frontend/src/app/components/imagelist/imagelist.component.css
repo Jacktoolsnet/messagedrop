@@ -180,8 +180,9 @@
 .message-content video,
 .message-content iframe {
   display: block;
-  width: 100%;
   height: auto;
+  max-width: min(50vw, 400px);
+  margin: 0 auto;
 }
 
 /* === Lists and buttons inside cards === */

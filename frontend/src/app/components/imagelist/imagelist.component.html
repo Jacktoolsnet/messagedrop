@@ -17,9 +17,13 @@
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
+            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
+                (click)="openAddImageDialog()">
+                <mat-icon [attr.aria-hidden]="false">image_search</mat-icon>
+            </button>
         </div>
 
-        @for (image of imagesSignal(); track image.id) {
+        @for (image of sortedImages(); track image.id) {
         <mat-card class="item" appMasonryItem>
             <mat-card-content>
                 <div class="message-content">
