@@ -1,0 +1,38 @@
+.dialog-content {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px 12px;
+  align-items: center;
+}
+
+.preview {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.body {
+  display: grid;
+  gap: 10px;
+}
+
+.headline {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--mat-mdc-dialog-label-ink-color, inherit);
+}
+
+.copy {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 6px;
+}

@@ -41,12 +41,12 @@ export class LocalImageService {
     return supported;
   }
 
-  async createImageEntryForOwner(fallbackLocation: Location): Promise<LocalImage | null> {
+  async createImageEntriesForOwner(fallbackLocation: Location): Promise<LocalImage[]> {
     if (!this.isSupported()) {
       this.lastErrorSignal.set(
         'File System Access API is not supported in this browser or context.',
       );
-      return null;
+      return [];
     }
 
     this.lastErrorSignal.set(null);
@@ -56,14 +56,14 @@ export class LocalImageService {
       this.lastErrorSignal.set(
         'File System Access API is not available in this environment.',
       );
-      return null;
+      return [];
     }
 
-    let handle: FileSystemFileHandle | undefined;
+    let handles: FileSystemFileHandle[] = [];
 
     try {
-      const handles = await picker({
-        multiple: false,
+      handles = await picker({
+        multiple: true,
         excludeAcceptAllOption: true,
         types: [
           {
@@ -74,21 +74,35 @@ export class LocalImageService {
           },
         ],
       });
-      handle = handles?.[0];
     } catch (error) {
       if (this.isAbortError(error)) {
-        return null;
+        return [];
       }
       console.error('Failed to open file picker', error);
       this.lastErrorSignal.set('Unable to open the file picker for images.');
-      return null;
+      return [];
     }
 
-    if (!handle) {
+    if (!handles.length) {
       this.lastErrorSignal.set('No file was selected.');
-      return null;
+      return [];
     }
 
+    const entries: LocalImage[] = [];
+    for (const handle of handles) {
+      const entry = await this.buildEntryFromHandle(handle, fallbackLocation);
+      if (entry) {
+        entries.push(entry);
+      }
+    }
+
+    return entries;
+  }
+
+  private async buildEntryFromHandle(
+    handle: FileSystemFileHandle,
+    fallbackLocation: Location,
+  ): Promise<LocalImage | null> {
     const hasPermission = await this.ensureReadPermission(handle);
     if (!hasPermission) {
       return null;
@@ -109,7 +123,6 @@ export class LocalImageService {
     }
 
     const exifData = await this.parseExifMetadata(file);
-    console.log('EXIF data', exifData);
     const exifCaptureDate: string | undefined = exifData?.captureDate;
     const exifLocation: Location | null = exifData?.location ?? null;
 

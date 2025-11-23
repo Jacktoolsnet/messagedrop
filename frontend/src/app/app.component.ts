@@ -10,6 +10,7 @@ import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
@@ -17,6 +18,7 @@ import { EditMessageComponent } from './components/editmessage/edit-message.comp
 import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
 import { ImagelistComponent } from './components/imagelist/imagelist.component';
+import { OverrideExifDataComponent } from './components/imagelist/override-exif-data/override-exif-data.component';
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { ExternalContentComponent } from './components/legal/external-content/external-content.component';
@@ -668,19 +670,61 @@ export class AppComponent implements OnInit {
     const location = this.mapService.getMapLocation();
 
     try {
-      const entry = await this.localImageService.createImageEntryForOwner(this.mapService.getMapLocation());
+      const entries = await this.localImageService.createImageEntriesForOwner(this.mapService.getMapLocation());
 
-      if (!entry) {
+      if (!entries.length) {
         return;
       }
 
-      await this.indexedDbService.saveImage(entry);
-      this.snackBar.open('Image imported locally.', undefined, { duration: 3000 });
+      const resolvedEntries = await this.resolveExifOverrides(entries);
+
+      await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
+      this.snackBar.open('Image(s) imported locally.', undefined, { duration: 3000 });
       this.updateDataForLocation();
     } catch (error) {
       console.error('Failed to add image', error);
       this.snackBar.open('Unable to import the image.', undefined, { duration: 4000 });
     }
+  }
+
+  private async resolveExifOverrides(entries: LocalImage[]): Promise<LocalImage[]> {
+    let rememberedChoice: boolean | null = null; // null = ask; true = use map; false = keep exif
+    const mapLocation = this.mapService.getMapLocation();
+    const mapLocationWithPlus = {
+      ...mapLocation,
+      plusCode: this.geolocationService.getPlusCode(mapLocation.latitude, mapLocation.longitude)
+    };
+
+    const result: LocalImage[] = [];
+
+    for (const entry of entries) {
+      if (entry.hasExifLocation && entry.location && rememberedChoice === null) {
+        const previewUrl = await this.localImageService.getImageUrl(entry).catch(() => undefined);
+        const dialogResult = await firstValueFrom(
+          this.dialog.open(OverrideExifDataComponent, {
+            data: { fileName: entry.fileName, previewUrl },
+            autoFocus: true,
+          }).afterClosed()
+        );
+
+        const useMap = dialogResult?.useMap === true;
+        if (dialogResult?.applyToAll) {
+          rememberedChoice = useMap;
+        }
+
+        if (useMap) {
+          entry.location = mapLocationWithPlus;
+          entry.hasExifLocation = false;
+        }
+      } else if (entry.hasExifLocation && entry.location && rememberedChoice === true) {
+        entry.location = mapLocationWithPlus;
+        entry.hasExifLocation = false;
+      }
+
+      result.push(entry);
+    }
+
+    return result;
   }
 
 
