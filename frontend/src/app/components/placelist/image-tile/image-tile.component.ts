@@ -23,8 +23,8 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   @Input() place!: Place;
 
   readonly allPlaceImages: WritableSignal<LocalImage[]> = signal<LocalImage[]>([]);
-  readonly latestImage = computed(() => this.sortImages(this.allPlaceImages())[0]);
-  readonly previewUrl = signal<string | null>(null);
+  readonly previewImages = computed(() => this.sortImages(this.allPlaceImages()).slice(0, 4));
+  readonly previewUrls = signal<string[]>([]);
 
   private readonly localImageService = inject(LocalImageService);
   private readonly geolocationService = inject(GeolocationService);
@@ -35,14 +35,14 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    const url = this.previewUrl();
-    if (url && url !== 'NOT_FOUND') {
-      URL.revokeObjectURL(url);
-    }
+    this.previewUrls().forEach(url => {
+      if (url && url !== 'NOT_FOUND') {
+        URL.revokeObjectURL(url);
+      }
+    });
   }
 
   private async loadImages(): Promise<void> {
-    console.log('Loading images for place', this.place.boundingBox);
     if (!this.place?.boundingBox) {
       return;
     }
@@ -50,13 +50,15 @@ export class ImageTileComponent implements OnInit, OnDestroy {
     const sorted = this.sortImages(images);
     this.allPlaceImages.set(sorted);
 
-    const first = sorted[0];
-    if (first) {
-      this.localImageService
-        .getImageUrl(first)
-        .then(url => this.previewUrl.set(url))
-        .catch(() => this.previewUrl.set('NOT_FOUND'));
-    }
+    const top = sorted.slice(0, 4);
+    const urls = await Promise.all(
+      top.map(img =>
+        this.localImageService
+          .getImageUrl(img)
+          .catch(() => 'NOT_FOUND')
+      )
+    );
+    this.previewUrls.set(urls);
   }
 
   private sortImages(images: LocalImage[]): LocalImage[] {
