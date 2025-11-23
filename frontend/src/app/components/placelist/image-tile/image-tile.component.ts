@@ -30,12 +30,15 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   private readonly geolocationService = inject(GeolocationService);
   private readonly matDialog = inject(MatDialog);
 
-  ngOnInit(): void {
-    this.loadImages();
+  constructor() {
     effect(() => {
       const top = this.previewImages();
       void this.refreshPreviewUrls(top);
     });
+  }
+
+  ngOnInit(): void {
+    this.loadImages();
   }
 
   ngOnDestroy(): void {
@@ -81,6 +84,7 @@ export class ImageTileComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       data: {
         location: this.place.location,
+        boundingBox: this.place.boundingBox,
         imagesSignal: this.allPlaceImages,
         skipExifOverride: true
       },

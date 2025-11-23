@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { DeleteImageComponent } from './delete-note.component';
+import { DeleteImageComponent } from './delete-image.component';
 
 describe('DeletemessageComponent', () => {
   let component: DeleteImageComponent;

@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OverrideExifDataComponent } from './delete-note.component';
+import { OverrideExifDataComponent } from './override-exif-data.component';
 
 describe('DeletemessageComponent', () => {
   let component: OverrideExifDataComponent;

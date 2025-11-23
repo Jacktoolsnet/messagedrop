@@ -670,7 +670,7 @@ export class AppComponent implements OnInit {
     const location = this.mapService.getMapLocation();
 
     try {
-      const entries = await this.localImageService.createImageEntriesForOwner(this.mapService.getMapLocation());
+      const entries = await this.localImageService.createImageEntries(this.mapService.getMapLocation());
 
       if (!entries.length) {
         return;

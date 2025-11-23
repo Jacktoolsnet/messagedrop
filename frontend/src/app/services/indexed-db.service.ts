@@ -809,6 +809,7 @@ export class IndexedDbService {
 
     const result = allImages
       .filter(localImageEntry => {
+        console.log(localImageEntry);
         const lat = localImageEntry.location.latitude;
         const lon = this.normalizeLon(localImageEntry.location.longitude);
 

@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { computed, Injectable, inject, signal } from '@angular/core';
+import { computed, inject, Injectable, signal } from '@angular/core';
 import { DateTime } from 'luxon';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -47,6 +47,7 @@ export class PlaceService {
     this.getByUserId(this.userService.getUser().id).subscribe({
       next: async (response) => {
         const places = await Promise.all(response.rows.map(row => this.loadPlaceFromIndexedDb(row.id)));
+        console.log('Loaded places', places);
         this._places.set(places as Place[]);
         this.ready = true;
       },

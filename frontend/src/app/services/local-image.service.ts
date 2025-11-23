@@ -41,7 +41,7 @@ export class LocalImageService {
     return supported;
   }
 
-  async createImageEntriesForOwner(fallbackLocation: Location): Promise<LocalImage[]> {
+  async createImageEntries(fallbackLocation: Location): Promise<LocalImage[]> {
     if (!this.isSupported()) {
       this.lastErrorSignal.set(
         'File System Access API is not supported in this browser or context.',

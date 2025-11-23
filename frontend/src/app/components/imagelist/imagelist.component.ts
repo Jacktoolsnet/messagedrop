@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnDestroy, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -12,6 +12,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 import { MasonryItemDirective } from '../../directives/masonry-item.directive';
+import { BoundingBox } from '../../interfaces/bounding-box';
 import { LocalImage } from '../../interfaces/local-image';
 import { Location } from '../../interfaces/location';
 import { User } from '../../interfaces/user';
@@ -21,10 +22,15 @@ import { LocalImageService } from '../../services/local-image.service';
 import { MapService } from '../../services/map.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { UserService } from '../../services/user.service';
-import { DeleteImageComponent } from './delete-image/delete-note.component';
+import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
 
-type ImageDialogData = { location: Location; imagesSignal: WritableSignal<LocalImage[]>; skipExifOverride?: boolean };
+type ImageDialogData = {
+  location: Location;
+  imagesSignal: WritableSignal<LocalImage[]>;
+  boundingBox?: BoundingBox;
+  skipExifOverride?: boolean;
+};
 
 @Component({
   selector: 'app-notelist',
@@ -46,7 +52,7 @@ type ImageDialogData = { location: Location; imagesSignal: WritableSignal<LocalI
   styleUrl: './imagelist.component.css',
   standalone: true
 })
-export class ImagelistComponent implements OnDestroy {
+export class ImagelistComponent implements OnInit, OnDestroy {
   private readonly snackBar = inject(MatSnackBar);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly dialogData = inject<ImageDialogData>(MAT_DIALOG_DATA);
@@ -67,6 +73,13 @@ export class ImagelistComponent implements OnDestroy {
   private location: Location = this.dialogData.location;
   private readonly imageUrls = signal<Record<string, string>>({});
   private previousImages = new Map<string, LocalImage>();
+
+  async ngOnInit(): Promise<void> {
+    if (this.dialogData?.boundingBox) {
+      const images = await this.localImageService.getImagesInBoundingBox(this.dialogData.boundingBox);
+      this.imagesSignal.set(images);
+    }
+  }
 
   constructor() {
     // keep dialogData in sync without reshuffling; sorting is read-only via computed
@@ -159,7 +172,7 @@ export class ImagelistComponent implements OnDestroy {
     const location = this.dialogData?.location ?? this.mapService.getMapLocation();
 
     try {
-      const entries = await this.localImageService.createImageEntriesForOwner(location);
+      const entries = await this.localImageService.createImageEntries(location);
 
       if (!entries.length) {
         return;
