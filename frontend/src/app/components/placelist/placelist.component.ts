@@ -25,6 +25,7 @@ import { UserService } from '../../services/user.service';
 import { AirQualityTileComponent } from './air-quality-tile/air-quality-tile.component';
 import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
 import { DeletePlaceComponent } from './delete-place/delete-place.component';
+import { ImageTileComponent } from './image-tile/image-tile.component';
 import { MessageTileComponent } from "./message-tile/messagetile.component";
 import { NoteTileComponent } from './note-tile/note-tile.component';
 import { PlaceProfileComponent } from './place-profile/place-profile.component';
@@ -50,6 +51,7 @@ interface TimezoneResponse { status: number; timezone: string }
     WeatherTileComponent,
     AirQualityTileComponent,
     NoteTileComponent,
+    ImageTileComponent,
     MatExpansionModule,
     MessageTileComponent
   ],
