@@ -251,7 +251,7 @@ export class LocalImageService {
       : false;
   }
 
-  async getimagesInBoundingBox(boundingBox: BoundingBox): Promise<LocalImage[]> {
+  async getImagesInBoundingBox(boundingBox: BoundingBox): Promise<LocalImage[]> {
     const localImageEntry = await this.indexedDbService.getImagesInBoundingBox(boundingBox);
     this.imagesSignal.set(localImageEntry);
     return localImageEntry;

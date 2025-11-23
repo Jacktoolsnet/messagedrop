@@ -6,10 +6,10 @@
                 <mat-icon>arrow_back</mat-icon>
             </button>
         </div>
-        <!--button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-            (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
-            <span>Add first private note</span>
-        </button-->
+        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
+            (click)="!userService.isReady() ? userService.login(openAddImageDialog.bind(this)) : openAddImageDialog()">
+            <span>Add first private image</span>
+        </button>
     </div>
     } @else {
     <div class="content">

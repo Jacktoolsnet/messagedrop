@@ -514,7 +514,7 @@ export class AppComponent implements OnInit {
     // notes from local device
     if (this.userService.isReady()) {
       await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      await this.localImageService.getimagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      await this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
     }
     // Messages
     this.messageService.getByVisibleMapBoundingBox();
@@ -542,7 +542,7 @@ export class AppComponent implements OnInit {
         break;
       case MarkerType.PRIVATE_IMAGE:
         if (this.userService.isReady()) {
-          this.localImageService.getimagesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
+          this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
             this.openMarkerImageListDialog(event.images);
           });
         }
@@ -666,7 +666,6 @@ export class AppComponent implements OnInit {
     }
 
     const location = this.mapService.getMapLocation();
-    const plusCode = this.geolocationService.getPlusCode(location.latitude, location.longitude) || location.plusCode;
 
     try {
       const entry = await this.localImageService.createImageEntryForOwner(this.mapService.getMapLocation());
@@ -676,12 +675,12 @@ export class AppComponent implements OnInit {
       }
 
       await this.indexedDbService.saveImage(entry);
-      this.snackBar.open('Image saved locally.', undefined, { duration: 3000 });
+      this.snackBar.open('Image imported locally.', undefined, { duration: 3000 });
+      this.updateDataForLocation();
     } catch (error) {
       console.error('Failed to add image', error);
-      this.snackBar.open('Unable to save the image.', undefined, { duration: 4000 });
+      this.snackBar.open('Unable to import the image.', undefined, { duration: 4000 });
     }
-
   }
 
 

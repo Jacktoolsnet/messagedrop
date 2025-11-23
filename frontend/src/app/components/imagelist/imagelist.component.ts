@@ -9,11 +9,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { LocalImage } from '../../interfaces/local-image';
 import { Location } from '../../interfaces/location';
 import { User } from '../../interfaces/user';
 import { GeolocationService } from '../../services/geolocation.service';
+import { IndexedDbService } from '../../services/indexed-db.service';
 import { LocalImageService } from '../../services/local-image.service';
 import { MapService } from '../../services/map.service';
 import { SharedContentService } from '../../services/shared-content.service';
@@ -41,6 +43,8 @@ import { DeleteImageComponent } from './delete-image/delete-note.component';
   standalone: true
 })
 export class ImagelistComponent implements OnDestroy {
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly indexedDbService = inject(IndexedDbService);
   private readonly dialogData = inject<{ location: Location; imagesSignal: WritableSignal<LocalImage[]> }>(MAT_DIALOG_DATA);
   public readonly userService = inject(UserService);
   private readonly localImageService = inject(LocalImageService);
@@ -129,6 +133,32 @@ export class ImagelistComponent implements OnDestroy {
 
   ngOnDestroy(): void {
     this.previousImages.forEach(img => this.localImageService.revokeImageUrl(img));
+  }
+
+  async openAddImageDialog(): Promise<void> {
+    if (!this.localImageService.isSupported()) {
+      this.snackBar.open('File picker is not supported in this browser.', undefined, { duration: 4000 });
+      return;
+    }
+
+    const location = this.mapService.getMapLocation();
+
+    try {
+      const entry = await this.localImageService.createImageEntryForOwner(this.mapService.getMapLocation());
+
+      if (!entry) {
+        return;
+      }
+
+      await this.indexedDbService.saveImage(entry);
+      const updatedImages = [entry, ...this.imagesSignal()];
+      this.imagesSignal.set(updatedImages);
+      this.snackBar.open('Image imported locally.', undefined, { duration: 3000 });
+    } catch (error) {
+      console.error('Failed to add image', error);
+      this.snackBar.open('Unable to import the image.', undefined, { duration: 4000 });
+    }
+
   }
 
 }
