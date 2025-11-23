@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, inject, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -32,6 +32,10 @@ export class ImageTileComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadImages();
+    effect(() => {
+      const top = this.previewImages();
+      void this.refreshPreviewUrls(top);
+    });
   }
 
   ngOnDestroy(): void {
@@ -49,10 +53,11 @@ export class ImageTileComponent implements OnInit, OnDestroy {
     const images = await this.localImageService.getImagesInBoundingBox(this.place.boundingBox);
     const sorted = this.sortImages(images);
     this.allPlaceImages.set(sorted);
+  }
 
-    const top = sorted.slice(0, 4);
+  private async refreshPreviewUrls(images: LocalImage[]): Promise<void> {
     const urls = await Promise.all(
-      top.map(img =>
+      images.map(img =>
         this.localImageService
           .getImageUrl(img)
           .catch(() => 'NOT_FOUND')
@@ -76,7 +81,8 @@ export class ImageTileComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       data: {
         location: this.place.location,
-        imagesSignal: this.allPlaceImages
+        imagesSignal: this.allPlaceImages,
+        skipExifOverride: true
       },
       minWidth: '20vw',
       maxWidth: '95vw',

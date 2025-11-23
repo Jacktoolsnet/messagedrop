@@ -24,6 +24,8 @@ import { UserService } from '../../services/user.service';
 import { DeleteImageComponent } from './delete-image/delete-note.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
 
+type ImageDialogData = { location: Location; imagesSignal: WritableSignal<LocalImage[]>; skipExifOverride?: boolean };
+
 @Component({
   selector: 'app-notelist',
   imports: [
@@ -47,7 +49,7 @@ import { OverrideExifDataComponent } from './override-exif-data/override-exif-da
 export class ImagelistComponent implements OnDestroy {
   private readonly snackBar = inject(MatSnackBar);
   private readonly indexedDbService = inject(IndexedDbService);
-  private readonly dialogData = inject<{ location: Location; imagesSignal: WritableSignal<LocalImage[]> }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<ImageDialogData>(MAT_DIALOG_DATA);
   public readonly userService = inject(UserService);
   private readonly localImageService = inject(LocalImageService);
   private readonly mapService = inject(MapService);
@@ -154,17 +156,16 @@ export class ImagelistComponent implements OnDestroy {
       return;
     }
 
-    const location = this.mapService.getMapLocation();
+    const location = this.dialogData?.location ?? this.mapService.getMapLocation();
 
     try {
-      const entries = await this.localImageService.createImageEntriesForOwner(this.mapService.getMapLocation());
+      const entries = await this.localImageService.createImageEntriesForOwner(location);
 
       if (!entries.length) {
         return;
       }
 
       const resolvedEntries = await this.resolveExifOverrides(entries);
-
       await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
       const updatedImages = [...resolvedEntries, ...this.imagesSignal()];
       this.imagesSignal.set(updatedImages);
@@ -177,6 +178,14 @@ export class ImagelistComponent implements OnDestroy {
   }
 
   private async resolveExifOverrides(entries: LocalImage[]): Promise<LocalImage[]> {
+    if (this.dialogData?.skipExifOverride) {
+      return entries.map(entry => ({
+        ...entry,
+        location: this.dialogData.location ? this.dialogData.location : this.mapService.getMapLocation(),
+        hasExifLocation: false
+      }));
+    }
+
     let rememberedChoice: boolean | null = null; // null = ask; true = use map; false = keep exif
     const mapLocation = this.mapService.getMapLocation();
     const mapLocationWithPlus = {
