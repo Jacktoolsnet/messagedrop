@@ -1,6 +1,6 @@
+import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { CommonModule, PlatformLocation } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
-import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -646,6 +646,11 @@ export class AppComponent implements OnInit {
       }
     });
   }
+
+  async openAddImageDialog(): Promise<void> {
+
+  }
+
 
   public openSystemMessages(): void {
     if (!this.userService.isReady()) {

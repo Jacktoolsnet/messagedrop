@@ -157,6 +157,15 @@
         <span>Private note</span>
     </button>
     <button mat-menu-item
+        (click)="!userService.isReady() ? userService.login(openAddImageDialog.bind(this)) : openAddImageDialog()">
+        @if (!userService.isReady()){
+        <mat-icon>locked</mat-icon>
+        } @else {
+        <mat-icon>image</mat-icon>
+        }
+        <span>Private image</span>
+    </button>
+    <button mat-menu-item
         (click)="!userService.isReady() ? userService.login(openContactListDialog.bind(this)) : openContactListDialog()">
         @if (!userService.isReady()){
         <mat-icon>locked</mat-icon>
