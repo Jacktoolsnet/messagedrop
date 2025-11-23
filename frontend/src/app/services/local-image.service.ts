@@ -2,6 +2,7 @@ import { inject, Injectable, signal } from '@angular/core';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { LocalImage } from '../interfaces/local-image';
 import { Location } from '../interfaces/location';
+import { User } from '../interfaces/user';
 import { IndexedDbService } from './indexed-db.service';
 
 type FilePickerWindow = typeof window & {
@@ -244,5 +245,15 @@ export class LocalImageService {
     const localImageEntry = await this.indexedDbService.getImagesInBoundingBox(boundingBox);
     this.imagesSignal.set(localImageEntry);
     return localImageEntry;
+  }
+
+  async deleteImage(image: LocalImage): Promise<void> {
+    await this.indexedDbService.deleteImage(image.id);
+    this.imagesSignal.update(images => images.filter(n => n.id !== image.id));
+  }
+
+  navigateToNoteLocation(user: User, image: LocalImage): void {
+    const url = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(image.location.plusCode)}`;
+    window.open(url, '_blank');
   }
 }

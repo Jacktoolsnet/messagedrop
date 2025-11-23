@@ -16,6 +16,7 @@ import { ContactlistComponent } from './components/contactlist/contactlist.compo
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
+import { ImagelistComponent } from './components/imagelist/imagelist.component';
 import { ConsentGateComponent } from './components/legal/consent-gate/consent-gate.component';
 import { DisclaimerComponent } from './components/legal/disclaimer/disclaimer.component';
 import { ExternalContentComponent } from './components/legal/external-content/external-content.component';
@@ -542,7 +543,7 @@ export class AppComponent implements OnInit {
       case MarkerType.PRIVATE_IMAGE:
         if (this.userService.isReady()) {
           this.localImageService.getimagesInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
-            //this.openMarkerImageListDialog(event.images);
+            this.openMarkerImageListDialog(event.images);
           });
         }
         break;
@@ -866,7 +867,7 @@ export class AppComponent implements OnInit {
             this.openMarkerNoteListDialog(result.notes);
             break
           case 'private_image':
-            //this.openMarkerImageListDialog(result.images);
+            this.openMarkerImageListDialog(result.images);
             break
         }
       }
@@ -914,7 +915,32 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterOpened().subscribe(() => {
-      this.myHistory.push("userNoteList");
+      this.myHistory.push("noteList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.updateDataForLocation();
+    });
+  }
+
+  public openMarkerImageListDialog(images: LocalImage[]) {
+    const imagesSignal = signal<LocalImage[]>(images);
+    const dialogRef = this.dialog.open(ImagelistComponent, {
+      panelClass: 'ImageListDialog',
+      closeOnNavigation: true,
+      data: { location: imagesSignal()[0].location, imagesSignal: imagesSignal },
+      minWidth: '20vw',
+      maxWidth: '95vw',
+      width: 'auto',
+      maxHeight: 'none',
+      height: 'auto',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.myHistory.push("imageList");
       window.history.replaceState(this.myHistory, '', '');
     });
 
