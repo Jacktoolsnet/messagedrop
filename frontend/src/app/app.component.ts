@@ -58,6 +58,7 @@ import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
+import { LocalImageFileService } from './services/local-image-file.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NetworkService } from './services/network.service';
@@ -134,6 +135,7 @@ export class AppComponent implements OnInit {
   private readonly contactMessageService = inject(ContactMessageService);
   readonly systemNotificationService = inject(SystemNotificationService);
   private readonly geolocationService = inject(GeolocationService);
+  private readonly localImageFileService = inject(LocalImageFileService);
   private readonly messageService = inject(MessageService);
   private readonly socketioService = inject(SocketioService);
   private readonly airQualityService = inject(AirQualityService);
@@ -648,6 +650,38 @@ export class AppComponent implements OnInit {
   }
 
   async openAddImageDialog(): Promise<void> {
+    if (!this.localImageFileService.isSupported()) {
+      this.snackBar.open('File picker is not supported in this browser.', undefined, { duration: 4000 });
+      return;
+    }
+
+    const location = this.mapService.getMapLocation();
+    const plusCode = this.geolocationService.getPlusCode(location.latitude, location.longitude) || location.plusCode;
+
+    try {
+      const entry = await this.localImageFileService.createImageEntryForOwner(
+        this.userService.getUser().id,
+        {
+          fallbackLocation: {
+            lat: location.latitude,
+            lon: location.longitude,
+            source: 'entity',
+            plusCode
+          },
+          fallbackPlusCode: plusCode ?? undefined
+        }
+      );
+
+      if (!entry) {
+        return;
+      }
+
+      await this.indexedDbService.saveImage(entry);
+      this.snackBar.open('Image saved locally.', undefined, { duration: 3000 });
+    } catch (error) {
+      console.error('Failed to add image', error);
+      this.snackBar.open('Unable to save the image.', undefined, { duration: 4000 });
+    }
 
   }
 

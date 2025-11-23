@@ -1,5 +1,3 @@
-export type ImageOwnerType = 'note' | 'message' | 'place' | 'user' | 'other';
-
 export type ImageLocationSource = 'exif' | 'entity' | 'manual';
 
 export interface ImageLocation {
@@ -11,7 +9,6 @@ export interface ImageLocation {
 
 export interface LocalImageEntry {
   id: string;
-  ownerType: ImageOwnerType;
   ownerId: string;
   handle: FileSystemFileHandle;
   fileName: string;
@@ -21,6 +18,5 @@ export interface LocalImageEntry {
   exifCaptureDate?: string;
   hasExifLocation: boolean;
   location: ImageLocation | null;
-  createdAt: number;
-  updatedAt: number;
+  timestamp: number;
 }

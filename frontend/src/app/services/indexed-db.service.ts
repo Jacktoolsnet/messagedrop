@@ -3,10 +3,12 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
-import { ImageOwnerType, LocalImageEntry } from '../interfaces/local-image-entry';
+import { LocalImageEntry } from '../interfaces/local-image-entry';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
+
+type StoredLocalImageMeta = string;
 
 /**
  * Service for managing data in IndexedDB for the MessageDrop application.
@@ -17,14 +19,14 @@ import { Profile } from '../interfaces/profile';
 })
 export class IndexedDbService {
   private dbName = 'MessageDrop';
-  private dbVersion = 2;
+  private dbVersion = 1;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
   private contactProfileStore = 'contactprofile';
   private placeStore = 'place';
   private noteStore = 'note';
-  private localImageStore = 'localImage';
+  private imageStore = 'image';
 
   private compress<T>(value: T): string {
     return compressToUTF16(JSON.stringify(value));
@@ -76,8 +78,8 @@ export class IndexedDbService {
         if (!db.objectStoreNames.contains(this.noteStore)) {
           db.createObjectStore(this.noteStore);
         }
-        if (!db.objectStoreNames.contains(this.localImageStore)) {
-          db.createObjectStore(this.localImageStore);
+        if (!db.objectStoreNames.contains(this.imageStore)) {
+          db.createObjectStore(this.imageStore);
         }
       };
 
@@ -598,18 +600,14 @@ export class IndexedDbService {
    * Stores or updates a local image entry (including the file handle).
    * Returns the entry id to mirror the note API.
    */
-  async saveImageEntry(entry: LocalImageEntry): Promise<string> {
+  async saveImage(image: LocalImageEntry): Promise<string> {
     const db = await this.openDB();
-    const entryToSave: LocalImageEntry = {
-      ...entry,
-      updatedAt: Date.now()
-    };
-
     return new Promise<string>((resolve, reject) => {
-      const tx = db.transaction(this.localImageStore, 'readwrite');
-      const store = tx.objectStore(this.localImageStore);
-      const request = store.put(entryToSave, entryToSave.id);
-      request.onsuccess = () => resolve(entryToSave.id);
+      const tx = db.transaction(this.imageStore, 'readwrite');
+      const store = tx.objectStore(this.imageStore);
+      const compressed = this.compress(image);
+      const request = store.put(compressed, image.id);
+      request.onsuccess = () => resolve(image.id);
       request.onerror = () => reject(request.error);
     });
   }
@@ -617,17 +615,14 @@ export class IndexedDbService {
   /**
    * Updates an existing local image entry and refreshes updatedAt.
    */
-  async updateImageEntry(entry: LocalImageEntry): Promise<void> {
+  async updateImage(image: LocalImageEntry): Promise<void> {
     const db = await this.openDB();
-    const entryToSave: LocalImageEntry = {
-      ...entry,
-      updatedAt: Date.now()
-    };
 
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.localImageStore, 'readwrite');
-      const store = tx.objectStore(this.localImageStore);
-      const request = store.put(entryToSave, entryToSave.id);
+      const tx = db.transaction(this.imageStore, 'readwrite');
+      const store = tx.objectStore(this.imageStore);
+      const compressed = this.compress(image);
+      const request = store.put(compressed, image.id);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
     });
@@ -636,13 +631,13 @@ export class IndexedDbService {
   /**
    * Retrieves a local image entry by ID.
    */
-  async getImageEntry(id: string): Promise<LocalImageEntry | undefined> {
+  async getImage(id: string): Promise<LocalImageEntry | undefined> {
     const db = await this.openDB();
     return new Promise<LocalImageEntry | undefined>((resolve, reject) => {
-      const tx = db.transaction(this.localImageStore, 'readonly');
-      const store = tx.objectStore(this.localImageStore);
+      const tx = db.transaction(this.imageStore, 'readonly');
+      const store = tx.objectStore(this.imageStore);
       const request = store.get(id);
-      request.onsuccess = () => resolve(request.result as LocalImageEntry | undefined);
+      request.onsuccess = () => resolve(this.decompress<LocalImageEntry>(request.result));
       request.onerror = () => reject(request.error);
     });
   }
@@ -650,11 +645,11 @@ export class IndexedDbService {
   /**
    * Deletes a local image entry by ID.
    */
-  async deleteImageEntry(id: string): Promise<void> {
+  async deleteImage(id: string): Promise<void> {
     const db = await this.openDB();
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.localImageStore, 'readwrite');
-      const store = tx.objectStore(this.localImageStore);
+      const tx = db.transaction(this.imageStore, 'readwrite');
+      const store = tx.objectStore(this.imageStore);
       const request = store.delete(id);
       request.onsuccess = () => resolve();
       request.onerror = () => reject(request.error);
@@ -664,29 +659,65 @@ export class IndexedDbService {
   /**
    * Retrieves all local image entries, newest first.
    */
-  async getAllImageEntries(): Promise<LocalImageEntry[]> {
+  async getAllImages(): Promise<LocalImageEntry[]> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.localImageStore, 'readonly');
-      const store = tx.objectStore(this.localImageStore);
+      const tx = db.transaction(this.imageStore, 'readonly');
+      const store = tx.objectStore(this.imageStore);
       const request = store.getAll();
       request.onsuccess = () => {
-        const entries = (request.result as LocalImageEntry[]) ?? [];
-        resolve(entries.sort((a, b) => b.updatedAt - a.updatedAt));
+        const compressedNotes = request.result as string[];
+        const localImages: LocalImageEntry[] = [];
+        compressedNotes.forEach(compressedNote => {
+          const localImageEntry = this.decompress<LocalImageEntry>(compressedNote);
+          if (localImageEntry) {
+            localImages.push(localImageEntry);
+          }
+        })
+        resolve(localImages.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
       };
       request.onerror = () => reject(request.error);
     });
   }
 
+  private encodeImageEntry(entry: LocalImageEntry): StoredLocalImageMeta {
+    const { handle, ...rest } = entry;
+    return this.compress(rest);
+  }
+
   /**
-   * Retrieves all image entries for a specific owner.
+   * Accepts compressed layout and legacy uncompressed LocalImageEntry.
    */
-  async getImageEntriesForOwner(
-    ownerType: ImageOwnerType,
-    ownerId: string
-  ): Promise<LocalImageEntry[]> {
-    const all = await this.getAllImageEntries();
-    return all.filter(entry => entry.ownerType === ownerType && entry.ownerId === ownerId);
+  private decodeImageEntry(rawMeta: unknown, handle: unknown): LocalImageEntry | undefined {
+    if (typeof rawMeta === 'string') {
+      const decoded = this.decompress<Omit<LocalImageEntry, 'handle'>>(rawMeta);
+      if (decoded) {
+        return {
+          ...decoded,
+          handle: (handle as FileSystemFileHandle | undefined) ?? (decoded as LocalImageEntry).handle
+        };
+      }
+      return undefined;
+    }
+
+    // Legacy object formats
+    if (rawMeta && typeof rawMeta === 'object') {
+      const typed = rawMeta as Partial<LocalImageEntry> & { meta?: string; handle?: FileSystemFileHandle };
+      if (typed.meta && typed.handle) {
+        const decoded = this.decompress<LocalImageEntry>(typed.meta);
+        if (!decoded) {
+          return undefined;
+        }
+        return {
+          ...decoded,
+          handle: typed.handle
+        };
+      }
+      if ('handle' in typed) {
+        return typed as LocalImageEntry;
+      }
+    }
+    return undefined;
   }
 
   private normalizeLon(lon: number): number {

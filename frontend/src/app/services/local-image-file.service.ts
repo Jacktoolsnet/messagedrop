@@ -2,7 +2,6 @@ import { Injectable, signal } from '@angular/core';
 import {
   ImageLocation,
   ImageLocationSource,
-  ImageOwnerType,
   LocalImageEntry,
 } from '../interfaces/local-image-entry';
 
@@ -33,7 +32,6 @@ export class LocalImageFileService {
   }
 
   async createImageEntryForOwner(
-    ownerType: ImageOwnerType,
     ownerId: string,
     options?: {
       fallbackLocation?: ImageLocation | null;
@@ -115,7 +113,6 @@ export class LocalImageFileService {
 
     const entry: LocalImageEntry = {
       id: this.generateId(),
-      ownerType,
       ownerId,
       handle,
       fileName: file.name,
@@ -125,8 +122,7 @@ export class LocalImageFileService {
       exifCaptureDate,
       hasExifLocation: exifLocation !== null,
       location,
-      createdAt: now,
-      updatedAt: now,
+      timestamp: now
     };
 
     return entry;
