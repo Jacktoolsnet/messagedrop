@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -40,7 +40,7 @@ import { DeleteImageComponent } from './delete-image/delete-note.component';
   styleUrl: './imagelist.component.css',
   standalone: true
 })
-export class ImagelistComponent {
+export class ImagelistComponent implements OnDestroy {
   private readonly dialogData = inject<{ location: Location; imagesSignal: WritableSignal<LocalImage[]> }>(MAT_DIALOG_DATA);
   public readonly userService = inject(UserService);
   private readonly localImageService = inject(LocalImageService);
@@ -54,6 +54,8 @@ export class ImagelistComponent {
   public user: User | undefined = this.userService.getUser();
   public imagesSignal: WritableSignal<LocalImage[]> = this.dialogData.imagesSignal;
   private location: Location = this.dialogData.location;
+  private readonly imageUrls = signal<Record<string, string>>({});
+  private previousImages = new Map<string, LocalImage>();
 
   constructor() {
     effect(() => {
@@ -61,6 +63,36 @@ export class ImagelistComponent {
       if (this.dialogData.imagesSignal) {
         this.dialogData.imagesSignal.set(this.imagesSignal());
       }
+    });
+
+    effect(() => {
+      const images = this.imagesSignal();
+
+      // revoke URLs for removed images
+      for (const [id, prev] of this.previousImages.entries()) {
+        if (!images.some(img => img.id === id)) {
+          this.localImageService.revokeImageUrl(prev);
+          this.imageUrls.update(map => {
+            const copy = { ...map };
+            delete copy[id];
+            return copy;
+          });
+        }
+      }
+
+      // load URLs for new images
+      images.forEach(image => {
+        if (!this.imageUrls()[image.id]) {
+          this.localImageService
+            .getImageUrl(image)
+            .then(url => this.imageUrls.update(map => ({ ...map, [image.id]: url })))
+            .catch(() => {
+              // error already handled inside service
+            });
+        }
+      });
+
+      this.previousImages = new Map(images.map(img => [img.id, img]));
     });
   }
 
@@ -90,10 +122,13 @@ export class ImagelistComponent {
     });
   }
 
-  async getImage(localImage: LocalImage): Promise<string> {
-    let url = await this.localImageService.getImageUrl(localImage);
-    console.log(url);
-    return url;
+  getImageUrl(imageId: string): string | undefined {
+    console.log('Getting image URL for', imageId, this.imageUrls()[imageId]);
+    return this.imageUrls()[imageId];
+  }
+
+  ngOnDestroy(): void {
+    this.previousImages.forEach(img => this.localImageService.revokeImageUrl(img));
   }
 
 }

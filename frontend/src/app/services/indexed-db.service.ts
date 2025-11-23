@@ -19,7 +19,7 @@ type StoredLocalImageMeta = string;
 })
 export class IndexedDbService {
   private dbName = 'MessageDrop';
-  private dbVersion = 1;
+  private dbVersion = 2;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -27,6 +27,7 @@ export class IndexedDbService {
   private placeStore = 'place';
   private noteStore = 'note';
   private imageStore = 'image';
+  private imageHandleStore = 'imageHandle';
 
   private compress<T>(value: T): string {
     return compressToUTF16(JSON.stringify(value));
@@ -80,6 +81,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.imageStore)) {
           db.createObjectStore(this.imageStore);
+        }
+        if (!db.objectStoreNames.contains(this.imageHandleStore)) {
+          db.createObjectStore(this.imageHandleStore);
         }
       };
 
@@ -603,12 +607,15 @@ export class IndexedDbService {
   async saveImage(image: LocalImage): Promise<string> {
     const db = await this.openDB();
     return new Promise<string>((resolve, reject) => {
-      const tx = db.transaction(this.imageStore, 'readwrite');
-      const store = tx.objectStore(this.imageStore);
-      const compressed = this.compress(image);
-      const request = store.put(compressed, image.id);
-      request.onsuccess = () => resolve(image.id);
-      request.onerror = () => reject(request.error);
+      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readwrite');
+      const metaStore = tx.objectStore(this.imageStore);
+      const handleStore = tx.objectStore(this.imageHandleStore);
+
+      metaStore.put(this.encodeImageEntry(image), image.id);
+      handleStore.put(image.handle, image.id);
+
+      tx.oncomplete = () => resolve(image.id);
+      tx.onerror = () => reject(tx.error);
     });
   }
 
@@ -619,12 +626,15 @@ export class IndexedDbService {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.imageStore, 'readwrite');
-      const store = tx.objectStore(this.imageStore);
-      const compressed = this.compress(image);
-      const request = store.put(compressed, image.id);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readwrite');
+      const metaStore = tx.objectStore(this.imageStore);
+      const handleStore = tx.objectStore(this.imageHandleStore);
+
+      metaStore.put(this.encodeImageEntry(image), image.id);
+      handleStore.put(image.handle, image.id);
+
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
     });
   }
 
@@ -634,11 +644,17 @@ export class IndexedDbService {
   async getImage(id: string): Promise<LocalImage | undefined> {
     const db = await this.openDB();
     return new Promise<LocalImage | undefined>((resolve, reject) => {
-      const tx = db.transaction(this.imageStore, 'readonly');
-      const store = tx.objectStore(this.imageStore);
-      const request = store.get(id);
-      request.onsuccess = () => resolve(this.decompress<LocalImage>(request.result));
-      request.onerror = () => reject(request.error);
+      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readonly');
+      const metaStore = tx.objectStore(this.imageStore);
+      const handleStore = tx.objectStore(this.imageHandleStore);
+
+      const metaReq = metaStore.get(id);
+      const handleReq = handleStore.get(id);
+
+      tx.oncomplete = () => {
+        resolve(this.decodeImageEntry(metaReq.result, handleReq.result));
+      };
+      tx.onerror = () => reject(tx.error);
     });
   }
 
@@ -648,11 +664,11 @@ export class IndexedDbService {
   async deleteImage(id: string): Promise<void> {
     const db = await this.openDB();
     return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.imageStore, 'readwrite');
-      const store = tx.objectStore(this.imageStore);
-      const request = store.delete(id);
-      request.onsuccess = () => resolve();
-      request.onerror = () => reject(request.error);
+      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readwrite');
+      tx.objectStore(this.imageStore).delete(id);
+      tx.objectStore(this.imageHandleStore).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
     });
   }
 
@@ -662,21 +678,37 @@ export class IndexedDbService {
   async getAllImages(): Promise<LocalImage[]> {
     const db = await this.openDB();
     return new Promise((resolve, reject) => {
-      const tx = db.transaction(this.imageStore, 'readonly');
-      const store = tx.objectStore(this.imageStore);
-      const request = store.getAll();
-      request.onsuccess = () => {
-        const compressedNotes = request.result as string[];
-        const localImages: LocalImage[] = [];
-        compressedNotes.forEach(compressedNote => {
-          const localImageEntry = this.decompress<LocalImage>(compressedNote);
-          if (localImageEntry) {
-            localImages.push(localImageEntry);
+      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readonly');
+      const metaStore = tx.objectStore(this.imageStore);
+      const handleStore = tx.objectStore(this.imageHandleStore);
+
+      const metaReq = metaStore.getAll();
+      const metaKeysReq = metaStore.getAllKeys();
+      const handleReq = handleStore.getAll();
+      const handleKeysReq = handleStore.getAllKeys();
+
+      tx.oncomplete = () => {
+        const metas = (metaReq.result as unknown[]) ?? [];
+        const metaKeys = (metaKeysReq.result as IDBValidKey[]) ?? [];
+        const handles = (handleReq.result as FileSystemFileHandle[]) ?? [];
+        const handleKeys = (handleKeysReq.result as IDBValidKey[]) ?? [];
+        const handleMap = new Map<string, FileSystemFileHandle>();
+        handleKeys.forEach((key, idx) => {
+          handleMap.set(String(key), handles[idx]);
+        });
+
+        const decoded: LocalImage[] = [];
+        metas.forEach((meta, idx) => {
+          const key = String(metaKeys[idx]);
+          const entry = this.decodeImageEntry(meta, handleMap.get(key));
+          if (entry) {
+            decoded.push(entry);
           }
-        })
-        resolve(localImages.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
+        });
+
+        resolve(decoded.sort((a, b) => b.timestamp - a.timestamp)); // Newest first
       };
-      request.onerror = () => reject(request.error);
+      tx.onerror = () => reject(tx.error);
     });
   }
 
@@ -691,7 +723,7 @@ export class IndexedDbService {
   private decodeImageEntry(rawMeta: unknown, handle: unknown): LocalImage | undefined {
     if (typeof rawMeta === 'string') {
       const decoded = this.decompress<Omit<LocalImage, 'handle'>>(rawMeta);
-      if (decoded) {
+      if (decoded && handle && typeof (handle as FileSystemFileHandle).getFile === 'function') {
         return {
           ...decoded,
           handle: (handle as FileSystemFileHandle | undefined) ?? (decoded as LocalImage).handle
@@ -705,7 +737,7 @@ export class IndexedDbService {
       const typed = rawMeta as Partial<LocalImage> & { meta?: string; handle?: FileSystemFileHandle };
       if (typed.meta && typed.handle) {
         const decoded = this.decompress<LocalImage>(typed.meta);
-        if (!decoded) {
+        if (!decoded || typeof typed.handle.getFile !== 'function') {
           return undefined;
         }
         return {
@@ -713,7 +745,7 @@ export class IndexedDbService {
           handle: typed.handle
         };
       }
-      if ('handle' in typed) {
+      if ('handle' in typed && typed.handle && typeof typed.handle.getFile === 'function') {
         return typed as LocalImage;
       }
     }

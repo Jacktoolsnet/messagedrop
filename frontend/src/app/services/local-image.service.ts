@@ -136,6 +136,11 @@ export class LocalImageService {
       return cached;
     }
 
+    if (!entry.handle || typeof entry.handle.getFile !== 'function') {
+      this.lastErrorSignal.set('Missing file handle for the image.');
+      return Promise.reject(new Error('Missing file handle for the image.'));
+    }
+
     const hasPermission = await this.ensureReadPermission(entry.handle);
     if (!hasPermission) {
       return Promise.reject(new Error('Read permission not granted for image.'));
@@ -181,6 +186,11 @@ export class LocalImageService {
   }
 
   private async ensureReadPermission(handle: FileSystemFileHandle): Promise<boolean> {
+    if (!handle || typeof handle.queryPermission !== 'function' || typeof handle.requestPermission !== 'function') {
+      this.lastErrorSignal.set('Invalid file handle; cannot request permission.');
+      return false;
+    }
+
     try {
       const status = await handle.queryPermission({ mode: 'read' });
       if (status === 'granted') {
