@@ -3,6 +3,7 @@ import { BoundingBox } from '../interfaces/bounding-box';
 import { LocalImage } from '../interfaces/local-image';
 import { Location } from '../interfaces/location';
 import { User } from '../interfaces/user';
+import { GeolocationService } from './geolocation.service';
 import { IndexedDbService } from './indexed-db.service';
 
 type FilePickerWindow = typeof window & {
@@ -26,6 +27,7 @@ export class LocalImageService {
   }
 
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly geoLocationService = inject(GeolocationService);
   readonly isSupportedSignal = signal<boolean>(this.detectSupport());
   readonly lastErrorSignal = signal<string | null>(null);
 
@@ -107,9 +109,10 @@ export class LocalImageService {
       return null;
     }
 
-    // TODO: Parse EXIF metadata for capture date and GPS location.
-    const exifCaptureDate: string | undefined = undefined;
-    const exifLocation: Location | null = null;
+    const exifData = await this.parseExifMetadata(file);
+    console.log('EXIF data', exifData);
+    const exifCaptureDate: string | undefined = exifData?.captureDate;
+    const exifLocation: Location | null = exifData?.location ?? null;
 
     const location = this.resolveLocation(exifLocation, fallbackLocation);
     const now = Date.now();
@@ -231,6 +234,60 @@ export class LocalImageService {
     } finally {
       URL.revokeObjectURL(objectUrl);
     }
+  }
+
+  private async parseExifMetadata(
+    file: File,
+  ): Promise<{ captureDate?: string; location?: Location } | null> {
+    try {
+      const { parse, gps } = await import("exifr");
+
+      const data = await parse(file, { pick: ["DateTimeOriginal", "CreateDate"] });
+      const dateValue = data?.DateTimeOriginal ?? data?.CreateDate;
+      const captureDate =
+        typeof dateValue === "string"
+          ? dateValue
+          : dateValue instanceof Date
+            ? dateValue.toISOString()
+            : undefined;
+
+      const gpsData = await gps(file);
+      const lat = typeof gpsData?.latitude === "number" ? gpsData.latitude : undefined;
+      const lon = typeof gpsData?.longitude === "number" ? gpsData.longitude : undefined;
+      const location =
+        lat !== undefined &&
+        lon !== undefined &&
+        this.isValidGps({ lat, lon })
+          ? {
+              latitude: lat,
+              longitude: lon,
+              plusCode: this.geoLocationService.getPlusCode(lat, lon),
+            }
+          : undefined;
+
+      if (captureDate || location) {
+        return { captureDate, location };
+      }
+    } catch (error) {
+      console.warn("EXIF parse via exifr failed", error);
+    }
+
+    if (file.lastModified) {
+      return { captureDate: new Date(file.lastModified).toISOString() };
+    }
+
+    return null;
+  }
+
+  private isValidGps(gps: { lat: number; lon: number }): boolean {
+    return (
+      Number.isFinite(gps.lat) &&
+      Number.isFinite(gps.lon) &&
+      gps.lat >= -90 &&
+      gps.lat <= 90 &&
+      gps.lon >= -180 &&
+      gps.lon <= 180
+    );
   }
 
   private detectSupport(): boolean {
