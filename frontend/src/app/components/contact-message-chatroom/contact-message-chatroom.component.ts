@@ -365,7 +365,6 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     this.contactMessageService.list(contact.id, { limit: 200 })
       .subscribe({
         next: async (res) => {
-          console.log('Loaded contact messages', res);
           // Merge with already present (live/optimistic) messages so we do not drop them while loading
           const merged = new Map<string, ChatroomMessage>(
             this.messages().map((msg) => [msg.messageId, msg])

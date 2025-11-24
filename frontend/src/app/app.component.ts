@@ -479,8 +479,9 @@ export class AppComponent implements OnInit {
           if (this.userService.isReady()) {
             this.userService.saveUser();
           }
-          this.mapService.setUserMarker(this.userService.getUser().location);
+          this.mapService.setMaplocation(this.userService.getUser().location);
           this.mapService.moveToWithZoom(this.userService.getUser().location, 17);
+          this.mapService.setUserMarker(this.userService.getUser().location);
           this.updateDataForLocation();
         },
         error: (error) => {
@@ -689,11 +690,6 @@ export class AppComponent implements OnInit {
 
   private async resolveExifOverrides(entries: LocalImage[]): Promise<LocalImage[]> {
     let rememberedChoice: boolean | null = null; // null = ask; true = use map; false = keep exif
-    const mapLocation = this.mapService.getMapLocation();
-    const mapLocationWithPlus = {
-      ...mapLocation,
-      plusCode: this.geolocationService.getPlusCode(mapLocation.latitude, mapLocation.longitude)
-    };
 
     const result: LocalImage[] = [];
 
@@ -713,11 +709,11 @@ export class AppComponent implements OnInit {
         }
 
         if (useMap) {
-          entry.location = mapLocationWithPlus;
+          entry.location = this.mapService.getMapLocation();
           entry.hasExifLocation = false;
         }
       } else if (entry.hasExifLocation && entry.location && rememberedChoice === true) {
-        entry.location = mapLocationWithPlus;
+        entry.location = this.mapService.getMapLocation();
         entry.hasExifLocation = false;
       }
 

@@ -150,7 +150,6 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   }
 
   getImageUrl(imageId: string): string | undefined {
-    console.log('Getting image URL for', imageId, this.imageUrls()[imageId]);
     return this.imageUrls()[imageId];
   }
 
@@ -208,12 +207,6 @@ export class ImagelistComponent implements OnInit, OnDestroy {
     }
 
     let rememberedChoice: boolean | null = null; // null = ask; true = use map; false = keep exif
-    const mapLocation = this.mapService.getMapLocation();
-    const mapLocationWithPlus = {
-      ...mapLocation,
-      plusCode: this.geolocationService.getPlusCode(mapLocation.latitude, mapLocation.longitude)
-    };
-
     const result: LocalImage[] = [];
 
     for (const entry of entries) {
@@ -232,11 +225,11 @@ export class ImagelistComponent implements OnInit, OnDestroy {
         }
 
         if (useMap) {
-          entry.location = mapLocationWithPlus;
+          entry.location = this.mapService.getMapLocation();
           entry.hasExifLocation = false;
         }
       } else if (entry.hasExifLocation && entry.location && rememberedChoice === true) {
-        entry.location = mapLocationWithPlus;
+        entry.location = this.mapService.getMapLocation();
         entry.hasExifLocation = false;
       }
 

@@ -153,6 +153,10 @@ export class MapService {
     return this.location;
   }
 
+  public setMaplocation(location: Location): void {
+    this.location = location;
+  }
+
   private normalizeLon(lon: number): number {
     const normalized = ((lon + 180) % 360 + 360) % 360 - 180;
     const epsilon = 1e-9;
