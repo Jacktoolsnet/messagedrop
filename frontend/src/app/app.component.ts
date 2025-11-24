@@ -972,7 +972,11 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(ImagelistComponent, {
       panelClass: 'ImageListDialog',
       closeOnNavigation: true,
-      data: { location: imagesSignal()[0].location, imagesSignal: imagesSignal },
+      data: {
+        location: imagesSignal()[0].location,
+        imagesSignal: imagesSignal,
+        skipExifOverride: false
+      },
       minWidth: '20vw',
       maxWidth: '95vw',
       width: 'auto',

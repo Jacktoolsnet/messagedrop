@@ -29,8 +29,8 @@
                 <div class="message-content">
                     @if (getImageUrl(image.id) === 'NOT_FOUND') {
                     <div class="missing">
-                      <mat-icon aria-hidden="true">broken_image</mat-icon>
-                      <div>Image not found on device</div>
+                        <mat-icon aria-hidden="true">broken_image</mat-icon>
+                        <div>Image not found on device</div>
                     </div>
                     } @else {
                     <img [src]="getImageUrl(image.id)" [alt]="image.fileName" class="image-preview" />

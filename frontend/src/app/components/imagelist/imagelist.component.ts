@@ -70,7 +70,6 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   );
   public user: User | undefined = this.userService.getUser();
   public imagesSignal: WritableSignal<LocalImage[]> = this.dialogData.imagesSignal;
-  private location: Location = this.dialogData.location;
   private readonly imageUrls = signal<Record<string, string>>({});
   private previousImages = new Map<string, LocalImage>();
 
@@ -127,7 +126,11 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   flyTo(localImage: LocalImage) {
     const location = { ...localImage.location, plusCode: this.geolocationService.getPlusCode(localImage.location.latitude, localImage.location.longitude) };
     this.mapService.setCircleMarker();
-    this.mapService.flyTo(location);
+    if (this.dialogData.boundingBox) {
+      this.mapService.fitMapToBounds(this.dialogData.boundingBox);
+    } else {
+      this.mapService.flyToWithZoom(location, 17);
+    }
     this.dialogRef.close();
   }
 
@@ -169,7 +172,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const location = this.dialogData?.location ?? this.mapService.getMapLocation();
+    const location = this.dialogData.location ? this.dialogData.location : this.mapService.getMapLocation();
 
     try {
       const entries = await this.localImageService.createImageEntries(location);
@@ -178,16 +181,21 @@ export class ImagelistComponent implements OnInit, OnDestroy {
         return;
       }
 
-      const resolvedEntries = await this.resolveExifOverrides(entries);
-      await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
-      const updatedImages = [...resolvedEntries, ...this.imagesSignal()];
-      this.imagesSignal.set(updatedImages);
-      this.snackBar.open('Images imported locally.', undefined, { duration: 3000 });
+      if (this.dialogData.skipExifOverride) {
+        await Promise.all(entries.map(entry => this.indexedDbService.saveImage(entry)));
+        const updatedImages = [...entries, ...this.imagesSignal()];
+        this.imagesSignal.set(updatedImages);
+      } else {
+        const resolvedEntries = await this.resolveExifOverrides(entries);
+        await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
+        const updatedImages = [...resolvedEntries, ...this.imagesSignal()];
+        this.imagesSignal.set(updatedImages);
+      }
+      this.snackBar.open('Image(s) imported locally.', undefined, { duration: 3000 });
     } catch (error) {
       console.error('Failed to add image', error);
       this.snackBar.open('Unable to import the image.', undefined, { duration: 4000 });
     }
-
   }
 
   private async resolveExifOverrides(entries: LocalImage[]): Promise<LocalImage[]> {
