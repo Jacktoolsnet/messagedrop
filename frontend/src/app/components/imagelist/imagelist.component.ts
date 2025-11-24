@@ -180,16 +180,11 @@ export class ImagelistComponent implements OnInit, OnDestroy {
         return;
       }
 
-      if (this.dialogData.skipExifOverride) {
-        await Promise.all(entries.map(entry => this.indexedDbService.saveImage(entry)));
-        const updatedImages = [...entries, ...this.imagesSignal()];
-        this.imagesSignal.set(updatedImages);
-      } else {
-        const resolvedEntries = await this.resolveExifOverrides(entries);
-        await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
-        const updatedImages = [...resolvedEntries, ...this.imagesSignal()];
-        this.imagesSignal.set(updatedImages);
-      }
+      const resolvedEntries = await this.resolveExifOverrides(entries);
+      await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
+      const updatedImages = [...resolvedEntries, ...this.imagesSignal()];
+      this.imagesSignal.set(updatedImages);
+
       this.snackBar.open('Image(s) imported locally.', undefined, { duration: 3000 });
     } catch (error) {
       console.error('Failed to add image', error);
@@ -198,10 +193,10 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   }
 
   private async resolveExifOverrides(entries: LocalImage[]): Promise<LocalImage[]> {
-    if (this.dialogData?.skipExifOverride) {
+    if (this.dialogData?.location && this.dialogData?.skipExifOverride) {
       return entries.map(entry => ({
         ...entry,
-        location: this.dialogData.location ? this.dialogData.location : this.mapService.getMapLocation(),
+        location: this.dialogData.location,
         hasExifLocation: false
       }));
     }
