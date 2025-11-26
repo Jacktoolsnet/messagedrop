@@ -6,8 +6,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatDialog } from '@angular/material/dialog';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 
 @Component({
   selector: 'app-tile-settings',
@@ -31,6 +33,7 @@ import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-set
 })
 export class TileSettingsComponent {
   private readonly dialogRef = inject(MatDialogRef<TileSettingsComponent>);
+  private readonly dialog = inject(MatDialog);
   readonly data = inject<{ place: Place }>(MAT_DIALOG_DATA);
 
   readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(this.data.place.tileSettings));
@@ -76,6 +79,18 @@ export class TileSettingsComponent {
   }
 
   editTile(tile: TileSetting) {
+    if (tile.type === 'custom-text') {
+      const ref = this.dialog.open(TextTileEditComponent, {
+        width: '520px',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
     const newLabel = prompt('Tile-Bezeichnung bearbeiten', tile.label);
     if (newLabel && newLabel.trim()) {
       this.tileSettings.set(this.tileSettings().map(t => t.id === tile.id ? { ...t, label: newLabel.trim() } : t));

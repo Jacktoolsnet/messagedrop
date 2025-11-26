@@ -19,7 +19,9 @@
   align-items: center;
   justify-content: center;
   width: 100%;
+  box-sizing: border-box;
   min-height: 64px;
+  padding: 8px;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   background: #f9fafb;
@@ -37,7 +39,10 @@
 }
 
 .icon-button mat-icon {
-  font-size: 28px;
+  font-size: 32px;
+  width: 32px;
+  height: 32px;
+  line-height: 32px;
 }
 
 mat-tab-group {

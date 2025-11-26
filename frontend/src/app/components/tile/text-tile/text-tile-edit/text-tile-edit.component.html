@@ -1,12 +1,13 @@
 <h2 mat-dialog-title>Edit text tile</h2>
 
 <mat-dialog-content class="edit-content">
-  <div class="icon-row">
-    <button mat-mini-fab color="primary" type="button" (click)="pickIcon()" aria-label="Icon auswählen">
-      <mat-icon>{{ icon() || 'short_text' }}</mat-icon>
-    </button>
-    <div class="icon-label">Pick an icon</div>
-  </div>
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
 
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Title</mat-label>
@@ -15,7 +16,7 @@
 
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>Text</mat-label>
-    <textarea matInput rows="6" [formControl]="textControl"></textarea>
+    <input matInput [formControl]="textControl" />
   </mat-form-field>
 </mat-dialog-content>
 
