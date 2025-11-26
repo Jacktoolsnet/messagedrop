@@ -67,6 +67,7 @@ export class PlaceService {
 
   private async loadPlaceFromIndexedDb(placeId: string): Promise<Place | null> {
     const place = await this.indexedDbService.getPlace(placeId);
+    const tileSettings = await this.indexedDbService.getTileSettings(placeId);
     if (!place) {
       this.deletePlace(placeId).subscribe();
     }
@@ -74,7 +75,8 @@ export class PlaceService {
       return null;
     }
 
-    return this.normalizePlaceTileSettings(place);
+    const mergedPlace: Place = tileSettings ? { ...place, tileSettings } : place;
+    return this.normalizePlaceTileSettings(mergedPlace);
   }
 
   private normalizePlaceTileSettings(place: Place): Place {
@@ -115,7 +117,10 @@ export class PlaceService {
 
     this._places.set(updatedPlaces);
 
-    await Promise.all(updatedPlaces.map(p => this.indexedDbService.setPlaceProfile(p.id, p)));
+    await Promise.all(updatedPlaces.map(async p => {
+      await this.indexedDbService.setPlaceProfile(p.id, p);
+      await this.indexedDbService.setTileSettings(p.id, p.tileSettings ?? []);
+    }));
   }
 
   isReady(): boolean {

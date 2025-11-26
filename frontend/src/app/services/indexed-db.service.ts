@@ -7,6 +7,7 @@ import { LocalImage } from '../interfaces/local-image';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
+import { TileSetting } from '../interfaces/tile-settings';
 
 type StoredLocalImageMeta = string;
 
@@ -19,12 +20,13 @@ type StoredLocalImageMeta = string;
 })
 export class IndexedDbService {
   private dbName = 'MessageDrop';
-  private dbVersion = 2;
+  private dbVersion = 3;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
   private contactProfileStore = 'contactprofile';
   private placeStore = 'place';
+  private tileSettingsStore = 'tileSettings';
   private noteStore = 'note';
   private imageStore = 'image';
   private imageHandleStore = 'imageHandle';
@@ -75,6 +77,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.placeStore)) {
           db.createObjectStore(this.placeStore);
+        }
+        if (!db.objectStoreNames.contains(this.tileSettingsStore)) {
+          db.createObjectStore(this.tileSettingsStore);
         }
         if (!db.objectStoreNames.contains(this.noteStore)) {
           db.createObjectStore(this.noteStore);
@@ -472,6 +477,42 @@ export class IndexedDbService {
       request.onerror = () => {
         reject(request.error);
       };
+    });
+  }
+
+  /**
+   * Stores tile settings for a given owner (place or contact) ID.
+   */
+  async setTileSettings(ownerId: string, tileSettings: TileSetting[]): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.tileSettingsStore, 'readwrite');
+      const store = tx.objectStore(this.tileSettingsStore);
+      const compressed = this.compress(tileSettings);
+      const request = store.put(compressed, ownerId);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves tile settings for a given owner (place or contact) ID.
+   */
+  async getTileSettings(ownerId: string): Promise<TileSetting[] | undefined> {
+    const db = await this.openDB();
+
+    return new Promise<TileSetting[] | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.tileSettingsStore, 'readonly');
+      const store = tx.objectStore(this.tileSettingsStore);
+      const request = store.get(ownerId);
+
+      request.onsuccess = () => {
+        resolve(this.decompress<TileSetting[]>(request.result));
+      };
+
+      request.onerror = () => reject(request.error);
     });
   }
 
