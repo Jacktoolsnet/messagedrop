@@ -118,11 +118,18 @@ export class MessagelistComponent implements OnInit {
 
   constructor() {
     this.userProfile = this.userService.getProfile();
+    // Wenn wir aus einer Tile kommen, initial den Service mit den Tile-Messages seeden,
+    // damit alle Service-Operationen (create/delete/like) auf derselben Liste arbeiten.
+    if (this.data.messageSignal) {
+      this.messageService.setMessages(this.data.messageSignal());
+    }
+
+    // Laufende Synchronisierung: Service -> lokale View, optional zurück in das übergebene Signal.
     effect(() => {
+      const serviceMessages = this.messageService.messagesSignal();
+      this.messagesSignal.set(serviceMessages);
       if (this.data.messageSignal) {
-        this.messagesSignal.set(this.data.messageSignal());
-      } else {
-        this.messagesSignal.set(this.messageService.messagesSignal());
+        this.data.messageSignal.set(serviceMessages);
       }
     });
 
