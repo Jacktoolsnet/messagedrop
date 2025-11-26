@@ -22,14 +22,9 @@ import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
 import { UserService } from '../../services/user.service';
-import { AirQualityTileComponent } from './air-quality-tile/air-quality-tile.component';
-import { DateTimeTileComponent } from './datetime-tile/datetime-tile.component';
-import { DeletePlaceComponent } from './delete-place/delete-place.component';
-import { ImageTileComponent } from './image-tile/image-tile.component';
-import { MessageTileComponent } from "./message-tile/messagetile.component";
-import { NoteTileComponent } from './note-tile/note-tile.component';
+import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
+import { TileListComponent } from "../tile/tile-list/tile-list.component";
 import { PlaceProfileComponent } from './place-profile/place-profile.component';
-import { WeatherTileComponent } from './weather-tile/weather-tile.component';
 
 interface TimezoneResponse { status: number; timezone: string }
 
@@ -47,13 +42,8 @@ interface TimezoneResponse { status: number; timezone: string }
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    DateTimeTileComponent,
-    WeatherTileComponent,
-    AirQualityTileComponent,
-    NoteTileComponent,
-    ImageTileComponent,
     MatExpansionModule,
-    MessageTileComponent
+    TileListComponent
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'

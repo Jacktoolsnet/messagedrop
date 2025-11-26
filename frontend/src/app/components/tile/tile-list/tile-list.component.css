@@ -1,0 +1,11 @@
+:host {
+    color: var(--mat-app-text-color);
+}
+
+.tile-grid {
+    column-count: 1;
+    grid-auto-flow: row;
+    grid-template-columns: 1fr;
+    column-gap: 1rem;
+    padding: 0.5rem;
+}
