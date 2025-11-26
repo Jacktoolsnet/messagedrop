@@ -102,11 +102,9 @@ button,
 }
 
 .tile-grid {
-  column-count: 1;
-  grid-auto-flow: row;
-  grid-template-columns: 1fr;
-  column-gap: 1rem;
-  padding: 0.5rem;
+  width: 100%;
+  display: block;
+  padding: 0.5rem 0;
 }
 
 /* 700px–1199px: exakt 2 Spalten */
@@ -121,10 +119,6 @@ button,
   .content {
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     /* Wenn du lieber schmalere Karten willst, setz --col-min z.B. auf 280px */
-  }
-
-  .tile-grid {
-    column-count: 2;
   }
 }
 
