@@ -1,13 +1,16 @@
-export type TileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image';
+export type DefaultTileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image';
+export type TileType = DefaultTileType | `custom-${string}`;
 
 export interface TileSetting {
+  id: string;
   type: TileType;
   label: string;
   enabled: boolean;
   order: number;
+  custom?: boolean;
 }
 
-export const tileTypeToLabel: Record<TileType, string> = {
+export const tileTypeToLabel: Record<DefaultTileType, string> = {
   datetime: 'Date & Time',
   weather: 'Weather',
   airQuality: 'Air quality',
@@ -16,11 +19,12 @@ export const tileTypeToLabel: Record<TileType, string> = {
   image: 'Images'
 };
 
-const tileTypeOrder: TileType[] = ['datetime', 'weather', 'airQuality', 'note', 'message', 'image'];
+const tileTypeOrder: DefaultTileType[] = ['datetime', 'weather', 'airQuality', 'note', 'message', 'image'];
 
 export function createDefaultTileSettings(): TileSetting[] {
   return tileTypeOrder.map((type, index) => {
     return {
+      id: `default-${type}`,
       type,
       label: tileTypeToLabel[type],
       enabled: true,
@@ -31,20 +35,28 @@ export function createDefaultTileSettings(): TileSetting[] {
 
 export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): TileSetting[] {
   const defaults = createDefaultTileSettings();
-  if (!tileSettings?.length) {
-    return defaults;
-  }
+  const incoming = tileSettings ?? [];
 
-  const merged = defaults.map(defaultSetting => {
-    const current = tileSettings.find(setting => setting.type === defaultSetting.type);
+  const defaultsNormalized = defaults.map(defaultSetting => {
+    const current = incoming.find(setting => setting.type === defaultSetting.type && !setting.custom);
     return {
       ...defaultSetting,
+      id: current?.id ?? defaultSetting.id,
       enabled: current?.enabled ?? defaultSetting.enabled,
       order: current?.order ?? defaultSetting.order
     };
   });
 
-  return merged
+  const customTiles = incoming
+    .filter(setting => setting.custom || setting.type.startsWith('custom-'))
+    .map((setting, index) => ({
+      ...setting,
+      id: setting.id ?? `custom-${setting.type}-${index}`,
+      custom: true,
+      order: setting.order ?? defaultsNormalized.length + index
+    }));
+
+  return [...defaultsNormalized, ...customTiles]
     .sort((a, b) => a.order - b.order)
     .map((setting, index) => ({ ...setting, order: index }));
 }

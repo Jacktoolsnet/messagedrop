@@ -19,9 +19,12 @@ import { MasonryItemDirective } from "../../../directives/masonry-item.directive
 export class TileListComponent {
   @Input() place!: Place;
 
+  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image']);
+
   get visibleTiles(): TileSetting[] {
-    return normalizeTileSettings(this.place.tileSettings).filter((tile: TileSetting) => tile.enabled);
+    return normalizeTileSettings(this.place.tileSettings)
+      .filter((tile: TileSetting) => tile.enabled && this.renderableTypes.has(tile.type));
   }
 
-  trackByTile = (_: number, tile: TileSetting) => tile.type;
+  trackByTile = (_: number, tile: TileSetting) => tile.id;
 }

@@ -1,7 +1,22 @@
-<h2 mat-dialog-title>Tile settings</h2>
+<div class="title-row">
+  <h2 mat-dialog-title>Tile settings</h2>
+  <button mat-mini-fab color="primary" [matMenuTriggerFor]="addMenu" aria-label="Tile hinzufügen">
+    <mat-icon>add</mat-icon>
+  </button>
+</div>
+<mat-menu #addMenu="matMenu">
+  @for (tile of addableTiles; track tile.type) {
+    <button mat-menu-item (click)="addTile(tile)">
+      <mat-icon>{{ tile.icon }}</mat-icon>
+      <span>{{ tile.label }}</span>
+    </button>
+  }
+</mat-menu>
 
-<mat-dialog-content>
-  <p class="hint">Reorder tiles and toggle their visibility.</p>
+<mat-dialog-content class="tile-settings-content">
+  <div class="toolbar">
+    <p class="hint">Reorder tiles and toggle their visibility.</p>
+  </div>
 
   <div cdkDropList class="tile-list" (cdkDropListDropped)="drop($event)">
     @for (tile of tileSettings(); track trackTile($index, tile)) {
@@ -14,6 +29,17 @@
           <div class="tile-name">{{ tile.label }}</div>
           <div class="tile-helper">Position {{ tile.order + 1 }}</div>
         </div>
+
+        @if (tile.custom) {
+        <div class="tile-actions">
+          <button mat-icon-button color="primary" type="button" (click)="editTile(tile)" aria-label="Tile bearbeiten">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)" aria-label="Tile löschen">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+        }
 
         <mat-slide-toggle [checked]="tile.enabled" (change)="toggleTile(tile, $event.checked)"
           [attr.aria-label]="'Toggle ' + tile.label">

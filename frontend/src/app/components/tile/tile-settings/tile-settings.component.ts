@@ -5,6 +5,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { MatMenuModule } from '@angular/material/menu';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 
@@ -18,6 +19,7 @@ import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-set
     MatDialogTitle,
     MatDialogModule,
     MatIcon,
+    MatMenuModule,
     MatSlideToggleModule,
     CdkDrag,
     CdkDropList,
@@ -32,6 +34,13 @@ export class TileSettingsComponent {
   readonly data = inject<{ place: Place }>(MAT_DIALOG_DATA);
 
   readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(this.data.place.tileSettings));
+  readonly addableTiles: { type: TileSetting['type']; label: string; icon: string }[] = [
+    { type: 'custom-text', label: 'Text', icon: 'text_fields' },
+    { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
+    { type: 'custom-date', label: 'Date', icon: 'event' },
+    { type: 'custom-link', label: 'Link', icon: 'link' },
+    { type: 'custom-multimedia', label: 'Multimedia', icon: 'perm_media' }
+  ];
 
   drop(event: CdkDragDrop<TileSetting[]>) {
     const updated = [...this.tileSettings()];
@@ -41,9 +50,38 @@ export class TileSettingsComponent {
 
   toggleTile(tile: TileSetting, enabled: boolean) {
     const updated = this.tileSettings().map((setting: TileSetting) =>
-      setting.type === tile.type ? { ...setting, enabled } : setting
+      setting.id === tile.id ? { ...setting, enabled } : setting
     );
     this.tileSettings.set(updated);
+  }
+
+  addTile(tileToAdd: { type: TileSetting['type']; label: string }) {
+    const updated = [...this.tileSettings()];
+    const id = typeof crypto !== 'undefined' && crypto.randomUUID
+      ? crypto.randomUUID()
+      : `tile-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    updated.push({
+      id,
+      type: tileToAdd.type,
+      label: tileToAdd.label,
+      enabled: true,
+      order: updated.length,
+      custom: true
+    });
+    this.tileSettings.set(updated.map((tile, index) => ({ ...tile, order: index })));
+  }
+
+  editTile(tile: TileSetting) {
+    const newLabel = prompt('Tile-Bezeichnung bearbeiten', tile.label);
+    if (newLabel && newLabel.trim()) {
+      this.tileSettings.set(this.tileSettings().map(t => t.id === tile.id ? { ...t, label: newLabel.trim() } : t));
+    }
+  }
+
+  deleteTile(tile: TileSetting) {
+    this.tileSettings.set(this.tileSettings()
+      .filter(t => t.id !== tile.id)
+      .map((t, index) => ({ ...t, order: index })));
   }
 
   close() {
@@ -56,5 +94,5 @@ export class TileSettingsComponent {
     this.dialogRef.close(normalized);
   }
 
-  trackTile = (_: number, tile: TileSetting) => tile.type;
+  trackTile = (_: number, tile: TileSetting) => tile.id;
 }
