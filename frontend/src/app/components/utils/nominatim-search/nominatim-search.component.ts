@@ -17,6 +17,7 @@ import { NominatimPlace } from '../../../interfaces/nominatim-place';
 import { Place } from '../../../interfaces/place';
 import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
 import { SimpleStatusResponse } from '../../../interfaces/simple-status-response';
+import { createDefaultTileSettings } from '../../../interfaces/tile-settings';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { MapService } from '../../../services/map.service';
 import { NominatimService } from '../../../services/nominatim.service';
@@ -241,6 +242,7 @@ export class NominatimSearchComponent {
         lonMax: 0
       },
       timezone: '',
+      tileSettings: createDefaultTileSettings(),
       datasets: {
         weatherDataset: {
           data: undefined,

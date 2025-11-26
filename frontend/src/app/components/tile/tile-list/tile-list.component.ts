@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { Place } from '../../../interfaces/place';
+import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { WeatherTileComponent } from "../../placelist/weather-tile/weather-tile.component";
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
@@ -17,4 +18,10 @@ import { MasonryItemDirective } from "../../../directives/masonry-item.directive
 })
 export class TileListComponent {
   @Input() place!: Place;
+
+  get visibleTiles(): TileSetting[] {
+    return normalizeTileSettings(this.place.tileSettings).filter((tile: TileSetting) => tile.enabled);
+  }
+
+  trackByTile = (_: number, tile: TileSetting) => tile.type;
 }

@@ -3,6 +3,7 @@ import { BoundingBox } from "./bounding-box"
 import { Dataset } from "./dataset"
 import { Location } from "./location"
 import { Weather } from "./weather"
+import { TileSetting } from "./tile-settings"
 
 export interface Place {
     id: string,
@@ -15,9 +16,9 @@ export interface Place {
     pinned: boolean,
     boundingBox: BoundingBox,
     timezone: string,
+    tileSettings?: TileSetting[],
     datasets: {
         weatherDataset: Dataset<Weather>;
         airQualityDataset: Dataset<AirQualityData>;
     }
 }
-

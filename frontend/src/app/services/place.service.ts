@@ -9,6 +9,7 @@ import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
+import { normalizeTileSettings } from '../interfaces/tile-settings';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
@@ -69,7 +70,18 @@ export class PlaceService {
     if (!place) {
       this.deletePlace(placeId).subscribe();
     }
-    return place ?? null;
+    if (!place) {
+      return null;
+    }
+
+    return this.normalizePlaceTileSettings(place);
+  }
+
+  private normalizePlaceTileSettings(place: Place): Place {
+    return {
+      ...place,
+      tileSettings: normalizeTileSettings(place.tileSettings)
+    };
   }
 
   readonly sortedPlacesSignal = computed(() =>
@@ -96,16 +108,13 @@ export class PlaceService {
   }
 
   async saveAdditionalPlaceInfos(place: Place) {
-    // Aktuelles Array holen
+    const normalizedPlace = this.normalizePlaceTileSettings(place);
     const places = this._places();
 
-    // Neuen Place einfügen (du kannst hier noch prüfen, ob er schon existiert)
-    const updatedPlaces = [...places.filter(p => p.id !== place.id), place];
+    const updatedPlaces = [...places.filter(p => p.id !== place.id).map(p => this.normalizePlaceTileSettings(p)), normalizedPlace];
 
-    // Signal updaten
     this._places.set(updatedPlaces);
 
-    // Alle Places in die IndexedDB schreiben
     await Promise.all(updatedPlaces.map(p => this.indexedDbService.setPlaceProfile(p.id, p)));
   }
 

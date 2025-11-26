@@ -1,8 +1,24 @@
 <div class="tile-grid">
-    <app-datetime-tile class="tile" appMasonryItem [timezone]="place.timezone"></app-datetime-tile>
-    <app-weather-tile class="tile" appMasonryItem [place]="place"></app-weather-tile>
-    <app-air-quality-tile class="tile" appMasonryItem [place]="place"></app-air-quality-tile>
-    <app-note-tile class="tile" appMasonryItem [place]="place"></app-note-tile>
-    <app-message-tile class="tile" appMasonryItem [place]="place"></app-message-tile>
-    <app-image-tile class="tile" appMasonryItem [place]="place"></app-image-tile>
+  @for (tile of visibleTiles; track trackByTile($index, tile)) {
+    @switch (tile.type) {
+      @case ('datetime') {
+        <app-datetime-tile class="tile" appMasonryItem [timezone]="place.timezone"></app-datetime-tile>
+      }
+      @case ('weather') {
+        <app-weather-tile class="tile" appMasonryItem [place]="place"></app-weather-tile>
+      }
+      @case ('airQuality') {
+        <app-air-quality-tile class="tile" appMasonryItem [place]="place"></app-air-quality-tile>
+      }
+      @case ('note') {
+        <app-note-tile class="tile" appMasonryItem [place]="place"></app-note-tile>
+      }
+      @case ('message') {
+        <app-message-tile class="tile" appMasonryItem [place]="place"></app-message-tile>
+      }
+      @case ('image') {
+        <app-image-tile class="tile" appMasonryItem [place]="place"></app-image-tile>
+      }
+    }
+  }
 </div>

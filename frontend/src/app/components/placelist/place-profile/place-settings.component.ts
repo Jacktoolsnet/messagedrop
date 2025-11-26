@@ -1,5 +1,5 @@
-import { Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,6 +10,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
+import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
   selector: 'app-place',
@@ -21,13 +23,14 @@ import { Place } from '../../../interfaces/place';
     MatDialogClose,
     MatDialogTitle,
     MatDialogContent,
+    MatDialogModule,
     MatIcon,
-    FormsModule,
     MatFormFieldModule,
     MatInputModule
   ],
   templateUrl: './place-settings.component.html',
-  styleUrl: './place-settings.component.css'
+  styleUrl: './place-settings.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PlaceProfileComponent {
 
@@ -35,15 +38,20 @@ export class PlaceProfileComponent {
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
   private oriIcon: string | undefined = undefined;
+  private oriTileSettings: TileSetting[] | undefined = undefined;
 
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
     this.oriName = this.data.place.name;
     this.oriBase64Avatar = this.data.place.base64Avatar;
     this.oriIcon = this.data.place.icon;
+    const normalizedTileSettings = normalizeTileSettings(this.data.place.tileSettings);
+    this.oriTileSettings = normalizedTileSettings.map((tile: TileSetting) => ({ ...tile }));
+    this.data.place.tileSettings = normalizedTileSettings;
   }
 
   onApplyClick(): void {
@@ -59,6 +67,9 @@ export class PlaceProfileComponent {
     }
     if (undefined != this.oriIcon) {
       this.data.place.icon = this.oriIcon;
+    }
+    if (this.oriTileSettings) {
+      this.data.place.tileSettings = this.oriTileSettings.map(tile => ({ ...tile }));
     }
     this.dialogRef.close();
   }
@@ -94,6 +105,19 @@ export class PlaceProfileComponent {
 
   deleteAvatar() {
     this.data.place.base64Avatar = '';
+  }
+
+  openTileSettings(): void {
+    const dialogRef = this.dialog.open(TileSettingsComponent, {
+      width: '480px',
+      data: { place: this.data.place }
+    });
+
+    dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
+      if (updatedSettings?.length) {
+        this.data.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
+      }
+    });
   }
 
   public showPolicy() {

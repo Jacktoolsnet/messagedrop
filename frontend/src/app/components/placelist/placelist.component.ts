@@ -16,6 +16,7 @@ import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-addr
 import { Mode } from '../../interfaces/mode';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { Place } from '../../interfaces/place';
+import { createDefaultTileSettings } from '../../interfaces/tile-settings';
 import { GeolocationService } from '../../services/geolocation.service';
 import { IndexedDbService } from '../../services/indexed-db.service';
 import { MapService } from '../../services/map.service';
@@ -191,6 +192,7 @@ export class PlacelistComponent {
         lonMax: 0
       },
       timezone: '',
+      tileSettings: createDefaultTileSettings(),
       datasets: {
         weatherDataset: {
           data: undefined,

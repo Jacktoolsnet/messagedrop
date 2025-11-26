@@ -32,7 +32,8 @@
     </div>
   </div>
 
-  <button mat-flat-button color="warn" [attr.aria-hidden]="false" class="button">
+  <button mat-flat-button color="warn" class="button" type="button" (click)="openTileSettings()"
+    [attr.aria-label]="'Open tile settings for ' + (data.place.name || 'place')">
     <mat-icon>settings</mat-icon>
     <span>Tile settings</span>
   </button>

@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Tile settings</h2>
+
+<mat-dialog-content>
+  <p class="hint">Reorder tiles and toggle their visibility.</p>
+
+  <div cdkDropList class="tile-list" (cdkDropListDropped)="drop($event)">
+    @for (tile of tileSettings(); track trackTile($index, tile)) {
+      <div class="tile-row" cdkDrag>
+        <button type="button" class="drag-handle" cdkDragHandle [attr.aria-label]="'Reorder ' + tile.label">
+          <mat-icon>drag_indicator</mat-icon>
+        </button>
+
+        <div class="tile-label">
+          <div class="tile-name">{{ tile.label }}</div>
+          <div class="tile-helper">Position {{ tile.order + 1 }}</div>
+        </div>
+
+        <mat-slide-toggle [checked]="tile.enabled" (change)="toggleTile(tile, $event.checked)"
+          [attr.aria-label]="'Toggle ' + tile.label">
+          Visible
+        </mat-slide-toggle>
+      </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="close()">Cancel</button>
+  <button mat-flat-button color="primary" (click)="save()">Save</button>
+</mat-dialog-actions>
