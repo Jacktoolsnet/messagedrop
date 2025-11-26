@@ -1,7 +1,7 @@
 @if (data.mode === 'add_place') {
 <h2 mat-dialog-title>Add a place</h2>
 } @else if (data.mode === 'edit_place') {
-<h2 mat-dialog-title>Place profile</h2>
+<h2 mat-dialog-title>Place settings</h2>
 }
 
 <mat-dialog-content>
@@ -31,6 +31,11 @@
       </button>
     </div>
   </div>
+
+  <button mat-flat-button color="warn" [attr.aria-hidden]="false" class="button">
+    <mat-icon>settings</mat-icon>
+    <span>Tile settings</span>
+  </button>
   }
 </mat-dialog-content>
 

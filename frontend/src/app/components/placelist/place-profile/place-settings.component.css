@@ -26,9 +26,9 @@ h4 {
   margin: auto;
 }
 
-button {
-  margin-right: 8px;
-  z-index: 1000;
+.button {
+  margin: auto;
+  width: 100%;
 }
 
 .file-input {

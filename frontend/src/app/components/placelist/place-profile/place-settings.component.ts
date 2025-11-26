@@ -26,8 +26,8 @@ import { Place } from '../../../interfaces/place';
     MatFormFieldModule,
     MatInputModule
   ],
-  templateUrl: './place-profile.component.html',
-  styleUrl: './place-profile.component.css'
+  templateUrl: './place-settings.component.html',
+  styleUrl: './place-settings.component.css'
 })
 export class PlaceProfileComponent {
 

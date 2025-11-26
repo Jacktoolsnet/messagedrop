@@ -1,6 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { PlaceProfileComponent } from './place-profile.component';
+import { PlaceProfileComponent } from './place-settings.component';
 
 describe('DropmessageComponent', () => {
   let component: PlaceProfileComponent;
