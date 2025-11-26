@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
+import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 
 @Component({
   selector: 'app-tile-settings',
@@ -98,9 +99,15 @@ export class TileSettingsComponent {
   }
 
   deleteTile(tile: TileSetting) {
-    this.tileSettings.set(this.tileSettings()
-      .filter(t => t.id !== tile.id)
-      .map((t, index) => ({ ...t, order: index })));
+    const ref = this.dialog.open(TileDeleteComponent, {
+      width: '360px'
+    });
+    ref.afterClosed().subscribe(result => {
+      if (!result) return;
+      this.tileSettings.set(this.tileSettings()
+        .filter(t => t.id !== tile.id)
+        .map((t, index) => ({ ...t, order: index })));
+    });
   }
 
   close() {
