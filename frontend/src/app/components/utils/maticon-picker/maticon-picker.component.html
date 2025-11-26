@@ -1,0 +1,21 @@
+<mat-dialog-content class="icon-picker">
+  <mat-tab-group>
+    @for (cat of iconCategories; track cat.name) {
+      <mat-tab>
+        <ng-template mat-tab-label>{{ cat.name }}</ng-template>
+        <div class="icon-grid">
+          @for (icon of cat.icons; track icon) {
+            <button type="button" class="icon-button" (click)="pick(icon)" [attr.aria-label]="'Use icon ' + icon">
+              <mat-icon>{{ icon }}</mat-icon>
+            </button>
+          }
+        </div>
+      </mat-tab>
+    }
+  </mat-tab-group>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="pick(null)">Kein Icon</button>
+  <button mat-button mat-dialog-close>Schließen</button>
+</mat-dialog-actions>
