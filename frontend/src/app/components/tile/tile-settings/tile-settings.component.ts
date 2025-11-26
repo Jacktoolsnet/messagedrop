@@ -66,7 +66,11 @@ export class TileSettingsComponent {
       label: tileToAdd.label,
       enabled: true,
       order: updated.length,
-      custom: true
+      custom: true,
+      payload: {
+        title: tileToAdd.label,
+        text: ''
+      }
     });
     this.tileSettings.set(updated.map((tile, index) => ({ ...tile, order: index })));
   }

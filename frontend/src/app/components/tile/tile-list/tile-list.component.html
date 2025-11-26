@@ -19,6 +19,9 @@
       @case ('image') {
         <app-image-tile class="tile" appMasonryItem [place]="place"></app-image-tile>
       }
+      @case ('custom-text') {
+        <app-text-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-text-tile>
+      }
     }
   }
 </div>

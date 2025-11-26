@@ -1,0 +1,25 @@
+<h2 mat-dialog-title>Edit text tile</h2>
+
+<mat-dialog-content class="edit-content">
+  <div class="icon-row">
+    <button mat-mini-fab color="primary" type="button" (click)="pickIcon()" aria-label="Icon auswählen">
+      <mat-icon>{{ icon() || 'short_text' }}</mat-icon>
+    </button>
+    <div class="icon-label">Pick an icon</div>
+  </div>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Text</mat-label>
+    <textarea matInput rows="6" [formControl]="textControl"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>

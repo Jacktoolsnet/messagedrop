@@ -8,6 +8,11 @@ export interface TileSetting {
   enabled: boolean;
   order: number;
   custom?: boolean;
+  payload?: {
+    title?: string;
+    text?: string;
+    icon?: string;
+  };
 }
 
 export const tileTypeToLabel: Record<DefaultTileType, string> = {
@@ -42,6 +47,7 @@ export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): 
     return {
       ...defaultSetting,
       id: current?.id ?? defaultSetting.id,
+      payload: current?.payload ?? defaultSetting.payload,
       enabled: current?.enabled ?? defaultSetting.enabled,
       order: current?.order ?? defaultSetting.order
     };
@@ -53,6 +59,7 @@ export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): 
       ...setting,
       id: setting.id ?? `custom-${setting.type}-${index}`,
       custom: true,
+      payload: setting.payload,
       order: setting.order ?? defaultsNormalized.length + index
     }));
 

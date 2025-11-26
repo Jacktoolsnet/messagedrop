@@ -1,0 +1,20 @@
+.edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.icon-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.icon-label {
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
+.full-width {
+  width: 100%;
+}

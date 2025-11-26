@@ -7,11 +7,12 @@ import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component"
 import { ImageTileComponent } from "../image-tile/image-tile.component";
 import { MessageTileComponent } from "../message-tile/messagetile.component";
 import { NoteTileComponent } from "../note-tile/note-tile.component";
+import { TextTileComponent } from "../text-tile/text-tile.component";
 import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, MasonryItemDirective],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, TextTileComponent, MasonryItemDirective],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -19,7 +20,7 @@ import { MasonryItemDirective } from "../../../directives/masonry-item.directive
 export class TileListComponent {
   @Input() place!: Place;
 
-  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image']);
+  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text']);
 
   get visibleTiles(): TileSetting[] {
     return normalizeTileSettings(this.place.tileSettings)
