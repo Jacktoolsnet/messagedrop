@@ -37,7 +37,7 @@ export class TileSettingsComponent {
   readonly addableTiles: { type: TileSetting['type']; label: string; icon: string }[] = [
     { type: 'custom-text', label: 'Text', icon: 'text_fields' },
     { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
-    { type: 'custom-date', label: 'Appointment', icon: 'event' },
+    { type: 'custom-date', label: 'Anniversary', icon: 'event' },
     { type: 'custom-link', label: 'Link', icon: 'link' },
     { type: 'custom-multimedia', label: 'Multimedia', icon: 'perm_media' }
   ];
