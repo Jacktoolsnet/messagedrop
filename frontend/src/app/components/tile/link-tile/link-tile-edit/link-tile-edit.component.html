@@ -1,0 +1,41 @@
+<h2 mat-dialog-title>Edit link tile</h2>
+
+<mat-dialog-content class="edit-content">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Link type</mat-label>
+    <mat-select [formControl]="linkTypeControl">
+      @for (type of linkTypes; track type.value) {
+        <mat-option [value]="type.value">{{ type.label }}</mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Target</mat-label>
+    <input matInput [formControl]="urlControl" />
+    <button mat-icon-button matSuffix type="button" (click)="pasteFromClipboard()" aria-label="Paste from clipboard">
+      <mat-icon>content_paste</mat-icon>
+    </button>
+    @if (urlControl.invalid && urlControl.touched) {
+      <mat-error>Enter a valid {{ linkTypeControl.value }} target</mat-error>
+    }
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>

@@ -6,7 +6,7 @@
 
 .emoticon-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(2.25rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(3rem, 1fr));
   gap: 0.6rem;
   justify-items: center;
   align-content: start;
@@ -16,9 +16,26 @@
 }
 
 .emoticon-grid button {
-  border: none;
-  background: transparent;
+  width: 100%;
+  min-height: 3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  background: #f9fafb;
+  transition: all 140ms ease;
   font-size: 1.9rem;
+}
+
+.emoticon-grid button:hover {
+  border-color: #cfd8dc;
+  background: #eef3f7;
+}
+
+.emoticon-grid button:focus-visible {
+  outline: 2px solid #1976d2;
+  outline-offset: 2px;
 }
 
 mat-tab-group {

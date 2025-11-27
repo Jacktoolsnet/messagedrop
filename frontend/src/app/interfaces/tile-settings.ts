@@ -12,6 +12,8 @@ export interface TileSetting {
     title?: string;
     text?: string;
     icon?: string;
+    url?: string;
+    linkType?: 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
   };
 }
 

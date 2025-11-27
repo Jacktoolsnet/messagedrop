@@ -47,7 +47,7 @@ export class MaticonPickerComponent {
       name: 'Communication',
       icons: [
         'chat', 'forum', 'sms', 'alternate_email', 'mail', 'inbox', 'call', 'call_end', 'contacts', 'share',
-        'send', 'mark_email_unread', 'notifications', 'notifications_active', 'support_agent'
+        'send', 'mark_email_unread', 'notifications', 'notifications_active', 'support_agent', 'link'
       ]
     },
     {

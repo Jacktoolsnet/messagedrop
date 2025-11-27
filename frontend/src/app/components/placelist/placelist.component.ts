@@ -25,7 +25,7 @@ import { PlaceService } from '../../services/place.service';
 import { UserService } from '../../services/user.service';
 import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
 import { TileListComponent } from "../tile/tile-list/tile-list.component";
-import { PlaceProfileComponent } from './place-profile/place-settings.component';
+import { PlaceProfileComponent } from './place-settings/place-settings.component';
 
 interface TimezoneResponse { status: number; timezone: string }
 

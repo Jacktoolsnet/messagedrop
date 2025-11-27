@@ -9,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
+import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 
@@ -63,7 +64,7 @@ export class TileSettingsComponent {
     const id = typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
       : `tile-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-    updated.push({
+    const baseTile: TileSetting = {
       id,
       type: tileToAdd.type,
       label: tileToAdd.label,
@@ -74,7 +75,18 @@ export class TileSettingsComponent {
         title: tileToAdd.label,
         text: ''
       }
-    });
+    };
+
+    if (tileToAdd.type === 'custom-link') {
+      baseTile.payload = {
+        title: tileToAdd.label,
+        url: '',
+        icon: 'link',
+        linkType: 'web'
+      };
+    }
+
+    updated.push(baseTile);
     this.tileSettings.set(updated.map((tile, index) => ({ ...tile, order: index })));
   }
 
@@ -93,6 +105,18 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-multitext') {
       const ref = this.dialog.open(MultitextTileEditComponent, {
+        width: '520px',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-link') {
+      const ref = this.dialog.open(LinkTileEditComponent, {
         width: '520px',
         data: { tile }
       });
