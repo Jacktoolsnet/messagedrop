@@ -1,17 +1,16 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatDialog } from '@angular/material/dialog';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
-import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 
 @Component({
   selector: 'app-tile-settings',
@@ -43,8 +42,7 @@ export class TileSettingsComponent {
     { type: 'custom-text', label: 'Text', icon: 'text_fields' },
     { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
     { type: 'custom-date', label: 'Anniversary', icon: 'event' },
-    { type: 'custom-link', label: 'Link', icon: 'link' },
-    { type: 'custom-multimedia', label: 'Multimedia', icon: 'perm_media' }
+    { type: 'custom-link', label: 'Link', icon: 'link' }
   ];
 
   drop(event: CdkDragDrop<TileSetting[]>) {
