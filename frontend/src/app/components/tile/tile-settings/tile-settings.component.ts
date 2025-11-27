@@ -11,6 +11,7 @@ import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
+import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 
 @Component({
   selector: 'app-tile-settings',
@@ -82,6 +83,18 @@ export class TileSettingsComponent {
   editTile(tile: TileSetting) {
     if (tile.type === 'custom-text') {
       const ref = this.dialog.open(TextTileEditComponent, {
+        width: '520px',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-multitext') {
+      const ref = this.dialog.open(MultitextTileEditComponent, {
         width: '520px',
         data: { tile }
       });

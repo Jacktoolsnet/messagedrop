@@ -1,0 +1,26 @@
+<h2 mat-dialog-title>Edit multi-line tile</h2>
+
+<mat-dialog-content class="edit-content">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Text</mat-label>
+    <textarea matInput rows="6" [formControl]="textControl"></textarea>
+  </mat-form-field>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>

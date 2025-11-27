@@ -1,0 +1,21 @@
+<div class="text-tile"
+     role="button"
+     tabindex="0"
+     (click)="editTile()"
+     (keyup.enter)="editTile()"
+     (keyup.space)="editTile()">
+  <div class="text-tile__header">
+    <div class="text-tile__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="text-tile__title">{{ title }}</div>
+  </div>
+
+  <div class="text-tile__body">
+    @if (text) {
+      <p>{{ text }}</p>
+    } @else {
+      <p class="text-muted">No text yet. Tap to add one.</p>
+    }
+  </div>
+</div>
