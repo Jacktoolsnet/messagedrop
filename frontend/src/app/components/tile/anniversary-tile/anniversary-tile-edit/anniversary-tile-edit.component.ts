@@ -51,8 +51,10 @@ export class AnniversaryTileEditComponent {
 
   private toDate(value: string | undefined): Date | null {
     if (!value) return null;
-    const d = new Date(value);
-    return Number.isNaN(d.getTime()) ? null : d;
+    const [y, m, d] = value.split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const date = new Date(y, m - 1, d);
+    return Number.isNaN(date.getTime()) ? null : date;
   }
 
   get startAt(): Date {
@@ -88,7 +90,7 @@ export class AnniversaryTileEditComponent {
     }
 
     const title = this.titleControl.value.trim() || 'Anniversary';
-    const date = this.dateControl.value ? this.dateControl.value.toISOString().slice(0, 10) : '';
+    const date = this.dateControl.value ? this.formatLocalDate(this.dateControl.value) : '';
     const updated: TileSetting = {
       ...this.data.tile,
       label: title,
@@ -100,5 +102,12 @@ export class AnniversaryTileEditComponent {
       }
     };
     this.dialogRef.close(updated);
+  }
+
+  private formatLocalDate(date: Date): string {
+    const y = date.getFullYear();
+    const m = `${date.getMonth() + 1}`.padStart(2, '0');
+    const d = `${date.getDate()}`.padStart(2, '0');
+    return `${y}-${m}-${d}`;
   }
 }

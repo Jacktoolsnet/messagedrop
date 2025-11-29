@@ -41,8 +41,8 @@ export class AnniversaryTileComponent implements OnChanges {
   get formattedDate(): string {
     const date = this.currentTile()?.payload?.date;
     if (!date) return 'Add a date';
-    const d = new Date(date);
-    if (Number.isNaN(d.getTime())) return 'Invalid date';
+    const d = this.parseLocalDate(date);
+    if (!d) return 'Invalid date';
     return new Intl.DateTimeFormat(navigator.language, { dateStyle: 'long' }).format(d);
   }
 
@@ -68,5 +68,12 @@ export class AnniversaryTileComponent implements OnChanges {
       this.placeService.saveAdditionalPlaceInfos(updatedPlace);
       this.cdr.markForCheck();
     });
+  }
+
+  private parseLocalDate(value: string): Date | null {
+    const [y, m, d] = value.split('-').map(Number);
+    if (!y || !m || !d) return null;
+    const date = new Date(y, m - 1, d);
+    return Number.isNaN(date.getTime()) ? null : date;
   }
 }
