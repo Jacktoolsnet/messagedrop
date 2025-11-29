@@ -8,9 +8,9 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
-import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
-import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
+import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
+import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 
@@ -126,7 +126,11 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-date') {
       const ref = this.dialog.open(AnniversaryTileEditComponent, {
-        width: '520px',
+        width: 'auto',
+        maxWidth: '95vw',
+        height: 'auto',
+        maxHeight: '90vh',
+        panelClass: 'TileEditDialog',
         data: { tile }
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {

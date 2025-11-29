@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatIcon } from '@angular/material/icon';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
@@ -51,7 +51,11 @@ export class AnniversaryTileComponent implements OnChanges {
     if (!tile) return;
 
     const ref = this.dialog.open(AnniversaryTileEditComponent, {
-      width: '520px',
+      width: 'auto',
+      maxWidth: '95vw',
+      height: 'auto',
+      maxHeight: '90vh',
+      panelClass: 'TileEditDialog',
       data: { tile }
     });
 
