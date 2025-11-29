@@ -109,7 +109,10 @@ export class PlaceProfileComponent {
 
   openTileSettings(): void {
     const dialogRef = this.dialog.open(TileSettingsComponent, {
-      width: '480px',
+      width: 'auto',
+      minWidth: '450px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
       data: { place: this.data.place }
     });
 
