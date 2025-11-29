@@ -1,0 +1,104 @@
+import { CommonModule } from '@angular/common';
+import { ChangeDetectionStrategy, Component, ViewChild, inject, signal } from '@angular/core';
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatCalendar, MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
+import { TileSetting } from '../../../../interfaces/tile-settings';
+import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
+
+interface AnniversaryTileDialogData {
+  tile: TileSetting;
+}
+
+@Component({
+  selector: 'app-anniversary-tile-edit',
+  standalone: true,
+  providers: [provideNativeDateAdapter()],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatFormFieldModule,
+    MatInputModule,
+    MatNativeDateModule,
+    MatButtonModule,
+    MatIcon,
+    MatCardModule,
+    MatDatepickerModule
+  ],
+  templateUrl: './anniversary-tile-edit.component.html',
+  styleUrl: './anniversary-tile-edit.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class AnniversaryTileEditComponent {
+  @ViewChild(MatCalendar) calendar?: MatCalendar<Date>;
+  private readonly dialogRef = inject(MatDialogRef<AnniversaryTileEditComponent>);
+  private readonly dialog = inject(MatDialog);
+  readonly data = inject<AnniversaryTileDialogData>(MAT_DIALOG_DATA);
+
+  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Anniversary', { nonNullable: true });
+  readonly dateControl = new FormControl<Date | null>(this.toDate(this.data.tile.payload?.date), { validators: [Validators.required] });
+  readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'event');
+
+  private toDate(value: string | undefined): Date | null {
+    if (!value) return null;
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? null : d;
+  }
+
+  get startAt(): Date {
+    return this.dateControl.value ?? new Date();
+  }
+
+  onDateSelected(date: Date | null): void {
+    this.dateControl.setValue(date);
+    this.dateControl.markAsTouched();
+  }
+
+  pickIcon(): void {
+    const ref = this.dialog.open(MaticonPickerComponent, {
+      width: '520px',
+      data: { current: this.icon() }
+    });
+
+    ref.afterClosed().subscribe((selected?: string | null) => {
+      if (selected !== undefined) {
+        this.icon.set(selected || undefined);
+      }
+    });
+  }
+
+  cancel(): void {
+    this.dialogRef.close();
+  }
+
+  save(): void {
+    if (this.dateControl.invalid) {
+      this.dateControl.markAsTouched();
+      return;
+    }
+
+    const title = this.titleControl.value.trim() || 'Anniversary';
+    const date = this.dateControl.value ? this.dateControl.value.toISOString().slice(0, 10) : '';
+    const updated: TileSetting = {
+      ...this.data.tile,
+      label: title,
+      payload: {
+        ...this.data.tile.payload,
+        title,
+        date,
+        icon: this.icon()
+      }
+    };
+    this.dialogRef.close(updated);
+  }
+}

@@ -10,6 +10,7 @@ import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
+import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 
@@ -77,6 +78,14 @@ export class TileSettingsComponent {
       }
     };
 
+    if (tileToAdd.type === 'custom-date') {
+      baseTile.payload = {
+        title: tileToAdd.label,
+        date: '',
+        icon: 'event'
+      };
+    }
+
     if (tileToAdd.type === 'custom-link') {
       baseTile.payload = {
         title: tileToAdd.label,
@@ -105,6 +114,18 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-multitext') {
       const ref = this.dialog.open(MultitextTileEditComponent, {
+        width: '520px',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-date') {
+      const ref = this.dialog.open(AnniversaryTileEditComponent, {
         width: '520px',
         data: { tile }
       });

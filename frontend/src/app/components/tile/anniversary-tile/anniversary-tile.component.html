@@ -1,0 +1,17 @@
+<div class="anniversary-tile"
+     role="button"
+     tabindex="0"
+     (click)="openEditor()"
+     (keyup.enter)="openEditor()"
+     (keyup.space)="openEditor()">
+  <div class="anniversary-tile__header">
+    <div class="anniversary-tile__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="anniversary-tile__title">{{ title }}</div>
+  </div>
+
+  <div class="anniversary-tile__body">
+    {{ formattedDate }}
+  </div>
+</div>
