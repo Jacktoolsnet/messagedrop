@@ -11,6 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { PlaceService } from '../../../services/place.service';
 import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
@@ -43,6 +44,7 @@ export class PlaceProfileComponent {
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly placeService = inject(PlaceService);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
@@ -119,6 +121,7 @@ export class PlaceProfileComponent {
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
       if (updatedSettings?.length) {
         this.data.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
+        this.placeService.saveAdditionalPlaceInfos(this.data.place);
       }
     });
   }

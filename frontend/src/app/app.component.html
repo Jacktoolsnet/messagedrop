@@ -19,7 +19,7 @@
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab aria-label="User Profile"
     (click)="{}" [@badgePulse]="animateUserBadgeTick()">
-    <mat-icon aria-hidden="false"
+    <mat-icon [attr.aria-hidden]="false"
         [matBadge]="userService.isReady() ? (unreadTotalAll() > 0 ? (unreadTotalAll() | shortNumber) : null) : null"
         [matBadgeHidden]="!userService.isReady()" [matBadgeSize]="'medium'" matBadgeColor="primary">person</mat-icon>
 </button>
@@ -65,7 +65,8 @@
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="openSystemMessages()">
-        <mat-icon [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
+        <mat-icon [attr.aria-hidden]="false"
+            [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
             [matBadgeHidden]="!hasUnreadSystemNotifications()" matBadgeColor="primary">notifications</mat-icon>
         <span>System messages</span>
     </button>
@@ -94,7 +95,7 @@
 
     @if (userService.isReady() && contactService.isReady()) {
     <button mat-menu-item (click)="openContactListDialog()">
-        <mat-icon matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()" matBadgeColor="warn"
+        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()" matBadgeColor="warn"
             matBadgeOverlap="true">contacts</mat-icon>
         <span>My contacts</span>
     </button>

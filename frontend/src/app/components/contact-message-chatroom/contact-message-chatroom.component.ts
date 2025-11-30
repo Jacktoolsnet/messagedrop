@@ -120,14 +120,14 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       }, ...msgs]);
       this.lastLiveMessageId = incoming.id;
     }
-  }, { allowSignalWrites: true });
+  });
 
   private readonly loadMessagesEffect = effect(() => {
     const contact = this.contact();
     if (contact && !this.loaded()) {
       this.loadMessages();
     }
-  }, { allowSignalWrites: true });
+  });
 
   private readonly observeUnreadEffect = effect(() => {
     void this.messages();
@@ -154,7 +154,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       )
     );
     this.contactMessageService.updatedMessages.set(null);
-  }, { allowSignalWrites: true });
+  });
 
   private readonly reactionEffect = effect(() => {
     const update = this.contactMessageService.reactionUpdate();
@@ -169,7 +169,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
       )
     );
     this.contactMessageService.reactionUpdate.set(null);
-  }, { allowSignalWrites: true });
+  });
 
   private readonly deletedMessagesEffect = effect(() => {
     const deleted = this.contactMessageService.deletedMessage();

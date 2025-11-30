@@ -275,7 +275,7 @@ export class AppComponent implements OnInit {
       if (update) {
         this.unreadContactCounts.update((map) => ({ ...map, [update.contactId]: update.unread }));
       }
-    }, { allowSignalWrites: true });
+    });
 
     effect(() => {
       if (!this.userService.isReady() || !this.appService.isConsentCompleted()) {
@@ -291,7 +291,7 @@ export class AppComponent implements OnInit {
       if (total === 0) {
         this.resetBadgeAnimation();
       }
-    }, { allowSignalWrites: true });
+    });
 
     effect(() => {
       const incoming = this.contactMessageService.liveMessages();
@@ -302,7 +302,7 @@ export class AppComponent implements OnInit {
         this.lastLiveMessageId = incoming.id;
         this.triggerBadgeAnimation();
       }
-    }, { allowSignalWrites: true });
+    });
 
     effect(() => {
       this.messageService.messageSet(); // <-- track changes
