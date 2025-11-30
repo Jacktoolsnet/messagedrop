@@ -85,6 +85,7 @@ export class AirQualityTileComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
 
   ngOnInit(): void {
+    console.log(this.place.datasets.airQualityDataset.data);
     if (this.place.datasets.airQualityDataset.data) {
       if (this.placeService.isDatasetExpired(this.place.datasets.airQualityDataset)) {
         // show cached while refreshing
