@@ -15,6 +15,12 @@ export interface TileSetting {
     url?: string;
     linkType?: 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
     date?: string;
+    migraine?: {
+      tempWarn1: number;
+      tempWarn2: number;
+      pressureWarn1: number;
+      pressureWarn2: number;
+    };
   };
 }
 

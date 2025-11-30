@@ -1,0 +1,24 @@
+<div class="migraine-tile" role="button" tabindex="0" (click)="edit()"
+  (keyup.enter)="edit()" (keyup.space)="edit()">
+  <div class="migraine-header">
+    <div class="migraine-icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="migraine-title">{{ title }}</div>
+    @if (isStale) {
+      <span class="stale">Data expired</span>
+    }
+  </div>
+
+  <div class="migraine-body">
+    <div class="metric" [class.warn]="tempChange.level === 'warn'" [class.alert]="tempChange.level === 'alert'">
+      <div class="label">Temperature change</div>
+      <div class="value">{{ formatValue(tempChange.value, '°C') }}</div>
+    </div>
+    <div class="metric" [class.warn]="pressureChange.level === 'warn'" [class.alert]="pressureChange.level === 'alert'">
+      <div class="label">Pressure change</div>
+      <div class="value">{{ formatValue(pressureChange.value, ' hPa') }}</div>
+    </div>
+  </div>
+
+</div>

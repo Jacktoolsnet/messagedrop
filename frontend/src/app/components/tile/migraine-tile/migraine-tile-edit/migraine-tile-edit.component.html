@@ -1,0 +1,47 @@
+<h2 mat-dialog-title>Edit migraine tile</h2>
+
+<mat-dialog-content class="edit-content">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <div class="thresholds">
+    <div class="threshold-group">
+      <div class="group-title">Temperature (°C)</div>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Warn level</mat-label>
+        <input matInput type="number" [formControl]="tempWarn1" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Alert level</mat-label>
+        <input matInput type="number" [formControl]="tempWarn2" />
+      </mat-form-field>
+    </div>
+
+    <div class="threshold-group">
+      <div class="group-title">Pressure (hPa)</div>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Warn level</mat-label>
+        <input matInput type="number" [formControl]="pressureWarn1" />
+      </mat-form-field>
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Alert level</mat-label>
+        <input matInput type="number" [formControl]="pressureWarn2" />
+      </mat-form-field>
+    </div>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>

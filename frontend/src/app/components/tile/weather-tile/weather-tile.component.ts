@@ -38,7 +38,6 @@ export class WeatherTileComponent implements OnInit {
       if (this.placeService.isDatasetExpired(this.place.datasets.weatherDataset)) {
         this.getWeather();
       } else {
-        console.log(this.place.datasets.weatherDataset.data);
         this.weather = this.place.datasets.weatherDataset.data;
         this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
         this.minMax = this.getHourlyMinMax('temperature');

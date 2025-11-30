@@ -1,0 +1,40 @@
+.edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.icon-pick-button {
+  width: 95%;
+  align-self: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.icon-pick-button mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+}
+
+.thresholds {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.threshold-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.group-title {
+  font-weight: 600;
+  color: var(--mat-sys-on-surface, inherit);
+}

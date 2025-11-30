@@ -9,6 +9,7 @@ import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
+import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
@@ -44,7 +45,8 @@ export class TileSettingsComponent {
     { type: 'custom-text', label: 'Text', icon: 'text_fields' },
     { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
     { type: 'custom-date', label: 'Anniversary', icon: 'event' },
-    { type: 'custom-link', label: 'Link', icon: 'link' }
+    { type: 'custom-link', label: 'Link', icon: 'link' },
+    { type: 'custom-migraine', label: 'Migraine', icon: 'crisis_alert' }
   ];
 
   drop(event: CdkDragDrop<TileSetting[]>) {
@@ -92,6 +94,19 @@ export class TileSettingsComponent {
         url: '',
         icon: 'link',
         linkType: 'web'
+      };
+    }
+
+    if (tileToAdd.type === 'custom-migraine') {
+      baseTile.payload = {
+        title: tileToAdd.label,
+        icon: 'crisis_alert',
+        migraine: {
+          tempWarn1: 5,
+          tempWarn2: 8,
+          pressureWarn1: 6,
+          pressureWarn2: 10
+        }
       };
     }
 
@@ -148,6 +163,18 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-link') {
       const ref = this.dialog.open(LinkTileEditComponent, {
+        width: '520px',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-migraine') {
+      const ref = this.dialog.open(MigraineTileEditComponent, {
         width: '520px',
         data: { tile }
       });
