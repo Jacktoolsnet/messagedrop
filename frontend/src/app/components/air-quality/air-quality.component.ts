@@ -10,6 +10,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { AirQualityCategory, AirQualityMetricKey, AirQualityTileValue } from '../../interfaces/air-quality-tile-value';
+import { getAirQualityLevelInfo } from '../../utils/air-quality-level.util';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
@@ -222,9 +223,11 @@ export class AirQualityComponent implements OnInit {
     const hourIndex = timeIndices[this.selectedHour] ?? null;
     const fullTimeArray = airQuality.hourly.time;
 
+    const isDarkMode = document.body.classList.contains('dark');
     this.tileValues = this.getCategoryKeys().map((key) => {
       const values = this.getHourlyValues(key) ?? [];
       const currentValue = hourIndex != null ? values[hourIndex] ?? 0 : 0;
+      const levelInfo = getAirQualityLevelInfo(key, currentValue, isDarkMode);
       return {
         key,
         value: currentValue,
@@ -232,10 +235,10 @@ export class AirQualityComponent implements OnInit {
         time: fullTimeArray,
         label: this.getChartLabel(key),
         unit: this.getUnitForKey(key),
-        color: this.getPollenColor(currentValue),
+        color: levelInfo.color,
         icon: this.getWeatherIcon(key),
         description: this.getValueDescription(currentValue, key),
-        levelText: this.getLevelTextForCategoryValue(this.selectedCategory, currentValue),
+        levelText: levelInfo.label,
         minMax: this.getHourlyMinMaxFromAirQuality(key)
       };
     });
@@ -449,10 +452,12 @@ export class AirQualityComponent implements OnInit {
     const hourIndex = timeIndices[this.selectedHour] ?? null;
     const fullTimeArray = airQuality.hourly.time;
 
+    const isDarkMode = document.body.classList.contains('dark');
     return this.categoryModes.flatMap((category) =>
       this.getCategoryKeysByType(category).map((key) => {
         const values = this.getHourlyValues(key) ?? [];
         const currentValue = hourIndex != null ? values[hourIndex] ?? 0 : 0;
+        const levelInfo = getAirQualityLevelInfo(key, currentValue, isDarkMode);
         return {
           key,
           value: currentValue,
@@ -460,10 +465,10 @@ export class AirQualityComponent implements OnInit {
           time: fullTimeArray,
           label: this.getChartLabel(key),
           unit: this.getUnitForKey(key),
-          color: this.getPollenColor(currentValue),
+          color: levelInfo.color,
           icon: this.getWeatherIcon(key),
           description: this.getValueDescription(currentValue, key),
-          levelText: this.getLevelTextForCategoryValue(category, currentValue),
+          levelText: levelInfo.label,
           minMax: this.getHourlyMinMaxFromAirQuality(key)
         };
       })

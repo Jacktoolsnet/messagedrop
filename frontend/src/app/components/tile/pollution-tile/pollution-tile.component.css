@@ -62,16 +62,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-}
-
-.metric-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid transparent;
 }
 
 .metric-text .label {
@@ -87,4 +78,14 @@
 
 .metric-action {
   margin-left: auto;
+}
+
+.metric.warn {
+  border-color: #fb8c00;
+  background: rgba(251, 140, 0, 0.1);
+}
+
+.metric.alert {
+  border-color: #e53935;
+  background: rgba(229, 57, 53, 0.12);
 }

@@ -10,6 +10,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PollutionTileEditComponent } from './pollution-tile-edit/pollution-tile-edit.component';
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
 import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
+import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
 
 @Component({
   selector: 'app-pollution-tile',
@@ -80,17 +81,19 @@ export class PollutionTileComponent implements OnChanges {
     return this.currentTile()?.payload?.pollution?.keys ?? [];
   }
 
-  get metrics(): { key: string; label: string; icon: string; value: string }[] {
+  get metrics(): { key: string; label: string; icon: string; value: string; level: 'none' | 'warn' | 'alert' }[] {
     if (!this.airQuality || !this.airQuality.hourly?.time) return [];
     const currentDate = new Date().toISOString().split('T')[0];
     return this.selectedKeys.map(key => {
       const values = this.getTodayValues(key);
       const maxVal = values.length ? Math.max(...values) : 0;
+      const level = getAirQualityLevelInfo(key as AirQualityMetricKey, maxVal).severity;
       return {
         key,
         label: this.labelMap[key] ?? key,
         icon: this.iconMap[key] ?? 'blur_on',
-        value: maxVal ? maxVal.toFixed(1) : '0'
+        value: maxVal ? maxVal.toFixed(1) : '0',
+        level
       };
     });
   }

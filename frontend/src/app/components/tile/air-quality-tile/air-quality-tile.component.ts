@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 import { DateTime } from 'luxon';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
 import { Location } from '../../../interfaces/location';
@@ -10,10 +11,12 @@ import { AirQualityService } from '../../../services/air-quality.service';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { PlaceService } from '../../../services/place.service';
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
+import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
+import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
 
 @Component({
   selector: 'app-air-quality-tile',
-  imports: [CommonModule, MatIcon],
+  imports: [CommonModule, MatIcon, MatButtonModule],
   templateUrl: './air-quality-tile.component.html',
   styleUrl: './air-quality-tile.component.css'
 })
@@ -149,7 +152,8 @@ export class AirQualityTileComponent implements OnInit {
 
     this.label = this.getChartLabel(dominant);
     this.value = this.getHourlyValue(dominant);
-    this.level = this.getLevelTextForCategoryValue(dominant, this.value);
+    const info = getAirQualityLevelInfo(dominant as AirQualityMetricKey, this.value, document.body.classList.contains('dark'));
+    this.level = info.label;
     this.airQualityIcon = this.getAirQualityIcon(dominant);
     this.minMax = this.getHourlyMinMax(dominant);
   }
