@@ -1,17 +1,17 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
-import { WeatherTileComponent } from "../../placelist/weather-tile/weather-tile.component";
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
+import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
 import { ImageTileComponent } from "../image-tile/image-tile.component";
+import { LinkTileComponent } from "../link-tile/link-tile.component";
 import { MessageTileComponent } from "../message-tile/messagetile.component";
+import { MultitextTileComponent } from "../multitext-tile/multitext-tile.component";
 import { NoteTileComponent } from "../note-tile/note-tile.component";
 import { TextTileComponent } from "../text-tile/text-tile.component";
-import { MultitextTileComponent } from "../multitext-tile/multitext-tile.component";
-import { LinkTileComponent } from "../link-tile/link-tile.component";
-import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
-import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
+import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 
 @Component({
   selector: 'app-tile-list',
