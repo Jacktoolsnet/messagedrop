@@ -27,6 +27,7 @@ export class AirQualityTileComponent implements OnInit {
   value = 0;
   level = '';
   dominantKey = '';
+  isStale = false;
 
   // --- Kategorien ---
   private readonly pollenKeys = [
@@ -85,11 +86,12 @@ export class AirQualityTileComponent implements OnInit {
 
   ngOnInit(): void {
     if (this.place.datasets.airQualityDataset.data) {
-      if (this.placeService.isDatasetExpired(this.place.datasets.weatherDataset)) {
+      if (this.placeService.isDatasetExpired(this.place.datasets.airQualityDataset)) {
         this.getAirQuality();
       } else {
         this.airQuality = this.place.datasets.airQualityDataset.data;
         this.updateFromAirQuality();
+        this.isStale = false;
       }
     } else {
       this.getAirQuality();
@@ -110,12 +112,20 @@ export class AirQualityTileComponent implements OnInit {
           this.place.datasets.airQualityDataset.lastUpdate = DateTime.now();
           this.airQuality = airQuality;
           this.updateFromAirQuality();
+          this.isStale = false;
         },
         error: () => {
-          this.airQuality = undefined;
-          this.value = 0;
-          this.level = '';
-          this.minMax = undefined;
+          if (this.place.datasets.airQualityDataset.data) {
+            this.airQuality = this.place.datasets.airQualityDataset.data;
+            this.updateFromAirQuality();
+            this.isStale = true;
+          } else {
+            this.airQuality = undefined;
+            this.value = 0;
+            this.level = '';
+            this.minMax = undefined;
+            this.isStale = true;
+          }
         }
       });
   }

@@ -3,8 +3,8 @@
     <div class="tile-info">
         <i class="wi wi-na" style="font-size: 1.5rem"></i>
         <div class="tile-content">
-            <div class="tile-value">Too many</div>
-            <div class="tile-minmax">requests</div>
+            <div class="tile-value">No data</div>
+            <div class="tile-minmax">Air quality unavailable</div>
         </div>
     </div>
 </div>
@@ -18,6 +18,9 @@
             <div class="tile-value">{{ label }} ({{ level }})</div>
             @if (minMax) {
             <div class="tile-minmax">{{ minMax.min }} - {{ minMax.max }}</div>
+            }
+            @if (isStale) {
+            <div class="stale">Data expired - showing cached values</div>
             }
         </div>
     </div>

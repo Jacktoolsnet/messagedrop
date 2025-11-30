@@ -257,6 +257,9 @@ export class PlaceService {
     this.indexedDbService.deletePlace(placeId).catch(err => {
       console.error('Failed to delete place locally', err);
     });
+    this.indexedDbService.deleteTileSettings(placeId).catch(err => {
+      console.error('Failed to delete tile settings locally', err);
+    });
   }
 
   subscribe(place: Place, showAlways = false) {

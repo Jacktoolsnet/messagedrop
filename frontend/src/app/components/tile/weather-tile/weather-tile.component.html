@@ -3,8 +3,8 @@
     <div class="tile-info">
         <i class="wi wi-na" style="font-size: 1.5rem"></i>
         <div class="tile-content">
-            <div class="tile-temperature">Too many</div>
-            <div class="tile-minmax">requests</div>
+            <div class="tile-temperature">No data</div>
+            <div class="tile-minmax">Weather unavailable</div>
         </div>
     </div>
 </div>
@@ -17,6 +17,9 @@
             <div class="tile-temperature">{{ weather.current.temperature }} °C</div>
             @if (minMax) {
             <div class="tile-minmax">{{ minMax.min }} °C - {{ minMax.max }} °C</div>
+            }
+            @if (isStale) {
+            <div class="stale">Data expired - showing cached values</div>
             }
         </div>
     </div>

@@ -26,6 +26,7 @@ export class WeatherTileComponent implements OnInit {
   weather: Weather | undefined;
   weatherIcon: string | undefined;
   minMax: { min: number, max: number } | undefined;
+  isStale = false;
 
   private readonly userService = inject(UserService);
   private readonly placeService = inject(PlaceService);
@@ -41,6 +42,7 @@ export class WeatherTileComponent implements OnInit {
         this.weather = this.place.datasets.weatherDataset.data;
         this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
         this.minMax = this.getHourlyMinMax('temperature');
+        this.isStale = false;
       }
     } else {
       this.getWeather();
@@ -66,11 +68,21 @@ export class WeatherTileComponent implements OnInit {
             this.weather = weather;
             this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
             this.minMax = this.getHourlyMinMax('temperature');
+            this.isStale = false;
           },
           error: () => {
-            this.weather = undefined;
-            this.weatherIcon = undefined;
-            this.minMax = undefined;
+            // Fallback to cached data if available
+            if (this.place.datasets.weatherDataset.data) {
+              this.weather = this.place.datasets.weatherDataset.data;
+              this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
+              this.minMax = this.getHourlyMinMax('temperature');
+              this.isStale = true;
+            } else {
+              this.weather = undefined;
+              this.weatherIcon = undefined;
+              this.minMax = undefined;
+              this.isStale = true;
+            }
           }
         });
     }

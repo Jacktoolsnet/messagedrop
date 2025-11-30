@@ -537,6 +537,22 @@ export class IndexedDbService {
   }
 
   /**
+   * Deletes stored tile settings for a given owner (place/contact) ID.
+   */
+  async deleteTileSettings(ownerId: string): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.tileSettingsStore, 'readwrite');
+      const store = tx.objectStore(this.tileSettingsStore);
+      const request = store.delete(ownerId);
+
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
    * Saves a note (creates a new note with a UUID or updates an existing one).
    * @param note The note data (without id and timestamp).
    * @param id Optional note ID to update.
