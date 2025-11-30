@@ -10,12 +10,18 @@
   margin-bottom: 8px;
   padding-right: 1.25rem;
   gap: 8px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  background: var(--mat-sys-surface, #fff);
 }
 
 .tile-settings-content {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  max-height: 60vh;
+  overflow: hidden;
 }
 
 .toolbar {
@@ -30,6 +36,16 @@
   flex-direction: column;
   gap: 10px;
   padding: 0;
+  overflow-y: auto;
+  min-height: 0;
+  flex: 1 1 auto;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background: var(--mat-sys-surface, #fff);
+  padding-top: 8px;
 }
 
 .tile-row {

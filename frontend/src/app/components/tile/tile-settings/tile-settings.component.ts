@@ -70,7 +70,7 @@ export class TileSettingsComponent {
       type: tileToAdd.type,
       label: tileToAdd.label,
       enabled: true,
-      order: updated.length,
+      order: 0,
       custom: true,
       payload: {
         title: tileToAdd.label,
@@ -95,11 +95,16 @@ export class TileSettingsComponent {
       };
     }
 
-    updated.push(baseTile);
+    updated.unshift(baseTile);
     this.tileSettings.set(updated.map((tile, index) => ({ ...tile, order: index })));
+    this.openEditorForTile(baseTile);
   }
 
   editTile(tile: TileSetting) {
+    this.openEditorForTile(tile);
+  }
+
+  private openEditorForTile(tile: TileSetting) {
     if (tile.type === 'custom-text') {
       const ref = this.dialog.open(TextTileEditComponent, {
         width: '520px',
