@@ -7,6 +7,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { A11yModule } from '@angular/cdk/a11y';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -31,7 +32,8 @@ interface LinkTileDialogData {
     MatInputModule,
     MatSelectModule,
     MatButtonModule,
-    MatIcon
+    MatIcon,
+    A11yModule
   ],
   templateUrl: './link-tile-edit.component.html',
   styleUrl: './link-tile-edit.component.css',

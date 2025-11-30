@@ -6,6 +6,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
+import { A11yModule } from '@angular/cdk/a11y';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
@@ -27,7 +28,8 @@ interface MultitextTileDialogData {
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
-    MatIcon
+    MatIcon,
+    A11yModule
   ],
   templateUrl: './multitext-tile-edit.component.html',
   styleUrl: './multitext-tile-edit.component.css',

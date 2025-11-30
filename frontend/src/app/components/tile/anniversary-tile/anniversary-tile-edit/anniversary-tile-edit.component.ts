@@ -9,6 +9,7 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { A11yModule } from '@angular/cdk/a11y';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
@@ -33,7 +34,8 @@ interface AnniversaryTileDialogData {
     MatButtonModule,
     MatIcon,
     MatCardModule,
-    MatDatepickerModule
+    MatDatepickerModule,
+    A11yModule
   ],
   templateUrl: './anniversary-tile-edit.component.html',
   styleUrl: './anniversary-tile-edit.component.css',
