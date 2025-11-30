@@ -13,11 +13,21 @@
   <div class="migraine-body">
     <div class="metric" [class.warn]="tempChange.level === 'warn'" [class.alert]="tempChange.level === 'alert'">
       <div class="label">Temperature change</div>
-      <div class="value">{{ formatValue(tempChange.value, '°C') }}</div>
+      <div class="metric-row">
+        <div class="value">{{ formatValue(tempChange.value, '°C') }}</div>
+        <button mat-icon-button color="primary" (click)="openWeatherDetails('temperature'); $event.stopPropagation();" type="button" aria-label="Open temperature details">
+          <mat-icon>thermostat</mat-icon>
+        </button>
+      </div>
     </div>
     <div class="metric" [class.warn]="pressureChange.level === 'warn'" [class.alert]="pressureChange.level === 'alert'">
       <div class="label">Pressure change</div>
-      <div class="value">{{ formatValue(pressureChange.value, ' hPa') }}</div>
+      <div class="metric-row">
+        <div class="value">{{ formatValue(pressureChange.value, ' hPa') }}</div>
+        <button mat-icon-button color="primary" (click)="openWeatherDetails('pressure'); $event.stopPropagation();" type="button" aria-label="Open pressure details">
+          <mat-icon>compress</mat-icon>
+        </button>
+      </div>
     </div>
   </div>
 

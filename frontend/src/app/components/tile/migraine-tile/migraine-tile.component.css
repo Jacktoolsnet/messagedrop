@@ -62,6 +62,13 @@
   color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.72));
 }
 
+.metric-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
 .metric .value {
   font-size: 1.1rem;
   font-weight: 600;

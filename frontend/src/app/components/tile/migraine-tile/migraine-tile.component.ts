@@ -2,13 +2,14 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 import { CommonModule } from '@angular/common';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DateTime } from 'luxon';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
 import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-edit.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Weather } from '../../../interfaces/weather';
+import { WeatherComponent } from '../../weather/weather.component';
+import { GeolocationService } from '../../../services/geolocation.service';
 
 @Component({
   selector: 'app-migraine-tile',
@@ -25,6 +26,7 @@ export class MigraineTileComponent implements OnChanges {
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly geolocationService = inject(GeolocationService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -106,6 +108,37 @@ export class MigraineTileComponent implements OnChanges {
 
   formatValue(val: number, unit: string): string {
     return `${val.toFixed(1)}${unit}`;
+  }
+
+  openWeatherDetails(tileType: 'temperature' | 'pressure'): void {
+    const boundingBox = this.place.boundingBox;
+    const dialogRef = this.dialog.open(WeatherComponent, {
+      data: {
+        weather: this.weather,
+        location: this.geolocationService.getCenterOfBoundingBox(boundingBox!)
+      },
+      closeOnNavigation: true,
+      minWidth: '90vw',
+      width: '90vw',
+      maxWidth: '90vw',
+      minHeight: '90vh',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe((refInstance) => {
+      const comp = dialogRef.componentInstance as WeatherComponent | undefined;
+      comp?.onTileClick({
+        type: tileType,
+        label: '',
+        icon: '',
+        value: '',
+        levelText: '',
+        minMax: { min: 0, max: 0 }
+      } as any);
+    });
   }
 
 }
