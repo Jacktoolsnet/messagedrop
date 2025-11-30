@@ -37,6 +37,11 @@ export class WeatherTileComponent implements OnInit {
   ngOnInit(): void {
     if (this.place.datasets.weatherDataset.data) {
       if (this.placeService.isDatasetExpired(this.place.datasets.weatherDataset)) {
+        // show cached while trying refresh
+        this.weather = this.place.datasets.weatherDataset.data;
+        this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
+        this.minMax = this.getHourlyMinMax('temperature');
+        this.isStale = true;
         this.getWeather();
       } else {
         this.weather = this.place.datasets.weatherDataset.data;
@@ -63,28 +68,35 @@ export class WeatherTileComponent implements OnInit {
         )
         .subscribe({
           next: (weather) => {
-            this.place.datasets.weatherDataset.data = weather;
-            this.place.datasets.weatherDataset.lastUpdate = DateTime.now();
-            this.weather = weather;
-            this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
-            this.minMax = this.getHourlyMinMax('temperature');
-            this.isStale = false;
-          },
-          error: () => {
-            // Fallback to cached data if available
-            if (this.place.datasets.weatherDataset.data) {
-              this.weather = this.place.datasets.weatherDataset.data;
+            if (weather) {
+              this.place.datasets.weatherDataset.data = weather;
+              this.place.datasets.weatherDataset.lastUpdate = DateTime.now();
+              this.weather = weather;
               this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
               this.minMax = this.getHourlyMinMax('temperature');
-              this.isStale = true;
+              this.isStale = false;
             } else {
-              this.weather = undefined;
-              this.weatherIcon = undefined;
-              this.minMax = undefined;
-              this.isStale = true;
+              this.useCachedAsStale();
             }
+          },
+          error: () => {
+            this.useCachedAsStale();
           }
         });
+    }
+  }
+
+  private useCachedAsStale(): void {
+    if (this.place.datasets.weatherDataset.data) {
+      this.weather = this.place.datasets.weatherDataset.data;
+      this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
+      this.minMax = this.getHourlyMinMax('temperature');
+      this.isStale = true;
+    } else {
+      this.weather = undefined;
+      this.weatherIcon = undefined;
+      this.minMax = undefined;
+      this.isStale = true;
     }
   }
 

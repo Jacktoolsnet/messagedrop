@@ -87,6 +87,10 @@ export class AirQualityTileComponent implements OnInit {
   ngOnInit(): void {
     if (this.place.datasets.airQualityDataset.data) {
       if (this.placeService.isDatasetExpired(this.place.datasets.airQualityDataset)) {
+        // show cached while refreshing
+        this.airQuality = this.place.datasets.airQualityDataset.data;
+        this.updateFromAirQuality();
+        this.isStale = true;
         this.getAirQuality();
       } else {
         this.airQuality = this.place.datasets.airQualityDataset.data;
@@ -108,26 +112,34 @@ export class AirQualityTileComponent implements OnInit {
       .getAirQuality(location.plusCode, location.latitude, location.longitude, 3)
       .subscribe({
         next: (airQuality) => {
-          this.place.datasets.airQualityDataset.data = airQuality;
-          this.place.datasets.airQualityDataset.lastUpdate = DateTime.now();
-          this.airQuality = airQuality;
-          this.updateFromAirQuality();
-          this.isStale = false;
+          if (airQuality) {
+            this.place.datasets.airQualityDataset.data = airQuality;
+            this.place.datasets.airQualityDataset.lastUpdate = DateTime.now();
+            this.airQuality = airQuality;
+            this.updateFromAirQuality();
+            this.isStale = false;
+          } else {
+            this.useCachedAsStale();
+          }
         },
         error: () => {
-          if (this.place.datasets.airQualityDataset.data) {
-            this.airQuality = this.place.datasets.airQualityDataset.data;
-            this.updateFromAirQuality();
-            this.isStale = true;
-          } else {
-            this.airQuality = undefined;
-            this.value = 0;
-            this.level = '';
-            this.minMax = undefined;
-            this.isStale = true;
-          }
+          this.useCachedAsStale();
         }
       });
+  }
+
+  private useCachedAsStale(): void {
+    if (this.place.datasets.airQualityDataset.data) {
+      this.airQuality = this.place.datasets.airQualityDataset.data;
+      this.updateFromAirQuality();
+      this.isStale = true;
+    } else {
+      this.airQuality = undefined;
+      this.value = 0;
+      this.level = '';
+      this.minMax = undefined;
+      this.isStale = true;
+    }
   }
 
   private updateFromAirQuality(): void {
