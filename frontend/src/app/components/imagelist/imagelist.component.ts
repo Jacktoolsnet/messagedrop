@@ -210,7 +210,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
         const dialogResult = await firstValueFrom(
           this.dialog.open(OverrideExifDataComponent, {
             data: { fileName: entry.fileName, previewUrl },
-            autoFocus: true,
+            autoFocus: false,
           }).afterClosed()
         );
 

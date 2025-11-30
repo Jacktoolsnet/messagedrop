@@ -699,7 +699,7 @@ export class AppComponent implements OnInit {
         const dialogResult = await firstValueFrom(
           this.dialog.open(OverrideExifDataComponent, {
             data: { fileName: entry.fileName, previewUrl },
-            autoFocus: true,
+            autoFocus: false,
           }).afterClosed()
         );
 
