@@ -45,8 +45,7 @@ export class TileSettingsComponent {
     { type: 'custom-text', label: 'Text', icon: 'text_fields' },
     { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
     { type: 'custom-date', label: 'Anniversary', icon: 'event' },
-    { type: 'custom-link', label: 'Link', icon: 'link' },
-    { type: 'custom-migraine', label: 'Migraine', icon: 'crisis_alert' }
+    { type: 'custom-link', label: 'Link', icon: 'link' }
   ];
 
   drop(event: CdkDragDrop<TileSetting[]>) {
@@ -98,16 +97,7 @@ export class TileSettingsComponent {
     }
 
     if (tileToAdd.type === 'custom-migraine') {
-      baseTile.payload = {
-        title: tileToAdd.label,
-        icon: 'crisis_alert',
-        migraine: {
-          tempWarn1: 5,
-          tempWarn2: 8,
-          pressureWarn1: 6,
-          pressureWarn2: 10
-        }
-      };
+      return;
     }
 
     updated.unshift(baseTile);
@@ -192,6 +182,9 @@ export class TileSettingsComponent {
   }
 
   deleteTile(tile: TileSetting) {
+    if (tile.type === 'custom-migraine') {
+      return;
+    }
     const ref = this.dialog.open(TileDeleteComponent, {
       width: '360px'
     });

@@ -26,12 +26,12 @@
         <div class="tile-name">{{ tile.label }}</div>
       </div>
 
-      @if (tile.custom) {
-      <div class="tile-actions">
-        <button mat-icon-button color="primary" type="button" (click)="editTile(tile)" aria-label="Tile bearbeiten">
-          <mat-icon>edit</mat-icon>
-        </button>
-        <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)" aria-label="Tile löschen">
+        @if (tile.custom && tile.type !== 'custom-migraine') {
+        <div class="tile-actions">
+          <button mat-icon-button color="primary" type="button" (click)="editTile(tile)" aria-label="Tile bearbeiten">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)" aria-label="Tile löschen">
           <mat-icon>delete</mat-icon>
         </button>
       </div>
