@@ -52,10 +52,11 @@ export class AnniversaryTileComponent implements OnChanges {
 
     const ref = this.dialog.open(AnniversaryTileEditComponent, {
       width: 'auto',
+      minWidth: '450px',
       maxWidth: '95vw',
       height: 'auto',
-      maxHeight: '90vh',
-      panelClass: 'TileEditDialog',
+      maxHeight: '95vh',
+      autoFocus: false,
       data: { tile }
     });
 

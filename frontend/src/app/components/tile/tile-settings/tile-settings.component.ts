@@ -127,10 +127,11 @@ export class TileSettingsComponent {
     if (tile.type === 'custom-date') {
       const ref = this.dialog.open(AnniversaryTileEditComponent, {
         width: 'auto',
+        minWidth: '450px',
         maxWidth: '95vw',
         height: 'auto',
-        maxHeight: '90vh',
-        panelClass: 'TileEditDialog',
+        maxHeight: '95vh',
+        autoFocus: false,
         data: { tile }
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
