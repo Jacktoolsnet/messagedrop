@@ -81,19 +81,21 @@ export class PollutionTileComponent implements OnChanges {
     return this.currentTile()?.payload?.pollution?.keys ?? [];
   }
 
-  get metrics(): { key: string; label: string; icon: string; value: string; level: 'none' | 'warn' | 'alert' }[] {
+  get metrics(): { key: string; label: string; icon: string; value: string; level: 'none' | 'warn' | 'alert'; color: string }[] {
     if (!this.airQuality || !this.airQuality.hourly?.time) return [];
     const currentDate = new Date().toISOString().split('T')[0];
+    const isDarkMode = document.body.classList.contains('dark');
     return this.selectedKeys.map(key => {
       const values = this.getTodayValues(key);
       const maxVal = values.length ? Math.max(...values) : 0;
-      const level = getAirQualityLevelInfo(key as AirQualityMetricKey, maxVal).severity;
+      const info = getAirQualityLevelInfo(key as AirQualityMetricKey, maxVal, isDarkMode);
       return {
         key,
         label: this.labelMap[key] ?? key,
         icon: this.iconMap[key] ?? 'blur_on',
         value: maxVal ? maxVal.toFixed(1) : '0',
-        level
+        level: info.severity,
+        color: info.color
       };
     });
   }

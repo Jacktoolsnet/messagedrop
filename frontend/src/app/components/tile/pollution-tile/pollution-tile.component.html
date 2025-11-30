@@ -15,10 +15,15 @@
   } @else {
     <div class="pollution-grid">
       @for (m of metrics; track m.key) {
-        <div class="metric" [class.warn]="m.level === 'warn'" [class.alert]="m.level === 'alert'">
+        <div
+          class="metric"
+          [class.warn]="m.level === 'warn'"
+          [class.alert]="m.level === 'alert'"
+          [style.borderColor]="m.color"
+          [style.backgroundColor]="m.color + '22'">
           <div class="metric-text">
             <div class="label">{{ m.label }}</div>
-            <div class="value">{{ m.value }}</div>
+            <div class="value" [style.color]="m.color">{{ m.value }}</div>
           </div>
           <button
             mat-icon-button
