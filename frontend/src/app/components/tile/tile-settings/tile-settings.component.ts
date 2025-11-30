@@ -12,6 +12,7 @@ import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-ti
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
+import { PollutionTileEditComponent } from '../pollution-tile/pollution-tile-edit/pollution-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 
@@ -153,6 +154,18 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-link') {
       const ref = this.dialog.open(LinkTileEditComponent, {
+        width: '520px',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-pollution') {
+      const ref = this.dialog.open(PollutionTileEditComponent, {
         width: '520px',
         data: { tile }
       });

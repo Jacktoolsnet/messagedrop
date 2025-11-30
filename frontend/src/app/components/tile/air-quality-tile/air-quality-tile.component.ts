@@ -276,9 +276,9 @@ export class AirQualityTileComponent implements OnInit {
   }
 
   // --- Dialog ---
-  public openAirQualityDetails(): void {
+  public openAirQualityDetails(selectedKey?: string): void {
     const dialogRef = this.dialog.open(AirQualityComponent, {
-      data: { airQuality: this.airQuality },
+      data: { airQuality: this.airQuality, selectedKey: selectedKey as any },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',

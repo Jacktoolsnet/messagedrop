@@ -1,0 +1,29 @@
+<h2 mat-dialog-title>Edit pollution tile</h2>
+
+<mat-dialog-content class="edit-content">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <div class="toggle-grid">
+    @for (item of keys; track item.key) {
+      <mat-slide-toggle [checked]="selectedKeys().has(item.key)" (change)="toggleKey(item.key, $event.checked)">
+        {{ item.label }}
+      </mat-slide-toggle>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>

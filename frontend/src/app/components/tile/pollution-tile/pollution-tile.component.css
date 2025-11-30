@@ -1,0 +1,90 @@
+.pollution-tile {
+  position: relative;
+  border-radius: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.pollution-tile:hover {
+  transform: scale(1.02);
+}
+
+.pollution-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pollution-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.75rem;
+  background: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.05));
+}
+
+.pollution-title {
+  flex: 1;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--mat-sys-on-surface, inherit);
+}
+
+.stale {
+  font-size: 0.85rem;
+  color: #f57c00;
+}
+
+.empty {
+  font-size: 0.95rem;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+}
+
+.pollution-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+}
+
+.metric {
+  padding: 10px;
+  border-radius: 10px;
+  background: var(--mat-sys-surface-container-high, rgba(0, 0, 0, 0.04));
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.metric-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.metric-text .label {
+  font-size: 0.9rem;
+  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.72));
+}
+
+.metric-text .value {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--mat-sys-on-surface, inherit);
+}
+
+.metric-action {
+  margin-left: auto;
+}

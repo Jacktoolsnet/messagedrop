@@ -34,7 +34,7 @@ import { AirQualityDetailComponent } from './air-quality-detail/air-quality-deta
 export class AirQualityComponent implements OnInit {
   private readonly mapService = inject(MapService);
   private readonly nominatimService = inject(NominatimService);
-  private readonly dialogData = inject<{ airQuality: AirQualityData }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<{ airQuality: AirQualityData; selectedKey?: AirQualityMetricKey }>(MAT_DIALOG_DATA);
 
   tileValues: AirQualityTileValue[] = [];
   allTileValues: AirQualityTileValue[] = [];
@@ -57,8 +57,44 @@ export class AirQualityComponent implements OnInit {
     this.selectedHour = new Date().getHours();
     this.checkAvailableCategories();
     this.getLocationName();
-    this.updateTiles();
+    const initialKey = this.dialogData.selectedKey;
+    if (initialKey) {
+      this.setSelectionByKey(initialKey);
+    } else {
+      this.updateTiles();
+    }
     this.dayLabels = this.getDayLabels();
+  }
+
+  private getCategoryForKey(key: AirQualityMetricKey): AirQualityCategory | null {
+    if (['alder_pollen', 'birch_pollen', 'grass_pollen', 'mugwort_pollen', 'olive_pollen', 'ragweed_pollen'].includes(key)) {
+      return 'pollen';
+    }
+    if (['pm10', 'pm2_5'].includes(key)) {
+      return 'particulateMatter';
+    }
+    if (['carbon_monoxide', 'nitrogen_dioxide', 'sulphur_dioxide', 'ozone'].includes(key)) {
+      return 'pollutants';
+    }
+    return null;
+  }
+
+  private setSelectionByKey(key: AirQualityMetricKey): void {
+    const category = this.getCategoryForKey(key);
+    if (category) {
+      if (!this.categoryModes.includes(category)) {
+        this.updateTiles();
+        return;
+      }
+      this.selectedCategory = category;
+      this.updateTiles();
+      this.allTileValues = this.getAllTileValues();
+      this.allKeys = this.getAllCategoryKeys();
+      this.tileIndex = this.allKeys.findIndex(k => k === key);
+      this.selectedTile = this.allTileValues.find(t => t.key === key) ?? null;
+    } else {
+      this.updateTiles();
+    }
   }
 
   checkAvailableCategories(): void {

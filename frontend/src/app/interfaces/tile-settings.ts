@@ -21,6 +21,10 @@ export interface TileSetting {
       pressureWarn1: number;
       pressureWarn2: number;
     };
+    pollution?: {
+      keys: string[];
+      icon?: string;
+    };
   };
 }
 
@@ -72,7 +76,48 @@ export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): 
       order: setting.order ?? defaultsNormalized.length + index
     }));
 
-  return [...defaultsNormalized, ...customTiles]
+  const systemTiles: TileSetting[] = [];
+
+  if (!incoming.find(t => t.type === 'custom-migraine')) {
+    systemTiles.push({
+      id: 'system-migraine',
+      type: 'custom-migraine',
+      label: 'Migraine',
+      enabled: true,
+      order: defaultsNormalized.length + customTiles.length,
+      custom: false,
+      payload: {
+        title: 'Migraine',
+        icon: 'crisis_alert',
+        migraine: {
+          tempWarn1: 5,
+          tempWarn2: 8,
+          pressureWarn1: 6,
+          pressureWarn2: 10
+        }
+      }
+    });
+  }
+
+  if (!incoming.find(t => t.type === 'custom-pollution')) {
+    systemTiles.push({
+      id: 'system-pollution',
+      type: 'custom-pollution',
+      label: 'Pollution',
+      enabled: true,
+      order: defaultsNormalized.length + customTiles.length + systemTiles.length,
+      custom: false,
+      payload: {
+        title: 'Pollution',
+        icon: 'air',
+        pollution: {
+          keys: ['alder_pollen', 'birch_pollen', 'grass_pollen', 'mugwort_pollen', 'olive_pollen', 'ragweed_pollen', 'pm10', 'pm2_5', 'ozone']
+        }
+      }
+    });
+  }
+
+  return [...defaultsNormalized, ...customTiles, ...systemTiles]
     .sort((a, b) => a.order - b.order)
     .map((setting, index) => ({ ...setting, order: index }));
 }

@@ -1,0 +1,39 @@
+<div class="pollution-tile" role="button" tabindex="0" (click)="edit()"
+  (keyup.enter)="edit()" (keyup.space)="edit()">
+  <div class="pollution-header">
+    <div class="pollution-icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="pollution-title">{{ title }}</div>
+    @if (isStale) {
+      <span class="stale">Data expired</span>
+    }
+  </div>
+
+  @if (!airQuality || metrics.length === 0) {
+    <div class="empty">No air quality data</div>
+  } @else {
+    <div class="pollution-grid">
+      @for (m of metrics; track m.key) {
+        <div class="metric">
+          <div class="metric-icon">
+            <mat-icon>{{ m.icon }}</mat-icon>
+          </div>
+          <div class="metric-text">
+            <div class="label">{{ m.label }}</div>
+            <div class="value">{{ m.value }}</div>
+          </div>
+          <button
+            mat-icon-button
+            class="metric-action"
+            color="primary"
+            type="button"
+            (click)="openAirQualityDetails(m.key); $event.stopPropagation()"
+            aria-label="Open details in air quality view">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
