@@ -5,6 +5,7 @@ import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { HourlyWeather } from '../../../interfaces/hourly-weather';
 import { Weather } from '../../../interfaces/weather';
 import { WeatherTile } from '../weather-tile.interface';
+import { getWeatherBaseColor } from '../../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather-detail',
@@ -140,9 +141,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           ...dataset,
           data: precipitationProbability,
           label: 'Rain chance (%)',
-          borderColor: '#42A5F5',
-          backgroundColor: 'rgba(66, 165, 245, 0.2)',
-          pointBackgroundColor: '#42A5F5'
+          borderColor: this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex),
+          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex), 0.2),
+          pointBackgroundColor: this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex)
         };
         minY = 0;
         maxY = 100;
@@ -157,9 +158,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           ...dataset,
           data: precipitation,
           label: 'Rainfall (mm/h)',
-          borderColor: '#42A5F5',
-          backgroundColor: 'rgba(66, 165, 245, 0.2)',
-          pointBackgroundColor: '#42A5F5'
+          borderColor: this.getBaseColorForSelectedValue(precipitation, selectedIndex),
+          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(precipitation, selectedIndex), 0.2),
+          pointBackgroundColor: this.getBaseColorForSelectedValue(precipitation, selectedIndex)
         };
         break;
       }
@@ -172,9 +173,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           ...dataset,
           data: winds,
           label: 'Wind (km/h)',
-          borderColor: '#9E9E9E',
-          backgroundColor: 'rgba(158, 158, 158, 0.2)',
-          pointBackgroundColor: '#9E9E9E'
+          borderColor: this.getBaseColorForSelectedValue(winds, selectedIndex),
+          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(winds, selectedIndex), 0.2),
+          pointBackgroundColor: this.getBaseColorForSelectedValue(winds, selectedIndex)
         };
         break;
       }
@@ -187,9 +188,9 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           ...dataset,
           data: pressures,
           label: 'Pressure (hPa)',
-          borderColor: '#BA68C8',
-          backgroundColor: 'rgba(186, 104, 200, 0.2)',
-          pointBackgroundColor: '#BA68C8'
+          borderColor: this.getBaseColorForSelectedValue(pressures, selectedIndex),
+          backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(pressures, selectedIndex), 0.2),
+          pointBackgroundColor: this.getBaseColorForSelectedValue(pressures, selectedIndex)
         };
         break;
       }
@@ -230,12 +231,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     if (selectedIndex !== -1) {
       const value = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const label = labels[selectedIndex];
-      let color = this.getAnnotationColorForChart();
-      if (this.tile.type === 'temperature') {
-        color = this.getTemperatureColor(value);
-      } else if (this.tile.type === 'uvIndex') {
-        color = this.getUvColor(value);
-      }
+      let color = getWeatherBaseColor(this.tile.type, value);
       annotations['selectedHour'] = {
         type: 'line',
         xMin: label,
@@ -348,18 +344,6 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     }
   }
 
-  getAnnotationColorForChart(): string {
-    switch (this.tile.type) {
-      case 'temperature': return '#EF5350';
-      case 'precipitationprobability': return '#42A5F5';
-      case 'precipitation': return '#42A5F5';
-      case 'uvIndex': return '#AB47BC';
-      case 'wind': return '#9E9E9E';
-      case 'pressure': return '#BA68C8';
-      default: return '#FF4081'; // fallback pink
-    }
-  }
-
   mixColors(color1: string, color2: string): string {
     const hexToRgb = (hex: string) => {
       const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
@@ -394,19 +378,11 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
   }
 
   getTemperatureColor(temp: number): string {
-    if (temp <= 0) return '#1565C0'; // dunkles Blau für Frost
-    if (temp <= 10) return '#42A5F5'; // helles Blau für kühl
-    if (temp <= 20) return '#66BB6A'; // grün für mild
-    if (temp <= 30) return '#FFA726'; // orange für warm
-    return '#EF5350'; // rot für heiß
+    return getWeatherBaseColor('temperature', temp);
   }
 
   getUvColor(uv: number): string {
-    if (uv <= 2) return '#4CAF50'; // grün
-    if (uv <= 5) return '#FFEB3B'; // gelb
-    if (uv <= 7) return '#FF9800'; // orange
-    if (uv <= 10) return '#F44336'; // rot
-    return '#9C27B0'; // violett
+    return getWeatherBaseColor('uvIndex', uv);
   }
 
   getHourlyMinMax(field: 'temperature' | 'precipitation' | 'wind' | 'pressure'): { min: number, max: number } {
@@ -422,5 +398,20 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     const max = Math.max(...values);
 
     return { min, max };
+  }
+
+  private getBaseColorForSelectedValue(values: number[], selectedIndex: number): string {
+    const safeIndex = selectedIndex >= 0 && selectedIndex < values.length ? selectedIndex : Math.floor(values.length / 2);
+    const value = values[safeIndex] ?? 0;
+    return getWeatherBaseColor(this.tile.type, value);
+  }
+
+  private toAlpha(color: string, alpha: number): string {
+    const hex = color.replace('#', '');
+    const bigint = parseInt(hex, 16);
+    const r = (bigint >> 16) & 255;
+    const g = (bigint >> 8) & 255;
+    const b = bigint & 255;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
   }
 }

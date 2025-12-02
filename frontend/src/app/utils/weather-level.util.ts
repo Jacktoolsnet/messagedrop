@@ -1,0 +1,103 @@
+import { WeatherTileType } from '../components/weather/weather-tile.interface';
+
+export interface WeatherLevelInfo {
+  label: string;
+  color: string;
+}
+
+export function getWeatherBaseColor(type: WeatherTileType, value: number): string {
+  switch (type) {
+    case 'temperature':
+      if (value < 0) return '#1565C0';
+      if (value < 10) return '#42A5F5';
+      if (value < 20) return '#66BB6A';
+      if (value < 28) return '#FFA726';
+      if (value < 35) return '#EF5350';
+      return '#B71C1C';
+    case 'uvIndex':
+      if (value < 3) return '#4CAF50';
+      if (value < 6) return '#FFEB3B';
+      if (value < 8) return '#FF9800';
+      if (value < 11) return '#F44336';
+      return '#9C27B0';
+    case 'precipitationprobability':
+      if (value < 20) return '#e0f7fa';
+      if (value < 50) return '#81d4fa';
+      if (value < 80) return '#0288d1';
+      return '#01579b';
+    case 'precipitation':
+      if (value < 0.1) return '#e0f7fa';
+      if (value < 1.0) return '#b3e5fc';
+      if (value < 5.0) return '#81d4fa';
+      if (value < 10.0) return '#4fc3f7';
+      return '#0288d1';
+    case 'wind':
+      if (value < 5) return '#c8e6c9';
+      if (value < 15) return '#aed581';
+      if (value < 30) return '#fbc02d';
+      if (value < 50) return '#fb8c00';
+      return '#e64a19';
+    case 'pressure':
+      if (value < 980) return '#81d4fa';
+      if (value < 1010) return '#c8e6c9';
+      if (value < 1030) return '#ffcc80';
+      return '#ffb74d';
+    default:
+      return '#ffffff';
+  }
+}
+
+export function getWeatherLevelInfo(type: WeatherTileType, value: number, isDarkMode = false): WeatherLevelInfo {
+  const baseColor = getWeatherBaseColor(type, value);
+  const label = getWeatherLevelLabel(type, value);
+  const color = isDarkMode ? baseColor : adjustColor(baseColor, -50);
+  return { label, color };
+}
+
+export function getWeatherLevelLabel(type: WeatherTileType, value: number): string {
+  switch (type) {
+    case 'temperature':
+      if (value < 0) return 'Freezing';
+      if (value < 10) return 'Cold';
+      if (value < 20) return 'Cool';
+      if (value < 28) return 'Warm';
+      if (value < 35) return 'Hot';
+      return 'Extreme heat';
+    case 'uvIndex':
+      if (value < 3) return 'Low';
+      if (value < 6) return 'Moderate';
+      if (value < 8) return 'High';
+      if (value < 11) return 'Very high';
+      return 'Extreme';
+    case 'precipitationprobability':
+      if (value < 20) return 'Unlikely';
+      if (value < 50) return 'Possible';
+      if (value < 80) return 'Likely';
+      return 'Very likely';
+    case 'precipitation':
+      if (value < 0.1) return 'Dry';
+      if (value < 1.0) return 'Light rain';
+      if (value < 5.0) return 'Rain';
+      if (value < 10.0) return 'Heavy rain';
+      return 'Downpour';
+    case 'wind':
+      if (value < 5) return 'Calm';
+      if (value < 15) return 'Breezy';
+      if (value < 30) return 'Windy';
+      if (value < 50) return 'Strong wind';
+      return 'Storm';
+    case 'pressure':
+      if (value < 980) return 'Low';
+      if (value < 1010) return 'Moderate';
+      if (value < 1030) return 'High';
+      return 'Very high';
+    default:
+      return '';
+  }
+}
+
+function adjustColor(hex: string, amount: number): string {
+  return '#' + hex.replace(/^#/, '').replace(/../g, c =>
+    ('0' + Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).slice(-2)
+  );
+}

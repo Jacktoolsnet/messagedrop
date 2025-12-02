@@ -12,5 +12,6 @@ export interface WeatherTile {
   icon: string;
   value: string;
   levelText: string;
+  color: string;
   minMax: { min: number; max: number };
 }

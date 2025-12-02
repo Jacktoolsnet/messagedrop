@@ -14,9 +14,9 @@
     <div class="tile-info">
         <i class="wi wi-{{ weatherIcon }}"></i>
         <div class="tile-content">
-            <div class="tile-temperature">{{ weather.current.temperature }} °C</div>
+            <div class="tile-temperature" [style.color]="tempColor">{{ weather.current.temperature }} °C</div>
             @if (minMax) {
-            <div class="tile-minmax">{{ minMax.min }} °C - {{ minMax.max }} °C</div>
+            <div class="tile-minmax" [style.color]="tempColor">{{ minMax.min }} °C - {{ minMax.max }} °C</div>
             }
             @if (isStale) {
             <div class="stale">Data expired - showing cached values</div>

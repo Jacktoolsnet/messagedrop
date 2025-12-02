@@ -14,6 +14,7 @@ import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 import { WeatherTile, WeatherTileType } from './weather-tile.interface';
+import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather',
@@ -122,14 +123,17 @@ export class WeatherComponent implements OnInit {
       return;
     }
 
+    const isDarkMode = document.body.classList.contains('dark');
+
     const make = (
       type: WeatherTileType,
       label: string,
       icon: string,
       value: string,
       levelText: string,
-      minMax: { min: number; max: number }
-    ): WeatherTile => ({ type, label, icon, value, levelText, minMax });
+      minMax: { min: number; max: number },
+      color: string
+    ): WeatherTile => ({ type, label, icon, value, levelText, color, minMax });
 
     this.tiles = [
       make(
@@ -137,48 +141,54 @@ export class WeatherComponent implements OnInit {
         'Temperature',
         'thermostat',
         `${init ? this.weather?.current.temperature : hourData.temperature} °C`,
-        this.getTileLevel('temperature', hourData.temperature),
-        this.getHourlyMinMax('temperature')
+        getWeatherLevelInfo('temperature', hourData.temperature, isDarkMode).label,
+        this.getHourlyMinMax('temperature'),
+        getWeatherLevelInfo('temperature', hourData.temperature, isDarkMode).color
       ),
       make(
         'precipitationprobability',
         'Rain chance',
         'water_drop',
         `${hourData.precipitationProbability} %`,
-        this.getTileLevel('precipitationprobability', hourData.precipitationProbability),
-        this.getHourlyMinMax('precipitationProbability')
+        getWeatherLevelInfo('precipitationprobability', hourData.precipitationProbability, isDarkMode).label,
+        this.getHourlyMinMax('precipitationProbability'),
+        getWeatherLevelInfo('precipitationprobability', hourData.precipitationProbability, isDarkMode).color
       ),
       make(
         'precipitation',
         'Rainfall',
         'grain',
         `${hourData.precipitation} mm/h`,
-        this.getTileLevel('precipitation', hourData.precipitation),
-        this.getHourlyMinMax('precipitation')
+        getWeatherLevelInfo('precipitation', hourData.precipitation, isDarkMode).label,
+        this.getHourlyMinMax('precipitation'),
+        getWeatherLevelInfo('precipitation', hourData.precipitation, isDarkMode).color
       ),
       make(
         'uvIndex',
         'UV Index',
         'light_mode',
         `${hourData.uvIndex}`,
-        this.getTileLevel('uvIndex', hourData.uvIndex),
-        this.getHourlyMinMax('uvIndex')
+        getWeatherLevelInfo('uvIndex', hourData.uvIndex, isDarkMode).label,
+        this.getHourlyMinMax('uvIndex'),
+        getWeatherLevelInfo('uvIndex', hourData.uvIndex, isDarkMode).color
       ),
       make(
         'wind',
         'Wind',
         'air',
         `${hourData.wind} km/h`,
-        this.getTileLevel('wind', hourData.wind),
-        this.getHourlyMinMax('wind')
+        getWeatherLevelInfo('wind', hourData.wind, isDarkMode).label,
+        this.getHourlyMinMax('wind'),
+        getWeatherLevelInfo('wind', hourData.wind, isDarkMode).color
       ),
       make(
         'pressure',
         'Pressure',
         'compress',
         `${hourData.pressure} hPa`,
-        this.getTileLevel('pressure', hourData.pressure),
-        this.getHourlyMinMax('pressure')
+        getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).label,
+        this.getHourlyMinMax('pressure'),
+        getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).color
       )
     ];
   }
@@ -203,109 +213,6 @@ export class WeatherComponent implements OnInit {
       case 'wind': return hourData.wind ?? null;
       case 'pressure': return hourData.pressure ?? null;
       default: return null;
-    }
-  }
-
-  getTileColor(type: WeatherTileType, value: number | null): string {
-    if (value == null) return '';
-    const isDarkMode = document.body.classList.contains('dark');
-
-    const color = (() => {
-      switch (type) {
-        case 'temperature':
-          if (value < 0) return '#1565C0';
-          if (value < 10) return '#42A5F5';
-          if (value < 20) return '#66BB6A';
-          if (value < 28) return '#FFA726';
-          if (value < 35) return '#EF5350';
-          return '#B71C1C';
-        case 'uvIndex':
-          if (value < 3) return '#4CAF50';
-          if (value < 6) return '#FFEB3B';
-          if (value < 8) return '#FF9800';
-          if (value < 11) return '#F44336';
-          return '#9C27B0';
-        case 'precipitationprobability':
-          if (value < 20) return '#e0f7fa';
-          if (value < 50) return '#81d4fa';
-          if (value < 80) return '#0288d1';
-          return '#01579b';
-        case 'precipitation':
-          if (value < 0.1) return '#e0f7fa';
-          if (value < 1.0) return '#b3e5fc';
-          if (value < 5.0) return '#81d4fa';
-          if (value < 10.0) return '#4fc3f7';
-          return '#0288d1';
-        case 'wind':
-          if (value < 5) return '#c8e6c9';
-          if (value < 15) return '#aed581';
-          if (value < 30) return '#fbc02d';
-          if (value < 50) return '#fb8c00';
-          return '#e64a19';
-        case 'pressure':
-          if (value < 980) return '#81d4fa';
-          if (value < 1010) return '#c8e6c9';
-          if (value < 1030) return '#ffcc80';
-          return '#ffb74d';
-        default:
-          return '#ffffff';
-      }
-    })();
-
-    return isDarkMode ? color : this.adjustColor(color, -50);
-  }
-
-  private adjustColor(hex: string, amount: number): string {
-    return '#' + hex.replace(/^#/, '').replace(/../g, c =>
-      ('0' + Math.min(255, Math.max(0, parseInt(c, 16) + amount)).toString(16)).slice(-2)
-    );
-  }
-
-  getTileLevel(type: WeatherTileType, value: number): string {
-    switch (type) {
-      case 'temperature':
-        if (value < 0) return 'Freezing';
-        if (value < 10) return 'Cold';
-        if (value < 20) return 'Cool';
-        if (value < 28) return 'Warm';
-        if (value < 35) return 'Hot';
-        return 'Extreme heat';
-
-      case 'uvIndex':
-        if (value < 3) return 'Low';
-        if (value < 6) return 'Moderate';
-        if (value < 8) return 'High';
-        if (value < 11) return 'Very high';
-        return 'Extreme';
-
-      case 'precipitationprobability':
-        if (value < 20) return 'Unlikely';
-        if (value < 50) return 'Possible';
-        if (value < 80) return 'Likely';
-        return 'Very likely';
-
-      case 'precipitation':
-        if (value < 0.1) return 'Dry';
-        if (value < 1.0) return 'Light rain';
-        if (value < 5.0) return 'Rain';
-        if (value < 10.0) return 'Heavy rain';
-        return 'Downpour';
-
-      case 'wind':
-        if (value < 5) return 'Calm';
-        if (value < 15) return 'Breezy';
-        if (value < 30) return 'Windy';
-        if (value < 50) return 'Strong wind';
-        return 'Storm';
-
-      case 'pressure':
-        if (value < 980) return 'Low';
-        if (value < 1010) return 'Moderate';
-        if (value < 1030) return 'High';
-        return 'Very high';
-
-      default:
-        return '';
     }
   }
 

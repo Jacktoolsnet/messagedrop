@@ -22,7 +22,7 @@
     <div class="tile-grid">
         @for (tile of tiles; track tile.type) {
         <button type="button" class="tile" (click)="onTileClick(tile)"
-            [style.color]="getTileColor(tile.type, getTileNumericValue(tile.type))">
+            [style.color]="tile.color">
             <div class="tile-title">{{ tile.label }}</div>
             <div class="tile-icon-wrapper">
                 <mat-icon class="material-symbols-outlined tile-icon">{{ tile.icon }}</mat-icon>

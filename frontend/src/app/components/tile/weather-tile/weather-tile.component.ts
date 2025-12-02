@@ -11,6 +11,7 @@ import { PlaceService } from '../../../services/place.service';
 import { UserService } from '../../../services/user.service';
 import { WeatherService } from '../../../services/weather.service';
 import { WeatherComponent } from '../../weather/weather.component';
+import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather-tile',
@@ -27,6 +28,7 @@ export class WeatherTileComponent implements OnInit {
   weatherIcon: string | undefined;
   minMax: { min: number, max: number } | undefined;
   isStale = false;
+  tempColor: string | undefined;
 
   private readonly userService = inject(UserService);
   private readonly placeService = inject(PlaceService);
@@ -41,12 +43,14 @@ export class WeatherTileComponent implements OnInit {
         this.weather = this.place.datasets.weatherDataset.data;
         this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
         this.minMax = this.getHourlyMinMax('temperature');
+        this.setTempColor();
         this.isStale = true;
         this.getWeather();
       } else {
         this.weather = this.place.datasets.weatherDataset.data;
         this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
         this.minMax = this.getHourlyMinMax('temperature');
+        this.setTempColor();
         this.isStale = false;
       }
     } else {
@@ -74,6 +78,7 @@ export class WeatherTileComponent implements OnInit {
               this.weather = weather;
               this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
               this.minMax = this.getHourlyMinMax('temperature');
+              this.setTempColor();
               this.isStale = false;
             } else {
               this.useCachedAsStale();
@@ -91,6 +96,7 @@ export class WeatherTileComponent implements OnInit {
       this.weather = this.place.datasets.weatherDataset.data;
       this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
       this.minMax = this.getHourlyMinMax('temperature');
+      this.setTempColor();
       this.isStale = true;
     } else {
       this.weather = undefined;
@@ -98,6 +104,12 @@ export class WeatherTileComponent implements OnInit {
       this.minMax = undefined;
       this.isStale = true;
     }
+  }
+
+  private setTempColor(): void {
+    const temp = this.weather?.current?.temperature ?? 0;
+    const isDarkMode = document.body.classList.contains('dark');
+    this.tempColor = getWeatherLevelInfo('temperature', temp, isDarkMode).color;
   }
 
   getWeatherIcon(code?: number): string {
