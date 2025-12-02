@@ -13,7 +13,6 @@
   position: sticky;
   top: 0;
   z-index: 2;
-  background: var(--mat-sys-surface, #fff);
 }
 
 .tile-settings-content {
@@ -44,7 +43,6 @@
 .sticky-actions {
   position: sticky;
   bottom: 0;
-  background: var(--mat-sys-surface, #fff);
   padding-top: 8px;
 }
 
@@ -53,7 +51,7 @@
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  border: 1px solid var(--mat-sys-outline-variant, #d0d7de);
+  border: 1px solid var(--mat-sys-outline-variant, #494a4b);
   border-radius: 12px;
 }
 

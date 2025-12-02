@@ -1,42 +1,51 @@
-<div class="tile-grid">
-  @for (tile of visibleTiles; track trackByTile($index, tile)) {
-    @switch (tile.type) {
-      @case ('datetime') {
-        <app-datetime-tile class="tile" appMasonryItem [timezone]="place.timezone"></app-datetime-tile>
-      }
-      @case ('weather') {
-        <app-weather-tile class="tile" appMasonryItem [place]="place"></app-weather-tile>
-      }
-      @case ('airQuality') {
-        <app-air-quality-tile class="tile" appMasonryItem [place]="place"></app-air-quality-tile>
-      }
-      @case ('note') {
-        <app-note-tile class="tile" appMasonryItem [place]="place"></app-note-tile>
-      }
-      @case ('message') {
-        <app-message-tile class="tile" appMasonryItem [place]="place"></app-message-tile>
-      }
-      @case ('image') {
-        <app-image-tile class="tile" appMasonryItem [place]="place"></app-image-tile>
-      }
-      @case ('custom-text') {
-        <app-text-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-text-tile>
-      }
-      @case ('custom-multitext') {
-        <app-multitext-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-multitext-tile>
-      }
-      @case ('custom-link') {
-        <app-link-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-link-tile>
-      }
-      @case ('custom-date') {
-        <app-anniversary-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-anniversary-tile>
-      }
-      @case ('custom-migraine') {
-        <app-migraine-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-migraine-tile>
-      }
-      @case ('custom-pollution') {
-        <app-pollution-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-pollution-tile>
+@if (hasVisibleTiles) {
+  <div class="tile-grid">
+    @for (tile of visibleTiles; track trackByTile($index, tile)) {
+      @switch (tile.type) {
+        @case ('datetime') {
+          <app-datetime-tile class="tile" appMasonryItem [timezone]="place.timezone"></app-datetime-tile>
+        }
+        @case ('weather') {
+          <app-weather-tile class="tile" appMasonryItem [place]="place"></app-weather-tile>
+        }
+        @case ('airQuality') {
+          <app-air-quality-tile class="tile" appMasonryItem [place]="place"></app-air-quality-tile>
+        }
+        @case ('note') {
+          <app-note-tile class="tile" appMasonryItem [place]="place"></app-note-tile>
+        }
+        @case ('message') {
+          <app-message-tile class="tile" appMasonryItem [place]="place"></app-message-tile>
+        }
+        @case ('image') {
+          <app-image-tile class="tile" appMasonryItem [place]="place"></app-image-tile>
+        }
+        @case ('custom-text') {
+          <app-text-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-text-tile>
+        }
+        @case ('custom-multitext') {
+          <app-multitext-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-multitext-tile>
+        }
+        @case ('custom-link') {
+          <app-link-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-link-tile>
+        }
+        @case ('custom-date') {
+          <app-anniversary-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-anniversary-tile>
+        }
+        @case ('custom-migraine') {
+          <app-migraine-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-migraine-tile>
+        }
+        @case ('custom-pollution') {
+          <app-pollution-tile class="tile" appMasonryItem [place]="place" [tile]="tile"></app-pollution-tile>
+        }
       }
     }
-  }
-</div>
+  </div>
+} @else {
+  <div class="tile-empty">
+    <p>No tiles visible.</p>
+    <button mat-flat-button color="primary" type="button" (click)="openTileSettings()">
+      Open tile settings
+    </button>
+  </div>
+}

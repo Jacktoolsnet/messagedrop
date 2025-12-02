@@ -1,7 +1,10 @@
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, inject } from '@angular/core';
 import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { PlaceService } from '../../../services/place.service';
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
 import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
@@ -14,10 +17,11 @@ import { MultitextTileComponent } from "../multitext-tile/multitext-tile.compone
 import { NoteTileComponent } from "../note-tile/note-tile.component";
 import { TextTileComponent } from "../text-tile/text-tile.component";
 import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
+import { TileSettingsComponent } from '../tile-settings/tile-settings.component';
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, MasonryItemDirective],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, MasonryItemDirective, MatButtonModule],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -25,11 +29,37 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 export class TileListComponent {
   @Input() place!: Place;
 
+  private readonly dialog = inject(MatDialog);
+  private readonly placeService = inject(PlaceService);
+  private readonly cdr = inject(ChangeDetectorRef);
+
   private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-link', 'custom-date', 'custom-migraine', 'custom-pollution']);
 
   get visibleTiles(): TileSetting[] {
     return normalizeTileSettings(this.place.tileSettings)
       .filter((tile: TileSetting) => tile.enabled && this.renderableTypes.has(tile.type));
+  }
+
+  get hasVisibleTiles(): boolean {
+    return this.visibleTiles.length > 0;
+  }
+
+  openTileSettings(): void {
+    const dialogRef = this.dialog.open(TileSettingsComponent, {
+      width: 'auto',
+      minWidth: '450px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      data: { place: this.place }
+    });
+
+    dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
+      if (updatedSettings?.length) {
+        this.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
+        this.placeService.saveAdditionalPlaceInfos(this.place);
+        this.cdr.markForCheck();
+      }
+    });
   }
 
   trackByTile = (_: number, tile: TileSetting) => tile.id;
