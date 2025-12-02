@@ -10,9 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
-import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
-import { ShortMessage } from '../../interfaces/short-message';
 import { ConnectService } from '../../services/connect.service';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
@@ -31,12 +29,6 @@ import { ScannerComponent } from '../utils/scanner/scanner.component';
 
 interface ConnectDialogResult {
   connectId?: string;
-}
-
-interface ContactEditMessageResult {
-  contact: Contact;
-  shortMessage: ShortMessage;
-  lastLocation?: Location;
 }
 
 @Component({

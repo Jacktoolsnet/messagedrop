@@ -18,7 +18,7 @@ import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
-type ChatroomMessage = {
+interface ChatroomMessage {
   id: string;
   messageId: string;
   direction: 'user' | 'contactUser';
@@ -27,7 +27,7 @@ type ChatroomMessage = {
   readAt?: string | null;
   status?: string;
   reaction?: string | null;
-};
+}
 
 @Component({
   selector: 'app-contact-message-chatroom',
@@ -514,7 +514,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     });
   }
 
-  openReactionPicker(message: ChatroomMessage, event: MouseEvent): void {
+  openReactionPicker(message: ChatroomMessage, event: Event): void {
     event.stopPropagation();
     const dialogRef = this.matDialog.open(EmoticonPickerComponent, {
       panelClass: '',

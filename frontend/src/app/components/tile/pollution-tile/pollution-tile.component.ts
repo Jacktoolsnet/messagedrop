@@ -101,7 +101,6 @@ export class PollutionTileComponent implements OnChanges {
 
   get metrics(): { key: string; label: string; icon: string; value: string; level: 'none' | 'warn' | 'alert'; color: string }[] {
     if (!this.airQuality || !this.airQuality.hourly?.time) return [];
-    const currentDate = new Date().toISOString().split('T')[0];
     const isDarkMode = document.body.classList.contains('dark');
     const available = this.getAvailableKeys();
     const keysToUse = this.selectedKeys.filter(k => available.has(k));
@@ -123,7 +122,10 @@ export class PollutionTileComponent implements OnChanges {
   private getTodayValues(key: string): number[] {
     if (!this.airQuality?.hourly?.time) return [];
     const times = this.airQuality.hourly.time;
-    const dataArray = (this.airQuality.hourly as any)[key] as number[] | undefined;
+    const { time: _time, ...rest } = this.airQuality.hourly;
+    void _time;
+    const hourly = rest as Record<string, (number | null | undefined)[] | undefined>;
+    const dataArray = hourly[key];
     if (!dataArray) return [];
     const currentDate = new Date().toISOString().split('T')[0];
     const values: number[] = [];
@@ -148,8 +150,11 @@ export class PollutionTileComponent implements OnChanges {
 
   private hasAnyPollenData(): boolean {
     if (!this.airQuality?.hourly) return false;
+    const { time: _time, ...rest } = this.airQuality.hourly;
+    void _time;
+    const hourly = rest as Record<string, (number | null | undefined)[] | undefined>;
     return this.pollenKeys.some(key => {
-      const arr = (this.airQuality!.hourly as any)[key] as Array<number | null | undefined> | undefined;
+      const arr = hourly[key];
       return Array.isArray(arr) && arr.some(v => typeof v === 'number');
     });
   }

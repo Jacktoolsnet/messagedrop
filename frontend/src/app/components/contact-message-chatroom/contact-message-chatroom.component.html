@@ -79,7 +79,9 @@
             @if (msg.payload?.message?.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
-            <div class="reaction-chip reaction-chip--them" (click)="openReactionPicker(msg, $event)">
+            <div class="reaction-chip reaction-chip--them" role="button" tabindex="0"
+              (click)="openReactionPicker(msg, $event)" (keyup.enter)="openReactionPicker(msg, $event)"
+              (keyup.space)="openReactionPicker(msg, $event)">
               <span class="reaction-chip-menu">{{ msg.reaction || '🫥' }}</span>
             </div>
           </div>

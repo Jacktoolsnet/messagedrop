@@ -770,7 +770,8 @@ export class IndexedDbService {
   }
 
   private encodeImageEntry(entry: LocalImage): StoredLocalImageMeta {
-    const { handle, ...rest } = entry;
+    const { handle: _handle, ...rest } = entry;
+    void _handle;
     return this.compress(rest);
   }
 

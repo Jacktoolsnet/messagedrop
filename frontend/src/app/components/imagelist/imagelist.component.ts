@@ -25,12 +25,12 @@ import { UserService } from '../../services/user.service';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
 
-type ImageDialogData = {
+interface ImageDialogData {
   location: Location;
   imagesSignal: WritableSignal<LocalImage[]>;
   boundingBox?: BoundingBox;
   skipExifOverride?: boolean;
-};
+}
 
 @Component({
   selector: 'app-notelist',

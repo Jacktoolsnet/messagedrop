@@ -9,10 +9,10 @@ import { IndexedDbService } from './indexed-db.service';
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
     multiple?: boolean;
-    types?: Array<{
+    types?: {
       description?: string;
       accept: Record<string, string[]>;
-    }>;
+    }[];
     excludeAcceptAllOption?: boolean;
   }) => Promise<FileSystemFileHandle[]>;
 };

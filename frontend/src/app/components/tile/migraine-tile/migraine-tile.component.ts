@@ -9,6 +9,7 @@ import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-ed
 import { MatDialog } from '@angular/material/dialog';
 import { Weather } from '../../../interfaces/weather';
 import { WeatherComponent } from '../../weather/weather.component';
+import { WeatherTile } from '../../weather/weather-tile.interface';
 import { GeolocationService } from '../../../services/geolocation.service';
 
 @Component({
@@ -128,16 +129,18 @@ export class MigraineTileComponent implements OnChanges {
       autoFocus: false
     });
 
-    dialogRef.afterOpened().subscribe((refInstance) => {
+    dialogRef.afterOpened().subscribe(() => {
       const comp = dialogRef.componentInstance as WeatherComponent | undefined;
-      comp?.onTileClick({
+      const placeholder: WeatherTile = {
         type: tileType,
         label: '',
         icon: '',
         value: '',
         levelText: '',
+        color: '',
         minMax: { min: 0, max: 0 }
-      } as any);
+      };
+      comp?.onTileClick(placeholder);
     });
   }
 

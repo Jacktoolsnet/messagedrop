@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -87,10 +87,8 @@ export class MaticonPickerComponent {
     }
   ];
 
-  constructor(
-    private readonly dialogRef: MatDialogRef<MaticonPickerComponent, string | null>,
-    @Inject(MAT_DIALOG_DATA) public data: { current?: string | null }
-  ) { }
+  readonly dialogRef = inject(MatDialogRef<MaticonPickerComponent, string | null>);
+  readonly data = inject<{ current?: string | null }>(MAT_DIALOG_DATA);
 
   pick(icon: string | null): void {
     this.dialogRef.close(icon);

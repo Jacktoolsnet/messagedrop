@@ -1,14 +1,11 @@
 import { ApplicationRef, Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Buffer } from 'buffer';
 import { Socket, SocketIoConfig } from 'ngx-socket-io';
 import { environment } from '../../environments/environment';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
-import { Contact } from '../interfaces/contact';
 import { Envelope } from '../interfaces/envelope';
-import { MultimediaType } from '../interfaces/multimedia-type';
-import { ShortMessage } from '../interfaces/short-message';
+import { Contact } from '../interfaces/contact';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { UserService } from './user.service';
@@ -126,7 +123,7 @@ export class SocketioService {
   }
 
   async initContacts(): Promise<void> {
-    this.contactService.contactsSignal().forEach((contact: Contact) => {
+    this.contactService.contactsSignal().forEach(() => {
       // legacy message flow removed; contact messages handled in ContactMessageService
     });
   }

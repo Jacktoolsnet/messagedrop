@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -66,10 +66,8 @@ export class EmoticonPickerComponent {
     }
   ];
 
-  constructor(
-    private readonly dialogRef: MatDialogRef<EmoticonPickerComponent, string | null>,
-    @Inject(MAT_DIALOG_DATA) public data: EmoticonPickerData
-  ) { }
+  readonly dialogRef = inject(MatDialogRef<EmoticonPickerComponent, string | null>);
+  readonly data = inject<EmoticonPickerData>(MAT_DIALOG_DATA);
 
   pick(reaction: string | null): void {
     this.dialogRef.close(reaction);

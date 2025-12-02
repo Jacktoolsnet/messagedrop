@@ -231,7 +231,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     if (selectedIndex !== -1) {
       const value = this.getSelectedChartValue(dayHourly[selectedIndex]);
       const label = labels[selectedIndex];
-      let color = getWeatherBaseColor(this.tile.type, value);
+      const color = getWeatherBaseColor(this.tile.type, value);
       annotations['selectedHour'] = {
         type: 'line',
         xMin: label,

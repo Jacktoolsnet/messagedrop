@@ -29,27 +29,27 @@ export class AirQualityTileComponent implements OnInit {
   label = '';
   value = 0;
   level = '';
-  dominantKey = '';
+  dominantKey: AirQualityMetricKey | '' = '';
   isStale = false;
 
   // --- Kategorien ---
-  private readonly pollenKeys = [
+  private readonly pollenKeys: AirQualityMetricKey[] = [
     'alder_pollen',
     'birch_pollen',
     'grass_pollen',
     'mugwort_pollen',
     'olive_pollen',
     'ragweed_pollen'
-  ] as const;
+  ];
 
-  private readonly pollutantKeys = [
+  private readonly pollutantKeys: AirQualityMetricKey[] = [
     'pm10',
     'pm2_5',
     'carbon_monoxide',
     'nitrogen_dioxide',
     'sulphur_dioxide',
     'ozone'
-  ] as const;
+  ];
 
   // --- Label/Icon Maps ---
   private readonly labelMap: Record<string, string> = {
@@ -150,9 +150,18 @@ export class AirQualityTileComponent implements OnInit {
     const dominant = this.getDominantKey();
     this.dominantKey = dominant;
 
+    if (!dominant) {
+      this.label = '';
+      this.value = 0;
+      this.level = '';
+      this.airQualityIcon = undefined;
+      this.minMax = undefined;
+      return;
+    }
+
     this.label = this.getChartLabel(dominant);
     this.value = this.getHourlyValue(dominant);
-    const info = getAirQualityLevelInfo(dominant as AirQualityMetricKey, this.value, document.body.classList.contains('dark'));
+    const info = getAirQualityLevelInfo(dominant, this.value, document.body.classList.contains('dark'));
     this.level = info.label;
     this.airQualityIcon = this.getAirQualityIcon(dominant);
     this.minMax = this.getHourlyMinMax(dominant);
@@ -160,21 +169,21 @@ export class AirQualityTileComponent implements OnInit {
 
   // --- Dominanz-Logik ---
   /** Wählt den Key mit dem höchsten Tages-Max. Präferenz: Pollen → sonst Schadstoffe. */
-  private getDominantKey(): string {
+  private getDominantKey(): AirQualityMetricKey | '' {
     if (!this.airQuality?.hourly?.time) return '';
 
-    const pollenWinner = this.getBestOfKeys(this.pollenKeys as readonly string[]);
-    if (pollenWinner) return pollenWinner;
+    const pollenWinner = this.getBestOfKeys(this.pollenKeys);
+    if (pollenWinner) return pollenWinner as AirQualityMetricKey;
 
-    const pollutantWinner = this.getBestOfKeys(this.pollutantKeys as readonly string[]);
-    if (pollutantWinner) return pollutantWinner;
+    const pollutantWinner = this.getBestOfKeys(this.pollutantKeys);
+    if (pollutantWinner) return pollutantWinner as AirQualityMetricKey;
 
     return ''; // Fallback: nichts vorhanden
   }
 
   /** Liefert den Key mit größtem Tages-Max aus der gegebenen Liste oder '' wenn alles leer. */
-  private getBestOfKeys(keys: readonly string[]): string {
-    let bestKey = '';
+  private getBestOfKeys(keys: readonly AirQualityMetricKey[]): AirQualityMetricKey | '' {
+    let bestKey: AirQualityMetricKey | '' = '';
     let bestValue = -Infinity;
 
     for (const key of keys) {
@@ -280,9 +289,9 @@ export class AirQualityTileComponent implements OnInit {
   }
 
   // --- Dialog ---
-  public openAirQualityDetails(selectedKey?: string): void {
+  public openAirQualityDetails(selectedKey?: AirQualityMetricKey): void {
     const dialogRef = this.dialog.open(AirQualityComponent, {
-      data: { airQuality: this.airQuality, selectedKey: selectedKey as any },
+      data: { airQuality: this.airQuality, selectedKey },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',
