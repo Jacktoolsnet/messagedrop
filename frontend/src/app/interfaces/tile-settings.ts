@@ -51,8 +51,13 @@ export function createDefaultTileSettings(): TileSetting[] {
   });
 }
 
-export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): TileSetting[] {
-  const defaults = createDefaultTileSettings();
+export function normalizeTileSettings(
+  tileSettings: TileSetting[] | undefined,
+  options?: { includeDefaults?: boolean; includeSystem?: boolean }
+): TileSetting[] {
+  const includeDefaults = options?.includeDefaults ?? true;
+  const includeSystem = options?.includeSystem ?? true;
+  const defaults = includeDefaults ? createDefaultTileSettings() : [];
   const incoming = tileSettings ?? [];
 
   const defaultsNormalized = defaults.map(defaultSetting => {
@@ -78,7 +83,7 @@ export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): 
 
   const systemTiles: TileSetting[] = [];
 
-  if (!incoming.find(t => t.type === 'custom-migraine')) {
+  if (includeSystem && !incoming.find(t => t.type === 'custom-migraine')) {
     systemTiles.push({
       id: 'system-migraine',
       type: 'custom-migraine',
@@ -99,7 +104,7 @@ export function normalizeTileSettings(tileSettings: TileSetting[] | undefined): 
     });
   }
 
-  if (!incoming.find(t => t.type === 'custom-pollution')) {
+  if (includeSystem && !incoming.find(t => t.type === 'custom-pollution')) {
     systemTiles.push({
       id: 'system-pollution',
       type: 'custom-pollution',

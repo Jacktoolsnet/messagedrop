@@ -6,8 +6,10 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { ContactService } from '../../../services/contact.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
@@ -39,9 +41,14 @@ import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 export class TileSettingsComponent {
   private readonly dialogRef = inject(MatDialogRef<TileSettingsComponent>);
   private readonly dialog = inject(MatDialog);
-  readonly data = inject<{ place: Place }>(MAT_DIALOG_DATA);
+  private readonly contactService = inject(ContactService);
+  readonly data = inject<{ place?: Place; contact?: Contact }>(MAT_DIALOG_DATA);
 
-  readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(this.data.place.tileSettings));
+  private readonly isPlaceContext = !!this.data.place;
+  readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(
+    this.data.place?.tileSettings ?? this.data.contact?.tileSettings,
+    { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
+  ));
   readonly addableTiles: { type: TileSetting['type']; label: string; icon: string }[] = [
     { type: 'custom-text', label: 'Text', icon: 'text_fields' },
     { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
@@ -215,7 +222,13 @@ export class TileSettingsComponent {
 
   save() {
     const normalized = this.tileSettings().map((tile: TileSetting, index: number) => ({ ...tile, order: index }));
-    this.data.place.tileSettings = normalized;
+    if (this.data.place) {
+      this.data.place.tileSettings = normalized;
+    }
+    if (this.data.contact) {
+      this.data.contact.tileSettings = normalized;
+      this.contactService.saveContactTileSettings(this.data.contact);
+    }
     this.dialogRef.close(normalized);
   }
 

@@ -111,7 +111,8 @@ export class ContactSettingsComponent {
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
       if (updatedSettings?.length) {
         this.data.contact.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
-        this.contactService.saveAdditionalPlaceInfos(this.data.contact);
+        this.contactService.saveContactTileSettings(this.data.contact);
+        this.contactService.refreshContact(this.data.contact.id);
       }
     });
   }

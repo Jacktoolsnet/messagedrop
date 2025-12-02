@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
+import { TileSetting } from '../interfaces/tile-settings';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { RawContact } from '../interfaces/raw-contact';
@@ -96,6 +97,8 @@ export class ContactService {
       contact.name = profile?.name || contact.name || '';
       contact.base64Avatar = profile?.base64Avatar || contact.base64Avatar || '';
       contact.pinned = profile?.pinned || false;
+      const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
+      contact.tileSettings = tileSettings ?? contact.tileSettings ?? [];
     }));
     this._contacts.set(this._contacts());
   }
@@ -108,6 +111,10 @@ export class ContactService {
         pinned: contact.pinned
       });
     }));
+  }
+
+  async saveContactTileSettings(contact: Contact): Promise<void> {
+    await this.indexedDbService.setTileSettings(contact.id, contact.tileSettings ?? []);
   }
 
   isReady(): boolean {

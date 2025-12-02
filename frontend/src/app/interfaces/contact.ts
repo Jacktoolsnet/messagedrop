@@ -22,5 +22,6 @@ export interface Contact {
     provided: boolean,
     lastMessageFrom: string,
     lastMessageAt?: string | null
-    unreadCount?: number
+    unreadCount?: number,
+    tileSettings?: import('./tile-settings').TileSetting[]
 }

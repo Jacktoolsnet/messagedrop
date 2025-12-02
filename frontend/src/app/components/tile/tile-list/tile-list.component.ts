@@ -5,6 +5,8 @@ import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-set
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { PlaceService } from '../../../services/place.service';
+import { Contact } from '../../../interfaces/contact';
+import { ContactService } from '../../../services/contact.service';
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
 import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
@@ -27,16 +29,21 @@ import { TileSettingsComponent } from '../tile-settings/tile-settings.component'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TileListComponent {
-  @Input() place!: Place;
+  @Input() place?: Place;
+  @Input() contact?: Contact;
 
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
+  private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
 
   private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-link', 'custom-date', 'custom-migraine', 'custom-pollution']);
 
   get visibleTiles(): TileSetting[] {
-    return normalizeTileSettings(this.place.tileSettings)
+    if (!this.place && !this.contact) return [];
+    const sourceTiles = this.contact ? this.contact.tileSettings : this.place?.tileSettings;
+    const opts = this.contact ? { includeDefaults: false, includeSystem: false } : undefined;
+    return normalizeTileSettings(sourceTiles, opts)
       .filter((tile: TileSetting) => tile.enabled && this.renderableTypes.has(tile.type));
   }
 
@@ -50,13 +57,19 @@ export class TileListComponent {
       minWidth: '450px',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      data: { place: this.place }
+      data: this.contact ? { contact: this.contact } : { place: this.place }
     });
 
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
       if (updatedSettings?.length) {
-        this.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
-        this.placeService.saveAdditionalPlaceInfos(this.place);
+        if (this.contact) {
+          this.contact.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
+          this.contactService.saveContactTileSettings(this.contact);
+          this.contactService.refreshContact(this.contact.id);
+        } else if (this.place) {
+          this.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
+          this.placeService.saveAdditionalPlaceInfos(this.place);
+        }
         this.cdr.markForCheck();
       }
     });
