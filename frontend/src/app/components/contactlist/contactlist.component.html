@@ -37,7 +37,10 @@
                 <span class="name">{{ contact.name || 'Unnamed' }}</span>
             </mat-expansion-panel-header>
             <mat-card>
-                <mat-card-content class="chatroom-preview__content">
+                <mat-card-content>
+                    <div class="tile-grid">
+                        <app-tile-list [contact]="contact"></app-tile-list>
+                    </div>
                 </mat-card-content>
                 <mat-card-actions class="buttonbar">
                     @if (contact.pinned) {

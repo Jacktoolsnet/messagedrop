@@ -22,6 +22,12 @@
   box-sizing: border-box;
 }
 
+.tile-grid {
+  width: 100%;
+  display: block;
+  padding: 0.5rem 0;
+}
+
 .no-content {
   justify-content: center;
   align-items: center;

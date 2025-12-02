@@ -2,13 +2,16 @@ import { CommonModule } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Contact } from '../../../interfaces/contact';
+import { TileSetting } from '../../../interfaces/tile-settings';
+import { ContactService } from '../../../services/contact.service';
 import { SocketioService } from '../../../services/socketio.service';
+import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
   selector: 'app-profile',
@@ -25,13 +28,15 @@ import { SocketioService } from '../../../services/socketio.service';
     MatDialogClose,
     MatIconModule
   ],
-  templateUrl: './contact-profile.component.html',
-  styleUrl: './contact-profile.component.css'
+  templateUrl: './contact-settingx.component.html',
+  styleUrl: './contact-settingx.component.css'
 })
-export class ContactProfileComponent {
+export class ContactSettingsComponent {
   private readonly socketioService = inject(SocketioService);
+  private readonly contactService = inject(ContactService);
   private readonly snackBar = inject(MatSnackBar);
-  readonly dialogRef = inject(MatDialogRef<ContactProfileComponent>);
+  readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
+  private readonly dialog = inject(MatDialog);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
 
   public contact: Contact = this.data.contact;
@@ -91,6 +96,23 @@ export class ContactProfileComponent {
       duration: 1500,
       horizontalPosition: 'center',
       verticalPosition: 'top'
+    });
+  }
+
+  openTileSettings(): void {
+    const dialogRef = this.dialog.open(TileSettingsComponent, {
+      width: 'auto',
+      minWidth: '450px',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      data: { contact: this.data.contact }
+    });
+
+    dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
+      if (updatedSettings?.length) {
+        this.data.contact.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
+        this.contactService.saveAdditionalPlaceInfos(this.data.contact);
+      }
     });
   }
 

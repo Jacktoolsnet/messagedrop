@@ -18,12 +18,13 @@
   } @else {
   <div class="avatar-area">
     <div class="center">
-      <img class="avatar" [src]="contact.base64Avatar" [attr.alt]="contact.name ? contact.name + ' avatar' : 'Contact avatar'" /><br />
+      <img class="avatar" [src]="contact.base64Avatar"
+        [attr.alt]="contact.name ? contact.name + ' avatar' : 'Contact avatar'" /><br />
     </div>
     <div class="button-style">
-  <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
-    <mat-icon>delete</mat-icon>
-  </button>
+      <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
+        <mat-icon>delete</mat-icon>
+      </button>
     </div>
   </div>
   }
@@ -38,6 +39,14 @@
     </div>
   </div>
   }
+
+  <div class="avatar-area">
+    <button mat-flat-button color="warn" class="button" type="button" (click)="openTileSettings()"
+      [attr.aria-label]="'Open tile settings for ' + (data.contact.name || 'place')">
+      <mat-icon>settings</mat-icon>
+      <span>Tile settings</span>
+    </button>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions>

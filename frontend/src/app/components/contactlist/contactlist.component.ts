@@ -22,8 +22,9 @@ import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
 import { ContactMessageChatroomComponent } from '../contact-message-chatroom/contact-message-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
-import { ContactProfileComponent } from '../contact/contact-profile/contact-profile.component';
+import { ContactSettingsComponent } from '../contact/contact-settingx/contact-settingx.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
+import { TileListComponent } from "../tile/tile-list/tile-list.component";
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
@@ -41,7 +42,8 @@ interface ConnectDialogResult {
     MatDialogContent,
     MatIcon,
     MatMenuModule,
-    MatExpansionModule
+    MatExpansionModule,
+    TileListComponent
   ],
   templateUrl: './contactlist.component.html',
   styleUrl: './contactlist.component.css'
@@ -192,7 +194,7 @@ export class ContactlistComponent {
   }
 
   public editContact(contact: Contact) {
-    const dialogRef = this.matDialog.open(ContactProfileComponent, {
+    const dialogRef = this.matDialog.open(ContactSettingsComponent, {
       data: { contact: contact },
       closeOnNavigation: true,
       maxHeight: '90vh',
