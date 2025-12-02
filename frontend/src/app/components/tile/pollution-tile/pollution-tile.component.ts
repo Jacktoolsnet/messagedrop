@@ -32,6 +32,24 @@ export class PollutionTileComponent implements OnChanges {
   private readonly dialog = inject(MatDialog);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  private readonly pollenKeys = [
+    'alder_pollen',
+    'birch_pollen',
+    'grass_pollen',
+    'mugwort_pollen',
+    'olive_pollen',
+    'ragweed_pollen'
+  ];
+
+  private readonly pollutantKeys = [
+    'pm10',
+    'pm2_5',
+    'carbon_monoxide',
+    'nitrogen_dioxide',
+    'sulphur_dioxide',
+    'ozone'
+  ];
+
   private readonly labelMap: Record<string, string> = {
     alder_pollen: 'Alder',
     birch_pollen: 'Birch',
@@ -85,7 +103,9 @@ export class PollutionTileComponent implements OnChanges {
     if (!this.airQuality || !this.airQuality.hourly?.time) return [];
     const currentDate = new Date().toISOString().split('T')[0];
     const isDarkMode = document.body.classList.contains('dark');
-    return this.selectedKeys.map(key => {
+    const available = this.getAvailableKeys();
+    const keysToUse = this.selectedKeys.filter(k => available.has(k));
+    return keysToUse.map(key => {
       const values = this.getTodayValues(key);
       const maxVal = values.length ? Math.max(...values) : 0;
       const info = getAirQualityLevelInfo(key as AirQualityMetricKey, maxVal, isDarkMode);
@@ -118,12 +138,29 @@ export class PollutionTileComponent implements OnChanges {
     return values;
   }
 
+  private getAvailableKeys(): Set<string> {
+    const set = new Set<string>([...this.pollutantKeys, ...this.pollenKeys]);
+    if (!this.hasAnyPollenData()) {
+      this.pollenKeys.forEach(k => set.delete(k));
+    }
+    return set;
+  }
+
+  private hasAnyPollenData(): boolean {
+    if (!this.airQuality?.hourly) return false;
+    return this.pollenKeys.some(key => {
+      const arr = (this.airQuality!.hourly as any)[key] as Array<number | null | undefined> | undefined;
+      return Array.isArray(arr) && arr.some(v => typeof v === 'number');
+    });
+  }
+
   edit(): void {
     const tile = this.currentTile();
     if (!tile) return;
+    const availableKeys = Array.from(this.getAvailableKeys());
     const ref = this.dialog.open(PollutionTileEditComponent, {
       width: '520px',
-      data: { tile }
+      data: { tile, availableKeys }
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;

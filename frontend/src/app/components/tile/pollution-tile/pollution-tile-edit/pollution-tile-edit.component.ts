@@ -14,6 +14,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 
 interface PollutionTileDialogData {
   tile: TileSetting;
+  availableKeys?: string[];
 }
 
 @Component({
@@ -46,7 +47,7 @@ export class PollutionTileEditComponent {
   readonly titleControl = this.fb.control(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Pollution');
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'air');
 
-  readonly keys = [
+  private readonly allKeys = [
     { key: 'alder_pollen', label: 'Alder' },
     { key: 'birch_pollen', label: 'Birch' },
     { key: 'grass_pollen', label: 'Grass' },
@@ -61,7 +62,9 @@ export class PollutionTileEditComponent {
     { key: 'carbon_monoxide', label: 'CO' }
   ];
 
-  readonly selectedKeys = signal<Set<string>>(new Set(this.data.tile.payload?.pollution?.keys ?? ['alder_pollen', 'birch_pollen', 'grass_pollen', 'mugwort_pollen', 'olive_pollen', 'ragweed_pollen']));
+  readonly keys = this.filterKeys();
+
+  readonly selectedKeys = signal<Set<string>>(new Set(this.initialSelectedKeys()));
 
   toggleKey(key: string, checked: boolean): void {
     const next = new Set(this.selectedKeys());
@@ -106,5 +109,23 @@ export class PollutionTileEditComponent {
       }
     };
     this.dialogRef.close(updated);
+  }
+
+  private filterKeys() {
+    const allowed = new Set(this.data.availableKeys ?? this.allKeys.map(k => k.key));
+    return this.allKeys.filter(k => allowed.has(k.key));
+  }
+
+  private initialSelectedKeys(): string[] {
+    const existing = this.data.tile.payload?.pollution?.keys;
+    const allowed = new Set(this.data.availableKeys ?? this.allKeys.map(k => k.key));
+    if (existing) {
+      return existing.filter(k => allowed.has(k));
+    }
+    // default: pollen if available, else pollutants
+    const pollenDefaults = ['alder_pollen', 'birch_pollen', 'grass_pollen', 'mugwort_pollen', 'olive_pollen', 'ragweed_pollen'];
+    const defaultList = pollenDefaults.filter(k => allowed.has(k));
+    if (defaultList.length) return defaultList;
+    return this.allKeys.map(k => k.key).filter(k => allowed.has(k));
   }
 }
