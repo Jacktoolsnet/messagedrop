@@ -4,7 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
-import { TileSetting } from '../interfaces/tile-settings';
+import { TileSetting, normalizeTileSettings } from '../interfaces/tile-settings';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { RawContact } from '../interfaces/raw-contact';
@@ -113,8 +113,21 @@ export class ContactService {
     }));
   }
 
-  async saveContactTileSettings(contact: Contact): Promise<void> {
-    await this.indexedDbService.setTileSettings(contact.id, contact.tileSettings ?? []);
+  async saveContactTileSettings(contact: Contact, tileSettings?: TileSetting[]): Promise<void> {
+    const normalized = normalizeTileSettings(tileSettings ?? contact.tileSettings ?? [], {
+      includeDefaults: false,
+      includeSystem: false
+    });
+
+    this._contacts.update((contacts) =>
+      contacts.map(c =>
+        c.id === contact.id
+          ? { ...c, tileSettings: normalized.map(t => ({ ...t })) }
+          : c
+      )
+    );
+
+    await this.indexedDbService.setTileSettings(contact.id, normalized);
   }
 
   isReady(): boolean {
@@ -140,6 +153,14 @@ export class ContactService {
     this._contacts.update((contacts) =>
       contacts.map(contact => contact.id === contactId ? { ...contact } : contact)
     );
+  }
+
+  updateContactTileSettings(contactId: string, tileSettings: TileSetting[]): void {
+    // Backward compatibility: Delegiere auf saveContactTileSettings mit Dummy-Contact
+    const contact = this._contacts().find(c => c.id === contactId);
+    if (contact) {
+      void this.saveContactTileSettings(contact, tileSettings);
+    }
   }
 
   createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {

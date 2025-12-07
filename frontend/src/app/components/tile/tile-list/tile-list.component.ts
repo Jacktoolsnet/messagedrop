@@ -61,17 +61,25 @@ export class TileListComponent {
     });
 
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
-      if (updatedSettings?.length) {
-        if (this.contact) {
-          this.contact.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
-          this.contactService.saveContactTileSettings(this.contact);
-          this.contactService.refreshContact(this.contact.id);
-        } else if (this.place) {
-          this.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
-          this.placeService.saveAdditionalPlaceInfos(this.place);
-        }
-        this.cdr.markForCheck();
+      if (!updatedSettings) {
+        return;
       }
+
+      const normalized = normalizeTileSettings(updatedSettings, {
+        includeDefaults: !!this.place,
+        includeSystem: !!this.place
+      }).map((tile: TileSetting) => ({ ...tile }));
+
+      if (this.contact) {
+        const updatedContact = { ...this.contact, tileSettings: normalized };
+        this.contact = updatedContact;
+        void this.contactService.saveContactTileSettings(updatedContact, normalized);
+      } else if (this.place) {
+        const updatedPlace = { ...this.place, tileSettings: normalized };
+        this.place = updatedPlace;
+        this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+      }
+      this.cdr.detectChanges();
     });
   }
 
