@@ -45,7 +45,7 @@
   width: auto;
   max-width: calc(90vw - 2.5rem);
   padding-right: 2.5rem;
-  margin: 0, auto;
+  margin: 0 auto;
   display: grid;
   grid-auto-flow: row;
   grid-template-columns: 1fr;
@@ -104,7 +104,7 @@ button,
 /* >=1200px: automatisch so viele Spalten wie reinpassen */
 @media (min-width: 1200px) {
   .content {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     /* Wenn du lieber schmalere Karten willst, setz --col-min z.B. auf 280px */
   }
 }
@@ -157,6 +157,13 @@ mat-expansion-panel-header .name {
 }
 
 .inactiv-button {
+  background-color: var(--mdc-outlined-button-container-color);
+  color: var(--mdc-outlined-button-label-text-color);
+  border: 1px solid var(--mdc-outlined-button-outline-color);
+}
+
+/* Alias, falls im Template versehentlich die Variante mit „e“ genutzt wird */
+.inactive-button {
   background-color: var(--mdc-outlined-button-container-color);
   color: var(--mdc-outlined-button-label-text-color);
   border: 1px solid var(--mdc-outlined-button-outline-color);
