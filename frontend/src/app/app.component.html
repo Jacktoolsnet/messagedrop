@@ -95,8 +95,8 @@
 
     @if (userService.isReady() && contactService.isReady()) {
     <button mat-menu-item (click)="openContactListDialog()">
-        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()" matBadgeColor="warn"
-            matBadgeOverlap="true">contacts</mat-icon>
+        <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
+            matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>
         <span>My contacts</span>
     </button>
     }
@@ -187,7 +187,7 @@
     </button>
 
     <!--button mat-menu-item (click)="showGeoStatistic()">
-        <mat-icon class="material-symbols-outlined">data_exploration</mat-icon>
+        <mat-icon >data_exploration</mat-icon>
         <span>Statistic</span>
     </button-->
 </mat-menu>

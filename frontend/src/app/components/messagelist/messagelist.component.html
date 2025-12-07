@@ -78,37 +78,37 @@
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
-                    <mat-icon class="material-symbols-outlined">place</mat-icon>
+                    <mat-icon>place</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Navigate to message location."
                     (click)="navigateToMessageLocation(message)">
-                    <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
+                    <mat-icon>assistant_direction</mat-icon>
                 </button>
                 @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">settings_account_box</mat-icon>
+                    <mat-icon aria-hidden="false">settings_account_box</mat-icon>
                 </button>
                 }
                 @if (this.userService.getUser().id === message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
+                    <mat-icon aria-hidden="false">edit</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Delete message"
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
+                    <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
                 }
                 @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="dsaReportMessage(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">flag</mat-icon>
+                    <mat-icon aria-hidden="false">flag</mat-icon>
                 </button>
                 }
                 @if (message.status === 'disabled' && message.dsaStatusToken) {
                 <button mat-mini-fab [ngClass]="getDsaStatusButtonClass(message)"
                     [attr.aria-label]="getDsaStatusAriaLabel(message)" (click)="openDsaStatus(message)">
-                    <mat-icon class="material-symbols-outlined">flag</mat-icon>
+                    <mat-icon>flag</mat-icon>
                 </button>
                 }
             </mat-card-actions>
@@ -124,7 +124,7 @@
     <div class="no-content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
@@ -137,11 +137,11 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_add"
                 (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
-                <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
+                <mat-icon>add_comment</mat-icon>
             </button>
         </div>
 
@@ -153,7 +153,7 @@
                 <img class="avatar" [src]="userProfile.base64Avatar"
                     [attr.alt]="userProfile.name ? userProfile.name + ' avatar' : 'Profile avatar'" />
                 } @else {
-                <mat-icon class="material-symbols-outlined">person</mat-icon>
+                <mat-icon>person</mat-icon>
                 }
                 <span class="name">{{ userProfile.name || 'Myself' }}</span>
             </div>
@@ -164,15 +164,14 @@
                 <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
                     [attr.alt]="(profileService.getProfile(message.userId)?.name || 'User') + ' avatar'">
                 } @else {
-                <mat-icon class="material-symbols-outlined">person</mat-icon>
+                <mat-icon>person</mat-icon>
                 }
                 <span class="name">{{ profileService.getProfile(message.userId)?.name || 'Unnamed'}}</span>
             </div>
             }
 
-            <mat-card-content role="button" tabindex="0"
-                (click)="onMessageCardActivate(message)" (keyup.enter)="onMessageCardActivate(message)"
-                (keyup.space)="onMessageCardActivate(message)">
+            <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
+                (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
                 <div class="message-content">
                     <app-showmultimedia (click)="$event.stopPropagation()"
                         [multimedia]="message.multimedia"></app-showmultimedia>
@@ -186,54 +185,52 @@
             <mat-card-actions class="buttonbar">
                 <button mat-mini-fab color="secondary" aria-label="Show or add comments"
                     (click)="!userService.isReady() ? handleCommentAfterLoginClick(message) : handleCommentClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined"
+                    <mat-icon aria-hidden="false"
                         matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
                         matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Like message"
                     (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined"
-                        matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
-                        matBadgeOverlap="true">thumb_up</mat-icon>
+                    <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}" matBadgePosition="after"
+                        matBadgeColor="accent" matBadgeOverlap="true">thumb_up</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Dislike message"
                     (click)="!userService.isReady() ? dislikeMessageAfterLoginClick(message) : dislikeMessageClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined"
-                        matBadge="{{ message.dislikes | shortNumber }}" matBadgePosition="after" matBadgeColor="accent"
-                        matBadgeOverlap="true">thumb_down</mat-icon>
+                    <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
+                        matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Fly to message" (click)="flyTo(message)">
-                    <mat-icon class="material-symbols-outlined">place</mat-icon>
+                    <mat-icon>place</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Navigate to message location."
                     (click)="navigateToMessageLocation(message)">
-                    <mat-icon class="material-symbols-outlined">assistant_direction</mat-icon>
+                    <mat-icon>assistant_direction</mat-icon>
                 </button>
                 @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="editMessageUserProfile(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">settings_account_box</mat-icon>
+                    <mat-icon aria-hidden="false">settings_account_box</mat-icon>
                 </button>
                 }
                 @if (this.userService.getUser().id === message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Edit message"
                     (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">edit</mat-icon>
+                    <mat-icon aria-hidden="false">edit</mat-icon>
                 </button>
                 <button mat-mini-fab color="secondary" aria-label="Delete message"
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">delete_forever</mat-icon>
+                    <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
                 }
                 @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" aria-label="Block message" (click)="dsaReportMessage(message)">
-                    <mat-icon aria-hidden="false" class="material-symbols-outlined">flag</mat-icon>
+                    <mat-icon aria-hidden="false">flag</mat-icon>
                 </button>
                 }
                 @if (message.status === 'disabled' && message.dsaStatusToken) {
                 <button mat-mini-fab [ngClass]="getDsaStatusButtonClass(message)"
                     [attr.aria-label]="getDsaStatusAriaLabel(message)" (click)="openDsaStatus(message)">
-                    <mat-icon class="material-symbols-outlined">flag</mat-icon>
+                    <mat-icon>flag</mat-icon>
                 </button>
                 }
             </mat-card-actions>

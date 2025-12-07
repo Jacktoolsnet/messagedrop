@@ -14,10 +14,10 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
             <button class="button_add" mat-mini-fab color="primary" aria-label="Add" (click)="addPlace()">
-                <mat-icon class="material-symbols-outlined">add_location</mat-icon>
+                <mat-icon>add_location</mat-icon>
             </button>
         </div>
         @for (place of placesSignal(); track place.id){
@@ -27,7 +27,7 @@
                 <img class="avatar" [src]="place.base64Avatar"
                     [attr.alt]="place.name ? place.name + ' avatar' : 'Place avatar'" />
                 } @else {
-                <mat-icon class="material-symbols-outlined">{{ place.icon || 'location' }}</mat-icon>
+                <mat-icon>{{ place.icon || 'location' }}</mat-icon>
                 }
                 @if (place.name) {
                 <span class="name">{{ place.name }}</span>
@@ -45,34 +45,34 @@
                 <mat-card-actions class="buttonbar">
                     @if(place.pinned) {
                     <button mat-mini-fab aria-label="Pin" [ngClass]="'active-button'" (click)="unpinPlace(place)">
-                        <mat-icon class="material-symbols-outlined">keep_off</mat-icon>
+                        <mat-icon>keep_off</mat-icon>
                     </button>
                     } @else {
                     <button mat-mini-fab aria-label="Unpin" [ngClass]="'inactiv-button'" (click)="pinPlace(place)">
-                        <mat-icon class="material-symbols-outlined">keep</mat-icon>
+                        <mat-icon>keep</mat-icon>
                     </button>
                     }
                     <button mat-mini-fab color="secondary" aria-label="Edit place" (click)="editPlace(place)">
-                        <mat-icon class="material-symbols-outlined">settings_account_box</mat-icon>
+                        <mat-icon>settings_account_box</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Delete place" (click)="deletePlace(place)">
-                        <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+                        <mat-icon>delete_forever</mat-icon>
                     </button>
                     @if (!subscriptionError) {
                     @if (place.subscribed) {
                     <button mat-mini-fab aria-label="Unsubscribe" [ngClass]="'active-button'"
                         (click)="handleSubscription(place)">
-                        <mat-icon class="material-symbols-outlined">bookmark_remove</mat-icon>
+                        <mat-icon>bookmark_remove</mat-icon>
                     </button>
                     } @else {
                     <button mat-mini-fab aria-label="Subscribe" [ngClass]="'inactiv-button'"
                         (click)="handleSubscription(place)">
-                        <mat-icon class="material-symbols-outlined">bookmark_add</mat-icon>
+                        <mat-icon>bookmark_add</mat-icon>
                     </button>
                     }
                     }
                     <button mat-mini-fab color="secondary" aria-label="Fly to place" (click)="flyTo(place)">
-                        <mat-icon class="material-symbols-outlined">place</mat-icon>
+                        <mat-icon>place</mat-icon>
                     </button>
                 </mat-card-actions>
             </mat-card>

@@ -11,7 +11,7 @@
         </div>
 
         <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')">
-            <mat-icon class="material-symbols-outlined">
+            <mat-icon>
                 {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
                 'check_box'}}
             </mat-icon>
@@ -21,7 +21,7 @@
         </button>
 
         <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')">
-            <mat-icon class="material-symbols-outlined">
+            <mat-icon>
                 {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
                 'check_box'}}
             </mat-icon>
@@ -30,7 +30,7 @@
         </button>
 
         <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')">
-            <mat-icon class="material-symbols-outlined">
+            <mat-icon>
                 {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box'
                 }}
             </mat-icon>
@@ -47,7 +47,7 @@
             </div>
         </div>
         <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
-            <mat-icon class="material-symbols-outlined">public</mat-icon>
+            <mat-icon>public</mat-icon>
             Edit external content settings
         </button>
     </div>

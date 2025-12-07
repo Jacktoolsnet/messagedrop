@@ -58,20 +58,7 @@
   align-self: start;
 }
 
-/* === MESSAGE CONTENT === */
-.message-content {
-  font-size: 0.9rem;
-  margin-top: 2.5rem;
-  margin-bottom: 1.5rem;
-  white-space: normal;
-  overflow-wrap: break-word;
-  word-break: break-word;
-}
-
 /* === LISTEN UND BUTTONS === */
-.list {
-  border-radius: 1.25rem;
-}
 
 button,
 .buttonbar_icon {
@@ -120,16 +107,6 @@ button,
     grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     /* Wenn du lieber schmalere Karten willst, setz --col-min z.B. auf 280px */
   }
-}
-
-.tile-grid>* {
-  break-inside: avoid;
-  margin-bottom: 1rem;
-  /* simuliert row-gap */
-  width: 100%;
-  /* verhindert "Umbruch" */
-  display: block;
-  /* zur Sicherheit */
 }
 
 mat-expansion-panel {

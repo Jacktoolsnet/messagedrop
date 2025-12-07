@@ -1,7 +1,7 @@
 <div class="page" *ngIf="!loading(); else loadingTpl">
   @if (error()) {
   <mat-card class="error-card">
-    <mat-icon class="material-symbols-outlined">error</mat-icon>
+    <mat-icon>error</mat-icon>
     <div>
       <h2>Unable to load status</h2>
       <p>{{ error() }}</p>
@@ -11,11 +11,11 @@
 
   <header class="actions">
     <button mat-stroked-button color="primary" (click)="copyLink()">
-      <mat-icon class="material-symbols-outlined">content_copy</mat-icon>
+      <mat-icon>content_copy</mat-icon>
       Copy link
     </button>
     <button mat-flat-button color="primary" (click)="print()">
-      <mat-icon class="material-symbols-outlined">print</mat-icon>
+      <mat-icon>print</mat-icon>
       Print / Save PDF
     </button>
   </header>
@@ -23,7 +23,7 @@
   <mat-card class="summary-card">
     <mat-card-header>
       <div mat-card-avatar class="avatar">
-        <mat-icon class="material-symbols-outlined">flag</mat-icon>
+        <mat-icon>flag</mat-icon>
       </div>
       <mat-card-title>
         {{ isNotice ? 'Notice' : 'Quick report' }} status overview
@@ -64,7 +64,7 @@
   <mat-card>
     <mat-card-header>
       <div mat-card-avatar class="avatar decision">
-        <mat-icon class="material-symbols-outlined">gavel</mat-icon>
+        <mat-icon>gavel</mat-icon>
       </div>
       <mat-card-title>Decision</mat-card-title>
       <mat-card-subtitle>{{ dec.decidedAt | date:'medium' }}</mat-card-subtitle>
@@ -93,7 +93,7 @@
   <mat-card>
     <mat-card-header>
       <div mat-card-avatar class="avatar evidence">
-        <mat-icon class="material-symbols-outlined">folder</mat-icon>
+        <mat-icon>folder</mat-icon>
       </div>
       <mat-card-title>Evidence</mat-card-title>
     </mat-card-header>
@@ -103,7 +103,7 @@
         <div class="evidence-entry">
           <div class="info">
             <div class="title">
-              <mat-icon class="material-symbols-outlined">
+              <mat-icon>
                 {{ ev.type === 'file' ? 'attach_file' : ev.type === 'url' ? 'link' : 'fingerprint' }}
               </mat-icon>
               <span>{{ ev.fileName || ev.url || ev.hash || ev.type }}</span>
@@ -113,13 +113,13 @@
           <div class="actions">
             @if (ev.type === 'file') {
             <button mat-stroked-button color="primary" (click)="downloadEvidence(ev)">
-              <mat-icon class="material-symbols-outlined">download</mat-icon>
+              <mat-icon>download</mat-icon>
               Download
             </button>
             }
             @if (ev.type === 'url' && ev.url) {
             <a mat-stroked-button color="primary" [href]="ev.url" target="_blank" rel="noopener">
-              <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+              <mat-icon>open_in_new</mat-icon>
               Open link
             </a>
             }
@@ -135,7 +135,7 @@
   <mat-card>
     <mat-card-header>
       <div mat-card-avatar class="avatar decision">
-        <mat-icon class="material-symbols-outlined">gavel</mat-icon>
+        <mat-icon>gavel</mat-icon>
       </div>
       <mat-card-title>Appeals</mat-card-title>
     </mat-card-header>
@@ -179,7 +179,7 @@
   <mat-card>
     <mat-card-header>
       <div mat-card-avatar class="avatar timeline">
-        <mat-icon class="material-symbols-outlined">history</mat-icon>
+        <mat-icon>history</mat-icon>
       </div>
       <mat-card-title>Timeline</mat-card-title>
     </mat-card-header>

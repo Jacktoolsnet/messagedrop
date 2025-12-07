@@ -2,14 +2,14 @@
   @if (selectedNotification(); as detail) {
   <div class="dialog-title">
     <button mat-icon-button class="back-button" (click)="backToList()" aria-label="Back to system messages">
-      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+      <mat-icon>arrow_back</mat-icon>
     </button>
     <span class="dialog-title__text">{{ detail.title }}</span>
   </div>
   } @else {
   <div class="dialog-title">
     <button mat-icon-button class="back-button" (click)="reloadNotifications()" aria-label="Back to system messages">
-      <mat-icon class="material-symbols-outlined">refresh</mat-icon>
+      <mat-icon>refresh</mat-icon>
     </button>
     <span class="dialog-title__text">System messages</span>
   </div>
@@ -23,15 +23,15 @@
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="filter-toggle-group" exclusive
         [value]="currentFilter()" (change)="handleFilterChange($event)" aria-label="Filter system messages">
         <mat-button-toggle value="unread">
-          <mat-icon class="material-symbols-outlined">mark_email_unread</mat-icon>
+          <mat-icon>mark_email_unread</mat-icon>
           <span>Unread</span>
         </mat-button-toggle>
         <mat-button-toggle value="read">
-          <mat-icon class="material-symbols-outlined">drafts</mat-icon>
+          <mat-icon>drafts</mat-icon>
           <span>Read</span>
         </mat-button-toggle>
         <mat-button-toggle value="all">
-          <mat-icon class="material-symbols-outlined">all_inbox</mat-icon>
+          <mat-icon>all_inbox</mat-icon>
           <span>All</span>
         </mat-button-toggle>
       </mat-button-toggle-group>
@@ -57,20 +57,20 @@
             @if (detail.metadata?.dsa?.statusUrl) {
             <button mat-icon-button color="primary" matTooltip="Open case details"
               (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
-              <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+              <mat-icon>open_in_new</mat-icon>
             </button>
             }
             <button mat-icon-button color="accent"
               [matTooltip]="detail.status === 'unread' ? 'Mark as read' : 'Mark as unread'"
               (click)="detail.status === 'unread' ? markNotificationAsRead(detail, $event) : markNotificationAsUnread(detail, $event)"
               aria-label="Toggle read state">
-              <mat-icon class="material-symbols-outlined">
+              <mat-icon>
                 {{ detail.status === 'unread' ? 'mark_email_read' : 'mark_email_unread' }}
               </mat-icon>
             </button>
             <button mat-icon-button color="warn" matTooltip="Delete message" (click)="confirmDelete(detail, $event)"
               aria-label="Delete message">
-              <mat-icon class="material-symbols-outlined">delete</mat-icon>
+              <mat-icon>delete</mat-icon>
             </button>
           </div>
         </div>
@@ -119,11 +119,10 @@
       } @else {
       @for (notification of notifications(); track trackByUuid($index, notification)) {
       <a mat-list-item class="notification-item" role="button" tabindex="0"
-        (click)="selectNotification(notification, $event)"
-        (keyup.enter)="selectNotification(notification, $event)"
+        (click)="selectNotification(notification, $event)" (keyup.enter)="selectNotification(notification, $event)"
         (keyup.space)="selectNotification(notification, $event)"
         [class.active]="selectedNotification()?.uuid === notification.uuid">
-        <mat-icon class="material-symbols-outlined" matListItemIcon>
+        <mat-icon matListItemIcon>
           {{ notification.status === 'unread' ? 'notifications_active' : 'notifications' }}
         </mat-icon>
         <div matLine class="notification-item__title">{{ notification.title }}</div>
@@ -134,23 +133,23 @@
           @if (notification.metadata?.dsa?.statusUrl) {
           <button mat-icon-button color="primary" matTooltip="Open case details"
             (click)="openStatusLink(notification.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
-            <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+            <mat-icon>open_in_new</mat-icon>
           </button>
           }
           @if (notification.status === 'unread') {
           <button mat-icon-button color="accent" matTooltip="Mark as read"
             (click)="markNotificationAsRead(notification, $event)" aria-label="Mark as read">
-            <mat-icon class="material-symbols-outlined">mark_email_read</mat-icon>
+            <mat-icon>mark_email_read</mat-icon>
           </button>
           } @else {
           <button mat-icon-button color="accent" matTooltip="Mark as unread"
             (click)="markNotificationAsUnread(notification, $event)" aria-label="Mark as unread">
-            <mat-icon class="material-symbols-outlined">mark_email_unread</mat-icon>
+            <mat-icon>mark_email_unread</mat-icon>
           </button>
           }
           <button mat-icon-button color="warn" matTooltip="Delete message" (click)="confirmDelete(notification, $event)"
             aria-label="Delete message">
-            <mat-icon class="material-symbols-outlined">delete</mat-icon>
+            <mat-icon>delete</mat-icon>
           </button>
         </div>
       </a>
@@ -163,9 +162,10 @@
 
 <mat-dialog-actions align="end">
   @if (!selectedNotification()) {
-  <button mat-button color="warn" matTooltip="Delete all" (click)="confirmDeleteAll($event)" aria-label="Delete all" [disabled]="notifications().length === 0">
+  <button mat-button color="warn" matTooltip="Delete all" (click)="confirmDeleteAll($event)" aria-label="Delete all"
+    [disabled]="notifications().length === 0">
     Delete all
-    <mat-icon class="material-symbols-outlined">delete_sweep</mat-icon>
+    <mat-icon>delete_sweep</mat-icon>
   </button>
   }
   <button mat-button (click)="close()">Close</button>

@@ -1,12 +1,12 @@
 <mat-card class="chatroom-card">
   <div class="chatroom-card__toolbar">
     <button class="button_back" mat-mini-fab color="accent" aria-label="Close chatroom" (click)="closeChatroom()">
-      <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+      <mat-icon>arrow_back</mat-icon>
     </button>
     @if (messages().length !== 0) {
     <button class="button_add" mat-mini-fab color="primary" aria-label="Create short message"
       (click)="requestCompose()">
-      <mat-icon class="material-symbols-outlined">add_comment</mat-icon>
+      <mat-icon>add_comment</mat-icon>
     </button>
     }
   </div>
@@ -29,12 +29,12 @@
             @if (profile.base64Avatar) {
             <img class="avatar" [src]="profile.base64Avatar" [attr.alt]="(profile.name || 'My') + ' avatar'" />
             } @else {
-            <mat-icon class="material-symbols-outlined">person</mat-icon>
+            <mat-icon>person</mat-icon>
             }
             <span class="name">{{ profile.name || 'Myself' }}</span>
           </div>
           <div class="status-chip status-chip--me">
-            <mat-icon class="material-symbols-outlined">{{ mapStatus(msg.status) }}</mat-icon>
+            <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
           <div class="bubble bubble--me">
             @if (msg.payload?.multimedia?.type !== 'undefined') {
@@ -50,10 +50,10 @@
           <div class="message-actions-row button-me">
             <div class="message-actions">
               <button mat-mini-fab color="primary" aria-label="Edit message" (click)="editMessage(msg)">
-                <mat-icon class="material-symbols-outlined">edit</mat-icon>
+                <mat-icon>edit</mat-icon>
               </button>
               <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
-                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+                <mat-icon>delete</mat-icon>
               </button>
             </div>
           </div>
@@ -65,12 +65,12 @@
             <img class="avatar" [src]="activeContact.base64Avatar"
               [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
             } @else {
-            <mat-icon class="material-symbols-outlined">person</mat-icon>
+            <mat-icon>person</mat-icon>
             }
             <span class="name">{{ activeContact.name || 'Contact' }}</span>
           </div>
           <div class="status-chip status-chip--them">
-            <mat-icon class="material-symbols-outlined">{{ mapStatus(msg.status) }}</mat-icon>
+            <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
           <div class="bubble bubble--them">
             @if (msg.payload?.multimedia?.type !== 'undefined') {
@@ -88,7 +88,7 @@
           <div class="message-actions-row button-them">
             <div class="message-actions">
               <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
-                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+                <mat-icon>delete</mat-icon>
               </button>
             </div>
           </div>

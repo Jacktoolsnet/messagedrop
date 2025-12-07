@@ -3,11 +3,11 @@
 
     @if (!urlInvalid) {
     <button mat-icon-button (click)="onApplyClick()">
-        <mat-icon class="material-symbols-outlined">check</mat-icon>
+        <mat-icon>check</mat-icon>
     </button>
     } @else {
     <button (click)="onCancelClick()">
-        <mat-icon class="material-symbols-outlined">cancel</mat-icon>
+        <mat-icon>cancel</mat-icon>
     </button>
     }
 </div>
@@ -24,7 +24,7 @@
     <div class="multimedia_container" [innerHTML]="safeHtml"></div>
     <div class="center">
         <button mat-mini-fab color="primary" class="upload-button" (click)="clearContent()">
-            <mat-icon class="material-symbols-outlined">delete</mat-icon>
+            <mat-icon>delete</mat-icon>
         </button>
     </div>
     }

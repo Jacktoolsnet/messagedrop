@@ -33,7 +33,7 @@
   <div class="avatar-area">
     <div class="buttonarea">
       <button mat-flat-button color="primary" class="button_style" (click)="getProfileFromContact(contact)">
-        <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
+        <mat-icon>connect_without_contact</mat-icon>
         <span>Ask contact for profile</span>
       </button>
     </div>
@@ -44,7 +44,7 @@
     <div class="buttonarea">
       <button mat-flat-button color="warn" class="button_style" type="button" (click)="openTileSettings()"
         [attr.aria-label]="'Open tile settings for ' + (data.contact.name || 'place')">
-        <mat-icon class="material-symbols-outlined">settings</mat-icon>
+        <mat-icon>settings</mat-icon>
         <span>Tile settings</span>
       </button>
     </div>

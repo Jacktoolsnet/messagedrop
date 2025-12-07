@@ -14,11 +14,11 @@
     <div class="content">
         <div class="toolbar">
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon class="material-symbols-outlined">arrow_back</mat-icon>
+                <mat-icon>arrow_back</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
                 [matMenuTriggerFor]="connectionMenu">
-                <mat-icon class="material-symbols-outlined">connect_without_contact</mat-icon>
+                <mat-icon>connect_without_contact</mat-icon>
             </button>
         </div>
 
@@ -42,38 +42,39 @@
                         <app-tile-list [contact]="contact"></app-tile-list>
                     </div>
                 </mat-card-content>
+
                 <mat-card-actions class="buttonbar">
                     @if (contact.pinned) {
                     <button mat-mini-fab [ngClass]="'active-button'" aria-label="Unpin" (click)="unpinContact(contact)">
-                        <mat-icon class="material-symbols-outlined">keep_off</mat-icon>
+                        <mat-icon>keep_off</mat-icon>
                     </button>
                     } @else {
                     <button mat-mini-fab [ngClass]="'inactive-button'" aria-label="Pin" (click)="pinContact(contact)">
-                        <mat-icon class="material-symbols-outlined">keep</mat-icon>
+                        <mat-icon>keep</mat-icon>
                     </button>
                     }
                     <button mat-mini-fab color="secondary" aria-label="Chatfenster öffnen"
                         [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
                         matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
-                        <mat-icon class="material-symbols-outlined">forum</mat-icon>
+                        <mat-icon>forum</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
-                        <mat-icon class="material-symbols-outlined">settings_account_box</mat-icon>
+                        <mat-icon>settings_account_box</mat-icon>
                     </button>
                     @if (!subscriptionError) {
                     @if (contact.subscribed) {
                     <button mat-mini-fab [color]="'active-button'" aria-label="Subscribe" (click)="subscribe(contact)">
-                        <mat-icon class="material-symbols-outlined">bookmark_remove</mat-icon>
+                        <mat-icon>bookmark_remove</mat-icon>
                     </button>
                     } @else {
                     <button mat-mini-fab [color]="'inactive-button'" aria-label="Subscribe"
                         (click)="subscribe(contact)">
-                        <mat-icon class="material-symbols-outlined">bookmark_add</mat-icon>
+                        <mat-icon>bookmark_add</mat-icon>
                     </button>
                     }
                     }
                     <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
-                        <mat-icon class="material-symbols-outlined">delete_forever</mat-icon>
+                        <mat-icon>delete_forever</mat-icon>
                     </button>
                 </mat-card-actions>
             </mat-card>
@@ -84,11 +85,11 @@
     }
 </mat-dialog-content>
 
-<mat-menu #connectionMenu="matMenu"> <button mat-menu-item (click)="shareConnectId()"> <mat-icon
-            class="material-symbols-outlined">share</mat-icon> <span>Share connect id</span> </button> <button
-        mat-menu-item (click)="openConnectDialog()"> <mat-icon class="material-symbols-outlined">link</mat-icon>
-        <span>Connect with connect id</span> </button> <button mat-menu-item (click)="openQrDialog()"> <mat-icon
-            class="material-symbols-outlined">qr_code</mat-icon> <span>Share QR-Code</span> </button> <button
-        mat-menu-item (click)="openScannerDialog()"> <mat-icon
-            class="material-symbols-outlined">qr_code_scanner</mat-icon> <span>Connect scanning QR-Code</span> </button>
+<mat-menu #connectionMenu="matMenu"> <button mat-menu-item (click)="shareConnectId()"> <mat-icon>share</mat-icon>
+        <span>Share connect id</span> </button> <button mat-menu-item (click)="openConnectDialog()">
+        <mat-icon>link</mat-icon>
+        <span>Connect with connect id</span> </button> <button mat-menu-item (click)="openQrDialog()">
+        <mat-icon>qr_code</mat-icon> <span>Share QR-Code</span> </button> <button mat-menu-item
+        (click)="openScannerDialog()"> <mat-icon>qr_code_scanner</mat-icon> <span>Connect scanning QR-Code</span>
+    </button>
 </mat-menu>

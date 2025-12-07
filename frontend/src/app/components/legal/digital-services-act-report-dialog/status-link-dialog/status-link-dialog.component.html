@@ -9,9 +9,9 @@
   @if (data.statusUrl) {
   <div class="link-box" title="Status URL">
     <span class="link-text">{{ data.statusUrl }}</span>
-    <button mat-icon-button color="primary" matTooltip="Open in browser"
-      (click)="openInBrowser()" aria-label="Open in browser">
-      <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+    <button mat-icon-button color="primary" matTooltip="Open in browser" (click)="openInBrowser()"
+      aria-label="Open in browser">
+      <mat-icon>open_in_new</mat-icon>
     </button>
   </div>
   } @else if (data.token) {
@@ -23,7 +23,7 @@
 
 <mat-dialog-actions align="end">
   <button mat-stroked-button color="primary" class="copy-btn" (click)="copy()">
-    <mat-icon class="material-symbols-outlined">content_copy</mat-icon>
+    <mat-icon>content_copy</mat-icon>
     Copy
   </button>
   <button mat-flat-button color="primary" (click)="close()">Close</button>

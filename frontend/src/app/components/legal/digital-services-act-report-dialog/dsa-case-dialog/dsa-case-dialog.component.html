@@ -6,7 +6,7 @@
   @if (!loading()) {
   @if (error()) {
   <mat-card class="error-card">
-    <mat-icon class="material-symbols-outlined">error</mat-icon>
+    <mat-icon>error</mat-icon>
     <div>
       <h3>We could not load the latest information.</h3>
       <p>{{ error() }}</p>
@@ -17,7 +17,7 @@
     (selectedIndexChange)="activeTab.set($event)">
     <mat-tab>
       <ng-template mat-tab-label>
-        <mat-icon class="material-symbols-outlined">info</mat-icon>
+        <mat-icon>info</mat-icon>
         <span>Overview</span>
       </ng-template>
 
@@ -127,13 +127,13 @@
                 <div class="evidence-actions">
                   @if (ev.type === 'file') {
                   <button mat-stroked-button color="primary" type="button" (click)="download(ev)">
-                    <mat-icon class="material-symbols-outlined">download</mat-icon>
+                    <mat-icon>download</mat-icon>
                     Download file
                   </button>
                   }
                   @if (ev.type === 'url' && ev.url) {
                   <a mat-stroked-button color="primary" [href]="ev.url" target="_blank" rel="noopener" role="button">
-                    <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+                    <mat-icon>open_in_new</mat-icon>
                     Open link
                   </a>
                   }
@@ -192,7 +192,7 @@
     @if (canSubmitAppeal()) {
     <mat-tab>
       <ng-template mat-tab-label>
-        <mat-icon class="material-symbols-outlined">rate_review</mat-icon>
+        <mat-icon>rate_review</mat-icon>
         <span>Submit appeal</span>
       </ng-template>
 
@@ -214,15 +214,11 @@
           </mat-form-field>
 
           <div class="url-upload">
-            <app-evidence-input [showUrl]="true" [showFiles]="true"
-              [disabled]="submitting() || uploading()"
-              [urlItems]="appealUrlViews()"
-              [fileItems]="attachmentViews()"
+            <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting() || uploading()"
+              [urlItems]="appealUrlViews()" [fileItems]="attachmentViews()"
               [fileHint]="'PDF or image files, up to 5\u00A0MB each (10\u00A0MB total). Currently selected files: ' + attachmentsSizeLabel() + '.'"
-              (urlAdd)="onAppealUrlAdd($event)"
-              (filesSelect)="onAttachmentsPicked($event)"
-              (urlRemove)="onAppealUrlRemove($event)"
-              (fileRemove)="onAttachmentRemove($event)"></app-evidence-input>
+              (urlAdd)="onAppealUrlAdd($event)" (filesSelect)="onAttachmentsPicked($event)"
+              (urlRemove)="onAppealUrlRemove($event)" (fileRemove)="onAttachmentRemove($event)"></app-evidence-input>
           </div>
         </form>
       </div>
@@ -242,13 +238,13 @@
   <button mat-flat-button color="primary" (click)="close()">Close</button>
   @if (!loading() && !error() && activeTab() === 0) {
   <button mat-stroked-button color="primary" (click)="openPublicStatus()" [disabled]="!publicStatusUrl()">
-    <mat-icon class="material-symbols-outlined">open_in_new</mat-icon>
+    <mat-icon>open_in_new</mat-icon>
     Open public page
   </button>
   }
   @if (!loading() && !error() && canSubmitAppeal() && activeTab() === 1) {
   <button mat-flat-button color="primary" type="submit" form="appeal-form" [disabled]="submitting() || uploading()">
-    <mat-icon class="material-symbols-outlined">send</mat-icon>
+    <mat-icon>send</mat-icon>
     Submit appeal
   </button>
   }
