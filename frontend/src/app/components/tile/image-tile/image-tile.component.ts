@@ -64,7 +64,7 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   private async loadUrlWithRetry(img: LocalImage): Promise<string> {
     try {
       return await this.localImageService.getImageUrl(img);
-    } catch (err) {
+    } catch {
       // Stale object URL oder Permission-Glitch? Einmal URL verwerfen und erneut versuchen.
       this.localImageService.revokeImageUrl(img);
       if (!this.retryTracker.has(img.id)) {

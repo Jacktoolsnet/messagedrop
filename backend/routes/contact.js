@@ -5,7 +5,6 @@ const router = express.Router();
 const crypto = require('crypto');
 const security = require('../middleware/security');
 const tableContact = require('../db/tableContact');
-const notify = require('../utils/notify');
 const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
