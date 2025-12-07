@@ -14,7 +14,13 @@
           <div>Not found</div>
         </div>
       } @else {
-        <img [src]="previewUrls()[idx]" [alt]="image.fileName || 'Image preview'" />
+        <img
+          [src]="previewUrls()[idx]"
+          [alt]="image.fileName || 'Image preview'"
+          loading="lazy"
+          decoding="async"
+          (error)="handleImageError(image, idx)"
+        />
       }
     }
   </div>

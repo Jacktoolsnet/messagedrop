@@ -29,6 +29,7 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   private readonly localImageService = inject(LocalImageService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly matDialog = inject(MatDialog);
+  private readonly retryTracker = new Set<string>();
 
   constructor() {
     effect(() => {
@@ -42,11 +43,8 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.previewUrls().forEach(url => {
-      if (url && url !== 'NOT_FOUND') {
-        URL.revokeObjectURL(url);
-      }
-    });
+    this.previewUrls.set([]);
+    this.localImageService.revokeAllImageUrls();
   }
 
   private async loadImages(): Promise<void> {
@@ -59,13 +57,37 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   }
 
   private async refreshPreviewUrls(images: LocalImage[]): Promise<void> {
-    const urls = await Promise.all(
-      images.map(img =>
-        this.localImageService
-          .getImageUrl(img)
-          .catch(() => 'NOT_FOUND')
-      )
-    );
+    const urls = await Promise.all(images.map(img => this.loadUrlWithRetry(img)));
+    this.previewUrls.set(urls);
+  }
+
+  private async loadUrlWithRetry(img: LocalImage): Promise<string> {
+    try {
+      return await this.localImageService.getImageUrl(img);
+    } catch (err) {
+      // Stale object URL oder Permission-Glitch? Einmal URL verwerfen und erneut versuchen.
+      this.localImageService.revokeImageUrl(img);
+      if (!this.retryTracker.has(img.id)) {
+        this.retryTracker.add(img.id);
+        try {
+          return await this.localImageService.getImageUrl(img);
+        } catch {
+          // Ignorieren, fällt unten auf NOT_FOUND
+        }
+      }
+      return 'NOT_FOUND';
+    }
+  }
+
+  handleImageError(img: LocalImage, index: number): void {
+    // Auf Fehler mit einem erneuten Ladeversuch reagieren; wenn der auch scheitert -> NOT_FOUND.
+    void this.reloadSingle(img, index);
+  }
+
+  private async reloadSingle(img: LocalImage, index: number): Promise<void> {
+    const url = await this.loadUrlWithRetry(img);
+    const urls = [...this.previewUrls()];
+    urls[index] = url;
     this.previewUrls.set(urls);
   }
 
