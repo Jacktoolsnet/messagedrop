@@ -26,18 +26,19 @@
         <div class="tile-name">{{ tile.label }}</div>
       </div>
 
-        @if ( (tile.custom && tile.type !== 'custom-migraine') || tile.type === 'custom-migraine' || tile.type === 'custom-pollution') {
-        <div class="tile-actions">
-          <button mat-icon-button color="primary" type="button" (click)="editTile(tile)" aria-label="Tile bearbeiten">
-            <mat-icon>edit</mat-icon>
-          </button>
-          @if (tile.custom && tile.type !== 'custom-migraine' && tile.type !== 'custom-pollution') {
-          <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)" aria-label="Tile löschen">
-            <mat-icon>delete</mat-icon>
-          </button>
-          }
-        </div>
+      @if ( (tile.custom && tile.type !== 'custom-migraine') || tile.type === 'custom-migraine' || tile.type ===
+      'custom-pollution') {
+      <div class="tile-actions">
+        <button mat-icon-button color="primary" type="button" (click)="editTile(tile)" aria-label="Tile bearbeiten">
+          <mat-icon>edit</mat-icon>
+        </button>
+        @if (tile.custom && tile.type !== 'custom-migraine' && tile.type !== 'custom-pollution') {
+        <button mat-icon-button color="warn" type="button" (click)="deleteTile(tile)" aria-label="Tile löschen">
+          <mat-icon>delete</mat-icon>
+        </button>
         }
+      </div>
+      }
 
       <mat-slide-toggle [checked]="tile.enabled" (change)="toggleTile(tile, $event.checked)"
         [attr.aria-label]="'Toggle ' + tile.label">
