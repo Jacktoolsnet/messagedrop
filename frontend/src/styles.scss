@@ -67,6 +67,32 @@ body {
 }
 
 /* === FONTS === */
+
+/* === DIALOG WIDTHS === */
+.ContactListDialog .mat-mdc-dialog-container {
+  --mdc-dialog-container-max-width: 95vw;
+  --mdc-dialog-container-min-width: 90vw;
+  width: 95vw;
+  max-width: 95vw;
+}
+
+.ContactListDialog .mat-mdc-dialog-surface {
+  width: 100%;
+  max-width: 100%;
+}
+
+.PalceListDialog .mat-mdc-dialog-container {
+  --mdc-dialog-container-max-width: 95vw;
+  --mdc-dialog-container-min-width: 90vw;
+  width: 95vw;
+  max-width: 95vw;
+}
+
+.PalceListDialog .mat-mdc-dialog-surface {
+  width: 100%;
+  max-width: 100%;
+}
+
 @font-face {
   font-family: 'DancingScript';
   src: url('/assets/fonts/DancingScript.ttf') format('truetype');

@@ -42,13 +42,14 @@
 
 /* === CONTENT === */
 .content {
-  width: auto;
-  max-width: calc(90vw - 2.5rem);
+  width: 100%;
+  max-width: 100%;
   padding-right: 2.5rem;
   margin: 0 auto;
   display: grid;
   grid-auto-flow: row;
-  grid-template-columns: 1fr;
+  /* Auto-fit auf Basis einer Mindestbreite: 450px, gedeckelt auf 95vw */
+  grid-template-columns: repeat(auto-fit, minmax(min(450px, 95vw), 1fr));
   justify-content: center;
   gap: 0.5rem;
   white-space: normal;
@@ -92,21 +93,6 @@ button,
   width: 100%;
   display: block;
   padding: 0.5rem 0;
-}
-
-/* 700px–1199px: exakt 2 Spalten */
-@media (min-width: 750px) and (max-width: 1199.98px) {
-  .content {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-/* >=1200px: automatisch so viele Spalten wie reinpassen */
-@media (min-width: 1200px) {
-  .content {
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    /* Wenn du lieber schmalere Karten willst, setz --col-min z.B. auf 280px */
-  }
 }
 
 mat-expansion-panel {
