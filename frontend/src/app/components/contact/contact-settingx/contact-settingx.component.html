@@ -41,11 +41,13 @@
   }
 
   <div class="avatar-area">
-    <button mat-flat-button color="warn" class="button" type="button" (click)="openTileSettings()"
-      [attr.aria-label]="'Open tile settings for ' + (data.contact.name || 'place')">
-      <mat-icon>settings</mat-icon>
-      <span>Tile settings</span>
-    </button>
+    <div class="buttonarea">
+      <button mat-flat-button color="warn" class="button_style" type="button" (click)="openTileSettings()"
+        [attr.aria-label]="'Open tile settings for ' + (data.contact.name || 'place')">
+        <mat-icon class="material-symbols-outlined">settings</mat-icon>
+        <span>Tile settings</span>
+      </button>
+    </div>
   </div>
 </mat-dialog-content>
 

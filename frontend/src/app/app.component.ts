@@ -868,7 +868,7 @@ export class AppComponent implements OnInit {
       minWidth: '20vw',
       maxWidth: '95vw',
       width: 'auto',
-      maxHeight: '95vh',
+      maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,
       autoFocus: false

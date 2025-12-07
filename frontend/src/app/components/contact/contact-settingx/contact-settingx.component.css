@@ -117,3 +117,15 @@ button {
   max-width: 100%;
   width: 100%;
 }
+
+.buttonarea {
+  display: flex;
+  justify-content: center;
+}
+
+.button_style {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 260px;
+}

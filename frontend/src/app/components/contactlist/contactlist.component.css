@@ -1,17 +1,6 @@
 :host {
   color: var(--mat-app-text-color);
-  --avatar-h: 3rem;
-  /* Höhe der Avatar-Box */
-  --avatar-out: 1rem;
-  /* wie weit über den Rand hinausragen */
-  --msg-maxw: 85%;
-  /* max. Breite einer Chatzeile */
-  /* Basis: Material Outlined Card Outline als neutraler Rahmen */
-  --bubble-outline: var(--mat-card-outlined-outline-color);
-  /* zarter Shadow nutzt ebenfalls Material-Outline, bleibt dadurch theme-kohärent */
-  --bubble-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
 }
-
 
 /* Inhalt kann scrollen, wenn zu groß */
 .mat-mdc-dialog-content {
@@ -20,12 +9,6 @@
   /* Abzug für Header/Footer, falls vorhanden */
   width: 100%;
   box-sizing: border-box;
-}
-
-.tile-grid {
-  width: 100%;
-  display: block;
-  padding: 0.5rem 0;
 }
 
 .no-content {
@@ -62,9 +45,10 @@
   width: auto;
   max-width: calc(90vw - 2.5rem);
   padding-right: 2.5rem;
-  margin: 0, auto;
+  margin: 0 auto;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, max-content));
+  grid-auto-flow: row;
+  grid-template-columns: 1fr;
   justify-content: center;
   gap: 0.5rem;
   white-space: normal;
@@ -72,6 +56,16 @@
 
 .content>mat-expansion-panel {
   align-self: start;
+}
+
+/* === MESSAGE CONTENT === */
+.message-content {
+  font-size: 0.9rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1.5rem;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 /* === LISTEN UND BUTTONS === */
@@ -92,14 +86,6 @@ button,
   margin-top: auto;
 }
 
-.chatroom-preview__content {
-  min-height: 4rem;
-  display: flex;
-  align-items: center;
-  color: var(--mat-card-subtitle-text-color);
-  font-size: 0.95rem;
-}
-
 /* === BUTTON POSITIONIERUNGEN === */
 .button_back {
   position: absolute;
@@ -116,15 +102,34 @@ button,
 }
 
 .tile-grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 1rem;
+  width: 100%;
+  display: block;
+  padding: 0.5rem 0;
 }
 
-@media (min-width: 800px) {
-  .tile-grid {
-    grid-template-columns: repeat(2, 1fr);
+/* 700px–1199px: exakt 2 Spalten */
+@media (min-width: 750px) and (max-width: 1199.98px) {
+  .content {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+/* >=1200px: automatisch so viele Spalten wie reinpassen */
+@media (min-width: 1200px) {
+  .content {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    /* Wenn du lieber schmalere Karten willst, setz --col-min z.B. auf 280px */
+  }
+}
+
+.tile-grid>* {
+  break-inside: avoid;
+  margin-bottom: 1rem;
+  /* simuliert row-gap */
+  width: 100%;
+  /* verhindert "Umbruch" */
+  display: block;
+  /* zur Sicherheit */
 }
 
 mat-expansion-panel {
@@ -132,9 +137,6 @@ mat-expansion-panel {
   border-radius: 1.25rem;
   overflow: hidden;
   max-width: auto;
-  color: var(--mat-card-subtitle-text-color);
-  background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 mat-expansion-panel-header {
@@ -168,29 +170,17 @@ mat-expansion-panel-header .name {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-left: 0.75rem;
-}
-
-.avatar-badge {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 0.75rem;
-  padding-bottom: 0.5rem;
-}
-
-.name {
-  margin-top: 0.75rem;
-  padding-bottom: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
 }
 
 .active-button {
-  color: var(--mat-app-text-color);
-  border: 1px solid var(--mdc-outlined-button-outline-color);
+  background-color: var(--mat-select-focused-arrow-color);
+  color: var(--mat-pseudo-checkbox-full-selected-checkmark-color);
 }
 
 .inactiv-button {
-  color: var(--mat-app-text-color);
+  background-color: var(--mdc-outlined-button-container-color);
+  color: var(--mdc-outlined-button-label-text-color);
   border: 1px solid var(--mdc-outlined-button-outline-color);
 }
