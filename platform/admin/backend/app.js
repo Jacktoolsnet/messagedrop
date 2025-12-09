@@ -19,6 +19,7 @@ const user = require('./routes/user');
 const publicStatus = require('./routes/public-status');
 const statistic = require('./routes/statistic');
 const errorLog = require('./routes/error-log');
+const infoLog = require('./routes/info-log');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -213,6 +214,7 @@ app.use('/user', user);
 app.use('/translate', translate);
 app.use('/statistic', statistic);
 app.use('/error-log', errorLog);
+app.use('/info-log', infoLog);
 
 
 // DSA
@@ -265,6 +267,16 @@ cron.schedule('15 0 * * *', () => {
   tableErrorLog.cleanupOlderThan(database.db, threshold, (err) => {
     if (err) {
       logger.error('ErrorLog cleanup failed', { error: err?.message });
+    }
+  });
+});
+
+// Clean info logs older than 7 days
+cron.schedule('20 0 * * *', () => {
+  const threshold = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  tableInfoLog.cleanupOlderThan(database.db, threshold, (err) => {
+    if (err) {
+      logger.error('InfoLog cleanup failed', { error: err?.message });
     }
   });
 });

@@ -12,6 +12,7 @@ const tableStatistic = require('./tableStatistic');
 const tableStatisticSettings = require('./tableStatisticSettings');
 const tableLoginOtp = require('./tableLoginOtp');
 const tableErrorLog = require('./tableErrorLog');
+const tableInfoLog = require('./tableInfoLog');
 
 
 class Database {
@@ -44,6 +45,7 @@ class Database {
         tableStatisticSettings.init(this.db);
         tableLoginOtp.init(this.db);
         tableErrorLog.init(this.db);
+        tableInfoLog.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers();
