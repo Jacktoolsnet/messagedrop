@@ -27,7 +27,7 @@ function buildStatusUrl(token) {
 
 /* ---------------------- Minimaler Make-Notifier (axios) ---------------------- */
 function notifyMake(title, text) {
-    const url = process.env.MAKE_DSA_WEBHOOK_URL;
+    const url = process.env.MAKE_PUSHBULLET_WEBHOOK_URL;
     const apiKey = process.env.MAKE_API_KEY;
     if (!url || !apiKey) return;
 
