@@ -14,6 +14,8 @@ import { LoginComponent } from './components/login/login.component';
 import { NotificationsComponent } from './components/dsa/notifications/notifications.component';
 import { authGuard } from './guards/auth/auth-guard';
 import { StatisticComponent } from './components/statistic/statistic.component';
+import { ErrorLogsComponent } from './components/logs/error-logs/error-logs.component';
+import { InfoLogsComponent } from './components/logs/info-logs/info-logs.component';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
@@ -76,6 +78,16 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/audits',
         component: AuditsComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/logs/errors',
+        component: ErrorLogsComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/logs/info',
+        component: InfoLogsComponent,
         canActivate: [authGuard]
     },
     { path: '**', redirectTo: '' }

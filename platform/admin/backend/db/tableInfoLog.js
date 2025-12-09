@@ -38,14 +38,39 @@ const create = function (db, id, source, file, message, createdAt, callback) {
   });
 };
 
+const list = function (db, limit, offset, callback) {
+  const lim = Number.isFinite(limit) ? Math.max(1, Math.min(500, limit)) : 100;
+  const off = Number.isFinite(offset) ? Math.max(0, offset) : 0;
+  const sql = `
+    SELECT * FROM ${tableName}
+    ORDER BY ${columnCreatedAt} DESC
+    LIMIT ? OFFSET ?`;
+  db.all(sql, [lim, off], (err, rows) => callback(err, rows || []));
+};
+
+const deleteById = function (db, id, callback) {
+  const sql = `DELETE FROM ${tableName} WHERE ${columnId} = ?`;
+  db.run(sql, [id], function (err) {
+    callback(err, this?.changes > 0);
+  });
+};
+
 const cleanupOlderThan = function (db, threshold, callback) {
   const sql = `DELETE FROM ${tableName} WHERE ${columnCreatedAt} < ?`;
   db.run(sql, [threshold], (err) => callback(err));
+};
+
+const countSince = function (db, sinceTs, callback) {
+  const sql = `SELECT COUNT(*) AS count FROM ${tableName} WHERE ${columnCreatedAt} >= ?`;
+  db.get(sql, [sinceTs], (err, row) => callback(err, row?.count || 0));
 };
 
 module.exports = {
   tableName,
   init,
   create,
-  cleanupOlderThan
+  list,
+  deleteById,
+  cleanupOlderThan,
+  countSince
 };

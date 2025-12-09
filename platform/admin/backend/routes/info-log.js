@@ -41,6 +41,49 @@ router.post('/', express.json({ limit: '256kb' }), (req, res) => {
 });
 
 /**
+ * GET /info-log
+ * Query: limit?, offset?
+ */
+router.get('/', (req, res) => {
+  const db = req.database?.db;
+  if (!db) return res.status(500).json({ message: 'database_unavailable' });
+  const limit = Number(req.query?.limit);
+  const offset = Number(req.query?.offset);
+  tableInfoLog.list(db, limit, offset, (err, rows) => {
+    if (err) {
+      req.logger?.error('Info log list failed', { error: err?.message });
+      return res.status(500).json({ message: 'list_failed' });
+    }
+    res.json({ rows });
+  });
+});
+
+/**
+ * GET /info-log/count?since=<ts>
+ * Returns count of entries since timestamp (ms). Default: start of current day (UTC).
+ */
+router.get('/count', (req, res) => {
+  const db = req.database?.db;
+  if (!db) return res.status(500).json({ message: 'database_unavailable' });
+
+  const since = Number(req.query?.since);
+  const defaultSince = (() => {
+    const d = new Date();
+    d.setUTCHours(0, 0, 0, 0);
+    return d.getTime();
+  })();
+  const sinceTs = Number.isFinite(since) ? since : defaultSince;
+
+  tableInfoLog.countSince(db, sinceTs, (err, count) => {
+    if (err) {
+      req.logger?.error('Info log count failed', { error: err?.message });
+      return res.status(500).json({ message: 'count_failed' });
+    }
+    res.json({ count, since: sinceTs });
+  });
+});
+
+/**
  * DELETE /info-log/cleanup
  * Removes entries older than 7 days.
  */
@@ -55,6 +98,22 @@ router.delete('/cleanup', (req, res) => {
       return res.status(500).json({ message: 'cleanup_failed' });
     }
     res.json({ cleaned: true, threshold: sevenDaysAgo });
+  });
+});
+
+/**
+ * DELETE /info-log/:id
+ */
+router.delete('/:id', (req, res) => {
+  const db = req.database?.db;
+  if (!db) return res.status(500).json({ message: 'database_unavailable' });
+  tableInfoLog.deleteById(db, req.params.id, (err, ok) => {
+    if (err) {
+      req.logger?.error('Info log delete failed', { error: err?.message });
+      return res.status(500).json({ message: 'delete_failed' });
+    }
+    if (!ok) return res.status(404).json({ message: 'not_found' });
+    res.json({ deleted: true });
   });
 });
 

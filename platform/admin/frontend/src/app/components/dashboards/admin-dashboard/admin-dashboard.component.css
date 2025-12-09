@@ -169,6 +169,16 @@ mat-card-header {
     box-shadow: 0 2px 8px rgba(2, 8, 20, 0.10);
 }
 
+.avatar.badge span {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+}
+
+.avatar.badge.info mat-icon {
+    color: #0284c7;
+}
+
 .avatar mat-icon {
     /* verhindert abgeschnittene Icons */
     width: 28px;

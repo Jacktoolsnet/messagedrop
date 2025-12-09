@@ -45,5 +45,33 @@
                 <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
             </mat-card-header>
         </mat-card>
+
+        <!-- Error Logs -->
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/errors" role="button"
+            tabindex="0">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar badge">
+                    <span matBadge="{{ errorCountToday ?? 0 }}" matBadgeColor="warn" matBadgeOverlap="false"
+                        matBadgeSize="medium"> </span>
+                    <mat-icon>error_outline</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Error Logs</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">Heute</mat-card-subtitle>
+            </mat-card-header>
+        </mat-card>
+
+        <!-- Info Logs -->
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/info" role="button"
+            tabindex="0">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar badge info">
+                    <span matBadge="{{ infoCountToday ?? 0 }}" matBadgeColor="accent" matBadgeOverlap="false"
+                        matBadgeSize="medium"> </span>
+                    <mat-icon>info</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Info Logs</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle">Heute</mat-card-subtitle>
+            </mat-card-header>
+        </mat-card>
     </div>
 </div>
