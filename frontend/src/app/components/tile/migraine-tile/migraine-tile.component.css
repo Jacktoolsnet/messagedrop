@@ -36,7 +36,7 @@
   flex: 1;
   font-weight: 600;
   font-size: 1rem;
-  color: var(--mat-sys-on-surface, inherit);
+  color: var(--mat-card-subtitle-text-color);
 }
 
 .stale {
@@ -59,7 +59,7 @@
 
 .metric .label {
   font-size: 0.9rem;
-  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.72));
+  color: var(--mat-card-subtitle-text-color);
 }
 
 .metric-row {
@@ -87,5 +87,5 @@
 
 .footer {
   font-size: 0.85rem;
-  color: var(--mat-sys-on-surface-variant, rgba(0, 0, 0, 0.6));
+  color: var(--mat-card-subtitle-text-color);
 }
