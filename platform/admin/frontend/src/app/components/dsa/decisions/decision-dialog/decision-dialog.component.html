@@ -1,97 +1,113 @@
 <h2 mat-dialog-title class="dialog-title">
-    Create decision
+  Create decision
 </h2>
 
 <!-- IMPORTANT: wrap everything in a form with [formGroup]! -->
 <form class="dialog-content" [formGroup]="form" (ngSubmit)="submit()">
-    <!-- Outcome -->
-    <mat-form-field appearance="outline" class="full">
-        <mat-label>Outcome</mat-label>
-        <mat-select formControlName="outcome" required>
-            <mat-option *ngFor="let o of outcomes" [value]="o.value">
-                <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
-                {{ o.label }}
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+  <!-- Outcome -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Outcome</mat-label>
+    <mat-select formControlName="outcome" required>
+      @for (o of outcomes; track o) {
+        <mat-option [value]="o.value">
+          <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
+          {{ o.label }}
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
-    <!-- Legal basis (combo + free text) -->
-    <mat-form-field appearance="outline" class="full">
-        <mat-label>Legal basis</mat-label>
-        <input type="text" matInput [formControl]="legalCtrl" [matAutocomplete]="legalAuto"
-            placeholder="e.g. Terms of Service violation" spellcheck="false" />
-        <button mat-icon-button matSuffix *ngIf="selectedLegalDesc" [matTooltip]="selectedLegalDesc" aria-label="Info">
-            <mat-icon>info</mat-icon>
-        </button>
-        <mat-autocomplete #legalAuto="matAutocomplete" (optionSelected)="onSelectLegal($event)" autoActiveFirstOption>
-            <mat-option *ngFor="let o of filteredLegal$ | async" [value]="o.label">
-                <div class="opt-line">
-                    <span class="opt-label">{{ o.label }}</span>
-                    <span class="opt-desc">{{ o.desc }}</span>
-                </div>
-            </mat-option>
-        </mat-autocomplete>
-        <mat-hint *ngIf="selectedLegalDesc" class="hint-desc">{{ selectedLegalDesc }}</mat-hint>
-    </mat-form-field>
+  <!-- Legal basis (combo + free text) -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Legal basis</mat-label>
+    <input type="text" matInput [formControl]="legalCtrl" [matAutocomplete]="legalAuto"
+      placeholder="e.g. Terms of Service violation" spellcheck="false" />
+    @if (selectedLegalDesc) {
+      <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" aria-label="Info">
+        <mat-icon>info</mat-icon>
+      </button>
+    }
+    <mat-autocomplete #legalAuto="matAutocomplete" (optionSelected)="onSelectLegal($event)" autoActiveFirstOption>
+      @for (o of filteredLegal$ | async; track o) {
+        <mat-option [value]="o.label">
+          <div class="opt-line">
+            <span class="opt-label">{{ o.label }}</span>
+            <span class="opt-desc">{{ o.desc }}</span>
+          </div>
+        </mat-option>
+      }
+    </mat-autocomplete>
+    @if (selectedLegalDesc) {
+      <mat-hint class="hint-desc">{{ selectedLegalDesc }}</mat-hint>
+    }
+  </mat-form-field>
 
-    <!-- ToS clause (combo + free text) -->
-    <mat-form-field appearance="outline" class="full">
-        <mat-label>Terms of Service clause (optional)</mat-label>
-        <input type="text" matInput [formControl]="tosCtrl" [matAutocomplete]="tosAuto"
-            placeholder="e.g. §3.2 Abuse / Harassment" spellcheck="false" />
-        <button mat-icon-button matSuffix *ngIf="selectedTosDesc" [matTooltip]="selectedTosDesc" aria-label="Info">
-            <mat-icon>info</mat-icon>
-        </button>
-        <mat-autocomplete #tosAuto="matAutocomplete" (optionSelected)="onSelectTos($event)" autoActiveFirstOption>
-            <mat-option *ngFor="let o of filteredTos$ | async" [value]="o.label">
-                <div class="opt-line">
-                    <span class="opt-label">{{ o.label }}</span>
-                    <span class="opt-desc">{{ o.desc }}</span>
-                </div>
-            </mat-option>
-        </mat-autocomplete>
-        @if(selectedTosDesc){
-        <mat-hint class="hint-desc">{{ selectedTosDesc }}</mat-hint>
-        }
-    </mat-form-field>
+  <!-- ToS clause (combo + free text) -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Terms of Service clause (optional)</mat-label>
+    <input type="text" matInput [formControl]="tosCtrl" [matAutocomplete]="tosAuto"
+      placeholder="e.g. §3.2 Abuse / Harassment" spellcheck="false" />
+    @if (selectedTosDesc) {
+      <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" aria-label="Info">
+        <mat-icon>info</mat-icon>
+      </button>
+    }
+    <mat-autocomplete #tosAuto="matAutocomplete" (optionSelected)="onSelectTos($event)" autoActiveFirstOption>
+      @for (o of filteredTos$ | async; track o) {
+        <mat-option [value]="o.label">
+          <div class="opt-line">
+            <span class="opt-label">{{ o.label }}</span>
+            <span class="opt-desc">{{ o.desc }}</span>
+          </div>
+        </mat-option>
+      }
+    </mat-autocomplete>
+    @if(selectedTosDesc){
+      <mat-hint class="hint-desc">{{ selectedTosDesc }}</mat-hint>
+    }
+  </mat-form-field>
 
-    <div class="toggle-row" id="automatedHelp">
-        <mat-slide-toggle [formControl]="form.controls.automatedUsed" aria-describedby="automatedHelp">
-            Automated tools used to support decision
-        </mat-slide-toggle>
-    </div>
-    <p class="help-text">
-        Mark this if automated systems or AI tools assisted your review (e.g. content detection, duplicate matching,
-        triage, translation, summarization).
-    </p>
+  <div class="toggle-row" id="automatedHelp">
+    <mat-slide-toggle [formControl]="form.controls.automatedUsed" aria-describedby="automatedHelp">
+      Automated tools used to support decision
+    </mat-slide-toggle>
+  </div>
+  <p class="help-text">
+    Mark this if automated systems or AI tools assisted your review (e.g. content detection, duplicate matching,
+    triage, translation, summarization).
+  </p>
 
-    <!-- Reasoning template select -->
-    <mat-form-field appearance="outline" class="full">
-        <mat-label>Reasoning template</mat-label>
-        <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
-            <mat-option [value]="''">None</mat-option>
-            <mat-option *ngFor="let t of reasoningTemplates" [value]="t.label">
-                <div class="opt-line">
-                    <span class="opt-label">{{ t.label }}</span>
-                    <span class="opt-desc">{{ t.desc }}</span>
-                </div>
-            </mat-option>
-        </mat-select>
-    </mat-form-field>
+  <!-- Reasoning template select -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Reasoning template</mat-label>
+    <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
+      <mat-option [value]="''">None</mat-option>
+      @for (t of reasoningTemplates; track t) {
+        <mat-option [value]="t.label">
+          <div class="opt-line">
+            <span class="opt-label">{{ t.label }}</span>
+            <span class="opt-desc">{{ t.desc }}</span>
+          </div>
+        </mat-option>
+      }
+    </mat-select>
+  </mat-form-field>
 
-    <!-- Statement -->
-    <mat-form-field appearance="outline" class="full">
-        <mat-label>Statement / reasoning (optional)</mat-label>
-        <textarea matInput formControlName="statement" rows="5"
-            placeholder="Short reasoning for the decision"></textarea>
-        <mat-hint align="end">{{ (form.get('statement')?.value || '').length }}/2000</mat-hint>
-    </mat-form-field>
+  <!-- Statement -->
+  <mat-form-field appearance="outline" class="full">
+    <mat-label>Statement / reasoning (optional)</mat-label>
+    <textarea matInput formControlName="statement" rows="5"
+    placeholder="Short reasoning for the decision"></textarea>
+    <mat-hint align="end">{{ (form.get('statement')?.value || '').length }}/2000</mat-hint>
+  </mat-form-field>
 
-    <div class="dialog-actions">
-        <button mat-stroked-button type="button" (click)="close()">Cancel</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
-            <mat-icon *ngIf="submitting()" class="spin">autorenew</mat-icon>
-            Save
-        </button>
-    </div>
+  <div class="dialog-actions">
+    <button mat-stroked-button type="button" (click)="close()">Cancel</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
+      @if (submitting()) {
+        <mat-icon class="spin">autorenew</mat-icon>
+      }
+      Save
+    </button>
+  </div>
 </form>

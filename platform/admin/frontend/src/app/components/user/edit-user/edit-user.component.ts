@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,7 +22,6 @@ export interface EditUserData {
   selector: 'app-edit-user',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -30,7 +29,7 @@ export interface EditUserData {
     MatSelectModule,
     MatButtonModule,
     MatIconModule
-  ],
+],
   templateUrl: './edit-user.component.html',
   styleUrls: ['./edit-user.component.css']
 })

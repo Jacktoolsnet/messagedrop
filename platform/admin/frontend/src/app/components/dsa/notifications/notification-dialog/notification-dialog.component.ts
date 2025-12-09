@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -19,7 +19,6 @@ export interface NotificationDialogData {
   selector: 'app-notification-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -27,7 +26,7 @@ export interface NotificationDialogData {
     MatSelectModule,
     MatButtonModule,
     MatIconModule
-  ],
+],
   templateUrl: './notification-dialog.component.html',
   styleUrls: ['./notification-dialog.component.css']
 })

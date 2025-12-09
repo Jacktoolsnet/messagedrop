@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,6 @@ import { UserService } from '../../../services/user/user.service';
   templateUrl: './create-user.component.html',
   styleUrls: ['./create-user.component.css'],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -24,7 +23,7 @@ import { UserService } from '../../../services/user/user.service';
     MatSelectModule,
     MatButtonModule,
     MatIconModule
-  ]
+]
 })
 export class CreateUserComponent {
   private dialogRef = inject(MatDialogRef<CreateUserComponent>);

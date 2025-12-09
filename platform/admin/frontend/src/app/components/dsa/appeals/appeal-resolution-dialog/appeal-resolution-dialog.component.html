@@ -6,36 +6,34 @@
       <mat-label>Outcome</mat-label>
       <mat-select formControlName="outcome" required>
         @for (option of outcomes; track option.value) {
-        <mat-option [value]="option.value">{{ option.label }}</mat-option>
+          <mat-option [value]="option.value">{{ option.label }}</mat-option>
         }
       </mat-select>
     </mat-form-field>
 
-    <ng-container *ngIf="isRevised()">
+    @if (isRevised()) {
       <mat-form-field appearance="outline">
         <mat-label>Revised decision</mat-label>
         <mat-select formControlName="decOutcome" required>
-          <mat-option *ngFor="let opt of decisionOutcomes" [value]="opt">{{ opt }}</mat-option>
+          @for (opt of decisionOutcomes; track opt) {
+            <mat-option [value]="opt">{{ opt }}</mat-option>
+          }
         </mat-select>
       </mat-form-field>
-
       <mat-form-field appearance="outline">
         <mat-label>Legal basis</mat-label>
         <input matInput formControlName="legalBasis" placeholder="e.g. Terms of Service violation" />
       </mat-form-field>
-
       <mat-form-field appearance="outline">
         <mat-label>ToS basis</mat-label>
         <input matInput formControlName="tosBasis" placeholder="e.g. §4.1 Hate Speech" />
       </mat-form-field>
-
       <mat-slide-toggle formControlName="automatedUsed">Automated tools used</mat-slide-toggle>
-
       <mat-form-field appearance="outline">
         <mat-label>Decision statement</mat-label>
         <textarea matInput rows="3" formControlName="statement" placeholder="Reasoning for the revised decision"></textarea>
       </mat-form-field>
-    </ng-container>
+    }
 
     <mat-form-field appearance="outline">
       <mat-label>Reviewer (optional)</mat-label>

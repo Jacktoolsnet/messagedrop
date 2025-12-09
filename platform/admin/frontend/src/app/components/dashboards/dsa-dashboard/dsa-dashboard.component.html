@@ -1,33 +1,35 @@
 <mat-toolbar color="primary">
-    <!-- Home -->
-    <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
-        <mat-icon>home</mat-icon>
-    </button>
+  <!-- Home -->
+  <button mat-icon-button routerLink="/dashboard" aria-label="Dashboard Home">
+    <mat-icon>home</mat-icon>
+  </button>
 
-    <!-- Titel -->
-    <span class="toolbar-title">
-        Digital Services Act
-    </span>
+  <!-- Titel -->
+  <span class="toolbar-title">
+    Digital Services Act
+  </span>
 </mat-toolbar>
 
 <!-- Ladeindikator (optional, hübsch) -->
-<mat-progress-bar *ngIf="loading()" mode="indeterminate"></mat-progress-bar>
+@if (loading()) {
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
 
 <div class="page">
-    <div class="tiles-container">
-        @for (tile of tiles; track trackByKey($index, tile)) {
-        <mat-card class="tile" appearance="raised" [routerLink]="tile.route">
-            <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="badgeCount(tile)" matBadgeOverlap="false"
-                    [matBadgeColor]="badgeColor(tile)" [matBadgeHidden]="!showBadge(tile)">
-                    <mat-icon>{{ tile.icon }}</mat-icon>
-                </div>
+  <div class="tiles-container">
+    @for (tile of tiles; track trackByKey($index, tile)) {
+      <mat-card class="tile" appearance="raised" [routerLink]="tile.route">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar" [matBadge]="badgeCount(tile)" matBadgeOverlap="false"
+            [matBadgeColor]="badgeColor(tile)" [matBadgeHidden]="!showBadge(tile)">
+            <mat-icon>{{ tile.icon }}</mat-icon>
+          </div>
 
-                <mat-card-title class="tile-title">{{ tile.title }}</mat-card-title>
-                <mat-card-subtitle class="tile-subtitle">{{ tile.subtitle }}</mat-card-subtitle>
-            </mat-card-header>
+          <mat-card-title class="tile-title">{{ tile.title }}</mat-card-title>
+          <mat-card-subtitle class="tile-subtitle">{{ tile.subtitle }}</mat-card-subtitle>
+        </mat-card-header>
 
-        </mat-card>
-        }
-    </div>
+      </mat-card>
+    }
+  </div>
 </div>

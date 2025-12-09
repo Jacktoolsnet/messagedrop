@@ -1,5 +1,5 @@
 import { Component, inject, computed } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -30,7 +30,6 @@ export interface AppealResolutionDialogData {
   selector: 'app-appeal-resolution-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogModule,
     MatButtonModule,
     MatFormFieldModule,
@@ -38,7 +37,7 @@ export interface AppealResolutionDialogData {
     MatInputModule,
     MatSlideToggleModule,
     ReactiveFormsModule
-  ],
+],
   templateUrl: './appeal-resolution-dialog.component.html',
   styleUrls: ['./appeal-resolution-dialog.component.css']
 })

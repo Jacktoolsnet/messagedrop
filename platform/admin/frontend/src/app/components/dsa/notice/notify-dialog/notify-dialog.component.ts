@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,7 +15,6 @@ import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
   selector: 'app-notify-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -24,7 +23,7 @@ import { DsaService } from '../../../../services/dsa/dsa/dsa.service';
     MatButtonModule,
     MatSlideToggleModule,
     MatIcon
-  ],
+],
   templateUrl: './notify-dialog.component.html',
   styleUrls: ['./notify-dialog.component.css']
 })

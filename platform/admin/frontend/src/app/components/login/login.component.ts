@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,7 +15,6 @@ import { AuthService } from '../../services/auth/auth.service';
   styleUrls: ['./login.component.css'],
   standalone: true,
   imports: [
-    CommonModule,
     MatCardModule,
     MatFormFieldModule,
     MatInputModule,
@@ -23,7 +22,7 @@ import { AuthService } from '../../services/auth/auth.service';
     FormsModule,
     MatIconModule,
     MatSnackBarModule
-  ]
+]
 })
 export class LoginComponent {
   username = '';

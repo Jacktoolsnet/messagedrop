@@ -7,9 +7,9 @@
   <div class="desktop-controls">
     <mat-chip-listbox class="range-chips" [value]="filterForm.controls.range.value" (change)="onRangeChange($event)" aria-label="Select range">
       @for (opt of rangeOptions; track opt.value) {
-      <mat-chip-option [value]="opt.value">
-        {{ opt.label }}
-      </mat-chip-option>
+        <mat-chip-option [value]="opt.value">
+          {{ opt.label }}
+        </mat-chip-option>
       }
     </mat-chip-listbox>
   </div>
@@ -20,173 +20,170 @@
     <mat-menu #transparencyMenu="matMenu">
       <button mat-menu-item disabled>Range</button>
       @for (opt of rangeOptions; track opt.value) {
-      <button mat-menu-item (click)="setRange(opt.value)">
-        <mat-icon>{{ filterForm.controls.range.value === opt.value ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
-        <span>{{ opt.label }}</span>
-      </button>
+        <button mat-menu-item (click)="setRange(opt.value)">
+          <mat-icon>{{ filterForm.controls.range.value === opt.value ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+          <span>{{ opt.label }}</span>
+        </button>
       }
     </mat-menu>
   </div>
 </mat-toolbar>
 
 @if (loadingStats()) {
-<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
 }
 
-<div class="page" *ngIf="stats() as data">
-  <section class="metrics">
-    <mat-card class="metric-card">
-      <div class="metric-title">
-        <mat-icon>flag</mat-icon>
-        Notices
-      </div>
-      <div class="metric-value">{{ data.notices.total | number }}</div>
-      <div class="metric-subtitle">Total cases {{ data.range.label }}</div>
-      <div class="pill-row">
-        @for (entry of toEntries(data.notices.byStatus); track entry.key) {
-        <mat-chip>
-          {{ entry.key }}: {{ entry.value }}
-        </mat-chip>
-        }
-      </div>
-    </mat-card>
-
-    <mat-card class="metric-card">
-      <div class="metric-title">
-        <mat-icon>check_circle</mat-icon>
-        Decisions
-      </div>
-      <div class="metric-value">{{ data.decisions.total | number }}</div>
-      <div class="metric-subtitle">Average resolution {{ formatDuration(data.decisions.avgDecisionTimeMs) }}</div>
-      <div class="pill-row">
-        @for (entry of toEntries(data.decisions.byOutcome); track entry.key) {
-        <mat-chip>
-          {{ labelForOutcome(entry.key) }}: {{ entry.value }}
-        </mat-chip>
-        }
-      </div>
-      <div class="metric-note">
-        Automated review: {{ automatedShare(data) }}
-      </div>
-    </mat-card>
-
-    <mat-card class="metric-card">
-      <div class="metric-title">
-        <mat-icon>notifications</mat-icon>
-        Signals
-      </div>
-      <div class="metric-value">{{ data.signals.total | number }}</div>
-      <div class="metric-subtitle">Reported quick signals</div>
-      <div class="pill-row">
-        @for (entry of toEntries(data.signals.byType); track entry.key) {
-        <mat-chip>
-          {{ entry.key }}: {{ entry.value }}
-        </mat-chip>
-        }
-      </div>
-    </mat-card>
-  </section>
-
-  <section class="charts-grid">
-    <mat-card class="chart-card">
-      <div class="chart-header">
-        <mat-icon>bar_chart</mat-icon>
-        Notices by status
-      </div>
-      <div class="chart-container">
-        <canvas #statusChart></canvas>
-      </div>
-    </mat-card>
-
-    <mat-card class="chart-card">
-      <div class="chart-header">
-        <mat-icon>pie_chart</mat-icon>
-        Decision outcomes
-      </div>
-      <div class="chart-container">
-        <canvas #decisionChart></canvas>
-      </div>
-    </mat-card>
-
-    <mat-card class="chart-card">
-      <div class="chart-header">
-        <mat-icon>show_chart</mat-icon>
-        Monthly trend
-      </div>
-      <div class="chart-container">
-        <canvas #trendChart></canvas>
-      </div>
-    </mat-card>
-  </section>
-
-  <section class="categories">
-    <mat-card>
-      <div class="chart-header">
-        <mat-icon>category</mat-icon>
-        Top categories
-      </div>
-      <div class="category-grid">
-        <div>
-          <h4>Notices</h4>
-          <div class="pill-column">
-            @for (entry of data.notices.topCategories; track entry.category) {
+@if (stats(); as data) {
+  <div class="page">
+    <section class="metrics">
+      <mat-card class="metric-card">
+        <div class="metric-title">
+          <mat-icon>flag</mat-icon>
+          Notices
+        </div>
+        <div class="metric-value">{{ data.notices.total | number }}</div>
+        <div class="metric-subtitle">Total cases {{ data.range.label }}</div>
+        <div class="pill-row">
+          @for (entry of toEntries(data.notices.byStatus); track entry.key) {
             <mat-chip>
-              {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
+              {{ entry.key }}: {{ entry.value }}
             </mat-chip>
-            }
-          </div>
-        </div>
-        <div>
-          <h4>Signals</h4>
-          <div class="pill-column">
-            @for (entry of data.signals.topCategories; track entry.category) {
-            <mat-chip>
-              {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
-            </mat-chip>
-            }
-          </div>
-        </div>
-      </div>
-    </mat-card>
-  </section>
-
-  <section class="reports">
-    <div class="reports-header">
-      <h3>
-        <mat-icon>description</mat-icon>
-        Transparency reports
-      </h3>
-      @if (loadingReports()) {
-      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-      }
-    </div>
-
-    <div class="report-tiles" *ngIf="reports().length > 0; else emptyReports">
-      @for (report of reports(); track $index) {
-      <mat-card class="report-tile">
-        <div class="report-head">
-          <div class="report-title">{{ report.title }}</div>
-          <div class="report-desc" *ngIf="report.description">{{ report.description }}</div>
-        </div>
-        <div class="report-meta">
-          <div class="meta-row"><span class="k">Period</span><span class="v">{{ report.period.label }}</span></div>
-          <div class="meta-row"><span class="k">Format</span><span class="v">{{ report.format.toUpperCase() }}</span></div>
-          <div class="meta-row"><span class="k">Generated</span><span class="v">{{ formatDateTime(report.generatedAt) }}</span></div>
-        </div>
-        <div class="report-actions">
-          <button mat-stroked-button color="primary" (click)="downloadReport(report)">
-            <mat-icon>download</mat-icon>
-            Download
-          </button>
+          }
         </div>
       </mat-card>
-      }
-    </div>
-    <ng-template #emptyReports>
-      <div class="empty-reports">
-        <mat-icon>inventory_2</mat-icon>
-        <p>No generated reports yet for {{ data.range.label }}.</p>
+      <mat-card class="metric-card">
+        <div class="metric-title">
+          <mat-icon>check_circle</mat-icon>
+          Decisions
+        </div>
+        <div class="metric-value">{{ data.decisions.total | number }}</div>
+        <div class="metric-subtitle">Average resolution {{ formatDuration(data.decisions.avgDecisionTimeMs) }}</div>
+        <div class="pill-row">
+          @for (entry of toEntries(data.decisions.byOutcome); track entry.key) {
+            <mat-chip>
+              {{ labelForOutcome(entry.key) }}: {{ entry.value }}
+            </mat-chip>
+          }
+        </div>
+        <div class="metric-note">
+          Automated review: {{ automatedShare(data) }}
+        </div>
+      </mat-card>
+      <mat-card class="metric-card">
+        <div class="metric-title">
+          <mat-icon>notifications</mat-icon>
+          Signals
+        </div>
+        <div class="metric-value">{{ data.signals.total | number }}</div>
+        <div class="metric-subtitle">Reported quick signals</div>
+        <div class="pill-row">
+          @for (entry of toEntries(data.signals.byType); track entry.key) {
+            <mat-chip>
+              {{ entry.key }}: {{ entry.value }}
+            </mat-chip>
+          }
+        </div>
+      </mat-card>
+    </section>
+    <section class="charts-grid">
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <mat-icon>bar_chart</mat-icon>
+          Notices by status
+        </div>
+        <div class="chart-container">
+          <canvas #statusChart></canvas>
+        </div>
+      </mat-card>
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <mat-icon>pie_chart</mat-icon>
+          Decision outcomes
+        </div>
+        <div class="chart-container">
+          <canvas #decisionChart></canvas>
+        </div>
+      </mat-card>
+      <mat-card class="chart-card">
+        <div class="chart-header">
+          <mat-icon>show_chart</mat-icon>
+          Monthly trend
+        </div>
+        <div class="chart-container">
+          <canvas #trendChart></canvas>
+        </div>
+      </mat-card>
+    </section>
+    <section class="categories">
+      <mat-card>
+        <div class="chart-header">
+          <mat-icon>category</mat-icon>
+          Top categories
+        </div>
+        <div class="category-grid">
+          <div>
+            <h4>Notices</h4>
+            <div class="pill-column">
+              @for (entry of data.notices.topCategories; track entry.category) {
+                <mat-chip>
+                  {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
+                </mat-chip>
+              }
+            </div>
+          </div>
+          <div>
+            <h4>Signals</h4>
+            <div class="pill-column">
+              @for (entry of data.signals.topCategories; track entry.category) {
+                <mat-chip>
+                  {{ entry.category || 'Uncategorized' }} · {{ entry.count }}
+                </mat-chip>
+              }
+            </div>
+          </div>
+        </div>
+      </mat-card>
+    </section>
+    <section class="reports">
+      <div class="reports-header">
+        <h3>
+          <mat-icon>description</mat-icon>
+          Transparency reports
+        </h3>
+        @if (loadingReports()) {
+          <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+        }
       </div>
-    </ng-template>
-  </section>
-</div>
+      @if (reports().length > 0) {
+        <div class="report-tiles">
+          @for (report of reports(); track $index) {
+            <mat-card class="report-tile">
+              <div class="report-head">
+                <div class="report-title">{{ report.title }}</div>
+                @if (report.description) {
+                  <div class="report-desc">{{ report.description }}</div>
+                }
+              </div>
+              <div class="report-meta">
+                <div class="meta-row"><span class="k">Period</span><span class="v">{{ report.period.label }}</span></div>
+                <div class="meta-row"><span class="k">Format</span><span class="v">{{ report.format.toUpperCase() }}</span></div>
+                <div class="meta-row"><span class="k">Generated</span><span class="v">{{ formatDateTime(report.generatedAt) }}</span></div>
+              </div>
+              <div class="report-actions">
+                <button mat-stroked-button color="primary" (click)="downloadReport(report)">
+                  <mat-icon>download</mat-icon>
+                  Download
+                </button>
+              </div>
+            </mat-card>
+          }
+        </div>
+      } @else {
+        <div class="empty-reports">
+          <mat-icon>inventory_2</mat-icon>
+          <p>No generated reports yet for {{ data.range.label }}.</p>
+        </div>
+      }
+    </section>
+  </div>
+}

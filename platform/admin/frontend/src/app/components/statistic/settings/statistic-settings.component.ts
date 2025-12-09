@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -24,7 +24,6 @@ interface Row {
   selector: 'app-statistic-settings',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatDialogModule,
     MatButtonModule,
@@ -33,7 +32,7 @@ interface Row {
     MatInputModule,
     MatCardModule,
     DragDropModule
-  ],
+],
   templateUrl: './statistic-settings.component.html',
   styleUrls: ['./statistic-settings.component.css']
 })

@@ -1,210 +1,212 @@
-<div class="page" *ngIf="!loading(); else loadingTpl">
-  @if (error()) {
-  <mat-card class="error-card">
-    <mat-icon>error</mat-icon>
-    <div>
-      <h2>Unable to load status</h2>
-      <p>{{ error() }}</p>
-    </div>
-  </mat-card>
-  } @else if (status(); as data) {
-
-  <header class="actions">
-    <button mat-stroked-button color="primary" (click)="copyLink()">
-      <mat-icon>content_copy</mat-icon>
-      Copy link
-    </button>
-    <button mat-flat-button color="primary" (click)="print()">
-      <mat-icon>print</mat-icon>
-      Print / Save PDF
-    </button>
-  </header>
-
-  <mat-card class="summary-card">
-    <mat-card-header>
-      <div mat-card-avatar class="avatar">
-        <mat-icon>flag</mat-icon>
-      </div>
-      <mat-card-title>
-        {{ isNotice ? 'Notice' : 'Quick report' }} status overview
-      </mat-card-title>
-      <mat-card-subtitle>
-        {{ (notice?.createdAt || signal?.createdAt) | date:'medium' }}
-      </mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="summary-grid">
+@if (!loading()) {
+  <div class="page">
+    @if (error()) {
+      <mat-card class="error-card">
+        <mat-icon>error</mat-icon>
         <div>
-          <span class="label">Current status</span>
-          <mat-chip [color]="isNotice ? 'primary' : 'accent'" selected>
-            {{ formatStatus(notice?.status) }}
-          </mat-chip>
+          <h2>Unable to load status</h2>
+          <p>{{ error() }}</p>
         </div>
-        <div>
-          <span class="label">Content ID</span>
-          <span>{{ notice?.contentId || signal?.contentId || '—' }}</span>
-        </div>
-        <div>
-          <span class="label">Category</span>
-          <span>{{ notice?.category || signal?.category || '—' }}</span>
-        </div>
-        <div *ngIf="isNotice">
-          <span class="label">Reason</span>
-          <span>{{ notice?.reasonText || '—' }}</span>
-        </div>
-        <div *ngIf="notice?.contentUrl">
-          <span class="label">Content URL</span>
-          <a [href]="notice?.contentUrl" target="_blank" rel="noopener">Open content</a>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-
-  @if (decision; as dec) {
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar class="avatar decision">
-        <mat-icon>gavel</mat-icon>
-      </div>
-      <mat-card-title>Decision</mat-card-title>
-      <mat-card-subtitle>{{ dec.decidedAt | date:'medium' }}</mat-card-subtitle>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="summary-grid">
-        <div>
-          <span class="label">Outcome</span>
-          <mat-chip color="primary" selected>{{ formatOutcome(dec.outcome) }}</mat-chip>
-        </div>
-        <div>
-          <span class="label">Decided by</span>
-          <span>{{ dec.decidedBy || '—' }}</span>
-        </div>
-        <div>
-          <span class="label">Statement</span>
-          <p class="statement" *ngIf="dec.statement; else noStatement">{{ dec.statement }}</p>
-          <ng-template #noStatement>—</ng-template>
-        </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  }
-
-  @if (isNotice && evidence.length > 0) {
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar class="avatar evidence">
-        <mat-icon>folder</mat-icon>
-      </div>
-      <mat-card-title>Evidence</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="evidence-list">
-        @for (ev of evidence; track ev.id) {
-        <div class="evidence-entry">
-          <div class="info">
-            <div class="title">
-              <mat-icon>
-                {{ ev.type === 'file' ? 'attach_file' : ev.type === 'url' ? 'link' : 'fingerprint' }}
-              </mat-icon>
-              <span>{{ ev.fileName || ev.url || ev.hash || ev.type }}</span>
-            </div>
-            <div class="meta">Added {{ ev.addedAt | date:'medium' }}</div>
+      </mat-card>
+    } @else if (status(); as data) {
+      <header class="actions">
+        <button mat-stroked-button color="primary" (click)="copyLink()">
+          <mat-icon>content_copy</mat-icon>
+          Copy link
+        </button>
+        <button mat-flat-button color="primary" (click)="print()">
+          <mat-icon>print</mat-icon>
+          Print / Save PDF
+        </button>
+      </header>
+      <mat-card class="summary-card">
+        <mat-card-header>
+          <div mat-card-avatar class="avatar">
+            <mat-icon>flag</mat-icon>
           </div>
-          <div class="actions">
-            @if (ev.type === 'file') {
-            <button mat-stroked-button color="primary" (click)="downloadEvidence(ev)">
-              <mat-icon>download</mat-icon>
-              Download
-            </button>
+          <mat-card-title>
+            {{ isNotice ? 'Notice' : 'Quick report' }} status overview
+          </mat-card-title>
+          <mat-card-subtitle>
+            {{ (notice?.createdAt || signal?.createdAt) | date:'medium' }}
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="summary-grid">
+            <div>
+              <span class="label">Current status</span>
+              <mat-chip [color]="isNotice ? 'primary' : 'accent'" selected>
+                {{ formatStatus(notice?.status) }}
+              </mat-chip>
+            </div>
+            <div>
+              <span class="label">Content ID</span>
+              <span>{{ notice?.contentId || signal?.contentId || '—' }}</span>
+            </div>
+            <div>
+              <span class="label">Category</span>
+              <span>{{ notice?.category || signal?.category || '—' }}</span>
+            </div>
+            @if (isNotice) {
+              <div>
+                <span class="label">Reason</span>
+                <span>{{ notice?.reasonText || '—' }}</span>
+              </div>
             }
-            @if (ev.type === 'url' && ev.url) {
-            <a mat-stroked-button color="primary" [href]="ev.url" target="_blank" rel="noopener">
-              <mat-icon>open_in_new</mat-icon>
-              Open link
-            </a>
+            @if (notice?.contentUrl) {
+              <div>
+                <span class="label">Content URL</span>
+                <a [href]="notice?.contentUrl" target="_blank" rel="noopener">Open content</a>
+              </div>
             }
           </div>
-        </div>
-        }
-      </div>
-    </mat-card-content>
-  </mat-card>
-  }
-
-  @if (appeals().length > 0) {
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar class="avatar decision">
-        <mat-icon>gavel</mat-icon>
-      </div>
-      <mat-card-title>Appeals</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <div class="appeals-list">
-        @for (appeal of appeals(); track appeal.id) {
-        <section class="appeal-tile">
-          <header>
-            <div class="meta">
-              <span class="label">Appeal</span>
-              <span>Filed {{ appeal.filedAt | date:'medium' }}</span>
+        </mat-card-content>
+      </mat-card>
+      @if (decision; as dec) {
+        <mat-card>
+          <mat-card-header>
+            <div mat-card-avatar class="avatar decision">
+              <mat-icon>gavel</mat-icon>
             </div>
-            <span class="status" [ngClass]="{ resolved: appeal.resolvedAt, open: !appeal.resolvedAt }">
-              {{ formatAppealOutcome(appeal.outcome) }}
-            </span>
-          </header>
-
-          <div class="body">
-            <h4>Arguments</h4>
-            <p>{{ appeal.arguments }}</p>
-          </div>
-
-          @if (appeal.resolvedAt) {
-          <footer>
-            <div class="meta decision">
-              <span class="label">Decision</span>
-              <span>Resolved {{ appeal.resolvedAt | date:'medium' }}</span>
-              @if (appeal.reviewer) {
-              <span>Reviewer: {{ appeal.reviewer }}</span>
+            <mat-card-title>Decision</mat-card-title>
+            <mat-card-subtitle>{{ dec.decidedAt | date:'medium' }}</mat-card-subtitle>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="summary-grid">
+              <div>
+                <span class="label">Outcome</span>
+                <mat-chip color="primary" selected>{{ formatOutcome(dec.outcome) }}</mat-chip>
+              </div>
+              <div>
+                <span class="label">Decided by</span>
+                <span>{{ dec.decidedBy || '—' }}</span>
+              </div>
+              <div>
+                <span class="label">Statement</span>
+                @if (dec.statement) {
+                  <p class="statement">{{ dec.statement }}</p>
+                } @else {
+                  —
+                }
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+      @if (isNotice && evidence.length > 0) {
+        <mat-card>
+          <mat-card-header>
+            <div mat-card-avatar class="avatar evidence">
+              <mat-icon>folder</mat-icon>
+            </div>
+            <mat-card-title>Evidence</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="evidence-list">
+              @for (ev of evidence; track ev.id) {
+                <div class="evidence-entry">
+                  <div class="info">
+                    <div class="title">
+                      <mat-icon>
+                        {{ ev.type === 'file' ? 'attach_file' : ev.type === 'url' ? 'link' : 'fingerprint' }}
+                      </mat-icon>
+                      <span>{{ ev.fileName || ev.url || ev.hash || ev.type }}</span>
+                    </div>
+                    <div class="meta">Added {{ ev.addedAt | date:'medium' }}</div>
+                  </div>
+                  <div class="actions">
+                    @if (ev.type === 'file') {
+                      <button mat-stroked-button color="primary" (click)="downloadEvidence(ev)">
+                        <mat-icon>download</mat-icon>
+                        Download
+                      </button>
+                    }
+                    @if (ev.type === 'url' && ev.url) {
+                      <a mat-stroked-button color="primary" [href]="ev.url" target="_blank" rel="noopener">
+                        <mat-icon>open_in_new</mat-icon>
+                        Open link
+                      </a>
+                    }
+                  </div>
+                </div>
               }
             </div>
-          </footer>
-          }
-        </section>
-        }
-      </div>
-    </mat-card-content>
-  </mat-card>
-  }
-
-  <mat-card>
-    <mat-card-header>
-      <div mat-card-avatar class="avatar timeline">
-        <mat-icon>history</mat-icon>
-      </div>
-      <mat-card-title>Timeline</mat-card-title>
-    </mat-card-header>
-    <mat-card-content>
-      <mat-list>
-        @for (entry of auditEntries(); track entry.id) {
-        <mat-list-item class="timeline-entry">
-          <div matListItemTitle>{{ formatAuditAction(entry) }}</div>
-          <div matListItemLine>on {{ entry.createdAt | date:'medium' }}</div>
-          <div matListItemLine class="muted">by {{ entry.actor }}</div>
-          <div class="detail" *ngIf="entry.detailsObj as details">
-            <pre>{{ details | json }}</pre>
+          </mat-card-content>
+        </mat-card>
+      }
+      @if (appeals().length > 0) {
+        <mat-card>
+          <mat-card-header>
+            <div mat-card-avatar class="avatar decision">
+              <mat-icon>gavel</mat-icon>
+            </div>
+            <mat-card-title>Appeals</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="appeals-list">
+              @for (appeal of appeals(); track appeal.id) {
+                <section class="appeal-tile">
+                  <header>
+                    <div class="meta">
+                      <span class="label">Appeal</span>
+                      <span>Filed {{ appeal.filedAt | date:'medium' }}</span>
+                    </div>
+                    <span class="status" [ngClass]="{ resolved: appeal.resolvedAt, open: !appeal.resolvedAt }">
+                      {{ formatAppealOutcome(appeal.outcome) }}
+                    </span>
+                  </header>
+                  <div class="body">
+                    <h4>Arguments</h4>
+                    <p>{{ appeal.arguments }}</p>
+                  </div>
+                  @if (appeal.resolvedAt) {
+                    <footer>
+                      <div class="meta decision">
+                        <span class="label">Decision</span>
+                        <span>Resolved {{ appeal.resolvedAt | date:'medium' }}</span>
+                        @if (appeal.reviewer) {
+                          <span>Reviewer: {{ appeal.reviewer }}</span>
+                        }
+                      </div>
+                    </footer>
+                  }
+                </section>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
+      <mat-card>
+        <mat-card-header>
+          <div mat-card-avatar class="avatar timeline">
+            <mat-icon>history</mat-icon>
           </div>
-        </mat-list-item>
-        <mat-divider class="timeline-divider"></mat-divider>
-        }
-      </mat-list>
-    </mat-card-content>
-  </mat-card>
-  }
-</div>
-
-<ng-template #loadingTpl>
+          <mat-card-title>Timeline</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <mat-list>
+            @for (entry of auditEntries(); track entry.id) {
+              <mat-list-item class="timeline-entry">
+                <div matListItemTitle>{{ formatAuditAction(entry) }}</div>
+                <div matListItemLine>on {{ entry.createdAt | date:'medium' }}</div>
+                <div matListItemLine class="muted">by {{ entry.actor }}</div>
+                @if (entry.detailsObj; as details) {
+                  <div class="detail">
+                    <pre>{{ details | json }}</pre>
+                  </div>
+                }
+              </mat-list-item>
+              <mat-divider class="timeline-divider"></mat-divider>
+            }
+          </mat-list>
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+} @else {
   <div class="loading">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
     <p>Loading status…</p>
   </div>
-</ng-template>
+}
+
