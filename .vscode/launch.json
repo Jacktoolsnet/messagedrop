@@ -31,8 +31,8 @@
             "internalConsoleOptions": "neverOpen"
         },
         {
-            "name": "Messagedrop-Service",
-            "program": "${workspaceFolder}/backend/app.js",
+            "name": "Admin-Service",
+            "program": "${workspaceFolder}/platform/admin/backend/app.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
@@ -40,8 +40,8 @@
             "type": "node"
         },
         {
-            "name": "Admin-Service",
-            "program": "${workspaceFolder}/platform/admin/backend/app.js",
+            "name": "Messagedrop-Service",
+            "program": "${workspaceFolder}/backend/app.js",
             "request": "launch",
             "skipFiles": [
                 "<node_internals>/**"
