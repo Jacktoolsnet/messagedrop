@@ -1,0 +1,67 @@
+const axios = require('axios');
+
+function resolveBaseUrl(envBase, envPort, fallback) {
+  if (fallback) return fallback.replace(/\/+$/, '');
+  const base = (envBase || '').replace(/\/+$/, '');
+  if (!base) return null;
+  return envPort ? `${base}:${envPort}` : base;
+}
+
+function getCallerFile() {
+  const err = new Error();
+  const stack = (err.stack || '').split('\n').slice(3);
+  for (const line of stack) {
+    const match = line.match(/\((.*):\d+:\d+\)$/) || line.match(/at (.*):\d+:\d+$/);
+    const file = match?.[1];
+    if (file && !file.includes('adminLogForwarder')) {
+      return file;
+    }
+  }
+  return 'unknown';
+}
+
+function createForwarder({ baseUrl, token, source }) {
+  if (!baseUrl || !token) {
+    return () => { };
+  }
+  const post = async (path, payload) => {
+    try {
+      await axios.post(`${baseUrl}${path}`, payload, {
+        headers: { 'x-api-authorization': token },
+        timeout: 2000,
+        validateStatus: () => true
+      });
+    } catch (_err) { /* silent */ }
+  };
+
+  return (level, message) => {
+    const file = getCallerFile();
+    const body = {
+      source: source || 'openmeteo-service',
+      file,
+      message: typeof message === 'string' ? message : JSON.stringify(message),
+      createdAt: Date.now()
+    };
+    if (level === 'error') {
+      return post('/error-log', body);
+    }
+    return post('/info-log', body);
+  };
+}
+
+function attachForwarding(logger, opts) {
+  const forward = createForwarder(opts);
+  ['info', 'error'].forEach(level => {
+    const orig = logger[level]?.bind(logger);
+    if (!orig) return;
+    logger[level] = (...args) => {
+      orig(...args);
+      forward(level, args[0]);
+    };
+  });
+}
+
+module.exports = {
+  resolveBaseUrl,
+  attachForwarding
+};

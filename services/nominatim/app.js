@@ -14,6 +14,7 @@ const cron = require('node-cron');
 const winston = require('winston');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const nominatim = require('./routes/nominatim');
+const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
 // Tables für Cron-Jobs
 const tableNominatimCache = require('./db/tableNominatimCache.js');
@@ -78,6 +79,14 @@ if (process.env.NODE_ENV !== 'production') {
     format: winston.format.simple()
   }));
 }
+
+// Forward logs to admin backend
+const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
+attachForwarding(logger, {
+  baseUrl: adminLogBase,
+  token: process.env.ADMIN_TOKEN || process.env.BACKEND_TOKEN,
+  source: 'nominatim-service'
+});
 
 // Hinweis: Socket.io entfernt. Server startet als klassischer Express-Server.
 

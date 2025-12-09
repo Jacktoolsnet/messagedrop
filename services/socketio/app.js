@@ -7,6 +7,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const winston = require('winston');
 const { Server } = require('socket.io');
+const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
@@ -58,6 +59,14 @@ const logger = winston.createLogger({
 if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
+
+// Forward logs to admin backend
+const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
+attachForwarding(logger, {
+  baseUrl: adminLogBase,
+  token: process.env.ADMIN_TOKEN || process.env.BACKEND_TOKEN,
+  source: 'socket-service'
+});
 
 const server = createServer(app);
 

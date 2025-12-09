@@ -33,6 +33,7 @@ const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
+const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
 // Tables for cronjobs
 const tableUser = require('./db/tableUser');
@@ -100,6 +101,14 @@ if (process.env.NODE_ENV !== 'production') {
     format: winston.format.simple()
   }));
 }
+
+// Forward logs to admin backend
+const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
+attachForwarding(logger, {
+  baseUrl: adminLogBase,
+  token: process.env.ADMIN_TOKEN || process.env.BACKEND_TOKEN,
+  source: 'public-backend'
+});
 
 /*
 “Helmet” is a collection of nine smaller middleware functions that are used to set security-relevant HTTP headers.

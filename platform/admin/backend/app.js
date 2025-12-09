@@ -25,6 +25,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
+const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -86,6 +87,14 @@ if (process.env.NODE_ENV !== 'production') {
     format: winston.format.simple()
   }));
 }
+
+// Forward logs to admin backend DB (self or external)
+const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
+attachForwarding(logger, {
+  baseUrl: adminLogBase || `http://localhost:${process.env.ADMIN_PORT || 3101}`,
+  token: process.env.ADMIN_TOKEN || process.env.BACKEND_TOKEN,
+  source: 'admin-backend'
+});
 
 /**
  * Socket.io
