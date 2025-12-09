@@ -20,6 +20,29 @@ const OTP_LENGTH = 6;
 const stripUser = (u) => u && ({ id: u.id, username: u.username, role: u.role, createdAt: u.createdAt });
 const isAdminOrRoot = (roles) => (Array.isArray(roles) ? roles : []).some(r => r === 'admin' || r === 'root');
 
+const getMakeConfig = () => ({
+    url: process.env.MAKE_PUSHBULLET_WEBHOOK_URL,
+    apiKey: process.env.MAKE_API_KEY
+});
+
+async function sendMakePush(title, text, { logger, strict } = { strict: false }) {
+    const { url, apiKey } = getMakeConfig();
+    if (!url || !apiKey) {
+        if (strict) throw new Error('MAKE_PUSHBULLET_WEBHOOK_URL/MAKE_API_KEY missing');
+        return;
+    }
+    try {
+        await axios.post(url, { title, text }, {
+            headers: { 'x-make-apikey': apiKey },
+            timeout: 4000,
+            validateStatus: () => true
+        });
+    } catch (err) {
+        logger?.warn?.('Pushbullet notify failed', { error: err?.message });
+        if (strict) throw err;
+    }
+}
+
 const hashOtp = (otp) => {
     const salt = process.env.ADMIN_OTP_SECRET || ADMIN_JWT_SECRET || '';
     return crypto.createHash('sha256').update(`${otp}:${salt}`).digest('hex');
@@ -30,23 +53,19 @@ const generateOtp = () => {
 };
 
 async function sendOtp(username, otp, logger) {
-    const url = process.env.MAKE_PUSHBULLET_WEBHOOK_URL;
-    const apiKey = process.env.MAKE_API_KEY;
-    if (!url || !apiKey) {
-        throw new Error('OTP delivery not configured (MAKE_PUSHBULLET_WEBHOOK_URL/MAKE_API_KEY missing)');
-    }
-
     const title = 'Messagedrop Admin Login';
     const text = `Code: ${otp}\nUser: ${username}\nGültig für ${Math.round(OTP_TTL_MS / 60000)} Minuten.`;
 
-    await axios.post(url, { title, text }, {
-        headers: { 'x-make-apikey': apiKey },
-        timeout: 4000,
-        validateStatus: () => true
-    }).catch((err) => {
+    await sendMakePush(title, text, { logger, strict: true }).catch((err) => {
         logger?.warn?.('OTP delivery failed', { error: err?.message });
         throw new Error('otp_delivery_failed');
     });
+}
+
+async function notifyLoginFailure(username, reason, logger) {
+    const title = 'Messagedrop Admin Login Failure';
+    const text = `User: ${username || 'unknown'}\nReason: ${reason}`;
+    await sendMakePush(title, text, { logger, strict: false });
 }
 
 function createChallenge(db, username, payload, logger) {
@@ -99,9 +118,15 @@ router.post('/login', async (req, res) => {
 
         // Normale User
         tableUser.getByUsername(db, username, async (err, user) => {
-            if (err || !user) return res.status(401).json({ message: 'Invalid login' });
+            if (err || !user) {
+                await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
+                return res.status(401).json({ message: 'Invalid login' });
+            }
             const match = await bcrypt.compare(password, user.password);
-            if (!match) return res.status(401).json({ message: 'Invalid login' });
+            if (!match) {
+                await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
+                return res.status(401).json({ message: 'Invalid login' });
+            }
 
             try {
                 const { id, expiresAt } = await createChallenge(
@@ -134,17 +159,21 @@ router.post('/login/verify', async (req, res) => {
     const now = Date.now();
     tableLoginOtp.getById(db, challengeId, async (err, challenge) => {
         if (err || !challenge) {
+            await notifyLoginFailure(null, 'invalid_challenge', req.logger);
             return res.status(401).json({ message: 'invalid_challenge' });
         }
         if (challenge.expiresAt < now) {
+            await notifyLoginFailure(challenge.username, 'otp_expired', req.logger);
             return res.status(401).json({ message: 'otp_expired' });
         }
         if (challenge.consumedAt) {
+            await notifyLoginFailure(challenge.username, 'otp_used', req.logger);
             return res.status(401).json({ message: 'otp_used' });
         }
 
         const hashed = hashOtp(String(otp));
         if (hashed !== challenge.codeHash) {
+            await notifyLoginFailure(challenge.username, 'otp_invalid', req.logger);
             return res.status(401).json({ message: 'otp_invalid' });
         }
 

@@ -38,13 +38,19 @@ export class LoginComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly cdr = inject(ChangeDetectorRef);
 
+  private runAsync(update: () => void) {
+    queueMicrotask(() => {
+      update();
+      this.cdr.detectChanges();
+    });
+  }
+
   private switchToOtp(challengeId: string, expiresAt: number) {
     // Defer to avoid ExpressionChangedAfterItHasBeenCheckedError
-    setTimeout(() => {
+    this.runAsync(() => {
       this.challengeId = challengeId;
       this.expiresAt = expiresAt;
       this.step = 'otp';
-      this.cdr.detectChanges();
     });
   }
 
@@ -56,7 +62,9 @@ export class LoginComponent {
       password: this.password
     }).subscribe({
       next: (response) => {
-        this.loading = false;
+        this.runAsync(() => {
+          this.loading = false;
+        });
         if ('token' in response && response.token) {
           this.authService.completeLogin(response.token);
         } else if ('challengeId' in response) {
@@ -77,7 +85,9 @@ export class LoginComponent {
         }
       },
       error: () => {
-        this.loading = false;
+        this.runAsync(() => {
+          this.loading = false;
+        });
       }
     });
   }
@@ -95,12 +105,15 @@ export class LoginComponent {
       return;
     }
     this.loading = true;
+    this.cdr.detectChanges();
     this.authService.verifyOtp({
       challengeId: this.challengeId,
       otp: code
     }).subscribe({
       next: (response) => {
-        this.loading = false;
+        this.runAsync(() => {
+          this.loading = false;
+        });
         if (response.token) {
           this.authService.completeLogin(response.token);
         } else {
@@ -113,7 +126,9 @@ export class LoginComponent {
         }
       },
       error: (err) => {
-        this.loading = false;
+        this.runAsync(() => {
+          this.loading = false;
+        });
         console.error('OTP verify failed', err);
         this.snackBar.open('OTP-Verifikation fehlgeschlagen. Bitte erneut versuchen.', undefined, {
           duration: 2500,
