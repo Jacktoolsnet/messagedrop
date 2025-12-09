@@ -42,6 +42,7 @@
     "@angular/compiler-cli": "^20.2.0",
     "@types/jasmine": "~5.1.0",
     "angular-eslint": "20.5.1",
+    "baseline-browser-mapping": "^2.9.5",
     "eslint": "^9.38.0",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",

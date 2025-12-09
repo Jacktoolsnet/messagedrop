@@ -10,6 +10,7 @@ const tableDsaNotification = require('./tableDsaNotification');
 const tableDsaAuditLog = require('./tableDsaAuditLog');
 const tableStatistic = require('./tableStatistic');
 const tableStatisticSettings = require('./tableStatisticSettings');
+const tableLoginOtp = require('./tableLoginOtp');
 
 
 class Database {
@@ -40,6 +41,7 @@ class Database {
         tableDsaAuditLog.init(this.db);
         tableStatistic.init(this.db);
         tableStatisticSettings.init(this.db);
+        tableLoginOtp.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers();

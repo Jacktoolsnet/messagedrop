@@ -100,6 +100,12 @@
         box-shadow: 0 6px 16px rgba(5, 165, 29, 0.25);
     }
 
+    button[type="button"] {
+        width: 100%;
+        border-color: var(--outline);
+        color: var(--text);
+    }
+
     .info {
         text-align: center;
         font-size: 0.9rem;

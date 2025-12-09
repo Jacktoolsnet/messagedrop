@@ -6,12 +6,14 @@ import { catchError, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { LoginRequest } from '../../interfaces/login-request.interface';
 import { LoginResponse } from '../../interfaces/login-response.interface';
+import { LoginOtpResponse } from '../../interfaces/login-otp-response.interface';
+import { VerifyOtpRequest } from '../../interfaces/verify-otp-request.interface';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private _isLoggedIn = signal(false);
+  private _isLoggedIn = signal(!!localStorage.getItem('admin_token'));
   readonly isLoggedIn = this._isLoggedIn.asReadonly();
 
   readonly username = signal<string | null>(null);
@@ -34,26 +36,28 @@ export class AuthService {
     return throwError(() => error);
   };
 
+  constructor() {
+    if (this.token) {
+      this._isLoggedIn.set(true);
+      this.loadUserInfo();
+    }
+  }
+
   login(data: LoginRequest) {
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, data)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (response) => {
-          localStorage.setItem('admin_token', response.token);
-          this._isLoggedIn.set(true);
-          this.loadUserInfo();
-          this.router.navigate(['/dashboard']);
-        },
-        error: () => {
-          this.snackBar.open('Login failed. Please check your credentials.', undefined, {
-            duration: 1000,
-            panelClass: ['snack-error'],
-            horizontalPosition: 'center',
-            verticalPosition: 'top'
-          });
-          this._isLoggedIn.set(false);
-        }
-      });
+    return this.http.post<LoginResponse | LoginOtpResponse>(`${this.baseUrl}/login`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  verifyOtp(data: VerifyOtpRequest) {
+    return this.http.post<LoginResponse>(`${this.baseUrl}/login/verify`, data)
+      .pipe(catchError(this.handleError));
+  }
+
+  completeLogin(token: string) {
+    localStorage.setItem('admin_token', token);
+    this._isLoggedIn.set(true);
+    this.loadUserInfo();
+    this.router.navigate(['/dashboard']);
   }
 
   logout() {

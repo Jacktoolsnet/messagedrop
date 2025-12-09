@@ -12,26 +12,47 @@
         </mat-card-header>
 
         <mat-card-content>
-            <form (ngSubmit)="onSubmit()" #loginForm="ngForm" class="form">
-                <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Username</mat-label>
-                    <input matInput type="text" [(ngModel)]="username" name="username" required />
-                </mat-form-field>
+            @if (step === 'credentials') {
+                <form (ngSubmit)="onSubmitCredentials()" #loginForm="ngForm" class="form">
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Username</mat-label>
+                        <input matInput type="text" [(ngModel)]="username" name="username" required autocomplete="username" />
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Password</mat-label>
+                        <input matInput type="password" [(ngModel)]="password" name="password" required autocomplete="current-password" />
+                    </mat-form-field>
+
+                    <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || loading">
+                        OTP anfordern
+                    </button>
+
+                    <p class="info">
+                        Diese Seite ist nur für interne Zwecke gedacht.<br />
+                        <a href="https://messagedrop.de" target="_blank" rel="noopener">Zu Messagedrop</a>
+                    </p>
+                </form>
+            } @else if (step === 'otp') {
+                <form (ngSubmit)="onSubmitOtp()" #otpForm="ngForm" class="form">
+                    <p class="info">
+                        Wir haben dir einen 6-stelligen Code über Pushbullet geschickt.
+                        Gib ihn hier ein, um den Login abzuschließen.
+                    </p>
 
                 <mat-form-field appearance="outline" class="full-width">
-                    <mat-label>Password</mat-label>
-                    <input matInput type="password" [(ngModel)]="password" name="password" required />
+                    <mat-label>6-stelliger Code</mat-label>
+                    <input matInput type="text" maxlength="6" pattern="[0-9]{6}" inputmode="numeric" [(ngModel)]="otpCode" name="otpCode" required autocomplete="one-time-code" />
                 </mat-form-field>
 
-                <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
-                    Login
+                <button mat-raised-button color="primary" type="submit" [disabled]="loading">
+                    Login abschließen
                 </button>
-
-                <p class="info">
-                    Diese Seite ist nur für interne Zwecke gedacht.<br />
-                    <a href="https://messagedrop.de" target="_blank" rel="noopener">Zu Messagedrop</a>
-                </p>
-            </form>
+                    <button mat-button type="button" (click)="reset()" [disabled]="loading">
+                        Andere Zugangsdaten verwenden
+                    </button>
+                </form>
+            }
         </mat-card-content>
     </mat-card>
 </div>

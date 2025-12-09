@@ -4,17 +4,77 @@ const router = express.Router();
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const axios = require('axios');
 
 const tableUser = require('../db/tableUser');
+const tableLoginOtp = require('../db/tableLoginOtp');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/';
 const ADMIN_AUD = process.env.ADMIN_AUD || 'messagedrop-admin';
+const OTP_TTL_MS = Number(process.env.ADMIN_OTP_TTL_MS || 5 * 60 * 1000);
+const OTP_LENGTH = 6;
 
 // Helpers
 const stripUser = (u) => u && ({ id: u.id, username: u.username, role: u.role, createdAt: u.createdAt });
 const isAdminOrRoot = (roles) => (Array.isArray(roles) ? roles : []).some(r => r === 'admin' || r === 'root');
+
+const hashOtp = (otp) => {
+    const salt = process.env.ADMIN_OTP_SECRET || ADMIN_JWT_SECRET || '';
+    return crypto.createHash('sha256').update(`${otp}:${salt}`).digest('hex');
+};
+
+const generateOtp = () => {
+    return String(Math.floor(Math.random() * 10 ** OTP_LENGTH)).padStart(OTP_LENGTH, '0');
+};
+
+async function sendOtp(username, otp, logger) {
+    const url = process.env.MAKE_PUSHBULLET_WEBHOOK_URL;
+    const apiKey = process.env.MAKE_API_KEY;
+    if (!url || !apiKey) {
+        throw new Error('OTP delivery not configured (MAKE_PUSHBULLET_WEBHOOK_URL/MAKE_API_KEY missing)');
+    }
+
+    const title = 'Messagedrop Admin Login';
+    const text = `Code: ${otp}\nUser: ${username}\nGültig für ${Math.round(OTP_TTL_MS / 60000)} Minuten.`;
+
+    await axios.post(url, { title, text }, {
+        headers: { 'x-make-apikey': apiKey },
+        timeout: 4000,
+        validateStatus: () => true
+    }).catch((err) => {
+        logger?.warn?.('OTP delivery failed', { error: err?.message });
+        throw new Error('otp_delivery_failed');
+    });
+}
+
+function createChallenge(db, username, payload, logger) {
+    return new Promise((resolve, reject) => {
+        const now = Date.now();
+        const otp = generateOtp();
+        const codeHash = hashOtp(otp);
+        const id = crypto.randomUUID();
+        const expiresAt = now + OTP_TTL_MS;
+        const payloadJson = JSON.stringify(payload);
+
+        tableLoginOtp.cleanup(db, now, () => {
+            tableLoginOtp.deleteByUsername(db, username, () => {
+                tableLoginOtp.create(db, id, username, codeHash, payloadJson, expiresAt, now, async (err) => {
+                    if (err) {
+                        return reject(err);
+                    }
+                    try {
+                        await sendOtp(username, otp, logger);
+                        resolve({ id, expiresAt });
+                    } catch (deliveryError) {
+                        tableLoginOtp.deleteByUsername(db, username, () => reject(deliveryError));
+                    }
+                });
+            });
+        });
+    });
+}
 
 // ======================= LOGIN (ohne Guard) =======================
 router.post('/login', async (req, res) => {
@@ -28,12 +88,13 @@ router.post('/login', async (req, res) => {
     try {
         // Root via ENV
         if (username === envUser && password === envPass) {
-            const token = jwt.sign(
-                { sub: 'root', username, role: 'root', roles: ['root'] },
-                ADMIN_JWT_SECRET,
-                { expiresIn: '2h', issuer: ADMIN_ISS, audience: ADMIN_AUD }
-            );
-            return res.json({ token });
+            try {
+                const { id, expiresAt } = await createChallenge(db, username, { sub: 'root', username, role: 'root', roles: ['root'] }, req.logger);
+                return res.json({ status: 'otp_required', challengeId: id, expiresAt });
+            } catch (otpErr) {
+                req.logger?.error('Root OTP challenge failed', { error: otpErr?.message });
+                return res.status(500).json({ message: 'otp_failed' });
+            }
         }
 
         // Normale User
@@ -42,17 +103,73 @@ router.post('/login', async (req, res) => {
             const match = await bcrypt.compare(password, user.password);
             if (!match) return res.status(401).json({ message: 'Invalid login' });
 
-            const token = jwt.sign(
-                { sub: user.id, username: user.username, role: user.role, roles: [user.role] },
-                ADMIN_JWT_SECRET,
-                { expiresIn: '2h', issuer: ADMIN_ISS, audience: ADMIN_AUD }
-            );
-            res.json({ token });
+            try {
+                const { id, expiresAt } = await createChallenge(
+                    db,
+                    user.username,
+                    { sub: user.id, username: user.username, role: user.role, roles: [user.role] },
+                    req.logger
+                );
+                res.json({ status: 'otp_required', challengeId: id, expiresAt });
+            } catch (otpErr) {
+                req.logger?.error('OTP challenge failed', { error: otpErr?.message });
+                res.status(500).json({ message: 'otp_failed' });
+            }
         });
     } catch (error) {
         req.logger?.error('Admin login failed', { error: error?.message });
         res.status(500).json({ message: 'login_failed' });
     }
+});
+
+router.post('/login/verify', async (req, res) => {
+    const db = req.database?.db;
+    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+
+    const { challengeId, otp } = req.body || {};
+    if (!challengeId || !otp) {
+        return res.status(400).json({ message: 'missing_challenge_or_code' });
+    }
+
+    const now = Date.now();
+    tableLoginOtp.getById(db, challengeId, async (err, challenge) => {
+        if (err || !challenge) {
+            return res.status(401).json({ message: 'invalid_challenge' });
+        }
+        if (challenge.expiresAt < now) {
+            return res.status(401).json({ message: 'otp_expired' });
+        }
+        if (challenge.consumedAt) {
+            return res.status(401).json({ message: 'otp_used' });
+        }
+
+        const hashed = hashOtp(String(otp));
+        if (hashed !== challenge.codeHash) {
+            return res.status(401).json({ message: 'otp_invalid' });
+        }
+
+        let payload;
+        try {
+            payload = JSON.parse(challenge.payload);
+        } catch (_err) {
+            req.logger?.error('OTP payload parse failed', { challengeId });
+            return res.status(500).json({ message: 'otp_payload_invalid' });
+        }
+
+        tableLoginOtp.consume(db, challengeId, (consumeErr) => {
+            if (consumeErr) {
+                req.logger?.error('OTP consume failed', { error: consumeErr?.message, challengeId });
+                return res.status(500).json({ message: 'otp_failed' });
+            }
+
+            const token = jwt.sign(
+                payload,
+                ADMIN_JWT_SECRET,
+                { expiresIn: '2h', issuer: ADMIN_ISS, audience: ADMIN_AUD }
+            );
+            res.json({ token });
+        });
+    });
 });
 
 // Ab hier: Admin-JWT Pflicht
