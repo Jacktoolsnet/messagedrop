@@ -17,6 +17,7 @@ const dsaBackend = require('./routes/dsa-backend');
 const user = require('./routes/user');
 const publicStatus = require('./routes/public-status');
 const statistic = require('./routes/statistic');
+const errorLog = require('./routes/error-log');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -210,6 +211,7 @@ app.use('/clientconnect', clientConnect);
 app.use('/user', user);
 app.use('/translate', translate);
 app.use('/statistic', statistic);
+app.use('/error-log', errorLog);
 
 
 // DSA

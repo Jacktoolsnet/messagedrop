@@ -1,7 +1,7 @@
-import { ApplicationRef, Injectable, inject } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { Socket, SocketIoConfig } from 'ngx-socket-io';
+import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
 import { Envelope } from '../interfaces/envelope';
@@ -31,32 +31,28 @@ export class SocketioService {
   private readonly userService = inject(UserService);
   private readonly contactService = inject(ContactService);
   private readonly cryptoService = inject(CryptoService);
-  private readonly appRef = inject(ApplicationRef);
 
   private socket: Socket;
-  private readonly ioConfig: SocketIoConfig = {
-    url: `${environment.socketIoUrl}`,
-    options: {
-      reconnection: true,
-      reconnectionAttempts: Infinity,
-      reconnectionDelay: 1000,
-      reconnectionDelayMax: 5000,
-      randomizationFactor: 0.5,
-      transports: ['websocket'],
-      withCredentials: true
-    }
+  private readonly ioOptions = {
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 5000,
+    randomizationFactor: 0.5,
+    transports: ['websocket'] as string[],
+    withCredentials: true
   };
   private ready = false;
   private joinedUserRoom = false;
 
   constructor() {
-    this.socket = new Socket(this.ioConfig, this.appRef);
+    this.socket = io(environment.socketIoUrl, this.ioOptions);
     this.registerConnectionHandlers();
   }
 
   private registerConnectionHandlers(): void {
     this.socket.on("connect", () => {
-      this.ready = this.socket.ioSocket.connected;
+      this.ready = this.socket.connected;
       /*this.snackBar.open('connect', '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
@@ -76,7 +72,7 @@ export class SocketioService {
     });
 
     this.socket.on("disconnect", () => {
-      this.ready = this.socket.ioSocket.connected;
+      this.ready = this.socket.connected;
       /*this.snackBar.open('disconnect', '', {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
@@ -85,8 +81,8 @@ export class SocketioService {
       });*/
     });
 
-    this.socket.on('reconnect_attempt', (attempt) => {
-      this.ready = this.socket.ioSocket.connected;
+    this.socket.on('reconnect_attempt', (attempt: number) => {
+      this.ready = this.socket.connected;
       console.info(`Socket reconnect attempt #${attempt}`);
       /*this.snackBar.open(`Reconnection attempt #${attempt}`, '', {
         panelClass: ['snack-info'],
@@ -97,7 +93,7 @@ export class SocketioService {
     });
 
     this.socket.on('reconnect', () => {
-      this.ready = this.socket.ioSocket.connected;
+      this.ready = this.socket.connected;
       /*this.snackBar.open('Reconnected successfully!', '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
@@ -107,7 +103,7 @@ export class SocketioService {
     });
 
     this.socket.on('reconnect_failed', () => {
-      this.ready = this.socket.ioSocket.connected;
+      this.ready = this.socket.connected;
       /*this.snackBar.open('Reconnection failed', '', {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
