@@ -8,6 +8,7 @@ const headerMW = require('./middleware/header')
 const Database = require('./db/database');
 const database = new Database();
 const tableStatistic = require('./db/tableStatistic');
+const tableErrorLog = require('./db/tableErrorLog');
 const root = require('./routes/root');
 const check = require('./routes/check');
 const translate = require('./routes/translate');
@@ -254,6 +255,16 @@ cron.schedule('5 0 * * *', () => {
   tableStatistic.clean(database.db, (err) => {
     if (err) {
       logger.error(err);
+    }
+  });
+});
+
+// Clean error logs older than 7 days
+cron.schedule('15 0 * * *', () => {
+  const threshold = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  tableErrorLog.cleanupOlderThan(database.db, threshold, (err) => {
+    if (err) {
+      logger.error('ErrorLog cleanup failed', { error: err?.message });
     }
   });
 });
