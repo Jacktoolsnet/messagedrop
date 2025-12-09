@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
@@ -14,9 +14,8 @@ import { UserService } from '../../services/user.service';
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatIcon,
-    CommonModule
-  ],
+    MatIcon
+],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })

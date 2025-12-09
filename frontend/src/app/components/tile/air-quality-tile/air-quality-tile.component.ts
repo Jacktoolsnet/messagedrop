@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -16,7 +16,7 @@ import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
 
 @Component({
   selector: 'app-air-quality-tile',
-  imports: [CommonModule, MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule],
   templateUrl: './air-quality-tile.component.html',
   styleUrl: './air-quality-tile.component.css'
 })

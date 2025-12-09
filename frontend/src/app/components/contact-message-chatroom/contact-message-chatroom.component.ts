@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, QueryList, ViewChild, ViewChildren, computed, effect, inject, output, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
@@ -32,13 +32,12 @@ interface ChatroomMessage {
 @Component({
   selector: 'app-contact-message-chatroom',
   imports: [
-    CommonModule,
     MatCardModule,
     MatButtonModule,
     MatIcon,
     ShowmultimediaComponent,
     ShowmessageComponent
-  ],
+],
   templateUrl: './contact-message-chatroom.component.html',
   styleUrl: './contact-message-chatroom.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

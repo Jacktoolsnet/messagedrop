@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -31,7 +31,6 @@ interface TextDialogResult {
   imports: [
     SelectMultimediaComponent,
     ShowmultimediaComponent,
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
@@ -41,7 +40,7 @@ interface TextDialogResult {
     MatFormFieldModule,
     MatInputModule,
     MatMenuModule
-  ],
+],
   templateUrl: './edit-message.component.html',
   styleUrl: './edit-message.component.css'
 })

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,10 +13,9 @@ import { MessagelistComponent } from '../../messagelist/messagelist.component';
 @Component({
   selector: 'app-message-tile',
   imports: [
-    CommonModule,
     MatIcon,
     MatButtonModule
-  ],
+],
   templateUrl: './messagetile.component.html',
   styleUrl: './messagetile.component.css'
 })

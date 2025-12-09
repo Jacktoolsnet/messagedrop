@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -13,7 +13,7 @@ import { LinkTileEditComponent } from './link-tile-edit/link-tile-edit.component
 @Component({
   selector: 'app-link-tile',
   standalone: true,
-  imports: [CommonModule, MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule],
   templateUrl: './link-tile.component.html',
   styleUrl: './link-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

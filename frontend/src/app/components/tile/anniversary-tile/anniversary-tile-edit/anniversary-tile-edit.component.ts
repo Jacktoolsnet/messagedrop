@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, ViewChild, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -22,7 +22,6 @@ interface AnniversaryTileDialogData {
   standalone: true,
   providers: [provideNativeDateAdapter()],
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatDialogTitle,
@@ -36,7 +35,7 @@ interface AnniversaryTileDialogData {
     MatCardModule,
     MatDatepickerModule,
     A11yModule
-  ],
+],
   templateUrl: './anniversary-tile-edit.component.html',
   styleUrl: './anniversary-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

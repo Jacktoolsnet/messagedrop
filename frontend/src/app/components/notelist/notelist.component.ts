@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, effect, inject, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -31,7 +31,6 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
     ShowmultimediaComponent,
     MatBadgeModule,
     MatCardModule,
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatDialogContent,
@@ -41,7 +40,7 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
     MatMenuModule,
     MatInputModule,
     MasonryItemDirective
-  ],
+],
   templateUrl: './notelist.component.html',
   styleUrl: './notelist.component.css',
   standalone: true

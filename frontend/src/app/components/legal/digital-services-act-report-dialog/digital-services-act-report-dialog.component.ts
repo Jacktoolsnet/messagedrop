@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { FormBuilder, FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,7 +29,6 @@ interface DigitalServicesActReportDialogData {
   selector: 'app-digital-services-act-report-dialog',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatTabsModule,
@@ -40,7 +39,7 @@ interface DigitalServicesActReportDialogData {
     MatButtonModule,
     MatIconModule,
     EvidenceInputComponent
-  ],
+],
   templateUrl: './digital-services-act-report-dialog.component.html',
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -13,7 +13,6 @@ import { Mode } from '../../../interfaces/mode';
 @Component({
   selector: 'app-contact',
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
@@ -24,7 +23,7 @@ import { Mode } from '../../../interfaces/mode';
     MatFormFieldModule,
     MatInputModule,
     MatIconModule
-  ],
+],
   templateUrl: './connect.component.html',
   styleUrl: './connect.component.css'
 })

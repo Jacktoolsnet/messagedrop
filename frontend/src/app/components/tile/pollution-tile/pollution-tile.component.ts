@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Place } from '../../../interfaces/place';
@@ -15,7 +15,7 @@ import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
 @Component({
   selector: 'app-pollution-tile',
   standalone: true,
-  imports: [CommonModule, MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule],
   templateUrl: './pollution-tile.component.html',
   styleUrl: './pollution-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

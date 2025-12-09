@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
@@ -15,9 +15,7 @@ import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather-tile',
-  imports: [
-    CommonModule
-  ],
+  imports: [],
   templateUrl: './weather-tile.component.html',
   styleUrl: './weather-tile.component.css'
 })

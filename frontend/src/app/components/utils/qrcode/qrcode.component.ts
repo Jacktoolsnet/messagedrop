@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
@@ -8,12 +8,11 @@ import QRCode from 'qrcode';
   selector: 'app-qrcode',
   imports: [
     MatDialogContent,
-    CommonModule,
     MatButtonModule,
     MatDialogTitle,
     MatDialogActions,
-    MatDialogClose,
-  ],
+    MatDialogClose
+],
   templateUrl: './qrcode.component.html',
   styleUrl: './qrcode.component.css'
 })

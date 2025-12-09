@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, effect, inject, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,10 +12,9 @@ import { ImagelistComponent } from '../../imagelist/imagelist.component';
 @Component({
   selector: 'app-image-tile',
   imports: [
-    CommonModule,
     MatIcon,
     MatButtonModule
-  ],
+],
   templateUrl: './image-tile.component.html',
   styleUrl: './image-tile.component.css'
 })

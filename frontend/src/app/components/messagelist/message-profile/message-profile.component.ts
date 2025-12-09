@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -20,9 +20,8 @@ import { Profile } from '../../../interfaces/profile';
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatIcon,
-    CommonModule
-  ],
+    MatIcon
+],
   templateUrl: './message-profile.component.html',
   styleUrl: './message-profile.component.css'
 })

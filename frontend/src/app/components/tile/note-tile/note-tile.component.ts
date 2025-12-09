@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, Input, OnInit, signal, WritableSignal, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -12,10 +12,9 @@ import { NotelistComponent } from '../../notelist/notelist.component';
 @Component({
   selector: 'app-note-tile',
   imports: [
-    CommonModule,
     MatIcon,
     MatButtonModule
-  ],
+],
   templateUrl: './note-tile.component.html',
   styleUrl: './note-tile.component.css'
 })

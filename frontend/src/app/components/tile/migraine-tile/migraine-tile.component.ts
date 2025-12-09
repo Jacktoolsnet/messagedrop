@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Place } from '../../../interfaces/place';
@@ -15,7 +15,7 @@ import { GeolocationService } from '../../../services/geolocation.service';
 @Component({
   selector: 'app-migraine-tile',
   standalone: true,
-  imports: [CommonModule, MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule],
   templateUrl: './migraine-tile.component.html',
   styleUrl: './migraine-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

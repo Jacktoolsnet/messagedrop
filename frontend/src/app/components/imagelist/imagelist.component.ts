@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -37,7 +37,6 @@ interface ImageDialogData {
   imports: [
     MatBadgeModule,
     MatCardModule,
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatDialogContent,
@@ -47,7 +46,7 @@ interface ImageDialogData {
     MatMenuModule,
     MatInputModule,
     MasonryItemDirective
-  ],
+],
   templateUrl: './imagelist.component.html',
   styleUrl: './imagelist.component.css',
   standalone: true

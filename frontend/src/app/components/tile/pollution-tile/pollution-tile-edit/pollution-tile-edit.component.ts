@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,7 +21,6 @@ interface PollutionTileDialogData {
   selector: 'app-pollution-tile-edit',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatDialogTitle,
@@ -33,7 +32,7 @@ interface PollutionTileDialogData {
     MatIcon,
     MatSlideToggleModule,
     A11yModule
-  ],
+],
   templateUrl: './pollution-tile-edit.component.html',
   styleUrl: './pollution-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

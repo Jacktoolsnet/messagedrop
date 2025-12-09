@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -12,7 +12,7 @@ import { AnniversaryTileEditComponent } from './anniversary-tile-edit/anniversar
 @Component({
   selector: 'app-anniversary-tile',
   standalone: true,
-  imports: [CommonModule, MatIcon],
+  imports: [MatIcon],
   templateUrl: './anniversary-tile.component.html',
   styleUrl: './anniversary-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

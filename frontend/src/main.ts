@@ -1,3 +1,4 @@
+import { provideZoneChangeDetection } from "@angular/core";
 import { registerLocaleData } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
@@ -35,7 +36,7 @@ if ('serviceWorker' in navigator) {
     .catch(err => console.warn('Failed to register share-handler service worker', err));
 }
 
-bootstrapApplication(AppComponent, appConfig)
+bootstrapApplication(AppComponent, {...appConfig, providers: [provideZoneChangeDetection(), ...appConfig.providers]})
   .then(appRef => {
     const injector = appRef.injector;
     registerLaunchHandler(injector);

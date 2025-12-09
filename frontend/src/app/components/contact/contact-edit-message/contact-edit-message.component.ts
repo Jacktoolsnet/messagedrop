@@ -1,7 +1,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -36,7 +36,6 @@ interface TextDialogResult {
   selector: 'app-message',
   imports: [
     SelectMultimediaComponent,
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
@@ -46,7 +45,7 @@ interface TextDialogResult {
     MatFormFieldModule,
     MatInputModule,
     ShowmultimediaComponent
-  ],
+],
   templateUrl: './contact-edit-message.component.html',
   styleUrl: './contact-edit-message.component.css'
 })

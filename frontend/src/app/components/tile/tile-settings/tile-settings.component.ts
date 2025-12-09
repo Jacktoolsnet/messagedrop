@@ -1,5 +1,5 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -21,7 +21,6 @@ import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 @Component({
   selector: 'app-tile-settings',
   imports: [
-    CommonModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
@@ -33,7 +32,7 @@ import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
     CdkDrag,
     CdkDropList,
     CdkDragHandle
-  ],
+],
   templateUrl: './tile-settings.component.html',
   styleUrl: './tile-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

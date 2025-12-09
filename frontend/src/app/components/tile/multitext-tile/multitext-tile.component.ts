@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
 import { Place } from '../../../interfaces/place';
@@ -12,7 +12,7 @@ import { MultitextTileEditComponent } from './multitext-tile-edit/multitext-tile
 @Component({
   selector: 'app-multitext-tile',
   standalone: true,
-  imports: [CommonModule, MatIcon],
+  imports: [MatIcon],
   templateUrl: './multitext-tile.component.html',
   styleUrl: './multitext-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

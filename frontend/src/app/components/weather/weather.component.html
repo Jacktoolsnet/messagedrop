@@ -1,79 +1,78 @@
 <mat-dialog-content #dialogContent>
-    @if (weather) {
-    <ng-container *ngIf="locationName$ | async as locationName; else loading">
-        <div class="header-title">Weather for {{ locationName }}</div>
-    </ng-container>
-    <ng-template #loading>
-        <div class="header-title">Weather</div>
-    </ng-template>
+  @if (weather) {
+    @if (locationName$ | async; as locationName) {
+      <div class="header-title">Weather for {{ locationName }}</div>
+    } @else {
+      <div class="header-title">Weather</div>
+    }
 
     <!-- Day Switch -->
     <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="day-toggle-group" [value]="selectedDayIndex"
-        (change)="onDayChange($event.value)">
-        @for (day of weather.daily; track day; let i = $index) {
+      (change)="onDayChange($event.value)">
+      @for (day of weather.daily; track day; let i = $index) {
         <mat-button-toggle [value]="i">
-            {{ getDayLabel(i) }}
+          {{ getDayLabel(i) }}
         </mat-button-toggle>
-        }
+      }
     </mat-button-toggle-group>
 
     <!-- TILE GRID -->
     @if (!selectedTile) {
-    <div class="tile-grid">
+      <div class="tile-grid">
         @for (tile of tiles; track tile.type) {
-        <button type="button" class="tile" (click)="onTileClick(tile)" [style.color]="tile.color">
+          <button type="button" class="tile" (click)="onTileClick(tile)" [style.color]="tile.color">
             <div class="tile-title">{{ tile.label }}</div>
             <div class="tile-icon-wrapper">
-                <mat-icon class="material-symbols-outlined tile-icon">{{ tile.icon }}</mat-icon>
+              <mat-icon class="material-symbols-outlined tile-icon">{{ tile.icon }}</mat-icon>
             </div>
             <div class="tile-value">{{ tile.value }}</div>
             @if (tile.levelText) {
-            <div class="tile-level">{{ tile.levelText }}</div>
+              <div class="tile-level">{{ tile.levelText }}</div>
             }
             @if (tile.minMax) {
-            <div class="tile-minmax">{{ tile.minMax.min }} - {{ tile.minMax.max }}</div>
+              <div class="tile-minmax">{{ tile.minMax.min }} - {{ tile.minMax.max }}</div>
             }
-        </button>
+          </button>
         }
-    </div>
+      </div>
     }
 
     <!-- CHART VIEW -->
     @if (selectedTile) {
-    <app-weather-detail [tile]="selectedTile" [weather]="weather" [selectedDayIndex]="selectedDayIndex"
+      <app-weather-detail [tile]="selectedTile" [weather]="weather" [selectedDayIndex]="selectedDayIndex"
         [selectedHour]="selectedHour">
-    </app-weather-detail>
+      </app-weather-detail>
     }
 
     <!-- SLIDER -->
     <div class="hour-slider">
-        <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
-            <input matSliderThumb [(ngModel)]="selectedHour" />
-        </mat-slider>
-        @if (!selectedTile) {
+      <mat-slider min="0" max="23" step="1" thumbLabel tickInterval="1" (input)="onHourChange()">
+        <input matSliderThumb [(ngModel)]="selectedHour" />
+      </mat-slider>
+      @if (!selectedTile) {
         <div class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
-        }
+      }
     </div>
 
     <!-- TILE NAVIGATION BUTTONS -->
     @if (selectedTile) {
-    <div class="tile-nav-buttons">
+      <div class="tile-nav-buttons">
         <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
-            <mat-icon>chevron_left</mat-icon>
+          <mat-icon>chevron_left</mat-icon>
         </button>
         <button mat-mini-fab color="primary" (click)="selectedTile = null">
-            <mat-icon>close</mat-icon>
+          <mat-icon>close</mat-icon>
         </button>
         <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === tiles.length - 1">
-            <mat-icon>chevron_right</mat-icon>
+          <mat-icon>chevron_right</mat-icon>
         </button>
-    </div>
+      </div>
     }
-    }
+  }
 
-    <!-- DATA SOURCE -->
-    <div class="data-source">
-        Weather data provided by
-        <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
-    </div>
+  <!-- DATA SOURCE -->
+  <div class="data-source">
+    Weather data provided by
+    <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
+  </div>
 </mat-dialog-content>

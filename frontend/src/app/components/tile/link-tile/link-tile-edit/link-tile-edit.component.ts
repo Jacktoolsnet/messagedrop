@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -22,7 +22,6 @@ interface LinkTileDialogData {
   selector: 'app-link-tile-edit',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatDialogTitle,
@@ -34,7 +33,7 @@ interface LinkTileDialogData {
     MatButtonModule,
     MatIcon,
     A11yModule
-  ],
+],
   templateUrl: './link-tile-edit.component.html',
   styleUrl: './link-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CategoryScale, Chart, ChartConfiguration, ChartDataset, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
@@ -9,9 +9,7 @@ import { getWeatherBaseColor } from '../../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather-detail',
-  imports: [
-    CommonModule
-  ],
+  imports: [],
   templateUrl: './weather-detail.component.html',
   styleUrl: './weather-detail.component.css'
 })

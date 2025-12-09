@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
@@ -8,7 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 @Component({
   selector: 'app-third-party-licenses-dialog',
   standalone: true,
-  imports: [CommonModule, MatDialogModule, MatButtonModule, MatProgressBarModule],
+  imports: [MatDialogModule, MatButtonModule, MatProgressBarModule],
   templateUrl: './third-party-licenses.component.html',
   styleUrls: ['./third-party-licenses.component.css']
 })

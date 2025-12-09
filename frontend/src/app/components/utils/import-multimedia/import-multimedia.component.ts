@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +17,6 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
   selector: 'app-pinterest', // (optional) kannst du umbenennen, z.B. 'app-import-multimedia'
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogContent,
     MatButtonModule,
     MatIcon,
@@ -25,7 +24,7 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
     MatFormFieldModule,
     MatInputModule,
     EnableExternalContentComponent
-  ],
+],
   templateUrl: './import-multimedia.component.html',
   styleUrl: './import-multimedia.component.css'
 })

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -45,7 +45,6 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
   selector: 'app-nominatim-search',
   imports: [
     ReactiveFormsModule,
-    CommonModule,
     MatButtonModule,
     MatIcon,
     FormsModule,
@@ -57,7 +56,7 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
     MatCardModule,
     MatMenuModule,
     MatDialogContent
-  ],
+],
   templateUrl: './nominatim-search.component.html',
   styleUrl: './nominatim-search.component.css'
 })

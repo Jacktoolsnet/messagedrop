@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, inject, Input, OnInit, Output } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
@@ -8,7 +8,7 @@ import { AppService } from '../../../services/app.service';
 @Component({
   selector: 'app-enable-location',
   standalone: true,
-  imports: [CommonModule, MatSlideToggleModule, MatIconModule],
+  imports: [MatSlideToggleModule, MatIconModule],
   templateUrl: './enable-location.component.html',
   styleUrl: './enable-location.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
@@ -9,10 +9,9 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
 @Component({
   selector: 'app-showmultimedia',
   imports: [
-    CommonModule,
     MatSlideToggleModule,
     EnableExternalContentComponent
-  ],
+],
   templateUrl: './showmultimedia.component.html',
   styleUrl: './showmultimedia.component.css'
 })

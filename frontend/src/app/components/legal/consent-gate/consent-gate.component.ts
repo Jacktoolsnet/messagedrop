@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -17,11 +17,10 @@ import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.co
   selector: 'app-consent-gate',
   standalone: true,
   imports: [
-    CommonModule,
     MatIconModule,
     MatButtonModule,
     MatChipsModule
-  ],
+],
   templateUrl: './consent-gate.component.html',
   styleUrl: './consent-gate.component.css'
 })

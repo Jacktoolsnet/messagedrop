@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
@@ -27,7 +27,7 @@ const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
 @Component({
   selector: 'app-enable-external-content',
   standalone: true,
-  imports: [CommonModule, MatSlideToggleModule, MatIconModule],
+  imports: [MatSlideToggleModule, MatIconModule],
   templateUrl: './enable-external-content.component.html',
   styleUrl: './enable-external-content.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

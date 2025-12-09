@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
@@ -15,17 +15,16 @@ import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
 @Component({
     selector: 'app-edit-user',
     imports: [
-        ShortNumberPipe,
-        MatBadgeModule,
-        MatFormFieldModule,
-        MatInputModule,
-        FormsModule,
-        MatButtonModule,
-        MatDialogContent,
-        MatDialogClose,
-        MatIcon,
-        CommonModule
-    ],
+    ShortNumberPipe,
+    MatBadgeModule,
+    MatFormFieldModule,
+    MatInputModule,
+    FormsModule,
+    MatButtonModule,
+    MatDialogContent,
+    MatDialogClose,
+    MatIcon
+],
     templateUrl: './multi-marker.component.html',
     styleUrl: './multi-marker.component.css'
 })

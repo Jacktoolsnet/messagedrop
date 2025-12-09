@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -10,7 +10,6 @@ import { MatMenuModule } from '@angular/material/menu';
 @Component({
   selector: 'app-message',
   imports: [
-    CommonModule,
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
@@ -18,7 +17,7 @@ import { MatMenuModule } from '@angular/material/menu';
     MatFormFieldModule,
     MatInputModule,
     MatMenuModule
-  ],
+],
   templateUrl: './text.component.html',
   styleUrl: './text.component.css'
 })

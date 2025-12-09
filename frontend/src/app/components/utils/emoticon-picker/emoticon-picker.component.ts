@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -9,7 +9,7 @@ import { EmoticonPickerData } from '../../../interfaces/emoticon-picker-data';
 @Component({
   selector: 'app-emoticon-picker',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule],
   templateUrl: './emoticon-picker.component.html',
   styleUrls: ['./emoticon-picker.component.css']
 })

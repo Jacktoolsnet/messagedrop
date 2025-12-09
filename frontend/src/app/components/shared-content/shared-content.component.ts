@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -12,7 +12,6 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
   standalone: true,
   selector: 'app-shared-content',
   imports: [
-    CommonModule,
     MatDialogContent,
     MatButtonModule,
     MatDialogTitle,
@@ -20,7 +19,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
     MatDialogClose,
     ShowmultimediaComponent,
     MatDialogModule
-  ],
+],
   templateUrl: './shared-content.component.html',
   styleUrl: './shared-content.component.css'
 })

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CategoryScale, Chart, ChartConfiguration, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
@@ -9,9 +9,8 @@ import { AirQualityTileValue } from '../../../interfaces/air-quality-tile-value'
   selector: 'app-air-quality-detail',
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogModule
-  ],
+],
   templateUrl: './air-quality-detail.component.html',
   styleUrl: './air-quality-detail.component.css'
 })

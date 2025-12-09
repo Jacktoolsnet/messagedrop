@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, OnInit, inject, ChangeDetectorRef } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,7 +18,6 @@ import { EnableExternalContentComponent } from "../enable-external-content/enabl
   selector: 'app-multimedia',
   imports: [
     ReactiveFormsModule,
-    CommonModule,
     MatButtonModule,
     MatDialogContent,
     MatIcon,
@@ -26,7 +25,7 @@ import { EnableExternalContentComponent } from "../enable-external-content/enabl
     MatFormFieldModule,
     MatInputModule,
     EnableExternalContentComponent
-  ],
+],
   templateUrl: './tenor.component.html',
   styleUrl: './tenor.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

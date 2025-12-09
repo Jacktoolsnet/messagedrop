@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import {
@@ -12,13 +12,12 @@ import {
   selector: 'app-legal-notice',
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
     MatButtonModule
-  ],
+],
   templateUrl: './legal-notice.component.html',
   styleUrl: './legal-notice.component.css'
 })

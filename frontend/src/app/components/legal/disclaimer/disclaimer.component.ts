@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -9,13 +9,12 @@ import { AppService } from '../../../services/app.service';
   selector: 'app-disclaimer',
   standalone: true,
   imports: [
-    CommonModule,
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
     MatSlideToggleModule
-  ],
+],
   templateUrl: './disclaimer.component.html',
   styleUrl: './disclaimer.component.css'
 })

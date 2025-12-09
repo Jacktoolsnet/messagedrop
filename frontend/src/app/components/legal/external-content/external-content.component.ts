@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -17,7 +17,6 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
 @Component({
   selector: 'app-external-content',
   imports: [
-    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -33,7 +32,7 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
     MatChipsModule,
     MatSlideToggleModule,
     EnableExternalContentComponent
-  ],
+],
   templateUrl: './external-content.component.html',
   styleUrl: './external-content.component.css'
 })

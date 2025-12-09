@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
-import { CommonModule } from '@angular/common';
+
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -17,7 +17,6 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
 @Component({
   selector: 'app-place',
   imports: [
-    CommonModule,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
@@ -28,7 +27,7 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
     MatIcon,
     MatFormFieldModule,
     MatInputModule
-  ],
+],
   templateUrl: './place-settings.component.html',
   styleUrl: './place-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -16,7 +16,6 @@ import { UserService } from '../../../services/user.service';
   selector: 'app-profile',
   standalone: true,
   imports: [
-    CommonModule,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
@@ -27,8 +26,8 @@ import { UserService } from '../../../services/user.service';
     MatDialogClose,
     MatIconModule,
     MatSelectModule,
-    MatFormFieldModule,
-  ],
+    MatFormFieldModule
+],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.css'
 })

@@ -1,134 +1,136 @@
 <h2 mat-dialog-title>Report content</h2>
 
 <mat-dialog-content>
-    <p class="intro">
-        Reporting should be easy. You can submit a <strong>Quick report</strong> (informal signal)
-        or a <strong>Formal DSA report</strong> (notice under the EU Digital Services Act) —
-        <em>no fields are mandatory</em>. We’ll review the post either way.
-    </p>
+  <p class="intro">
+    Reporting should be easy. You can submit a <strong>Quick report</strong> (informal signal)
+    or a <strong>Formal DSA report</strong> (notice under the EU Digital Services Act) —
+    <em>no fields are mandatory</em>. We’ll review the post either way.
+  </p>
 
-    <!-- Message-Preview -->
-    <section class="message-preview" aria-label="Reported content">
-        <div class="meta">
-            <div class="meta-row">
-                <span class="meta-label">Content ID</span>
-                <span class="meta-value">{{ quickForm.get('contentId')?.value }}</span>
-            </div>
-            @if (data.contentUrl) {
-            <div class="meta-row">
-                <span class="meta-label">Link</span>
-                <span class="meta-value url">{{ data.contentUrl }}</span>
-            </div>
-            }
+  <!-- Message-Preview -->
+  <section class="message-preview" aria-label="Reported content">
+    <div class="meta">
+      <div class="meta-row">
+        <span class="meta-label">Content ID</span>
+        <span class="meta-value">{{ quickForm.get('contentId')?.value }}</span>
+      </div>
+      @if (data.contentUrl) {
+        <div class="meta-row">
+          <span class="meta-label">Link</span>
+          <span class="meta-value url">{{ data.contentUrl }}</span>
         </div>
-    </section>
+      }
+    </div>
+  </section>
 
-    <mat-tab-group [(selectedIndex)]="activeTabIndex">
-        <!-- TAB 1: QUICK REPORT -->
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <mat-icon>flag</mat-icon>
-                <span class="tab-label">Quick report</span>
-            </ng-template>
+  <mat-tab-group [(selectedIndex)]="activeTabIndex">
+    <!-- TAB 1: QUICK REPORT -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>flag</mat-icon>
+        <span class="tab-label">Quick report</span>
+      </ng-template>
 
-            <div class="tab-explainer"></div>
+      <div class="tab-explainer"></div>
 
-            <form [formGroup]="quickForm" class="dialog-grid">
-                <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Category (optional)</mat-label>
-                    <mat-select formControlName="category">
-                        @for (c of categories; track c.value) {
-                        <mat-option [value]="c.value">{{ c.label }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
+      <form [formGroup]="quickForm" class="dialog-grid">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Category (optional)</mat-label>
+          <mat-select formControlName="category">
+            @for (c of categories; track c.value) {
+              <mat-option [value]="c.value">{{ c.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-                <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Why is this content problematic? (optional)</mat-label>
-                    <textarea matInput formControlName="reasonText" rows="5"
-                        placeholder="Share any details that help us understand the issue..."></textarea>
-                </mat-form-field>
-            </form>
-        </mat-tab>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Why is this content problematic? (optional)</mat-label>
+          <textarea matInput formControlName="reasonText" rows="5"
+          placeholder="Share any details that help us understand the issue..."></textarea>
+        </mat-form-field>
+      </form>
+    </mat-tab>
 
-        <!-- TAB 2: FORMAL DSA REPORT -->
-        <mat-tab>
-            <ng-template mat-tab-label>
-                <mat-icon>gavel</mat-icon>
-                <span class="tab-label">Formal DSA report</span>
-            </ng-template>
+    <!-- TAB 2: FORMAL DSA REPORT -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon>gavel</mat-icon>
+        <span class="tab-label">Formal DSA report</span>
+      </ng-template>
 
-            <div class="tab-explainer"></div>
+      <div class="tab-explainer"></div>
 
-            <form [formGroup]="formalForm" class="dialog-grid">
-                <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Category (optional)</mat-label>
-                    <mat-select formControlName="category">
-                        @for (c of categories; track c.value) {
-                        <mat-option [value]="c.value">{{ c.label }}</mat-option>
-                        }
-                    </mat-select>
-                </mat-form-field>
+      <form [formGroup]="formalForm" class="dialog-grid">
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Category (optional)</mat-label>
+          <mat-select formControlName="category">
+            @for (c of categories; track c.value) {
+              <mat-option [value]="c.value">{{ c.label }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
 
-                <mat-form-field appearance="outline" class="w-full">
-                    <mat-label>Why is this content illegal? (optional)</mat-label>
-                    <textarea matInput formControlName="reasonText" rows="6"
-                        placeholder="Describe the issue and provide any relevant facts or references..."></textarea>
-                </mat-form-field>
+        <mat-form-field appearance="outline" class="w-full">
+          <mat-label>Why is this content illegal? (optional)</mat-label>
+          <textarea matInput formControlName="reasonText" rows="6"
+          placeholder="Describe the issue and provide any relevant facts or references..."></textarea>
+        </mat-form-field>
 
-                <div class="row two-cols">
-                    <mat-form-field appearance="outline" class="half">
-                        <mat-label>Your email (optional)</mat-label>
-                        <input matInput formControlName="reporterEmail" type="email" inputmode="email"
-                            autocomplete="email" />
+        <div class="row two-cols">
+          <mat-form-field appearance="outline" class="half">
+            <mat-label>Your email (optional)</mat-label>
+            <input matInput formControlName="reporterEmail" type="email" inputmode="email"
+              autocomplete="email" />
 
-                        <mat-hint align="start">
-                            {{
-                            (formalForm.get('reporterEmail')?.value || '').trim()
-                            ? ('We will notify you at ' + formalForm.get('reporterEmail')?.value)
-                            : 'We can only notify you if you provide an email.'
-                            }}
-                        </mat-hint>
+            <mat-hint align="start">
+              {{
+              (formalForm.get('reporterEmail')?.value || '').trim()
+              ? ('We will notify you at ' + formalForm.get('reporterEmail')?.value)
+              : 'We can only notify you if you provide an email.'
+              }}
+            </mat-hint>
 
-                        <mat-error *ngIf="isFormalEmailInvalid">
-                            Please enter a valid email address or leave this field empty.
-                        </mat-error>
-                    </mat-form-field>
+            @if (isFormalEmailInvalid) {
+              <mat-error>
+                Please enter a valid email address or leave this field empty.
+              </mat-error>
+            }
+          </mat-form-field>
 
-                    <mat-form-field appearance="outline">
-                        <mat-label>Your name (optional)</mat-label>
-                        <input matInput formControlName="reporterName" placeholder="Jane Doe">
-                    </mat-form-field>
-                </div>
+          <mat-form-field appearance="outline">
+            <mat-label>Your name (optional)</mat-label>
+            <input matInput formControlName="reporterName" placeholder="Jane Doe">
+          </mat-form-field>
+        </div>
 
-                <mat-checkbox formControlName="truthAffirmation">
-                    I declare that the information provided is accurate to the best of my knowledge. (optional)
-                </mat-checkbox>
+        <mat-checkbox formControlName="truthAffirmation">
+          I declare that the information provided is accurate to the best of my knowledge. (optional)
+        </mat-checkbox>
 
-                <div class="url-upload">
-                    <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting"
-                        [urlItems]="evidenceUrlViews()"
-                        [fileItems]="evidenceFileViews()"
-                        [fileHint]="'PDF or image files, up to 5\u00A0MB each (10\u00A0MB total). Currently selected files: ' + evidenceFilesSizeLabel() + '.'"
-                        (urlAdd)="addEvidenceUrlFromInput($event)"
-                        (filesSelect)="onEvidenceFilesPicked($event)"
-                        (urlRemove)="removeEvidenceById($event)"
-                        (fileRemove)="removeEvidenceById($event)"></app-evidence-input>
-                </div>
-            </form>
-        </mat-tab>
-    </mat-tab-group>
+        <div class="url-upload">
+          <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting"
+            [urlItems]="evidenceUrlViews()"
+            [fileItems]="evidenceFileViews()"
+            [fileHint]="'PDF or image files, up to 5\u00A0MB each (10\u00A0MB total). Currently selected files: ' + evidenceFilesSizeLabel() + '.'"
+            (urlAdd)="addEvidenceUrlFromInput($event)"
+            (filesSelect)="onEvidenceFilesPicked($event)"
+            (urlRemove)="removeEvidenceById($event)"
+          (fileRemove)="removeEvidenceById($event)"></app-evidence-input>
+        </div>
+      </form>
+    </mat-tab>
+  </mat-tab-group>
 
-    @if (errorMsg) {
+  @if (errorMsg) {
     <div class="error" role="alert">{{ errorMsg }}</div>
-    }
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-    <button mat-button (click)="cancel()" [disabled]="submitting">Cancel</button>
-    <button color="primary" mat-flat-button (click)="submit()"
-        [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">
-        <mat-icon>send</mat-icon>
-        Submit
-    </button>
+  <button mat-button (click)="cancel()" [disabled]="submitting">Cancel</button>
+  <button color="primary" mat-flat-button (click)="submit()"
+    [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">
+    <mat-icon>send</mat-icon>
+    Submit
+  </button>
 </mat-dialog-actions>

@@ -1,5 +1,5 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
-import { CommonModule, PlatformLocation } from '@angular/common';
+import { PlatformLocation } from '@angular/common';
 import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -81,7 +81,6 @@ import { WeatherService } from './services/weather.service';
   imports: [
     ConsentGateComponent,
     MatBadgeModule,
-    CommonModule,
     RouterOutlet,
     MapComponent,
     MatButtonModule,
@@ -89,7 +88,7 @@ import { WeatherService } from './services/weather.service';
     MatIconModule,
     ShortNumberPipe,
     MatMenuModule
-  ],
+],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   animations: [

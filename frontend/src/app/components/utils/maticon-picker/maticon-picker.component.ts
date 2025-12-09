@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
@@ -13,7 +13,7 @@ interface IconCategory {
 @Component({
   selector: 'app-maticon-picker',
   standalone: true,
-  imports: [CommonModule, MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule],
   templateUrl: './maticon-picker.component.html',
   styleUrl: './maticon-picker.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

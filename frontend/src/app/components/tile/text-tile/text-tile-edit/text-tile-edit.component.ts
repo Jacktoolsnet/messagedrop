@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -19,7 +19,6 @@ interface TextTileDialogData {
   selector: 'app-text-tile-edit',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
     MatDialogTitle,
@@ -30,7 +29,7 @@ interface TextTileDialogData {
     MatButtonModule,
     MatIcon,
     A11yModule
-  ],
+],
   templateUrl: './text-tile-edit.component.html',
   styleUrl: './text-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
