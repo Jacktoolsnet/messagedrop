@@ -1,28 +1,39 @@
 
-import { Component, inject, OnInit } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppService } from '../../../services/app.service';
-import { DisclaimerComponent } from '../disclaimer/disclaimer.component';
 
 @Component({
   selector: 'app-privacy-policy',
+  standalone: true,
   imports: [
     MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
-    MatSlideToggleModule
-],
+    MatSlideToggleModule,
+    MatProgressBarModule
+  ],
   templateUrl: './privacy-policy.component.html',
-  styleUrl: './privacy-policy.component.css'
+  styleUrls: ['./privacy-policy.component.css']
 })
 export class PrivacyPolicyComponent implements OnInit {
   accepted = false;
+  readonly url = new URL('assets/legal/privacy-policy.txt', document.baseURI).toString();
 
-  private dialogRef = inject(MatDialogRef<DisclaimerComponent>);
+  readonly text = signal<string>('');
+  readonly loading = signal<boolean>(true);
+  readonly error = signal<boolean>(false);
+
+  private http = inject(HttpClient);
+  private dialogRef = inject(MatDialogRef<PrivacyPolicyComponent>);
   private appService = inject(AppService);
+
+  constructor() { this.load(); }
 
   ngOnInit(): void {
     // falls bereits zugestimmt wurde, Toggle vorbefüllen
@@ -37,4 +48,27 @@ export class PrivacyPolicyComponent implements OnInit {
     this.dialogRef.close(val);
   }
 
+  reload(): void { this.load(); }
+  openInNewTab(): void { window.open(this.url, '_blank', 'noopener'); }
+
+  download(): void {
+    const blob = new Blob([this.text()], { type: 'text/plain;charset=utf-8' });
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = 'privacy-policy.txt';
+    a.click();
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  close(): void { this.dialogRef.close(); }
+
+  private load(): void {
+    this.loading.set(true);
+    this.error.set(false);
+    this.http.get(this.url, { responseType: 'text' }).subscribe({
+      next: (content) => { this.text.set(content ?? ''); this.loading.set(false); },
+      error: () => { this.error.set(true); this.loading.set(false); }
+    });
+  }
 }

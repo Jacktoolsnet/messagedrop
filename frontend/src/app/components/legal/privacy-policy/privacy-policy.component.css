@@ -4,9 +4,8 @@
     line-height: 1.35;
 }
 
-/* Dialog sizing & scrolling */
 .mat-mdc-dialog-content.content {
-    max-height: 85vh;
+    max-height: 75vh;
     min-width: min(320px, 90vw);
     max-width: 90vw;
     overflow: auto;
@@ -14,67 +13,43 @@
     padding-bottom: 0.5rem;
 }
 
-/* Typography & sections */
-.last-updated {
-    margin: 0 0 0.5rem 0;
-    opacity: 0.85;
+.muted {
+    margin: .5rem 0 0;
+    opacity: .7;
 }
 
-.block+.block {
-    margin-top: 1rem;
+.error {
+    margin-top: .5rem;
+    padding: .75rem;
+    border-radius: 10px;
+    border: 1px solid #f3c2c2;
+    background: #fff1f1;
 }
 
-.h {
-    margin: 0 0 0.25rem 0;
-    font-size: 1rem;
-    font-weight: 700;
-}
-
-ul {
-    margin: 0.25rem 0 0.5rem 1.1rem;
-}
-
-ul li {
-    margin: 0.15rem 0;
-}
-
-em {
-    font-style: italic;
-}
-
-/* Links: main text color, bold, always underlined; wrap gracefully */
-.link,
-.link:hover,
-.link:focus,
-.link:active,
-.link:visited,
-.link:focus-visible {
-    color: var(--mat-app-text-color) !important;
-    font-weight: 700;
-    text-decoration: underline;
-    text-underline-offset: 2px;
-    text-decoration-thickness: 1.5px;
-    outline: none;
-    white-space: normal;
-    overflow-wrap: anywhere;
+.policy-text {
+    white-space: pre-wrap;
     word-break: break-word;
+    overflow: auto;
+    padding: .75rem;
 }
 
-/* Consent area */
+.actions,
 .consent {
-    margin-top: 1rem;
+    display: flex;
+    gap: .5rem;
+    flex-wrap: wrap;
+}
+
+.consent {
+    margin-top: .25rem;
     padding-top: 0.5rem;
     border-top: 1px solid var(--mat-card-outlined-outline-color);
+    justify-content: flex-start;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .mat-mdc-slide-toggle .mdc-label {
     white-space: normal;
     max-width: 100%;
-}
-
-/* Small screens */
-@media (max-width: 420px) {
-    .h {
-        font-size: 0.95rem;
-    }
 }
