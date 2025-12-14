@@ -1,162 +1,32 @@
-<h2 mat-dialog-title>Disclaimer</h2>
+<h1 mat-dialog-title>Disclaimer</h1>
 
 <mat-dialog-content class="content">
-    <p class="last-updated"><em>Last updated: 25 Sep 2025</em></p>
+    @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p class="muted">Loading disclaimer…</p>
+    }
 
-    <section class="block">
-        <h3 class="h">1. Scope</h3>
-        <p>
-            This disclaimer applies to the use of the website and app <strong>“MessageDrop”</strong> (messagedrop.de) of
-            <strong>JackTools.Net UG (haftungsbeschränkt)</strong>, Im Kirchfeld 27, 38304 Wolfenbüttel, Germany
-            (“we/us”).
-        </p>
-    </section>
+    @if (error()) {
+    <div class="error" role="alert">
+        <p>Could not load the disclaimer file.</p>
+        <button mat-stroked-button (click)="reload()">Retry</button>
+    </div>
+    }
 
-    <section class="block">
-        <h3 class="h">2. Availability</h3>
-        <p>
-            We strive to provide reliable availability. However, technical or other reasons may lead to outages or
-            limitations;
-            a specific level of availability is not guaranteed.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">3. Content – our own, user-generated and third-party</h3>
-        <p><strong>Our own content:</strong> We provide our own content with due care, but do not assume any warranty
-            for correctness,
-            completeness, or timeliness.</p>
-        <p><strong>User-generated content (UGC):</strong> Users can create and share content. We employ automated
-            procedures (including
-            AI-assisted detection), but do <strong>not</strong> conduct comprehensive pre-moderation. Content can be
-            reported; in addition,
-            the “Hide” feature can hide a post <strong>globally</strong>, i.e., it will no longer be visible <strong>to
-                all users</strong>.
-            We review notices of unlawful content promptly and remove or block such content once we become aware of it
-            (“notice-and-takedown”).</p>
-        <p><strong>Third-party information:</strong> Certain features rely on external services: weather and air-quality
-            data from
-            <strong>Open-Meteo</strong>, translations from <strong>DeepL</strong>, and place/reverse-geocoding via
-            <strong>Nominatim</strong> (OpenStreetMap). Despite careful selection, deviations, outages, quota/rate
-            limits, or API changes
-            may occur. We do not warrant correctness, completeness, availability, or timeliness. Use is subject to each
-            provider’s terms and,
-            where applicable, license requirements. <em>Note: For OpenStreetMap data, the required attribution (e.g., “©
-                OpenStreetMap contributors”) is provided.</em>
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">4. Embeds & external providers (YouTube, Pinterest, TikTok, Tenor, Spotify)</h3>
-        <p>
-            External media (e.g., YouTube videos, TikTok clips, Pinterest pins, Tenor GIFs, Spotify content) are
-            embedded by users.
-            Responsibility for such third-party content lies solely with the respective provider. When
-            <strong>activating/displaying</strong>
-            such content, data (e.g., IP address, usage data) may be transmitted to the respective provider; that
-            provider’s terms and
-            privacy policy apply. In the app, you can enable/disable external content <strong>per provider</strong>.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">5. Links</h3>
-        <p>
-            Our service may contain links to external websites. We have no control over their content; responsibility
-            rests with the respective
-            operator. Links were checked for potential legal violations at the time of linking. Without specific
-            indications of a violation,
-            permanent content monitoring is not reasonable. If we become aware of violations, we remove such links
-            promptly.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">6. Copyright</h3>
-        <p>
-            Where content is not created by us, we respect third-party rights and label such content accordingly. If you
-            suspect a rights
-            infringement, please notify us at
-            <a class="link" href="mailto:jacktoolsnet@gmail.com"
-                (click)="$event.stopPropagation()">jacktoolsnet&#64;gmail.com</a>.
-            Upon verification, we will promptly remove the content.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">7. Privacy notice</h3>
-        <p>
-            For details on how we process personal data, please refer to our <strong>Privacy Policy</strong>. This
-            notice is not a privacy policy.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">8. No access to emergency services</h3>
-        <p>
-            Our website/app does <strong>not</strong> provide access to emergency services (e.g., police, fire
-            department, ambulance).
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">9. Local data storage (IndexedDB) & data loss</h3>
-        <p>
-            Our app stores certain data locally on your device/browser (e.g., in <strong>IndexedDB</strong>,
-            local/session storage or the application cache)
-            to enable offline/more reliable functionality. These local data are <strong>device- and
-                browser-bound</strong> and are
-            <strong>not</strong> automatically synchronized with other devices or a cloud (unless expressly stated
-            otherwise).
-        </p>
-        <p>Local data can be lost or deleted <strong>at any time</strong>, including due to:</p>
-        <ul>
-            <li>manual deletion of website/app data or browser data,</li>
-            <li>use of private/incognito mode,</li>
-            <li>automatic storage cleanup by the browser/OS,</li>
-            <li>quota/storage limits or browser/profile changes,</li>
-            <li>uninstall/reinstall (e.g., PWA) or system/browser updates.</li>
-        </ul>
-        <p>
-            We assume <strong>no liability</strong> for loss, damage, or unavailability of locally stored data, nor for
-            resulting damages.
-            Where available, please use the app’s <strong>export/backup features</strong> and keep backups outside the
-            device.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">10. Backend availability, maintenance & server-side data loss</h3>
-        <p>
-            Our backend is operated and monitored with reasonable care. Nevertheless, disruptions may occur, including
-            planned or unplanned
-            maintenance, infrastructure/provider outages, network issues, security incidents (e.g., DDoS),
-            software/database updates, or force majeure.
-            No specific availability or recovery time is guaranteed.
-        </p>
-        <p>
-            We create backups at reasonable intervals. However, in an incident, <strong>data loss</strong> may occur
-            (e.g., between the last backup and
-            the time of the incident) or functionality may be <strong>temporarily limited</strong>. A gapless
-            point-in-time recovery cannot be guaranteed.
-        </p>
-        <p>
-            To the extent permitted by law, we are not liable for indirect damages, lost profits, data loss, or
-            consequential damages resulting from
-            backend disruptions. Claims based on intent or gross negligence and mandatory liability remain unaffected.
-        </p>
-    </section>
-
-    <section class="block">
-        <h3 class="h">11. Changes</h3>
-        <p>We may amend this disclaimer at any time. The currently published version applies.</p>
-    </section>
-
-
+    @if (!loading() && !error()) {
+    <pre class="disclaimer-text" [textContent]="text()" aria-label="Disclaimer"></pre>
+    }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-    <mat-slide-toggle [checked]="accepted" (change)="onToggle($event.checked)" aria-label="Accept disclaimer">
+<mat-dialog-actions class="consent" align="start">
+    <mat-slide-toggle [checked]="accepted" [disabled]="loading() || error()" (change)="onToggle($event.checked)"
+        aria-label="Accept disclaimer">
         I have read and accept this Disclaimer.
     </mat-slide-toggle>
+</mat-dialog-actions>
+
+<mat-dialog-actions class="actions" align="end">
+    <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">Open in new tab</button>
+    <button mat-button (click)="download()" [disabled]="loading() || error()">Download</button>
+    <button mat-button color="primary" (click)="close()">Close</button>
 </mat-dialog-actions>

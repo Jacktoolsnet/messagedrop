@@ -1,7 +1,9 @@
 
-import { Component, OnInit, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { AppService } from '../../../services/app.service';
 
@@ -13,22 +15,25 @@ import { AppService } from '../../../services/app.service';
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
-    MatSlideToggleModule
-],
+    MatSlideToggleModule,
+    MatProgressBarModule
+  ],
   templateUrl: './disclaimer.component.html',
-  styleUrl: './disclaimer.component.css'
+  styleUrls: ['./disclaimer.component.css']
 })
 export class DisclaimerComponent implements OnInit {
   accepted = false;
+  readonly url = new URL('assets/legal/disclaimer.txt', document.baseURI).toString();
 
+  readonly text = signal<string>('');
+  readonly loading = signal<boolean>(true);
+  readonly error = signal<boolean>(false);
+
+  private http = inject(HttpClient);
   private dialogRef = inject(MatDialogRef<DisclaimerComponent>);
   private appService = inject(AppService);
 
-  ngOnInit(): void {
-    // falls bereits zugestimmt wurde, Toggle vorbefüllen
-    const settings = this.appService.getAppSettings();
-    this.accepted = !!settings?.consentSettings?.disclaimer;
-  }
+  constructor() { this.load(); }
 
   onToggle(val: boolean) {
     const current = this.appService.getAppSettings();
@@ -37,4 +42,33 @@ export class DisclaimerComponent implements OnInit {
     this.dialogRef.close(val);
   }
 
+  reload(): void { this.load(); }
+  openInNewTab(): void { window.open(this.url, '_blank', 'noopener'); }
+
+  download(): void {
+    const blob = new Blob([this.text()], { type: 'text/plain;charset=utf-8' });
+    const objectUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = objectUrl;
+    a.download = 'disclaimer.txt';
+    a.click();
+    URL.revokeObjectURL(objectUrl);
+  }
+
+  ngOnInit(): void {
+    // falls bereits zugestimmt wurde, Toggle vorbefüllen
+    const settings = this.appService.getAppSettings();
+    this.accepted = !!settings?.consentSettings?.disclaimer;
+  }
+
+  close(): void { this.dialogRef.close(); }
+
+  private load(): void {
+    this.loading.set(true);
+    this.error.set(false);
+    this.http.get(this.url, { responseType: 'text' }).subscribe({
+      next: (content) => { this.text.set(content ?? ''); this.loading.set(false); },
+      error: () => { this.error.set(true); this.loading.set(false); }
+    });
+  }
 }
