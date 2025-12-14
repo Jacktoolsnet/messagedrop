@@ -1,5 +1,12 @@
 <h1 mat-dialog-title>Privacy Policy</h1>
 
+<mat-dialog-actions class="lang-actions" align="start">
+    <button mat-stroked-button [color]="lang() === 'de' ? 'primary' : undefined" (click)="setLanguage('de')"
+        [disabled]="loading()" [class.active]="lang() === 'de'">Deutsch</button>
+    <button mat-stroked-button [color]="lang() === 'en' ? 'primary' : undefined" (click)="setLanguage('en')"
+        [disabled]="loading()" [class.active]="lang() === 'en'">English</button>
+</mat-dialog-actions>
+
 <mat-dialog-content class="content">
     @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
