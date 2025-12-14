@@ -2,6 +2,8 @@
 logs
 *.log
 *.txt
+# keep legal text assets
+!frontend/src/assets/legal/*.txt
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*

@@ -1,0 +1,46 @@
+Disclaimer
+Last updated: 25 Sep 2025
+
+1. Scope
+This disclaimer applies to the use of the website and app “MessageDrop” (messagedrop.de) of JackTools.Net UG (haftungsbeschränkt), Im Kirchfeld 27, 38304 Wolfenbüttel, Germany (“we/us”).
+
+2. Availability
+We strive to provide reliable availability. However, technical or other reasons may lead to outages or limitations; a specific level of availability is not guaranteed.
+
+3. Content – our own, user-generated and third-party
+Our own content: We provide our own content with due care, but do not assume any warranty for correctness, completeness, or timeliness.
+User-generated content (UGC): Users can create and share content. We employ automated procedures (including AI-assisted detection), but do not conduct comprehensive pre-moderation. Content can be reported; in addition, the “Hide” feature can hide a post globally, i.e., it will no longer be visible to all users. We review notices of unlawful content promptly and remove or block such content once we become aware of it (“notice-and-takedown”).
+Third-party information: Certain features rely on external services: weather and air-quality data from Open-Meteo, translations from DeepL, and place/reverse-geocoding via Nominatim (OpenStreetMap). Despite careful selection, deviations, outages, quota/rate limits, or API changes may occur. We do not warrant correctness, completeness, availability, or timeliness. Use is subject to each provider’s terms and, where applicable, license requirements. Note: For OpenStreetMap data, the required attribution (e.g., “© OpenStreetMap contributors”) is provided.
+
+4. Embeds & external providers (YouTube, Pinterest, TikTok, Tenor, Spotify)
+External media (e.g., YouTube videos, TikTok clips, Pinterest pins, Tenor GIFs, Spotify content) are embedded by users. Responsibility for such third-party content lies solely with the respective provider. When activating/displaying such content, data (e.g., IP address, usage data) may be transmitted to the respective provider; that provider’s terms and privacy policy apply. In the app, you can enable/disable external content per provider.
+
+5. Links
+Our service may contain links to external websites. We have no control over their content; responsibility rests with the respective operator. Links were checked for potential legal violations at the time of linking. Without specific indications of a violation, permanent content monitoring is not reasonable. If we become aware of violations, we remove such links promptly.
+
+6. Copyright
+Where content is not created by us, we respect third-party rights and label such content accordingly. If you suspect a rights infringement, please notify us at jacktoolsnet@gmail.com. Upon verification, we will promptly remove the content.
+
+7. Privacy notice
+For details on how we process personal data, please refer to our Privacy Policy. This notice is not a privacy policy.
+
+8. No access to emergency services
+Our website/app does not provide access to emergency services (e.g., police, fire department, ambulance).
+
+9. Local data storage (IndexedDB) & data loss
+Our app stores certain data locally on your device/browser (e.g., in IndexedDB, local/session storage or the application cache) to enable offline/more reliable functionality. These local data are device- and browser-bound and are not automatically synchronized with other devices or a cloud (unless expressly stated otherwise).
+Local data can be lost or deleted at any time, including due to:
+- manual deletion of website/app data or browser data,
+- use of private/incognito mode,
+- automatic storage cleanup by the browser/OS,
+- quota/storage limits or browser/profile changes,
+- uninstall/reinstall (e.g., PWA) or system/browser updates.
+We assume no liability for loss, damage, or unavailability of locally stored data, nor for resulting damages. Where available, please use the app’s export/backup features and keep backups outside the device.
+
+10. Backend availability, maintenance & server-side data loss
+Our backend is operated and monitored with reasonable care. Nevertheless, disruptions may occur, including planned or unplanned maintenance, infrastructure/provider outages, network issues, security incidents (e.g., DDoS), software/database updates, or force majeure. No specific availability or recovery time is guaranteed.
+We create backups at reasonable intervals. However, in an incident, data loss may occur (e.g., between the last backup and the time of the incident) or functionality may be temporarily limited. A gapless point-in-time recovery cannot be guaranteed.
+To the extent permitted by law, we are not liable for indirect damages, lost profits, data loss, or consequential damages resulting from backend disruptions. Claims based on intent or gross negligence and mandatory liability remain unaffected.
+
+11. Changes
+We may amend this disclaimer at any time. The currently published version applies.
