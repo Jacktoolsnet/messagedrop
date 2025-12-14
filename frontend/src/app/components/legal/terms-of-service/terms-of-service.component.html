@@ -1,19 +1,32 @@
-<h2 mat-dialog-title>Terms of Service</h2>
+<h1 mat-dialog-title>Terms of Service</h1>
 
 <mat-dialog-content class="content">
-    <p class="last-updated"><em>Last updated: 25 Sep 2025</em></p>
+    @if (loading()) {
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p class="muted">Loading terms of service…</p>
+    }
 
-    <section class="block">
-        <h3 class="h">Working on it</h3>
-        <p>
-            Comming soon...
-        </p>
-    </section>
+    @if (error()) {
+    <div class="error" role="alert">
+        <p>Could not load the terms of service file.</p>
+        <button mat-stroked-button (click)="reload()">Retry</button>
+    </div>
+    }
 
+    @if (!loading() && !error()) {
+    <pre class="terms-text" [textContent]="text()" aria-label="Terms of service"></pre>
+    }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
-    <mat-slide-toggle [checked]="accepted" (change)="onToggle($event.checked)" aria-label="Accept Terms of Service">
+<mat-dialog-actions class="consent" align="start">
+    <mat-slide-toggle [checked]="accepted" [disabled]="loading() || error()" (change)="onToggle($event.checked)"
+        aria-label="Accept Terms of Service">
         I have read and accept this Terms of Service.
     </mat-slide-toggle>
+</mat-dialog-actions>
+
+<mat-dialog-actions class="actions" align="end">
+    <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">Open in new tab</button>
+    <button mat-button (click)="download()" [disabled]="loading() || error()">Download</button>
+    <button mat-button color="primary" (click)="close()">Close</button>
 </mat-dialog-actions>

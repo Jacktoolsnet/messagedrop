@@ -1,0 +1,65 @@
+TERMS OF SERVICE
+Last updated: [fill in date]
+
+1. Who we are
+MessageDrop (messagedrop.de) is provided by JackTools.Net UG (haftungsbeschränkt), Im Kirchfeld 27, 38304 Wolfenbüttel, Germany (“we”, “us”). Contact: jacktoolsnet@gmail.com, +49 (0) 176 / 41 23 57 74.
+
+2. Acceptance
+By accessing or using MessageDrop you agree to these Terms. If you do not agree, do not use the service.
+
+3. Changes
+We may update these Terms; the current version applies upon publication. If changes materially affect you, we will provide notice where reasonable.
+
+4. Eligibility
+You must be legally capable of entering contracts in your jurisdiction. If you use the service on behalf of an organization, you confirm you have authority to bind it.
+
+5. Service description
+MessageDrop lets users create, share, and view user-generated content. It may embed or rely on third-party services (e.g., Open-Meteo, DeepL, Nominatim/OpenStreetMap, YouTube, TikTok, Pinterest, Tenor, Spotify). We do not guarantee any specific features or availability.
+
+6. Accounts and security (if/where applicable)
+Keep credentials confidential. You are responsible for all activity under your account. Notify us promptly of unauthorized use.
+
+7. User content and licenses
+You retain ownership of content you post. You grant us a worldwide, non-exclusive, royalty-free license to host, store, reproduce, adapt, publish, display, and distribute your content for operating and improving the service. You represent you have all rights and that your content is lawful and does not infringe third-party rights.
+
+8. Moderation and removals
+We may remove or block content at our discretion (e.g., illegal content, rights violations, policy breaches) and will act on valid notices (“notice-and-takedown”). Users may report content; a “Hide” feature can remove content globally.
+
+9. Prohibited conduct
+Do not: (a) break the law; (b) infringe IP or privacy rights; (c) post illegal, harmful, defamatory, or hateful content; (d) circumvent security or technical limits; (e) misuse the service (spam, malware, scraping beyond what is permitted); (f) interfere with others’ use; (g) falsely imply endorsement.
+
+10. Third-party services and content
+Third-party data and embeds are subject to their own terms and may be unavailable, incorrect, or incomplete. We do not control or guarantee third-party services. Required attributions (e.g., “© OpenStreetMap contributors”) apply.
+
+11. No emergency services
+MessageDrop does not provide access to emergency services (police, fire, ambulance).
+
+12. Availability and maintenance
+The service may be interrupted for maintenance, outages, provider issues, or force majeure. No specific uptime is guaranteed.
+
+13. Local storage and data loss
+Data may be stored locally (e.g., IndexedDB, local/session storage, caches) and is device/browser-specific. Local data can be lost at any time (deletion, private mode, storage cleanup, updates, reinstall). Keep backups where needed.
+
+14. Intellectual property
+We and our licensors retain all rights in the service. Do not use our trademarks or branding without permission.
+
+15. Termination
+You may stop using the service at any time. We may suspend or terminate access if you breach these Terms, if required by law, or for misuse. Certain provisions survive termination (e.g., disclaimers, liability limits, licenses granted for service operation).
+
+16. Disclaimers
+The service is provided “as is” and “as available” without warranties of any kind. We do not warrant that the service will be uninterrupted, secure, or error-free, or that content is accurate or reliable.
+
+17. Limitation of liability
+To the extent permitted by law, we are not liable for indirect, incidental, consequential, or punitive damages, lost profits, or loss of data arising from your use of the service. Mandatory statutory liability (e.g., for intent or gross negligence) remains unaffected.
+
+18. Indemnity
+You agree to defend, indemnify, and hold us harmless from claims arising out of your content or your breach of these Terms, to the extent permitted by law.
+
+19. Governing law and venue
+These Terms are governed by German law (excluding its conflict-of-law rules). If you are a merchant, public law entity, or special fund under public law, exclusive venue is our registered office. Mandatory consumer protections and venues remain unaffected.
+
+20. Severability
+If any provision is invalid, the remaining provisions remain in effect. An invalid provision shall be replaced by a valid one that best reflects the economic intent.
+
+21. Contact
+jacktoolsnet@gmail.com, +49 (0) 176 / 41 23 57 74, JackTools.Net UG (haftungsbeschränkt), Im Kirchfeld 27, 38304 Wolfenbüttel, Germany.
