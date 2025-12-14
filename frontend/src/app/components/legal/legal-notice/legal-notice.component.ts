@@ -26,7 +26,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
   styleUrls: ['./legal-notice.component.css']
 })
 export class LegalNoticeComponent {
-  readonly url = new URL('assets/legal/legal-notice.txt', document.baseURI).toString();
+  readonly url = new URL('assets/legal/legal-notice-de.txt', document.baseURI).toString();
 
   readonly text = signal<string>('');
   readonly loading = signal<boolean>(true);

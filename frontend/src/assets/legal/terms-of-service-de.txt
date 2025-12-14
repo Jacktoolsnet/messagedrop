@@ -1,0 +1,324 @@
+NUTZUNGSBEDINGUNGEN
+
+Stand: 14. Dezember 2025
+
+
+---
+
+Kurzfassung (nicht rechtsverbindlich)
+
+Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
+
+Du bist für deine Inhalte verantwortlich und musst sicherstellen, dass sie rechtmäßig sind und keine Rechte Dritter verletzen.
+
+Inhalte können manuell und automatisiert (einschließlich KI-gestützter Verfahren) moderiert, gesperrt oder entfernt werden.
+
+Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen den Bedingungen der jeweiligen Anbieter.
+
+Der Dienst kann zeitweise ausfallen; eine bestimmte Verfügbarkeit wird nicht garantiert.
+
+Lokal gespeicherte Daten können verloren gehen; sichere wichtige Daten selbst.
+
+
+Maßgeblich ist ausschließlich die nachfolgende vollständige Fassung dieser Nutzungsbedingungen.
+
+
+---
+
+1. Anbieter
+
+MessageDrop (messagedrop.de) wird betrieben von:
+
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
+
+E-Mail: jacktoolsnet@gmail.com
+Telefon: +49 (0) 176 / 41 23 57 74
+
+(im Folgenden „wir“ oder „Anbieter“)
+
+
+---
+
+2. Geltungsbereich und Zustimmung
+
+Diese Nutzungsbedingungen regeln die Nutzung der Plattform MessageDrop.
+
+Mit dem Zugriff auf oder der Nutzung von MessageDrop erklärst du dich mit diesen Nutzungsbedingungen einverstanden.
+Wenn du diesen Bedingungen nicht zustimmst, darfst du den Dienst nicht nutzen.
+
+
+---
+
+3. Änderungen der Nutzungsbedingungen
+
+Wir behalten uns vor, diese Nutzungsbedingungen jederzeit zu ändern oder zu aktualisieren.
+Die jeweils aktuelle Fassung gilt ab dem Zeitpunkt der Veröffentlichung.
+
+Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren.
+
+
+---
+
+4. Nutzungsberechtigung
+
+Die Nutzung von MessageDrop ist Personen unter 16 Jahren nicht gestattet.
+
+Soweit die Nutzung den Abschluss rechtsverbindlicher Erklärungen oder Verträge erfordert, ist sie nur Personen gestattet, die voll geschäftsfähig sind.
+
+Wenn du den Dienst im Namen einer Organisation nutzt, bestätigst du, dass du hierzu berechtigt bist.
+
+
+---
+
+5. Leistungsbeschreibung
+
+MessageDrop ist eine Plattform zum Erstellen, Teilen und Anzeigen nutzergenerierter Inhalte.
+
+Der Dienst kann Funktionen oder Inhalte externer Drittanbieter einbinden oder auf diesen basieren, unter anderem:
+
+Open-Meteo
+
+DeepL
+
+Nominatim / OpenStreetMap
+
+YouTube, TikTok, Pinterest, Tenor, Spotify
+
+
+Ein Anspruch auf bestimmte Funktionen, Inhalte oder eine permanente Verfügbarkeit besteht nicht.
+
+
+---
+
+6. Nutzerkonten und Sicherheit (sofern anwendbar)
+
+Sofern Nutzerkonten angeboten werden, bist du verpflichtet:
+
+Zugangsdaten vertraulich zu behandeln
+
+unbefugte Nutzung unverzüglich zu melden
+
+
+Du bist für alle Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
+
+
+---
+
+7. Nutzergenerierte Inhalte und Nutzungsrechte
+
+Du behältst alle Rechte an den von dir erstellten und veröffentlichten Inhalten.
+
+Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives, unentgeltliches Nutzungsrecht ein, diese Inhalte zum Zweck des Betriebs, der Darstellung, der Moderation und der Weiterentwicklung des Dienstes zu:
+
+speichern
+
+vervielfältigen
+
+öffentlich zugänglich machen
+
+anzeigen
+
+technisch verarbeiten
+
+
+Du sicherst zu, dass:
+
+du über alle erforderlichen Rechte verfügst
+
+deine Inhalte rechtmäßig sind
+
+keine Rechte Dritter (z. B. Urheber-, Persönlichkeits- oder Datenschutzrechte) verletzt werden
+
+
+
+---
+
+8. Moderation und Entfernung von Inhalten
+
+Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder deren Sichtbarkeit einzuschränken, insbesondere bei:
+
+rechtswidrigen Inhalten
+
+Verstößen gegen diese Nutzungsbedingungen
+
+Hinweisen im Rahmen eines „Notice-and-Takedown“-Verfahrens
+
+
+Zur Unterstützung der Moderation können automatisierte Verfahren (einschließlich KI-gestützter Prüfungen) eingesetzt werden.
+Diese ersetzen keine vollständige manuelle Vorabprüfung sämtlicher Inhalte.
+
+Nutzer können Inhalte melden.
+Eine „Verbergen“-Funktion kann Inhalte global unsichtbar machen, ohne dass diese endgültig gelöscht werden.
+
+Gesetzliche Pflichten zur Moderation, insbesondere nach dem Digital Services Act (DSA), bleiben unberührt.
+
+
+---
+
+9. Unzulässige Nutzung
+
+Es ist untersagt, MessageDrop insbesondere zu nutzen, um:
+
+a) gegen geltendes Recht zu verstoßen
+b) Rechte Dritter zu verletzen
+c) rechtswidrige, schädliche, beleidigende, verleumderische oder hasserfüllte Inhalte zu verbreiten
+d) Sicherheitsmaßnahmen zu umgehen
+e) Schadsoftware, Spam oder unerlaubtes Scraping zu betreiben
+f) die Nutzung durch andere zu beeinträchtigen
+g) eine falsche Verbindung oder Unterstützung durch uns vorzutäuschen
+
+
+---
+
+10. Inhalte und Dienste Dritter
+
+Inhalte und Dienste Dritter unterliegen deren eigenen Nutzungs- und Datenschutzbedingungen.
+
+Wir übernehmen keine Verantwortung für Verfügbarkeit, Richtigkeit oder Vollständigkeit von Drittinhalten oder -diensten.
+
+Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu beachten.
+
+
+---
+
+11. Keine Notfalldienste
+
+MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienste).
+
+
+---
+
+12. Verfügbarkeit und Wartung
+
+Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere aufgrund von:
+
+Wartungsarbeiten
+
+technischen Störungen
+
+Ausfällen von Drittanbietern
+
+höherer Gewalt
+
+
+Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
+
+
+---
+
+13. Lokale Speicherung und Datenverlust
+
+Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage, Cache).
+
+Diese Daten sind:
+
+geräte- und browserabhängig
+
+jederzeit löschbar oder verlierbar (z. B. durch Updates, private Nutzung, Speicherbereinigung)
+
+
+Du bist selbst für geeignete Sicherungen verantwortlich.
+
+
+---
+
+14. Geistiges Eigentum
+
+Alle Rechte an MessageDrop, einschließlich Software, Gestaltung und Marken, liegen bei uns oder unseren Lizenzgebern.
+
+Eine Nutzung unserer Marken oder Kennzeichen ist ohne vorherige Zustimmung nicht gestattet.
+
+
+---
+
+15. Beendigung der Nutzung
+
+Du kannst die Nutzung von MessageDrop jederzeit einstellen.
+
+Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei:
+
+Verstößen gegen diese Nutzungsbedingungen
+
+gesetzlicher Verpflichtung
+
+missbräuchlicher Nutzung
+
+
+Regelungen, die ihrer Natur nach fortgelten (z. B. Haftungsausschlüsse, Nutzungsrechte), bleiben wirksam.
+
+
+---
+
+16. Haftungsausschluss
+
+Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
+
+Wir übernehmen keine Gewähr dafür, dass:
+
+der Dienst jederzeit verfügbar ist
+
+Inhalte fehlerfrei, vollständig oder aktuell sind
+
+der Dienst frei von Störungen oder Sicherheitslücken ist
+
+
+
+---
+
+17. Haftungsbeschränkung
+
+Wir haften unbeschränkt bei:
+
+Vorsatz
+
+grober Fahrlässigkeit
+
+Verletzung von Leben, Körper oder Gesundheit
+
+
+Bei leichter Fahrlässigkeit haften wir nur bei Verletzung wesentlicher Vertragspflichten und begrenzt auf den vorhersehbaren Schaden.
+
+Eine weitergehende Haftung ist ausgeschlossen, soweit gesetzlich zulässig.
+
+
+---
+
+18. Freistellung
+
+Du stellst uns von Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
+
+
+---
+
+19. Anwendbares Recht und Gerichtsstand
+
+Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des internationalen Privatrechts.
+
+Sofern du Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen bist, ist ausschließlicher Gerichtsstand unser Sitz.
+
+Zwingende Verbraucherschutzvorschriften bleiben unberührt.
+
+
+---
+
+20. Salvatorische Klausel
+
+Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
+
+Die unwirksame Bestimmung ist durch eine wirksame zu ersetzen, die dem wirtschaftlichen Zweck am nächsten kommt.
+
+
+---
+
+21. Kontakt
+
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
+
+E-Mail: jacktoolsnet@gmail.com
+Telefon: +49 (0) 176 / 41 23 57 74

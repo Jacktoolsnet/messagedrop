@@ -23,7 +23,7 @@ import { AppService } from '../../../services/app.service';
 })
 export class TermsOfServiceComponent implements OnInit {
   accepted = false;
-  readonly url = new URL('assets/legal/terms-of-service.txt', document.baseURI).toString();
+  readonly url = new URL('assets/legal/terms-of-service-de.txt', document.baseURI).toString();
 
   readonly text = signal<string>('');
   readonly loading = signal<boolean>(true);

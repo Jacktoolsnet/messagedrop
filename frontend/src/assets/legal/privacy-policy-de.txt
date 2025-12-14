@@ -1,0 +1,388 @@
+DATENSCHUTZERKLÄRUNG
+
+Stand: 14. Dezember 2025
+
+
+---
+
+Kurzfassung (nicht rechtsverbindlich)
+
+Personenbezogene Daten werden zur Bereitstellung, Sicherheit und Moderation von MessageDrop verarbeitet.
+
+Öffentliche Inhalte können automatisiert, einschließlich mittels KI-gestützter Moderation, geprüft werden.
+
+Technisch notwendige Daten (z. B. IP-Adresse, Logs) werden zur Sicherheit verarbeitet und zeitnah gelöscht.
+
+Bestimmte Daten werden lokal auf deinem Gerät gespeichert.
+
+Externe Dienste erhalten Daten nur, soweit dies für die jeweilige Funktion erforderlich ist.
+
+DSA-bezogene Moderations- und Verfahrensdaten können dauerhaft gespeichert werden.
+
+
+Maßgeblich ist ausschließlich die vollständige Datenschutzerklärung einschließlich der DSA-Ergänzung.
+
+
+---
+
+1. Verantwortlicher im Sinne der DSGVO
+
+Verantwortlicher gemäß Art. 4 Nr. 7 DSGVO ist:
+
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
+
+E-Mail: jacktoolsnet@gmail.com
+Telefon: +49 (0) 176 / 41 23 57 74
+
+Diese Datenschutzerklärung gilt für MessageDrop (messagedrop.de), die zugehörigen mobilen Anwendungen und Progressive Web Apps (PWA) sowie für interne Admin- und Moderationsoberflächen.
+
+
+---
+
+2. Gegenstand und Zweck der Verarbeitung personenbezogener Daten
+
+Wir verarbeiten personenbezogene Daten ausschließlich im Einklang mit der Datenschutz-Grundverordnung (DSGVO), dem Digital Services Act (DSA) sowie den anwendbaren nationalen Datenschutzgesetzen.
+
+a) Account- und Profildaten (sofern freiwillig bereitgestellt)
+
+Zur Bereitstellung der Funktionen des Dienstes, zur Anzeige nutzergenerierter Inhalte sowie zur technischen Verwaltung des Nutzerkontos.
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO
+
+
+---
+
+b) Nutzergenerierte Inhalte (ergänzt)
+
+Beiträge, Kommentare, Anhänge, eingebettete Inhalte sowie zugehörige Metadaten werden verarbeitet, um die Plattform bereitzustellen, Inhalte darzustellen, zu moderieren und vor Missbrauch zu schützen.
+
+Zur Moderation können automatisierte Verfahren einschließlich KI-gestützter Erkennung eingesetzt werden.
+
+Rechtsgrundlage:
+Art. 6 Abs. 1 lit. b und lit. f DSGVO
+
+
+---
+
+c) Geräte- und Nutzungsdaten
+
+Hierzu zählen insbesondere IP-Adresse, Zeitstempel, technische Header sowie – sofern von dir aktiviert – grobe Standortinformationen.
+
+Die Verarbeitung erfolgt zur:
+
+technischen Auslieferung des Dienstes
+
+Gewährleistung der Systemsicherheit
+
+Missbrauchs- und Betrugsprävention
+
+Fehleranalyse und Stabilitätssicherung
+
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+
+
+---
+
+d) Lokale Speicherung auf deinem Endgerät
+
+Zur Bereitstellung von Offline-Funktionen, Performance-Optimierung und Zuverlässigkeit speichern wir Daten lokal im Browser oder in der App (z. B. IndexedDB, Local Storage, Cache).
+
+Diese Daten verbleiben grundsätzlich auf deinem Endgerät, sofern keine aktive Synchronisierung oder ein Export erfolgt.
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. b und lit. f DSGVO
+
+
+---
+
+e) Kontakt- und Supportanfragen
+
+Wenn du uns kontaktierst, verarbeiten wir die von dir übermittelten Daten zur Bearbeitung deiner Anfrage.
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. b oder lit. f DSGVO
+
+
+---
+
+f) Einwilligungs- und Präferenzeinstellungen
+
+Zur Dokumentation und Umsetzung deiner Entscheidungen (z. B. Datenschutz-, Inhalts- oder Nutzungseinstellungen).
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. c und lit. a DSGVO
+
+
+---
+
+3. Admin-Backend und interne Auswertungen
+
+a) Admin-Backend
+
+Das Admin-Backend ist nicht öffentlich zugänglich und ausschließlich autorisierten Personen vorbehalten.
+Eine Nutzung durch Endnutzer ist ausgeschlossen.
+
+
+---
+
+b) Anonymisierte Nutzungsstatistiken
+
+Im Admin-Bereich werden anonymisierte statistische Auswertungen darüber gespeichert, wie häufig einzelne Backend-Routen aufgerufen werden.
+
+Diese Daten:
+
+sind vollständig anonymisiert
+
+enthalten keine IP-Adressen oder Nutzerkennungen
+
+lassen keine Rückschlüsse auf einzelne Personen zu
+
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+
+
+---
+
+c) Server- und Systemprotokolle (Logs)
+
+Server-Logdateien werden maximal 7 Tage gespeichert und anschließend automatisch gelöscht.
+
+Logeinträge, die an das Admin-Backend übermittelt werden, werden maximal 2 Tage aufbewahrt.
+
+
+Die Speicherung erfolgt ausschließlich zu Zwecken der Sicherheit, Fehleranalyse und Missbrauchsprävention.
+
+Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+
+
+---
+
+4. Einbindung externer Dienste (ergänzt)
+
+Zur Bereitstellung einzelner Funktionen und zur Sicherheit binden wir externe Dienste ein:
+
+Wetter- und Luftqualitätsdaten: Open-Meteo
+
+Übersetzungen: DeepL
+
+Geokodierung: Nominatim / OpenStreetMap
+© OpenStreetMap-Mitwirkende
+
+Medien-Einbettungen (optional): YouTube, TikTok, Pinterest, Tenor, Spotify
+
+
+Inhaltsmoderation (KI)
+
+Zur Erkennung und Moderation potenziell rechtswidriger oder regelwidriger öffentlicher Inhalte setzen wir eine externe KI-gestützte Moderationslösung (z. B. OpenAI) ein.
+
+Hierbei können insbesondere übermittelt werden:
+
+der zu prüfende Textinhalt
+
+technisch notwendige Kontextinformationen (z. B. Sprache/Locale)
+
+
+Die Verarbeitung erfolgt zur Missbrauchsprävention, Sicherheit und Durchsetzung von Plattform-Regeln.
+
+Rechtsgrundlage:
+Art. 6 Abs. 1 lit. f DSGVO
+ggf. Art. 6 Abs. 1 lit. c DSGVO (gesetzliche Verpflichtungen)
+
+Sofern Daten außerhalb des Europäischen Wirtschaftsraums verarbeitet werden, erfolgt dies unter Einhaltung geeigneter Garantien (z. B. Standardvertragsklauseln gemäß Art. 46 DSGVO).
+
+
+---
+
+5. Cookies und vergleichbare Technologien
+
+Wir verwenden keine Tracking- oder Marketing-Cookies.
+Es kommen ausschließlich technisch notwendige Speichertechnologien zum Einsatz (z. B. Local Storage, IndexedDB, Cache).
+
+Eine Einwilligung ist hierfür nicht erforderlich (§ 25 Abs. 2 TTDSG).
+
+
+---
+
+6. Speicherdauer (präzisiert)
+
+Personenbezogene Daten werden nur so lange gespeichert, wie dies für die jeweiligen Zwecke erforderlich ist oder gesetzliche Verpflichtungen bestehen.
+
+Abweichend davon können DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten gemäß der DSA-Ergänzung dauerhaft gespeichert werden.
+
+---
+
+7. Datensicherheit
+
+Wir setzen angemessene technische und organisatorische Maßnahmen ein, um personenbezogene Daten vor Verlust, Missbrauch oder unbefugtem Zugriff zu schützen.
+Ein vollständiger Schutz kann jedoch nicht garantiert werden.
+
+
+---
+
+8. Weitergabe von Daten
+
+Eine Weitergabe personenbezogener Daten erfolgt nur:
+
+an Auftragsverarbeiter gemäß Art. 28 DSGVO
+
+bei gesetzlicher Verpflichtung
+
+oder soweit dies zur Nutzung einer ausdrücklich gewählten Funktion erforderlich ist
+
+
+
+---
+
+9. Datenübermittlung in Drittstaaten
+
+Sofern Daten außerhalb des Europäischen Wirtschaftsraums verarbeitet werden, erfolgt dies nur unter Einhaltung der gesetzlichen Vorgaben (z. B. Standardvertragsklauseln gemäß Art. 46 DSGVO) oder aufgrund deiner ausdrücklichen Nutzung der entsprechenden Funktion.
+
+
+---
+
+10. Rechte der betroffenen Personen
+
+Du hast das Recht auf:
+
+Auskunft (Art. 15 DSGVO)
+
+Berichtigung (Art. 16 DSGVO)
+
+Löschung (Art. 17 DSGVO)
+
+Einschränkung der Verarbeitung (Art. 18 DSGVO)
+
+Datenübertragbarkeit (Art. 20 DSGVO)
+
+Widerspruch gegen Verarbeitungen nach Art. 6 Abs. 1 lit. f DSGVO (Art. 21 DSGVO)
+
+
+Erteilte Einwilligungen kannst du jederzeit mit Wirkung für die Zukunft widerrufen.
+
+
+---
+
+11. Mindestalter
+
+Der Dienst richtet sich nicht an Personen unter 16 Jahren gemäß Art. 8 DSGVO.
+
+
+---
+
+12. Keine Notfalldienste
+
+Der Dienst stellt keinen Ersatz für Notfalldienste dar und bietet keinen Zugang zu solchen Diensten.
+
+
+---
+
+13. Änderungen der Datenschutzerklärung
+
+Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen.
+Es gilt stets die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
+
+
+---
+
+ERGÄNZUNG ZUR DATENSCHUTZERKLÄRUNG
+
+Digital Services Act (DSA)
+
+Stand: 14. Dezember 2025
+
+
+---
+
+1. Anwendungsbereich
+
+Diese Ergänzung gilt für alle Verarbeitungen personenbezogener Daten im Zusammenhang mit Meldungen rechtswidriger Inhalte, Moderationsmaßnahmen, Entscheidungen und Beschwerden gemäß dem Digital Services Act (DSA).
+
+
+---
+
+2. Meldungen rechtswidriger Inhalte (Notices)
+
+Bei Abgabe einer Meldung verarbeiten wir insbesondere:
+
+Angaben zum gemeldeten Inhalt
+
+Zeitpunkt der Meldung
+
+freiwillig übermittelte Begründungen
+
+freiwillig angegebene Kontaktdaten (Name, E-Mail-Adresse)
+
+
+Die Angabe von Name und E-Mail-Adresse ist freiwillig und dient der Kommunikation im Rahmen des Verfahrens.
+
+Rechtsgrundlage:
+Art. 6 Abs. 1 lit. c DSGVO
+Art. 6 Abs. 1 lit. f DSGVO
+
+
+---
+
+3. Öffentliche Fallseite
+
+Für jeden DSA-relevanten Vorgang kann eine öffentlich zugängliche Fallseite bereitgestellt werden.
+
+Diese dient:
+
+dem meldenden Nutzer
+
+dem betroffenen Nutzer (Beschuldigter)
+
+zuständigen Behörden
+
+
+Auf der Fallseite können insbesondere angezeigt werden:
+
+Informationen zum gemeldeten Inhalt
+
+Verfahrensstatus
+
+getroffene Entscheidungen
+
+Begründungen gemäß DSA
+
+
+Die Veröffentlichung erfolgt ausschließlich im Rahmen der gesetzlichen Transparenzpflichten.
+
+
+---
+
+4. Moderationsentscheidungen und dauerhafte Speicherung
+
+Moderationsentscheidungen, Begründungen, Verfahrensschritte und zugehörige Metadaten werden dauerhaft gespeichert, sofern dies zur Erfüllung der gesetzlichen Dokumentations-, Nachweis- und Rechenschaftspflichten nach dem Digital Services Act erforderlich ist.
+
+Eine automatische Löschung dieser Daten erfolgt nicht.
+
+Rechtsgrundlage:
+Art. 6 Abs. 1 lit. c DSGVO
+Art. 6 Abs. 1 lit. f DSGVO
+
+
+---
+
+5. Beschwerden und Rechtsbehelfe (Appeals)
+
+Bei Einlegung einer Beschwerde verarbeiten wir die hierfür übermittelten Daten zur Durchführung und Dokumentation des Verfahrens.
+
+Die Daten werden über den Abschluss des Verfahrens hinaus gespeichert, soweit dies gesetzlich erforderlich ist.
+
+
+---
+
+6. Export und Weitergabe an Behörden
+
+Für zuständige Behörden besteht eine Exportmöglichkeit relevanter Verfahrensdaten zur Erfüllung gesetzlicher Auskunfts- und Mitwirkungspflichten.
+
+Die Weitergabe erfolgt ausschließlich im rechtlich zulässigen Rahmen.
+
+
+---
+
+7. Zugriffsbeschränkung
+
+DSA-relevante Daten sind ausschließlich autorisierten Personen im internen Admin- und Moderationsbereich zugänglich.

@@ -23,7 +23,7 @@ import { AppService } from '../../../services/app.service';
 })
 export class PrivacyPolicyComponent implements OnInit {
   accepted = false;
-  readonly url = new URL('assets/legal/privacy-policy.txt', document.baseURI).toString();
+  readonly url = new URL('assets/legal/privacy-policy-de.txt', document.baseURI).toString();
 
   readonly text = signal<string>('');
   readonly loading = signal<boolean>(true);

@@ -1,0 +1,175 @@
+HAFTUNGSHINWEIS (DISCLAIMER)
+
+Stand: 14. Dezember 2025
+
+
+---
+
+Kurzfassung (nicht rechtsverbindlich)
+
+MessageDrop wird mit Sorgfalt betrieben, eine dauerhafte Verfügbarkeit oder Fehlerfreiheit kann jedoch nicht garantiert werden.
+
+Für nutzergenerierte Inhalte sowie Inhalte und Dienste Dritter übernehmen wir keine Verantwortung; gemeldete rechtswidrige Inhalte werden nach Kenntniserlangung geprüft und entfernt.
+
+Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
+
+Bestimmte Daten werden lokal auf deinem Gerät gespeichert und können jederzeit verloren gehen; hierfür übernehmen wir keine Haftung.
+
+MessageDrop bietet keinen Zugang zu Notfalldiensten.
+
+
+Maßgeblich ist ausschließlich die nachfolgende vollständige Fassung dieses Haftungshinweises.
+
+
+---
+
+1. Geltungsbereich
+
+Dieser Haftungshinweis gilt für die Nutzung der Website und der App „MessageDrop“ (messagedrop.de) der
+JackTools.Net UG (haftungsbeschränkt), Im Kirchfeld 27, 38304 Wolfenbüttel, Deutschland
+(im Folgenden „wir“ oder „Anbieter“).
+
+
+---
+
+2. Verfügbarkeit
+
+Wir bemühen uns um eine zuverlässige Bereitstellung des Dienstes.
+Aus technischen oder sonstigen Gründen kann es jedoch zu Einschränkungen, Unterbrechungen oder Ausfällen kommen.
+Ein bestimmter Grad an Verfügbarkeit wird nicht zugesichert.
+
+
+---
+
+3. Inhalte – eigene Inhalte, nutzergenerierte Inhalte und Inhalte Dritter
+
+a) Eigene Inhalte
+
+Unsere eigenen Inhalte werden mit der gebotenen Sorgfalt erstellt.
+Wir übernehmen jedoch keine Gewähr für Richtigkeit, Vollständigkeit oder Aktualität.
+
+
+---
+
+b) Nutzergenerierte Inhalte (User Generated Content – UGC)
+
+Nutzer können Inhalte erstellen und veröffentlichen.
+Wir setzen automatisierte Verfahren (einschließlich KI-gestützter Erkennung) ein, führen jedoch keine umfassende Vorabkontrolle sämtlicher Inhalte durch.
+
+Inhalte können gemeldet werden. Zusätzlich kann eine „Verbergen“-Funktion Inhalte global unsichtbar machen, d. h. sie sind für alle Nutzer nicht mehr sichtbar.
+Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich und entfernen oder sperren entsprechende Inhalte nach Kenntniserlangung („Notice-and-Takedown“).
+
+
+---
+
+c) Informationen und Dienste Dritter
+
+Einzelne Funktionen basieren auf externen Diensten, insbesondere:
+
+Wetter- und Luftqualitätsdaten von Open-Meteo
+
+Übersetzungen über DeepL
+
+Orts- und Reverse-Geokodierung über Nominatim / OpenStreetMap
+
+
+Trotz sorgfältiger Auswahl kann es zu Abweichungen, Ausfällen, Quoten- oder Ratenbegrenzungen sowie API-Änderungen kommen.
+Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit, Verfügbarkeit oder Aktualität dieser Inhalte und Dienste.
+Es gelten die jeweiligen Nutzungs- und Lizenzbedingungen der Anbieter.
+Hinweis: Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) werden bereitgestellt.
+
+
+---
+
+4. Einbettungen und externe Anbieter
+
+(YouTube, Pinterest, TikTok, Tenor, Spotify)
+
+Externe Medien (z. B. YouTube-Videos, TikTok-Clips, Pinterest-Pins, Tenor-GIFs, Spotify-Inhalte) werden von Nutzern eingebettet.
+Für diese Inhalte ist ausschließlich der jeweilige Anbieter verantwortlich.
+
+Beim Aktivieren bzw. Anzeigen solcher Inhalte können Daten (z. B. IP-Adresse, Nutzungsdaten) an den jeweiligen Anbieter übermittelt werden; es gelten dessen Nutzungs- und Datenschutzbestimmungen.
+In der App können externe Inhalte anbieterbezogen aktiviert oder deaktiviert werden.
+
+
+---
+
+5. Externe Links
+
+Unser Dienst kann Links zu externen Webseiten enthalten.
+Auf deren Inhalte haben wir keinen Einfluss; verantwortlich ist stets der jeweilige Betreiber.
+
+Zum Zeitpunkt der Verlinkung wurden die Inhalte auf mögliche Rechtsverstöße geprüft.
+Eine permanente inhaltliche Kontrolle ist ohne konkrete Anhaltspunkte nicht zumutbar.
+Bei Bekanntwerden von Rechtsverstößen entfernen wir entsprechende Links unverzüglich.
+
+
+---
+
+6. Urheberrecht
+
+Sofern Inhalte nicht von uns erstellt wurden, beachten wir die Rechte Dritter und kennzeichnen entsprechende Inhalte.
+Solltest du eine Urheber- oder Rechtsverletzung vermuten, bitten wir um einen Hinweis an jacktoolsnet@gmail.com.
+Bei berechtigter Beanstandung entfernen wir die Inhalte unverzüglich.
+
+
+---
+
+7. Datenschutzhinweis
+
+Informationen zur Verarbeitung personenbezogener Daten findest du in unserer Datenschutzerklärung.
+Dieser Haftungshinweis stellt keine Datenschutzerklärung dar.
+
+
+---
+
+8. Kein Zugang zu Notfalldiensten
+
+Unsere Website/App bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
+
+
+---
+
+9. Lokale Datenspeicherung (z. B. IndexedDB) und Datenverlust
+
+Unsere App speichert bestimmte Daten lokal auf deinem Endgerät bzw. im Browser (z. B. IndexedDB, Local/Session Storage oder App-Cache), um Offline- oder Stabilitätsfunktionen zu ermöglichen.
+Diese lokalen Daten sind geräte- und browserabhängig und werden nicht automatisch mit anderen Geräten oder einer Cloud synchronisiert (sofern nicht ausdrücklich angegeben).
+
+Lokale Daten können jederzeit verloren gehen oder gelöscht werden, unter anderem durch:
+
+manuelles Löschen von Website-/App- oder Browserdaten
+
+Nutzung des privaten/Inkognito-Modus
+
+automatische Speicherbereinigung durch Browser oder Betriebssystem
+
+Speicher- oder Quotenbegrenzungen, Profil- oder Browserwechsel
+
+Deinstallation/Neuinstallation (z. B. PWA) oder System-/Browser-Updates
+
+
+Soweit gesetzlich zulässig, übernehmen wir keine Haftung für Verlust, Beschädigung oder Nichtverfügbarkeit lokal gespeicherter Daten sowie für daraus resultierende Schäden.
+Sofern verfügbar, nutze bitte Export- oder Backup-Funktionen und bewahre Sicherungen außerhalb des Geräts auf.
+
+
+---
+
+10. Backend-Verfügbarkeit, Wartung und serverseitiger Datenverlust
+
+Unser Backend wird mit angemessener Sorgfalt betrieben und überwacht.
+Dennoch können Störungen auftreten, z. B. durch geplante oder ungeplante Wartungen, Infrastruktur- oder Provider-Ausfälle, Netzwerkprobleme, Sicherheitsereignisse (z. B. DDoS), Software- oder Datenbank-Updates oder höhere Gewalt.
+
+Eine bestimmte Verfügbarkeit oder Wiederherstellungszeit wird nicht garantiert.
+Wir erstellen in angemessenen Abständen Backups; dennoch kann es im Ereignisfall zu Datenverlusten (z. B. zwischen letztem Backup und Ereigniszeitpunkt) oder vorübergehenden Funktionseinschränkungen kommen.
+Eine lückenlose Wiederherstellung zu jedem Zeitpunkt kann nicht zugesichert werden.
+
+Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, entgangenen Gewinn, Datenverlust oder Folgeschäden infolge von Backend-Störungen.
+Ansprüche aufgrund von Vorsatz oder grober Fahrlässigkeit sowie zwingende gesetzliche Haftung bleiben unberührt.
+
+
+---
+
+11. Änderungen
+
+Wir behalten uns vor, diesen Haftungshinweis jederzeit zu ändern.
+Es gilt die jeweils veröffentlichte Fassung.

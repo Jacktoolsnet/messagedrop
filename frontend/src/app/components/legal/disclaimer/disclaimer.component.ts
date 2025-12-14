@@ -23,7 +23,7 @@ import { AppService } from '../../../services/app.service';
 })
 export class DisclaimerComponent implements OnInit {
   accepted = false;
-  readonly url = new URL('assets/legal/disclaimer.txt', document.baseURI).toString();
+  readonly url = new URL('assets/legal/disclaimer-de.txt', document.baseURI).toString();
 
   readonly text = signal<string>('');
   readonly loading = signal<boolean>(true);

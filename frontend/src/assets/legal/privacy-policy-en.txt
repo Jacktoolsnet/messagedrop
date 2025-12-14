@@ -1,0 +1,395 @@
+PRIVACY POLICY (ENGLISH TRANSLATION)
+
+Last updated: 14 December 2025
+
+
+---
+
+Important notice
+
+This English version is provided for convenience only.
+The German version (“Datenschutzerklärung”) is the legally binding version.
+In the event of any discrepancies, the German text shall prevail.
+
+
+---
+
+Summary (non-binding)
+
+Personal data is processed to provide, secure, and moderate MessageDrop.
+
+Public content may be reviewed automatically, including through AI-assisted moderation.
+
+Technically necessary data (e.g., IP address, logs) is processed for security purposes and deleted promptly.
+
+Certain data is stored locally on your device.
+
+External services receive data only to the extent necessary for the respective feature.
+
+DSA-related moderation and procedure data may be stored permanently.
+
+Only the full Privacy Policy below, including the DSA addendum, is legally relevant.
+
+
+---
+
+1. Controller under the GDPR
+
+The controller within the meaning of Art. 4(7) GDPR is:
+
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Germany
+
+Email: jacktoolsnet@gmail.com
+Phone: +49 (0) 176 / 41 23 57 74
+
+This Privacy Policy applies to MessageDrop (messagedrop.de), the associated mobile applications and Progressive Web Apps (PWA), as well as internal admin and moderation interfaces.
+
+
+---
+
+2. Subject matter and purposes of processing personal data
+
+We process personal data solely in accordance with the General Data Protection Regulation (GDPR), the Digital Services Act (DSA), and applicable national data protection laws.
+
+a) Account and profile data (if provided voluntarily)
+
+To provide the service’s features, display user-generated content, and technically administer the user account.
+
+Legal basis: Art. 6(1)(b) GDPR
+
+
+---
+
+b) User-generated content (as amended)
+
+Posts, comments, attachments, embedded content, and related metadata are processed in order to provide the platform, display content, moderate content, and protect against misuse.
+
+For moderation purposes, automated procedures including AI-assisted detection may be used.
+
+Legal basis: Art. 6(1)(b) and Art. 6(1)(f) GDPR
+
+
+---
+
+c) Device and usage data
+
+This includes in particular IP address, timestamps, technical headers, and—if enabled by you—coarse location information.
+
+Processing is carried out for:
+
+technical delivery of the service
+
+ensuring system security
+
+abuse and fraud prevention
+
+error analysis and stability assurance
+
+
+Legal basis: Art. 6(1)(f) GDPR
+
+
+---
+
+d) Local storage on your device
+
+To provide offline features, performance optimization, and reliability, we store data locally in the browser or the app (e.g., IndexedDB, local storage, cache).
+
+This data generally remains on your device unless active synchronization or export takes place.
+
+Legal basis: Art. 6(1)(b) and Art. 6(1)(f) GDPR
+
+
+---
+
+e) Contact and support requests
+
+If you contact us, we process the data you provide to handle your request.
+
+Legal basis: Art. 6(1)(b) or Art. 6(1)(f) GDPR
+
+
+---
+
+f) Consent and preference settings
+
+To document and implement your choices (e.g., privacy, content, or usage settings).
+
+Legal basis: Art. 6(1)(c) and Art. 6(1)(a) GDPR
+
+
+---
+
+3. Admin backend and internal evaluations
+
+a) Admin backend
+
+The admin backend is not publicly accessible and is restricted to authorized persons only.
+Use by end users is excluded.
+
+
+---
+
+b) Anonymized usage statistics
+
+Within the admin area, anonymized statistical evaluations are stored regarding how often individual backend routes are accessed.
+
+This data:
+
+is fully anonymized
+
+does not contain IP addresses or user identifiers
+
+does not allow conclusions to be drawn about individual persons
+
+
+Legal basis: Art. 6(1)(f) GDPR
+
+
+---
+
+c) Server and system logs
+
+Server log files are stored for a maximum of 7 days and then automatically deleted.
+
+Log entries transmitted to the admin backend are stored for a maximum of 2 days.
+
+Storage is carried out exclusively for security, error analysis, and abuse prevention purposes.
+
+Legal basis: Art. 6(1)(f) GDPR
+
+
+---
+
+4. Integration of external services (as amended)
+
+To provide certain functions and for security purposes, we integrate external services:
+
+Weather and air quality data: Open-Meteo
+
+Translations: DeepL
+
+Geocoding: Nominatim / OpenStreetMap
+© OpenStreetMap contributors
+
+Media embeds (optional): YouTube, TikTok, Pinterest, Tenor, Spotify
+
+
+Content moderation (AI)
+
+To detect and moderate potentially unlawful or policy-violating public content, we use an external AI-assisted moderation solution (e.g., OpenAI).
+
+In particular, the following may be transmitted:
+
+the text content to be reviewed
+
+technically necessary context information (e.g., language/locale)
+
+
+Processing is carried out for abuse prevention, security, and enforcement of platform rules.
+
+Legal basis:
+Art. 6(1)(f) GDPR
+where applicable Art. 6(1)(c) GDPR (statutory obligations)
+
+If data is processed outside the European Economic Area (EEA), this is done in compliance with applicable requirements and subject to appropriate safeguards (e.g., Standard Contractual Clauses under Art. 46 GDPR).
+
+
+---
+
+5. Cookies and similar technologies
+
+We do not use tracking or marketing cookies.
+Only technically necessary storage technologies are used (e.g., local storage, IndexedDB, cache).
+
+Consent is not required for this (§ 25(2) TTDSG).
+
+
+---
+
+6. Retention period (as specified)
+
+Personal data is stored only as long as necessary for the respective purposes or as required by legal obligations.
+
+By way of exception, DSA-related moderation, decision, and procedure data may be stored permanently in accordance with the DSA addendum.
+
+
+---
+
+7. Data security
+
+We implement appropriate technical and organizational measures to protect personal data against loss, misuse, or unauthorized access.
+However, complete protection cannot be guaranteed.
+
+
+---
+
+8. Sharing of data
+
+Personal data is shared only:
+
+with processors pursuant to Art. 28 GDPR
+
+where required by law
+
+or insofar as this is necessary to use an explicitly selected feature
+
+
+
+---
+
+9. International data transfers
+
+If data is processed outside the EEA, this is carried out only in compliance with applicable legal requirements (e.g., Standard Contractual Clauses under Art. 46 GDPR) or due to your explicit use of the relevant feature.
+
+
+---
+
+10. Rights of data subjects
+
+You have the right to:
+
+access (Art. 15 GDPR)
+
+rectification (Art. 16 GDPR)
+
+erasure (Art. 17 GDPR)
+
+restriction of processing (Art. 18 GDPR)
+
+data portability (Art. 20 GDPR)
+
+object to processing based on Art. 6(1)(f) GDPR (Art. 21 GDPR)
+
+
+You may withdraw any consent you have given at any time with effect for the future.
+
+
+---
+
+11. Minimum age
+
+The service is not directed to persons under 16 years of age pursuant to Art. 8 GDPR.
+
+
+---
+
+12. No emergency services
+
+The service does not replace emergency services and does not provide access to such services.
+
+
+---
+
+13. Changes to this Privacy Policy
+
+We reserve the right to amend this Privacy Policy as necessary.
+The version published at the time shall apply.
+
+
+---
+
+ADDENDUM TO THE PRIVACY POLICY
+
+Digital Services Act (DSA)
+
+Last updated: 14 December 2025
+
+
+---
+
+1. Scope
+
+This addendum applies to all processing of personal data in connection with notices of unlawful content, moderation measures, decisions, and complaints pursuant to the Digital Services Act (DSA).
+
+
+---
+
+2. Notices of unlawful content (Notices)
+
+When submitting a notice, we process in particular:
+
+information about the reported content
+
+time of the notice
+
+voluntarily provided reasoning
+
+voluntarily provided contact details (name, email address)
+
+
+Providing name and email address is voluntary and serves communication within the procedure.
+
+Legal basis:
+Art. 6(1)(c) GDPR
+Art. 6(1)(f) GDPR
+
+
+---
+
+3. Public case page
+
+For each DSA-relevant procedure, a publicly accessible case page may be provided.
+
+It is intended for:
+
+the reporting user
+
+the affected user (accused)
+
+competent authorities
+
+
+In particular, the following may be displayed on the case page:
+
+information about the reported content
+
+procedural status
+
+decisions taken
+
+reasons pursuant to the DSA
+
+
+Publication is carried out exclusively within the scope of statutory transparency obligations.
+
+
+---
+
+4. Moderation decisions and permanent storage
+
+Moderation decisions, reasons, procedural steps, and related metadata are stored permanently insofar as this is required to fulfill statutory documentation, evidence, and accountability obligations under the Digital Services Act.
+
+No automatic deletion of this data takes place.
+
+Legal basis:
+Art. 6(1)(c) GDPR
+Art. 6(1)(f) GDPR
+
+
+---
+
+5. Complaints and legal remedies (Appeals)
+
+If a complaint is filed, we process the data provided for the implementation and documentation of the procedure.
+
+The data is stored beyond completion of the procedure insofar as this is legally required.
+
+
+---
+
+6. Export and disclosure to authorities
+
+Competent authorities may be provided with an export option for relevant procedure data to fulfill statutory information and cooperation obligations.
+
+Disclosure is carried out exclusively within the legally permissible framework.
+
+
+---
+
+7. Access restrictions
+
+DSA-relevant data is accessible only to authorized persons within the internal admin and moderation area.
