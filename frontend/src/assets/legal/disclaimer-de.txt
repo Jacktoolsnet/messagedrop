@@ -1,175 +1,249 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
-
 Stand: 14. Dezember 2025
-
-
----
 
 Kurzfassung (nicht rechtsverbindlich)
 
-MessageDrop wird mit Sorgfalt betrieben, eine dauerhafte Verfügbarkeit oder Fehlerfreiheit kann jedoch nicht garantiert werden.
+MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
-Für nutzergenerierte Inhalte sowie Inhalte und Dienste Dritter übernehmen wir keine Verantwortung; gemeldete rechtswidrige Inhalte werden nach Kenntniserlangung geprüft und entfernt.
+Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind. Der Dienst richtet sich nicht an Kinder unter 16 Jahren. Eine Nutzung durch Personen unter 16 Jahren ist nicht vorgesehen und nicht zulässig.
 
-Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
+Soweit technisch möglich, speichert MessageDrop Daten lokal auf dem Endgerät des Nutzers (IndexedDB), um einen hohen Datenschutzstandard und Datenminimierung zu gewährleisten. Lokal gespeicherte Daten können verloren gehen.
 
-Bestimmte Daten werden lokal auf deinem Gerät gespeichert und können jederzeit verloren gehen; hierfür übernehmen wir keine Haftung.
+Öffentliche Inhalte werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, bei denen ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt. Rechtswidrige Inhalte werden nach Kenntniserlangung entfernt oder gesperrt.
+
+Private Chatnachrichten werden verschlüsselt und signiert übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
+
+Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden ausschließlich auf Wunsch der Nutzer eingebunden bzw. angezeigt und unterliegen den Bedingungen der jeweiligen Anbieter.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
-
 
 Maßgeblich ist ausschließlich die nachfolgende vollständige Fassung dieses Haftungshinweises.
 
 
----
-
 1. Geltungsbereich
 
-Dieser Haftungshinweis gilt für die Nutzung der Website und der App „MessageDrop“ (messagedrop.de) der
-JackTools.Net UG (haftungsbeschränkt), Im Kirchfeld 27, 38304 Wolfenbüttel, Deutschland
+Dieser Haftungshinweis gilt für die Nutzung der Web-App „MessageDrop“ (messagedrop.de) der
+
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
+
 (im Folgenden „wir“ oder „Anbieter“).
 
 
----
+2. Mindestalter und Zulässigkeit der Nutzung
 
-2. Verfügbarkeit
+Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
-Wir bemühen uns um eine zuverlässige Bereitstellung des Dienstes.
-Aus technischen oder sonstigen Gründen kann es jedoch zu Einschränkungen, Unterbrechungen oder Ausfällen kommen.
-Ein bestimmter Grad an Verfügbarkeit wird nicht zugesichert.
+Der Dienst richtet sich ausdrücklich nicht an Kinder unter 16 Jahren. Eine Nutzung durch Personen unter 16 Jahren ist nicht vorgesehen, nicht erwünscht und nicht zulässig.
+
+Mit der Nutzung von MessageDrop bestätigt der Nutzer, dass er das 16. Lebensjahr vollendet hat.
+
+Sollten wir Kenntnis davon erlangen, dass MessageDrop von Personen unter 16 Jahren genutzt wird, behalten wir uns vor, entsprechende Zugriffe oder Nutzungen zu unterbinden und gegebenenfalls angelegte Nutzer zu deaktivieren oder zu löschen.
+
+Eine besondere Ansprache, Ausrichtung oder Verarbeitung personenbezogener Daten von Kindern im Sinne der DSGVO findet nicht statt.
 
 
----
+3. Nutzung ohne eigenen Nutzer (Basisnutzung)
 
-3. Inhalte – eigene Inhalte, nutzergenerierte Inhalte und Inhalte Dritter
+MessageDrop kann grundsätzlich auch ohne Anlage eines Nutzers verwendet werden.
 
-a) Eigene Inhalte
+Im Rahmen dieser Basisnutzung können insbesondere:
+- öffentliche Inhalte gelesen werden, soweit diese verfügbar sind
+- externe Inhalte (z. B. YouTube, TikTok, Pinterest, Spotify, Tenor) in den Einstellungen anbieterbezogen aktiviert oder deaktiviert werden
+
+Auch im Rahmen der Basisnutzung gilt das Mindestalter von 16 Jahren uneingeschränkt.
+
+Wenn externe Inhalte aktiviert werden, können personenbezogene Daten (z. B. IP-Adresse, Geräte- und Nutzungsinformationen) an den jeweiligen Anbieter übermittelt werden. Es gelten die Nutzungs- und Datenschutzbestimmungen des jeweiligen Anbieters.
+
+
+4. Nutzeranlage und Funktionen mit Nutzer
+
+4.1 Nutzeranlage und PIN-basierte Anmeldung
+
+Sofern ein Nutzer freiwillig einen Nutzer anlegt, ist hierfür ausschließlich die Vergabe eines PINs erforderlich.
+
+Beim Anlegen des Nutzers wird serverseitig:
+- eine eindeutige User-ID erzeugt,
+- ein Nutzerstatus (z. B. enabled oder disabled) geführt,
+- das Datum des letzten Logins gespeichert,
+- sowie kryptografische Schlüssel erzeugt, die für die Verschlüsselung und Signierung im Rahmen des Login-Prozesses erforderlich sind.
+
+Darüber hinaus erzeugt das lokale Endgerät des Nutzers eigene kryptografische Schlüssel (Verschlüsselungs- und Signaturschlüssel), die ausschließlich für die private Kommunikation (z. B. verschlüsselte Chaträume) verwendet werden.
+
+Die vollständigen Nutzerdaten werden ausschließlich verschlüsselt auf dem Endgerät des Nutzers gespeichert.
+Der vom Nutzer vergebene PIN ist integraler Bestandteil dieses verschlüsselten Nutzerdatensatzes und wird nicht separat gespeichert.
+
+Zum Anmeldevorgang wird der verschlüsselte Nutzer temporär an das Backend übertragen, dort ausschließlich für die Dauer der Prüfung entschlüsselt, um zu überprüfen, ob der eingegebene PIN korrekt ist.
+Eine dauerhafte Speicherung der entschlüsselten Nutzerdaten oder des PINs auf dem Server erfolgt nicht.
+
+Nach erfolgreicher Anmeldung wird der entschlüsselte Nutzer ausschließlich im Arbeitsspeicher des Endgeräts vorgehalten und bleibt dort nur bis zum Logout oder bis zum Schließen der App verfügbar.
+
+Wird der PIN vergessen, besteht keine Möglichkeit, den Nutzer, den PIN oder die lokal gespeicherten Nutzerdaten wiederherzustellen, da weder der PIN noch eine entschlüsselbare Kopie der Nutzerdaten serverseitig vorgehalten werden.
+
+Nutzer, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden aus dem Backend entfernt.
+In diesem Fall ist eine weitere Anmeldung mit diesen Nutzerdaten nicht mehr möglich.
+
+
+
+4.2 Lokale Speicherung, Datenminimierung und Risiko des Datenverlustes
+
+MessageDrop ist nach dem Grundsatz der Datenminimierung und des Datenschutzes durch Technikgestaltung konzipiert.
+
+Soweit technisch möglich, speichert die App Daten ausschließlich lokal auf dem Endgerät des Nutzers, insbesondere in der IndexedDB des Browsers. Ziel ist es, einen möglichst hohen Datenschutzstandard zu gewährleisten und die Speicherung personenbezogener Daten auf unseren Servern auf das notwendige Minimum zu beschränken.
+
+Die lokal gespeicherten Daten dienen insbesondere:
+- Offline-Funktionen
+- Performance-Optimierung
+- Stabilität der Anwendung
+
+Diese Daten sind geräte- und browserabhängig und werden nicht automatisch mit anderen Geräten oder einer Cloud synchronisiert.
+
+Lokale Daten können jederzeit verloren gehen oder gelöscht werden, unter anderem durch:
+- manuelles Löschen von Website-, App- oder Browserdaten
+- Nutzung des privaten bzw. Inkognito-Modus
+- automatische Speicherbereinigung durch Browser oder Betriebssystem
+- Speicher- oder Quotenbegrenzungen sowie Profil- oder Browserwechsel
+- Deinstallation oder Neuinstallation (z. B. als PWA) oder System- bzw. Browser-Updates
+
+Soweit gesetzlich zulässig, übernehmen wir keine Haftung für den Verlust, die Beschädigung oder die Nichtverfügbarkeit lokal gespeicherter Daten.
+
+
+4.3 Öffentliche Inhalte erstellen und veröffentlichen
+
+Nutzer können Inhalte erstellen und öffentlich veröffentlichen, sofern sie mindestens 16 Jahre alt sind.
+
+Nutzer dürfen ausschließlich solche Inhalte öffentlich erstellen, hochladen oder einbinden, die rechtmäßig sind und weder gegen geltendes Recht noch gegen die Nutzungsbedingungen verstoßen.
+
+Insbesondere dürfen nur Inhalte veröffentlicht werden, an denen der Nutzer die erforderlichen Rechte besitzt oder über die erforderlichen Nutzungs- oder Lizenzrechte verfügt.
+
+Unzulässig sind insbesondere Inhalte, die:
+- gegen geltendes Recht verstoßen
+- Rechte Dritter verletzen (z. B. Urheber-, Persönlichkeits-, Marken- oder Datenschutzrechte)
+- strafbare Inhalte darstellen oder fördern
+- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten
+- diskriminierend, extremistisch oder menschenverachtend sind
+- irreführende, betrügerische oder manipulative Inhalte enthalten
+- Schadsoftware, Spam oder missbräuchliche Automatisierungen beinhalten
+- offensichtlich aus rechtswidrigen oder nicht autorisierten Quellen stammen
+
+Die Aufzählung ist nicht abschließend.
+
+Zur Unterstützung der Moderation setzen wir automatisierte Verfahren ein, einschließlich KI-gestützter Erkennung. Eine umfassende oder permanente Vorabkontrolle sämtlicher Inhalte findet jedoch nicht statt.
+
+
+4.4 Mit anderen Nutzern verbinden und private Kommunikation
+
+MessageDrop ermöglicht es Nutzern, sich miteinander zu verbinden und Kontakte zu verwalten.
+
+Zu Kontakten können zusätzliche Eigenschaften hinterlegt werden. Diese Informationen werden grundsätzlich lokal auf dem Endgerät gespeichert.
+
+MessageDrop ermöglicht es zudem, private Chaträume zu nutzen. Private Chatnachrichten werden verschlüsselt und signiert übertragen. Der Inhalt dieser privaten Kommunikation ist für uns grundsätzlich nicht im Klartext einsehbar.
+
+Für Inhalte in privaten Chats sind ausschließlich die beteiligten Nutzer verantwortlich. Eine inhaltliche Vorabprüfung oder laufende Überwachung privater Chatnachrichten findet nicht statt.
+
+Gesetzliche Pflichten zur Mitwirkung bei rechtmäßigen Anfragen von Behörden bleiben unberührt.
+
+
+4.5 Plätze auf der Weltkarte
+
+Nutzer können sogenannte Plätze definieren.
+
+Ein Platz beschreibt ein rechteckiges Gebiet auf der Weltkarte, dem ein Name sowie weitere Eigenschaften zugeordnet werden können.
+
+Der vom Nutzer vergebene Name eines Platzes wird aus technischen Gründen serverseitig gespeichert. Weitere Eigenschaften oder Metadaten werden lokal auf dem Endgerät gespeichert.
+
+Für die Rechtmäßigkeit der vergebenen Bezeichnungen und Inhalte ist ausschließlich der jeweilige Nutzer verantwortlich.
+
+
+4.6 Lokale Bilder und Datei-Verweise
+
+Nutzer können Bilder von ihrem Endgerät auf der Karte platzieren.
+
+Dabei wird das jeweilige Bild nicht auf unsere Server hochgeladen und nicht dauerhaft in die App importiert.
+Stattdessen wird ausschließlich ein lokaler Datei-Verweis gespeichert, der auf die Bilddatei auf dem Endgerät des Nutzers verweist.
+
+Die tatsächliche Bilddatei verbleibt vollständig auf dem Endgerät des Nutzers.
+Der Nutzer behält jederzeit die vollständige Hoheit und Kontrolle über seine Bilder.
+Wir haben keinen Zugriff auf die Bilddateien, keine Einsicht in deren Inhalt und keine Möglichkeit, diese zu verändern, zu sichern oder wiederherzustellen.
+
+Wird eine Bilddatei auf dem Endgerät gelöscht, verschoben oder ist aus anderen Gründen nicht mehr verfügbar, kann sie in der App nicht mehr angezeigt werden.
+In diesem Fall bleibt lediglich der lokale Verweis bestehen, ohne dass das Bild geladen werden kann.
+
+Zur Platzierung von Bildern auf der Karte können – sofern vom Nutzer erlaubt und technisch verfügbar – Metadaten der Bilddatei (z. B. EXIF-Daten wie Aufnahmestandort oder Zeitstempel) verwendet werden.
+Diese Auswertung erfolgt ausschließlich lokal auf dem Endgerät des Nutzers.
+
+Ein serverseitiger Zugriff, eine serverseitige Speicherung der Bilddateien oder eine nachträgliche Wiederherstellung durch uns ist ausgeschlossen.
+
+
+5. Verfahren nach dem Digital Services Act (DSA)
+
+Für öffentliche Inhalte kann jederzeit ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch:
+- eine Meldung („Notice“)
+- eine Beschwerde („Appeal“)
+
+Wird ein solches Verfahren eingeleitet, wird der betroffene Inhalt vorübergehend auf den Status „nicht öffentlich sichtbar“ gestellt.
+
+„Nicht öffentlich sichtbar“ bedeutet, dass der Inhalt für andere Nutzer nicht mehr öffentlich angezeigt wird, bis eine inhaltliche Entscheidung im Rahmen des Verfahrens getroffen wurde. Der Inhalt wird in diesem Zustand weder empfohlen noch öffentlich verbreitet.
+
+Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlangung von rechtswidrigen Inhalten entfernen oder sperren wir diese entsprechend den gesetzlichen Vorgaben („Notice-and-Takedown“).
+
+Nach Abschluss des Verfahrens erfolgt – je nach Ergebnis – eine Wiederfreigabe, Einschränkung oder Entfernung des Inhalts.
+
+
+6. Von uns erstellte Inhalte sowie Informationen und Dienste Dritter
+
+6.1 Eigene Inhalte
 
 Unsere eigenen Inhalte werden mit der gebotenen Sorgfalt erstellt.
-Wir übernehmen jedoch keine Gewähr für Richtigkeit, Vollständigkeit oder Aktualität.
+Wir übernehmen jedoch keine Gewähr für deren Richtigkeit, Vollständigkeit oder Aktualität.
 
-
----
-
-b) Nutzergenerierte Inhalte (User Generated Content – UGC)
-
-Nutzer können Inhalte erstellen und veröffentlichen.
-Wir setzen automatisierte Verfahren (einschließlich KI-gestützter Erkennung) ein, führen jedoch keine umfassende Vorabkontrolle sämtlicher Inhalte durch.
-
-Inhalte können gemeldet werden. Zusätzlich kann eine „Verbergen“-Funktion Inhalte global unsichtbar machen, d. h. sie sind für alle Nutzer nicht mehr sichtbar.
-Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich und entfernen oder sperren entsprechende Inhalte nach Kenntniserlangung („Notice-and-Takedown“).
-
-
----
-
-c) Informationen und Dienste Dritter
+6.2 Informationen und Dienste Dritter
 
 Einzelne Funktionen basieren auf externen Diensten, insbesondere:
-
-Wetter- und Luftqualitätsdaten von Open-Meteo
-
-Übersetzungen über DeepL
-
-Orts- und Reverse-Geokodierung über Nominatim / OpenStreetMap
-
+- Wetter- und Luftqualitätsdaten von Open-Meteo
+- Übersetzungen über DeepL
+- Orts- und Reverse-Geokodierung über Nominatim / OpenStreetMap
 
 Trotz sorgfältiger Auswahl kann es zu Abweichungen, Ausfällen, Quoten- oder Ratenbegrenzungen sowie API-Änderungen kommen.
+
 Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit, Verfügbarkeit oder Aktualität dieser Inhalte und Dienste.
-Es gelten die jeweiligen Nutzungs- und Lizenzbedingungen der Anbieter.
-Hinweis: Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) werden bereitgestellt.
+Es gelten zusätzlich die jeweiligen Nutzungs- und Lizenzbedingungen der Anbieter.
 
 
----
+7. Verfügbarkeit, Wartung und serverseitiger Datenverlust
 
-4. Einbettungen und externe Anbieter
+Wir bemühen uns um eine zuverlässige Bereitstellung des Dienstes.
 
-(YouTube, Pinterest, TikTok, Tenor, Spotify)
+Dennoch können Störungen auftreten, z. B. durch Wartungen, Infrastruktur- oder Provider-Ausfälle, Netzwerkprobleme, Sicherheitsereignisse (z. B. DDoS), Software- oder Datenbank-Updates oder höhere Gewalt.
 
-Externe Medien (z. B. YouTube-Videos, TikTok-Clips, Pinterest-Pins, Tenor-GIFs, Spotify-Inhalte) werden von Nutzern eingebettet.
-Für diese Inhalte ist ausschließlich der jeweilige Anbieter verantwortlich.
+Eine bestimmte Verfügbarkeit oder Wiederherstellungszeit wird nicht garantiert.
 
-Beim Aktivieren bzw. Anzeigen solcher Inhalte können Daten (z. B. IP-Adresse, Nutzungsdaten) an den jeweiligen Anbieter übermittelt werden; es gelten dessen Nutzungs- und Datenschutzbestimmungen.
-In der App können externe Inhalte anbieterbezogen aktiviert oder deaktiviert werden.
+Backups werden in angemessenen Abständen erstellt; eine lückenlose Wiederherstellung kann jedoch nicht zugesichert werden.
+
+Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, entgangenen Gewinn, Datenverlust oder Folgeschäden.
+Ansprüche aufgrund von Vorsatz oder grober Fahrlässigkeit bleiben unberührt.
 
 
----
-
-5. Externe Links
+8. Externe Links
 
 Unser Dienst kann Links zu externen Webseiten enthalten.
 Auf deren Inhalte haben wir keinen Einfluss; verantwortlich ist stets der jeweilige Betreiber.
 
 Zum Zeitpunkt der Verlinkung wurden die Inhalte auf mögliche Rechtsverstöße geprüft.
 Eine permanente inhaltliche Kontrolle ist ohne konkrete Anhaltspunkte nicht zumutbar.
+
 Bei Bekanntwerden von Rechtsverstößen entfernen wir entsprechende Links unverzüglich.
 
 
----
-
-6. Urheberrecht
-
-Sofern Inhalte nicht von uns erstellt wurden, beachten wir die Rechte Dritter und kennzeichnen entsprechende Inhalte.
-Solltest du eine Urheber- oder Rechtsverletzung vermuten, bitten wir um einen Hinweis an jacktoolsnet@gmail.com.
-Bei berechtigter Beanstandung entfernen wir die Inhalte unverzüglich.
-
-
----
-
-7. Datenschutzhinweis
-
-Informationen zur Verarbeitung personenbezogener Daten findest du in unserer Datenschutzerklärung.
-Dieser Haftungshinweis stellt keine Datenschutzerklärung dar.
-
-
----
-
-8. Kein Zugang zu Notfalldiensten
+9. Kein Zugang zu Notfalldiensten
 
 Unsere Website/App bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
 
 
----
-
-9. Lokale Datenspeicherung (z. B. IndexedDB) und Datenverlust
-
-Unsere App speichert bestimmte Daten lokal auf deinem Endgerät bzw. im Browser (z. B. IndexedDB, Local/Session Storage oder App-Cache), um Offline- oder Stabilitätsfunktionen zu ermöglichen.
-Diese lokalen Daten sind geräte- und browserabhängig und werden nicht automatisch mit anderen Geräten oder einer Cloud synchronisiert (sofern nicht ausdrücklich angegeben).
-
-Lokale Daten können jederzeit verloren gehen oder gelöscht werden, unter anderem durch:
-
-manuelles Löschen von Website-/App- oder Browserdaten
-
-Nutzung des privaten/Inkognito-Modus
-
-automatische Speicherbereinigung durch Browser oder Betriebssystem
-
-Speicher- oder Quotenbegrenzungen, Profil- oder Browserwechsel
-
-Deinstallation/Neuinstallation (z. B. PWA) oder System-/Browser-Updates
-
-
-Soweit gesetzlich zulässig, übernehmen wir keine Haftung für Verlust, Beschädigung oder Nichtverfügbarkeit lokal gespeicherter Daten sowie für daraus resultierende Schäden.
-Sofern verfügbar, nutze bitte Export- oder Backup-Funktionen und bewahre Sicherungen außerhalb des Geräts auf.
-
-
----
-
-10. Backend-Verfügbarkeit, Wartung und serverseitiger Datenverlust
-
-Unser Backend wird mit angemessener Sorgfalt betrieben und überwacht.
-Dennoch können Störungen auftreten, z. B. durch geplante oder ungeplante Wartungen, Infrastruktur- oder Provider-Ausfälle, Netzwerkprobleme, Sicherheitsereignisse (z. B. DDoS), Software- oder Datenbank-Updates oder höhere Gewalt.
-
-Eine bestimmte Verfügbarkeit oder Wiederherstellungszeit wird nicht garantiert.
-Wir erstellen in angemessenen Abständen Backups; dennoch kann es im Ereignisfall zu Datenverlusten (z. B. zwischen letztem Backup und Ereigniszeitpunkt) oder vorübergehenden Funktionseinschränkungen kommen.
-Eine lückenlose Wiederherstellung zu jedem Zeitpunkt kann nicht zugesichert werden.
-
-Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, entgangenen Gewinn, Datenverlust oder Folgeschäden infolge von Backend-Störungen.
-Ansprüche aufgrund von Vorsatz oder grober Fahrlässigkeit sowie zwingende gesetzliche Haftung bleiben unberührt.
-
-
----
-
-11. Änderungen
+10. Änderungen
 
 Wir behalten uns vor, diesen Haftungshinweis jederzeit zu ändern.
-Es gilt die jeweils veröffentlichte Fassung.
+Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
+
