@@ -2,9 +2,9 @@ NUTZUNGSBEDINGUNGEN
 Stand: 14. Dezember 2025
 
 
-─────────────────────────────────────────────────────────
+###
 Kurzfassung (nicht rechtsverbindlich)
-─────────────────────────────────────────────────────────
+###
 
 Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
 
@@ -23,9 +23,9 @@ MessageDrop bietet keinen Zugang zu Notfalldiensten und ersetzt keine Aufmerksam
 Maßgeblich ist ausschließlich die aktuelle vollständige Fassung dieser Nutzungsbedingungen.
 
 
-─────────────────────────────────────────────────────────
+###
 1. Anbieter
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop (messagedrop.de) wird betrieben von:
 
@@ -42,9 +42,9 @@ Telefon: +49 (0) 176 / 41 23 57 74
 (im Folgenden „wir“, „uns“ oder „Anbieter“)
 
 
-─────────────────────────────────────────────────────────
+###
 2. Geltungsbereich und Zustimmung
-─────────────────────────────────────────────────────────
+###
 
 Diese Nutzungsbedingungen regeln die Nutzung der Plattform MessageDrop.
 
@@ -53,9 +53,9 @@ Mit dem Zugriff auf oder der Nutzung von MessageDrop erklärst du dich mit diese
 Wenn du diesen Bedingungen nicht zustimmst, darfst du den Dienst nicht nutzen.
 
 
-─────────────────────────────────────────────────────────
+###
 3. Änderungen der Nutzungsbedingungen
-─────────────────────────────────────────────────────────
+###
 
 Wir behalten uns vor, diese Nutzungsbedingungen jederzeit zu ändern oder zu aktualisieren.
 
@@ -64,9 +64,9 @@ Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
 Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren.
 
 
-─────────────────────────────────────────────────────────
+###
 4. Nutzungsberechtigung
-─────────────────────────────────────────────────────────
+###
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
@@ -79,9 +79,9 @@ Soweit im Rahmen der Nutzung rechtsverbindliche Erklärungen erforderlich sind, 
 Wenn du MessageDrop im Namen einer Organisation nutzt, bestätigst du, hierzu berechtigt zu sein.
 
 
-─────────────────────────────────────────────────────────
+###
 5. Leistungsbeschreibung
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop ist eine Plattform zur Veröffentlichung, Anzeige und Organisation nutzergenerierter Inhalte mit optionaler privater Kommunikation.
 
@@ -99,18 +99,18 @@ Der Dienst kann externe Inhalte oder Funktionen einbinden, unter anderem von:
 Ein Anspruch auf bestimmte Funktionen, eine bestimmte Darstellung oder eine permanente Verfügbarkeit besteht nicht.
 
 
-─────────────────────────────────────────────────────────
+###
 6. Nutzerkonten und Sicherheit (sofern genutzt)
-─────────────────────────────────────────────────────────
+###
 
 Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln und unbefugte Nutzung unverzüglich zu melden.
 
 Du bist für alle Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
 
 
-─────────────────────────────────────────────────────────
+###
 7. Nutzergenerierte Inhalte und Nutzungsrechte
-─────────────────────────────────────────────────────────
+###
 
 Du behältst alle Rechte an den von dir erstellten Inhalten.
 
@@ -119,9 +119,9 @@ Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives,
 Du sicherst zu, dass du über alle erforderlichen Rechte verfügst, deine Inhalte rechtmäßig sind und keine Rechte Dritter verletzt werden.
 
 
-─────────────────────────────────────────────────────────
+###
 8. Moderation und Entfernung von Inhalten
-─────────────────────────────────────────────────────────
+###
 
 Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder in ihrer Sichtbarkeit einzuschränken, insbesondere bei rechtswidrigen Inhalten, Verstößen gegen diese Nutzungsbedingungen oder Meldungen im Rahmen gesetzlicher Verfahren (z. B. DSA).
 
@@ -130,9 +130,9 @@ Zur Unterstützung der Moderation können automatisierte Verfahren, einschließl
 Eine vollständige Vorabkontrolle sämtlicher Inhalte findet nicht statt.
 
 
-─────────────────────────────────────────────────────────
+###
 9. Unzulässige Nutzung
-─────────────────────────────────────────────────────────
+###
 
 Es ist untersagt, MessageDrop zu nutzen, um Inhalte zu erstellen, zu verbreiten, zu verlinken oder anderweitig bereitzustellen, die gegen geltendes Recht, gegen diese Nutzungsbedingungen oder gegen Rechte Dritter verstoßen.
 
@@ -180,9 +180,9 @@ Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist
 Die Aufzählung ist nicht abschließend.
 
 
-─────────────────────────────────────────────────────────
+###
 10. Inhalte und Dienste Dritter
-─────────────────────────────────────────────────────────
+###
 
 Inhalte und Dienste Dritter unterliegen ausschließlich den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
 
@@ -191,27 +191,27 @@ Wir übernehmen keine Verantwortung für Inhalte Dritter, die Verfügbarkeit ext
 Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu beachten.
 
 
-─────────────────────────────────────────────────────────
+###
 11. Keine Notfalldienste
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
 
 Der Dienst ersetzt keine Aufmerksamkeit, keine Vorsicht und kein verantwortungsbewusstes Verhalten im realen Leben.
 
 
-─────────────────────────────────────────────────────────
+###
 12. Verfügbarkeit und Wartung
-─────────────────────────────────────────────────────────
+###
 
 Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere durch Wartungsarbeiten, technische Störungen, Ausfälle externer Dienste oder höhere Gewalt.
 
 Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
 
 
-─────────────────────────────────────────────────────────
+###
 13. Lokale Speicherung und Datenverlust
-─────────────────────────────────────────────────────────
+###
 
 Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage, Cache).
 
@@ -220,27 +220,27 @@ Diese Daten sind geräte- und browserabhängig sowie jederzeit löschbar oder ve
 Du bist selbst für geeignete Sicherungen verantwortlich. Eine Wiederherstellung durch uns ist nicht möglich.
 
 
-─────────────────────────────────────────────────────────
+###
 14. Geistiges Eigentum
-─────────────────────────────────────────────────────────
+###
 
 Alle Rechte an MessageDrop, einschließlich Software, Design und Marken, liegen bei uns oder unseren Lizenzgebern.
 
 Eine Nutzung unserer Marken oder Kennzeichen ist ohne vorherige Zustimmung nicht gestattet.
 
 
-─────────────────────────────────────────────────────────
+###
 15. Beendigung der Nutzung
-─────────────────────────────────────────────────────────
+###
 
 Du kannst die Nutzung von MessageDrop jederzeit einstellen.
 
 Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei Verstößen gegen diese Nutzungsbedingungen, gesetzlicher Verpflichtung oder missbräuchlicher Nutzung.
 
 
-─────────────────────────────────────────────────────────
+###
 16. Haftungsausschluss
-─────────────────────────────────────────────────────────
+###
 
 Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
 
@@ -249,25 +249,25 @@ Die Nutzung erfolgt auf eigene Verantwortung.
 Wir übernehmen keine Verantwortung für Schäden, die durch eine unsachgemäße oder unaufmerksame Nutzung entstehen, insbesondere nicht für Schäden, die außerhalb des Einflussbereichs des Dienstes liegen.
 
 
-─────────────────────────────────────────────────────────
+###
 17. Haftungsbeschränkung
-─────────────────────────────────────────────────────────
+###
 
 Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder Verletzung von Leben, Körper oder Gesundheit.
 
 Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
 
 
-─────────────────────────────────────────────────────────
+###
 18. Freistellung
-─────────────────────────────────────────────────────────
+###
 
 Du stellst uns von Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
 
 
-─────────────────────────────────────────────────────────
+###
 19. Anwendbares Recht und Gerichtsstand
-─────────────────────────────────────────────────────────
+###
 
 Es gilt das Recht der Bundesrepublik Deutschland.
 
@@ -276,16 +276,16 @@ Sofern du Kaufmann oder juristische Person bist, ist Gerichtsstand unser Sitz.
 Zwingende Verbraucherschutzvorschriften bleiben unberührt.
 
 
-─────────────────────────────────────────────────────────
+###
 20. Salvatorische Klausel
-─────────────────────────────────────────────────────────
+###
 
 Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleiben die übrigen Bestimmungen wirksam.
 
 
-─────────────────────────────────────────────────────────
+###
 21. Kontakt
-─────────────────────────────────────────────────────────
+###
 
 JackTools.Net UG (haftungsbeschränkt)  
 Im Kirchfeld 27  

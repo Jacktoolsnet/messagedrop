@@ -1,9 +1,9 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
 Stand: 14. Dezember 2025
 
-─────────────────────────────────────────────────────────
+###
 Kurzfassung (nicht rechtsverbindlich)
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
@@ -23,9 +23,9 @@ MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
 Maßgeblich ist ausschließlich die aktuelle vollständige Fassung dieses Haftungshinweises.
 
-─────────────────────────────────────────────────────────
+###
 1. Geltungsbereich
-─────────────────────────────────────────────────────────
+###
 
 Dieser Haftungshinweis gilt für die Nutzung der Web-App „MessageDrop“ (messagedrop.de) der
 
@@ -42,9 +42,9 @@ Telefon: +49 (0) 176 / 41 23 57 74
 
 (im Folgenden „wir“, „uns“ oder „Anbieter“)
 
-─────────────────────────────────────────────────────────
+###
 2. Mindestalter und Zulässigkeit der Nutzung
-─────────────────────────────────────────────────────────
+###
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
@@ -56,9 +56,9 @@ Sollten wir Kenntnis davon erlangen, dass MessageDrop von Personen unter 16 Jahr
 
 Eine besondere Ansprache, Ausrichtung oder Verarbeitung personenbezogener Daten von Kindern im Sinne der DSGVO findet nicht statt.
 
-─────────────────────────────────────────────────────────
+###
 3. Technische Voraussetzungen und Internetverbindung
-─────────────────────────────────────────────────────────
+###
 
 Die Nutzung von MessageDrop setzt eine funktionierende Internetverbindung voraus.
 
@@ -70,9 +70,9 @@ Wir haben keinen Einfluss auf Art, Umfang oder Abrechnung der Internetverbindung
 
 Bestimmte Funktionen können bei eingeschränkter oder fehlender Internetverbindung nur eingeschränkt oder gar nicht zur Verfügung stehen.
 
-─────────────────────────────────────────────────────────
+###
 4. Nutzung ohne eigenen Nutzer (Basisnutzung)
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop kann grundsätzlich auch ohne Anlage eines Nutzers verwendet werden.
 
@@ -90,13 +90,13 @@ Dabei kann der jeweilige Anbieter technisch bedingt Informationen über den Abru
 
 Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer Abruf externer Inhalte und keine Datenübertragung an diese Anbieter statt.
 
-─────────────────────────────────────────────────────────
+###
 5. Nutzeranlage und Funktionen mit Nutzer
-─────────────────────────────────────────────────────────
+###
 
-─────────────────────────────────────────────────────────
+###
 5.1 Nutzeranlage und PIN-basierte Anmeldung
-─────────────────────────────────────────────────────────
+###
 
 Sofern ein Nutzer freiwillig einen Nutzer anlegt, ist hierfür ausschließlich die Vergabe eines PINs erforderlich.
 
@@ -138,9 +138,9 @@ In diesem Fall erfolgt die sofortige und endgültige Löschung des Nutzers sowie
 
 Die Löschung ist endgültig und kann nicht rückgängig gemacht werden.
 
-─────────────────────────────────────────────────────────
+###
 5.2 Lokale Speicherung, Datenminimierung und Risiko des Datenverlustes
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop ist nach dem Grundsatz der Datenminimierung und des Datenschutzes durch Technikgestaltung konzipiert.
 
@@ -162,9 +162,9 @@ Lokale Daten können jederzeit verloren gehen oder gelöscht werden, unter ander
 
 Soweit gesetzlich zulässig, übernehmen wir keine Haftung für den Verlust, die Beschädigung oder die Nichtverfügbarkeit lokal gespeicherter Daten.
 
-─────────────────────────────────────────────────────────
+###
 5.3 Öffentliche Inhalte erstellen und veröffentlichen
-─────────────────────────────────────────────────────────
+###
 
 Nutzer können Inhalte erstellen und öffentlich veröffentlichen, sofern sie mindestens 16 Jahre alt sind.
 
@@ -225,9 +225,9 @@ Zur Unterstützung der Moderation setzen wir automatisierte Verfahren ein, einsc
 
 Bewertungen (z. B. „Like“/„Dislike“) sind sowohl für öffentliche Nachrichten als auch für öffentliche Kommentare möglich. Ein Anspruch auf bestimmte Bewertungsergebnisse oder eine bestimmte Wirkung solcher Bewertungen besteht nicht.
 
-─────────────────────────────────────────────────────────
+###
 5.4 Darstellung, Sortierung und fehlende Personalisierung öffentlicher Inhalte
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System.
 
@@ -249,9 +249,9 @@ Ein Anspruch auf vollständige Anzeige aller veröffentlichten Inhalte besteht n
 
 Ein Anspruch auf Veröffentlichung, Sichtbarkeit, Reichweite oder bestimmte Darstellung eines einzelnen Inhalts besteht nicht. Inhalte können aus technischen, räumlichen, zeitlichen oder moderationsbezogenen Gründen nicht, nur teilweise oder nur vorübergehend angezeigt werden.
 
-─────────────────────────────────────────────────────────
+###
 5.5 Mit anderen Nutzern verbinden und private Kommunikation
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop ermöglicht es Nutzern, sich miteinander zu verbinden und Kontakte zu verwalten.
 
@@ -275,9 +275,9 @@ Streitigkeiten zwischen Nutzern, die aus privaten Nachrichten, Kontakten oder so
 
 Gesetzliche Pflichten zur Mitwirkung bei rechtmäßigen Anfragen von Behörden bleiben unberührt.
 
-─────────────────────────────────────────────────────────
+###
 5.6 Plätze auf der Weltkarte
-─────────────────────────────────────────────────────────
+###
 
 Nutzer können sogenannte Plätze definieren.
 
@@ -289,9 +289,9 @@ Alle weiteren Eigenschaften, Metadaten oder Inhalte eines Platzes werden ausschl
 
 Für die Rechtmäßigkeit der vergebenen Bezeichnungen und Inhalte eines Platzes ist ausschließlich der jeweilige Nutzer verantwortlich.
 
-─────────────────────────────────────────────────────────
+###
 5.7 Lokale Bilder und Datei-Verweise
-─────────────────────────────────────────────────────────
+###
 
 Nutzer können Bilder von ihrem Endgerät auf der Karte platzieren.
 
@@ -311,9 +311,9 @@ Zur Platzierung von Bildern auf der Karte können – sofern vom Nutzer ausdrüc
 
 Ein serverseitiger Zugriff, eine serverseitige Speicherung, eine Weitergabe an andere Nutzer oder eine nachträgliche Wiederherstellung der Bilddateien durch uns ist ausgeschlossen.
 
-─────────────────────────────────────────────────────────
+###
 6. Verfahren nach dem Digital Services Act (DSA)
-─────────────────────────────────────────────────────────
+###
 
 Für öffentliche Inhalte, einschließlich öffentlicher Kommentare, kann jederzeit ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch:
 - eine Meldung („Notice“)
@@ -341,21 +341,21 @@ Personenbezogene Daten der meldenden Person, des betroffenen Nutzers oder unbete
 
 Nach Abschluss des Verfahrens erfolgt – abhängig vom Ergebnis – eine Wiederfreigabe, Einschränkung oder endgültige Entfernung des betroffenen Inhalts.
 
-─────────────────────────────────────────────────────────
+###
 7. Von uns erstellte Inhalte sowie Informationen und Dienste Dritter
-─────────────────────────────────────────────────────────
+###
 
-─────────────────────────────────────────────────────────
+###
 7.1 Eigene Inhalte
-─────────────────────────────────────────────────────────
+###
 
 Unsere eigenen Inhalte werden mit der gebotenen Sorgfalt erstellt.
 
 Wir übernehmen jedoch keine Gewähr für deren Richtigkeit, Vollständigkeit oder Aktualität.
 
-─────────────────────────────────────────────────────────
+###
 7.2 Informationen und Dienste Dritter
-─────────────────────────────────────────────────────────
+###
 
 Einzelne Funktionen basieren auf externen Diensten, insbesondere:
 - Wetter- und Luftqualitätsdaten von Open-Meteo
@@ -369,9 +369,9 @@ Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit, Verfügbarkeit
 
 Es gelten zusätzlich die jeweiligen Nutzungs- und Lizenzbedingungen der Anbieter.
 
-─────────────────────────────────────────────────────────
+###
 8. Verfügbarkeit, Wartung und serverseitiger Datenverlust
-─────────────────────────────────────────────────────────
+###
 
 Wir bemühen uns um eine zuverlässige Bereitstellung des Dienstes.
 
@@ -385,15 +385,15 @@ Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, entgange
 
 Ansprüche aufgrund von Vorsatz oder grober Fahrlässigkeit bleiben unberührt.
 
-─────────────────────────────────────────────────────────
+###
 9. Externe Links
-─────────────────────────────────────────────────────────
+###
 
 Unser Dienst kann Links zu externen Webseiten enthalten.
 
-─────────────────────────────────────────────────────────
+###
 9.a) Von uns gesetzte Links
-─────────────────────────────────────────────────────────
+###
 
 Soweit wir selbst externe Links bereitstellen, wurden die verlinkten Inhalte zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße geprüft.
 
@@ -403,9 +403,9 @@ Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist ohne konkrete An
 
 Bei Bekanntwerden von Rechtsverstößen entfernen wir entsprechende Links unverzüglich.
 
-─────────────────────────────────────────────────────────
+###
 9.b) Von Nutzern erstellte Links
-─────────────────────────────────────────────────────────
+###
 
 Nutzer können im Rahmen der Nutzung von MessageDrop eigenständig Links zu externen Webseiten erstellen oder veröffentlichen.
 
@@ -419,15 +419,15 @@ Hinweise auf rechtswidrige oder problematische Inhalte externer Links können ü
 
 Gemeldete Links können im Rahmen der gesetzlichen Vorgaben, insbesondere nach dem Digital Services Act (DSA), überprüft und bei Bedarf entfernt oder in ihrer Sichtbarkeit eingeschränkt werden.
 
-─────────────────────────────────────────────────────────
+###
 10. Kein Zugang zu Notfalldiensten
-─────────────────────────────────────────────────────────
+###
 
 Unsere Website/App bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
 
-─────────────────────────────────────────────────────────
+###
 11. Änderungen und Funktionsanpassungen
-─────────────────────────────────────────────────────────
+###
 
 Wir behalten uns vor, diesen Haftungshinweis jederzeit zu ändern. Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
 
@@ -435,9 +435,9 @@ Wir behalten uns außerdem vor, Funktionen und Darstellungen von MessageDrop jed
 
 Ein Anspruch auf bestimmte Funktionen, bestimmte Bedienabläufe, bestimmte Parameter (z. B. Ergebnisanzahlen), eine bestimmte Darstellung oder eine bestimmte technische Ausgestaltung besteht nicht.
 
-─────────────────────────────────────────────────────────
+###
 12. Haftungsausschluss
-─────────────────────────────────────────────────────────
+###
 
 Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
 
@@ -445,9 +445,9 @@ Die Nutzung erfolgt auf eigene Verantwortung.
 
 Wir übernehmen keine Verantwortung für Schäden, die durch eine unsachgemäße oder unaufmerksame Nutzung entstehen, insbesondere nicht für Schäden, die außerhalb des Einflussbereichs des Dienstes liegen.
 
-─────────────────────────────────────────────────────────
+###
 13. Haftungsbeschränkung
-─────────────────────────────────────────────────────────
+###
 
 Wir haften unbeschränkt nur bei:
 - Vorsatz
@@ -456,9 +456,9 @@ Wir haften unbeschränkt nur bei:
 
 Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
 
-─────────────────────────────────────────────────────────
+###
 14. Anwendbares Recht und Gerichtsstand
-─────────────────────────────────────────────────────────
+###
 
 Es gilt das Recht der Bundesrepublik Deutschland.
 
@@ -466,8 +466,8 @@ Sofern der Nutzer Kaufmann oder juristische Person ist, ist Gerichtsstand unser 
 
 Zwingende Verbraucherschutzvorschriften bleiben unberührt.
 
-─────────────────────────────────────────────────────────
+###
 15. Salvatorische Klausel
-─────────────────────────────────────────────────────────
+###
 
 Sollte eine Bestimmung dieses Haftungshinweises unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.

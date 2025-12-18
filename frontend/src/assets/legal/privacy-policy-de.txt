@@ -1,9 +1,9 @@
 DATENSCHUTZERKLÄRUNG
 Stand: 14. Dezember 2025
 
-─────────────────────────────────────────────────────────
+###
 Kurzfassung (nicht rechtsverbindlich)
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
@@ -25,9 +25,9 @@ MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
 Maßgeblich ist ausschließlich die aktuelle vollständige Datenschutzerklärung einschließlich der Ergänzungen zum Digital Services Act (DSA).
 
-─────────────────────────────────────────────────────────
+###
 1. Verantwortlicher im Sinne der DSGVO
-─────────────────────────────────────────────────────────
+###
 
 Verantwortlicher gemäß Art. 4 Nr. 7 DSGVO ist:
 
@@ -46,19 +46,19 @@ Telefon: +49 (0) 176 / 41 23 57 74
 
 Diese Datenschutzerklärung gilt für MessageDrop (messagedrop.de), zugehörige mobile Anwendungen, Progressive Web Apps (PWA) sowie interne Admin- und Moderationsoberflächen.
 
-─────────────────────────────────────────────────────────
+###
 2. Nutzung als Besucher (ohne Nutzerkonto)
-─────────────────────────────────────────────────────────
+###
 
-─────────────────────────────────────────────────────────
+###
 2.1 Allgemeine Nutzung
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop kann ohne Anlage eines Nutzers verwendet werden. Dabei können insbesondere öffentliche Inhalte gelesen werden.
 
-─────────────────────────────────────────────────────────
+###
 2.2 Technische Datenverarbeitung
-─────────────────────────────────────────────────────────
+###
 
 Bei der Nutzung als Besucher werden technisch notwendige Daten verarbeitet, insbesondere IP-Adresse, Zeitstempel und technische Header-Informationen.
 
@@ -66,9 +66,9 @@ Zweck der Verarbeitung ist die technische Auslieferung des Dienstes, die Systems
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
 
-─────────────────────────────────────────────────────────
+###
 2.3 Externe Inhalte und Drittanbieter
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop ermöglicht die optionale Einbindung externer Inhalte von Drittanbietern (z. B. Videos, Musik, animierte Inhalte oder eingebettete Medien).
 
@@ -112,13 +112,13 @@ Die Liste der externen Anbieter kann technisch bedingt erweitert oder angepasst 
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung).
 
-─────────────────────────────────────────────────────────
+###
 3. Nutzung mit Nutzerkonto
-─────────────────────────────────────────────────────────
+###
 
-─────────────────────────────────────────────────────────
+###
 3.1 Nutzeranlage
-─────────────────────────────────────────────────────────
+###
 
 Die Anlage eines Nutzers erfolgt freiwillig und ausschließlich über die Vergabe eines PINs.
 
@@ -128,15 +128,15 @@ Weitere Nutzerdaten werden ausschließlich verschlüsselt lokal auf dem Endgerä
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
-─────────────────────────────────────────────────────────
+###
 3.2 Login und Authentifizierung
-─────────────────────────────────────────────────────────
+###
 
 Zum Login wird der verschlüsselte Nutzerdatensatz temporär an das Backend übertragen und ausschließlich zur Prüfung der PIN-Gültigkeit verarbeitet. Eine dauerhafte Speicherung entschlüsselter Nutzerdaten oder des PINs erfolgt nicht.
 
-─────────────────────────────────────────────────────────
+###
 3.3 Löschung und Inaktivität
-─────────────────────────────────────────────────────────
+###
 
 Nutzer, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden ohne Vorwarnung aus dem Backend entfernt.
 
@@ -146,9 +146,9 @@ Die Löschung ist endgültig und nicht rückgängig zu machen.
 
 Unabhängig davon kann der Nutzer seinen Nutzer jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung aller serverseitigen und lokalen Datensätze.
 
-─────────────────────────────────────────────────────────
+###
 3.4 Öffentliche Inhalte und Kommentare
-─────────────────────────────────────────────────────────
+###
 
 Nutzer können öffentliche Nachrichten und öffentliche Kommentare erstellen.
 
@@ -160,9 +160,9 @@ Diese Inhalte werden zur Darstellung, Moderation, Missbrauchsprävention und zur
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b und lit. f DSGVO.
 
-─────────────────────────────────────────────────────────
+###
 3.5 Private Kommunikation
-─────────────────────────────────────────────────────────
+###
 
 Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen.
 
@@ -172,9 +172,9 @@ Für Inhalte privater Kommunikation sind ausschließlich die beteiligten Nutzer 
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
-─────────────────────────────────────────────────────────
+###
 3.6 Lokale Datenspeicherung auf dem Endgerät
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop verfolgt einen datenschutzorientierten Ansatz, bei dem ein Großteil der Daten ausschließlich lokal auf dem Endgerät des Nutzers gespeichert wird.
 
@@ -192,13 +192,13 @@ Werden lokal gespeicherte Daten durch den Nutzer oder durch technische Umstände
 
 Die Verantwortung für Sicherung, Erhalt und Verwaltung lokal gespeicherter Daten liegt ausschließlich beim Nutzer.
 
-─────────────────────────────────────────────────────────
+###
 4. Digital Services Act (DSA)
-─────────────────────────────────────────────────────────
+###
 
-─────────────────────────────────────────────────────────
+###
 4.1 DSA-Verfahren
-─────────────────────────────────────────────────────────
+###
 
 Für öffentliche Inhalte und Kommentare kann ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
 
@@ -206,9 +206,9 @@ Dabei verarbeiten wir insbesondere die User-ID, Angaben zum gemeldeten Inhalt, Z
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO.
 
-─────────────────────────────────────────────────────────
+###
 4.2 Öffentliche Fallseite
-─────────────────────────────────────────────────────────
+###
 
 Für jeden DSA-relevanten Vorgang wird eine öffentlich zugängliche Fallseite bereitgestellt.
 
@@ -216,58 +216,58 @@ Diese enthält ausschließlich anonymisierte oder nicht personenbezogene Informa
 
 Es werden keine personenbezogenen Daten veröffentlicht. Die Veröffentlichung erfolgt ausschließlich zur Erfüllung gesetzlicher Transparenzpflichten.
 
-─────────────────────────────────────────────────────────
+###
 4.3 Öffentliche DSA-Statistik
-─────────────────────────────────────────────────────────
+###
 
 MessageDrop stellt eine öffentlich zugängliche, aggregierte Statistik bereit, aus der hervorgeht die Anzahl eingeleiteter Verfahren, die Art der Entscheidungen sowie das Verhältnis von Meldungen zu Maßnahmen.
 
 Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschlüsse auf einzelne Nutzer zu.
 
-─────────────────────────────────────────────────────────
+###
 4.4 Speicherung und Weitergabe
-─────────────────────────────────────────────────────────
+###
 
 DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten werden dauerhaft gespeichert, soweit dies zur Erfüllung gesetzlicher Dokumentations-, Nachweis- und Rechenschaftspflichten erforderlich ist.
 
 Eine Weitergabe an zuständige Behörden erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
 
-─────────────────────────────────────────────────────────
+###
 5. Speicherdauer
-─────────────────────────────────────────────────────────
+###
 
 Personenbezogene Daten werden nur so lange gespeichert, wie dies für den jeweiligen Zweck erforderlich ist oder gesetzliche Verpflichtungen bestehen.
 
 Davon ausgenommen sind DSA-Verfahrensdaten, die gesetzlichen Aufbewahrungspflichten unterliegen.
 
-─────────────────────────────────────────────────────────
+###
 6. Datensicherheit
-─────────────────────────────────────────────────────────
+###
 
 Wir setzen angemessene technische und organisatorische Maßnahmen ein, um personenbezogene Daten vor Verlust, Missbrauch oder unbefugtem Zugriff zu schützen. Ein vollständiger Schutz kann jedoch nicht garantiert werden.
 
-─────────────────────────────────────────────────────────
+###
 7. Rechte der betroffenen Personen
-─────────────────────────────────────────────────────────
+###
 
 Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie Widerspruch (Art. 21 DSGVO).
 
 Erteilte Einwilligungen können jederzeit mit Wirkung für die Zukunft widerrufen werden.
 
-─────────────────────────────────────────────────────────
+###
 8. Mindestalter
-─────────────────────────────────────────────────────────
+###
 
 Der Dienst richtet sich nicht an Personen unter 16 Jahren (Art. 8 DSGVO).
 
-─────────────────────────────────────────────────────────
+###
 9. Keine Notfalldienste
-─────────────────────────────────────────────────────────
+###
 
 Der Dienst stellt keinen Ersatz für Notfalldienste dar und bietet keinen Zugang zu solchen Diensten.
 
-─────────────────────────────────────────────────────────
+###
 10. Änderungen der Datenschutzerklärung
-─────────────────────────────────────────────────────────
+###
 
 Wir behalten uns vor, diese Datenschutzerklärung anzupassen. Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
