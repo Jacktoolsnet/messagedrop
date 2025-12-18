@@ -4,9 +4,34 @@
             <div class="titles">
                 <div class="welcome">Welcome to MessageDrop 👋</div>
                 <div id="consent-title" class="title">Before we start</div>
+                <p class="age-note">
+                    You must be at least 16 years old to use MessageDrop.
+                </p>
+                <mat-slide-toggle class="age-toggle" color="primary"
+                    [checked]="appService.getAppSettings().consentSettings.ageConfirmed"
+                    (change)="toggleAgeConfirmed($event.checked)">
+                    I confirm I am at least 16 years old
+                </mat-slide-toggle>
+            </div>
+        </div>
+
+        <div class="head">
+            <div class="titles">
+                <div id="consent-title" class="title">External content</div>
                 <div class="subtitle">
-                    Please review and accept the following items so we can show the map and all features.
+                    Choose wich external content you like to see. You can change the settings whenever you like.
                 </div>
+            </div>
+        </div>
+        <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
+            <mat-icon>public</mat-icon>
+            Edit external content settings
+        </button>
+
+        <div class="head">
+            <div id="consent-title" class="title">Legal</div>
+            <div class="subtitle">
+                Please review and accept the following items so we can show the map and all features.
             </div>
         </div>
 
@@ -36,19 +61,6 @@
             </mat-icon>
             Disclaimer {{ !appService.getAppSettings().consentSettings.disclaimer ? '(review and accept)' :
             '(accepted)'}}
-        </button>
-
-        <div class="head">
-            <div class="titles">
-                <div id="consent-title" class="title">Optional</div>
-                <div class="subtitle">
-                    You can change the settings whenever you like.
-                </div>
-            </div>
-        </div>
-        <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
-            <mat-icon>public</mat-icon>
-            Edit external content settings
         </button>
     </div>
 </div>

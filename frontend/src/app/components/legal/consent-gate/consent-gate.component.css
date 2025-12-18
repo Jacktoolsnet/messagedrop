@@ -1,19 +1,26 @@
 :host {
+    display: block;
     color: var(--mat-app-text-color);
 }
 
 .gate {
-    height: auto;
-    width: 800px;
-    margin: auto;
-    max-width: 90vw;
+    height: 100vh;
+    width: 100%;
+    margin: 0 auto;
     display: grid;
     place-items: center;
-    padding: 2rem;
-    background: var(--mdc-elevated-card-container-color, transparent);
+    padding: 3rem 1.5rem;
+    box-sizing: border-box;
+    background: #f6f9ff url('/assets/images/consentGateBackground.svg') center/cover no-repeat;
+    overflow: hidden;
 }
 
 .card {
+    width: 100%;
+    max-width: 500px;
+    max-height: calc(100vh - 6rem);
+    box-sizing: border-box;
+    overflow: auto;
     background: var(--mat-card-filled-container-color);
     color: var(--mat-app-text-color);
     border-radius: 1rem;
@@ -49,4 +56,25 @@
     width: 100%;
     justify-content: flex-start;
     margin-bottom: 0.5rem;
+}
+
+.age-note {
+    margin: 0 0 0.25rem 0;
+    font-size: 0.95rem;
+    color: var(--mat-app-text-color);
+}
+
+.age-toggle {
+    margin-top: 0.25rem;
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 768px) {
+    .gate {
+        padding: 2.5rem 1rem;
+    }
+    .card {
+        max-width: 100%;
+        max-height: calc(100vh - 4rem);
+    }
 }

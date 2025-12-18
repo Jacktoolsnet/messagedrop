@@ -13,6 +13,8 @@ export class AppService {
   private _settingsSet = signal(0);
   readonly settingsSet = this._settingsSet.asReadonly();
 
+  private readonly legalVersion = 1;
+
   private themeListener: ((e: MediaQueryListEvent) => void) | null = null;
   private appSettings: AppSettings | undefined;
   private notificationAction?: NotificationAction;
@@ -33,12 +35,19 @@ export class AppService {
     consentSettings: {
       disclaimer: false,
       privacyPolicy: false,
-      termsOfService: false
-    }
+      termsOfService: false,
+      ageConfirmed: false
+    },
+    legalVersion: this.legalVersion,
+    acceptedLegalVersion: undefined
   };
 
   public isSettingsReady(): boolean {
     return this.settingsReady;
+  }
+
+  public getLegalVersion(): number {
+    return this.legalVersion;
   }
 
   public isConsentCompleted(): boolean {
@@ -47,6 +56,15 @@ export class AppService {
 
   async setAppSettings(newAppSettings: AppSettings): Promise<void> {
     const merged = { ...this.defaultAppSettings, ...newAppSettings };
+
+    // Wenn alle Zustimmungen erteilt sind, die akzeptierte Version mitschreiben
+    const isConsentComplete =
+      merged.consentSettings.disclaimer === true &&
+      merged.consentSettings.privacyPolicy === true &&
+      merged.consentSettings.termsOfService === true &&
+      merged.consentSettings.ageConfirmed === true;
+
+    merged.acceptedLegalVersion = isConsentComplete ? this.legalVersion : undefined;
     await this.indexedDbService.setSetting('appSettings', JSON.stringify(merged)).then(() => {
       this.appSettings = merged;
       this.setTheme(this.appSettings);
@@ -67,6 +85,22 @@ export class AppService {
       const raw = await this.indexedDbService.getSetting<string>('appSettings');
       const parsed = raw ? JSON.parse(raw) as Partial<AppSettings> : null;
       this.appSettings = { ...this.defaultAppSettings, ...(parsed ?? {}) };
+
+      // Wenn die gespeicherte Version nicht der aktuellen entspricht, Consent zurücksetzen
+      if (this.appSettings.acceptedLegalVersion !== this.legalVersion) {
+        this.appSettings = {
+          ...this.appSettings,
+          consentSettings: {
+            ...this.appSettings.consentSettings,
+            disclaimer: false,
+            privacyPolicy: false,
+            termsOfService: false,
+            ageConfirmed: false
+          },
+          acceptedLegalVersion: undefined,
+          legalVersion: this.legalVersion
+        };
+      }
     } catch {
       this.appSettings = { ...this.defaultAppSettings };
     }
@@ -78,11 +112,17 @@ export class AppService {
   }
 
   public chekConsentCompleted() {
-    this.consentCompleted = (
+    const consentsComplete = (
       this.appSettings?.consentSettings.disclaimer === true
       && this.appSettings?.consentSettings.privacyPolicy === true
       && this.appSettings?.consentSettings.termsOfService === true
+      && this.appSettings?.consentSettings.ageConfirmed === true
     );
+
+    const versionAccepted = this.appSettings?.acceptedLegalVersion === this.legalVersion;
+
+    // Consent gilt nur, wenn alle Häkchen gesetzt und die aktuelle Version akzeptiert wurde
+    this.consentCompleted = consentsComplete && versionAccepted;
   }
 
   // Notification-Daten

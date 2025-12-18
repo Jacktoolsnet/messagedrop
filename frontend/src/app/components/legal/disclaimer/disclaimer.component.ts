@@ -39,6 +39,7 @@ export class DisclaimerComponent implements OnInit {
   onToggle(val: boolean) {
     const current = this.appService.getAppSettings();
     current.consentSettings.disclaimer = val;
+    current.acceptedLegalVersion = val ? this.appService.getLegalVersion() : undefined;
     this.appService.setAppSettings(current);
     this.dialogRef.close(val);
   }

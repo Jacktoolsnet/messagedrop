@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { Observable, Subscription } from 'rxjs';
 import { ConsentKey } from '../../../interfaces/consent-settings.interface';
 import { AppService } from '../../../services/app.service';
@@ -19,7 +20,8 @@ import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.co
   imports: [
     MatIconModule,
     MatButtonModule,
-    MatChipsModule
+    MatChipsModule,
+    MatSlideToggleModule
 ],
   templateUrl: './consent-gate.component.html',
   styleUrl: './consent-gate.component.css'
@@ -56,8 +58,10 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       ? this.requiredKeys
       : (Object.keys(consents) as ConsentKey[]);
 
+    const versionMismatch = s.acceptedLegalVersion !== this.appService.getLegalVersion();
+
     this.missing = keys.filter(k => !consents[k]);
-    this.show = this.missing.length > 0;
+    this.show = this.missing.length > 0 || versionMismatch;
   }
 
   displayName(k: ConsentKey): string {
@@ -65,7 +69,8 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
     const map: Record<string, string> = {
       disclaimer: 'Disclaimer',
       privacyPolicy: 'Privacy Policy',
-      termsOfService: 'Terms of Service'
+      termsOfService: 'Terms of Service',
+      ageConfirmed: 'I confirm I am at least 16 years old'
     };
     if (map[k]) return map[k];
     return k.replace(/([A-Z])/g, ' $1').replace(/^./, c => c.toUpperCase()).trim();
@@ -108,6 +113,17 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
+    if (key === 'ageConfirmed') {
+      this.toggleAgeConfirmed(true);
+      return;
+    }
+  }
+
+  toggleAgeConfirmed(val: boolean): void {
+    const current = this.appService.getAppSettings();
+    current.consentSettings.ageConfirmed = val;
+    this.appService.setAppSettings(current);
+    this.computeMissing();
   }
 
   public editExternalContentSettings() {

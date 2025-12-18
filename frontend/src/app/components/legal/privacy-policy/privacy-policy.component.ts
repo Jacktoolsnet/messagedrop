@@ -45,6 +45,7 @@ export class PrivacyPolicyComponent implements OnInit {
   onToggle(val: boolean) {
     const current = this.appService.getAppSettings();
     current.consentSettings.privacyPolicy = val;
+    current.acceptedLegalVersion = val ? this.appService.getLegalVersion() : undefined;
     this.appService.setAppSettings(current);
     this.dialogRef.close(val);
   }
