@@ -1,324 +1,296 @@
 NUTZUNGSBEDINGUNGEN
-
 Stand: 14. Dezember 2025
 
 
----
-
+─────────────────────────────────────────────────────────
 Kurzfassung (nicht rechtsverbindlich)
+─────────────────────────────────────────────────────────
 
 Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
 
-Du bist für deine Inhalte verantwortlich und musst sicherstellen, dass sie rechtmäßig sind und keine Rechte Dritter verletzen.
+Du bist für die von dir erstellten Inhalte selbst verantwortlich und musst sicherstellen, dass diese rechtmäßig sind und keine Rechte Dritter verletzen.
 
 Inhalte können manuell und automatisiert (einschließlich KI-gestützter Verfahren) moderiert, gesperrt oder entfernt werden.
 
 Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen den Bedingungen der jeweiligen Anbieter.
 
-Der Dienst kann zeitweise ausfallen; eine bestimmte Verfügbarkeit wird nicht garantiert.
+Der Dienst kann zeitweise eingeschränkt oder nicht verfügbar sein; eine bestimmte Verfügbarkeit wird nicht garantiert.
 
-Lokal gespeicherte Daten können verloren gehen; sichere wichtige Daten selbst.
+Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; sichere wichtige Daten selbst.
+
+MessageDrop bietet keinen Zugang zu Notfalldiensten und ersetzt keine Aufmerksamkeit oder Sorgfalt im realen Leben.
+
+Maßgeblich ist ausschließlich die aktuelle vollständige Fassung dieser Nutzungsbedingungen.
 
 
-Maßgeblich ist ausschließlich die nachfolgende vollständige Fassung dieser Nutzungsbedingungen.
-
-
----
-
+─────────────────────────────────────────────────────────
 1. Anbieter
+─────────────────────────────────────────────────────────
 
 MessageDrop (messagedrop.de) wird betrieben von:
 
-JackTools.Net UG (haftungsbeschränkt)
-Im Kirchfeld 27
-38304 Wolfenbüttel
-Deutschland
+JackTools.Net UG (haftungsbeschränkt)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
+Deutschland  
 
-E-Mail: jacktoolsnet@gmail.com
-Telefon: +49 (0) 176 / 41 23 57 74
+Vertreten durch den Geschäftsführer: Christian Wagner, Dipl.-Inform. (FH)
 
-(im Folgenden „wir“ oder „Anbieter“)
+E-Mail: jacktoolsnet@gmail.com  
+Telefon: +49 (0) 176 / 41 23 57 74  
+
+(im Folgenden „wir“, „uns“ oder „Anbieter“)
 
 
----
-
+─────────────────────────────────────────────────────────
 2. Geltungsbereich und Zustimmung
+─────────────────────────────────────────────────────────
 
 Diese Nutzungsbedingungen regeln die Nutzung der Plattform MessageDrop.
 
 Mit dem Zugriff auf oder der Nutzung von MessageDrop erklärst du dich mit diesen Nutzungsbedingungen einverstanden.
+
 Wenn du diesen Bedingungen nicht zustimmst, darfst du den Dienst nicht nutzen.
 
 
----
-
+─────────────────────────────────────────────────────────
 3. Änderungen der Nutzungsbedingungen
+─────────────────────────────────────────────────────────
 
 Wir behalten uns vor, diese Nutzungsbedingungen jederzeit zu ändern oder zu aktualisieren.
-Die jeweils aktuelle Fassung gilt ab dem Zeitpunkt der Veröffentlichung.
+
+Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
 
 Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren.
 
 
----
-
+─────────────────────────────────────────────────────────
 4. Nutzungsberechtigung
+─────────────────────────────────────────────────────────
 
-Die Nutzung von MessageDrop ist Personen unter 16 Jahren nicht gestattet.
+Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
-Soweit die Nutzung den Abschluss rechtsverbindlicher Erklärungen oder Verträge erfordert, ist sie nur Personen gestattet, die voll geschäftsfähig sind.
+Der Dienst richtet sich nicht an Kinder unter 16 Jahren.
 
-Wenn du den Dienst im Namen einer Organisation nutzt, bestätigst du, dass du hierzu berechtigt bist.
+Personen zwischen 16 und 17 Jahren dürfen MessageDrop ausschließlich im Rahmen der gesetzlich zulässigen beschränkten Geschäftsfähigkeit nutzen. Rechtsverbindliche Erklärungen oder Verpflichtungen, die über den vertragsgemäßen Gebrauch des Dienstes hinausgehen, dürfen nur von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
+
+Soweit im Rahmen der Nutzung rechtsverbindliche Erklärungen erforderlich sind, ist die Nutzung insoweit nur Personen gestattet, die voll geschäftsfähig sind.
+
+Wenn du MessageDrop im Namen einer Organisation nutzt, bestätigst du, hierzu berechtigt zu sein.
 
 
----
-
+─────────────────────────────────────────────────────────
 5. Leistungsbeschreibung
+─────────────────────────────────────────────────────────
 
-MessageDrop ist eine Plattform zum Erstellen, Teilen und Anzeigen nutzergenerierter Inhalte.
+MessageDrop ist eine Plattform zur Veröffentlichung, Anzeige und Organisation nutzergenerierter Inhalte mit optionaler privater Kommunikation.
 
-Der Dienst kann Funktionen oder Inhalte externer Drittanbieter einbinden oder auf diesen basieren, unter anderem:
+Der Dienst kann externe Inhalte oder Funktionen einbinden, unter anderem von:
 
-Open-Meteo
+- Open-Meteo
+- DeepL
+- Nominatim / OpenStreetMap
+- YouTube
+- TikTok
+- Pinterest
+- Tenor
+- Spotify
 
-DeepL
-
-Nominatim / OpenStreetMap
-
-YouTube, TikTok, Pinterest, Tenor, Spotify
+Ein Anspruch auf bestimmte Funktionen, eine bestimmte Darstellung oder eine permanente Verfügbarkeit besteht nicht.
 
 
-Ein Anspruch auf bestimmte Funktionen, Inhalte oder eine permanente Verfügbarkeit besteht nicht.
+─────────────────────────────────────────────────────────
+6. Nutzerkonten und Sicherheit (sofern genutzt)
+─────────────────────────────────────────────────────────
 
-
----
-
-6. Nutzerkonten und Sicherheit (sofern anwendbar)
-
-Sofern Nutzerkonten angeboten werden, bist du verpflichtet:
-
-Zugangsdaten vertraulich zu behandeln
-
-unbefugte Nutzung unverzüglich zu melden
-
+Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln und unbefugte Nutzung unverzüglich zu melden.
 
 Du bist für alle Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
 
 
----
-
+─────────────────────────────────────────────────────────
 7. Nutzergenerierte Inhalte und Nutzungsrechte
+─────────────────────────────────────────────────────────
 
-Du behältst alle Rechte an den von dir erstellten und veröffentlichten Inhalten.
+Du behältst alle Rechte an den von dir erstellten Inhalten.
 
-Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives, unentgeltliches Nutzungsrecht ein, diese Inhalte zum Zweck des Betriebs, der Darstellung, der Moderation und der Weiterentwicklung des Dienstes zu:
+Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives, unentgeltliches Nutzungsrecht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren.
 
-speichern
-
-vervielfältigen
-
-öffentlich zugänglich machen
-
-anzeigen
-
-technisch verarbeiten
+Du sicherst zu, dass du über alle erforderlichen Rechte verfügst, deine Inhalte rechtmäßig sind und keine Rechte Dritter verletzt werden.
 
 
-Du sicherst zu, dass:
-
-du über alle erforderlichen Rechte verfügst
-
-deine Inhalte rechtmäßig sind
-
-keine Rechte Dritter (z. B. Urheber-, Persönlichkeits- oder Datenschutzrechte) verletzt werden
-
-
-
----
-
+─────────────────────────────────────────────────────────
 8. Moderation und Entfernung von Inhalten
+─────────────────────────────────────────────────────────
 
-Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder deren Sichtbarkeit einzuschränken, insbesondere bei:
+Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder in ihrer Sichtbarkeit einzuschränken, insbesondere bei rechtswidrigen Inhalten, Verstößen gegen diese Nutzungsbedingungen oder Meldungen im Rahmen gesetzlicher Verfahren (z. B. DSA).
 
-rechtswidrigen Inhalten
+Zur Unterstützung der Moderation können automatisierte Verfahren, einschließlich KI-gestützter Prüfungen, eingesetzt werden.
 
-Verstößen gegen diese Nutzungsbedingungen
-
-Hinweisen im Rahmen eines „Notice-and-Takedown“-Verfahrens
-
-
-Zur Unterstützung der Moderation können automatisierte Verfahren (einschließlich KI-gestützter Prüfungen) eingesetzt werden.
-Diese ersetzen keine vollständige manuelle Vorabprüfung sämtlicher Inhalte.
-
-Nutzer können Inhalte melden.
-Eine „Verbergen“-Funktion kann Inhalte global unsichtbar machen, ohne dass diese endgültig gelöscht werden.
-
-Gesetzliche Pflichten zur Moderation, insbesondere nach dem Digital Services Act (DSA), bleiben unberührt.
+Eine vollständige Vorabkontrolle sämtlicher Inhalte findet nicht statt.
 
 
----
-
+─────────────────────────────────────────────────────────
 9. Unzulässige Nutzung
+─────────────────────────────────────────────────────────
 
-Es ist untersagt, MessageDrop insbesondere zu nutzen, um:
+Es ist untersagt, MessageDrop zu nutzen, um Inhalte zu erstellen, zu verbreiten, zu verlinken oder anderweitig bereitzustellen, die gegen geltendes Recht, gegen diese Nutzungsbedingungen oder gegen Rechte Dritter verstoßen.
 
-a) gegen geltendes Recht zu verstoßen
-b) Rechte Dritter zu verletzen
-c) rechtswidrige, schädliche, beleidigende, verleumderische oder hasserfüllte Inhalte zu verbreiten
-d) Sicherheitsmaßnahmen zu umgehen
-e) Schadsoftware, Spam oder unerlaubtes Scraping zu betreiben
-f) die Nutzung durch andere zu beeinträchtigen
-g) eine falsche Verbindung oder Unterstützung durch uns vorzutäuschen
+Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
+
+- gegen geltendes Recht verstoßen oder zu solchen Verstößen auffordern,
+- Rechte Dritter verletzen, insbesondere Urheber-, Persönlichkeits-, Marken-, Namens- oder Datenschutzrechte,
+- strafbare Inhalte darstellen, fördern oder vorbereiten,
+- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten,
+- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind,
+- diskriminierend, extremistisch oder menschenverachtend sind,
+- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten,
+- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten,
+- private oder personenbezogene Daten Dritter ohne deren ausdrückliche Einwilligung offenlegen, insbesondere:
+  - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben,
+  - Geburtsdatum oder Geburtstag,
+  - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen,
+  - E-Mail-Adressen,
+  - Telefonnummern,
+  - Wohn-, Aufenthalts- oder Arbeitsadressen,
+  - genaue Standortdaten (z. B. GPS-Koordinaten, Live-Standorte, regelmäßig genutzte Orte),
+  - Informationen zu Aufenthaltsorten in Echtzeit oder rückverfolgbar,
+  - Ausweiskopien, Identifikationsnummern oder amtliche Kennzeichen,
+  - Benutzernamen, IDs oder Profilverknüpfungen zu anderen Diensten,
+  - Fotos oder Videos von Personen, sofern diese eindeutig identifizierbar sind und keine Einwilligung vorliegt,
+  - biometrische Daten (z. B. Gesichtsmerkmale, Fingerabdrücke),
+  - Gesundheitsdaten oder Informationen zum körperlichen oder psychischen Zustand,
+  - Informationen zur sexuellen Orientierung oder zum Sexualleben,
+  - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen,
+  - Bank-, Zahlungs- oder Finanzinformationen,
+  - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen,
+- irreführende, betrügerische oder manipulative Inhalte enthalten,
+- falsche Tatsachenbehauptungen über Personen verbreiten,
+- zu Täuschung, Betrug oder Missbrauch verleiten,
+- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten,
+- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
+- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten,
+- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
+- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
+- eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen,
+- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
+
+Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die betreffenden Informationen öffentlich zugänglich erscheinen.
+
+Die Aufzählung ist nicht abschließend.
 
 
----
-
+─────────────────────────────────────────────────────────
 10. Inhalte und Dienste Dritter
+─────────────────────────────────────────────────────────
 
-Inhalte und Dienste Dritter unterliegen deren eigenen Nutzungs- und Datenschutzbedingungen.
+Inhalte und Dienste Dritter unterliegen ausschließlich den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
 
-Wir übernehmen keine Verantwortung für Verfügbarkeit, Richtigkeit oder Vollständigkeit von Drittinhalten oder -diensten.
+Wir übernehmen keine Verantwortung für Inhalte Dritter, die Verfügbarkeit externer Dienste oder die Richtigkeit bzw. Aktualität externer Informationen.
 
 Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu beachten.
 
 
----
-
+─────────────────────────────────────────────────────────
 11. Keine Notfalldienste
+─────────────────────────────────────────────────────────
 
-MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienste).
+MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
+
+Der Dienst ersetzt keine Aufmerksamkeit, keine Vorsicht und kein verantwortungsbewusstes Verhalten im realen Leben.
 
 
----
-
+─────────────────────────────────────────────────────────
 12. Verfügbarkeit und Wartung
+─────────────────────────────────────────────────────────
 
-Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere aufgrund von:
-
-Wartungsarbeiten
-
-technischen Störungen
-
-Ausfällen von Drittanbietern
-
-höherer Gewalt
-
+Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere durch Wartungsarbeiten, technische Störungen, Ausfälle externer Dienste oder höhere Gewalt.
 
 Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
 
 
----
-
+─────────────────────────────────────────────────────────
 13. Lokale Speicherung und Datenverlust
+─────────────────────────────────────────────────────────
 
 Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage, Cache).
 
-Diese Daten sind:
+Diese Daten sind geräte- und browserabhängig sowie jederzeit löschbar oder verlierbar.
 
-geräte- und browserabhängig
-
-jederzeit löschbar oder verlierbar (z. B. durch Updates, private Nutzung, Speicherbereinigung)
+Du bist selbst für geeignete Sicherungen verantwortlich. Eine Wiederherstellung durch uns ist nicht möglich.
 
 
-Du bist selbst für geeignete Sicherungen verantwortlich.
-
-
----
-
+─────────────────────────────────────────────────────────
 14. Geistiges Eigentum
+─────────────────────────────────────────────────────────
 
-Alle Rechte an MessageDrop, einschließlich Software, Gestaltung und Marken, liegen bei uns oder unseren Lizenzgebern.
+Alle Rechte an MessageDrop, einschließlich Software, Design und Marken, liegen bei uns oder unseren Lizenzgebern.
 
 Eine Nutzung unserer Marken oder Kennzeichen ist ohne vorherige Zustimmung nicht gestattet.
 
 
----
-
+─────────────────────────────────────────────────────────
 15. Beendigung der Nutzung
+─────────────────────────────────────────────────────────
 
 Du kannst die Nutzung von MessageDrop jederzeit einstellen.
 
-Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei:
-
-Verstößen gegen diese Nutzungsbedingungen
-
-gesetzlicher Verpflichtung
-
-missbräuchlicher Nutzung
+Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei Verstößen gegen diese Nutzungsbedingungen, gesetzlicher Verpflichtung oder missbräuchlicher Nutzung.
 
 
-Regelungen, die ihrer Natur nach fortgelten (z. B. Haftungsausschlüsse, Nutzungsrechte), bleiben wirksam.
-
-
----
-
+─────────────────────────────────────────────────────────
 16. Haftungsausschluss
+─────────────────────────────────────────────────────────
 
 Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
 
-Wir übernehmen keine Gewähr dafür, dass:
+Die Nutzung erfolgt auf eigene Verantwortung.
 
-der Dienst jederzeit verfügbar ist
-
-Inhalte fehlerfrei, vollständig oder aktuell sind
-
-der Dienst frei von Störungen oder Sicherheitslücken ist
+Wir übernehmen keine Verantwortung für Schäden, die durch eine unsachgemäße oder unaufmerksame Nutzung entstehen, insbesondere nicht für Schäden, die außerhalb des Einflussbereichs des Dienstes liegen.
 
 
-
----
-
+─────────────────────────────────────────────────────────
 17. Haftungsbeschränkung
+─────────────────────────────────────────────────────────
 
-Wir haften unbeschränkt bei:
+Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder Verletzung von Leben, Körper oder Gesundheit.
 
-Vorsatz
-
-grober Fahrlässigkeit
-
-Verletzung von Leben, Körper oder Gesundheit
+Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
 
 
-Bei leichter Fahrlässigkeit haften wir nur bei Verletzung wesentlicher Vertragspflichten und begrenzt auf den vorhersehbaren Schaden.
-
-Eine weitergehende Haftung ist ausgeschlossen, soweit gesetzlich zulässig.
-
-
----
-
+─────────────────────────────────────────────────────────
 18. Freistellung
+─────────────────────────────────────────────────────────
 
 Du stellst uns von Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
 
 
----
-
+─────────────────────────────────────────────────────────
 19. Anwendbares Recht und Gerichtsstand
+─────────────────────────────────────────────────────────
 
-Es gilt das Recht der Bundesrepublik Deutschland unter Ausschluss des internationalen Privatrechts.
+Es gilt das Recht der Bundesrepublik Deutschland.
 
-Sofern du Kaufmann, juristische Person des öffentlichen Rechts oder öffentlich-rechtliches Sondervermögen bist, ist ausschließlicher Gerichtsstand unser Sitz.
+Sofern du Kaufmann oder juristische Person bist, ist Gerichtsstand unser Sitz.
 
 Zwingende Verbraucherschutzvorschriften bleiben unberührt.
 
 
----
-
+─────────────────────────────────────────────────────────
 20. Salvatorische Klausel
+─────────────────────────────────────────────────────────
 
-Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
-
-Die unwirksame Bestimmung ist durch eine wirksame zu ersetzen, die dem wirtschaftlichen Zweck am nächsten kommt.
+Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleiben die übrigen Bestimmungen wirksam.
 
 
----
-
+─────────────────────────────────────────────────────────
 21. Kontakt
+─────────────────────────────────────────────────────────
 
-JackTools.Net UG (haftungsbeschränkt)
-Im Kirchfeld 27
-38304 Wolfenbüttel
-Deutschland
+JackTools.Net UG (haftungsbeschränkt)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
+Deutschland  
 
-E-Mail: jacktoolsnet@gmail.com
+E-Mail: jacktoolsnet@gmail.com  
 Telefon: +49 (0) 176 / 41 23 57 74

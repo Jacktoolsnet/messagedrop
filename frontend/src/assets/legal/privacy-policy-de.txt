@@ -1,388 +1,273 @@
 DATENSCHUTZERKLÄRUNG
-
 Stand: 14. Dezember 2025
 
-
----
-
+─────────────────────────────────────────────────────────
 Kurzfassung (nicht rechtsverbindlich)
+─────────────────────────────────────────────────────────
 
-Personenbezogene Daten werden zur Bereitstellung, Sicherheit und Moderation von MessageDrop verarbeitet.
+MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
-Öffentliche Inhalte können automatisiert, einschließlich mittels KI-gestützter Moderation, geprüft werden.
+Der Dienst kann ohne Nutzerkonto verwendet werden. Bestimmte Funktionen erfordern die freiwillige Anlage eines Nutzers.
 
-Technisch notwendige Daten (z. B. IP-Adresse, Logs) werden zur Sicherheit verarbeitet und zeitnah gelöscht.
+Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
-Bestimmte Daten werden lokal auf deinem Gerät gespeichert.
+Ein Großteil der Daten wird bewusst ausschließlich lokal auf dem Endgerät des Nutzers gespeichert (z. B. im Browser oder App-Speicher), um Datenminimierung und einen hohen Datenschutzstandard zu gewährleisten. Die Kontrolle über diese lokal gespeicherten Daten liegt vollständig beim Nutzer. Ein Verlust oder eine Löschung lokaler Daten ist jederzeit möglich.
 
-Externe Dienste erhalten Daten nur, soweit dies für die jeweilige Funktion erforderlich ist.
+Öffentliche Inhalte und Kommentare werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, für die ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt.
 
-DSA-bezogene Moderations- und Verfahrensdaten können dauerhaft gespeichert werden.
+MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Öffentliche Inhalte werden nicht algorithmisch gefiltert oder priorisiert, sondern ausschließlich anhand des betrachteten geografischen Bereichs und der zeitlichen Veröffentlichung angezeigt.
 
+Private Chatnachrichten werden verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
-Maßgeblich ist ausschließlich die vollständige Datenschutzerklärung einschließlich der DSA-Ergänzung.
+Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden nur auf ausdrücklichen Wunsch des Nutzers aktiviert und direkt von den jeweiligen Drittanbietern geladen. Es gelten deren Datenschutz- und Nutzungsbedingungen.
 
+MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
----
+Maßgeblich ist ausschließlich die aktuelle vollständige Datenschutzerklärung einschließlich der Ergänzungen zum Digital Services Act (DSA).
 
+─────────────────────────────────────────────────────────
 1. Verantwortlicher im Sinne der DSGVO
+─────────────────────────────────────────────────────────
 
 Verantwortlicher gemäß Art. 4 Nr. 7 DSGVO ist:
 
-JackTools.Net UG (haftungsbeschränkt)
-Im Kirchfeld 27
-38304 Wolfenbüttel
-Deutschland
+JackTools.Net UG (haftungsbeschränkt)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
+Deutschland  
 
-E-Mail: jacktoolsnet@gmail.com
-Telefon: +49 (0) 176 / 41 23 57 74
+Vertreten durch den Geschäftsführer:  
+Christian Wagner, Dipl.-Inform. (FH)
 
-Diese Datenschutzerklärung gilt für MessageDrop (messagedrop.de), die zugehörigen mobilen Anwendungen und Progressive Web Apps (PWA) sowie für interne Admin- und Moderationsoberflächen.
+E-Mail: jacktoolsnet@gmail.com  
+Telefon: +49 (0) 176 / 41 23 57 74  
 
+(im Folgenden „wir“, „uns“ oder „Anbieter“)
 
----
+Diese Datenschutzerklärung gilt für MessageDrop (messagedrop.de), zugehörige mobile Anwendungen, Progressive Web Apps (PWA) sowie interne Admin- und Moderationsoberflächen.
 
-2. Gegenstand und Zweck der Verarbeitung personenbezogener Daten
+─────────────────────────────────────────────────────────
+2. Nutzung als Besucher (ohne Nutzerkonto)
+─────────────────────────────────────────────────────────
 
-Wir verarbeiten personenbezogene Daten ausschließlich im Einklang mit der Datenschutz-Grundverordnung (DSGVO), dem Digital Services Act (DSA) sowie den anwendbaren nationalen Datenschutzgesetzen.
+─────────────────────────────────────────────────────────
+2.1 Allgemeine Nutzung
+─────────────────────────────────────────────────────────
 
-a) Account- und Profildaten (sofern freiwillig bereitgestellt)
+MessageDrop kann ohne Anlage eines Nutzers verwendet werden. Dabei können insbesondere öffentliche Inhalte gelesen werden.
 
-Zur Bereitstellung der Funktionen des Dienstes, zur Anzeige nutzergenerierter Inhalte sowie zur technischen Verwaltung des Nutzerkontos.
+─────────────────────────────────────────────────────────
+2.2 Technische Datenverarbeitung
+─────────────────────────────────────────────────────────
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. b DSGVO
+Bei der Nutzung als Besucher werden technisch notwendige Daten verarbeitet, insbesondere IP-Adresse, Zeitstempel und technische Header-Informationen.
 
+Zweck der Verarbeitung ist die technische Auslieferung des Dienstes, die Systemsicherheit, die Missbrauchs- und Betrugsprävention sowie die Fehleranalyse und Stabilität.
 
----
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
 
-b) Nutzergenerierte Inhalte (ergänzt)
+─────────────────────────────────────────────────────────
+2.3 Externe Inhalte und Drittanbieter
+─────────────────────────────────────────────────────────
 
-Beiträge, Kommentare, Anhänge, eingebettete Inhalte sowie zugehörige Metadaten werden verarbeitet, um die Plattform bereitzustellen, Inhalte darzustellen, zu moderieren und vor Missbrauch zu schützen.
+MessageDrop ermöglicht die optionale Einbindung externer Inhalte von Drittanbietern (z. B. Videos, Musik, animierte Inhalte oder eingebettete Medien).
 
-Zur Moderation können automatisierte Verfahren einschließlich KI-gestützter Erkennung eingesetzt werden.
+Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wird ein Hinweistext angezeigt, der den Nutzer darüber informiert, dass Inhalte eines Drittanbieters verfügbar sind, sowie eine aktive Entscheidungsmöglichkeit (z. B. ein Toggle), mit der der jeweilige Anbieter ausdrücklich aktiviert werden kann.
 
-Rechtsgrundlage:
-Art. 6 Abs. 1 lit. b und lit. f DSGVO
+Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
+Die Einbindung erfolgt über Einbettungstechniken wie iFrames oder oEmbed. Dabei werden die Inhalte direkt von den Servern des jeweiligen Drittanbieters geladen. Wir haben keinen Einfluss auf Art, Umfang und Zweck der Datenverarbeitung durch diese Anbieter.
 
----
+Durch die Aktivierung eines externen Inhaltsanbieters können insbesondere folgende Daten an den jeweiligen Anbieter übermittelt werden: IP-Adresse, technische Geräte- und Browserinformationen (z. B. User-Agent, Spracheinstellungen), Zeitpunkt des Abrufs, Referrer-Informationen (sofern vom Browser übertragen) sowie ggf. weitere technisch notwendige Request-Informationen.
 
-c) Geräte- und Nutzungsdaten
+Zugleich kann der jeweilige Anbieter technisch bedingt Daten an das Endgerät des Nutzers übertragen oder dort speichern, insbesondere Cookies oder vergleichbare Identifikationsinformationen (z. B. Local Storage, Session Storage), Pixel-, Tracking- oder Mess-Technologien (soweit vom Anbieter eingesetzt und technisch möglich) sowie Cache-Daten oder sonstige technisch erforderliche Inhalte zur Auslieferung der Einbettung.
 
-Hierzu zählen insbesondere IP-Adresse, Zeitstempel, technische Header sowie – sofern von dir aktiviert – grobe Standortinformationen.
+Wir haben auf Art, Umfang und Zweck dieser Datenverarbeitung durch den externen Anbieter keinen Einfluss. Die Verarbeitung erfolgt ausschließlich in der Verantwortung des jeweiligen Drittanbieters. Es gelten die Datenschutz- und Nutzungsbedingungen des jeweiligen Anbieters.
 
-Die Verarbeitung erfolgt zur:
+Nachfolgend sind die zum Zeitpunkt der Erstellung bekannten externen Anbieter aufgeführt:
 
-technischen Auslieferung des Dienstes
+YouTube (Google Ireland Limited)  
+Datenschutzerklärung: https://policies.google.com/privacy  
+Impressum / Kontakt: https://www.google.com/about/company/
 
-Gewährleistung der Systemsicherheit
+TikTok (TikTok Technology Limited / TikTok Information Technologies UK Limited)  
+Datenschutzerklärung: https://www.tiktok.com/legal/page/eea/privacy-policy/de  
+Impressum / Kontakt: https://www.tiktok.com/legal/page/global/impressum
 
-Missbrauchs- und Betrugsprävention
+Pinterest (Pinterest Europe Ltd.)  
+Datenschutzerklärung: https://policy.pinterest.com/de/privacy-policy  
+Kontakt: https://help.pinterest.com/de/contact
 
-Fehleranalyse und Stabilitätssicherung
+Spotify (Spotify AB)  
+Datenschutzerklärung: https://www.spotify.com/de/legal/privacy-policy/  
+Impressum: https://www.spotify.com/de/legal/imprint/
 
+Tenor (Google Ireland Limited)  
+Datenschutzerklärung: https://policies.google.com/privacy  
+Impressum / Kontakt: https://www.google.com/about/company/
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+Die oben genannten Links dienen ausschließlich der Information. Für Inhalte, Aktualität, Verfügbarkeit oder Änderungen der externen Seiten übernehmen wir keine Verantwortung oder Gewähr.
 
+Die Liste der externen Anbieter kann technisch bedingt erweitert oder angepasst werden, ohne dass dies eine Änderung dieser Datenschutzerklärung erfordert.
 
----
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung).
 
-d) Lokale Speicherung auf deinem Endgerät
+─────────────────────────────────────────────────────────
+3. Nutzung mit Nutzerkonto
+─────────────────────────────────────────────────────────
 
-Zur Bereitstellung von Offline-Funktionen, Performance-Optimierung und Zuverlässigkeit speichern wir Daten lokal im Browser oder in der App (z. B. IndexedDB, Local Storage, Cache).
+─────────────────────────────────────────────────────────
+3.1 Nutzeranlage
+─────────────────────────────────────────────────────────
 
-Diese Daten verbleiben grundsätzlich auf deinem Endgerät, sofern keine aktive Synchronisierung oder ein Export erfolgt.
+Die Anlage eines Nutzers erfolgt freiwillig und ausschließlich über die Vergabe eines PINs.
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. b und lit. f DSGVO
+Serverseitig werden gespeichert eine pseudonyme User-ID, der Nutzerstatus (z. B. enabled oder disabled) sowie das Datum des letzten Logins.
 
+Weitere Nutzerdaten werden ausschließlich verschlüsselt lokal auf dem Endgerät gespeichert.
 
----
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
-e) Kontakt- und Supportanfragen
+─────────────────────────────────────────────────────────
+3.2 Login und Authentifizierung
+─────────────────────────────────────────────────────────
 
-Wenn du uns kontaktierst, verarbeiten wir die von dir übermittelten Daten zur Bearbeitung deiner Anfrage.
+Zum Login wird der verschlüsselte Nutzerdatensatz temporär an das Backend übertragen und ausschließlich zur Prüfung der PIN-Gültigkeit verarbeitet. Eine dauerhafte Speicherung entschlüsselter Nutzerdaten oder des PINs erfolgt nicht.
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. b oder lit. f DSGVO
+─────────────────────────────────────────────────────────
+3.3 Löschung und Inaktivität
+─────────────────────────────────────────────────────────
 
+Nutzer, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden ohne Vorwarnung aus dem Backend entfernt.
 
----
+Mit der Entfernung des Nutzers werden alle zugehörigen serverseitig gespeicherten Datensätze gelöscht, insbesondere die User-ID, der Nutzerstatus, Login- und Aktivitätsinformationen sowie sonstige eindeutig zuordenbare serverseitige Referenzen.
 
-f) Einwilligungs- und Präferenzeinstellungen
+Die Löschung ist endgültig und nicht rückgängig zu machen.
 
-Zur Dokumentation und Umsetzung deiner Entscheidungen (z. B. Datenschutz-, Inhalts- oder Nutzungseinstellungen).
+Unabhängig davon kann der Nutzer seinen Nutzer jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung aller serverseitigen und lokalen Datensätze.
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. c und lit. a DSGVO
+─────────────────────────────────────────────────────────
+3.4 Öffentliche Inhalte und Kommentare
+─────────────────────────────────────────────────────────
 
+Nutzer können öffentliche Nachrichten und öffentliche Kommentare erstellen.
 
----
+Diese Inhalte werden zur Darstellung, Moderation, Missbrauchsprävention und zur Durchsetzung gesetzlicher Pflichten verarbeitet.
 
-3. Admin-Backend und interne Auswertungen
+Öffentliche Nachrichten und öffentliche Kommentare werden nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit oder Archivierung besteht nicht.
 
-a) Admin-Backend
+Öffentliche Inhalte können bewertet werden (z. B. Like / Dislike). Ein Anspruch auf bestimmte Reichweite, Sichtbarkeit oder Bewertungsergebnisse besteht nicht.
 
-Das Admin-Backend ist nicht öffentlich zugänglich und ausschließlich autorisierten Personen vorbehalten.
-Eine Nutzung durch Endnutzer ist ausgeschlossen.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b und lit. f DSGVO.
 
+─────────────────────────────────────────────────────────
+3.5 Private Kommunikation
+─────────────────────────────────────────────────────────
 
----
+Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen.
 
-b) Anonymisierte Nutzungsstatistiken
+Gelesene private Nachrichten werden nach 7 Tagen automatisch gelöscht. Ein Anspruch auf Archivierung oder Wiederherstellung besteht nicht.
 
-Im Admin-Bereich werden anonymisierte statistische Auswertungen darüber gespeichert, wie häufig einzelne Backend-Routen aufgerufen werden.
+Für Inhalte privater Kommunikation sind ausschließlich die beteiligten Nutzer verantwortlich. Eine inhaltliche Vorabprüfung oder laufende Überwachung findet nicht statt.
 
-Diese Daten:
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
-sind vollständig anonymisiert
+─────────────────────────────────────────────────────────
+3.6 Lokale Datenspeicherung auf dem Endgerät
+─────────────────────────────────────────────────────────
 
-enthalten keine IP-Adressen oder Nutzerkennungen
+MessageDrop verfolgt einen datenschutzorientierten Ansatz, bei dem ein Großteil der Daten ausschließlich lokal auf dem Endgerät des Nutzers gespeichert wird.
 
-lassen keine Rückschlüsse auf einzelne Personen zu
+Hierzu zählen insbesondere lokale Nutzerdaten, Einstellungen und Präferenzen, Kontakte und Verknüpfungen, lokal zwischengespeicherte Inhalte, kryptografische Schlüssel sowie temporäre Arbeitsdaten.
 
+Die Speicherung erfolgt je nach Plattform insbesondere über Browser-IndexedDB, lokalen App-Speicher sowie Cache-Mechanismen des Betriebssystems oder Browsers.
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+Diese Daten werden nicht automatisch mit unseren Servern synchronisiert, nicht zentral gespeichert und nicht von uns verwaltet.
 
+Die vollständige Kontrolle über lokal gespeicherte Daten liegt beim Nutzer. Der Nutzer kann diese Daten jederzeit selbst löschen, insbesondere durch entsprechende Funktionen innerhalb der App, das Löschen von App- oder Browserdaten, die Deinstallation der App oder PWA oder das Zurücksetzen des Browsers oder Endgeräts.
 
----
+Wir haben keinen Zugriff auf lokal gespeicherte Daten und keine Möglichkeit, diese Daten einzusehen, zu sichern, zu exportieren oder nachträglich wiederherzustellen.
 
-c) Server- und Systemprotokolle (Logs)
+Werden lokal gespeicherte Daten durch den Nutzer oder durch technische Umstände gelöscht, kann dies zum Verlust von Inhalten, Einstellungen oder Zugängen führen. Eine Wiederherstellung durch uns ist nicht möglich.
 
-Server-Logdateien werden maximal 7 Tage gespeichert und anschließend automatisch gelöscht.
+Die Verantwortung für Sicherung, Erhalt und Verwaltung lokal gespeicherter Daten liegt ausschließlich beim Nutzer.
 
-Logeinträge, die an das Admin-Backend übermittelt werden, werden maximal 2 Tage aufbewahrt.
+─────────────────────────────────────────────────────────
+4. Digital Services Act (DSA)
+─────────────────────────────────────────────────────────
 
+─────────────────────────────────────────────────────────
+4.1 DSA-Verfahren
+─────────────────────────────────────────────────────────
 
-Die Speicherung erfolgt ausschließlich zu Zwecken der Sicherheit, Fehleranalyse und Missbrauchsprävention.
+Für öffentliche Inhalte und Kommentare kann ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
 
-Rechtsgrundlage: Art. 6 Abs. 1 lit. f DSGVO
+Dabei verarbeiten wir insbesondere die User-ID, Angaben zum gemeldeten Inhalt, Zeitpunkte und Status des Verfahrens sowie getroffene Entscheidungen und Begründungen.
 
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO.
 
----
+─────────────────────────────────────────────────────────
+4.2 Öffentliche Fallseite
+─────────────────────────────────────────────────────────
 
-4. Einbindung externer Dienste (ergänzt)
+Für jeden DSA-relevanten Vorgang wird eine öffentlich zugängliche Fallseite bereitgestellt.
 
-Zur Bereitstellung einzelner Funktionen und zur Sicherheit binden wir externe Dienste ein:
+Diese enthält ausschließlich anonymisierte oder nicht personenbezogene Informationen, insbesondere den Verfahrensstatus, die Art des gemeldeten Inhalts, getroffene Entscheidungen sowie rechtliche Begründungen gemäß DSA.
 
-Wetter- und Luftqualitätsdaten: Open-Meteo
+Es werden keine personenbezogenen Daten veröffentlicht. Die Veröffentlichung erfolgt ausschließlich zur Erfüllung gesetzlicher Transparenzpflichten.
 
-Übersetzungen: DeepL
+─────────────────────────────────────────────────────────
+4.3 Öffentliche DSA-Statistik
+─────────────────────────────────────────────────────────
 
-Geokodierung: Nominatim / OpenStreetMap
-© OpenStreetMap-Mitwirkende
+MessageDrop stellt eine öffentlich zugängliche, aggregierte Statistik bereit, aus der hervorgeht die Anzahl eingeleiteter Verfahren, die Art der Entscheidungen sowie das Verhältnis von Meldungen zu Maßnahmen.
 
-Medien-Einbettungen (optional): YouTube, TikTok, Pinterest, Tenor, Spotify
+Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschlüsse auf einzelne Nutzer zu.
 
+─────────────────────────────────────────────────────────
+4.4 Speicherung und Weitergabe
+─────────────────────────────────────────────────────────
 
-Inhaltsmoderation (KI)
+DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten werden dauerhaft gespeichert, soweit dies zur Erfüllung gesetzlicher Dokumentations-, Nachweis- und Rechenschaftspflichten erforderlich ist.
 
-Zur Erkennung und Moderation potenziell rechtswidriger oder regelwidriger öffentlicher Inhalte setzen wir eine externe KI-gestützte Moderationslösung (z. B. OpenAI) ein.
+Eine Weitergabe an zuständige Behörden erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
 
-Hierbei können insbesondere übermittelt werden:
+─────────────────────────────────────────────────────────
+5. Speicherdauer
+─────────────────────────────────────────────────────────
 
-der zu prüfende Textinhalt
+Personenbezogene Daten werden nur so lange gespeichert, wie dies für den jeweiligen Zweck erforderlich ist oder gesetzliche Verpflichtungen bestehen.
 
-technisch notwendige Kontextinformationen (z. B. Sprache/Locale)
+Davon ausgenommen sind DSA-Verfahrensdaten, die gesetzlichen Aufbewahrungspflichten unterliegen.
 
+─────────────────────────────────────────────────────────
+6. Datensicherheit
+─────────────────────────────────────────────────────────
 
-Die Verarbeitung erfolgt zur Missbrauchsprävention, Sicherheit und Durchsetzung von Plattform-Regeln.
+Wir setzen angemessene technische und organisatorische Maßnahmen ein, um personenbezogene Daten vor Verlust, Missbrauch oder unbefugtem Zugriff zu schützen. Ein vollständiger Schutz kann jedoch nicht garantiert werden.
 
-Rechtsgrundlage:
-Art. 6 Abs. 1 lit. f DSGVO
-ggf. Art. 6 Abs. 1 lit. c DSGVO (gesetzliche Verpflichtungen)
+─────────────────────────────────────────────────────────
+7. Rechte der betroffenen Personen
+─────────────────────────────────────────────────────────
 
-Sofern Daten außerhalb des Europäischen Wirtschaftsraums verarbeitet werden, erfolgt dies unter Einhaltung geeigneter Garantien (z. B. Standardvertragsklauseln gemäß Art. 46 DSGVO).
+Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), Löschung (Art. 17 DSGVO), Einschränkung der Verarbeitung (Art. 18 DSGVO), Datenübertragbarkeit (Art. 20 DSGVO) sowie Widerspruch (Art. 21 DSGVO).
 
+Erteilte Einwilligungen können jederzeit mit Wirkung für die Zukunft widerrufen werden.
 
----
+─────────────────────────────────────────────────────────
+8. Mindestalter
+─────────────────────────────────────────────────────────
 
-5. Cookies und vergleichbare Technologien
+Der Dienst richtet sich nicht an Personen unter 16 Jahren (Art. 8 DSGVO).
 
-Wir verwenden keine Tracking- oder Marketing-Cookies.
-Es kommen ausschließlich technisch notwendige Speichertechnologien zum Einsatz (z. B. Local Storage, IndexedDB, Cache).
-
-Eine Einwilligung ist hierfür nicht erforderlich (§ 25 Abs. 2 TTDSG).
-
-
----
-
-6. Speicherdauer (präzisiert)
-
-Personenbezogene Daten werden nur so lange gespeichert, wie dies für die jeweiligen Zwecke erforderlich ist oder gesetzliche Verpflichtungen bestehen.
-
-Abweichend davon können DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten gemäß der DSA-Ergänzung dauerhaft gespeichert werden.
-
----
-
-7. Datensicherheit
-
-Wir setzen angemessene technische und organisatorische Maßnahmen ein, um personenbezogene Daten vor Verlust, Missbrauch oder unbefugtem Zugriff zu schützen.
-Ein vollständiger Schutz kann jedoch nicht garantiert werden.
-
-
----
-
-8. Weitergabe von Daten
-
-Eine Weitergabe personenbezogener Daten erfolgt nur:
-
-an Auftragsverarbeiter gemäß Art. 28 DSGVO
-
-bei gesetzlicher Verpflichtung
-
-oder soweit dies zur Nutzung einer ausdrücklich gewählten Funktion erforderlich ist
-
-
-
----
-
-9. Datenübermittlung in Drittstaaten
-
-Sofern Daten außerhalb des Europäischen Wirtschaftsraums verarbeitet werden, erfolgt dies nur unter Einhaltung der gesetzlichen Vorgaben (z. B. Standardvertragsklauseln gemäß Art. 46 DSGVO) oder aufgrund deiner ausdrücklichen Nutzung der entsprechenden Funktion.
-
-
----
-
-10. Rechte der betroffenen Personen
-
-Du hast das Recht auf:
-
-Auskunft (Art. 15 DSGVO)
-
-Berichtigung (Art. 16 DSGVO)
-
-Löschung (Art. 17 DSGVO)
-
-Einschränkung der Verarbeitung (Art. 18 DSGVO)
-
-Datenübertragbarkeit (Art. 20 DSGVO)
-
-Widerspruch gegen Verarbeitungen nach Art. 6 Abs. 1 lit. f DSGVO (Art. 21 DSGVO)
-
-
-Erteilte Einwilligungen kannst du jederzeit mit Wirkung für die Zukunft widerrufen.
-
-
----
-
-11. Mindestalter
-
-Der Dienst richtet sich nicht an Personen unter 16 Jahren gemäß Art. 8 DSGVO.
-
-
----
-
-12. Keine Notfalldienste
+─────────────────────────────────────────────────────────
+9. Keine Notfalldienste
+─────────────────────────────────────────────────────────
 
 Der Dienst stellt keinen Ersatz für Notfalldienste dar und bietet keinen Zugang zu solchen Diensten.
 
+─────────────────────────────────────────────────────────
+10. Änderungen der Datenschutzerklärung
+─────────────────────────────────────────────────────────
 
----
-
-13. Änderungen der Datenschutzerklärung
-
-Wir behalten uns vor, diese Datenschutzerklärung bei Bedarf anzupassen.
-Es gilt stets die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
-
-
----
-
-ERGÄNZUNG ZUR DATENSCHUTZERKLÄRUNG
-
-Digital Services Act (DSA)
-
-Stand: 14. Dezember 2025
-
-
----
-
-1. Anwendungsbereich
-
-Diese Ergänzung gilt für alle Verarbeitungen personenbezogener Daten im Zusammenhang mit Meldungen rechtswidriger Inhalte, Moderationsmaßnahmen, Entscheidungen und Beschwerden gemäß dem Digital Services Act (DSA).
-
-
----
-
-2. Meldungen rechtswidriger Inhalte (Notices)
-
-Bei Abgabe einer Meldung verarbeiten wir insbesondere:
-
-Angaben zum gemeldeten Inhalt
-
-Zeitpunkt der Meldung
-
-freiwillig übermittelte Begründungen
-
-freiwillig angegebene Kontaktdaten (Name, E-Mail-Adresse)
-
-
-Die Angabe von Name und E-Mail-Adresse ist freiwillig und dient der Kommunikation im Rahmen des Verfahrens.
-
-Rechtsgrundlage:
-Art. 6 Abs. 1 lit. c DSGVO
-Art. 6 Abs. 1 lit. f DSGVO
-
-
----
-
-3. Öffentliche Fallseite
-
-Für jeden DSA-relevanten Vorgang kann eine öffentlich zugängliche Fallseite bereitgestellt werden.
-
-Diese dient:
-
-dem meldenden Nutzer
-
-dem betroffenen Nutzer (Beschuldigter)
-
-zuständigen Behörden
-
-
-Auf der Fallseite können insbesondere angezeigt werden:
-
-Informationen zum gemeldeten Inhalt
-
-Verfahrensstatus
-
-getroffene Entscheidungen
-
-Begründungen gemäß DSA
-
-
-Die Veröffentlichung erfolgt ausschließlich im Rahmen der gesetzlichen Transparenzpflichten.
-
-
----
-
-4. Moderationsentscheidungen und dauerhafte Speicherung
-
-Moderationsentscheidungen, Begründungen, Verfahrensschritte und zugehörige Metadaten werden dauerhaft gespeichert, sofern dies zur Erfüllung der gesetzlichen Dokumentations-, Nachweis- und Rechenschaftspflichten nach dem Digital Services Act erforderlich ist.
-
-Eine automatische Löschung dieser Daten erfolgt nicht.
-
-Rechtsgrundlage:
-Art. 6 Abs. 1 lit. c DSGVO
-Art. 6 Abs. 1 lit. f DSGVO
-
-
----
-
-5. Beschwerden und Rechtsbehelfe (Appeals)
-
-Bei Einlegung einer Beschwerde verarbeiten wir die hierfür übermittelten Daten zur Durchführung und Dokumentation des Verfahrens.
-
-Die Daten werden über den Abschluss des Verfahrens hinaus gespeichert, soweit dies gesetzlich erforderlich ist.
-
-
----
-
-6. Export und Weitergabe an Behörden
-
-Für zuständige Behörden besteht eine Exportmöglichkeit relevanter Verfahrensdaten zur Erfüllung gesetzlicher Auskunfts- und Mitwirkungspflichten.
-
-Die Weitergabe erfolgt ausschließlich im rechtlich zulässigen Rahmen.
-
-
----
-
-7. Zugriffsbeschränkung
-
-DSA-relevante Daten sind ausschließlich autorisierten Personen im internen Admin- und Moderationsbereich zugänglich.
+Wir behalten uns vor, diese Datenschutzerklärung anzupassen. Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
