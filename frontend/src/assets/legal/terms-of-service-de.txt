@@ -1,7 +1,6 @@
 NUTZUNGSBEDINGUNGEN
 Stand: 14. Dezember 2025
 
-
 ###
 Kurzfassung (nicht rechtsverbindlich)
 ###
@@ -10,13 +9,13 @@ Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
 
 Du bist für die von dir erstellten Inhalte selbst verantwortlich und musst sicherstellen, dass diese rechtmäßig sind und keine Rechte Dritter verletzen.
 
-Inhalte können manuell und automatisiert (einschließlich KI-gestützter Verfahren) moderiert, gesperrt oder entfernt werden.
+Inhalte können manuell sowie automatisiert, einschließlich KI-gestützter Verfahren, moderiert, eingeschränkt oder entfernt werden.
 
-Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen den Bedingungen der jeweiligen Anbieter.
+Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen ausschließlich den Bedingungen der jeweiligen Anbieter.
 
 Der Dienst kann zeitweise eingeschränkt oder nicht verfügbar sein; eine bestimmte Verfügbarkeit wird nicht garantiert.
 
-Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; sichere wichtige Daten selbst.
+Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; du bist selbst für geeignete Sicherungen verantwortlich.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten und ersetzt keine Aufmerksamkeit oder Sorgfalt im realen Leben.
 
@@ -37,13 +36,13 @@ Im Kirchfeld 27
 38304 Wolfenbüttel  
 Deutschland  
 
-Vertreten durch den Geschäftsführer: Christian Wagner, Dipl.-Inform. (FH)
+Vertreten durch den Geschäftsführer:
+Christian Wagner, Dipl.-Inform. (FH)
 
 E-Mail: jacktoolsnet@gmail.com  
 Telefon: +49 (0) 176 / 41 23 57 74  
 
 (im Folgenden „wir“, „uns“ oder „Anbieter“)
-
 
 ###
 2. Geltungsbereich und Zustimmung
@@ -53,8 +52,7 @@ Diese Nutzungsbedingungen regeln die Nutzung der Plattform MessageDrop.
 
 Mit dem Zugriff auf oder der Nutzung von MessageDrop erklärst du dich mit diesen Nutzungsbedingungen einverstanden.
 
-Wenn du diesen Bedingungen nicht zustimmst, darfst du den Dienst nicht nutzen.
-
+Wenn du diesen Nutzungsbedingungen nicht zustimmst, ist eine Nutzung des Dienstes nicht zulässig.
 
 ###
 3. Änderungen der Nutzungsbedingungen
@@ -66,7 +64,6 @@ Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
 
 Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren.
 
-
 ###
 4. Nutzungsberechtigung
 ###
@@ -75,12 +72,9 @@ Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindeste
 
 Der Dienst richtet sich nicht an Kinder unter 16 Jahren.
 
-Personen zwischen 16 und 17 Jahren dürfen MessageDrop ausschließlich im Rahmen der gesetzlich zulässigen beschränkten Geschäftsfähigkeit nutzen. Rechtsverbindliche Erklärungen oder Verpflichtungen, die über den vertragsgemäßen Gebrauch des Dienstes hinausgehen, dürfen nur von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
+Personen zwischen 16 und 17 Jahren dürfen MessageDrop nur im Rahmen der gesetzlich zulässigen beschränkten Geschäftsfähigkeit nutzen. Rechtsverbindliche Erklärungen oder Verpflichtungen, die über den vertragsgemäßen Gebrauch des Dienstes hinausgehen, dürfen ausschließlich von voll geschäftsfähigen Personen (ab 18 Jahren) abgegeben werden.
 
-Soweit im Rahmen der Nutzung rechtsverbindliche Erklärungen erforderlich sind, ist die Nutzung insoweit nur Personen gestattet, die voll geschäftsfähig sind.
-
-Wenn du MessageDrop im Namen einer Organisation nutzt, bestätigst du, hierzu berechtigt zu sein.
-
+Wenn du MessageDrop im Namen einer Organisation oder juristischen Person nutzt, bestätigst du, hierzu rechtlich befugt zu sein.
 
 ###
 5. Leistungsbeschreibung
@@ -88,7 +82,7 @@ Wenn du MessageDrop im Namen einer Organisation nutzt, bestätigst du, hierzu be
 
 MessageDrop ist eine Plattform zur Veröffentlichung, Anzeige und Organisation nutzergenerierter Inhalte mit optionaler privater Kommunikation.
 
-Der Dienst kann externe Inhalte oder Funktionen einbinden, unter anderem von:
+Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
 
 - Open-Meteo
 - DeepL
@@ -99,17 +93,15 @@ Der Dienst kann externe Inhalte oder Funktionen einbinden, unter anderem von:
 - Tenor
 - Spotify
 
-Ein Anspruch auf bestimmte Funktionen, eine bestimmte Darstellung oder eine permanente Verfügbarkeit besteht nicht.
-
+Ein Anspruch auf bestimmte Funktionen, Darstellungen oder eine dauerhafte Verfügbarkeit besteht nicht.
 
 ###
 6. Nutzerkonten und Sicherheit (sofern genutzt)
 ###
 
-Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln.
+Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln und vor dem Zugriff durch unbefugte Dritte zu schützen.
 
-Du bist für alle Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
-
+Du bist für sämtliche Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
 
 ###
 7. Nutzergenerierte Inhalte und Nutzungsrechte
@@ -117,27 +109,27 @@ Du bist für alle Aktivitäten verantwortlich, die über dein Nutzerkonto erfolg
 
 Du behältst alle Rechte an den von dir erstellten Inhalten.
 
-Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives, unentgeltliches Nutzungsrecht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren.
+Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives und unentgeltliches Recht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren.
 
-Du sicherst zu, dass du über alle erforderlichen Rechte verfügst, deine Inhalte rechtmäßig sind und keine Rechte Dritter verletzt werden.
-
+Du sicherst zu, dass du über alle erforderlichen Rechte verfügst und dass deine Inhalte rechtmäßig sind sowie keine Rechte Dritter verletzen.
 
 ###
 8. Moderation und Entfernung von Inhalten
 ###
 
-Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder in ihrer Sichtbarkeit einzuschränken, insbesondere bei rechtswidrigen Inhalten, Verstößen gegen diese Nutzungsbedingungen oder Meldungen im Rahmen gesetzlicher Verfahren (z. B. DSA).
+Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder in ihrer Sichtbarkeit einzuschränken, insbesondere bei rechtswidrigen Inhalten, Verstößen gegen diese Nutzungsbedingungen oder Meldungen im Rahmen gesetzlicher Verfahren (z. B. Digital Services Act).
 
 Zur Unterstützung der Moderation können automatisierte Verfahren, einschließlich KI-gestützter Prüfungen, eingesetzt werden.
 
 Eine vollständige Vorabkontrolle sämtlicher Inhalte findet nicht statt.
 
-
 ###
 9. Unzulässige Nutzung
 ###
 
-Es ist untersagt, MessageDrop zu nutzen, um Inhalte zu erstellen, zu verbreiten, zu verlinken oder anderweitig bereitzustellen, die gegen geltendes Recht, gegen diese Nutzungsbedingungen oder gegen Rechte Dritter verstoßen.
+Es ist untersagt, MessageDrop für rechtswidrige, missbräuchliche oder vertragswidrige Zwecke zu nutzen.
+
+Insbesondere ist es untersagt, Inhalte zu erstellen, zu verbreiten, zu verlinken oder bereitzustellen, die gegen geltendes Recht, diese Nutzungsbedingungen oder Rechte Dritter verstoßen.
 
 Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
 
@@ -181,8 +173,8 @@ Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
 
 Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die betreffenden Informationen öffentlich zugänglich erscheinen.
 
-Die Aufzählung ist nicht abschließend.
 
+Die Aufzählung ist nicht abschließend.
 
 ###
 10. Inhalte und Dienste Dritter
@@ -190,10 +182,9 @@ Die Aufzählung ist nicht abschließend.
 
 Inhalte und Dienste Dritter unterliegen ausschließlich den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
 
-Wir übernehmen keine Verantwortung für Inhalte Dritter, die Verfügbarkeit externer Dienste oder die Richtigkeit bzw. Aktualität externer Informationen.
+Wir übernehmen keine Verantwortung für Inhalte Dritter, die Verfügbarkeit externer Dienste oder die Richtigkeit und Aktualität externer Informationen.
 
 Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu beachten.
-
 
 ###
 11. Keine Notfalldienste
@@ -201,28 +192,25 @@ Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu 
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
 
-Der Dienst ersetzt keine Aufmerksamkeit, keine Vorsicht und kein verantwortungsbewusstes Verhalten im realen Leben.
-
+Der Dienst ersetzt keine Aufmerksamkeit, Vorsicht oder verantwortungsbewusstes Verhalten im realen Leben.
 
 ###
 12. Verfügbarkeit und Wartung
 ###
 
-Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere durch Wartungsarbeiten, technische Störungen, Ausfälle externer Dienste oder höhere Gewalt.
+Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere aufgrund von Wartungsarbeiten, technischen Störungen, Ausfällen externer Dienste oder höherer Gewalt.
 
 Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
-
 
 ###
 13. Lokale Speicherung und Datenverlust
 ###
 
-Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage, Cache).
+Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage oder Cache).
 
-Diese Daten sind geräte- und browserabhängig sowie jederzeit löschbar oder verlierbar.
+Diese Daten sind geräte- und browserabhängig und können jederzeit gelöscht werden oder verloren gehen.
 
-Du bist selbst für geeignete Sicherungen verantwortlich. Eine Wiederherstellung durch uns ist nicht möglich.
-
+Du bist selbst für geeignete Sicherungen verantwortlich; eine Wiederherstellung durch uns ist nicht möglich.
 
 ###
 14. Geistiges Eigentum
@@ -230,8 +218,7 @@ Du bist selbst für geeignete Sicherungen verantwortlich. Eine Wiederherstellung
 
 Alle Rechte an MessageDrop, einschließlich Software, Design und Marken, liegen bei uns oder unseren Lizenzgebern.
 
-Eine Nutzung unserer Marken oder Kennzeichen ist ohne vorherige Zustimmung nicht gestattet.
-
+Eine Nutzung unserer Marken oder Kennzeichen ohne vorherige Zustimmung ist nicht gestattet.
 
 ###
 15. Beendigung der Nutzung
@@ -241,7 +228,6 @@ Du kannst die Nutzung von MessageDrop jederzeit einstellen.
 
 Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei Verstößen gegen diese Nutzungsbedingungen, gesetzlicher Verpflichtung oder missbräuchlicher Nutzung.
 
-
 ###
 16. Haftungsausschluss
 ###
@@ -250,24 +236,21 @@ Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
 
 Die Nutzung erfolgt auf eigene Verantwortung.
 
-Wir übernehmen keine Verantwortung für Schäden, die durch eine unsachgemäße oder unaufmerksame Nutzung entstehen, insbesondere nicht für Schäden, die außerhalb des Einflussbereichs des Dienstes liegen.
-
+Wir übernehmen keine Verantwortung für Schäden, die durch unsachgemäße, unaufmerksame oder zweckwidrige Nutzung entstehen und außerhalb unseres Einflussbereichs liegen.
 
 ###
 17. Haftungsbeschränkung
 ###
 
-Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder Verletzung von Leben, Körper oder Gesundheit.
+Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder bei Verletzung von Leben, Körper oder Gesundheit.
 
 Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
-
 
 ###
 18. Freistellung
 ###
 
-Du stellst uns von Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
-
+Du stellst uns von sämtlichen Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
 
 ###
 19. Anwendbares Recht und Gerichtsstand
@@ -279,13 +262,11 @@ Sofern du Kaufmann oder juristische Person bist, ist Gerichtsstand unser Sitz.
 
 Zwingende Verbraucherschutzvorschriften bleiben unberührt.
 
-
 ###
 20. Salvatorische Klausel
 ###
 
-Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleiben die übrigen Bestimmungen wirksam.
-
+Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
 
 ###
 21. Kontakt

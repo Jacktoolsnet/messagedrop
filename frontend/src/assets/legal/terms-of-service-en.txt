@@ -1,0 +1,283 @@
+TERMS OF USE
+As of: 14 December 2025
+
+NOTICE REGARDING LANGUAGE
+The German version of these Terms of Use is the only legally binding version. This English translation is provided solely as a convenience service and does not replace the German version.
+
+###
+Summary (not legally binding)
+###
+
+By using MessageDrop, you accept these Terms of Use.
+
+You are responsible for the content you create and must ensure that it is lawful and does not infringe the rights of third parties.
+
+Content may be moderated, restricted, or removed manually as well as by automated means, including AI-assisted methods.
+
+External services and embedded content (e.g., YouTube, OpenStreetMap, DeepL) are governed exclusively by the terms and conditions of the respective providers.
+
+The service may be temporarily restricted or unavailable; specific availability is not guaranteed.
+
+A large portion of the data is stored locally on your device. This data may be lost or deleted; you are responsible for making appropriate backups.
+
+MessageDrop does not provide access to emergency services and does not replace attention or care in real life.
+
+Only the current complete German version of these Terms of Use is authoritative.
+
+###
+Full Version
+###
+
+###
+1. Provider
+###
+
+MessageDrop (messagedrop.de) is operated by:
+
+JackTools.Net UG (limited liability)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
+Germany  
+
+Represented by the Managing Director:  
+Christian Wagner, Dipl.-Inform. (FH)
+
+Email: jacktoolsnet@gmail.com  
+Phone: +49 (0) 176 / 41 23 57 74  
+
+(hereinafter "we", "us", or "Provider")
+
+###
+2. Scope and Acceptance
+###
+
+These Terms of Use govern the use of the MessageDrop platform.
+
+By accessing or using MessageDrop, you agree to these Terms of Use.
+
+If you do not agree to these Terms of Use, you are not permitted to use the service.
+
+###
+3. Changes to the Terms of Use
+###
+
+We reserve the right to change or update these Terms of Use at any time.
+
+The version that is current at the time of publication shall apply.
+
+If changes have a material impact on users, we will inform users in an appropriate manner.
+
+###
+4. Eligibility to Use
+###
+
+Use of MessageDrop is permitted only for persons who are at least 16 years old.
+
+The service is not directed at children under 16 years of age.
+
+Persons between 16 and 17 years of age may use MessageDrop only within the limits of legally permitted limited capacity to contract. Legally binding declarations or obligations that go beyond the contractual use of the service may be made only by persons with full legal capacity (from 18 years of age).
+
+If you use MessageDrop on behalf of an organization or legal entity, you confirm that you are legally authorized to do so.
+
+###
+5. Service Description
+###
+
+MessageDrop is a platform for publishing, displaying, and organizing user-generated content, with optional private communication.
+
+The service may integrate external content or functions, in particular from:
+
+- Open-Meteo
+- DeepL
+- Nominatim / OpenStreetMap
+- YouTube
+- TikTok
+- Pinterest
+- Tenor
+- Spotify
+
+There is no entitlement to specific functions, displays, or permanent availability.
+
+###
+6. User Accounts and Security (if used)
+###
+
+If user accounts are offered or used, you are required to keep your access credentials confidential and protect them from access by unauthorized third parties.
+
+You are responsible for all activities carried out via your user account.
+
+###
+7. User-Generated Content and Usage Rights
+###
+
+You retain all rights to the content you create.
+
+By posting content, you grant us a worldwide, non-exclusive, and royalty-free right to store, reproduce, make publicly accessible, display, technically process, and moderate such content for the operation of the service.
+
+You warrant that you hold all necessary rights and that your content is lawful and does not infringe the rights of third parties.
+
+###
+8. Moderation and Removal of Content
+###
+
+We reserve the right to remove content, block it, or restrict its visibility in whole or in part, in particular in the case of unlawful content, violations of these Terms of Use, or reports made under statutory procedures (e.g., the Digital Services Act).
+
+To support moderation, automated procedures, including AI-assisted checks, may be used.
+
+A complete prior review of all content does not take place.
+
+###
+9. Prohibited Use
+###
+
+It is prohibited to use MessageDrop for unlawful, abusive, or contract-breaching purposes.
+
+In particular, it is prohibited to create, distribute, link to, or otherwise provide content that violates applicable law, these Terms of Use, or the rights of third parties.
+
+Prohibited content or uses include, in particular, content or uses that:
+
+- violate applicable law or encourage such violations
+- infringe the rights of third parties, in particular copyright, personality rights, trademark rights, name rights, or data protection rights
+- constitute, promote, or prepare criminal offenses
+- incite criminal acts
+- contain hate speech, glorification of violence, threats, or targeted harassment
+- are insulting, degrading, or deliberately hurtful toward individuals or groups
+- are discriminatory, extremist, or inhumane
+- contain pornographic, sexually explicit, or harmful-to-minors content
+- depict or imply sexual acts involving minors
+- disclose private or personal data of third parties without their express consent, in particular:
+  - first and last names, nicknames, or other identifying name information
+  - date of birth or birthday
+  - age or age information in combination with identifying information
+  - email addresses
+  - phone numbers
+  - residential, current, or work addresses
+  - precise location data (e.g., GPS coordinates, live locations, regularly used places)
+  - real-time location information or information that can be traced back
+  - copies of identity documents, identification numbers, or official identifiers
+  - usernames, IDs, or profile links to other services
+  - photos or videos of persons, insofar as they are clearly identifiable and no consent exists
+  - biometric data (e.g., facial features, fingerprints)
+  - health data or information about physical or mental condition
+  - information about sexual orientation or sex life
+  - information about political opinions, religious or philosophical beliefs
+  - banking, payment, or financial information
+  - access credentials, passwords, PINs, or other security-related information
+- contain misleading, fraudulent, or manipulative content
+- spread false statements of fact about persons
+- facilitate deception, fraud, or abuse
+- contain malware, spyware, or comparable harmful content
+- include spam, chain messages, or abusive automation
+- encourage circumvention of security measures or protective mechanisms, or contain corresponding instructions
+- intentionally bypass technical restrictions or usage limits, or instruct others to do so
+- misuse the service in a manner that impairs functionality, security, or availability (e.g., flooding, scraping, automated mass use)
+- falsely suggest a connection, partnership, or endorsement by us or by third parties
+- originate from obviously unlawful, unauthorized, or leaked sources
+
+This applies regardless of whether the affected person is a user of MessageDrop or whether the information appears to be publicly accessible.
+
+The list is not exhaustive.
+
+###
+10. Third-Party Content and Services
+###
+
+Third-party content and services are governed exclusively by the terms of use and privacy policies of the respective providers.
+
+We assume no responsibility for third-party content, the availability of external services, or the correctness and timeliness of external information.
+
+Required attributions (e.g., "© OpenStreetMap contributors") must be observed.
+
+###
+11. No Emergency Services
+###
+
+MessageDrop does not provide access to emergency services (e.g., police, fire department, emergency medical services).
+
+The service does not replace attention, caution, or responsible behavior in real life.
+
+###
+12. Availability and Maintenance
+###
+
+The service may be temporarily restricted or interrupted, in particular due to maintenance work, technical disruptions, failures of external services, or force majeure.
+
+Specific availability or accessibility is not guaranteed.
+
+###
+13. Local Storage and Data Loss
+###
+
+Data may be stored locally on your device (e.g., IndexedDB, Local Storage, or cache).
+
+Such data is device- and browser-dependent and may be deleted or lost at any time.
+
+You are responsible for making appropriate backups; restoration by us is not possible.
+
+###
+14. Intellectual Property
+###
+
+All rights to MessageDrop, including software, design, and trademarks, are held by us or our licensors.
+
+Use of our trademarks or identifiers without prior consent is not permitted.
+
+###
+15. Termination of Use
+###
+
+You may stop using MessageDrop at any time.
+
+We reserve the right to block or terminate access in whole or in part, in particular in the event of violations of these Terms of Use, legal obligations, or abusive use.
+
+###
+16. Disclaimer of Liability
+###
+
+The service is provided "as is" and "as available".
+
+Use is at your own risk.
+
+We assume no responsibility for damages resulting from improper, inattentive, or improper-purpose use that arise outside our sphere of influence.
+
+###
+17. Limitation of Liability
+###
+
+We are liable without limitation only in cases of intent, gross negligence, or injury to life, body, or health.
+
+Otherwise, liability is excluded to the extent permitted by law.
+
+###
+18. Indemnification
+###
+
+You shall indemnify us against all third-party claims asserted due to your content or your violation of these Terms of Use, to the extent permitted by law.
+
+###
+19. Applicable Law and Jurisdiction
+###
+
+The law of the Federal Republic of Germany shall apply.
+
+If you are a merchant or a legal entity, the place of jurisdiction shall be our registered office.
+
+Mandatory consumer protection provisions remain unaffected.
+
+###
+20. Severability Clause
+###
+
+Should any provision of these Terms of Use be or become invalid, the validity of the remaining provisions shall remain unaffected.
+
+###
+21. Contact
+###
+
+JackTools.Net UG (limited liability)  
+Im Kirchfeld 27  
+38304 Wolfenbüttel  
+Germany  
+
+Email: jacktoolsnet@gmail.com  
+Phone: +49 (0) 176 / 41 23 57 74
