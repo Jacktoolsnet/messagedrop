@@ -21,7 +21,7 @@ Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden ausschließlich auf Wuns
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
-Maßgeblich ist ausschließlich die aktuelle vollständige Fassung dieses Haftungshinweises.
+Maßgeblich ist ausschließlich die aktuelle vollständige deutsche Fassung dieses Haftungshinweises.
 
 ###
 Vollständige Fassung
@@ -184,6 +184,7 @@ Unzulässig sind insbesondere Inhalte, die:
 - gegen geltendes Recht verstoßen
 - Rechte Dritter verletzen (z. B. Urheber-, Persönlichkeits-, Marken- oder Datenschutzrechte)
 - strafbare Inhalte darstellen oder fördern
+- zu strafbaren Handlungen auffordern
 - Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten
 - beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind
 - diskriminierend, extremistisch oder menschenverachtend sind
@@ -263,6 +264,8 @@ Zu Kontakten können zusätzliche Eigenschaften hinterlegt werden. Diese Informa
 
 Ein Nutzer kann einen bestehenden Kontakt jederzeit selbstständig löschen und so die Verbindung zu diesem Kontakt beenden. Mit dem Löschen eines Kontakts ist keine weitere private Kommunikation zwischen den beteiligten Nutzern über MessageDrop möglich.
 
+Eine erneute Kontaktaufnahme zwischen den Nutzern ist weiterhin möglich.
+
 MessageDrop ermöglicht es zudem, private Chaträume zu nutzen. Private Chatnachrichten werden verschlüsselt und signiert übertragen. Der Inhalt dieser privaten Kommunikation ist für uns grundsätzlich nicht im Klartext einsehbar.
 
 Private Chatnachrichten werden ausschließlich für die Kommunikation zwischen den beteiligten Nutzern bereitgestellt.
@@ -327,11 +330,11 @@ Wird ein solches Verfahren eingeleitet, wird der betroffene Inhalt vorübergehen
 
 „Nicht öffentlich sichtbar“ bedeutet, dass der Inhalt für andere Nutzer nicht mehr öffentlich angezeigt wird, bis eine inhaltliche Entscheidung im Rahmen des Verfahrens getroffen wurde. Der Inhalt wird in diesem Zustand weder empfohlen noch öffentlich verbreitet.
 
-Im Rahmen des DSA-Verfahrens werden insbesondere verfahrensbezogene Informationen verarbeitet, darunter Angaben zum gemeldeten Inhalt, Zeitpunkte, Verfahrensstatus, Entscheidungen und Begründungen.
+Im Rahmen des DSA-Verfahrens werden insbesondere verfahrensbezogene Informationen verarbeitet, darunter vom Melder gemachte Angaben, Angaben zum gemeldeten Inhalt, Zeitpunkte, Verfahrensstatus, Entscheidungen und Begründungen.
 
 Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlangung von rechtswidrigen Inhalten entfernen oder sperren wir diese entsprechend den gesetzlichen Vorgaben („Notice-and-Takedown“).
 
-Die im Rahmen eines DSA-Verfahrens erhobenen und dokumentierten Informationen können auf rechtmäßige Anfrage an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen weitergegeben werden, soweit dies gesetzlich vorgeschrieben oder zulässig ist.
+Die im Rahmen eines DSA-Verfahrens erhobenen und dokumentierten Informationen können an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen weitergegeben werden, soweit dies gesetzlich vorgeschrieben oder zulässig ist.
 
 Für jeden DSA-relevanten Vorgang (Meldung oder Beschwerde) kann eine öffentlich zugängliche Fallseite bereitgestellt werden. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
 

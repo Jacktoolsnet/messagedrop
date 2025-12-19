@@ -23,7 +23,7 @@ Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden nur auf ausdrücklichen 
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
-Maßgeblich ist ausschließlich die aktuelle vollständige Datenschutzerklärung einschließlich der Ergänzungen zum Digital Services Act (DSA).
+Maßgeblich ist ausschließlich die aktuelle vollständige deutsche Fassung dieser Datenschutzerklärung einschließlich der Ergänzungen zum Digital Services Act (DSA).
 
 ###
 Vollständige Fassung
@@ -224,7 +224,7 @@ Es werden keine personenbezogenen Daten veröffentlicht. Die Veröffentlichung e
 4.3 Öffentliche DSA-Statistik
 ###
 
-MessageDrop stellt eine öffentlich zugängliche, aggregierte Statistik bereit, aus der hervorgeht die Anzahl eingeleiteter Verfahren, die Art der Entscheidungen sowie das Verhältnis von Meldungen zu Maßnahmen.
+MessageDrop stellt eine öffentlich zugängliche, aggregierte Statistik bereit, aus der die Anzahl eingeleiteter Verfahren, die Art der Entscheidungen sowie das Verhältnis von Meldungen zu Maßnahmen hervorgeht.
 
 Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschlüsse auf einzelne Nutzer zu.
 

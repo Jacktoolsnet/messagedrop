@@ -20,7 +20,7 @@ Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten und ersetzt keine Aufmerksamkeit oder Sorgfalt im realen Leben.
 
-Maßgeblich ist ausschließlich die aktuelle vollständige Fassung dieser Nutzungsbedingungen.
+Maßgeblich ist ausschließlich die aktuelle vollständige deutsche Fassung dieser Nutzungsbedingungen.
 
 ###
 Vollständige Fassung
@@ -106,7 +106,7 @@ Ein Anspruch auf bestimmte Funktionen, eine bestimmte Darstellung oder eine perm
 6. Nutzerkonten und Sicherheit (sofern genutzt)
 ###
 
-Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln und unbefugte Nutzung unverzüglich zu melden.
+Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln.
 
 Du bist für alle Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
 
@@ -141,42 +141,43 @@ Es ist untersagt, MessageDrop zu nutzen, um Inhalte zu erstellen, zu verbreiten,
 
 Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
 
-- gegen geltendes Recht verstoßen oder zu solchen Verstößen auffordern,
-- Rechte Dritter verletzen, insbesondere Urheber-, Persönlichkeits-, Marken-, Namens- oder Datenschutzrechte,
-- strafbare Inhalte darstellen, fördern oder vorbereiten,
-- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten,
-- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind,
-- diskriminierend, extremistisch oder menschenverachtend sind,
-- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten,
-- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten,
+- gegen geltendes Recht verstoßen oder zu solchen Verstößen auffordern
+- Rechte Dritter verletzen, insbesondere Urheber-, Persönlichkeits-, Marken-, Namens- oder Datenschutzrechte
+- strafbare Inhalte darstellen, fördern oder vorbereiten
+- zu strafbaren Handlungen auffordern
+- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten
+- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind
+- diskriminierend, extremistisch oder menschenverachtend sind
+- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten
+- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten
 - private oder personenbezogene Daten Dritter ohne deren ausdrückliche Einwilligung offenlegen, insbesondere:
-  - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben,
-  - Geburtsdatum oder Geburtstag,
-  - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen,
-  - E-Mail-Adressen,
-  - Telefonnummern,
-  - Wohn-, Aufenthalts- oder Arbeitsadressen,
-  - genaue Standortdaten (z. B. GPS-Koordinaten, Live-Standorte, regelmäßig genutzte Orte),
-  - Informationen zu Aufenthaltsorten in Echtzeit oder rückverfolgbar,
-  - Ausweiskopien, Identifikationsnummern oder amtliche Kennzeichen,
-  - Benutzernamen, IDs oder Profilverknüpfungen zu anderen Diensten,
-  - Fotos oder Videos von Personen, sofern diese eindeutig identifizierbar sind und keine Einwilligung vorliegt,
-  - biometrische Daten (z. B. Gesichtsmerkmale, Fingerabdrücke),
-  - Gesundheitsdaten oder Informationen zum körperlichen oder psychischen Zustand,
-  - Informationen zur sexuellen Orientierung oder zum Sexualleben,
-  - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen,
-  - Bank-, Zahlungs- oder Finanzinformationen,
-  - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen,
-- irreführende, betrügerische oder manipulative Inhalte enthalten,
-- falsche Tatsachenbehauptungen über Personen verbreiten,
-- zu Täuschung, Betrug oder Missbrauch verleiten,
-- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten,
-- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
-- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten,
-- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
-- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
-- eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen,
-- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
+  - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben
+  - Geburtsdatum oder Geburtstag
+  - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen
+  - E-Mail-Adressen
+  - Telefonnummern
+  - Wohn-, Aufenthalts- oder Arbeitsadressen
+  - genaue Standortdaten (z. B. GPS-Koordinaten, Live-Standorte, regelmäßig genutzte Orte)
+  - Informationen zu Aufenthaltsorten in Echtzeit oder rückverfolgbar
+  - Ausweiskopien, Identifikationsnummern oder amtliche Kennzeichen
+  - Benutzernamen, IDs oder Profilverknüpfungen zu anderen Diensten
+  - Fotos oder Videos von Personen, sofern diese eindeutig identifizierbar sind und keine Einwilligung vorliegt
+  - biometrische Daten (z. B. Gesichtsmerkmale, Fingerabdrücke)
+  - Gesundheitsdaten oder Informationen zum körperlichen oder psychischen Zustand
+  - Informationen zur sexuellen Orientierung oder zum Sexualleben
+  - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen
+  - Bank-, Zahlungs- oder Finanzinformationen
+  - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen
+- irreführende, betrügerische oder manipulative Inhalte enthalten
+- falsche Tatsachenbehauptungen über Personen verbreiten
+- zu Täuschung, Betrug oder Missbrauch verleiten
+- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten
+- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten
+- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten
+- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten
+- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung)
+- eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen
+- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen
 
 Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die betreffenden Informationen öffentlich zugänglich erscheinen.
 
