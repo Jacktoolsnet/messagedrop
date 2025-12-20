@@ -24,6 +24,7 @@ const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
+const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
@@ -215,23 +216,72 @@ app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
 
+const rateLimitDefaults = {
+  standardHeaders: true,
+  legacyHeaders: false
+};
+
+const adminDefaultLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 600,
+  ...rateLimitDefaults,
+  message: { error: 'Too many requests, please slow down.' }
+});
+
+const adminPublicLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: { error: 'Too many public status requests, please try again later.' }
+});
+
+const adminDsaLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: { error: 'Too many DSA requests, please try again later.' }
+});
+
+const adminTranslateLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: { error: 'Too many translate requests, please try again later.' }
+});
+
+const adminUserLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 30,
+  ...rateLimitDefaults,
+  message: { error: 'Too many user requests, please try again later.' }
+});
+
+const adminLogLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  ...rateLimitDefaults,
+  message: { error: 'Too many log requests, please try again later.' }
+});
+
+app.use(adminDefaultLimit);
+
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
-app.use('/clientconnect', clientConnect);
-app.use('/user', user);
-app.use('/translate', translate);
+app.use('/clientconnect', adminUserLimit, clientConnect);
+app.use('/user', adminUserLimit, user);
+app.use('/translate', adminTranslateLimit, translate);
 app.use('/statistic', statistic);
-app.use('/error-log', errorLog);
-app.use('/info-log', infoLog);
+app.use('/error-log', adminLogLimit, errorLog);
+app.use('/info-log', adminLogLimit, infoLog);
 
 
 // DSA
-app.use('/dsa/frontend', dsaFrontend);
-app.use('/dsa/backend', dsaBackend);
+app.use('/dsa/frontend', adminDsaLimit, dsaFrontend);
+app.use('/dsa/backend', adminDsaLimit, dsaBackend);
 
 // Public status endpoints
-app.use('/public', publicStatus);
+app.use('/public', adminPublicLimit, publicStatus);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));

@@ -14,6 +14,7 @@ const airQualtiy = require('./routes/air-quality');
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
+const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
@@ -123,11 +124,30 @@ app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
 
+const rateLimitDefaults = {
+  standardHeaders: true,
+  legacyHeaders: false
+};
+
+const weatherLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: { error: 'Too many weather requests, please try again later.' }
+});
+
+const airQualityLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: { error: 'Too many air quality requests, please try again later.' }
+});
+
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
-app.use('/airquality', airQualtiy);
-app.use('/weather', weather);
+app.use('/airquality', airQualityLimit, airQualtiy);
+app.use('/weather', weatherLimit, weather);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));

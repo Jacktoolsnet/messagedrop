@@ -16,6 +16,35 @@ const app = express();
 
 app.use(helmet());
 
+const healthWindowMs = 10 * 60 * 1000;
+const healthLimit = 60;
+const healthHits = new Map();
+
+function healthLimiter(req, res, next) {
+  const now = Date.now();
+  const key = req.ip || req.connection?.remoteAddress || 'unknown';
+  const entry = healthHits.get(key) || { count: 0, start: now };
+  if (now - entry.start >= healthWindowMs) {
+    entry.count = 0;
+    entry.start = now;
+  }
+  entry.count += 1;
+  healthHits.set(key, entry);
+  if (entry.count > healthLimit) {
+    return res.status(429).json({ error: 'Too many health requests, please try again later.' });
+  }
+  next();
+}
+
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, entry] of healthHits.entries()) {
+    if (now - entry.start >= healthWindowMs) {
+      healthHits.delete(key);
+    }
+  }
+}, healthWindowMs).unref();
+
 const allowedOrigins = process.env.ORIGIN?.split(',').map(origin => origin.trim()).filter(Boolean) ?? [];
 app.use(cors({
   origin: (origin, callback) => {
@@ -28,7 +57,7 @@ app.use(cors({
   credentials: true
 }));
 
-app.get('/health', (_, res) => res.json({ status: 'ok' }));
+app.get('/health', healthLimiter, (_, res) => res.json({ status: 'ok' }));
 
 const logFormat = winston.format.combine(
   winston.format.timestamp(),

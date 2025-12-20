@@ -2,9 +2,34 @@ const express = require('express');
 const axios = require('axios');
 const multer = require('multer');
 const FormData = require('form-data');
+const rateLimit = require('express-rate-limit');
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
+
+const statusLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many status requests, please try again later.' }
+});
+
+const appealLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many appeal requests, please try again later.' }
+});
+
+const evidenceLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many evidence uploads, please try again later.' }
+});
 
 function adminBase(path) {
   const base = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}`.replace(/\/+$/, '');
@@ -33,7 +58,7 @@ async function forwardPost(path, body, opts = {}) {
   });
 }
 
-router.get('/status/:token', async (req, res) => {
+router.get('/status/:token', statusLimiter, async (req, res) => {
   try {
     const resp = await forwardGet(`/status/${encodeURIComponent(req.params.token)}`);
     res.status(resp.status).json(resp.data);
@@ -42,7 +67,7 @@ router.get('/status/:token', async (req, res) => {
   }
 });
 
-router.get('/status/:token/evidence/:id', async (req, res) => {
+router.get('/status/:token/evidence/:id', statusLimiter, async (req, res) => {
   try {
     const resp = await forwardGet(`/status/${encodeURIComponent(req.params.token)}/evidence/${encodeURIComponent(req.params.id)}`, { responseType: 'arraybuffer' });
     Object.entries(resp.headers || {}).forEach(([key, value]) => {
@@ -58,7 +83,7 @@ router.get('/status/:token/evidence/:id', async (req, res) => {
   }
 });
 
-router.post('/status/:token/appeals', express.json({ limit: '2mb' }), async (req, res) => {
+router.post('/status/:token/appeals', appealLimiter, express.json({ limit: '2mb' }), async (req, res) => {
   try {
     const resp = await forwardPost(`/status/${encodeURIComponent(req.params.token)}/appeals`, req.body);
     res.status(resp.status).json(resp.data);
@@ -67,7 +92,7 @@ router.post('/status/:token/appeals', express.json({ limit: '2mb' }), async (req
   }
 });
 
-router.post('/status/:token/appeals/:appealId/evidence', upload.single('file'), async (req, res) => {
+router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload.single('file'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'file_required' });
   try {
     const form = new FormData();
@@ -91,7 +116,7 @@ router.post('/status/:token/appeals/:appealId/evidence', upload.single('file'), 
 });
 
 // Forward adding URL evidence for an appeal (JSON body)
-router.post('/status/:token/appeals/:appealId/evidence/url', express.json({ limit: '1mb' }), async (req, res) => {
+router.post('/status/:token/appeals/:appealId/evidence/url', evidenceLimiter, express.json({ limit: '1mb' }), async (req, res) => {
   try {
     const resp = await forwardPost(
       `/status/${encodeURIComponent(req.params.token)}/appeals/${encodeURIComponent(req.params.appealId)}/evidence/url`,

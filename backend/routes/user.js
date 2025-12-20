@@ -5,11 +5,31 @@ const crypto = require('crypto');
 const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
+const rateLimit = require('express-rate-limit');
 const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
+
+const rateLimitDefaults = {
+  standardHeaders: true,
+  legacyHeaders: false
+};
+
+const userCreateLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 5,
+  ...rateLimitDefaults,
+  message: { error: 'Too many user create requests, please try again later.' }
+});
+
+const userConfirmLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 10,
+  ...rateLimitDefaults,
+  message: { error: 'Too many user confirm requests, please try again later.' }
+});
 
 router.get('/get',
   [
@@ -91,6 +111,7 @@ router.post('/hashpin',
 
 router.post('/create',
   [
+    userCreateLimit,
     express.json({ type: 'application/json' }),
     metric.count('user.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -146,6 +167,7 @@ router.post('/create',
 
 router.post('/confirm',
   [
+    userConfirmLimit,
     express.json({ type: 'application/json' }),
     metric.count('user.confirm', { when: 'always', timezone: 'utc', amount: 1 })
   ]
@@ -271,19 +293,6 @@ router.post('/confirm',
     }
 
   });
-
-router.get('/clean', function (req, res) {
-  let response = { 'status': 0 };
-  tableUser.clean(req.database.db, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
 
 router.get('/delete/:userId',
   [

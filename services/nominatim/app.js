@@ -12,6 +12,7 @@ const check = require('./routes/check');
 const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
+const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const nominatim = require('./routes/nominatim');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
@@ -120,10 +121,22 @@ app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
 
+const rateLimitDefaults = {
+  standardHeaders: true,
+  legacyHeaders: false
+};
+
+const nominatimLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: { error: 'Too many nominatim requests, please try again later.' }
+});
+
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
-app.use('/nominatim', nominatim);
+app.use('/nominatim', nominatimLimit, nominatim);
 
 // 404 (letzte Route)
 app.use((req, res) => res.status(404).json({ error: 'not_found' }));

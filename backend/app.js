@@ -159,86 +159,175 @@ app.use(loggerMw(logger));
 app.use(headerMW())
 
 // Route ratelimit
+const rateLimitDefaults = {
+  standardHeaders: true,
+  legacyHeaders: false
+};
+
 const translateLimit = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  limit: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 15 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
   message: {
-    error: 'Too many translate requests, please try again after 15 minutes.'
+    error: 'Too many translate requests, please try again later.'
   }
-})
+});
 
 const userLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  limit: 10, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 5 * 60 * 1000,
+  limit: 20,
+  ...rateLimitDefaults,
   message: {
-    error: 'Too many user requests, please try again after a minute.'
+    error: 'Too many user requests, please try again later.'
   }
-})
+});
 
 const geoStatisticLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minutes
-  limit: 10, // Limit each IP to 10 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 5 * 60 * 1000,
+  limit: 30,
+  ...rateLimitDefaults,
   message: {
-    error: 'Too many weather requests, please try again after a minute.'
+    error: 'Too many geostatistic requests, please try again later.'
   }
-})
+});
 
 const airQualtiyLimit = rateLimit({
-  windowMs: 100 * 60 * 1000, // 1 minutes
-  limit: 50, // Limit each IP to 50 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 10 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
   message: {
-    error: 'Too many weather requests, please try again after a minute.'
+    error: 'Too many air quality requests, please try again later.'
   }
-})
+});
 
 const weatherLimit = rateLimit({
-  windowMs: 100 * 60 * 1000, // 15 minutes
-  limit: 500, // Limit each IP to 50 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  windowMs: 10 * 60 * 1000,
+  limit: 240,
+  ...rateLimitDefaults,
   message: {
-    error: 'Too many weather requests, please try again after a minute.'
+    error: 'Too many weather requests, please try again later.'
   }
-})
+});
 
 const notificationLimit = rateLimit({
-  windowMs: 1 * 60 * 1000, // 1 minute
+  windowMs: 1 * 60 * 1000,
   limit: 60,
-  standardHeaders: true,
-  legacyHeaders: false,
+  ...rateLimitDefaults,
   message: {
     error: 'Too many notification requests, please slow down.'
   }
-})
+});
+
+const openAiLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 30,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many OpenAI requests, please try again later.'
+  }
+});
+
+const nominatimLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many nominatim requests, please try again later.'
+  }
+});
+
+const tenorLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many tenor requests, please try again later.'
+  }
+});
+
+const messageLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many message requests, please try again later.'
+  }
+});
+
+const contactLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many contact requests, please try again later.'
+  }
+});
+
+const contactMessageLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 600,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many chat requests, please slow down.'
+  }
+});
+
+const placeLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 240,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many place requests, please try again later.'
+  }
+});
+
+const connectLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many connection requests, please try again later.'
+  }
+});
+
+const utilsLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many util requests, please try again later.'
+  }
+});
+
+const dsaStatusLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many DSA status requests, please try again later.'
+  }
+});
 
 // ROUTES
 app.use('/', root);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
 app.use('/check', check);
-app.use('/clientconnect', clientConnect);
-app.use('/connect', connect);
-app.use('/contact', contact);
-app.use('/contactMessage', contactMessage);
+app.use('/clientconnect', connectLimit, clientConnect);
+app.use('/connect', connectLimit, connect);
+app.use('/contact', contactLimit, contact);
+app.use('/contactMessage', contactMessageLimit, contactMessage);
 app.use('/digitalserviceact', digitalServiceAct);
-app.use('/dsa', dsaStatus);
+app.use('/dsa', dsaStatusLimit, dsaStatus);
 app.use('/geostatistic', geoStatisticLimit, geoStatistic);
-app.use('/message', message);
+app.use('/message', messageLimit, message);
 app.use('/notification', notificationLimit, notification);
-app.use('/nominatim', nominatim);
-app.use('/openai', openAi);
-app.use('/place', place);
-app.use('/tenor', tenor);
+app.use('/nominatim', nominatimLimit, nominatim);
+app.use('/openai', openAiLimit, openAi);
+app.use('/place', placeLimit, place);
+app.use('/tenor', tenorLimit, tenor);
 app.use('/translate', translateLimit, translate);
 app.use('/user', userLimit, user);
-app.use('/utils', utils);
+app.use('/utils', utilsLimit, utils);
 app.use('/weather', weatherLimit, weather);
 
 // 404 (letzte Route)

@@ -30,6 +30,14 @@ const noticeLimiter = rateLimit({
     message: { error: 'Too many DSA notice requests. Please try again later.' }
 });
 
+const evidenceLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 20,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many evidence uploads. Please try again later.' }
+});
+
 /* --------------------------------- Helper ---------------------------------- */
 async function forwardPost(path, body, reqHeaders = {}) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
@@ -166,7 +174,7 @@ module.exports = router;
  * POST /digitalserviceact/notices/:id/evidence
  * - Accepts either multipart/form-data with 'file' or JSON { type: 'url'|'hash', url?, hash? }
  */
-router.post('/notices/:id/evidence', (req, res) => {
+router.post('/notices/:id/evidence', evidenceLimiter, (req, res) => {
     upload.single('file')(req, res, async (uploadErr) => {
         try {
             if (uploadErr) {
@@ -207,7 +215,7 @@ router.post('/notices/:id/evidence', (req, res) => {
  * For attaching evidence to a notice using the public status token.
  * Forwards to admin public endpoint /public/status/:token/evidence
  */
-router.post('/status/:token/evidence', (req, res) => {
+router.post('/status/:token/evidence', evidenceLimiter, (req, res) => {
     upload.single('file')(req, res, async (uploadErr) => {
         try {
             if (uploadErr) {
