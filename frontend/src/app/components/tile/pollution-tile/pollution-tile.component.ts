@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
 
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -6,6 +6,7 @@ import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
 import { PlaceService } from '../../../services/place.service';
+import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
 import { MatDialog } from '@angular/material/dialog';
 import { PollutionTileEditComponent } from './pollution-tile-edit/pollution-tile-edit.component';
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
@@ -20,17 +21,24 @@ import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
   styleUrl: './pollution-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class PollutionTileComponent implements OnChanges {
-  @Input() tile!: TileSetting;
-  @Input() place!: Place;
+export class PollutionTileComponent {
+  private readonly placeSignal = signal<Place | null>(null);
+  @Input() set place(value: Place) {
+    this.placeSignal.set(value);
+    this.airQualityState = this.refreshService.getAirQualityState(value);
+    this.refreshService.refreshAirQuality(value);
+  }
+
+  @Input() set tile(value: TileSetting) {
+    this.currentTile.set(value);
+  }
 
   readonly currentTile = signal<TileSetting | null>(null);
-  airQuality?: AirQualityData;
-  isStale = false;
+  private airQualityState?: DatasetState<AirQualityData>;
 
   private readonly placeService = inject(PlaceService);
   private readonly dialog = inject(MatDialog);
-  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly refreshService = inject(OpenMeteoRefreshService);
 
   private readonly pollenKeys = [
     'alder_pollen',
@@ -80,10 +88,12 @@ export class PollutionTileComponent implements OnChanges {
     ozone: 'filter_drama'
   };
 
-  ngOnChanges(): void {
-    this.currentTile.set(this.tile);
-    this.airQuality = this.place.datasets.airQualityDataset.data;
-    this.isStale = this.placeService.isDatasetExpired(this.place.datasets.airQualityDataset);
+  get airQuality(): AirQualityData | undefined {
+    return this.airQualityState?.data() ?? undefined;
+  }
+
+  get isStale(): boolean {
+    return this.airQualityState?.isStale() ?? false;
   }
 
   get title(): string {
@@ -100,7 +110,8 @@ export class PollutionTileComponent implements OnChanges {
   }
 
   get metrics(): { key: string; label: string; icon: string; value: string; level: 'none' | 'warn' | 'alert'; color: string }[] {
-    if (!this.airQuality || !this.airQuality.hourly?.time) return [];
+    const airQuality = this.airQuality;
+    if (!airQuality || !airQuality.hourly?.time) return [];
     const isDarkMode = document.body.classList.contains('dark');
     const available = this.getAvailableKeys();
     const keysToUse = this.selectedKeys.filter(k => available.has(k));
@@ -120,9 +131,10 @@ export class PollutionTileComponent implements OnChanges {
   }
 
   private getTodayValues(key: string): number[] {
-    if (!this.airQuality?.hourly?.time) return [];
-    const times = this.airQuality.hourly.time;
-    const { time: _time, ...rest } = this.airQuality.hourly;
+    const airQuality = this.airQuality;
+    if (!airQuality?.hourly?.time) return [];
+    const times = airQuality.hourly.time;
+    const { time: _time, ...rest } = airQuality.hourly;
     void _time;
     const hourly = rest as Record<string, (number | null | undefined)[] | undefined>;
     const dataArray = hourly[key];
@@ -149,8 +161,9 @@ export class PollutionTileComponent implements OnChanges {
   }
 
   private hasAnyPollenData(): boolean {
-    if (!this.airQuality?.hourly) return false;
-    const { time: _time, ...rest } = this.airQuality.hourly;
+    const airQuality = this.airQuality;
+    if (!airQuality?.hourly) return false;
+    const { time: _time, ...rest } = airQuality.hourly;
     void _time;
     const hourly = rest as Record<string, (number | null | undefined)[] | undefined>;
     return this.pollenKeys.some(key => {
@@ -169,19 +182,22 @@ export class PollutionTileComponent implements OnChanges {
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
-      const tiles = (this.place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-      const updatedPlace = { ...this.place, tileSettings: tiles };
-      this.place = updatedPlace;
+      const place = this.placeSignal();
+      if (!place) return;
+      const tiles = (place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+      const updatedPlace = { ...place, tileSettings: tiles };
+      this.placeSignal.set(updatedPlace);
       this.currentTile.set(updated);
       this.placeService.saveAdditionalPlaceInfos(updatedPlace);
-      this.cdr.markForCheck();
     });
   }
 
   openAirQualityDetails(key: string): void {
     const metricKey = key as AirQualityMetricKey;
+    const place = this.placeSignal() ?? undefined;
+    const location = place?.location;
     this.dialog.open(AirQualityComponent, {
-      data: { airQuality: this.airQuality, selectedKey: metricKey },
+      data: { airQuality: this.airQuality, selectedKey: metricKey, place, location },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',

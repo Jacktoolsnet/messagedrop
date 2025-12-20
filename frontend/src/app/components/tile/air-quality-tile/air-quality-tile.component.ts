@@ -1,15 +1,10 @@
-
-import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
-import { DateTime } from 'luxon';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
-import { Location } from '../../../interfaces/location';
 import { Place } from '../../../interfaces/place';
-import { AirQualityService } from '../../../services/air-quality.service';
-import { GeolocationService } from '../../../services/geolocation.service';
-import { PlaceService } from '../../../services/place.service';
+import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
 import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
 import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
@@ -20,17 +15,15 @@ import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
   templateUrl: './air-quality-tile.component.html',
   styleUrl: './air-quality-tile.component.css'
 })
-export class AirQualityTileComponent implements OnInit {
-  @Input() place!: Place;
+export class AirQualityTileComponent {
+  private placeRef?: Place;
+  private airQualityState?: DatasetState<AirQualityData>;
 
-  airQuality: AirQualityData | undefined;
-  airQualityIcon: string | undefined;
-  minMax: { min: number; max: number } | undefined;
-  label = '';
-  value = 0;
-  level = '';
-  dominantKey: AirQualityMetricKey | '' = '';
-  isStale = false;
+  @Input() set place(value: Place) {
+    this.placeRef = value;
+    this.airQualityState = this.refreshService.getAirQualityState(value);
+    this.refreshService.refreshAirQuality(value);
+  }
 
   // --- Kategorien ---
   private readonly pollenKeys: AirQualityMetricKey[] = [
@@ -82,95 +75,48 @@ export class AirQualityTileComponent implements OnInit {
     ozone: 'filter_drama'
   };
 
-  private readonly placeService = inject(PlaceService);
-  private readonly airQualityService = inject(AirQualityService);
-  private readonly geolocationService = inject(GeolocationService);
   private readonly dialog = inject(MatDialog);
-  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly refreshService = inject(OpenMeteoRefreshService);
 
-  ngOnInit(): void {
-    console.log(this.place.datasets.airQualityDataset.data);
-    if (this.place.datasets.airQualityDataset.data) {
-      if (this.placeService.isDatasetExpired(this.place.datasets.airQualityDataset)) {
-        // show cached while refreshing
-        this.airQuality = this.place.datasets.airQualityDataset.data;
-        this.updateFromAirQuality();
-        this.isStale = true;
-        this.getAirQuality();
-      } else {
-        this.airQuality = this.place.datasets.airQualityDataset.data;
-        this.updateFromAirQuality();
-        this.isStale = false;
-      }
-    } else {
-      this.getAirQuality();
-    }
+  get airQuality(): AirQualityData | undefined {
+    return this.airQualityState?.data() ?? undefined;
   }
 
-  // --- Fetch + Update ---
-  private getAirQuality() {
-    if (!this.place?.boundingBox) return;
-
-    const location: Location = this.geolocationService.getCenterOfBoundingBox(this.place.boundingBox);
-
-    this.airQualityService
-      .getAirQuality(location.plusCode, location.latitude, location.longitude, 3)
-      .subscribe({
-        next: (airQuality) => {
-          if (airQuality) {
-            this.place.datasets.airQualityDataset.data = airQuality;
-            this.place.datasets.airQualityDataset.lastUpdate = DateTime.now();
-            this.airQuality = airQuality;
-            this.updateFromAirQuality();
-            this.isStale = false;
-            this.cdr.markForCheck();
-          } else {
-            this.useCachedAsStale();
-          }
-        },
-        error: () => {
-          this.useCachedAsStale();
-        }
-      });
+  get minMax(): { min: number; max: number } | undefined {
+    const key = this.dominantKey;
+    if (!key) return undefined;
+    return this.getHourlyMinMax(key);
   }
 
-  private useCachedAsStale(): void {
-    if (this.place.datasets.airQualityDataset.data) {
-      this.airQuality = this.place.datasets.airQualityDataset.data;
-      this.updateFromAirQuality();
-      this.isStale = true;
-      this.cdr.markForCheck();
-    } else {
-      this.airQuality = undefined;
-      this.value = 0;
-      this.level = '';
-      this.minMax = undefined;
-      this.isStale = true;
-      this.cdr.markForCheck();
-    }
+  get isStale(): boolean {
+    return this.airQualityState?.isStale() ?? false;
   }
 
-  private updateFromAirQuality(): void {
-    const dominant = this.getDominantKey();
-    this.dominantKey = dominant;
+  get dominantKey(): AirQualityMetricKey | '' {
+    return this.getDominantKey();
+  }
 
-    if (!dominant) {
-      this.label = '';
-      this.value = 0;
-      this.level = '';
-      this.airQualityIcon = undefined;
-      this.minMax = undefined;
-      this.cdr.markForCheck();
-      return;
-    }
+  get label(): string {
+    const key = this.dominantKey;
+    return key ? this.getChartLabel(key) : '';
+  }
 
-    this.label = this.getChartLabel(dominant);
-    this.value = this.getHourlyValue(dominant);
-    const info = getAirQualityLevelInfo(dominant, this.value, document.body.classList.contains('dark'));
-    this.level = info.label;
-    this.airQualityIcon = this.getAirQualityIcon(dominant);
-    this.minMax = this.getHourlyMinMax(dominant);
-    this.cdr.markForCheck();
+  get value(): number {
+    const key = this.dominantKey;
+    return key ? this.getHourlyValue(key) : 0;
+  }
+
+  get level(): string {
+    const key = this.dominantKey;
+    if (!key) return '';
+    const info = getAirQualityLevelInfo(key, this.value, document.body.classList.contains('dark'));
+    return info.label;
+  }
+
+  get airQualityIcon(): string | undefined {
+    const key = this.dominantKey;
+    if (!key) return undefined;
+    return this.getAirQualityIcon(key);
   }
 
   // --- Dominanz-Logik ---
@@ -198,7 +144,7 @@ export class AirQualityTileComponent implements OnInit {
       const hasAnyValue = this.hasAnyTodayValue(key);
       if (!hasAnyValue) continue;
 
-      if (mm.max > bestValue) {
+      if (mm && mm.max > bestValue) {
         bestValue = mm.max;
         bestKey = key;
       }
@@ -207,12 +153,13 @@ export class AirQualityTileComponent implements OnInit {
   }
 
   private hasAnyTodayValue(key: string): boolean {
-    if (!this.airQuality?.hourly?.time) return false;
+    const airQuality = this.airQuality;
+    if (!airQuality?.hourly?.time) return false;
     const values = this.getHourlyArray(key);
     if (!Array.isArray(values)) return false;
 
     const currentDate = new Date().toISOString().split('T')[0];
-    const timeArray = this.airQuality.hourly.time;
+    const timeArray = airQuality.hourly.time;
     for (let i = 0; i < timeArray.length; i++) {
       if (timeArray[i]?.startsWith(currentDate)) {
         const v = values[i];
@@ -224,13 +171,14 @@ export class AirQualityTileComponent implements OnInit {
 
   // --- Werte + Min/Max ---
   private getHourlyValue(key: string): number {
-    if (!this.airQuality?.hourly?.time) return 0;
+    const airQuality = this.airQuality;
+    if (!airQuality?.hourly?.time) return 0;
 
     const now = new Date();
     const currentDate = now.toISOString().split('T')[0];
     const currentHour = now.getHours(); // 0-23
 
-    const timeArray = this.airQuality.hourly.time;
+    const timeArray = airQuality.hourly.time;
     const baseIndex = timeArray.findIndex((t) => t.startsWith(`${currentDate}T00:00`));
     if (baseIndex === -1) return 0;
 
@@ -243,21 +191,22 @@ export class AirQualityTileComponent implements OnInit {
     return typeof value === 'number' ? value : 0;
   }
 
-  private getHourlyMinMax(key: string): { min: number; max: number } {
-    if (!this.airQuality?.hourly?.time) {
-      return { min: 0, max: 0 };
+  private getHourlyMinMax(key: string): { min: number; max: number } | undefined {
+    const airQuality = this.airQuality;
+    if (!airQuality?.hourly?.time) {
+      return undefined;
     }
 
-    const timeArray = this.airQuality.hourly.time;
+    const timeArray = airQuality.hourly.time;
     const valuesArray = this.getHourlyArray(key);
-    if (!Array.isArray(valuesArray)) return { min: 0, max: 0 };
+    if (!Array.isArray(valuesArray)) return undefined;
 
     const currentDate = new Date().toISOString().split('T')[0];
     const valuesToday = timeArray
       .map((t: string, i: number) => (t?.startsWith(currentDate) ? valuesArray[i] : undefined))
       .filter((v: number | null | undefined): v is number => typeof v === 'number');
 
-    if (valuesToday.length === 0) return { min: 0, max: 0 };
+    if (valuesToday.length === 0) return undefined;
     return { min: Math.min(...valuesToday), max: Math.max(...valuesToday) };
   }
 
@@ -296,8 +245,9 @@ export class AirQualityTileComponent implements OnInit {
 
   // --- Dialog ---
   public openAirQualityDetails(selectedKey?: AirQualityMetricKey): void {
+    const location = this.placeRef?.location;
     const dialogRef = this.dialog.open(AirQualityComponent, {
-      data: { airQuality: this.airQuality, selectedKey },
+      data: { airQuality: this.airQuality, selectedKey, place: this.placeRef, location },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',
@@ -312,7 +262,8 @@ export class AirQualityTileComponent implements OnInit {
   }
 
   private getHourlyArray(key: string): (number | null)[] | undefined {
-    const hourly = this.airQuality?.hourly as Record<string, (number | null)[] | undefined> | undefined;
+    const airQuality = this.airQuality;
+    const hourly = airQuality?.hourly as Record<string, (number | null)[] | undefined> | undefined;
     return hourly?.[key];
   }
 }

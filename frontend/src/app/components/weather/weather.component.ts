@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -10,8 +10,10 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { catchError, map, Observable, of } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
+import { Place } from '../../interfaces/place';
 import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
+import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 import { WeatherTile, WeatherTileType } from './weather-tile.interface';
 import { getWeatherLevelInfo } from '../../utils/weather-level.util';
@@ -35,11 +37,11 @@ import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 })
 export class WeatherComponent implements OnInit {
 
-  private readonly dialogData = inject<{ weather: Weather; location: Location }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place }>(MAT_DIALOG_DATA);
+  private readonly refreshService = inject(OpenMeteoRefreshService);
 
-  weather: Weather | null = this.dialogData.weather;
   location: Location = this.dialogData.location;
-  tiles: WeatherTile[] = [];
+  private readonly tilesSignal = signal<WeatherTile[]>([]);
 
   selectedDayIndex = 0;
   selectedHour = 0;
@@ -50,10 +52,34 @@ export class WeatherComponent implements OnInit {
   locationName$: Observable<string> | undefined;
 
   private readonly nomatinService = inject(NominatimService);
+  private readonly weatherSignal = signal<Weather | null>(null);
+  private weatherState?: DatasetState<Weather>;
+
+  get weather(): Weather | null {
+    return this.weatherSignal();
+  }
+
+  get tiles(): WeatherTile[] {
+    return this.tilesSignal();
+  }
 
   ngOnInit(): void {
     this.selectedHour = new Date().getHours();
     this.getLocationName();
+    const place = this.dialogData.place;
+    if (place) {
+      this.weatherState = this.refreshService.getWeatherState(place);
+      this.refreshService.refreshWeather(place);
+    }
+    const initialWeather = this.dialogData.weather ?? this.weatherState?.data() ?? null;
+    this.weatherSignal.set(initialWeather);
+    effect(() => {
+      const nextWeather = this.weatherState?.data() ?? this.dialogData.weather ?? null;
+      if (nextWeather !== this.weatherSignal()) {
+        this.weatherSignal.set(nextWeather);
+        this.updateTiles();
+      }
+    });
     this.updateTiles(true);
   }
 
@@ -108,19 +134,34 @@ export class WeatherComponent implements OnInit {
   }
 
   private updateTiles(init = false): void {
-    const date = this.weather?.daily[this.selectedDayIndex]?.date;
+    const daily = this.weather?.daily ?? [];
+    if (this.selectedDayIndex >= daily.length) {
+      this.selectedDayIndex = 0;
+    }
+    const date = daily[this.selectedDayIndex]?.date;
     const hour = this.selectedHour.toString().padStart(2, '0');
     const hourly = this.weather?.hourly;
 
     if (!hourly || !date) {
-      this.tiles = [];
+      this.tilesSignal.set([]);
       return;
     }
 
-    const hourData = hourly.find(h => h.time.startsWith(date) && h.time.includes(`${hour}:`));
-    if (!hourData) {
-      this.tiles = [];
+    const dayHours = hourly.filter(h => h.time.startsWith(date));
+    if (dayHours.length === 0) {
+      this.tilesSignal.set([]);
       return;
+    }
+    let hourData = dayHours.find(h => h.time.includes(`${hour}:`));
+    if (!hourData) {
+      hourData = dayHours[0];
+      const fallbackHour = hourData.time.split('T')[1]?.slice(0, 2);
+      if (fallbackHour) {
+        const parsed = Number(fallbackHour);
+        if (!Number.isNaN(parsed)) {
+          this.selectedHour = parsed;
+        }
+      }
     }
 
     const isDarkMode = document.body.classList.contains('dark');
@@ -135,7 +176,7 @@ export class WeatherComponent implements OnInit {
       color: string
     ): WeatherTile => ({ type, label, icon, value, levelText, color, minMax });
 
-    this.tiles = [
+    this.tilesSignal.set([
       make(
         'temperature',
         'Temperature',
@@ -190,7 +231,7 @@ export class WeatherComponent implements OnInit {
         this.getHourlyMinMax('pressure'),
         getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).color
       )
-    ];
+    ]);
   }
 
   getTileNumericValue(type: WeatherTileType): number | null {

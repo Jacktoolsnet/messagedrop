@@ -363,6 +363,8 @@ export class MapService {
       const currentMap = this.map;
       this.messageMarkers.forEach(marker => marker.addTo(currentMap));
     }
+
+    this.setCircleMarker();
   }
 
   private createMarkerForType(markerLocation: MarkerLocation): leaflet.Marker | null {

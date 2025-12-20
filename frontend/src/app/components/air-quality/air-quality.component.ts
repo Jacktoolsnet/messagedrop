@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -11,8 +11,10 @@ import { Observable, catchError, map, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { AirQualityCategory, AirQualityMetricKey, AirQualityTileValue } from '../../interfaces/air-quality-tile-value';
 import { getAirQualityLevelInfo } from '../../utils/air-quality-level.util';
-import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
+import { Location } from '../../interfaces/location';
+import { Place } from '../../interfaces/place';
+import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
 import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
 
 @Component({
@@ -33,38 +35,83 @@ import { AirQualityDetailComponent } from './air-quality-detail/air-quality-deta
   styleUrls: ['./air-quality.component.css']
 })
 export class AirQualityComponent implements OnInit {
-  private readonly mapService = inject(MapService);
   private readonly nominatimService = inject(NominatimService);
-  private readonly dialogData = inject<{ airQuality: AirQualityData; selectedKey?: AirQualityMetricKey }>(MAT_DIALOG_DATA);
+  private readonly dialogData = inject<{ airQuality?: AirQualityData; selectedKey?: AirQualityMetricKey; place?: Place; location?: Location }>(MAT_DIALOG_DATA);
+  private readonly refreshService = inject(OpenMeteoRefreshService);
 
-  tileValues: AirQualityTileValue[] = [];
-  allTileValues: AirQualityTileValue[] = [];
+  private readonly tileValuesSignal = signal<AirQualityTileValue[]>([]);
+  private readonly allTileValuesSignal = signal<AirQualityTileValue[]>([]);
+  private readonly allKeysSignal = signal<AirQualityMetricKey[]>([]);
+  private readonly dayLabelsSignal = signal<string[]>([]);
   categoryModes: AirQualityCategory[] = ['pollen', 'particulateMatter', 'pollutants'];
   selectedDayIndex = 0;
   selectedHour = 0;
   selectedCategory: AirQualityCategory = 'pollen';
   selectedTile: AirQualityTileValue | null = null;
   tileIndex = 0;
-  allKeys: AirQualityMetricKey[] = [];
-  dayLabels: string[] = [];
   locationName?: string;
   locationName$?: Observable<string>;
+  private readonly airQualitySignal = signal<AirQualityData | null>(null);
+  private airQualityState?: DatasetState<AirQualityData>;
+  private initialKeyApplied = false;
 
   get airQuality(): AirQualityData | null {
-    return this.dialogData?.airQuality ?? null;
+    return this.airQualitySignal();
+  }
+
+  get tileValues(): AirQualityTileValue[] {
+    return this.tileValuesSignal();
+  }
+
+  get allTileValues(): AirQualityTileValue[] {
+    return this.allTileValuesSignal();
+  }
+
+  get allKeys(): AirQualityMetricKey[] {
+    return this.allKeysSignal();
+  }
+
+  get dayLabels(): string[] {
+    return this.dayLabelsSignal();
   }
 
   ngOnInit(): void {
     this.selectedHour = new Date().getHours();
-    this.checkAvailableCategories();
     this.getLocationName();
     const initialKey = this.dialogData.selectedKey;
-    if (initialKey) {
-      this.setSelectionByKey(initialKey);
-    } else {
-      this.updateTiles();
+    const place = this.dialogData.place;
+    if (place) {
+      this.airQualityState = this.refreshService.getAirQualityState(place);
+      this.refreshService.refreshAirQuality(place);
     }
-    this.dayLabels = this.getDayLabels();
+    const initialAirQuality = this.dialogData.airQuality ?? this.airQualityState?.data() ?? null;
+    this.airQualitySignal.set(initialAirQuality);
+    effect(() => {
+      const nextAirQuality = this.airQualityState?.data() ?? this.dialogData.airQuality ?? null;
+      this.airQualitySignal.set(nextAirQuality);
+      if (!nextAirQuality) {
+        this.tileValuesSignal.set([]);
+        this.allTileValuesSignal.set([]);
+        this.allKeysSignal.set([]);
+        this.dayLabelsSignal.set([]);
+        return;
+      }
+      this.checkAvailableCategories();
+      const labels = this.getDayLabels();
+      this.dayLabelsSignal.set(labels);
+      if (this.selectedDayIndex >= labels.length) {
+        this.selectedDayIndex = 0;
+      }
+      if (!this.categoryModes.includes(this.selectedCategory)) {
+        this.selectedCategory = this.categoryModes[0] ?? this.selectedCategory;
+      }
+      if (initialKey && !this.initialKeyApplied) {
+        this.initialKeyApplied = true;
+        this.setSelectionByKey(initialKey);
+      } else {
+        this.updateTiles();
+      }
+    });
   }
 
   private getCategoryForKey(key: AirQualityMetricKey): AirQualityCategory | null {
@@ -89,10 +136,12 @@ export class AirQualityComponent implements OnInit {
       }
       this.selectedCategory = category;
       this.updateTiles();
-      this.allTileValues = this.getAllTileValues();
-      this.allKeys = this.getAllCategoryKeys();
-      this.tileIndex = this.allKeys.findIndex(k => k === key);
-      this.selectedTile = this.allTileValues.find(t => t.key === key) ?? null;
+      const allTileValues = this.getAllTileValues();
+      const allKeys = this.getAllCategoryKeys();
+      this.allTileValuesSignal.set(allTileValues);
+      this.allKeysSignal.set(allKeys);
+      this.tileIndex = allKeys.findIndex(k => k === key);
+      this.selectedTile = allTileValues.find(t => t.key === key) ?? null;
     } else {
       this.updateTiles();
     }
@@ -220,11 +269,23 @@ export class AirQualityComponent implements OnInit {
     if (!airQuality) return;
 
     const timeIndices = this.getDayTimeIndices(this.selectedDayIndex);
-    const hourIndex = timeIndices[this.selectedHour] ?? null;
+    let hourIndex = timeIndices[this.selectedHour] ?? null;
+    if (hourIndex == null && timeIndices.length) {
+      const fallbackIndex = timeIndices[0];
+      hourIndex = fallbackIndex ?? null;
+      const fallbackTime = airQuality.hourly.time[fallbackIndex];
+      const fallbackHour = fallbackTime?.split('T')[1]?.slice(0, 2);
+      if (fallbackHour) {
+        const parsed = Number(fallbackHour);
+        if (!Number.isNaN(parsed)) {
+          this.selectedHour = parsed;
+        }
+      }
+    }
     const fullTimeArray = airQuality.hourly.time;
 
     const isDarkMode = document.body.classList.contains('dark');
-    this.tileValues = this.getCategoryKeys().map((key) => {
+    const tileValues = this.getCategoryKeys().map((key) => {
       const values = this.getHourlyValues(key) ?? [];
       const currentValue = hourIndex != null ? values[hourIndex] ?? 0 : 0;
       const levelInfo = getAirQualityLevelInfo(key, currentValue, isDarkMode);
@@ -243,7 +304,8 @@ export class AirQualityComponent implements OnInit {
       };
     });
 
-    this.allKeys = this.getAllCategoryKeys();
+    this.tileValuesSignal.set(tileValues);
+    this.allKeysSignal.set(this.getAllCategoryKeys());
   }
 
   onCategoryToggle(category: AirQualityCategory): void {
@@ -252,8 +314,13 @@ export class AirQualityComponent implements OnInit {
   }
 
   getLocationName(): void {
+    const location = this.dialogData.location ?? this.dialogData.place?.location;
+    if (!location) {
+      this.locationName$ = of('Air Quality');
+      return;
+    }
     this.locationName$ = this.nominatimService
-      .getNominatimPlaceByLocation(this.mapService.getMapLocation())
+      .getNominatimPlaceByLocation(location)
       .pipe(
         map(res => {
           const addr = res.nominatimPlace.address;
@@ -422,9 +489,11 @@ export class AirQualityComponent implements OnInit {
     if (tile.minMax.min === 0 && tile.minMax.max === 0) {
       return;
     }
-    this.allTileValues = this.getAllTileValues();
-    this.allKeys = this.getAllCategoryKeys();
-    this.tileIndex = this.allKeys.findIndex(k => k === tile.key);
+    const allTileValues = this.getAllTileValues();
+    const allKeys = this.getAllCategoryKeys();
+    this.allTileValuesSignal.set(allTileValues);
+    this.allKeysSignal.set(allKeys);
+    this.tileIndex = allKeys.findIndex(k => k === tile.key);
     this.selectedTile = tile;
   }
 

@@ -1,10 +1,11 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
 
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
+import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
 import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-edit.component';
 import { MatDialog } from '@angular/material/dialog';
 import { Weather } from '../../../interfaces/weather';
@@ -20,20 +21,25 @@ import { GeolocationService } from '../../../services/geolocation.service';
   styleUrl: './migraine-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class MigraineTileComponent implements OnChanges {
-  @Input() tile!: TileSetting;
-  @Input() place!: Place;
+export class MigraineTileComponent {
+  private readonly placeSignal = signal<Place | null>(null);
+  @Input() set place(value: Place) {
+    this.placeSignal.set(value);
+    this.weatherState = this.refreshService.getWeatherState(value);
+    this.refreshService.refreshWeather(value);
+  }
+
+  @Input() set tile(value: TileSetting) {
+    this.currentTile.set(value);
+  }
 
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
-  private readonly cdr = inject(ChangeDetectorRef);
   private readonly geolocationService = inject(GeolocationService);
+  private readonly refreshService = inject(OpenMeteoRefreshService);
 
   readonly currentTile = signal<TileSetting | null>(null);
-
-  ngOnChanges(): void {
-    this.currentTile.set(this.tile);
-  }
+  private weatherState?: DatasetState<Weather>;
 
   get title(): string {
     const tile = this.currentTile();
@@ -45,7 +51,11 @@ export class MigraineTileComponent implements OnChanges {
   }
 
   get weather(): Weather | undefined {
-    return this.place.datasets.weatherDataset.data;
+    return this.weatherState?.data() ?? undefined;
+  }
+
+  get isStale(): boolean {
+    return this.weatherState?.isStale() ?? false;
   }
 
   private thresholds() {
@@ -85,10 +95,6 @@ export class MigraineTileComponent implements OnChanges {
     return { value, level };
   }
 
-  get isStale(): boolean {
-    return this.placeService.isDatasetExpired(this.place.datasets.weatherDataset, 60);
-  }
-
   edit(): void {
     const tile = this.currentTile();
     if (!tile) return;
@@ -98,12 +104,13 @@ export class MigraineTileComponent implements OnChanges {
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
-      const tiles = (this.place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-      const updatedPlace = { ...this.place, tileSettings: tiles };
-      this.place = updatedPlace;
+      const place = this.placeSignal();
+      if (!place) return;
+      const tiles = (place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+      const updatedPlace = { ...place, tileSettings: tiles };
+      this.placeSignal.set(updatedPlace);
       this.currentTile.set(updated);
       this.placeService.saveAdditionalPlaceInfos(updatedPlace);
-      this.cdr.markForCheck();
     });
   }
 
@@ -112,11 +119,13 @@ export class MigraineTileComponent implements OnChanges {
   }
 
   openWeatherDetails(tileType: 'temperature' | 'pressure'): void {
-    const boundingBox = this.place.boundingBox;
+    const place = this.placeSignal();
+    if (!place?.boundingBox) return;
     const dialogRef = this.dialog.open(WeatherComponent, {
       data: {
         weather: this.weather,
-        location: this.geolocationService.getCenterOfBoundingBox(boundingBox!)
+        location: this.geolocationService.getCenterOfBoundingBox(place.boundingBox),
+        place: place
       },
       closeOnNavigation: true,
       minWidth: '90vw',
@@ -143,5 +152,4 @@ export class MigraineTileComponent implements OnChanges {
       comp?.onTileClick(placeholder);
     });
   }
-
 }

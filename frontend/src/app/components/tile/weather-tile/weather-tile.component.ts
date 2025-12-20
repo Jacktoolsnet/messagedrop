@@ -1,15 +1,10 @@
-
-import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
+import { Component, Input, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { DateTime } from 'luxon';
 import { BoundingBox } from '../../../interfaces/bounding-box';
-import { Location } from '../../../interfaces/location';
 import { Place } from '../../../interfaces/place';
 import { Weather } from '../../../interfaces/weather';
 import { GeolocationService } from '../../../services/geolocation.service';
-import { PlaceService } from '../../../services/place.service';
-import { UserService } from '../../../services/user.service';
-import { WeatherService } from '../../../services/weather.service';
+import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
 import { WeatherComponent } from '../../weather/weather.component';
 import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
 
@@ -19,99 +14,40 @@ import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
   templateUrl: './weather-tile.component.html',
   styleUrl: './weather-tile.component.css'
 })
-export class WeatherTileComponent implements OnInit {
-  @Input() place!: Place;
+export class WeatherTileComponent {
+  private placeRef?: Place;
+  private weatherState?: DatasetState<Weather>;
 
-  weather: Weather | undefined;
-  weatherIcon: string | undefined;
-  minMax: { min: number, max: number } | undefined;
-  isStale = false;
-  tempColor: string | undefined;
+  @Input() set place(value: Place) {
+    this.placeRef = value;
+    this.weatherState = this.refreshService.getWeatherState(value);
+    this.refreshService.refreshWeather(value);
+  }
 
-  private readonly userService = inject(UserService);
-  private readonly placeService = inject(PlaceService);
-  private readonly weatherService = inject(WeatherService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly dialog = inject(MatDialog);
-  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly refreshService = inject(OpenMeteoRefreshService);
 
-  ngOnInit(): void {
-    if (this.place.datasets.weatherDataset.data) {
-      if (this.placeService.isDatasetExpired(this.place.datasets.weatherDataset)) {
-        // show cached while trying refresh
-        this.weather = this.place.datasets.weatherDataset.data;
-        this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
-        this.minMax = this.getHourlyMinMax('temperature');
-        this.setTempColor();
-        this.isStale = true;
-        this.getWeather();
-      } else {
-        this.weather = this.place.datasets.weatherDataset.data;
-        this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
-        this.minMax = this.getHourlyMinMax('temperature');
-        this.setTempColor();
-        this.isStale = false;
-      }
-    } else {
-      this.getWeather();
-    }
+  get weather(): Weather | undefined {
+    return this.weatherState?.data() ?? undefined;
   }
 
-  private getWeather() {
-    const boundingBox: BoundingBox | undefined = this.place.boundingBox;
-    if (boundingBox) {
-      const location: Location = this.geolocationService.getCenterOfBoundingBox(boundingBox);
-      this.weatherService
-        .getWeather(
-          this.userService.getUser().language?.slice(0, 2) || 'de',
-          location.plusCode,
-          location.latitude,
-          location.longitude,
-          3
-        )
-        .subscribe({
-          next: (weather) => {
-            if (weather) {
-              this.place.datasets.weatherDataset.data = weather;
-              this.place.datasets.weatherDataset.lastUpdate = DateTime.now();
-            this.weather = weather;
-            this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
-            this.minMax = this.getHourlyMinMax('temperature');
-            this.setTempColor();
-            this.isStale = false;
-            this.cdr.markForCheck();
-          } else {
-            this.useCachedAsStale();
-          }
-        },
-        error: () => {
-          this.useCachedAsStale();
-          }
-        });
-    }
+  get weatherIcon(): string | undefined {
+    return this.getWeatherIcon(this.weather?.current.weatherCode);
   }
 
-  private useCachedAsStale(): void {
-    if (this.place.datasets.weatherDataset.data) {
-      this.weather = this.place.datasets.weatherDataset.data;
-      this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
-      this.minMax = this.getHourlyMinMax('temperature');
-      this.setTempColor();
-      this.isStale = true;
-      this.cdr.markForCheck();
-    } else {
-      this.weather = undefined;
-      this.weatherIcon = undefined;
-      this.minMax = undefined;
-      this.isStale = true;
-      this.cdr.markForCheck();
-    }
+  get minMax(): { min: number, max: number } | undefined {
+    return this.getHourlyMinMax('temperature');
   }
 
-  private setTempColor(): void {
+  get isStale(): boolean {
+    return this.weatherState?.isStale() ?? false;
+  }
+
+  get tempColor(): string | undefined {
     const temp = this.weather?.current?.temperature ?? 0;
     const isDarkMode = document.body.classList.contains('dark');
-    this.tempColor = getWeatherLevelInfo('temperature', temp, isDarkMode).color;
+    return getWeatherLevelInfo('temperature', temp, isDarkMode).color;
   }
 
   getWeatherIcon(code?: number): string {
@@ -152,9 +88,9 @@ export class WeatherTileComponent implements OnInit {
   }
 
   openWeatherDetails(): void {
-    const boundingBox: BoundingBox | undefined = this.place.boundingBox;
+    const boundingBox: BoundingBox | undefined = this.placeRef?.boundingBox;
     this.dialog.open(WeatherComponent, {
-      data: { weather: this.weather, location: this.geolocationService.getCenterOfBoundingBox(boundingBox!) },
+      data: { weather: this.weather, location: this.geolocationService.getCenterOfBoundingBox(boundingBox!), place: this.placeRef },
       closeOnNavigation: true,
       minWidth: '90vw',
       width: '90vw',
@@ -167,22 +103,23 @@ export class WeatherTileComponent implements OnInit {
     });
   }
 
-  getHourlyMinMax(field: 'temperature' | 'precipitationProbability' | 'precipitation' | 'wind' | 'pressure' | 'uvIndex'): { min: number, max: number } {
+  getHourlyMinMax(field: 'temperature' | 'precipitationProbability' | 'precipitation' | 'wind' | 'pressure' | 'uvIndex'): { min: number, max: number } | undefined {
+    const weather = this.weather;
     if (
-      !this.weather ||
-      !this.weather.hourly ||
-      !this.weather.current?.time
+      !weather ||
+      !weather.hourly ||
+      !weather.current?.time
     ) {
-      return { min: 0, max: 0 };
+      return undefined;
     }
-    const currentDate = this.weather.current.time.split('T')[0];
+    const currentDate = weather.current.time.split('T')[0];
 
-    const values = this.weather.hourly
-      .filter(h => h.time.startsWith(currentDate))
-      .map(h => h[field])
-      .filter(v => typeof v === 'number');
+    const values = weather.hourly
+      .filter((h: Weather['hourly'][number]) => h.time.startsWith(currentDate))
+      .map((h: Weather['hourly'][number]) => h[field])
+      .filter((v: unknown): v is number => typeof v === 'number');
 
-    if (values.length === 0) return { min: 0, max: 0 };
+    if (values.length === 0) return undefined;
 
     return {
       min: Math.min(...values),

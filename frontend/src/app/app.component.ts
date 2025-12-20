@@ -1195,7 +1195,7 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (airQualityData) => {
           this.dialog.open(AirQualityComponent, {
-            data: { airQuality: airQualityData },
+            data: { airQuality: airQualityData, location: this.mapService.getMapLocation() },
             closeOnNavigation: true,
             minWidth: '90vw',
             width: '90vw',
