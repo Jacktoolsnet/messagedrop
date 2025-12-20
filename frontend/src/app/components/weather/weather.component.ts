@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, inject, signal } from '@angular/core';
+import { Component, effect, inject, Injector, OnInit, runInInjectionContext, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -14,9 +14,9 @@ import { Place } from '../../interfaces/place';
 import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
+import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 import { WeatherTile, WeatherTileType } from './weather-tile.interface';
-import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather',
@@ -39,9 +39,11 @@ export class WeatherComponent implements OnInit {
 
   private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly injector = inject(Injector);
 
   location: Location = this.dialogData.location;
   private readonly tilesSignal = signal<WeatherTile[]>([]);
+  readonly tiles = this.tilesSignal.asReadonly();
 
   selectedDayIndex = 0;
   selectedHour = 0;
@@ -53,14 +55,11 @@ export class WeatherComponent implements OnInit {
 
   private readonly nomatinService = inject(NominatimService);
   private readonly weatherSignal = signal<Weather | null>(null);
+  readonly weatherSig = this.weatherSignal.asReadonly();
   private weatherState?: DatasetState<Weather>;
 
   get weather(): Weather | null {
     return this.weatherSignal();
-  }
-
-  get tiles(): WeatherTile[] {
-    return this.tilesSignal();
   }
 
   ngOnInit(): void {
@@ -73,12 +72,14 @@ export class WeatherComponent implements OnInit {
     }
     const initialWeather = this.dialogData.weather ?? this.weatherState?.data() ?? null;
     this.weatherSignal.set(initialWeather);
-    effect(() => {
-      const nextWeather = this.weatherState?.data() ?? this.dialogData.weather ?? null;
-      if (nextWeather !== this.weatherSignal()) {
-        this.weatherSignal.set(nextWeather);
-        this.updateTiles();
-      }
+    runInInjectionContext(this.injector, () => {
+      effect(() => {
+        const nextWeather = this.weatherState?.data() ?? this.dialogData.weather ?? null;
+        if (nextWeather !== this.weatherSignal()) {
+          this.weatherSignal.set(nextWeather);
+          this.updateTiles();
+        }
+      });
     });
     this.updateTiles(true);
   }
@@ -87,25 +88,25 @@ export class WeatherComponent implements OnInit {
     const numericValue = this.getTileNumericValue(tile.type);
     if (numericValue == null || numericValue === 0) return;
     this.selectedTile = tile;
-    this.tileIndex = this.tiles.findIndex(t => t.type === tile.type);
+    this.tileIndex = this.tiles().findIndex(t => t.type === tile.type);
   }
 
   selectPreviousTile(): void {
     if (this.tileIndex > 0) {
       this.tileIndex--;
-      this.selectedTile = this.tiles[this.tileIndex];
+      this.selectedTile = this.tiles()[this.tileIndex];
     }
   }
 
   selectNextTile(): void {
-    if (this.tileIndex < this.tiles.length - 1) {
+    if (this.tileIndex < this.tiles().length - 1) {
       this.tileIndex++;
-      this.selectedTile = this.tiles[this.tileIndex];
+      this.selectedTile = this.tiles()[this.tileIndex];
     }
   }
 
   onDayChange(index: number): void {
-    this.selectedDayIndex = index;
+    this.selectedDayIndex = Number(index);
     this.updateTiles();
   }
 

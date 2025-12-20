@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, effect, inject, signal } from '@angular/core';
+import { Component, Injector, OnInit, computed, effect, inject, runInInjectionContext, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
@@ -38,11 +38,23 @@ export class AirQualityComponent implements OnInit {
   private readonly nominatimService = inject(NominatimService);
   private readonly dialogData = inject<{ airQuality?: AirQualityData; selectedKey?: AirQualityMetricKey; place?: Place; location?: Location }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly injector = inject(Injector);
 
   private readonly tileValuesSignal = signal<AirQualityTileValue[]>([]);
   private readonly allTileValuesSignal = signal<AirQualityTileValue[]>([]);
   private readonly allKeysSignal = signal<AirQualityMetricKey[]>([]);
-  private readonly dayLabelsSignal = signal<string[]>([]);
+  readonly tileValues = this.tileValuesSignal.asReadonly();
+  readonly allTileValues = this.allTileValuesSignal.asReadonly();
+  readonly allKeys = this.allKeysSignal.asReadonly();
+  readonly dayLabels = computed(() => {
+    const times = this.airQuality?.hourly.time ?? [];
+    const uniqueDates = Array.from(new Set(times.map(t => t.split('T')[0])));
+    return uniqueDates.map(dateStr => {
+      const date = new Date(dateStr);
+      const options: Intl.DateTimeFormatOptions = { weekday: 'short', day: '2-digit', month: '2-digit' };
+      return date.toLocaleDateString(undefined, options);
+    });
+  });
   categoryModes: AirQualityCategory[] = ['pollen', 'particulateMatter', 'pollutants'];
   selectedDayIndex = 0;
   selectedHour = 0;
@@ -52,27 +64,12 @@ export class AirQualityComponent implements OnInit {
   locationName?: string;
   locationName$?: Observable<string>;
   private readonly airQualitySignal = signal<AirQualityData | null>(null);
+  readonly airQualitySig = this.airQualitySignal.asReadonly();
   private airQualityState?: DatasetState<AirQualityData>;
   private initialKeyApplied = false;
 
   get airQuality(): AirQualityData | null {
     return this.airQualitySignal();
-  }
-
-  get tileValues(): AirQualityTileValue[] {
-    return this.tileValuesSignal();
-  }
-
-  get allTileValues(): AirQualityTileValue[] {
-    return this.allTileValuesSignal();
-  }
-
-  get allKeys(): AirQualityMetricKey[] {
-    return this.allKeysSignal();
-  }
-
-  get dayLabels(): string[] {
-    return this.dayLabelsSignal();
   }
 
   ngOnInit(): void {
@@ -86,31 +83,31 @@ export class AirQualityComponent implements OnInit {
     }
     const initialAirQuality = this.dialogData.airQuality ?? this.airQualityState?.data() ?? null;
     this.airQualitySignal.set(initialAirQuality);
-    effect(() => {
-      const nextAirQuality = this.airQualityState?.data() ?? this.dialogData.airQuality ?? null;
-      this.airQualitySignal.set(nextAirQuality);
-      if (!nextAirQuality) {
-        this.tileValuesSignal.set([]);
-        this.allTileValuesSignal.set([]);
-        this.allKeysSignal.set([]);
-        this.dayLabelsSignal.set([]);
-        return;
-      }
-      this.checkAvailableCategories();
-      const labels = this.getDayLabels();
-      this.dayLabelsSignal.set(labels);
-      if (this.selectedDayIndex >= labels.length) {
-        this.selectedDayIndex = 0;
-      }
-      if (!this.categoryModes.includes(this.selectedCategory)) {
-        this.selectedCategory = this.categoryModes[0] ?? this.selectedCategory;
-      }
-      if (initialKey && !this.initialKeyApplied) {
-        this.initialKeyApplied = true;
-        this.setSelectionByKey(initialKey);
-      } else {
-        this.updateTiles();
-      }
+    runInInjectionContext(this.injector, () => {
+      effect(() => {
+        const nextAirQuality = this.airQualityState?.data() ?? this.dialogData.airQuality ?? null;
+        this.airQualitySignal.set(nextAirQuality);
+        if (!nextAirQuality) {
+          this.tileValuesSignal.set([]);
+          this.allTileValuesSignal.set([]);
+          this.allKeysSignal.set([]);
+          return;
+        }
+        this.checkAvailableCategories();
+        const labels = this.dayLabels();
+        if (this.selectedDayIndex >= labels.length) {
+          this.selectedDayIndex = 0;
+        }
+        if (!this.categoryModes.includes(this.selectedCategory)) {
+          this.selectedCategory = this.categoryModes[0] ?? this.selectedCategory;
+        }
+        if (initialKey && !this.initialKeyApplied) {
+          this.initialKeyApplied = true;
+          this.setSelectionByKey(initialKey);
+        } else {
+          this.updateTiles();
+        }
+      });
     });
   }
 
@@ -256,7 +253,7 @@ export class AirQualityComponent implements OnInit {
   }
 
   onDayChange(index: number): void {
-    this.selectedDayIndex = index;
+    this.selectedDayIndex = Number(index);
     this.updateTiles();
   }
 
@@ -500,16 +497,16 @@ export class AirQualityComponent implements OnInit {
   selectPreviousTile(): void {
     if (this.tileIndex > 0) {
       this.tileIndex--;
-      const key = this.allKeys[this.tileIndex];
-      this.selectedTile = this.allTileValues.find(t => t.key === key) ?? null;
+      const key = this.allKeys()[this.tileIndex];
+      this.selectedTile = this.allTileValues().find(t => t.key === key) ?? null;
     }
   }
 
   selectNextTile(): void {
-    if (this.tileIndex < this.allKeys.length - 1) {
+    if (this.tileIndex < this.allKeys().length - 1) {
       this.tileIndex++;
-      const key = this.allKeys[this.tileIndex];
-      this.selectedTile = this.allTileValues.find(t => t.key === key) ?? null;
+      const key = this.allKeys()[this.tileIndex];
+      this.selectedTile = this.allTileValues().find(t => t.key === key) ?? null;
     }
   }
 
