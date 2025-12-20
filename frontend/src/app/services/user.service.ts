@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, inject, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwPush } from '@angular/service-worker';
@@ -224,10 +224,10 @@ export class UserService {
             autoFocus: false
           });
 
-        dialogRef.afterClosed().subscribe(() => {
-          // Optional: Aktionen nach Schließen
-          this.blocked = false;
-        });
+          dialogRef.afterClosed().subscribe(() => {
+            // Optional: Aktionen nach Schließen
+            this.blocked = false;
+          });
         }
       });
   }
@@ -352,15 +352,15 @@ export class UserService {
             autoFocus: false
           });
 
-        dialogRef.afterClosed().subscribe(() => {
-          this.blocked = false;
-        });
-      }
-    },
-    error: (err) => {
-      console.error('Failed to load user details', err);
-      this.logout();
-      const dialogRef = this.displayMessage.open(DisplayMessage, {
+          dialogRef.afterClosed().subscribe(() => {
+            this.blocked = false;
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Failed to load user details', err);
+        this.logout();
+        const dialogRef = this.displayMessage.open(DisplayMessage, {
           panelClass: '',
           closeOnNavigation: false,
           data: {
@@ -644,20 +644,19 @@ export class UserService {
         closeOnNavigation: false,
         data: {
           showAlways: true,
-          title: 'Want to create a user? Easy peasy.',
+          title: 'Want to create a user? It’s that easy.',
           image: '',
           icon: 'person_add',
-          message: `Just pick a PIN – no username, no password, no DNA sample.
+          message: `Just choose a PIN — no username and no password required.
 
-But hey, *don’t forget that PIN!*
+Please keep this PIN safe. We do not store it, cannot reset it, and cannot recover it for you.
 
-We don’t store it, we don’t back it up, and we definitely can’t send you a “forgot PIN?” email.  
-Basically: lose it, and your user is gone like your last cup of coffee.
+If the PIN is lost, access to this user is permanently lost as well.
 
-You can delete your user anytime (rage quit or just Marie Kondo your data).
+You can delete your user at any time in the app.
 
-Also, if you ghost us for 90 days, your user and all its data get quietly deleted.`,
-          button: 'Create PIN',
+If the user is not used for 90 days, it will be automatically and permanently deleted, including all associated data.`,
+          button: 'Get started',
           delay: 200,
           showSpinner: false
         },
@@ -667,11 +666,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
         autoFocus: false
       });
 
-    dialogRef.afterClosed().subscribe((result) => {
-      if (result) {
-        this.openCreatePinDialog();
-      }
-    });
+      dialogRef.afterClosed().subscribe((result) => {
+        if (result) {
+          this.openCreatePinDialog();
+        }
+      });
     }
   }
 
@@ -753,11 +752,11 @@ Also, if you ghost us for 90 days, your user and all its data get quietly delete
                 this.indexedDbService.clearAllData();
                 this.openCreatePinDialog();
               },
-            error: (err) => {
-              console.error('Failed to delete user during reset', err);
-              this.indexedDbService.clearAllData();
-              this.openCreatePinDialog();
-            }
+              error: (err) => {
+                console.error('Failed to delete user during reset', err);
+                this.indexedDbService.clearAllData();
+                this.openCreatePinDialog();
+              }
             });
         }
         return;
