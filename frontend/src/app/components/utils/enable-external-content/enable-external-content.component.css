@@ -14,8 +14,14 @@
 
 .platform-header mat-icon {
     font-size: 1.75rem;
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 2rem;
+    height: 2rem;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    overflow: visible;
 }
 
 .platform-header-copy {
