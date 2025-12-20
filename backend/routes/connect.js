@@ -7,6 +7,23 @@ const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
 
+function getAuthUserId(req) {
+  return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
+}
+
+function ensureSameUser(req, res, userId) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    res.status(401).json({ status: 401, error: 'unauthorized' });
+    return false;
+  }
+  if (String(authUserId) !== String(userId)) {
+    res.status(403).json({ status: 403, error: 'forbidden' });
+    return false;
+  }
+  return true;
+}
+
 router.post('/create',
   [
     security.authenticate,
@@ -15,6 +32,9 @@ router.post('/create',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
+    if (!ensureSameUser(req, res, req.body.userId)) {
+      return;
+    }
     let connectId = crypto.randomUUID();
     tableConnect.create(req.database.db, connectId, req.body.userId, req.body.hint, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.signature, function (err) {
       if (err) {

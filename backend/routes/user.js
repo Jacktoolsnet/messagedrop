@@ -12,6 +12,23 @@ const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
 
+function getAuthUserId(req) {
+  return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
+}
+
+function ensureSameUser(req, res, userId) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    res.status(401).json({ status: 401, error: 'unauthorized' });
+    return false;
+  }
+  if (String(authUserId) !== String(userId)) {
+    res.status(403).json({ status: 403, error: 'forbidden' });
+    return false;
+  }
+  return true;
+}
+
 const rateLimitDefaults = {
   standardHeaders: true,
   legacyHeaders: false
@@ -31,31 +48,14 @@ const userConfirmLimit = rateLimit({
   message: { error: 'Too many user confirm requests, please try again later.' }
 });
 
-router.get('/get',
+router.get('/get/:userId',
   [
     security.authenticate
-  ]
-  , function (req, res) {
-    let response = { 'status': 0, 'rows': [] };
-    tableUser.getAll(req.database.db, function (err, rows) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        if (!rows || rows.length == 0) {
-          response.status = 404;
-        } else {
-          rows.forEach((row) => {
-            response.rows.push(row);
-          });
-          response.status = 200;
-        }
-      }
-      res.status(response.status).json(response);
-    });
-  });
-
-router.get('/get/:userId', function (req, res) {
+  ],
+  function (req, res) {
+  if (!ensureSameUser(req, res, req.params.userId)) {
+    return;
+  }
   let response = { 'status': 0 };
   tableUser.getById(req.database.db, req.params.userId, function (err, row) {
     if (err) {
@@ -300,6 +300,9 @@ router.get('/delete/:userId',
     metric.count('user.delete', { when: 'always', timezone: 'utc', amount: 1 })
   ]
   , function (req, res) {
+    if (!ensureSameUser(req, res, req.params.userId)) {
+      return;
+    }
     let response = { 'status': 0 };
     tableUser.deleteById(req.database.db, req.params.userId, function (err) {
       if (err) {

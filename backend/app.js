@@ -164,6 +164,15 @@ const rateLimitDefaults = {
   legacyHeaders: false
 };
 
+const basicLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: {
+    error: 'Too many requests, please try again later.'
+  }
+});
+
 const translateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 120,
@@ -309,9 +318,9 @@ const dsaStatusLimit = rateLimit({
 });
 
 // ROUTES
-app.use('/', root);
+app.use('/', basicLimit, root);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
-app.use('/check', check);
+app.use('/check', basicLimit, check);
 app.use('/clientconnect', connectLimit, clientConnect);
 app.use('/connect', connectLimit, connect);
 app.use('/contact', contactLimit, contact);

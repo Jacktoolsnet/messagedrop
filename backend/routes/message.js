@@ -9,6 +9,32 @@ const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
 
+function getAuthUserId(req) {
+  return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
+}
+
+function ensureSameUser(req, res, userId) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    res.status(401).json({ status: 401, error: 'unauthorized' });
+    return false;
+  }
+  if (String(authUserId) !== String(userId)) {
+    res.status(403).json({ status: 403, error: 'forbidden' });
+    return false;
+  }
+  return true;
+}
+
+function findMessageByIdOrUuid(db, messageId, callback) {
+  const raw = String(messageId ?? '');
+  const isNumeric = /^\d+$/.test(raw);
+  if (isNumeric) {
+    return tableMessage.getById(db, raw, callback);
+  }
+  return tableMessage.getByUuid(db, raw, callback);
+}
+
 // helper
 function normalizeLon(lon) {
   const value = Number(lon);
@@ -80,7 +106,14 @@ router.get('/get/uuid/:messageUuid', function (req, res) {
   });
 });
 
-router.get('/get/userId/:userId', function (req, res) {
+router.get('/get/userId/:userId',
+  [
+    security.authenticate
+  ],
+  function (req, res) {
+  if (!ensureSameUser(req, res, req.params.userId)) {
+    return;
+  }
   let response = { 'status': 0, 'rows': [] };
   tableMessage.getByUserId(req.database.db, req.params.userId, function (err, rows) {
     if (err) {
@@ -208,6 +241,9 @@ router.post('/create',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
+    if (!ensureSameUser(req, res, req.body.messageUserId)) {
+      return;
+    }
     if (undefined == req.body.parentMessageId) {
       req.body.parentMessageId = 0;
     }
@@ -250,77 +286,101 @@ router.post('/update',
     express.json({ type: 'application/json' })
   ],
   function (req, res) {
-    let response = { 'status': 0 };
-    tableMessage.update(
-      req.database.db,
-      req.body.id,
-      sanitizeSingleQuotes(req.body.message),
-      req.body.style,
-      sanitizeSingleQuotes(req.body.multimedia),
-      function (err) {
+    const messageId = req.body.id;
+    findMessageByIdOrUuid(req.database.db, messageId, (lookupErr, row) => {
+      if (lookupErr) {
+        return res.status(500).json({ status: 500, error: lookupErr });
+      }
+      if (!row) {
+        return res.status(404).json({ status: 404, error: 'not_found' });
+      }
+      if (!ensureSameUser(req, res, row.userId)) {
+        return;
+      }
+      tableMessage.update(
+        req.database.db,
+        row.id,
+        sanitizeSingleQuotes(req.body.message),
+        req.body.style,
+        sanitizeSingleQuotes(req.body.multimedia),
+        function (err) {
+          if (err) {
+            return res.status(500).json({ status: 500, error: err });
+          }
+          res.status(200).json({ status: 200 });
+        });
+    });
+  });
+
+router.get('/disable/:messageId',
+  [
+    security.authenticate
+  ],
+  function (req, res) {
+    findMessageByIdOrUuid(req.database.db, req.params.messageId, (lookupErr, row) => {
+      if (lookupErr) {
+        return res.status(500).json({ status: 500, error: lookupErr });
+      }
+      if (!row) {
+        return res.status(404).json({ status: 404, error: 'not_found' });
+      }
+      if (!ensureSameUser(req, res, row.userId)) {
+        return;
+      }
+      tableMessage.disableMessage(req.database.db, row.uuid, function (err) {
         if (err) {
-          response.status = 500;
-          response.error = err;
-        } else {
-          response.status = 200;
+          return res.status(500).json({ status: 500, error: err });
         }
-        res.status(response.status).json(response);
+        res.status(200).json({ status: 200 });
       });
+    });
   });
 
-router.get('/clean/public', function (req, res) {
-  let response = { 'status': 0 };
-  tableMessage.cleanPublic(req.database.db, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
+router.get('/enable/:messageId',
+  [
+    security.authenticate
+  ],
+  function (req, res) {
+    findMessageByIdOrUuid(req.database.db, req.params.messageId, (lookupErr, row) => {
+      if (lookupErr) {
+        return res.status(500).json({ status: 500, error: lookupErr });
+      }
+      if (!row) {
+        return res.status(404).json({ status: 404, error: 'not_found' });
+      }
+      if (!ensureSameUser(req, res, row.userId)) {
+        return;
+      }
+      tableMessage.enableMessage(req.database.db, row.uuid, function (err) {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err });
+        }
+        res.status(200).json({ status: 200 });
+      });
+    });
   });
-});
-
-router.get('/disable/:messageId', function (req, res) {
-  let response = { 'status': 0 };
-  tableMessage.disableMessage(req.database.db, req.params.messageId, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
-
-router.get('/enable/:messageId', function (req, res) {
-  let response = { 'status': 0 };
-  tableMessage.enableMessage(req.database.db, req.params.messageId, function (err) {
-    if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      response.status = 200;
-    }
-    res.status(response.status).json(response);
-  });
-});
 
 router.get('/delete/:messageId',
   [
     security.authenticate
   ]
   , function (req, res) {
-    let response = { 'status': 0 };
-    tableMessage.deleteById(req.database.db, req.params.messageId, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
+    findMessageByIdOrUuid(req.database.db, req.params.messageId, (lookupErr, row) => {
+      if (lookupErr) {
+        return res.status(500).json({ status: 500, error: lookupErr });
       }
-      res.status(response.status).json(response);
+      if (!row) {
+        return res.status(404).json({ status: 404, error: 'not_found' });
+      }
+      if (!ensureSameUser(req, res, row.userId)) {
+        return;
+      }
+      tableMessage.deleteById(req.database.db, row.id, function (err) {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err });
+        }
+        res.status(200).json({ status: 200 });
+      });
     });
   });
 
@@ -332,6 +392,9 @@ router.get('/like/:messageUuid/by/:userId',
   , (req, res) => {
     const messageUuid = String(req.params.messageUuid);
     const userId = String(req.params.userId);
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
     if (!messageUuid || !userId) {
       return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
     }
@@ -352,6 +415,9 @@ router.get('/dislike/:messageUuid/by/:userId',
   , (req, res) => {
     const messageUuid = String(req.params.messageUuid);
     const userId = String(req.params.userId);
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
     if (!messageUuid || !userId) {
       return res.status(400).json({ status: 400, error: 'Invalid messageId or userId' });
     }

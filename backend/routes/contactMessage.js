@@ -9,6 +9,42 @@ const tableContactMessage = require('../db/tableContactMessage');
 
 router.use(security.checkToken);
 
+function getAuthUserId(req) {
+  return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
+}
+
+function ensureSameUser(req, res, userId) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    res.status(401).json({ status: 401, error: 'unauthorized' });
+    return false;
+  }
+  if (String(authUserId) !== String(userId)) {
+    res.status(403).json({ status: 403, error: 'forbidden' });
+    return false;
+  }
+  return true;
+}
+
+function withContactOwnership(req, res, contactId, handler) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    return res.status(401).json({ status: 401, error: 'unauthorized' });
+  }
+  tableContact.getById(req.database.db, contactId, (err, row) => {
+    if (err) {
+      return res.status(500).json({ status: 500, error: err });
+    }
+    if (!row) {
+      return res.status(404).json({ status: 404, error: 'not_found' });
+    }
+    if (String(row.userId) !== String(authUserId)) {
+      return res.status(403).json({ status: 403, error: 'forbidden' });
+    }
+    handler(row);
+  });
+}
+
 const validateSendBody = (body) => {
   const required = ['contactId', 'direction', 'encryptedMessageForUser', 'encryptedMessageForContact', 'signature', 'userId', 'contactUserId'];
   const missing = required.filter((key) => body?.[key] === undefined || body?.[key] === null || body?.[key] === '');
@@ -48,43 +84,49 @@ router.post('/send',
       messageId: providedMessageId
     } = req.body;
 
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
+
     const recordId = id || crypto.randomUUID();
     const sharedMessageId = providedMessageId || recordId;
     const mirrorMessageId = crypto.randomUUID();
 
     // Store message for sender's contact
-    tableContactMessage.createMessage(req.database.db, {
-      id: recordId,
-      messageId: sharedMessageId,
-      contactId,
-      direction,
-      encryptedMessage: encryptedMessageForUser,
-      signature,
-      status,
-      createdAt
-    }, (err) => {
-      if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
-      }
-      // Try to find reciprocal contact and store mirrored message for recipient
-      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-        if (!lookupErr && reciprocal?.id) {
-          tableContactMessage.createMessage(req.database.db, {
-            id: mirrorMessageId,
-            messageId: sharedMessageId,
-            contactId: reciprocal.id,
-            direction: 'contactUser',
-            encryptedMessage: encryptedMessageForContact,
-            signature,
-            status: 'delivered',
-            createdAt
-          }, () => { /* ignore errors for mirror insert */ });
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.createMessage(req.database.db, {
+        id: recordId,
+        messageId: sharedMessageId,
+        contactId,
+        direction,
+        encryptedMessage: encryptedMessageForUser,
+        signature,
+        status,
+        createdAt
+      }, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
         }
-        return res.status(200).json({
-          status: 200,
-          messageId: recordId,
-          mirrorMessageId,
-          sharedMessageId
+        // Try to find reciprocal contact and store mirrored message for recipient
+        tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+          if (!lookupErr && reciprocal?.id) {
+            tableContactMessage.createMessage(req.database.db, {
+              id: mirrorMessageId,
+              messageId: sharedMessageId,
+              contactId: reciprocal.id,
+              direction: 'contactUser',
+              encryptedMessage: encryptedMessageForContact,
+              signature,
+              status: 'delivered',
+              createdAt
+            }, () => { /* ignore errors for mirror insert */ });
+          }
+          return res.status(200).json({
+            status: 200,
+            messageId: recordId,
+            mirrorMessageId,
+            sharedMessageId
+          });
         });
       });
     });
@@ -114,24 +156,30 @@ router.post('/update',
       return res.status(400).json({ status: 400, error: 'Missing required fields' });
     }
 
-    tableContactMessage.updateMessageForContact(req.database.db, contactId, messageId, {
-      encryptedMessage: encryptedMessageForUser,
-      signature,
-      status
-    }, (err) => {
-      if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
-      }
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
 
-      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-        if (!lookupErr && reciprocal?.id) {
-          tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
-            encryptedMessage: encryptedMessageForContact,
-            signature,
-            status
-          }, () => { /* best-effort */ });
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.updateMessageForContact(req.database.db, contactId, messageId, {
+        encryptedMessage: encryptedMessageForUser,
+        signature,
+        status
+      }, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
         }
-        return res.status(200).json({ status: 200, messageId });
+
+        tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+          if (!lookupErr && reciprocal?.id) {
+            tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
+              encryptedMessage: encryptedMessageForContact,
+              signature,
+              status
+            }, () => { /* best-effort */ });
+          }
+          return res.status(200).json({ status: 200, messageId });
+        });
       });
     });
   }
@@ -158,30 +206,40 @@ router.post('/delete',
     }
 
     if (scope === 'both') {
-      tableContactMessage.deleteByMessageId(req.database.db, messageId, (err) => {
-        if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
-        }
-        return res.status(200).json({ status: 200, messageId });
+      if (!ensureSameUser(req, res, userId)) {
+        return;
+      }
+      return withContactOwnership(req, res, contactId, () => {
+        tableContactMessage.deleteByMessageId(req.database.db, messageId, (err) => {
+          if (err) {
+            return res.status(500).json({ status: 500, error: err.message || err });
+          }
+          return res.status(200).json({ status: 200, messageId });
+        });
       });
+    }
+
+    if (!ensureSameUser(req, res, userId)) {
       return;
     }
 
-    tableContactMessage.deleteByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
-      if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
-      }
-      // Mark reciprocal as deleted (if exists)
-      if (userId && contactUserId) {
-        tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-          if (!lookupErr && reciprocal?.id) {
-            tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
-              status: 'deleted'
-            }, () => { /* best-effort */ });
-          }
-        });
-      }
-      return res.status(200).json({ status: 200, messageId });
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.deleteByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
+        }
+        // Mark reciprocal as deleted (if exists)
+        if (userId && contactUserId) {
+          tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+            if (!lookupErr && reciprocal?.id) {
+              tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
+                status: 'deleted'
+              }, () => { /* best-effort */ });
+            }
+          });
+        }
+        return res.status(200).json({ status: 200, messageId });
+      });
     });
   }
 );
@@ -199,15 +257,21 @@ router.post('/reaction',
       return res.status(400).json({ status: 400, error: 'Missing required fields' });
     }
 
-    tableContactMessage.setReactionForContact(req.database.db, contactId, messageId, reaction ?? null, (err) => {
-      if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
-      }
-      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-        if (!lookupErr && reciprocal?.id) {
-          tableContactMessage.setReactionForContact(req.database.db, reciprocal.id, messageId, reaction ?? null, () => { /* best-effort */ });
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
+
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.setReactionForContact(req.database.db, contactId, messageId, reaction ?? null, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
         }
-        return res.status(200).json({ status: 200, messageId, reaction: reaction ?? null });
+        tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+          if (!lookupErr && reciprocal?.id) {
+            tableContactMessage.setReactionForContact(req.database.db, reciprocal.id, messageId, reaction ?? null, () => { /* best-effort */ });
+          }
+          return res.status(200).json({ status: 200, messageId, reaction: reaction ?? null });
+        });
       });
     });
   }
@@ -226,15 +290,21 @@ router.post('/status/read',
       return res.status(400).json({ status: 400, error: 'Missing required fields' });
     }
 
-    tableContactMessage.markAsReadByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
-      if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
-      }
-      tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
-        if (!lookupErr && reciprocal?.id) {
-          tableContactMessage.markAsReadByContactAndMessageId(req.database.db, reciprocal.id, messageId, () => { });
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
+
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.markAsReadByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
         }
-        return res.status(200).json({ status: 200, messageId });
+        tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
+          if (!lookupErr && reciprocal?.id) {
+            tableContactMessage.markAsReadByContactAndMessageId(req.database.db, reciprocal.id, messageId, () => { });
+          }
+          return res.status(200).json({ status: 200, messageId });
+        });
       });
     });
   }

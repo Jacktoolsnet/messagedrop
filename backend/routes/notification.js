@@ -50,7 +50,7 @@ function normalizeMetadata(raw) {
     return { value: raw };
 }
 
-router.post('/create', (req, res) => {
+router.post('/create', [security.authenticate], (req, res) => {
     const { userId, title, body } = req.body || {};
 
     if (!userId || !title || !body) {
@@ -58,6 +58,10 @@ router.post('/create', (req, res) => {
             status: 400,
             error: 'missing_required_fields'
         });
+    }
+
+    if (!ensureSameUser(req, res, userId)) {
+        return;
     }
 
     const uuid = req.body.uuid && typeof req.body.uuid === 'string'

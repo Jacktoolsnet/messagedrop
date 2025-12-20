@@ -10,6 +10,48 @@ const metric = require('../middleware/metric');
 
 router.use(security.checkToken);
 
+function getAuthUserId(req) {
+  return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
+}
+
+function ensureSameUser(req, res, userId) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    res.status(401).json({ status: 401, error: 'unauthorized' });
+    return false;
+  }
+  if (String(authUserId) !== String(userId)) {
+    res.status(403).json({ status: 403, error: 'forbidden' });
+    return false;
+  }
+  return true;
+}
+
+function withPlaceOwnership(req, res, placeId, handler) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    return res.status(401).json({ status: 401, error: 'unauthorized' });
+  }
+  tablePlace.getById(req.database.db, placeId, (err, row) => {
+    if (err) {
+      return res.status(500).json({ status: 500, error: err });
+    }
+    if (!row) {
+      return res.status(404).json({ status: 404, error: 'not_found' });
+    }
+    if (String(row.userId) !== String(authUserId)) {
+      return res.status(403).json({ status: 403, error: 'forbidden' });
+    }
+    try {
+      Promise.resolve(handler(row)).catch((handlerErr) => {
+        res.status(500).json({ status: 500, error: handlerErr?.message || handlerErr });
+      });
+    } catch (handlerErr) {
+      res.status(500).json({ status: 500, error: handlerErr?.message || handlerErr });
+    }
+  });
+}
+
 router.post('/create',
   [
     security.authenticate,
@@ -18,6 +60,9 @@ router.post('/create',
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
+    if (!ensureSameUser(req, res, req.body.userId)) {
+      return;
+    }
     let placeId = crypto.randomUUID();
     let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/'/g, "''"));
     tablePlace.create(req.database.db, placeId, req.body.userId, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
@@ -39,15 +84,17 @@ router.post('/update',
   ]
   , async function (req, res) {
     let response = { 'status': 0 };
-    let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/'/g, "''"));
-    tablePlace.update(req.database.db, req.body.id, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-      }
-      res.status(response.status).json(response);
+    withPlaceOwnership(req, res, req.body.id, async () => {
+      let cryptedPlaceName = await cryptoUtil.encrypt(await getEncryptionPublicKey(), req.body.name.replace(/'/g, "''"));
+      tablePlace.update(req.database.db, req.body.id, JSON.stringify(cryptedPlaceName), req.body.latMin, req.body.latMax, req.body.lonMin, req.body.lonMax, function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
+      });
     });
   });
 
@@ -57,23 +104,17 @@ router.get('/get/:placeId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    tablePlace.getById(req.database.db, req.params.placeId, function (err, row) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        if (!row) {
-          response.status = 404;
-        } else {
-          response.status = 200;
-          response.place = row;
-        }
-      }
+    withPlaceOwnership(req, res, req.params.placeId, (row) => {
+      response.status = 200;
+      response.place = row;
       res.status(response.status).json(response);
     });
   });
 
 router.get('/get/userId/:userId/name/:name', security.authenticate, function (req, res) {
+  if (!ensureSameUser(req, res, req.params.userId)) {
+    return;
+  }
   let response = { 'status': 0 };
   tablePlace.getByUserIdAndName(req.database.db, req.params.userId, req.params.name, function (err, row) {
     if (err) {
@@ -96,6 +137,9 @@ router.get('/get/userId/:userId',
     security.authenticate
   ]
   , function (req, res) {
+    if (!ensureSameUser(req, res, req.params.userId)) {
+      return;
+    }
     let response = { 'status': 0, 'rows': [] };
     tablePlace.getByUserId(req.database.db, req.params.userId, function (err, rows) {
       if (err) {
@@ -129,14 +173,16 @@ router.get('/subscribe/:placeId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    tablePlace.subscribe(req.database.db, req.params.placeId, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-      }
-      res.status(response.status).json(response);
+    withPlaceOwnership(req, res, req.params.placeId, () => {
+      tablePlace.subscribe(req.database.db, req.params.placeId, function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
+      });
     });
   });
 
@@ -145,14 +191,16 @@ router.get('/unsubscribe/:placeId',
     security.authenticate
   ], function (req, res) {
     let response = { 'status': 0 };
-    tablePlace.unsubscribe(req.database.db, req.params.placeId, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-      }
-      res.status(response.status).json(response);
+    withPlaceOwnership(req, res, req.params.placeId, () => {
+      tablePlace.unsubscribe(req.database.db, req.params.placeId, function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
+      });
     });
   });
 
@@ -162,14 +210,16 @@ router.get('/delete/:placeId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    tablePlace.deleteById(req.database.db, req.params.placeId, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-      }
-      res.status(response.status).json(response);
+    withPlaceOwnership(req, res, req.params.placeId, () => {
+      tablePlace.deleteById(req.database.db, req.params.placeId, function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
+      });
     });
   });
 
