@@ -88,7 +88,7 @@ import { WeatherService } from './services/weather.service';
     MatIconModule,
     ShortNumberPipe,
     MatMenuModule
-],
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
   animations: [
@@ -478,9 +478,7 @@ export class AppComponent implements OnInit {
           if (this.userService.isReady()) {
             this.userService.saveUser();
           }
-          this.mapService.setMaplocation(this.userService.getUser().location);
           this.mapService.moveToWithZoom(this.userService.getUser().location, 17);
-          this.mapService.setUserMarker(this.userService.getUser().location);
           this.updateDataForLocation();
         },
         error: (error) => {
@@ -525,8 +523,6 @@ export class AppComponent implements OnInit {
   public handleMoveEndEvent() {
     this.updateDataForLocation();
     this.setIsUserLocation();
-    // this.mapService.drawSearchRectange(event);
-    this.mapService.setCircleMarker();
   }
 
   public handleMarkerClickEvent(event: MarkerLocation) {

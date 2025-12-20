@@ -1,5 +1,5 @@
 
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -86,6 +86,7 @@ export class AirQualityTileComponent implements OnInit {
   private readonly airQualityService = inject(AirQualityService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     console.log(this.place.datasets.airQualityDataset.data);
@@ -122,6 +123,7 @@ export class AirQualityTileComponent implements OnInit {
             this.airQuality = airQuality;
             this.updateFromAirQuality();
             this.isStale = false;
+            this.cdr.markForCheck();
           } else {
             this.useCachedAsStale();
           }
@@ -137,12 +139,14 @@ export class AirQualityTileComponent implements OnInit {
       this.airQuality = this.place.datasets.airQualityDataset.data;
       this.updateFromAirQuality();
       this.isStale = true;
+      this.cdr.markForCheck();
     } else {
       this.airQuality = undefined;
       this.value = 0;
       this.level = '';
       this.minMax = undefined;
       this.isStale = true;
+      this.cdr.markForCheck();
     }
   }
 
@@ -156,6 +160,7 @@ export class AirQualityTileComponent implements OnInit {
       this.level = '';
       this.airQualityIcon = undefined;
       this.minMax = undefined;
+      this.cdr.markForCheck();
       return;
     }
 
@@ -165,6 +170,7 @@ export class AirQualityTileComponent implements OnInit {
     this.level = info.label;
     this.airQualityIcon = this.getAirQualityIcon(dominant);
     this.minMax = this.getHourlyMinMax(dominant);
+    this.cdr.markForCheck();
   }
 
   // --- Dominanz-Logik ---

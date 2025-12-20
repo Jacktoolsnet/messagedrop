@@ -46,7 +46,7 @@ interface ImageDialogData {
     MatMenuModule,
     MatInputModule,
     MasonryItemDirective
-],
+  ],
   templateUrl: './imagelist.component.html',
   styleUrl: './imagelist.component.css',
   standalone: true
@@ -124,7 +124,6 @@ export class ImagelistComponent implements OnInit, OnDestroy {
 
   flyTo(localImage: LocalImage) {
     const location = { ...localImage.location, plusCode: this.geolocationService.getPlusCode(localImage.location.latitude, localImage.location.longitude) };
-    this.mapService.setCircleMarker();
     if (this.dialogData.boundingBox) {
       this.mapService.fitMapToBounds(this.dialogData.boundingBox);
     } else {

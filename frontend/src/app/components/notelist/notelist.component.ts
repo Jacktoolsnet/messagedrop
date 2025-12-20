@@ -40,7 +40,7 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
     MatMenuModule,
     MatInputModule,
     MasonryItemDirective
-],
+  ],
   templateUrl: './notelist.component.html',
   styleUrl: './notelist.component.css',
   standalone: true
@@ -75,7 +75,6 @@ export class NotelistComponent {
 
   flyTo(note: Note) {
     const location = { ...note.location, plusCode: this.geolocationService.getPlusCode(note.location.latitude, note.location.longitude) };
-    this.mapService.setCircleMarker();
     this.mapService.flyTo(location);
     this.dialogRef.close();
   }

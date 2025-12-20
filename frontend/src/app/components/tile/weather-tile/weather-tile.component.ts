@@ -1,5 +1,5 @@
 
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, Input, OnInit, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { DateTime } from 'luxon';
 import { BoundingBox } from '../../../interfaces/bounding-box';
@@ -33,6 +33,7 @@ export class WeatherTileComponent implements OnInit {
   private readonly weatherService = inject(WeatherService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly dialog = inject(MatDialog);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
     if (this.place.datasets.weatherDataset.data) {
@@ -73,17 +74,18 @@ export class WeatherTileComponent implements OnInit {
             if (weather) {
               this.place.datasets.weatherDataset.data = weather;
               this.place.datasets.weatherDataset.lastUpdate = DateTime.now();
-              this.weather = weather;
-              this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
-              this.minMax = this.getHourlyMinMax('temperature');
-              this.setTempColor();
-              this.isStale = false;
-            } else {
-              this.useCachedAsStale();
-            }
-          },
-          error: () => {
+            this.weather = weather;
+            this.weatherIcon = this.getWeatherIcon(this.weather?.current.weatherCode);
+            this.minMax = this.getHourlyMinMax('temperature');
+            this.setTempColor();
+            this.isStale = false;
+            this.cdr.markForCheck();
+          } else {
             this.useCachedAsStale();
+          }
+        },
+        error: () => {
+          this.useCachedAsStale();
           }
         });
     }
@@ -96,11 +98,13 @@ export class WeatherTileComponent implements OnInit {
       this.minMax = this.getHourlyMinMax('temperature');
       this.setTempColor();
       this.isStale = true;
+      this.cdr.markForCheck();
     } else {
       this.weather = undefined;
       this.weatherIcon = undefined;
       this.minMax = undefined;
       this.isStale = true;
+      this.cdr.markForCheck();
     }
   }
 

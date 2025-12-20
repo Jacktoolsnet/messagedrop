@@ -134,6 +134,8 @@ export class MapService {
       [boundingBox.latMax, boundingBox.lonMax]
     );
     this.map.fitBounds(bounds, { padding: [paddingX, paddingY] });
+    this.setMaplocation(this.geolocationService.getCenterOfBoundingBox(boundingBox));
+    this.setCircleMarker();
   }
 
   public setMapMinMaxZoom(minZoom: number, maxZoom: number) {
@@ -155,6 +157,7 @@ export class MapService {
 
   public setMaplocation(location: Location): void {
     this.location = location;
+    this.setCircleMarker();
   }
 
   private normalizeLon(lon: number): number {
@@ -254,6 +257,7 @@ export class MapService {
     if (!this.map) {
       return;
     }
+    this.setMaplocation(location);
     this.map.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map.getZoom());
   }
 
@@ -261,11 +265,16 @@ export class MapService {
     if (!this.map) {
       return;
     }
+    this.setMaplocation(location);
     this.map.setZoom(zoom);
     this.map.flyTo(new leaflet.LatLng(location.latitude, location.longitude), this.map.getZoom());
   }
 
   public moveTo(location: Location): void {
+    if (!this.map) {
+      return;
+    }
+    this.setMaplocation(location);
     this.map?.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }
 
@@ -273,6 +282,7 @@ export class MapService {
     if (!this.map) {
       return;
     }
+    this.setMaplocation(location);
     this.map.setZoom(zoom);
     this.map.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }
