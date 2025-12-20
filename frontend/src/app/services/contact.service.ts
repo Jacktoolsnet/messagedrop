@@ -47,7 +47,12 @@ export class ContactService {
     if (this.ready && !force) {
       return;
     }
-    this.getByUserId(this.userService.getUser().id)
+    const userId = this.userService.getUser().id;
+    if (!this.userService.isReady() || !userId) {
+      this.ready = false;
+      return;
+    }
+    this.getByUserId(userId)
       .subscribe({
         next: (getContactsResponse: GetContactsResponse) => {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));

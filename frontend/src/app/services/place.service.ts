@@ -45,7 +45,12 @@ export class PlaceService {
   }
 
   initPlaces() {
-    this.getByUserId(this.userService.getUser().id).subscribe({
+    const userId = this.userService.getUser().id;
+    if (!this.userService.isReady() || !userId) {
+      this.ready = false;
+      return;
+    }
+    this.getByUserId(userId).subscribe({
       next: async (response) => {
         const places = await Promise.all(response.rows.map(row => this.loadPlaceFromIndexedDb(row.id)));
         this._places.set(places as Place[]);

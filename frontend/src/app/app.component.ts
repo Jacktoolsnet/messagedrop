@@ -237,11 +237,11 @@ export class AppComponent implements OnInit {
     effect(() => {
       this.userService.userSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
-        this.contactService.initContacts();
-        if (!this.placeService.isReady()) {
-          this.placeService.initPlaces();
-        }
         if (this.userService.isReady()) {
+          this.contactService.initContacts();
+          if (!this.placeService.isReady()) {
+            this.placeService.initPlaces();
+          }
           this.contactMessageService.initLiveReceive();
           void this.systemNotificationService.refreshUnreadCount();
         } else {
