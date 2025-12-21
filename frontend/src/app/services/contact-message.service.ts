@@ -54,6 +54,13 @@ interface ReactionPayload {
   contactUserId: string;
 }
 
+interface TranslationPayload {
+  messageId: string;
+  contactId: string;
+  translatedMessage: string;
+  userId: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -126,6 +133,14 @@ export class ContactMessageService {
   updateMessage(payload: UpdateMessagePayload) {
     return this.http.post<{ status: number; messageId: string }>(
       `${environment.apiUrl}/contactMessage/update`,
+      payload,
+      this.httpOptions
+    ).pipe(catchError(this.handleError));
+  }
+
+  updateTranslation(payload: TranslationPayload) {
+    return this.http.post<{ status: number; messageId: string }>(
+      `${environment.apiUrl}/contactMessage/translate`,
       payload,
       this.httpOptions
     ).pipe(catchError(this.handleError));
@@ -301,6 +316,13 @@ export class ContactMessageService {
     return { encryptedMessageForUser, encryptedMessageForContact, signature };
   }
 
+  async encryptTranslation(text: string): Promise<string> {
+    return this.cryptoService.encrypt(
+      this.userService.getUser().cryptoKeyPair.publicKey,
+      text
+    );
+  }
+
   async decryptAndVerify(contact: Contact, msg: ContactMessage): Promise<ShortMessage | null> {
     try {
       const decrypted = await this.cryptoService.decrypt(
@@ -325,7 +347,27 @@ export class ContactMessageService {
         signatureArrayBuffer
       );
       if (!valid) return null;
-      return JSON.parse(decrypted) as ShortMessage;
+      const payload = JSON.parse(decrypted) as ShortMessage;
+      const translated = await this.decryptTranslation(msg.translatedMessage);
+      if (translated) {
+        payload.translatedMessage = translated;
+      }
+      return payload;
+    } catch {
+      return null;
+    }
+  }
+
+  private async decryptTranslation(encrypted?: string | null): Promise<string | null> {
+    if (!encrypted) {
+      return null;
+    }
+    try {
+      const decrypted = await this.cryptoService.decrypt(
+        this.userService.getUser().cryptoKeyPair.privateKey,
+        JSON.parse(encrypted) as CryptoData
+      );
+      return decrypted || null;
     } catch {
       return null;
     }

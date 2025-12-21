@@ -6,6 +6,7 @@ const columnContactId = 'contactId';
 const columnDirection = 'direction'; // 'user' | 'contactUser'
 const columnEncryptedMessage = 'encryptedMessage';
 const columnSignature = 'signature';
+const columnTranslatedMessage = 'translatedMessage';
 const columnCreatedAt = 'createdAt'; // ISO8601
 const columnReadAt = 'readAt';       // ISO8601 | NULL
 const columnStatus = 'status';       // sent | delivered | read | deleted
@@ -20,6 +21,7 @@ const init = function (db) {
       ${columnDirection} TEXT NOT NULL CHECK (${columnDirection} IN ('user','contactUser')),
       ${columnEncryptedMessage} TEXT NOT NULL,
       ${columnSignature} TEXT NOT NULL,
+      ${columnTranslatedMessage} TEXT DEFAULT NULL,
       ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read','deleted')),
       ${columnCreatedAt} TEXT NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%S','now')),
       ${columnReadAt} TEXT DEFAULT NULL,
@@ -42,6 +44,16 @@ const init = function (db) {
       WHERE ${columnReadAt} IS NULL;
   `;
     db.exec(sql, (err) => { if (err) throw err; });
+
+    db.all(`PRAGMA table_info(${tableName});`, (err, rows) => {
+        if (err || !rows) {
+            return;
+        }
+        const hasTranslation = rows.some((row) => row.name === columnTranslatedMessage);
+        if (!hasTranslation) {
+            db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnTranslatedMessage} TEXT DEFAULT NULL;`);
+        }
+    });
 
     // Trigger: Bei neuer Nachricht den Denormalisierer im Kontakt füttern (optional)
     const trig = `
@@ -181,6 +193,16 @@ const updateMessageForContact = function (db, contactId, messageId, {
     db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, reaction ?? null, messageId, contactId], (err) => callback(err));
 };
 
+const setTranslatedMessageForContact = function (db, contactId, messageId, translatedMessage, callback) {
+    const sql = `
+    UPDATE ${tableName}
+    SET ${columnTranslatedMessage} = ?
+    WHERE ${columnMessageId} = ?
+      AND ${columnContactId} = ?;
+  `;
+    db.run(sql, [translatedMessage ?? null, messageId, contactId], (err) => callback(err));
+};
+
 const deleteByMessageId = function (db, messageId, callback) {
     const sql = `
     DELETE FROM ${tableName}
@@ -242,6 +264,7 @@ module.exports = {
     columnMessageId,
     updateMessageByMessageId,
     updateMessageForContact,
+    setTranslatedMessageForContact,
     deleteByMessageId,
     deleteByContactAndMessageId,
     markAsReadByContactAndMessageId,

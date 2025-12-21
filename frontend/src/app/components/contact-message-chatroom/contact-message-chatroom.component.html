@@ -77,7 +77,7 @@
             <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
             }
             @if (msg.payload?.message?.trim() !== '') {
-            <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
+            <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
             <div class="reaction-chip reaction-chip--them" role="button" tabindex="0"
               (click)="openReactionPicker(msg, $event)" (keyup.enter)="openReactionPicker(msg, $event)"
@@ -87,6 +87,17 @@
           </div>
           <div class="message-actions-row button-them">
             <div class="message-actions">
+              @if (msg.payload?.message?.trim() !== '') {
+              @if (msg.payload?.translatedMessage && !msg.showOriginal) {
+              <button mat-mini-fab color="primary" aria-label="Show original message" (click)="showOriginalMessage(msg)">
+                <mat-icon>undo</mat-icon>
+              </button>
+              } @else {
+              <button mat-mini-fab color="primary" aria-label="Translate message" (click)="translateMessage(msg)">
+                <mat-icon>translate</mat-icon>
+              </button>
+              }
+              }
               <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
                 <mat-icon>delete</mat-icon>
               </button>

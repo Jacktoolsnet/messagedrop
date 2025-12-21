@@ -185,6 +185,34 @@ router.post('/update',
   }
 );
 
+// Store translation for a single contact copy
+router.post('/translate',
+  [
+    security.authenticate,
+    express.json({ type: 'application/json' }),
+    metric.count('contactMessage.translate', { when: 'always', timezone: 'utc', amount: 1 })
+  ],
+  (req, res) => {
+    const { messageId, contactId, translatedMessage, userId } = req.body ?? {};
+    if (!messageId || !contactId || !translatedMessage || !userId) {
+      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+    }
+
+    if (!ensureSameUser(req, res, userId)) {
+      return;
+    }
+
+    withContactOwnership(req, res, contactId, () => {
+      tableContactMessage.setTranslatedMessageForContact(req.database.db, contactId, messageId, translatedMessage, (err) => {
+        if (err) {
+          return res.status(500).json({ status: 500, error: err.message || err });
+        }
+        return res.status(200).json({ status: 200, messageId });
+      });
+    });
+  }
+);
+
 // Delete message(s)
 router.post('/delete',
   [

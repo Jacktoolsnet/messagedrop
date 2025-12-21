@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -11,6 +12,7 @@ import { ShortMessage } from '../../interfaces/short-message';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { SocketioService } from '../../services/socketio.service';
+import { TranslateService } from '../../services/translate.service';
 import { UserService } from '../../services/user.service';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -27,6 +29,7 @@ interface ChatroomMessage {
   readAt?: string | null;
   status?: string;
   reaction?: string | null;
+  showOriginal?: boolean;
 }
 
 @Component({
@@ -50,6 +53,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
   private readonly matDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<ContactMessageChatroomComponent>);
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
+  private readonly translateService = inject(TranslateService);
+  private readonly snackBar = inject(MatSnackBar);
 
   @ViewChild('messageScroll') private messageScroll?: ElementRef<HTMLElement>;
   @ViewChildren('messageRow') private messageRows?: QueryList<ElementRef<HTMLElement>>;
@@ -115,7 +120,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
         createdAt: incoming.createdAt,
         readAt: incoming.readAt,
         status: incoming.status,
-        reaction: incoming.reaction
+        reaction: incoming.reaction,
+        showOriginal: false
       }, ...msgs]);
       this.lastLiveMessageId = incoming.id;
     }
@@ -252,6 +258,65 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     return message.direction === 'contactUser' && !message.readAt;
   }
 
+  getDisplayedMessage(message: ChatroomMessage): string {
+    const payload = message.payload;
+    if (!payload) {
+      return '';
+    }
+    if (message.direction === 'contactUser' && payload.translatedMessage && !message.showOriginal) {
+      return payload.translatedMessage;
+    }
+    return payload.message;
+  }
+
+  showOriginalMessage(message: ChatroomMessage): void {
+    if (message.direction !== 'contactUser' || !message.payload?.translatedMessage) {
+      return;
+    }
+    this.setShowOriginal(message.messageId, true);
+  }
+
+  translateMessage(message: ChatroomMessage): void {
+    if (message.direction !== 'contactUser') {
+      return;
+    }
+    const text = message.payload?.message?.trim();
+    if (!text) {
+      return;
+    }
+    if (message.payload?.translatedMessage) {
+      this.setShowOriginal(message.messageId, false);
+      return;
+    }
+    this.translateService.translate(text, this.userService.getUser().language).subscribe({
+      next: (response) => {
+        if (response.status !== 200) {
+          return;
+        }
+        const translated = response.result?.text?.trim();
+        if (!translated) {
+          return;
+        }
+        this.messages.update((msgs) =>
+          msgs.map((msg) =>
+            msg.messageId === message.messageId
+              ? {
+                ...msg,
+                payload: msg.payload ? { ...msg.payload, translatedMessage: translated } : msg.payload,
+                showOriginal: false
+              }
+              : msg
+          )
+        );
+        void this.persistTranslation(message.messageId, translated);
+      },
+      error: (err) => {
+        const errorMessage = err?.error?.error ?? 'Translation failed';
+        this.snackBar.open(errorMessage, '', { duration: 3000 });
+      }
+    });
+  }
+
   editMessage(message: ChatroomMessage): void {
     const contact = this.contact();
     if (!contact || message.direction !== 'user') {
@@ -372,6 +437,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
             const key = this.buildMessageKey(msg.id, msg.signature, msg.encryptedMessage);
             this.messageKeys.add(key);
+            const existing = merged.get(msg.messageId);
             merged.set(msg.messageId, {
               id: msg.id,
               messageId: msg.messageId,
@@ -380,7 +446,8 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
               createdAt: msg.createdAt,
               readAt: msg.readAt,
               status: msg.status,
-              reaction: (msg as unknown as { reaction?: string | null }).reaction ?? null
+              reaction: (msg as unknown as { reaction?: string | null }).reaction ?? null,
+              showOriginal: existing?.showOriginal ?? false
             });
           }
           const mergedMessages = Array.from(merged.values()).sort((a, b) => b.createdAt.localeCompare(a.createdAt));
@@ -645,5 +712,36 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
 
   mapStatus(status?: string): string {
     return this.contactMessageService.mapStatusIcon(status as ('sent' | 'delivered' | 'read' | 'deleted' | undefined));
+  }
+
+  private setShowOriginal(messageId: string, showOriginal: boolean): void {
+    this.messages.update((msgs) =>
+      msgs.map((msg) =>
+        msg.messageId === messageId ? { ...msg, showOriginal } : msg
+      )
+    );
+  }
+
+  private async persistTranslation(messageId: string, translation: string): Promise<void> {
+    const contact = this.contact();
+    if (!contact) {
+      return;
+    }
+    try {
+      const encryptedTranslation = await this.contactMessageService.encryptTranslation(translation);
+      this.contactMessageService.updateTranslation({
+        messageId,
+        contactId: contact.id,
+        translatedMessage: encryptedTranslation,
+        userId: this.userService.getUser().id
+      }).subscribe({
+        error: (err) => {
+          const errorMessage = err?.error?.error ?? 'Failed to store translation';
+          this.snackBar.open(errorMessage, '', { duration: 3000 });
+        }
+      });
+    } catch {
+      this.snackBar.open('Failed to store translation', '', { duration: 3000 });
+    }
   }
 }

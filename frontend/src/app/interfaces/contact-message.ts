@@ -5,6 +5,7 @@ export interface ContactMessage {
   direction: 'user' | 'contactUser';
   encryptedMessage: string;
   signature: string;
+  translatedMessage?: string | null;
   status: 'sent' | 'delivered' | 'read';
   createdAt: string;
   readAt?: string | null;
