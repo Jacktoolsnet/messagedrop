@@ -20,6 +20,11 @@ function getAuthenticatedUserId(req) {
     return null;
 }
 
+function isBackendTokenRequest(req) {
+    const token = req.headers['x-api-authorization'];
+    return !!token && token === process.env.BACKEND_TOKEN;
+}
+
 function ensureSameUser(req, res, userId) {
     const authUserId = getAuthenticatedUserId(req);
     if (!authUserId) {
@@ -50,7 +55,17 @@ function normalizeMetadata(raw) {
     return { value: raw };
 }
 
-router.post('/create', [security.authenticate], (req, res) => {
+router.post('/create', [
+    (req, res, next) => {
+        if (isBackendTokenRequest(req)) {
+            if (req.body?.userId) {
+                req.jwtUser = { userId: req.body.userId };
+            }
+            return next();
+        }
+        return security.authenticate(req, res, next);
+    }
+], (req, res) => {
     const { userId, title, body } = req.body || {};
 
     if (!userId || !title || !body) {
