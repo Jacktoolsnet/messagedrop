@@ -8,22 +8,25 @@
 }
 
 .mat-mdc-dialog-content {
-  overflow-y: auto;
+  overflow: hidden;
   min-height: 4rem;
   max-height: calc(90vh - 0.5rem);
   width: 100%;
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 .chatroom-card {
   position: relative;
   padding-right: 4rem;
   min-height: 4rem;
-  height: auto;
-  max-height: 95vh;
+  height: 100%;
+  max-height: 100%;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 .chatroom-card__toolbar {
@@ -46,9 +49,17 @@
   overflow-y: auto;
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
+  overflow-anchor: none;
   flex: 1;
   padding: 0 1rem 1rem 0.5rem;
   box-sizing: border-box;
+}
+
+@supports (-moz-appearance: none) {
+  .chatroom-card__content {
+    overscroll-behavior: auto;
+    scrollbar-gutter: auto;
+  }
 }
 
 .chatroom-card__content--empty {
