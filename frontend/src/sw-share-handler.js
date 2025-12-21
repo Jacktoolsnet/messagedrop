@@ -121,6 +121,7 @@ function detectContentType(url) {
 
 async function deliverToClientAndSave(content, type) {
     await saveSharedContentToDB(content, type);
+    await delay(10000);
 
     const bc = new BroadcastChannel('shared-content');
     bc.postMessage({ type: 'shared', content });
@@ -153,4 +154,8 @@ function saveSharedContentToDB(data, type) {
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function delay(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
