@@ -249,7 +249,7 @@ export class ContactlistComponent {
       data: contact.id,
       minWidth: 'min(600px, 95vw)',
       maxWidth: '95vw',
-      width: 'auto',
+      width: 'max(600px, 95vw)',
       maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,

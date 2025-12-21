@@ -124,6 +124,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         showOriginal: false
       }, ...msgs]);
       this.lastLiveMessageId = incoming.id;
+      queueMicrotask(() => this.scrollToTopIfNeeded());
     }
   });
 
@@ -401,6 +402,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       createdAt: now,
       status: 'sent'
     }, ...msgs]);
+    queueMicrotask(() => this.scrollToTop());
     return messageId;
   }
 
@@ -712,6 +714,24 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   mapStatus(status?: string): string {
     return this.contactMessageService.mapStatusIcon(status as ('sent' | 'delivered' | 'read' | 'deleted' | undefined));
+  }
+
+  private scrollToTop(): void {
+    const container = this.messageScroll?.nativeElement;
+    if (!container) {
+      return;
+    }
+    container.scrollTop = 0;
+  }
+
+  private scrollToTopIfNeeded(): void {
+    const container = this.messageScroll?.nativeElement;
+    if (!container) {
+      return;
+    }
+    if (container.scrollTop > 0) {
+      container.scrollTop = 0;
+    }
   }
 
   private setShowOriginal(messageId: string, showOriginal: boolean): void {
