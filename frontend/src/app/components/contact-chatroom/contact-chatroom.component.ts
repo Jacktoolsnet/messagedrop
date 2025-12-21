@@ -33,7 +33,7 @@ interface ChatroomMessage {
 }
 
 @Component({
-  selector: 'app-contact-message-chatroom',
+  selector: 'app-contact-chatroom',
   imports: [
     MatCardModule,
     MatButtonModule,
@@ -41,17 +41,17 @@ interface ChatroomMessage {
     ShowmultimediaComponent,
     ShowmessageComponent
 ],
-  templateUrl: './contact-message-chatroom.component.html',
-  styleUrl: './contact-message-chatroom.component.css',
+  templateUrl: './contact-chatroom.component.html',
+  styleUrl: './contact-chatroom.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ContactMessageChatroomComponent implements AfterViewInit {
+export class ContactChatroomComponent implements AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
   private readonly contactMessageService = inject(ContactMessageService);
   private readonly matDialog = inject(MatDialog);
-  private readonly dialogRef = inject(MatDialogRef<ContactMessageChatroomComponent>);
+  private readonly dialogRef = inject(MatDialogRef<ContactChatroomComponent>);
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
   private readonly snackBar = inject(MatSnackBar);

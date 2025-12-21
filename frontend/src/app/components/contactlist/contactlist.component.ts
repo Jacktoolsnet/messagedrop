@@ -20,7 +20,7 @@ import { SharedContentService } from '../../services/shared-content.service';
 import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
 import { UserService } from '../../services/user.service';
-import { ContactMessageChatroomComponent } from '../contact-message-chatroom/contact-message-chatroom.component';
+import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
 import { ContactSettingsComponent } from '../contact/contact-settingx/contact-settingx.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
@@ -244,7 +244,7 @@ export class ContactlistComponent {
   }
 
   openContactChatroom(contact: Contact): void {
-    const dialogRef = this.matDialog.open(ContactMessageChatroomComponent, {
+    const dialogRef = this.matDialog.open(ContactChatroomComponent, {
       closeOnNavigation: true,
       data: contact.id,
       minWidth: 'min(600px, 95vw)',
