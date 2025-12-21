@@ -741,8 +741,7 @@ export class AppComponent implements OnInit {
     this.userService.getUserMessages(this.userService.getUser())
       .subscribe({
         next: (getMessageResponse) => {
-          const allMessages: Message[] = this.messageService.mapRawMessages(getMessageResponse.rows);
-          this.messageService.setMessages(allMessages.filter(msg => !msg.parentUuid))
+          this.messageService.setMessages(this.messageService.mapRawMessages(getMessageResponse.rows));
           const dialogRef = this.dialog.open(MessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
@@ -750,7 +749,7 @@ export class AppComponent implements OnInit {
             minWidth: '20vw',
             maxWidth: '95vw',
             width: 'auto',
-            maxHeight: 'none',
+            maxHeight: '95vh',
             height: 'auto',
             hasBackdrop: true,
             autoFocus: false
