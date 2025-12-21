@@ -61,7 +61,7 @@
     z-index: 1000;
     top: 0rem;
     display: flex;
-    background-color: var(--mat-fab-foreground-color);
+    background-color: var(--mat-card-filled-container-color);
     overflow: hidden;
     height: 4rem;
     min-height: 4rem;
