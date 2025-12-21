@@ -1,4 +1,4 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, computed, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,6 +7,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
 import { LogService } from '../../../services/log.service';
+import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -26,6 +27,7 @@ export class AdminDashboardComponent implements OnInit {
   private router = inject(Router);
   private authService = inject(AuthService);
   private logService = inject(LogService);
+  private dsaService = inject(DsaService);
 
   readonly username = this.authService.username;
   readonly role = this.authService.role;
@@ -33,8 +35,21 @@ export class AdminDashboardComponent implements OnInit {
   errorCountToday: number | null = null;
   infoCountToday: number | null = null;
 
+  readonly dsaOpenCount = computed(() => {
+    const noticesOpen = this.dsaService.noticeStats()?.open ?? 0;
+    const signalsOpen = this.dsaService.signalStats()?.total ?? 0;
+    return noticesOpen + signalsOpen;
+  });
+
+  readonly dsaOpenBadge = computed(() => {
+    const total = this.dsaOpenCount();
+    if (total <= 0) return '';
+    return total >= 10 ? '10+' : String(total);
+  });
+
   ngOnInit(): void {
     this.refreshCounts();
+    this.dsaService.loadAllStats();
   }
 
   private startOfTodayUtc(): number {

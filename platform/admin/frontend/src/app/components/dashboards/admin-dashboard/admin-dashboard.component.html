@@ -26,7 +26,8 @@
         <!-- Digital Services Act -->
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa" role="button" tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar">
+                <div mat-card-avatar class="avatar" [matBadge]="dsaOpenBadge()" [matBadgeHidden]="dsaOpenCount() === 0"
+                    matBadgeColor="warn" matBadgeOverlap="false">
                     <mat-icon>gavel</mat-icon>
                 </div>
                 <mat-card-title class="tile-title">Digital Services Act</mat-card-title>
@@ -62,8 +63,7 @@
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/info" role="button"
             tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="infoCountToday ?? 0" matBadgeColor="accent"
-                    matBadgeOverlap="false">
+                <div mat-card-avatar class="avatar">
                     <mat-icon>info</mat-icon>
                 </div>
                 <mat-card-title class="tile-title">Info Logs</mat-card-title>

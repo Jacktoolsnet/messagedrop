@@ -77,11 +77,17 @@ export class DigitalServicesActReportDialogComponent {
   }
 
   readonly categories: { value: DsaNoticeCategory; label: string }[] = [
-    { value: 'privacy', label: 'Privacy / personal data' },
-    { value: 'hate', label: 'Hate speech / incitement' },
-    { value: 'copyright', label: 'Copyright / IP infringement' },
-    { value: 'terror', label: 'Terrorism content' },
-    { value: 'other', label: 'Other illegal content' }
+    { value: 'privacy', label: 'Privacy or personal data (doxxing)' },
+    { value: 'ip_rights', label: 'Copyright or other third-party rights' },
+    { value: 'violence_crime', label: 'Violence, threats, or criminal incitement' },
+    { value: 'hate_harass', label: 'Hate, harassment, or discrimination' },
+    { value: 'sexual', label: 'Pornographic or sexual content' },
+    { value: 'child_safety', label: 'Sexual content involving minors' },
+    { value: 'fraud', label: 'Fraud, deception, or impersonation' },
+    { value: 'malware', label: 'Malware or security circumvention' },
+    { value: 'spam_abuse', label: 'Spam or abusive automation' },
+    { value: 'illegal_source', label: 'Leaked or unauthorized sources' },
+    { value: 'other', label: 'Other illegal or prohibited content' }
   ];
 
   /** Quick report – alles optional */
