@@ -2,7 +2,7 @@
   color: var(--mat-app-text-color);
   --avatar-h: 3rem;
   --avatar-out: 1rem;
-  --msg-maxw: 85%;
+  --msg-maxw: calc(100% - 4rem);
   --bubble-outline: var(--mat-card-outlined-outline-color);
   --bubble-shadow: 0 2px 6px color-mix(in srgb, var(--mat-card-outlined-outline-color) 35%, transparent);
 }
@@ -421,22 +421,4 @@ avatar-them mat-icon {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-@media (max-width: 600px) {
-  :root {
-    --msg-maxw: 92%;
-  }
-
-  .avatar-me,
-  .avatar-them {
-    height: 2.5rem;
-    padding: 0.25rem 0.5rem;
-  }
-
-  .avatar-me .avatar,
-  .avatar-them .avatar {
-    width: 2rem;
-    height: 2rem;
-  }
 }
