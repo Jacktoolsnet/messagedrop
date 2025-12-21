@@ -254,9 +254,10 @@ export class SystemNotificationService {
 
     try {
       const response = await firstValueFrom(this.http.get<NotificationCountResponse>(url, this.httpOptions));
-      const total = typeof response.total === 'number' ? response.total : 0;
-      this.unreadCountSig.set(total);
-      return total;
+      const total = Number(response.total ?? 0);
+      const safeTotal = Number.isFinite(total) ? total : 0;
+      this.unreadCountSig.set(safeTotal);
+      return safeTotal;
     } catch (error) {
       // Avoid spamming the user with snackbars for background refreshes.
       console.error('Failed to refresh unread notification count', error);
