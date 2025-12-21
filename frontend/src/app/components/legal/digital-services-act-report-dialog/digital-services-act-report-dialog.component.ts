@@ -176,6 +176,32 @@ export class DigitalServicesActReportDialogComponent {
     return d ? d.toLocaleString() : '—';
   }
 
+  private buildReportedContent(): Record<string, unknown> | null {
+    const msg = this.data?.message ?? null;
+    if (!msg) return null;
+    return {
+      id: msg.id ?? null,
+      uuid: msg.uuid ?? null,
+      parentId: msg.parentId ?? null,
+      parentUuid: msg.parentUuid ?? null,
+      type: msg.typ ?? null,
+      message: msg.message ?? null,
+      translatedMessage: msg.translatedMessage ?? null,
+      userId: msg.userId ?? null,
+      createDateTime: msg.createDateTime ?? null,
+      deleteDateTime: msg.deleteDateTime ?? null,
+      location: msg.location ?? null,
+      markerType: msg.markerType ?? null,
+      style: msg.style ?? null,
+      views: msg.views ?? null,
+      likes: msg.likes ?? null,
+      dislikes: msg.dislikes ?? null,
+      commentsNumber: msg.commentsNumber ?? null,
+      status: msg.status ?? null,
+      multimedia: msg.multimedia ?? null
+    };
+  }
+
   async submit(): Promise<void> {
     if (this.submitting) return;
     this.errorMsg = '';
@@ -184,7 +210,7 @@ export class DigitalServicesActReportDialogComponent {
     try {
       const contentId = this.contentIdSig();
       const contentUrl = this.data?.contentUrl ?? '';
-      const contentSnapshot = this.data?.message ? JSON.stringify(this.data.message) : '';
+      const contentSnapshot = this.buildReportedContent();
       const contentType = 'public message';
 
       if (this.activeTabIndex === 0) {
