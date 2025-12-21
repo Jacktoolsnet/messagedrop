@@ -4,7 +4,7 @@ const columnId = 'id';
 const columnMessageId = 'messageId';
 const columnContactId = 'contactId';
 const columnDirection = 'direction'; // 'user' | 'contactUser'
-const columnEncryptedMessage = 'encryptedMessage';
+const columnMessage = 'message';
 const columnSignature = 'signature';
 const columnTranslatedMessage = 'translatedMessage';
 const columnCreatedAt = 'createdAt'; // ISO8601
@@ -19,7 +19,7 @@ const init = function (db) {
       ${columnContactId} TEXT NOT NULL,
       ${columnMessageId} TEXT NOT NULL,
       ${columnDirection} TEXT NOT NULL CHECK (${columnDirection} IN ('user','contactUser')),
-      ${columnEncryptedMessage} TEXT NOT NULL,
+      ${columnMessage} TEXT NOT NULL,
       ${columnSignature} TEXT NOT NULL,
       ${columnTranslatedMessage} TEXT DEFAULT NULL,
       ${columnStatus} TEXT NOT NULL DEFAULT 'sent' CHECK (${columnStatus} IN ('sent','delivered','read','deleted')),
@@ -75,7 +75,7 @@ const createMessage = function (db, {
     messageId,     // shared uuid across sender/recipient copies
     contactId,
     direction,     // 'user' | 'contactUser'
-    encryptedMessage,
+    message,
     signature,
     status = 'sent',
     createdAt, // optional ISO, else default
@@ -87,10 +87,10 @@ const createMessage = function (db, {
     const sql = `
     INSERT INTO ${tableName}
       (${columnId}, ${columnContactId}, ${columnMessageId}, ${columnDirection},
-       ${columnEncryptedMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt}, ${columnReaction})
+       ${columnMessage}, ${columnSignature}, ${columnStatus}, ${columnCreatedAt}, ${columnReadAt}, ${columnReaction})
     VALUES (?, ?, ?, ?, ?, ?, ?, COALESCE(?, strftime('%Y-%m-%dT%H:%M:%S','now')), ?, ?);
   `;
-    const params = [id, contactId, messageId, direction, encryptedMessage, signature, status, createdAt ?? null, normalizedReadAt, reaction ?? null];
+    const params = [id, contactId, messageId, direction, message, signature, status, createdAt ?? null, normalizedReadAt, reaction ?? null];
     db.run(sql, params, (err) => callback(err));
 };
 
@@ -159,38 +159,38 @@ const cleanupReadMessages = function (db, callback) {
 };
 
 const updateMessageByMessageId = function (db, messageId, {
-    encryptedMessage,
+    message,
     signature,
     status = 'sent',
     reaction
 }, callback) {
     const sql = `
     UPDATE ${tableName}
-    SET ${columnEncryptedMessage} = COALESCE(?, ${columnEncryptedMessage}),
+    SET ${columnMessage} = COALESCE(?, ${columnMessage}),
         ${columnSignature} = COALESCE(?, ${columnSignature}),
         ${columnStatus} = COALESCE(?, ${columnStatus}),
         ${columnReaction} = COALESCE(?, ${columnReaction})
     WHERE ${columnMessageId} = ?;
   `;
-    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, reaction ?? null, messageId], (err) => callback(err));
+    db.run(sql, [message ?? null, signature ?? null, status ?? null, reaction ?? null, messageId], (err) => callback(err));
 };
 
 const updateMessageForContact = function (db, contactId, messageId, {
-    encryptedMessage,
+    message,
     signature,
     status = 'sent',
     reaction
 }, callback) {
     const sql = `
     UPDATE ${tableName}
-    SET ${columnEncryptedMessage} = COALESCE(?, ${columnEncryptedMessage}),
+    SET ${columnMessage} = COALESCE(?, ${columnMessage}),
         ${columnSignature} = COALESCE(?, ${columnSignature}),
         ${columnStatus} = COALESCE(?, ${columnStatus}),
         ${columnReaction} = COALESCE(?, ${columnReaction})
     WHERE ${columnMessageId} = ?
       AND ${columnContactId} = ?;
   `;
-    db.run(sql, [encryptedMessage ?? null, signature ?? null, status ?? null, reaction ?? null, messageId, contactId], (err) => callback(err));
+    db.run(sql, [message ?? null, signature ?? null, status ?? null, reaction ?? null, messageId, contactId], (err) => callback(err));
 };
 
 const setTranslatedMessageForContact = function (db, contactId, messageId, translatedMessage, callback) {

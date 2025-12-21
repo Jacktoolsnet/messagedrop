@@ -3,7 +3,7 @@ export interface ContactMessage {
   messageId: string;
   contactId: string;
   direction: 'user' | 'contactUser';
-  encryptedMessage: string;
+  message: string;
   signature: string;
   translatedMessage?: string | null;
   status: 'sent' | 'delivered' | 'read';

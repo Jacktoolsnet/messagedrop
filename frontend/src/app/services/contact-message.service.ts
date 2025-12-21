@@ -211,7 +211,7 @@ export class ContactMessageService {
           messageId: payload.envelope.messageId ?? msgId,
           contactId: contact.id,
           direction: 'contactUser',
-          encryptedMessage: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
+          message: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
           signature: payload.envelope.messageSignature,
           status: 'delivered',
           createdAt: new Date().toISOString(),
@@ -237,7 +237,7 @@ export class ContactMessageService {
           messageId: payload.envelope.messageId ?? msgId,
           contactId: contact.id,
           direction: 'contactUser',
-          encryptedMessage: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
+          message: payload.envelope.contactUserEncryptedMessage || payload.envelope.userEncryptedMessage,
           signature: payload.envelope.messageSignature,
           status: 'delivered',
           createdAt: new Date().toISOString(),
@@ -279,7 +279,7 @@ export class ContactMessageService {
           messageId: payload.messageId,
           contactId: payload.contactId ?? '',
           direction: 'user',
-          encryptedMessage: '',
+          message: '',
           signature: '',
           status: 'read',
           createdAt: ''
@@ -327,7 +327,7 @@ export class ContactMessageService {
     try {
       const decrypted = await this.cryptoService.decrypt(
         this.userService.getUser().cryptoKeyPair.privateKey,
-        JSON.parse(msg.encryptedMessage) as CryptoData
+        JSON.parse(msg.message) as CryptoData
       );
       if (!decrypted) return null;
 

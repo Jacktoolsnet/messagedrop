@@ -108,7 +108,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
     if (!incoming || !contact || incoming.contactId !== contact.id) {
       return;
     }
-    const key = this.buildMessageKey(incoming.id, incoming.signature, incoming.encryptedMessage);
+    const key = this.buildMessageKey(incoming.id, incoming.signature, incoming.message);
     const payload = await this.contactMessageService.decryptAndVerify(contact, incoming);
     if (!this.messageKeys.has(key)) {
       this.messageKeys.add(key);
@@ -435,7 +435,7 @@ export class ContactMessageChatroomComponent implements AfterViewInit {
           );
           for (const msg of res.rows ?? []) {
             const payload = await this.contactMessageService.decryptAndVerify(contact, msg);
-            const key = this.buildMessageKey(msg.id, msg.signature, msg.encryptedMessage);
+            const key = this.buildMessageKey(msg.id, msg.signature, msg.message);
             this.messageKeys.add(key);
             const existing = merged.get(msg.messageId);
             merged.set(msg.messageId, {

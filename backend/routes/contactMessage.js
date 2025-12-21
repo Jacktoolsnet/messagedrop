@@ -99,7 +99,7 @@ router.post('/send',
         messageId: sharedMessageId,
         contactId,
         direction,
-        encryptedMessage: encryptedMessageForUser,
+        message: encryptedMessageForUser,
         signature,
         status,
         createdAt
@@ -115,7 +115,7 @@ router.post('/send',
               messageId: sharedMessageId,
               contactId: reciprocal.id,
               direction: 'contactUser',
-              encryptedMessage: encryptedMessageForContact,
+              message: encryptedMessageForContact,
               signature,
               status: 'delivered',
               createdAt
@@ -162,7 +162,7 @@ router.post('/update',
 
     withContactOwnership(req, res, contactId, () => {
       tableContactMessage.updateMessageForContact(req.database.db, contactId, messageId, {
-        encryptedMessage: encryptedMessageForUser,
+        message: encryptedMessageForUser,
         signature,
         status
       }, (err) => {
@@ -173,7 +173,7 @@ router.post('/update',
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
           if (!lookupErr && reciprocal?.id) {
             tableContactMessage.updateMessageForContact(req.database.db, reciprocal.id, messageId, {
-              encryptedMessage: encryptedMessageForContact,
+              message: encryptedMessageForContact,
               signature,
               status
             }, () => { /* best-effort */ });
