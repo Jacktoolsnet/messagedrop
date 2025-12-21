@@ -8,6 +8,7 @@ const helmet = require('helmet');
 const winston = require('winston');
 const { Server } = require('socket.io');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
+const security = require('./middleware/security');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
@@ -15,6 +16,7 @@ const userHandlers = require('./socketIo/userHandlers');
 const app = express();
 
 app.use(helmet());
+app.use(express.json({ limit: '1mb' }));
 
 const healthWindowMs = 10 * 60 * 1000;
 const healthLimit = 60;
@@ -58,6 +60,16 @@ app.use(cors({
 }));
 
 app.get('/health', healthLimiter, (_, res) => res.json({ status: 'ok' }));
+
+app.post('/emit/user', security.checkToken, (req, res) => {
+  const { userId, event, payload } = req.body || {};
+  if (!userId) {
+    return res.status(400).json({ error: 'userId is required' });
+  }
+  const eventName = typeof event === 'string' && event.trim() ? event.trim() : String(userId);
+  io.to(String(userId)).emit(eventName, payload ?? {});
+  return res.json({ ok: true });
+});
 
 const logFormat = winston.format.combine(
   winston.format.timestamp(),

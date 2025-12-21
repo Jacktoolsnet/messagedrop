@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const axios = require('axios');
 const security = require('../middleware/security');
 const tableNotification = require('../db/tableNotification');
 
@@ -9,6 +10,39 @@ router.use(security.checkToken);
 router.use(express.json({ limit: '1mb' }));
 
 const ALLOWED_STATUSES = new Set(Object.values(tableNotification.notificationStatus));
+
+function resolveSocketIoBaseUrl() {
+    const base = (process.env.SOCKETIO_BASE_URL || process.env.BASE_URL || '').replace(/\/+$/, '');
+    const port = process.env.SOCKETIO_PORT;
+    if (!base || !port) {
+        return null;
+    }
+    return `${base}:${port}`;
+}
+
+async function emitSystemNotification(userId, payload) {
+    const baseUrl = resolveSocketIoBaseUrl();
+    const token = process.env.BACKEND_TOKEN;
+    if (!baseUrl || !token || !userId) {
+        return;
+    }
+    try {
+        await axios.post(`${baseUrl}/emit/user`, {
+            userId,
+            event: String(userId),
+            payload
+        }, {
+            headers: {
+                'content-type': 'application/json',
+                'x-api-authorization': token
+            },
+            timeout: 3000,
+            validateStatus: () => true
+        });
+    } catch {
+        // best-effort only
+    }
+}
 
 function getAuthenticatedUserId(req) {
     if (req.jwtUser?.userId) {
@@ -117,6 +151,18 @@ router.post('/create', [
                     error: err.message || 'failed_to_create_notification'
                 });
             }
+
+            void emitSystemNotification(userId, {
+                status: 200,
+                type: 'system_notification',
+                content: {
+                    uuid: notification?.uuid ?? uuid,
+                    title,
+                    category,
+                    source,
+                    createdAt: notification?.createdAt ?? null
+                }
+            });
 
             return res.status(200).json({
                 status: 200,

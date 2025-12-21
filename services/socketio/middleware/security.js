@@ -1,7 +1,13 @@
 require('dotenv').config();
-const jwt = require('jsonwebtoken');
 
 function authenticate(req, res, next) {
+  let jwt;
+  try {
+    jwt = require('jsonwebtoken');
+  } catch {
+    return res.sendStatus(403);
+  }
+
   const secret = process.env.JWT_SECRET;
   jwt.verify(req.token, secret, (err, jwtUser) => {
     if (err) return res.sendStatus(403);

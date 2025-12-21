@@ -8,6 +8,7 @@ import { Envelope } from '../interfaces/envelope';
 import { Contact } from '../interfaces/contact';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
+import { SystemNotificationService } from './system-notification.service';
 import { UserService } from './user.service';
 
 interface UserRoomPayload {
@@ -31,6 +32,7 @@ export class SocketioService {
   private readonly userService = inject(UserService);
   private readonly contactService = inject(ContactService);
   private readonly cryptoService = inject(CryptoService);
+  private readonly systemNotificationService = inject(SystemNotificationService);
 
   private socket: Socket;
   private readonly ioOptions = {
@@ -146,8 +148,11 @@ export class SocketioService {
 
   public initUserSocketEvents(): void {
     // User room.
-    this.socket.emit('user:joinUserRoom', this.userService.getUser().id);
-    this.socket.on(`${this.userService.getUser().id}`, (payload: UserRoomPayload) => {
+    const userId = this.userService.getUser().id;
+    const eventName = `${userId}`;
+    this.socket.emit('user:joinUserRoom', userId);
+    this.socket.off(eventName);
+    this.socket.on(eventName, (payload: UserRoomPayload) => {
       switch (payload.type) {
         case 'joined':
           this.joinedUserRoom = true;
@@ -159,6 +164,9 @@ export class SocketioService {
           });*/
           // Request to provide profile information.
           this.requestProfileForContact();
+          break;
+        case 'system_notification':
+          void this.systemNotificationService.refreshUnreadCount();
           break;
       }
     });
