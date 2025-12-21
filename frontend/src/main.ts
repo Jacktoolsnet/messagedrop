@@ -28,7 +28,7 @@ registerLocaleData(localeJa);
 registerLocaleData(localeKo);
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw-share-handler.js', {
+navigator.serviceWorker.register('/messagedrop-service-worker.js', {
     scope: '/',
     type: 'classic' // wichtig: nicht module!
   })

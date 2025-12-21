@@ -93,7 +93,7 @@
                 "output": "./assets"
               },
               {
-                "glob": "sw-share-handler.js",
+                "glob": "messagedrop-service-worker.js",
                 "input": "src",
                 "output": "/"
               }
@@ -176,7 +176,7 @@
                 "output": "./assets"
               },
               {
-                "glob": "sw-share-handler.js",
+                "glob": "messagedrop-service-worker.js",
                 "input": "src",
                 "output": "/"
               }
