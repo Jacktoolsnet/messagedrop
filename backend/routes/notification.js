@@ -158,6 +158,7 @@ router.post('/create', [
                 content: {
                     uuid: notification?.uuid ?? uuid,
                     title,
+                    body,
                     category,
                     source,
                     createdAt: notification?.createdAt ?? null

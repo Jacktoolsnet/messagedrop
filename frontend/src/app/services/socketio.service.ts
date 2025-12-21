@@ -167,9 +167,45 @@ export class SocketioService {
           break;
         case 'system_notification':
           void this.systemNotificationService.refreshUnreadCount();
+          void this.notifyViaServiceWorker(payload?.content);
           break;
       }
     });
+  }
+
+  private async notifyViaServiceWorker(content: unknown): Promise<void> {
+    if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) {
+      return;
+    }
+    if (typeof Notification !== 'undefined' && Notification.permission !== 'granted') {
+      return;
+    }
+
+    const parsed = (content ?? {}) as {
+      uuid?: string;
+      title?: string;
+      body?: string;
+    };
+
+    const title = parsed.title || 'System message';
+    const body = parsed.body || 'You have a new system message.';
+    const tag = parsed.uuid ? `system-${parsed.uuid}` : 'system-message';
+
+    try {
+      const reg = await navigator.serviceWorker.ready;
+      if (!reg.active) return;
+      reg.active.postMessage({
+        type: 'SHOW_NOTIFICATION',
+        payload: {
+          title,
+          body,
+          tag,
+          url: '/'
+        }
+      });
+    } catch {
+      // best-effort only
+    }
   }
 
   public requestProfileForContact(): void {

@@ -13,6 +13,37 @@ self.addEventListener('fetch', (event) => {
     }
 });
 
+self.addEventListener('message', (event) => {
+    const data = event.data;
+    if (!data || data.type !== 'SHOW_NOTIFICATION') return;
+
+    const payload = data.payload || {};
+    const title = payload.title || 'Notification';
+    const body = payload.body || '';
+    const url = payload.url || '/';
+    const tag = payload.tag || 'generic';
+
+    event.waitUntil(
+        self.registration.showNotification(title, {
+            body,
+            icon: '/assets/icons/notify-icon.png',
+            badge: '/assets/icons/icon-72x72.png',
+            data: { url },
+            tag,
+            renotify: true,
+            vibrate: [80, 40, 80]
+        })
+    );
+});
+
+self.addEventListener('notificationclick', (event) => {
+    event.notification.close();
+    const url = event.notification.data?.url || '/';
+    event.waitUntil(
+        clients.openWindow(url)
+    );
+});
+
 async function handleShareTargetPost(event) {
     try {
         const formData = await event.request.formData();
