@@ -17,6 +17,7 @@ import { PollutionTileComponent } from "../pollution-tile/pollution-tile.compone
 import { MessageTileComponent } from "../message-tile/messagetile.component";
 import { MultitextTileComponent } from "../multitext-tile/multitext-tile.component";
 import { NoteTileComponent } from "../note-tile/note-tile.component";
+import { QuickActionTileComponent } from "../quick-action-tile/quick-action-tile.component";
 import { TextTileComponent } from "../text-tile/text-tile.component";
 import { TodoTileComponent } from "../todo-tile/todo-tile.component";
 import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
@@ -24,7 +25,7 @@ import { TileSettingsComponent } from '../tile-settings/tile-settings.component'
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, MasonryItemDirective, MatButtonModule],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -38,7 +39,7 @@ export class TileListComponent {
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-link', 'custom-date', 'custom-todo', 'custom-migraine', 'custom-pollution']);
+  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-link', 'custom-date', 'custom-todo', 'custom-quickaction', 'custom-migraine', 'custom-pollution']);
 
   get visibleTiles(): TileSetting[] {
     if (!this.place && !this.contact) return [];

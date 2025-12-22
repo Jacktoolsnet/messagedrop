@@ -1,10 +1,20 @@
 export type DefaultTileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image';
 export type TileType = DefaultTileType | `custom-${string}`;
+export type TileLinkType = 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
 
 export interface TileTodoItem {
   id: string;
   text: string;
   done: boolean;
+  order: number;
+}
+
+export interface TileQuickAction {
+  id: string;
+  label: string;
+  type: TileLinkType;
+  value: string;
+  icon?: string;
   order: number;
 }
 
@@ -20,9 +30,10 @@ export interface TileSetting {
     text?: string;
     icon?: string;
     url?: string;
-    linkType?: 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
+    linkType?: TileLinkType;
     date?: string;
     todos?: TileTodoItem[];
+    actions?: TileQuickAction[];
     migraine?: {
       tempWarn1: number;
       tempWarn2: number;

@@ -1,0 +1,140 @@
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+
+import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIcon } from '@angular/material/icon';
+import { A11yModule } from '@angular/cdk/a11y';
+import { TileLinkType, TileQuickAction } from '../../../../interfaces/tile-settings';
+import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
+import { MatDialog } from '@angular/material/dialog';
+
+interface QuickActionDialogData {
+  action: TileQuickAction;
+}
+
+@Component({
+  selector: 'app-quick-action-action-edit',
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    MatIcon,
+    A11yModule
+  ],
+  templateUrl: './quick-action-action-edit.component.html',
+  styleUrl: './quick-action-action-edit.component.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
+})
+export class QuickActionActionEditComponent {
+  private readonly dialogRef = inject(MatDialogRef<QuickActionActionEditComponent>);
+  private readonly dialog = inject(MatDialog);
+  readonly data = inject<QuickActionDialogData>(MAT_DIALOG_DATA);
+
+  readonly actionTypes: { value: TileLinkType; label: string }[] = [
+    { value: 'web', label: 'Web' },
+    { value: 'email', label: 'Mail' },
+    { value: 'phone', label: 'Phone' },
+    { value: 'whatsapp', label: 'WhatsApp' },
+    { value: 'sms', label: 'SMS' },
+    { value: 'map', label: 'Map' }
+  ];
+
+  readonly labelControl = new FormControl(this.data.action.label ?? 'Action', { nonNullable: true });
+  readonly valueControl = new FormControl(this.data.action.value ?? '', { nonNullable: true });
+  readonly typeControl = new FormControl<TileLinkType>(this.normalizeType(this.data.action.type), { nonNullable: true });
+  readonly icon = signal<string | undefined>(this.data.action.icon ?? this.defaultIconForType(this.data.action.type));
+
+  constructor() {
+    this.applyValidators(this.typeControl.value);
+    this.typeControl.valueChanges.subscribe(type => {
+      this.applyValidators(type);
+    });
+  }
+
+  pickIcon(): void {
+    const ref = this.dialog.open(MaticonPickerComponent, {
+      width: '520px',
+      data: { current: this.icon() }
+    });
+
+    ref.afterClosed().subscribe((selected?: string | null) => {
+      if (selected !== undefined) {
+        this.icon.set(selected || undefined);
+      }
+    });
+  }
+
+  cancel(): void {
+    this.dialogRef.close();
+  }
+
+  save(): void {
+    if (this.valueControl.invalid) {
+      this.valueControl.markAsTouched();
+      return;
+    }
+
+    const label = this.labelControl.value.trim() || 'Action';
+    const value = this.valueControl.value.trim();
+    const type = this.typeControl.value;
+
+    const updated: TileQuickAction = {
+      ...this.data.action,
+      label,
+      value,
+      type,
+      icon: this.icon()
+    };
+
+    this.dialogRef.close(updated);
+  }
+
+  private normalizeType(type: TileLinkType | undefined): TileLinkType {
+    const allowed: TileLinkType[] = ['web', 'email', 'phone', 'whatsapp', 'sms', 'map'];
+    return allowed.includes(type ?? 'web') ? (type as TileLinkType) : 'web';
+  }
+
+  private applyValidators(type: TileLinkType) {
+    const validators = [Validators.required];
+    if (type === 'web') {
+      validators.push(Validators.pattern(/^(https?:\/\/)?([a-zA-Z0-9-]+\.)+[A-Za-z]{2,}.*$/));
+    }
+    if (type === 'phone' || type === 'whatsapp' || type === 'sms') {
+      validators.push(Validators.pattern(/^[0-9+][0-9 ()-]{3,}$/));
+    }
+    if (type === 'email') {
+      validators.push(Validators.email);
+    }
+    this.valueControl.setValidators(validators);
+    this.valueControl.updateValueAndValidity({ emitEvent: false });
+  }
+
+  private defaultIconForType(type: TileLinkType | undefined): string {
+    switch (type) {
+      case 'phone':
+        return 'call';
+      case 'email':
+        return 'mail';
+      case 'whatsapp':
+        return 'chat';
+      case 'sms':
+        return 'sms';
+      case 'map':
+        return 'map';
+      case 'web':
+      default:
+        return 'public';
+    }
+  }
+}

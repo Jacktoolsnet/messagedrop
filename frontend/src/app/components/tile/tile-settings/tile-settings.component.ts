@@ -15,6 +15,7 @@ import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/m
 import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { PollutionTileEditComponent } from '../pollution-tile/pollution-tile-edit/pollution-tile-edit.component';
+import { QuickActionTileEditComponent } from '../quick-action-tile/quick-action-tile-edit/quick-action-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TodoTileEditComponent } from '../todo-tile/todo-tile-edit/todo-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
@@ -54,6 +55,7 @@ export class TileSettingsComponent {
     { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
     { type: 'custom-date', label: 'Anniversary', icon: 'event' },
     { type: 'custom-todo', label: 'Todo list', icon: 'check_circle' },
+    { type: 'custom-quickaction', label: 'Quick actions', icon: 'bolt' },
     { type: 'custom-link', label: 'Link', icon: 'link' }
   ];
 
@@ -110,6 +112,14 @@ export class TileSettingsComponent {
         title: tileToAdd.label,
         icon: 'list',
         todos: []
+      };
+    }
+
+    if (tileToAdd.type === 'custom-quickaction') {
+      baseTile.payload = {
+        title: tileToAdd.label,
+        icon: 'bolt',
+        actions: []
       };
     }
 
@@ -182,6 +192,20 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-todo') {
       const ref = this.dialog.open(TodoTileEditComponent, {
+        width: '560px',
+        maxWidth: '95vw',
+        maxHeight: '98vh',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-quickaction') {
+      const ref = this.dialog.open(QuickActionTileEditComponent, {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',

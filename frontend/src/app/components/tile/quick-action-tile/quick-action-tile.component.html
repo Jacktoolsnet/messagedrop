@@ -1,0 +1,28 @@
+<div class="quick-action-tile"
+     role="button"
+     tabindex="0"
+     (click)="openEditor()"
+     (keyup.enter)="openEditor()"
+     (keyup.space)="openEditor()">
+  <div class="quick-action-tile__header">
+    <div class="quick-action-tile__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="quick-action-tile__title">{{ title }}</div>
+  </div>
+
+  <div class="quick-action-tile__body">
+    @if (actions.length > 0) {
+      <div class="action-grid">
+        @for (action of actions; track action.id) {
+          <button type="button" class="action-button" (click)="triggerAction(action, $event)" [attr.aria-label]="getActionLabel(action)">
+            <mat-icon class="action-icon">{{ getActionIcon(action) }}</mat-icon>
+            <span class="action-label">{{ getActionLabel(action) }}</span>
+          </button>
+        }
+      </div>
+    } @else {
+      <p class="text-muted">No actions yet. Tap to add.</p>
+    }
+  </div>
+</div>

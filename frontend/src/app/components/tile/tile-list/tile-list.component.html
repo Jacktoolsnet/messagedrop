@@ -35,6 +35,9 @@
       @case ('custom-todo') {
         <app-todo-tile class="tile" appMasonryItem [place]="place" [contact]="contact" [tile]="tile"></app-todo-tile>
       }
+      @case ('custom-quickaction') {
+        <app-quick-action-tile class="tile" appMasonryItem [place]="place" [contact]="contact" [tile]="tile"></app-quick-action-tile>
+      }
       @case ('custom-migraine') {
         <app-migraine-tile class="tile" appMasonryItem [place]="place!" [tile]="tile"></app-migraine-tile>
       }
