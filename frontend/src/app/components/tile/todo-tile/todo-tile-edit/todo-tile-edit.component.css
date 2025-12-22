@@ -72,10 +72,21 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0.5rem 0.75rem;
-  border-radius: 0.75rem;
+  padding: 0.25rem;
+  border-radius: 1rem;
   background: var(--mat-card-filled-container-color);
   box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.todo-row .mat-mdc-icon-button {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.todo-row .mat-mdc-icon-button .mat-icon {
+  font-size: 1.25rem;
+  width: 1.25rem;
+  height: 1.25rem;
 }
 
 .drag-handle {
@@ -90,6 +101,7 @@
 .todo-text {
   flex: 1;
   word-break: break-word;
+  font-size: 1rem;
 }
 
 .todo-text--done {
