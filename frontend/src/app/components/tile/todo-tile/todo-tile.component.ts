@@ -73,20 +73,42 @@ export class TodoTileComponent implements OnChanges {
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
-      if (this.place) {
-        const tiles = (this.place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-        const updatedPlace = { ...this.place, tileSettings: tiles };
-        this.place = updatedPlace;
-        this.currentTile.set(updated);
-        this.placeService.saveAdditionalPlaceInfos(updatedPlace);
-      } else if (this.contact) {
-        const tiles = (this.contact.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
-        this.contact = { ...this.contact, tileSettings: tiles };
-        this.currentTile.set(updated);
-        this.contactService.saveContactTileSettings(this.contact);
-        this.contactService.refreshContact(this.contact.id);
-      }
-      this.cdr.markForCheck();
+      this.applyTileUpdate(updated);
     });
+  }
+
+  toggleTodo(todo: TileTodoItem, event?: Event): void {
+    event?.stopPropagation();
+    const tile = this.currentTile();
+    if (!tile) return;
+    const todos = tile.payload?.todos ?? [];
+    const updatedTodos = todos.map(item =>
+      item.id === todo.id ? { ...item, done: !item.done } : item
+    );
+    const updated: TileSetting = {
+      ...tile,
+      payload: {
+        ...tile.payload,
+        todos: updatedTodos
+      }
+    };
+    this.applyTileUpdate(updated);
+  }
+
+  private applyTileUpdate(updated: TileSetting): void {
+    if (this.place) {
+      const tiles = (this.place.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+      const updatedPlace = { ...this.place, tileSettings: tiles };
+      this.place = updatedPlace;
+      this.currentTile.set(updated);
+      this.placeService.saveAdditionalPlaceInfos(updatedPlace);
+    } else if (this.contact) {
+      const tiles = (this.contact.tileSettings ?? []).map(t => t.id === updated.id ? { ...t, ...updated } : t);
+      this.contact = { ...this.contact, tileSettings: tiles };
+      this.currentTile.set(updated);
+      this.contactService.saveContactTileSettings(this.contact);
+      this.contactService.refreshContact(this.contact.id);
+    }
+    this.cdr.markForCheck();
   }
 }

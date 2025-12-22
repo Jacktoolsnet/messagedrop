@@ -81,6 +81,24 @@
   margin-top: 0.1rem;
 }
 
+.todo-toggle {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+  cursor: pointer;
+}
+
+.todo-toggle:focus-visible {
+  outline: 2px solid var(--mat-card-outlined-outline-color);
+  outline-offset: 2px;
+}
+
 .todo-text {
   flex: 1 1 auto;
   min-width: 0;

@@ -19,8 +19,10 @@
       <ul class="todo-list">
         @for (todo of todos; track todo.id) {
           <li class="todo-item" [class.todo-item--done]="todo.done">
-            <mat-icon class="todo-status-icon">{{ todo.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
-            <span class="todo-text">{{ todo.text }}</span>
+            <button type="button" class="todo-toggle" (click)="toggleTodo(todo, $event)" [attr.aria-pressed]="todo.done" [attr.aria-label]="todo.done ? 'Mark as not done' : 'Mark as done'">
+              <mat-icon class="todo-status-icon">{{ todo.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+              <span class="todo-text">{{ todo.text }}</span>
+            </button>
           </li>
         }
       </ul>
