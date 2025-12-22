@@ -30,12 +30,32 @@
 
 .todo-add-row {
   display: flex;
-  align-items: flex-end;
+  align-items: stretch;
   gap: 12px;
 }
 
 .todo-input {
   flex: 1;
+}
+
+.todo-add-button {
+  width: var(--mat-form-field-container-height, 56px);
+  height: var(--mat-form-field-container-height, 56px);
+  min-width: var(--mat-form-field-container-height, 56px);
+  min-height: var(--mat-form-field-container-height, 56px);
+  align-self: stretch;
+  margin-top: 0;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.todo-add-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 14px 26px rgba(0, 0, 0, 0.35);
+}
+
+.todo-add-button:disabled {
+  box-shadow: none;
 }
 
 .todo-list {

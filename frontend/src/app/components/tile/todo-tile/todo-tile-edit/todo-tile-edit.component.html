@@ -19,7 +19,7 @@
       <mat-label>Add todo</mat-label>
       <input matInput [formControl]="newTodoControl" (keyup.enter)="addTodo()" />
     </mat-form-field>
-    <button mat-icon-button color="primary" type="button" (click)="addTodo()" [disabled]="!newTodoControl.value.trim()" aria-label="Add todo">
+    <button mat-mini-fab class="todo-add-button" color="primary" type="button" (click)="addTodo()" [disabled]="!newTodoControl.value.trim()" aria-label="Add todo">
       <mat-icon>add</mat-icon>
     </button>
   </div>
