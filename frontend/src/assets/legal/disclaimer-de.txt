@@ -1,5 +1,5 @@
 HAFTUNGSHINWEIS (DISCLAIMER)
-Stand: 14. Dezember 2025
+Stand: 22. Dezember 2025
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -9,7 +9,7 @@ MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzer
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind. Der Dienst richtet sich nicht an Kinder unter 16 Jahren. Eine Nutzung durch Personen unter 16 Jahren ist nicht vorgesehen und nicht zulässig.
 
-Soweit technisch möglich, speichert MessageDrop Daten lokal auf dem Endgerät des Nutzers (IndexedDB), um einen hohen Datenschutzstandard und Datenminimierung zu gewährleisten. Lokal gespeicherte Daten können verloren gehen.
+Soweit technisch möglich, speichert MessageDrop Daten lokal auf dem Endgerät des Nutzers (z. B. IndexedDB), um einen hohen Datenschutzstandard und Datenminimierung zu gewährleisten. Lokal gespeicherte Daten können verloren gehen.
 
 Öffentliche Inhalte werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, bei denen ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt. Rechtswidrige Inhalte werden nach Kenntniserlangung entfernt oder gesperrt.
 
@@ -94,6 +94,18 @@ Dabei kann der jeweilige Anbieter technisch bedingt Informationen über den Abru
 
 Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer Abruf externer Inhalte und keine Datenübertragung an diese Anbieter statt.
 
+Im Rahmen der Basisnutzung besteht zudem die Möglichkeit, lokal Profile zu erstellen. Ein Profil besteht aus einem frei wählbaren Namen und einem Avatar (Bild).
+
+Profile dienen ausschließlich der lokalen, subjektiven Organisation und Darstellung für den jeweiligen Nutzer.
+
+Ein Nutzer kann anderen Nutzern – unabhängig davon, ob eine persönliche Beziehung besteht oder nicht – lokal frei wählbare Profile (z. B. Name, Avatar) zuordnen. Diese Zuordnung stellt eine rein persönliche, subjektive Darstellung dar und kann auch fiktiv oder fantasiebasiert erfolgen.
+
+Solche Profile sind keine Eigenschaften des betroffenen Nutzers, werden nicht von diesem bereitgestellt, bestätigt oder beeinflusst und sind für andere Nutzer nicht sichtbar.
+
+Die Anzeige eines Profils dient ausschließlich der individuellen Orientierung und Wiedererkennung innerhalb der eigenen Nutzung und begründet keinerlei Aussage über Identität, Echtheit, Beziehung oder Verantwortlichkeit der dargestellten Person.
+
+Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit oder Angemessenheit lokal vergebener Profile und keine Haftung für daraus abgeleitete Annahmen.
+
 ###
 5. Nutzeranlage und Funktionen mit Nutzer
 ###
@@ -105,10 +117,10 @@ Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer 
 Sofern ein Nutzer freiwillig einen Nutzer anlegt, ist hierfür ausschließlich die Vergabe eines PINs erforderlich.
 
 Beim Anlegen des Nutzers wird serverseitig:
-- eine eindeutige User-ID erzeugt
-- ein Nutzerstatus (z. B. enabled oder disabled) geführt
-- das Datum des letzten Logins gespeichert
-- sowie kryptografische Schlüssel erzeugt, die für die Verschlüsselung und Signierung im Rahmen des Login-Prozesses erforderlich sind
+- eine eindeutige User-ID erzeugt,
+- ein Nutzerstatus (z. B. enabled oder disabled) geführt,
+- das Datum des letzten Logins gespeichert,
+- sowie kryptografische Schlüssel erzeugt, die für die Verschlüsselung und Signierung im Rahmen des Login-Prozesses erforderlich sind.
 
 Darüber hinaus erzeugt das lokale Endgerät des Nutzers eigene kryptografische Schlüssel (Verschlüsselungs- und Signaturschlüssel), die ausschließlich für die private Kommunikation (z. B. verschlüsselte Chaträume) verwendet werden.
 
@@ -116,13 +128,15 @@ Die vollständigen Nutzerdaten werden ausschließlich verschlüsselt auf dem End
 
 Der vom Nutzer vergebene PIN ist integraler Bestandteil dieses verschlüsselten Nutzerdatensatzes und wird nicht separat gespeichert.
 
-Zum Anmeldevorgang wird der verschlüsselte Nutzer temporär an das Backend übertragen, dort ausschließlich für die Dauer der Prüfung entschlüsselt, um zu überprüfen, ob der eingegebene PIN korrekt ist.
+Zum Anmeldevorgang wird der verschlüsselte Nutzer temporär an das Backend übertragen und dort ausschließlich für die Dauer der Prüfung entschlüsselt, um zu überprüfen, ob der eingegebene PIN korrekt ist.
 
 Eine dauerhafte Speicherung der entschlüsselten Nutzerdaten oder des PINs auf dem Server erfolgt nicht.
 
 Nach erfolgreicher Anmeldung wird der entschlüsselte Nutzer ausschließlich im Arbeitsspeicher des Endgeräts vorgehalten und bleibt dort nur bis zum Logout oder bis zum Schließen der App verfügbar.
 
 Wird der PIN vergessen, besteht keine Möglichkeit, den Nutzer, den PIN oder die lokal gespeicherten Nutzerdaten wiederherzustellen, da weder der PIN noch eine entschlüsselbare Kopie der Nutzerdaten serverseitig vorgehalten werden.
+
+Der Nutzer kann für sich selbst optional ein lokales Profil anlegen, bestehend aus einem frei wählbaren Namen und einem Avatar (Bild). Dieses Profil dient ausschließlich der besseren Erkennbarkeit eigener Beiträge innerhalb der eigenen Nutzung. Das Profil wird bei eigenen Beiträgen lediglich lokal angezeigt, nicht an unsere Server übertragen und ist für andere Nutzer nicht sichtbar.
 
 Nutzer, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden aus dem Backend ohne Vorwarnung entfernt.
 
@@ -138,7 +152,7 @@ Eine Wiederherstellung des Nutzers oder der zugehörigen Daten ist ausgeschlosse
 
 Unabhängig davon kann der Nutzer seinen Nutzer jederzeit selbstständig über eine Funktion in der App löschen.
 
-In diesem Fall erfolgt die sofortige und endgültige Löschung des Nutzers sowie aller zugehörigen serverseitigen und lokalen Datensätze entsprechend den vorstehenden Regelungen.
+In diesem Fall erfolgt die sofortige und endgültige Löschung des Nutzers sowie aller zugehörigen serverseitigen und lokalen Datensätze.
 
 Die Löschung ist endgültig und kann nicht rückgängig gemacht werden.
 
@@ -151,18 +165,20 @@ MessageDrop ist nach dem Grundsatz der Datenminimierung und des Datenschutzes du
 Soweit technisch möglich, speichert die App Daten ausschließlich lokal auf dem Endgerät des Nutzers, insbesondere in der IndexedDB des Browsers. Ziel ist es, einen möglichst hohen Datenschutzstandard zu gewährleisten und die Speicherung personenbezogener Daten auf unseren Servern auf das notwendige Minimum zu beschränken.
 
 Die lokal gespeicherten Daten dienen insbesondere:
-- Offline-Funktionen
-- Performance-Optimierung
-- Stabilität der Anwendung
+- Offline-Funktionen,
+- Performance-Optimierung,
+- Stabilität der Anwendung.
 
 Diese Daten sind geräte- und browserabhängig und werden nicht automatisch mit anderen Geräten oder einer Cloud synchronisiert.
 
 Lokale Daten können jederzeit verloren gehen oder gelöscht werden, unter anderem durch:
-- manuelles Löschen von Website-, App- oder Browserdaten
-- Nutzung des privaten bzw. Inkognito-Modus
-- automatische Speicherbereinigung durch Browser oder Betriebssystem
-- Speicher- oder Quotenbegrenzungen sowie Profil- oder Browserwechsel
-- Deinstallation oder Neuinstallation (z. B. als PWA) oder System- bzw. Browser-Updates
+- manuelles Löschen von Website-, App- oder Browserdaten,
+- Nutzung des privaten bzw. Inkognito-Modus,
+- automatische Speicherbereinigung durch Browser oder Betriebssystem,
+- Speicher- oder Quotenbegrenzungen,
+- Profil- oder Browserwechsel,
+- Deinstallation oder Neuinstallation (z. B. als PWA),
+- System- oder Browser-Updates.
 
 Soweit gesetzlich zulässig, übernehmen wir keine Haftung für den Verlust, die Beschädigung oder die Nichtverfügbarkeit lokal gespeicherter Daten.
 
@@ -231,94 +247,6 @@ Zur Unterstützung der Moderation setzen wir automatisierte Verfahren ein, einsc
 Bewertungen (z. B. „Like“/„Dislike“) sind sowohl für öffentliche Nachrichten als auch für öffentliche Kommentare möglich. Ein Anspruch auf bestimmte Bewertungsergebnisse oder eine bestimmte Wirkung solcher Bewertungen besteht nicht.
 
 ###
-5.4 Darstellung, Sortierung und fehlende Personalisierung öffentlicher Inhalte
-###
-
-MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System.
-
-Es existiert kein Algorithmus, der versucht vorherzusagen, welche Inhalte für einen bestimmten Nutzer „relevant“ oder „interessant“ sein könnten.
-
-Öffentliche Inhalte werden ausschließlich auf Basis des aktuell betrachteten geografischen Suchbereichs („Suchquadrat“) und der Zeit ihrer Veröffentlichung bereitgestellt.
-
-Für jede Abfrage werden die zuletzt veröffentlichten öffentlichen Inhalte innerhalb des jeweiligen Suchquadrats zurückgegeben. Eine weitergehende Sortierung, Gewichtung oder Personalisierung findet nicht statt.
-
-Die Anzahl der pro Abfrage zurückgegebenen Inhalte kann technisch bedingt variieren (z. B. zur Stabilität, Performance oder abhängig von der Serverauslastung). Ein Anspruch auf eine bestimmte Anzahl von Ergebnissen besteht nicht.
-
-Es erfolgt kein automatisches Nachladen älterer Inhalte.
-
-Ändert sich der Zoom-Level oder der sichtbare Kartenausschnitt, verändert sich das Suchquadrat entsprechend, wodurch andere – ebenfalls nur die jeweils neuesten – Inhalte angezeigt werden können.
-
-Aufgrund dieses Konzepts kann es dazu kommen, dass Nutzer öffentliche Inhalte verpassen, insbesondere wenn die App nur selten genutzt wird oder sich der betrachtete Kartenausschnitt häufig ändert.
-
-Ein Anspruch auf vollständige Anzeige aller veröffentlichten Inhalte besteht nicht.
-
-Ein Anspruch auf Veröffentlichung, Sichtbarkeit, Reichweite oder bestimmte Darstellung eines einzelnen Inhalts besteht nicht. Inhalte können aus technischen, räumlichen, zeitlichen oder moderationsbezogenen Gründen nicht, nur teilweise oder nur vorübergehend angezeigt werden.
-
-###
-5.5 Mit anderen Nutzern verbinden und private Kommunikation
-###
-
-MessageDrop ermöglicht es Nutzern, sich miteinander zu verbinden und Kontakte zu verwalten.
-
-Zu Kontakten können zusätzliche Eigenschaften hinterlegt werden. Diese Informationen werden grundsätzlich lokal auf dem Endgerät des Nutzers gespeichert.
-
-Ein Nutzer kann einen bestehenden Kontakt jederzeit selbstständig löschen und so die Verbindung zu diesem Kontakt beenden. Mit dem Löschen eines Kontakts ist keine weitere private Kommunikation zwischen den beteiligten Nutzern über MessageDrop möglich.
-
-Eine erneute Kontaktaufnahme zwischen den Nutzern ist weiterhin möglich.
-
-MessageDrop ermöglicht es zudem, private Chaträume zu nutzen. Private Chatnachrichten werden verschlüsselt und signiert übertragen. Der Inhalt dieser privaten Kommunikation ist für uns grundsätzlich nicht im Klartext einsehbar.
-
-Private Chatnachrichten werden ausschließlich für die Kommunikation zwischen den beteiligten Nutzern bereitgestellt.
-
-Gelesene private Nachrichten werden nach einem Zeitraum von 7 Tagen automatisch gelöscht.
-
-Ein Anspruch auf dauerhafte Speicherung, Archivierung oder Wiederherstellung privater Nachrichten besteht nicht.
-
-Für Inhalte in privaten Chats sind ausschließlich die beteiligten Nutzer verantwortlich.
-
-Eine inhaltliche Vorabprüfung oder laufende Überwachung privater Chatnachrichten findet nicht statt.
-
-Streitigkeiten zwischen Nutzern, die aus privaten Nachrichten, Kontakten oder sonstigen Interaktionen resultieren, sind grundsätzlich von den beteiligten Nutzern eigenverantwortlich zu klären.
-
-Gesetzliche Pflichten zur Mitwirkung bei rechtmäßigen Anfragen von Behörden bleiben unberührt.
-
-###
-5.6 Plätze auf der Weltkarte
-###
-
-Nutzer können sogenannte Plätze definieren.
-
-Ein Platz beschreibt ein rechteckiges Gebiet auf der Weltkarte, dem ein Name sowie weitere Eigenschaften zugeordnet werden können.
-
-Der vom Nutzer vergebene Name eines Platzes wird aus technischen Gründen serverseitig gespeichert, jedoch ausschließlich dem jeweiligen Nutzer zugeordnet und nur für dessen eigenen Gebrauch verwendet. Andere Nutzer können diese Plätze weder sehen noch deren Namen oder Eigenschaften einsehen.
-
-Alle weiteren Eigenschaften, Metadaten oder Inhalte eines Platzes werden ausschließlich lokal auf dem Endgerät des Nutzers gespeichert und nicht serverseitig verarbeitet oder gespeichert.
-
-Für die Rechtmäßigkeit der vergebenen Bezeichnungen und Inhalte eines Platzes ist ausschließlich der jeweilige Nutzer verantwortlich.
-
-###
-5.7 Lokale Bilder und Datei-Verweise
-###
-
-Nutzer können Bilder von ihrem Endgerät auf der Karte platzieren.
-
-Dabei wird das jeweilige Bild weder auf unsere Server hochgeladen noch dauerhaft in die App importiert oder zentral gespeichert.
-
-Stattdessen wird ausschließlich ein lokaler Datei-Verweis gespeichert, der auf die jeweilige Bilddatei auf dem Endgerät des Nutzers verweist. Die tatsächliche Bilddatei verbleibt vollständig und ausschließlich auf dem Endgerät des Nutzers.
-
-Die platzierten Bilder sowie deren Zuordnung zu Kartenpositionen sind ausschließlich für den jeweiligen Nutzer sichtbar. Andere Nutzer können diese Bilder, Datei-Verweise, Positionen oder zugehörige Informationen nicht sehen oder darauf zugreifen.
-
-Der Nutzer behält jederzeit die vollständige Hoheit und Kontrolle über seine Bilder und deren lokale Verwendung innerhalb der App.
-
-Wir haben keinen Zugriff auf die Bilddateien, keine Einsicht in deren Inhalt und keine Möglichkeit, diese zu verändern, zu sichern, zu exportieren oder wiederherzustellen.
-
-Wird eine Bilddatei auf dem Endgerät gelöscht, verschoben oder ist aus anderen Gründen nicht mehr verfügbar, kann sie in der App nicht mehr angezeigt werden. In diesem Fall verbleibt lediglich der lokale Verweis, ohne dass das Bild geladen werden kann.
-
-Zur Platzierung von Bildern auf der Karte können – sofern vom Nutzer ausdrücklich erlaubt und technisch verfügbar – Metadaten der Bilddatei (z. B. EXIF-Daten wie Aufnahmestandort oder Zeitstempel) verwendet werden. Diese Auswertung erfolgt ausschließlich lokal auf dem Endgerät des Nutzers.
-
-Ein serverseitiger Zugriff, eine serverseitige Speicherung, eine Weitergabe an andere Nutzer oder eine nachträgliche Wiederherstellung der Bilddateien durch uns ist ausgeschlossen.
-
-###
 6. Verfahren nach dem Digital Services Act (DSA)
 ###
 
@@ -332,9 +260,19 @@ Wird ein solches Verfahren eingeleitet, wird der betroffene Inhalt vorübergehen
 
 Im Rahmen des DSA-Verfahrens werden insbesondere verfahrensbezogene Informationen verarbeitet, darunter vom Melder gemachte Angaben, Angaben zum gemeldeten Inhalt, Zeitpunkte, Verfahrensstatus, Entscheidungen und Begründungen.
 
+Der meldenden Person wird im Rahmen einer Meldung („Notice“) oder Beschwerde („Appeal“) die Möglichkeit eingeräumt, zusätzliche Informationen bereitzustellen, insbesondere:
+- das Hochladen von Dateien (z. B. Screenshots oder Dokumente) als Belege,
+- das Angeben von externen Links als Nachweise.
+
+Diese Belege werden ausschließlich zur Prüfung des gemeldeten Sachverhalts im Rahmen des DSA-Verfahrens verwendet und entsprechend den gesetzlichen Vorgaben verarbeitet. Eine Veröffentlichung dieser Belege erfolgt nicht.
+
 Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlangung von rechtswidrigen Inhalten entfernen oder sperren wir diese entsprechend den gesetzlichen Vorgaben („Notice-and-Takedown“).
 
 Die im Rahmen eines DSA-Verfahrens erhobenen und dokumentierten Informationen können an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen weitergegeben werden, soweit dies gesetzlich vorgeschrieben oder zulässig ist.
+
+Der von einem DSA-Verfahren betroffene Nutzer wird über den jeweiligen Verfahrensstand, Entscheidungen und etwaige Maßnahmen informiert. Diese Informationen werden über Systemmeldungen bereitgestellt.
+
+Systemmeldungen sind interne Nachrichten, die vom Admin-Backend an das MessageDrop-Backend übermittelt und dem Nutzer im Frontend in einem gesonderten Nachrichtenbereich angezeigt werden. Sie dienen der formellen Kommunikation im Rahmen gesetzlicher Verfahren und stellen kein klassisches E-Mail-Postfach dar.
 
 Für jeden DSA-relevanten Vorgang (Meldung oder Beschwerde) kann eine öffentlich zugängliche Fallseite bereitgestellt werden. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
 
@@ -349,11 +287,32 @@ Personenbezogene Daten der meldenden Person, des betroffenen Nutzers oder unbete
 Nach Abschluss des Verfahrens erfolgt – abhängig vom Ergebnis – eine Wiederfreigabe, Einschränkung oder endgültige Entfernung des betroffenen Inhalts.
 
 ###
-7. Von uns erstellte Inhalte sowie Informationen und Dienste Dritter
+7. Systemmeldungen
+###
+
+MessageDrop stellt Nutzern sogenannte Systemmeldungen zur Verfügung. Systemmeldungen sind interne Mitteilungen, die ausschließlich durch das MessageDrop-Admin-Backend erzeugt und über das MessageDrop-Backend an das Frontend des jeweiligen Nutzers übermittelt werden.
+
+Systemmeldungen dienen insbesondere der:
+- Information über Verfahren nach dem Digital Services Act (DSA),
+- Mitteilung von Entscheidungen, Verfahrensständen oder Maßnahmen,
+- Information über technische oder organisatorische Vorgänge, z. B. geplante Wartungsarbeiten, sicherheitsrelevante Hinweise oder systembedingte Einschränkungen.
+
+Systemmeldungen werden im Nutzerkonto in einem gesonderten, internen Nachrichtenbereich angezeigt. Sie stellen kein klassisches E-Mail-Postfach dar und ersetzen keine externe Kommunikation per E-Mail.
+
+Ausschließlich autorisierte administrative Systeme von MessageDrop sind berechtigt, Systemmeldungen zu erstellen und zu versenden. Nutzer selbst sowie Dritte haben keine Möglichkeit, Systemmeldungen zu verfassen, zu verändern oder im Namen von MessageDrop zu versenden.
+
+Systemmeldungen sind aktuell als Einwegkommunikation ausgestaltet. Eine direkte Antwortfunktion oder Interaktion durch den Nutzer ist derzeit nicht vorgesehen.
+
+Systemmeldungen können personenbezogene Informationen enthalten, soweit dies für den jeweiligen Zweck erforderlich ist (z. B. zur Information über ein den Nutzer betreffendes Verfahren). Sie werden nicht öffentlich angezeigt und sind nur für den jeweils adressierten Nutzer einsehbar.
+
+Systemmeldungen können zu Dokumentations- und Nachweiszwecken gespeichert werden, insbesondere im Zusammenhang mit gesetzlichen Verpflichtungen.
+
+###
+8. Von uns erstellte Inhalte sowie Informationen und Dienste Dritter
 ###
 
 ###
-7.1 Eigene Inhalte
+8.1 Eigene Inhalte
 ###
 
 Unsere eigenen Inhalte werden mit der gebotenen Sorgfalt erstellt.
@@ -361,7 +320,7 @@ Unsere eigenen Inhalte werden mit der gebotenen Sorgfalt erstellt.
 Wir übernehmen jedoch keine Gewähr für deren Richtigkeit, Vollständigkeit oder Aktualität.
 
 ###
-7.2 Informationen und Dienste Dritter
+8.2 Informationen und Dienste Dritter
 ###
 
 Einzelne Funktionen basieren auf externen Diensten, insbesondere:
@@ -377,7 +336,7 @@ Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit, Verfügbarkeit
 Es gelten zusätzlich die jeweiligen Nutzungs- und Lizenzbedingungen der Anbieter.
 
 ###
-8. Verfügbarkeit, Wartung und serverseitiger Datenverlust
+9. Verfügbarkeit, Wartung und serverseitiger Datenverlust
 ###
 
 Wir bemühen uns um eine zuverlässige Bereitstellung des Dienstes.
@@ -393,13 +352,13 @@ Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, entgange
 Ansprüche aufgrund von Vorsatz oder grober Fahrlässigkeit bleiben unberührt.
 
 ###
-9. Externe Links
+10. Externe Links
 ###
 
 Unser Dienst kann Links zu externen Webseiten enthalten.
 
 ###
-9.a) Von uns gesetzte Links
+10.a) Von uns gesetzte Links
 ###
 
 Soweit wir selbst externe Links bereitstellen, wurden die verlinkten Inhalte zum Zeitpunkt der Verlinkung auf mögliche Rechtsverstöße geprüft.
@@ -411,7 +370,7 @@ Eine permanente inhaltliche Kontrolle der verlinkten Seiten ist ohne konkrete An
 Bei Bekanntwerden von Rechtsverstößen entfernen wir entsprechende Links unverzüglich.
 
 ###
-9.b) Von Nutzern erstellte Links
+10.b) Von Nutzern erstellte Links
 ###
 
 Nutzer können im Rahmen der Nutzung von MessageDrop eigenständig Links zu externen Webseiten erstellen oder veröffentlichen.
@@ -427,13 +386,13 @@ Hinweise auf rechtswidrige oder problematische Inhalte externer Links können ü
 Gemeldete Links können im Rahmen der gesetzlichen Vorgaben, insbesondere nach dem Digital Services Act (DSA), überprüft und bei Bedarf entfernt oder in ihrer Sichtbarkeit eingeschränkt werden.
 
 ###
-10. Kein Zugang zu Notfalldiensten
+11. Kein Zugang zu Notfalldiensten
 ###
 
 Unsere Website/App bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
 
 ###
-11. Änderungen und Funktionsanpassungen
+12. Änderungen und Funktionsanpassungen
 ###
 
 Wir behalten uns vor, diesen Haftungshinweis jederzeit zu ändern. Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
@@ -443,17 +402,17 @@ Wir behalten uns außerdem vor, Funktionen und Darstellungen von MessageDrop jed
 Ein Anspruch auf bestimmte Funktionen, bestimmte Bedienabläufe, bestimmte Parameter (z. B. Ergebnisanzahlen), eine bestimmte Darstellung oder eine bestimmte technische Ausgestaltung besteht nicht.
 
 ###
-12. Haftungsausschluss
+13. Haftungsausschluss
 ###
 
 Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
 
 Die Nutzung erfolgt auf eigene Verantwortung.
 
-Wir übernehmen keine Verantwortung für Schäden, die durch eine unsachgemäße oder unaufmerksame Nutzung entstehen, insbesondere nicht für Schäden, die außerhalb des Einflussbereichs des Dienstes liegen.
+Wir übernehmen keine Verantwortung für Schäden, die durch eine unsachgemäße, zweckwidrige oder unaufmerksame Nutzung des Dienstes entstehen. Dies gilt insbesondere für Fehlinterpretationen von Inhalten, lokalen Darstellungen (z. B. Profilzuordnungen), technischen Einschränkungen sowie für Entscheidungen, die Nutzer auf Grundlage der im Dienst dargestellten Informationen treffen.
 
 ###
-13. Haftungsbeschränkung
+14. Haftungsbeschränkung
 ###
 
 Wir haften unbeschränkt nur bei:
@@ -464,7 +423,7 @@ Wir haften unbeschränkt nur bei:
 Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
 
 ###
-14. Anwendbares Recht und Gerichtsstand
+15. Anwendbares Recht und Gerichtsstand
 ###
 
 Es gilt das Recht der Bundesrepublik Deutschland.
@@ -474,7 +433,7 @@ Sofern der Nutzer Kaufmann oder juristische Person ist, ist Gerichtsstand unser 
 Zwingende Verbraucherschutzvorschriften bleiben unberührt.
 
 ###
-15. Salvatorische Klausel
+16. Salvatorische Klausel
 ###
 
 Sollte eine Bestimmung dieses Haftungshinweises unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.

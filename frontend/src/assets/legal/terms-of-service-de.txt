@@ -1,5 +1,5 @@
 NUTZUNGSBEDINGUNGEN
-Stand: 14. Dezember 2025
+Stand: 22. Dezember 2025
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -9,13 +9,19 @@ Mit der Nutzung von MessageDrop akzeptierst du diese Nutzungsbedingungen.
 
 Du bist für die von dir erstellten Inhalte selbst verantwortlich und musst sicherstellen, dass diese rechtmäßig sind und keine Rechte Dritter verletzen.
 
-Inhalte können manuell sowie automatisiert, einschließlich KI-gestützter Verfahren, moderiert, eingeschränkt oder entfernt werden.
+Inhalte können manuell sowie automatisiert, einschließlich KI-gestützter Verfahren, moderiert, eingeschränkt oder entfernt werden. Für öffentliche Inhalte können Verfahren nach dem Digital Services Act (DSA) eingeleitet werden.
 
 Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterliegen ausschließlich den Bedingungen der jeweiligen Anbieter.
 
 Der Dienst kann zeitweise eingeschränkt oder nicht verfügbar sein; eine bestimmte Verfügbarkeit wird nicht garantiert.
 
 Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; du bist selbst für geeignete Sicherungen verantwortlich.
+
+Profile (Name/Avatar) können lokal genutzt werden. Bei Kontaktaufnahme kann optional eine Profilfreigabe an einen Kontakt angefragt werden; der Kontakt muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert; ein Zurückholen ist technisch nicht möglich.
+
+Systemmeldungen (z. B. zu DSA-Verfahren oder Wartungsarbeiten) können im Nutzerkonto angezeigt werden und werden ausschließlich durch autorisierte administrative Systeme erzeugt. Nutzer können darauf derzeit nicht antworten.
+
+Plätzen kann gefolgt werden; soweit technisch möglich können Push-Benachrichtigungen über neue öffentliche Inhalte an gefolgten Plätzen angezeigt werden. Push/Realtime-Funktionen erfolgen ausschließlich nach technischer Verfügbarkeit („Best Effort“); es besteht kein Anspruch auf Zustellung oder zeitnahe Benachrichtigung.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten und ersetzt keine Aufmerksamkeit oder Sorgfalt im realen Leben.
 
@@ -31,16 +37,16 @@ Vollständige Fassung
 
 MessageDrop (messagedrop.de) wird betrieben von:
 
-JackTools.Net UG (haftungsbeschränkt)  
-Im Kirchfeld 27  
-38304 Wolfenbüttel  
-Deutschland  
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
 
 Vertreten durch den Geschäftsführer:
 Christian Wagner, Dipl.-Inform. (FH)
 
-E-Mail: jacktoolsnet@gmail.com  
-Telefon: +49 (0) 176 / 41 23 57 74  
+E-Mail: jacktoolsnet@gmail.com
+Telefon: +49 (0) 176 / 41 23 57 74
 
 (im Folgenden „wir“, „uns“ oder „Anbieter“)
 
@@ -62,7 +68,7 @@ Wir behalten uns vor, diese Nutzungsbedingungen jederzeit zu ändern oder zu akt
 
 Es gilt jeweils die zum Zeitpunkt der Veröffentlichung aktuelle Fassung.
 
-Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren.
+Sofern Änderungen wesentliche Auswirkungen auf Nutzer haben, werden wir hierüber in angemessener Weise informieren, insbesondere über Systemmeldungen oder Hinweise innerhalb des Dienstes.
 
 ###
 4. Nutzungsberechtigung
@@ -93,7 +99,7 @@ Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
 - Tenor
 - Spotify
 
-Ein Anspruch auf bestimmte Funktionen, Darstellungen oder eine dauerhafte Verfügbarkeit besteht nicht.
+Ein Anspruch auf bestimmte Funktionen, Darstellungen, Reichweiten, Rankings, Benachrichtigungen, Echtzeitfunktionen oder eine dauerhafte Verfügbarkeit besteht nicht.
 
 ###
 6. Nutzerkonten und Sicherheit (sofern genutzt)
@@ -102,6 +108,8 @@ Ein Anspruch auf bestimmte Funktionen, Darstellungen oder eine dauerhafte Verfü
 Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln und vor dem Zugriff durch unbefugte Dritte zu schützen.
 
 Du bist für sämtliche Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
+
+Du bist dafür verantwortlich, dein Endgerät und deine lokalen Daten (z. B. PIN, Schlüsselmaterial, lokale Datensätze) vor unbefugtem Zugriff zu schützen.
 
 ###
 7. Nutzergenerierte Inhalte und Nutzungsrechte
@@ -112,6 +120,8 @@ Du behältst alle Rechte an den von dir erstellten Inhalten.
 Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives und unentgeltliches Recht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren.
 
 Du sicherst zu, dass du über alle erforderlichen Rechte verfügst und dass deine Inhalte rechtmäßig sind sowie keine Rechte Dritter verletzen.
+
+Hinweis: Soweit Inhalte im Rahmen gesetzlicher Verfahren (z. B. DSA) vorübergehend nicht öffentlich sichtbar gestellt, eingeschränkt oder entfernt werden, bleiben technische Kopien und Nachweisdaten im gesetzlich zulässigen Umfang hiervon unberührt.
 
 ###
 8. Moderation und Entfernung von Inhalten
@@ -124,7 +134,35 @@ Zur Unterstützung der Moderation können automatisierte Verfahren, einschließl
 Eine vollständige Vorabkontrolle sämtlicher Inhalte findet nicht statt.
 
 ###
-9. Unzulässige Nutzung
+9. Verfahren nach dem Digital Services Act (DSA)
+###
+
+Für öffentliche Inhalte, einschließlich öffentlicher Kommentare, kann jederzeit ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch:
+- eine Meldung („Notice“),
+- eine Beschwerde („Appeal“).
+
+Wird ein solches Verfahren eingeleitet, kann der betroffene Inhalt vorübergehend auf den Status „nicht öffentlich sichtbar“ gestellt werden. „Nicht öffentlich sichtbar“ bedeutet, dass der Inhalt für andere Nutzer nicht mehr öffentlich angezeigt wird, bis eine inhaltliche Entscheidung im Rahmen des Verfahrens getroffen wurde. Der Inhalt wird in diesem Zustand weder empfohlen noch öffentlich verbreitet.
+
+Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlangung von rechtswidrigen Inhalten entfernen oder sperren wir diese entsprechend den gesetzlichen Vorgaben („Notice-and-Takedown“).
+
+Im Rahmen eines DSA-Verfahrens können verfahrensbezogene Informationen verarbeitet werden, darunter Angaben zum gemeldeten Inhalt, Zeitpunkte, Verfahrensstatus, Entscheidungen und Begründungen.
+
+Die meldende Person kann – soweit technisch vorgesehen – zusätzliche Informationen als Belege bereitstellen, insbesondere durch:
+- das Hochladen von Dateien,
+- das Angeben von Links.
+
+Diese Belege dienen ausschließlich der Prüfung und Dokumentation im Rahmen des DSA-Verfahrens.
+
+Der von einem DSA-Verfahren betroffene Nutzer kann über Systemmeldungen über den Verfahrensstand, Entscheidungen und Maßnahmen informiert werden.
+
+Die im Rahmen eines DSA-Verfahrens erhobenen Informationen können an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen weitergegeben werden, soweit dies gesetzlich vorgeschrieben oder zulässig ist.
+
+Für DSA-relevante Vorgänge kann eine öffentlich zugängliche Fallseite bereitgestellt werden, die ausschließlich anonymisierte oder nicht personenbezogene Informationen enthält (z. B. Art des gemeldeten Inhalts, Verfahrensstatus, Entscheidungen, rechtliche Begründungen).
+
+Nach Abschluss des Verfahrens erfolgt – abhängig vom Ergebnis – eine Wiederfreigabe, Einschränkung oder endgültige Entfernung des betroffenen Inhalts.
+
+###
+10. Unzulässige Nutzung
 ###
 
 Es ist untersagt, MessageDrop für rechtswidrige, missbräuchliche oder vertragswidrige Zwecke zu nutzen.
@@ -173,11 +211,10 @@ Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
 
 Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die betreffenden Informationen öffentlich zugänglich erscheinen.
 
-
 Die Aufzählung ist nicht abschließend.
 
 ###
-10. Inhalte und Dienste Dritter
+11. Inhalte und Dienste Dritter
 ###
 
 Inhalte und Dienste Dritter unterliegen ausschließlich den Nutzungs- und Datenschutzbedingungen der jeweiligen Anbieter.
@@ -187,7 +224,50 @@ Wir übernehmen keine Verantwortung für Inhalte Dritter, die Verfügbarkeit ext
 Erforderliche Quellenangaben (z. B. „© OpenStreetMap-Mitwirkende“) sind zu beachten.
 
 ###
-11. Keine Notfalldienste
+12. Systemmeldungen
+###
+
+MessageDrop kann Systemmeldungen im Nutzerkonto anzeigen (z. B. Informationen zu DSA-Verfahren, Entscheidungen, sicherheitsrelevante Hinweise oder geplante Wartungsarbeiten).
+
+Systemmeldungen werden ausschließlich durch autorisierte administrative Systeme erzeugt. Nutzer und Dritte können Systemmeldungen nicht im Namen von MessageDrop versenden.
+
+Systemmeldungen sind stets aktiv und können nicht abbestellt werden. Eine Antwortfunktion ist derzeit nicht vorgesehen.
+
+Nutzer können Systemmeldungen im Frontend löschen. Das Löschen betrifft ausschließlich die Anzeige bzw. lokale Verfügbarkeit im Nutzer-Frontend. Gesetzlich erforderliche oder dokumentationspflichtige Nachweise können hiervon unberührt bleiben.
+
+###
+13. Profile, Kontakt-Profile und Profilfreigabe
+###
+
+Nutzer können lokal Profile anlegen (z. B. Name und Avatar). Diese Profile dienen der besseren Zuordnung und Darstellung innerhalb des Dienstes.
+
+Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfordern. Der Kontakt muss die Profilfreigabe aktiv bestätigen, bevor eine Übertragung erfolgt.
+
+Nach Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
+
+Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Der Kontakt kann die lokal gespeicherten Daten jedoch auf seinem Endgerät löschen.
+
+Unabhängig davon kann jeder Nutzer eigene lokale Profileinträge für Kontakte festlegen (z. B. eigener Anzeigename, eigener Avatar).
+
+###
+14. Plätzen folgen und Push-Benachrichtigungen (Best Effort)
+###
+
+Nutzer können Plätzen folgen oder das Folgen beenden.
+
+Soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erstellt werden.
+
+Push- und Echtzeitfunktionen werden ausschließlich nach technischer Verfügbarkeit erbracht („Best Effort“). Insbesondere kann es aus technischen, systembedingten oder nutzerspezifischen Gründen dazu kommen, dass:
+- Push-Benachrichtigungen verspätet eintreffen,
+- Benachrichtigungen gar nicht zugestellt werden,
+- Benachrichtigungen mehrfach zugestellt werden,
+- ein gefolgter Platz vorübergehend nicht korrekt benachrichtigt,
+- oder die Funktion zeitweise vollständig nicht verfügbar ist.
+
+Ein Anspruch auf Zustellung, Vollständigkeit, Reihenfolge oder zeitnahe Benachrichtigung besteht nicht.
+
+###
+15. Keine Notfalldienste
 ###
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, Rettungsdienst).
@@ -195,7 +275,7 @@ MessageDrop bietet keinen Zugang zu Notfalldiensten (z. B. Polizei, Feuerwehr, R
 Der Dienst ersetzt keine Aufmerksamkeit, Vorsicht oder verantwortungsbewusstes Verhalten im realen Leben.
 
 ###
-12. Verfügbarkeit und Wartung
+16. Verfügbarkeit und Wartung
 ###
 
 Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere aufgrund von Wartungsarbeiten, technischen Störungen, Ausfällen externer Dienste oder höherer Gewalt.
@@ -203,7 +283,7 @@ Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere au
 Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
 
 ###
-13. Lokale Speicherung und Datenverlust
+17. Lokale Speicherung und Datenverlust
 ###
 
 Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage oder Cache).
@@ -213,7 +293,7 @@ Diese Daten sind geräte- und browserabhängig und können jederzeit gelöscht w
 Du bist selbst für geeignete Sicherungen verantwortlich; eine Wiederherstellung durch uns ist nicht möglich.
 
 ###
-14. Geistiges Eigentum
+18. Geistiges Eigentum
 ###
 
 Alle Rechte an MessageDrop, einschließlich Software, Design und Marken, liegen bei uns oder unseren Lizenzgebern.
@@ -221,7 +301,7 @@ Alle Rechte an MessageDrop, einschließlich Software, Design und Marken, liegen 
 Eine Nutzung unserer Marken oder Kennzeichen ohne vorherige Zustimmung ist nicht gestattet.
 
 ###
-15. Beendigung der Nutzung
+19. Beendigung der Nutzung
 ###
 
 Du kannst die Nutzung von MessageDrop jederzeit einstellen.
@@ -229,7 +309,7 @@ Du kannst die Nutzung von MessageDrop jederzeit einstellen.
 Wir behalten uns vor, den Zugang ganz oder teilweise zu sperren oder zu beenden, insbesondere bei Verstößen gegen diese Nutzungsbedingungen, gesetzlicher Verpflichtung oder missbräuchlicher Nutzung.
 
 ###
-16. Haftungsausschluss
+20. Haftungsausschluss
 ###
 
 Der Dienst wird „wie er ist“ und „wie verfügbar“ bereitgestellt.
@@ -239,7 +319,7 @@ Die Nutzung erfolgt auf eigene Verantwortung.
 Wir übernehmen keine Verantwortung für Schäden, die durch unsachgemäße, unaufmerksame oder zweckwidrige Nutzung entstehen und außerhalb unseres Einflussbereichs liegen.
 
 ###
-17. Haftungsbeschränkung
+21. Haftungsbeschränkung
 ###
 
 Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder bei Verletzung von Leben, Körper oder Gesundheit.
@@ -247,13 +327,13 @@ Wir haften unbeschränkt nur bei Vorsatz, grober Fahrlässigkeit oder bei Verlet
 Im Übrigen ist eine Haftung, soweit gesetzlich zulässig, ausgeschlossen.
 
 ###
-18. Freistellung
+22. Freistellung
 ###
 
 Du stellst uns von sämtlichen Ansprüchen Dritter frei, die aufgrund deiner Inhalte oder deines Verstoßes gegen diese Nutzungsbedingungen geltend gemacht werden, soweit gesetzlich zulässig.
 
 ###
-19. Anwendbares Recht und Gerichtsstand
+23. Anwendbares Recht und Gerichtsstand
 ###
 
 Es gilt das Recht der Bundesrepublik Deutschland.
@@ -263,19 +343,19 @@ Sofern du Kaufmann oder juristische Person bist, ist Gerichtsstand unser Sitz.
 Zwingende Verbraucherschutzvorschriften bleiben unberührt.
 
 ###
-20. Salvatorische Klausel
+24. Salvatorische Klausel
 ###
 
 Sollte eine Bestimmung dieser Nutzungsbedingungen unwirksam sein oder werden, bleibt die Wirksamkeit der übrigen Bestimmungen unberührt.
 
 ###
-21. Kontakt
+25. Kontakt
 ###
 
-JackTools.Net UG (haftungsbeschränkt)  
-Im Kirchfeld 27  
-38304 Wolfenbüttel  
-Deutschland  
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
 
-E-Mail: jacktoolsnet@gmail.com  
+E-Mail: jacktoolsnet@gmail.com
 Telefon: +49 (0) 176 / 41 23 57 74

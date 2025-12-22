@@ -1,5 +1,5 @@
 DATENSCHUTZERKLÄRUNG
-Stand: 14. Dezember 2025
+Stand: 22. Dezember 2025
 
 ###
 Kurzfassung (nicht rechtsverbindlich)
@@ -21,6 +21,12 @@ Private Chatnachrichten werden verschlüsselt übertragen und sind für uns grun
 
 Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden nur auf ausdrücklichen Wunsch des Nutzers aktiviert und direkt von den jeweiligen Drittanbietern geladen. Es gelten deren Datenschutz- und Nutzungsbedingungen.
 
+Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können darauf derzeit nicht antworten.
+
+Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfordern; der andere Nutzer muss aktiv zustimmen (z. B. per Popup). Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
+
+Plätzen kann gefolgt werden; soweit technisch möglich kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Push-Token werden nur temporär verarbeitet. Es besteht kein Anspruch auf Zustellung von Push-Benachrichtigungen.
+
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
 Maßgeblich ist ausschließlich die aktuelle vollständige deutsche Fassung dieser Datenschutzerklärung einschließlich der Ergänzungen zum Digital Services Act (DSA).
@@ -35,16 +41,16 @@ Vollständige Fassung
 
 Verantwortlicher gemäß Art. 4 Nr. 7 DSGVO ist:
 
-JackTools.Net UG (haftungsbeschränkt)  
-Im Kirchfeld 27  
-38304 Wolfenbüttel  
-Deutschland  
+JackTools.Net UG (haftungsbeschränkt)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Deutschland
 
-Vertreten durch den Geschäftsführer:  
+Vertreten durch den Geschäftsführer:
 Christian Wagner, Dipl.-Inform. (FH)
 
-E-Mail: jacktoolsnet@gmail.com  
-Telefon: +49 (0) 176 / 41 23 57 74  
+E-Mail: jacktoolsnet@gmail.com
+Telefon: +49 (0) 176 / 41 23 57 74
 
 (im Folgenden „wir“, „uns“ oder „Anbieter“)
 
@@ -90,24 +96,24 @@ Wir haben auf Art, Umfang und Zweck dieser Datenverarbeitung durch den externen 
 
 Nachfolgend sind die zum Zeitpunkt der Erstellung bekannten externen Anbieter aufgeführt:
 
-YouTube (Google Ireland Limited)  
-Datenschutzerklärung: https://policies.google.com/privacy  
+YouTube (Google Ireland Limited)
+Datenschutzerklärung: https://policies.google.com/privacy
 Impressum / Kontakt: https://www.google.com/about/company/
 
-TikTok (TikTok Technology Limited / TikTok Information Technologies UK Limited)  
-Datenschutzerklärung: https://www.tiktok.com/legal/page/eea/privacy-policy/de  
+TikTok (TikTok Technology Limited / TikTok Information Technologies UK Limited)
+Datenschutzerklärung: https://www.tiktok.com/legal/page/eea/privacy-policy/de
 Impressum / Kontakt: https://www.tiktok.com/legal/page/global/impressum
 
-Pinterest (Pinterest Europe Ltd.)  
-Datenschutzerklärung: https://policy.pinterest.com/de/privacy-policy  
+Pinterest (Pinterest Europe Ltd.)
+Datenschutzerklärung: https://policy.pinterest.com/de/privacy-policy
 Kontakt: https://help.pinterest.com/de/contact
 
-Spotify (Spotify AB)  
-Datenschutzerklärung: https://www.spotify.com/de/legal/privacy-policy/  
+Spotify (Spotify AB)
+Datenschutzerklärung: https://www.spotify.com/de/legal/privacy-policy/
 Impressum: https://www.spotify.com/de/legal/imprint/
 
-Tenor (Google Ireland Limited)  
-Datenschutzerklärung: https://policies.google.com/privacy  
+Tenor (Google Ireland Limited)
+Datenschutzerklärung: https://policies.google.com/privacy
 Impressum / Kontakt: https://www.google.com/about/company/
 
 Die oben genannten Links dienen ausschließlich der Information. Für Inhalte, Aktualität, Verfügbarkeit oder Änderungen der externen Seiten übernehmen wir keine Verantwortung oder Gewähr.
@@ -115,6 +121,16 @@ Die oben genannten Links dienen ausschließlich der Information. Für Inhalte, A
 Die Liste der externen Anbieter kann technisch bedingt erweitert oder angepasst werden, ohne dass dies eine Änderung dieser Datenschutzerklärung erfordert.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung).
+
+###
+2.4 Lokale Profile ohne Nutzerkonto (optional)
+###
+
+Im Rahmen der Nutzung ohne Nutzerkonto kann der Nutzer optional lokale Profile zur besseren Organisation und Wiedererkennung eigener Inhalte anlegen. Ein solches Profil kann insbesondere aus einem frei wählbaren Namen und einem Avatar (Bild) bestehen.
+
+Diese Profile werden ausschließlich lokal auf dem Endgerät gespeichert und sind nur für den jeweiligen Nutzer sichtbar. Eine Übertragung an unsere Server oder eine Veröffentlichung für andere Nutzer findet nicht statt.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzerfreundlicher Darstellung) bzw. Art. 6 Abs. 1 lit. b DSGVO, soweit die Verarbeitung zur Bereitstellung einer vom Nutzer genutzten Funktion erforderlich ist.
 
 ###
 3. Nutzung mit Nutzerkonto
@@ -138,6 +154,8 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
 Zum Login wird der verschlüsselte Nutzerdatensatz temporär an das Backend übertragen und ausschließlich zur Prüfung der PIN-Gültigkeit verarbeitet. Eine dauerhafte Speicherung entschlüsselter Nutzerdaten oder des PINs erfolgt nicht.
 
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+
 ###
 3.3 Löschung und Inaktivität
 ###
@@ -149,6 +167,8 @@ Mit der Entfernung des Nutzers werden alle zugehörigen serverseitig gespeichert
 Die Löschung ist endgültig und nicht rückgängig zu machen.
 
 Unabhängig davon kann der Nutzer seinen Nutzer jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung aller serverseitigen und lokalen Datensätze.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
 ###
 3.4 Öffentliche Inhalte und Kommentare
@@ -197,6 +217,55 @@ Werden lokal gespeicherte Daten durch den Nutzer oder durch technische Umstände
 Die Verantwortung für Sicherung, Erhalt und Verwaltung lokal gespeicherter Daten liegt ausschließlich beim Nutzer.
 
 ###
+3.7 Lokales Profil, Profilfreigabe und Kontakt-Profile
+###
+
+Der Nutzer kann für sein eigenes Nutzerkonto ein lokales Profil (z. B. Name und Avatar) anlegen. Dieses Profil wird grundsätzlich ausschließlich lokal auf dem Endgerät gespeichert.
+
+Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfordern. Der Kontakt muss die Profilfreigabe aktiv bestätigen (z. B. per Popup), bevor eine Übertragung erfolgt.
+
+Nach erfolgter Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
+
+Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Der Kontakt kann die lokal gespeicherten Daten jedoch auf seinem Endgerät löschen.
+
+Zusätzlich kann jeder Nutzer unabhängig davon eigene lokale Profileinträge für Kontakte festlegen (z. B. eigener Anzeigename, eigener Avatar). Diese Informationen sind nur lokal sichtbar.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung der Kontaktfunktion) sowie Art. 6 Abs. 1 lit. a DSGVO, soweit die Profilfreigabe als freiwillige Zustimmung (Opt-in) ausgestaltet ist.
+
+###
+3.8 Systemmeldungen
+###
+
+MessageDrop stellt Nutzern Systemmeldungen zur Verfügung. Systemmeldungen sind interne Mitteilungen, die ausschließlich durch autorisierte administrative Systeme (insbesondere über das Admin- und Moderationssystem) erzeugt und über das MessageDrop-Backend an das Nutzer-Frontend übermittelt werden.
+
+Systemmeldungen dienen insbesondere der:
+- Information über Verfahren nach dem Digital Services Act (DSA),
+- Mitteilung von Entscheidungen, Verfahrensständen oder Maßnahmen,
+- Information über technische oder organisatorische Vorgänge (z. B. geplante Wartungsarbeiten, sicherheitsrelevante Hinweise oder systembedingte Einschränkungen).
+
+Systemmeldungen sind stets aktiv und können nicht abbestellt werden. Eine direkte Antwortfunktion ist derzeit nicht vorgesehen.
+
+Im Rahmen der Systemmeldungen verarbeiten wir insbesondere die User-ID, den Inhalt der Mitteilung, Zeitpunkte, sowie Zustell- und Lesestatus.
+
+Nutzer können Systemmeldungen im Frontend löschen. Das Löschen betrifft ausschließlich die Anzeige bzw. lokale Verfügbarkeit im Nutzer-Frontend. Gesetzlich erforderliche oder dokumentationspflichtige Nachweise (z. B. im Rahmen von DSA-Verfahren) können hiervon unberührt bleiben.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. c DSGVO, soweit Systemmeldungen zur Erfüllung gesetzlicher Pflichten erforderlich sind (z. B. DSA).
+
+###
+3.9 Plätzen folgen und Push-Benachrichtigungen
+###
+
+Nutzer können Plätzen folgen oder das Folgen beenden.
+
+Soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erstellt werden.
+
+Für Push-Benachrichtigungen können je nach Plattform technisch erforderliche Token/Identifiers verarbeitet werden, um Nachrichten an das Endgerät zustellen zu können (z. B. Push-Token). Diese Token werden nur temporär verarbeitet und nicht dauerhaft zu Profilbildungs- oder Tracking-Zwecken gespeichert.
+
+Push-Benachrichtigungen können aus technischen, systembedingten oder nutzerspezifischen Gründen verzögert, eingeschränkt oder nicht zugestellt werden; ein Anspruch auf Zustellung besteht nicht.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Funktion „Folgen“) sowie Art. 6 Abs. 1 lit. a DSGVO, sofern die Push-Nutzung als einwilligungsbasiert ausgestaltet ist bzw. eine systemseitige Berechtigung des Endgeräts erforderlich ist.
+
+###
 4. Digital Services Act (DSA)
 ###
 
@@ -207,6 +276,12 @@ Die Verantwortung für Sicherung, Erhalt und Verwaltung lokal gespeicherter Date
 Für öffentliche Inhalte und Kommentare kann ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
 
 Dabei verarbeiten wir insbesondere die User-ID, Angaben zum gemeldeten Inhalt, Zeitpunkte und Status des Verfahrens sowie getroffene Entscheidungen und Begründungen.
+
+Zusätzlich kann die meldende Person im Rahmen eines DSA-Verfahrens freiwillig Belege bereitstellen, insbesondere:
+- Datei-Uploads (z. B. Screenshots oder Dokumente),
+- externe Links als Nachweise.
+
+Datei-Uploads werden auf unseren Servern gespeichert. Externe Links werden in unserer Datenbank gespeichert. Diese Belege werden ausschließlich zur Prüfung des gemeldeten Sachverhalts sowie zur Dokumentation im Rahmen gesetzlicher Pflichten verarbeitet und nicht öffentlich veröffentlicht.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO.
 
@@ -234,6 +309,8 @@ Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschl�
 
 DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten werden dauerhaft gespeichert, soweit dies zur Erfüllung gesetzlicher Dokumentations-, Nachweis- und Rechenschaftspflichten erforderlich ist.
 
+Belege (Dateien/Links) können – abhängig von ihrer Erforderlichkeit für Dokumentations- und Nachweispflichten – für die Dauer des jeweiligen Verfahrens und darüber hinaus im gesetzlich zulässigen Rahmen gespeichert werden.
+
 Eine Weitergabe an zuständige Behörden erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
 
 ###
@@ -242,7 +319,7 @@ Eine Weitergabe an zuständige Behörden erfolgt ausschließlich im rechtlich er
 
 Personenbezogene Daten werden nur so lange gespeichert, wie dies für den jeweiligen Zweck erforderlich ist oder gesetzliche Verpflichtungen bestehen.
 
-Davon ausgenommen sind DSA-Verfahrensdaten, die gesetzlichen Aufbewahrungspflichten unterliegen.
+Davon ausgenommen sind DSA-Verfahrensdaten (einschließlich erforderlicher Nachweise/Belege), die gesetzlichen Aufbewahrungspflichten oder dokumentationsbezogenen Erfordernissen unterliegen können.
 
 ###
 6. Datensicherheit
