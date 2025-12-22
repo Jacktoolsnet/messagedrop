@@ -40,6 +40,8 @@ export class QuickActionActionEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionActionEditComponent>);
   private readonly dialog = inject(MatDialog);
   readonly data = inject<QuickActionDialogData>(MAT_DIALOG_DATA);
+  private iconAuto = true;
+  private lastType: TileLinkType;
 
   readonly actionTypes: { value: TileLinkType; label: string }[] = [
     { value: 'web', label: 'Web' },
@@ -56,9 +58,15 @@ export class QuickActionActionEditComponent {
   readonly icon = signal<string | undefined>(this.data.action.icon ?? this.defaultIconForType(this.data.action.type));
 
   constructor() {
+    this.iconAuto = this.isDefaultIcon(this.icon(), this.typeControl.value);
+    this.lastType = this.typeControl.value;
     this.applyValidators(this.typeControl.value);
     this.typeControl.valueChanges.subscribe(type => {
       this.applyValidators(type);
+      if (this.iconAuto && this.isDefaultIcon(this.icon(), this.lastType)) {
+        this.icon.set(this.defaultIconForType(type));
+      }
+      this.lastType = type;
     });
   }
 
@@ -70,7 +78,13 @@ export class QuickActionActionEditComponent {
 
     ref.afterClosed().subscribe((selected?: string | null) => {
       if (selected !== undefined) {
-        this.icon.set(selected || undefined);
+        if (selected === null) {
+          this.icon.set(undefined);
+          this.iconAuto = true;
+          return;
+        }
+        this.icon.set(selected);
+        this.iconAuto = selected === this.defaultIconForType(this.typeControl.value);
       }
     });
   }
@@ -136,5 +150,10 @@ export class QuickActionActionEditComponent {
       default:
         return 'public';
     }
+  }
+
+  private isDefaultIcon(icon: string | undefined, type: TileLinkType): boolean {
+    if (!icon) return true;
+    return icon === this.defaultIconForType(type);
   }
 }
