@@ -1,0 +1,52 @@
+<h2 mat-dialog-title>Edit todo list</h2>
+
+<mat-dialog-content class="edit-content">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <div class="todo-add-row">
+    <mat-form-field appearance="outline" class="todo-input">
+      <mat-label>Add todo</mat-label>
+      <input matInput [formControl]="newTodoControl" (keyup.enter)="addTodo()" />
+    </mat-form-field>
+    <button mat-icon-button color="primary" type="button" (click)="addTodo()" [disabled]="!newTodoControl.value.trim()" aria-label="Add todo">
+      <mat-icon>add</mat-icon>
+    </button>
+  </div>
+
+  @if (hasTodos) {
+    <div cdkDropList class="todo-list" (cdkDropListDropped)="drop($event)">
+      @for (todo of todos(); track todo.id) {
+        <div class="todo-row" cdkDrag>
+          <button type="button" class="drag-handle" cdkDragHandle aria-label="Reorder todo">
+            <mat-icon>drag_indicator</mat-icon>
+          </button>
+          <button mat-icon-button color="primary" type="button" (click)="toggleTodo(todo)" [attr.aria-label]="todo.done ? 'Mark as not done' : 'Mark as done'">
+            <mat-icon>{{ todo.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+          </button>
+          <span class="todo-text" [class.todo-text--done]="todo.done">{{ todo.text }}</span>
+          <button mat-icon-button color="warn" type="button" (click)="deleteTodo(todo)" aria-label="Delete todo">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="text-muted">No todos yet. Add your first one above.</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>

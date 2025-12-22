@@ -1,0 +1,83 @@
+.edit-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  height: auto;
+  max-height: calc(98vh - 200px);
+  overflow: hidden;
+  min-height: 0;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.icon-pick-button {
+  width: 95%;
+  align-self: center;
+  justify-content: center;
+  gap: 1.75rem;
+  margin: auto;
+  padding: 1.5rem;
+}
+
+.icon-pick-button mat-icon {
+  font-size: 2rem;
+  width: 2rem;
+  height: 2rem;
+}
+
+.todo-add-row {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.todo-input {
+  flex: 1;
+}
+
+.todo-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1 1 auto;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 4px;
+}
+
+.todo-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  cursor: grab;
+}
+
+.todo-text {
+  flex: 1;
+  word-break: break-word;
+}
+
+.todo-text--done {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.text-muted {
+  margin: 0;
+  font-style: italic;
+}

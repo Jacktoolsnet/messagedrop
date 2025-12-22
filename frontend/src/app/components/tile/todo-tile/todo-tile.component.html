@@ -1,0 +1,31 @@
+<div class="todo-tile"
+     role="button"
+     tabindex="0"
+     (click)="editTile()"
+     (keyup.enter)="editTile()"
+     (keyup.space)="editTile()">
+  <div class="todo-tile__header">
+    <div class="todo-tile__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="todo-tile__title">{{ title }}</div>
+    @if (totalCount > 0) {
+      <div class="todo-tile__count">{{ doneCount }}/{{ totalCount }}</div>
+    }
+  </div>
+
+  <div class="todo-tile__body">
+    @if (todos.length > 0) {
+      <ul class="todo-list">
+        @for (todo of todos; track todo.id) {
+          <li class="todo-item" [class.todo-item--done]="todo.done">
+            <mat-icon class="todo-status-icon">{{ todo.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
+            <span class="todo-text">{{ todo.text }}</span>
+          </li>
+        }
+      </ul>
+    } @else {
+      <p class="text-muted">No todos yet. Tap to add.</p>
+    }
+  </div>
+</div>

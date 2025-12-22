@@ -1,6 +1,13 @@
 export type DefaultTileType = 'datetime' | 'weather' | 'airQuality' | 'note' | 'message' | 'image';
 export type TileType = DefaultTileType | `custom-${string}`;
 
+export interface TileTodoItem {
+  id: string;
+  text: string;
+  done: boolean;
+  order: number;
+}
+
 export interface TileSetting {
   id: string;
   type: TileType;
@@ -15,6 +22,7 @@ export interface TileSetting {
     url?: string;
     linkType?: 'web' | 'phone' | 'email' | 'whatsapp' | 'sms' | 'map';
     date?: string;
+    todos?: TileTodoItem[];
     migraine?: {
       tempWarn1: number;
       tempWarn2: number;
