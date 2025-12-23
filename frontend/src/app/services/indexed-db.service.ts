@@ -3,6 +3,7 @@ import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
+import { IndexedDbBackup, IndexedDbBackupEntry } from '../interfaces/indexed-db-backup';
 import { LocalImage } from '../interfaces/local-image';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
@@ -122,6 +123,49 @@ export class IndexedDbService {
         reject(tx.error);
       };
     });
+  }
+
+  async exportAllData(skipStores: string[] = []): Promise<IndexedDbBackup> {
+    const db = await this.openDB();
+    const storeNames = Array.from(db.objectStoreNames);
+    const stores: Record<string, IndexedDbBackupEntry[]> = {};
+    const skipped = new Set(skipStores);
+
+    await Promise.all(storeNames.map((storeName) => {
+      if (skipped.has(storeName)) {
+        stores[storeName] = [];
+        return Promise.resolve();
+      }
+      return new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readonly');
+        const store = tx.objectStore(storeName);
+        const keysRequest = store.getAllKeys();
+        const valuesRequest = store.getAll();
+
+        tx.oncomplete = () => {
+          const entries: IndexedDbBackupEntry[] = [];
+          const keys = (keysRequest.result as IDBValidKey[]) ?? [];
+          const values = (valuesRequest.result as unknown[]) ?? [];
+          for (let i = 0; i < keys.length; i++) {
+            entries.push({
+              key: keys[i],
+              value: values[i]
+            });
+          }
+          stores[storeName] = entries;
+          resolve();
+        };
+
+        tx.onerror = () => reject(tx.error);
+      });
+    }));
+
+    return {
+      dbName: this.dbName,
+      dbVersion: this.dbVersion,
+      stores,
+      skippedStores: skipStores.length ? skipStores : undefined
+    };
   }
 
   /**

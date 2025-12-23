@@ -29,6 +29,76 @@ function ensureSameUser(req, res, userId) {
   return true;
 }
 
+function queryAll(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(rows || []);
+    });
+  });
+}
+
+function queryGet(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.get(sql, params, (err, row) => {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(row || null);
+    });
+  });
+}
+
+async function buildUserBackup(db, userId) {
+  const [
+    userRow,
+    messages,
+    contacts,
+    contactMessages,
+    places,
+    notifications,
+    likes,
+    dislikes,
+    connects
+  ] = await Promise.all([
+    queryGet(db, 'SELECT * FROM tableUser WHERE id = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableMessage WHERE userId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableContact WHERE userId = ?', [userId]),
+    queryAll(db, `
+      SELECT cm.*
+      FROM tableContactMessage cm
+      INNER JOIN tableContact c ON c.id = cm.contactId
+      WHERE c.userId = ?;
+    `, [userId]),
+    queryAll(db, 'SELECT * FROM tablePlace WHERE userId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableNotification WHERE userId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableLike WHERE likeUserId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableDislike WHERE dislikeUserId = ?', [userId]),
+    queryAll(db, 'SELECT * FROM tableConnect WHERE userId = ?', [userId])
+  ]);
+
+  return {
+    schemaVersion: 1,
+    createdAt: new Date().toISOString(),
+    userId,
+    tables: {
+      tableUser: userRow ? [userRow] : [],
+      tableMessage: messages,
+      tableContact: contacts,
+      tableContactMessage: contactMessages,
+      tablePlace: places,
+      tableNotification: notifications,
+      tableLike: likes,
+      tableDislike: dislikes,
+      tableConnect: connects
+    }
+  };
+}
+
 const rateLimitDefaults = {
   standardHeaders: true,
   legacyHeaders: false
@@ -73,6 +143,29 @@ router.get('/get/:userId',
     res.status(response.status).json(response);
   });
 });
+
+router.get('/backup/:userId',
+  [
+    security.authenticate
+  ],
+  async function (req, res) {
+    if (!ensureSameUser(req, res, req.params.userId)) {
+      return;
+    }
+
+    const response = { status: 0 };
+
+    try {
+      const backup = await buildUserBackup(req.database.db, req.params.userId);
+      response.status = 200;
+      response.backup = backup;
+      res.status(200).json(response);
+    } catch (err) {
+      response.status = 500;
+      response.error = err?.message || err;
+      res.status(500).json(response);
+    }
+  });
 
 router.post('/hashpin',
   [

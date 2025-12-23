@@ -57,6 +57,7 @@ import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
+import { BackupService } from './services/backup.service';
 import { ContactMessageService } from './services/contact-message.service';
 import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
@@ -69,6 +70,7 @@ import { NetworkService } from './services/network.service';
 import { NoteService } from './services/note.service';
 import { OembedService } from './services/oembed.service';
 import { PlaceService } from './services/place.service';
+import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SocketioService } from './services/socketio.service';
@@ -128,6 +130,8 @@ export class AppComponent implements OnInit {
   readonly networkService = inject(NetworkService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly backupService = inject(BackupService);
+  private readonly restoreService = inject(RestoreService);
   readonly serverService = inject(ServerService);
   readonly userService = inject(UserService);
   readonly mapService = inject(MapService);
@@ -1073,6 +1077,10 @@ export class AppComponent implements OnInit {
     });
   }
 
+  public startRestore() {
+    this.restoreService.startRestore();
+  }
+
   public editUserProfile() {
     const dialogRef = this.dialog.open(UserProfileComponent, {
       data: {},
@@ -1135,6 +1143,9 @@ export class AppComponent implements OnInit {
         case "deleteUserId":
           this.deleteUser();
           break
+        case "backup":
+          this.backupService.startBackup();
+          break;
       }
     });
   }
