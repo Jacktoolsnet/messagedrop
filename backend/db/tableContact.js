@@ -28,16 +28,67 @@ const init = function (db) {
             CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
-            ON UPDATE CASCADE ON DELETE CASCADE,
-            CONSTRAINT FK_CONTACT_USER_ID FOREIGN KEY (${columnContactUserId}) 
-            REFERENCES tableUser (id) 
-            ON UPDATE CASCADE ON DELETE CASCADE 
+            ON UPDATE CASCADE ON DELETE CASCADE
         );`;
 
         db.run(sql, (err) => {
             if (err) {
                 throw err;
             }
+        });
+
+        db.all(`PRAGMA foreign_key_list(${tableName});`, (fkErr, rows) => {
+            if (fkErr || !rows) {
+                return;
+            }
+            const contactUserFk = rows.find((row) => row.from === columnContactUserId && row.table === 'tableUser');
+            if (!contactUserFk) {
+                return;
+            }
+
+            const newTable = `${tableName}_new`;
+            const createNew = `
+            CREATE TABLE ${newTable} (
+                ${columnContactId} TEXT PRIMARY KEY NOT NULL, 
+                ${columnUserId} TEXT DEFAULT NULL,
+                ${columnContactUserId} TEXT DEFAULT NULL,
+                ${columnContactUserSigningPublicKey} TEXT NOT NULL,
+                ${columnContactUserEncryptionPublicKey} TEXT NOT NULL,
+                ${columnSubscribed} BOOLEAN NOT NULL DEFAULT false,
+                ${columnHint} TEXT DEFAULT NULL,
+                ${columnName} TEXT DEFAULT NULL,
+                ${columnLastMessageFrom} TEXT DEFAULT '',
+                ${columnLastMessageAt} TEXT DEFAULT NULL,
+                CONSTRAINT SECONDARY_KEY UNIQUE (${columnUserId}, ${columnContactUserId}),
+                CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
+                REFERENCES tableUser (id) 
+                ON UPDATE CASCADE ON DELETE CASCADE
+            );`;
+
+            const columns = [
+                columnContactId,
+                columnUserId,
+                columnContactUserId,
+                columnContactUserSigningPublicKey,
+                columnContactUserEncryptionPublicKey,
+                columnSubscribed,
+                columnHint,
+                columnName,
+                columnLastMessageFrom,
+                columnLastMessageAt
+            ];
+            const columnList = columns.join(', ');
+            const copySql = `INSERT INTO ${newTable} (${columnList}) SELECT ${columnList} FROM ${tableName};`;
+
+            db.serialize(() => {
+                db.run('BEGIN IMMEDIATE');
+                db.run(`DROP TABLE IF EXISTS ${newTable};`);
+                db.run(createNew);
+                db.run(copySql);
+                db.run(`DROP TABLE ${tableName};`);
+                db.run(`ALTER TABLE ${newTable} RENAME TO ${tableName};`);
+                db.run('COMMIT');
+            });
         });
     } catch (error) {
         throw error;
