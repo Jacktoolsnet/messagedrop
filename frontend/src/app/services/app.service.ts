@@ -32,6 +32,7 @@ export class AppService {
     enableSpotifyContent: false,
     enableTikTokContent: false,
     enableTenorContent: false,
+    backupOnExit: false,
     consentSettings: {
       disclaimer: false,
       privacyPolicy: false,

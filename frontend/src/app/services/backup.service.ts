@@ -11,6 +11,7 @@ import { environment } from '../../environments/environment';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
+import { BackupStateService } from './backup-state.service';
 
 type DirectoryPickerWindow = typeof window & {
   showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
@@ -30,6 +31,7 @@ export class BackupService {
   private readonly networkService = inject(NetworkService);
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly backupState = inject(BackupStateService);
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -65,6 +67,7 @@ export class BackupService {
       const envelope = await this.encryptPayload(payload, pin);
       const filename = `${this.formatTimestamp(new Date())}_messagedrop.backup`;
       await this.writeBackupFile(directoryHandle, filename, JSON.stringify(envelope));
+      this.backupState.clearDirty();
       this.snackBar.open('Backup created successfully.', undefined, {
         duration: 3000,
         horizontalPosition: 'center',

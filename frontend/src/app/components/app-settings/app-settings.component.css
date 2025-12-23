@@ -189,3 +189,40 @@ h4 {
     font-size: 0.9rem;
     color: var(--mat-form-field-error-text-color, #ba1a1a);
 }
+
+.platform-tile.backup-exit-tile {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.backup-exit-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.backup-exit-header mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.backup-exit-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mat-app-text-color);
+}
+
+.backup-exit-subtitle,
+.backup-exit-note {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.35;
+}
+
+.backup-exit-note {
+    color: var(--mat-card-subtitle-text-color);
+}

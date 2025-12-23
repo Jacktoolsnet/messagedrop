@@ -100,6 +100,11 @@ export class AppSettingsComponent implements OnInit {
     this.appService.setAppSettings(this.appSettings);
   }
 
+  setBackupOnExit(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, backupOnExit: enabled };
+    this.appService.setAppSettings(this.appSettings);
+  }
+
   async onStoragePersistenceToggle(event: MatSlideToggleChange): Promise<void> {
     if (!this.storagePersistenceSupported) {
       event.source.checked = false;

@@ -62,6 +62,7 @@ import { ContactMessageService } from './services/contact-message.service';
 import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
+import { BackupStateService } from './services/backup-state.service';
 import { IndexedDbService } from './services/indexed-db.service';
 import { LocalImageService } from './services/local-image.service';
 import { MapService } from './services/map.service';
@@ -132,6 +133,7 @@ export class AppComponent implements OnInit {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly backupService = inject(BackupService);
   private readonly restoreService = inject(RestoreService);
+  private readonly backupState = inject(BackupStateService);
   readonly serverService = inject(ServerService);
   readonly userService = inject(UserService);
   readonly mapService = inject(MapService);
@@ -151,6 +153,8 @@ export class AppComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
+  private exitBackupPromptPending = false;
+  private exitBackupDialogOpen = false;
   readonly userMessagesSignal = computed(() =>
     this.messageService.messagesSignal().filter(
       msg => msg.userId === this.userService.getUser().id
@@ -170,6 +174,7 @@ export class AppComponent implements OnInit {
   private lastLiveMessageId?: string;
 
   constructor() {
+    this.setupExitBackupPrompt();
     effect(async () => {
       this.appService.settingsSet(); // <-- track changes
       this.appService.chekConsentCompleted();
@@ -384,6 +389,60 @@ export class AppComponent implements OnInit {
           // best effort for badge; ignore errors
         }
       });
+    });
+  }
+
+  private setupExitBackupPrompt(): void {
+    window.addEventListener('beforeunload', (event) => {
+      if (!this.shouldPromptBackupOnExit()) {
+        return;
+      }
+      this.exitBackupPromptPending = true;
+      event.preventDefault();
+      event.returnValue = '';
+      setTimeout(() => {
+        if (!this.exitBackupPromptPending) {
+          return;
+        }
+        if (document.visibilityState !== 'visible') {
+          return;
+        }
+        this.exitBackupPromptPending = false;
+        this.openExitBackupDialog();
+      }, 0);
+    });
+  }
+
+  private shouldPromptBackupOnExit(): boolean {
+    const settings = this.appService.getAppSettings();
+    return settings.backupOnExit === true
+      && this.userService.isReady()
+      && this.backupState.isDirty();
+  }
+
+  private openExitBackupDialog(): void {
+    if (this.exitBackupDialogOpen || !this.shouldPromptBackupOnExit()) {
+      return;
+    }
+    this.exitBackupDialogOpen = true;
+    const dialogRef = this.dialog.open(DeleteUserComponent, {
+      data: {
+        title: 'Create backup before leaving?',
+        message: 'You have unsaved changes. Do you want to create a backup now?',
+        confirmLabel: 'Backup now',
+        cancelLabel: 'No'
+      },
+      closeOnNavigation: true,
+      hasBackdrop: true
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      this.exitBackupDialogOpen = false;
+      if (result === true) {
+        this.backupService.startBackup();
+      } else if (result === false) {
+        this.backupState.clearDirty();
+      }
     });
   }
 

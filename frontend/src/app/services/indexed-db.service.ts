@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { ContactProfile } from '../interfaces/contact-profile';
@@ -9,6 +9,7 @@ import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
 import { Profile } from '../interfaces/profile';
 import { TileSetting } from '../interfaces/tile-settings';
+import { BackupStateService } from './backup-state.service';
 
 type StoredLocalImageMeta = string;
 
@@ -20,6 +21,7 @@ type StoredLocalImageMeta = string;
   providedIn: 'root'
 })
 export class IndexedDbService {
+  private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
   private dbVersion = 3;
   private settingStore = 'setting';
@@ -358,7 +360,10 @@ export class IndexedDbService {
       const compressed = this.compress(profile);
       const request = store.put(compressed, userId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => {
         reject(request.error);
       };
@@ -438,7 +443,10 @@ export class IndexedDbService {
       const store = tx.objectStore(this.profileStore);
       const request = store.delete(userId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => {
         reject(request.error);
       };
@@ -460,7 +468,10 @@ export class IndexedDbService {
       const compressed = this.compress(contactProfile);
       const request = store.put(compressed, contactProfileId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => {
         reject(request.error);
       };
@@ -503,7 +514,10 @@ export class IndexedDbService {
       const store = tx.objectStore(this.contactProfileStore);
       const request = store.delete(contactProfileId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => {
         reject(request.error);
       };
@@ -525,7 +539,10 @@ export class IndexedDbService {
       const compressed = this.compress(place);
       const request = store.put(compressed, placeId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => {
         reject(request.error);
       };
@@ -567,7 +584,10 @@ export class IndexedDbService {
       const compressed = this.compress(tileSettings);
       const request = store.put(compressed, ownerId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }
@@ -604,7 +624,10 @@ export class IndexedDbService {
       const store = tx.objectStore(this.placeStore);
       const request = store.delete(placeId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => {
         reject(request.error);
       };
@@ -622,7 +645,10 @@ export class IndexedDbService {
       const store = tx.objectStore(this.tileSettingsStore);
       const request = store.delete(ownerId);
 
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }
@@ -646,7 +672,10 @@ export class IndexedDbService {
       const store = tx.objectStore(this.noteStore);
       const compressed = this.compress(noteWithMeta);
       const request = store.put(compressed, key);
-      request.onsuccess = () => resolve(key);
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve(key);
+      };
       request.onerror = () => reject(request.error);
     });
   }
@@ -670,7 +699,10 @@ export class IndexedDbService {
       const store = tx.objectStore(this.noteStore);
       const compressed = this.compress(updatedNote);
       const request = store.put(compressed, note.id);
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }
@@ -702,7 +734,10 @@ export class IndexedDbService {
       const tx = db.transaction(this.noteStore, 'readwrite');
       const store = tx.objectStore(this.noteStore);
       const request = store.delete(id);
-      request.onsuccess = () => resolve();
+      request.onsuccess = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
       request.onerror = () => reject(request.error);
     });
   }

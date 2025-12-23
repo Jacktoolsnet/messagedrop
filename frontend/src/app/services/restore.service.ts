@@ -13,6 +13,7 @@ import { environment } from '../../environments/environment';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
+import { BackupStateService } from './backup-state.service';
 
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
@@ -38,6 +39,7 @@ export class RestoreService {
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly networkService = inject(NetworkService);
+  private readonly backupState = inject(BackupStateService);
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -123,6 +125,7 @@ export class RestoreService {
       await this.restoreIndexedDb(payload.indexedDb);
       await this.restoreLocalImages(payload.localImages || []);
 
+      this.backupState.clearDirty();
       this.userService.logout();
       this.snackBar.open('Restore completed. Please log in with your PIN.', undefined, {
         duration: 3500,

@@ -23,6 +23,7 @@ import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { ServerService } from './server.service';
+import { BackupStateService } from './backup-state.service';
 
 @Injectable({
   providedIn: 'root'
@@ -83,6 +84,7 @@ export class UserService {
   private readonly checkPinDialog = this.displayMessage;
   private readonly serverService = inject(ServerService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly backupState = inject(BackupStateService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -116,6 +118,7 @@ export class UserService {
     };
     this.ready = false;
     this.blocked = false;
+    this.backupState.clearDirty();
     this.initUserId();
   }
 

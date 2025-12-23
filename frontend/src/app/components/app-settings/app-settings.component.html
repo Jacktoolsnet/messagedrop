@@ -69,6 +69,22 @@
         }
       </div>
     }
+    <div class="platform-tile backup-exit-tile">
+      <div class="backup-exit-header">
+        <mat-icon>save</mat-icon>
+        <div>
+          <h3>Backup reminder</h3>
+          <p class="backup-exit-subtitle">Ask before closing if new data should be backed up.</p>
+        </div>
+      </div>
+      <p class="backup-exit-note">
+        When enabled, you will be prompted before leaving the app if there are new changes.
+      </p>
+      <mat-slide-toggle color="primary" [checked]="appSettings.backupOnExit"
+        (change)="setBackupOnExit($event.checked)">
+        Ask before closing
+      </mat-slide-toggle>
+    </div>
   </div>
 
   <mat-chip-set class="version-chipset">

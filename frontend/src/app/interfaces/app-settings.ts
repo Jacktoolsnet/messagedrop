@@ -10,6 +10,7 @@ export interface AppSettings {
     enableTenorContent: boolean,
     enableTikTokContent: boolean,
     enableYoutubeContent: boolean,
+    backupOnExit: boolean,
     consentSettings: ConsentSettings,
     legalVersion: number,
     acceptedLegalVersion?: number
