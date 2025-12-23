@@ -168,6 +168,37 @@ export class IndexedDbService {
     };
   }
 
+  async importAllData(backup: IndexedDbBackup): Promise<{ skippedStores: string[] }> {
+    const db = await this.openDB();
+    const existingStores = new Set(Array.from(db.objectStoreNames));
+    const skippedStores: string[] = [];
+
+    const stores = backup?.stores ?? {};
+    for (const [storeName, entries] of Object.entries(stores)) {
+      if (!existingStores.has(storeName)) {
+        skippedStores.push(storeName);
+        continue;
+      }
+      if (!Array.isArray(entries) || entries.length === 0) {
+        continue;
+      }
+
+      await new Promise<void>((resolve, reject) => {
+        const tx = db.transaction(storeName, 'readwrite');
+        const store = tx.objectStore(storeName);
+
+        for (const entry of entries as IndexedDbBackupEntry[]) {
+          store.put(entry.value, entry.key);
+        }
+
+        tx.oncomplete = () => resolve();
+        tx.onerror = () => reject(tx.error);
+      });
+    }
+
+    return { skippedStores };
+  }
+
   /**
    * Stores a setting value by key.
    * @param key The setting key.

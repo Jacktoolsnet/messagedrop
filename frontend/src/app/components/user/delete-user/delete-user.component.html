@@ -1,8 +1,12 @@
-<h2 mat-dialog-title>Delete user</h2>
+<h2 mat-dialog-title>{{ data?.title || 'Delete user' }}</h2>
 <mat-dialog-content>
-    This user and all related data will be permanently deleted. Are you sure?
+    {{ data?.message || 'This user and all related data will be permanently deleted. Are you sure?' }}
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">Yes</button>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">
+    {{ data?.cancelLabel || 'Abort' }}
+  </button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="true">
+    {{ data?.confirmLabel || 'Yes' }}
+  </button>
 </mat-dialog-actions>

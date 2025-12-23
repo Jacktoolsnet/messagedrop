@@ -1,17 +1,469 @@
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { firstValueFrom } from 'rxjs';
+import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
+import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
+import { BackupEnvelope, BackupLocalImage, BackupPayload, UserServerBackup } from '../interfaces/backup';
+import { IndexedDbBackup } from '../interfaces/indexed-db-backup';
+import { LocalImage } from '../interfaces/local-image';
+import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { environment } from '../../environments/environment';
+import { IndexedDbService } from './indexed-db.service';
+import { NetworkService } from './network.service';
+import { UserService } from './user.service';
+
+type FilePickerWindow = typeof window & {
+  showOpenFilePicker?: (options?: {
+    multiple?: boolean;
+    types?: {
+      description?: string;
+      accept: Record<string, string[]>;
+    }[];
+    excludeAcceptAllOption?: boolean;
+  }) => Promise<FileSystemFileHandle[]>;
+  showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
+};
 
 @Injectable({
   providedIn: 'root'
 })
 export class RestoreService {
-  private readonly snackBar = inject(MatSnackBar);
+  private restoreInProgress = false;
 
-  startRestore(): void {
-    this.snackBar.open('Restore is not implemented yet.', undefined, {
-      duration: 3000,
-      horizontalPosition: 'center',
-      verticalPosition: 'top'
+  private readonly http = inject(HttpClient);
+  private readonly dialog = inject(MatDialog);
+  private readonly snackBar = inject(MatSnackBar);
+  private readonly userService = inject(UserService);
+  private readonly indexedDbService = inject(IndexedDbService);
+  private readonly networkService = inject(NetworkService);
+
+  private httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      'X-API-Authorization': `${environment.apiToken}`,
+      withCredentials: 'true'
+    })
+  };
+
+  async startRestore(): Promise<void> {
+    if (this.restoreInProgress) {
+      return;
+    }
+
+    const hasUser = await this.indexedDbService.hasUser();
+    if (hasUser && !this.userService.isReady()) {
+      this.snackBar.open('Please log in to restore your backup.', undefined, {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      this.userService.login(() => {
+        this.startRestore();
+      });
+      return;
+    }
+
+    this.restoreInProgress = true;
+
+    try {
+      const backupFile = await this.pickBackupFile();
+      if (!backupFile) {
+        return;
+      }
+
+      const envelope = this.parseEnvelope(await backupFile.text());
+      if (!envelope) {
+        return;
+      }
+
+      const pin = await this.requestPin();
+      if (!pin) {
+        return;
+      }
+
+      const payload = await this.decryptEnvelope(envelope, pin);
+      if (!payload) {
+        return;
+      }
+
+      if (payload.schemaVersion !== 1 || payload.server.schemaVersion !== 1) {
+        this.snackBar.open('This backup version is not supported.', undefined, {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return;
+      }
+
+      if (!payload.server || !payload.indexedDb) {
+        this.snackBar.open('Backup file is missing data.', undefined, {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return;
+      }
+
+      if (hasUser && this.userService.isReady()) {
+        const confirmed = await this.confirmOverwrite(payload.userId);
+        if (!confirmed) {
+          return;
+        }
+
+        const deleted = await this.deleteCurrentUser();
+        if (!deleted) {
+          return;
+        }
+      }
+
+      await this.indexedDbService.clearAllData();
+      await this.restoreServerData(payload.server);
+      await this.restoreIndexedDb(payload.indexedDb);
+      await this.restoreLocalImages(payload.localImages || []);
+
+      this.userService.logout();
+      this.snackBar.open('Restore completed. Please log in with your PIN.', undefined, {
+        duration: 3500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+    } catch (error) {
+      console.error('Restore failed', error);
+      this.snackBar.open('Restore failed. Please try again.', undefined, {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+    } finally {
+      this.restoreInProgress = false;
+    }
+  }
+
+  private async pickBackupFile(): Promise<File | null> {
+    const picker = window as FilePickerWindow;
+    if (picker.showOpenFilePicker) {
+      try {
+        const handles = await picker.showOpenFilePicker({
+          multiple: false,
+          excludeAcceptAllOption: true,
+          types: [
+            {
+              description: 'MessageDrop Backup',
+              accept: {
+                'application/octet-stream': ['.backup'],
+                'application/json': ['.backup', '.json']
+              }
+            }
+          ]
+        });
+        const handle = handles[0];
+        if (!handle) {
+          return null;
+        }
+        return await handle.getFile();
+      } catch (error) {
+        if (this.isAbortError(error)) {
+          return null;
+        }
+        this.snackBar.open('File selection failed.', undefined, {
+          duration: 2500,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return null;
+      }
+    }
+
+    return new Promise((resolve) => {
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.backup,application/json';
+      input.onchange = () => {
+        const file = input.files?.[0] ?? null;
+        resolve(file);
+      };
+      input.click();
     });
+  }
+
+  private parseEnvelope(content: string): BackupEnvelope | null {
+    try {
+      const parsed = JSON.parse(content) as BackupEnvelope;
+      if (!parsed || parsed.format !== 'messagedrop-backup') {
+        this.snackBar.open('This file is not a valid backup.', undefined, {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return null;
+      }
+      return parsed;
+    } catch (error) {
+      this.snackBar.open('Backup file could not be read.', undefined, {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return null;
+    }
+  }
+
+  private async requestPin(): Promise<string | undefined> {
+    const dialogRef = this.dialog.open(CheckPinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true
+    });
+    const pin = await firstValueFrom(dialogRef.afterClosed());
+    if (!pin || pin === 'reset') {
+      return undefined;
+    }
+    return pin;
+  }
+
+  private async decryptEnvelope(envelope: BackupEnvelope, pin: string): Promise<BackupPayload | null> {
+    if (!envelope.encrypted) {
+      try {
+        if (envelope.payloadEncoding === 'base64') {
+          const decoded = new TextDecoder().decode(this.base64ToArrayBuffer(envelope.payload));
+          return JSON.parse(decoded) as BackupPayload;
+        }
+        return JSON.parse(envelope.payload) as BackupPayload;
+      } catch {
+        this.snackBar.open('Backup file is corrupted.', undefined, {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return null;
+      }
+    }
+
+    if (!crypto?.subtle || !envelope.kdf || !envelope.cipher) {
+      this.snackBar.open('Encrypted backups are not supported in this browser.', undefined, {
+        duration: 3500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return null;
+    }
+
+    try {
+      const encoder = new TextEncoder();
+      const salt = this.base64ToArrayBuffer(envelope.kdf.salt);
+      const iv = this.base64ToArrayBuffer(envelope.cipher.iv);
+
+      const keyMaterial = await crypto.subtle.importKey(
+        'raw',
+        encoder.encode(pin),
+        'PBKDF2',
+        false,
+        ['deriveKey']
+      );
+
+      const key = await crypto.subtle.deriveKey(
+        {
+          name: 'PBKDF2',
+          salt,
+          iterations: envelope.kdf.iterations,
+          hash: envelope.kdf.hash
+        },
+        keyMaterial,
+        { name: 'AES-GCM', length: 256 },
+        false,
+        ['decrypt']
+      );
+
+      const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        this.base64ToArrayBuffer(envelope.payload)
+      );
+
+      const decoded = new TextDecoder().decode(decrypted);
+      return JSON.parse(decoded) as BackupPayload;
+    } catch (error) {
+      this.snackBar.open('PIN is incorrect or the backup is corrupted.', undefined, {
+        duration: 3500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return null;
+    }
+  }
+
+  private async confirmOverwrite(backupUserId: string): Promise<boolean> {
+    const currentUserId = this.userService.getUser().id;
+    const userHint = backupUserId && backupUserId !== currentUserId
+      ? `The backup belongs to user ${backupUserId}.`
+      : '';
+
+    const dialogRef = this.dialog.open(DeleteUserComponent, {
+      data: {
+        title: 'Restore backup',
+        message: `Restoring this backup will delete the current user and all related data on this device and on the server. ${userHint} Continue?`,
+        confirmLabel: 'Restore',
+        cancelLabel: 'Cancel'
+      },
+      closeOnNavigation: true,
+      hasBackdrop: true
+    });
+
+    return (await firstValueFrom(dialogRef.afterClosed())) === true;
+  }
+
+  private async deleteCurrentUser(): Promise<boolean> {
+    const userId = this.userService.getUser().id;
+    if (!userId) {
+      return true;
+    }
+
+    try {
+      const response = await firstValueFrom(this.userService.deleteUser(userId, true));
+      if (response.status !== 200) {
+        this.snackBar.open('Unable to delete the current user.', undefined, {
+          duration: 3000,
+          horizontalPosition: 'center',
+          verticalPosition: 'top'
+        });
+        return false;
+      }
+      await this.indexedDbService.clearAllData();
+      this.userService.logout();
+      return true;
+    } catch (error) {
+      console.error('Failed to delete user before restore', error);
+      this.snackBar.open('Unable to delete the current user.', undefined, {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return false;
+    }
+  }
+
+  private async restoreServerData(backup: UserServerBackup): Promise<void> {
+    const url = `${environment.apiUrl}/user/restore`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: true,
+      title: 'Restore',
+      image: '',
+      icon: 'cloud_download',
+      message: 'Restoring server data',
+      button: '',
+      delay: 0,
+      showSpinner: true
+    });
+
+    try {
+      const response = await firstValueFrom(
+        this.http.post<SimpleStatusResponse>(url, { backup }, this.httpOptions)
+      );
+      if (response.status !== 200) {
+        throw new Error('Server restore failed');
+      }
+    } catch (error) {
+      const httpError = error as HttpErrorResponse;
+      throw new Error(httpError?.message || 'Server restore failed');
+    }
+  }
+
+  private async restoreIndexedDb(backup: IndexedDbBackup): Promise<void> {
+    const result = await this.indexedDbService.importAllData(backup);
+    if (result.skippedStores.length) {
+      console.warn('Skipped restoring stores:', result.skippedStores);
+    }
+  }
+
+  private async restoreLocalImages(localImages: BackupLocalImage[]): Promise<void> {
+    if (!localImages.length) {
+      return;
+    }
+
+    const restorable = localImages.filter((image) => Boolean(image.fileBase64));
+    if (!restorable.length) {
+      return;
+    }
+
+    const picker = window as FilePickerWindow;
+    if (!picker.showDirectoryPicker) {
+      this.snackBar.open('Image restore is not supported in this browser.', undefined, {
+        duration: 3500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    let directoryHandle: FileSystemDirectoryHandle | null = null;
+    try {
+      directoryHandle = await picker.showDirectoryPicker();
+    } catch (error) {
+      if (this.isAbortError(error)) {
+        return;
+      }
+      this.snackBar.open('Image restore was skipped.', undefined, {
+        duration: 2500,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    for (const image of restorable) {
+      const fileName = this.buildImageFileName(image);
+      const handle = await directoryHandle.getFileHandle(fileName, { create: true });
+      const writable = await handle.createWritable();
+      await writable.write(this.base64ToArrayBuffer(image.fileBase64 || ''));
+      await writable.close();
+
+      const entry: LocalImage = {
+        id: image.id,
+        handle,
+        fileName,
+        mimeType: image.mimeType || 'application/octet-stream',
+        width: image.width,
+        height: image.height,
+        exifCaptureDate: image.exifCaptureDate,
+        hasExifLocation: image.hasExifLocation ?? false,
+        location: image.location || { latitude: 0, longitude: 0, plusCode: '' },
+        timestamp: image.timestamp
+      };
+
+      await this.indexedDbService.saveImage(entry);
+    }
+  }
+
+  private buildImageFileName(image: BackupLocalImage): string {
+    if (image.fileName && image.fileName.trim()) {
+      return image.fileName;
+    }
+    const extension = this.extensionFromMime(image.mimeType);
+    return extension ? `${image.id}.${extension}` : `${image.id}.bin`;
+  }
+
+  private extensionFromMime(mimeType?: string): string | null {
+    if (!mimeType) {
+      return null;
+    }
+    const match = mimeType.split('/')[1];
+    return match ? match.replace(/[^a-z0-9]/gi, '') : null;
+  }
+
+  private base64ToArrayBuffer(base64: string): ArrayBuffer {
+    const binary = atob(base64);
+    const buffer = new ArrayBuffer(binary.length);
+    const bytes = new Uint8Array(buffer);
+    for (let i = 0; i < binary.length; i++) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return buffer;
+  }
+
+  private isAbortError(error: unknown): boolean {
+    return error instanceof DOMException && error.name === 'AbortError';
   }
 }

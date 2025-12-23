@@ -1,6 +1,13 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+
+export interface ConfirmDialogData {
+  title?: string;
+  message?: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+}
 
 @Component({
   selector: 'app-deleteuser',
@@ -10,4 +17,5 @@ import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDi
 })
 export class DeleteUserComponent {
   readonly dialogRef = inject(MatDialogRef<DeleteUserComponent>);
+  readonly data = inject<ConfirmDialogData | null>(MAT_DIALOG_DATA, { optional: true });
 }

@@ -99,6 +99,225 @@ async function buildUserBackup(db, userId) {
   };
 }
 
+function runQuery(db, sql, params = []) {
+  return new Promise((resolve, reject) => {
+    db.run(sql, params, function (err) {
+      if (err) {
+        reject(err);
+        return;
+      }
+      resolve(this);
+    });
+  });
+}
+
+function normalizeRows(rows) {
+  if (!Array.isArray(rows)) {
+    return [];
+  }
+  return rows;
+}
+
+async function insertRows(db, tableName, columns, rows) {
+  const safeRows = normalizeRows(rows);
+  if (!safeRows.length) {
+    return;
+  }
+
+  const placeholders = columns.map(() => '?').join(', ');
+  const sql = `INSERT OR IGNORE INTO ${tableName} (${columns.join(', ')}) VALUES (${placeholders});`;
+
+  for (const row of safeRows) {
+    const values = columns.map((column) => (row && row[column] !== undefined ? row[column] : null));
+    await runQuery(db, sql, values);
+  }
+}
+
+async function restoreUserBackup(db, backup) {
+  const tables = backup?.tables || {};
+
+  const userColumns = [
+    'id',
+    'cryptoPrivateKey',
+    'cryptoPublicKey',
+    'signingPrivateKey',
+    'signingPublicKey',
+    'numberOfMessages',
+    'numberOfBlockedMessages',
+    'userStatus',
+    'lastSignOfLife',
+    'subscription',
+    'type'
+  ];
+
+  const messageColumns = [
+    'id',
+    'uuid',
+    'parentUuid',
+    'typ',
+    'createDateTime',
+    'deleteDateTime',
+    'latitude',
+    'longitude',
+    'plusCode',
+    'message',
+    'markerType',
+    'style',
+    'views',
+    'likes',
+    'dislikes',
+    'commentsNumber',
+    'status',
+    'userId',
+    'multimedia',
+    'dsaStatusToken',
+    'dsaStatusTokenCreatedAt'
+  ];
+
+  const contactColumns = [
+    'id',
+    'userId',
+    'contactUserId',
+    'contactUserSigningPublicKey',
+    'contactUserEncryptionPublicKey',
+    'subscribed',
+    'hint',
+    'name',
+    'lastMessageFrom',
+    'lastMessageAt'
+  ];
+
+  const contactMessageColumns = [
+    'id',
+    'messageId',
+    'contactId',
+    'direction',
+    'message',
+    'signature',
+    'translatedMessage',
+    'status',
+    'createdAt',
+    'readAt',
+    'reaction'
+  ];
+
+  const placeColumns = [
+    'id',
+    'userId',
+    'name',
+    'subscribed',
+    'latMin',
+    'latMax',
+    'lonMin',
+    'lonMax'
+  ];
+
+  const notificationColumns = [
+    'id',
+    'uuid',
+    'userId',
+    'title',
+    'body',
+    'category',
+    'source',
+    'status',
+    'metadata',
+    'createdAt',
+    'readAt'
+  ];
+
+  const connectColumns = [
+    'id',
+    'userId',
+    'hint',
+    'signature',
+    'encryptionPublicKey',
+    'signingPublicKey',
+    'timeOfCreation'
+  ];
+
+  const likeColumns = ['likeMessageUuid', 'likeUserId'];
+  const dislikeColumns = ['dislikeMessageUuid', 'dislikeUserId'];
+
+  await runQuery(db, 'BEGIN IMMEDIATE');
+
+  try {
+    await insertRows(db, 'tableUser', userColumns, tables.tableUser);
+
+    const allMessages = normalizeRows(tables.tableMessage);
+    const parentMessages = allMessages.filter((row) => !row?.parentUuid);
+    const childMessages = allMessages.filter((row) => row?.parentUuid);
+
+    await insertRows(db, 'tableMessage', messageColumns, parentMessages);
+    for (const row of childMessages) {
+      if (!row?.parentUuid) {
+        continue;
+      }
+      const parentExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.parentUuid]);
+      if (!parentExists) {
+        continue;
+      }
+      await insertRows(db, 'tableMessage', messageColumns, [row]);
+    }
+
+    const contacts = normalizeRows(tables.tableContact);
+    for (const row of contacts) {
+      if (!row?.contactUserId) {
+        continue;
+      }
+      const contactUserExists = await queryGet(db, 'SELECT 1 FROM tableUser WHERE id = ? LIMIT 1;', [row.contactUserId]);
+      if (!contactUserExists) {
+        continue;
+      }
+      await insertRows(db, 'tableContact', contactColumns, [row]);
+    }
+    await insertRows(db, 'tablePlace', placeColumns, tables.tablePlace);
+    await insertRows(db, 'tableNotification', notificationColumns, tables.tableNotification);
+    await insertRows(db, 'tableConnect', connectColumns, tables.tableConnect);
+
+    const contactMessages = normalizeRows(tables.tableContactMessage);
+    for (const row of contactMessages) {
+      if (!row?.contactId) {
+        continue;
+      }
+      const contactExists = await queryGet(db, 'SELECT 1 FROM tableContact WHERE id = ? LIMIT 1;', [row.contactId]);
+      if (!contactExists) {
+        continue;
+      }
+      await insertRows(db, 'tableContactMessage', contactMessageColumns, [row]);
+    }
+
+    const likeRows = normalizeRows(tables.tableLike);
+    for (const row of likeRows) {
+      if (!row?.likeMessageUuid) {
+        continue;
+      }
+      const messageExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.likeMessageUuid]);
+      if (!messageExists) {
+        continue;
+      }
+      await insertRows(db, 'tableLike', likeColumns, [row]);
+    }
+
+    const dislikeRows = normalizeRows(tables.tableDislike);
+    for (const row of dislikeRows) {
+      if (!row?.dislikeMessageUuid) {
+        continue;
+      }
+      const messageExists = await queryGet(db, 'SELECT 1 FROM tableMessage WHERE uuid = ? LIMIT 1;', [row.dislikeMessageUuid]);
+      if (!messageExists) {
+        continue;
+      }
+      await insertRows(db, 'tableDislike', dislikeColumns, [row]);
+    }
+
+    await runQuery(db, 'COMMIT');
+  } catch (err) {
+    await runQuery(db, 'ROLLBACK');
+    throw err;
+  }
+}
+
 const rateLimitDefaults = {
   standardHeaders: true,
   legacyHeaders: false
@@ -164,6 +383,24 @@ router.get('/backup/:userId',
       response.status = 500;
       response.error = err?.message || err;
       res.status(500).json(response);
+    }
+  });
+
+router.post('/restore',
+  [
+    express.json({ type: 'application/json', limit: '20mb' })
+  ],
+  async function (req, res) {
+    const backup = req.body?.backup;
+    if (!backup || !backup.tables || !backup.userId) {
+      return res.status(400).json({ status: 400, error: 'invalid_backup' });
+    }
+
+    try {
+      await restoreUserBackup(req.database.db, backup);
+      res.status(200).json({ status: 200 });
+    } catch (err) {
+      res.status(500).json({ status: 500, error: err?.message || err });
     }
   });
 
