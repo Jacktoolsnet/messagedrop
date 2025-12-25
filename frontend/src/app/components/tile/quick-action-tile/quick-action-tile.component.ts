@@ -22,6 +22,7 @@ export class QuickActionTileComponent implements OnChanges {
   @Input() place?: Place;
   @Input() contact?: Contact;
 
+  private readonly allowedActionTypes: TileLinkType[] = ['web', 'email', 'phone', 'whatsapp', 'sms'];
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
@@ -47,7 +48,7 @@ export class QuickActionTileComponent implements OnChanges {
     return [...items]
       .map((action, index) => ({
         ...action,
-        type: action.type ?? 'web',
+        type: this.allowedActionTypes.includes(action.type ?? 'web') ? (action.type ?? 'web') : 'web',
         order: Number.isFinite(action.order) ? action.order : index
       }))
       .filter(action => action.value?.trim())
@@ -101,8 +102,6 @@ export class QuickActionTileComponent implements OnChanges {
         return `https://wa.me/${trimmed.replace(/[^0-9+]/g, '')}`;
       case 'sms':
         return `sms:${trimmed.replace(/\s+/g, '')}`;
-      case 'map':
-        return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trimmed)}`;
       default:
         return trimmed;
     }
@@ -118,8 +117,6 @@ export class QuickActionTileComponent implements OnChanges {
         return 'chat';
       case 'sms':
         return 'sms';
-      case 'map':
-        return 'map';
       case 'web':
       default:
         return 'public';

@@ -48,8 +48,7 @@ export class QuickActionActionEditComponent {
     { value: 'email', label: 'Mail' },
     { value: 'phone', label: 'Phone' },
     { value: 'whatsapp', label: 'WhatsApp' },
-    { value: 'sms', label: 'SMS' },
-    { value: 'map', label: 'Map' }
+    { value: 'sms', label: 'SMS' }
   ];
 
   readonly labelControl = new FormControl(this.data.action.label ?? 'Action', { nonNullable: true });
@@ -115,7 +114,7 @@ export class QuickActionActionEditComponent {
   }
 
   private normalizeType(type: TileLinkType | undefined): TileLinkType {
-    const allowed: TileLinkType[] = ['web', 'email', 'phone', 'whatsapp', 'sms', 'map'];
+    const allowed: TileLinkType[] = ['web', 'email', 'phone', 'whatsapp', 'sms'];
     return allowed.includes(type ?? 'web') ? (type as TileLinkType) : 'web';
   }
 
@@ -144,8 +143,6 @@ export class QuickActionActionEditComponent {
         return 'chat';
       case 'sms':
         return 'sms';
-      case 'map':
-        return 'map';
       case 'web':
       default:
         return 'public';

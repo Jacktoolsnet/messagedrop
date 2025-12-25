@@ -42,6 +42,7 @@ export class QuickActionTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   readonly data = inject<QuickActionTileDialogData>(MAT_DIALOG_DATA);
+  private readonly allowedActionTypes: TileQuickAction['type'][] = ['web', 'email', 'phone', 'whatsapp', 'sms'];
 
   readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Quick actions', { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'bolt');
@@ -146,7 +147,7 @@ export class QuickActionTileEditComponent {
     return (actions ?? [])
       .map((action, index) => ({
         ...action,
-        type: action.type ?? 'web',
+        type: this.allowedActionTypes.includes(action.type ?? 'web') ? (action.type ?? 'web') : 'web',
         label: action.label?.trim() || 'Action',
         value: action.value?.trim() || '',
         order: Number.isFinite(action.order) ? action.order : index
@@ -173,8 +174,6 @@ export class QuickActionTileEditComponent {
         return 'chat';
       case 'sms':
         return 'sms';
-      case 'map':
-        return 'map';
       case 'web':
       default:
         return 'public';
