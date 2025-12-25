@@ -11,6 +11,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
@@ -85,6 +86,7 @@ import { WeatherService } from './services/weather.service';
     ConsentGateComponent,
     MatBadgeModule,
     RouterOutlet,
+    TranslocoPipe,
     MapComponent,
     MatButtonModule,
     MatTooltipModule,

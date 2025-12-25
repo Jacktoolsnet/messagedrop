@@ -1,1 +1,8 @@
-{}
+{
+  "common": {
+    "appName": "MessageDrop (EN)",
+    "save": "Save",
+    "cancel": "Cancel",
+    "language": "Language"
+  }
+}
