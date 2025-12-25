@@ -39,6 +39,33 @@
       </mat-button-toggle-group>
     </div>
 
+    <div class="platform-tile language-settings-tile">
+      <div class="language-settings-header">
+        <mat-icon>translate</mat-icon>
+        <div>
+          <h3>{{ 'settings.language.title' | transloco }}</h3>
+          <p class="language-settings-subtitle">{{ 'settings.language.description' | transloco }}</p>
+        </div>
+      </div>
+
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="languageService.languageMode()"
+        (change)="setLanguageMode($event.value)" class="language-toggle-group" exclusive
+        [attr.aria-label]="'settings.language.title' | transloco">
+        <mat-button-toggle value="system">
+          <mat-icon>public</mat-icon>
+          {{ 'settings.language.optionSystem' | transloco }}
+        </mat-button-toggle>
+        <mat-button-toggle value="en">
+          <mat-icon>language</mat-icon>
+          {{ 'settings.language.optionEnglish' | transloco }}
+        </mat-button-toggle>
+        <mat-button-toggle value="de">
+          <mat-icon>language</mat-icon>
+          {{ 'settings.language.optionGerman' | transloco }}
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
     @if(showDetectLocationOnStart){
       <div class="platform-tile">
         <app-enable-location (enabledChange)="setDetectLocationOnStart($event)"></app-enable-location>

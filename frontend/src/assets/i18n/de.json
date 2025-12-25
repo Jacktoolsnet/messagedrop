@@ -4,5 +4,14 @@
     "save": "Speichern",
     "cancel": "Abbrechen",
     "language": "Sprache"
+  },
+  "settings": {
+    "language": {
+      "title": "Sprache",
+      "description": "Lege fest, wie MessageDrop die Sprache auswaehlt.",
+      "optionSystem": "System / Browser",
+      "optionEnglish": "Englisch",
+      "optionGerman": "Deutsch"
+    }
   }
 }

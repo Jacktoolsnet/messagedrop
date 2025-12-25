@@ -17,7 +17,7 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       inject(LanguageService);
     }),
-    { provide: LOCALE_ID, useFactory: () => inject(LanguageService).activeLang() },
+    { provide: LOCALE_ID, useFactory: () => inject(LanguageService).effectiveLanguage() },
     { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } },
     provideHttpClient(
       withFetch(),

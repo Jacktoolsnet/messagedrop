@@ -1,6 +1,7 @@
 import { ConsentSettings } from "./consent-settings.interface";
 
 export interface AppSettings {
+    languageMode?: 'system' | 'en' | 'de',
     language?: 'en' | 'de',
     defaultTheme: string,
     themeMode: 'light' | 'dark' | 'system',

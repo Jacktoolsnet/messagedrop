@@ -10,9 +10,11 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleChange, MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
+import { LanguageMode, LanguageService } from '../../services/language.service';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 
 
@@ -34,6 +36,7 @@ import { EnableLocationComponent } from "../utils/enable-location/enable-locatio
     MatButtonToggleModule,
     MatChipsModule,
     MatSlideToggleModule,
+    TranslocoPipe,
     EnableLocationComponent
   ],
   templateUrl: './app-settings.component.html',
@@ -43,6 +46,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<AppSettingsComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
+  readonly languageService = inject(LanguageService);
 
   public versionInfo = APP_VERSION_INFO;
 
@@ -103,6 +107,10 @@ export class AppSettingsComponent implements OnInit {
   setBackupOnExit(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, backupOnExit: enabled };
     this.appService.setAppSettings(this.appSettings);
+  }
+
+  setLanguageMode(mode: LanguageMode): void {
+    this.languageService.setLanguageMode(mode);
   }
 
   async onStoragePersistenceToggle(event: MatSlideToggleChange): Promise<void> {

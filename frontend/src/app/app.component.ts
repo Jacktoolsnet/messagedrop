@@ -10,8 +10,8 @@ import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { firstValueFrom } from 'rxjs';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
@@ -58,12 +58,12 @@ import { SharedContent } from './interfaces/shared-content';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
+import { BackupStateService } from './services/backup-state.service';
 import { BackupService } from './services/backup.service';
 import { ContactMessageService } from './services/contact-message.service';
 import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
-import { BackupStateService } from './services/backup-state.service';
 import { IndexedDbService } from './services/indexed-db.service';
 import { LocalImageService } from './services/local-image.service';
 import { MapService } from './services/map.service';
@@ -1118,7 +1118,7 @@ export class AppComponent implements OnInit {
       data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
-      width: '800px',
+      width: 'max(800px, 90vw)',
       maxWidth: '90vw',
       autoFocus: false,
       hasBackdrop: true

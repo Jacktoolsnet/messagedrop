@@ -4,60 +4,73 @@ import { AppService } from './app.service';
 
 const LANGUAGE_STORAGE_KEY = 'messagedrop.language';
 const SUPPORTED_LANGS = ['en', 'de'] as const;
-type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
+export type LanguageMode = 'system' | SupportedLang;
 
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private readonly transloco = inject(TranslocoService);
   private readonly appService = inject(AppService);
 
-  private readonly _activeLang = signal<SupportedLang>(this.resolveInitialLang());
-  readonly activeLang = this._activeLang.asReadonly();
+  private readonly _languageMode = signal<LanguageMode>(this.resolveInitialMode());
+  readonly languageMode = this._languageMode.asReadonly();
   readonly availableLangs = SUPPORTED_LANGS;
+  readonly effectiveLanguage = computed<SupportedLang>(() => {
+    const mode = this._languageMode();
+    if (mode === 'system') {
+      return this.resolveBrowserLang() ?? this.defaultLang;
+    }
 
-  private readonly persistedLang = computed<SupportedLang | null>(() => {
+    return mode;
+  });
+
+  private readonly persistedMode = computed<LanguageMode | null>(() => {
     this.appService.settingsSet();
     if (!this.appService.isSettingsReady()) {
       return null;
     }
 
-    return this.normalizeLang(this.appService.getAppSettings().language);
+    return this.resolveModeFromSettings();
   });
 
   constructor() {
     effect(() => {
-      const lang = this._activeLang();
+      const lang = this.effectiveLanguage();
       this.transloco.setActiveLang(lang);
       this.updateDocumentLang(lang);
-      this.persistLocalStorage(lang);
     });
 
     effect(() => {
-      const persisted = this.persistedLang();
-      if (persisted && persisted !== this._activeLang()) {
-        this._activeLang.set(persisted);
+      const mode = this._languageMode();
+      this.persistLocalStorage(mode);
+    });
+
+    effect(() => {
+      const persisted = this.persistedMode();
+      if (persisted && persisted !== this._languageMode()) {
+        this._languageMode.set(persisted);
       }
     });
 
     effect(() => {
-      const lang = this._activeLang();
+      const mode = this._languageMode();
       this.appService.settingsSet();
       if (!this.appService.isSettingsReady()) {
         return;
       }
 
       const settings = this.appService.getAppSettings();
-      if (settings.language === lang) {
+      if (settings.languageMode === mode) {
         return;
       }
 
-      void this.appService.setAppSettings({ ...settings, language: lang });
+      void this.appService.setAppSettings({ ...settings, languageMode: mode });
     });
   }
 
-  setLanguage(lang: SupportedLang): void {
-    if (lang !== this._activeLang()) {
-      this._activeLang.set(lang);
+  setLanguageMode(mode: LanguageMode): void {
+    if (mode !== this._languageMode()) {
+      this._languageMode.set(mode);
     }
   }
 
@@ -65,20 +78,20 @@ export class LanguageService {
     return 'en';
   }
 
-  private resolveInitialLang(): SupportedLang {
+  private resolveInitialMode(): LanguageMode {
     if (this.appService.isSettingsReady()) {
-      const settingsLang = this.normalizeLang(this.appService.getAppSettings().language);
-      if (settingsLang) {
-        return settingsLang;
+      const settingsMode = this.resolveModeFromSettings();
+      if (settingsMode) {
+        return settingsMode;
       }
     }
 
-    const stored = this.normalizeLang(this.readStoredLang());
+    const stored = this.normalizeMode(this.readStoredMode());
     if (stored) {
       return stored;
     }
 
-    return this.resolveBrowserLang() ?? this.defaultLang;
+    return 'system';
   }
 
   private resolveBrowserLang(): SupportedLang | null {
@@ -86,18 +99,12 @@ export class LanguageService {
       return null;
     }
 
-    const candidates = navigator.languages?.length
-      ? navigator.languages
-      : [navigator.language];
-
-    for (const candidate of candidates) {
-      const normalized = this.normalizeLang(candidate);
-      if (normalized) {
-        return normalized;
-      }
+    const candidate = navigator.languages?.[0] || navigator.language;
+    if (!candidate) {
+      return null;
     }
 
-    return null;
+    return candidate.toLowerCase().startsWith('de') ? 'de' : 'en';
   }
 
   private normalizeLang(lang: string | null | undefined): SupportedLang | null {
@@ -111,7 +118,30 @@ export class LanguageService {
       : null;
   }
 
-  private readStoredLang(): string | null {
+  private resolveModeFromSettings(): LanguageMode | null {
+    const settings = this.appService.getAppSettings();
+    const mode = this.normalizeMode(settings.languageMode);
+    if (mode) {
+      return mode;
+    }
+
+    const legacy = this.normalizeLang(settings.language);
+    return legacy ?? null;
+  }
+
+  private normalizeMode(mode: string | null | undefined): LanguageMode | null {
+    if (!mode) {
+      return null;
+    }
+
+    if (mode === 'system') {
+      return mode;
+    }
+
+    return this.normalizeLang(mode);
+  }
+
+  private readStoredMode(): string | null {
     if (typeof localStorage === 'undefined') {
       return null;
     }
@@ -123,13 +153,13 @@ export class LanguageService {
     }
   }
 
-  private persistLocalStorage(lang: SupportedLang): void {
+  private persistLocalStorage(mode: LanguageMode): void {
     if (typeof localStorage === 'undefined') {
       return;
     }
 
     try {
-      localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
+      localStorage.setItem(LANGUAGE_STORAGE_KEY, mode);
     } catch {
     }
   }

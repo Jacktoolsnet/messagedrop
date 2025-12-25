@@ -6,6 +6,11 @@
     max-height: unset !important;
     overflow: visible !important;
     display: block;
+    padding: 0;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 ::ng-deep mat-dialog-container {
@@ -49,9 +54,9 @@ h4 {
 }
 
 .theme-select {
-    min-width: 200px;
     max-width: 100%;
     width: 100%;
+    min-width: 0;
 }
 
 .theme-toggle-group {
@@ -59,6 +64,8 @@ h4 {
     min-height: 2rem;
     display: flex;
     justify-content: space-between;
+    flex-wrap: wrap;
+    min-width: 0;
 
     ::ng-deep .mat-button-toggle {
         flex: 1 1 0;
@@ -74,6 +81,9 @@ h4 {
         border-radius: 1rem;
         text-transform: none;
         gap: 0.25rem;
+        min-width: 0;
+        white-space: normal;
+        text-align: center;
     }
 
     ::ng-deep .mat-icon {
@@ -95,7 +105,11 @@ h4 {
     justify-content: center;
     gap: 1rem;
     padding: 0.5rem;
-    width: auto;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    margin: 0;
 }
 
 .platform-tile {
@@ -107,6 +121,10 @@ h4 {
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
 }
 
 .platform-tile.theme-settings-tile {
@@ -139,6 +157,77 @@ h4 {
     margin: 0;
     font-size: 0.9rem;
     color: var(--mat-card-subtitle-text-color);
+}
+
+.platform-tile.language-settings-tile {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.language-settings-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.language-settings-header mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+}
+
+.language-settings-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mat-app-text-color);
+}
+
+.language-settings-subtitle {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--mat-card-subtitle-text-color);
+}
+
+.language-toggle-group {
+    width: 100%;
+    min-height: 2rem;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    min-width: 0;
+
+    ::ng-deep .mat-button-toggle {
+        flex: 1 1 0;
+    }
+
+    ::ng-deep .mat-button-toggle-button {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-radius: 1rem;
+        text-transform: none;
+        gap: 0.25rem;
+        min-width: 0;
+        white-space: normal;
+        text-align: center;
+    }
+
+    ::ng-deep .mat-icon {
+        font-size: 1.4rem;
+        padding-right: 0.25rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .platform-tile-container {
+        grid-template-columns: minmax(0, 1fr);
+    }
 }
 
 .platform-tile.storage-persistence-tile {
