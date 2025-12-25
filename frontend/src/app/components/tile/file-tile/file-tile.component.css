@@ -1,0 +1,111 @@
+.file-tile {
+  position: relative;
+  border-radius: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  padding: 1rem;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: auto;
+  cursor: pointer;
+}
+
+.file-tile:hover {
+  transform: scale(1.02);
+  transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.file-tile__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+}
+
+.file-tile__icon {
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.file-tile__title {
+  flex: 1;
+}
+
+.file-tile__body {
+  font-size: 0.95rem;
+}
+
+.file-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.file-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.75rem;
+  border: 2px solid var(--mat-card-outlined-outline-color);
+  background: transparent;
+  color: inherit;
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.file-row:focus-visible {
+  outline: 2px solid var(--mat-card-outlined-outline-color);
+  outline-offset: 2px;
+}
+
+.file-icon {
+  font-size: 1.2rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.file-name {
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-date {
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.file-open {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  opacity: 0.7;
+}
+
+.text-muted {
+  margin: 0;
+  font-style: italic;
+}

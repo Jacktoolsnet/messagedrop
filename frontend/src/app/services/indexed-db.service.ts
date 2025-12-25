@@ -23,7 +23,7 @@ type StoredLocalImageMeta = string;
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 3;
+  private dbVersion = 4;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -33,6 +33,7 @@ export class IndexedDbService {
   private noteStore = 'note';
   private imageStore = 'image';
   private imageHandleStore = 'imageHandle';
+  private fileHandleStore = 'fileHandle';
 
   private compress<T>(value: T): string {
     return compressToUTF16(JSON.stringify(value));
@@ -92,6 +93,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.imageHandleStore)) {
           db.createObjectStore(this.imageHandleStore);
+        }
+        if (!db.objectStoreNames.contains(this.fileHandleStore)) {
+          db.createObjectStore(this.fileHandleStore);
         }
       };
 
@@ -836,6 +840,48 @@ export class IndexedDbService {
       tx.objectStore(this.imageHandleStore).delete(id);
       tx.oncomplete = () => resolve();
       tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  /**
+   * Stores a file handle by ID for file tiles.
+   */
+  async setFileHandle(id: string, handle: FileSystemFileHandle): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.fileHandleStore, 'readwrite');
+      const store = tx.objectStore(this.fileHandleStore);
+      const request = store.put(handle, id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves a file handle by ID for file tiles.
+   */
+  async getFileHandle(id: string): Promise<FileSystemFileHandle | undefined> {
+    const db = await this.openDB();
+    return new Promise<FileSystemFileHandle | undefined>((resolve, reject) => {
+      const tx = db.transaction(this.fileHandleStore, 'readonly');
+      const store = tx.objectStore(this.fileHandleStore);
+      const request = store.get(id);
+      request.onsuccess = () => resolve(request.result as FileSystemFileHandle | undefined);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Deletes a stored file handle by ID for file tiles.
+   */
+  async deleteFileHandle(id: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.fileHandleStore, 'readwrite');
+      const store = tx.objectStore(this.fileHandleStore);
+      const request = store.delete(id);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
     });
   }
 

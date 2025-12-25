@@ -1,0 +1,32 @@
+<div class="file-tile"
+     role="button"
+     tabindex="0"
+     (click)="openEditor()"
+     (keyup.enter)="openEditor()"
+     (keyup.space)="openEditor()">
+  <div class="file-tile__header">
+    <div class="file-tile__icon">
+      <mat-icon>{{ icon }}</mat-icon>
+    </div>
+    <div class="file-tile__title">{{ title }}</div>
+  </div>
+
+  <div class="file-tile__body">
+    @if (hasFiles) {
+      <div class="file-list">
+        @for (file of files; track file.id) {
+          <button type="button" class="file-row" (click)="openFile(file, $event)" [attr.aria-label]="file.fileName">
+            <mat-icon class="file-icon">{{ getFileIcon(file) }}</mat-icon>
+            <div class="file-info">
+              <div class="file-name">{{ file.fileName }}</div>
+              <div class="file-date">{{ getFileDate(file) | date: 'mediumDate' }}</div>
+            </div>
+            <mat-icon class="file-open">open_in_new</mat-icon>
+          </button>
+        }
+      </div>
+    } @else {
+      <p class="text-muted">No files yet. Tap to add.</p>
+    }
+  </div>
+</div>

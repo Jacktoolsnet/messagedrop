@@ -18,6 +18,7 @@ import { PollutionTileEditComponent } from '../pollution-tile/pollution-tile-edi
 import { QuickActionTileEditComponent } from '../quick-action-tile/quick-action-tile-edit/quick-action-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
 import { TodoTileEditComponent } from '../todo-tile/todo-tile-edit/todo-tile-edit.component';
+import { FileTileEditComponent } from '../file-tile/file-tile-edit/file-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
 
 @Component({
@@ -56,6 +57,7 @@ export class TileSettingsComponent {
     { type: 'custom-date', label: 'Anniversary', icon: 'event' },
     { type: 'custom-todo', label: 'Todo list', icon: 'check_circle' },
     { type: 'custom-quickaction', label: 'Quick actions', icon: 'bolt' },
+    { type: 'custom-file', label: 'Files', icon: 'attach_file' },
     { type: 'custom-link', label: 'Link', icon: 'link' }
   ];
 
@@ -120,6 +122,14 @@ export class TileSettingsComponent {
         title: tileToAdd.label,
         icon: 'bolt',
         actions: []
+      };
+    }
+
+    if (tileToAdd.type === 'custom-file') {
+      baseTile.payload = {
+        title: tileToAdd.label,
+        icon: 'attach_file',
+        files: []
       };
     }
 
@@ -206,6 +216,20 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-quickaction') {
       const ref = this.dialog.open(QuickActionTileEditComponent, {
+        width: '560px',
+        maxWidth: '95vw',
+        maxHeight: '98vh',
+        data: { tile }
+      });
+      ref.afterClosed().subscribe((updated?: TileSetting) => {
+        if (!updated) return;
+        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
+      });
+      return;
+    }
+
+    if (tile.type === 'custom-file') {
+      const ref = this.dialog.open(FileTileEditComponent, {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',

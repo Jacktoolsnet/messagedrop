@@ -18,6 +18,16 @@ export interface TileQuickAction {
   order: number;
 }
 
+export interface TileFileEntry {
+  id: string;
+  fileName: string;
+  mimeType?: string;
+  size?: number;
+  lastModified?: number;
+  addedAt: number;
+  order: number;
+}
+
 export interface TileSetting {
   id: string;
   type: TileType;
@@ -34,6 +44,7 @@ export interface TileSetting {
     date?: string;
     todos?: TileTodoItem[];
     actions?: TileQuickAction[];
+    files?: TileFileEntry[];
     migraine?: {
       tempWarn1: number;
       tempWarn2: number;

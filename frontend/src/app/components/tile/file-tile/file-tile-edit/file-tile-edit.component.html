@@ -1,0 +1,58 @@
+<h2 mat-dialog-title>Edit files</h2>
+
+<mat-dialog-content class="edit-content">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+    @if (icon()) {
+      <mat-icon>{{ icon() }}</mat-icon>
+    } @else {
+      <span>Pick an icon</span>
+    }
+  </button>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Title</mat-label>
+    <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
+  </mat-form-field>
+
+  <div class="files-header">
+    <div class="files-title">Files</div>
+    <button mat-stroked-button color="primary" type="button" (click)="addFiles()">
+      <mat-icon>add</mat-icon>
+      Add files
+    </button>
+  </div>
+
+  @if (hasFiles) {
+    <div cdkDropList class="file-list" (cdkDropListDropped)="drop($event)">
+      @for (file of files(); track file.id) {
+        <div class="file-row" cdkDrag>
+          <button type="button" class="drag-handle" cdkDragHandle aria-label="Reorder file">
+            <mat-icon>drag_indicator</mat-icon>
+          </button>
+          <div class="file-info">
+            <mat-icon class="file-preview">{{ getFileIcon(file) }}</mat-icon>
+            <div class="file-text">
+              <div class="file-label">{{ file.fileName }}</div>
+              <div class="file-meta">{{ getFileDate(file) | date: 'mediumDate' }}</div>
+            </div>
+          </div>
+          <div class="file-buttons">
+            <button mat-icon-button color="primary" type="button" (click)="openFile(file)" aria-label="Open file">
+              <mat-icon>open_in_new</mat-icon>
+            </button>
+            <button mat-icon-button color="warn" type="button" (click)="deleteFile(file)" aria-label="Remove file">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <p class="text-muted">No files yet. Add one above.</p>
+  }
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button type="button" (click)="cancel()">Cancel</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+</mat-dialog-actions>
