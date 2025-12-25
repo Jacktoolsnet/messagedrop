@@ -7,25 +7,25 @@ Kurzfassung (nicht rechtsverbindlich)
 
 MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
-Der Dienst kann ohne Nutzerkonto verwendet werden. Bestimmte Funktionen erfordern die freiwillige Anlage eines Nutzers.
+Der Dienst kann ohne Nutzerkonto verwendet werden. Bestimmte Funktionen erfordern die freiwillige Anlage eines Nutzerkontos.
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
-Ein Großteil der Daten wird bewusst ausschließlich lokal auf dem Endgerät des Nutzers gespeichert (z. B. im Browser oder App-Speicher), um Datenminimierung und einen hohen Datenschutzstandard zu gewährleisten. Die Kontrolle über diese lokal gespeicherten Daten liegt vollständig beim Nutzer. Ein Verlust oder eine Löschung lokaler Daten ist jederzeit möglich.
+Ein Großteil der Daten wird bewusst primär lokal auf dem Endgerät des Nutzers gespeichert (z. B. im Browser- oder App-Speicher), um Datenminimierung und einen hohen Datenschutzstandard zu gewährleisten. Die Kontrolle über diese lokal gespeicherten Daten liegt grundsätzlich beim Nutzer. Ein Verlust oder eine Löschung lokaler Daten ist jederzeit möglich.
 
 Öffentliche Inhalte und Kommentare werden von Nutzern erstellt und können gemäß den Vorgaben des Digital Services Act (DSA) gemeldet, überprüft und moderiert werden. Inhalte, für die ein DSA-Verfahren eingeleitet wird, werden vorübergehend nicht öffentlich sichtbar gestellt.
 
 MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Öffentliche Inhalte werden nicht algorithmisch gefiltert oder priorisiert, sondern ausschließlich anhand des betrachteten geografischen Bereichs und der zeitlichen Veröffentlichung angezeigt.
 
-Private Chatnachrichten werden verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
+Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen und sind für uns grundsätzlich nicht im Klartext einsehbar.
 
 Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden nur auf ausdrücklichen Wunsch des Nutzers aktiviert und direkt von den jeweiligen Drittanbietern geladen. Es gelten deren Datenschutz- und Nutzungsbedingungen.
 
 Systemmeldungen (z. B. Hinweise zu DSA-Verfahren oder geplante Wartungsarbeiten) werden ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend des Nutzers angezeigt. Systemmeldungen sind stets aktiv; Nutzer können darauf derzeit nicht antworten.
 
-Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfordern; der andere Nutzer muss aktiv zustimmen (z. B. per Popup). Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
+Profile (Name/Avatar) können lokal zur besseren Zuordnung genutzt werden. Bei Kontaktaufnahme kann ein Nutzer optional eine Profilfreigabe anfordern; der andere Nutzer muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert.
 
-Plätzen kann gefolgt werden; soweit technisch möglich kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Push-Token werden nur temporär verarbeitet. Es besteht kein Anspruch auf Zustellung von Push-Benachrichtigungen.
+Plätzen kann gefolgt werden; soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erscheinen. Technisch erforderliche Push-Token werden nur für die Zustellung verarbeitet. Ein Anspruch auf Zustellung von Push-Benachrichtigungen besteht nicht.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -64,17 +64,21 @@ Diese Datenschutzerklärung gilt für MessageDrop (messagedrop.de), zugehörige 
 2.1 Allgemeine Nutzung
 ###
 
-MessageDrop kann ohne Anlage eines Nutzers verwendet werden. Dabei können insbesondere öffentliche Inhalte gelesen werden.
+MessageDrop kann ohne Anlage eines Nutzerkontos verwendet werden. Dabei können insbesondere öffentliche Inhalte gelesen werden, soweit diese verfügbar sind.
 
 ###
 2.2 Technische Datenverarbeitung
 ###
 
-Bei der Nutzung als Besucher werden technisch notwendige Daten verarbeitet, insbesondere IP-Adresse, Zeitstempel und technische Header-Informationen.
+Bei der Nutzung als Besucher werden technisch notwendige Daten verarbeitet, insbesondere:
+- IP-Adresse,
+- Zeitstempel,
+- technische Header-Informationen (z. B. User-Agent in Server-Logs, soweit technisch übertragen),
+- ggf. Request-Metadaten zur Auslieferung und Absicherung des Dienstes.
 
 Zweck der Verarbeitung ist die technische Auslieferung des Dienstes, die Systemsicherheit, die Missbrauchs- und Betrugsprävention sowie die Fehleranalyse und Stabilität.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an sicherem und stabilem Betrieb).
 
 ###
 2.3 Externe Inhalte und Drittanbieter
@@ -82,15 +86,23 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO.
 
 MessageDrop ermöglicht die optionale Einbindung externer Inhalte von Drittanbietern (z. B. Videos, Musik, animierte Inhalte oder eingebettete Medien).
 
-Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wird ein Hinweistext angezeigt, der den Nutzer darüber informiert, dass Inhalte eines Drittanbieters verfügbar sind, sowie eine aktive Entscheidungsmöglichkeit (z. B. ein Toggle), mit der der jeweilige Anbieter ausdrücklich aktiviert werden kann.
+Externe Inhalte sind standardmäßig deaktiviert. Statt der externen Inhalte wird ein Hinweistext angezeigt, der den Nutzer darüber informiert, dass Inhalte eines Drittanbieters verfügbar sind, sowie eine aktive Entscheidungsmöglichkeit (z. B. Toggle), mit der der jeweilige Anbieter ausdrücklich aktiviert werden kann.
 
 Erst nach einer bewussten und freiwilligen Aktivierung durch den Nutzer werden externe Inhalte technisch eingebunden.
 
 Die Einbindung erfolgt über Einbettungstechniken wie iFrames oder oEmbed. Dabei werden die Inhalte direkt von den Servern des jeweiligen Drittanbieters geladen. Wir haben keinen Einfluss auf Art, Umfang und Zweck der Datenverarbeitung durch diese Anbieter.
 
-Durch die Aktivierung eines externen Inhaltsanbieters können insbesondere folgende Daten an den jeweiligen Anbieter übermittelt werden: IP-Adresse, technische Geräte- und Browserinformationen (z. B. User-Agent, Spracheinstellungen), Zeitpunkt des Abrufs, Referrer-Informationen (sofern vom Browser übertragen) sowie ggf. weitere technisch notwendige Request-Informationen.
+Durch die Aktivierung eines externen Inhaltsanbieters können insbesondere folgende Daten an den jeweiligen Anbieter übermittelt werden:
+- IP-Adresse,
+- technische Geräte- und Browserinformationen (z. B. User-Agent, Spracheinstellungen),
+- Zeitpunkt des Abrufs,
+- Referrer-Informationen (sofern vom Browser übertragen),
+- ggf. weitere technisch notwendige Request-Informationen.
 
-Zugleich kann der jeweilige Anbieter technisch bedingt Daten an das Endgerät des Nutzers übertragen oder dort speichern, insbesondere Cookies oder vergleichbare Identifikationsinformationen (z. B. Local Storage, Session Storage), Pixel-, Tracking- oder Mess-Technologien (soweit vom Anbieter eingesetzt und technisch möglich) sowie Cache-Daten oder sonstige technisch erforderliche Inhalte zur Auslieferung der Einbettung.
+Zugleich kann der jeweilige Anbieter technisch bedingt Daten an das Endgerät des Nutzers übertragen oder dort speichern, insbesondere:
+- Cookies oder vergleichbare Identifikationsinformationen (z. B. Local Storage, Session Storage),
+- Pixel-, Tracking- oder Mess-Technologien (soweit vom Anbieter eingesetzt und technisch möglich),
+- Cache-Daten oder sonstige technisch erforderliche Inhalte zur Auslieferung der Einbettung.
 
 Wir haben auf Art, Umfang und Zweck dieser Datenverarbeitung durch den externen Anbieter keinen Einfluss. Die Verarbeitung erfolgt ausschließlich in der Verantwortung des jeweiligen Drittanbieters. Es gelten die Datenschutz- und Nutzungsbedingungen des jeweiligen Anbieters.
 
@@ -118,15 +130,15 @@ Impressum / Kontakt: https://www.google.com/about/company/
 
 Die oben genannten Links dienen ausschließlich der Information. Für Inhalte, Aktualität, Verfügbarkeit oder Änderungen der externen Seiten übernehmen wir keine Verantwortung oder Gewähr.
 
-Die Liste der externen Anbieter kann technisch bedingt erweitert oder angepasst werden, ohne dass dies eine Änderung dieser Datenschutzerklärung erfordert.
+Die Liste der externen Anbieter kann technisch bedingt erweitert oder angepasst werden. Sofern neue Anbieter integriert werden, wird die Liste in einer aktualisierten Fassung dieser Datenschutzerklärung ergänzt.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung).
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. a DSGVO (Einwilligung). Eine erteilte Einwilligung kann jederzeit mit Wirkung für die Zukunft widerrufen werden, insbesondere durch Deaktivierung des jeweiligen Anbieters in den Einstellungen.
 
 ###
 2.4 Lokale Profile ohne Nutzerkonto (optional)
 ###
 
-Im Rahmen der Nutzung ohne Nutzerkonto kann der Nutzer optional lokale Profile zur besseren Organisation und Wiedererkennung eigener Inhalte anlegen. Ein solches Profil kann insbesondere aus einem frei wählbaren Namen und einem Avatar (Bild) bestehen.
+Im Rahmen der Nutzung ohne Nutzerkonto kann der Nutzer optional lokale Profile zur besseren Organisation und Wiedererkennung anlegen. Ein solches Profil kann insbesondere aus einem frei wählbaren Namen und einem Avatar (Bild) bestehen.
 
 Diese Profile werden ausschließlich lokal auf dem Endgerät gespeichert und sind nur für den jeweiligen Nutzer sichtbar. Eine Übertragung an unsere Server oder eine Veröffentlichung für andere Nutzer findet nicht statt.
 
@@ -137,16 +149,19 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzer
 ###
 
 ###
-3.1 Nutzeranlage
+3.1 Nutzerkontoanlage
 ###
 
-Die Anlage eines Nutzers erfolgt freiwillig und ausschließlich über die Vergabe eines PINs.
+Die Anlage eines Nutzerkontos erfolgt freiwillig und ausschließlich über die Vergabe eines PINs.
 
-Serverseitig werden gespeichert eine pseudonyme User-ID, der Nutzerstatus (z. B. enabled oder disabled) sowie das Datum des letzten Logins.
+Serverseitig werden gespeichert:
+- eine pseudonyme User-ID,
+- ein Nutzerstatus (z. B. enabled oder disabled),
+- das Datum des letzten Logins.
 
-Weitere Nutzerdaten werden ausschließlich verschlüsselt lokal auf dem Endgerät gespeichert.
+Weitere Nutzerdaten werden grundsätzlich ausschließlich verschlüsselt lokal auf dem Endgerät gespeichert.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung bzw. Durchführung vorvertraglicher Maßnahmen auf Anfrage des Nutzers).
 
 ###
 3.2 Login und Authentifizierung
@@ -160,15 +175,19 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 3.3 Löschung und Inaktivität
 ###
 
-Nutzer, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden ohne Vorwarnung aus dem Backend entfernt.
+Nutzerkonten, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden ohne Vorwarnung aus dem Backend entfernt.
 
-Mit der Entfernung des Nutzers werden alle zugehörigen serverseitig gespeicherten Datensätze gelöscht, insbesondere die User-ID, der Nutzerstatus, Login- und Aktivitätsinformationen sowie sonstige eindeutig zuordenbare serverseitige Referenzen.
+Mit der Entfernung des Nutzerkontos werden alle zugehörigen serverseitig gespeicherten Datensätze gelöscht, insbesondere:
+- die User-ID,
+- der Nutzerstatus,
+- Login- und Aktivitätsinformationen,
+- sonstige eindeutig zuordenbare serverseitige Referenzen.
 
-Die Löschung ist endgültig und nicht rückgängig zu machen.
+Die Löschung ist endgültig, sofern kein zuvor erstelltes Backup des Nutzers vorliegt.
 
-Unabhängig davon kann der Nutzer seinen Nutzer jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung aller serverseitigen und lokalen Datensätze.
+Unabhängig davon kann der Nutzer sein Nutzerkonto jederzeit selbstständig über die App löschen. In diesem Fall erfolgt die sofortige und endgültige Löschung aller serverseitigen und lokalen Datensätze, vorbehaltlich gesetzlicher Aufbewahrungs- oder Nachweispflichten (z. B. im Zusammenhang mit DSA-Verfahren).
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. c DSGVO, soweit gesetzliche Pflichten eine weitere Verarbeitung erfordern.
 
 ###
 3.4 Öffentliche Inhalte und Kommentare
@@ -176,13 +195,17 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
 Nutzer können öffentliche Nachrichten und öffentliche Kommentare erstellen.
 
-Diese Inhalte werden zur Darstellung, Moderation, Missbrauchsprävention und zur Durchsetzung gesetzlicher Pflichten verarbeitet.
+Diese Inhalte werden verarbeitet zur:
+- Bereitstellung und Darstellung innerhalb des Dienstes,
+- Moderation und Durchsetzung von Nutzungsregeln,
+- Missbrauchs- und Betrugsprävention,
+- Erfüllung gesetzlicher Pflichten, insbesondere nach dem DSA.
 
-Öffentliche Nachrichten und öffentliche Kommentare werden nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit oder Archivierung besteht nicht.
+Öffentliche Nachrichten und öffentliche Kommentare werden nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung besteht nicht.
 
 Öffentliche Inhalte können bewertet werden (z. B. Like / Dislike). Ein Anspruch auf bestimmte Reichweite, Sichtbarkeit oder Bewertungsergebnisse besteht nicht.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. b und lit. f DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Betrieb, Sicherheit und Missbrauchsprävention) sowie Art. 6 Abs. 1 lit. c DSGVO, soweit gesetzliche Pflichten einschlägig sind.
 
 ###
 3.5 Private Kommunikation
@@ -192,7 +215,7 @@ Private Chatnachrichten werden Ende-zu-Ende-verschlüsselt übertragen.
 
 Gelesene private Nachrichten werden nach 7 Tagen automatisch gelöscht. Ein Anspruch auf Archivierung oder Wiederherstellung besteht nicht.
 
-Für Inhalte privater Kommunikation sind ausschließlich die beteiligten Nutzer verantwortlich. Eine inhaltliche Vorabprüfung oder laufende Überwachung findet nicht statt.
+Für Inhalte privater Kommunikation sind ausschließlich die beteiligten Nutzer verantwortlich. Eine inhaltliche Vorabprüfung oder laufende Überwachung findet nicht statt. Verfahrensbezogene Maßnahmen (z. B. Sperrung/Entfernung) können sich jedoch aus gesetzlichen Pflichten ergeben, soweit dies im Einzelfall erforderlich ist.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 
@@ -200,21 +223,43 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
 3.6 Lokale Datenspeicherung auf dem Endgerät
 ###
 
-MessageDrop verfolgt einen datenschutzorientierten Ansatz, bei dem ein Großteil der Daten ausschließlich lokal auf dem Endgerät des Nutzers gespeichert wird.
+MessageDrop verfolgt einen datenschutzorientierten Ansatz, bei dem ein Großteil der Daten primär lokal auf dem Endgerät des Nutzers gespeichert wird.
 
-Hierzu zählen insbesondere lokale Nutzerdaten, Einstellungen und Präferenzen, Kontakte und Verknüpfungen, lokal zwischengespeicherte Inhalte, kryptografische Schlüssel sowie temporäre Arbeitsdaten.
+Hierzu zählen insbesondere:
+- lokale Nutzerdaten,
+- Einstellungen und Präferenzen,
+- Kontakte und Verknüpfungen,
+- lokal zwischengespeicherte Inhalte,
+- kryptografische Schlüssel,
+- temporäre Arbeitsdaten.
 
 Die Speicherung erfolgt je nach Plattform insbesondere über Browser-IndexedDB, lokalen App-Speicher sowie Cache-Mechanismen des Betriebssystems oder Browsers.
 
-Diese Daten werden nicht automatisch mit unseren Servern synchronisiert, nicht zentral gespeichert und nicht von uns verwaltet.
+Lokal gespeicherte Daten werden nicht automatisch mit anderen Geräten oder einer Cloud synchronisiert.
 
-Die vollständige Kontrolle über lokal gespeicherte Daten liegt beim Nutzer. Der Nutzer kann diese Daten jederzeit selbst löschen, insbesondere durch entsprechende Funktionen innerhalb der App, das Löschen von App- oder Browserdaten, die Deinstallation der App oder PWA oder das Zurücksetzen des Browsers oder Endgeräts.
+Die Kontrolle über lokal gespeicherte Daten liegt beim Nutzer. Der Nutzer kann diese Daten jederzeit selbst löschen, insbesondere durch entsprechende Funktionen innerhalb der App, das Löschen von App- oder Browserdaten, die Deinstallation der App oder PWA oder das Zurücksetzen des Browsers oder Endgeräts.
 
-Wir haben keinen Zugriff auf lokal gespeicherte Daten und keine Möglichkeit, diese Daten einzusehen, zu sichern, zu exportieren oder nachträglich wiederherzustellen.
+Wir haben ohne Mitwirkung des Nutzers keinen Zugriff auf lokal gespeicherte Daten und keine Möglichkeit, diese lokal gespeicherten Daten einzusehen, zu sichern oder nachträglich wiederherzustellen.
 
-Werden lokal gespeicherte Daten durch den Nutzer oder durch technische Umstände gelöscht, kann dies zum Verlust von Inhalten, Einstellungen oder Zugängen führen. Eine Wiederherstellung durch uns ist nicht möglich.
+Werden lokal gespeicherte Daten durch den Nutzer oder durch technische Umstände gelöscht, kann dies zum Verlust von Inhalten, Einstellungen oder Zugängen führen. Eine Wiederherstellung durch uns ist ohne ein vom Nutzer zuvor erstelltes Backup nicht möglich.
 
 Die Verantwortung für Sicherung, Erhalt und Verwaltung lokal gespeicherter Daten liegt ausschließlich beim Nutzer.
+
+###
+3.6.1 Backup- und Restore-Funktion (optional)
+###
+
+Zur Reduzierung des Risikos eines Datenverlustes stellt MessageDrop eine optionale Backup- und Restore-Funktion zur Verfügung.
+
+Im Rahmen der Backup-Funktion wählt der Nutzer einen lokalen Speicherort sowie einen persönlichen PIN. Das Backup wird verschlüsselt gespeichert. Der verwendete PIN ist ausschließlich dem Nutzer bekannt und wird von uns weder gespeichert noch wiederhergestellt. Bei Verlust oder Vergessen des PINs ist eine Wiederherstellung des Backups technisch nicht möglich.
+
+Die im Backup enthaltenen Daten entsprechen dem zum Zeitpunkt der Erstellung dem Nutzer zugeordneten lokal und serverseitig gespeicherten Datenbestand.
+
+Beim Einspielen eines Backups (Restore) wird ein ggf. vorhandenes Nutzerkonto sowohl lokal als auch serverseitig endgültig gelöscht. Sämtliche zugehörigen Daten werden entfernt und anschließend auf Basis des Backups wiederhergestellt. Eine Zusammenführung („Merge“) von bestehenden und wiederhergestellten Daten erfolgt nicht.
+
+Im Rahmen des Restore-Vorgangs werden die im Backup enthaltenen Daten erneut an den Server übertragen und dort – soweit technisch vorgesehen – erzeugt oder wiederhergestellt. Abweichungen zwischen dem ursprünglichen Zustand und dem nach dem Restore hergestellten Zustand sind möglich.
+
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Nutzung der Backup-/Restore-Funktion auf Anfrage des Nutzers).
 
 ###
 3.7 Lokales Profil, Profilfreigabe und Kontakt-Profile
@@ -224,7 +269,7 @@ Der Nutzer kann für sein eigenes Nutzerkonto ein lokales Profil (z. B. Name und
 
 Im Rahmen der Kontaktfunktion kann ein Nutzer aktiv eine Profilfreigabe an einen Kontakt anfordern. Der Kontakt muss die Profilfreigabe aktiv bestätigen (z. B. per Popup), bevor eine Übertragung erfolgt.
 
-Nach erfolgter Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
+Nach erfolter Zustimmung werden Profilname und Avatar auf das Endgerät des Kontakts übertragen und dort lokal gespeichert. Eine zentrale Speicherung dieser Profilinformationen durch uns erfolgt nicht.
 
 Hinweis: Nach der Übertragung besteht keine technische Möglichkeit, die bereits übertragenen Profilinformationen auf dem Endgerät des Kontakts zurückzuholen oder dort zu löschen. Der Kontakt kann die lokal gespeicherten Daten jedoch auf seinem Endgerät löschen.
 
@@ -245,7 +290,11 @@ Systemmeldungen dienen insbesondere der:
 
 Systemmeldungen sind stets aktiv und können nicht abbestellt werden. Eine direkte Antwortfunktion ist derzeit nicht vorgesehen.
 
-Im Rahmen der Systemmeldungen verarbeiten wir insbesondere die User-ID, den Inhalt der Mitteilung, Zeitpunkte, sowie Zustell- und Lesestatus.
+Im Rahmen der Systemmeldungen verarbeiten wir insbesondere:
+- User-ID,
+- Inhalt der Mitteilung,
+- Zeitpunkte,
+- Zustell- und Lesestatus (soweit technisch umgesetzt).
 
 Nutzer können Systemmeldungen im Frontend löschen. Das Löschen betrifft ausschließlich die Anzeige bzw. lokale Verfügbarkeit im Nutzer-Frontend. Gesetzlich erforderliche oder dokumentationspflichtige Nachweise (z. B. im Rahmen von DSA-Verfahren) können hiervon unberührt bleiben.
 
@@ -259,7 +308,7 @@ Nutzer können Plätzen folgen oder das Folgen beenden.
 
 Soweit technisch möglich und vom Endgerät unterstützt, kann der Nutzer Push-Benachrichtigungen erhalten, wenn an einem gefolgten Platz neue öffentliche Inhalte erstellt werden.
 
-Für Push-Benachrichtigungen können je nach Plattform technisch erforderliche Token/Identifiers verarbeitet werden, um Nachrichten an das Endgerät zustellen zu können (z. B. Push-Token). Diese Token werden nur temporär verarbeitet und nicht dauerhaft zu Profilbildungs- oder Tracking-Zwecken gespeichert.
+Für Push-Benachrichtigungen werden je nach Plattform technisch erforderliche Token/Identifiers verarbeitet, um Nachrichten an das Endgerät zustellen zu können (z. B. Push-Token). Diese Token werden zur Zustellung verarbeitet und nicht zu Profilbildungs- oder Tracking-Zwecken durch uns genutzt.
 
 Push-Benachrichtigungen können aus technischen, systembedingten oder nutzerspezifischen Gründen verzögert, eingeschränkt oder nicht zugestellt werden; ein Anspruch auf Zustellung besteht nicht.
 
@@ -275,7 +324,12 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Funktion „Folgen“) sowie Art
 
 Für öffentliche Inhalte und Kommentare kann ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch Meldungen (Notices) oder Beschwerden (Appeals).
 
-Dabei verarbeiten wir insbesondere die User-ID, Angaben zum gemeldeten Inhalt, Zeitpunkte und Status des Verfahrens sowie getroffene Entscheidungen und Begründungen.
+Dabei verarbeiten wir insbesondere:
+- User-ID (soweit vorhanden),
+- Angaben zum gemeldeten Inhalt,
+- Zeitpunkte,
+- Status des Verfahrens,
+- getroffene Entscheidungen und Begründungen.
 
 Zusätzlich kann die meldende Person im Rahmen eines DSA-Verfahrens freiwillig Belege bereitstellen, insbesondere:
 - Datei-Uploads (z. B. Screenshots oder Dokumente),
@@ -283,7 +337,7 @@ Zusätzlich kann die meldende Person im Rahmen eines DSA-Verfahrens freiwillig B
 
 Datei-Uploads werden auf unseren Servern gespeichert. Externe Links werden in unserer Datenbank gespeichert. Diese Belege werden ausschließlich zur Prüfung des gemeldeten Sachverhalts sowie zur Dokumentation im Rahmen gesetzlicher Pflichten verarbeitet und nicht öffentlich veröffentlicht.
 
-Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO sowie Art. 6 Abs. 1 lit. f DSGVO.
+Rechtsgrundlage ist Art. 6 Abs. 1 lit. c DSGVO (rechtliche Verpflichtung) sowie Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an Rechtsdurchsetzung, Missbrauchsprävention und Nachweisführung).
 
 ###
 4.2 Öffentliche Fallseite
@@ -307,11 +361,11 @@ Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschl�
 4.4 Speicherung und Weitergabe
 ###
 
-DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten werden dauerhaft gespeichert, soweit dies zur Erfüllung gesetzlicher Dokumentations-, Nachweis- und Rechenschaftspflichten erforderlich ist.
+DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten werden gespeichert, soweit dies zur Erfüllung gesetzlicher Dokumentations-, Nachweis- und Rechenschaftspflichten erforderlich ist.
 
 Belege (Dateien/Links) können – abhängig von ihrer Erforderlichkeit für Dokumentations- und Nachweispflichten – für die Dauer des jeweiligen Verfahrens und darüber hinaus im gesetzlich zulässigen Rahmen gespeichert werden.
 
-Eine Weitergabe an zuständige Behörden erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
+Eine Weitergabe an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
 
 ###
 5. Speicherdauer
@@ -320,6 +374,13 @@ Eine Weitergabe an zuständige Behörden erfolgt ausschließlich im rechtlich er
 Personenbezogene Daten werden nur so lange gespeichert, wie dies für den jeweiligen Zweck erforderlich ist oder gesetzliche Verpflichtungen bestehen.
 
 Davon ausgenommen sind DSA-Verfahrensdaten (einschließlich erforderlicher Nachweise/Belege), die gesetzlichen Aufbewahrungspflichten oder dokumentationsbezogenen Erfordernissen unterliegen können.
+
+Im Übrigen gelten insbesondere folgende Grundsätze:
+- Besucher-/Server-Logs: Speicherung nach Erforderlichkeit für Sicherheit und Betrieb (Art. 6 Abs. 1 lit. f DSGVO),
+- Nutzerkonto-Metadaten (User-ID, Status, letzter Login): bis zur Löschung des Nutzerkontos, vorbehaltlich gesetzlicher Pflichten,
+- öffentliche Inhalte: Löschung nach 30 Tagen,
+- gelesene private Nachrichten: Löschung nach 7 Tagen,
+- lokal gespeicherte Daten: Löschung durch den Nutzer bzw. durch technische Umstände möglich.
 
 ###
 6. Datensicherheit
@@ -335,11 +396,13 @@ Du hast das Recht auf Auskunft (Art. 15 DSGVO), Berichtigung (Art. 16 DSGVO), L�
 
 Erteilte Einwilligungen können jederzeit mit Wirkung für die Zukunft widerrufen werden.
 
+Zur Ausübung deiner Rechte kannst du dich an den Verantwortlichen (siehe Abschnitt 1) wenden.
+
 ###
 8. Mindestalter
 ###
 
-Der Dienst richtet sich nicht an Personen unter 16 Jahren (Art. 8 DSGVO).
+Der Dienst richtet sich nicht an Personen unter 16 Jahren (Art. 8 DSGVO). Sofern wir Kenntnis davon erlangen, dass der Dienst von Personen unter 16 Jahren genutzt wird, behalten wir uns vor, entsprechende Nutzerkonten zu deaktivieren oder zu löschen.
 
 ###
 9. Keine Notfalldienste

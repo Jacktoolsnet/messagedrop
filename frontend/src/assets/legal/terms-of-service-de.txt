@@ -15,7 +15,7 @@ Externe Dienste und Einbettungen (z. B. YouTube, OpenStreetMap, DeepL) unterlieg
 
 Der Dienst kann zeitweise eingeschränkt oder nicht verfügbar sein; eine bestimmte Verfügbarkeit wird nicht garantiert.
 
-Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; du bist selbst für geeignete Sicherungen verantwortlich.
+Ein Großteil der Daten wird lokal auf deinem Endgerät gespeichert. Diese Daten können verloren gehen oder gelöscht werden; du bist selbst für geeignete Sicherungen verantwortlich (z. B. durch eine Backup-Funktion, soweit vorhanden).
 
 Profile (Name/Avatar) können lokal genutzt werden. Bei Kontaktaufnahme kann optional eine Profilfreigabe an einen Kontakt angefragt werden; der Kontakt muss aktiv zustimmen. Nach Zustimmung werden Name und Avatar auf dem Endgerät des Kontakts lokal gespeichert; ein Zurückholen ist technisch nicht möglich.
 
@@ -89,7 +89,6 @@ Wenn du MessageDrop im Namen einer Organisation oder juristischen Person nutzt, 
 MessageDrop ist eine Plattform zur Veröffentlichung, Anzeige und Organisation nutzergenerierter Inhalte mit optionaler privater Kommunikation.
 
 Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
-
 - Open-Meteo
 - DeepL
 - Nominatim / OpenStreetMap
@@ -101,15 +100,21 @@ Der Dienst kann externe Inhalte oder Funktionen einbinden, insbesondere von:
 
 Ein Anspruch auf bestimmte Funktionen, Darstellungen, Reichweiten, Rankings, Benachrichtigungen, Echtzeitfunktionen oder eine dauerhafte Verfügbarkeit besteht nicht.
 
+Öffentliche Inhalte sind grundsätzlich zeitlich begrenzt verfügbar. Öffentliche Nachrichten und öffentliche Kommentare können nach einem festgelegten Zeitraum (derzeit 30 Tage) gelöscht werden. Ein Anspruch auf Archivierung, Wiederherstellung oder dauerhafte Verfügbarkeit besteht nicht.
+
 ###
 6. Nutzerkonten und Sicherheit (sofern genutzt)
 ###
 
-Sofern Nutzerkonten angeboten oder genutzt werden, bist du verpflichtet, deine Zugangsdaten vertraulich zu behandeln und vor dem Zugriff durch unbefugte Dritte zu schützen.
+Die Nutzung von MessageDrop kann ohne Nutzerkonto möglich sein. Bestimmte Funktionen setzen ein Nutzerkonto voraus.
 
-Du bist für sämtliche Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen.
+Sofern du ein Nutzerkonto nutzt, bist du verpflichtet, deine Zugangsdaten (z. B. PIN) vertraulich zu behandeln und vor dem Zugriff durch unbefugte Dritte zu schützen.
+
+Du bist für sämtliche Aktivitäten verantwortlich, die über dein Nutzerkonto erfolgen, soweit gesetzlich zulässig.
 
 Du bist dafür verantwortlich, dein Endgerät und deine lokalen Daten (z. B. PIN, Schlüsselmaterial, lokale Datensätze) vor unbefugtem Zugriff zu schützen.
+
+Hinweis: Wird dein PIN vergessen, kann ein Nutzerkonto ohne zuvor erstelltes Backup nicht wiederhergestellt werden.
 
 ###
 7. Nutzergenerierte Inhalte und Nutzungsrechte
@@ -117,7 +122,7 @@ Du bist dafür verantwortlich, dein Endgerät und deine lokalen Daten (z. B. PIN
 
 Du behältst alle Rechte an den von dir erstellten Inhalten.
 
-Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives und unentgeltliches Recht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren.
+Mit dem Einstellen von Inhalten räumst du uns ein weltweites, nicht-exklusives und unentgeltliches Recht ein, diese Inhalte zum Betrieb des Dienstes zu speichern, zu vervielfältigen, öffentlich zugänglich zu machen, anzuzeigen, technisch zu verarbeiten und zu moderieren, soweit dies für die Bereitstellung des Dienstes erforderlich ist.
 
 Du sicherst zu, dass du über alle erforderlichen Rechte verfügst und dass deine Inhalte rechtmäßig sind sowie keine Rechte Dritter verletzen.
 
@@ -141,7 +146,9 @@ Für öffentliche Inhalte, einschließlich öffentlicher Kommentare, kann jederz
 - eine Meldung („Notice“),
 - eine Beschwerde („Appeal“).
 
-Wird ein solches Verfahren eingeleitet, kann der betroffene Inhalt vorübergehend auf den Status „nicht öffentlich sichtbar“ gestellt werden. „Nicht öffentlich sichtbar“ bedeutet, dass der Inhalt für andere Nutzer nicht mehr öffentlich angezeigt wird, bis eine inhaltliche Entscheidung im Rahmen des Verfahrens getroffen wurde. Der Inhalt wird in diesem Zustand weder empfohlen noch öffentlich verbreitet.
+Wird ein solches Verfahren eingeleitet, kann der betroffene Inhalt vorübergehend auf den Status „nicht öffentlich sichtbar“ gestellt werden.
+
+„Nicht öffentlich sichtbar“ bedeutet, dass der Inhalt für andere Nutzer nicht mehr öffentlich angezeigt wird, bis eine inhaltliche Entscheidung im Rahmen des Verfahrens getroffen wurde. Der Inhalt wird in diesem Zustand weder empfohlen noch öffentlich verbreitet.
 
 Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlangung von rechtswidrigen Inhalten entfernen oder sperren wir diese entsprechend den gesetzlichen Vorgaben („Notice-and-Takedown“).
 
@@ -170,44 +177,43 @@ Es ist untersagt, MessageDrop für rechtswidrige, missbräuchliche oder vertrags
 Insbesondere ist es untersagt, Inhalte zu erstellen, zu verbreiten, zu verlinken oder bereitzustellen, die gegen geltendes Recht, diese Nutzungsbedingungen oder Rechte Dritter verstoßen.
 
 Unzulässig sind insbesondere Inhalte oder Nutzungen, die:
-
-- gegen geltendes Recht verstoßen oder zu solchen Verstößen auffordern
-- Rechte Dritter verletzen, insbesondere Urheber-, Persönlichkeits-, Marken-, Namens- oder Datenschutzrechte
-- strafbare Inhalte darstellen, fördern oder vorbereiten
-- zu strafbaren Handlungen auffordern
-- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten
-- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind
-- diskriminierend, extremistisch oder menschenverachtend sind
-- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten
-- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten
+- gegen geltendes Recht verstoßen oder zu solchen Verstößen auffordern,
+- Rechte Dritter verletzen, insbesondere Urheber-, Persönlichkeits-, Marken-, Namens- oder Datenschutzrechte,
+- strafbare Inhalte darstellen, fördern oder vorbereiten,
+- zu strafbaren Handlungen auffordern,
+- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten,
+- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind,
+- diskriminierend, extremistisch oder menschenverachtend sind,
+- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten,
+- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten,
 - private oder personenbezogene Daten Dritter ohne deren ausdrückliche Einwilligung offenlegen, insbesondere:
-  - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben
-  - Geburtsdatum oder Geburtstag
-  - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen
-  - E-Mail-Adressen
-  - Telefonnummern
-  - Wohn-, Aufenthalts- oder Arbeitsadressen
-  - genaue Standortdaten (z. B. GPS-Koordinaten, Live-Standorte, regelmäßig genutzte Orte)
-  - Informationen zu Aufenthaltsorten in Echtzeit oder rückverfolgbar
-  - Ausweiskopien, Identifikationsnummern oder amtliche Kennzeichen
-  - Benutzernamen, IDs oder Profilverknüpfungen zu anderen Diensten
-  - Fotos oder Videos von Personen, sofern diese eindeutig identifizierbar sind und keine Einwilligung vorliegt
-  - biometrische Daten (z. B. Gesichtsmerkmale, Fingerabdrücke)
-  - Gesundheitsdaten oder Informationen zum körperlichen oder psychischen Zustand
-  - Informationen zur sexuellen Orientierung oder zum Sexualleben
-  - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen
-  - Bank-, Zahlungs- oder Finanzinformationen
-  - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen
-- irreführende, betrügerische oder manipulative Inhalte enthalten
-- falsche Tatsachenbehauptungen über Personen verbreiten
-- zu Täuschung, Betrug oder Missbrauch verleiten
-- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten
-- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten
-- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten
-- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten
-- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung)
-- eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen
-- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen
+  - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben,
+  - Geburtsdatum oder Geburtstag,
+  - Alter oder Altersangaben in Verbindung mit identifizierenden Informationen,
+  - E-Mail-Adressen,
+  - Telefonnummern,
+  - Wohn-, Aufenthalts- oder Arbeitsadressen,
+  - genaue Standortdaten (z. B. GPS-Koordinaten, Live-Standorte, regelmäßig genutzte Orte),
+  - Informationen zu Aufenthaltsorten in Echtzeit oder rückverfolgbar,
+  - Ausweiskopien, Identifikationsnummern oder amtliche Kennzeichen,
+  - Benutzernamen, IDs oder Profilverknüpfungen zu anderen Diensten,
+  - Fotos oder Videos von Personen, sofern diese eindeutig identifizierbar sind und keine Einwilligung vorliegt,
+  - biometrische Daten (z. B. Gesichtsmerkmale, Fingerabdrücke),
+  - Gesundheitsdaten oder Informationen zum körperlichen oder psychischen Zustand,
+  - Informationen zur sexuellen Orientierung oder zum Sexualleben,
+  - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen,
+  - Bank-, Zahlungs- oder Finanzinformationen,
+  - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen,
+- irreführende, betrügerische oder manipulative Inhalte enthalten,
+- falsche Tatsachenbehauptungen über Personen verbreiten,
+- zu Täuschung, Betrug oder Missbrauch verleiten,
+- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten,
+- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
+- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern oder entsprechende Anleitungen enthalten,
+- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
+- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
+- eine falsche Verbindung, Partnerschaft oder Unterstützung durch uns oder durch Dritte vortäuschen,
+- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
 
 Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die betreffenden Informationen öffentlich zugänglich erscheinen.
 
@@ -283,14 +289,16 @@ Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere au
 Eine bestimmte Verfügbarkeit oder Erreichbarkeit wird nicht garantiert.
 
 ###
-17. Lokale Speicherung und Datenverlust
+17. Lokale Speicherung, Backup und Datenverlust
 ###
 
-Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage oder Cache).
+Daten können lokal auf deinem Endgerät gespeichert werden (z. B. IndexedDB, Local Storage oder Cache). Diese Daten sind geräte- und browserabhängig und können jederzeit gelöscht werden oder verloren gehen.
 
-Diese Daten sind geräte- und browserabhängig und können jederzeit gelöscht werden oder verloren gehen.
+Du bist selbst für geeignete Sicherungen verantwortlich.
 
-Du bist selbst für geeignete Sicherungen verantwortlich; eine Wiederherstellung durch uns ist nicht möglich.
+Soweit eine Backup- und Restore-Funktion bereitgestellt wird, kann diese die Wiederherstellung unterstützen. Die Nutzung erfolgt freiwillig und auf eigene Verantwortung. Ein Anspruch auf erfolgreiche, vollständige oder fehlerfreie Wiederherstellung besteht nicht.
+
+Eine Wiederherstellung ohne ein vom Nutzer zuvor erstelltes Backup ist regelmäßig nicht möglich.
 
 ###
 18. Geistiges Eigentum

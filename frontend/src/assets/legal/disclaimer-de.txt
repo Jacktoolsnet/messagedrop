@@ -17,7 +17,7 @@ MessageDrop verwendet kein personalisiertes Empfehlungs- oder Ranking-System. Ö
 
 Private Chatnachrichten werden verschlüsselt und signiert übertragen und sind für uns und Dritte grundsätzlich nicht im Klartext einsehbar.
 
-Externe Inhalte (z. B. YouTube, TikTok, Spotify) werden ausschließlich auf Wunsch der Nutzer eingebunden bzw. angezeigt und unterliegen den Bedingungen der jeweiligen Anbieter.
+Externe Inhalte (z. B. YouTube, TikTok, Spotify usw.) werden ausschließlich auf Wunsch der Nutzer eingebunden bzw. angezeigt und unterliegen den Bedingungen der jeweiligen Anbieter.
 
 MessageDrop bietet keinen Zugang zu Notfalldiensten.
 
@@ -56,7 +56,7 @@ Der Dienst richtet sich ausdrücklich nicht an Kinder unter 16 Jahren. Eine Nutz
 
 Mit der Nutzung von MessageDrop bestätigt der Nutzer, dass er das 16. Lebensjahr vollendet hat.
 
-Sollten wir Kenntnis davon erlangen, dass MessageDrop von Personen unter 16 Jahren genutzt wird, behalten wir uns vor, entsprechende Zugriffe oder Nutzungen zu unterbinden und gegebenenfalls angelegte Nutzer zu deaktivieren oder zu löschen.
+Sollten wir Kenntnis davon erlangen, dass MessageDrop von Personen unter 16 Jahren genutzt wird, behalten wir uns vor, entsprechende Zugriffe oder Nutzungen zu unterbinden und gegebenenfalls angelegte Nutzerkonten zu deaktivieren oder zu löschen.
 
 Eine besondere Ansprache, Ausrichtung oder Verarbeitung personenbezogener Daten von Kindern im Sinne der DSGVO findet nicht statt.
 
@@ -66,19 +66,21 @@ Eine besondere Ansprache, Ausrichtung oder Verarbeitung personenbezogener Daten 
 
 Die Nutzung von MessageDrop setzt eine funktionierende Internetverbindung voraus.
 
-Für den Abruf öffentlicher Inhalte, die Nutzung externer Dienste, die Anmeldung eines Nutzers sowie für bestimmte Funktionen (z. B. Synchronisations-, Karten- oder Kommunikationsfunktionen) ist eine aktive Internetverbindung erforderlich.
+Für den Abruf öffentlicher Inhalte, die Nutzung externer Dienste, die Anmeldung eines Nutzerkontos sowie für bestimmte Funktionen (z. B. Synchronisations-, Karten- oder Kommunikationsfunktionen) ist eine aktive Internetverbindung erforderlich.
 
 Die Nutzung von MessageDrop kann – abhängig vom jeweiligen Endgerät, Tarif und Anbieter – zu Kosten für die Internetverbindung (z. B. mobile Daten, Roaming-Gebühren) führen. Diese Kosten trägt ausschließlich der Nutzer.
 
-Wir haben keinen Einfluss auf Art, Umfang oder Abrechnung der Internetverbindung und übernehmen keine Verantwortung für daraus entstehende Kosten oder Einschränkungen.
+Wir haben keinen Einfluss auf Art, Umfang oder Abrechnung der Internetverbindung und übernehmen keine Verantwortung für daraus entstehende Kosten, Einschränkungen oder Verbindungsprobleme.
 
-Bestimmte Funktionen können bei eingeschränkter oder fehlender Internetverbindung nur eingeschränkt oder gar nicht zur Verfügung stehen.
+Für die Nutzung von MessageDrop ist ein geeignetes Endgerät erforderlich (z. B. Smartphone, Tablet oder Desktop-Computer) sowie ein aktueller, gängiger Webbrowser, der moderne Web-Standards unterstützt. Die Nutzung von Browsern oder Systemen, die diese technischen Voraussetzungen nicht erfüllen, kann zu Einschränkungen in Funktionalität, Darstellung oder Sicherheit führen.
+
+Bestimmte Funktionen von MessageDrop können bei eingeschränkter oder fehlender Internetverbindung sowie bei nicht geeigneten Endgeräten oder Browsern nur eingeschränkt oder gar nicht zur Verfügung stehen.
 
 ###
-4. Nutzung ohne eigenen Nutzer (Basisnutzung)
+4. Nutzung ohne eigenes Nutzerkonto (Basisnutzung)
 ###
 
-MessageDrop kann grundsätzlich auch ohne Anlage eines Nutzers verwendet werden.
+MessageDrop kann grundsätzlich auch ohne Anlage eines Nutzerkontos verwendet werden.
 
 Im Rahmen dieser Basisnutzung können insbesondere:
 - öffentliche Inhalte gelesen werden, soweit diese verfügbar sind,
@@ -92,7 +94,7 @@ Erst wenn der Nutzer einen externen Anbieter ausdrücklich aktiviert, werden des
 
 Dabei kann der jeweilige Anbieter technisch bedingt Informationen über den Abruf erhalten (z. B. IP-Adresse, Geräte- oder Browserinformationen) und gegebenenfalls Cookies oder vergleichbare Technologien einsetzen. Auf Art, Umfang und Zweck dieser Datenverarbeitung durch den externen Anbieter haben wir keinen Einfluss. Es gelten ausschließlich die Nutzungs- und Datenschutzbestimmungen des jeweiligen Anbieters.
 
-Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer Abruf externer Inhalte und keine Datenübertragung an diese Anbieter statt.
+Ohne eine ausdrückliche Aktivierung durch den Nutzer findet kein automatischer Abruf externer Inhalte und keine Datenübertragung an diese Anbieter statt. Die Aktivierung externer Inhalte erfolgt freiwillig und kann vom Nutzer jederzeit mit Wirkung für die Zukunft wieder deaktiviert werden.
 
 Im Rahmen der Basisnutzung besteht zudem die Möglichkeit, lokal Profile zu erstellen. Ein Profil besteht aus einem frei wählbaren Namen und einem Avatar (Bild).
 
@@ -107,16 +109,16 @@ Die Anzeige eines Profils dient ausschließlich der individuellen Orientierung u
 Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit oder Angemessenheit lokal vergebener Profile und keine Haftung für daraus abgeleitete Annahmen.
 
 ###
-5. Nutzeranlage und Funktionen mit Nutzer
+5. Nutzerkonten und Funktionen mit Nutzerkonto
 ###
 
 ###
-5.1 Nutzeranlage und PIN-basierte Anmeldung
+5.1 Nutzerkontoanlage und PIN-basierte Anmeldung
 ###
 
-Sofern ein Nutzer freiwillig einen Nutzer anlegt, ist hierfür ausschließlich die Vergabe eines PINs erforderlich.
+Sofern ein Nutzer freiwillig ein Nutzerkonto anlegt, ist hierfür ausschließlich die Vergabe eines PINs erforderlich. Alternativ kann der Nutzer jederzeit ein neues Nutzerkonto anlegen und die App ohne Bezug zu einem zuvor bestehenden Nutzerkonto neu verwenden.
 
-Beim Anlegen des Nutzers wird serverseitig:
+Beim Anlegen des Nutzerkontos wird serverseitig:
 - eine eindeutige User-ID erzeugt,
 - ein Nutzerstatus (z. B. enabled oder disabled) geführt,
 - das Datum des letzten Logins gespeichert,
@@ -134,35 +136,33 @@ Eine dauerhafte Speicherung der entschlüsselten Nutzerdaten oder des PINs auf d
 
 Nach erfolgreicher Anmeldung wird der entschlüsselte Nutzer ausschließlich im Arbeitsspeicher des Endgeräts vorgehalten und bleibt dort nur bis zum Logout oder bis zum Schließen der App verfügbar.
 
-Wird der PIN vergessen, besteht keine Möglichkeit, den Nutzer, den PIN oder die lokal gespeicherten Nutzerdaten wiederherzustellen, da weder der PIN noch eine entschlüsselbare Kopie der Nutzerdaten serverseitig vorgehalten werden.
+Wird der PIN vergessen, besteht keine Möglichkeit, das Nutzerkonto oder die lokal gespeicherten Nutzerdaten ohne ein zuvor erstelltes Backup wiederherzustellen, da weder der PIN noch eine entschlüsselbare Kopie der Nutzerdaten serverseitig vorgehalten werden.
 
 Der Nutzer kann für sich selbst optional ein lokales Profil anlegen, bestehend aus einem frei wählbaren Namen und einem Avatar (Bild). Dieses Profil dient ausschließlich der besseren Erkennbarkeit eigener Beiträge innerhalb der eigenen Nutzung. Das Profil wird bei eigenen Beiträgen lediglich lokal angezeigt, nicht an unsere Server übertragen und ist für andere Nutzer nicht sichtbar.
 
-Nutzer, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden aus dem Backend ohne Vorwarnung entfernt.
+Nutzerkonten, bei denen über einen Zeitraum von 90 Tagen keine Anmeldung erfolgt, werden aus dem Backend ohne Vorwarnung entfernt.
 
-Mit der Entfernung des Nutzers werden zugleich alle mit diesem Nutzer verbundenen serverseitig gespeicherten Datensätze gelöscht, insbesondere:
+Mit der Entfernung des Nutzerkontos werden zugleich alle mit diesem Nutzerkonto verbundenen serverseitig gespeicherten Datensätze gelöscht, insbesondere:
 - die zugehörige User-ID,
 - der Nutzerstatus,
 - Login- und Aktivitätsinformationen,
-- sowie alle sonstigen serverseitigen Referenzen, die eindeutig diesem Nutzer zugeordnet sind.
+- sowie alle sonstigen serverseitigen Referenzen, die eindeutig diesem Nutzerkonto zugeordnet sind.
 
-Nach der Löschung ist eine weitere Anmeldung mit diesen Nutzerdaten nicht mehr möglich.
+Nach der Löschung ist eine weitere Anmeldung mit diesen Nutzerdaten nicht mehr möglich, sofern kein zuvor erstelltes Backup vorhanden ist.
 
-Eine Wiederherstellung des Nutzers oder der zugehörigen Daten ist ausgeschlossen.
+Unabhängig davon kann der Nutzer sein Nutzerkonto jederzeit selbstständig über eine Funktion in der App löschen.
 
-Unabhängig davon kann der Nutzer seinen Nutzer jederzeit selbstständig über eine Funktion in der App löschen.
+In diesem Fall erfolgt die sofortige und endgültige Löschung des Nutzerkontos sowie aller zugehörigen serverseitigen und lokalen Datensätze.
 
-In diesem Fall erfolgt die sofortige und endgültige Löschung des Nutzers sowie aller zugehörigen serverseitigen und lokalen Datensätze.
-
-Die Löschung ist endgültig und kann nicht rückgängig gemacht werden.
+Eine Wiederherstellung des gelöschten Nutzerkontos ist ausschließlich durch das Einspielen eines zuvor erstellten Backups gemäß Abschnitt 5.2 durch den Anwender möglich.
 
 ###
 5.2 Lokale Speicherung, Datenminimierung und Risiko des Datenverlustes
 ###
 
-MessageDrop ist nach dem Grundsatz der Datenminimierung und des Datenschutzes durch Technikgestaltung konzipiert.
+MessageDrop ist nach dem Grundsatz der Datenminimierung und des Datenschutzes durch technische Gestaltung konzipiert.
 
-Soweit technisch möglich, speichert die App Daten ausschließlich lokal auf dem Endgerät des Nutzers, insbesondere in der IndexedDB des Browsers. Ziel ist es, einen möglichst hohen Datenschutzstandard zu gewährleisten und die Speicherung personenbezogener Daten auf unseren Servern auf das notwendige Minimum zu beschränken.
+Soweit technisch möglich, speichert die App Daten primär lokal auf dem Endgerät des Nutzers, insbesondere in der IndexedDB des Browsers. Ziel ist es, einen möglichst hohen Datenschutzstandard zu gewährleisten und die Speicherung von Daten, insbesondere personenbezogenen Daten, auf unseren Servern auf das notwendige Minimum zu beschränken.
 
 Die lokal gespeicherten Daten dienen insbesondere:
 - Offline-Funktionen,
@@ -182,6 +182,18 @@ Lokale Daten können jederzeit verloren gehen oder gelöscht werden, unter ander
 
 Soweit gesetzlich zulässig, übernehmen wir keine Haftung für den Verlust, die Beschädigung oder die Nichtverfügbarkeit lokal gespeicherter Daten.
 
+Zur Reduzierung des Risikos eines Datenverlustes stellt MessageDrop eine optionale Backup- und Restore-Funktion zur Verfügung. Die Nutzung dieser Funktion erfolgt freiwillig und auf Verantwortung des Nutzers.
+
+Im Rahmen der Backup-Funktion wählt der Nutzer einen lokalen Speicherort (z. B. einen Ordner auf dem Endgerät) sowie einen persönlichen PIN. Das Backup wird verschlüsselt gespeichert. Der verwendete PIN ist ausschließlich dem Nutzer bekannt und wird von uns weder gespeichert noch wiederhergestellt. Bei Verlust oder Vergessen des PINs ist eine Wiederherstellung des Backups technisch nicht möglich.
+
+Die im Backup enthaltenen Daten entsprechen dem zum Zeitpunkt der Erstellung dem Nutzer zugeordneten lokal und serverseitig gespeicherten Datenbestand.
+
+Beim Einspielen eines Backups (Restore) wird ein eventuell vorhandener Nutzer sowohl lokal als auch serverseitig endgültig gelöscht. Sämtliche zugehörigen Daten werden entfernt und anschließend auf Basis des Backups neu angelegt. Eine Zusammenführung („Merge“) von bestehenden und wiederhergestellten Daten erfolgt nicht.
+
+Im Rahmen des Restore-Vorgangs werden die im Backup enthaltenen Daten erneut an den Server übertragen und dort – soweit technisch vorgesehen – neu erzeugt. Abweichungen zwischen dem ursprünglichen Serverzustand und dem nach dem Restore hergestellten Zustand sind möglich.
+
+Die Wiederherstellung eines Backups kann – insbesondere aufgrund technischer Einschränkungen, fehlerhafter Backups, inkompatibler Umgebungen, zwischenzeitlicher Änderungen der Anwendung oder unvollständiger Datensätze – fehlschlagen oder zu Abweichungen vom erwarteten Datenbestand führen. Ein Anspruch auf vollständige, fehlerfreie oder erfolgreiche Wiederherstellung aller Daten besteht nicht.
+
 ###
 5.3 Öffentliche Inhalte erstellen und veröffentlichen
 ###
@@ -197,15 +209,15 @@ Nutzer dürfen ausschließlich solche Inhalte öffentlich erstellen, hochladen o
 Insbesondere dürfen nur Inhalte veröffentlicht werden, an denen der Nutzer die erforderlichen Rechte besitzt oder über die erforderlichen Nutzungs- oder Lizenzrechte verfügt.
 
 Unzulässig sind insbesondere Inhalte, die:
-- gegen geltendes Recht verstoßen
-- Rechte Dritter verletzen (z. B. Urheber-, Persönlichkeits-, Marken- oder Datenschutzrechte)
-- strafbare Inhalte darstellen oder fördern
-- zu strafbaren Handlungen auffordern
-- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten
-- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind
-- diskriminierend, extremistisch oder menschenverachtend sind
-- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten
-- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten
+- gegen geltendes Recht verstoßen,
+- Rechte Dritter verletzen (z. B. Urheber-, Persönlichkeits-, Marken- oder Datenschutzrechte),
+- strafbare Inhalte darstellen oder fördern,
+- zu strafbaren Handlungen auffordern,
+- Hassrede, Gewaltverherrlichung, Bedrohungen oder gezielte Belästigung enthalten,
+- beleidigend, herabwürdigend oder bewusst verletzend gegenüber Einzelpersonen oder Gruppen sind,
+- diskriminierend, extremistisch oder menschenverachtend sind,
+- pornografische, sexuell explizite oder jugendgefährdende Inhalte enthalten,
+- sexuelle Handlungen oder Darstellungen Minderjähriger zeigen oder andeuten,
 - private oder personenbezogene Daten Dritter ohne deren ausdrückliche Einwilligung offenlegen, insbesondere:
   - Vor- und Nachnamen, Spitznamen oder sonstige identifizierende Namensangaben,
   - Geburtsdatum oder Geburtstag,
@@ -224,15 +236,15 @@ Unzulässig sind insbesondere Inhalte, die:
   - Informationen zu politischen Meinungen, religiösen oder weltanschaulichen Überzeugungen,
   - Bank-, Zahlungs- oder Finanzinformationen,
   - Zugangsdaten, Passwörter, PINs oder sonstige Sicherheitsinformationen.
-- irreführende, betrügerische oder manipulative Inhalte enthalten
-- falsche Tatsachenbehauptungen über Personen verbreiten
-- zu Täuschung, Betrug oder Missbrauch verleiten
-- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten
-- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten
-- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern
-- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten
-- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung)
-- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen
+- irreführende, betrügerische oder manipulative Inhalte enthalten,
+- falsche Tatsachenbehauptungen über Personen verbreiten,
+- zu Täuschung, Betrug oder Missbrauch verleiten,
+- Schadsoftware, Malware, Spyware oder vergleichbare schädliche Inhalte enthalten,
+- Spam, Kettennachrichten oder missbräuchliche Automatisierungen beinhalten,
+- zur Umgehung von Sicherheitsmaßnahmen oder Schutzmechanismen auffordern,
+- technische Beschränkungen oder Nutzungsbegrenzungen gezielt umgehen oder zu deren Umgehung anleiten,
+- den Dienst in einer Weise missbrauchen, die die Funktionsfähigkeit, Sicherheit oder Verfügbarkeit beeinträchtigt (z. B. Flooding, Scraping, automatisierte Massennutzung),
+- offensichtlich aus rechtswidrigen, nicht autorisierten oder geleakten Quellen stammen.
 
 Dies gilt unabhängig davon, ob die betroffene Person Nutzer von MessageDrop ist oder ob die Informationen öffentlich zugänglich erscheinen.
 
@@ -240,11 +252,11 @@ Die Aufzählung ist nicht abschließend.
 
 Zur Unterstützung der Moderation setzen wir automatisierte Verfahren ein, einschließlich KI-gestützter Erkennung. Eine umfassende oder permanente Vorabkontrolle sämtlicher Inhalte findet jedoch nicht statt.
 
-Öffentliche Inhalte sind grundsätzlich zeitlich begrenzt verfügbar. Öffentliche Nachrichten und öffentliche Kommentare werden nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit oder Archivierung öffentlicher Inhalte besteht nicht.
+Öffentliche Inhalte sind grundsätzlich zeitlich begrenzt verfügbar. Öffentliche Nachrichten und öffentliche Kommentare werden nach 30 Tagen gelöscht. Ein Anspruch auf dauerhafte Verfügbarkeit, Archivierung oder Wiederherstellung öffentlicher Inhalte besteht nicht.
 
-Öffentliche Inhalte können von Nutzern bewertet werden (z. B. „Like“/„Dislike“). Solche Bewertungen dienen der Interaktion und Darstellung innerhalb des Dienstes; ein Anspruch auf bestimmte Reichweite, Sichtbarkeit oder Bewertungsergebnisse besteht nicht.
+Es besteht kein Anspruch darauf, dass öffentliche Inhalte innerhalb des Dienstes dauerhaft, vollständig oder überhaupt angezeigt, verbreitet oder auffindbar sind. Die Sichtbarkeit öffentlicher Inhalte kann insbesondere von technischen, funktionalen, moderativen, rechtlichen oder nutzungsabhängigen Faktoren abhängen.
 
-Bewertungen (z. B. „Like“/„Dislike“) sind sowohl für öffentliche Nachrichten als auch für öffentliche Kommentare möglich. Ein Anspruch auf bestimmte Bewertungsergebnisse oder eine bestimmte Wirkung solcher Bewertungen besteht nicht.
+Öffentliche Nachrichten und öffentliche Kommentare können von Nutzern bewertet werden (z. B. „Like“/„Dislike“). Bewertungen dienen ausschließlich der Interaktion und Darstellung innerhalb des Dienstes. Ein Anspruch auf bestimmte Reichweite, Sichtbarkeit, Bewertungsergebnisse oder eine bestimmte Wirkung solcher Bewertungen besteht nicht.
 
 ###
 6. Verfahren nach dem Digital Services Act (DSA)
@@ -270,11 +282,15 @@ Hinweise auf rechtswidrige Inhalte prüfen wir unverzüglich. Bei Kenntniserlang
 
 Die im Rahmen eines DSA-Verfahrens erhobenen und dokumentierten Informationen können an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen weitergegeben werden, soweit dies gesetzlich vorgeschrieben oder zulässig ist.
 
+Der meldenden Person wird – sofern im Rahmen der Meldung freiwillig eine E-Mail-Adresse angegeben wurde – eine Benachrichtigung über wesentliche Verfahrensschritte per E-Mail übermittelt. Eine Verpflichtung zur Angabe einer E-Mail-Adresse besteht nicht.
+
+Unabhängig davon kann sich die meldende Person jederzeit über den Stand des Verfahrens über die zugehörige öffentliche Fallseite informieren. Der Link zur öffentlichen Fallseite wird dem Melder unmittelbar nach Abgabe der Meldung angezeigt und kann kopiert sowie für spätere Nachfragen oder zur eigenen Dokumentation gespeichert werden.
+
 Der von einem DSA-Verfahren betroffene Nutzer wird über den jeweiligen Verfahrensstand, Entscheidungen und etwaige Maßnahmen informiert. Diese Informationen werden über Systemmeldungen bereitgestellt.
 
 Systemmeldungen sind interne Nachrichten, die vom Admin-Backend an das MessageDrop-Backend übermittelt und dem Nutzer im Frontend in einem gesonderten Nachrichtenbereich angezeigt werden. Sie dienen der formellen Kommunikation im Rahmen gesetzlicher Verfahren und stellen kein klassisches E-Mail-Postfach dar.
 
-Für jeden DSA-relevanten Vorgang (Meldung oder Beschwerde) kann eine öffentlich zugängliche Fallseite bereitgestellt werden. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
+Für jeden DSA-relevanten Vorgang (Meldung oder Beschwerde) wird eine öffentlich zugängliche Fallseite bereitgestellt. Diese dient der gesetzlichen Transparenz und Nachvollziehbarkeit des Verfahrens.
 
 Auf diesen öffentlichen Fallseiten werden ausschließlich anonymisierte oder nicht personenbezogene Informationen dargestellt, insbesondere:
 - Art des gemeldeten Inhalts,
@@ -345,7 +361,7 @@ Dennoch können Störungen auftreten, z. B. durch Wartungen, Infrastruktur- oder
 
 Eine bestimmte Verfügbarkeit oder Wiederherstellungszeit wird nicht garantiert.
 
-Backups werden in angemessenen Abständen erstellt; eine lückenlose Wiederherstellung kann jedoch nicht zugesichert werden.
+Serverseitige Backups werden in angemessenen Abständen erstellt; eine lückenlose Wiederherstellung kann jedoch nicht zugesichert werden.
 
 Soweit gesetzlich zulässig, haften wir nicht für mittelbare Schäden, entgangenen Gewinn, Datenverlust oder Folgeschäden.
 
