@@ -1,5 +1,6 @@
-import { effect, inject, Injectable, signal } from '@angular/core';
+import { computed, effect, inject, Injectable, signal } from '@angular/core';
 import { TranslocoService } from '@jsverse/transloco';
+import { AppService } from './app.service';
 
 const LANGUAGE_STORAGE_KEY = 'messagedrop.language';
 const SUPPORTED_LANGS = ['en', 'de'] as const;
@@ -8,20 +9,56 @@ type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 @Injectable({ providedIn: 'root' })
 export class LanguageService {
   private readonly transloco = inject(TranslocoService);
+  private readonly appService = inject(AppService);
 
+  private readonly _activeLang = signal<SupportedLang>(this.resolveInitialLang());
+  readonly activeLang = this._activeLang.asReadonly();
   readonly availableLangs = SUPPORTED_LANGS;
-  readonly activeLang = signal<SupportedLang>(this.resolveInitialLang());
+
+  private readonly persistedLang = computed<SupportedLang | null>(() => {
+    this.appService.settingsSet();
+    if (!this.appService.isSettingsReady()) {
+      return null;
+    }
+
+    return this.normalizeLang(this.appService.getAppSettings().language);
+  });
 
   constructor() {
     effect(() => {
-      const lang = this.activeLang();
+      const lang = this._activeLang();
       this.transloco.setActiveLang(lang);
-      this.persistLang(lang);
+      this.updateDocumentLang(lang);
+      this.persistLocalStorage(lang);
+    });
+
+    effect(() => {
+      const persisted = this.persistedLang();
+      if (persisted && persisted !== this._activeLang()) {
+        this._activeLang.set(persisted);
+      }
+    });
+
+    effect(() => {
+      const lang = this._activeLang();
+      this.appService.settingsSet();
+      if (!this.appService.isSettingsReady()) {
+        return;
+      }
+
+      const settings = this.appService.getAppSettings();
+      if (settings.language === lang) {
+        return;
+      }
+
+      void this.appService.setAppSettings({ ...settings, language: lang });
     });
   }
 
-  setLanguage(lang: string): void {
-    this.activeLang.set(this.normalizeLang(lang) ?? this.defaultLang);
+  setLanguage(lang: SupportedLang): void {
+    if (lang !== this._activeLang()) {
+      this._activeLang.set(lang);
+    }
   }
 
   private get defaultLang(): SupportedLang {
@@ -29,17 +66,19 @@ export class LanguageService {
   }
 
   private resolveInitialLang(): SupportedLang {
+    if (this.appService.isSettingsReady()) {
+      const settingsLang = this.normalizeLang(this.appService.getAppSettings().language);
+      if (settingsLang) {
+        return settingsLang;
+      }
+    }
+
     const stored = this.normalizeLang(this.readStoredLang());
     if (stored) {
       return stored;
     }
 
-    const browser = this.resolveBrowserLang();
-    if (browser) {
-      return browser;
-    }
-
-    return this.defaultLang;
+    return this.resolveBrowserLang() ?? this.defaultLang;
   }
 
   private resolveBrowserLang(): SupportedLang | null {
@@ -84,7 +123,7 @@ export class LanguageService {
     }
   }
 
-  private persistLang(lang: SupportedLang): void {
+  private persistLocalStorage(lang: SupportedLang): void {
     if (typeof localStorage === 'undefined') {
       return;
     }
@@ -93,5 +132,13 @@ export class LanguageService {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, lang);
     } catch {
     }
+  }
+
+  private updateDocumentLang(lang: SupportedLang): void {
+    if (typeof document === 'undefined') {
+      return;
+    }
+
+    document.documentElement.lang = lang;
   }
 }
