@@ -3,17 +3,17 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
 import { BackupEnvelope, BackupLocalImage, BackupPayload, UserServerBackup } from '../interfaces/backup';
 import { IndexedDbBackup } from '../interfaces/indexed-db-backup';
 import { LocalImage } from '../interfaces/local-image';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { environment } from '../../environments/environment';
+import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
-import { BackupStateService } from './backup-state.service';
 
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
@@ -56,11 +56,6 @@ export class RestoreService {
 
     const hasUser = await this.indexedDbService.hasUser();
     if (hasUser && !this.userService.isReady()) {
-      this.snackBar.open('Please log in to restore your backup.', undefined, {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top'
-      });
       this.userService.login(() => {
         this.startRestore();
       });
