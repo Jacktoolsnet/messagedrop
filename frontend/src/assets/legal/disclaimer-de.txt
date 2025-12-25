@@ -28,6 +28,37 @@ Vollständige Fassung
 ###
 
 ###
+Begriffsverzeichnis
+###
+
+Nutzer  
+Natürliche Person, die MessageDrop verwendet, unabhängig davon, ob ein Nutzerkonto angelegt wurde.
+
+Nutzerkonto  
+Technische, pseudonyme Zugangseinheit, die ein Nutzer freiwillig anlegen kann und die durch eine User-ID identifiziert wird.
+
+User-ID  
+Technische Kennung eines Nutzerkontos. Die User-ID ist pseudonym und erlaubt für sich genommen keine direkte Identifikation einer Person.
+
+Öffentliche Inhalte  
+Von Nutzern erstellte Inhalte (z. B. öffentliche Nachrichten und Kommentare), die grundsätzlich öffentlich sichtbar sind, sofern sie nicht eingeschränkt oder entfernt wurden.
+
+Private Kommunikation  
+Kommunikation zwischen Nutzern, die verschlüsselt übertragen wird (z. B. private Chats).
+
+Systemmeldungen  
+Interne Mitteilungen, die ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend angezeigt werden (z. B. zu DSA-Verfahren oder Wartungsarbeiten). Systemmeldungen sind kein E-Mail-Postfach.
+
+DSA-Verfahren  
+Verfahren nach dem Digital Services Act (DSA), insbesondere Meldungen („Notice“) und Beschwerden („Appeal“) im Zusammenhang mit öffentlichen Inhalten.
+
+Öffentliche Fallseite  
+Öffentlich zugängliche Seite zu einem DSA-Verfahren, auf der ausschließlich anonymisierte oder nicht personenbezogene Informationen veröffentlicht werden.
+
+Backup / Restore  
+Optionale Funktion zur Sicherung und Wiederherstellung nutzerbezogener Daten durch den Nutzer. Backups werden verschlüsselt gespeichert und erfordern einen vom Nutzer vergebenen PIN.
+
+###
 1. Geltungsbereich
 ###
 
@@ -130,11 +161,11 @@ Die vollständigen Nutzerdaten werden ausschließlich verschlüsselt auf dem End
 
 Der vom Nutzer vergebene PIN ist integraler Bestandteil dieses verschlüsselten Nutzerdatensatzes und wird nicht separat gespeichert.
 
-Zum Anmeldevorgang wird der verschlüsselte Nutzer temporär an das Backend übertragen und dort ausschließlich für die Dauer der Prüfung entschlüsselt, um zu überprüfen, ob der eingegebene PIN korrekt ist.
+Zum Anmeldevorgang wird der verschlüsselte Nutzerdatensatz temporär an das Backend übertragen und dort ausschließlich für die Dauer der Prüfung entschlüsselt, um zu überprüfen, ob der eingegebene PIN korrekt ist.
 
 Eine dauerhafte Speicherung der entschlüsselten Nutzerdaten oder des PINs auf dem Server erfolgt nicht.
 
-Nach erfolgreicher Anmeldung wird der entschlüsselte Nutzer ausschließlich im Arbeitsspeicher des Endgeräts vorgehalten und bleibt dort nur bis zum Logout oder bis zum Schließen der App verfügbar.
+Nach erfolgreicher Anmeldung wird der entschlüsselte Nutzerdatensatz ausschließlich im Arbeitsspeicher des Endgeräts vorgehalten und bleibt dort nur bis zum Logout oder bis zum Schließen der App verfügbar.
 
 Wird der PIN vergessen, besteht keine Möglichkeit, das Nutzerkonto oder die lokal gespeicherten Nutzerdaten ohne ein zuvor erstelltes Backup wiederherzustellen, da weder der PIN noch eine entschlüsselbare Kopie der Nutzerdaten serverseitig vorgehalten werden.
 
@@ -188,7 +219,7 @@ Im Rahmen der Backup-Funktion wählt der Nutzer einen lokalen Speicherort (z. B.
 
 Die im Backup enthaltenen Daten entsprechen dem zum Zeitpunkt der Erstellung dem Nutzer zugeordneten lokal und serverseitig gespeicherten Datenbestand.
 
-Beim Einspielen eines Backups (Restore) wird ein eventuell vorhandener Nutzer sowohl lokal als auch serverseitig endgültig gelöscht. Sämtliche zugehörigen Daten werden entfernt und anschließend auf Basis des Backups neu angelegt. Eine Zusammenführung („Merge“) von bestehenden und wiederhergestellten Daten erfolgt nicht.
+Beim Einspielen eines Backups (Restore) wird ein eventuell vorhandenes Nutzerkonto sowohl lokal als auch serverseitig endgültig gelöscht. Sämtliche zugehörigen Daten werden entfernt und anschließend auf Basis des Backups neu angelegt. Eine Zusammenführung („Merge“) von bestehenden und wiederhergestellten Daten erfolgt nicht.
 
 Im Rahmen des Restore-Vorgangs werden die im Backup enthaltenen Daten erneut an den Server übertragen und dort – soweit technisch vorgesehen – neu erzeugt. Abweichungen zwischen dem ursprünglichen Serverzustand und dem nach dem Restore hergestellten Zustand sind möglich.
 
@@ -263,8 +294,8 @@ Es besteht kein Anspruch darauf, dass öffentliche Inhalte innerhalb des Dienste
 ###
 
 Für öffentliche Inhalte, einschließlich öffentlicher Kommentare, kann jederzeit ein Verfahren nach dem Digital Services Act (DSA) eingeleitet werden, insbesondere durch:
-- eine Meldung („Notice“)
-- eine Beschwerde („Appeal“)
+- eine Meldung („Notice“),
+- eine Beschwerde („Appeal“).
 
 Wird ein solches Verfahren eingeleitet, wird der betroffene Inhalt vorübergehend auf den Status „nicht öffentlich sichtbar“ gestellt.
 

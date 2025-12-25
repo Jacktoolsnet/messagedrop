@@ -32,6 +32,46 @@ Vollständige Fassung
 ###
 
 ###
+Begriffsverzeichnis
+###
+
+Nutzer
+Natürliche Person, die MessageDrop verwendet, unabhängig davon, ob ein Nutzerkonto angelegt wurde.
+
+Nutzerkonto
+Technische, pseudonyme Zugangseinheit, die ein Nutzer freiwillig anlegen kann und die durch eine User-ID identifiziert wird.
+
+User-ID
+Technische Kennung eines Nutzerkontos. Die User-ID ist pseudonym und erlaubt für sich genommen keine direkte Identifikation einer Person.
+
+Besucher
+Nutzer, der MessageDrop ohne Anlage eines Nutzerkontos verwendet.
+
+Öffentliche Inhalte
+Von Nutzern erstellte Inhalte (z. B. öffentliche Nachrichten und Kommentare), die grundsätzlich öffentlich sichtbar sind, sofern sie nicht eingeschränkt oder entfernt wurden.
+
+Private Kommunikation
+Kommunikation zwischen Nutzern, die verschlüsselt übertragen wird (z. B. private Chats), soweit angeboten.
+
+Externe Inhalte / Drittanbieter
+Inhalte, Funktionen oder Einbettungen, die von Drittanbietern bereitgestellt werden und ggf. eine Datenübertragung an den jeweiligen Anbieter auslösen (z. B. iFrames/oEmbed).
+
+Systemmeldungen
+Interne Mitteilungen, die ausschließlich durch autorisierte administrative Systeme erzeugt und im Frontend angezeigt werden (z. B. zu DSA-Verfahren oder Wartungsarbeiten). Systemmeldungen sind kein E-Mail-Postfach.
+
+DSA-Verfahren
+Verfahren nach dem Digital Services Act (DSA), insbesondere Meldungen („Notice“) und Beschwerden („Appeal“) im Zusammenhang mit öffentlichen Inhalten.
+
+Öffentliche Fallseite
+Öffentlich zugängliche Seite zu einem DSA-Verfahren, auf der ausschließlich anonymisierte oder nicht personenbezogene Informationen veröffentlicht werden.
+
+Push-Benachrichtigungen / Push-Token
+Technische Funktion zur Zustellung von Benachrichtigungen an ein Endgerät. Push-Token sind technische Kennungen, die zur Zustellung erforderlich sein können.
+
+Lokale Speicherung
+Speicherung von Daten auf dem Endgerät des Nutzers (z. B. IndexedDB, App-Speicher, Cache). Diese Daten können durch den Nutzer oder durch technische Umstände gelöscht werden.
+
+###
 1. Anbieter
 ###
 
