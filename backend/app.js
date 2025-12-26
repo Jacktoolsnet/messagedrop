@@ -67,13 +67,16 @@ const logFormat = winston.format.combine(
   })
 );
 
+const infoOnlyFilter = winston.format((info) => (info.level === 'error' ? false : info));
+
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
   filename: 'logs/backend-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
-  level: 'info'
+  level: 'info',
+  format: winston.format.combine(infoOnlyFilter(), logFormat)
 });
 
 // Transport für Error-Logs
@@ -82,7 +85,8 @@ const errorTransport = new winston.transports.DailyRotateFile({
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
-  level: 'error'
+  level: 'error',
+  format: logFormat
 });
 
 // Logger erstellen
