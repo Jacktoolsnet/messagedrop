@@ -1,4 +1,5 @@
 const axios = require('axios');
+const { signServiceJwt } = require('./serviceJwt');
 
 function resolveBaseUrl(envBase, envPort, fallback) {
   if (fallback) return fallback.replace(/\/+$/, '');
@@ -20,14 +21,21 @@ function getCallerFile() {
   return 'unknown';
 }
 
-function createForwarder({ baseUrl, token, source }) {
-  if (!baseUrl || !token) {
-    return () => { };
+function createForwarder({ baseUrl, token, audience, source }) {
+  if (!baseUrl) {
+    return () => { /* disabled */ };
   }
   const post = async (path, payload) => {
     try {
+      let authHeader = null;
+      if (audience) {
+        const jwtToken = await signServiceJwt({ audience });
+        authHeader = `Bearer ${jwtToken}`;
+      } else if (token) {
+        authHeader = `Bearer ${token}`;
+      }
       await axios.post(`${baseUrl}${path}`, payload, {
-        headers: { 'x-api-authorization': token },
+        headers: authHeader ? { Authorization: authHeader } : undefined,
         timeout: 2000,
         validateStatus: () => true
       });

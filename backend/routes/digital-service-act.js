@@ -5,6 +5,7 @@ const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const FormData = require('form-data');
 const tableMessage = require('../db/tableMessage');
+const { signServiceJwt } = require('../utils/serviceJwt');
 
 const router = express.Router();
 
@@ -45,16 +46,16 @@ const moderationToggleLimiter = rateLimit({
     message: { error: 'Too many moderation toggle requests. Please try again later.' }
 });
 
+const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
+
 /* --------------------------------- Helper ---------------------------------- */
 async function forwardPost(path, body, reqHeaders = {}) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
+    const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
     const headers = {
         'content-type': 'application/json',
-        'x-api-authorization': process.env.ADMIN_TOKEN,
+        Authorization: `Bearer ${serviceToken}`,
     };
-    if (reqHeaders?.authorization) {
-        headers.authorization = reqHeaders.authorization;
-    }
 
     const resp = await axios.post(url, body, {
         headers,
@@ -66,8 +67,9 @@ async function forwardPost(path, body, reqHeaders = {}) {
 
 async function forwardPostBackend(path, body, extraHeaders = {}) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/backend${path}`;
+    const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
     const headers = {
-        'x-api-authorization': process.env.ADMIN_TOKEN,
+        Authorization: `Bearer ${serviceToken}`,
         ...extraHeaders
     };
     const resp = await axios.post(url, body, {
@@ -197,7 +199,8 @@ router.post('/notices/:id/evidence', evidenceLimiter, (req, res) => {
                 form.append('file', req.file.buffer, req.file.originalname);
                 // pass through optional hash if provided
                 if (req.body?.hash) form.append('hash', String(req.body.hash));
-                const headers = form.getHeaders({ 'x-api-authorization': process.env.ADMIN_TOKEN });
+                const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
+                const headers = form.getHeaders({ Authorization: `Bearer ${serviceToken}` });
                 const resp = await axios.post(`${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/backend/notices/${id}/evidence`, form, {
                     headers,
                     timeout: 10000,
@@ -237,7 +240,8 @@ router.post('/status/:token/evidence', evidenceLimiter, (req, res) => {
                 const form = new FormData();
                 form.append('file', req.file.buffer, req.file.originalname);
                 if (req.body?.hash) form.append('hash', String(req.body.hash));
-                const headers = form.getHeaders({ 'x-api-authorization': process.env.ADMIN_TOKEN });
+                const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
+                const headers = form.getHeaders({ Authorization: `Bearer ${serviceToken}` });
                 const resp = await axios.post(`${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/public/status/${token}/evidence`, form, {
                     headers,
                     timeout: 10000,
@@ -249,7 +253,8 @@ router.post('/status/:token/evidence', evidenceLimiter, (req, res) => {
             }
 
             // JSON forward (url/hash) -> use dedicated URL endpoint for robustness
-            const headers = { 'x-api-authorization': process.env.ADMIN_TOKEN };
+            const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
+            const headers = { Authorization: `Bearer ${serviceToken}` };
             const endpoint = req.body?.type === 'hash' ? 'evidence' : 'evidence/url';
             const resp = await axios.post(`${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/public/status/${token}/${endpoint}`, req.body, {
                 headers,

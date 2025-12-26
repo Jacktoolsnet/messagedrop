@@ -88,7 +88,7 @@ if (process.env.NODE_ENV !== 'production') {
 const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
 attachForwarding(logger, {
   baseUrl: adminLogBase,
-  token: process.env.ADMIN_TOKEN || process.env.BACKEND_TOKEN,
+  audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend',
   source: 'openmeteo-service'
 });
 

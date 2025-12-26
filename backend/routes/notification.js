@@ -3,12 +3,14 @@ const crypto = require('crypto');
 const axios = require('axios');
 const security = require('../middleware/security');
 const tableNotification = require('../db/tableNotification');
+const { signServiceJwt, verifyServiceJwt } = require('../utils/serviceJwt');
 
 const router = express.Router();
 
 router.use(express.json({ limit: '1mb' }));
 
 const ALLOWED_STATUSES = new Set(Object.values(tableNotification.notificationStatus));
+const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
 
 function resolveSocketIoBaseUrl() {
     const base = (process.env.SOCKETIO_BASE_URL || process.env.BASE_URL || '').replace(/\/+$/, '');
@@ -21,11 +23,11 @@ function resolveSocketIoBaseUrl() {
 
 async function emitSystemNotification(userId, payload) {
     const baseUrl = resolveSocketIoBaseUrl();
-    const token = process.env.BACKEND_TOKEN;
-    if (!baseUrl || !token || !userId) {
+    if (!baseUrl || !userId) {
         return;
     }
     try {
+        const token = await signServiceJwt({ audience: SOCKET_AUDIENCE });
         await axios.post(`${baseUrl}/emit/user`, {
             userId,
             event: String(userId),
@@ -33,7 +35,7 @@ async function emitSystemNotification(userId, payload) {
         }, {
             headers: {
                 'content-type': 'application/json',
-                'x-api-authorization': token
+                Authorization: `Bearer ${token}`
             },
             timeout: 3000,
             validateStatus: () => true
@@ -54,8 +56,17 @@ function getAuthenticatedUserId(req) {
 }
 
 function isBackendTokenRequest(req) {
-    const token = req.headers['x-api-authorization'];
-    return !!token && token === process.env.BACKEND_TOKEN;
+    const auth = req.headers.authorization;
+    if (!auth) {
+        return false;
+    }
+    const token = auth.startsWith('Bearer ') ? auth.slice(7) : auth;
+    try {
+        verifyServiceJwt(token, { audience: process.env.SERVICE_JWT_AUDIENCE || 'service.backend' });
+        return true;
+    } catch {
+        return false;
+    }
 }
 
 function ensureSameUser(req, res, userId) {

@@ -3,6 +3,7 @@ const axios = require('axios');
 const multer = require('multer');
 const FormData = require('form-data');
 const rateLimit = require('express-rate-limit');
+const { signServiceJwt } = require('../utils/serviceJwt');
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
@@ -37,10 +38,13 @@ function adminBase(path) {
 }
 
 async function forwardGet(path, opts = {}) {
+  const token = await signServiceJwt({
+    audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend'
+  });
   return axios.get(adminBase(path), {
     timeout: 5000,
     headers: {
-      'x-api-authorization': process.env.ADMIN_TOKEN,
+      Authorization: `Bearer ${token}`,
       ...(opts.headers || {})
     },
     responseType: opts.responseType || 'json'
@@ -48,10 +52,13 @@ async function forwardGet(path, opts = {}) {
 }
 
 async function forwardPost(path, body, opts = {}) {
+  const token = await signServiceJwt({
+    audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend'
+  });
   return axios.post(adminBase(path), body, {
     timeout: 5000,
     headers: {
-      'x-api-authorization': process.env.ADMIN_TOKEN,
+      Authorization: `Bearer ${token}`,
       ...(opts.headers || {})
     },
     validateStatus: () => true
@@ -97,7 +104,10 @@ router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload
   try {
     const form = new FormData();
     form.append('file', req.file.buffer, req.file.originalname);
-    const headers = form.getHeaders({ 'x-api-authorization': process.env.ADMIN_TOKEN });
+    const token = await signServiceJwt({
+      audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend'
+    });
+    const headers = form.getHeaders({ Authorization: `Bearer ${token}` });
     const resp = await axios.post(
       adminBase(`/status/${encodeURIComponent(req.params.token)}/appeals/${encodeURIComponent(req.params.appealId)}/evidence`),
       form,

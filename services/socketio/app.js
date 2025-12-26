@@ -10,6 +10,7 @@ const { Server } = require('socket.io');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const security = require('./middleware/security');
 const jwt = require('jsonwebtoken');
+const { generateOrLoadKeypairs } = require('./utils/keyStore');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
@@ -106,7 +107,7 @@ if (process.env.NODE_ENV !== 'production') {
 const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);
 attachForwarding(logger, {
   baseUrl: adminLogBase,
-  token: process.env.ADMIN_TOKEN || process.env.BACKEND_TOKEN,
+  audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend',
   source: 'socket-service'
 });
 
@@ -163,6 +164,14 @@ io.engine.on('connection_error', (err) => {
 });
 
 const port = Number(process.env.SOCKETIO_PORT);
-server.listen(port, () => {
-  logger.info(`Socket service listening on port ${port}`);
-});
+(async () => {
+  try {
+    await generateOrLoadKeypairs();
+    server.listen(port, () => {
+      logger.info(`Socket service listening on port ${port}`);
+    });
+  } catch (err) {
+    logger.error('Failed to initialize signing keys', { error: err?.message });
+    process.exit(1);
+  }
+})();

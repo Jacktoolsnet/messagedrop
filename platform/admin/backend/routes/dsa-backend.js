@@ -7,6 +7,7 @@ const axios = require('axios');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
+const { signServiceJwt } = require('../utils/serviceJwt');
 
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
@@ -264,11 +265,13 @@ router.get('/health', (_req, res) => res.json({ ok: true, service: 'dsa-backend'
 /* ----------------------------- Helper ----------------------------- */
 async function enablePublicMessage(messageId) {
     const url = `${process.env.BASE_URL}:${process.env.PORT}/digitalserviceact/enable/publicmessage/${encodeURIComponent(messageId)}`;
+    const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
+    const serviceToken = await signServiceJwt({ audience: backendAudience });
     const res = await fetch(url, {
         method: 'GET',
         headers: {
-            'X-API-Authorization': process.env.BACKEND_TOKEN,
-            'Accept': 'application/json'
+            Authorization: `Bearer ${serviceToken}`,
+            Accept: 'application/json'
         }
     });
     let json = null;
@@ -1279,7 +1282,7 @@ router.post('/notifications/:id/resend', async (req, res) => {
             return res.status(400).json({ error: 'invalid_inapp_payload' });
         }
 
-        if (!process.env.BASE_URL || !process.env.PORT || !process.env.BACKEND_TOKEN) {
+        if (!process.env.BASE_URL || !process.env.PORT) {
             return res.status(500).json({ error: 'notification_service_unavailable' });
         }
 
@@ -1293,13 +1296,15 @@ router.post('/notifications/:id/resend', async (req, res) => {
         };
 
         try {
+            const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
+            const serviceToken = await signServiceJwt({ audience: backendAudience });
             const response = await axios.post(
                 `${process.env.BASE_URL}:${process.env.PORT}/notification/create`,
                 deliveryPayload,
                 {
                     headers: {
-                        'X-API-Authorization': process.env.BACKEND_TOKEN,
-                        'Accept': 'application/json'
+                        Authorization: `Bearer ${serviceToken}`,
+                        Accept: 'application/json'
                     },
                     timeout: 5000,
                     validateStatus: () => true

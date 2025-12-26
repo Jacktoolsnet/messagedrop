@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { recordNotification } = require('./recordNotification');
+const { signServiceJwt } = require('./serviceJwt');
 
 function truncate(text, maxLength = 160) {
     if (typeof text !== 'string' || text.length <= maxLength) {
@@ -10,17 +11,19 @@ function truncate(text, maxLength = 160) {
 
 async function notifyContentOwner(req, notification) {
     const { contentId } = notification || {};
-    if (!contentId || !process.env.BASE_URL || !process.env.PORT || !process.env.BACKEND_TOKEN) {
+    if (!contentId || !process.env.BASE_URL || !process.env.PORT) {
         return false;
     }
 
     const baseUrl = `${process.env.BASE_URL}:${process.env.PORT}`;
-    const headers = {
-        'X-API-Authorization': process.env.BACKEND_TOKEN,
-        'Accept': 'application/json'
-    };
+    const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
 
     try {
+        const serviceToken = await signServiceJwt({ audience: backendAudience });
+        const headers = {
+            Authorization: `Bearer ${serviceToken}`,
+            Accept: 'application/json'
+        };
         const messageResp = await axios.get(
             `${baseUrl}/message/get/uuid/${encodeURIComponent(contentId)}`,
             {

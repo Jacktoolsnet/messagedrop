@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { signServiceJwt } = require('../utils/serviceJwt');
 const metric = require('../middleware/metric');
 
 // Ein eigenes Axios-Client mit BaseURL + Backend-Token
@@ -11,8 +12,7 @@ const client = axios.create({
     // wir wollen Fehlerstatus manuell durchreichen
     validateStatus: () => true,
     headers: {
-        'content-type': 'application/json',
-        'x-api-authorization': process.env.BACKEND_TOKEN
+        'content-type': 'application/json'
     }
 });
 
@@ -27,10 +27,14 @@ router.get('/:pluscode/:latitude/:longitude/:days', [
         const url = `/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}/${encodeURIComponent(days)}`;
 
         // Optional: Query/Headers aus der Original-Anfrage übernehmen (falls relevant)
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_OPENMETEO || 'service.openmeteo'
+        });
         const upstream = await client.get(url, {
             params: req.query,
             // falls du zusätzliche Forward-Header brauchst:
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },

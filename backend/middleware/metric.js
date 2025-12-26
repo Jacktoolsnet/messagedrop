@@ -2,6 +2,7 @@
 // Super-slim metric forwarder -> Admin-Backend (axios, fire-and-forget)
 
 const axios = require('axios');
+const { signServiceJwt } = require('../utils/serviceJwt');
 
 // === tiny helpers ===
 const dateUTC = () => new Date().toISOString().slice(0, 10);
@@ -22,7 +23,7 @@ function count(key, opts = {}) {
     const when = opts.when ?? 'success';
     const tz = opts.timezone ?? 'utc';
     const amountOpt = opts.amount ?? 1;
-    const BACKEND_TOKEN = process.env.BACKEND_TOKEN; // wird vorausgesetzt
+    const audience = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
 
     return function metricMiddleware(req, res, next) {
         res.on('finish', () => {
@@ -39,17 +40,22 @@ function count(key, opts = {}) {
                 : Number(amountOpt) || 1;
 
             // Fire-and-forget: kein await/then, nur catch fürs Log
-            setImmediate(() => {
-                adminStatistic.post(
-                    '/statistic/count',
-                    { key, dateStr, amount },
-                    {
-                        headers: {
-                            'content-type': 'application/json',
-                            'x-api-authorization': BACKEND_TOKEN,
+            setImmediate(async () => {
+                try {
+                    const token = await signServiceJwt({ audience });
+                    await adminStatistic.post(
+                        '/statistic/count',
+                        { key, dateStr, amount },
+                        {
+                            headers: {
+                                'content-type': 'application/json',
+                                Authorization: `Bearer ${token}`,
+                            },
                         },
-                    },
-                ).catch(() => { /* bewusst ignorieren */ });
+                    );
+                } catch {
+                    // bewusst ignorieren
+                }
             });
         });
 

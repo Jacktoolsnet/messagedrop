@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { signServiceJwt } = require('../utils/serviceJwt');
 const metric = require('../middleware/metric');
 
 // Axios-Client für Upstream
@@ -10,8 +11,7 @@ const client = axios.create({
     timeout: 5000,
     validateStatus: () => true, // Statuscodes transparent weiterreichen
     headers: {
-        'content-type': 'application/json',
-        'x-api-authorization': process.env.BACKEND_TOKEN
+        'content-type': 'application/json'
     }
 });
 
@@ -22,9 +22,13 @@ router.get('/countryCode/:pluscode/:latitude/:longitude', [
     const { pluscode, latitude, longitude } = req.params;
     try {
         const url = `/countryCode/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}`;
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_NOMINATIM || 'service.nominatim'
+        });
         const upstream = await client.get(url, {
             params: req.query,
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },
@@ -44,9 +48,13 @@ router.get('/search/:searchTerm/:limit', [
     const { searchTerm, limit } = req.params;
     try {
         const url = `/search/${encodeURIComponent(searchTerm)}/${encodeURIComponent(limit)}`;
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_NOMINATIM || 'service.nominatim'
+        });
         const upstream = await client.get(url, {
             params: req.query,
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },
@@ -67,9 +75,13 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', [
     try {
         // Achtung: viewbox enthält Kommas; sollte vom Client bereits URL-encoded sein.
         const url = `/noboundedsearch/${encodeURIComponent(searchTerm)}/${encodeURIComponent(limit)}/${encodeURIComponent(viewbox)}`;
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_NOMINATIM || 'service.nominatim'
+        });
         const upstream = await client.get(url, {
             params: req.query,
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },
@@ -89,9 +101,13 @@ router.get('/boundedsearch/:searchTerm/:limit/:viewbox', [
     const { searchTerm, limit, viewbox } = req.params;
     try {
         const url = `/boundedsearch/${encodeURIComponent(searchTerm)}/${encodeURIComponent(limit)}/${encodeURIComponent(viewbox)}`;
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_NOMINATIM || 'service.nominatim'
+        });
         const upstream = await client.get(url, {
             params: req.query,
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },

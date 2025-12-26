@@ -2,6 +2,7 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
+const { signServiceJwt } = require('../utils/serviceJwt');
 const metric = require('../middleware/metric');
 
 // Axios-Client für Upstream
@@ -10,8 +11,7 @@ const client = axios.create({
     timeout: 5000,
     validateStatus: () => true, // wir geben Statuscodes transparent weiter
     headers: {
-        'content-type': 'application/json',
-        'x-api-authorization': process.env.BACKEND_TOKEN
+        'content-type': 'application/json'
     }
 });
 
@@ -25,9 +25,13 @@ router.get('/:locale/:pluscode/:latitude/:longitude/:days', [
         // Pfad im OpenMeteo-Service ggf. anpassen (z. B. '/openmeteo/weather/...').
         const url = `/${encodeURIComponent(locale)}/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}/${encodeURIComponent(days)}`;
 
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_OPENMETEO || 'service.openmeteo'
+        });
         const upstream = await client.get(url, {
             params: req.query, // Querystrings mit durchreichen (z. B. flags)
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },
@@ -54,9 +58,13 @@ router.get('/history/:pluscode/:latitude/:longitude/:years', [
     try {
         const url = `/history/${encodeURIComponent(pluscode)}/${encodeURIComponent(latitude)}/${encodeURIComponent(longitude)}/${encodeURIComponent(years)}`;
 
+        const token = await signServiceJwt({
+            audience: process.env.SERVICE_JWT_AUDIENCE_OPENMETEO || 'service.openmeteo'
+        });
         const upstream = await client.get(url, {
             params: req.query,
             headers: {
+                Authorization: `Bearer ${token}`,
                 'x-forwarded-host': req.get('host'),
                 'x-forwarded-proto': req.protocol,
             },
