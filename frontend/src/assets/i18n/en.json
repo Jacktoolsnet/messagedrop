@@ -59,6 +59,15 @@
       "airQuality": "Air quality",
       "searchPlace": "Search a place"
     },
+    "meta": {
+      "title": "MessageDrop - Explore Places & News",
+      "description": "Discover real places, social media, weather and news in one app.",
+      "keywords": "MessageDrop, Places, News, Weather, Social",
+      "ogTitle": "MessageDrop",
+      "ogDescription": "Your gateway to social stories, places, and updates.",
+      "twitterTitle": "MessageDrop",
+      "twitterDescription": "Discover your world - smarter."
+    },
     "translate": {
       "title": "Translate service",
       "message": "Translating message"

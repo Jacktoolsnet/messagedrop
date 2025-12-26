@@ -59,6 +59,15 @@
       "airQuality": "Luftqualität",
       "searchPlace": "Ort suchen"
     },
+    "meta": {
+      "title": "MessageDrop - Orte und Nachrichten entdecken",
+      "description": "Entdecke echte Orte, soziale Inhalte, Wetter und Nachrichten in einer App.",
+      "keywords": "MessageDrop, Orte, Nachrichten, Wetter, Social",
+      "ogTitle": "MessageDrop",
+      "ogDescription": "Dein Zugang zu Social Stories, Orten und Updates.",
+      "twitterTitle": "MessageDrop",
+      "twitterDescription": "Entdecke deine Welt - smarter."
+    },
     "translate": {
       "title": "Übersetzungsservice",
       "message": "Nachricht wird übersetzt"

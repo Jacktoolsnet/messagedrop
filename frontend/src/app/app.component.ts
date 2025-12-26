@@ -342,20 +342,20 @@ export class AppComponent implements OnInit {
 
   public ngOnInit(): void {
     // Titel
-    this.titleService.setTitle('MessageDrop – Explore Places & News');
+    this.titleService.setTitle(this.translation.t('common.meta.title'));
     // Meta-Tags
-    this.metaService.updateTag({ name: 'description', content: 'Discover real places, social media, weather and news in one app.' });
-    this.metaService.updateTag({ name: 'keywords', content: 'MessageDrop, Places, News, Weather, Social' });
+    this.metaService.updateTag({ name: 'description', content: this.translation.t('common.meta.description') });
+    this.metaService.updateTag({ name: 'keywords', content: this.translation.t('common.meta.keywords') });
     this.metaService.updateTag({ name: 'robots', content: 'index, follow' });
 
     // Optional: Open Graph / Twitter für Social Sharing
-    this.metaService.updateTag({ property: 'og:title', content: 'MessageDrop' });
-    this.metaService.updateTag({ property: 'og:description', content: 'Your gateway to social stories, places, and updates.' });
+    this.metaService.updateTag({ property: 'og:title', content: this.translation.t('common.meta.ogTitle') });
+    this.metaService.updateTag({ property: 'og:description', content: this.translation.t('common.meta.ogDescription') });
     this.metaService.updateTag({ property: 'og:image', content: 'https://messagedrop.de/assets/icons/icon-512x512.png' });
 
     this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-    this.metaService.updateTag({ name: 'twitter:title', content: 'MessageDrop' });
-    this.metaService.updateTag({ name: 'twitter:description', content: 'Discover your world – smarter.' });
+    this.metaService.updateTag({ name: 'twitter:title', content: this.translation.t('common.meta.twitterTitle') });
+    this.metaService.updateTag({ name: 'twitter:description', content: this.translation.t('common.meta.twitterDescription') });
     // Handle back button
     this.platformLocation.onPopState(() => {
       if (this.myHistory.length > 0) {
