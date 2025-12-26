@@ -472,10 +472,47 @@
       "removeLocation": "Remove shared location"
     },
     "systemMessages": {
-      "title": "System messages",
-      "loading": "Loading system messages...",
-      "updatingStatus": "Updating message status...",
-      "removing": "Removing system message..."
+      "title": "Mensajes del sistema",
+      "loading": "Cargando mensajes del sistema...",
+      "updatingStatus": "Actualizando estado del mensaje...",
+      "removing": "Eliminando mensaje del sistema...",
+      "backAria": "Volver a la lista",
+      "refreshAria": "Recargar mensajes del sistema",
+      "filterAria": "Filtrar mensajes del sistema",
+      "filters": {
+        "unread": "No leídos",
+        "read": "Leídos",
+        "all": "Todos"
+      },
+      "detail": {
+        "caseId": "ID de caso",
+        "actions": "Acciones",
+        "message": "Mensaje",
+        "reason": "Motivo",
+        "category": "Categoría",
+        "contentType": "Tipo de contenido",
+        "status": "Estado"
+      },
+      "notAvailable": "No disponible",
+      "caseActionsAria": "Acciones del caso",
+      "openCaseDetails": "Abrir detalles del caso",
+      "markAsRead": "Marcar como leído",
+      "markAsUnread": "Marcar como no leído",
+      "toggleReadState": "Alternar estado de lectura",
+      "deleteMessage": "Eliminar mensaje",
+      "status": {
+        "unread": "No leído",
+        "read": "Leído"
+      },
+      "empty": "Aún no hay mensajes del sistema.",
+      "deleteAll": "Eliminar todos",
+      "deleteTitle": "Eliminar mensaje del sistema",
+      "deleteConfirm": "Este mensaje del sistema se eliminará permanentemente. ¿Estás seguro?",
+      "deleteAllTitle": "Eliminar todos los mensajes del sistema",
+      "deleteAllConfirm": "Todos los mensajes del sistema se eliminarán permanentemente. ¿Estás seguro?",
+      "authRequired": "Se requiere autorización para los mensajes del sistema.",
+      "requestFailed": "No se pudo procesar la solicitud de mensajes del sistema.",
+      "unexpected": "Error inesperado al procesar mensajes del sistema."
     },
     "legal": {
       "language": {
@@ -711,11 +748,6 @@
         "gatewayTimeout": "The server took too long to respond.",
         "unexpected": "Something went wrong. Please try again later."
       }
-    },
-    "systemMessages": {
-      "authRequired": "Authorization required for system messages.",
-      "requestFailed": "Unable to process request for system messages.",
-      "unexpected": "Unexpected error while processing system messages."
     }
   },
   "auth": {

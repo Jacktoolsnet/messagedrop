@@ -331,7 +331,44 @@
       "title": "Systemnachrichten",
       "loading": "Systemnachrichten werden geladen...",
       "updatingStatus": "Nachrichtenstatus wird aktualisiert...",
-      "removing": "Systemnachricht wird entfernt..."
+      "removing": "Systemnachricht wird entfernt...",
+      "backAria": "Zurück zur Liste",
+      "refreshAria": "Systemnachrichten neu laden",
+      "filterAria": "Systemnachrichten filtern",
+      "filters": {
+        "unread": "Ungelesen",
+        "read": "Gelesen",
+        "all": "Alle"
+      },
+      "detail": {
+        "caseId": "Fall-ID",
+        "actions": "Aktionen",
+        "message": "Nachricht",
+        "reason": "Grund",
+        "category": "Kategorie",
+        "contentType": "Inhaltstyp",
+        "status": "Status"
+      },
+      "notAvailable": "Nicht verfügbar",
+      "caseActionsAria": "Fallaktionen",
+      "openCaseDetails": "Falldetails öffnen",
+      "markAsRead": "Als gelesen markieren",
+      "markAsUnread": "Als ungelesen markieren",
+      "toggleReadState": "Lesestatus umschalten",
+      "deleteMessage": "Nachricht löschen",
+      "status": {
+        "unread": "Ungelesen",
+        "read": "Gelesen"
+      },
+      "empty": "Noch keine Systemnachrichten.",
+      "deleteAll": "Alle löschen",
+      "deleteTitle": "Systemnachricht löschen",
+      "deleteConfirm": "Diese Systemnachricht wird dauerhaft gelöscht. Bist du sicher?",
+      "deleteAllTitle": "Alle Systemnachrichten löschen",
+      "deleteAllConfirm": "Alle Systemnachrichten werden dauerhaft gelöscht. Bist du sicher?",
+      "authRequired": "Für Systemnachrichten ist eine Autorisierung erforderlich.",
+      "requestFailed": "Anfrage für Systemnachrichten konnte nicht verarbeitet werden.",
+      "unexpected": "Unerwarteter Fehler beim Verarbeiten der Systemnachrichten."
     },
     "legal": {
       "language": {
@@ -567,11 +604,6 @@
         "gatewayTimeout": "Der Server hat zu lange geantwortet.",
         "unexpected": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
       }
-    },
-    "systemMessages": {
-      "authRequired": "Für Systemnachrichten ist eine Autorisierung erforderlich.",
-      "requestFailed": "Anfrage für Systemnachrichten konnte nicht verarbeitet werden.",
-      "unexpected": "Unerwarteter Fehler beim Verarbeiten von Systemnachrichten."
     }
   },
   "auth": {

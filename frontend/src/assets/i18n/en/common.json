@@ -475,7 +475,44 @@
       "title": "System messages",
       "loading": "Loading system messages...",
       "updatingStatus": "Updating message status...",
-      "removing": "Removing system message..."
+      "removing": "Removing system message...",
+      "backAria": "Back to list",
+      "refreshAria": "Reload system messages",
+      "filterAria": "Filter system messages",
+      "filters": {
+        "unread": "Unread",
+        "read": "Read",
+        "all": "All"
+      },
+      "detail": {
+        "caseId": "Case ID",
+        "actions": "Actions",
+        "message": "Message",
+        "reason": "Reason",
+        "category": "Category",
+        "contentType": "Content type",
+        "status": "Status"
+      },
+      "notAvailable": "Not available",
+      "caseActionsAria": "Case actions",
+      "openCaseDetails": "Open case details",
+      "markAsRead": "Mark as read",
+      "markAsUnread": "Mark as unread",
+      "toggleReadState": "Toggle read status",
+      "deleteMessage": "Delete message",
+      "status": {
+        "unread": "Unread",
+        "read": "Read"
+      },
+      "empty": "No system messages yet.",
+      "deleteAll": "Delete all",
+      "deleteTitle": "Delete system message",
+      "deleteConfirm": "This system message will be permanently deleted. Are you sure?",
+      "deleteAllTitle": "Delete all system messages",
+      "deleteAllConfirm": "All system messages will be permanently deleted. Are you sure?",
+      "authRequired": "Authorization required for system messages.",
+      "requestFailed": "Unable to process request for system messages.",
+      "unexpected": "Unexpected error while processing system messages."
     },
     "legal": {
       "language": {
@@ -711,11 +748,6 @@
         "gatewayTimeout": "The server took too long to respond.",
         "unexpected": "Something went wrong. Please try again later."
       }
-    },
-    "systemMessages": {
-      "authRequired": "Authorization required for system messages.",
-      "requestFailed": "Unable to process request for system messages.",
-      "unexpected": "Unexpected error while processing system messages."
     }
   },
   "auth": {
