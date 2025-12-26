@@ -1,37 +1,37 @@
-<div class="gate" role="region" aria-label="Action required: missing consents">
+<div class="gate" role="region" [attr.aria-label]="'common.legal.consent.regionAria' | transloco">
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="consent-title">
         <div class="head">
             <div class="titles">
-                <div class="welcome">Welcome to MessageDrop 👋</div>
-                <div id="consent-title" class="title">Before we start</div>
+                <div class="welcome">{{ 'common.legal.consent.welcome' | transloco }}</div>
+                <div id="consent-title" class="title">{{ 'common.legal.consent.beforeStart' | transloco }}</div>
                 <p class="age-note">
-                    You must be at least 16 years old to use MessageDrop.
+                    {{ 'common.legal.consent.ageNote' | transloco }}
                 </p>
                 <mat-slide-toggle class="age-toggle" color="primary"
                     [checked]="appService.getAppSettings().consentSettings.ageConfirmed"
                     (change)="toggleAgeConfirmed($event.checked)">
-                    I confirm I am at least 16 years old
+                    {{ 'common.legal.consent.ageConfirm' | transloco }}
                 </mat-slide-toggle>
             </div>
         </div>
 
         <div class="head">
             <div class="titles">
-                <div id="consent-title" class="title">External content</div>
+                <div id="consent-title" class="title">{{ 'common.legal.consent.externalTitle' | transloco }}</div>
                 <div class="subtitle">
-                    Choose which external content you want to see. You can change these settings anytime.
+                    {{ 'common.legal.consent.externalSubtitle' | transloco }}
                 </div>
             </div>
         </div>
         <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
             <mat-icon>public</mat-icon>
-            Edit external content settings
+            {{ 'common.legal.consent.externalButton' | transloco }}
         </button>
 
         <div class="head">
-            <div id="consent-title" class="title">Legal</div>
+            <div id="consent-title" class="title">{{ 'common.legal.consent.legalTitle' | transloco }}</div>
             <div class="subtitle">
-                Please review and accept the following items to continue.
+                {{ 'common.legal.consent.legalSubtitle' | transloco }}
             </div>
         </div>
 
@@ -40,9 +40,12 @@
                 {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
                 'check_box'}}
             </mat-icon>
-            Terms of Service {{ !appService.getAppSettings().consentSettings.termsOfService ? '(review and accept)'
-            :
-            '(accepted)'}}
+            {{ 'common.legal.terms.title' | transloco }}
+            {{
+            !appService.getAppSettings().consentSettings.termsOfService
+            ? ('common.legal.consent.status.review' | transloco)
+            : ('common.legal.consent.status.accepted' | transloco)
+            }}
         </button>
 
         <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')">
@@ -50,8 +53,12 @@
                 {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
                 'check_box'}}
             </mat-icon>
-            Privacy Policy {{ !appService.getAppSettings().consentSettings.privacyPolicy ? '(review and accept)' :
-            '(accepted)'}}
+            {{ 'common.legal.privacy.title' | transloco }}
+            {{
+            !appService.getAppSettings().consentSettings.privacyPolicy
+            ? ('common.legal.consent.status.review' | transloco)
+            : ('common.legal.consent.status.accepted' | transloco)
+            }}
         </button>
 
         <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')">
@@ -59,8 +66,12 @@
                 {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box'
                 }}
             </mat-icon>
-            Disclaimer {{ !appService.getAppSettings().consentSettings.disclaimer ? '(review and accept)' :
-            '(accepted)'}}
+            {{ 'common.legal.disclaimer.title' | transloco }}
+            {{
+            !appService.getAppSettings().consentSettings.disclaimer
+            ? ('common.legal.consent.status.review' | transloco)
+            : ('common.legal.consent.status.accepted' | transloco)
+            }}
         </button>
     </div>
 </div>

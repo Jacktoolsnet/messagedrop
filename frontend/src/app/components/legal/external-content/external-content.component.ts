@@ -10,6 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../../utils/enable-external-content/enable-external-content.component';
@@ -31,7 +32,8 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
     MatButtonToggleModule,
     MatChipsModule,
     MatSlideToggleModule,
-    EnableExternalContentComponent
+    EnableExternalContentComponent,
+    TranslocoPipe
 ],
   templateUrl: './external-content.component.html',
   styleUrl: './external-content.component.css'

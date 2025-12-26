@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>External content settings</h2>
+<h2 mat-dialog-title>{{ 'common.legal.externalContent.title' | transloco }}</h2>
 
 <mat-dialog-content class="content">
     <div class="platform-tile-container">
@@ -26,5 +26,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">Close</button>
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">
+        {{ 'common.actions.close' | transloco }}
+    </button>
 </mat-dialog-actions>

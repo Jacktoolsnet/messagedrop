@@ -10,11 +10,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../../utils/evidence-input/evidence-input.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
 import { Message } from '../../../interfaces/message';
 import { DigitalServicesActService, DsaSubmissionResponse } from '../../../services/digital-services-act.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
 import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-dialog.component';
 
@@ -38,7 +40,8 @@ interface DigitalServicesActReportDialogData {
     MatCheckboxModule,
     MatButtonModule,
     MatIconModule,
-    EvidenceInputComponent
+    EvidenceInputComponent,
+    TranslocoPipe
 ],
   templateUrl: './digital-services-act-report-dialog.component.html',
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
@@ -51,6 +54,7 @@ export class DigitalServicesActReportDialogComponent {
   private readonly fb = inject(FormBuilder);
   private readonly dsa = inject(DigitalServicesActService);
   private readonly matDialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = this.dialogData;
 
   // Content-ID robust aus der Message ziehen
@@ -76,18 +80,18 @@ export class DigitalServicesActReportDialogComponent {
     return !!v && this.formalEmailCtrl?.invalid === true;
   }
 
-  readonly categories: { value: DsaNoticeCategory; label: string }[] = [
-    { value: 'privacy', label: 'Privacy or personal data (doxxing)' },
-    { value: 'ip_rights', label: 'Copyright or other third-party rights' },
-    { value: 'violence_crime', label: 'Violence, threats, or criminal incitement' },
-    { value: 'hate_harass', label: 'Hate, harassment, or discrimination' },
-    { value: 'sexual', label: 'Pornographic or sexual content' },
-    { value: 'child_safety', label: 'Sexual content involving minors' },
-    { value: 'fraud', label: 'Fraud, deception, or impersonation' },
-    { value: 'malware', label: 'Malware or security circumvention' },
-    { value: 'spam_abuse', label: 'Spam or abusive automation' },
-    { value: 'illegal_source', label: 'Leaked or unauthorized sources' },
-    { value: 'other', label: 'Other illegal or prohibited content' }
+  readonly categories: { value: DsaNoticeCategory; labelKey: string }[] = [
+    { value: 'privacy', labelKey: 'dsa.report.categories.privacy' },
+    { value: 'ip_rights', labelKey: 'dsa.report.categories.ipRights' },
+    { value: 'violence_crime', labelKey: 'dsa.report.categories.violenceCrime' },
+    { value: 'hate_harass', labelKey: 'dsa.report.categories.hateHarass' },
+    { value: 'sexual', labelKey: 'dsa.report.categories.sexual' },
+    { value: 'child_safety', labelKey: 'dsa.report.categories.childSafety' },
+    { value: 'fraud', labelKey: 'dsa.report.categories.fraud' },
+    { value: 'malware', labelKey: 'dsa.report.categories.malware' },
+    { value: 'spam_abuse', labelKey: 'dsa.report.categories.spamAbuse' },
+    { value: 'illegal_source', labelKey: 'dsa.report.categories.illegalSource' },
+    { value: 'other', labelKey: 'dsa.report.categories.other' }
   ];
 
   /** Quick report – alles optional */
@@ -122,7 +126,9 @@ export class DigitalServicesActReportDialogComponent {
       .filter(e => e.type === 'file' && !!e.file)
       .map(e => ({
         id: e.id,
-        label: e.file ? `${e.file.name} · ${this.formatBytes(e.file.size)}` : 'File',
+        label: e.file
+          ? `${e.file.name} · ${this.formatBytes(e.file.size)}`
+          : this.translation.t('dsa.report.evidence.fileFallback'),
         tooltip: e.file ? `${e.file.name} · ${this.formatBytes(e.file.size)}` : undefined
       }))
   );
@@ -248,7 +254,7 @@ export class DigitalServicesActReportDialogComponent {
     } catch (error) {
       const detail =
         (error as { error?: { message?: string } })?.error?.message ??
-        'Submitting failed. Please try again.';
+        this.translation.t('dsa.report.submitFailed');
       this.errorMsg = detail;
       this.showError(error);
     } finally {
@@ -275,7 +281,7 @@ export class DigitalServicesActReportDialogComponent {
         image: '',
         icon: opts.icon,
         message: opts.message,
-        button: 'Ok',
+        button: this.translation.t('common.actions.ok'),
         delay: 0,
         showSpinner: false
       },
@@ -316,8 +322,8 @@ export class DigitalServicesActReportDialogComponent {
 
     if (kind === 'signal') {
       this.openDisplayMessage({
-        title: 'Report sent',
-        message: 'Thanks! Your quick report was submitted successfully. Our team will review it.',
+        title: this.translation.t('dsa.report.successSignalTitle'),
+        message: this.translation.t('dsa.report.successSignalMessage'),
         icon: 'flag',
         closeParentalDialog: true
       });
@@ -326,11 +332,11 @@ export class DigitalServicesActReportDialogComponent {
 
     const email = (reporterEmail || '').trim();
     const message = email
-      ? 'Your DSA notice was submitted successfully. We will contact you via email after the review.'
-      : 'Your DSA notice was submitted successfully. If you would like to receive updates, please provide an email address next time.';
+      ? this.translation.t('dsa.report.successNoticeMessageWithEmail')
+      : this.translation.t('dsa.report.successNoticeMessageNoEmail');
 
     this.openDisplayMessage({
-      title: 'Notice submitted',
+      title: this.translation.t('dsa.report.successNoticeTitle'),
       message,
       icon: 'gavel',
       closeParentalDialog: true
@@ -343,10 +349,10 @@ export class DigitalServicesActReportDialogComponent {
       typed?.error?.message ||
       typed?.error?.detail ||
       typed?.message ||
-      'Submitting failed. Please try again.';
+      this.translation.t('dsa.report.submitFailed');
     // Fehler: deutliches Warn-Icon, Dialog bleibt offen
     this.openDisplayMessage({
-      title: 'Submission failed',
+      title: this.translation.t('dsa.report.submitFailedTitle'),
       message: detail,
       icon: 'report_problem',
       closeParentalDialog: false

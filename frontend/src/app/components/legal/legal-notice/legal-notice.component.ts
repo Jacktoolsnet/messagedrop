@@ -10,6 +10,7 @@ import {
   MatDialogTitle
 } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-legal-notice',
@@ -20,7 +21,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    TranslocoPipe
   ],
   templateUrl: './legal-notice.component.html',
   styleUrls: ['./legal-notice.component.css']

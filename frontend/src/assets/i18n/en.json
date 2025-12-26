@@ -16,6 +16,9 @@
       "abort": "Abort",
       "randomizeStyle": "Randomize style",
       "delete": "Delete",
+      "openInNewTab": "Open in new tab",
+      "download": "Download",
+      "copy": "Copy",
       "close": "Close"
     },
     "clipboard": {
@@ -365,6 +368,77 @@
         "useMap": "Use map location"
       }
     },
+    "legal": {
+      "language": {
+        "de": "Deutsch",
+        "en": "English"
+      },
+      "notice": {
+        "title": "Imprint (Legal Notice)",
+        "loading": "Loading legal notice...",
+        "loadFailed": "Could not load the legal notice file.",
+        "ariaLabel": "Legal notice"
+      },
+      "disclaimer": {
+        "title": "Disclaimer",
+        "loading": "Loading disclaimer...",
+        "loadFailed": "Could not load the disclaimer file.",
+        "ariaLabel": "Disclaimer",
+        "acceptAria": "Accept disclaimer",
+        "acceptText": "I have read and accept this disclaimer."
+      },
+      "terms": {
+        "title": "Terms of Service",
+        "loading": "Loading terms of service...",
+        "loadFailed": "Could not load the terms of service file.",
+        "ariaLabel": "Terms of service",
+        "acceptAria": "Accept terms of service",
+        "acceptText": "I have read and accept these Terms of Service."
+      },
+      "privacy": {
+        "title": "Privacy Policy",
+        "loading": "Loading privacy policy...",
+        "loadFailed": "Could not load the privacy policy file.",
+        "ariaLabel": "Privacy policy",
+        "acceptAria": "Accept privacy policy",
+        "acceptText": "I have read and accept this Privacy Policy."
+      },
+      "thirdParty": {
+        "title": "Third-Party Licenses",
+        "loading": "Loading licenses...",
+        "loadFailed": "Could not load the license file.",
+        "ariaLabel": "Third-party licenses"
+      },
+      "externalContent": {
+        "title": "External content settings",
+        "platformTitle": "External content: {{ platform }}",
+        "platformSubtitle": "Allow embeds, previews, and widgets from this provider.",
+        "platformNote": "By enabling, you allow loading content from {{ platform }} and agree to the provider's",
+        "platformNoteEnd": ".",
+        "platformWarning": "This may send your IP address and usage data to {{ platform }}.",
+        "terms": "Terms",
+        "privacy": "Privacy Policy",
+        "and": "and",
+        "enableLabel": "Enable {{ platform }}",
+        "enableAria": "Enable {{ platform }}"
+      },
+      "consent": {
+        "regionAria": "Action required: missing consents",
+        "welcome": "Welcome to MessageDrop 👋",
+        "beforeStart": "Before we start",
+        "ageNote": "You must be at least 16 years old to use MessageDrop.",
+        "ageConfirm": "I confirm I am at least 16 years old",
+        "externalTitle": "External content",
+        "externalSubtitle": "Choose which external content you want to see. You can change these settings anytime.",
+        "externalButton": "Edit external content settings",
+        "legalTitle": "Legal",
+        "legalSubtitle": "Please review and accept the following items to continue.",
+        "status": {
+          "review": "(review and accept)",
+          "accepted": "(accepted)"
+        }
+      }
+    },
     "server": {
       "connectingTitle": "Connecting",
       "connectingMessage": "Connecting to backend..."
@@ -583,7 +657,166 @@
   "dsa": {
     "title": "DSA",
     "sendingQuickReport": "Sending quick report...",
-    "submittingNotice": "Submitting DSA notice..."
+    "submittingNotice": "Submitting DSA notice...",
+    "report": {
+      "title": "Report content",
+      "intro": {
+        "start": "Reporting should be easy. You can submit a",
+        "quick": "Quick report",
+        "middle": "(informal signal) or a",
+        "formal": "Formal DSA report",
+        "end": "(notice under the EU Digital Services Act) -",
+        "emphasis": "no fields are mandatory",
+        "tail": "We will review the post either way."
+      },
+      "meta": {
+        "reportedContent": "Reported content",
+        "contentId": "Content ID",
+        "link": "Link"
+      },
+      "tabs": {
+        "quick": "Quick report",
+        "formal": "Formal DSA report"
+      },
+      "fields": {
+        "categoryLabel": "Category (optional)",
+        "reasonLabelQuick": "Why is this content problematic? (optional)",
+        "reasonPlaceholderQuick": "Share any details that help us understand the issue...",
+        "reasonLabelFormal": "Why is this content illegal? (optional)",
+        "reasonPlaceholderFormal": "Describe the issue and provide any relevant facts or references...",
+        "emailLabel": "Your email (optional)",
+        "emailHintProvided": "We will notify you at {{ email }}",
+        "emailHintMissing": "We can only notify you if you provide an email.",
+        "emailInvalid": "Please enter a valid email address or leave this field empty.",
+        "nameLabel": "Your name (optional)",
+        "namePlaceholder": "Jane Doe",
+        "truthAffirmation": "I declare that the information provided is accurate to the best of my knowledge. (optional)"
+      },
+      "evidence": {
+        "fileFallback": "File",
+        "hint": "PDF or image files, up to 5 MB each (10 MB total). Currently selected files: {{ size }}."
+      },
+      "categories": {
+        "privacy": "Privacy or personal data (doxxing)",
+        "ipRights": "Copyright or other third-party rights",
+        "violenceCrime": "Violence, threats, or criminal incitement",
+        "hateHarass": "Hate, harassment, or discrimination",
+        "sexual": "Pornographic or sexual content",
+        "childSafety": "Sexual content involving minors",
+        "fraud": "Fraud, deception, or impersonation",
+        "malware": "Malware or security circumvention",
+        "spamAbuse": "Spam or abusive automation",
+        "illegalSource": "Leaked or unauthorized sources",
+        "other": "Other illegal or prohibited content"
+      },
+      "submitButton": "Submit",
+      "submitFailed": "Submitting failed. Please try again.",
+      "submitFailedTitle": "Submission failed",
+      "successSignalTitle": "Report sent",
+      "successSignalMessage": "Thanks! Your quick report was submitted successfully. Our team will review it.",
+      "successNoticeTitle": "Notice submitted",
+      "successNoticeMessageWithEmail": "Your DSA notice was submitted successfully. We will contact you via email after the review.",
+      "successNoticeMessageNoEmail": "Your DSA notice was submitted successfully. If you would like to receive updates, please provide an email address next time."
+    },
+    "status": {
+      "title": "Report sent successfully",
+      "primarySignal": "Your report was sent successfully.",
+      "primaryNotice": "Your notice was submitted successfully.",
+      "secondarySignal": "Keep the link below to follow up on the review progress at any time.",
+      "secondaryNoticeEmail": "We will also try to reach out via email when the review is complete. You can check the latest status using this link.",
+      "secondaryNotice": "If you want to keep track of the review, save this link. You can come back to it whenever you need the latest status.",
+      "copySuccess": "Link copied to clipboard.",
+      "copyFailed": "Could not copy the link automatically. Please copy it manually.",
+      "statusUrlTitle": "Status URL",
+      "openInBrowser": "Open in browser",
+      "statusTokenTitle": "Status token",
+      "tokenLabel": "Token"
+    },
+    "case": {
+      "title": "Moderation status",
+      "loading": "Loading status...",
+      "loadLatestFailed": "We could not load the latest information.",
+      "loadNotFound": "No case information was found for this token.",
+      "loadFailed": "Could not load the current status. Please try again later.",
+      "summary": {
+        "title": "Case summary",
+        "status": "Status",
+        "contentId": "Content ID",
+        "submitted": "Submitted"
+      },
+      "noticeStatus": {
+        "received": "Received",
+        "underReview": "Under review",
+        "decided": "Decided"
+      },
+      "signalReceived": "Signal received",
+      "reportDetails": {
+        "title": "Report details",
+        "type": "Type",
+        "category": "Category",
+        "reason": "Reason",
+        "link": "Content link"
+      },
+      "contentType": {
+        "publicMessage": "Public message"
+      },
+      "decision": {
+        "title": "Decision",
+        "outcome": "Outcome",
+        "reviewedOn": "Reviewed on",
+        "statement": "Statement"
+      },
+      "evidence": {
+        "title": "Evidence collected",
+        "label": "Evidence",
+        "added": "Added",
+        "download": "Download file",
+        "openLink": "Open link",
+        "hash": "Hash",
+        "type": {
+          "file": "File",
+          "link": "Link"
+        }
+      },
+      "appeals": {
+        "title": "Submitted appeals",
+        "label": "Appeal",
+        "filed": "Filed",
+        "arguments": "Arguments",
+        "decision": "Decision",
+        "resolved": "Resolved",
+        "reviewer": "Reviewer"
+      },
+      "tabs": {
+        "overview": "Overview",
+        "submitAppeal": "Submit appeal"
+      },
+      "appealHint": "You can provide additional context and optional contact details. Supporting documents help us review faster.",
+      "appealForm": {
+        "explanationLabel": "Your explanation",
+        "minimumHint": "Minimum 20 characters",
+        "error": "Please describe why you believe this decision should be reviewed.",
+        "fileHint": "PDF or image files, up to 5 MB each (10 MB total). Currently selected files: {{ size }}."
+      },
+      "openPublicPage": "Open public page",
+      "submitAppeal": "Submit appeal",
+      "filesTypeLimit": "Only PDF or image files are allowed.",
+      "filesSizeLimit": "Each file must be at most 5 MB.",
+      "filesTotalLimit": "Files exceed the total limit of 10 MB.",
+      "appealSubmitted": "Appeal submitted successfully.",
+      "appealSubmittedPartial": "Appeal submitted but some files failed to upload.",
+      "appealDecisionPending": "A decision has not been finalized yet. Appeals are only possible afterwards.",
+      "appealSubmitFailed": "Could not submit the appeal. Please try again later.",
+      "urlAlreadyAdded": "This link is already added.",
+      "downloadFailed": "Could not download the file.",
+      "appealOutcome": {
+        "pending": "Pending",
+        "upheld": "Decision upheld",
+        "revised": "Decision revised",
+        "partial": "Partially revised",
+        "withdrawn": "Withdrawn"
+      }
+    }
   },
   "weather": {
     "service": {

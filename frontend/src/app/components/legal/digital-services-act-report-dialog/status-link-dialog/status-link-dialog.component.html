@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>
-  Report sent successfully
+  {{ 'dsa.status.title' | transloco }}
 </h2>
 
 <mat-dialog-content class="dialog-content">
@@ -7,16 +7,16 @@
   <p class="secondary">{{ secondaryText }}</p>
 
   @if (data.statusUrl) {
-  <div class="link-box" title="Status URL">
+  <div class="link-box" [attr.title]="'dsa.status.statusUrlTitle' | transloco">
     <span class="link-text">{{ data.statusUrl }}</span>
-    <button mat-icon-button color="primary" matTooltip="Open in browser" (click)="openInBrowser()"
-      aria-label="Open in browser">
+    <button mat-icon-button color="primary" [matTooltip]="'dsa.status.openInBrowser' | transloco"
+      (click)="openInBrowser()" [attr.aria-label]="'dsa.status.openInBrowser' | transloco">
       <mat-icon>open_in_new</mat-icon>
     </button>
   </div>
   } @else if (data.token) {
-  <div class="link-box" title="Status token">
-    <span class="link-text">Token: {{ data.token }}</span>
+  <div class="link-box" [attr.title]="'dsa.status.statusTokenTitle' | transloco">
+    <span class="link-text">{{ 'dsa.status.tokenLabel' | transloco }}: {{ data.token }}</span>
   </div>
   }
 </mat-dialog-content>
@@ -24,7 +24,7 @@
 <mat-dialog-actions align="end">
   <button mat-stroked-button color="primary" class="copy-btn" (click)="copy()">
     <mat-icon>content_copy</mat-icon>
-    Copy
+    {{ 'common.actions.copy' | transloco }}
   </button>
-  <button mat-flat-button color="primary" (click)="close()">Close</button>
+  <button mat-flat-button color="primary" (click)="close()">{{ 'common.actions.close' | transloco }}</button>
 </mat-dialog-actions>

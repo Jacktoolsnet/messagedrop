@@ -1,21 +1,24 @@
 <div class="platform-header">
     <mat-icon>{{ platformIcon }}</mat-icon>
     <div class="platform-header-copy">
-        <h3 class="platform-name">External content: {{ platformName }}</h3>
-        <p class="platform-subtitle">Allow embeds, previews, and widgets from this provider.</p>
+        <h3 class="platform-name">
+            {{ 'common.legal.externalContent.platformTitle' | transloco:{ platform: platformName } }}
+        </h3>
+        <p class="platform-subtitle">{{ 'common.legal.externalContent.platformSubtitle' | transloco }}</p>
     </div>
 </div>
 
 <div class="platform-note">
-    By enabling, you allow loading content from {{ platformName }} and agree to the provider’s
+    {{ 'common.legal.externalContent.platformNote' | transloco:{ platform: platformName } }}
     <a class="platform-link" [href]="termsUrl" target="_blank" rel="noopener"
-        (click)="$event.stopPropagation()">Terms</a>
-    and
+        (click)="$event.stopPropagation()">{{ 'common.legal.externalContent.terms' | transloco }}</a>
+    {{ 'common.legal.externalContent.and' | transloco }}
     <a class="platform-link" [href]="privacyUrl" target="_blank" rel="noopener"
-        (click)="$event.stopPropagation()">Privacy Policy</a>.
-    This may send your IP address and usage data to {{ platformName }}.
+        (click)="$event.stopPropagation()">{{ 'common.legal.externalContent.privacy' | transloco }}</a>{{ 'common.legal.externalContent.platformNoteEnd' | transloco }}
+    {{ 'common.legal.externalContent.platformWarning' | transloco:{ platform: platformName } }}
 </div>
 
-<mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)" aria-label="Enable {{ platformName }}">
-    Enable {{ platformName }}
+<mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)"
+    [attr.aria-label]="'common.legal.externalContent.enableAria' | transloco:{ platform: platformName }">
+    {{ 'common.legal.externalContent.enableLabel' | transloco:{ platform: platformName } }}
 </mat-slide-toggle>

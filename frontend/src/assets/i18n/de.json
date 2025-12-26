@@ -16,6 +16,9 @@
       "abort": "Abbrechen",
       "randomizeStyle": "Stil zufällig ändern",
       "delete": "Löschen",
+      "openInNewTab": "In neuem Tab öffnen",
+      "download": "Herunterladen",
+      "copy": "Kopieren",
       "close": "Schließen"
     },
     "clipboard": {
@@ -365,6 +368,77 @@
         "useMap": "Kartenposition verwenden"
       }
     },
+    "legal": {
+      "language": {
+        "de": "Deutsch",
+        "en": "Englisch"
+      },
+      "notice": {
+        "title": "Impressum (rechtlicher Hinweis)",
+        "loading": "Impressum wird geladen...",
+        "loadFailed": "Das Impressum konnte nicht geladen werden.",
+        "ariaLabel": "Impressum"
+      },
+      "disclaimer": {
+        "title": "Haftungsausschluss",
+        "loading": "Haftungsausschluss wird geladen...",
+        "loadFailed": "Der Haftungsausschluss konnte nicht geladen werden.",
+        "ariaLabel": "Haftungsausschluss",
+        "acceptAria": "Haftungsausschluss akzeptieren",
+        "acceptText": "Ich habe den Haftungsausschluss gelesen und akzeptiere ihn."
+      },
+      "terms": {
+        "title": "Nutzungsbedingungen",
+        "loading": "Nutzungsbedingungen werden geladen...",
+        "loadFailed": "Die Nutzungsbedingungen konnten nicht geladen werden.",
+        "ariaLabel": "Nutzungsbedingungen",
+        "acceptAria": "Nutzungsbedingungen akzeptieren",
+        "acceptText": "Ich habe die Nutzungsbedingungen gelesen und akzeptiere sie."
+      },
+      "privacy": {
+        "title": "Datenschutz",
+        "loading": "Datenschutz wird geladen...",
+        "loadFailed": "Die Datenschutzerklärung konnte nicht geladen werden.",
+        "ariaLabel": "Datenschutz",
+        "acceptAria": "Datenschutz akzeptieren",
+        "acceptText": "Ich habe die Datenschutzerklärung gelesen und akzeptiere sie."
+      },
+      "thirdParty": {
+        "title": "Lizenzen von Drittanbietern",
+        "loading": "Lizenzen werden geladen...",
+        "loadFailed": "Die Lizenzdatei konnte nicht geladen werden.",
+        "ariaLabel": "Lizenzen von Drittanbietern"
+      },
+      "externalContent": {
+        "title": "Einstellungen für externe Inhalte",
+        "platformTitle": "Externe Inhalte: {{ platform }}",
+        "platformSubtitle": "Einbettungen, Vorschauen und Widgets dieses Anbieters erlauben.",
+        "platformNote": "Durch Aktivieren erlaubst du das Laden von Inhalten von {{ platform }} und stimmst den",
+        "platformNoteEnd": "zu.",
+        "platformWarning": "Dabei können deine IP-Adresse und Nutzungsdaten an {{ platform }} übertragen werden.",
+        "terms": "Nutzungsbedingungen",
+        "privacy": "Datenschutz",
+        "and": "und",
+        "enableLabel": "{{ platform }} aktivieren",
+        "enableAria": "{{ platform }} aktivieren"
+      },
+      "consent": {
+        "regionAria": "Aktion erforderlich: fehlende Einwilligungen",
+        "welcome": "Willkommen bei MessageDrop 👋",
+        "beforeStart": "Bevor wir starten",
+        "ageNote": "Du musst mindestens 16 Jahre alt sein, um MessageDrop zu nutzen.",
+        "ageConfirm": "Ich bestätige, dass ich mindestens 16 Jahre alt bin",
+        "externalTitle": "Externe Inhalte",
+        "externalSubtitle": "Wähle aus, welche externen Inhalte du sehen möchtest. Du kannst diese Einstellungen jederzeit ändern.",
+        "externalButton": "Externe Inhalte bearbeiten",
+        "legalTitle": "Rechtliches",
+        "legalSubtitle": "Bitte prüfe und akzeptiere die folgenden Punkte, um fortzufahren.",
+        "status": {
+          "review": "(prüfen und akzeptieren)",
+          "accepted": "(akzeptiert)"
+        }
+      }
+    },
     "server": {
       "connectingTitle": "Verbinden",
       "connectingMessage": "Verbindung zum Backend wird hergestellt..."
@@ -583,7 +657,166 @@
   "dsa": {
     "title": "DSA",
     "sendingQuickReport": "Schnellmeldung wird gesendet...",
-    "submittingNotice": "DSA-Meldung wird gesendet..."
+    "submittingNotice": "DSA-Meldung wird gesendet...",
+    "report": {
+      "title": "Inhalt melden",
+      "intro": {
+        "start": "Melden soll einfach sein. Du kannst eine",
+        "quick": "Schnellmeldung",
+        "middle": "(informelles Signal) oder einen",
+        "formal": "formellen DSA-Report",
+        "end": "(Meldung nach dem EU Digital Services Act) -",
+        "emphasis": "keines der Felder ist verpflichtend",
+        "tail": "Wir prüfen den Beitrag in jedem Fall."
+      },
+      "meta": {
+        "reportedContent": "Gemeldeter Inhalt",
+        "contentId": "Inhalt-ID",
+        "link": "Link"
+      },
+      "tabs": {
+        "quick": "Schnellmeldung",
+        "formal": "Formeller DSA-Report"
+      },
+      "fields": {
+        "categoryLabel": "Kategorie (optional)",
+        "reasonLabelQuick": "Warum ist dieser Inhalt problematisch? (optional)",
+        "reasonPlaceholderQuick": "Teile Details, die uns helfen, das Problem zu verstehen...",
+        "reasonLabelFormal": "Warum ist dieser Inhalt illegal? (optional)",
+        "reasonPlaceholderFormal": "Beschreibe das Problem und nenne relevante Fakten oder Quellen...",
+        "emailLabel": "Deine E-Mail (optional)",
+        "emailHintProvided": "Wir benachrichtigen dich unter {{ email }}",
+        "emailHintMissing": "Wir können dich nur benachrichtigen, wenn du eine E-Mail angibst.",
+        "emailInvalid": "Bitte gib eine gültige E-Mail-Adresse ein oder lasse das Feld leer.",
+        "nameLabel": "Dein Name (optional)",
+        "namePlaceholder": "Max Mustermann",
+        "truthAffirmation": "Ich erkläre, dass die gemachten Angaben nach bestem Wissen korrekt sind. (optional)"
+      },
+      "evidence": {
+        "fileFallback": "Datei",
+        "hint": "PDF- oder Bilddateien, bis zu 5 MB pro Datei (10 MB gesamt). Aktuell ausgewählte Dateien: {{ size }}."
+      },
+      "categories": {
+        "privacy": "Privatsphäre oder persönliche Daten (Doxxing)",
+        "ipRights": "Urheberrecht oder andere Rechte Dritter",
+        "violenceCrime": "Gewalt, Drohungen oder strafbare Aufstachelung",
+        "hateHarass": "Hass, Belästigung oder Diskriminierung",
+        "sexual": "Pornografische oder sexuelle Inhalte",
+        "childSafety": "Sexuelle Inhalte mit Minderjährigen",
+        "fraud": "Betrug, Täuschung oder Identitätsmissbrauch",
+        "malware": "Malware oder Umgehung von Sicherheitsmaßnahmen",
+        "spamAbuse": "Spam oder missbräuchliche Automatisierung",
+        "illegalSource": "Geleakte oder unautorisierte Quellen",
+        "other": "Andere illegale oder verbotene Inhalte"
+      },
+      "submitButton": "Absenden",
+      "submitFailed": "Senden fehlgeschlagen. Bitte versuche es erneut.",
+      "submitFailedTitle": "Senden fehlgeschlagen",
+      "successSignalTitle": "Meldung gesendet",
+      "successSignalMessage": "Danke! Deine Schnellmeldung wurde erfolgreich übermittelt. Unser Team prüft sie.",
+      "successNoticeTitle": "Meldung übermittelt",
+      "successNoticeMessageWithEmail": "Deine DSA-Meldung wurde erfolgreich übermittelt. Wir kontaktieren dich nach der Prüfung per E-Mail.",
+      "successNoticeMessageNoEmail": "Deine DSA-Meldung wurde erfolgreich übermittelt. Wenn du Updates erhalten möchtest, gib beim nächsten Mal eine E-Mail-Adresse an."
+    },
+    "status": {
+      "title": "Meldung erfolgreich gesendet",
+      "primarySignal": "Deine Meldung wurde erfolgreich gesendet.",
+      "primaryNotice": "Deine Meldung wurde erfolgreich übermittelt.",
+      "secondarySignal": "Bewahre den Link auf, um den Prüfstatus jederzeit nachzuverfolgen.",
+      "secondaryNoticeEmail": "Wir versuchen dich zusätzlich per E-Mail zu kontaktieren, sobald die Prüfung abgeschlossen ist. Den aktuellen Status kannst du über diesen Link prüfen.",
+      "secondaryNotice": "Wenn du den Prüfstatus verfolgen möchtest, speichere diesen Link. Du kannst ihn jederzeit öffnen, um den aktuellen Status zu sehen.",
+      "copySuccess": "Link in die Zwischenablage kopiert.",
+      "copyFailed": "Der Link konnte nicht automatisch kopiert werden. Bitte kopiere ihn manuell.",
+      "statusUrlTitle": "Status-URL",
+      "openInBrowser": "Im Browser öffnen",
+      "statusTokenTitle": "Status-Token",
+      "tokenLabel": "Token"
+    },
+    "case": {
+      "title": "Moderationsstatus",
+      "loading": "Status wird geladen...",
+      "loadLatestFailed": "Die neuesten Informationen konnten nicht geladen werden.",
+      "loadNotFound": "Für dieses Token wurden keine Falldaten gefunden.",
+      "loadFailed": "Der aktuelle Status konnte nicht geladen werden. Bitte später erneut versuchen.",
+      "summary": {
+        "title": "Fallübersicht",
+        "status": "Status",
+        "contentId": "Inhalt-ID",
+        "submitted": "Eingereicht"
+      },
+      "noticeStatus": {
+        "received": "Eingegangen",
+        "underReview": "In Prüfung",
+        "decided": "Entschieden"
+      },
+      "signalReceived": "Signal eingegangen",
+      "reportDetails": {
+        "title": "Meldedetails",
+        "type": "Typ",
+        "category": "Kategorie",
+        "reason": "Begründung",
+        "link": "Inhalt-Link"
+      },
+      "contentType": {
+        "publicMessage": "Öffentliche Nachricht"
+      },
+      "decision": {
+        "title": "Entscheidung",
+        "outcome": "Ergebnis",
+        "reviewedOn": "Geprüft am",
+        "statement": "Stellungnahme"
+      },
+      "evidence": {
+        "title": "Gesammelte Nachweise",
+        "label": "Nachweis",
+        "added": "Hinzugefügt",
+        "download": "Datei herunterladen",
+        "openLink": "Link öffnen",
+        "hash": "Hash",
+        "type": {
+          "file": "Datei",
+          "link": "Link"
+        }
+      },
+      "appeals": {
+        "title": "Eingereichte Einsprüche",
+        "label": "Einspruch",
+        "filed": "Eingereicht",
+        "arguments": "Begründung",
+        "decision": "Entscheidung",
+        "resolved": "Abgeschlossen",
+        "reviewer": "Prüfer"
+      },
+      "tabs": {
+        "overview": "Übersicht",
+        "submitAppeal": "Einspruch einreichen"
+      },
+      "appealHint": "Du kannst zusätzlichen Kontext und optionale Kontaktdaten angeben. Belege helfen uns, schneller zu prüfen.",
+      "appealForm": {
+        "explanationLabel": "Deine Begründung",
+        "minimumHint": "Mindestens 20 Zeichen",
+        "error": "Bitte beschreibe, warum du diese Entscheidung überprüfen lassen möchtest.",
+        "fileHint": "PDF- oder Bilddateien, bis zu 5 MB pro Datei (10 MB gesamt). Aktuell ausgewählte Dateien: {{ size }}."
+      },
+      "openPublicPage": "Öffentliche Seite öffnen",
+      "submitAppeal": "Einspruch einreichen",
+      "filesTypeLimit": "Nur PDF- oder Bilddateien sind erlaubt.",
+      "filesSizeLimit": "Jede Datei darf höchstens 5 MB groß sein.",
+      "filesTotalLimit": "Dateien überschreiten das Gesamtlimit von 10 MB.",
+      "appealSubmitted": "Einspruch erfolgreich eingereicht.",
+      "appealSubmittedPartial": "Einspruch eingereicht, aber einige Dateien konnten nicht hochgeladen werden.",
+      "appealDecisionPending": "Eine Entscheidung ist noch nicht final. Einsprüche sind erst danach möglich.",
+      "appealSubmitFailed": "Einspruch konnte nicht eingereicht werden. Bitte später erneut versuchen.",
+      "urlAlreadyAdded": "Dieser Link wurde bereits hinzugefügt.",
+      "downloadFailed": "Datei konnte nicht heruntergeladen werden.",
+      "appealOutcome": {
+        "pending": "Ausstehend",
+        "upheld": "Entscheidung bestätigt",
+        "revised": "Entscheidung geändert",
+        "partial": "Teilweise geändert",
+        "withdrawn": "Zurückgezogen"
+      }
+    }
   },
   "weather": {
     "service": {

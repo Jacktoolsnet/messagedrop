@@ -4,11 +4,12 @@ import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-third-party-licenses-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatProgressBarModule],
+  imports: [MatDialogModule, MatButtonModule, MatProgressBarModule, TranslocoPipe],
   templateUrl: './third-party-licenses.component.html',
   styleUrls: ['./third-party-licenses.component.css']
 })

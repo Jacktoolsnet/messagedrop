@@ -1,22 +1,26 @@
-<h2 mat-dialog-title>Report content</h2>
+<h2 mat-dialog-title>{{ 'dsa.report.title' | transloco }}</h2>
 
 <mat-dialog-content>
   <p class="intro">
-    Reporting should be easy. You can submit a <strong>Quick report</strong> (informal signal)
-    or a <strong>Formal DSA report</strong> (notice under the EU Digital Services Act) —
-    <em>no fields are mandatory</em>. We’ll review the post either way.
+    {{ 'dsa.report.intro.start' | transloco }}
+    <strong>{{ 'dsa.report.intro.quick' | transloco }}</strong>
+    {{ 'dsa.report.intro.middle' | transloco }}
+    <strong>{{ 'dsa.report.intro.formal' | transloco }}</strong>
+    {{ 'dsa.report.intro.end' | transloco }}
+    <em>{{ 'dsa.report.intro.emphasis' | transloco }}</em>.
+    {{ 'dsa.report.intro.tail' | transloco }}
   </p>
 
   <!-- Message-Preview -->
-  <section class="message-preview" aria-label="Reported content">
+  <section class="message-preview" [attr.aria-label]="'dsa.report.meta.reportedContent' | transloco">
     <div class="meta">
       <div class="meta-row">
-        <span class="meta-label">Content ID</span>
+        <span class="meta-label">{{ 'dsa.report.meta.contentId' | transloco }}</span>
         <span class="meta-value">{{ quickForm.get('contentId')?.value }}</span>
       </div>
       @if (data.contentUrl) {
         <div class="meta-row">
-          <span class="meta-label">Link</span>
+          <span class="meta-label">{{ 'dsa.report.meta.link' | transloco }}</span>
           <span class="meta-value url">{{ data.contentUrl }}</span>
         </div>
       }
@@ -28,25 +32,25 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon>flag</mat-icon>
-        <span class="tab-label">Quick report</span>
+        <span class="tab-label">{{ 'dsa.report.tabs.quick' | transloco }}</span>
       </ng-template>
 
       <div class="tab-explainer"></div>
 
       <form [formGroup]="quickForm" class="dialog-grid">
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Category (optional)</mat-label>
+          <mat-label>{{ 'dsa.report.fields.categoryLabel' | transloco }}</mat-label>
           <mat-select formControlName="category">
             @for (c of categories; track c.value) {
-              <mat-option [value]="c.value">{{ c.label }}</mat-option>
+              <mat-option [value]="c.value">{{ c.labelKey | transloco }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Why is this content problematic? (optional)</mat-label>
+          <mat-label>{{ 'dsa.report.fields.reasonLabelQuick' | transloco }}</mat-label>
           <textarea matInput formControlName="reasonText" rows="5"
-          placeholder="Share any details that help us understand the issue..."></textarea>
+          [placeholder]="'dsa.report.fields.reasonPlaceholderQuick' | transloco"></textarea>
         </mat-form-field>
       </form>
     </mat-tab>
@@ -55,63 +59,63 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon>gavel</mat-icon>
-        <span class="tab-label">Formal DSA report</span>
+        <span class="tab-label">{{ 'dsa.report.tabs.formal' | transloco }}</span>
       </ng-template>
 
       <div class="tab-explainer"></div>
 
       <form [formGroup]="formalForm" class="dialog-grid">
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Category (optional)</mat-label>
+          <mat-label>{{ 'dsa.report.fields.categoryLabel' | transloco }}</mat-label>
           <mat-select formControlName="category">
             @for (c of categories; track c.value) {
-              <mat-option [value]="c.value">{{ c.label }}</mat-option>
+              <mat-option [value]="c.value">{{ c.labelKey | transloco }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="w-full">
-          <mat-label>Why is this content illegal? (optional)</mat-label>
+          <mat-label>{{ 'dsa.report.fields.reasonLabelFormal' | transloco }}</mat-label>
           <textarea matInput formControlName="reasonText" rows="6"
-          placeholder="Describe the issue and provide any relevant facts or references..."></textarea>
+          [placeholder]="'dsa.report.fields.reasonPlaceholderFormal' | transloco"></textarea>
         </mat-form-field>
 
         <div class="row two-cols">
           <mat-form-field appearance="outline" class="half">
-            <mat-label>Your email (optional)</mat-label>
+            <mat-label>{{ 'dsa.report.fields.emailLabel' | transloco }}</mat-label>
             <input matInput formControlName="reporterEmail" type="email" inputmode="email"
               autocomplete="email" />
 
             <mat-hint align="start">
               {{
               (formalForm.get('reporterEmail')?.value || '').trim()
-              ? ('We will notify you at ' + formalForm.get('reporterEmail')?.value)
-              : 'We can only notify you if you provide an email.'
+              ? ('dsa.report.fields.emailHintProvided' | transloco:{ email: formalForm.get('reporterEmail')?.value })
+              : ('dsa.report.fields.emailHintMissing' | transloco)
               }}
             </mat-hint>
 
             @if (isFormalEmailInvalid) {
               <mat-error>
-                Please enter a valid email address or leave this field empty.
+                {{ 'dsa.report.fields.emailInvalid' | transloco }}
               </mat-error>
             }
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Your name (optional)</mat-label>
-            <input matInput formControlName="reporterName" placeholder="Jane Doe">
+            <mat-label>{{ 'dsa.report.fields.nameLabel' | transloco }}</mat-label>
+            <input matInput formControlName="reporterName" [placeholder]="'dsa.report.fields.namePlaceholder' | transloco">
           </mat-form-field>
         </div>
 
         <mat-checkbox formControlName="truthAffirmation">
-          I declare that the information provided is accurate to the best of my knowledge. (optional)
+          {{ 'dsa.report.fields.truthAffirmation' | transloco }}
         </mat-checkbox>
 
         <div class="url-upload">
           <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting"
             [urlItems]="evidenceUrlViews()"
             [fileItems]="evidenceFileViews()"
-            [fileHint]="'PDF or image files, up to 5\u00A0MB each (10\u00A0MB total). Currently selected files: ' + evidenceFilesSizeLabel() + '.'"
+            [fileHint]="'dsa.report.evidence.hint' | transloco:{ size: evidenceFilesSizeLabel() }"
             (urlAdd)="addEvidenceUrlFromInput($event)"
             (filesSelect)="onEvidenceFilesPicked($event)"
             (urlRemove)="removeEvidenceById($event)"
@@ -127,10 +131,10 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="cancel()" [disabled]="submitting">Cancel</button>
+  <button mat-button (click)="cancel()" [disabled]="submitting">{{ 'common.cancel' | transloco }}</button>
   <button color="primary" mat-flat-button (click)="submit()"
     [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">
     <mat-icon>send</mat-icon>
-    Submit
+    {{ 'dsa.report.submitButton' | transloco }}
   </button>
 </mat-dialog-actions>

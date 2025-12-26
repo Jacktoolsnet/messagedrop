@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>
-  Moderation status
+  {{ 'dsa.case.title' | transloco }}
 </h2>
 
 <mat-dialog-content class="dialog-content">
@@ -8,7 +8,7 @@
   <mat-card class="error-card">
     <mat-icon>error</mat-icon>
     <div>
-      <h3>We could not load the latest information.</h3>
+      <h3>{{ 'dsa.case.loadLatestFailed' | transloco }}</h3>
       <p>{{ error() }}</p>
     </div>
   </mat-card>
@@ -18,26 +18,26 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon>info</mat-icon>
-        <span>Overview</span>
+        <span>{{ 'dsa.case.tabs.overview' | transloco }}</span>
       </ng-template>
 
       @if (status(); as caseData) {
       <div class="tab-body">
         <div class="tile-grid">
           <mat-card class="tile-card">
-            <mat-card-title>Case summary</mat-card-title>
+            <mat-card-title>{{ 'dsa.case.summary.title' | transloco }}</mat-card-title>
             <mat-card-content>
               <dl>
                 <div>
-                  <dt>Status</dt>
+                  <dt>{{ 'dsa.case.summary.status' | transloco }}</dt>
                   <dd>{{ summaryStatusLabel() }}</dd>
                 </div>
                 <div>
-                  <dt>Content ID</dt>
+                  <dt>{{ 'dsa.case.summary.contentId' | transloco }}</dt>
                   <dd>{{ summaryContentId() }}</dd>
                 </div>
                 <div>
-                  <dt>Submitted</dt>
+                  <dt>{{ 'dsa.case.summary.submitted' | transloco }}</dt>
                   @if (summarySubmittedAt(); as submittedAt) {
                   <dd>{{ submittedAt | date:'medium' }}</dd>
                   } @else {
@@ -50,24 +50,24 @@
 
           @if (isSignal()) {
           <mat-card class="tile-card">
-            <mat-card-title>Report details</mat-card-title>
+            <mat-card-title>{{ 'dsa.case.reportDetails.title' | transloco }}</mat-card-title>
             <mat-card-content>
               <dl>
                 <div>
-                  <dt>Type</dt>
-                  <dd>{{ signalContentType() || 'public message' }}</dd>
+                  <dt>{{ 'dsa.case.reportDetails.type' | transloco }}</dt>
+                  <dd>{{ signalContentType() || ('dsa.case.contentType.publicMessage' | transloco) }}</dd>
                 </div>
                 <div>
-                  <dt>Category</dt>
+                  <dt>{{ 'dsa.case.reportDetails.category' | transloco }}</dt>
                   <dd>{{ signalCategory() || '—' }}</dd>
                 </div>
                 <div>
-                  <dt>Reason</dt>
+                  <dt>{{ 'dsa.case.reportDetails.reason' | transloco }}</dt>
                   <dd class="statement">{{ signalReason() || '—' }}</dd>
                 </div>
                 @if (signalContentUrl()) {
                 <div>
-                  <dt>Content link</dt>
+                  <dt>{{ 'dsa.case.reportDetails.link' | transloco }}</dt>
                   <dd class="statement">{{ signalContentUrl() }}</dd>
                 </div>
                 }
@@ -78,22 +78,22 @@
 
           @if (isNotice() && caseData.decision; as decision) {
           <mat-card class="tile-card">
-            <mat-card-title>Decision</mat-card-title>
+            <mat-card-title>{{ 'dsa.case.decision.title' | transloco }}</mat-card-title>
             <mat-card-content>
               <dl>
                 <div>
-                  <dt>Outcome</dt>
+                  <dt>{{ 'dsa.case.decision.outcome' | transloco }}</dt>
                   <dd>{{ decision.outcome }}</dd>
                 </div>
                 @if (decision.decidedAt) {
                 <div>
-                  <dt>Reviewed on</dt>
+                  <dt>{{ 'dsa.case.decision.reviewedOn' | transloco }}</dt>
                   <dd>{{ decision.decidedAt | date:'medium' }}</dd>
                 </div>
                 }
                 @if (decision.statement) {
                 <div>
-                  <dt>Statement</dt>
+                  <dt>{{ 'dsa.case.decision.statement' | transloco }}</dt>
                   <dd class="statement">{{ decision.statement }}</dd>
                 </div>
                 }
@@ -104,23 +104,29 @@
 
           @if (isNotice() && evidence().length > 0) {
           <mat-card class="tile-card">
-            <mat-card-title>Evidence collected</mat-card-title>
+            <mat-card-title>{{ 'dsa.case.evidence.title' | transloco }}</mat-card-title>
             <mat-card-content class="appeals-stack">
               @for (ev of evidence(); track ev.id) {
               <section class="appeal-block evidence-block">
                 <header>
                   <div class="appeal-meta">
-                    <span class="label">Evidence</span>
+                    <span class="label">{{ 'dsa.case.evidence.label' | transloco }}</span>
                     <span>{{ ev.fileName || ev.url || ev.hash || ev.type }}</span>
                   </div>
                   <div class="status-chip">
-                    {{ ev.type === 'file' ? 'File' : ev.type === 'url' ? 'Link' : ev.type }}
+                    {{
+                    ev.type === 'file'
+                    ? ('dsa.case.evidence.type.file' | transloco)
+                    : ev.type === 'url'
+                      ? ('dsa.case.evidence.type.link' | transloco)
+                      : ev.type
+                    }}
                   </div>
                 </header>
 
                 @if (ev.addedAt) {
                 <div class="evidence-meta">
-                  Added {{ ev.addedAt | date:'medium' }}
+                  {{ 'dsa.case.evidence.added' | transloco }} {{ ev.addedAt | date:'medium' }}
                 </div>
                 }
 
@@ -128,17 +134,17 @@
                   @if (ev.type === 'file') {
                   <button mat-stroked-button color="primary" type="button" (click)="download(ev)">
                     <mat-icon>download</mat-icon>
-                    Download file
+                    {{ 'dsa.case.evidence.download' | transloco }}
                   </button>
                   }
                   @if (ev.type === 'url' && ev.url) {
                   <a mat-stroked-button color="primary" [href]="ev.url" target="_blank" rel="noopener" role="button">
                     <mat-icon>open_in_new</mat-icon>
-                    Open link
+                    {{ 'dsa.case.evidence.openLink' | transloco }}
                   </a>
                   }
                   @if (ev.type === 'hash' && ev.hash) {
-                  <span class="hash-value">Hash: {{ ev.hash }}</span>
+                  <span class="hash-value">{{ 'dsa.case.evidence.hash' | transloco }}: {{ ev.hash }}</span>
                   }
                 </div>
               </section>
@@ -149,14 +155,14 @@
 
           @if (isNotice() && appeals().length > 0) {
           <mat-card class="tile-card">
-            <mat-card-title>Submitted appeals</mat-card-title>
+            <mat-card-title>{{ 'dsa.case.appeals.title' | transloco }}</mat-card-title>
             <mat-card-content class="appeals-stack">
               @for (appeal of appeals(); track appeal.id) {
               <section class="appeal-block">
                 <header>
                   <div class="appeal-meta">
-                    <span class="label">Appeal</span>
-                    <span>Filed {{ appeal.filedAt | date:'medium' }}</span>
+                    <span class="label">{{ 'dsa.case.appeals.label' | transloco }}</span>
+                    <span>{{ 'dsa.case.appeals.filed' | transloco }} {{ appeal.filedAt | date:'medium' }}</span>
                   </div>
                   <div class="status-chip" [ngClass]="{ 'resolved': !!appeal.resolvedAt, 'open': !appeal.resolvedAt }">
                     {{ formatAppealOutcome(appeal.outcome) }}
@@ -164,17 +170,17 @@
                 </header>
 
                 <div class="appeal-content">
-                  <h4>Arguments</h4>
+                  <h4>{{ 'dsa.case.appeals.arguments' | transloco }}</h4>
                   <p>{{ appeal.arguments }}</p>
                 </div>
 
                 @if (appeal.resolvedAt) {
                 <footer>
                   <div class="decision-meta">
-                    <span class="label">Decision</span>
-                    <span>Resolved {{ appeal.resolvedAt | date:'medium' }}</span>
+                    <span class="label">{{ 'dsa.case.appeals.decision' | transloco }}</span>
+                    <span>{{ 'dsa.case.appeals.resolved' | transloco }} {{ appeal.resolvedAt | date:'medium' }}</span>
                     @if (appeal.reviewer) {
-                    <span>Reviewer: {{ appeal.reviewer }}</span>
+                    <span>{{ 'dsa.case.appeals.reviewer' | transloco }}: {{ appeal.reviewer }}</span>
                     }
                   </div>
                 </footer>
@@ -193,22 +199,22 @@
     <mat-tab>
       <ng-template mat-tab-label>
         <mat-icon>rate_review</mat-icon>
-        <span>Submit appeal</span>
+        <span>{{ 'dsa.case.tabs.submitAppeal' | transloco }}</span>
       </ng-template>
 
       <div class="tab-body">
         <p class="appeal-hint">
-          You can provide additional context and optional contact details. Supporting documents help us review faster.
+          {{ 'dsa.case.appealHint' | transloco }}
         </p>
 
         <form id="appeal-form" [formGroup]="appealForm" (ngSubmit)="submitAppeal()" class="appeal-form">
           <mat-form-field appearance="outline">
-            <mat-label>Your explanation</mat-label>
+            <mat-label>{{ 'dsa.case.appealForm.explanationLabel' | transloco }}</mat-label>
             <textarea matInput rows="4" formControlName="arguments" required></textarea>
-            <mat-hint align="end">Minimum 20 characters</mat-hint>
+            <mat-hint align="end">{{ 'dsa.case.appealForm.minimumHint' | transloco }}</mat-hint>
             @if (appealForm.controls.arguments.invalid && appealForm.controls.arguments.touched) {
             <mat-error>
-              Please describe why you believe this decision should be reviewed.
+              {{ 'dsa.case.appealForm.error' | transloco }}
             </mat-error>
             }
           </mat-form-field>
@@ -216,7 +222,7 @@
           <div class="url-upload">
             <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting() || uploading()"
               [urlItems]="appealUrlViews()" [fileItems]="attachmentViews()"
-              [fileHint]="'PDF or image files, up to 5\u00A0MB each (10\u00A0MB total). Currently selected files: ' + attachmentsSizeLabel() + '.'"
+              [fileHint]="'dsa.case.appealForm.fileHint' | transloco:{ size: attachmentsSizeLabel() }"
               (urlAdd)="onAppealUrlAdd($event)" (filesSelect)="onAttachmentsPicked($event)"
               (urlRemove)="onAppealUrlRemove($event)" (fileRemove)="onAttachmentRemove($event)"></app-evidence-input>
           </div>
@@ -229,23 +235,23 @@
   } @else {
   <div class="loading">
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <p>Loading status…</p>
+    <p>{{ 'dsa.case.loading' | transloco }}</p>
   </div>
   }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-flat-button color="primary" (click)="close()">Close</button>
+  <button mat-flat-button color="primary" (click)="close()">{{ 'common.actions.close' | transloco }}</button>
   @if (!loading() && !error() && activeTab() === 0) {
   <button mat-stroked-button color="primary" (click)="openPublicStatus()" [disabled]="!publicStatusUrl()">
     <mat-icon>open_in_new</mat-icon>
-    Open public page
+    {{ 'dsa.case.openPublicPage' | transloco }}
   </button>
   }
   @if (!loading() && !error() && canSubmitAppeal() && activeTab() === 1) {
   <button mat-flat-button color="primary" type="submit" form="appeal-form" [disabled]="submitting() || uploading()">
     <mat-icon>send</mat-icon>
-    Submit appeal
+    {{ 'dsa.case.submitAppeal' | transloco }}
   </button>
   }
 </mat-dialog-actions>

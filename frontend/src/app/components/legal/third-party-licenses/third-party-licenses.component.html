@@ -1,25 +1,32 @@
-<h1 mat-dialog-title>Third-Party Licenses</h1>
+<h1 mat-dialog-title>{{ 'common.legal.thirdParty.title' | transloco }}</h1>
 
 <div mat-dialog-content>
     @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <p class="muted">Loading licenses…</p>
+    <p class="muted">{{ 'common.legal.thirdParty.loading' | transloco }}</p>
     }
 
     @if (error()) {
     <div class="error" role="alert">
-        <p>Could not load the license file.</p>
-        <button mat-stroked-button (click)="reload()">Retry</button>
+        <p>{{ 'common.legal.thirdParty.loadFailed' | transloco }}</p>
+        <button mat-stroked-button (click)="reload()">{{ 'common.actions.retry' | transloco }}</button>
     </div>
     }
 
     @if (!loading() && !error()) {
-    <pre class="license-text" [textContent]="text()" aria-label="Third-party licenses"></pre>
+    <pre class="license-text" [textContent]="text()"
+        [attr.aria-label]="'common.legal.thirdParty.ariaLabel' | transloco"></pre>
     }
 </div>
 
 <div mat-dialog-actions align="end">
-    <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">Open in new tab</button>
-    <button mat-button (click)="download()" [disabled]="loading() || error()">Download</button>
-    <button mat-button color="primary" (click)="close()">Close</button>
+    <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">
+        {{ 'common.actions.openInNewTab' | transloco }}
+    </button>
+    <button mat-button (click)="download()" [disabled]="loading() || error()">
+        {{ 'common.actions.download' | transloco }}
+    </button>
+    <button mat-button color="primary" (click)="close()">
+        {{ 'common.actions.close' | transloco }}
+    </button>
 </div>

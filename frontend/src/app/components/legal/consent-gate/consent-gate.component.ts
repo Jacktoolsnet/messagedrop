@@ -5,6 +5,7 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Observable, Subscription } from 'rxjs';
 import { ConsentKey } from '../../../interfaces/consent-settings.interface';
 import { AppService } from '../../../services/app.service';
@@ -21,7 +22,8 @@ import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.co
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
-    MatSlideToggleModule
+    MatSlideToggleModule,
+    TranslocoPipe
 ],
   templateUrl: './consent-gate.component.html',
   styleUrl: './consent-gate.component.css'

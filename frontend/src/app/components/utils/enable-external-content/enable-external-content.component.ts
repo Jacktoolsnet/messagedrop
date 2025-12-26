@@ -2,6 +2,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 
@@ -27,7 +28,7 @@ const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
 @Component({
   selector: 'app-enable-external-content',
   standalone: true,
-  imports: [MatSlideToggleModule, MatIconModule],
+  imports: [MatSlideToggleModule, MatIconModule, TranslocoPipe],
   templateUrl: './enable-external-content.component.html',
   styleUrl: './enable-external-content.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

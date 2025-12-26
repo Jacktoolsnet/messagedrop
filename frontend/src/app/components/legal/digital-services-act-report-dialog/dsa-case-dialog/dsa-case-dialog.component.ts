@@ -15,12 +15,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { firstValueFrom } from 'rxjs';
 import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../../../utils/evidence-input/evidence-input.component';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { environment } from '../../../../../environments/environment';
 import { DsaStatusAppeal } from '../../../../interfaces/dsa-status-appeal.interface';
 import { DsaStatusEvidence } from '../../../../interfaces/dsa-status-evidence.interface';
 import { DsaStatusResponse } from '../../../../interfaces/dsa-status-response.interface';
 import { Message } from '../../../../interfaces/message';
 import { DsaStatusService } from '../../../../services/dsa-status.service';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-dsa-case-dialog',
@@ -41,7 +43,8 @@ import { DsaStatusService } from '../../../../services/dsa-status.service';
     MatTooltipModule,
     EvidenceInputComponent,
     DatePipe,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslocoPipe
   ],
   templateUrl: './dsa-case-dialog.component.html',
   styleUrl: './dsa-case-dialog.component.css'
@@ -58,9 +61,9 @@ export class DsaCaseDialogComponent implements OnInit {
     'image/svg+xml'
   ]);
   private static readonly NOTICE_STATUS_LABELS: Record<string, string> = {
-    RECEIVED: 'Received',
-    UNDER_REVIEW: 'Under review',
-    DECIDED: 'Decided'
+    RECEIVED: 'dsa.case.noticeStatus.received',
+    UNDER_REVIEW: 'dsa.case.noticeStatus.underReview',
+    DECIDED: 'dsa.case.noticeStatus.decided'
   };
 
   readonly loading = signal(true);
@@ -101,7 +104,7 @@ export class DsaCaseDialogComponent implements OnInit {
       return this.formatNoticeStatus(this.notice()?.status);
     }
     if (this.isSignal()) {
-      return 'Signal received';
+      return this.translation.t('dsa.case.signalReceived');
     }
     return '—';
   });
@@ -124,6 +127,7 @@ export class DsaCaseDialogComponent implements OnInit {
   private readonly service = inject(DsaStatusService);
   private readonly fb = inject(FormBuilder);
   private readonly snack = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   private readonly dialogRef = inject(MatDialogRef<DsaCaseDialogComponent>);
   private readonly dialogData = inject<{ token: string; message: Message }>(MAT_DIALOG_DATA);
   readonly data = this.dialogData;
@@ -153,8 +157,8 @@ export class DsaCaseDialogComponent implements OnInit {
       },
       error: (err) => {
         const msg = err?.error?.error === 'not_found'
-          ? 'No case information was found for this token.'
-          : 'Could not load the current status. Please try again later.';
+          ? this.translation.t('dsa.case.loadNotFound')
+          : this.translation.t('dsa.case.loadFailed');
         this.error.set(msg);
         this.loading.set(false);
       }
@@ -168,7 +172,11 @@ export class DsaCaseDialogComponent implements OnInit {
     }
 
     if (this.attachmentsSize() > DsaCaseDialogComponent.MAX_TOTAL_SIZE) {
-      this.snack.open('Files exceed the total limit of 10 MB.', 'OK', { duration: 4000, verticalPosition: 'top' });
+      this.snack.open(
+        this.translation.t('dsa.case.filesTotalLimit'),
+        this.translation.t('common.actions.ok'),
+        { duration: 4000, verticalPosition: 'top' }
+      );
       return;
     }
 
@@ -194,10 +202,10 @@ export class DsaCaseDialogComponent implements OnInit {
       }
 
       const successMessage = uploadIssue
-        ? 'Appeal submitted but some files failed to upload.'
-        : 'Appeal submitted successfully.';
+        ? this.translation.t('dsa.case.appealSubmittedPartial')
+        : this.translation.t('dsa.case.appealSubmitted');
 
-      this.snack.open(successMessage, 'OK', { duration: 3500, verticalPosition: 'top' });
+      this.snack.open(successMessage, this.translation.t('common.actions.ok'), { duration: 3500, verticalPosition: 'top' });
       if (!uploadIssue) {
         this.appealForm.reset();
         this.attachments.set([]);
@@ -210,9 +218,9 @@ export class DsaCaseDialogComponent implements OnInit {
     } catch (err) {
       const typed = err as { error?: { error?: string } };
       const msg = typed?.error?.error === 'decision_pending'
-        ? 'A decision has not been finalised yet. Appeals are only possible afterwards.'
-        : 'Could not submit the appeal. Please try again later.';
-      this.snack.open(msg, 'OK', { duration: 4000, verticalPosition: 'top' });
+        ? this.translation.t('dsa.case.appealDecisionPending')
+        : this.translation.t('dsa.case.appealSubmitFailed');
+      this.snack.open(msg, this.translation.t('common.actions.ok'), { duration: 4000, verticalPosition: 'top' });
     } finally {
       this.submitting.set(false);
       this.uploading.set(false);
@@ -222,7 +230,11 @@ export class DsaCaseDialogComponent implements OnInit {
   onAppealUrlAdd(url: string): void {
     const exists = this.appealUrls().some(u => u.toLowerCase() === url.toLowerCase());
     if (exists) {
-      this.snack.open('This link is already added.', 'OK', { duration: 2500, verticalPosition: 'top' });
+      this.snack.open(
+        this.translation.t('dsa.case.urlAlreadyAdded'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2500, verticalPosition: 'top' }
+      );
       return;
     }
     this.appealUrls.update(arr => [...arr, url]);
@@ -238,17 +250,17 @@ export class DsaCaseDialogComponent implements OnInit {
     for (const file of files) {
       if (!this.isAllowedFile(file)) {
         rejected = true;
-        message = 'Only PDF or image files are allowed.';
+        message = this.translation.t('dsa.case.filesTypeLimit');
         continue;
       }
       if (file.size > DsaCaseDialogComponent.MAX_FILE_SIZE) {
         rejected = true;
-        message = 'Each file must be at most 5 MB.';
+        message = this.translation.t('dsa.case.filesSizeLimit');
         continue;
       }
       if (currentSize + file.size > DsaCaseDialogComponent.MAX_TOTAL_SIZE) {
         rejected = true;
-        message = 'Files exceed the total limit of 10 MB.';
+        message = this.translation.t('dsa.case.filesTotalLimit');
         continue;
       }
       currentSize += file.size;
@@ -257,7 +269,7 @@ export class DsaCaseDialogComponent implements OnInit {
 
     this.attachments.set(currentFiles);
     if (rejected && message) {
-      this.snack.open(message, 'OK', { duration: 4000, verticalPosition: 'top' });
+      this.snack.open(message, this.translation.t('common.actions.ok'), { duration: 4000, verticalPosition: 'top' });
     }
   }
 
@@ -301,7 +313,11 @@ export class DsaCaseDialogComponent implements OnInit {
         document.body.removeChild(anchor);
         window.URL.revokeObjectURL(url);
       },
-      error: () => this.snack.open('Could not download the file.', 'OK', { duration: 3000 })
+      error: () => this.snack.open(
+        this.translation.t('dsa.case.downloadFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 3000 }
+      )
     });
   }
 
@@ -362,21 +378,23 @@ export class DsaCaseDialogComponent implements OnInit {
 
   formatNoticeStatus(status: string | null | undefined): string {
     if (!status) return '—';
-    const label = DsaCaseDialogComponent.NOTICE_STATUS_LABELS[status.toUpperCase()];
-    return label ?? status;
+    const key = DsaCaseDialogComponent.NOTICE_STATUS_LABELS[status.toUpperCase()];
+    if (!key) return status;
+    const translated = this.translation.t(key);
+    return translated === key ? status : translated;
   }
 
   formatAppealOutcome(outcome: string | null | undefined): string {
-    if (!outcome) return 'Pending';
+    if (!outcome) return this.translation.t('dsa.case.appealOutcome.pending');
     switch (outcome.toUpperCase()) {
       case 'UPHELD':
-        return 'Decision upheld';
+        return this.translation.t('dsa.case.appealOutcome.upheld');
       case 'REVISED':
-        return 'Decision revised';
+        return this.translation.t('dsa.case.appealOutcome.revised');
       case 'PARTIAL':
-        return 'Partially revised';
+        return this.translation.t('dsa.case.appealOutcome.partial');
       case 'WITHDRAWN':
-        return 'Withdrawn';
+        return this.translation.t('dsa.case.appealOutcome.withdrawn');
       default:
         return outcome;
     }

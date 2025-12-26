@@ -1,39 +1,46 @@
-<h1 mat-dialog-title>Disclaimer</h1>
+<h1 mat-dialog-title>{{ 'common.legal.disclaimer.title' | transloco }}</h1>
 
 <mat-dialog-actions class="lang-actions" align="start">
     <button mat-stroked-button [color]="lang() === 'de' ? 'primary' : undefined" (click)="setLanguage('de')"
-        [disabled]="loading()" [class.active]="lang() === 'de'">Deutsch</button>
+        [disabled]="loading()" [class.active]="lang() === 'de'">{{ 'common.legal.language.de' | transloco }}</button>
     <button mat-stroked-button [color]="lang() === 'en' ? 'primary' : undefined" (click)="setLanguage('en')"
-        [disabled]="loading()" [class.active]="lang() === 'en'">English</button>
+        [disabled]="loading()" [class.active]="lang() === 'en'">{{ 'common.legal.language.en' | transloco }}</button>
 </mat-dialog-actions>
 
 <mat-dialog-content class="content">
     @if (loading()) {
     <mat-progress-bar mode="indeterminate"></mat-progress-bar>
-    <p class="muted">Loading disclaimer…</p>
+    <p class="muted">{{ 'common.legal.disclaimer.loading' | transloco }}</p>
     }
 
     @if (error()) {
     <div class="error" role="alert">
-        <p>Could not load the disclaimer file.</p>
-        <button mat-stroked-button (click)="reload()">Retry</button>
+        <p>{{ 'common.legal.disclaimer.loadFailed' | transloco }}</p>
+        <button mat-stroked-button (click)="reload()">{{ 'common.actions.retry' | transloco }}</button>
     </div>
     }
 
     @if (!loading() && !error()) {
-    <pre class="disclaimer-text" [textContent]="text()" aria-label="Disclaimer"></pre>
+    <pre class="disclaimer-text" [textContent]="text()"
+        [attr.aria-label]="'common.legal.disclaimer.ariaLabel' | transloco"></pre>
     }
 </mat-dialog-content>
 
 <mat-dialog-actions class="consent" align="start">
     <mat-slide-toggle [checked]="accepted" [disabled]="loading() || error()" (change)="onToggle($event.checked)"
-        aria-label="Accept disclaimer">
-        I have read and accept this Disclaimer.
+        [attr.aria-label]="'common.legal.disclaimer.acceptAria' | transloco">
+        {{ 'common.legal.disclaimer.acceptText' | transloco }}
     </mat-slide-toggle>
 </mat-dialog-actions>
 
 <mat-dialog-actions class="actions" align="end">
-    <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">Open in new tab</button>
-    <button mat-button (click)="download()" [disabled]="loading() || error()">Download</button>
-    <button mat-button color="primary" (click)="close()">Close</button>
+    <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">
+        {{ 'common.actions.openInNewTab' | transloco }}
+    </button>
+    <button mat-button (click)="download()" [disabled]="loading() || error()">
+        {{ 'common.actions.download' | transloco }}
+    </button>
+    <button mat-button color="primary" (click)="close()">
+        {{ 'common.actions.close' | transloco }}
+    </button>
 </mat-dialog-actions>
