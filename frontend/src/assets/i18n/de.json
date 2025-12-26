@@ -4,6 +4,7 @@
     "save": "Speichern",
     "cancel": "Abbrechen",
     "language": "Sprache",
+    "unknown": "Unbekannt",
     "actions": {
       "ok": "OK",
       "retry": "Erneut versuchen",
@@ -327,6 +328,77 @@
     "airQuality": {
       "serviceTitle": "Luftqualitätsdienst",
       "loading": "Luftqualitätsdaten werden geladen...",
+      "title": "Luftqualität",
+      "header": "{{ category }}",
+      "headerFor": "{{ category }} für {{ location }}",
+      "selectedHour": "Ausgewählte Stunde: {{ hour }}:00",
+      "dataSource": "Luftqualitätsdaten bereitgestellt von",
+      "noDescription": "Keine Beschreibung verfügbar.",
+      "category": {
+        "pollen": "Pollen",
+        "particulateMatter": "Feinstaub",
+        "pollutants": "Schadstoffe"
+      },
+      "metric": {
+        "alderPollen": "Erlenpollen",
+        "birchPollen": "Birkenpollen",
+        "grassPollen": "Gräserpollen",
+        "mugwortPollen": "Beifußpollen",
+        "olivePollen": "Olivenpollen",
+        "ragweedPollen": "Ambrosiapollen",
+        "pm10": "PM10",
+        "pm2_5": "PM2.5",
+        "carbonMonoxide": "CO",
+        "nitrogenDioxide": "NO2",
+        "sulphurDioxide": "SO2",
+        "ozone": "Ozon",
+        "unknown": "Unbekannt"
+      },
+      "axis": {
+        "time": "Zeit"
+      },
+      "description": {
+        "pollen": {
+          "none": "Keine Pollenbelastung zu erwarten.",
+          "low": "Geringe Pollenkonzentration.",
+          "moderate": "Mäßige Pollenkonzentration.",
+          "high": "Hohe Pollenkonzentration.",
+          "veryHigh": "Sehr hohe Pollenkonzentration."
+        },
+        "pm10": {
+          "low": "Niedrige PM10-Werte. Die Luftqualität ist gut.",
+          "moderate": "Mäßige PM10-Werte.",
+          "sensitive": "Ungesund für empfindliche Gruppen.",
+          "high": "Hohe PM10-Werte. Reduziere längere Aktivitäten im Freien."
+        },
+        "pm2_5": {
+          "low": "Niedrige PM2.5-Werte. Die Luft ist sauber.",
+          "moderate": "Mäßige PM2.5-Werte.",
+          "high": "Hohe PM2.5-Werte. Längere Belastung vermeiden.",
+          "veryHigh": "Sehr hohe PM2.5-Werte. Ungesunde Luftqualität."
+        },
+        "pollutants": {
+          "default": "Schadstoffbelastung der Luft.",
+          "carbonMonoxide": "Kohlenmonoxid (CO) - farb- und geruchloses Gas, das in hohen Konzentrationen schädlich ist.",
+          "nitrogenDioxide": "Stickstoffdioxid (NO2) - Schadstoff aus Verkehr und Verbrennung.",
+          "sulphurDioxide": "Schwefeldioxid (SO2) - kann die Atemwege reizen und die Lungenfunktion beeinträchtigen.",
+          "ozone": "Ozon (O3) - hohe Werte können Atemprobleme verursachen."
+        }
+      },
+      "tooltips": {
+        "alderPollen": "Erlenpollen kann allergische Reaktionen wie Niesen oder juckende Augen auslösen.",
+        "birchPollen": "Birkenpollen ist ein häufiger Auslöser von Allergien, besonders im Frühling.",
+        "grassPollen": "Gräserpollen ist eine der Hauptursachen für Heuschnupfen im Sommer.",
+        "mugwortPollen": "Beifußpollen ist im Spätsommer aktiv und kann Asthma auslösen.",
+        "olivePollen": "Olivenpollen ist in mediterranen Regionen verbreitet.",
+        "ragweedPollen": "Ambrosiapollen ist stark allergen und verbreitet sich leicht.",
+        "pm10": "PM10 steht für grobe Partikel, die in die Lunge gelangen und Atemprobleme verursachen können.",
+        "pm2_5": "PM2.5 sind feine Partikel, die tief in die Lunge und den Blutkreislauf eindringen.",
+        "carbonMonoxide": "CO ist ein giftiges Gas, das den Sauerstofftransport im Körper beeinträchtigen kann.",
+        "nitrogenDioxide": "NO2 entsteht vor allem durch Verkehr und beeinträchtigt die Lungenfunktion.",
+        "sulphurDioxide": "SO2 kann Atemwegssymptome auslösen und Asthma verschlimmern.",
+        "ozone": "O3 ist ein reaktives Gas, das Entzündungen der Atemwege verursachen kann."
+      },
       "pollen": {
         "none": "Keine",
         "low": "Niedrig",

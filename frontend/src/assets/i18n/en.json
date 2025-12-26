@@ -4,6 +4,7 @@
     "save": "Save",
     "cancel": "Cancel",
     "language": "Language",
+    "unknown": "Unknown",
     "actions": {
       "ok": "OK",
       "retry": "Retry",
@@ -327,6 +328,77 @@
     "airQuality": {
       "serviceTitle": "Air quality service",
       "loading": "Fetching air quality data...",
+      "title": "Air quality",
+      "header": "{{ category }}",
+      "headerFor": "{{ category }} for {{ location }}",
+      "selectedHour": "Selected hour: {{ hour }}:00",
+      "dataSource": "Air quality data provided by",
+      "noDescription": "No description available.",
+      "category": {
+        "pollen": "Pollen",
+        "particulateMatter": "Particulate matter",
+        "pollutants": "Pollutants"
+      },
+      "metric": {
+        "alderPollen": "Alder pollen",
+        "birchPollen": "Birch pollen",
+        "grassPollen": "Grass pollen",
+        "mugwortPollen": "Mugwort pollen",
+        "olivePollen": "Olive pollen",
+        "ragweedPollen": "Ragweed pollen",
+        "pm10": "PM10",
+        "pm2_5": "PM2.5",
+        "carbonMonoxide": "CO",
+        "nitrogenDioxide": "NO2",
+        "sulphurDioxide": "SO2",
+        "ozone": "Ozone",
+        "unknown": "Unknown"
+      },
+      "axis": {
+        "time": "Time"
+      },
+      "description": {
+        "pollen": {
+          "none": "No pollen exposure expected.",
+          "low": "Low pollen concentration.",
+          "moderate": "Moderate pollen concentration.",
+          "high": "High pollen concentration.",
+          "veryHigh": "Very high pollen concentration."
+        },
+        "pm10": {
+          "low": "Low PM10 level. Air quality is good.",
+          "moderate": "Moderate PM10 level.",
+          "sensitive": "Unhealthy for sensitive groups.",
+          "high": "High PM10 level. Consider limiting outdoor activity."
+        },
+        "pm2_5": {
+          "low": "Low PM2.5 level. Air is clean.",
+          "moderate": "Moderate PM2.5 level.",
+          "high": "High PM2.5. Avoid prolonged exposure.",
+          "veryHigh": "Very high PM2.5. Unhealthy air quality."
+        },
+        "pollutants": {
+          "default": "Air pollutant level.",
+          "carbonMonoxide": "Carbon monoxide (CO) - a colorless, odorless gas harmful in high concentrations.",
+          "nitrogenDioxide": "Nitrogen dioxide (NO2) - a pollutant from traffic and combustion.",
+          "sulphurDioxide": "Sulphur dioxide (SO2) - can irritate airways and affect lung function.",
+          "ozone": "Ozone (O3) - high levels can lead to respiratory problems."
+        }
+      },
+      "tooltips": {
+        "alderPollen": "Alder pollen can cause allergic reactions like sneezing or itchy eyes.",
+        "birchPollen": "Birch pollen is a common allergen, especially in spring.",
+        "grassPollen": "Grass pollen is a major cause of hay fever during the summer months.",
+        "mugwortPollen": "Mugwort pollen is active late summer and may trigger asthma.",
+        "olivePollen": "Olive pollen is common in Mediterranean areas.",
+        "ragweedPollen": "Ragweed pollen is highly allergenic and spreads easily.",
+        "pm10": "PM10 refers to coarse particles that can enter the lungs and cause respiratory issues.",
+        "pm2_5": "PM2.5 are fine particles that penetrate deep into the lungs and bloodstream.",
+        "carbonMonoxide": "CO is a toxic gas that can impair oxygen transport in the body.",
+        "nitrogenDioxide": "NO2 is produced by traffic emissions and affects lung function.",
+        "sulphurDioxide": "SO2 can cause respiratory symptoms and aggravate asthma.",
+        "ozone": "O3 is a reactive gas that can cause airway inflammation and breathing issues."
+      },
       "pollen": {
         "none": "None",
         "low": "Low",

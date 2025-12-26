@@ -1,9 +1,10 @@
 
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild, inject } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { CategoryScale, Chart, ChartConfiguration, ChartType, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin, { AnnotationOptions, ScaleValue as AnnotationScaleValue } from 'chartjs-plugin-annotation';
 import { AirQualityTileValue } from '../../../interfaces/air-quality-tile-value';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-air-quality-detail',
@@ -21,6 +22,7 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit {
   @Input() selectedHour = 0;
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
   private chart: Chart | null = null;
+  private readonly translation = inject(TranslationHelperService);
 
   lineChartType: ChartType = 'line';
   chartOptions: ChartConfiguration['options'] = {};
@@ -152,7 +154,7 @@ export class AirQualityDetailComponent implements OnChanges, AfterViewInit {
         x: {
           title: {
             display: true,
-            text: 'Time',
+            text: this.translation.t('weather.airQuality.axis.time'),
             color: textColor,
             font: {
               size: 14,

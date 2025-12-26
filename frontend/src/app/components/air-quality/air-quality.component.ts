@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Observable, catchError, map, of } from 'rxjs';
 import { AirQualityData } from '../../interfaces/air-quality-data';
 import { AirQualityCategory, AirQualityMetricKey, AirQualityTileValue } from '../../interfaces/air-quality-tile-value';
@@ -30,7 +31,8 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
     MatSliderModule,
     FormsModule,
     AirQualityDetailComponent,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    TranslocoPipe
   ],
   templateUrl: './air-quality.component.html',
   styleUrls: ['./air-quality.component.css']
@@ -220,29 +222,30 @@ export class AirQualityComponent implements OnInit {
 
   getChartLabel(key: AirQualityMetricKey): string {
     const map: Partial<Record<AirQualityMetricKey, string>> = {
-      alder_pollen: 'Alder Pollen',
-      birch_pollen: 'Birch Pollen',
-      grass_pollen: 'Grass Pollen',
-      mugwort_pollen: 'Mugwort Pollen',
-      olive_pollen: 'Olive Pollen',
-      ragweed_pollen: 'Ragweed Pollen',
-      pm10: 'PM10',
-      pm2_5: 'PM2.5',
-      carbon_monoxide: 'CO',
-      nitrogen_dioxide: 'NO₂',
-      sulphur_dioxide: 'SO₂',
-      ozone: 'Ozone'
+      alder_pollen: 'weather.airQuality.metric.alderPollen',
+      birch_pollen: 'weather.airQuality.metric.birchPollen',
+      grass_pollen: 'weather.airQuality.metric.grassPollen',
+      mugwort_pollen: 'weather.airQuality.metric.mugwortPollen',
+      olive_pollen: 'weather.airQuality.metric.olivePollen',
+      ragweed_pollen: 'weather.airQuality.metric.ragweedPollen',
+      pm10: 'weather.airQuality.metric.pm10',
+      pm2_5: 'weather.airQuality.metric.pm2_5',
+      carbon_monoxide: 'weather.airQuality.metric.carbonMonoxide',
+      nitrogen_dioxide: 'weather.airQuality.metric.nitrogenDioxide',
+      sulphur_dioxide: 'weather.airQuality.metric.sulphurDioxide',
+      ozone: 'weather.airQuality.metric.ozone'
     };
-    return map[key] ?? key;
+    const labelKey = map[key] ?? 'weather.airQuality.metric.unknown';
+    return this.translation.t(labelKey);
   }
 
   getCategoryLabel(category: AirQualityCategory): string {
-    switch (category) {
-      case 'pollen': return 'Pollen';
-      case 'particulateMatter': return 'Particulate Matter';
-      case 'pollutants': return 'Pollutants';
-      default: return category;
-    }
+    const map: Record<AirQualityCategory, string> = {
+      pollen: 'weather.airQuality.category.pollen',
+      particulateMatter: 'weather.airQuality.category.particulateMatter',
+      pollutants: 'weather.airQuality.category.pollutants'
+    };
+    return this.translation.t(map[category] ?? 'common.unknown');
   }
 
   getCategoryIcon(category: AirQualityCategory): string {
@@ -315,7 +318,7 @@ export class AirQualityComponent implements OnInit {
   getLocationName(): void {
     const location = this.dialogData.location ?? this.dialogData.place?.location;
     if (!location) {
-      this.locationName$ = of('Air Quality');
+      this.locationName$ = of(this.translation.t('weather.airQuality.title'));
       return;
     }
     this.locationName$ = this.nominatimService
@@ -323,12 +326,12 @@ export class AirQualityComponent implements OnInit {
       .pipe(
         map(res => {
           const addr = res.nominatimPlace.address;
-          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || 'Unknown';
+          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || this.translation.t('common.unknown');
           const country = addr?.country || '';
           this.locationName = `${place}${country ? ', ' + country : ''}`;
           return this.locationName;
         }),
-        catchError(() => of('Air Quality'))
+        catchError(() => of(this.translation.t('weather.airQuality.title')))
       );
   }
 
@@ -353,24 +356,24 @@ export class AirQualityComponent implements OnInit {
   getLevelTextForCategoryValue(category: AirQualityCategory, value: number): string {
     switch (category) {
       case 'pollen':
-        if (value === 0) return 'None';
-        if (value <= 10) return 'Low';
-        if (value <= 30) return 'Moderate';
-        if (value <= 50) return 'High';
-        return 'Very High';
+        if (value === 0) return this.translation.t('weather.airQuality.pollen.none');
+        if (value <= 10) return this.translation.t('weather.airQuality.pollen.low');
+        if (value <= 30) return this.translation.t('weather.airQuality.pollen.moderate');
+        if (value <= 50) return this.translation.t('weather.airQuality.pollen.high');
+        return this.translation.t('weather.airQuality.pollen.veryHigh');
       case 'particulateMatter':
-        if (value <= 20) return 'Good';
-        if (value <= 40) return 'Moderate';
-        if (value <= 60) return 'Unhealthy for Sensitive';
-        if (value <= 100) return 'Unhealthy';
-        return 'Very Unhealthy';
+        if (value <= 20) return this.translation.t('weather.airQuality.particulateMatter.good');
+        if (value <= 40) return this.translation.t('weather.airQuality.particulateMatter.moderate');
+        if (value <= 60) return this.translation.t('weather.airQuality.particulateMatter.unhealthySensitive');
+        if (value <= 100) return this.translation.t('weather.airQuality.particulateMatter.unhealthy');
+        return this.translation.t('weather.airQuality.particulateMatter.veryUnhealthy');
       case 'pollutants':
-        if (value <= 40) return 'Good';
-        if (value <= 100) return 'Moderate';
-        if (value <= 200) return 'Unhealthy';
-        return 'Very Unhealthy';
+        if (value <= 40) return this.translation.t('weather.airQuality.pollutants.good');
+        if (value <= 100) return this.translation.t('weather.airQuality.pollutants.moderate');
+        if (value <= 200) return this.translation.t('weather.airQuality.pollutants.unhealthy');
+        return this.translation.t('weather.airQuality.pollutants.veryUnhealthy');
       default:
-        return 'Unknown';
+        return this.translation.t('common.unknown');
     }
   }
 
@@ -421,67 +424,69 @@ export class AirQualityComponent implements OnInit {
   }
 
   getSeverityLabel(value: number): string {
-    if (value === 0) return 'None';
-    if (value <= 10) return 'Low';
-    if (value <= 30) return 'Moderate';
-    if (value <= 50) return 'High';
-    return 'Very High';
+    if (value === 0) return this.translation.t('weather.airQuality.pollen.none');
+    if (value <= 10) return this.translation.t('weather.airQuality.pollen.low');
+    if (value <= 30) return this.translation.t('weather.airQuality.pollen.moderate');
+    if (value <= 50) return this.translation.t('weather.airQuality.pollen.high');
+    return this.translation.t('weather.airQuality.pollen.veryHigh');
   }
 
   getInfoTooltip(key: AirQualityMetricKey): string {
-    return this.infoTooltips[key] || 'No description available.';
+    const tooltipKey = this.infoTooltipKeys[key];
+    return tooltipKey ? this.translation.t(tooltipKey) : this.translation.t('weather.airQuality.noDescription');
   }
 
   getValueDescription(value: number, key: AirQualityMetricKey): string {
     if (this.selectedCategory === 'pollen') {
-      if (value === 0) return 'No pollen exposure expected.';
-      if (value <= 10) return 'Low pollen concentration.';
-      if (value <= 30) return 'Moderate pollen concentration.';
-      if (value <= 50) return 'High pollen concentration.';
-      return 'Very high pollen concentration.';
+      if (value === 0) return this.translation.t('weather.airQuality.description.pollen.none');
+      if (value <= 10) return this.translation.t('weather.airQuality.description.pollen.low');
+      if (value <= 30) return this.translation.t('weather.airQuality.description.pollen.moderate');
+      if (value <= 50) return this.translation.t('weather.airQuality.description.pollen.high');
+      return this.translation.t('weather.airQuality.description.pollen.veryHigh');
     }
 
     if (this.selectedCategory === 'particulateMatter') {
       if (key === 'pm10') {
-        if (value <= 20) return 'Low PM10 level. Air quality is good.';
-        if (value <= 40) return 'Moderate PM10 level.';
-        if (value <= 60) return 'Unhealthy for sensitive groups.';
-        return 'High PM10 level. Consider limiting outdoor activity.';
+        if (value <= 20) return this.translation.t('weather.airQuality.description.pm10.low');
+        if (value <= 40) return this.translation.t('weather.airQuality.description.pm10.moderate');
+        if (value <= 60) return this.translation.t('weather.airQuality.description.pm10.sensitive');
+        return this.translation.t('weather.airQuality.description.pm10.high');
       }
       if (key === 'pm2_5') {
-        if (value <= 10) return 'Low PM2.5 level. Air is clean.';
-        if (value <= 25) return 'Moderate PM2.5 level.';
-        if (value <= 50) return 'High PM2.5. Avoid prolonged exposure.';
-        return 'Very high PM2.5. Unhealthy air quality.';
+        if (value <= 10) return this.translation.t('weather.airQuality.description.pm2_5.low');
+        if (value <= 25) return this.translation.t('weather.airQuality.description.pm2_5.moderate');
+        if (value <= 50) return this.translation.t('weather.airQuality.description.pm2_5.high');
+        return this.translation.t('weather.airQuality.description.pm2_5.veryHigh');
       }
     }
 
     if (this.selectedCategory === 'pollutants') {
       const pollutantsInfo: Partial<Record<AirQualityMetricKey, string>> = {
-        carbon_monoxide: 'Carbon monoxide (CO) – a colorless, odorless gas harmful in high concentrations.',
-        nitrogen_dioxide: 'Nitrogen dioxide (NO₂) – a pollutant from traffic and combustion.',
-        sulphur_dioxide: 'Sulphur dioxide (SO₂) – can irritate airways and affect lung function.',
-        ozone: 'Ozone (O₃) – high levels can lead to respiratory problems.',
+        carbon_monoxide: 'weather.airQuality.description.pollutants.carbonMonoxide',
+        nitrogen_dioxide: 'weather.airQuality.description.pollutants.nitrogenDioxide',
+        sulphur_dioxide: 'weather.airQuality.description.pollutants.sulphurDioxide',
+        ozone: 'weather.airQuality.description.pollutants.ozone'
       };
-      return pollutantsInfo[key] || 'Air pollutant level.';
+      const descriptionKey = pollutantsInfo[key] ?? 'weather.airQuality.description.pollutants.default';
+      return this.translation.t(descriptionKey);
     }
 
-    return 'No description available.';
+    return this.translation.t('weather.airQuality.noDescription');
   }
 
-  private readonly infoTooltips: Partial<Record<AirQualityMetricKey, string>> = {
-    alder_pollen: 'Alder pollen can cause allergic reactions like sneezing or itchy eyes.',
-    birch_pollen: 'Birch pollen is a common allergen, especially in spring.',
-    grass_pollen: 'Grass pollen is a major cause of hay fever during the summer months.',
-    mugwort_pollen: 'Mugwort pollen is active late summer and may trigger asthma.',
-    olive_pollen: 'Olive pollen is common in Mediterranean areas.',
-    ragweed_pollen: 'Ragweed pollen is highly allergenic and spreads easily.',
-    pm10: 'PM10 refers to coarse particles that can enter the lungs and cause respiratory issues.',
-    pm2_5: 'PM2.5 are fine particles that penetrate deep into the lungs and bloodstream.',
-    carbon_monoxide: 'CO is a toxic gas that can impair oxygen transport in the body.',
-    nitrogen_dioxide: 'NO₂ is produced by traffic emissions and affects lung function.',
-    sulphur_dioxide: 'SO₂ can cause respiratory symptoms and aggravate asthma.',
-    ozone: 'O₃ is a reactive gas that can cause airway inflammation and breathing issues.',
+  private readonly infoTooltipKeys: Partial<Record<AirQualityMetricKey, string>> = {
+    alder_pollen: 'weather.airQuality.tooltips.alderPollen',
+    birch_pollen: 'weather.airQuality.tooltips.birchPollen',
+    grass_pollen: 'weather.airQuality.tooltips.grassPollen',
+    mugwort_pollen: 'weather.airQuality.tooltips.mugwortPollen',
+    olive_pollen: 'weather.airQuality.tooltips.olivePollen',
+    ragweed_pollen: 'weather.airQuality.tooltips.ragweedPollen',
+    pm10: 'weather.airQuality.tooltips.pm10',
+    pm2_5: 'weather.airQuality.tooltips.pm2_5',
+    carbon_monoxide: 'weather.airQuality.tooltips.carbonMonoxide',
+    nitrogen_dioxide: 'weather.airQuality.tooltips.nitrogenDioxide',
+    sulphur_dioxide: 'weather.airQuality.tooltips.sulphurDioxide',
+    ozone: 'weather.airQuality.tooltips.ozone'
   };
 
   onTileClick(tile: AirQualityTileValue): void {

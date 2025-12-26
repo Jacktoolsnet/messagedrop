@@ -2,11 +2,11 @@
     @if (airQualitySig()) {
     @if (locationName$ | async) {
     <div class="header-title">
-        {{ getCategoryLabel(selectedCategory) }} for {{ locationName }}
+        {{ 'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName } }}
     </div>
     } @else {
     <div class="header-title">
-        {{ getCategoryLabel(selectedCategory) }}
+        {{ 'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) } }}
     </div>
     }
 
@@ -49,7 +49,7 @@
             <input matSliderThumb [(ngModel)]="selectedHour">
         </mat-slider>
         @if (!selectedTile) {
-        <div class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
+        <div class="selected-hour">{{ 'weather.airQuality.selectedHour' | transloco:{ hour: selectedHour } }}</div>
         }
     </div>
 
@@ -84,7 +84,7 @@
     }
 
     <div class="data-source">
-        Air quality data provided by
+        {{ 'weather.airQuality.dataSource' | transloco }}
         <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
     </div>
 </mat-dialog-content>
