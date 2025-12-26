@@ -3,18 +3,18 @@
     matBadge="{{data.messages.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
     matBadgeOverlap="true">
     <mat-icon>speaker_notes</mat-icon>
-    Show messages
+    {{ 'common.map.multiMarker.showMessages' | transloco }}
   </button>
   <button mat-stroked-button [mat-dialog-close]="{type: 'private_note', notes: data.notes}"
     matBadge="{{data.notes.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
     matBadgeOverlap="true">
     <mat-icon>clinical_notes</mat-icon>
-    Show notes
+    {{ 'common.map.multiMarker.showNotes' | transloco }}
   </button>
   <button mat-stroked-button [mat-dialog-close]="{type: 'private_image', images: data.images}"
     matBadge="{{data.images.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
     matBadgeOverlap="true">
     <mat-icon>images</mat-icon>
-    Show images
+    {{ 'common.map.multiMarker.showImages' | transloco }}
   </button>
 </mat-dialog-content>

@@ -10,6 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
@@ -23,6 +24,7 @@ import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { TranslateService } from '../../services/translate.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
 import { DigitalServicesActReportDialogComponent } from '../legal/digital-services-act-report-dialog/digital-services-act-report-dialog.component';
@@ -50,7 +52,8 @@ type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MasonryItemDirective
+    MasonryItemDirective,
+    TranslocoPipe
   ],
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
@@ -59,10 +62,10 @@ export class MessagelistComponent implements OnInit {
 
   private static readonly DSA_NOTICE_STATUSES = new Set(['RECEIVED', 'UNDER_REVIEW', 'DECIDED']);
   private static readonly STATUS_LABELS: Record<'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN', string> = {
-    RECEIVED: 'Notice received',
-    UNDER_REVIEW: 'Under review',
-    DECIDED: 'Decision available',
-    UNKNOWN: 'Status unavailable'
+    RECEIVED: 'dsa.case.noticeStatus.received',
+    UNDER_REVIEW: 'dsa.case.noticeStatus.underReview',
+    DECIDED: 'dsa.case.noticeStatus.decided',
+    UNKNOWN: 'dsa.case.statusUnavailable'
   };
   private static readonly STATUS_CLASS_SUFFIX: Record<'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN', string> = {
     RECEIVED: 'received',
@@ -87,6 +90,7 @@ export class MessagelistComponent implements OnInit {
   public readonly messageDialog = this.matDialog;
   public readonly dialog = this.matDialog;
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   private readonly dsaStatusService = inject(DsaStatusService);
   readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);
 
@@ -118,13 +122,13 @@ export class MessagelistComponent implements OnInit {
 
   constructor() {
     this.userProfile = this.userService.getProfile();
-    // Wenn wir aus einer Tile kommen, initial den Service mit den Tile-Messages seeden,
-    // damit alle Service-Operationen (create/delete/like) auf derselben Liste arbeiten.
+    // If we come from a tile, seed the service with the tile messages
+    // so create/delete/like operate on the same list.
     if (this.data.messageSignal) {
       this.messageService.setMessages(this.data.messageSignal());
     }
 
-    // Laufende Synchronisierung: Service -> lokale View, optional zurück in das übergebene Signal.
+    // Ongoing sync: service -> local view, optionally back into the provided signal.
     effect(() => {
       const serviceMessages = this.messageService.messagesSignal();
       this.messagesSignal.set(serviceMessages);
@@ -173,7 +177,7 @@ export class MessagelistComponent implements OnInit {
       const newSelected = [...selected];
       newSelected.pop();
 
-      // Hier: Parent aus dem Signal neu holen → damit counts aktuell sind
+      // Refresh parent from signals so counts stay up to date.
       const parent = newSelected.at(-1);
       if (parent) {
         const updatedParent = this.findMessageInSignals(parent.uuid) || parent;
@@ -262,16 +266,18 @@ export class MessagelistComponent implements OnInit {
 
       if (result?.token) {
         this.flagMessageLocally(message, result.token);
-        this.snackBar.open('The content was hidden and marked for review.', 'OK', {
-          duration: 3000,
-          verticalPosition: 'top'
-        });
+        this.snackBar.open(
+          this.translation.t('common.messageList.blockedMarked'),
+          this.translation.t('common.actions.ok'),
+          { duration: 3000, verticalPosition: 'top' }
+        );
       } else {
         this.removeMessageLocally(message);
-        this.snackBar.open('The content was hidden and removed from the view.', 'OK', {
-          duration: 3000,
-          verticalPosition: 'top'
-        });
+        this.snackBar.open(
+          this.translation.t('common.messageList.blockedRemoved'),
+          this.translation.t('common.actions.ok'),
+          { duration: 3000, verticalPosition: 'top' }
+        );
       }
     });
   }
@@ -298,18 +304,18 @@ export class MessagelistComponent implements OnInit {
 
         const selected = this.messageService.selectedMessagesSignal();
 
-        // 1. Löschen
+        // 1. Delete
         this.messageService.deleteMessage(this.clickedMessage!);
 
-        // 2. Prüfen, ob in der aktuellen Ebene noch Comments da sind
+        // 2. Check if the current level still has comments.
         const parentUuid = this.clickedMessage!.parentUuid;
-        if (!parentUuid) return; // Root → nichts zu tun
+        if (!parentUuid) return; // Root -> nothing to do.
 
         const commentsSignal = this.messageService.getCommentsSignalForMessage(parentUuid);
         const remainingComments = commentsSignal().filter(c => c.id !== this.clickedMessage!.id);
 
         if (remainingComments.length === 0) {
-          // Eine Ebene zurückgehen
+          // Go up one level.
           const newSelected = [...selected];
           newSelected.pop();
           this.messageService.selectedMessagesSignal.set(newSelected);
@@ -375,7 +381,9 @@ export class MessagelistComponent implements OnInit {
 
   public getDsaStatusAriaLabel(message: Message): string {
     const status = this.resolveDsaStatus(message);
-    return `Moderation status: ${MessagelistComponent.STATUS_LABELS[status] ?? MessagelistComponent.STATUS_LABELS.UNKNOWN}`;
+    const key = MessagelistComponent.STATUS_LABELS[status] ?? MessagelistComponent.STATUS_LABELS.UNKNOWN;
+    const label = this.translation.t(key);
+    return this.translation.t('dsa.case.statusAria', { status: label });
   }
 
   private resolveDsaStatus(message: Message): ResolvedDsaStatus {
@@ -481,7 +489,8 @@ export class MessagelistComponent implements OnInit {
         }
       },
       error: err => {
-        this.snackBar.open(err.error.error, '', { duration: 3000 });
+        const errorMessage = err?.error?.error ?? this.translation.t('common.messageList.translateFailed');
+        this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });
   }

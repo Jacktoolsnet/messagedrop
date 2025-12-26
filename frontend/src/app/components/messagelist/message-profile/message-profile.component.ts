@@ -7,7 +7,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Profile } from '../../../interfaces/profile';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-edit-user',
@@ -20,13 +22,15 @@ import { Profile } from '../../../interfaces/profile';
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatIcon
+    MatIcon,
+    TranslocoPipe
 ],
   templateUrl: './message-profile.component.html',
   styleUrl: './message-profile.component.css'
 })
 export class MessageProfileComponent {
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<MessageProfileComponent>);
   readonly data = inject<{ profile: Profile; userId: string }>(MAT_DIALOG_DATA);
 
@@ -71,7 +75,11 @@ export class MessageProfileComponent {
   }
 
   handleFileError(): void {
-    this.snackBar.open('Could not read the selected file. Please try again.', 'OK', { duration: 2500 });
+    this.snackBar.open(
+      this.translation.t('common.messageProfile.fileReadFailed'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2500 }
+    );
   }
 
   deleteAvatar() {
@@ -79,6 +87,10 @@ export class MessageProfileComponent {
   }
 
   public showPolicy() {
-    this.snackBar.open(`Profile name and avatar is stored on the device.`, 'OK', {});
+    this.snackBar.open(
+      this.translation.t('common.messageProfile.policy'),
+      this.translation.t('common.actions.ok'),
+      {}
+    );
   }
 }

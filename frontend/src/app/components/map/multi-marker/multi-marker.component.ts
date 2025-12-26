@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogClose, MatDialogContent, MatDialogRef } from 
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { LocalImage } from '../../../interfaces/local-image';
 import { Message } from '../../../interfaces/message';
 import { Note } from '../../../interfaces/note';
@@ -23,7 +24,8 @@ import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
     MatButtonModule,
     MatDialogContent,
     MatDialogClose,
-    MatIcon
+    MatIcon,
+    TranslocoPipe
 ],
     templateUrl: './multi-marker.component.html',
     styleUrl: './multi-marker.component.css'

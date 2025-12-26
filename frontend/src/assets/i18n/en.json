@@ -368,6 +368,54 @@
         "useMap": "Use map location"
       }
     },
+    "map": {
+      "multiMarker": {
+        "showMessages": "Show messages",
+        "showNotes": "Show notes",
+        "showImages": "Show images"
+      }
+    },
+    "messageList": {
+      "addFirstMessage": "Add my first public message",
+      "addMessageAria": "Add message",
+      "addFirstComment": "Add my first public comment",
+      "addCommentAria": "Add comment",
+      "commentsAria": "Show or add comments",
+      "likeAria": "Like message",
+      "dislikeAria": "Dislike message",
+      "translateAria": "Translate message",
+      "flyToAria": "Fly to message",
+      "navigateAria": "Navigate to message location",
+      "editProfileAria": "Edit profile",
+      "editAria": "Edit message",
+      "deleteAria": "Delete message",
+      "blockAria": "Report message",
+      "avatarAltName": "{{ name }} avatar",
+      "avatarAltFallback": "Profile avatar",
+      "nameFallback": "Unnamed",
+      "myself": "Myself",
+      "blockedMarked": "The content was hidden and marked for review.",
+      "blockedRemoved": "The content was hidden and removed from the view.",
+      "translateFailed": "Translation failed.",
+      "blockDialog": {
+        "title": "Block message",
+        "confirm": "The message will be blocked for everyone. Are you sure the message violates the rules?"
+      },
+      "deleteDialog": {
+        "title": "Delete message",
+        "confirm": "The message and all related comments will be permanently deleted. Are you sure?"
+      }
+    },
+    "messageProfile": {
+      "title": "Edit profile",
+      "nameLabel": "Profile name",
+      "addAvatar": "Give the profile an avatar",
+      "avatarAltName": "{{ name }} avatar",
+      "avatarAltFallback": "Profile avatar",
+      "deleteAvatarAria": "Remove avatar",
+      "fileReadFailed": "Could not read the selected file. Please try again.",
+      "policy": "Profile name and avatar are stored on the device."
+    },
     "legal": {
       "language": {
         "de": "Deutsch",
@@ -749,6 +797,8 @@
         "underReview": "Under review",
         "decided": "Decided"
       },
+      "statusUnavailable": "Status unavailable",
+      "statusAria": "Moderation status: {{ status }}",
       "signalReceived": "Signal received",
       "reportDetails": {
         "title": "Report details",

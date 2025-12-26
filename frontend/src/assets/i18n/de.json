@@ -368,6 +368,54 @@
         "useMap": "Kartenposition verwenden"
       }
     },
+    "map": {
+      "multiMarker": {
+        "showMessages": "Nachrichten anzeigen",
+        "showNotes": "Notizen anzeigen",
+        "showImages": "Bilder anzeigen"
+      }
+    },
+    "messageList": {
+      "addFirstMessage": "Erste öffentliche Nachricht hinzufügen",
+      "addMessageAria": "Nachricht hinzufügen",
+      "addFirstComment": "Ersten öffentlichen Kommentar hinzufügen",
+      "addCommentAria": "Kommentar hinzufügen",
+      "commentsAria": "Kommentare anzeigen oder hinzufügen",
+      "likeAria": "Nachricht positiv bewerten",
+      "dislikeAria": "Nachricht negativ bewerten",
+      "translateAria": "Nachricht übersetzen",
+      "flyToAria": "Zur Nachricht springen",
+      "navigateAria": "Zur Nachrichtenposition navigieren",
+      "editProfileAria": "Profil bearbeiten",
+      "editAria": "Nachricht bearbeiten",
+      "deleteAria": "Nachricht löschen",
+      "blockAria": "Nachricht melden",
+      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltFallback": "Profil-Avatar",
+      "nameFallback": "Ohne Namen",
+      "myself": "Ich",
+      "blockedMarked": "Der Inhalt wurde ausgeblendet und zur Prüfung markiert.",
+      "blockedRemoved": "Der Inhalt wurde ausgeblendet und aus der Ansicht entfernt.",
+      "translateFailed": "Übersetzung fehlgeschlagen.",
+      "blockDialog": {
+        "title": "Nachricht blockieren",
+        "confirm": "Die Nachricht wird für alle blockiert. Bist du sicher, dass sie gegen die Regeln verstößt?"
+      },
+      "deleteDialog": {
+        "title": "Nachricht löschen",
+        "confirm": "Die Nachricht und alle zugehörigen Kommentare werden dauerhaft gelöscht. Bist du sicher?"
+      }
+    },
+    "messageProfile": {
+      "title": "Profil bearbeiten",
+      "nameLabel": "Profilname",
+      "addAvatar": "Dem Profil einen Avatar geben",
+      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltFallback": "Profil-Avatar",
+      "deleteAvatarAria": "Avatar entfernen",
+      "fileReadFailed": "Die ausgewählte Datei konnte nicht gelesen werden. Bitte versuche es erneut.",
+      "policy": "Profilname und Avatar werden auf dem Gerät gespeichert."
+    },
     "legal": {
       "language": {
         "de": "Deutsch",
@@ -749,6 +797,8 @@
         "underReview": "In Prüfung",
         "decided": "Entschieden"
       },
+      "statusUnavailable": "Status nicht verfügbar",
+      "statusAria": "Moderationsstatus: {{ status }}",
       "signalReceived": "Signal eingegangen",
       "reportDetails": {
         "title": "Meldedetails",
