@@ -10,7 +10,8 @@
       "retry": "Erneut versuchen",
       "backupNow": "Backup jetzt",
       "restore": "Wiederherstellen",
-      "no": "Nein"
+      "no": "Nein",
+      "close": "Schließen"
     },
     "aria": {
       "wait": "Warten",
@@ -195,12 +196,40 @@
     }
   },
   "settings": {
+    "title": "App-Einstellungen",
+    "versionLabel": "Version",
+    "theme": {
+      "title": "Design & Erscheinungsbild",
+      "description": "Wähle Farben und das Hell-/Dunkel-Verhalten.",
+      "label": "Design",
+      "modeLabel": "Designmodus umschalten",
+      "mode": {
+        "light": "Hell",
+        "dark": "Dunkel",
+        "system": "System"
+      }
+    },
     "language": {
       "title": "Sprache",
       "description": "Lege fest, wie MessageDrop die Sprache auswählt.",
       "optionSystem": "System / Browser",
       "optionEnglish": "Englisch",
       "optionGerman": "Deutsch"
+    },
+    "storage": {
+      "title": "Persistenter Speicher",
+      "description": "Schützt lokale Daten vor automatischer Bereinigung.",
+      "note": "Wenn verfügbar, bitten wir den Browser, IndexedDB-Daten dauerhaft zu behalten. Ideal für Offline-Nutzung oder große Archive.",
+      "toggle": "Lokale Daten schützen",
+      "applying": "Einstellung wird angewendet ...",
+      "warning": "Persistenter Speicher konnte vom Browser nicht gewährt werden.",
+      "confirmDisable": "Wenn du deaktivierst, kann der Browser gespeicherte Daten entfernen. Möchtest du wirklich fortfahren?"
+    },
+    "backup": {
+      "title": "Backup-Erinnerung",
+      "description": "Vor dem Schließen fragen, ob neue Daten gesichert werden sollen.",
+      "note": "Wenn aktiviert, wirst du beim Verlassen der App gefragt, falls neue Änderungen vorliegen.",
+      "toggle": "Vor dem Schließen fragen"
     }
   },
   "errors": {

@@ -15,6 +15,7 @@ import { APP_VERSION_INFO } from '../../../environments/version';
 import { AppSettings } from '../../interfaces/app-settings';
 import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
 
 
@@ -47,6 +48,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly dialogRef = inject(MatDialogRef<AppSettingsComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
   readonly languageService = inject(LanguageService);
+  private readonly translation = inject(TranslationHelperService);
 
   public versionInfo = APP_VERSION_INFO;
 
@@ -127,7 +129,7 @@ export class AppSettingsComponent implements OnInit {
     if (!targetState) {
       const confirmed = typeof window === 'undefined'
         ? true
-        : window.confirm('Disabling may allow the browser to prune stored data. Do you really want to continue?');
+        : window.confirm(this.translation.t('settings.storage.confirmDisable'));
       if (!confirmed) {
         event.source.checked = previousState;
         return;
@@ -146,7 +148,7 @@ export class AppSettingsComponent implements OnInit {
       this.storagePersistenceBusy = false;
       event.source.checked = this.appSettings.persistStorage;
       if (targetState && !this.appSettings.persistStorage) {
-        this.storagePersistenceWarning = 'Persistent storage could not be granted by the browser.';
+        this.storagePersistenceWarning = this.translation.t('settings.storage.warning');
       } else {
         this.storagePersistenceWarning = '';
       }

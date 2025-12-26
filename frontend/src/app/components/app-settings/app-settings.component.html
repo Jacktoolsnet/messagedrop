@@ -1,17 +1,17 @@
-<h2 mat-dialog-title>App settings</h2>
+<h2 mat-dialog-title>{{ 'settings.title' | transloco }}</h2>
 <mat-dialog-content>
   <div class="platform-tile-container">
     <div class="platform-tile theme-settings-tile">
       <div class="theme-settings-header">
         <mat-icon>palette</mat-icon>
         <div>
-          <h3>Theme & appearance</h3>
-          <p class="theme-settings-subtitle">Choose colors and light/dark behavior.</p>
+          <h3>{{ 'settings.theme.title' | transloco }}</h3>
+          <p class="theme-settings-subtitle">{{ 'settings.theme.description' | transloco }}</p>
         </div>
       </div>
 
       <mat-form-field appearance="fill" class="theme-select">
-        <mat-label>Theme</mat-label>
+        <mat-label>{{ 'settings.theme.label' | transloco }}</mat-label>
         <mat-select [value]="appSettings.defaultTheme" (selectionChange)="setTheme($event.value)">
           @for (theme of availableThemes; track theme) {
             <mat-option [value]="theme">
@@ -23,18 +23,18 @@
 
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.themeMode"
         (change)="setThemeMode($event.value)" class="theme-toggle-group" exclusive
-        aria-label="Theme mode toggle">
+        [attr.aria-label]="'settings.theme.modeLabel' | transloco">
         <mat-button-toggle value="light">
           <mat-icon>light_mode</mat-icon>
-          Light
+          {{ 'settings.theme.mode.light' | transloco }}
         </mat-button-toggle>
         <mat-button-toggle value="dark">
           <mat-icon>dark_mode</mat-icon>
-          Dark
+          {{ 'settings.theme.mode.dark' | transloco }}
         </mat-button-toggle>
         <mat-button-toggle value="system">
           <mat-icon>settings</mat-icon>
-          System
+          {{ 'settings.theme.mode.system' | transloco }}
         </mat-button-toggle>
       </mat-button-toggle-group>
     </div>
@@ -73,54 +73,53 @@
     }
     @if(storagePersistenceSupported){
       <div class="platform-tile storage-persistence-tile">
-        <div class="storage-persistence-header">
-          <mat-icon>inventory_2</mat-icon>
-          <div>
-            <h3>Persistent storage</h3>
-            <p class="storage-persistence-subtitle">Keeps local data safe from automatic cleanup.</p>
-          </div>
+      <div class="storage-persistence-header">
+        <mat-icon>inventory_2</mat-icon>
+        <div>
+          <h3>{{ 'settings.storage.title' | transloco }}</h3>
+          <p class="storage-persistence-subtitle">{{ 'settings.storage.description' | transloco }}</p>
         </div>
-        <p class="storage-persistence-note">
-          When available, we ask the browser to keep IndexedDB data permanently.
-          Ideal for offline usage or large message archives.
-        </p>
-        <mat-slide-toggle color="primary" [checked]="appSettings.persistStorage"
+      </div>
+      <p class="storage-persistence-note">
+        {{ 'settings.storage.note' | transloco }}
+      </p>
+      <mat-slide-toggle color="primary" [checked]="appSettings.persistStorage"
           (change)="onStoragePersistenceToggle($event)" [disabled]="storagePersistenceBusy">
-          Protect local data
-        </mat-slide-toggle>
-        @if(storagePersistenceBusy){
-          <small class="storage-persistence-hint">Applying preference ...</small>
-        }
-        @if(storagePersistenceWarning){
+          {{ 'settings.storage.toggle' | transloco }}
+      </mat-slide-toggle>
+      @if(storagePersistenceBusy){
+          <small class="storage-persistence-hint">{{ 'settings.storage.applying' | transloco }}</small>
+      }
+      @if(storagePersistenceWarning){
           <p class="storage-persistence-warning">{{ storagePersistenceWarning }}</p>
-        }
+      }
       </div>
     }
     <div class="platform-tile backup-exit-tile">
       <div class="backup-exit-header">
         <mat-icon>save</mat-icon>
         <div>
-          <h3>Backup reminder</h3>
-          <p class="backup-exit-subtitle">Ask before closing if new data should be backed up.</p>
+          <h3>{{ 'settings.backup.title' | transloco }}</h3>
+          <p class="backup-exit-subtitle">{{ 'settings.backup.description' | transloco }}</p>
         </div>
       </div>
       <p class="backup-exit-note">
-        When enabled, you will be prompted before leaving the app if there are new changes.
+        {{ 'settings.backup.note' | transloco }}
       </p>
       <mat-slide-toggle color="primary" [checked]="appSettings.backupOnExit"
         (change)="setBackupOnExit($event.checked)">
-        Ask before closing
+        {{ 'settings.backup.toggle' | transloco }}
       </mat-slide-toggle>
     </div>
   </div>
 
   <mat-chip-set class="version-chipset">
     <mat-chip appearance="outlined" color="primary" disableRipple>
-      Version {{ versionInfo.semver }}-{{ versionInfo.build }}-{{ versionInfo.commit }}-{{ versionInfo.timestamp
+      {{ 'settings.versionLabel' | transloco }} {{ versionInfo.semver }}-{{ versionInfo.build }}-{{ versionInfo.commit }}-{{ versionInfo.timestamp
       }}
     </mat-chip>
   </mat-chip-set>
 
   <mat-dialog-actions>
-    <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">Close</button>
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">{{ 'common.actions.close' | transloco }}</button>
   </mat-dialog-actions>
