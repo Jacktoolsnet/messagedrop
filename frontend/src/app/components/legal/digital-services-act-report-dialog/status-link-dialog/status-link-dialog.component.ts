@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
@@ -19,7 +20,7 @@ export interface DsaStatusLinkDialogData {
 @Component({
   selector: 'app-dsa-status-link-dialog',
   standalone: true,
-  imports: [MatDialogModule, MatButtonModule, MatIconModule, TranslocoPipe],
+  imports: [MatDialogModule, MatButtonModule, MatIconModule, MatTooltipModule, TranslocoPipe],
   templateUrl: './status-link-dialog.component.html',
   styleUrl: './status-link-dialog.component.css'
 })
