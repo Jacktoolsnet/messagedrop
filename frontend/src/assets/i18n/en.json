@@ -3,7 +3,77 @@
     "appName": "MessageDrop (EN)",
     "save": "Save",
     "cancel": "Cancel",
-    "language": "Language"
+    "language": "Language",
+    "actions": {
+      "ok": "OK",
+      "retry": "Retry",
+      "backupNow": "Backup now",
+      "no": "No"
+    },
+    "aria": {
+      "wait": "Wait",
+      "userProfile": "User profile",
+      "appMenu": "App menu",
+      "mainMenu": "Main menu",
+      "search": "Search"
+    },
+    "menu": {
+      "logout": "Logout",
+      "myUser": "My user",
+      "myProfile": "My profile",
+      "systemMessages": "System messages",
+      "myPublicMessages": "My public messages",
+      "myPrivateNotes": "My private notes",
+      "myPlaces": "My places",
+      "myContacts": "My contacts",
+      "appSettings": "App settings",
+      "externalContentSettings": "External content settings",
+      "restoreBackup": "Restore backup",
+      "termsOfService": "Terms of Service",
+      "privacyPolicy": "Privacy Policy",
+      "disclaimer": "Disclaimer",
+      "imprintLegalNotice": "Imprint (Legal notice)",
+      "thirdPartyLicenses": "Third-Party Licenses",
+      "locateMe": "Locate me",
+      "publicMessage": "Public message",
+      "privateNote": "Private note",
+      "privateImage": "Private image",
+      "contactsMessage": "Contacts message",
+      "weather": "Weather",
+      "airQuality": "Air quality",
+      "searchPlace": "Search a place"
+    },
+    "serverDown": {
+      "title": "Oops! Our server went on a coffee break...",
+      "message": "Apparently, our backend needed some \"me time\".\n\nDon't worry, we sent a carrier pigeon to bring it back."
+    },
+    "backupExit": {
+      "title": "Create backup before leaving?",
+      "message": "You have unsaved changes. Do you want to create a backup now?"
+    },
+    "location": {
+      "locatingTitle": "Locating you",
+      "locatingMessage": "Please wait while your device determines your current location...",
+      "authorizationRequired": "Please authorize location.",
+      "failed": "Position could not be determined. Please try again later."
+    },
+    "notifications": {
+      "received": "Notification received: {{ action }}"
+    },
+    "files": {
+      "pickerUnsupported": "File picker is not supported in this browser."
+    },
+    "images": {
+      "imported": "Image(s) imported locally.",
+      "importFailed": "Unable to import the image."
+    },
+    "user": {
+      "deleteSuccess": "User and related data were removed permanently."
+    },
+    "geoStatistic": {
+      "title": "GeoStatistic Service",
+      "unexpectedResponse": "Unexpected response."
+    }
   },
   "settings": {
     "language": {

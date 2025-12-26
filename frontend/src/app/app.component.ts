@@ -79,6 +79,7 @@ import { SocketioService } from './services/socketio.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
+import { TranslationHelperService } from './services/translation-helper.service';
 
 @Component({
   selector: 'app-root',
@@ -155,6 +156,7 @@ export class AppComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
+  private readonly translation = inject(TranslationHelperService);
   private exitBackupPromptPending = false;
   private exitBackupDialogOpen = false;
   readonly userMessagesSignal = computed(() =>
@@ -207,11 +209,11 @@ export class AppComponent implements OnInit {
           closeOnNavigation: false,
           data: {
             showAlways: true,
-            title: 'Oops! Our server went on a coffee break...',
+            title: this.translation.t('common.serverDown.title'),
             image: '',
             icon: 'cloud_off',
-            message: 'Apparently, our backend needed some “me time”.\n\nDon’t worry, we sent a carrier pigeon to bring it back.',
-            button: 'Retry...',
+            message: this.translation.t('common.serverDown.message'),
+            button: this.translation.t('common.actions.retry'),
             delay: 10000,
             showSpinner: false
           },
@@ -429,10 +431,10 @@ export class AppComponent implements OnInit {
     this.exitBackupDialogOpen = true;
     const dialogRef = this.dialog.open(DeleteUserComponent, {
       data: {
-        title: 'Create backup before leaving?',
-        message: 'You have unsaved changes. Do you want to create a backup now?',
-        confirmLabel: 'Backup now',
-        cancelLabel: 'No'
+        title: this.translation.t('common.backupExit.title'),
+        message: this.translation.t('common.backupExit.message'),
+        confirmLabel: this.translation.t('common.actions.backupNow'),
+        cancelLabel: this.translation.t('common.actions.no')
       },
       closeOnNavigation: true,
       hasBackdrop: true
@@ -467,7 +469,7 @@ export class AppComponent implements OnInit {
       } else if (this.oembedService.isLocation(objectFromUrl)) {
         location = objectFromUrl;
       } else {
-        this.snackBar.open(JSON.stringify(content, null, 2), 'OK', {
+        this.snackBar.open(JSON.stringify(content, null, 2), this.translation.t('common.actions.ok'), {
           horizontalPosition: 'center',
           verticalPosition: 'top',
         });
@@ -494,7 +496,10 @@ export class AppComponent implements OnInit {
   public handleNotification() {
     const notificationAction: NotificationAction | undefined = this.appService.getNotificationAction();
     if (notificationAction) {
-      this.snackBar.open(`Notification content received -> ${notificationAction}`, 'OK');
+      this.snackBar.open(
+        this.translation.t('common.notifications.received', { action: notificationAction }),
+        this.translation.t('common.actions.ok')
+      );
       // z. B. Navigation starten, Dialog öffnen, etc.
       void this.systemNotificationService.refreshUnreadCount();
     }
@@ -518,10 +523,10 @@ export class AppComponent implements OnInit {
       closeOnNavigation: false,
       data: {
         showAlways: true,
-        title: 'Locating You',
+        title: this.translation.t('common.location.locatingTitle'),
         image: '',
         icon: 'place',
-        message: 'Please wait while your device determine your current location...',
+        message: this.translation.t('common.location.locatingMessage'),
         button: '',
         delay: 0,
         showSpinner: true
@@ -550,14 +555,14 @@ export class AppComponent implements OnInit {
           dialogRef.close();
           this.locationReady = false;
           if (error.code == 1) {
-            this.snackBarRef = this.snackBar.open(`Please authorize location.`, 'OK', {
+            this.snackBarRef = this.snackBar.open(this.translation.t('common.location.authorizationRequired'), this.translation.t('common.actions.ok'), {
               panelClass: ['snack-info'],
               horizontalPosition: 'center',
               verticalPosition: 'top',
               duration: 1000
             });
           } else {
-            this.snackBarRef = this.snackBar.open("Position could not be determined. Please try again later.", 'OK', {
+            this.snackBarRef = this.snackBar.open(this.translation.t('common.location.failed'), this.translation.t('common.actions.ok'), {
               panelClass: ['snack-info'],
               horizontalPosition: 'center',
               verticalPosition: 'top',
@@ -724,7 +729,7 @@ export class AppComponent implements OnInit {
 
   async openAddImageDialog(): Promise<void> {
     if (!this.localImageService.isSupported()) {
-      this.snackBar.open('File picker is not supported in this browser.', undefined, { duration: 4000 });
+      this.snackBar.open(this.translation.t('common.files.pickerUnsupported'), undefined, { duration: 4000 });
       return;
     }
 
@@ -738,11 +743,11 @@ export class AppComponent implements OnInit {
       const resolvedEntries = await this.resolveExifOverrides(entries);
 
       await Promise.all(resolvedEntries.map(entry => this.indexedDbService.saveImage(entry)));
-      this.snackBar.open('Image(s) imported locally.', undefined, { duration: 3000 });
+      this.snackBar.open(this.translation.t('common.images.imported'), undefined, { duration: 3000 });
       this.updateDataForLocation();
     } catch (error) {
       console.error('Failed to add image', error);
-      this.snackBar.open('Unable to import the image.', undefined, { duration: 4000 });
+      this.snackBar.open(this.translation.t('common.images.importFailed'), undefined, { duration: 4000 });
     }
   }
 
@@ -1171,7 +1176,7 @@ export class AppComponent implements OnInit {
                 this.userService.logout();
                 this.indexedDbService.clearAllData();
                 this.updateDataForLocation();
-                this.snackBarRef = this.snackBar.open("User and related data were removed permanently.", undefined, {
+                this.snackBarRef = this.snackBar.open(this.translation.t('common.user.deleteSuccess'), undefined, {
                   panelClass: ['snack-success'],
                   horizontalPosition: 'center',
                   verticalPosition: 'top',
@@ -1180,7 +1185,7 @@ export class AppComponent implements OnInit {
               }
             },
             error: () => {
-              this.snackBarRef = this.snackBar.open("Oops, something went wrong. Please try again later.", undefined, {
+              this.snackBarRef = this.snackBar.open(this.translation.t('errors.unknown'), undefined, {
                 panelClass: ['snack-warning'],
                 horizontalPosition: 'center',
                 verticalPosition: 'top',
@@ -1318,7 +1323,7 @@ export class AppComponent implements OnInit {
             });
           } else {
             // Bei Fehlerstatus trotzdem Fehlerdialog zeigen
-            this.showGeoStatisticError('Unexpected response');
+            this.showGeoStatisticError(this.translation.t('common.geoStatistic.unexpectedResponse'));
           }
         },
         error: (err) => {
@@ -1333,7 +1338,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: false,
       data: {
         showAlways: true,
-        title: 'GeoStatistic Service',
+        title: this.translation.t('common.geoStatistic.title'),
         image: '',
         icon: 'bug_report',
         message: message,

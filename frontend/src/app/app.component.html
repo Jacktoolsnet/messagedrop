@@ -8,16 +8,19 @@
 </app-map>
 
 @if (userService.isBlocked()) {
-<button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="Wait">
+<button aria-hidden="false" class="button_profile" mat-fab color="accent"
+    [attr.aria-label]="'common.aria.wait' | transloco">
     <mat-icon aria-hidden="false">hourglass_top</mat-icon>
 </button>
 } @else if (!userService.isReady()) {
-<button aria-hidden="false" class="button_profile" mat-fab color="accent" aria-label="User Profile"
+<button aria-hidden="false" class="button_profile" mat-fab color="accent"
+    [attr.aria-label]="'common.aria.userProfile' | transloco"
     (click)="userService.login(loadLocalDataAfterLogin.bind(this))">
     <mat-icon aria-hidden="false">lock_open</mat-icon>
 </button>
 } @else {
-<button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab aria-label="User Profile"
+<button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab
+    [attr.aria-label]="'common.aria.userProfile' | transloco"
     (click)="{}" [@badgePulse]="animateUserBadgeTick()">
     <mat-icon [attr.aria-hidden]="false"
         [matBadge]="userService.isReady() ? (unreadTotalAll() > 0 ? (unreadTotalAll() | shortNumber) : null) : null"
@@ -25,17 +28,20 @@
 </button>
 }
 
-<button [attr.aria-hidden]="false" [matMenuTriggerFor]="appMenu" class="button_app" mat-fab aria-label="Appmenu"
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="appMenu" class="button_app" mat-fab
+    [attr.aria-label]="'common.aria.appMenu' | transloco"
     (click)="{}">
     <mat-icon [attr.aria-hidden]="false">apps</mat-icon>
 </button>
 
-<button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab aria-label="Mainmenu"
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab
+    [attr.aria-label]="'common.aria.mainMenu' | transloco"
     (click)="{}">
     <mat-icon [attr.aria-hidden]="false">pin_drop</mat-icon>
 </button>
 
-<button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab aria-label="Search"
+<button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab
+    [attr.aria-label]="'common.aria.search' | transloco"
     (click)="{}">
     <mat-icon [attr.aria-hidden]="false">search</mat-icon>
 </button>
@@ -45,21 +51,21 @@
     @if (userService.isReady()) {
     <button mat-menu-item (click)="logout()">
         <mat-icon>lock</mat-icon>
-        <span>Logout</span>
+        <span>{{ 'common.menu.logout' | transloco }}</span>
     </button>
     }
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="showUser()">
         <mat-icon>account_circle</mat-icon>
-        <span>My user</span>
+        <span>{{ 'common.menu.myUser' | transloco }}</span>
     </button>
     }
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="editUserProfile()">
         <mat-icon>badge</mat-icon>
-        <span>My profile</span>
+        <span>{{ 'common.menu.myProfile' | transloco }}</span>
     </button>
     }
 
@@ -68,28 +74,28 @@
         <mat-icon [attr.aria-hidden]="false"
             [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
             [matBadgeHidden]="!hasUnreadSystemNotifications()" matBadgeColor="primary">notifications</mat-icon>
-        <span>System messages</span>
+        <span>{{ 'common.menu.systemMessages' | transloco }}</span>
     </button>
     }
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon>speaker_notes</mat-icon>
-        <span>My public messages</span>
+        <span>{{ 'common.menu.myPublicMessages' | transloco }}</span>
     </button>
     }
 
     @if (userService.isReady()) {
     <button mat-menu-item (click)="openNoteListDialog()">
         <mat-icon>clinical_notes</mat-icon>
-        <span>My private notes</span>
+        <span>{{ 'common.menu.myPrivateNotes' | transloco }}</span>
     </button>
     }
 
     @if (userService.isReady() && placeService.isReady()) {
     <button mat-menu-item (click)="openPlaceListDialog()">
         <mat-icon>personal_places</mat-icon>
-        <span>My places</span>
+        <span>{{ 'common.menu.myPlaces' | transloco }}</span>
     </button>
     }
 
@@ -97,7 +103,7 @@
     <button mat-menu-item (click)="openContactListDialog()">
         <mat-icon [attr.aria-hidden]="false" matBadge="{{ getContactsBadge() }}" [matBadgeHidden]="!getContactsBadge()"
             matBadgeColor="warn" matBadgeOverlap="true">contacts</mat-icon>
-        <span>My contacts</span>
+        <span>{{ 'common.menu.myContacts' | transloco }}</span>
     </button>
     }
 </mat-menu>
@@ -109,42 +115,42 @@
     </button>
     <button mat-menu-item (click)="editAppSettings()">
         <mat-icon>settings_applications</mat-icon>
-        <span>App settings</span>
+        <span>{{ 'common.menu.appSettings' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="editExternalContentSettings()">
         <mat-icon>public</mat-icon>
-        <span>External content settings</span>
+        <span>{{ 'common.menu.externalContentSettings' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="startRestore()">
         <mat-icon>restore</mat-icon>
-        <span>Restore backup</span>
+        <span>{{ 'common.menu.restoreBackup' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showTermsOfService()">
         <mat-icon>rule</mat-icon>
-        <span>Terms of Service</span>
+        <span>{{ 'common.menu.termsOfService' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showPrivacyPolicy()">
         <mat-icon>privacy_tip</mat-icon>
-        <span>Privacy Policy</span>
+        <span>{{ 'common.menu.privacyPolicy' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showDisclaimer()">
         <mat-icon>policy</mat-icon>
-        <span>Disclaimer</span>
+        <span>{{ 'common.menu.disclaimer' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showLegalNotice()">
         <mat-icon>gavel</mat-icon>
-        <span>Imprint (Legal notice)</span>
+        <span>{{ 'common.menu.imprintLegalNotice' | transloco }}</span>
     </button>
     <button mat-menu-item (click)="showLicenses()">
         <mat-icon>receipt_long</mat-icon>
-        <span>Third-Party Licenses</span>
+        <span>{{ 'common.menu.thirdPartyLicenses' | transloco }}</span>
     </button>
 </mat-menu>
 
 <mat-menu #messageMenu="matMenu">
     <button mat-menu-item (click)="getCurrentPosition()">
         <mat-icon [attr.aria-hidden]="locationReady">place</mat-icon>
-        <span>Locate me</span>
+        <span>{{ 'common.menu.locateMe' | transloco }}</span>
     </button>
 
     <button mat-menu-item
@@ -154,7 +160,7 @@
         } @else {
         <mat-icon>send</mat-icon>
         }
-        <span>Public message</span>
+        <span>{{ 'common.menu.publicMessage' | transloco }}</span>
     </button>
     <button mat-menu-item
         (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
@@ -163,7 +169,7 @@
         } @else {
         <mat-icon>add_notes</mat-icon>
         }
-        <span>Private note</span>
+        <span>{{ 'common.menu.privateNote' | transloco }}</span>
     </button>
     <button mat-menu-item
         (click)="!userService.isReady() ? userService.login(openAddImageDialog.bind(this)) : openAddImageDialog()">
@@ -172,7 +178,7 @@
         } @else {
         <mat-icon>image_search</mat-icon>
         }
-        <span>Private image</span>
+        <span>{{ 'common.menu.privateImage' | transloco }}</span>
     </button>
     <button mat-menu-item
         (click)="!userService.isReady() ? userService.login(openContactListDialog.bind(this)) : openContactListDialog()">
@@ -181,17 +187,17 @@
         } @else {
         <mat-icon>contacts</mat-icon>
         }
-        <span>Contacts message</span>
+        <span>{{ 'common.menu.contactsMessage' | transloco }}</span>
     </button>
 
     <button mat-menu-item (click)="showWeather()">
         <mat-icon>weather_mix</mat-icon>
-        <span>Weather</span>
+        <span>{{ 'common.menu.weather' | transloco }}</span>
     </button>
 
     <button mat-menu-item (click)="showAirQuality()">
         <mat-icon>eco</mat-icon>
-        <span>Air quality</span>
+        <span>{{ 'common.menu.airQuality' | transloco }}</span>
     </button>
 
     <!--button mat-menu-item (click)="showGeoStatistic()">
@@ -203,7 +209,7 @@
 <mat-menu #searchMenu="matMenu">
     <button mat-menu-item (click)="showNominatimSearchDialog()">
         <mat-icon>travel_explore</mat-icon>
-        <span>Search a place</span>
+        <span>{{ 'common.menu.searchPlace' | transloco }}</span>
     </button>
 </mat-menu>
 }

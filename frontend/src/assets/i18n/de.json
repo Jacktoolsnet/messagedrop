@@ -3,19 +3,89 @@
     "appName": "MessageDrop (DE)",
     "save": "Speichern",
     "cancel": "Abbrechen",
-    "language": "Sprache"
+    "language": "Sprache",
+    "actions": {
+      "ok": "OK",
+      "retry": "Erneut versuchen",
+      "backupNow": "Backup jetzt",
+      "no": "Nein"
+    },
+    "aria": {
+      "wait": "Warten",
+      "userProfile": "Benutzerprofil",
+      "appMenu": "App-Menü",
+      "mainMenu": "Hauptmenü",
+      "search": "Suche"
+    },
+    "menu": {
+      "logout": "Abmelden",
+      "myUser": "Mein Benutzer",
+      "myProfile": "Mein Profil",
+      "systemMessages": "Systemnachrichten",
+      "myPublicMessages": "Meine öffentlichen Nachrichten",
+      "myPrivateNotes": "Meine privaten Notizen",
+      "myPlaces": "Meine Orte",
+      "myContacts": "Meine Kontakte",
+      "appSettings": "App-Einstellungen",
+      "externalContentSettings": "Einstellungen für externe Inhalte",
+      "restoreBackup": "Backup wiederherstellen",
+      "termsOfService": "Nutzungsbedingungen",
+      "privacyPolicy": "Datenschutz",
+      "disclaimer": "Haftungsausschluss",
+      "imprintLegalNotice": "Impressum (rechtlicher Hinweis)",
+      "thirdPartyLicenses": "Lizenzen von Drittanbietern",
+      "locateMe": "Standort bestimmen",
+      "publicMessage": "Öffentliche Nachricht",
+      "privateNote": "Private Notiz",
+      "privateImage": "Privates Bild",
+      "contactsMessage": "Kontakt-Nachricht",
+      "weather": "Wetter",
+      "airQuality": "Luftqualität",
+      "searchPlace": "Ort suchen"
+    },
+    "serverDown": {
+      "title": "Ups! Unser Server macht eine Kaffeepause...",
+      "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge, wir haben eine Brieftaube geschickt."
+    },
+    "backupExit": {
+      "title": "Backup vor dem Beenden erstellen?",
+      "message": "Du hast ungespeicherte Änderungen. Möchtest du jetzt ein Backup erstellen?"
+    },
+    "location": {
+      "locatingTitle": "Standort wird ermittelt",
+      "locatingMessage": "Bitte warte, während dein Gerät deinen Standort ermittelt...",
+      "authorizationRequired": "Bitte Standortfreigabe erteilen.",
+      "failed": "Standort konnte nicht bestimmt werden. Bitte später erneut versuchen."
+    },
+    "notifications": {
+      "received": "Benachrichtigung erhalten: {{ action }}"
+    },
+    "files": {
+      "pickerUnsupported": "Dateiauswahl wird in diesem Browser nicht unterstützt."
+    },
+    "images": {
+      "imported": "Bild(er) lokal importiert.",
+      "importFailed": "Bild konnte nicht importiert werden."
+    },
+    "user": {
+      "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt."
+    },
+    "geoStatistic": {
+      "title": "Geo-Statistik-Service",
+      "unexpectedResponse": "Unerwartete Antwort."
+    }
   },
   "settings": {
     "language": {
       "title": "Sprache",
-      "description": "Lege fest, wie MessageDrop die Sprache auswaehlt.",
+      "description": "Lege fest, wie MessageDrop die Sprache auswählt.",
       "optionSystem": "System / Browser",
       "optionEnglish": "Englisch",
       "optionGerman": "Deutsch"
     }
   },
   "errors": {
-    "unknown": "Es ist ein Fehler aufgetreten. Bitte spaeter erneut versuchen.",
+    "unknown": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen.",
     "noteTooLarge": "Notiz ist zu lang. Maximal {{ maxChars }} Zeichen.",
     "unauthorized": "Bitte melde dich an, um fortzufahren.",
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut."
