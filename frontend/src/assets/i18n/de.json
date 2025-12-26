@@ -14,6 +14,7 @@
       "yes": "Ja",
       "apply": "Anwenden",
       "abort": "Abbrechen",
+      "delete": "Löschen",
       "close": "Schließen"
     },
     "clipboard": {
@@ -107,6 +108,27 @@
         "imageInvalid": "Bitte wähle eine gültige Bilddatei aus.",
         "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: {{ maxMb }} MB.",
         "fileReadError": "Fehler beim Lesen der Datei."
+      },
+      "chatroom": {
+        "closeAria": "Chatroom schließen",
+        "composeAria": "Nachricht schreiben",
+        "avatarAltName": "{{ name }}-Avatar",
+        "avatarAltMe": "Mein Avatar",
+        "meLabel": "Ich",
+        "avatarAltContact": "Kontakt-Avatar",
+        "contactLabel": "Kontakt",
+        "editAria": "Nachricht bearbeiten",
+        "deleteAria": "Nachricht löschen",
+        "showOriginalAria": "Originalnachricht anzeigen",
+        "translateAria": "Nachricht übersetzen",
+        "firstMessage": "Erste Nachricht senden",
+        "loading": "Chatroom wird geladen...",
+        "translateFailed": "Übersetzung fehlgeschlagen.",
+        "storeTranslationFailed": "Übersetzte Nachricht konnte nicht gespeichert werden.",
+        "deleteMessage": {
+          "title": "Nachricht löschen",
+          "confirm": "Diese Nachricht wird dauerhaft gelöscht. Bist du sicher?"
+        }
       },
       "message": {
         "addText": "Text hinzufügen",

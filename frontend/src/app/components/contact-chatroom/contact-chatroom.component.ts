@@ -5,6 +5,7 @@ import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -13,6 +14,7 @@ import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
 import { SocketioService } from '../../services/socketio.service';
 import { TranslateService } from '../../services/translate.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -39,7 +41,8 @@ interface ChatroomMessage {
     MatButtonModule,
     MatIcon,
     ShowmultimediaComponent,
-    ShowmessageComponent
+    ShowmessageComponent,
+    TranslocoPipe
 ],
   templateUrl: './contact-chatroom.component.html',
   styleUrl: './contact-chatroom.component.css',
@@ -55,6 +58,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
   private readonly translateService = inject(TranslateService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
 
   @ViewChild('messageScroll') private messageScroll?: ElementRef<HTMLElement>;
   @ViewChildren('messageRow') private messageRows?: QueryList<ElementRef<HTMLElement>>;
@@ -312,7 +316,7 @@ export class ContactChatroomComponent implements AfterViewInit {
         void this.persistTranslation(message.messageId, translated);
       },
       error: (err) => {
-        const errorMessage = err?.error?.error ?? 'Translation failed';
+        const errorMessage = err?.error?.error ?? this.translation.t('common.contact.chatroom.translateFailed');
         this.snackBar.open(errorMessage, '', { duration: 3000 });
       }
     });
@@ -749,19 +753,19 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     try {
       const encryptedTranslation = await this.contactMessageService.encryptTranslation(translation);
-      this.contactMessageService.updateTranslation({
-        messageId,
-        contactId: contact.id,
-        translatedMessage: encryptedTranslation,
-        userId: this.userService.getUser().id
-      }).subscribe({
+        this.contactMessageService.updateTranslation({
+          messageId,
+          contactId: contact.id,
+          translatedMessage: encryptedTranslation,
+          userId: this.userService.getUser().id
+        }).subscribe({
         error: (err) => {
-          const errorMessage = err?.error?.error ?? 'Failed to store translation';
+          const errorMessage = err?.error?.error ?? this.translation.t('common.contact.chatroom.storeTranslationFailed');
           this.snackBar.open(errorMessage, '', { duration: 3000 });
         }
       });
     } catch {
-      this.snackBar.open('Failed to store translation', '', { duration: 3000 });
+      this.snackBar.open(this.translation.t('common.contact.chatroom.storeTranslationFailed'), '', { duration: 3000 });
     }
   }
 }

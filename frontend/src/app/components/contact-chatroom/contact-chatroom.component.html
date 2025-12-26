@@ -1,10 +1,12 @@
 <mat-card class="chatroom-card">
   <div class="chatroom-card__toolbar">
-    <button class="button_back" mat-mini-fab color="accent" aria-label="Close chatroom" (click)="closeChatroom()">
+    <button class="button_back" mat-mini-fab color="accent" [attr.aria-label]="'common.contact.chatroom.closeAria' | transloco"
+      (click)="closeChatroom()">
       <mat-icon>arrow_back</mat-icon>
     </button>
     @if (messages().length !== 0) {
-    <button class="button_add" mat-mini-fab color="primary" aria-label="Create short message"
+    <button class="button_add" mat-mini-fab color="primary"
+      [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"
       (click)="requestCompose()">
       <mat-icon>add_comment</mat-icon>
     </button>
@@ -27,11 +29,12 @@
         <div class="bubble-row me">
           <div class="avatar-me">
             @if (profile.base64Avatar) {
-            <img class="avatar" [src]="profile.base64Avatar" [attr.alt]="(profile.name || 'My') + ' avatar'" />
+            <img class="avatar" [src]="profile.base64Avatar"
+              [attr.alt]="profile.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: profile.name }) : ('common.contact.chatroom.avatarAltMe' | transloco)" />
             } @else {
             <mat-icon>person</mat-icon>
             }
-            <span class="name">{{ profile.name || 'Myself' }}</span>
+            <span class="name">{{ profile.name || ('common.contact.chatroom.meLabel' | transloco) }}</span>
           </div>
           <div class="status-chip status-chip--me">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
@@ -49,10 +52,12 @@
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
-              <button mat-mini-fab color="primary" aria-label="Edit message" (click)="editMessage(msg)">
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
+                (click)="editMessage(msg)">
                 <mat-icon>edit</mat-icon>
               </button>
-              <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
+              <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
+                (click)="deleteMessage(msg)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -63,11 +68,11 @@
           <div class="avatar-them">
             @if (activeContact.base64Avatar) {
             <img class="avatar" [src]="activeContact.base64Avatar"
-              [attr.alt]="(activeContact.name || 'Contact') + ' avatar'" />
+              [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
             } @else {
             <mat-icon>person</mat-icon>
             }
-            <span class="name">{{ activeContact.name || 'Contact' }}</span>
+            <span class="name">{{ activeContact.name || ('common.contact.chatroom.contactLabel' | transloco) }}</span>
           </div>
           <div class="status-chip status-chip--them">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
@@ -89,16 +94,19 @@
             <div class="message-actions">
               @if (msg.payload?.message?.trim() !== '') {
               @if (msg.payload?.translatedMessage && !msg.showOriginal) {
-              <button mat-mini-fab color="primary" aria-label="Show original message" (click)="showOriginalMessage(msg)">
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.showOriginalAria' | transloco"
+                (click)="showOriginalMessage(msg)">
                 <mat-icon>undo</mat-icon>
               </button>
               } @else {
-              <button mat-mini-fab color="primary" aria-label="Translate message" (click)="translateMessage(msg)">
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.translateAria' | transloco"
+                (click)="translateMessage(msg)">
                 <mat-icon>translate</mat-icon>
               </button>
               }
               }
-              <button mat-mini-fab color="warn" aria-label="Delete message" (click)="deleteMessage(msg)">
+              <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
+                (click)="deleteMessage(msg)">
                 <mat-icon>delete</mat-icon>
               </button>
             </div>
@@ -111,14 +119,14 @@
       @if (loaded() && messages().length === 0) {
       <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
         (click)="requestCompose()">
-        <span>Create my first message</span>
+        <span>{{ 'common.contact.chatroom.firstMessage' | transloco }}</span>
       </button>
       }
     </div>
   </mat-card-content>
   } @else {
   <mat-card-content class="chatroom-card__content chatroom-card__content--empty">
-    <span>Loading conversation…</span>
+    <span>{{ 'common.contact.chatroom.loading' | transloco }}</span>
   </mat-card-content>
   }
 </mat-card>
