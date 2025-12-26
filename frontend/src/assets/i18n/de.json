@@ -11,7 +11,15 @@
       "backupNow": "Backup jetzt",
       "restore": "Wiederherstellen",
       "no": "Nein",
+      "yes": "Ja",
+      "apply": "Anwenden",
+      "abort": "Abbrechen",
       "close": "Schließen"
+    },
+    "clipboard": {
+      "pasteLabel": "Aus Zwischenablage einfügen",
+      "unavailable": "Zwischenablage ist in diesem Browser nicht verfügbar.",
+      "readFailed": "Zwischenablage konnte nicht gelesen werden."
     },
     "aria": {
       "wait": "Warten",
@@ -70,7 +78,42 @@
       "loading": "Kontakt wird geladen",
       "hintDecryptFailed": "Hinweis konnte nicht entschlüsselt werden!",
       "notSet": "Nicht gesetzt",
-      "profileRequestDeclined": "Der Kontakt hat die Profilanfrage abgelehnt."
+      "profileRequestDeclined": "Der Kontakt hat die Profilanfrage abgelehnt.",
+      "connect": {
+        "title": "Verbindung hinzufügen",
+        "description": "Die Connect-ID, die ich importieren möchte.",
+        "label": "Connect-ID",
+        "placeholder": "Die Connect-ID.",
+        "abortAria": "Import abbrechen",
+        "applyAria": "Verbindung anwenden",
+        "policy": "Connect-ID, Benutzer-ID, Kontakt-Benutzer-ID und der Abo-Status werden auf unserem Server gespeichert. Diese Information ist für die Funktion der App erforderlich."
+      },
+      "delete": {
+        "title": "Kontakt löschen",
+        "confirm": "Dieser Kontakt und alle zugehörigen Daten werden dauerhaft gelöscht. Bist du sicher?"
+      },
+      "profile": {
+        "title": "Kontaktprofil",
+        "nameLabel": "Kontaktname",
+        "setAvatar": "Kontakt-Avatar festlegen.",
+        "avatarAlt": "Kontakt-Avatar",
+        "avatarAltName": "{{ name }}-Avatar",
+        "askProfile": "Kontakt nach Profil fragen",
+        "tileSettings": "Tile-Einstellungen",
+        "tileSettingsAria": "Tile-Einstellungen für {{ name }} öffnen",
+        "nameFallback": "Kontakt",
+        "policy": "Kontakt-Profil-ID und Abo-Status werden auf dem Server gespeichert. Name und Avatar bleiben lokal.",
+        "requestSent": "Profilanfrage gesendet.",
+        "imageInvalid": "Bitte wähle eine gültige Bilddatei aus.",
+        "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: {{ maxMb }} MB.",
+        "fileReadError": "Fehler beim Lesen der Datei."
+      },
+      "message": {
+        "addText": "Text hinzufügen",
+        "dropNewAria": "Neue Nachricht senden",
+        "applyAria": "Nachricht senden",
+        "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar."
+      }
     },
     "message": {
       "title": "Nachrichten-Service",
@@ -185,6 +228,9 @@
     "images": {
       "imported": "Bild(er) lokal importiert.",
       "importFailed": "Bild konnte nicht importiert werden."
+    },
+    "media": {
+      "tenorAttribution": "Powered by Tenor"
     },
     "user": {
       "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt."

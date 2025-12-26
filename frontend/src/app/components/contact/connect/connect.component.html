@@ -1,14 +1,16 @@
 @if (data.mode === 'add_connect') {
-<h2 mat-dialog-title>Add a connection</h2>
+<h2 mat-dialog-title>{{ 'common.contact.connect.title' | transloco }}</h2>
 }
 
 <mat-dialog-content>
-  <p>The connect id I like to import</p>
+  <p>{{ 'common.contact.connect.description' | transloco }}</p>
   <mat-form-field appearance="fill" class="connect-input-field">
-    <mat-label>Connect id</mat-label>
-    <input #connectIdInput matInput type="text" maxlength="64" placeholder="The connect id."
+    <mat-label>{{ 'common.contact.connect.label' | transloco }}</mat-label>
+    <input #connectIdInput matInput type="text" maxlength="64"
+      [placeholder]="'common.contact.connect.placeholder' | transloco"
       [(ngModel)]="data.connectId" />
-    <button mat-icon-button matSuffix type="button" aria-label="Paste from clipboard"
+    <button mat-icon-button matSuffix type="button"
+      [attr.aria-label]="'common.clipboard.pasteLabel' | transloco"
       (click)="onPasteFromClipboard($event)">
       <mat-icon>content_paste_go</mat-icon>
     </button>
@@ -16,13 +18,15 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial aria-label="Abort import" (click)="onAbortClick()">
-    Abort
+  <button mat-button mat-dialog-close cdkFocusInitial
+    [attr.aria-label]="'common.contact.connect.abortAria' | transloco" (click)="onAbortClick()">
+    {{ 'common.actions.abort' | transloco }}
   </button>
 
   @if (data.connectId !== '') {
-  <button mat-button mat-dialog-close aria-label="Apply connection" (click)="onApplyClick()">
-    Apply
+  <button mat-button mat-dialog-close [attr.aria-label]="'common.contact.connect.applyAria' | transloco"
+    (click)="onApplyClick()">
+    {{ 'common.actions.apply' | transloco }}
   </button>
   }
 </mat-dialog-actions>

@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>Contact profile</h2>
+<h2 mat-dialog-title>{{ 'common.contact.profile.title' | transloco }}</h2>
 
 <mat-dialog-content>
   <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Contact name</mat-label>
+    <mat-label>{{ 'common.contact.profile.nameLabel' | transloco }}</mat-label>
     <input matInput maxlength="64" [(ngModel)]="contact.name" />
   </mat-form-field>
 
@@ -12,14 +12,14 @@
   @if (!contact.base64Avatar) {
   <div class="avatar-area">
     <button mat-flat-button class="button-set-avatar" (click)="fileUpload.click()">
-      <span>Set the contact avatar.</span>
+      <span>{{ 'common.contact.profile.setAvatar' | transloco }}</span>
     </button>
   </div>
   } @else {
   <div class="avatar-area">
     <div class="center">
       <img class="avatar" [src]="contact.base64Avatar"
-        [attr.alt]="contact.name ? contact.name + ' avatar' : 'Contact avatar'" /><br />
+        [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" /><br />
     </div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
@@ -34,7 +34,7 @@
     <div class="buttonarea">
       <button mat-flat-button color="primary" class="button_style" (click)="getProfileFromContact(contact)">
         <mat-icon>connect_without_contact</mat-icon>
-        <span>Ask contact for profile</span>
+        <span>{{ 'common.contact.profile.askProfile' | transloco }}</span>
       </button>
     </div>
   </div>
@@ -43,15 +43,15 @@
   <div class="avatar-area">
     <div class="buttonarea">
       <button mat-flat-button color="warn" class="button_style" type="button" (click)="openTileSettings()"
-        [attr.aria-label]="'Open tile settings for ' + (data.contact.name || 'place')">
+        [attr.aria-label]="'common.contact.profile.tileSettingsAria' | transloco:{ name: data.contact.name || ('common.contact.profile.nameFallback' | transloco) }">
         <mat-icon>settings</mat-icon>
-        <span>Tile settings</span>
+        <span>{{ 'common.contact.profile.tileSettings' | transloco }}</span>
       </button>
     </div>
   </div>
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
-  <button mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">{{ 'common.actions.abort' | transloco }}</button>
+  <button mat-button mat-dialog-close (click)="onApplyClick()">{{ 'common.actions.apply' | transloco }}</button>
 </mat-dialog-actions>

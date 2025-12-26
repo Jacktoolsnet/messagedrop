@@ -11,7 +11,15 @@
       "backupNow": "Backup now",
       "restore": "Restore",
       "no": "No",
+      "yes": "Yes",
+      "apply": "Apply",
+      "abort": "Abort",
       "close": "Close"
+    },
+    "clipboard": {
+      "pasteLabel": "Paste from clipboard",
+      "unavailable": "Clipboard access is not available in this browser.",
+      "readFailed": "Could not read clipboard content."
     },
     "aria": {
       "wait": "Wait",
@@ -70,7 +78,42 @@
       "loading": "Loading contact",
       "hintDecryptFailed": "Hint cannot be decrypted!",
       "notSet": "Not set",
-      "profileRequestDeclined": "The contact declined the profile information request."
+      "profileRequestDeclined": "The contact declined the profile information request.",
+      "connect": {
+        "title": "Add a connection",
+        "description": "The connect ID I want to import.",
+        "label": "Connect ID",
+        "placeholder": "The connect ID.",
+        "abortAria": "Abort import",
+        "applyAria": "Apply connection",
+        "policy": "Contact ID, user ID, contact user ID, and the subscribed flag are saved on our server. This information is essential for the app to work."
+      },
+      "delete": {
+        "title": "Delete contact",
+        "confirm": "This contact and all related data will be permanently deleted. Are you sure?"
+      },
+      "profile": {
+        "title": "Contact profile",
+        "nameLabel": "Contact name",
+        "setAvatar": "Set the contact avatar.",
+        "avatarAlt": "Contact avatar",
+        "avatarAltName": "{{ name }} avatar",
+        "askProfile": "Ask contact for profile",
+        "tileSettings": "Tile settings",
+        "tileSettingsAria": "Open tile settings for {{ name }}",
+        "nameFallback": "contact",
+        "policy": "The contact profile ID and subscription are stored on the server. Name and avatar remain local.",
+        "requestSent": "Profile request sent.",
+        "imageInvalid": "Please select a valid image file.",
+        "imageTooLarge": "The image is too large. Maximum allowed size is {{ maxMb }} MB.",
+        "fileReadError": "Error reading the file."
+      },
+      "message": {
+        "addText": "Add a text",
+        "dropNewAria": "Drop a new message",
+        "applyAria": "Drop your message",
+        "policy": "This information is stored on our server and is visible to everyone."
+      }
     },
     "message": {
       "title": "Message service",
@@ -185,6 +228,9 @@
     "images": {
       "imported": "Image(s) imported locally.",
       "importFailed": "Unable to import the image."
+    },
+    "media": {
+      "tenorAttribution": "Powered by Tenor"
     },
     "user": {
       "deleteSuccess": "User and related data were removed permanently."

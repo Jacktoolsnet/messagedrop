@@ -7,8 +7,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-contact',
@@ -22,7 +24,8 @@ import { Mode } from '../../../interfaces/mode';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    TranslocoPipe
 ],
   templateUrl: './connect.component.html',
   styleUrl: './connect.component.css'
@@ -30,6 +33,7 @@ import { Mode } from '../../../interfaces/mode';
 export class ConnectComponent {
   @ViewChild('connectIdInput') connectIdInput?: ElementRef<HTMLInputElement>;
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   private readonly dialogRef = inject(MatDialogRef<ConnectComponent>);
   public readonly data = inject<{ mode: Mode; contact: Contact; connectId: string }>(MAT_DIALOG_DATA);
   public isPasting = false;
@@ -43,7 +47,11 @@ export class ConnectComponent {
   }
 
   public showPolicy() {
-    this.snackBar.open(`Contact id, user id, contact user id and the subscribed flag is saved on our server. This informations are essential for the functionality of the application.`, 'OK', {});
+    this.snackBar.open(
+      this.translation.t('common.contact.connect.policy'),
+      this.translation.t('common.actions.ok'),
+      {}
+    );
   }
 
   async onPasteFromClipboard(event?: MouseEvent): Promise<void> {
@@ -53,7 +61,7 @@ export class ConnectComponent {
       event.stopImmediatePropagation();
     }
     if (!navigator?.clipboard) {
-      this.snackBar.open('Clipboard access is not available in this browser.', 'OK', {
+      this.snackBar.open(this.translation.t('common.clipboard.unavailable'), this.translation.t('common.actions.ok'), {
         panelClass: ['snack-warning'],
         duration: 3000
       });
@@ -68,7 +76,7 @@ export class ConnectComponent {
       queueMicrotask(() => this.connectIdInput?.nativeElement?.focus());
     } catch (err) {
       console.error('Failed to read clipboard', err);
-      this.snackBar.open('Could not read clipboard content.', 'OK', {
+      this.snackBar.open(this.translation.t('common.clipboard.readFailed'), this.translation.t('common.actions.ok'), {
         panelClass: ['snack-warning'],
         duration: 3000
       });

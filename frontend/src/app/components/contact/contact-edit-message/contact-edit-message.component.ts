@@ -14,7 +14,9 @@ import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { StyleService } from '../../../services/style.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
@@ -44,7 +46,8 @@ interface TextDialogResult {
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    ShowmultimediaComponent
+    ShowmultimediaComponent,
+    TranslocoPipe
 ],
   templateUrl: './contact-edit-message.component.html',
   styleUrl: './contact-edit-message.component.css'
@@ -56,6 +59,7 @@ export class ContactEditMessageComponent implements OnInit {
   private readonly matDialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<ContactEditMessageComponent>);
   private readonly style = inject(StyleService);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<{ mode: Mode; contact: Contact; shortMessage: ShortMessage }>(MAT_DIALOG_DATA);
 
   safeHtml: SafeHtml | undefined = undefined;
@@ -87,7 +91,11 @@ export class ContactEditMessageComponent implements OnInit {
   }
 
   public showPolicy() {
-    this.snackBar.open(`This information is stored on our server and is visible to everyone.`, 'OK', {});
+    this.snackBar.open(
+      this.translation.t('common.contact.message.policy'),
+      this.translation.t('common.actions.ok'),
+      {}
+    );
   }
 
   public openTenorDialog(): void {
@@ -111,7 +119,7 @@ export class ContactEditMessageComponent implements OnInit {
         return;
       }
       multimedia.type = MultimediaType.TENOR;
-      multimedia.attribution = 'Powered by Tenor';
+      multimedia.attribution = this.translation.t('common.media.tenorAttribution');
       multimedia.title = result.title ?? '';
       multimedia.description = result.content_description ?? '';
       multimedia.url = result.media_formats?.gif?.url ?? '';

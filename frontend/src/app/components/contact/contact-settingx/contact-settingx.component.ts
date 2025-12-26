@@ -7,10 +7,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
 import { SocketioService } from '../../../services/socketio.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
@@ -25,7 +27,8 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatIconModule
+    MatIconModule,
+    TranslocoPipe
 ],
   templateUrl: './contact-settingx.component.html',
   styleUrl: './contact-settingx.component.css'
@@ -34,6 +37,7 @@ export class ContactSettingsComponent {
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
   private readonly dialog = inject(MatDialog);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
@@ -52,12 +56,20 @@ export class ContactSettingsComponent {
     }
 
     if (!file.type.startsWith('image/')) {
-      this.snackBar.open('Please select a valid image file.', 'OK', { duration: 2000 });
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageInvalid'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
       return;
     }
 
     if (file.size > this.maxFileSize) {
-      this.snackBar.open('The image is too large. Maximum allowed size is 5MB.', 'OK', { duration: 2000 });
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 5 }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
       return;
     }
 
@@ -66,7 +78,11 @@ export class ContactSettingsComponent {
       this.contact.base64Avatar = (e.target as FileReader).result as string;
     };
     reader.onerror = () => {
-      this.snackBar.open('Error reading the file.', 'OK', { duration: 2000 });
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.fileReadError'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
     };
 
     reader.readAsDataURL(file);
@@ -78,8 +94,9 @@ export class ContactSettingsComponent {
 
   showPolicy(): void {
     this.snackBar.open(
-      'The contact profile ID and subscription are stored on the server. Name and avatar remain local.',
-      'OK', { duration: 4000 }
+      this.translation.t('common.contact.profile.policy'),
+      this.translation.t('common.actions.ok'),
+      { duration: 4000 }
     );
   }
 
@@ -91,7 +108,7 @@ export class ContactSettingsComponent {
     this.socketioService.getSocket().emit('contact:requestProfile', contact);
     this.dialogRef.close();
 
-    this.snackBar.open('Profile request sent.', '', {
+    this.snackBar.open(this.translation.t('common.contact.profile.requestSent'), '', {
       duration: 1500,
       horizontalPosition: 'center',
       verticalPosition: 'top'

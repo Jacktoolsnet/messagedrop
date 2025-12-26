@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>Delete contact</h2>
+<h2 mat-dialog-title>{{ 'common.contact.delete.title' | transloco }}</h2>
 <mat-dialog-content>
-    This contact and all related data will be permanently deleted. Are you sure?
+    {{ 'common.contact.delete.confirm' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">Yes</button>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">{{ 'common.actions.abort' | transloco }}</button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="true">{{ 'common.actions.yes' | transloco }}</button>
 </mat-dialog-actions>
