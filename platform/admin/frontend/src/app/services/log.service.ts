@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -13,40 +13,34 @@ export interface LogCountResponse {
 export class LogService {
     private readonly http = inject(HttpClient);
     private readonly baseUrl = environment.apiUrl;
-    private readonly httpOptions = {
-        headers: new HttpHeaders({
-            'Content-Type': 'application/json',
-            'X-API-Authorization': `${environment.apiToken}`
-        })
-    };
 
     getErrorCountSince(since: number) {
-        return this.http.get<LogCountResponse>(`${this.baseUrl}/error-log/count?since=${since}`, this.httpOptions)
+        return this.http.get<LogCountResponse>(`${this.baseUrl}/error-log/count?since=${since}`)
             .pipe(catchError(() => of({ count: 0, since })));
     }
 
     getInfoCountSince(since: number) {
-        return this.http.get<LogCountResponse>(`${this.baseUrl}/info-log/count?since=${since}`, this.httpOptions)
+        return this.http.get<LogCountResponse>(`${this.baseUrl}/info-log/count?since=${since}`)
             .pipe(catchError(() => of({ count: 0, since })));
     }
 
     listErrorLogs(limit = 100, offset = 0) {
-        return this.http.get<{ rows: ErrorLogEntry[] }>(`${this.baseUrl}/error-log?limit=${limit}&offset=${offset}`, this.httpOptions)
+        return this.http.get<{ rows: ErrorLogEntry[] }>(`${this.baseUrl}/error-log?limit=${limit}&offset=${offset}`)
             .pipe(catchError(() => of({ rows: [] })));
     }
 
     deleteErrorLog(id: string) {
-        return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/error-log/${id}`, this.httpOptions)
+        return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/error-log/${id}`)
             .pipe(catchError(() => of({ deleted: false })));
     }
 
     listInfoLogs(limit = 100, offset = 0) {
-        return this.http.get<{ rows: ErrorLogEntry[] }>(`${this.baseUrl}/info-log?limit=${limit}&offset=${offset}`, this.httpOptions)
+        return this.http.get<{ rows: ErrorLogEntry[] }>(`${this.baseUrl}/info-log?limit=${limit}&offset=${offset}`)
             .pipe(catchError(() => of({ rows: [] })));
     }
 
     deleteInfoLog(id: string) {
-        return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/info-log/${id}`, this.httpOptions)
+        return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/info-log/${id}`)
             .pipe(catchError(() => of({ deleted: false })));
     }
 }

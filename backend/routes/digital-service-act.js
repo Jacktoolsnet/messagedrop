@@ -1,5 +1,6 @@
 const express = require('express');
 const axios = require('axios');
+const security = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
 const FormData = require('form-data');
@@ -34,6 +35,14 @@ const evidenceLimiter = rateLimit({
     standardHeaders: true,
     legacyHeaders: false,
     message: { error: 'Too many evidence uploads. Please try again later.' }
+});
+
+const moderationToggleLimiter = rateLimit({
+    windowMs: 10 * 60 * 1000,
+    limit: 60,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many moderation toggle requests. Please try again later.' }
 });
 
 /* --------------------------------- Helper ---------------------------------- */
@@ -137,7 +146,7 @@ router.post('/notices', noticeLimiter, async (req, res) => {
 });
 
 
-router.get('/disable/publicmessage/:messageId', function (req, res) {
+router.get('/disable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res) {
     let response = { 'status': 0 };
     tableMessage.disableMessage(req.database.db, req.params.messageId, function (err) {
         if (err) {
@@ -150,7 +159,7 @@ router.get('/disable/publicmessage/:messageId', function (req, res) {
     });
 });
 
-router.get('/enable/publicmessage/:messageId', function (req, res) {
+router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res) {
     let response = { 'status': 0 };
     tableMessage.enableMessage(req.database.db, req.params.messageId, function (err) {
         if (err) {
@@ -163,7 +172,7 @@ router.get('/enable/publicmessage/:messageId', function (req, res) {
     });
 });
 
-router.get('/health', (_req, res) => res.json({ ok: true, adminBase: `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend` }));
+router.get('/health', moderationToggleLimiter, (_req, res) => res.json({ ok: true, adminBase: `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend` }));
 
 module.exports = router;
 

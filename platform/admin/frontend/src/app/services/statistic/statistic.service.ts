@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { Observable } from 'rxjs';
@@ -10,15 +10,8 @@ export class StatisticService {
   private readonly baseUrl = `${environment.apiUrl}/statistic`;
   private readonly http = inject(HttpClient);
 
-  private get headers() {
-    return new HttpHeaders({
-      'Content-Type': 'application/json',
-      'X-API-Authorization': environment.apiToken
-    });
-  }
-
   getKeys(): Observable<{ status: number; keys: string[] }> {
-    return this.http.get<{ status: number; keys: string[] }>(`${this.baseUrl}/keys`, { headers: this.headers });
+    return this.http.get<{ status: number; keys: string[] }>(`${this.baseUrl}/keys`);
   }
 
   getSeriesForKeys(keys: string[], preset: StatisticRangePreset): Observable<MultiSeriesResponse> {
@@ -33,6 +26,6 @@ export class StatisticService {
     }
     params = params.set('fill', 'true');
 
-    return this.http.get<MultiSeriesResponse>(`${this.baseUrl}/series`, { headers: this.headers, params });
+    return this.http.get<MultiSeriesResponse>(`${this.baseUrl}/series`, { params });
   }
 }
