@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface ConfirmDialogData {
   title?: string;
@@ -11,7 +12,7 @@ export interface ConfirmDialogData {
 
 @Component({
   selector: 'app-deleteuser',
-  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent],
+  imports: [MatButtonModule, MatDialogActions, MatDialogClose, MatDialogTitle, MatDialogContent, TranslocoPipe],
   templateUrl: './delete-user.component.html',
   styleUrl: './delete-user.component.css'
 })

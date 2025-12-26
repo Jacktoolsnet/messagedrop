@@ -697,7 +697,38 @@
       "tenorAttribution": "Powered by Tenor"
     },
     "user": {
-      "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt."
+      "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt.",
+      "serverInfoHint": "User-ID, öffentlicher Verschlüsselungsschlüssel, öffentlicher Signaturschlüssel, Anzahl der Nachrichten, Anzahl der blockierten Nachrichten, Benutzerstatus, letztes Lebenszeichen, Abonnement und Verbindungshinweis werden auf unserem Server gespeichert. Diese Informationen sind für die Funktion der Anwendung erforderlich.",
+      "dialog": {
+        "title": "Mein Benutzer",
+        "userIdLabel": "User-ID:",
+        "backup": "Daten sichern",
+        "delete": "Meinen Benutzer löschen"
+      },
+      "deleteDialog": {
+        "title": "Benutzer löschen",
+        "confirm": "Dieser Benutzer und alle zugehörigen Daten werden dauerhaft gelöscht. Bist du sicher?"
+      },
+      "resetDialog": {
+        "title": "Benutzer zurücksetzen",
+        "confirm": "Beim Zurücksetzen werden alle Informationen gelöscht. Das kann nicht rückgängig gemacht werden. Möchtest du fortfahren?"
+      },
+      "profileShare": {
+        "title": "Profilinformationen teilen",
+        "body": "Es sieht so aus, als wäre ich mit Benutzer {{ userId }} verbunden. Der Benutzer möchte meinen Profilnamen und Avatar verwenden. Ich teile meinen Profilnamen und Avatar."
+      },
+      "profile": {
+        "title": "Mein Profil",
+        "nameLabel": "Profilname",
+        "setAvatar": "Profil-Avatar festlegen.",
+        "avatarAltName": "Avatar von {{ name }}",
+        "avatarAltFallback": "Profil-Avatar",
+        "styleSample": "Mein ausgewählter Schriftstil",
+        "policyHint": "Dein Profilname und Avatar werden lokal auf deinem Gerät gespeichert.",
+        "fileTypeInvalid": "Bitte wähle eine gültige Bilddatei aus.",
+        "fileTooLarge": "Das Bild ist zu groß. Maximal erlaubt sind {{ maxSizeMb }} MB.",
+        "fileReadError": "Fehler beim Lesen der Datei."
+      }
     },
     "geoStatistic": {
       "title": "Geo-Statistik-Service",

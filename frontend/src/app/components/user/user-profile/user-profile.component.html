@@ -1,7 +1,7 @@
-<h2 mat-dialog-title>My profile</h2>
+<h2 mat-dialog-title>{{ 'common.user.profile.title' | transloco }}</h2>
 <mat-dialog-content>
   <mat-form-field appearance="fill" class="full-width">
-    <mat-label>Profile name</mat-label>
+    <mat-label>{{ 'common.user.profile.nameLabel' | transloco }}</mat-label>
     <input matInput maxlength="64" [(ngModel)]="userService.getProfile().name" />
   </mat-form-field>
 
@@ -11,14 +11,16 @@
   @if (userService.getProfile().base64Avatar === '') {
   <div class="avatar-area">
     <button mat-flat-button class="button-set-avatar" (click)="fileUpload.click()">
-      <span>Set my profile avatar.</span>
+      <span>{{ 'common.user.profile.setAvatar' | transloco }}</span>
     </button>
   </div>
   } @else {
   <div class="avatar-area">
     <div class="center">
       <img class="avatar" [src]="userService.getProfile().base64Avatar"
-        [attr.alt]="userService.getProfile().name ? userService.getProfile().name + ' avatar' : 'Profile avatar'" /><br />
+        [attr.alt]="userService.getProfile().name
+          ? ('common.user.profile.avatarAltName' | transloco: { name: userService.getProfile().name })
+          : ('common.user.profile.avatarAltFallback' | transloco)" /><br />
     </div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
@@ -30,7 +32,7 @@
 
   <div class="style-area">
     <div class="sample-style" [style]="userService.getProfile().defaultStyle">
-      My selected font style
+      {{ 'common.user.profile.styleSample' | transloco }}
     </div>
     <button mat-flat-button aria-hidden="false" class="button-set-avatar" (click)="changeDefaultStyle()">
       <mat-icon>cycle</mat-icon>
@@ -39,8 +41,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-  <button mat-button cdkFocusInitial (click)="onAbortClick()">Abort</button>
+  <button mat-button cdkFocusInitial (click)="onAbortClick()">{{ 'common.actions.abort' | transloco }}</button>
   <button mat-button mat-dialog-close [mat-dialog-close]="userService.getProfile()">
-    Apply
+    {{ 'common.actions.apply' | transloco }}
   </button>
 </mat-dialog-actions>

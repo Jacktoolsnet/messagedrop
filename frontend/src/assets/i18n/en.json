@@ -841,7 +841,38 @@
       "tenorAttribution": "Powered by Tenor"
     },
     "user": {
-      "deleteSuccess": "User and related data were removed permanently."
+      "deleteSuccess": "User and related data were removed permanently.",
+      "serverInfoHint": "User ID, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life, subscription, and connect hint are saved on our server. This information is essential for the application to function.",
+      "dialog": {
+        "title": "My user",
+        "userIdLabel": "User ID:",
+        "backup": "Backup data",
+        "delete": "Delete my user"
+      },
+      "deleteDialog": {
+        "title": "Delete user",
+        "confirm": "This user and all related data will be permanently deleted. Are you sure?"
+      },
+      "resetDialog": {
+        "title": "Reset user",
+        "confirm": "Resetting your user deletes all information and cannot be undone. Do you want to continue?"
+      },
+      "profileShare": {
+        "title": "Share profile information",
+        "body": "It looks like I'm connected to user {{ userId }}. The user would like to use my profile name and avatar. I share my profile name and avatar."
+      },
+      "profile": {
+        "title": "My profile",
+        "nameLabel": "Profile name",
+        "setAvatar": "Set my profile avatar.",
+        "avatarAltName": "{{ name }} avatar",
+        "avatarAltFallback": "Profile avatar",
+        "styleSample": "My selected font style",
+        "policyHint": "Your profile name and avatar are stored locally on your device.",
+        "fileTypeInvalid": "Please select a valid image file.",
+        "fileTooLarge": "The image is too large. Maximum allowed size is {{ maxSizeMb }} MB.",
+        "fileReadError": "Error reading the file."
+      }
     },
     "geoStatistic": {
       "title": "GeoStatistic Service",

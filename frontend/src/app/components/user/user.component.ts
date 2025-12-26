@@ -4,6 +4,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 
 @Component({
@@ -14,8 +16,9 @@ import { UserService } from '../../services/user.service';
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
-    MatIcon
-],
+    MatIcon,
+    TranslocoPipe
+  ],
   templateUrl: './user.component.html',
   styleUrl: './user.component.css'
 })
@@ -24,8 +27,14 @@ export class UserComponent {
   public connectHint = '';
   readonly userService = inject(UserService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
+
   public showPolicy(): void {
-    this.snackBarRef = this.snackBar.open(`User id, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life, subscription and connect hint is saved on our server. This informations are essential for the functionality of the application.`, 'OK', {});
+    this.snackBarRef = this.snackBar.open(
+      this.translation.t('common.user.serverInfoHint'),
+      this.translation.t('common.actions.ok'),
+      {}
+    );
   }
 
 }

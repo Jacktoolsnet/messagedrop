@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>Reset user</h2>
+<h2 mat-dialog-title>{{ 'common.user.resetDialog.title' | transloco }}</h2>
 <mat-dialog-content>
-    If I reset my user, all information will be deleted. This cannot be undone. Do I really want to reset my user?
+    {{ 'common.user.resetDialog.confirm' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
-    <button mat-button mat-dialog-close [mat-dialog-close]="true">Yes</button>
+    <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">{{ 'common.actions.abort' | transloco }}</button>
+    <button mat-button mat-dialog-close [mat-dialog-close]="true">{{ 'common.actions.yes' | transloco }}</button>
 </mat-dialog-actions>
