@@ -1,12 +1,30 @@
 module.exports = (io, socket) => {
+  const getAuthUserId = () => socket.user?.userId ?? socket.user?.id ?? null;
+
   const emitError = (event, context, reason) => {
     socket.logger.warn(`${event} rejected`, { reason, context });
     socket.emit(`${event}:error`, { status: 400, reason });
   };
 
+  const ensureAuth = (event, context, expectedUserId) => {
+    const authUserId = getAuthUserId();
+    if (!authUserId) {
+      emitError(event, context, 'unauthorized');
+      return false;
+    }
+    if (expectedUserId && String(authUserId) !== String(expectedUserId)) {
+      emitError(event, context, 'forbidden');
+      return false;
+    }
+    return true;
+  };
+
   const requestProfile = (contact) => {
-    if (!contact?.contactUserId) {
-      emitError('contact:requestProfile', contact, 'missing contactUserId');
+    if (!contact?.userId || !contact?.contactUserId) {
+      emitError('contact:requestProfile', contact, 'missing contact userId or contactUserId');
+      return;
+    }
+    if (!ensureAuth('contact:requestProfile', contact, contact.userId)) {
       return;
     }
 
@@ -17,8 +35,11 @@ module.exports = (io, socket) => {
   };
 
   const provideUserProfile = (contact) => {
-    if (!contact?.id || !contact?.userId) {
-      emitError('contact:provideUserProfile', contact, 'missing contact id or userId');
+    if (!contact?.id || !contact?.userId || !contact?.contactUserId) {
+      emitError('contact:provideUserProfile', contact, 'missing contact id or userId/contactUserId');
+      return;
+    }
+    if (!ensureAuth('contact:provideUserProfile', contact, contact.contactUserId)) {
       return;
     }
 
@@ -31,6 +52,9 @@ module.exports = (io, socket) => {
     const missing = requiredFields.filter((key) => envelope?.[key] === undefined || envelope?.[key] === null);
     if (missing.length) {
       emitError('contact:newContactMessage', { envelope }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+    if (!ensureAuth('contact:newContactMessage', envelope, envelope.userId)) {
       return;
     }
 
@@ -54,6 +78,9 @@ module.exports = (io, socket) => {
       emitError('contact:updateContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
       return;
     }
+    if (!ensureAuth('contact:updateContactMessage', payload, payload.userId)) {
+      return;
+    }
 
     io.to(payload.contactUserId).emit(`receiveUpdatedContactMessage:${payload.contactUserId}`, {
       status: 200,
@@ -72,6 +99,9 @@ module.exports = (io, socket) => {
     const missing = requiredFields.filter((key) => payload?.[key] === undefined || payload?.[key] === null);
     if (missing.length) {
       emitError('contact:deleteContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+    if (!ensureAuth('contact:deleteContactMessage', payload, payload.userId)) {
       return;
     }
 
@@ -97,6 +127,9 @@ module.exports = (io, socket) => {
       emitError('contact:readContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
       return;
     }
+    if (!ensureAuth('contact:readContactMessage', payload, payload.userId)) {
+      return;
+    }
     io.to(payload.contactUserId).emit(`receiveMessageRead:${payload.contactUserId}`, {
       status: 200,
       messageId: payload.messageId,
@@ -114,6 +147,9 @@ module.exports = (io, socket) => {
     const missing = requiredFields.filter((key) => payload?.[key] === undefined || payload?.[key] === null);
     if (missing.length) {
       emitError('contact:reactContactMessage', { payload }, `missing fields: ${missing.join(', ')}`);
+      return;
+    }
+    if (!ensureAuth('contact:reactContactMessage', payload, payload.userId)) {
       return;
     }
 

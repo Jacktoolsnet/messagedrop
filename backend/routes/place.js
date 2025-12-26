@@ -8,8 +8,6 @@ const tablePlace = require('../db/tablePlace');
 const geoTz = require('geo-tz');
 const metric = require('../middleware/metric');
 
-router.use(security.checkToken);
-
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }

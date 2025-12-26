@@ -10,8 +10,6 @@ const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
 
-router.use(security.checkToken);
-
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
@@ -388,12 +386,16 @@ router.get('/backup/:userId',
 
 router.post('/restore',
   [
+    security.authenticate,
     express.json({ type: 'application/json', limit: '20mb' })
   ],
   async function (req, res) {
     const backup = req.body?.backup;
     if (!backup || !backup.tables || !backup.userId) {
       return res.status(400).json({ status: 400, error: 'invalid_backup' });
+    }
+    if (!ensureSameUser(req, res, backup.userId)) {
+      return;
     }
 
     try {
@@ -667,6 +669,9 @@ router.post('/subscribe',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
+    if (!ensureSameUser(req, res, req.body.userId)) {
+      return;
+    }
     tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
       if (err) {
         response.status = 500;
@@ -684,6 +689,9 @@ router.get('/unsubscribe/:userId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
+    if (!ensureSameUser(req, res, req.params.userId)) {
+      return;
+    }
     tableUser.unsubscribe(req.database.db, req.params.userId, function (err) {
       if (err) {
         response.status = 500;

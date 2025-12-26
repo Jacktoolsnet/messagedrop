@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const security = require('../middleware/security');
 const axios = require('axios');
 const metric = require('../middleware/metric');
-
-router.use(security.checkToken);
 
 router.get('/featured/:country/:locale',
     [

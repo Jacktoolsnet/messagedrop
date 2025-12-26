@@ -2,7 +2,6 @@ const CACHE_TTL_DAYS = 30;
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const security = require('../middleware/security');
 // const { getCountryCodeFromNominatim } = require('../utils/nominatimQueue');
 const tableGeoStatistic = require('../db/tableGeoStatistic');
 const tableWeatherHistory = require('../db/tableWeatherHistory');
@@ -20,8 +19,6 @@ async function getWorldBankIndicator(countryAlpha3, indicator, years) {
             value: entry.value
         }));
 }
-
-router.use(security.checkToken);
 
 router.get('/:pluscode/:latitude/:longitude/:years',
     [

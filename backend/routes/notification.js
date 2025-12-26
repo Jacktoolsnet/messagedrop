@@ -6,7 +6,6 @@ const tableNotification = require('../db/tableNotification');
 
 const router = express.Router();
 
-router.use(security.checkToken);
 router.use(express.json({ limit: '1mb' }));
 
 const ALLOWED_STATUSES = new Set(Object.values(tableNotification.notificationStatus));

@@ -3,7 +3,6 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const metric = require('../middleware/metric');
-const security = require('../middleware/security');
 
 // Ein eigenes Axios-Client mit BaseURL + Backend-Token
 const client = axios.create({
@@ -16,9 +15,6 @@ const client = axios.create({
         'x-api-authorization': process.env.BACKEND_TOKEN
     }
 });
-
-// Eingehende Requests weiterhin per App-Token absichern
-router.use(security.checkToken);
 
 // GET /airquality/:pluscode/:latitude/:longitude/:days  (alter Pfad beibehalten)
 router.get('/:pluscode/:latitude/:longitude/:days', [

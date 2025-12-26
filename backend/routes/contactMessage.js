@@ -7,8 +7,6 @@ const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 const tableContactMessage = require('../db/tableContactMessage');
 
-router.use(security.checkToken);
-
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }

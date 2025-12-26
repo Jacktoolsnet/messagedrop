@@ -23,7 +23,6 @@ export class DigitalServicesActService {
   private httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'X-API-Authorization': `${environment.apiToken}`
     }),
     withCredentials: true
   };
@@ -113,8 +112,7 @@ export class DigitalServicesActService {
       form.append('type', 'file');
       form.append('file', data.file);
       if (data.hash) form.append('hash', data.hash);
-      const headers = new HttpHeaders({ 'X-API-Authorization': `${environment.apiToken}` });
-      return this.http.post<{ id: string }>(url, form, { headers, withCredentials: true }).pipe(
+      return this.http.post<{ id: string }>(url, form, { withCredentials: true }).pipe(
         catchError(this.handleError)
       );
     }
@@ -134,8 +132,7 @@ export class DigitalServicesActService {
       const form = new FormData();
       form.append('file', data.file);
       if (data.hash) form.append('hash', data.hash);
-      const headers = new HttpHeaders({ 'X-API-Authorization': `${environment.apiToken}` });
-      return this.http.post<{ id: string }>(url, form, { headers, withCredentials: true }).pipe(
+      return this.http.post<{ id: string }>(url, form, { withCredentials: true }).pipe(
         catchError(this.handleError)
       );
     }
@@ -156,8 +153,7 @@ export class DigitalServicesActService {
       form.append('type', 'file');
       form.append('file', data.file);
       if (data.hash) form.append('hash', data.hash);
-      const headers = new HttpHeaders({ 'X-API-Authorization': `${environment.apiToken}` });
-      return this.http.post<{ id: string }>(url, form, { headers, withCredentials: true }).pipe(
+      return this.http.post<{ id: string }>(url, form, { withCredentials: true }).pipe(
         catchError(this.handleError)
       );
     }

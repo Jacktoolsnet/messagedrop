@@ -1,5 +1,4 @@
 const express = require('express');
-const security = require('../middleware/security');
 const axios = require('axios');
 const rateLimit = require('express-rate-limit');
 const multer = require('multer');
@@ -8,7 +7,6 @@ const tableMessage = require('../db/tableMessage');
 
 const router = express.Router();
 
-router.use(security.checkToken);
 router.use(express.json({ limit: '1mb' }));
 
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });

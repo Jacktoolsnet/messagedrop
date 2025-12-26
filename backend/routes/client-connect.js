@@ -1,10 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 const { getEncryptionPublicJwk, getSigningPublicJwk } = require('../utils/keyStore');
-
-router.use(security.checkToken);
 
 router.get('/',
     [

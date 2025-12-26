@@ -17,7 +17,6 @@ export class NominatimService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'X-API-Authorization': `${environment.apiToken}`,
       withCredentials: 'true'
     })
   };

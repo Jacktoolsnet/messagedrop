@@ -5,8 +5,6 @@ const OpenAI = require('openai')
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 const metric = require('../middleware/metric');
 
-router.use(security.checkToken);
-
 router.post('/moderate',
   [
     security.authenticate,

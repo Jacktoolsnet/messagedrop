@@ -5,8 +5,6 @@ const security = require('../middleware/security');
 const tableConnect = require('../db/tableConnect');
 const metric = require('../middleware/metric');
 
-router.use(security.checkToken);
-
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
@@ -22,6 +20,25 @@ function ensureSameUser(req, res, userId) {
     return false;
   }
   return true;
+}
+
+function withConnectOwnership(req, res, connectId, handler) {
+  const authUserId = getAuthUserId(req);
+  if (!authUserId) {
+    return res.status(401).json({ status: 401, error: 'unauthorized' });
+  }
+  tableConnect.getById(req.database.db, connectId, (err, row) => {
+    if (err) {
+      return res.status(500).json({ status: 500, error: err });
+    }
+    if (!row) {
+      return res.status(404).json({ status: 404, error: 'not_found' });
+    }
+    if (String(row.userId) !== String(authUserId)) {
+      return res.status(403).json({ status: 403, error: 'forbidden' });
+    }
+    handler(row);
+  });
 }
 
 router.post('/create',
@@ -54,18 +71,9 @@ router.get('/get/:connectId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    tableConnect.getById(req.database.db, req.params.connectId, function (err, row) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        if (!row) {
-          response.status = 404;
-        } else {
-          response.status = 200;
-          response.connect = row;
-        }
-      }
+    withConnectOwnership(req, res, req.params.connectId, (row) => {
+      response.status = 200;
+      response.connect = row;
       res.status(response.status).json(response);
     });
   });
@@ -76,14 +84,16 @@ router.get('/delete/:connectId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    tableConnect.deleteById(req.database.db, req.params.connectId, function (err) {
-      if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-      }
-      res.status(response.status).json(response);
+    withConnectOwnership(req, res, req.params.connectId, () => {
+      tableConnect.deleteById(req.database.db, req.params.connectId, function (err) {
+        if (err) {
+          response.status = 500;
+          response.error = err;
+        } else {
+          response.status = 200;
+        }
+        res.status(response.status).json(response);
+      });
     });
   });
 

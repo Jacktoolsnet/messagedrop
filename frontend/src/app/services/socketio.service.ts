@@ -149,8 +149,13 @@ export class SocketioService {
   }
 
   public initUserSocketEvents(): void {
+    const user = this.userService.getUser();
+    if (!user?.id || !user?.jwt) {
+      return;
+    }
+    this.setAuthToken(user.jwt);
     // User room.
-    const userId = this.userService.getUser().id;
+    const userId = user.id;
     const eventName = `${userId}`;
     this.socket.emit('user:joinUserRoom', userId);
     this.socket.off(eventName);
@@ -284,6 +289,14 @@ export class SocketioService {
 
   public sendReactionContactMessage(payload: { contactId: string; userId: string; contactUserId: string; messageId: string; reaction: string | null }) {
     this.socket.emit('contact:reactContactMessage', payload);
+  }
+
+  private setAuthToken(token: string): void {
+    this.socket.auth = { token };
+    if (this.socket.connected) {
+      this.socket.disconnect();
+    }
+    this.socket.connect();
   }
 
 }

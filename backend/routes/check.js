@@ -1,9 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const security = require('../middleware/security');
 const metric = require('../middleware/metric');
-
-router.use(security.checkToken);
 
 router.post('/',
   [

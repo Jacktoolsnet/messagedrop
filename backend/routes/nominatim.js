@@ -2,7 +2,6 @@
 const express = require('express');
 const router = express.Router();
 const axios = require('axios');
-const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 
 // Axios-Client für Upstream
@@ -15,9 +14,6 @@ const client = axios.create({
         'x-api-authorization': process.env.BACKEND_TOKEN
     }
 });
-
-// Eingehende Requests wie gewohnt absichern
-router.use(security.checkToken);
 
 // GET /nominatim/countryCode/:pluscode/:latitude/:longitude
 router.get('/countryCode/:pluscode/:latitude/:longitude', [

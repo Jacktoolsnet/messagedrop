@@ -9,6 +9,7 @@ const winston = require('winston');
 const { Server } = require('socket.io');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const security = require('./middleware/security');
+const jwt = require('jsonwebtoken');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
@@ -123,7 +124,19 @@ const io = new Server(server, {
 
 io.use((socket, next) => {
   socket.logger = logger.child({ socketId: socket.id });
-  next();
+  const rawToken = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
+  if (!rawToken) {
+    return next();
+  }
+  const token = rawToken.startsWith('Bearer ') ? rawToken.slice(7) : rawToken;
+  try {
+    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    socket.user = payload;
+    return next();
+  } catch (err) {
+    socket.logger.warn('socket auth failed', { error: err?.message });
+    return next(new Error('unauthorized'));
+  }
 });
 
 io.on('connection', (socket) => {

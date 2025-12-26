@@ -6,10 +6,9 @@ const metric = require('../middleware/metric');
 
 const translator = new deepl.Translator(process.env.DEEPL_API_KEY);
 
-router.use(security.checkToken);
-
 router.get('/:language/:value',
     [
+        security.authenticate,
         metric.count('translate', { when: 'always', timezone: 'utc', amount: 1 })
     ], function (req, res) {
         let response = { 'status': 0 };
