@@ -1,41 +1,39 @@
 {
-  "settings": {
-    "title": "Ajustes de la aplicación",
-    "versionLabel": "Versión",
-    "theme": {
-      "title": "Tema y apariencia",
-      "description": "Elige colores y el modo claro/oscuro.",
-      "label": "Tema",
-      "modeLabel": "Cambiar modo de tema",
-      "mode": {
-        "light": "Claro",
-        "dark": "Oscuro",
-        "system": "Sistema"
-      }
-    },
-    "language": {
-      "title": "Idioma",
-      "description": "Elige cómo MessageDrop selecciona tu idioma.",
-      "optionSystem": "Sistema / navegador",
-      "optionEnglish": "Inglés",
-      "optionGerman": "Alemán",
-      "optionSpanish": "Español",
-      "optionFrench": "Francés"
-    },
-    "storage": {
-      "title": "Almacenamiento persistente",
-      "description": "Mantiene los datos locales a salvo de la limpieza automática.",
-      "note": "Cuando es posible, pedimos al navegador que mantenga los datos de IndexedDB de forma permanente. Ideal para uso sin conexión o archivos grandes.",
-      "toggle": "Proteger datos locales",
-      "applying": "Aplicando preferencia ...",
-      "warning": "El navegador no pudo conceder el almacenamiento persistente.",
-      "confirmDisable": "Desactivarlo puede permitir que el navegador elimine datos almacenados. ¿Quieres continuar?"
-    },
-    "backup": {
-      "title": "Recordatorio de copia de seguridad",
-      "description": "Preguntar antes de cerrar si hay datos nuevos para respaldar.",
-      "note": "Cuando está activado, se te preguntará antes de salir si hay cambios nuevos.",
-      "toggle": "Preguntar antes de cerrar"
+  "title": "Ajustes de la aplicación",
+  "versionLabel": "Versión",
+  "theme": {
+    "title": "Tema y apariencia",
+    "description": "Elige colores y el modo claro/oscuro.",
+    "label": "Tema",
+    "modeLabel": "Cambiar modo de tema",
+    "mode": {
+      "light": "Claro",
+      "dark": "Oscuro",
+      "system": "Sistema"
     }
+  },
+  "language": {
+    "title": "Idioma",
+    "description": "Elige cómo MessageDrop selecciona tu idioma.",
+    "optionSystem": "Sistema",
+    "optionEnglish": "Inglés",
+    "optionGerman": "Alemán",
+    "optionSpanish": "Español",
+    "optionFrench": "Francés"
+  },
+  "storage": {
+    "title": "Almacenamiento persistente",
+    "description": "Mantiene los datos locales a salvo de la limpieza automática.",
+    "note": "Cuando es posible, pedimos al navegador que mantenga los datos de IndexedDB de forma permanente. Ideal para uso sin conexión o archivos grandes.",
+    "toggle": "Proteger datos locales",
+    "applying": "Aplicando preferencia ...",
+    "warning": "El navegador no pudo conceder el almacenamiento persistente.",
+    "confirmDisable": "Desactivarlo puede permitir que el navegador elimine datos almacenados. ¿Quieres continuar?"
+  },
+  "backup": {
+    "title": "Recordatorio de copia de seguridad",
+    "description": "Preguntar antes de cerrar si hay datos nuevos para respaldar.",
+    "note": "Cuando está activado, se te preguntará antes de salir si hay cambios nuevos.",
+    "toggle": "Preguntar antes de cerrar"
   }
 }

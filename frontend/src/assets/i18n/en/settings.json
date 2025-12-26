@@ -1,41 +1,39 @@
 {
-  "settings": {
-    "title": "App settings",
-    "versionLabel": "Version",
-    "theme": {
-      "title": "Theme & appearance",
-      "description": "Choose colors and light/dark behavior.",
-      "label": "Theme",
-      "modeLabel": "Theme mode toggle",
-      "mode": {
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
-      }
-    },
-    "language": {
-      "title": "Language",
-      "description": "Choose how MessageDrop picks your language.",
-      "optionSystem": "System / browser",
-      "optionEnglish": "English",
-      "optionGerman": "German",
-      "optionSpanish": "Spanish",
-      "optionFrench": "French"
-    },
-    "storage": {
-      "title": "Persistent storage",
-      "description": "Keeps local data safe from automatic cleanup.",
-      "note": "When available, we ask the browser to keep IndexedDB data permanently. Ideal for offline usage or large message archives.",
-      "toggle": "Protect local data",
-      "applying": "Applying preference ...",
-      "warning": "Persistent storage could not be granted by the browser.",
-      "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
-    },
-    "backup": {
-      "title": "Backup reminder",
-      "description": "Ask before closing if new data should be backed up.",
-      "note": "When enabled, you will be prompted before leaving the app if there are new changes.",
-      "toggle": "Ask before closing"
+  "title": "App settings",
+  "versionLabel": "Version",
+  "theme": {
+    "title": "Theme & appearance",
+    "description": "Choose colors and light/dark behavior.",
+    "label": "Theme",
+    "modeLabel": "Theme mode toggle",
+    "mode": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
     }
+  },
+  "language": {
+    "title": "Language",
+    "description": "Choose how MessageDrop picks your language.",
+    "optionSystem": "System",
+    "optionEnglish": "English",
+    "optionGerman": "German",
+    "optionSpanish": "Spanish",
+    "optionFrench": "French"
+  },
+  "storage": {
+    "title": "Persistent storage",
+    "description": "Keeps local data safe from automatic cleanup.",
+    "note": "When available, we ask the browser to keep IndexedDB data permanently. Ideal for offline usage or large message archives.",
+    "toggle": "Protect local data",
+    "applying": "Applying preference ...",
+    "warning": "Persistent storage could not be granted by the browser.",
+    "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
+  },
+  "backup": {
+    "title": "Backup reminder",
+    "description": "Ask before closing if new data should be backed up.",
+    "note": "When enabled, you will be prompted before leaving the app if there are new changes.",
+    "toggle": "Ask before closing"
   }
 }
