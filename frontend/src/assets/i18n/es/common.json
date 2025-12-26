@@ -1,25 +1,25 @@
 {
   "common": {
-    "appName": "MessageDrop (EN)",
-    "save": "Save",
-    "cancel": "Cancel",
-    "language": "Language",
-    "unknown": "Unknown",
+    "appName": "MessageDrop (ES)",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "language": "Idioma",
+    "unknown": "Desconocido",
     "actions": {
       "ok": "OK",
-      "retry": "Retry",
-      "backupNow": "Backup now",
-      "restore": "Restore",
+      "retry": "Reintentar",
+      "backupNow": "Hacer copia ahora",
+      "restore": "Restaurar",
       "no": "No",
-      "yes": "Yes",
-      "apply": "Apply",
-      "abort": "Abort",
-      "randomizeStyle": "Randomize style",
-      "delete": "Delete",
-      "openInNewTab": "Open in new tab",
-      "download": "Download",
-      "copy": "Copy",
-      "close": "Close"
+      "yes": "Sí",
+      "apply": "Aplicar",
+      "abort": "Cancelar",
+      "randomizeStyle": "Estilo aleatorio",
+      "delete": "Eliminar",
+      "openInNewTab": "Abrir en una nueva pestaña",
+      "download": "Descargar",
+      "copy": "Copiar",
+      "close": "Cerrar"
     },
     "clipboard": {
       "pasteLabel": "Paste from clipboard",
@@ -27,46 +27,46 @@
       "readFailed": "Could not read clipboard content."
     },
     "aria": {
-      "wait": "Wait",
-      "userProfile": "User profile",
-      "appMenu": "App menu",
-      "mainMenu": "Main menu",
-      "search": "Search"
+      "wait": "Esperar",
+      "userProfile": "Perfil de usuario",
+      "appMenu": "Menú de la aplicación",
+      "mainMenu": "Menú principal",
+      "search": "Buscar"
     },
     "menu": {
-      "logout": "Logout",
-      "myUser": "My user",
-      "myProfile": "My profile",
-      "systemMessages": "System messages",
-      "myPublicMessages": "My public messages",
-      "myPrivateNotes": "My private notes",
-      "myPlaces": "My places",
-      "myContacts": "My contacts",
-      "appSettings": "App settings",
-      "externalContentSettings": "External content settings",
-      "restoreBackup": "Restore backup",
-      "termsOfService": "Terms of Service",
-      "privacyPolicy": "Privacy Policy",
-      "disclaimer": "Disclaimer",
-      "imprintLegalNotice": "Imprint (Legal notice)",
-      "thirdPartyLicenses": "Third-Party Licenses",
-      "locateMe": "Locate me",
-      "publicMessage": "Public message",
-      "privateNote": "Private note",
-      "privateImage": "Private image",
-      "contactsMessage": "Contacts message",
-      "weather": "Weather",
-      "airQuality": "Air quality",
-      "searchPlace": "Search a place"
+      "logout": "Cerrar sesión",
+      "myUser": "Mi usuario",
+      "myProfile": "Mi perfil",
+      "systemMessages": "Mensajes del sistema",
+      "myPublicMessages": "Mis mensajes públicos",
+      "myPrivateNotes": "Mis notas privadas",
+      "myPlaces": "Mis lugares",
+      "myContacts": "Mis contactos",
+      "appSettings": "Ajustes de la aplicación",
+      "externalContentSettings": "Ajustes de contenido externo",
+      "restoreBackup": "Restaurar copia de seguridad",
+      "termsOfService": "Términos de servicio",
+      "privacyPolicy": "Política de privacidad",
+      "disclaimer": "Aviso legal",
+      "imprintLegalNotice": "Aviso legal (imprint)",
+      "thirdPartyLicenses": "Licencias de terceros",
+      "locateMe": "Localizarme",
+      "publicMessage": "Mensaje público",
+      "privateNote": "Nota privada",
+      "privateImage": "Imagen privada",
+      "contactsMessage": "Mensaje a contactos",
+      "weather": "Tiempo",
+      "airQuality": "Calidad del aire",
+      "searchPlace": "Buscar un lugar"
     },
     "meta": {
-      "title": "MessageDrop - Explore Places & News",
-      "description": "Discover real places, social media, weather and news in one app.",
-      "keywords": "MessageDrop, Places, News, Weather, Social",
+      "title": "MessageDrop - Explora lugares y noticias",
+      "description": "Descubre lugares reales, redes sociales, tiempo y noticias en una sola app.",
+      "keywords": "MessageDrop, Lugares, Noticias, Tiempo, Social",
       "ogTitle": "MessageDrop",
-      "ogDescription": "Your gateway to social stories, places, and updates.",
+      "ogDescription": "Tu acceso a historias sociales, lugares y actualizaciones.",
       "twitterTitle": "MessageDrop",
-      "twitterDescription": "Discover your world - smarter."
+      "twitterDescription": "Descubre tu mundo - más inteligente."
     },
     "translate": {
       "title": "Translate service",
@@ -172,160 +172,9 @@
       }
     },
     "geoStatistic": {
-      "details": {
-        "title": "Location details",
-        "state": "State",
-        "county": "County",
-        "city": "City",
-        "suburb": "Suburb",
-        "neighbourhood": "Neighbourhood",
-        "flagAlt": "Flag",
-        "capital": "Capital",
-        "region": "Region",
-        "languages": "Languages",
-        "currencies": "Currencies",
-        "population": "Population",
-        "populationUnit": "people",
-        "area": "Area",
-        "areaUnit": "km²",
-        "density": "Density",
-        "densityUnit": "people/km²",
-        "googleMaps": "Google Maps"
-      },
-      "stats": {
-        "title": "Location statistics",
-        "categoryLabel": "Category",
-        "indicatorLabel": "Indicator",
-        "dataSources": "Data sources"
-      },
-      "categories": {
-        "economy": "Economy",
-        "social": "Social",
-        "climate": "Environment"
-      },
-      "axis": {
-        "years": "Years"
-      },
-      "units": {
-        "usd": "USD",
-        "usdPerPerson": "USD per person",
-        "percent": "%",
-        "people": "people",
-        "years": "years",
-        "kilotons": "kilotons",
-        "mwh": "MWh",
-        "micrograms": "µg/m³",
-        "kgOilEqPerCapita": "kg oil eq. per capita",
-        "celsius": "°C",
-        "mm": "mm"
-      },
-      "fallback": {
-        "label": "Unknown indicator",
-        "description": "No description available for this indicator.",
-        "tooltip": "Click to view details"
-      },
-      "indicators": {
-        "gdp": {
-          "label": "GDP (USD)",
-          "description": "Gross Domestic Product (GDP) represents the total value of all goods and services produced within a country.",
-          "tooltip": "Gross Domestic Product (GDP) in absolute USD over time."
-        },
-        "gdpPerCapita": {
-          "label": "GDP per Capita (USD)",
-          "description": "GDP per capita is the average economic output per person, calculated by dividing GDP by the total population.",
-          "tooltip": "GDP divided by total population (USD per person)."
-        },
-        "militaryExpenditure": {
-          "label": "Military Expenditure (USD)",
-          "description": "Total military spending in absolute terms, covering equipment, personnel, and operations.",
-          "tooltip": "Total military spending in USD over time."
-        },
-        "governmentSpending": {
-          "label": "Government Spending (USD)",
-          "description": "Total government expenditure in absolute values, including healthcare, education, defense, and infrastructure.",
-          "tooltip": "Total government expenditure in USD over time."
-        },
-        "inflation": {
-          "label": "Inflation (%)",
-          "description": "Annual percentage change in the average consumer price level, reflecting the cost of living.",
-          "tooltip": "Annual consumer price inflation rate (%)."
-        },
-        "unemployment": {
-          "label": "Unemployment (%)",
-          "description": "Percentage of the labor force that is unemployed and actively seeking work.",
-          "tooltip": "Percentage of the labor force unemployed (%)."
-        },
-        "investment": {
-          "label": "Investment (USD)",
-          "description": "Gross capital formation, representing investments in infrastructure, machinery, and other assets.",
-          "tooltip": "Gross capital formation in USD over time."
-        },
-        "lifeExpectancy": {
-          "label": "Life Expectancy (years)",
-          "description": "The average number of years a person is expected to live at birth.",
-          "tooltip": "Average expected lifespan at birth (years)."
-        },
-        "povertyRate": {
-          "label": "Poverty (absolute number)",
-          "description": "Total number of people living below the international poverty line.",
-          "tooltip": "Number of people living below the poverty line."
-        },
-        "literacyRate": {
-          "label": "Literacy Rate (%)",
-          "description": "Percentage of adults (15 years and older) who can read and write.",
-          "tooltip": "Adult literacy rate (% of population aged 15 and above)."
-        },
-        "primaryEnrollment": {
-          "label": "Primary Enrollment (%)",
-          "description": "Percentage of children of official primary school age enrolled in school.",
-          "tooltip": "Primary school enrollment rate (% of eligible children)."
-        },
-        "secondaryEnrollment": {
-          "label": "Secondary Enrollment (%)",
-          "description": "Percentage of youth of official secondary school age enrolled in secondary education.",
-          "tooltip": "Secondary school enrollment rate (% of eligible youth)."
-        },
-        "giniIndex": {
-          "label": "Gini Index",
-          "description": "A measure of income inequality where 0 indicates perfect equality and 100 indicates maximal inequality.",
-          "tooltip": "Gini Index measuring income inequality (0 = equality, 100 = inequality)."
-        },
-        "co2Emissions": {
-          "label": "CO₂ Emissions (kilotons)",
-          "description": "Total annual CO₂ emissions measured in kilotons, reflecting the environmental impact.",
-          "tooltip": "Total CO₂ emissions in kilotons per year."
-        },
-        "renewableEnergy": {
-          "label": "Renewable Energy (absolute)",
-          "description": "Absolute amount of renewable energy used, including wind, solar, and hydroelectric sources.",
-          "tooltip": "Absolute amount of renewable energy used."
-        },
-        "forestArea": {
-          "label": "Forest Area (%)",
-          "description": "Percentage of total land area covered by forests.",
-          "tooltip": "Percentage of land area covered by forests (%)."
-        },
-        "airPollution": {
-          "label": "Air Pollution (PM2.5 µg/m³)",
-          "description": "Average concentration of fine particulate matter (PM2.5) in micrograms per cubic meter.",
-          "tooltip": "Average PM2.5 air pollution concentration (µg/m³)."
-        },
-        "energyUse": {
-          "label": "Energy Use (kg oil equivalent per capita)",
-          "description": "Average energy consumption per person, measured in kilograms of oil equivalent.",
-          "tooltip": "Energy use per capita (kg of oil equivalent)."
-        },
-        "temperatureTrend": {
-          "label": "Temperature Trend (°C)",
-          "description": "Average annual temperature trends over time in degrees Celsius.",
-          "tooltip": "Historical yearly average temperatures (°C)."
-        },
-        "precipitationTrend": {
-          "label": "Precipitation Trend (mm)",
-          "description": "Total annual precipitation sums over time, measured in millimeters.",
-          "tooltip": "Historical yearly total precipitation (mm)."
-        }
-      }
+      "title": "GeoStatistic Service",
+      "loading": "Fetching location data",
+      "unexpectedResponse": "Unexpected response."
     },
     "message": {
       "title": "Message service",
@@ -355,27 +204,8 @@
       "policy": "This information is stored on your device and is only visible to you."
     },
     "images": {
-      "addFirst": "Add first private image",
-      "addAria": "Add image",
-      "notFound": "Image not found on device",
-      "deleteAria": "Delete image",
-      "flyToAria": "Fly to image",
-      "navigateAria": "Navigate to image location",
-      "filePickerUnsupported": "File picker is not supported in this browser.",
-      "importSuccess": "Image(s) imported locally.",
-      "importFailed": "Unable to import the image.",
-      "delete": {
-        "title": "Remove image",
-        "confirm": "The image will be permanently removed from the map. Are you sure?"
-      },
-      "exif": {
-        "previewAlt": "Image preview",
-        "title": "Choose location",
-        "body": "This photo has EXIF coordinates. Replace with the current map location?",
-        "remember": "Remember this choice for all images in this import",
-        "keep": "Keep EXIF",
-        "useMap": "Use map location"
-      }
+      "imported": "Imagen(es) importadas localmente.",
+      "importFailed": "No se pudo importar la imagen."
     },
     "map": {
       "multiMarker": {
@@ -643,40 +473,9 @@
     },
     "systemMessages": {
       "title": "System messages",
-      "backAria": "Back to system messages",
-      "refreshAria": "Reload system messages",
-      "filterAria": "Filter system messages",
-      "caseActionsAria": "Case actions",
-      "openCaseDetails": "Open case details",
-      "markAsRead": "Mark as read",
-      "markAsUnread": "Mark as unread",
-      "toggleReadState": "Toggle read state",
-      "deleteMessage": "Delete message",
-      "empty": "No system messages in this view.",
-      "deleteAll": "Delete all",
-      "deleteTitle": "Delete system message",
-      "deleteConfirm": "Do you really want to permanently delete this system message?",
-      "deleteAllTitle": "Delete system messages",
-      "deleteAllConfirm": "Do you really want to permanently delete all filtered system messages?",
-      "notAvailable": "n/a",
-      "filters": {
-        "unread": "Unread",
-        "read": "Read",
-        "all": "All"
-      },
-      "status": {
-        "unread": "Unread",
-        "read": "Read"
-      },
-      "detail": {
-        "caseId": "Case ID",
-        "actions": "Actions",
-        "message": "Message",
-        "reason": "Reason",
-        "category": "Category",
-        "contentType": "Content type",
-        "status": "Status"
-      }
+      "loading": "Loading system messages...",
+      "updatingStatus": "Updating message status...",
+      "removing": "Removing system message..."
     },
     "legal": {
       "language": {
@@ -772,12 +571,6 @@
       "unsubscribing": "Unsubscribing from place",
       "loadingTimezone": "Loading timezone"
     },
-    "systemMessages": {
-      "title": "System messages",
-      "loading": "Loading system messages...",
-      "updatingStatus": "Updating message status...",
-      "removing": "Removing system message..."
-    },
     "backup": {
       "title": "Backup",
       "signInRequired": "Please sign in before creating a backup.",
@@ -811,18 +604,18 @@
       "imageRestoreSkipped": "Image restore was skipped."
     },
     "serverDown": {
-      "title": "Oops! Our server went on a coffee break...",
-      "message": "Apparently, our backend needed some \"me time\".\n\nDon't worry, we sent a carrier pigeon to bring it back."
+      "title": "¡Vaya! Nuestro servidor se fue por un café...",
+      "message": "Parece que nuestro backend necesitaba un poco de \"tiempo para sí\".\n\nNo te preocupes, enviamos una paloma mensajera para traerlo de vuelta."
     },
     "backupExit": {
-      "title": "Create backup before leaving?",
-      "message": "You have unsaved changes. Do you want to create a backup now?"
+      "title": "¿Crear copia de seguridad antes de salir?",
+      "message": "Tienes cambios sin guardar. ¿Quieres crear una copia de seguridad ahora?"
     },
     "location": {
-      "locatingTitle": "Locating you",
-      "locatingMessage": "Please wait while your device determines your current location...",
-      "authorizationRequired": "Please authorize location.",
-      "failed": "Position could not be determined. Please try again later.",
+      "locatingTitle": "Localizándote",
+      "locatingMessage": "Por favor espera mientras tu dispositivo determina tu ubicación actual...",
+      "authorizationRequired": "Por favor autoriza la ubicación.",
+      "failed": "No se pudo determinar la posición. Inténtalo de nuevo más tarde.",
       "nominatimTitle": "Nominatim service",
       "fetchingNominatim": "Fetching Nominatim data",
       "searchTitle": "Searching location",
@@ -835,95 +628,49 @@
       }
     },
     "notifications": {
-      "received": "Notification received: {{ action }}",
-      "systemTitle": "System message",
-      "systemBody": "You have a new system message."
+      "received": "Notificación recibida: {{ action }}",
+      "systemTitle": "Mensaje del sistema",
+      "systemBody": "Tienes un nuevo mensaje del sistema."
     },
     "files": {
-      "pickerUnsupported": "File picker is not supported in this browser."
-    },
-    "images": {
-      "imported": "Image(s) imported locally.",
-      "importFailed": "Unable to import the image."
+      "pickerUnsupported": "El selector de archivos no es compatible con este navegador."
     },
     "media": {
       "tenorAttribution": "Powered by Tenor"
     },
     "user": {
-      "deleteSuccess": "User and related data were removed permanently.",
-      "serverInfoHint": "User ID, public encryption key, public signing key, number of messages, number of blocked messages, user status, last sign of life, subscription, and connect hint are saved on our server. This information is essential for the application to function.",
+      "deleteSuccess": "El usuario y los datos relacionados se eliminaron de forma permanente.",
+      "serverInfoHint": "La ID de usuario, la clave pública de cifrado, la clave pública de firma, el número de mensajes, el número de mensajes bloqueados, el estado del usuario, el último signo de vida, la suscripción y la pista de conexión se guardan en nuestro servidor. Esta información es esencial para que la aplicación funcione.",
       "dialog": {
-        "title": "My user",
-        "userIdLabel": "User ID:",
-        "backup": "Backup data",
-        "delete": "Delete my user"
+        "title": "Mi usuario",
+        "userIdLabel": "ID de usuario:",
+        "backup": "Hacer copia de seguridad",
+        "delete": "Eliminar mi usuario"
       },
       "deleteDialog": {
-        "title": "Delete user",
-        "confirm": "This user and all related data will be permanently deleted. Are you sure?"
+        "title": "Eliminar usuario",
+        "confirm": "Este usuario y todos los datos relacionados se eliminarán de forma permanente. ¿Estás seguro?"
       },
       "resetDialog": {
-        "title": "Reset user",
-        "confirm": "Resetting your user deletes all information and cannot be undone. Do you want to continue?"
+        "title": "Restablecer usuario",
+        "confirm": "Restablecer tu usuario elimina toda la información y no se puede deshacer. ¿Quieres continuar?"
       },
       "profileShare": {
-        "title": "Share profile information",
-        "body": "It looks like I'm connected to user {{ userId }}. The user would like to use my profile name and avatar. I share my profile name and avatar."
+        "title": "Compartir información del perfil",
+        "body": "Parece que estoy conectado con el usuario {{ userId }}. El usuario quiere usar mi nombre de perfil y avatar. Comparto mi nombre de perfil y avatar."
       },
       "profile": {
-        "title": "My profile",
-        "nameLabel": "Profile name",
-        "setAvatar": "Set my profile avatar.",
-        "avatarAltName": "{{ name }} avatar",
-        "avatarAltFallback": "Profile avatar",
-        "styleSample": "My selected font style",
-        "policyHint": "Your profile name and avatar are stored locally on your device.",
-        "fileTypeInvalid": "Please select a valid image file.",
-        "fileTooLarge": "The image is too large. Maximum allowed size is {{ maxSizeMb }} MB.",
-        "fileReadError": "Error reading the file."
+        "title": "Mi perfil",
+        "nameLabel": "Nombre de perfil",
+        "setAvatar": "Establecer mi avatar de perfil.",
+        "avatarAltName": "Avatar de {{ name }}",
+        "avatarAltFallback": "Avatar de perfil",
+        "styleSample": "Mi estilo de fuente seleccionado",
+        "policyHint": "Tu nombre de perfil y avatar se almacenan localmente en tu dispositivo.",
+        "fileTypeInvalid": "Por favor selecciona un archivo de imagen válido.",
+        "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es {{ maxSizeMb }} MB.",
+        "fileReadError": "Error al leer el archivo."
       }
-    },
-    "geoStatistic": {
-      "title": "GeoStatistic Service",
-      "loading": "Fetching location data",
-      "unexpectedResponse": "Unexpected response."
-    }
-  },
-  "settings": {
-    "title": "App settings",
-    "versionLabel": "Version",
-    "theme": {
-      "title": "Theme & appearance",
-      "description": "Choose colors and light/dark behavior.",
-      "label": "Theme",
-      "modeLabel": "Theme mode toggle",
-      "mode": {
-        "light": "Light",
-        "dark": "Dark",
-        "system": "System"
-      }
-    },
-    "language": {
-      "title": "Language",
-      "description": "Choose how MessageDrop picks your language.",
-      "optionSystem": "System / browser",
-      "optionEnglish": "English",
-      "optionGerman": "German"
-    },
-    "storage": {
-      "title": "Persistent storage",
-      "description": "Keeps local data safe from automatic cleanup.",
-      "note": "When available, we ask the browser to keep IndexedDB data permanently. Ideal for offline usage or large message archives.",
-      "toggle": "Protect local data",
-      "applying": "Applying preference ...",
-      "warning": "Persistent storage could not be granted by the browser.",
-      "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
-    },
-    "backup": {
-      "title": "Backup reminder",
-      "description": "Ask before closing if new data should be backed up.",
-      "note": "When enabled, you will be prompted before leaving the app if there are new changes.",
-      "toggle": "Ask before closing"
     }
   },
   "errors": {

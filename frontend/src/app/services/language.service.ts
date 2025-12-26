@@ -3,8 +3,7 @@ import { TranslocoService } from '@jsverse/transloco';
 import { AppService } from './app.service';
 
 const LANGUAGE_STORAGE_KEY = 'messagedrop.language';
-// Add 'es'/'fr' here once their translation files exist under assets/i18n/{lang}.
-const SUPPORTED_LANGS = ['en', 'de'] as const;
+const SUPPORTED_LANGS = ['en', 'de', 'es', 'fr'] as const;
 export type SupportedLang = (typeof SUPPORTED_LANGS)[number];
 export type LanguageMode = 'system' | SupportedLang;
 
@@ -101,11 +100,7 @@ export class LanguageService {
     }
 
     const candidate = navigator.languages?.[0] || navigator.language;
-    if (!candidate) {
-      return null;
-    }
-
-    return candidate.toLowerCase().startsWith('de') ? 'de' : 'en';
+    return this.normalizeLang(candidate) ?? this.defaultLang;
   }
 
   private normalizeLang(lang: string | null | undefined): SupportedLang | null {

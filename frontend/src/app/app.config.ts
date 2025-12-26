@@ -26,9 +26,9 @@ export const appConfig: ApplicationConfig = {
     ),
     provideTransloco({
       config: {
-        // To add es/fr later: create assets/i18n/es/common.json + settings.json,
-        // then add 'es'/'fr' here and in LanguageService.SUPPORTED_LANGS.
-        availableLangs: ['en', 'de'],
+        // To add more languages later: create assets/i18n/{lang}/common.json + settings.json,
+        // then add the language here and in LanguageService.SUPPORTED_LANGS.
+        availableLangs: ['en', 'de', 'es', 'fr'],
         defaultLang: 'en',
         fallbackLang: 'en',
         reRenderOnLangChange: true,

@@ -18,7 +18,9 @@
       "description": "Lege fest, wie MessageDrop die Sprache auswählt.",
       "optionSystem": "System / Browser",
       "optionEnglish": "Englisch",
-      "optionGerman": "Deutsch"
+      "optionGerman": "Deutsch",
+      "optionSpanish": "Spanisch",
+      "optionFrench": "Französisch"
     },
     "storage": {
       "title": "Persistenter Speicher",
