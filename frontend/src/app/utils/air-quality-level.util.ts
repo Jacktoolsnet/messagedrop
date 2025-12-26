@@ -4,21 +4,38 @@ export type AirQualitySeverity = 'none' | 'warn' | 'alert';
 
 interface ThresholdConfig {
   thresholds: number[];
-  labels: string[];
+  labelKeys: string[];
 }
 
 const configMap: Record<AirQualityCategory, ThresholdConfig> = {
   pollen: {
     thresholds: [0, 10, 30, 50],
-    labels: ['None', 'Low', 'Moderate', 'High', 'Very High']
+    labelKeys: [
+      'weather.airQuality.pollen.none',
+      'weather.airQuality.pollen.low',
+      'weather.airQuality.pollen.moderate',
+      'weather.airQuality.pollen.high',
+      'weather.airQuality.pollen.veryHigh'
+    ]
   },
   particulateMatter: {
     thresholds: [20, 40, 60, 100],
-    labels: ['Good', 'Moderate', 'Unhealthy for Sensitive', 'Unhealthy', 'Very Unhealthy']
+    labelKeys: [
+      'weather.airQuality.particulateMatter.good',
+      'weather.airQuality.particulateMatter.moderate',
+      'weather.airQuality.particulateMatter.unhealthySensitive',
+      'weather.airQuality.particulateMatter.unhealthy',
+      'weather.airQuality.particulateMatter.veryUnhealthy'
+    ]
   },
   pollutants: {
     thresholds: [40, 100, 200],
-    labels: ['Good', 'Moderate', 'Unhealthy', 'Very Unhealthy']
+    labelKeys: [
+      'weather.airQuality.pollutants.good',
+      'weather.airQuality.pollutants.moderate',
+      'weather.airQuality.pollutants.unhealthy',
+      'weather.airQuality.pollutants.veryUnhealthy'
+    ]
   }
 };
 
@@ -36,24 +53,24 @@ export function getAirQualityLevelInfo(
   key: AirQualityMetricKey,
   value: number,
   isDarkMode = false
-): { label: string; severity: AirQualitySeverity; color: string } {
+): { labelKey: string; severity: AirQualitySeverity; color: string } {
   const category = getAirQualityCategoryForKey(key);
-  const { thresholds, labels } = configMap[category];
+  const { thresholds, labelKeys } = configMap[category];
 
   const idx = thresholds.findIndex((t) => value <= t);
   const levelIndex = idx === -1 ? thresholds.length : idx;
-  const label = labels[levelIndex] ?? labels[labels.length - 1];
+  const labelKey = labelKeys[levelIndex] ?? labelKeys[labelKeys.length - 1];
 
   const severity: AirQualitySeverity =
-    levelIndex >= labels.length - 1 ? 'alert' :
-    levelIndex >= labels.length - 2 ? 'warn' :
+    levelIndex >= labelKeys.length - 1 ? 'alert' :
+    levelIndex >= labelKeys.length - 2 ? 'warn' :
     'none';
 
   const palette = getPaletteForCategory(category);
   const baseColor = palette[levelIndex] ?? palette[palette.length - 1];
   const color = isDarkMode ? baseColor : adjustColor(baseColor, -40);
 
-  return { label, severity, color };
+  return { labelKey, severity, color };
 }
 
 function getPaletteForCategory(category: AirQualityCategory): string[] {

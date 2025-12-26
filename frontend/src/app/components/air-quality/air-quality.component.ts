@@ -16,6 +16,7 @@ import { Location } from '../../interfaces/location';
 import { Place } from '../../interfaces/place';
 import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
 import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 
 @Component({
   selector: 'app-air-quality',
@@ -38,6 +39,7 @@ export class AirQualityComponent implements OnInit {
   private readonly nominatimService = inject(NominatimService);
   private readonly dialogData = inject<{ airQuality?: AirQualityData; selectedKey?: AirQualityMetricKey; place?: Place; location?: Location }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly translation = inject(TranslationHelperService);
   private readonly injector = inject(Injector);
 
   private readonly tileValuesSignal = signal<AirQualityTileValue[]>([]);
@@ -296,7 +298,7 @@ export class AirQualityComponent implements OnInit {
         color: levelInfo.color,
         icon: this.getWeatherIcon(key),
         description: this.getValueDescription(currentValue, key),
-        levelText: levelInfo.label,
+        levelText: this.translation.t(levelInfo.labelKey),
         minMax: this.getHourlyMinMaxFromAirQuality(key)
       };
     });
@@ -534,7 +536,7 @@ export class AirQualityComponent implements OnInit {
           color: levelInfo.color,
           icon: this.getWeatherIcon(key),
           description: this.getValueDescription(currentValue, key),
-          levelText: levelInfo.label,
+          levelText: this.translation.t(levelInfo.labelKey),
           minMax: this.getHourlyMinMaxFromAirQuality(key)
         };
       })

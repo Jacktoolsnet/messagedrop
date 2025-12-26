@@ -92,5 +92,71 @@
   },
   "auth": {},
   "dsa": {},
-  "weather": {}
+  "weather": {
+    "level": {
+      "temperature": {
+        "freezing": "Gefrierend",
+        "cold": "Kalt",
+        "cool": "Kühl",
+        "warm": "Warm",
+        "hot": "Heiß",
+        "extremeHeat": "Extreme Hitze"
+      },
+      "uvIndex": {
+        "low": "Niedrig",
+        "moderate": "Mäßig",
+        "high": "Hoch",
+        "veryHigh": "Sehr hoch",
+        "extreme": "Extrem"
+      },
+      "precipitationProbability": {
+        "unlikely": "Unwahrscheinlich",
+        "possible": "Möglich",
+        "likely": "Wahrscheinlich",
+        "veryLikely": "Sehr wahrscheinlich"
+      },
+      "precipitation": {
+        "dry": "Trocken",
+        "lightRain": "Leichter Regen",
+        "rain": "Regen",
+        "heavyRain": "Starker Regen",
+        "downpour": "Starkregen"
+      },
+      "wind": {
+        "calm": "Ruhig",
+        "breezy": "Leicht windig",
+        "windy": "Windig",
+        "strongWind": "Starker Wind",
+        "storm": "Sturm"
+      },
+      "pressure": {
+        "low": "Niedrig",
+        "moderate": "Mäßig",
+        "high": "Hoch",
+        "veryHigh": "Sehr hoch"
+      }
+    },
+    "airQuality": {
+      "pollen": {
+        "none": "Keine",
+        "low": "Niedrig",
+        "moderate": "Mäßig",
+        "high": "Hoch",
+        "veryHigh": "Sehr hoch"
+      },
+      "particulateMatter": {
+        "good": "Gut",
+        "moderate": "Mäßig",
+        "unhealthySensitive": "Ungesund für Empfindliche",
+        "unhealthy": "Ungesund",
+        "veryUnhealthy": "Sehr ungesund"
+      },
+      "pollutants": {
+        "good": "Gut",
+        "moderate": "Mäßig",
+        "unhealthy": "Ungesund",
+        "veryUnhealthy": "Sehr ungesund"
+      }
+    }
+  }
 }

@@ -8,6 +8,7 @@ import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-me
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
 import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
 import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-air-quality-tile',
@@ -77,6 +78,7 @@ export class AirQualityTileComponent {
 
   private readonly dialog = inject(MatDialog);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly translation = inject(TranslationHelperService);
 
   get airQuality(): AirQualityData | undefined {
     return this.airQualityState?.data() ?? undefined;
@@ -110,7 +112,7 @@ export class AirQualityTileComponent {
     const key = this.dominantKey;
     if (!key) return '';
     const info = getAirQualityLevelInfo(key, this.value, document.body.classList.contains('dark'));
-    return info.label;
+    return this.translation.t(info.labelKey);
   }
 
   get airQualityIcon(): string | undefined {

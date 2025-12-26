@@ -14,6 +14,7 @@ import { Place } from '../../interfaces/place';
 import { Weather } from '../../interfaces/weather';
 import { NominatimService } from '../../services/nominatim.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 import { WeatherTile, WeatherTileType } from './weather-tile.interface';
@@ -39,6 +40,7 @@ export class WeatherComponent implements OnInit {
 
   private readonly dialogData = inject<{ weather?: Weather; location: Location; place?: Place }>(MAT_DIALOG_DATA);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly translation = inject(TranslationHelperService);
   private readonly injector = inject(Injector);
 
   location: Location = this.dialogData.location;
@@ -183,7 +185,7 @@ export class WeatherComponent implements OnInit {
         'Temperature',
         'thermostat',
         `${init ? this.weather?.current.temperature : hourData.temperature} °C`,
-        getWeatherLevelInfo('temperature', hourData.temperature, isDarkMode).label,
+        this.translation.t(getWeatherLevelInfo('temperature', hourData.temperature, isDarkMode).labelKey),
         this.getHourlyMinMax('temperature'),
         getWeatherLevelInfo('temperature', hourData.temperature, isDarkMode).color
       ),
@@ -192,7 +194,7 @@ export class WeatherComponent implements OnInit {
         'Rain chance',
         'water_drop',
         `${hourData.precipitationProbability} %`,
-        getWeatherLevelInfo('precipitationprobability', hourData.precipitationProbability, isDarkMode).label,
+        this.translation.t(getWeatherLevelInfo('precipitationprobability', hourData.precipitationProbability, isDarkMode).labelKey),
         this.getHourlyMinMax('precipitationProbability'),
         getWeatherLevelInfo('precipitationprobability', hourData.precipitationProbability, isDarkMode).color
       ),
@@ -201,7 +203,7 @@ export class WeatherComponent implements OnInit {
         'Rainfall',
         'grain',
         `${hourData.precipitation} mm/h`,
-        getWeatherLevelInfo('precipitation', hourData.precipitation, isDarkMode).label,
+        this.translation.t(getWeatherLevelInfo('precipitation', hourData.precipitation, isDarkMode).labelKey),
         this.getHourlyMinMax('precipitation'),
         getWeatherLevelInfo('precipitation', hourData.precipitation, isDarkMode).color
       ),
@@ -210,7 +212,7 @@ export class WeatherComponent implements OnInit {
         'UV Index',
         'light_mode',
         `${hourData.uvIndex}`,
-        getWeatherLevelInfo('uvIndex', hourData.uvIndex, isDarkMode).label,
+        this.translation.t(getWeatherLevelInfo('uvIndex', hourData.uvIndex, isDarkMode).labelKey),
         this.getHourlyMinMax('uvIndex'),
         getWeatherLevelInfo('uvIndex', hourData.uvIndex, isDarkMode).color
       ),
@@ -219,7 +221,7 @@ export class WeatherComponent implements OnInit {
         'Wind',
         'air',
         `${hourData.wind} km/h`,
-        getWeatherLevelInfo('wind', hourData.wind, isDarkMode).label,
+        this.translation.t(getWeatherLevelInfo('wind', hourData.wind, isDarkMode).labelKey),
         this.getHourlyMinMax('wind'),
         getWeatherLevelInfo('wind', hourData.wind, isDarkMode).color
       ),
@@ -228,7 +230,7 @@ export class WeatherComponent implements OnInit {
         'Pressure',
         'compress',
         `${hourData.pressure} hPa`,
-        getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).label,
+        this.translation.t(getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).labelKey),
         this.getHourlyMinMax('pressure'),
         getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).color
       )
