@@ -14,7 +14,12 @@
       "optionGerman": "Deutsch"
     }
   },
-  "errors": {},
+  "errors": {
+    "unknown": "Es ist ein Fehler aufgetreten. Bitte spaeter erneut versuchen.",
+    "noteTooLarge": "Notiz ist zu lang. Maximal {{ maxChars }} Zeichen.",
+    "unauthorized": "Bitte melde dich an, um fortzufahren.",
+    "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut."
+  },
   "auth": {},
   "dsa": {},
   "weather": {}

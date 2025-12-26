@@ -14,7 +14,12 @@
       "optionGerman": "German"
     }
   },
-  "errors": {},
+  "errors": {
+    "unknown": "Something went wrong. Please try again later.",
+    "noteTooLarge": "Note is too large. Maximum {{ maxChars }} characters.",
+    "unauthorized": "You need to sign in to continue.",
+    "rateLimit": "Too many requests. Please wait and try again."
+  },
   "auth": {},
   "dsa": {},
   "weather": {}
