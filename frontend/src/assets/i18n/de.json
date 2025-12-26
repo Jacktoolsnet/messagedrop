@@ -414,7 +414,7 @@
         "platformTitle": "Externe Inhalte: {{ platform }}",
         "platformSubtitle": "Einbettungen, Vorschauen und Widgets dieses Anbieters erlauben.",
         "platformNote": "Durch Aktivieren erlaubst du das Laden von Inhalten von {{ platform }} und stimmst den",
-        "platformNoteEnd": "zu.",
+        "platformNoteEnd": " zu.",
         "platformWarning": "Dabei können deine IP-Adresse und Nutzungsdaten an {{ platform }} übertragen werden.",
         "terms": "Nutzungsbedingungen",
         "privacy": "Datenschutz",
@@ -769,7 +769,7 @@
       "evidence": {
         "title": "Gesammelte Nachweise",
         "label": "Nachweis",
-        "added": "Hinzugefügt",
+        "added": "Hinzugefügt am",
         "download": "Datei herunterladen",
         "openLink": "Link öffnen",
         "hash": "Hash",
@@ -781,10 +781,10 @@
       "appeals": {
         "title": "Eingereichte Einsprüche",
         "label": "Einspruch",
-        "filed": "Eingereicht",
+        "filed": "Eingereicht am",
         "arguments": "Begründung",
         "decision": "Entscheidung",
-        "resolved": "Abgeschlossen",
+        "resolved": "Abgeschlossen am",
         "reviewer": "Prüfer"
       },
       "tabs": {
@@ -805,7 +805,7 @@
       "filesTotalLimit": "Dateien überschreiten das Gesamtlimit von 10 MB.",
       "appealSubmitted": "Einspruch erfolgreich eingereicht.",
       "appealSubmittedPartial": "Einspruch eingereicht, aber einige Dateien konnten nicht hochgeladen werden.",
-      "appealDecisionPending": "Eine Entscheidung ist noch nicht final. Einsprüche sind erst danach möglich.",
+      "appealDecisionPending": "Eine Entscheidung ist noch nicht finalisiert. Einsprüche sind erst danach möglich.",
       "appealSubmitFailed": "Einspruch konnte nicht eingereicht werden. Bitte später erneut versuchen.",
       "urlAlreadyAdded": "Dieser Link wurde bereits hinzugefügt.",
       "downloadFailed": "Datei konnte nicht heruntergeladen werden.",
