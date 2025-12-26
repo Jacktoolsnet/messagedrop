@@ -1,41 +1,45 @@
-<h2 mat-dialog-title>Edit link tile</h2>
+<h2 mat-dialog-title>{{ 'common.tileEdit.linkTitle' | transloco }}</h2>
 
 <mat-dialog-content class="edit-content">
-  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"
+    [attr.aria-label]="'common.tileFields.pickIcon' | transloco">
     @if (icon()) {
       <mat-icon>{{ icon() }}</mat-icon>
     } @else {
-      <span>Pick an icon</span>
+      <span>{{ 'common.tileFields.pickIcon' | transloco }}</span>
     }
   </button>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Title</mat-label>
+    <mat-label>{{ 'common.tileFields.title' | transloco }}</mat-label>
     <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Link type</mat-label>
+    <mat-label>{{ 'common.tileFields.linkType' | transloco }}</mat-label>
     <mat-select [formControl]="linkTypeControl">
       @for (type of linkTypes; track type.value) {
-        <mat-option [value]="type.value">{{ type.label }}</mat-option>
+        <mat-option [value]="type.value">{{ type.labelKey | transloco }}</mat-option>
       }
     </mat-select>
   </mat-form-field>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Target</mat-label>
+    <mat-label>{{ 'common.tileFields.target' | transloco }}</mat-label>
     <input matInput [formControl]="urlControl" />
-    <button mat-icon-button matSuffix type="button" (click)="pasteFromClipboard()" aria-label="Paste from clipboard">
+    <button mat-icon-button matSuffix type="button" (click)="pasteFromClipboard()"
+      [attr.aria-label]="'common.clipboard.pasteLabel' | transloco">
       <mat-icon>content_paste</mat-icon>
     </button>
     @if (urlControl.invalid && urlControl.touched) {
-      <mat-error>Enter a valid {{ linkTypeControl.value }} target</mat-error>
+      <mat-error>
+        {{ 'common.tileFields.invalidTarget' | transloco:{ type: ('common.tileLinkTypes.' + linkTypeControl.value) | transloco } }}
+      </mat-error>
     }
   </mat-form-field>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+  <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">{{ 'common.save' | transloco }}</button>
 </mat-dialog-actions>

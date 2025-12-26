@@ -7,7 +7,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { A11yModule } from '@angular/cdk/a11y';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -28,7 +30,8 @@ interface MultitextTileDialogData {
     MatInputModule,
     MatButtonModule,
     MatIcon,
-    A11yModule
+    A11yModule,
+    TranslocoPipe
 ],
   templateUrl: './multitext-tile-edit.component.html',
   styleUrl: './multitext-tile-edit.component.css',
@@ -37,9 +40,13 @@ interface MultitextTileDialogData {
 export class MultitextTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<MultitextTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<MultitextTileDialogData>(MAT_DIALOG_DATA);
 
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Multitext', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.multitext'),
+    { nonNullable: true }
+  );
   readonly textControl = new FormControl(this.data.tile.payload?.text ?? '', { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
 
@@ -61,7 +68,7 @@ export class MultitextTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || 'Multitext';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.multitext');
     const text = this.textControl.value;
     const updated: TileSetting = {
       ...this.data.tile,

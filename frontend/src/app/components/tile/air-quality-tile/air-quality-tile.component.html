@@ -3,8 +3,8 @@
     <div class="tile-info">
         <i class="wi wi-na" style="font-size: 1.5rem"></i>
         <div class="tile-content">
-            <div class="tile-value">No data</div>
-            <div class="tile-minmax">Air quality unavailable</div>
+            <div class="tile-value">{{ 'common.tiles.noData' | transloco }}</div>
+            <div class="tile-minmax">{{ 'common.tiles.airQualityUnavailable' | transloco }}</div>
         </div>
     </div>
 </div>
@@ -20,7 +20,7 @@
             <div class="tile-minmax">{{ minMax.min }} - {{ minMax.max }}</div>
             }
             @if (isStale) {
-            <div class="stale">Data expired - showing cached values</div>
+            <div class="stale">{{ 'common.tiles.dataExpiredCached' | transloco }}</div>
             }
         </div>
     </div>

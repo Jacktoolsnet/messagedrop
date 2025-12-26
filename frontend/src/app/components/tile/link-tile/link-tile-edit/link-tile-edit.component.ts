@@ -8,7 +8,9 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { A11yModule } from '@angular/cdk/a11y';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -32,7 +34,8 @@ interface LinkTileDialogData {
     MatSelectModule,
     MatButtonModule,
     MatIcon,
-    A11yModule
+    A11yModule,
+    TranslocoPipe
 ],
   templateUrl: './link-tile-edit.component.html',
   styleUrl: './link-tile-edit.component.css',
@@ -41,15 +44,19 @@ interface LinkTileDialogData {
 export class LinkTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<LinkTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<LinkTileDialogData>(MAT_DIALOG_DATA);
 
-  readonly linkTypes: { value: LinkType; label: string }[] = [
-    { value: 'web', label: 'Web' },
-    { value: 'email', label: 'Mail' },
-    { value: 'phone', label: 'Phone' }
+  readonly linkTypes: { value: LinkType; labelKey: string }[] = [
+    { value: 'web', labelKey: 'common.tileLinkTypes.web' },
+    { value: 'email', labelKey: 'common.tileLinkTypes.email' },
+    { value: 'phone', labelKey: 'common.tileLinkTypes.phone' }
   ];
 
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Link', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.link'),
+    { nonNullable: true }
+  );
   readonly urlControl = new FormControl(this.data.tile.payload?.url ?? '', { nonNullable: true });
   readonly linkTypeControl = new FormControl<LinkType>(this.normalizeLinkType(this.data.tile.payload?.linkType), { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'link');
@@ -117,7 +124,7 @@ export class LinkTileEditComponent {
       return;
     }
 
-    const title = this.titleControl.value.trim() || 'Link';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.link');
     const url = this.urlControl.value.trim();
     const linkType = this.linkTypeControl.value;
     const updated: TileSetting = {

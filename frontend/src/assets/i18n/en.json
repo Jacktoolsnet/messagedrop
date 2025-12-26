@@ -454,6 +454,10 @@
       "subscribeAria": "Subscribe to place",
       "unsubscribeAria": "Unsubscribe from place",
       "flyToAria": "Fly to place",
+      "deleteDialog": {
+        "title": "Delete place",
+        "confirm": "The place will be permanently deleted. Are you sure?"
+      },
       "deleteFailed": "Could not delete the place.",
       "subscribeFailed": "Subscribing failed.",
       "unsubscribeFailed": "Unsubscribing failed.",
@@ -475,6 +479,150 @@
       "imageTooLarge": "The image is too large. Maximum allowed size is 5 MB.",
       "imageReadError": "Error reading the file.",
       "savePolicy": "Place id, place name (hashed), the added locations, and the subscribed flag are saved on our server. The readable name and the avatar are saved on your device."
+    },
+    "tileList": {
+      "empty": "No tiles visible.",
+      "openSettings": "Open tile settings"
+    },
+    "tileSettings": {
+      "title": "Tile settings",
+      "addTile": "Add tile",
+      "reorderAria": "Reorder {{ label }}",
+      "editAria": "Edit tile",
+      "deleteAria": "Delete tile",
+      "toggleAria": "Toggle {{ label }}",
+      "visible": "Visible",
+      "editLabelPrompt": "Edit tile label"
+    },
+    "tileTypes": {
+      "datetime": "Date & time",
+      "weather": "Weather",
+      "airQuality": "Air quality",
+      "note": "Notes",
+      "message": "Messages",
+      "image": "Images",
+      "text": "Text",
+      "multitext": "Multitext",
+      "link": "Link",
+      "anniversary": "Anniversary",
+      "todo": "Todo list",
+      "quickActions": "Quick actions",
+      "files": "Files",
+      "migraine": "Migraine alert",
+      "pollution": "Pollution"
+    },
+    "tileDelete": {
+      "title": "Delete tile",
+      "confirm": "Do you really want to delete this tile?",
+      "confirmYes": "Yes, delete"
+    },
+    "tiles": {
+      "noData": "No data",
+      "airQualityUnavailable": "Air quality unavailable",
+      "weatherUnavailable": "Weather unavailable",
+      "dataExpiredCached": "Data expired - showing cached values",
+      "images": {
+        "title": "Private images",
+        "notFound": "Not found",
+        "previewAlt": "Image preview",
+        "empty": "No images found."
+      },
+      "messages": {
+        "title": "Messages",
+        "empty": "No messages found."
+      },
+      "notes": {
+        "title": "Private notes",
+        "empty": "No notes found."
+      },
+      "text": {
+        "empty": "No text yet. Tap to add one."
+      },
+      "link": {
+        "add": "Add link"
+      },
+      "anniversary": {
+        "addDate": "Add a date",
+        "invalidDate": "Invalid date"
+      },
+      "migraine": {
+        "stale": "Data expired",
+        "temperatureChange": "Temperature change",
+        "pressureChange": "Pressure change",
+        "openTemperatureAria": "Open temperature details",
+        "openPressureAria": "Open pressure details",
+        "temperatureGroup": "Temperature (°C)",
+        "pressureGroup": "Pressure (hPa)"
+      },
+      "pollution": {
+        "stale": "Data expired",
+        "empty": "No air quality data",
+        "openDetailsAria": "Open details in air quality view"
+      },
+      "todo": {
+        "empty": "No todos yet. Tap to add.",
+        "emptyEditor": "No todos yet. Add your first one above.",
+        "addLabel": "Add todo",
+        "addAria": "Add todo",
+        "reorderAria": "Reorder todo",
+        "deleteAria": "Delete todo",
+        "markDone": "Mark as done",
+        "markUndone": "Mark as not done"
+      },
+      "quickActions": {
+        "empty": "No actions yet. Tap to add.",
+        "emptyEditor": "No actions yet. Add one above.",
+        "title": "Actions",
+        "addAction": "Add action",
+        "reorderAria": "Reorder action",
+        "editAria": "Edit action",
+        "deleteAria": "Delete action",
+        "actionFallback": "Action"
+      },
+      "files": {
+        "empty": "No files yet. Tap to add.",
+        "emptyEditor": "No files yet. Add one above.",
+        "header": "Files",
+        "add": "Add files",
+        "reorderAria": "Reorder file",
+        "openAria": "Open file",
+        "removeAria": "Remove file",
+        "pickerUnsupported": "File picker is not supported in this browser.",
+        "openFailed": "Unable to open the file.",
+        "saveHandlesFailed": "Unable to save file handles."
+      }
+    },
+    "tileEdit": {
+      "textTitle": "Edit text tile",
+      "multitextTitle": "Edit multi-line tile",
+      "linkTitle": "Edit link tile",
+      "anniversaryTitle": "Edit anniversary tile",
+      "todoTitle": "Edit todo list",
+      "quickActionsTitle": "Edit quick actions",
+      "actionTitle": "Edit action",
+      "filesTitle": "Edit files",
+      "migraineTitle": "Edit migraine tile",
+      "pollutionTitle": "Edit pollution tile"
+    },
+    "tileFields": {
+      "pickIcon": "Pick an icon",
+      "title": "Title",
+      "text": "Text",
+      "linkType": "Link type",
+      "target": "Target",
+      "invalidTarget": "Enter a valid {{ type }} target",
+      "label": "Label",
+      "type": "Type",
+      "pickDateError": "Please pick a date",
+      "warnLevel": "Warn level",
+      "alertLevel": "Alert level"
+    },
+    "tileLinkTypes": {
+      "web": "Web",
+      "email": "Email",
+      "phone": "Phone",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS"
     },
     "sharedContent": {
       "multimediaTitle": "Shared multimedia content received",

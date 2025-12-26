@@ -6,10 +6,12 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
@@ -34,7 +36,8 @@ import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
     MatSlideToggleModule,
     CdkDrag,
     CdkDropList,
-    CdkDragHandle
+    CdkDragHandle,
+    TranslocoPipe
 ],
   templateUrl: './tile-settings.component.html',
   styleUrl: './tile-settings.component.css',
@@ -44,6 +47,7 @@ export class TileSettingsComponent {
   private readonly dialogRef = inject(MatDialogRef<TileSettingsComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly contactService = inject(ContactService);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<{ place?: Place; contact?: Contact }>(MAT_DIALOG_DATA);
 
   private readonly isPlaceContext = !!this.data.place;
@@ -51,15 +55,33 @@ export class TileSettingsComponent {
     this.data.place?.tileSettings ?? this.data.contact?.tileSettings,
     { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
   ));
-  readonly addableTiles: { type: TileSetting['type']; label: string; icon: string }[] = [
-    { type: 'custom-text', label: 'Text', icon: 'text_fields' },
-    { type: 'custom-multitext', label: 'Multitext', icon: 'notes' },
-    { type: 'custom-date', label: 'Anniversary', icon: 'event' },
-    { type: 'custom-todo', label: 'Todo list', icon: 'check_circle' },
-    { type: 'custom-quickaction', label: 'Quick actions', icon: 'bolt' },
-    { type: 'custom-file', label: 'Files', icon: 'attach_file' },
-    { type: 'custom-link', label: 'Link', icon: 'link' }
+  readonly addableTiles: { type: TileSetting['type']; labelKey: string; icon: string }[] = [
+    { type: 'custom-text', labelKey: 'common.tileTypes.text', icon: 'text_fields' },
+    { type: 'custom-multitext', labelKey: 'common.tileTypes.multitext', icon: 'notes' },
+    { type: 'custom-date', labelKey: 'common.tileTypes.anniversary', icon: 'event' },
+    { type: 'custom-todo', labelKey: 'common.tileTypes.todo', icon: 'check_circle' },
+    { type: 'custom-quickaction', labelKey: 'common.tileTypes.quickActions', icon: 'bolt' },
+    { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' },
+    { type: 'custom-link', labelKey: 'common.tileTypes.link', icon: 'link' }
   ];
+
+  private readonly tileTypeLabelKeys: Partial<Record<TileSetting['type'], string>> = {
+    datetime: 'common.tileTypes.datetime',
+    weather: 'common.tileTypes.weather',
+    airQuality: 'common.tileTypes.airQuality',
+    note: 'common.tileTypes.note',
+    message: 'common.tileTypes.message',
+    image: 'common.tileTypes.image',
+    'custom-text': 'common.tileTypes.text',
+    'custom-multitext': 'common.tileTypes.multitext',
+    'custom-link': 'common.tileTypes.link',
+    'custom-date': 'common.tileTypes.anniversary',
+    'custom-todo': 'common.tileTypes.todo',
+    'custom-quickaction': 'common.tileTypes.quickActions',
+    'custom-file': 'common.tileTypes.files',
+    'custom-migraine': 'common.tileTypes.migraine',
+    'custom-pollution': 'common.tileTypes.pollution'
+  };
 
   drop(event: CdkDragDrop<TileSetting[]>) {
     const updated = [...this.tileSettings()];
@@ -74,7 +96,8 @@ export class TileSettingsComponent {
     this.tileSettings.set(updated);
   }
 
-  addTile(tileToAdd: { type: TileSetting['type']; label: string }) {
+  addTile(tileToAdd: { type: TileSetting['type']; labelKey: string }) {
+    const label = this.translation.t(tileToAdd.labelKey);
     const updated = [...this.tileSettings()];
     const id = typeof crypto !== 'undefined' && crypto.randomUUID
       ? crypto.randomUUID()
@@ -82,19 +105,19 @@ export class TileSettingsComponent {
     const baseTile: TileSetting = {
       id,
       type: tileToAdd.type,
-      label: tileToAdd.label,
+      label,
       enabled: true,
       order: 0,
       custom: true,
       payload: {
-        title: tileToAdd.label,
+        title: label,
         text: ''
       }
     };
 
     if (tileToAdd.type === 'custom-date') {
       baseTile.payload = {
-        title: tileToAdd.label,
+        title: label,
         date: '',
         icon: 'event'
       };
@@ -102,7 +125,7 @@ export class TileSettingsComponent {
 
     if (tileToAdd.type === 'custom-link') {
       baseTile.payload = {
-        title: tileToAdd.label,
+        title: label,
         url: '',
         icon: 'link',
         linkType: 'web'
@@ -111,7 +134,7 @@ export class TileSettingsComponent {
 
     if (tileToAdd.type === 'custom-todo') {
       baseTile.payload = {
-        title: tileToAdd.label,
+        title: label,
         icon: 'list',
         todos: []
       };
@@ -119,7 +142,7 @@ export class TileSettingsComponent {
 
     if (tileToAdd.type === 'custom-quickaction') {
       baseTile.payload = {
-        title: tileToAdd.label,
+        title: label,
         icon: 'bolt',
         actions: []
       };
@@ -127,7 +150,7 @@ export class TileSettingsComponent {
 
     if (tileToAdd.type === 'custom-file') {
       baseTile.payload = {
-        title: tileToAdd.label,
+        title: label,
         icon: 'attach_file',
         files: []
       };
@@ -266,7 +289,7 @@ export class TileSettingsComponent {
       return;
     }
 
-    const newLabel = prompt('Tile-Bezeichnung bearbeiten', tile.label);
+    const newLabel = prompt(this.translation.t('common.tileSettings.editLabelPrompt'), tile.label);
     if (newLabel && newLabel.trim()) {
       this.tileSettings.set(this.tileSettings().map(t => t.id === tile.id ? { ...t, label: newLabel.trim() } : t));
     }
@@ -301,6 +324,17 @@ export class TileSettingsComponent {
       this.contactService.saveContactTileSettings(this.data.contact);
     }
     this.dialogRef.close(normalized);
+  }
+
+  getTileLabel(tile: TileSetting): string {
+    const key = this.tileTypeLabelKeys[tile.type];
+    if (!tile.custom && key) {
+      return this.translation.t(key);
+    }
+    if (tile.custom && tile.label?.trim()) {
+      return tile.label;
+    }
+    return key ? this.translation.t(key) : tile.label;
   }
 
   trackTile = (_: number, tile: TileSetting) => tile.id;

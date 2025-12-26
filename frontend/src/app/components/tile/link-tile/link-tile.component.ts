@@ -8,6 +8,7 @@ import { Contact } from '../../../interfaces/contact';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
 import { ContactService } from '../../../services/contact.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { LinkTileEditComponent } from './link-tile-edit/link-tile-edit.component';
 
 @Component({
@@ -27,6 +28,7 @@ export class LinkTileComponent implements OnChanges {
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -36,7 +38,8 @@ export class LinkTileComponent implements OnChanges {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Link';
+    const fallback = this.translation.t('common.tileTypes.link');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {
@@ -45,7 +48,7 @@ export class LinkTileComponent implements OnChanges {
 
   get linkLabel(): string {
     const payload = this.currentTile()?.payload;
-    if (!payload?.url) return 'Add link';
+    if (!payload?.url) return this.translation.t('common.tiles.link.add');
     return payload.url;
   }
 

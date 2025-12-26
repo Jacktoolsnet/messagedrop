@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angu
 
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
@@ -12,11 +13,12 @@ import { PollutionTileEditComponent } from './pollution-tile-edit/pollution-tile
 import { AirQualityComponent } from '../../air-quality/air-quality.component';
 import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
 import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-pollution-tile',
   standalone: true,
-  imports: [MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule, TranslocoPipe],
   templateUrl: './pollution-tile.component.html',
   styleUrl: './pollution-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -39,6 +41,7 @@ export class PollutionTileComponent {
   private readonly placeService = inject(PlaceService);
   private readonly dialog = inject(MatDialog);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly translation = inject(TranslationHelperService);
 
   private readonly pollenKeys = [
     'alder_pollen',
@@ -58,19 +61,19 @@ export class PollutionTileComponent {
     'ozone'
   ];
 
-  private readonly labelMap: Record<string, string> = {
-    alder_pollen: 'Alder',
-    birch_pollen: 'Birch',
-    grass_pollen: 'Grass',
-    mugwort_pollen: 'Mugwort',
-    olive_pollen: 'Olive',
-    ragweed_pollen: 'Ragweed',
-    pm10: 'PM10',
-    pm2_5: 'PM2.5',
-    carbon_monoxide: 'CO',
-    nitrogen_dioxide: 'NO₂',
-    sulphur_dioxide: 'SO₂',
-    ozone: 'O₃'
+  private readonly labelKeyMap: Record<string, string> = {
+    alder_pollen: 'weather.airQuality.metric.alderPollen',
+    birch_pollen: 'weather.airQuality.metric.birchPollen',
+    grass_pollen: 'weather.airQuality.metric.grassPollen',
+    mugwort_pollen: 'weather.airQuality.metric.mugwortPollen',
+    olive_pollen: 'weather.airQuality.metric.olivePollen',
+    ragweed_pollen: 'weather.airQuality.metric.ragweedPollen',
+    pm10: 'weather.airQuality.metric.pm10',
+    pm2_5: 'weather.airQuality.metric.pm2_5',
+    carbon_monoxide: 'weather.airQuality.metric.carbonMonoxide',
+    nitrogen_dioxide: 'weather.airQuality.metric.nitrogenDioxide',
+    sulphur_dioxide: 'weather.airQuality.metric.sulphurDioxide',
+    ozone: 'weather.airQuality.metric.ozone'
   };
 
   private readonly iconMap: Record<string, string> = {
@@ -98,7 +101,8 @@ export class PollutionTileComponent {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Pollution';
+    const fallback = this.translation.t('common.tileTypes.pollution');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {
@@ -121,7 +125,7 @@ export class PollutionTileComponent {
       const info = getAirQualityLevelInfo(key as AirQualityMetricKey, maxVal, isDarkMode);
       return {
         key,
-        label: this.labelMap[key] ?? key,
+        label: this.translation.t(this.labelKeyMap[key] ?? 'weather.airQuality.metric.unknown'),
         icon: this.iconMap[key] ?? 'blur_on',
         value: maxVal ? maxVal.toFixed(1) : '0',
         level: info.severity,

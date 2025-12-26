@@ -1,8 +1,12 @@
-<h2 mat-dialog-title>Delete place</h2>
+<h2 mat-dialog-title>{{ 'common.placeList.deleteDialog.title' | transloco }}</h2>
 <mat-dialog-content>
-    The place will be permanently deleted. Are you sure?
+    {{ 'common.placeList.deleteDialog.confirm' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">Yes</button>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">
+    {{ 'common.actions.abort' | transloco }}
+  </button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="true">
+    {{ 'common.actions.yes' | transloco }}
+  </button>
 </mat-dialog-actions>

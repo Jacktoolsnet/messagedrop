@@ -1,8 +1,10 @@
-<h2 mat-dialog-title>Delete tile</h2>
+<h2 mat-dialog-title>{{ 'common.tileDelete.title' | transloco }}</h2>
 <mat-dialog-content>
-  Do you really want to delete this tile?
+  {{ 'common.tileDelete.confirm' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button mat-dialog-close>No</button>
-  <button mat-flat-button color="warn" [mat-dialog-close]="true">Yes, delete</button>
+  <button mat-button mat-dialog-close>{{ 'common.actions.no' | transloco }}</button>
+  <button mat-flat-button color="warn" [mat-dialog-close]="true">
+    {{ 'common.tileDelete.confirmYes' | transloco }}
+  </button>
 </mat-dialog-actions>

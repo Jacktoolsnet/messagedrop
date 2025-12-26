@@ -9,6 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { TileSetting, TileTodoItem } from '../../../../interfaces/tile-settings';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface TodoTileDialogData {
@@ -31,7 +33,8 @@ interface TodoTileDialogData {
     A11yModule,
     CdkDrag,
     CdkDropList,
-    CdkDragHandle
+    CdkDragHandle,
+    TranslocoPipe
   ],
   templateUrl: './todo-tile-edit.component.html',
   styleUrl: './todo-tile-edit.component.css',
@@ -40,9 +43,13 @@ interface TodoTileDialogData {
 export class TodoTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<TodoTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<TodoTileDialogData>(MAT_DIALOG_DATA);
 
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Todo list', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.todo'),
+    { nonNullable: true }
+  );
   readonly newTodoControl = new FormControl('', { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
   readonly todos = signal<TileTodoItem[]>(this.normalizeTodos(this.data.tile.payload?.todos));
@@ -97,7 +104,7 @@ export class TodoTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || 'Todo list';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.todo');
     const todos = this.normalizeTodos(this.todos()).map((todo, index) => ({ ...todo, order: index }));
     const updated: TileSetting = {
       ...this.data.tile,

@@ -52,9 +52,9 @@
   </div>
 } @else {
   <div class="tile-empty">
-    <p>No tiles visible.</p>
+    <p>{{ 'common.tileList.empty' | transloco }}</p>
     <button mat-flat-button color="primary" type="button" (click)="openTileSettings()">
-      Open tile settings
+      {{ 'common.tileList.openSettings' | transloco }}
     </button>
   </div>
 }

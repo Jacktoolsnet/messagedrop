@@ -2,17 +2,19 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, TileTodoItem } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
 import { PlaceService } from '../../../services/place.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { TodoTileEditComponent } from './todo-tile-edit/todo-tile-edit.component';
 
 @Component({
   selector: 'app-todo-tile',
   standalone: true,
-  imports: [MatIcon],
+  imports: [MatIcon, TranslocoPipe],
   templateUrl: './todo-tile.component.html',
   styleUrl: './todo-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,6 +28,7 @@ export class TodoTileComponent implements OnChanges {
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -35,7 +38,8 @@ export class TodoTileComponent implements OnChanges {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Todo list';
+    const fallback = this.translation.t('common.tileTypes.todo');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {

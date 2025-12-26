@@ -10,7 +10,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { A11yModule } from '@angular/cdk/a11y';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface AnniversaryTileDialogData {
@@ -34,7 +36,8 @@ interface AnniversaryTileDialogData {
     MatIcon,
     MatCardModule,
     MatDatepickerModule,
-    A11yModule
+    A11yModule,
+    TranslocoPipe
 ],
   templateUrl: './anniversary-tile-edit.component.html',
   styleUrl: './anniversary-tile-edit.component.css',
@@ -44,9 +47,13 @@ export class AnniversaryTileEditComponent {
   @ViewChild(MatCalendar) calendar?: MatCalendar<Date>;
   private readonly dialogRef = inject(MatDialogRef<AnniversaryTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<AnniversaryTileDialogData>(MAT_DIALOG_DATA);
 
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Anniversary', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.anniversary'),
+    { nonNullable: true }
+  );
   readonly dateControl = new FormControl<Date | null>(this.toDate(this.data.tile.payload?.date), { validators: [Validators.required] });
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'event');
 
@@ -90,7 +97,7 @@ export class AnniversaryTileEditComponent {
       return;
     }
 
-    const title = this.titleControl.value.trim() || 'Anniversary';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.anniversary');
     const date = this.dateControl.value ? this.formatLocalDate(this.dateControl.value) : '';
     const updated: TileSetting = {
       ...this.data.tile,

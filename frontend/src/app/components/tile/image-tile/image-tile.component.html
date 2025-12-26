@@ -2,7 +2,7 @@
   (keyup.enter)="openImageDialog()" (keyup.space)="openImageDialog()">
   <div class="tile-header">
     <mat-icon class="tile-icon">photo_library</mat-icon>
-    <span class="tile-title">Private images</span>
+    <span class="tile-title">{{ 'common.tiles.images.title' | transloco }}</span>
   </div>
 
   @if (previewImages().length > 0) {
@@ -11,12 +11,12 @@
       @if (previewUrls()[idx] === 'NOT_FOUND') {
         <div class="missing">
           <mat-icon aria-hidden="true">broken_image</mat-icon>
-          <div>Not found</div>
+          <div>{{ 'common.tiles.images.notFound' | transloco }}</div>
         </div>
       } @else {
         <img
           [src]="previewUrls()[idx]"
-          [alt]="image.fileName || 'Image preview'"
+          [alt]="image.fileName || ('common.tiles.images.previewAlt' | transloco)"
           loading="lazy"
           decoding="async"
           (error)="handleImageError(image, idx)"
@@ -25,6 +25,6 @@
     }
   </div>
   } @else {
-  <div class="empty">No images found.</div>
+  <div class="empty">{{ 'common.tiles.images.empty' | transloco }}</div>
   }
 </div>

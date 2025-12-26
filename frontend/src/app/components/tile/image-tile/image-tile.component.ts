@@ -3,6 +3,7 @@ import { Component, computed, effect, inject, Input, OnDestroy, OnInit, signal, 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { LocalImage } from '../../../interfaces/local-image';
 import { Place } from '../../../interfaces/place';
 import { GeolocationService } from '../../../services/geolocation.service';
@@ -13,7 +14,8 @@ import { ImagelistComponent } from '../../imagelist/imagelist.component';
   selector: 'app-image-tile',
   imports: [
     MatIcon,
-    MatButtonModule
+    MatButtonModule,
+    TranslocoPipe
 ],
   templateUrl: './image-tile.component.html',
   styleUrl: './image-tile.component.css'
@@ -64,14 +66,14 @@ export class ImageTileComponent implements OnInit, OnDestroy {
     try {
       return await this.localImageService.getImageUrl(img);
     } catch {
-      // Stale object URL oder Permission-Glitch? Einmal URL verwerfen und erneut versuchen.
+      // Stale object URL or permission glitch? Revoke once and retry.
       this.localImageService.revokeImageUrl(img);
       if (!this.retryTracker.has(img.id)) {
         this.retryTracker.add(img.id);
         try {
           return await this.localImageService.getImageUrl(img);
         } catch {
-          // Ignorieren, fällt unten auf NOT_FOUND
+          // Ignore errors; fallback will return NOT_FOUND.
         }
       }
       return 'NOT_FOUND';
@@ -79,7 +81,7 @@ export class ImageTileComponent implements OnInit, OnDestroy {
   }
 
   handleImageError(img: LocalImage, index: number): void {
-    // Auf Fehler mit einem erneuten Ladeversuch reagieren; wenn der auch scheitert -> NOT_FOUND.
+    // Retry once on error; fallback will mark as NOT_FOUND.
     void this.reloadSingle(img, index);
   }
 

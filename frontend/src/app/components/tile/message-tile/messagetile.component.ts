@@ -3,6 +3,7 @@ import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal, 
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { GetMessageResponse } from '../../../interfaces/get-message-response';
 import { Message } from '../../../interfaces/message';
 import { Place } from '../../../interfaces/place';
@@ -14,7 +15,8 @@ import { MessagelistComponent } from '../../messagelist/messagelist.component';
   selector: 'app-message-tile',
   imports: [
     MatIcon,
-    MatButtonModule
+    MatButtonModule,
+    TranslocoPipe
 ],
   templateUrl: './messagetile.component.html',
   styleUrl: './messagetile.component.css'

@@ -1,24 +1,25 @@
-<h2 mat-dialog-title>Edit quick actions</h2>
+<h2 mat-dialog-title>{{ 'common.tileEdit.quickActionsTitle' | transloco }}</h2>
 
 <mat-dialog-content class="edit-content">
-  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"
+    [attr.aria-label]="'common.tileFields.pickIcon' | transloco">
     @if (icon()) {
       <mat-icon>{{ icon() }}</mat-icon>
     } @else {
-      <span>Pick an icon</span>
+      <span>{{ 'common.tileFields.pickIcon' | transloco }}</span>
     }
   </button>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Title</mat-label>
+    <mat-label>{{ 'common.tileFields.title' | transloco }}</mat-label>
     <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
   </mat-form-field>
 
   <div class="actions-header">
-    <div class="actions-title">Actions</div>
+    <div class="actions-title">{{ 'common.tiles.quickActions.title' | transloco }}</div>
     <button mat-stroked-button color="primary" type="button" (click)="addAction()">
       <mat-icon>add</mat-icon>
-      Add action
+      {{ 'common.tiles.quickActions.addAction' | transloco }}
     </button>
   </div>
 
@@ -26,7 +27,8 @@
     <div cdkDropList class="action-list" (cdkDropListDropped)="drop($event)">
       @for (action of actions(); track action.id) {
         <div class="action-row" cdkDrag>
-          <button type="button" class="drag-handle" cdkDragHandle aria-label="Reorder action">
+          <button type="button" class="drag-handle" cdkDragHandle
+            [attr.aria-label]="'common.tiles.quickActions.reorderAria' | transloco">
             <mat-icon>drag_indicator</mat-icon>
           </button>
           <div class="action-info">
@@ -37,10 +39,12 @@
             </div>
           </div>
           <div class="action-buttons">
-            <button mat-icon-button color="primary" type="button" (click)="editAction(action)" aria-label="Edit action">
+            <button mat-icon-button color="primary" type="button" (click)="editAction(action)"
+              [attr.aria-label]="'common.tiles.quickActions.editAria' | transloco">
               <mat-icon>edit</mat-icon>
             </button>
-            <button mat-icon-button color="warn" type="button" (click)="deleteAction(action)" aria-label="Delete action">
+            <button mat-icon-button color="warn" type="button" (click)="deleteAction(action)"
+              [attr.aria-label]="'common.tiles.quickActions.deleteAria' | transloco">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -48,11 +52,11 @@
       }
     </div>
   } @else {
-    <p class="text-muted">No actions yet. Add one above.</p>
+    <p class="text-muted">{{ 'common.tiles.quickActions.emptyEditor' | transloco }}</p>
   }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+  <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">{{ 'common.save' | transloco }}</button>
 </mat-dialog-actions>

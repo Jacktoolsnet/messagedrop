@@ -2,7 +2,7 @@
     (keyup.enter)="openNoteDialog()" (keyup.space)="openNoteDialog()">
     <div class="tile-header">
         <mat-icon class="tile-icon">clinical_notes</mat-icon>
-        <span class="tile-title">Private notes</span>
+        <span class="tile-title">{{ 'common.tiles.notes.title' | transloco }}</span>
     </div>
 
     @if (placeNotes().length > 0) {
@@ -12,6 +12,6 @@
     </div>
     }
     } @else {
-    <div class="note-empty">No notes found.</div>
+    <div class="note-empty">{{ 'common.tiles.notes.empty' | transloco }}</div>
     }
 </div>

@@ -11,6 +11,8 @@ import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TileFileEntry, TileSetting } from '../../../../interfaces/tile-settings';
 import { TileFileService } from '../../../../services/tile-file.service';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { getFileIcon } from '../../../../utils/file-icon.util';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
@@ -35,7 +37,8 @@ interface FileTileDialogData {
     CdkDrag,
     CdkDropList,
     CdkDragHandle,
-    DatePipe
+    DatePipe,
+    TranslocoPipe
   ],
   templateUrl: './file-tile-edit.component.html',
   styleUrl: './file-tile-edit.component.css',
@@ -46,10 +49,14 @@ export class FileTileEditComponent {
   private readonly dialog = inject(MatDialog);
   private readonly fileTileService = inject(TileFileService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<FileTileDialogData>(MAT_DIALOG_DATA);
 
   private readonly initialFiles = this.normalizeFiles(this.data.tile.payload?.files);
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Files', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.files'),
+    { nonNullable: true }
+  );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon);
   readonly files = signal<TileFileEntry[]>(this.initialFiles);
   private readonly pendingHandles = new Map<string, FileSystemFileHandle>();
@@ -73,7 +80,7 @@ export class FileTileEditComponent {
 
   async addFiles(): Promise<void> {
     if (!this.fileTileService.isSupported()) {
-      this.snackBar.open('File picker is not supported in this browser.', undefined, { duration: 4000 });
+      this.snackBar.open(this.translation.t('common.tiles.files.pickerUnsupported'), undefined, { duration: 4000 });
       return;
     }
 
@@ -113,7 +120,7 @@ export class FileTileEditComponent {
       const pendingHandle = this.pendingHandles.get(file.id);
       await this.fileTileService.openFile(file, pendingHandle);
     } catch {
-      const message = this.fileTileService.lastErrorSignal() ?? 'Unable to open the file.';
+      const message = this.fileTileService.lastErrorSignal() ?? this.translation.t('common.tiles.files.openFailed');
       this.snackBar.open(message, undefined, { duration: 4000 });
     }
   }
@@ -123,7 +130,7 @@ export class FileTileEditComponent {
   }
 
   async save(): Promise<void> {
-    const title = this.titleControl.value.trim() || 'Files';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.files');
     const files = this.normalizeFiles(this.files()).map((file, index) => ({ ...file, order: index }));
     const removedIds = this.initialFiles
       .filter(initial => !files.some(current => current.id === initial.id))
@@ -137,7 +144,7 @@ export class FileTileEditComponent {
       await Promise.all(removedIds.map(id => this.fileTileService.deleteHandle(id)));
     } catch (error) {
       console.error('Failed to persist file handles', error);
-      this.snackBar.open('Unable to save file handles.', undefined, { duration: 4000 });
+      this.snackBar.open(this.translation.t('common.tiles.files.saveHandlesFailed'), undefined, { duration: 4000 });
       return;
     }
 

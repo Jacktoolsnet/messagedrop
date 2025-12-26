@@ -10,6 +10,8 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
 import { A11yModule } from '@angular/cdk/a11y';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 
 interface MigraineTileDialogData {
   tile: TileSetting;
@@ -28,7 +30,8 @@ interface MigraineTileDialogData {
     MatInputModule,
     MatButtonModule,
     MatIcon,
-    A11yModule
+    A11yModule,
+    TranslocoPipe
 ],
   templateUrl: './migraine-tile-edit.component.html',
   styleUrl: './migraine-tile-edit.component.css',
@@ -37,9 +40,13 @@ interface MigraineTileDialogData {
 export class MigraineTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<MigraineTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<MigraineTileDialogData>(MAT_DIALOG_DATA);
 
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Migraine alert', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.migraine'),
+    { nonNullable: true }
+  );
 
   private defaults = {
     tempWarn1: 5,
@@ -80,7 +87,7 @@ export class MigraineTileEditComponent {
       return;
     }
 
-    const title = this.titleControl.value.trim() || 'Migraine alert';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.migraine');
     const updated: TileSetting = {
       ...this.data.tile,
       label: title,

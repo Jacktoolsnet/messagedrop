@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angu
 
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
@@ -12,11 +13,12 @@ import { Weather } from '../../../interfaces/weather';
 import { WeatherComponent } from '../../weather/weather.component';
 import { WeatherTile } from '../../weather/weather-tile.interface';
 import { GeolocationService } from '../../../services/geolocation.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-migraine-tile',
   standalone: true,
-  imports: [MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule, TranslocoPipe],
   templateUrl: './migraine-tile.component.html',
   styleUrl: './migraine-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -37,13 +39,15 @@ export class MigraineTileComponent {
   private readonly placeService = inject(PlaceService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly refreshService = inject(OpenMeteoRefreshService);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
   private weatherState?: DatasetState<Weather>;
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Migraine alert';
+    const fallback = this.translation.t('common.tileTypes.migraine');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {

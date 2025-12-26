@@ -6,12 +6,12 @@
     </div>
     <div class="pollution-title">{{ title }}</div>
     @if (isStale) {
-      <span class="stale">Data expired</span>
+      <span class="stale">{{ 'common.tiles.pollution.stale' | transloco }}</span>
     }
   </div>
 
   @if (!airQuality || metrics.length === 0) {
-    <div class="empty">No air quality data</div>
+    <div class="empty">{{ 'common.tiles.pollution.empty' | transloco }}</div>
   } @else {
     <div class="pollution-grid">
       @for (m of metrics; track m.key) {
@@ -31,7 +31,7 @@
             color="primary"
             type="button"
             (click)="openAirQualityDetails(m.key); $event.stopPropagation()"
-            aria-label="Open details in air quality view">
+            [attr.aria-label]="'common.tiles.pollution.openDetailsAria' | transloco">
             <mat-icon>{{ m.icon }}</mat-icon>
           </button>
         </div>

@@ -4,19 +4,21 @@ import { DatePipe } from '@angular/common';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TileFileEntry, TileSetting } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
 import { PlaceService } from '../../../services/place.service';
 import { TileFileService } from '../../../services/tile-file.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { getFileIcon } from '../../../utils/file-icon.util';
 import { FileTileEditComponent } from './file-tile-edit/file-tile-edit.component';
 
 @Component({
   selector: 'app-file-tile',
   standalone: true,
-  imports: [MatIcon, DatePipe],
+  imports: [MatIcon, DatePipe, TranslocoPipe],
   templateUrl: './file-tile.component.html',
   styleUrl: './file-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -32,6 +34,7 @@ export class FileTileComponent implements OnChanges {
   private readonly fileTileService = inject(TileFileService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -41,7 +44,8 @@ export class FileTileComponent implements OnChanges {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Files';
+    const fallback = this.translation.t('common.tileTypes.files');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {
@@ -87,7 +91,7 @@ export class FileTileComponent implements OnChanges {
     try {
       await this.fileTileService.openFile(file);
     } catch {
-      const message = this.fileTileService.lastErrorSignal() ?? 'Unable to open the file.';
+      const message = this.fileTileService.lastErrorSignal() ?? this.translation.t('common.tiles.files.openFailed');
       this.snackBar.open(message, undefined, { duration: 4000 });
     }
   }

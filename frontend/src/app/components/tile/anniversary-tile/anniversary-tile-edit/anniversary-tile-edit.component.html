@@ -1,17 +1,17 @@
-<h2 mat-dialog-title>Edit anniversary tile</h2>
+<h2 mat-dialog-title>{{ 'common.tileEdit.anniversaryTitle' | transloco }}</h2>
 
 <mat-dialog-content class="edit-content">
   <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"
-    aria-label="Pick an icon">
+    [attr.aria-label]="'common.tileFields.pickIcon' | transloco">
     @if (icon()) {
     <mat-icon>{{ icon() }}</mat-icon>
     } @else {
-    <span>Pick an icon</span>
+    <span>{{ 'common.tileFields.pickIcon' | transloco }}</span>
     }
   </button>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Title</mat-label>
+    <mat-label>{{ 'common.tileFields.title' | transloco }}</mat-label>
     <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
   </mat-form-field>
 
@@ -19,12 +19,12 @@
     <mat-calendar [startAt]="startAt" [selected]="dateControl.value"
       (selectedChange)="onDateSelected($event)"></mat-calendar>
     @if (dateControl.invalid && dateControl.touched) {
-    <div class="calendar-error">Please pick a date</div>
+    <div class="calendar-error">{{ 'common.tileFields.pickDateError' | transloco }}</div>
     }
   </div>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+  <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">{{ 'common.save' | transloco }}</button>
 </mat-dialog-actions>

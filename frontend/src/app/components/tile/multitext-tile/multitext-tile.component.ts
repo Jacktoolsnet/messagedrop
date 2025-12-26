@@ -2,17 +2,19 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 
 import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Place } from '../../../interfaces/place';
 import { Contact } from '../../../interfaces/contact';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
 import { ContactService } from '../../../services/contact.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { MultitextTileEditComponent } from './multitext-tile-edit/multitext-tile-edit.component';
 
 @Component({
   selector: 'app-multitext-tile',
   standalone: true,
-  imports: [MatIcon],
+  imports: [MatIcon, TranslocoPipe],
   templateUrl: './multitext-tile.component.html',
   styleUrl: './multitext-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -26,6 +28,7 @@ export class MultitextTileComponent implements OnChanges {
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -35,7 +38,8 @@ export class MultitextTileComponent implements OnChanges {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Multitext';
+    const fallback = this.translation.t('common.tileTypes.multitext');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get text(): string {

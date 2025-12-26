@@ -7,6 +7,7 @@ import { Contact } from '../../../interfaces/contact';
 import { TileSetting } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
 import { ContactService } from '../../../services/contact.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AnniversaryTileEditComponent } from './anniversary-tile-edit/anniversary-tile-edit.component';
 
 @Component({
@@ -26,6 +27,7 @@ export class AnniversaryTileComponent implements OnChanges {
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -35,7 +37,8 @@ export class AnniversaryTileComponent implements OnChanges {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Anniversary';
+    const fallback = this.translation.t('common.tileTypes.anniversary');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {
@@ -44,9 +47,9 @@ export class AnniversaryTileComponent implements OnChanges {
 
   get formattedDate(): string {
     const date = this.currentTile()?.payload?.date;
-    if (!date) return 'Add a date';
+    if (!date) return this.translation.t('common.tiles.anniversary.addDate');
     const d = this.parseLocalDate(date);
-    if (!d) return 'Invalid date';
+    if (!d) return this.translation.t('common.tiles.anniversary.invalidDate');
     return new Intl.DateTimeFormat(navigator.language, { dateStyle: 'long' }).format(d);
   }
 

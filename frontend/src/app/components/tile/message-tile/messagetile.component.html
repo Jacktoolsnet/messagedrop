@@ -2,7 +2,7 @@
     (keyup.enter)="openMessageDialog()" (keyup.space)="openMessageDialog()">
     <div class="tile-header">
         <mat-icon class="material-symbols-outlined tile-icon">speaker_notes</mat-icon>
-        <span class="tile-title">Messages</span>
+        <span class="tile-title">{{ 'common.tiles.messages.title' | transloco }}</span>
     </div>
 
     @if (placeMessages().length > 0) {
@@ -12,6 +12,6 @@
     </div>
     }
     } @else {
-    <div class="message-empty">No messages found.</div>
+    <div class="message-empty">{{ 'common.tiles.messages.empty' | transloco }}</div>
     }
 </div>

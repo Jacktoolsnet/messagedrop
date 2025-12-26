@@ -1,40 +1,41 @@
-<h2 mat-dialog-title>Edit migraine tile</h2>
+<h2 mat-dialog-title>{{ 'common.tileEdit.migraineTitle' | transloco }}</h2>
 
 <mat-dialog-content class="edit-content">
-  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"
+    [attr.aria-label]="'common.tileFields.pickIcon' | transloco">
     @if (icon()) {
       <mat-icon>{{ icon() }}</mat-icon>
     } @else {
-      <span>Pick an icon</span>
+      <span>{{ 'common.tileFields.pickIcon' | transloco }}</span>
     }
   </button>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Title</mat-label>
+    <mat-label>{{ 'common.tileFields.title' | transloco }}</mat-label>
     <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
   </mat-form-field>
 
   <div class="thresholds">
     <div class="threshold-group">
-      <div class="group-title">Temperature (°C)</div>
+      <div class="group-title">{{ 'common.tiles.migraine.temperatureGroup' | transloco }}</div>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Warn level</mat-label>
+        <mat-label>{{ 'common.tileFields.warnLevel' | transloco }}</mat-label>
         <input matInput type="number" [formControl]="tempWarn1" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Alert level</mat-label>
+        <mat-label>{{ 'common.tileFields.alertLevel' | transloco }}</mat-label>
         <input matInput type="number" [formControl]="tempWarn2" />
       </mat-form-field>
     </div>
 
     <div class="threshold-group">
-      <div class="group-title">Pressure (hPa)</div>
+      <div class="group-title">{{ 'common.tiles.migraine.pressureGroup' | transloco }}</div>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Warn level</mat-label>
+        <mat-label>{{ 'common.tileFields.warnLevel' | transloco }}</mat-label>
         <input matInput type="number" [formControl]="pressureWarn1" />
       </mat-form-field>
       <mat-form-field appearance="outline" class="full-width">
-        <mat-label>Alert level</mat-label>
+        <mat-label>{{ 'common.tileFields.alertLevel' | transloco }}</mat-label>
         <input matInput type="number" [formControl]="pressureWarn2" />
       </mat-form-field>
     </div>
@@ -42,6 +43,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+  <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">{{ 'common.save' | transloco }}</button>
 </mat-dialog-actions>

@@ -7,6 +7,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { PlaceService } from '../../../services/place.service';
 import { Contact } from '../../../interfaces/contact';
 import { ContactService } from '../../../services/contact.service';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
 import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
@@ -26,7 +27,7 @@ import { TileSettingsComponent } from '../tile-settings/tile-settings.component'
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

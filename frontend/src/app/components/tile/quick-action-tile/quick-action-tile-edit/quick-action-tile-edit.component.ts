@@ -9,6 +9,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settings';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { QuickActionActionEditComponent } from '../quick-action-action-edit/quick-action-action-edit.component';
 
@@ -32,7 +34,8 @@ interface QuickActionTileDialogData {
     A11yModule,
     CdkDrag,
     CdkDropList,
-    CdkDragHandle
+    CdkDragHandle,
+    TranslocoPipe
   ],
   templateUrl: './quick-action-tile-edit.component.html',
   styleUrl: './quick-action-tile-edit.component.css',
@@ -41,10 +44,14 @@ interface QuickActionTileDialogData {
 export class QuickActionTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionTileEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<QuickActionTileDialogData>(MAT_DIALOG_DATA);
   private readonly allowedActionTypes: TileQuickAction['type'][] = ['web', 'email', 'phone', 'whatsapp', 'sms'];
 
-  readonly titleControl = new FormControl(this.data.tile.payload?.title ?? this.data.tile.label ?? 'Quick actions', { nonNullable: true });
+  readonly titleControl = new FormControl(
+    this.data.tile.payload?.title ?? this.data.tile.label ?? this.translation.t('common.tileTypes.quickActions'),
+    { nonNullable: true }
+  );
   readonly icon = signal<string | undefined>(this.data.tile.payload?.icon ?? 'bolt');
   readonly actions = signal<TileQuickAction[]>(this.normalizeActions(this.data.tile.payload?.actions));
 
@@ -68,7 +75,7 @@ export class QuickActionTileEditComponent {
   addAction(): void {
     const action: TileQuickAction = {
       id: this.createActionId(),
-      label: 'Action',
+      label: this.translation.t('common.tiles.quickActions.actionFallback'),
       type: 'web',
       value: '',
       icon: 'public',
@@ -96,7 +103,7 @@ export class QuickActionTileEditComponent {
   }
 
   save(): void {
-    const title = this.titleControl.value.trim() || 'Quick actions';
+    const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.quickActions');
     const actions = this.normalizeActions(this.actions());
     const updated: TileSetting = {
       ...this.data.tile,
@@ -112,7 +119,8 @@ export class QuickActionTileEditComponent {
   }
 
   getActionLabel(action: TileQuickAction): string {
-    return action.label?.trim() || action.value || 'Action';
+    const fallback = this.translation.t('common.tiles.quickActions.actionFallback');
+    return action.label?.trim() || action.value || fallback;
   }
 
   getActionIcon(action: TileQuickAction): string {
@@ -120,8 +128,9 @@ export class QuickActionTileEditComponent {
   }
 
   getActionMeta(action: TileQuickAction): string {
-    if (!action.value) return action.type;
-    return `${action.type} · ${action.value}`;
+    const typeLabel = this.translation.t(`common.tileLinkTypes.${action.type}`);
+    if (!action.value) return typeLabel;
+    return `${typeLabel} · ${action.value}`;
   }
 
   private openActionEditor(action: TileQuickAction, isNew: boolean): void {
@@ -144,11 +153,12 @@ export class QuickActionTileEditComponent {
   }
 
   private normalizeActions(actions?: TileQuickAction[]): TileQuickAction[] {
+    const fallbackLabel = this.translation.t('common.tiles.quickActions.actionFallback');
     return (actions ?? [])
       .map((action, index) => ({
         ...action,
         type: this.allowedActionTypes.includes(action.type ?? 'web') ? (action.type ?? 'web') : 'web',
-        label: action.label?.trim() || 'Action',
+        label: action.label?.trim() || fallbackLabel,
         value: action.value?.trim() || '',
         order: Number.isFinite(action.order) ? action.order : index
       }))

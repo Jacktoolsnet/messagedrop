@@ -454,6 +454,10 @@
       "subscribeAria": "Ort abonnieren",
       "unsubscribeAria": "Ort abbestellen",
       "flyToAria": "Zum Ort springen",
+      "deleteDialog": {
+        "title": "Ort löschen",
+        "confirm": "Der Ort wird dauerhaft gelöscht. Bist du sicher?"
+      },
       "deleteFailed": "Der Ort konnte nicht gelöscht werden.",
       "subscribeFailed": "Abonnieren fehlgeschlagen.",
       "unsubscribeFailed": "Abbestellen fehlgeschlagen.",

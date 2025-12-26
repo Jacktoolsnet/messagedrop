@@ -1,24 +1,25 @@
-<h2 mat-dialog-title>Edit files</h2>
+<h2 mat-dialog-title>{{ 'common.tileEdit.filesTitle' | transloco }}</h2>
 
 <mat-dialog-content class="edit-content">
-  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()" aria-label="Pick an icon">
+  <button class="icon-pick-button" mat-stroked-button color="primary" type="button" (click)="pickIcon()"
+    [attr.aria-label]="'common.tileFields.pickIcon' | transloco">
     @if (icon()) {
       <mat-icon>{{ icon() }}</mat-icon>
     } @else {
-      <span>Pick an icon</span>
+      <span>{{ 'common.tileFields.pickIcon' | transloco }}</span>
     }
   </button>
 
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Title</mat-label>
+    <mat-label>{{ 'common.tileFields.title' | transloco }}</mat-label>
     <input matInput cdkFocusInitial [formControl]="titleControl" maxlength="64" />
   </mat-form-field>
 
   <div class="files-header">
-    <div class="files-title">Files</div>
+    <div class="files-title">{{ 'common.tiles.files.header' | transloco }}</div>
     <button mat-stroked-button color="primary" type="button" (click)="addFiles()">
       <mat-icon>add</mat-icon>
-      Add files
+      {{ 'common.tiles.files.add' | transloco }}
     </button>
   </div>
 
@@ -26,7 +27,8 @@
     <div cdkDropList class="file-list" (cdkDropListDropped)="drop($event)">
       @for (file of files(); track file.id) {
         <div class="file-row" cdkDrag>
-          <button type="button" class="drag-handle" cdkDragHandle aria-label="Reorder file">
+          <button type="button" class="drag-handle" cdkDragHandle
+            [attr.aria-label]="'common.tiles.files.reorderAria' | transloco">
             <mat-icon>drag_indicator</mat-icon>
           </button>
           <div class="file-info">
@@ -37,10 +39,12 @@
             </div>
           </div>
           <div class="file-buttons">
-            <button mat-icon-button color="primary" type="button" (click)="openFile(file)" aria-label="Open file">
+            <button mat-icon-button color="primary" type="button" (click)="openFile(file)"
+              [attr.aria-label]="'common.tiles.files.openAria' | transloco">
               <mat-icon>open_in_new</mat-icon>
             </button>
-            <button mat-icon-button color="warn" type="button" (click)="deleteFile(file)" aria-label="Remove file">
+            <button mat-icon-button color="warn" type="button" (click)="deleteFile(file)"
+              [attr.aria-label]="'common.tiles.files.removeAria' | transloco">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
@@ -48,11 +52,11 @@
       }
     </div>
   } @else {
-    <p class="text-muted">No files yet. Add one above.</p>
+    <p class="text-muted">{{ 'common.tiles.files.emptyEditor' | transloco }}</p>
   }
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button type="button" (click)="cancel()">Cancel</button>
-  <button mat-flat-button color="primary" type="button" (click)="save()">Save</button>
+  <button mat-button type="button" (click)="cancel()">{{ 'common.cancel' | transloco }}</button>
+  <button mat-flat-button color="primary" type="button" (click)="save()">{{ 'common.save' | transloco }}</button>
 </mat-dialog-actions>

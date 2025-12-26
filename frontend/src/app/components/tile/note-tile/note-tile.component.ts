@@ -3,6 +3,7 @@ import { Component, computed, Input, OnInit, signal, WritableSignal, inject } fr
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Note } from '../../../interfaces/note';
 import { Place } from '../../../interfaces/place';
 import { GeolocationService } from '../../../services/geolocation.service';
@@ -13,7 +14,8 @@ import { NotelistComponent } from '../../notelist/notelist.component';
   selector: 'app-note-tile',
   imports: [
     MatIcon,
-    MatButtonModule
+    MatButtonModule,
+    TranslocoPipe
 ],
   templateUrl: './note-tile.component.html',
   styleUrl: './note-tile.component.css'

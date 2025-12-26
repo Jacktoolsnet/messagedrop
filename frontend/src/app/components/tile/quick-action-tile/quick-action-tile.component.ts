@@ -2,17 +2,19 @@ import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TileLinkType, TileQuickAction, TileSetting } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
 import { PlaceService } from '../../../services/place.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { QuickActionTileEditComponent } from './quick-action-tile-edit/quick-action-tile-edit.component';
 
 @Component({
   selector: 'app-quick-action-tile',
   standalone: true,
-  imports: [MatIcon],
+  imports: [MatIcon, TranslocoPipe],
   templateUrl: './quick-action-tile.component.html',
   styleUrl: './quick-action-tile.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -27,6 +29,7 @@ export class QuickActionTileComponent implements OnChanges {
   private readonly placeService = inject(PlaceService);
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
+  private readonly translation = inject(TranslationHelperService);
 
   readonly currentTile = signal<TileSetting | null>(null);
 
@@ -36,7 +39,8 @@ export class QuickActionTileComponent implements OnChanges {
 
   get title(): string {
     const tile = this.currentTile();
-    return tile?.payload?.title?.trim() || tile?.label || 'Quick actions';
+    const fallback = this.translation.t('common.tileTypes.quickActions');
+    return tile?.payload?.title?.trim() || tile?.label || fallback;
   }
 
   get icon(): string {
@@ -80,7 +84,8 @@ export class QuickActionTileComponent implements OnChanges {
   }
 
   getActionLabel(action: TileQuickAction): string {
-    return action.label?.trim() || action.value || 'Action';
+    const fallback = this.translation.t('common.tiles.quickActions.actionFallback');
+    return action.label?.trim() || action.value || fallback;
   }
 
   getActionIcon(action: TileQuickAction): string {

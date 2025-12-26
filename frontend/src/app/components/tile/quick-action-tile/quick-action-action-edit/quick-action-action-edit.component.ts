@@ -9,6 +9,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
 import { A11yModule } from '@angular/cdk/a11y';
 import { TileLinkType, TileQuickAction } from '../../../../interfaces/tile-settings';
+import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
 
@@ -30,7 +32,8 @@ interface QuickActionDialogData {
     MatSelectModule,
     MatButtonModule,
     MatIcon,
-    A11yModule
+    A11yModule,
+    TranslocoPipe
   ],
   templateUrl: './quick-action-action-edit.component.html',
   styleUrl: './quick-action-action-edit.component.css',
@@ -39,19 +42,23 @@ interface QuickActionDialogData {
 export class QuickActionActionEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionActionEditComponent>);
   private readonly dialog = inject(MatDialog);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<QuickActionDialogData>(MAT_DIALOG_DATA);
   private iconAuto = true;
   private lastType: TileLinkType;
 
-  readonly actionTypes: { value: TileLinkType; label: string }[] = [
-    { value: 'web', label: 'Web' },
-    { value: 'email', label: 'Mail' },
-    { value: 'phone', label: 'Phone' },
-    { value: 'whatsapp', label: 'WhatsApp' },
-    { value: 'sms', label: 'SMS' }
+  readonly actionTypes: { value: TileLinkType; labelKey: string }[] = [
+    { value: 'web', labelKey: 'common.tileLinkTypes.web' },
+    { value: 'email', labelKey: 'common.tileLinkTypes.email' },
+    { value: 'phone', labelKey: 'common.tileLinkTypes.phone' },
+    { value: 'whatsapp', labelKey: 'common.tileLinkTypes.whatsapp' },
+    { value: 'sms', labelKey: 'common.tileLinkTypes.sms' }
   ];
 
-  readonly labelControl = new FormControl(this.data.action.label ?? 'Action', { nonNullable: true });
+  readonly labelControl = new FormControl(
+    this.data.action.label ?? this.translation.t('common.tiles.quickActions.actionFallback'),
+    { nonNullable: true }
+  );
   readonly valueControl = new FormControl(this.data.action.value ?? '', { nonNullable: true });
   readonly typeControl = new FormControl<TileLinkType>(this.normalizeType(this.data.action.type), { nonNullable: true });
   readonly icon = signal<string | undefined>(this.data.action.icon ?? this.defaultIconForType(this.data.action.type));
@@ -98,7 +105,7 @@ export class QuickActionActionEditComponent {
       return;
     }
 
-    const label = this.labelControl.value.trim() || 'Action';
+    const label = this.labelControl.value.trim() || this.translation.t('common.tiles.quickActions.actionFallback');
     const value = this.valueControl.value.trim();
     const type = this.typeControl.value;
 

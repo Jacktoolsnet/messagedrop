@@ -19,7 +19,8 @@
       <ul class="todo-list">
         @for (todo of todos; track todo.id) {
           <li class="todo-item" [class.todo-item--done]="todo.done">
-            <button type="button" class="todo-toggle" (click)="toggleTodo(todo, $event)" [attr.aria-pressed]="todo.done" [attr.aria-label]="todo.done ? 'Mark as not done' : 'Mark as done'">
+            <button type="button" class="todo-toggle" (click)="toggleTodo(todo, $event)" [attr.aria-pressed]="todo.done"
+              [attr.aria-label]="todo.done ? ('common.tiles.todo.markUndone' | transloco) : ('common.tiles.todo.markDone' | transloco)">
               <mat-icon class="todo-status-icon">{{ todo.done ? 'check_circle' : 'radio_button_unchecked' }}</mat-icon>
               <span class="todo-text">{{ todo.text }}</span>
             </button>
@@ -27,7 +28,7 @@
         }
       </ul>
     } @else {
-      <p class="text-muted">No todos yet. Tap to add.</p>
+      <p class="text-muted">{{ 'common.tiles.todo.empty' | transloco }}</p>
     }
   </div>
 </div>

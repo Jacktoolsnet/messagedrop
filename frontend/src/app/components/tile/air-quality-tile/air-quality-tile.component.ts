@@ -2,6 +2,7 @@ import { Component, Input, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
 import { Place } from '../../../interfaces/place';
 import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
@@ -12,7 +13,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 
 @Component({
   selector: 'app-air-quality-tile',
-  imports: [MatIcon, MatButtonModule],
+  imports: [MatIcon, MatButtonModule, TranslocoPipe],
   templateUrl: './air-quality-tile.component.html',
   styleUrl: './air-quality-tile.component.css'
 })
@@ -46,19 +47,19 @@ export class AirQualityTileComponent {
   ];
 
   // --- Label/Icon Maps ---
-  private readonly labelMap: Record<string, string> = {
-    alder_pollen: 'Alder Pollen',
-    birch_pollen: 'Birch Pollen',
-    grass_pollen: 'Grass Pollen',
-    mugwort_pollen: 'Mugwort Pollen',
-    olive_pollen: 'Olive Pollen',
-    ragweed_pollen: 'Ragweed Pollen',
-    pm10: 'PM10',
-    pm2_5: 'PM2.5',
-    carbon_monoxide: 'Carbon Monoxide',
-    nitrogen_dioxide: 'Nitrogen Dioxide',
-    sulphur_dioxide: 'Sulphur Dioxide',
-    ozone: 'Ozone'
+  private readonly labelKeyMap: Record<string, string> = {
+    alder_pollen: 'weather.airQuality.metric.alderPollen',
+    birch_pollen: 'weather.airQuality.metric.birchPollen',
+    grass_pollen: 'weather.airQuality.metric.grassPollen',
+    mugwort_pollen: 'weather.airQuality.metric.mugwortPollen',
+    olive_pollen: 'weather.airQuality.metric.olivePollen',
+    ragweed_pollen: 'weather.airQuality.metric.ragweedPollen',
+    pm10: 'weather.airQuality.metric.pm10',
+    pm2_5: 'weather.airQuality.metric.pm2_5',
+    carbon_monoxide: 'weather.airQuality.metric.carbonMonoxide',
+    nitrogen_dioxide: 'weather.airQuality.metric.nitrogenDioxide',
+    sulphur_dioxide: 'weather.airQuality.metric.sulphurDioxide',
+    ozone: 'weather.airQuality.metric.ozone'
   };
 
   private readonly iconMap: Record<string, string> = {
@@ -218,7 +219,8 @@ export class AirQualityTileComponent {
   }
 
   getChartLabel(key: string): string {
-    return this.labelMap[key] || key || 'Air Quality';
+    const labelKey = this.labelKeyMap[key] ?? 'weather.airQuality.metric.unknown';
+    return this.translation.t(labelKey);
   }
 
   /**
