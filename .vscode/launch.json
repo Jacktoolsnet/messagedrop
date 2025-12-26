@@ -37,6 +37,11 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.admin-backend",
+                "SERVICE_JWT_AUDIENCE": "service.admin-backend",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/platform/admin/backend/config/service-jwks.json"
+            },
             "type": "node"
         },
         {
@@ -46,6 +51,11 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.backend",
+                "SERVICE_JWT_AUDIENCE": "service.backend",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/backend/config/service-jwks.json"
+            },
             "type": "node"
         },
         {
@@ -55,6 +65,11 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.openmeteo",
+                "SERVICE_JWT_AUDIENCE": "service.openmeteo",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/openMeteo/config/service-jwks.json"
+            },
             "type": "node"
         },
         {
@@ -64,6 +79,11 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.nominatim",
+                "SERVICE_JWT_AUDIENCE": "service.nominatim",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/nominatim/config/service-jwks.json"
+            },
             "type": "node"
         },
         {
@@ -73,6 +93,11 @@
             "skipFiles": [
                 "<node_internals>/**"
             ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.socketio",
+                "SERVICE_JWT_AUDIENCE": "service.socketio",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/socketio/config/service-jwks.json"
+            },
             "type": "node"
         },
         {
