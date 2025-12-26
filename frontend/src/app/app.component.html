@@ -20,8 +20,7 @@
 </button>
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab
-    [attr.aria-label]="'common.aria.userProfile' | transloco"
-    (click)="{}" [@badgePulse]="animateUserBadgeTick()">
+    [attr.aria-label]="'common.aria.userProfile' | transloco" (click)="{}" [@badgePulse]="animateUserBadgeTick()">
     <mat-icon [attr.aria-hidden]="false"
         [matBadge]="userService.isReady() ? (unreadTotalAll() > 0 ? (unreadTotalAll() | shortNumber) : null) : null"
         [matBadgeHidden]="!userService.isReady()" [matBadgeSize]="'medium'" matBadgeColor="primary">person</mat-icon>
@@ -29,20 +28,17 @@
 }
 
 <button [attr.aria-hidden]="false" [matMenuTriggerFor]="appMenu" class="button_app" mat-fab
-    [attr.aria-label]="'common.aria.appMenu' | transloco"
-    (click)="{}">
+    [attr.aria-label]="'common.aria.appMenu' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false">apps</mat-icon>
 </button>
 
 <button [attr.aria-hidden]="false" [matMenuTriggerFor]="messageMenu" class="button_drop" mat-fab
-    [attr.aria-label]="'common.aria.mainMenu' | transloco"
-    (click)="{}">
+    [attr.aria-label]="'common.aria.mainMenu' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false">pin_drop</mat-icon>
 </button>
 
 <button [attr.aria-hidden]="false" [matMenuTriggerFor]="searchMenu" class="button_search" mat-fab
-    [attr.aria-label]="'common.aria.search' | transloco"
-    (click)="{}">
+    [attr.aria-label]="'common.aria.search' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false">search</mat-icon>
 </button>
 }
@@ -109,10 +105,6 @@
 </mat-menu>
 
 <mat-menu #appMenu="matMenu">
-    <button mat-menu-item disabled>
-        <mat-icon>info</mat-icon>
-        <span>{{ 'common.appName' | transloco }}</span>
-    </button>
     <button mat-menu-item (click)="editAppSettings()">
         <mat-icon>settings_applications</mat-icon>
         <span>{{ 'common.menu.appSettings' | transloco }}</span>
