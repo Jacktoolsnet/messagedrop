@@ -1,6 +1,7 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { PlatformLocation } from '@angular/common';
-import { Component, computed, effect, inject, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
@@ -10,7 +11,7 @@ import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
@@ -117,6 +118,8 @@ import { TranslationHelperService } from './services/translation-helper.service'
 })
 
 export class AppComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly transloco = inject(TranslocoService);
   locationReady = false;
   public myHistory: string[] = [];
   public markerLocations = new Map<string, MarkerLocation>();
@@ -341,21 +344,31 @@ export class AppComponent implements OnInit {
   }
 
   public ngOnInit(): void {
-    // Titel
-    this.titleService.setTitle(this.translation.t('common.meta.title'));
-    // Meta-Tags
-    this.metaService.updateTag({ name: 'description', content: this.translation.t('common.meta.description') });
-    this.metaService.updateTag({ name: 'keywords', content: this.translation.t('common.meta.keywords') });
-    this.metaService.updateTag({ name: 'robots', content: 'index, follow' });
+    this.transloco.selectTranslation()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((translation) => {
+        const meta = translation?.['common']?.['meta'];
+        if (!meta) {
+          return;
+        }
 
-    // Optional: Open Graph / Twitter für Social Sharing
-    this.metaService.updateTag({ property: 'og:title', content: this.translation.t('common.meta.ogTitle') });
-    this.metaService.updateTag({ property: 'og:description', content: this.translation.t('common.meta.ogDescription') });
-    this.metaService.updateTag({ property: 'og:image', content: 'https://messagedrop.de/assets/icons/icon-512x512.png' });
+        // Title
+        this.titleService.setTitle(meta.title ?? '');
 
-    this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
-    this.metaService.updateTag({ name: 'twitter:title', content: this.translation.t('common.meta.twitterTitle') });
-    this.metaService.updateTag({ name: 'twitter:description', content: this.translation.t('common.meta.twitterDescription') });
+        // Meta tags
+        this.metaService.updateTag({ name: 'description', content: meta.description ?? '' });
+        this.metaService.updateTag({ name: 'keywords', content: meta.keywords ?? '' });
+        this.metaService.updateTag({ name: 'robots', content: 'index, follow' });
+
+        // Open Graph / Twitter
+        this.metaService.updateTag({ property: 'og:title', content: meta.ogTitle ?? '' });
+        this.metaService.updateTag({ property: 'og:description', content: meta.ogDescription ?? '' });
+        this.metaService.updateTag({ property: 'og:image', content: 'https://messagedrop.de/assets/icons/icon-512x512.png' });
+
+        this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
+        this.metaService.updateTag({ name: 'twitter:title', content: meta.twitterTitle ?? '' });
+        this.metaService.updateTag({ name: 'twitter:description', content: meta.twitterDescription ?? '' });
+      });
     // Handle back button
     this.platformLocation.onPopState(() => {
       if (this.myHistory.length > 0) {
