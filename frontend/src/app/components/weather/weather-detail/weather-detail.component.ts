@@ -1,9 +1,10 @@
 
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, inject, Input, OnChanges, SimpleChanges, ViewChild } from '@angular/core';
 import { CategoryScale, Chart, ChartConfiguration, ChartDataset, Filler, LinearScale, LineController, LineElement, PointElement, ScriptableContext, Title, Tooltip } from 'chart.js';
 import annotationPlugin, { AnnotationOptions } from 'chartjs-plugin-annotation';
 import { HourlyWeather } from '../../../interfaces/hourly-weather';
 import { Weather } from '../../../interfaces/weather';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { WeatherTile } from '../weather-tile.interface';
 import { getWeatherBaseColor } from '../../../utils/weather-level.util';
 
@@ -21,6 +22,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
   @ViewChild('chartCanvas', { static: true }) chartCanvas!: ElementRef<HTMLCanvasElement>;
 
   private chart: Chart<'line'> | null = null;
+  private readonly translation = inject(TranslationHelperService);
 
   readonly lineChartType = 'line' as const;
   chartOptions: ChartConfiguration<'line'>['options'] = {};
@@ -74,7 +76,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     let minY: number | undefined;
     let maxY: number | undefined;
 
-    // === Datensätze vorbereiten ===
+    // === Prepare datasets ===
     switch (this.tile.type) {
       case 'temperature': {
         const temps = dayHourly.map(h => h.temperature);
@@ -86,7 +88,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         dataset = {
           ...dataset,
           data: temps,
-          label: 'Temperature (°C)',
+          label: this.translation.t('weather.chart.temperature'),
           pointBackgroundColor: temps.map(t => this.getTemperatureColor(t)),
           segment: {
             borderColor: ctx => this.mixColors(
@@ -112,7 +114,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         dataset = {
           ...dataset,
           data: uvs,
-          label: 'UV Index',
+          label: this.translation.t('weather.chart.uvIndex'),
           pointBackgroundColor: uvs.map(v => this.getUvColor(v)),
           segment: {
             borderColor: ctx => this.mixColors(
@@ -138,7 +140,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         dataset = {
           ...dataset,
           data: precipitationProbability,
-          label: 'Rain chance (%)',
+          label: this.translation.t('weather.chart.precipitationProbability'),
           borderColor: this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex),
           backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex), 0.2),
           pointBackgroundColor: this.getBaseColorForSelectedValue(precipitationProbability, selectedIndex)
@@ -155,7 +157,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         dataset = {
           ...dataset,
           data: precipitation,
-          label: 'Rainfall (mm/h)',
+          label: this.translation.t('weather.chart.precipitation'),
           borderColor: this.getBaseColorForSelectedValue(precipitation, selectedIndex),
           backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(precipitation, selectedIndex), 0.2),
           pointBackgroundColor: this.getBaseColorForSelectedValue(precipitation, selectedIndex)
@@ -170,7 +172,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         dataset = {
           ...dataset,
           data: winds,
-          label: 'Wind (km/h)',
+          label: this.translation.t('weather.chart.wind'),
           borderColor: this.getBaseColorForSelectedValue(winds, selectedIndex),
           backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(winds, selectedIndex), 0.2),
           pointBackgroundColor: this.getBaseColorForSelectedValue(winds, selectedIndex)
@@ -185,7 +187,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         dataset = {
           ...dataset,
           data: pressures,
-          label: 'Pressure (hPa)',
+          label: this.translation.t('weather.chart.pressure'),
           borderColor: this.getBaseColorForSelectedValue(pressures, selectedIndex),
           backgroundColor: this.toAlpha(this.getBaseColorForSelectedValue(pressures, selectedIndex), 0.2),
           pointBackgroundColor: this.getBaseColorForSelectedValue(pressures, selectedIndex)
@@ -194,7 +196,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
       }
     }
 
-    // === Annotationen ===
+    // === Annotations ===
     const annotations: Record<string, Partial<AnnotationOptions<'line'>>> = {
       /*sunrise: {
         type: 'line',
@@ -252,7 +254,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
     const textColor = isDark ? '#ffffff' : '#000000';
     const gridColor = isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
 
-    // === Chart Optionen und Daten setzen ===
+    // === Set chart options and data ===
     this.chartOptions = {
       responsive: true,
       maintainAspectRatio: false,
@@ -283,7 +285,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
           grid: { color: gridColor },
           title: {
             display: true,
-            text: 'Time',
+            text: this.translation.t('weather.axis.time'),
             color: textColor,
             font: { size: 14, weight: 'bold' }
           }
@@ -305,7 +307,7 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
 
     this.chartData = { labels, datasets: [dataset] };
     if (this.chart) {
-      this.chart.data = this.chartData; // <- wichtig!
+      this.chart.data = this.chartData; // keep chart data in sync
       this.chart.options = this.chartOptions;
       this.chart.update();
     }

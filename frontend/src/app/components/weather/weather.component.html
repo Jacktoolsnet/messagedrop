@@ -1,9 +1,9 @@
 <mat-dialog-content #dialogContent>
   @if (weatherSig(); as weather) {
     @if (locationName$ | async; as locationName) {
-      <div class="header-title">Weather for {{ locationName }}</div>
+      <div class="header-title">{{ 'weather.titleForLocation' | transloco: { location: locationName } }}</div>
     } @else {
-      <div class="header-title">Weather</div>
+      <div class="header-title">{{ 'weather.title' | transloco }}</div>
     }
 
     <!-- Day Switch -->
@@ -50,7 +50,7 @@
         <input matSliderThumb [(ngModel)]="selectedHour" />
       </mat-slider>
       @if (!selectedTile) {
-        <div class="selected-hour">Selected hour: {{ selectedHour }}:00</div>
+        <div class="selected-hour">{{ 'weather.selectedHour' | transloco: { hour: selectedHour } }}</div>
       }
     </div>
 
@@ -72,7 +72,7 @@
 
   <!-- DATA SOURCE -->
   <div class="data-source">
-    Weather data provided by
+    {{ 'weather.dataSource' | transloco }}
     <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
   </div>
 </mat-dialog-content>

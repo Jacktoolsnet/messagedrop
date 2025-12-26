@@ -1153,6 +1153,32 @@
     }
   },
   "weather": {
+    "title": "Weather",
+    "titleForLocation": "Weather for {{ location }}",
+    "selectedHour": "Selected hour: {{ hour }}:00",
+    "dataSource": "Weather data provided by",
+    "location": {
+      "unknown": "Unknown place"
+    },
+    "tiles": {
+      "temperature": "Temperature",
+      "precipitationProbability": "Rain chance",
+      "precipitation": "Rainfall",
+      "uvIndex": "UV Index",
+      "wind": "Wind",
+      "pressure": "Pressure"
+    },
+    "chart": {
+      "temperature": "Temperature (°C)",
+      "uvIndex": "UV Index",
+      "precipitationProbability": "Rain chance (%)",
+      "precipitation": "Rainfall (mm/h)",
+      "wind": "Wind (km/h)",
+      "pressure": "Pressure (hPa)"
+    },
+    "axis": {
+      "time": "Time"
+    },
     "service": {
       "title": "Weather service",
       "loading": "Fetching weather data"

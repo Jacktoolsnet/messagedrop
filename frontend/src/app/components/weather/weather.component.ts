@@ -7,6 +7,7 @@ import { MAT_DIALOG_DATA, MatDialogModule } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { catchError, map, Observable, of } from 'rxjs';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Location } from '../../interfaces/location';
@@ -31,7 +32,8 @@ import { WeatherTile, WeatherTileType } from './weather-tile.interface';
     MatSliderModule,
     FormsModule,
     WeatherDetailComponent,
-    MatButtonToggleModule
+    MatButtonToggleModule,
+    TranslocoPipe
   ],
   templateUrl: './weather.component.html',
   styleUrls: ['./weather.component.css']
@@ -59,6 +61,14 @@ export class WeatherComponent implements OnInit {
   private readonly weatherSignal = signal<Weather | null>(null);
   readonly weatherSig = this.weatherSignal.asReadonly();
   private weatherState?: DatasetState<Weather>;
+  private readonly tileLabelKeys: Record<WeatherTileType, string> = {
+    temperature: 'weather.tiles.temperature',
+    precipitationprobability: 'weather.tiles.precipitationProbability',
+    precipitation: 'weather.tiles.precipitation',
+    uvIndex: 'weather.tiles.uvIndex',
+    wind: 'weather.tiles.wind',
+    pressure: 'weather.tiles.pressure'
+  };
 
   get weather(): Weather | null {
     return this.weatherSignal();
@@ -123,16 +133,17 @@ export class WeatherComponent implements OnInit {
   }
 
   getLocationName(): void {
+    const unknownPlace = this.translation.t('weather.location.unknown');
     this.locationName$ = this.nomatinService
       .getNominatimPlaceByLocation(this.location)
       .pipe(
         map((res: GetNominatimAddressResponse) => {
           const addr = res.nominatimPlace.address;
-          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || 'Unknown place';
+          const place = addr?.city || addr?.town || addr?.village || addr?.hamlet || unknownPlace;
           const country = addr?.country || '';
           return `${place}${country ? ', ' + country : ''}`;
         }),
-        catchError(() => of('Weather'))
+        catchError(() => of(''))
       );
   }
 
@@ -171,18 +182,16 @@ export class WeatherComponent implements OnInit {
 
     const make = (
       type: WeatherTileType,
-      label: string,
       icon: string,
       value: string,
       levelText: string,
       minMax: { min: number; max: number },
       color: string
-    ): WeatherTile => ({ type, label, icon, value, levelText, color, minMax });
+    ): WeatherTile => ({ type, label: this.translation.t(this.tileLabelKeys[type]), icon, value, levelText, color, minMax });
 
     this.tilesSignal.set([
       make(
         'temperature',
-        'Temperature',
         'thermostat',
         `${init ? this.weather?.current.temperature : hourData.temperature} °C`,
         this.translation.t(getWeatherLevelInfo('temperature', hourData.temperature, isDarkMode).labelKey),
@@ -191,7 +200,6 @@ export class WeatherComponent implements OnInit {
       ),
       make(
         'precipitationprobability',
-        'Rain chance',
         'water_drop',
         `${hourData.precipitationProbability} %`,
         this.translation.t(getWeatherLevelInfo('precipitationprobability', hourData.precipitationProbability, isDarkMode).labelKey),
@@ -200,7 +208,6 @@ export class WeatherComponent implements OnInit {
       ),
       make(
         'precipitation',
-        'Rainfall',
         'grain',
         `${hourData.precipitation} mm/h`,
         this.translation.t(getWeatherLevelInfo('precipitation', hourData.precipitation, isDarkMode).labelKey),
@@ -209,7 +216,6 @@ export class WeatherComponent implements OnInit {
       ),
       make(
         'uvIndex',
-        'UV Index',
         'light_mode',
         `${hourData.uvIndex}`,
         this.translation.t(getWeatherLevelInfo('uvIndex', hourData.uvIndex, isDarkMode).labelKey),
@@ -218,7 +224,6 @@ export class WeatherComponent implements OnInit {
       ),
       make(
         'wind',
-        'Wind',
         'air',
         `${hourData.wind} km/h`,
         this.translation.t(getWeatherLevelInfo('wind', hourData.wind, isDarkMode).labelKey),
@@ -227,7 +232,6 @@ export class WeatherComponent implements OnInit {
       ),
       make(
         'pressure',
-        'Pressure',
         'compress',
         `${hourData.pressure} hPa`,
         this.translation.t(getWeatherLevelInfo('pressure', hourData.pressure, isDarkMode).labelKey),
