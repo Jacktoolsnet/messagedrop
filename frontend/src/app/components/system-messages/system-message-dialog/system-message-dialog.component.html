@@ -1,17 +1,19 @@
 <h2 mat-dialog-title>
   @if (selectedNotification(); as detail) {
   <div class="dialog-title">
-    <button mat-icon-button class="back-button" (click)="backToList()" aria-label="Back to system messages">
+    <button mat-icon-button class="back-button" (click)="backToList()"
+      [attr.aria-label]="'common.systemMessages.backAria' | transloco">
       <mat-icon>arrow_back</mat-icon>
     </button>
     <span class="dialog-title__text">{{ detail.title }}</span>
   </div>
   } @else {
   <div class="dialog-title">
-    <button mat-icon-button class="back-button" (click)="reloadNotifications()" aria-label="Back to system messages">
+    <button mat-icon-button class="back-button" (click)="reloadNotifications()"
+      [attr.aria-label]="'common.systemMessages.refreshAria' | transloco">
       <mat-icon>refresh</mat-icon>
     </button>
-    <span class="dialog-title__text">System messages</span>
+    <span class="dialog-title__text">{{ 'common.systemMessages.title' | transloco }}</span>
   </div>
   }
 </h2>
@@ -21,18 +23,19 @@
     @if (!selectedNotification()) {
     <div class="filter-group">
       <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="filter-toggle-group" exclusive
-        [value]="currentFilter()" (change)="handleFilterChange($event)" aria-label="Filter system messages">
+        [value]="currentFilter()" (change)="handleFilterChange($event)"
+        [attr.aria-label]="'common.systemMessages.filterAria' | transloco">
         <mat-button-toggle value="unread">
           <mat-icon>mark_email_unread</mat-icon>
-          <span>Unread</span>
+          <span>{{ 'common.systemMessages.filters.unread' | transloco }}</span>
         </mat-button-toggle>
         <mat-button-toggle value="read">
           <mat-icon>drafts</mat-icon>
-          <span>Read</span>
+          <span>{{ 'common.systemMessages.filters.read' | transloco }}</span>
         </mat-button-toggle>
         <mat-button-toggle value="all">
           <mat-icon>all_inbox</mat-icon>
-          <span>All</span>
+          <span>{{ 'common.systemMessages.filters.all' | transloco }}</span>
         </mat-button-toggle>
       </mat-button-toggle-group>
     </div>
@@ -46,64 +49,65 @@
     <div class="detail-view">
       <div class="detail-tile-grid">
         <div class="detail-tile detail-meta-item detail-meta-case">
-          <span class="detail-meta-item__label">Case ID</span>
+          <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.caseId' | transloco }}</span>
           <span class="detail-meta-item__value">
-            {{ detail.metadata?.dsa?.caseId ?? 'n/a' }}
+            {{ detail.metadata?.dsa?.caseId ?? ('common.systemMessages.notAvailable' | transloco) }}
           </span>
         </div>
         <div class="detail-tile detail-meta-item detail-meta-actions">
-          <span class="detail-meta-item__label">Actions</span>
-          <div class="detail-actions" role="group" aria-label="Case actions">
+          <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.actions' | transloco }}</span>
+          <div class="detail-actions" role="group" [attr.aria-label]="'common.systemMessages.caseActionsAria' | transloco">
             @if (detail.metadata?.dsa?.statusUrl) {
-            <button mat-icon-button color="primary" matTooltip="Open case details"
-              (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
+            <button mat-icon-button color="primary" [matTooltip]="'common.systemMessages.openCaseDetails' | transloco"
+              (click)="openStatusLink(detail.metadata?.dsa?.statusUrl, $event)"
+              [attr.aria-label]="'common.systemMessages.openCaseDetails' | transloco">
               <mat-icon>open_in_new</mat-icon>
             </button>
             }
             <button mat-icon-button color="accent"
-              [matTooltip]="detail.status === 'unread' ? 'Mark as read' : 'Mark as unread'"
+              [matTooltip]="(detail.status === 'unread' ? 'common.systemMessages.markAsRead' : 'common.systemMessages.markAsUnread') | transloco"
               (click)="detail.status === 'unread' ? markNotificationAsRead(detail, $event) : markNotificationAsUnread(detail, $event)"
-              aria-label="Toggle read state">
+              [attr.aria-label]="'common.systemMessages.toggleReadState' | transloco">
               <mat-icon>
                 {{ detail.status === 'unread' ? 'mark_email_read' : 'mark_email_unread' }}
               </mat-icon>
             </button>
-            <button mat-icon-button color="warn" matTooltip="Delete message" (click)="confirmDelete(detail, $event)"
-              aria-label="Delete message">
+            <button mat-icon-button color="warn" [matTooltip]="'common.systemMessages.deleteMessage' | transloco"
+              (click)="confirmDelete(detail, $event)" [attr.aria-label]="'common.systemMessages.deleteMessage' | transloco">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
         </div>
       </div>
       <div class="detail-tile detail-body">
-        <span class="detail-meta-item__label">Message</span>
+        <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.message' | transloco }}</span>
         <span class="detail-meta-item__value">{{ detail.body }}</span>
       </div>
 
       <div class="detail-tile-grid">
         @if (detail.metadata?.reasonText) {
         <div class="detail-tile detail-meta-item">
-          <span class="detail-meta-item__label">Reason</span>
+          <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.reason' | transloco }}</span>
           <span class="detail-meta-item__value">{{ detail.metadata?.reasonText }}</span>
         </div>
         }
         @if (detail.metadata?.category) {
         <div class="detail-tile detail-meta-item">
-          <span class="detail-meta-item__label">Category</span>
+          <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.category' | transloco }}</span>
           <span class="detail-meta-item__value">{{ detail.metadata?.category }}</span>
         </div>
         }
         @if (detail.metadata?.reportedContentType) {
         <div class="detail-tile detail-meta-item">
-          <span class="detail-meta-item__label">Content type</span>
+          <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.contentType' | transloco }}</span>
           <span class="detail-meta-item__value">{{ detail.metadata?.reportedContentType }}</span>
         </div>
         }
         <div class="detail-tile detail-meta-item detail-meta-status">
-          <span class="detail-meta-item__label">Status</span>
+          <span class="detail-meta-item__label">{{ 'common.systemMessages.detail.status' | transloco }}</span>
           <div class="detail-status-wrapper">
             <span class="detail-status detail-status-text" [class.unread-text]="detail.status === 'unread'">
-              {{ detail.status | titlecase }}
+              {{ ('common.systemMessages.status.' + detail.status) | transloco }}
             </span>
             <span class="detail-meta-item__note">{{ (detail.createdAt * 1000) | date : 'medium' }}</span>
           </div>
@@ -114,7 +118,7 @@
     <mat-nav-list class="notification-list">
       @if (notifications().length === 0 && !loading()) {
       <div class="empty-state">
-        No system messages in this view.
+        {{ 'common.systemMessages.empty' | transloco }}
       </div>
       } @else {
       @for (notification of notifications(); track trackByUuid($index, notification)) {
@@ -131,24 +135,28 @@
         </div>
         <div matListItemMeta class="notification-item__actions">
           @if (notification.metadata?.dsa?.statusUrl) {
-          <button mat-icon-button color="primary" matTooltip="Open case details"
-            (click)="openStatusLink(notification.metadata?.dsa?.statusUrl, $event)" aria-label="Open case details">
+          <button mat-icon-button color="primary" [matTooltip]="'common.systemMessages.openCaseDetails' | transloco"
+            (click)="openStatusLink(notification.metadata?.dsa?.statusUrl, $event)"
+            [attr.aria-label]="'common.systemMessages.openCaseDetails' | transloco">
             <mat-icon>open_in_new</mat-icon>
           </button>
           }
           @if (notification.status === 'unread') {
-          <button mat-icon-button color="accent" matTooltip="Mark as read"
-            (click)="markNotificationAsRead(notification, $event)" aria-label="Mark as read">
+          <button mat-icon-button color="accent" [matTooltip]="'common.systemMessages.markAsRead' | transloco"
+            (click)="markNotificationAsRead(notification, $event)"
+            [attr.aria-label]="'common.systemMessages.markAsRead' | transloco">
             <mat-icon>mark_email_read</mat-icon>
           </button>
           } @else {
-          <button mat-icon-button color="accent" matTooltip="Mark as unread"
-            (click)="markNotificationAsUnread(notification, $event)" aria-label="Mark as unread">
+          <button mat-icon-button color="accent" [matTooltip]="'common.systemMessages.markAsUnread' | transloco"
+            (click)="markNotificationAsUnread(notification, $event)"
+            [attr.aria-label]="'common.systemMessages.markAsUnread' | transloco">
             <mat-icon>mark_email_unread</mat-icon>
           </button>
           }
-          <button mat-icon-button color="warn" matTooltip="Delete message" (click)="confirmDelete(notification, $event)"
-            aria-label="Delete message">
+          <button mat-icon-button color="warn" [matTooltip]="'common.systemMessages.deleteMessage' | transloco"
+            (click)="confirmDelete(notification, $event)"
+            [attr.aria-label]="'common.systemMessages.deleteMessage' | transloco">
             <mat-icon>delete</mat-icon>
           </button>
         </div>
@@ -162,11 +170,12 @@
 
 <mat-dialog-actions align="end">
   @if (!selectedNotification()) {
-  <button mat-button color="warn" matTooltip="Delete all" (click)="confirmDeleteAll($event)" aria-label="Delete all"
+  <button mat-button color="warn" [matTooltip]="'common.systemMessages.deleteAll' | transloco"
+    (click)="confirmDeleteAll($event)" [attr.aria-label]="'common.systemMessages.deleteAll' | transloco"
     [disabled]="notifications().length === 0">
-    Delete all
+    {{ 'common.systemMessages.deleteAll' | transloco }}
     <mat-icon>delete_sweep</mat-icon>
   </button>
   }
-  <button mat-button (click)="close()">Close</button>
+  <button mat-button (click)="close()">{{ 'common.actions.close' | transloco }}</button>
 </mat-dialog-actions>

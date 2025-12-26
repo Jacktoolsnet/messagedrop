@@ -476,6 +476,51 @@
       "imageReadError": "Fehler beim Lesen der Datei.",
       "savePolicy": "Ort-ID, Ortsname (gehasht), die hinzugefügten Standorte und das Abonnement-Flag werden auf unserem Server gespeichert. Der lesbare Name und der Avatar werden auf deinem Gerät gespeichert."
     },
+    "sharedContent": {
+      "multimediaTitle": "Geteilter Multimedia-Inhalt empfangen",
+      "multimediaHint": "Diesen Inhalt zu einem Beitrag, einer Notiz oder einer Nachricht hinzufügen.",
+      "removeContent": "Geteilten Inhalt entfernen",
+      "locationTitle": "Geteilten Standort empfangen",
+      "locationHint": "Zur geteilten Position auf der Karte springen.",
+      "removeLocation": "Geteilten Standort entfernen"
+    },
+    "systemMessages": {
+      "title": "Systemnachrichten",
+      "backAria": "Zurück zu Systemnachrichten",
+      "refreshAria": "Systemnachrichten neu laden",
+      "filterAria": "Systemnachrichten filtern",
+      "caseActionsAria": "Aktionen zum Fall",
+      "openCaseDetails": "Falldetails öffnen",
+      "markAsRead": "Als gelesen markieren",
+      "markAsUnread": "Als ungelesen markieren",
+      "toggleReadState": "Lesestatus umschalten",
+      "deleteMessage": "Nachricht löschen",
+      "empty": "Keine Systemnachrichten in dieser Ansicht.",
+      "deleteAll": "Alle löschen",
+      "deleteTitle": "Systemnachricht löschen",
+      "deleteConfirm": "Möchtest du diese Systemnachricht wirklich dauerhaft löschen?",
+      "deleteAllTitle": "Systemnachrichten löschen",
+      "deleteAllConfirm": "Möchtest du wirklich alle gefilterten Systemnachrichten dauerhaft löschen?",
+      "notAvailable": "k. A.",
+      "filters": {
+        "unread": "Ungelesen",
+        "read": "Gelesen",
+        "all": "Alle"
+      },
+      "status": {
+        "unread": "Ungelesen",
+        "read": "Gelesen"
+      },
+      "detail": {
+        "caseId": "Fall-ID",
+        "actions": "Aktionen",
+        "message": "Nachricht",
+        "reason": "Begründung",
+        "category": "Kategorie",
+        "contentType": "Inhaltstyp",
+        "status": "Status"
+      }
+    },
     "legal": {
       "language": {
         "de": "Deutsch",

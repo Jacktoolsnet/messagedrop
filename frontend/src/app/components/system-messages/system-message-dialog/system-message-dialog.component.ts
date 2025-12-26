@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { SystemNotification, SystemNotificationFilter } from '../../../interfaces/system-notification';
 import { SystemNotificationService } from '../../../services/system-notification.service';
@@ -26,7 +27,8 @@ import { DeleteSystemNotificationComponent } from '../delete-system-notification
     MatIconModule,
     MatListModule,
     MatProgressBarModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslocoPipe
   ],
   templateUrl: './system-message-dialog.component.html',
   styleUrl: './system-message-dialog.component.css'

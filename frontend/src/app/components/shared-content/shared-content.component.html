@@ -1,22 +1,30 @@
 @if (multimedia) {
-<h2 mat-dialog-title>Shared multimedia content received</h2>
+<h2 mat-dialog-title>{{ 'common.sharedContent.multimediaTitle' | transloco }}</h2>
 <mat-dialog-content class="full-width">
     <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
-    <h4>Add this content to a post, note or message.</h4>
+    <h4>{{ 'common.sharedContent.multimediaHint' | transloco }}</h4>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">Close</button>
-    <button mat-button color="warn" (click)="deleteSharedContent()">Remove shared content</button>
+    <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">
+        {{ 'common.actions.close' | transloco }}
+    </button>
+    <button mat-button color="warn" (click)="deleteSharedContent()">
+        {{ 'common.sharedContent.removeContent' | transloco }}
+    </button>
 </mat-dialog-actions>
 }
 
 @else if (location) {
-<h2 mat-dialog-title>Shared location received</h2>
+<h2 mat-dialog-title>{{ 'common.sharedContent.locationTitle' | transloco }}</h2>
 <mat-dialog-content class="full-width">
-    <h4>Jumping to the shared location on the map.</h4>
+    <h4>{{ 'common.sharedContent.locationHint' | transloco }}</h4>
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">Close</button>
-    <button mat-button color="warn" (click)="deleteSharedLocation()">Remove shared location</button>
+    <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">
+        {{ 'common.actions.close' | transloco }}
+    </button>
+    <button mat-button color="warn" (click)="deleteSharedLocation()">
+        {{ 'common.sharedContent.removeLocation' | transloco }}
+    </button>
 </mat-dialog-actions>
 }

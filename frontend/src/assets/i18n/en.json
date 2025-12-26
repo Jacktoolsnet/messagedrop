@@ -476,6 +476,51 @@
       "imageReadError": "Error reading the file.",
       "savePolicy": "Place id, place name (hashed), the added locations, and the subscribed flag are saved on our server. The readable name and the avatar are saved on your device."
     },
+    "sharedContent": {
+      "multimediaTitle": "Shared multimedia content received",
+      "multimediaHint": "Add this content to a post, note, or message.",
+      "removeContent": "Remove shared content",
+      "locationTitle": "Shared location received",
+      "locationHint": "Jumping to the shared location on the map.",
+      "removeLocation": "Remove shared location"
+    },
+    "systemMessages": {
+      "title": "System messages",
+      "backAria": "Back to system messages",
+      "refreshAria": "Reload system messages",
+      "filterAria": "Filter system messages",
+      "caseActionsAria": "Case actions",
+      "openCaseDetails": "Open case details",
+      "markAsRead": "Mark as read",
+      "markAsUnread": "Mark as unread",
+      "toggleReadState": "Toggle read state",
+      "deleteMessage": "Delete message",
+      "empty": "No system messages in this view.",
+      "deleteAll": "Delete all",
+      "deleteTitle": "Delete system message",
+      "deleteConfirm": "Do you really want to permanently delete this system message?",
+      "deleteAllTitle": "Delete system messages",
+      "deleteAllConfirm": "Do you really want to permanently delete all filtered system messages?",
+      "notAvailable": "n/a",
+      "filters": {
+        "unread": "Unread",
+        "read": "Read",
+        "all": "All"
+      },
+      "status": {
+        "unread": "Unread",
+        "read": "Read"
+      },
+      "detail": {
+        "caseId": "Case ID",
+        "actions": "Actions",
+        "message": "Message",
+        "reason": "Reason",
+        "category": "Category",
+        "contentType": "Content type",
+        "status": "Status"
+      }
+    },
     "legal": {
       "language": {
         "de": "Deutsch",

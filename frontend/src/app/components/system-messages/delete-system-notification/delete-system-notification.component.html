@@ -1,8 +1,10 @@
-<h2 mat-dialog-title>Delete system message</h2>
+<h2 mat-dialog-title>{{ 'common.systemMessages.deleteTitle' | transloco }}</h2>
 <mat-dialog-content>
-  <p>Do you really want to permanently delete this system message?</p>
+  <p>{{ 'common.systemMessages.deleteConfirm' | transloco }}</p>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button [mat-dialog-close]="false">Cancel</button>
-  <button mat-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>Delete</button>
+  <button mat-button [mat-dialog-close]="false">{{ 'common.cancel' | transloco }}</button>
+  <button mat-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>
+    {{ 'common.actions.delete' | transloco }}
+  </button>
 </mat-dialog-actions>
