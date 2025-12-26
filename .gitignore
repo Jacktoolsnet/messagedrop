@@ -145,6 +145,9 @@ platform/admin/backend/keys
 
 # service-to-service trust bundle
 config/service-jwks.json
+backend/config/service-jwks.json
+platform/admin/backend/config/service-jwks.json
+services/*/config/service-jwks.json
 
 # admin backend uploads
 platform/admin/backend/uploads/

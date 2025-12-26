@@ -20,13 +20,23 @@ async function run() {
   }
 
   const outDir = path.join(process.cwd(), 'config');
-  if (!fs.existsSync(outDir)) {
-    fs.mkdirSync(outDir, { recursive: true });
-  }
+  const outputDirs = [
+    outDir,
+    path.join(process.cwd(), 'backend', 'config'),
+    path.join(process.cwd(), 'platform', 'admin', 'backend', 'config'),
+    path.join(process.cwd(), 'services', 'openMeteo', 'config'),
+    path.join(process.cwd(), 'services', 'nominatim', 'config'),
+    path.join(process.cwd(), 'services', 'socketio', 'config')
+  ];
 
-  const outPath = path.join(outDir, 'service-jwks.json');
-  fs.writeFileSync(outPath, JSON.stringify(jwks, null, 2));
-  console.log(`Wrote ${outPath}`);
+  for (const dir of outputDirs) {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true });
+    }
+    const outPath = path.join(dir, 'service-jwks.json');
+    fs.writeFileSync(outPath, JSON.stringify(jwks, null, 2));
+    console.log(`Wrote ${outPath}`);
+  }
 }
 
 run().catch((err) => {
