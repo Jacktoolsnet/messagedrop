@@ -159,6 +159,162 @@
         "policy": "This information is stored on our server and is visible to everyone."
       }
     },
+    "geoStatistic": {
+      "details": {
+        "title": "Location details",
+        "state": "State",
+        "county": "County",
+        "city": "City",
+        "suburb": "Suburb",
+        "neighbourhood": "Neighbourhood",
+        "flagAlt": "Flag",
+        "capital": "Capital",
+        "region": "Region",
+        "languages": "Languages",
+        "currencies": "Currencies",
+        "population": "Population",
+        "populationUnit": "people",
+        "area": "Area",
+        "areaUnit": "km²",
+        "density": "Density",
+        "densityUnit": "people/km²",
+        "googleMaps": "Google Maps"
+      },
+      "stats": {
+        "title": "Location statistics",
+        "categoryLabel": "Category",
+        "indicatorLabel": "Indicator",
+        "dataSources": "Data sources"
+      },
+      "categories": {
+        "economy": "Economy",
+        "social": "Social",
+        "climate": "Environment"
+      },
+      "axis": {
+        "years": "Years"
+      },
+      "units": {
+        "usd": "USD",
+        "usdPerPerson": "USD per person",
+        "percent": "%",
+        "people": "people",
+        "years": "years",
+        "kilotons": "kilotons",
+        "mwh": "MWh",
+        "micrograms": "µg/m³",
+        "kgOilEqPerCapita": "kg oil eq. per capita",
+        "celsius": "°C",
+        "mm": "mm"
+      },
+      "fallback": {
+        "label": "Unknown indicator",
+        "description": "No description available for this indicator.",
+        "tooltip": "Click to view details"
+      },
+      "indicators": {
+        "gdp": {
+          "label": "GDP (USD)",
+          "description": "Gross Domestic Product (GDP) represents the total value of all goods and services produced within a country.",
+          "tooltip": "Gross Domestic Product (GDP) in absolute USD over time."
+        },
+        "gdpPerCapita": {
+          "label": "GDP per Capita (USD)",
+          "description": "GDP per capita is the average economic output per person, calculated by dividing GDP by the total population.",
+          "tooltip": "GDP divided by total population (USD per person)."
+        },
+        "militaryExpenditure": {
+          "label": "Military Expenditure (USD)",
+          "description": "Total military spending in absolute terms, covering equipment, personnel, and operations.",
+          "tooltip": "Total military spending in USD over time."
+        },
+        "governmentSpending": {
+          "label": "Government Spending (USD)",
+          "description": "Total government expenditure in absolute values, including healthcare, education, defense, and infrastructure.",
+          "tooltip": "Total government expenditure in USD over time."
+        },
+        "inflation": {
+          "label": "Inflation (%)",
+          "description": "Annual percentage change in the average consumer price level, reflecting the cost of living.",
+          "tooltip": "Annual consumer price inflation rate (%)."
+        },
+        "unemployment": {
+          "label": "Unemployment (%)",
+          "description": "Percentage of the labor force that is unemployed and actively seeking work.",
+          "tooltip": "Percentage of the labor force unemployed (%)."
+        },
+        "investment": {
+          "label": "Investment (USD)",
+          "description": "Gross capital formation, representing investments in infrastructure, machinery, and other assets.",
+          "tooltip": "Gross capital formation in USD over time."
+        },
+        "lifeExpectancy": {
+          "label": "Life Expectancy (years)",
+          "description": "The average number of years a person is expected to live at birth.",
+          "tooltip": "Average expected lifespan at birth (years)."
+        },
+        "povertyRate": {
+          "label": "Poverty (absolute number)",
+          "description": "Total number of people living below the international poverty line.",
+          "tooltip": "Number of people living below the poverty line."
+        },
+        "literacyRate": {
+          "label": "Literacy Rate (%)",
+          "description": "Percentage of adults (15 years and older) who can read and write.",
+          "tooltip": "Adult literacy rate (% of population aged 15 and above)."
+        },
+        "primaryEnrollment": {
+          "label": "Primary Enrollment (%)",
+          "description": "Percentage of children of official primary school age enrolled in school.",
+          "tooltip": "Primary school enrollment rate (% of eligible children)."
+        },
+        "secondaryEnrollment": {
+          "label": "Secondary Enrollment (%)",
+          "description": "Percentage of youth of official secondary school age enrolled in secondary education.",
+          "tooltip": "Secondary school enrollment rate (% of eligible youth)."
+        },
+        "giniIndex": {
+          "label": "Gini Index",
+          "description": "A measure of income inequality where 0 indicates perfect equality and 100 indicates maximal inequality.",
+          "tooltip": "Gini Index measuring income inequality (0 = equality, 100 = inequality)."
+        },
+        "co2Emissions": {
+          "label": "CO₂ Emissions (kilotons)",
+          "description": "Total annual CO₂ emissions measured in kilotons, reflecting the environmental impact.",
+          "tooltip": "Total CO₂ emissions in kilotons per year."
+        },
+        "renewableEnergy": {
+          "label": "Renewable Energy (absolute)",
+          "description": "Absolute amount of renewable energy used, including wind, solar, and hydroelectric sources.",
+          "tooltip": "Absolute amount of renewable energy used."
+        },
+        "forestArea": {
+          "label": "Forest Area (%)",
+          "description": "Percentage of total land area covered by forests.",
+          "tooltip": "Percentage of land area covered by forests (%)."
+        },
+        "airPollution": {
+          "label": "Air Pollution (PM2.5 µg/m³)",
+          "description": "Average concentration of fine particulate matter (PM2.5) in micrograms per cubic meter.",
+          "tooltip": "Average PM2.5 air pollution concentration (µg/m³)."
+        },
+        "energyUse": {
+          "label": "Energy Use (kg oil equivalent per capita)",
+          "description": "Average energy consumption per person, measured in kilograms of oil equivalent.",
+          "tooltip": "Energy use per capita (kg of oil equivalent)."
+        },
+        "temperatureTrend": {
+          "label": "Temperature Trend (°C)",
+          "description": "Average annual temperature trends over time in degrees Celsius.",
+          "tooltip": "Historical yearly average temperatures (°C)."
+        },
+        "precipitationTrend": {
+          "label": "Precipitation Trend (mm)",
+          "description": "Total annual precipitation sums over time, measured in millimeters.",
+          "tooltip": "Historical yearly total precipitation (mm)."
+        }
+      }
+    },
     "message": {
       "title": "Message service",
       "addText": "Add a text",
@@ -185,6 +341,29 @@
     "note": {
       "addText": "Add a text",
       "policy": "This information is stored on your device and is only visible to you."
+    },
+    "images": {
+      "addFirst": "Add first private image",
+      "addAria": "Add image",
+      "notFound": "Image not found on device",
+      "deleteAria": "Delete image",
+      "flyToAria": "Fly to image",
+      "navigateAria": "Navigate to image location",
+      "filePickerUnsupported": "File picker is not supported in this browser.",
+      "importSuccess": "Image(s) imported locally.",
+      "importFailed": "Unable to import the image.",
+      "delete": {
+        "title": "Remove image",
+        "confirm": "The image will be permanently removed from the map. Are you sure?"
+      },
+      "exif": {
+        "previewAlt": "Image preview",
+        "title": "Choose location",
+        "body": "This photo has EXIF coordinates. Replace with the current map location?",
+        "remember": "Remember this choice for all images in this import",
+        "keep": "Keep EXIF",
+        "useMap": "Use map location"
+      }
     },
     "server": {
       "connectingTitle": "Connecting",

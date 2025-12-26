@@ -10,6 +10,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { BoundingBox } from '../../interfaces/bounding-box';
@@ -21,6 +22,7 @@ import { IndexedDbService } from '../../services/indexed-db.service';
 import { LocalImageService } from '../../services/local-image.service';
 import { MapService } from '../../services/map.service';
 import { SharedContentService } from '../../services/shared-content.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
@@ -45,7 +47,8 @@ interface ImageDialogData {
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MasonryItemDirective
+    MasonryItemDirective,
+    TranslocoPipe
   ],
   templateUrl: './imagelist.component.html',
   styleUrl: './imagelist.component.css',
@@ -60,6 +63,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly sharedContentService = inject(SharedContentService);
+  private readonly translation = inject(TranslationHelperService);
   public readonly dialogRef = inject(MatDialogRef<ImagelistComponent>);
   public readonly dialog = inject(MatDialog);
 
@@ -165,7 +169,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
 
   async openAddImageDialog(): Promise<void> {
     if (!this.localImageService.isSupported()) {
-      this.snackBar.open('File picker is not supported in this browser.', undefined, { duration: 4000 });
+      this.snackBar.open(this.translation.t('common.images.filePickerUnsupported'), undefined, { duration: 4000 });
       return;
     }
 
@@ -183,10 +187,10 @@ export class ImagelistComponent implements OnInit, OnDestroy {
       const updatedImages = [...resolvedEntries, ...this.imagesSignal()];
       this.imagesSignal.set(updatedImages);
 
-      this.snackBar.open('Image(s) imported locally.', undefined, { duration: 3000 });
+      this.snackBar.open(this.translation.t('common.images.importSuccess'), undefined, { duration: 3000 });
     } catch (error) {
       console.error('Failed to add image', error);
-      this.snackBar.open('Unable to import the image.', undefined, { duration: 4000 });
+      this.snackBar.open(this.translation.t('common.images.importFailed'), undefined, { duration: 4000 });
     }
   }
 

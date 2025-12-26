@@ -1,8 +1,12 @@
-<h2 mat-dialog-title>Remove image</h2>
+<h2 mat-dialog-title>{{ 'common.images.delete.title' | transloco }}</h2>
 <mat-dialog-content>
-  The image will be permanently removed from the map. Are you sure?
+  {{ 'common.images.delete.confirm' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">Abort</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">Yes</button>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">
+    {{ 'common.actions.abort' | transloco }}
+  </button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="true">
+    {{ 'common.actions.yes' | transloco }}
+  </button>
 </mat-dialog-actions>

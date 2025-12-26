@@ -159,6 +159,162 @@
         "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar."
       }
     },
+    "geoStatistic": {
+      "details": {
+        "title": "Standortdetails",
+        "state": "Bundesland",
+        "county": "Landkreis",
+        "city": "Stadt",
+        "suburb": "Stadtteil",
+        "neighbourhood": "Nachbarschaft",
+        "flagAlt": "Flagge",
+        "capital": "Hauptstadt",
+        "region": "Region",
+        "languages": "Sprachen",
+        "currencies": "Währungen",
+        "population": "Bevölkerung",
+        "populationUnit": "Personen",
+        "area": "Fläche",
+        "areaUnit": "km²",
+        "density": "Dichte",
+        "densityUnit": "Personen/km²",
+        "googleMaps": "Google Maps"
+      },
+      "stats": {
+        "title": "Standortstatistik",
+        "categoryLabel": "Kategorie",
+        "indicatorLabel": "Indikator",
+        "dataSources": "Datenquellen"
+      },
+      "categories": {
+        "economy": "Wirtschaft",
+        "social": "Soziales",
+        "climate": "Umwelt"
+      },
+      "axis": {
+        "years": "Jahre"
+      },
+      "units": {
+        "usd": "USD",
+        "usdPerPerson": "USD pro Person",
+        "percent": "%",
+        "people": "Personen",
+        "years": "Jahre",
+        "kilotons": "Kilotonnen",
+        "mwh": "MWh",
+        "micrograms": "µg/m³",
+        "kgOilEqPerCapita": "kg Öläquivalent pro Kopf",
+        "celsius": "°C",
+        "mm": "mm"
+      },
+      "fallback": {
+        "label": "Unbekannter Indikator",
+        "description": "Keine Beschreibung für diesen Indikator verfügbar.",
+        "tooltip": "Zum Anzeigen der Details klicken"
+      },
+      "indicators": {
+        "gdp": {
+          "label": "BIP (USD)",
+          "description": "Das Bruttoinlandsprodukt (BIP) ist der Gesamtwert aller innerhalb eines Landes produzierten Güter und Dienstleistungen.",
+          "tooltip": "Bruttoinlandsprodukt (BIP) in absoluten USD im Zeitverlauf."
+        },
+        "gdpPerCapita": {
+          "label": "BIP pro Kopf (USD)",
+          "description": "BIP pro Kopf ist die durchschnittliche Wirtschaftsleistung pro Person, berechnet als BIP geteilt durch die Gesamtbevölkerung.",
+          "tooltip": "BIP geteilt durch die Gesamtbevölkerung (USD pro Person)."
+        },
+        "militaryExpenditure": {
+          "label": "Militärausgaben (USD)",
+          "description": "Gesamte Militärausgaben in absoluten Zahlen, einschließlich Ausrüstung, Personal und Betrieb.",
+          "tooltip": "Gesamte Militärausgaben in USD im Zeitverlauf."
+        },
+        "governmentSpending": {
+          "label": "Staatsausgaben (USD)",
+          "description": "Gesamte Staatsausgaben in absoluten Werten, einschließlich Gesundheit, Bildung, Verteidigung und Infrastruktur.",
+          "tooltip": "Gesamte Staatsausgaben in USD im Zeitverlauf."
+        },
+        "inflation": {
+          "label": "Inflation (%)",
+          "description": "Jährliche prozentuale Veränderung des durchschnittlichen Verbraucherpreisniveaus und damit der Lebenshaltungskosten.",
+          "tooltip": "Jährliche Verbraucherpreisinflationsrate (%)."
+        },
+        "unemployment": {
+          "label": "Arbeitslosigkeit (%)",
+          "description": "Anteil der Erwerbsbevölkerung, der arbeitslos ist und aktiv Arbeit sucht.",
+          "tooltip": "Anteil der Erwerbsbevölkerung arbeitslos (%)."
+        },
+        "investment": {
+          "label": "Investitionen (USD)",
+          "description": "Bruttoanlageinvestitionen, also Investitionen in Infrastruktur, Maschinen und andere Vermögenswerte.",
+          "tooltip": "Bruttoanlageinvestitionen in USD im Zeitverlauf."
+        },
+        "lifeExpectancy": {
+          "label": "Lebenserwartung (Jahre)",
+          "description": "Durchschnittliche Anzahl der Jahre, die eine Person bei Geburt voraussichtlich lebt.",
+          "tooltip": "Durchschnittliche Lebenserwartung bei Geburt (Jahre)."
+        },
+        "povertyRate": {
+          "label": "Armut (absolute Zahl)",
+          "description": "Gesamtzahl der Menschen unterhalb der internationalen Armutsgrenze.",
+          "tooltip": "Anzahl der Menschen unter der Armutsgrenze."
+        },
+        "literacyRate": {
+          "label": "Alphabetisierungsrate (%)",
+          "description": "Anteil der Erwachsenen (ab 15 Jahren), die lesen und schreiben können.",
+          "tooltip": "Alphabetisierungsrate der Erwachsenen (% der Bevölkerung ab 15 Jahren)."
+        },
+        "primaryEnrollment": {
+          "label": "Grundschul-Einschulungsrate (%)",
+          "description": "Anteil der Kinder im offiziellen Grundschulalter, die eingeschult sind.",
+          "tooltip": "Grundschul-Einschulungsrate (% der schulpflichtigen Kinder)."
+        },
+        "secondaryEnrollment": {
+          "label": "Sekundarschul-Einschulungsrate (%)",
+          "description": "Anteil der Jugendlichen im offiziellen Sekundarschulalter, die eine Sekundarschule besuchen.",
+          "tooltip": "Sekundarschul-Einschulungsrate (% der schulpflichtigen Jugendlichen)."
+        },
+        "giniIndex": {
+          "label": "Gini-Index",
+          "description": "Maß für Einkommensungleichheit: 0 bedeutet völlige Gleichheit, 100 maximale Ungleichheit.",
+          "tooltip": "Gini-Index zur Einkommensungleichheit (0 = Gleichheit, 100 = Ungleichheit)."
+        },
+        "co2Emissions": {
+          "label": "CO₂-Emissionen (Kilotonnen)",
+          "description": "Jährliche CO₂-Gesamtemissionen in Kilotonnen, als Maß für die Umweltbelastung.",
+          "tooltip": "Gesamte CO₂-Emissionen in Kilotonnen pro Jahr."
+        },
+        "renewableEnergy": {
+          "label": "Erneuerbare Energie (absolut)",
+          "description": "Absolute Menge genutzter erneuerbarer Energie, einschließlich Wind, Solar und Wasserkraft.",
+          "tooltip": "Absolute Menge genutzter erneuerbarer Energie."
+        },
+        "forestArea": {
+          "label": "Waldfläche (%)",
+          "description": "Anteil der gesamten Landfläche, die von Wald bedeckt ist.",
+          "tooltip": "Anteil der Landfläche, die von Wald bedeckt ist (%)."
+        },
+        "airPollution": {
+          "label": "Luftverschmutzung (PM2.5 µg/m³)",
+          "description": "Durchschnittliche Konzentration von Feinstaub (PM2.5) in Mikrogramm pro Kubikmeter.",
+          "tooltip": "Durchschnittliche PM2.5-Konzentration (µg/m³)."
+        },
+        "energyUse": {
+          "label": "Energieverbrauch (kg Öläquivalent pro Kopf)",
+          "description": "Durchschnittlicher Energieverbrauch pro Person, gemessen in Kilogramm Öläquivalent.",
+          "tooltip": "Energieverbrauch pro Kopf (kg Öläquivalent)."
+        },
+        "temperatureTrend": {
+          "label": "Temperaturtrend (°C)",
+          "description": "Durchschnittliche jährliche Temperaturtrends im Zeitverlauf in Grad Celsius.",
+          "tooltip": "Historische jährliche Durchschnittstemperaturen (°C)."
+        },
+        "precipitationTrend": {
+          "label": "Niederschlagstrend (mm)",
+          "description": "Jährliche Gesamtniederschläge im Zeitverlauf, gemessen in Millimetern.",
+          "tooltip": "Historische jährliche Gesamtniederschläge (mm)."
+        }
+      }
+    },
     "message": {
       "title": "Nachrichten-Service",
       "addText": "Text hinzufügen",
@@ -185,6 +341,29 @@
     "note": {
       "addText": "Text hinzufügen",
       "policy": "Diese Information wird auf deinem Gerät gespeichert und ist nur für dich sichtbar."
+    },
+    "images": {
+      "addFirst": "Erstes privates Bild hinzufügen",
+      "addAria": "Bild hinzufügen",
+      "notFound": "Bild auf dem Gerät nicht gefunden",
+      "deleteAria": "Bild löschen",
+      "flyToAria": "Zur Bildposition springen",
+      "navigateAria": "Zur Bildposition navigieren",
+      "filePickerUnsupported": "Dateiauswahl wird in diesem Browser nicht unterstützt.",
+      "importSuccess": "Bild(er) wurden lokal importiert.",
+      "importFailed": "Bild konnte nicht importiert werden.",
+      "delete": {
+        "title": "Bild entfernen",
+        "confirm": "Das Bild wird dauerhaft von der Karte entfernt. Bist du sicher?"
+      },
+      "exif": {
+        "previewAlt": "Bildvorschau",
+        "title": "Ort auswählen",
+        "body": "Dieses Foto enthält EXIF-Koordinaten. Mit der aktuellen Kartenposition ersetzen?",
+        "remember": "Diese Auswahl für alle Bilder in diesem Import merken",
+        "keep": "EXIF behalten",
+        "useMap": "Kartenposition verwenden"
+      }
     },
     "server": {
       "connectingTitle": "Verbinden",

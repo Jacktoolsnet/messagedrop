@@ -8,7 +8,7 @@
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
             (click)="!userService.isReady() ? userService.login(openAddImageDialog.bind(this)) : openAddImageDialog()">
-            <span>Add first private image</span>
+            <span>{{ 'common.images.addFirst' | transloco }}</span>
         </button>
     </div>
     } @else {
@@ -17,8 +17,8 @@
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
-            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
-                (click)="openAddImageDialog()">
+            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
+                [attr.aria-label]="'common.images.addAria' | transloco" (click)="openAddImageDialog()">
                 <mat-icon [attr.aria-hidden]="false">image_search</mat-icon>
             </button>
         </div>
@@ -30,7 +30,7 @@
                     @if (getImageUrl(image.id) === 'NOT_FOUND') {
                     <div class="missing">
                         <mat-icon aria-hidden="true">broken_image</mat-icon>
-                        <div>Image not found on device</div>
+                        <div>{{ 'common.images.notFound' | transloco }}</div>
                     </div>
                     } @else {
                     <img [src]="getImageUrl(image.id)" [alt]="image.fileName" class="image-preview" />
@@ -39,13 +39,15 @@
             </mat-card-content>
             <mat-card-actions class="buttonbar">
                 @if (userService.isReady()) {
-                <button mat-mini-fab color="secondary" aria-label="Delete image" (click)="deleteImage(image)">
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.deleteAria' | transloco"
+                    (click)="deleteImage(image)">
                     <mat-icon>delete_forever</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Fly to image" (click)="flyTo(image)">
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.flyToAria' | transloco"
+                    (click)="flyTo(image)">
                     <mat-icon>place</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.navigateAria' | transloco"
                     (click)="navigateToNoteLocation(image)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>

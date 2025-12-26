@@ -6,6 +6,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIconModule } from '@angular/material/icon';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import {
   CategoryScale, Chart, ChartConfiguration, ChartType,
   Filler,
@@ -13,9 +14,10 @@ import {
 } from 'chart.js';
 import { debounceTime, fromEvent, Subscription } from 'rxjs';
 import { GeoStatistic } from '../../interfaces/geo-statistic';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 type WorldBankKey = keyof GeoStatistic['worldBank'];
 type IndicatorCategory = 'economy' | 'social' | 'climate';
-interface IndicatorDefinition { key: string; label: string }
+interface IndicatorDefinition { key: string }
 interface CategoryColor { border: string; background: string; point: string }
 
 @Component({
@@ -29,7 +31,8 @@ interface CategoryColor { border: string; background: string; point: string }
     MatTooltipModule,
     MatExpansionModule,
     MatButtonModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslocoPipe
   ],
   templateUrl: './geo-statistic.component.html',
   styleUrl: './geo-statistic.component.css'
@@ -41,48 +44,51 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
   @ViewChild('dialogContent', { static: true }) dialogContentRef!: ElementRef;
   private resizeObserver?: ResizeObserver;
   private windowResizeSub?: Subscription;
+  private langChangeSub?: Subscription;
 
   private readonly dialogData = inject<{ geoStatistic: GeoStatistic }>(MAT_DIALOG_DATA);
   readonly geoStatistic = this.dialogData.geoStatistic;
+  private readonly translation = inject(TranslationHelperService);
+  private readonly transloco = inject(TranslocoService);
 
   selectedCategory: IndicatorCategory = 'economy';
   selectedIndicator: IndicatorDefinition | null = null;
   currentIndicatorDescription = '';
   public isSmallScreen = false;
 
-  readonly categories: readonly { value: IndicatorCategory; label: string }[] = [
-    { value: 'economy', label: 'Economy' },
-    { value: 'social', label: 'Social' },
-    { value: 'climate', label: 'Environment' }
+  readonly categories: readonly { value: IndicatorCategory; labelKey: string }[] = [
+    { value: 'economy', labelKey: 'common.geoStatistic.categories.economy' },
+    { value: 'social', labelKey: 'common.geoStatistic.categories.social' },
+    { value: 'climate', labelKey: 'common.geoStatistic.categories.climate' }
   ] as const;
 
   // Original complete map
   private readonly fullIndicatorMap: Record<IndicatorCategory, IndicatorDefinition[]> = {
     economy: [
-      { key: 'gdp', label: 'GDP (USD)' },
-      { key: 'gdpPerCapita', label: 'GDP per Capita (USD)' },
-      { key: 'militaryExpenditure', label: 'Military Expenditure (USD)' },
-      { key: 'governmentSpending', label: 'Government Spending (USD)' },
-      { key: 'inflation', label: 'Inflation (%)' },
-      { key: 'unemployment', label: 'Unemployment (%)' },
-      { key: 'investment', label: 'Investment (USD)' }
+      { key: 'gdp' },
+      { key: 'gdpPerCapita' },
+      { key: 'militaryExpenditure' },
+      { key: 'governmentSpending' },
+      { key: 'inflation' },
+      { key: 'unemployment' },
+      { key: 'investment' }
     ],
     social: [
-      { key: 'lifeExpectancy', label: 'Life Expectancy (years)' },
-      { key: 'povertyRate', label: 'Poverty (absolute number)' },
-      { key: 'literacyRate', label: 'Literacy Rate (%)' },
-      { key: 'primaryEnrollment', label: 'Primary Enrollment (%)' },
-      { key: 'secondaryEnrollment', label: 'Secondary Enrollment (%)' },
-      { key: 'giniIndex', label: 'Gini Index' }
+      { key: 'lifeExpectancy' },
+      { key: 'povertyRate' },
+      { key: 'literacyRate' },
+      { key: 'primaryEnrollment' },
+      { key: 'secondaryEnrollment' },
+      { key: 'giniIndex' }
     ],
     climate: [
-      { key: 'co2Emissions', label: 'CO₂ Emissions (kilotons)' },
-      { key: 'renewableEnergy', label: 'Renewable Energy (absolute)' },
-      { key: 'forestArea', label: 'Forest Area (%)' },
-      { key: 'airPollution', label: 'Air Pollution (PM2.5 µg/m³)' },
-      { key: 'energyUse', label: 'Energy Use (kg oil equivalent per capita)' },
-      { key: 'temperatureTrend', label: 'Temperature Trend (°C)' },
-      { key: 'precipitationTrend', label: 'Precipitation Trend (mm)' }
+      { key: 'co2Emissions' },
+      { key: 'renewableEnergy' },
+      { key: 'forestArea' },
+      { key: 'airPollution' },
+      { key: 'energyUse' },
+      { key: 'temperatureTrend' },
+      { key: 'precipitationTrend' }
     ]
   };
 
@@ -105,26 +111,26 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
   };
 
   private readonly indicatorUnits: Record<string, string> = {
-    gdp: 'USD',
-    gdpPerCapita: 'USD per person',
-    militaryExpenditure: 'USD',
-    governmentSpending: 'USD',
-    inflation: '%',
-    unemployment: '%',
-    investment: 'USD',
-    lifeExpectancy: 'years',
-    povertyRate: 'people',
-    literacyRate: '%',
-    primaryEnrollment: '%',
-    secondaryEnrollment: '%',
-    giniIndex: '',  // kein direktes Einheitssuffix
-    co2Emissions: 'kilotons',
-    renewableEnergy: 'MWh',
-    forestArea: '%',
-    airPollution: 'µg/m³',
-    energyUse: 'kg oil eq. per capita',
-    temperatureTrend: '°C',
-    precipitationTrend: 'mm'
+    gdp: 'common.geoStatistic.units.usd',
+    gdpPerCapita: 'common.geoStatistic.units.usdPerPerson',
+    militaryExpenditure: 'common.geoStatistic.units.usd',
+    governmentSpending: 'common.geoStatistic.units.usd',
+    inflation: 'common.geoStatistic.units.percent',
+    unemployment: 'common.geoStatistic.units.percent',
+    investment: 'common.geoStatistic.units.usd',
+    lifeExpectancy: 'common.geoStatistic.units.years',
+    povertyRate: 'common.geoStatistic.units.people',
+    literacyRate: 'common.geoStatistic.units.percent',
+    primaryEnrollment: 'common.geoStatistic.units.percent',
+    secondaryEnrollment: 'common.geoStatistic.units.percent',
+    giniIndex: '',
+    co2Emissions: 'common.geoStatistic.units.kilotons',
+    renewableEnergy: 'common.geoStatistic.units.mwh',
+    forestArea: 'common.geoStatistic.units.percent',
+    airPollution: 'common.geoStatistic.units.micrograms',
+    energyUse: 'common.geoStatistic.units.kgOilEqPerCapita',
+    temperatureTrend: 'common.geoStatistic.units.celsius',
+    precipitationTrend: 'common.geoStatistic.units.mm'
   };
 
   // Filtered map (only those with available data)
@@ -173,11 +179,20 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
         this.checkScreenSize();
         this.updateChartSize();
       });
+
+    this.langChangeSub = this.transloco.langChanges$.subscribe(() => {
+      if (this.selectedIndicator) {
+        this.setChartOptionsForIndicator(this.selectedIndicator.key);
+        this.updateChartLabel(this.selectedIndicator.key);
+        this.chart?.update();
+      }
+    });
   }
 
   ngOnDestroy(): void {
     this.resizeObserver?.disconnect();
     this.windowResizeSub?.unsubscribe();
+    this.langChangeSub?.unsubscribe();
   }
 
   private updateChartSize() {
@@ -213,11 +228,12 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
   }
 
   setChartOptionsForIndicator(indicatorKey: string) {
-    const unit = this.indicatorUnits[indicatorKey] ?? '';
+    const unitKey = this.indicatorUnits[indicatorKey];
+    const unit = unitKey ? this.translation.t(unitKey) : '';
     const locale = navigator.language;
     const allIndicators = Object.values(this.fullIndicatorMap).flat();
     const indicator = allIndicators.find(i => i.key === indicatorKey);
-    const label = indicator ? indicator.label : indicatorKey;
+    const label = indicator ? this.getIndicatorLabel(indicator.key) : indicatorKey;
     const description = this.getIndicatorDescription(indicatorKey);
     const canvasWidth = this.chart?.width || 300;
     const isSmallScreen = window.innerWidth < 500 || canvasWidth < 300;
@@ -306,7 +322,7 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
           grid: { color: '#444' },
           title: {
             display: true,
-            text: 'Years',
+            text: this.translation.t('common.geoStatistic.axis.years'),
             color: '#ccc'
           }
         }
@@ -328,30 +344,8 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
   }
 
   getIndicatorDescription(key: string): string {
-    const descriptions: Record<string, string> = {
-      gdp: 'Gross Domestic Product (GDP) represents the total value of all goods and services produced within a country.',
-      gdpPerCapita: 'GDP per capita is the average economic output per person, calculated by dividing GDP by the total population.',
-      militaryExpenditure: 'Total military spending in absolute terms, covering equipment, personnel, and operations.',
-      governmentSpending: 'Total government expenditure in absolute values, including healthcare, education, defense, and infrastructure.',
-      inflation: 'Annual percentage change in the average consumer price level, reflecting the cost of living.',
-      unemployment: 'Percentage of the labor force that is unemployed and actively seeking work.',
-      investment: 'Gross capital formation, representing investments in infrastructure, machinery, and other assets.',
-      lifeExpectancy: 'The average number of years a person is expected to live at birth.',
-      povertyRate: 'Total number of people living below the international poverty line.',
-      literacyRate: 'Percentage of adults (15 years and older) who can read and write.',
-      primaryEnrollment: 'Percentage of children of official primary school age enrolled in school.',
-      secondaryEnrollment: 'Percentage of youth of official secondary school age enrolled in secondary education.',
-      giniIndex: 'A measure of income inequality where 0 indicates perfect equality and 100 indicates maximal inequality.',
-      co2Emissions: 'Total annual CO₂ emissions measured in kilotons, reflecting the environmental impact.',
-      renewableEnergy: 'Absolute amount of renewable energy used, including wind, solar, and hydroelectric sources.',
-      forestArea: 'Percentage of total land area covered by forests.',
-      airPollution: 'Average concentration of fine particulate matter (PM2.5) in micrograms per cubic meter.',
-      energyUse: 'Average energy consumption per person, measured in kilograms of oil equivalent.',
-      temperatureTrend: 'Average annual temperature trends over time in degrees Celsius.',
-      precipitationTrend: 'Total annual precipitation sums over time, measured in millimeters.'
-    };
-
-    return descriptions[key] || 'No description available for this indicator.';
+    const translationKey = `common.geoStatistic.indicators.${key}.description`;
+    return this.translateOrFallback(translationKey, 'common.geoStatistic.fallback.description');
   }
 
   getWrappedTextByWidth(text: string, canvasWidth: number, fontSize = 12): string[] {
@@ -375,29 +369,28 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
   }
 
   getTooltipText(key: string): string {
-    const tooltips: Record<string, string> = {
-      gdp: 'Gross Domestic Product (GDP) in absolute USD over time.',
-      gdpPerCapita: 'GDP divided by total population (USD per person).',
-      militaryExpenditure: 'Total military spending in USD over time.',
-      governmentSpending: 'Total government expenditure in USD over time.',
-      inflation: 'Annual consumer price inflation rate (%).',
-      unemployment: 'Percentage of the labor force unemployed (%).',
-      investment: 'Gross capital formation in USD over time.',
-      lifeExpectancy: 'Average expected lifespan at birth (years).',
-      povertyRate: 'Number of people living below the poverty line.',
-      literacyRate: 'Adult literacy rate (% of population aged 15 and above).',
-      primaryEnrollment: 'Primary school enrollment rate (% of eligible children).',
-      secondaryEnrollment: 'Secondary school enrollment rate (% of eligible youth).',
-      giniIndex: 'Gini Index measuring income inequality (0 = equality, 100 = inequality).',
-      co2Emissions: 'Total CO₂ emissions in kilotons per year.',
-      renewableEnergy: 'Absolute amount of renewable energy used.',
-      forestArea: 'Percentage of land area covered by forests (%).',
-      airPollution: 'Average PM2.5 air pollution concentration (µg/m³).',
-      energyUse: 'Energy use per capita (kg of oil equivalent).',
-      temperatureTrend: 'Historical yearly average temperatures (°C).',
-      precipitationTrend: 'Historical yearly total precipitation (mm).'
+    const translationKey = `common.geoStatistic.indicators.${key}.tooltip`;
+    return this.translateOrFallback(translationKey, 'common.geoStatistic.fallback.tooltip');
+  }
+
+  getIndicatorLabel(key: string): string {
+    const translationKey = `common.geoStatistic.indicators.${key}.label`;
+    return this.translateOrFallback(translationKey, 'common.geoStatistic.fallback.label');
+  }
+
+  private translateOrFallback(key: string, fallbackKey: string): string {
+    const value = this.translation.t(key);
+    return value === key ? this.translation.t(fallbackKey) : value;
+  }
+
+  private updateChartLabel(indicatorKey: string): void {
+    this.chartData = {
+      ...this.chartData,
+      datasets: (this.chartData.datasets ?? []).map(dataset => ({
+        ...dataset,
+        label: this.getIndicatorLabel(indicatorKey)
+      }))
     };
-    return tooltips[key] || 'Click to view details';
   }
 
   onCategoryChange(newCategory: string) {
@@ -406,7 +399,7 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
     this.chartData = { labels: [], datasets: [] };  // Chart leeren
   }
 
-  onIndicatorSelect(indicator: { key: string; label: string }) {
+  onIndicatorSelect(indicator: { key: string }) {
     this.selectedIndicator = indicator;
     this.setChartOptionsForIndicator(indicator.key);
 
@@ -425,7 +418,7 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
         labels,
         datasets: [{
           data,
-          label: indicator.label,
+          label: this.getIndicatorLabel(indicator.key),
           borderColor: indicator.key === 'temperatureTrend' ? '#FF5722' : '#2196F3',
           backgroundColor: indicator.key === 'temperatureTrend' ? 'rgba(255, 87, 34, 0.3)' : 'rgba(33, 150, 243, 0.3)',
           pointBackgroundColor: indicator.key === 'temperatureTrend' ? '#FF5722' : '#2196F3',
@@ -446,7 +439,7 @@ export class GeoStatisticComponent implements AfterViewInit, OnDestroy {
         labels,
         datasets: [{
           data,
-          label: indicator.label,
+          label: this.getIndicatorLabel(indicator.key),
           borderColor: colors.border,
           backgroundColor: colors.background,
           pointBackgroundColor: colors.point,
