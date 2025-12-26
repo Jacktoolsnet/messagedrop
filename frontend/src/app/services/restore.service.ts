@@ -14,6 +14,7 @@ import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
@@ -40,6 +41,7 @@ export class RestoreService {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly networkService = inject(NetworkService);
   private readonly backupState = inject(BackupStateService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -86,7 +88,7 @@ export class RestoreService {
       }
 
       if (payload.schemaVersion !== 1 || payload.server.schemaVersion !== 1) {
-        this.snackBar.open('This backup version is not supported.', undefined, {
+        this.snackBar.open(this.i18n.t('common.restore.versionUnsupported'), undefined, {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -95,7 +97,7 @@ export class RestoreService {
       }
 
       if (!payload.server || !payload.indexedDb) {
-        this.snackBar.open('Backup file is missing data.', undefined, {
+        this.snackBar.open(this.i18n.t('common.restore.missingData'), undefined, {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -122,14 +124,14 @@ export class RestoreService {
 
       this.backupState.clearDirty();
       this.userService.logout();
-      this.snackBar.open('Restore completed. Please log in with your PIN.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.completed'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
       });
     } catch (error) {
       console.error('Restore failed', error);
-      this.snackBar.open('Restore failed. Please try again.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.failed'), undefined, {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -148,7 +150,7 @@ export class RestoreService {
           excludeAcceptAllOption: true,
           types: [
             {
-              description: 'MessageDrop Backup',
+              description: this.i18n.t('common.backup.fileTypeDescription'),
               accept: {
                 'application/octet-stream': ['.backup'],
                 'application/json': ['.backup', '.json']
@@ -165,7 +167,7 @@ export class RestoreService {
         if (this.isAbortError(error)) {
           return null;
         }
-        this.snackBar.open('File selection failed.', undefined, {
+        this.snackBar.open(this.i18n.t('common.restore.fileSelectionFailed'), undefined, {
           duration: 2500,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -190,7 +192,7 @@ export class RestoreService {
     try {
       const parsed = JSON.parse(content) as BackupEnvelope;
       if (!parsed || parsed.format !== 'messagedrop-backup') {
-        this.snackBar.open('This file is not a valid backup.', undefined, {
+        this.snackBar.open(this.i18n.t('common.restore.invalidFile'), undefined, {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -199,7 +201,7 @@ export class RestoreService {
       }
       return parsed;
     } catch (error) {
-      this.snackBar.open('Backup file could not be read.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.readFailed'), undefined, {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -231,7 +233,7 @@ export class RestoreService {
         }
         return JSON.parse(envelope.payload) as BackupPayload;
       } catch {
-        this.snackBar.open('Backup file is corrupted.', undefined, {
+        this.snackBar.open(this.i18n.t('common.restore.corrupted'), undefined, {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -241,7 +243,7 @@ export class RestoreService {
     }
 
     if (!crypto?.subtle || !envelope.kdf || !envelope.cipher) {
-      this.snackBar.open('Encrypted backups are not supported in this browser.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.encryptedNotSupported'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -284,7 +286,7 @@ export class RestoreService {
       const decoded = new TextDecoder().decode(decrypted);
       return JSON.parse(decoded) as BackupPayload;
     } catch (error) {
-      this.snackBar.open('PIN is incorrect or the backup is corrupted.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.pinIncorrect'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -296,15 +298,17 @@ export class RestoreService {
   private async confirmOverwrite(backupUserId: string): Promise<boolean> {
     const currentUserId = this.userService.getUser().id;
     const userHint = backupUserId && backupUserId !== currentUserId
-      ? `The backup belongs to user ${backupUserId}.`
+      ? this.i18n.t('common.restore.overwriteUserHint', { userId: backupUserId })
       : '';
+    const baseMessage = this.i18n.t('common.restore.overwriteMessage');
+    const message = userHint ? `${baseMessage}\n\n${userHint}` : baseMessage;
 
     const dialogRef = this.dialog.open(DeleteUserComponent, {
       data: {
-        title: 'Restore backup',
-        message: `Restoring this backup will delete the current user and all related data on this device and on the server. ${userHint} Continue?`,
-        confirmLabel: 'Restore',
-        cancelLabel: 'Cancel'
+        title: this.i18n.t('common.restore.overwriteTitle'),
+        message,
+        confirmLabel: this.i18n.t('common.actions.restore'),
+        cancelLabel: this.i18n.t('common.cancel')
       },
       closeOnNavigation: true,
       hasBackdrop: true
@@ -322,7 +326,7 @@ export class RestoreService {
     try {
       const response = await firstValueFrom(this.userService.deleteUser(userId, true));
       if (response.status !== 200) {
-        this.snackBar.open('Unable to delete the current user.', undefined, {
+        this.snackBar.open(this.i18n.t('common.restore.deleteUserFailed'), undefined, {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -334,7 +338,7 @@ export class RestoreService {
       return true;
     } catch (error) {
       console.error('Failed to delete user before restore', error);
-      this.snackBar.open('Unable to delete the current user.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.deleteUserFailed'), undefined, {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -347,10 +351,10 @@ export class RestoreService {
     const url = `${environment.apiUrl}/user/restore`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: true,
-      title: 'Restore',
+      title: this.i18n.t('common.restore.title'),
       image: '',
       icon: 'cloud_download',
-      message: 'Restoring server data',
+      message: this.i18n.t('common.restore.restoringServerData'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -388,7 +392,7 @@ export class RestoreService {
 
     const picker = window as FilePickerWindow;
     if (!picker.showDirectoryPicker) {
-      this.snackBar.open('Image restore is not supported in this browser.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.imageRestoreUnsupported'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -403,7 +407,7 @@ export class RestoreService {
       if (this.isAbortError(error)) {
         return;
       }
-      this.snackBar.open('Image restore was skipped.', undefined, {
+      this.snackBar.open(this.i18n.t('common.restore.imageRestoreSkipped'), undefined, {
         duration: 2500,
         horizontalPosition: 'center',
         verticalPosition: 'top'

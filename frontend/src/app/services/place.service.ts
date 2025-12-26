@@ -14,6 +14,7 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,7 @@ export class PlaceService {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly networkService = inject(NetworkService);
   private readonly http = inject(HttpClient);
+  private readonly i18n = inject(TranslationHelperService);
 
   get getPlaces() { return this._places.asReadonly(); }
   get selectedPlace() { return this._selectedPlace.asReadonly(); }
@@ -136,10 +138,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Creating place`,
+      message: this.i18n.t('common.place.creating'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -162,10 +164,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/update`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Updating place`,
+      message: this.i18n.t('common.place.updating'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -188,10 +190,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/get/userId/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Loading places`,
+      message: this.i18n.t('common.place.loadingList'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -206,10 +208,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/get/${placeId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Loading place`,
+      message: this.i18n.t('common.place.loadingSingle'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -224,10 +226,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Loading places`,
+      message: this.i18n.t('common.place.loadingList'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -242,10 +244,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/delete/${placeId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Deleting place`,
+      message: this.i18n.t('common.place.deleting'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -271,10 +273,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/subscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Subscribe to place`,
+      message: this.i18n.t('common.place.subscribing'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -289,10 +291,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/unsubscribe/${place.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Unsubscribe from place`,
+      message: this.i18n.t('common.place.unsubscribing'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -307,10 +309,10 @@ export class PlaceService {
     const url = `${environment.apiUrl}/place/timezone/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Place service',
+      title: this.i18n.t('common.place.title'),
       image: '',
       icon: '',
-      message: `Unsubscribe from place`,
+      message: this.i18n.t('common.place.loadingTimezone'),
       button: '',
       delay: 0,
       showSpinner: true

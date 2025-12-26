@@ -4,6 +4,7 @@ import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Weather } from '../interfaces/weather';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 interface WeatherApiResponse {
   current_weather: {
@@ -44,6 +45,7 @@ export class WeatherService {
 
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -53,10 +55,10 @@ export class WeatherService {
     const url = `${environment.apiUrl}/weather/${locale}/${pluscode}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Weather service',
+      title: this.i18n.t('weather.service.title'),
       image: '',
       icon: '',
-      message: 'Fetching weather data',
+      message: this.i18n.t('weather.service.loading'),
       button: '',
       delay: 0,
       showSpinner: true

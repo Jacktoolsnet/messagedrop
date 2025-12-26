@@ -4,6 +4,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetClientConnect } from '../interfaces/get-client-connect';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -28,6 +29,7 @@ export class ServerService {
 
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -57,10 +59,10 @@ export class ServerService {
     const url = `${environment.apiUrl}/clientconnect`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'Connecting',
+      title: this.i18n.t('common.server.connectingTitle'),
       image: '',
       icon: '',
-      message: `Connecting to backend...`,
+      message: this.i18n.t('common.server.connectingMessage'),
       button: '',
       delay: 0,
       showSpinner: true,

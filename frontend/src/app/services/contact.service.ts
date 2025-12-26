@@ -13,6 +13,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
 import { UserService } from './user.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -36,6 +37,7 @@ export class ContactService {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   get contactsSignal() { return this._contacts.asReadonly(); }
 
@@ -172,10 +174,10 @@ export class ContactService {
     const url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Contact service',
+      title: this.i18n.t('common.contact.title'),
       image: '',
       icon: '',
-      message: `Creating contact`,
+      message: this.i18n.t('common.contact.creating'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -196,11 +198,11 @@ export class ContactService {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
             this.saveAditionalContactInfos();
-            this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
+            this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
             this._contacts.update(contacts => [...contacts, contact]);
           }
         },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); }
+        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
   }
 
@@ -208,10 +210,10 @@ export class ContactService {
     const url = `${environment.apiUrl}/contact/update/name`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Contact service',
+      title: this.i18n.t('common.contact.title'),
       image: '',
       icon: '',
-      message: `Updating contact name`,
+      message: this.i18n.t('common.contact.updatingName'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -227,12 +229,12 @@ export class ContactService {
       .subscribe({
         next: (response) => {
           if (response.status !== 200) {
-            this.snackBar.open('Failed to update contact name.', 'OK');
+            this.snackBar.open(this.i18n.t('common.contact.updateNameFailed'), this.i18n.t('common.actions.ok'));
           }
         },
         error: (err) => {
-          const message = err?.message ?? 'Failed to update contact name.';
-          this.snackBar.open(message, 'OK');
+          const message = err?.message ?? this.i18n.t('common.contact.updateNameFailed');
+          this.snackBar.open(message, this.i18n.t('common.actions.ok'));
         }
       });
   }
@@ -241,10 +243,10 @@ export class ContactService {
     const url = `${environment.apiUrl}/contact/get/${contactId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Contact service',
+      title: this.i18n.t('common.contact.title'),
       image: '',
       icon: '',
-      message: `Loading contact`,
+      message: this.i18n.t('common.contact.loading'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -277,7 +279,7 @@ export class ContactService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: () => { contact.subscribed = true; },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); }
+        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
   }
 
@@ -288,7 +290,7 @@ export class ContactService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: () => { contact.subscribed = false; },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); }
+        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
   }
 }

@@ -24,6 +24,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { ServerService } from './server.service';
 import { BackupStateService } from './backup-state.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -85,6 +86,7 @@ export class UserService {
   private readonly serverService = inject(ServerService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly backupState = inject(BackupStateService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -127,10 +129,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/hashpin`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Hashing your PIN`,
+      message: this.i18n.t('auth.hashingPin'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -185,11 +187,11 @@ export class UserService {
                   closeOnNavigation: false,
                   data: {
                     showAlways: true,
-                    title: 'User Service',
+                    title: this.i18n.t('auth.serviceTitle'),
                     image: '',
                     icon: 'verified_user',
-                    message: 'Your account has been created. You can log in now.',
-                    button: 'Ok',
+                    message: this.i18n.t('auth.accountCreated'),
+                    button: this.i18n.t('common.actions.ok'),
                     delay: 0,
                     showSpinner: false
                   },
@@ -213,11 +215,11 @@ export class UserService {
             closeOnNavigation: false,
             data: {
               showAlways: true,
-              title: 'User Service',
+              title: this.i18n.t('auth.serviceTitle'),
               image: '',
               icon: 'bug_report',
-              message: 'Uuups! Something went wrong while creating your user. Please try again later.',
-              button: 'Ok',
+              message: this.i18n.t('auth.userCreationFailed'),
+              button: this.i18n.t('common.actions.ok'),
               delay: 0,
               showSpinner: false
             },
@@ -281,10 +283,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Creating user`,
+      message: this.i18n.t('auth.creatingUser'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -300,10 +302,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/confirm`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Confirming user`,
+      message: this.i18n.t('auth.confirmingUser'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -341,11 +343,11 @@ export class UserService {
             closeOnNavigation: false,
             data: {
               showAlways: true,
-              title: 'Session expired',
+              title: this.i18n.t('auth.sessionExpiredTitle'),
               image: '',
               icon: 'logout', // oder: 'schedule', 'lock', 'warning'
-              message: 'Your session has expired for security reasons. Please log in again to continue.',
-              button: 'Ok',
+              message: this.i18n.t('auth.sessionExpiredMessage'),
+              button: this.i18n.t('common.actions.ok'),
               delay: 0,
               showSpinner: false
             },
@@ -368,11 +370,11 @@ export class UserService {
           closeOnNavigation: false,
           data: {
             showAlways: true,
-            title: 'Session expired',
+            title: this.i18n.t('auth.sessionExpiredTitle'),
             image: '',
             icon: 'logout', // oder: 'schedule', 'lock', 'warning'
-            message: 'Your session has expired for security reasons. Please log in again to continue.',
-            button: 'Ok',
+            message: this.i18n.t('auth.sessionExpiredMessage'),
+            button: this.i18n.t('common.actions.ok'),
             delay: 0,
             showSpinner: false
           },
@@ -410,10 +412,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/get/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Getting user information`,
+      message: this.i18n.t('auth.gettingUserInfo'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -428,10 +430,10 @@ export class UserService {
     const url = `${environment.apiUrl}/message/get/userId/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Getting user messages`,
+      message: this.i18n.t('auth.gettingUserMessages'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -446,10 +448,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/delete/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Deleting user`,
+      message: this.i18n.t('auth.deletingUser'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -464,10 +466,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/subscribe`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Subscribing to user`,
+      message: this.i18n.t('auth.subscribingUser'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -486,10 +488,10 @@ export class UserService {
     const url = `${environment.apiUrl}/user/unsubscribe/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'User service',
+      title: this.i18n.t('auth.serviceTitle'),
       image: '',
       icon: '',
-      message: `Unsubscribing from user`,
+      message: this.i18n.t('auth.unsubscribingUser'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -647,19 +649,11 @@ export class UserService {
         closeOnNavigation: false,
         data: {
           showAlways: true,
-          title: 'Want to create a user? It’s that easy.',
+          title: this.i18n.t('auth.createUserTitle'),
           image: '',
           icon: 'person_add',
-          message: `Just choose a PIN — no username and no password required.
-
-Please keep this PIN safe. We do not store it, cannot reset it, and cannot recover it for you.
-
-If the PIN is lost, access to this user is permanently lost as well.
-
-You can delete your user at any time in the app.
-
-If the user is not used for 90 days, it will be automatically and permanently deleted, including all associated data.`,
-          button: 'Get started',
+          message: this.i18n.t('auth.createUserMessage'),
+          button: this.i18n.t('auth.createUserAction'),
           delay: 200,
           showSpinner: false
         },
@@ -710,11 +704,11 @@ If the user is not used for 90 days, it will be automatically and permanently de
                 closeOnNavigation: false,
                 data: {
                   showAlways: true,
-                  title: 'User Service',
+                  title: this.i18n.t('auth.serviceTitle'),
                   image: '',
                   icon: 'bug_report',
-                  message: 'Uuups! Something went wrong while creating your user. Please try again later.',
-                  button: 'Ok',
+                  message: this.i18n.t('auth.userCreationFailed'),
+                  button: this.i18n.t('common.actions.ok'),
                   delay: 0,
                   showSpinner: false
                 },
@@ -793,7 +787,7 @@ If the user is not used for 90 days, it will be automatically and permanently de
                 error: (err) => {
                   console.error('Confirm user failed during login', err);
                   if (err.status === 401) {
-                    this.snackBar.open("Pin is not correct. Please try again.", undefined, {
+                    this.snackBar.open(this.i18n.t('auth.pinIncorrect'), undefined, {
                       panelClass: ['snack-warning'],
                       horizontalPosition: 'center',
                       verticalPosition: 'top',
@@ -806,15 +800,11 @@ If the user is not used for 90 days, it will be automatically and permanently de
                       closeOnNavigation: false,
                       data: {
                         showAlways: true,
-                        title: 'User not found',
+                        title: this.i18n.t('auth.userNotFoundTitle'),
                         image: '',
                         icon: 'person_remove',
-                        message: `Looks like this user has been inactive for a while. 
-                          
-                          To keep things clean and simple, users are automatically deleted after 90 days of inactivity.
-                          
-                          You can create a new one anytime — no signup, no hassle.`,
-                        button: 'Create new user',
+                        message: this.i18n.t('auth.userNotFoundMessage'),
+                        button: this.i18n.t('auth.userNotFoundAction'),
                         delay: 200,
                         showSpinner: false
                       },
@@ -837,11 +827,11 @@ If the user is not used for 90 days, it will be automatically and permanently de
                       closeOnNavigation: false,
                       data: {
                         showAlways: true,
-                        title: 'Oops! Backend error!',
+                        title: this.i18n.t('auth.backendErrorTitle'),
                         image: '',
                         icon: 'bug_report',
-                        message: 'Something went wrong. Please try again later.',
-                        button: 'Retry...',
+                        message: this.i18n.t('auth.backendErrorMessage'),
+                        button: this.i18n.t('common.actions.retry'),
                         delay: 10000,
                         showSpinner: false
                       },

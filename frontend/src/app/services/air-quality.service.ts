@@ -4,6 +4,7 @@ import { Observable, catchError, map, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { AirQualityData } from '../interfaces/air-quality-data';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class AirQualityService {
 
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -28,10 +30,10 @@ export class AirQualityService {
     const url = `${environment.apiUrl}/airquality/${pluscode}/${latitude}/${longitude}/${days}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Air Quality Service',
+      title: this.i18n.t('weather.airQuality.serviceTitle'),
       image: '',
       icon: 'eco',
-      message: 'Fetching air quality data...',
+      message: this.i18n.t('weather.airQuality.loading'),
       button: '',
       delay: 0,
       showSpinner: true

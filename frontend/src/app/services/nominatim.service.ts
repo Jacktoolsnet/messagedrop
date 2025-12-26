@@ -8,6 +8,7 @@ import { Location } from '../interfaces/location';
 import { NominatimPlace } from '../interfaces/nominatim-place';
 import { GeolocationService } from './geolocation.service';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -24,6 +25,7 @@ export class NominatimService {
   private readonly geolocationService = inject(GeolocationService);
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -34,10 +36,10 @@ export class NominatimService {
     const url = `${environment.apiUrl}/nominatim/countryCode/${location.plusCode}/${location.latitude}/${location.longitude}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Nominatim service',
+      title: this.i18n.t('common.location.nominatimTitle'),
       image: '',
       icon: '',
-      message: 'Fetching nominatim data',
+      message: this.i18n.t('common.location.fetchingNominatim'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -55,10 +57,10 @@ export class NominatimService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Searching location',
+      title: this.i18n.t('common.location.searchTitle'),
       image: '',
       icon: '',
-      message: `Searching for "${searchTerm}"`,
+      message: this.i18n.t('common.location.searching', { term: searchTerm }),
       button: '',
       delay: 0,
       showSpinner: true
@@ -76,10 +78,10 @@ export class NominatimService {
     const url = `${environment.apiUrl}/nominatim/noboundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Searching location',
+      title: this.i18n.t('common.location.searchTitle'),
       image: '',
       icon: '',
-      message: `Searching for "${searchTerm}" near your location`,
+      message: this.i18n.t('common.location.searchingNear', { term: searchTerm }),
       button: '',
       delay: 0,
       showSpinner: true
@@ -113,14 +115,15 @@ export class NominatimService {
     const encodedTerm = encodeURIComponent(searchTerm);
     const encodedViewbox = encodeURIComponent(viewbox);
     const url = `${environment.apiUrl}/nominatim/boundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
-    const description = bounded === 1 ? 'in defined area' : 'around your location';
+    const areaKey = bounded === 1 ? 'common.location.area.defined' : 'common.location.area.nearby';
+    const area = this.i18n.t(areaKey);
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Searching location',
+      title: this.i18n.t('common.location.searchTitle'),
       image: '',
       icon: '',
-      message: `Searching for "${searchTerm}" ${description}`,
+      message: this.i18n.t('common.location.searchingWithArea', { term: searchTerm, area }),
       button: '',
       delay: 0,
       showSpinner: true

@@ -8,6 +8,7 @@
       "ok": "OK",
       "retry": "Erneut versuchen",
       "backupNow": "Backup jetzt",
+      "restore": "Wiederherstellen",
       "no": "Nein"
     },
     "aria": {
@@ -43,6 +44,110 @@
       "airQuality": "Luftqualität",
       "searchPlace": "Ort suchen"
     },
+    "translate": {
+      "title": "Übersetzungsservice",
+      "message": "Nachricht wird übersetzt"
+    },
+    "connect": {
+      "title": "Connect-Service",
+      "creatingInfo": "Connect-Informationen werden erstellt",
+      "loadingInfo": "Connect-Informationen werden geladen",
+      "invalidData": "Connect-Daten sind ungültig.",
+      "selfAddBlocked": "Du kannst deinen eigenen Benutzer nicht zur Kontaktliste hinzufügen.",
+      "notFound": "Connect-ID nicht gefunden.",
+      "deletingInfo": "Connect-Informationen werden gelöscht",
+      "deleteFailed": "Connect-Eintrag konnte nicht gelöscht werden.",
+      "deleteUnavailable": "Connect-Eintrag konnte nicht gelöscht werden."
+    },
+    "contact": {
+      "title": "Kontakt-Service",
+      "creating": "Kontakt wird erstellt",
+      "created": "Kontakt erfolgreich erstellt.",
+      "updatingName": "Kontaktname wird aktualisiert",
+      "updateNameFailed": "Kontaktname konnte nicht aktualisiert werden.",
+      "loading": "Kontakt wird geladen",
+      "hintDecryptFailed": "Hinweis konnte nicht entschlüsselt werden!",
+      "notSet": "Nicht gesetzt",
+      "profileRequestDeclined": "Der Kontakt hat die Profilanfrage abgelehnt."
+    },
+    "message": {
+      "title": "Nachrichten-Service",
+      "creating": "Nachricht wird erstellt",
+      "created": "Nachricht erfolgreich gesendet.",
+      "updating": "Nachricht wird aktualisiert",
+      "togglingLike": "Gefällt mir wird umgeschaltet",
+      "togglingDislike": "Gefällt mir nicht wird umgeschaltet",
+      "loading": "Nachricht wird geladen",
+      "disabling": "Nachricht wird deaktiviert",
+      "disableFailed": "Nachricht konnte nicht deaktiviert werden.",
+      "deleting": "Nachricht wird gelöscht",
+      "deleteFailed": "Nachricht konnte nicht gelöscht werden.",
+      "loadingComments": "Kommentare werden geladen"
+    },
+    "comment": {
+      "created": "Kommentar erfolgreich gesendet."
+    },
+    "server": {
+      "connectingTitle": "Verbinden",
+      "connectingMessage": "Verbindung zum Backend wird hergestellt..."
+    },
+    "moderation": {
+      "title": "Moderationsservice",
+      "message": "Nachricht wird mit OpenAI-Moderation geprüft"
+    },
+    "tenor": {
+      "title": "Tenor-Service",
+      "loading": "Laden"
+    },
+    "place": {
+      "title": "Ort-Service",
+      "creating": "Ort wird erstellt",
+      "updating": "Ort wird aktualisiert",
+      "loadingList": "Orte werden geladen",
+      "loadingSingle": "Ort wird geladen",
+      "deleting": "Ort wird gelöscht",
+      "subscribing": "Ort wird abonniert",
+      "unsubscribing": "Abonnement wird beendet",
+      "loadingTimezone": "Zeitzone wird geladen"
+    },
+    "systemMessages": {
+      "title": "Systemnachrichten",
+      "loading": "Systemnachrichten werden geladen...",
+      "updatingStatus": "Nachrichtenstatus wird aktualisiert...",
+      "removing": "Systemnachricht wird entfernt..."
+    },
+    "backup": {
+      "title": "Backup",
+      "signInRequired": "Bitte melde dich an, bevor du ein Backup erstellst.",
+      "createdSuccess": "Backup erfolgreich erstellt.",
+      "failed": "Backup fehlgeschlagen. Bitte erneut versuchen.",
+      "folderSelectionFailed": "Ordnerauswahl fehlgeschlagen.",
+      "folderSelectionUnsupported": "Ordnerauswahl wird nicht unterstützt. Bitte das Backup als Datei speichern.",
+      "fileTypeDescription": "MessageDrop-Backup",
+      "fileSelectionFailed": "Dateiauswahl fehlgeschlagen.",
+      "notSupported": "Backups werden in diesem Browser nicht unterstützt.",
+      "collectingServerData": "Daten werden vom Server gesammelt"
+    },
+    "restore": {
+      "title": "Wiederherstellen",
+      "versionUnsupported": "Diese Backup-Version wird nicht unterstützt.",
+      "missingData": "Backup-Datei enthält keine vollständigen Daten.",
+      "completed": "Wiederherstellung abgeschlossen. Bitte mit deiner PIN anmelden.",
+      "failed": "Wiederherstellung fehlgeschlagen. Bitte erneut versuchen.",
+      "fileSelectionFailed": "Dateiauswahl fehlgeschlagen.",
+      "invalidFile": "Diese Datei ist kein gültiges Backup.",
+      "readFailed": "Backup-Datei konnte nicht gelesen werden.",
+      "corrupted": "Backup-Datei ist beschädigt.",
+      "encryptedNotSupported": "Verschlüsselte Backups werden in diesem Browser nicht unterstützt.",
+      "pinIncorrect": "PIN ist falsch oder das Backup ist beschädigt.",
+      "overwriteTitle": "Backup wiederherstellen",
+      "overwriteMessage": "Das Wiederherstellen löscht den aktuellen Benutzer und alle zugehörigen Daten auf diesem Gerät und auf dem Server. Fortfahren?",
+      "overwriteUserHint": "Das Backup gehört zu Benutzer {{ userId }}.",
+      "deleteUserFailed": "Aktueller Benutzer konnte nicht gelöscht werden.",
+      "restoringServerData": "Serverdaten werden wiederhergestellt",
+      "imageRestoreUnsupported": "Bilder wiederherstellen wird in diesem Browser nicht unterstützt.",
+      "imageRestoreSkipped": "Bild-Wiederherstellung wurde übersprungen."
+    },
     "serverDown": {
       "title": "Ups! Unser Server macht eine Kaffeepause...",
       "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge, wir haben eine Brieftaube geschickt."
@@ -55,10 +160,22 @@
       "locatingTitle": "Standort wird ermittelt",
       "locatingMessage": "Bitte warte, während dein Gerät deinen Standort ermittelt...",
       "authorizationRequired": "Bitte Standortfreigabe erteilen.",
-      "failed": "Standort konnte nicht bestimmt werden. Bitte später erneut versuchen."
+      "failed": "Standort konnte nicht bestimmt werden. Bitte später erneut versuchen.",
+      "nominatimTitle": "Nominatim-Service",
+      "fetchingNominatim": "Nominatim-Daten werden geladen",
+      "searchTitle": "Ort wird gesucht",
+      "searching": "Suche nach \"{{ term }}\"",
+      "searchingNear": "Suche nach \"{{ term }}\" in deiner Nähe",
+      "searchingWithArea": "Suche nach \"{{ term }}\" {{ area }}",
+      "area": {
+        "defined": "im definierten Gebiet",
+        "nearby": "in deiner Umgebung"
+      }
     },
     "notifications": {
-      "received": "Benachrichtigung erhalten: {{ action }}"
+      "received": "Benachrichtigung erhalten: {{ action }}",
+      "systemTitle": "Systemnachricht",
+      "systemBody": "Du hast eine neue Systemnachricht."
     },
     "files": {
       "pickerUnsupported": "Dateiauswahl wird in diesem Browser nicht unterstützt."
@@ -72,6 +189,7 @@
     },
     "geoStatistic": {
       "title": "Geo-Statistik-Service",
+      "loading": "Standortdaten werden geladen",
       "unexpectedResponse": "Unerwartete Antwort."
     }
   },
@@ -88,11 +206,81 @@
     "unknown": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen.",
     "noteTooLarge": "Notiz ist zu lang. Maximal {{ maxChars }} Zeichen.",
     "unauthorized": "Bitte melde dich an, um fortzufahren.",
-    "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut."
+    "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut.",
+    "offline": {
+      "title": "Ups! Du bist offline..",
+      "message": "Offenbar brauchte dein Netzwerk kurz eine Pause."
+    },
+    "http": {
+      "title": {
+        "noConnection": "Keine Verbindung",
+        "badRequest": "Fehlerhafte Anfrage",
+        "unauthorized": "Nicht autorisiert",
+        "forbidden": "Zugriff verweigert",
+        "notFound": "Nicht gefunden",
+        "requestTimeout": "Zeitüberschreitung",
+        "tooManyRequests": "Zu viele Anfragen",
+        "serverError": "Serverfehler",
+        "badGateway": "Ungültiges Gateway",
+        "serviceUnavailable": "Dienst nicht verfügbar",
+        "gatewayTimeout": "Gateway-Zeitüberschreitung",
+        "unexpected": "Unerwarteter Fehler"
+      },
+      "message": {
+        "noConnection": "Bitte überprüfe deine Internetverbindung.",
+        "badRequest": "Die Anfrage konnte nicht verarbeitet werden.",
+        "unauthorized": "Bitte melde dich an, um fortzufahren.",
+        "forbidden": "Du hast keinen Zugriff auf diese Ressource.",
+        "notFound": "Die angeforderte Ressource wurde nicht gefunden.",
+        "requestTimeout": "Die Anfrage hat zu lange gedauert.",
+        "tooManyRequests": "Zu viele Anfragen. Bitte einen Moment warten.",
+        "serverError": "Ein unerwarteter Serverfehler ist aufgetreten.",
+        "badGateway": "Der Server hat eine ungültige Antwort erhalten.",
+        "serviceUnavailable": "Der Dienst ist vorübergehend nicht verfügbar.",
+        "gatewayTimeout": "Der Server hat zu lange geantwortet.",
+        "unexpected": "Es ist ein Fehler aufgetreten. Bitte später erneut versuchen."
+      }
+    },
+    "systemMessages": {
+      "authRequired": "Für Systemnachrichten ist eine Autorisierung erforderlich.",
+      "requestFailed": "Anfrage für Systemnachrichten konnte nicht verarbeitet werden.",
+      "unexpected": "Unerwarteter Fehler beim Verarbeiten von Systemnachrichten."
+    }
   },
-  "auth": {},
-  "dsa": {},
+  "auth": {
+    "serviceTitle": "Benutzer-Service",
+    "hashingPin": "PIN wird gehasht",
+    "accountCreated": "Dein Konto wurde erstellt. Du kannst dich jetzt anmelden.",
+    "userCreationFailed": "Uuups! Beim Erstellen deines Benutzers ist etwas schiefgelaufen. Bitte später erneut versuchen.",
+    "creatingUser": "Benutzer wird erstellt",
+    "confirmingUser": "Benutzer wird bestätigt",
+    "sessionExpiredTitle": "Sitzung abgelaufen",
+    "sessionExpiredMessage": "Deine Sitzung ist aus Sicherheitsgründen abgelaufen. Bitte melde dich erneut an, um fortzufahren.",
+    "gettingUserInfo": "Benutzerinformationen werden geladen",
+    "gettingUserMessages": "Benutzernachrichten werden geladen",
+    "deletingUser": "Benutzer wird gelöscht",
+    "subscribingUser": "Benutzer wird abonniert",
+    "unsubscribingUser": "Abonnement wird beendet",
+    "createUserTitle": "Möchtest du einen Benutzer erstellen? So einfach geht's.",
+    "createUserMessage": "Wähle einfach eine PIN - kein Benutzername und kein Passwort erforderlich.\n\nBitte bewahre diese PIN sicher auf. Wir speichern sie nicht, können sie nicht zurücksetzen und nicht wiederherstellen.\n\nWenn die PIN verloren geht, ist der Zugriff auf diesen Benutzer dauerhaft verloren.\n\nDu kannst deinen Benutzer jederzeit in der App löschen.\n\nWenn der Benutzer 90 Tage lang nicht verwendet wird, wird er automatisch und dauerhaft gelöscht, einschließlich aller zugehörigen Daten.",
+    "createUserAction": "Los geht's",
+    "pinIncorrect": "PIN ist falsch. Bitte erneut versuchen.",
+    "userNotFoundTitle": "Benutzer nicht gefunden",
+    "userNotFoundMessage": "Es sieht so aus, als wäre dieser Benutzer eine Weile inaktiv gewesen.\n\nUm alles sauber und einfach zu halten, werden Benutzer nach 90 Tagen Inaktivität automatisch gelöscht.\n\nDu kannst jederzeit einen neuen erstellen - ohne Registrierung, ohne Aufwand.",
+    "userNotFoundAction": "Neuen Benutzer erstellen",
+    "backendErrorTitle": "Ups! Backend-Fehler!",
+    "backendErrorMessage": "Es ist etwas schiefgelaufen. Bitte später erneut versuchen."
+  },
+  "dsa": {
+    "title": "DSA",
+    "sendingQuickReport": "Schnellmeldung wird gesendet...",
+    "submittingNotice": "DSA-Meldung wird gesendet..."
+  },
   "weather": {
+    "service": {
+      "title": "Wetterdienst",
+      "loading": "Wetterdaten werden geladen"
+    },
     "level": {
       "temperature": {
         "freezing": "Gefrierend",
@@ -137,6 +325,8 @@
       }
     },
     "airQuality": {
+      "serviceTitle": "Luftqualitätsdienst",
+      "loading": "Luftqualitätsdaten werden geladen...",
       "pollen": {
         "none": "Keine",
         "low": "Niedrig",

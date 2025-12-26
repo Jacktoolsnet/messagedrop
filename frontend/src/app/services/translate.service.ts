@@ -4,6 +4,7 @@ import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TranslateResponse } from '../interfaces/translate-response';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -20,6 +21,7 @@ export class TranslateService {
 
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -29,10 +31,10 @@ export class TranslateService {
     const url = `${environment.apiUrl}/translate/${language}/${value}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Translate service',
+      title: this.i18n.t('common.translate.title'),
       image: '',
       icon: '',
-      message: `Translating message`,
+      message: this.i18n.t('common.translate.message'),
       button: '',
       delay: 0,
       showSpinner: true

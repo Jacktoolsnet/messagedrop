@@ -14,6 +14,7 @@ import { User } from '../interfaces/user';
 import { GeolocationService } from './geolocation.service';
 import { MapService } from './map.service';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -46,6 +47,7 @@ export class MessageService {
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -118,10 +120,10 @@ export class MessageService {
     const url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Creating message`,
+      message: this.i18n.t('common.message.creating'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -147,9 +149,9 @@ export class MessageService {
       .subscribe({
         next: () => {
           this.messagesSignal.update(messages => [message, ...messages]);
-          this.snackBar.open(`Message succesfully dropped.`, '', { duration: 1000 });
+          this.snackBar.open(this.i18n.t('common.message.created'), '', { duration: 1000 });
         },
-        error: (err) => { this.snackBar.open(err.message, 'OK'); }
+        error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
   }
 
@@ -157,10 +159,10 @@ export class MessageService {
     const url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Creating message`,
+      message: this.i18n.t('common.message.creating'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -190,10 +192,10 @@ export class MessageService {
 
           this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
 
-          this.snackBar.open(`Comment successfully dropped.`, '', { duration: 1000 });
+          this.snackBar.open(this.i18n.t('common.comment.created'), '', { duration: 1000 });
         },
         error: (err) => {
-          this.snackBar.open(err.message, 'OK')
+          this.snackBar.open(err.message, this.i18n.t('common.actions.ok'))
         }
       });
   }
@@ -203,10 +205,10 @@ export class MessageService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Updating message`,
+      message: this.i18n.t('common.message.updating'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -228,7 +230,7 @@ export class MessageService {
             return messages.map(m => m.id === message.id ? { ...m, ...message } : m);
           });
         },
-        error: err => this.snackBar.open(err.message, 'OK')
+        error: err => this.snackBar.open(err.message, this.i18n.t('common.actions.ok'))
       });
   }
 
@@ -254,10 +256,10 @@ export class MessageService {
     const url = `${environment.apiUrl}/message/like/${message.uuid}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: 'Toggling like',
+      message: this.i18n.t('common.message.togglingLike'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -279,10 +281,10 @@ export class MessageService {
     const url = `${environment.apiUrl}/message/dislike/${message.uuid}/by/${user.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: 'Toggling dislike',
+      message: this.i18n.t('common.message.togglingDislike'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -306,10 +308,10 @@ export class MessageService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Loading message`,
+      message: this.i18n.t('common.message.loading'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -391,10 +393,10 @@ export class MessageService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Loading message`,
+      message: this.i18n.t('common.message.loading'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -438,10 +440,10 @@ export class MessageService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Disabling message`,
+      message: this.i18n.t('common.message.disabling'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -462,7 +464,8 @@ export class MessageService {
           }
         },
         error: (err) => {
-          this.snackBar.open(err.message ?? 'Failed to disable message.', 'OK');
+          const message = err.message ?? this.i18n.t('common.message.disableFailed');
+          this.snackBar.open(message, this.i18n.t('common.actions.ok'));
         }
       });
   }
@@ -472,10 +475,10 @@ export class MessageService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Deleting message`,
+      message: this.i18n.t('common.message.deleting'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -505,7 +508,8 @@ export class MessageService {
           }
         },
         error: (err) => {
-          this.snackBar.open(err.message ?? 'Failed to delete message.', 'OK');
+          const message = err.message ?? this.i18n.t('common.message.deleteFailed');
+          this.snackBar.open(message, this.i18n.t('common.actions.ok'));
         }
       });
   }
@@ -514,10 +518,10 @@ export class MessageService {
     const url = `${environment.apiUrl}/message/get/comment/${message.uuid}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
-      title: 'Message service',
+      title: this.i18n.t('common.message.title'),
       image: '',
       icon: '',
-      message: `Loading comments`,
+      message: this.i18n.t('common.message.loadingComments'),
       button: '',
       delay: 0,
       showSpinner: true

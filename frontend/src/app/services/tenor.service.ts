@@ -5,6 +5,7 @@ import { environment } from '../../environments/environment';
 import { TenorApiResponse } from '../interfaces/tenor-response';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -22,6 +23,7 @@ export class TenorService {
   private readonly http = inject(HttpClient);
   private readonly userService = inject(UserService);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   /**
    * Handles HTTP errors by wrapping the error in an observable.
@@ -51,10 +53,10 @@ export class TenorService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Tenor service',
+      title: this.i18n.t('common.tenor.title'),
       image: '',
       icon: '',
-      message: `Loading`,
+      message: this.i18n.t('common.tenor.loading'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -83,10 +85,10 @@ export class TenorService {
     const url = !!next && next.trim().length > 0 ? `${base}/${encodeURIComponent(next)}` : base;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Tenor service',
+      title: this.i18n.t('common.tenor.title'),
       image: '',
       icon: '',
-      message: `Loading`,
+      message: this.i18n.t('common.tenor.loading'),
       button: '',
       delay: 0,
       showSpinner: true

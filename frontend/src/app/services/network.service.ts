@@ -2,6 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { DisplayMessageConfig } from '../interfaces/display-message-config';
+import { TranslationHelperService } from './translation-helper.service';
 
 interface LiteNetworkInformation {
   effectiveType?: string;
@@ -16,9 +17,37 @@ export class NetworkService {
   private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
 
   private readonly displayMessage = inject(MatDialog);
+  private readonly i18n = inject(TranslationHelperService);
 
   online = true;
   private networkMessageMap = new Map<string, DisplayMessageConfig>();
+  private readonly errorTitleKeyMap: Record<number, string> = {
+    0: 'errors.http.title.noConnection',
+    400: 'errors.http.title.badRequest',
+    401: 'errors.http.title.unauthorized',
+    403: 'errors.http.title.forbidden',
+    404: 'errors.http.title.notFound',
+    408: 'errors.http.title.requestTimeout',
+    429: 'errors.http.title.tooManyRequests',
+    500: 'errors.http.title.serverError',
+    502: 'errors.http.title.badGateway',
+    503: 'errors.http.title.serviceUnavailable',
+    504: 'errors.http.title.gatewayTimeout'
+  };
+
+  private readonly errorMessageKeyMap: Record<number, string> = {
+    0: 'errors.http.message.noConnection',
+    400: 'errors.http.message.badRequest',
+    401: 'errors.http.message.unauthorized',
+    403: 'errors.http.message.forbidden',
+    404: 'errors.http.message.notFound',
+    408: 'errors.http.message.requestTimeout',
+    429: 'errors.http.message.tooManyRequests',
+    500: 'errors.http.message.serverError',
+    502: 'errors.http.message.badGateway',
+    503: 'errors.http.message.serviceUnavailable',
+    504: 'errors.http.message.gatewayTimeout'
+  };
 
   init() {
     window.addEventListener('online', () => {
@@ -32,10 +61,10 @@ export class NetworkService {
         closeOnNavigation: false,
         data: {
           showAlways: true,
-          title: 'Oops! You are offline..',
+          title: this.i18n.t('errors.offline.title'),
           image: '',
           icon: '',
-          message: `Apparently, your network needed some “me time”.`,
+          message: this.i18n.t('errors.offline.message'),
           button: '',
           delay: 0,
           showSpinner: false
@@ -97,20 +126,8 @@ export class NetworkService {
   }
 
   getErrorTitle(status: number): string {
-    switch (status) {
-      case 0: return 'No Connection';
-      case 400: return 'Bad Request';
-      case 401: return 'Unauthorized';
-      case 403: return 'Forbidden';
-      case 404: return 'Not Found';
-      case 408: return 'Request Timeout';
-      case 429: return 'Too Many Requests';
-      case 500: return 'Server Error';
-      case 502: return 'Bad Gateway';
-      case 503: return 'Service Unavailable';
-      case 504: return 'Gateway Timeout';
-      default: return 'Unexpected Error';
-    }
+    const key = this.errorTitleKeyMap[status] ?? 'errors.http.title.unexpected';
+    return this.i18n.t(key);
   }
 
   getErrorIcon(status: number): string {
@@ -131,20 +148,8 @@ export class NetworkService {
   }
 
   getErrorMessage(status: number): string {
-    switch (status) {
-      case 0: return 'Please check your internet connection.';
-      case 400: return 'The request could not be processed.';
-      case 401: return 'You need to sign in to continue.';
-      case 403: return 'You are not allowed to access this resource.';
-      case 404: return 'The requested resource was not found.';
-      case 408: return 'The request took too long to complete.';
-      case 429: return 'You sent too many requests. Please wait a moment.';
-      case 500: return 'An unexpected server error occurred.';
-      case 502: return 'The server received an invalid response.';
-      case 503: return 'The service is temporarily unavailable.';
-      case 504: return 'The server took too long to respond.';
-      default: return 'Something went wrong. Please try again later.';
-    }
+    const key = this.errorMessageKeyMap[status] ?? 'errors.http.message.unexpected';
+    return this.i18n.t(key);
   }
 
 }

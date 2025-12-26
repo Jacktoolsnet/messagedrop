@@ -4,6 +4,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 // deine Interfaces (ggf. Pfade anpassen)
 import { CreateDsaNotice } from '../interfaces/create-dsa-notice.interface';
@@ -29,6 +30,7 @@ export class DigitalServicesActService {
 
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -43,10 +45,10 @@ export class DigitalServicesActService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'DSA',
+      title: this.i18n.t('dsa.title'),
       image: '',
       icon: '',
-      message: 'Sending quick report…',
+      message: this.i18n.t('dsa.sendingQuickReport'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -74,10 +76,10 @@ export class DigitalServicesActService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'DSA',
+      title: this.i18n.t('dsa.title'),
       image: '',
       icon: '',
-      message: 'Submitting DSA notice…',
+      message: this.i18n.t('dsa.submittingNotice'),
       button: '',
       delay: 0,
       showSpinner: true

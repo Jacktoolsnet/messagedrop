@@ -4,6 +4,7 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetGeoStatisticResponse } from '../interfaces/get-geo-statistic-response';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,7 @@ export class GeoStatisticService {
 
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -29,10 +31,10 @@ export class GeoStatisticService {
     const url = `${environment.apiUrl}/geostatistic/${pluscode}/${latitude}/${longitude}/${years}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'GeoStatistic Service',
+      title: this.i18n.t('common.geoStatistic.title'),
       image: '',
       icon: '',
-      message: 'Fetching location data',
+      message: this.i18n.t('common.geoStatistic.loading'),
       button: '',
       delay: 0,
       showSpinner: true

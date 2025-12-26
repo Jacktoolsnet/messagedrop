@@ -8,6 +8,7 @@
       "ok": "OK",
       "retry": "Retry",
       "backupNow": "Backup now",
+      "restore": "Restore",
       "no": "No"
     },
     "aria": {
@@ -43,6 +44,110 @@
       "airQuality": "Air quality",
       "searchPlace": "Search a place"
     },
+    "translate": {
+      "title": "Translate service",
+      "message": "Translating message"
+    },
+    "connect": {
+      "title": "Connect service",
+      "creatingInfo": "Creating connect information",
+      "loadingInfo": "Loading connect information",
+      "invalidData": "Connect data is invalid.",
+      "selfAddBlocked": "It is not possible to add my user to the contact list.",
+      "notFound": "Connect ID not found.",
+      "deletingInfo": "Deleting connect information",
+      "deleteFailed": "Failed to delete connect record.",
+      "deleteUnavailable": "Unable to delete connect record."
+    },
+    "contact": {
+      "title": "Contact service",
+      "creating": "Creating contact",
+      "created": "Contact successfully created.",
+      "updatingName": "Updating contact name",
+      "updateNameFailed": "Failed to update contact name.",
+      "loading": "Loading contact",
+      "hintDecryptFailed": "Hint cannot be decrypted!",
+      "notSet": "Not set",
+      "profileRequestDeclined": "The contact declined the profile information request."
+    },
+    "message": {
+      "title": "Message service",
+      "creating": "Creating message",
+      "created": "Message successfully dropped.",
+      "updating": "Updating message",
+      "togglingLike": "Toggling like",
+      "togglingDislike": "Toggling dislike",
+      "loading": "Loading message",
+      "disabling": "Disabling message",
+      "disableFailed": "Failed to disable message.",
+      "deleting": "Deleting message",
+      "deleteFailed": "Failed to delete message.",
+      "loadingComments": "Loading comments"
+    },
+    "comment": {
+      "created": "Comment successfully dropped."
+    },
+    "server": {
+      "connectingTitle": "Connecting",
+      "connectingMessage": "Connecting to backend..."
+    },
+    "moderation": {
+      "title": "Moderation service",
+      "message": "Moderating message using OpenAI moderation AI"
+    },
+    "tenor": {
+      "title": "Tenor service",
+      "loading": "Loading"
+    },
+    "place": {
+      "title": "Place service",
+      "creating": "Creating place",
+      "updating": "Updating place",
+      "loadingList": "Loading places",
+      "loadingSingle": "Loading place",
+      "deleting": "Deleting place",
+      "subscribing": "Subscribing to place",
+      "unsubscribing": "Unsubscribing from place",
+      "loadingTimezone": "Loading timezone"
+    },
+    "systemMessages": {
+      "title": "System messages",
+      "loading": "Loading system messages...",
+      "updatingStatus": "Updating message status...",
+      "removing": "Removing system message..."
+    },
+    "backup": {
+      "title": "Backup",
+      "signInRequired": "Please sign in before creating a backup.",
+      "createdSuccess": "Backup created successfully.",
+      "failed": "Backup failed. Please try again.",
+      "folderSelectionFailed": "Folder selection failed.",
+      "folderSelectionUnsupported": "Folder selection is not supported. Save the backup file instead.",
+      "fileTypeDescription": "MessageDrop Backup",
+      "fileSelectionFailed": "File selection failed.",
+      "notSupported": "Backup is not supported in this browser.",
+      "collectingServerData": "Collecting your data from the server"
+    },
+    "restore": {
+      "title": "Restore",
+      "versionUnsupported": "This backup version is not supported.",
+      "missingData": "Backup file is missing data.",
+      "completed": "Restore completed. Please log in with your PIN.",
+      "failed": "Restore failed. Please try again.",
+      "fileSelectionFailed": "File selection failed.",
+      "invalidFile": "This file is not a valid backup.",
+      "readFailed": "Backup file could not be read.",
+      "corrupted": "Backup file is corrupted.",
+      "encryptedNotSupported": "Encrypted backups are not supported in this browser.",
+      "pinIncorrect": "PIN is incorrect or the backup is corrupted.",
+      "overwriteTitle": "Restore backup",
+      "overwriteMessage": "Restoring this backup will delete the current user and all related data on this device and on the server. Continue?",
+      "overwriteUserHint": "The backup belongs to user {{ userId }}.",
+      "deleteUserFailed": "Unable to delete the current user.",
+      "restoringServerData": "Restoring server data",
+      "imageRestoreUnsupported": "Image restore is not supported in this browser.",
+      "imageRestoreSkipped": "Image restore was skipped."
+    },
     "serverDown": {
       "title": "Oops! Our server went on a coffee break...",
       "message": "Apparently, our backend needed some \"me time\".\n\nDon't worry, we sent a carrier pigeon to bring it back."
@@ -55,10 +160,22 @@
       "locatingTitle": "Locating you",
       "locatingMessage": "Please wait while your device determines your current location...",
       "authorizationRequired": "Please authorize location.",
-      "failed": "Position could not be determined. Please try again later."
+      "failed": "Position could not be determined. Please try again later.",
+      "nominatimTitle": "Nominatim service",
+      "fetchingNominatim": "Fetching Nominatim data",
+      "searchTitle": "Searching location",
+      "searching": "Searching for \"{{ term }}\"",
+      "searchingNear": "Searching for \"{{ term }}\" near your location",
+      "searchingWithArea": "Searching for \"{{ term }}\" {{ area }}",
+      "area": {
+        "defined": "in defined area",
+        "nearby": "around your location"
+      }
     },
     "notifications": {
-      "received": "Notification received: {{ action }}"
+      "received": "Notification received: {{ action }}",
+      "systemTitle": "System message",
+      "systemBody": "You have a new system message."
     },
     "files": {
       "pickerUnsupported": "File picker is not supported in this browser."
@@ -72,6 +189,7 @@
     },
     "geoStatistic": {
       "title": "GeoStatistic Service",
+      "loading": "Fetching location data",
       "unexpectedResponse": "Unexpected response."
     }
   },
@@ -88,11 +206,81 @@
     "unknown": "Something went wrong. Please try again later.",
     "noteTooLarge": "Note is too large. Maximum {{ maxChars }} characters.",
     "unauthorized": "You need to sign in to continue.",
-    "rateLimit": "Too many requests. Please wait and try again."
+    "rateLimit": "Too many requests. Please wait and try again.",
+    "offline": {
+      "title": "Oops! You are offline..",
+      "message": "Apparently, your network needed some \"me time\"."
+    },
+    "http": {
+      "title": {
+        "noConnection": "No Connection",
+        "badRequest": "Bad Request",
+        "unauthorized": "Unauthorized",
+        "forbidden": "Forbidden",
+        "notFound": "Not Found",
+        "requestTimeout": "Request Timeout",
+        "tooManyRequests": "Too Many Requests",
+        "serverError": "Server Error",
+        "badGateway": "Bad Gateway",
+        "serviceUnavailable": "Service Unavailable",
+        "gatewayTimeout": "Gateway Timeout",
+        "unexpected": "Unexpected Error"
+      },
+      "message": {
+        "noConnection": "Please check your internet connection.",
+        "badRequest": "The request could not be processed.",
+        "unauthorized": "You need to sign in to continue.",
+        "forbidden": "You are not allowed to access this resource.",
+        "notFound": "The requested resource was not found.",
+        "requestTimeout": "The request took too long to complete.",
+        "tooManyRequests": "You sent too many requests. Please wait a moment.",
+        "serverError": "An unexpected server error occurred.",
+        "badGateway": "The server received an invalid response.",
+        "serviceUnavailable": "The service is temporarily unavailable.",
+        "gatewayTimeout": "The server took too long to respond.",
+        "unexpected": "Something went wrong. Please try again later."
+      }
+    },
+    "systemMessages": {
+      "authRequired": "Authorization required for system messages.",
+      "requestFailed": "Unable to process request for system messages.",
+      "unexpected": "Unexpected error while processing system messages."
+    }
   },
-  "auth": {},
-  "dsa": {},
+  "auth": {
+    "serviceTitle": "User service",
+    "hashingPin": "Hashing your PIN",
+    "accountCreated": "Your account has been created. You can log in now.",
+    "userCreationFailed": "Uuups! Something went wrong while creating your user. Please try again later.",
+    "creatingUser": "Creating user",
+    "confirmingUser": "Confirming user",
+    "sessionExpiredTitle": "Session expired",
+    "sessionExpiredMessage": "Your session has expired for security reasons. Please log in again to continue.",
+    "gettingUserInfo": "Getting user information",
+    "gettingUserMessages": "Getting user messages",
+    "deletingUser": "Deleting user",
+    "subscribingUser": "Subscribing to user",
+    "unsubscribingUser": "Unsubscribing from user",
+    "createUserTitle": "Want to create a user? It's that easy.",
+    "createUserMessage": "Just choose a PIN - no username and no password required.\n\nPlease keep this PIN safe. We do not store it, cannot reset it, and cannot recover it for you.\n\nIf the PIN is lost, access to this user is permanently lost as well.\n\nYou can delete your user at any time in the app.\n\nIf the user is not used for 90 days, it will be automatically and permanently deleted, including all associated data.",
+    "createUserAction": "Get started",
+    "pinIncorrect": "PIN is not correct. Please try again.",
+    "userNotFoundTitle": "User not found",
+    "userNotFoundMessage": "Looks like this user has been inactive for a while.\n\nTo keep things clean and simple, users are automatically deleted after 90 days of inactivity.\n\nYou can create a new one anytime - no signup, no hassle.",
+    "userNotFoundAction": "Create new user",
+    "backendErrorTitle": "Oops! Backend error!",
+    "backendErrorMessage": "Something went wrong. Please try again later."
+  },
+  "dsa": {
+    "title": "DSA",
+    "sendingQuickReport": "Sending quick report...",
+    "submittingNotice": "Submitting DSA notice..."
+  },
   "weather": {
+    "service": {
+      "title": "Weather service",
+      "loading": "Fetching weather data"
+    },
     "level": {
       "temperature": {
         "freezing": "Freezing",
@@ -137,6 +325,8 @@
       }
     },
     "airQuality": {
+      "serviceTitle": "Air quality service",
+      "loading": "Fetching air quality data...",
       "pollen": {
         "none": "None",
         "low": "Low",

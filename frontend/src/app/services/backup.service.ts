@@ -12,6 +12,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
 import { BackupStateService } from './backup-state.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 type DirectoryPickerWindow = typeof window & {
   showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
@@ -32,6 +33,7 @@ export class BackupService {
   private readonly userService = inject(UserService);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly backupState = inject(BackupStateService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -44,7 +46,7 @@ export class BackupService {
   async startBackup(): Promise<void> {
     const userId = this.userService.getUser().id;
     if (!userId) {
-      this.snackBar.open('Please sign in before creating a backup.', undefined, {
+      this.snackBar.open(this.i18n.t('common.backup.signInRequired'), undefined, {
         duration: 2500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -68,14 +70,14 @@ export class BackupService {
       const filename = `${this.formatTimestamp(new Date())}_messagedrop.backup`;
       await this.writeBackupFile(directoryHandle, filename, JSON.stringify(envelope));
       this.backupState.clearDirty();
-      this.snackBar.open('Backup created successfully.', undefined, {
+      this.snackBar.open(this.i18n.t('common.backup.createdSuccess'), undefined, {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top'
       });
     } catch (error) {
       console.error('Backup failed', error);
-      this.snackBar.open('Backup failed. Please try again.', undefined, {
+      this.snackBar.open(this.i18n.t('common.backup.failed'), undefined, {
         duration: 3000,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -92,7 +94,7 @@ export class BackupService {
         if (this.isAbortError(error)) {
           return null;
         }
-        this.snackBar.open('Folder selection failed.', undefined, {
+        this.snackBar.open(this.i18n.t('common.backup.folderSelectionFailed'), undefined, {
           duration: 2500,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -102,7 +104,7 @@ export class BackupService {
     }
 
     if (picker.showSaveFilePicker) {
-      this.snackBar.open('Folder selection is not supported. Save the backup file instead.', undefined, {
+      this.snackBar.open(this.i18n.t('common.backup.folderSelectionUnsupported'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',
         verticalPosition: 'top'
@@ -110,14 +112,17 @@ export class BackupService {
       try {
         const handle = await picker.showSaveFilePicker({
           suggestedName: `${this.formatTimestamp(new Date())}_messagedrop.backup`,
-          types: [{ description: 'MessageDrop Backup', accept: { 'application/octet-stream': ['.backup'] } }]
+          types: [{
+            description: this.i18n.t('common.backup.fileTypeDescription'),
+            accept: { 'application/octet-stream': ['.backup'] }
+          }]
         });
         return this.wrapFileHandleAsDirectory(handle);
       } catch (error) {
         if (this.isAbortError(error)) {
           return null;
         }
-        this.snackBar.open('File selection failed.', undefined, {
+        this.snackBar.open(this.i18n.t('common.backup.fileSelectionFailed'), undefined, {
           duration: 2500,
           horizontalPosition: 'center',
           verticalPosition: 'top'
@@ -126,7 +131,7 @@ export class BackupService {
       }
     }
 
-    this.snackBar.open('Backup is not supported in this browser.', undefined, {
+    this.snackBar.open(this.i18n.t('common.backup.notSupported'), undefined, {
       duration: 3000,
       horizontalPosition: 'center',
       verticalPosition: 'top'
@@ -173,10 +178,10 @@ export class BackupService {
     const url = `${environment.apiUrl}/user/backup/${userId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: true,
-      title: 'Backup',
+      title: this.i18n.t('common.backup.title'),
       image: '',
       icon: 'cloud_download',
-      message: 'Collecting your data from the server',
+      message: this.i18n.t('common.backup.collectingServerData'),
       button: '',
       delay: 0,
       showSpinner: true

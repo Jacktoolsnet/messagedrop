@@ -10,6 +10,7 @@ import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { SystemNotificationService } from './system-notification.service';
 import { UserService } from './user.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 interface UserRoomPayload {
   status: number;
@@ -33,6 +34,7 @@ export class SocketioService {
   private readonly contactService = inject(ContactService);
   private readonly cryptoService = inject(CryptoService);
   private readonly systemNotificationService = inject(SystemNotificationService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private socket: Socket;
   private readonly ioOptions = {
@@ -187,8 +189,8 @@ export class SocketioService {
       body?: string;
     };
 
-    const title = parsed.title || 'System message';
-    const body = parsed.body || 'You have a new system message.';
+    const title = parsed.title || this.i18n.t('common.notifications.systemTitle');
+    const body = parsed.body || this.i18n.t('common.notifications.systemBody');
     const tag = parsed.uuid ? `system-${parsed.uuid}` : 'system-message';
 
     try {
@@ -217,7 +219,7 @@ export class SocketioService {
           if (hint !== '') {
             payload.contact.hint = hint;
           } else {
-            payload.contact.hint = 'Hint cannot be decrypted!';
+            payload.contact.hint = this.i18n.t('common.contact.hintDecryptFailed');
           }
           const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
             data: { contact: payload.contact },
@@ -245,15 +247,19 @@ export class SocketioService {
   public receiveProfileForContactEvent(contact: Contact): void {
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
       if (payload.status == 200) {
-        contact.name = payload.contact.name !== '' ? payload.contact.name : "Not set";
+        contact.name = payload.contact.name !== '' ? payload.contact.name : this.i18n.t('common.contact.notSet');
         contact.base64Avatar = payload.contact.base64Avatar !== '' ? payload.contact.base64Avatar : undefined;
         this.contactService.saveAditionalContactInfos();
       } else {
-        this.snackBar.open("The contact declined the profile information request.", "Ok", {
+        this.snackBar.open(
+          this.i18n.t('common.contact.profileRequestDeclined'),
+          this.i18n.t('common.actions.ok'),
+          {
           panelClass: ['snack-warning'],
           horizontalPosition: 'center',
           verticalPosition: 'top',
-        });
+          }
+        );
       }
     });
   }

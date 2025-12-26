@@ -8,6 +8,7 @@ import { NotificationListResponse } from '../interfaces/notification-list-respon
 import { SystemNotification, SystemNotificationFilter } from '../interfaces/system-notification';
 import { NetworkService } from './network.service';
 import { UserService } from './user.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,7 @@ export class SystemNotificationService {
   private readonly userService = inject(UserService);
   private readonly networkService = inject(NetworkService);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly i18n = inject(TranslationHelperService);
 
   getNotificationsSignal() {
     return this.notificationsSig.asReadonly();
@@ -83,10 +85,10 @@ export class SystemNotificationService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'System messages',
+      title: this.i18n.t('common.systemMessages.title'),
       image: '',
       icon: 'notifications',
-      message: 'Loading system messages…',
+      message: this.i18n.t('common.systemMessages.loading'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -102,7 +104,7 @@ export class SystemNotificationService {
       const message = this.resolveErrorMessage(error);
       this.notificationsSig.set([]);
       this.errorSig.set('load_failed');
-      this.snackBar.open(message, 'OK', { duration: 3000 });
+      this.snackBar.open(message, this.i18n.t('common.actions.ok'), { duration: 3000 });
       throw error;
     } finally {
       this.loadingSig.set(false);
@@ -120,10 +122,10 @@ export class SystemNotificationService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'System messages',
+      title: this.i18n.t('common.systemMessages.title'),
       image: '',
       icon: 'notifications',
-      message: 'Updating message status…',
+      message: this.i18n.t('common.systemMessages.updatingStatus'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -155,7 +157,7 @@ export class SystemNotificationService {
         return [];
       }
       const message = this.resolveErrorMessage(error);
-      this.snackBar.open(message, 'OK', { duration: 3000 });
+      this.snackBar.open(message, this.i18n.t('common.actions.ok'), { duration: 3000 });
       throw error;
     }
   }
@@ -171,10 +173,10 @@ export class SystemNotificationService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'System messages',
+      title: this.i18n.t('common.systemMessages.title'),
       image: '',
       icon: '',
-      message: 'Updating message status…',
+      message: this.i18n.t('common.systemMessages.updatingStatus'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -201,7 +203,7 @@ export class SystemNotificationService {
       return updated;
     } catch (error) {
       const message = this.resolveErrorMessage(error);
-      this.snackBar.open(message, 'OK', { duration: 3000 });
+      this.snackBar.open(message, this.i18n.t('common.actions.ok'), { duration: 3000 });
       throw error;
     }
   }
@@ -217,10 +219,10 @@ export class SystemNotificationService {
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'System messages',
+      title: this.i18n.t('common.systemMessages.title'),
       image: '',
       icon: 'delete',
-      message: 'Removing system message…',
+      message: this.i18n.t('common.systemMessages.removing'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -238,7 +240,7 @@ export class SystemNotificationService {
       return deleted;
     } catch (error) {
       const message = this.resolveErrorMessage(error);
-      this.snackBar.open(message, 'OK', { duration: 3000 });
+      this.snackBar.open(message, this.i18n.t('common.actions.ok'), { duration: 3000 });
       throw error;
     }
   }
@@ -268,10 +270,10 @@ export class SystemNotificationService {
   private resolveErrorMessage(error: unknown): string {
     if (error instanceof HttpErrorResponse) {
       if (error.status === 403) {
-        return 'Authorization required for system messages.';
+        return this.i18n.t('errors.systemMessages.authRequired');
       }
-      return error.error?.error || 'Unable to process request for system messages.';
+      return error.error?.error || this.i18n.t('errors.systemMessages.requestFailed');
     }
-    return 'Unexpected error while processing system messages.';
+    return this.i18n.t('errors.systemMessages.unexpected');
   }
 }

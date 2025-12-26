@@ -4,6 +4,7 @@ import { catchError, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Message } from '../interfaces/message';
 import { NetworkService } from './network.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 interface ModerationResult {
   flagged: boolean;
@@ -30,6 +31,7 @@ export class OpenAiService {
 
   private readonly networkService = inject(NetworkService);
   private readonly http = inject(HttpClient);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -39,10 +41,10 @@ export class OpenAiService {
     const url = `${environment.apiUrl}/openai/moderate`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Moderation service',
+      title: this.i18n.t('common.moderation.title'),
       image: '',
       icon: '',
-      message: `Moderating message using OpenAI moderation AI`,
+      message: this.i18n.t('common.moderation.message'),
       button: '',
       delay: 0,
       showSpinner: true

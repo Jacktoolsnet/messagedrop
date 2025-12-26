@@ -13,6 +13,7 @@ import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -31,6 +32,7 @@ export class ConnectService {
   private readonly http = inject(HttpClient);
   private readonly snackBar = inject(MatSnackBar);
   private readonly networkService = inject(NetworkService);
+  private readonly i18n = inject(TranslationHelperService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -40,10 +42,10 @@ export class ConnectService {
     const url = `${environment.apiUrl}/connect/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: false,
-      title: 'Connect service',
+      title: this.i18n.t('common.connect.title'),
       image: '',
       icon: '',
-      message: `Creating connect informations`,
+      message: this.i18n.t('common.connect.creatingInfo'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -65,10 +67,10 @@ export class ConnectService {
     const url = `${environment.apiUrl}/connect/get/${connectId}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Connect service',
+      title: this.i18n.t('common.connect.title'),
       image: '',
       icon: '',
-      message: `Loading connect informations`,
+      message: this.i18n.t('common.connect.loadingInfo'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -100,21 +102,21 @@ export class ConnectService {
                     this.contactService.createContact(contact, socketioService);
                     // Delete connect record
                     this.deleteConnect(getConnectResponse.connect);
-                    this.snackBar.open(`Contact succesfully created.`, '', { duration: 1000 });
+                    this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
                   } else {
-                    this.snackBar.open(`Connect data is invalid.`, 'OK');
+                    this.snackBar.open(this.i18n.t('common.connect.invalidData'), this.i18n.t('common.actions.ok'));
                   }
                 });
             } else {
               // Delete connect record
               this.deleteConnect(getConnectResponse.connect);
-              this.snackBar.open(`It is not possible to add my user to the contact list`, 'OK');
+              this.snackBar.open(this.i18n.t('common.connect.selfAddBlocked'), this.i18n.t('common.actions.ok'));
             }
           }
         },
         error: (error) => {
           console.error('Failed to load connect record', error);
-          this.snackBar.open(`Connect id not found.`, 'OK');
+          this.snackBar.open(this.i18n.t('common.connect.notFound'), this.i18n.t('common.actions.ok'));
         }
       });
   }
@@ -123,10 +125,10 @@ export class ConnectService {
     const url = `${environment.apiUrl}/connect/delete/${connect.id}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
-      title: 'Connect service',
+      title: this.i18n.t('common.connect.title'),
       image: '',
       icon: '',
-      message: `Deleting connect informations`,
+      message: this.i18n.t('common.connect.deletingInfo'),
       button: '',
       delay: 0,
       showSpinner: true
@@ -138,12 +140,12 @@ export class ConnectService {
       .subscribe({
         next: (simpleStatusResponse) => {
           if (simpleStatusResponse.status !== 200) {
-            this.snackBar.open('Failed to delete connect record.', 'OK');
+            this.snackBar.open(this.i18n.t('common.connect.deleteFailed'), this.i18n.t('common.actions.ok'));
           }
         },
         error: (error) => {
           console.error('Failed to delete connect', error);
-          this.snackBar.open('Unable to delete connect record.', 'OK');
+          this.snackBar.open(this.i18n.t('common.connect.deleteUnavailable'), this.i18n.t('common.actions.ok'));
         }
       });
   }
