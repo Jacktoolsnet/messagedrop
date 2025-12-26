@@ -9,12 +9,14 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -36,7 +38,8 @@ interface TextDialogResult {
     MatIcon,
     FormsModule,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    TranslocoPipe
 ],
   templateUrl: './edit-note.component.html',
   styleUrl: './edit-note.component.css'
@@ -47,6 +50,7 @@ export class EditNoteComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<EditNoteComponent>);
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; note: Note }>(MAT_DIALOG_DATA);
@@ -91,7 +95,7 @@ export class EditNoteComponent implements OnInit {
   }
 
   public showPolicy() {
-    this.snackBar.open(`This information is stored on your device and is only visible to you.`, 'OK', {});
+    this.snackBar.open(this.translation.t('common.note.policy'), this.translation.t('common.actions.ok'), {});
   }
 
   applyNewMultimedia(newMultimedia: Multimedia) {

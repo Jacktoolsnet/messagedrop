@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
@@ -17,6 +18,7 @@ import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -39,7 +41,8 @@ interface TextDialogResult {
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslocoPipe
 ],
   templateUrl: './edit-message.component.html',
   styleUrl: './edit-message.component.css'
@@ -52,6 +55,7 @@ export class EditMessageComponent implements OnInit {
   private readonly matDialog = inject(MatDialog);
   private readonly messageService = inject(MessageService);
   private readonly openAiService = inject(OpenAiService);
+  private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
@@ -74,7 +78,11 @@ export class EditMessageComponent implements OnInit {
       case 'add_comment':
       case 'edit_comment':
         if (this.messageService.detectPersonalInformation(this.data.message.message)) {
-          this.snackBar.open(`My message will not be published because it appears to contain personal information.`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
+          this.snackBar.open(
+            this.translation.t('common.message.personalInfoBlocked'),
+            this.translation.t('common.actions.ok'),
+            { horizontalPosition: 'center', verticalPosition: 'top' }
+          );
         } else {
           if (this.data.message.message !== '') {
             this.openAiService.moderateMessage(this.data.message)
@@ -85,11 +93,15 @@ export class EditMessageComponent implements OnInit {
                     this.dialogRef.close(this.data);
                   } else {
                     // abgelehnt
-                    this.snackBar.open(`Content will not be published because it was rejected by the moderation AI`, 'OK', { horizontalPosition: 'center', verticalPosition: 'top' });
+                    this.snackBar.open(
+                      this.translation.t('common.message.moderationRejected'),
+                      this.translation.t('common.actions.ok'),
+                      { horizontalPosition: 'center', verticalPosition: 'top' }
+                    );
                   }
                 },
                 error: () => {
-                  this.snackBar.open('Moderation failed. Please try again later.', 'OK', {
+                  this.snackBar.open(this.translation.t('common.message.moderationFailed'), this.translation.t('common.actions.ok'), {
                     horizontalPosition: 'center',
                     verticalPosition: 'top'
                   });
@@ -131,7 +143,7 @@ export class EditMessageComponent implements OnInit {
   }
 
   public showPolicy() {
-    this.snackBar.open(`This information is stored on our server and is visible to everyone.`, 'OK', {});
+    this.snackBar.open(this.translation.t('common.message.policy'), this.translation.t('common.actions.ok'), {});
   }
 
   applyNewMultimedia(newMultimedia: Multimedia) {

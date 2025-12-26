@@ -8,6 +8,7 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Connect } from '../../interfaces/connect';
 import { Contact } from '../../interfaces/contact';
 import { Mode } from '../../interfaces/mode';
@@ -19,6 +20,7 @@ import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
@@ -43,7 +45,8 @@ interface ConnectDialogResult {
     MatIcon,
     MatMenuModule,
     MatExpansionModule,
-    TileListComponent
+    TileListComponent,
+    TranslocoPipe
   ],
   templateUrl: './contactlist.component.html',
   styleUrl: './contactlist.component.css'
@@ -61,6 +64,7 @@ export class ContactlistComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
   private readonly contactMessageService = inject(ContactMessageService);
+  private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});
@@ -181,11 +185,15 @@ export class ContactlistComponent {
           next: () => {
             const remaining = this.contactsSignal().filter(c => c.id !== targetId);
             this.contactService.setContacts(remaining);
-            this.snackBar.open('Contact deleted', 'OK', { duration: 1500 });
+            this.snackBar.open(
+              this.translation.t('common.contact.delete.success'),
+              this.translation.t('common.actions.ok'),
+              { duration: 1500 }
+            );
           },
           error: (err) => {
-            const message = err?.message ?? 'Failed to delete contact.';
-            this.snackBar.open(message, 'OK');
+            const message = err?.message ?? this.translation.t('common.contact.delete.failed');
+            this.snackBar.open(message, this.translation.t('common.actions.ok'));
           }
         });
         this.contactToDelete = undefined;
@@ -291,25 +299,38 @@ export class ContactlistComponent {
 
                     if (navigator.share) {
                       navigator.share({
-                        title: 'MessageDrop – Share Connect-ID',
+                        title: this.translation.t('common.contact.connect.shareTitle'),
                         text: connect.id
                       }).catch(() => {
-                        this.snackBar.open('Sharing was canceled.', 'OK', { duration: 2000 });
+                        this.snackBar.open(
+                          this.translation.t('common.contact.connect.shareCanceled'),
+                          this.translation.t('common.actions.ok'),
+                          { duration: 2000 }
+                        );
                       });
                     } else {
                       navigator.clipboard.writeText(connect.id).then(() => {
                         this.snackBarRef = this.snackBar.open(
-                          'The Connect-ID has been copied to your clipboard.',
-                          'OK',
+                          this.translation.t('common.contact.connect.copied'),
+                          this.translation.t('common.actions.ok'),
                           { duration: 2500 }
                         );
                       }).catch(() => {
-                        this.snackBar.open('Copying failed. Please use QR-Code to connect.', 'OK', { duration: 2500 });
+                        this.snackBar.open(
+                          this.translation.t('common.contact.connect.copyFailed'),
+                          this.translation.t('common.actions.ok'),
+                          { duration: 2500 }
+                        );
                       });
                     }
                   }
                 },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                error: (err) => {
+                  this.snackBarRef = this.snackBar.open(
+                    err.message,
+                    this.translation.t('common.actions.ok')
+                  );
+                }
               });
           });
       });
@@ -343,7 +364,12 @@ export class ContactlistComponent {
                     });
                   }
                 },
-                error: (err) => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                error: (err) => {
+                  this.snackBarRef = this.snackBar.open(
+                    err.message,
+                    this.translation.t('common.actions.ok')
+                  );
+                }
               });
           });
       });

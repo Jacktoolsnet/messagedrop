@@ -21,12 +21,13 @@
         <div class="oembed_container">
             <button (click)="openTextDialog()" mat-flat-button class="button_default" color="primary">
                 <mat-icon>post_add</mat-icon>
-                <span>Add a text</span>
+                <span>{{ 'common.note.addText' | transloco }}</span>
             </button>
         </div>
         } @else {
         <div class="text_container">
-            <button mat-mini-fab class="button_random" color="secondary" aria-label="Drop a new message"
+            <button mat-mini-fab class="button_random" color="secondary"
+                [attr.aria-label]="'common.actions.randomizeStyle' | transloco"
                 (click)="onNewFontClick()">
                 <mat-icon>cycle</mat-icon>
             </button>
@@ -44,8 +45,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">Abort</button>
+    <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">{{ 'common.actions.abort' | transloco }}</button>
     @if (data.note.note !== '' || data.note.multimedia.type !== 'undefined') {
-    <button mat-button mat-dialog-close (click)="onApplyClick()">Apply</button>
+    <button mat-button mat-dialog-close (click)="onApplyClick()">{{ 'common.actions.apply' | transloco }}</button>
     }
 </mat-dialog-actions>

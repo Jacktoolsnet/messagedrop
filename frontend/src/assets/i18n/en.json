@@ -14,6 +14,7 @@
       "yes": "Yes",
       "apply": "Apply",
       "abort": "Abort",
+      "randomizeStyle": "Randomize style",
       "delete": "Delete",
       "close": "Close"
     },
@@ -85,13 +86,34 @@
         "description": "The connect ID I want to import.",
         "label": "Connect ID",
         "placeholder": "The connect ID.",
+        "start": "Start connecting",
+        "addAria": "Add connection",
+        "menuShare": "Share connect ID",
+        "menuConnectWithId": "Connect with connect ID",
+        "menuShareQr": "Share QR code",
+        "menuConnectQr": "Connect by scanning QR code",
+        "shareTitle": "MessageDrop - share Connect ID",
+        "shareCanceled": "Sharing was canceled.",
+        "copied": "The Connect ID has been copied to your clipboard.",
+        "copyFailed": "Copying failed. Please use the QR code to connect.",
         "abortAria": "Abort import",
         "applyAria": "Apply connection",
         "policy": "Contact ID, user ID, contact user ID, and the subscribed flag are saved on our server. This information is essential for the app to work."
       },
       "delete": {
         "title": "Delete contact",
-        "confirm": "This contact and all related data will be permanently deleted. Are you sure?"
+        "confirm": "This contact and all related data will be permanently deleted. Are you sure?",
+        "success": "Contact deleted.",
+        "failed": "Failed to delete contact."
+      },
+      "list": {
+        "nameFallback": "Unnamed",
+        "pinAria": "Pin contact",
+        "unpinAria": "Unpin contact",
+        "openChatroomAria": "Open chatroom",
+        "editAria": "Edit contact",
+        "subscribeAria": "Subscribe to contact",
+        "unsubscribeAria": "Unsubscribe from contact"
       },
       "profile": {
         "title": "Contact profile",
@@ -139,6 +161,12 @@
     },
     "message": {
       "title": "Message service",
+      "addText": "Add a text",
+      "updateAria": "Update your message",
+      "policy": "This information is stored on our server and is visible to everyone.",
+      "personalInfoBlocked": "My message will not be published because it appears to contain personal information.",
+      "moderationRejected": "Content will not be published because it was rejected by the moderation AI.",
+      "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
       "created": "Message successfully dropped.",
       "updating": "Updating message",
@@ -153,6 +181,10 @@
     },
     "comment": {
       "created": "Comment successfully dropped."
+    },
+    "note": {
+      "addText": "Add a text",
+      "policy": "This information is stored on your device and is only visible to you."
     },
     "server": {
       "connectingTitle": "Connecting",

@@ -7,7 +7,7 @@
             </button>
         </div>
         <button class="first-button" mat-flat-button color="primary" [matMenuTriggerFor]="connectionMenu">
-            <span>Start connecting</span>
+            <span>{{ 'common.contact.connect.start' | transloco }}</span>
         </button>
     </div>
     } @else {
@@ -16,7 +16,8 @@
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
-            <button mat-mini-fab color="primary" class="button_add" aria-label="Add connection"
+            <button mat-mini-fab color="primary" class="button_add"
+                [attr.aria-label]="'common.contact.connect.addAria' | transloco"
                 [matMenuTriggerFor]="connectionMenu">
                 <mat-icon>connect_without_contact</mat-icon>
             </button>
@@ -29,12 +30,12 @@
                     [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true" matBadgeColor="warn">
                     @if (contact.base64Avatar) {
                     <img class="avatar" [src]="contact.base64Avatar"
-                        [attr.alt]="(contact.name || 'Contact') + ' avatar'" />
+                        [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" />
                     } @else {
                     <mat-icon>person</mat-icon>
                     }
                 </span>
-                <span class="name">{{ contact.name || 'Unnamed' }}</span>
+                <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
             </mat-expansion-panel-header>
             <mat-card>
                 <mat-card-content>
@@ -45,35 +46,44 @@
 
                 <mat-card-actions class="buttonbar">
                     @if (contact.pinned) {
-                    <button mat-mini-fab [ngClass]="'active-button'" aria-label="Unpin" (click)="unpinContact(contact)">
+                    <button mat-mini-fab [ngClass]="'active-button'"
+                        [attr.aria-label]="'common.contact.list.unpinAria' | transloco" (click)="unpinContact(contact)">
                         <mat-icon>keep_off</mat-icon>
                     </button>
                     } @else {
-                    <button mat-mini-fab [ngClass]="'inactive-button'" aria-label="Pin" (click)="pinContact(contact)">
+                    <button mat-mini-fab [ngClass]="'inactive-button'"
+                        [attr.aria-label]="'common.contact.list.pinAria' | transloco" (click)="pinContact(contact)">
                         <mat-icon>keep</mat-icon>
                     </button>
                     }
-                    <button mat-mini-fab color="secondary" aria-label="Chatfenster öffnen"
+                    <button mat-mini-fab color="secondary"
+                        [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
                         [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
                         matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
                         <mat-icon>forum</mat-icon>
                     </button>
-                    <button mat-mini-fab color="secondary" aria-label="Edit contact" (click)="editContact(contact)">
+                    <button mat-mini-fab color="secondary"
+                        [attr.aria-label]="'common.contact.list.editAria' | transloco" (click)="editContact(contact)">
                         <mat-icon>settings_account_box</mat-icon>
                     </button>
                     @if (!subscriptionError) {
                     @if (contact.subscribed) {
-                    <button mat-mini-fab [color]="'active-button'" aria-label="Subscribe" (click)="subscribe(contact)">
+                    <button mat-mini-fab [color]="'active-button'"
+                        [attr.aria-label]="'common.contact.list.unsubscribeAria' | transloco"
+                        (click)="subscribe(contact)">
                         <mat-icon>bookmark_remove</mat-icon>
                     </button>
                     } @else {
-                    <button mat-mini-fab [color]="'inactive-button'" aria-label="Subscribe"
+                    <button mat-mini-fab [color]="'inactive-button'"
+                        [attr.aria-label]="'common.contact.list.subscribeAria' | transloco"
                         (click)="subscribe(contact)">
                         <mat-icon>bookmark_add</mat-icon>
                     </button>
                     }
                     }
-                    <button mat-mini-fab color="secondary" aria-label="Delete contact" (click)="deleteContact(contact)">
+                    <button mat-mini-fab color="secondary"
+                        [attr.aria-label]="'common.contact.delete.title' | transloco"
+                        (click)="deleteContact(contact)">
                         <mat-icon>delete_forever</mat-icon>
                     </button>
                 </mat-card-actions>
@@ -85,11 +95,21 @@
     }
 </mat-dialog-content>
 
-<mat-menu #connectionMenu="matMenu"> <button mat-menu-item (click)="shareConnectId()"> <mat-icon>share</mat-icon>
-        <span>Share connect id</span> </button> <button mat-menu-item (click)="openConnectDialog()">
+<mat-menu #connectionMenu="matMenu">
+    <button mat-menu-item (click)="shareConnectId()">
+        <mat-icon>share</mat-icon>
+        <span>{{ 'common.contact.connect.menuShare' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openConnectDialog()">
         <mat-icon>link</mat-icon>
-        <span>Connect with connect id</span> </button> <button mat-menu-item (click)="openQrDialog()">
-        <mat-icon>qr_code</mat-icon> <span>Share QR-Code</span> </button> <button mat-menu-item
-        (click)="openScannerDialog()"> <mat-icon>qr_code_scanner</mat-icon> <span>Connect scanning QR-Code</span>
+        <span>{{ 'common.contact.connect.menuConnectWithId' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openQrDialog()">
+        <mat-icon>qr_code</mat-icon>
+        <span>{{ 'common.contact.connect.menuShareQr' | transloco }}</span>
+    </button>
+    <button mat-menu-item (click)="openScannerDialog()">
+        <mat-icon>qr_code_scanner</mat-icon>
+        <span>{{ 'common.contact.connect.menuConnectQr' | transloco }}</span>
     </button>
 </mat-menu>
