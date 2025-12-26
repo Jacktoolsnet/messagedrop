@@ -29,6 +29,9 @@ export const appConfig: ApplicationConfig = {
         defaultLang: 'en',
         fallbackLang: 'en',
         reRenderOnLangChange: true,
+        missingHandler: {
+          useFallbackTranslation: true
+        },
         prodMode: !isDevMode()
       },
       loader: TranslocoHttpLoader

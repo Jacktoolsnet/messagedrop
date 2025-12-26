@@ -13,5 +13,9 @@
       "optionEnglish": "Englisch",
       "optionGerman": "Deutsch"
     }
-  }
+  },
+  "errors": {},
+  "auth": {},
+  "dsa": {},
+  "weather": {}
 }
