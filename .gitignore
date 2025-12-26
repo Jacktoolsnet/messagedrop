@@ -139,7 +139,12 @@ environment*
 
 # keys
 backend/keys
+services/*/keys
+platform/admin/backend/keys
 *.enc
+
+# service-to-service trust bundle
+config/service-jwks.json
 
 # admin backend uploads
 platform/admin/backend/uploads/

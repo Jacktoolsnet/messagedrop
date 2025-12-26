@@ -2,18 +2,18 @@ const fs = require('fs');
 const path = require('path');
 
 const services = [
-  { issuer: 'service.backend', keyStore: './backend/utils/keyStore' },
-  { issuer: 'service.admin-backend', keyStore: './platform/admin/backend/utils/keyStore' },
-  { issuer: 'service.openmeteo', keyStore: './services/openMeteo/utils/keyStore' },
-  { issuer: 'service.nominatim', keyStore: './services/nominatim/utils/keyStore' },
-  { issuer: 'service.socketio', keyStore: './services/socketio/utils/keyStore' }
+  { issuer: 'service.backend', keyStore: '../backend/utils/keyStore' },
+  { issuer: 'service.admin-backend', keyStore: '../platform/admin/backend/utils/keyStore' },
+  { issuer: 'service.openmeteo', keyStore: '../services/openMeteo/utils/keyStore' },
+  { issuer: 'service.nominatim', keyStore: '../services/nominatim/utils/keyStore' },
+  { issuer: 'service.socketio', keyStore: '../services/socketio/utils/keyStore' }
 ];
 
 async function run() {
   const jwks = {};
 
   for (const svc of services) {
-    const ks = require(svc.keyStore);
+    const ks = require(path.join(__dirname, svc.keyStore));
     await ks.generateOrLoadKeypairs();
     const jwk = await ks.getSigningPublicJwk();
     jwks[svc.issuer] = jwk;
