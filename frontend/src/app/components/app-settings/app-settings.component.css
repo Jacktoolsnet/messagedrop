@@ -138,12 +138,19 @@ h4 {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .theme-settings-header mat-icon {
     font-size: 1.75rem;
     width: 1.75rem;
     height: 1.75rem;
+    flex: 0 0 auto;
+}
+
+.theme-settings-header > div {
+    min-width: 0;
+    flex: 1 1 0;
 }
 
 .theme-settings-header h3 {
@@ -170,12 +177,19 @@ h4 {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .language-settings-header mat-icon {
     font-size: 1.75rem;
     width: 1.75rem;
     height: 1.75rem;
+    flex: 0 0 auto;
+}
+
+.language-settings-header > div {
+    min-width: 0;
+    flex: 1 1 0;
 }
 
 .language-settings-header h3 {
@@ -241,12 +255,19 @@ h4 {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .storage-persistence-header mat-icon {
     font-size: 1.75rem;
     width: 1.75rem;
     height: 1.75rem;
+    flex: 0 0 auto;
+}
+
+.storage-persistence-header > div {
+    min-width: 0;
+    flex: 1 1 0;
 }
 
 .storage-persistence-header h3 {
@@ -290,12 +311,19 @@ h4 {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    flex-wrap: wrap;
 }
 
 .backup-exit-header mat-icon {
     font-size: 1.75rem;
     width: 1.75rem;
     height: 1.75rem;
+    flex: 0 0 auto;
+}
+
+.backup-exit-header > div {
+    min-width: 0;
+    flex: 1 1 0;
 }
 
 .backup-exit-header h3 {

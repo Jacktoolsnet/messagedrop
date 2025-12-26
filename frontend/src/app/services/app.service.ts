@@ -23,6 +23,7 @@ export class AppService {
 
   // Irgendwo oben im Service:
   private readonly defaultAppSettings: AppSettings = {
+    languageMode: 'system',
     defaultTheme: 'azure',
     themeMode: 'system',
     detectLocationOnStart: false,
@@ -56,7 +57,8 @@ export class AppService {
   }
 
   async setAppSettings(newAppSettings: AppSettings): Promise<void> {
-    const merged = { ...this.defaultAppSettings, ...newAppSettings };
+    const current = this.appSettings ?? this.defaultAppSettings;
+    const merged = { ...this.defaultAppSettings, ...current, ...newAppSettings };
 
     // Wenn alle Zustimmungen erteilt sind, die akzeptierte Version mitschreiben
     const isConsentComplete =

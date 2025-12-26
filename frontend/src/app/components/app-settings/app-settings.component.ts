@@ -110,7 +110,9 @@ export class AppSettingsComponent implements OnInit {
   }
 
   setLanguageMode(mode: LanguageMode): void {
+    this.appSettings = { ...this.appSettings, languageMode: mode };
     this.languageService.setLanguageMode(mode);
+    this.appService.setAppSettings(this.appSettings);
   }
 
   async onStoragePersistenceToggle(event: MatSlideToggleChange): Promise<void> {
