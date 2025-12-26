@@ -1,0 +1,52 @@
+{
+  "service.backend": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "-8_FWAyMSEQgQMTUfHi03HOjvBzwJT6T3xrOW44SanDcE-dw4kV75h3h0rO3jGSK",
+    "y": "u5TkmR8KfkcB7UXSqIcH0L3PGuE-2m1wfrxm3G_5BVmB2rZXnlNsmbcl6uogZmlJ",
+    "crv": "P-384"
+  },
+  "service.admin-backend": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "KHa3aEXbdLYXLxCnNaPSEt8w4R0NpzOqTD4HmTly-uW2EWbTW5a_mmyj5OGlr3Zw",
+    "y": "s_XCgwjNh9ODMgNiDZfV0uTSHimv8c3as7I6NvAvaT6EUpl_H1cvBNFybW82b3je",
+    "crv": "P-384"
+  },
+  "service.openmeteo": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "qqML-S3-LVW2AZu7Q8pdKX3gFoee0vytrX-u7AmrjJa3S0faGTc3OgZ27sl-PAF7",
+    "y": "wRgwHpU3c0eZgAieN6rJYxsZpD_oFpArLce7xfWihkbPWGp68uKCQcwwEGeiGn9q",
+    "crv": "P-384"
+  },
+  "service.nominatim": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "1d2uMdKkmBw8_Z9p9NMHc2EcB39Wbc_2rjArK9XA_3EeF4lNddhvRvzP9VkHU8e5",
+    "y": "EGvzIAL48U5KEtb5dWDdqeMv6aqILZUPTxHpE79eZHXebuAMYBI7muNn6GZM5OJV",
+    "crv": "P-384"
+  },
+  "service.socketio": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "zN4NoigX5tWF47XAo97gCTD6qiV2lp6fhFBx3RrNlFkfNqOpT4V4wHbiBVYix6Xy",
+    "y": "VzaAWXRUYCVc0wqi7Le41kIHDapmU0JX2zYtJ8yH08bSbLCTSCBCOQ7RFRfct9jY",
+    "crv": "P-384"
+  }
+}

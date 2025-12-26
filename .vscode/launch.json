@@ -74,6 +74,16 @@
                 "<node_internals>/**"
             ],
             "type": "node"
+        },
+        {
+            "name": "Generate Service JWKs",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/tools/generate-service-jwks.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
         }
     ]
 }
