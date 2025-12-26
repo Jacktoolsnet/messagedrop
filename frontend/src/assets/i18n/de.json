@@ -433,6 +433,49 @@
         "confirm": "Die Notiz wird dauerhaft gelöscht. Bist du sicher?"
       }
     },
+    "pin": {
+      "enterTitle": "PIN eingeben",
+      "createTitle": "PIN erstellen",
+      "confirmTitle": "PIN bestätigen",
+      "hintTitle": "PIN-Hinweis",
+      "hintBody": "Um MessageDrop zu nutzen, muss ich eine PIN wählen. Ich darf sie nicht vergessen, denn es gibt keine Möglichkeit, sie wiederherzustellen. Die PIN wird verschlüsselt, gehasht und nur auf meinem Gerät gespeichert.",
+      "mismatch": "PINs stimmen nicht überein."
+    },
+    "placeList": {
+      "addFirstPlace": "Ersten Ort hinzufügen",
+      "addPlaceAria": "Ort hinzufügen",
+      "nameFallback": "Ohne Namen",
+      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltFallback": "Ort-Avatar",
+      "pinAria": "Ort anheften",
+      "unpinAria": "Ort lösen",
+      "editAria": "Ort bearbeiten",
+      "deleteAria": "Ort löschen",
+      "subscribeAria": "Ort abonnieren",
+      "unsubscribeAria": "Ort abbestellen",
+      "flyToAria": "Zum Ort springen",
+      "deleteFailed": "Der Ort konnte nicht gelöscht werden.",
+      "subscribeFailed": "Abonnieren fehlgeschlagen.",
+      "unsubscribeFailed": "Abbestellen fehlgeschlagen.",
+      "createSuccess": "Ort erfolgreich erstellt.",
+      "resolveFailed": "Der aktuelle Ort konnte nicht bestimmt werden."
+    },
+    "placeSettings": {
+      "addTitle": "Ort hinzufügen",
+      "editTitle": "Ortseinstellungen",
+      "nameLabel": "Ortsname",
+      "setAvatar": "Ort-Avatar festlegen.",
+      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltFallback": "Ort-Avatar",
+      "deleteAvatarAria": "Avatar entfernen",
+      "tileSettings": "Tile-Einstellungen",
+      "openTileSettingsAria": "Tile-Einstellungen für {{ name }} öffnen",
+      "nameFallback": "Ort",
+      "imageInvalid": "Bitte wähle eine gültige Bilddatei aus.",
+      "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: 5 MB.",
+      "imageReadError": "Fehler beim Lesen der Datei.",
+      "savePolicy": "Ort-ID, Ortsname (gehasht), die hinzugefügten Standorte und das Abonnement-Flag werden auf unserem Server gespeichert. Der lesbare Name und der Avatar werden auf deinem Gerät gespeichert."
+    },
     "legal": {
       "language": {
         "de": "Deutsch",

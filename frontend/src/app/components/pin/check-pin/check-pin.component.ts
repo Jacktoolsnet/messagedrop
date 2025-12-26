@@ -5,6 +5,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { ResetUserComponent } from '../../user/reset-user/reset-user.component';
 
 @Component({
@@ -14,7 +15,8 @@ import { ResetUserComponent } from '../../user/reset-user/reset-user.component';
     MatIcon,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslocoPipe
   ],
   templateUrl: './check-pin.component.html',
   styleUrl: './check-pin.component.css'

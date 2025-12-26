@@ -12,6 +12,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
 import { Mode } from '../../interfaces/mode';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
@@ -22,6 +23,7 @@ import { IndexedDbService } from '../../services/indexed-db.service';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
+import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
 import { TileListComponent } from "../tile/tile-list/tile-list.component";
@@ -44,7 +46,8 @@ interface TimezoneResponse { status: number; timezone: string }
     MatMenuModule,
     MatInputModule,
     MatExpansionModule,
-    TileListComponent
+    TileListComponent,
+    TranslocoPipe
   ],
   templateUrl: './placelist.component.html',
   styleUrl: './placelist.component.css'
@@ -59,6 +62,7 @@ export class PlacelistComponent {
   readonly dialogRef = inject(MatDialogRef<PlacelistComponent>);
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   private readonly dialogData = inject<unknown>(MAT_DIALOG_DATA);
 
   readonly placesSignal: Signal<Place[]> = this.placeService.sortedPlacesSignal;
@@ -87,7 +91,11 @@ export class PlacelistComponent {
               }
             },
             error: err => {
-              this.snackBar.open(err?.message ?? 'Could not delete the place.', 'OK', { duration: 3000 });
+              this.snackBar.open(
+                err?.message ?? this.translation.t('common.placeList.deleteFailed'),
+                this.translation.t('common.actions.ok'),
+                { duration: 3000 }
+              );
             }
           });
       }
@@ -111,7 +119,9 @@ export class PlacelistComponent {
               this.placeService.saveAdditionalPlaceInfos(place);
             }
           },
-          error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+          error: err => {
+            this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+          }
         });
     });
   }
@@ -130,7 +140,11 @@ export class PlacelistComponent {
           }
         },
         error: err => {
-          this.snackBar.open(err?.message ?? 'Subscribing failed.', 'OK', { duration: 3000 });
+          this.snackBar.open(
+            err?.message ?? this.translation.t('common.placeList.subscribeFailed'),
+            this.translation.t('common.actions.ok'),
+            { duration: 3000 }
+          );
         }
       });
     } else {
@@ -143,7 +157,11 @@ export class PlacelistComponent {
           }
         },
         error: err => {
-          this.snackBar.open(err?.message ?? 'Unsubscribing failed.', 'OK', { duration: 3000 });
+          this.snackBar.open(
+            err?.message ?? this.translation.t('common.placeList.unsubscribeFailed'),
+            this.translation.t('common.actions.ok'),
+            { duration: 3000 }
+          );
         }
       });
     }
@@ -213,7 +231,7 @@ export class PlacelistComponent {
         this.mapService.getMapLocation(),
         this.nominatimService.getLocationFromNominatimPlace(nominatimPlace),
         50
-      ); // innerhalb 50 m
+      ); // within 50 m
     }
     if (!isNearby) {
       this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation(), true).subscribe({
@@ -232,14 +250,22 @@ export class PlacelistComponent {
                         if (createPlaceResponse.status === 200) {
                           place.id = createPlaceResponse.placeId;
                           this.placeService.saveAdditionalPlaceInfos(place);
-                          this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                          this.snackBarRef = this.snackBar.open(
+                            this.translation.t('common.placeList.createSuccess'),
+                            '',
+                            { duration: 1000 }
+                          );
                         }
                       },
-                      error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                      error: err => {
+                        this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+                      }
                     });
                   }
                 },
-                error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                error: err => {
+                  this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+                }
               });
             } else {
               nominatimPlace = nominatimAddressResponse.nominatimPlace;
@@ -257,20 +283,32 @@ export class PlacelistComponent {
                         if (createPlaceResponse.status === 200) {
                           place.id = createPlaceResponse.placeId;
                           this.placeService.saveAdditionalPlaceInfos(place);
-                          this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                          this.snackBarRef = this.snackBar.open(
+                            this.translation.t('common.placeList.createSuccess'),
+                            '',
+                            { duration: 1000 }
+                          );
                         }
                       },
-                      error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                      error: err => {
+                        this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+                      }
                     });
                   }
                 },
-                error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+                error: err => {
+                  this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+                }
               });
             }
           }
         },
         error: () => {
-          this.snackBar.open('Could not determine the current place.', 'OK', { duration: 3000 });
+          this.snackBar.open(
+            this.translation.t('common.placeList.resolveFailed'),
+            this.translation.t('common.actions.ok'),
+            { duration: 3000 }
+          );
         }
       });
     } else {
@@ -289,14 +327,22 @@ export class PlacelistComponent {
                   if (createPlaceResponse.status === 200) {
                     place.id = createPlaceResponse.placeId;
                     this.placeService.saveAdditionalPlaceInfos(place);
-                    this.snackBarRef = this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                    this.snackBarRef = this.snackBar.open(
+                      this.translation.t('common.placeList.createSuccess'),
+                      '',
+                      { duration: 1000 }
+                    );
                   }
                 },
-                error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+              error: err => {
+                this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+              }
               });
             }
           },
-          error: err => { this.snackBarRef = this.snackBar.open(err.message, 'OK'); }
+        error: err => {
+          this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+        }
         });
       }
     }

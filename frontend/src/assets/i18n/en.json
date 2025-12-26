@@ -433,6 +433,49 @@
         "confirm": "The note will be permanently deleted. Are you sure?"
       }
     },
+    "pin": {
+      "enterTitle": "Enter PIN",
+      "createTitle": "Create PIN",
+      "confirmTitle": "Confirm PIN",
+      "hintTitle": "PIN hint",
+      "hintBody": "To use MessageDrop, I have to choose a PIN. I can't forget it, since there's no way to recover it. The PIN is encrypted, hashed, and stored only on my device.",
+      "mismatch": "PINs do not match."
+    },
+    "placeList": {
+      "addFirstPlace": "Add my first place",
+      "addPlaceAria": "Add place",
+      "nameFallback": "Unnamed",
+      "avatarAltName": "{{ name }} avatar",
+      "avatarAltFallback": "Place avatar",
+      "pinAria": "Pin place",
+      "unpinAria": "Unpin place",
+      "editAria": "Edit place",
+      "deleteAria": "Delete place",
+      "subscribeAria": "Subscribe to place",
+      "unsubscribeAria": "Unsubscribe from place",
+      "flyToAria": "Fly to place",
+      "deleteFailed": "Could not delete the place.",
+      "subscribeFailed": "Subscribing failed.",
+      "unsubscribeFailed": "Unsubscribing failed.",
+      "createSuccess": "Place successfully created.",
+      "resolveFailed": "Could not determine the current place."
+    },
+    "placeSettings": {
+      "addTitle": "Add a place",
+      "editTitle": "Place settings",
+      "nameLabel": "Place name",
+      "setAvatar": "Set the place avatar.",
+      "avatarAltName": "{{ name }} avatar",
+      "avatarAltFallback": "Place avatar",
+      "deleteAvatarAria": "Remove avatar",
+      "tileSettings": "Tile settings",
+      "openTileSettingsAria": "Open tile settings for {{ name }}",
+      "nameFallback": "place",
+      "imageInvalid": "Please select a valid image file.",
+      "imageTooLarge": "The image is too large. Maximum allowed size is 5 MB.",
+      "imageReadError": "Error reading the file.",
+      "savePolicy": "Place id, place name (hashed), the added locations, and the subscribed flag are saved on our server. The readable name and the avatar are saved on your device."
+    },
     "legal": {
       "language": {
         "de": "Deutsch",

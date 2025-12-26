@@ -1,4 +1,6 @@
-<h2 mat-dialog-title>{{ isConfirming ? 'Confirm PIN' : 'Create PIN' }}</h2>
+<h2 mat-dialog-title>
+    {{ isConfirming ? ('common.pin.confirmTitle' | transloco) : ('common.pin.createTitle' | transloco) }}
+</h2>
 
 <div class="pin-display">
     @for (digit of isConfirming ? confirmPinDisplay : pinDisplay; track $index) {
@@ -15,17 +17,17 @@
     </button>
     }
 
-    <!-- Reset Button mit Icon -->
+    <!-- Reset button with icon. -->
     <button mat-mini-fab color="primary" (click)="reset()">
         <mat-icon>autorenew</mat-icon>
     </button>
 
-    <!-- 0 Button -->
+    <!-- 0 button. -->
     <button mat-mini-fab color="accent" (click)="addDigit('0')">
         0
     </button>
 
-    <!-- Help Button mit Icon -->
+    <!-- Help button with icon. -->
     <button mat-mini-fab color="primary" [disabled]="false" (click)="showPinHint()">
         <mat-icon>question_mark</mat-icon>
     </button>

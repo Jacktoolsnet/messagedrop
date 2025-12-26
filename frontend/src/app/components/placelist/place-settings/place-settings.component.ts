@@ -8,10 +8,12 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { PlaceService } from '../../../services/place.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
@@ -26,7 +28,8 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
     MatDialogModule,
     MatIcon,
     MatFormFieldModule,
-    MatInputModule
+    MatInputModule,
+    TranslocoPipe
 ],
   templateUrl: './place-settings.component.html',
   styleUrl: './place-settings.component.css',
@@ -42,6 +45,7 @@ export class PlaceProfileComponent {
 
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   private readonly dialog = inject(MatDialog);
   private readonly placeService = inject(PlaceService);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
@@ -84,12 +88,20 @@ export class PlaceProfileComponent {
     }
 
     if (!file.type.startsWith('image/')) {
-      this.snackBar.open('Please select a valid image file.', 'OK', { duration: 2000 });
+      this.snackBar.open(
+        this.translation.t('common.placeSettings.imageInvalid'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
       return;
     }
 
     if (file.size > this.maxFileSize) {
-      this.snackBar.open('The image is too large. Maximum allowed size is 5MB.', 'OK', { duration: 2000 });
+      this.snackBar.open(
+        this.translation.t('common.placeSettings.imageTooLarge'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
       return;
     }
 
@@ -98,7 +110,11 @@ export class PlaceProfileComponent {
       this.data.place.base64Avatar = (e.target as FileReader).result as string;
     };
     reader.onerror = () => {
-      this.snackBar.open('Error reading the file.', 'OK', { duration: 2000 });
+      this.snackBar.open(
+        this.translation.t('common.placeSettings.imageReadError'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
     };
 
     reader.readAsDataURL(file);
@@ -126,7 +142,11 @@ export class PlaceProfileComponent {
   }
 
   public showPolicy() {
-    this.snackBar.open(`Place id, place name (hashed), the added locations and the subscribed flag is saved on our server. The readable name and the avatar is saved on your device.`, 'OK', {});
+    this.snackBar.open(
+      this.translation.t('common.placeSettings.savePolicy'),
+      this.translation.t('common.actions.ok'),
+      {}
+    );
   }
 
 }

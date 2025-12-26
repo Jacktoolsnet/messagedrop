@@ -1,8 +1,7 @@
-<h2 mat-dialog-title>Pin hint</h2>
+<h2 mat-dialog-title>{{ 'common.pin.hintTitle' | transloco }}</h2>
 <mat-dialog-content>
-    To use Messagedrop, I have to choose a PIN. I can't forget it, since there's no way to recover it. The PIN is
-    encrypted, hashed, and stored only on my device.
+    {{ 'common.pin.hintBody' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close [mat-dialog-close]="">Ok</button>
+    <button mat-button mat-dialog-close [mat-dialog-close]="">{{ 'common.actions.ok' | transloco }}</button>
 </mat-dialog-actions>

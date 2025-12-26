@@ -5,7 +5,9 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PinHintComponent } from '../pin-hint/pin-hint.component';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
   selector: 'app-createpin',
@@ -14,7 +16,8 @@ import { PinHintComponent } from '../pin-hint/pin-hint.component';
     MatIcon,
     MatInputModule,
     MatButtonModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    TranslocoPipe
   ],
   templateUrl: './create-pin.component.html',
   styleUrl: './create-pin.component.css'
@@ -31,6 +34,7 @@ export class CreatePinComponent implements OnDestroy {
   private readonly pinHintDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<CreatePinComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
 
   ngOnDestroy(): void {
     this.dialogClosed = true;
@@ -69,13 +73,13 @@ export class CreatePinComponent implements OnDestroy {
         this.showDigitTemporarily(this.confirmPin.length - 1, true);
 
         if (this.confirmPin.length === this.pinLength) {
-          // Automatisch prüfen & ggf. schließen
+          // Auto-check and close if it matches.
           setTimeout(() => {
             if (this.confirmPin === this.pin && !this.dialogClosed) {
               this.dialogClosed = true;
               this.dialogRef.close(this.pin);
             } else {
-              this.snackBar.open('PINs do not match', '', {
+              this.snackBar.open(this.translation.t('common.pin.mismatch'), '', {
                 duration: 2000,
                 horizontalPosition: 'center',
                 verticalPosition: 'top'
