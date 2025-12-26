@@ -8,7 +8,7 @@
         </div>
         <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
             (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
-            <span>Add first private note</span>
+            <span>{{ 'common.noteList.addFirstNote' | transloco }}</span>
         </button>
     </div>
     } @else {
@@ -17,7 +17,8 @@
             <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
                 <mat-icon>arrow_back</mat-icon>
             </button>
-            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary" aria-label="Back"
+            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
+                [attr.aria-label]="'common.noteList.addNoteAria' | transloco"
                 (click)="openNoteDialog()">
                 <mat-icon [attr.aria-hidden]="false">add_notes</mat-icon>
             </button>
@@ -33,16 +34,19 @@
             </mat-card-content>
             <mat-card-actions class="buttonbar">
                 @if (userService.isReady()) {
-                <button mat-mini-fab color="secondary" aria-label="Edit note" (click)="editNote(note)">
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.editAria' | transloco"
+                    (click)="editNote(note)">
                     <mat-icon>edit</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Delete note" (click)="deleteNote(note)">
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.deleteAria' | transloco"
+                    (click)="deleteNote(note)">
                     <mat-icon>delete_forever</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Fly to note" (click)="flyTo(note)">
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.flyToAria' | transloco"
+                    (click)="flyTo(note)">
                     <mat-icon>place</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" aria-label="Navigate to note location."
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.navigateAria' | transloco"
                     (click)="navigateToNoteLocation(note)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>

@@ -1,10 +1,10 @@
-<!-- Wenn Plattform erlaubt => bestehenden Inhalt zeigen -->
+<!-- Show existing content when the platform is enabled. -->
 @if (isPlatformEnabled) {
 @if (multimedia?.type === 'tenor') {
 <div class="media_block">
     <div class="multimedia_container">
         <img class="multimedia_image" [src]="multimedia!.url"
-            [attr.alt]="multimedia?.title || 'Embedded media'" />
+            [attr.alt]="multimedia?.title || ('common.multimedia.embeddedAlt' | transloco)" />
     </div>
     @if (multimedia?.attribution !== '') {
     <a class="attribution-link" [href]="multimedia?.sourceUrl" target="_blank">
@@ -23,7 +23,7 @@
 </div>
 }
 } @else {
-<!-- Activation Tile, wenn Plattform (noch) deaktiviert -->
+<!-- Activation tile when the platform is disabled. -->
 @if(multimedia?.type === 'youtube') {
 <app-enable-external-content [platform]="'youtube'" (enabledChange)="onEnabledChange($event)">
 </app-enable-external-content>

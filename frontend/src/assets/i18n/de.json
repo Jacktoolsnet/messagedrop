@@ -416,6 +416,23 @@
       "fileReadFailed": "Die ausgewählte Datei konnte nicht gelesen werden. Bitte versuche es erneut.",
       "policy": "Profilname und Avatar werden auf dem Gerät gespeichert."
     },
+    "multimedia": {
+      "embeddedAlt": "Eingebettete Medien",
+      "addFromTenor": "Von Tenor hinzufügen",
+      "addContent": "Multimedia-Inhalt hinzufügen"
+    },
+    "noteList": {
+      "addFirstNote": "Erste private Notiz hinzufügen",
+      "addNoteAria": "Notiz hinzufügen",
+      "editAria": "Notiz bearbeiten",
+      "deleteAria": "Notiz löschen",
+      "flyToAria": "Zur Notiz springen",
+      "navigateAria": "Zur Notizposition navigieren",
+      "deleteDialog": {
+        "title": "Notiz löschen",
+        "confirm": "Die Notiz wird dauerhaft gelöscht. Bist du sicher?"
+      }
+    },
     "legal": {
       "language": {
         "de": "Deutsch",

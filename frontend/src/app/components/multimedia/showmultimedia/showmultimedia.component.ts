@@ -2,6 +2,7 @@
 import { Component, Input, OnChanges, SimpleChanges, inject } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../../utils/enable-external-content/enable-external-content.component';
@@ -10,7 +11,8 @@ import { EnableExternalContentComponent } from '../../utils/enable-external-cont
   selector: 'app-showmultimedia',
   imports: [
     MatSlideToggleModule,
-    EnableExternalContentComponent
+    EnableExternalContentComponent,
+    TranslocoPipe
 ],
   templateUrl: './showmultimedia.component.html',
   styleUrl: './showmultimedia.component.css'
@@ -20,10 +22,10 @@ export class ShowmultimediaComponent implements OnChanges {
 
   termsLinks?: { terms: string; privacy: string };
 
-  safeUrl: SafeResourceUrl | undefined; // falls du mal iframe-URLs brauchst
+  safeUrl: SafeResourceUrl | undefined; // for iframe URLs if needed later
   safeHtml: SafeHtml | undefined;
 
-  // Aktivierungs-Logik
+  // Activation logic
   isPlatformEnabled = false;
 
   private readonly sanitizer = inject(DomSanitizer);
@@ -54,7 +56,7 @@ export class ShowmultimediaComponent implements OnChanges {
         this.isPlatformEnabled = settings.enableTenorContent;
         break;
       default:
-        this.isPlatformEnabled = true; // Unbekannt -> nicht blocken
+        this.isPlatformEnabled = true; // Unknown -> do not block.
         break;
     }
 

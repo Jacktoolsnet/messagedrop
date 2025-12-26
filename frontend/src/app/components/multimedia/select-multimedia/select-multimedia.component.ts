@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Output, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { ImportMultimediaComponent } from '../../utils/import-multimedia/import-multimedia.component';
 import { TenorComponent } from '../../utils/tenor/tenor.component';
@@ -8,7 +9,8 @@ import { TenorComponent } from '../../utils/tenor/tenor.component';
 @Component({
   selector: 'app-select-multimedia',
   imports: [
-    MatButtonModule
+    MatButtonModule,
+    TranslocoPipe
   ],
   templateUrl: './select-multimedia.component.html',
   styleUrl: './select-multimedia.component.css'

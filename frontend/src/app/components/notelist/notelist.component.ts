@@ -9,6 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { MasonryItemDirective } from '../../directives/masonry-item.directive';
 import { Location } from '../../interfaces/location';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -39,7 +40,8 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MasonryItemDirective
+    MasonryItemDirective,
+    TranslocoPipe
   ],
   templateUrl: './notelist.component.html',
   styleUrl: './notelist.component.css',

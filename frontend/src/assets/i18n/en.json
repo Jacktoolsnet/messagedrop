@@ -416,6 +416,23 @@
       "fileReadFailed": "Could not read the selected file. Please try again.",
       "policy": "Profile name and avatar are stored on the device."
     },
+    "multimedia": {
+      "embeddedAlt": "Embedded media",
+      "addFromTenor": "Add from Tenor",
+      "addContent": "Add multimedia content"
+    },
+    "noteList": {
+      "addFirstNote": "Add my first private note",
+      "addNoteAria": "Add note",
+      "editAria": "Edit note",
+      "deleteAria": "Delete note",
+      "flyToAria": "Fly to note",
+      "navigateAria": "Navigate to note location",
+      "deleteDialog": {
+        "title": "Delete note",
+        "confirm": "The note will be permanently deleted. Are you sure?"
+      }
+    },
     "legal": {
       "language": {
         "de": "Deutsch",

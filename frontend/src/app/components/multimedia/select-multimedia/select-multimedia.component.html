@@ -1,10 +1,11 @@
 <div class="button_container">
     <button (click)="openTenorDialog()" mat-flat-button class="button_default" color="primary"
-        aria-label="Add from Tenor">
-        <span>Add from Tenor</span>
+        [attr.aria-label]="'common.multimedia.addFromTenor' | transloco">
+        <span>{{ 'common.multimedia.addFromTenor' | transloco }}</span>
     </button>
 
-    <button (click)="openImportMultimediaDialog()" mat-flat-button class="button_default" color="primary">
-        <span>Add multimedia content</span>
+    <button (click)="openImportMultimediaDialog()" mat-flat-button class="button_default" color="primary"
+        [attr.aria-label]="'common.multimedia.addContent' | transloco">
+        <span>{{ 'common.multimedia.addContent' | transloco }}</span>
     </button>
 </div>
