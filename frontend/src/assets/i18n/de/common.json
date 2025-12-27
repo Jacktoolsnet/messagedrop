@@ -319,6 +319,150 @@
       "imageReadError": "Fehler beim Lesen der Datei.",
       "savePolicy": "Ort-ID, Ortsname (gehasht), die hinzugefügten Standorte und das Abonnement-Flag werden auf unserem Server gespeichert. Der lesbare Name und der Avatar werden auf deinem Gerät gespeichert."
     },
+    "tileList": {
+      "empty": "Keine Tiles sichtbar.",
+      "openSettings": "Tile-Einstellungen öffnen"
+    },
+    "tileSettings": {
+      "title": "Tile-Einstellungen",
+      "addTile": "Tile hinzufügen",
+      "reorderAria": "{{ label }} neu anordnen",
+      "editAria": "Tile bearbeiten",
+      "deleteAria": "Tile löschen",
+      "toggleAria": "{{ label }} umschalten",
+      "visible": "Sichtbar",
+      "editLabelPrompt": "Tile-Label bearbeiten"
+    },
+    "tileTypes": {
+      "datetime": "Datum & Uhrzeit",
+      "weather": "Wetter",
+      "airQuality": "Luftqualität",
+      "note": "Notizen",
+      "message": "Nachrichten",
+      "image": "Bilder",
+      "text": "Text",
+      "multitext": "Multitext",
+      "link": "Link",
+      "anniversary": "Jahrestag",
+      "todo": "To-do-Liste",
+      "quickActions": "Schnellaktionen",
+      "files": "Dateien",
+      "migraine": "Migräne-Alarm",
+      "pollution": "Luftverschmutzung"
+    },
+    "tileDelete": {
+      "title": "Tile löschen",
+      "confirm": "Möchtest du dieses Tile wirklich löschen?",
+      "confirmYes": "Ja, löschen"
+    },
+    "tiles": {
+      "noData": "Keine Daten",
+      "airQualityUnavailable": "Luftqualität nicht verfügbar",
+      "weatherUnavailable": "Wetter nicht verfügbar",
+      "dataExpiredCached": "Daten abgelaufen – zeige zwischengespeicherte Werte",
+      "images": {
+        "title": "Private Bilder",
+        "notFound": "Nicht gefunden",
+        "previewAlt": "Bildvorschau",
+        "empty": "Keine Bilder gefunden."
+      },
+      "messages": {
+        "title": "Nachrichten",
+        "empty": "Keine Nachrichten gefunden."
+      },
+      "notes": {
+        "title": "Private Notizen",
+        "empty": "Keine Notizen gefunden."
+      },
+      "text": {
+        "empty": "Noch kein Text. Tippe, um einen hinzuzufügen."
+      },
+      "link": {
+        "add": "Link hinzufügen"
+      },
+      "anniversary": {
+        "addDate": "Datum hinzufügen",
+        "invalidDate": "Ungültiges Datum"
+      },
+      "migraine": {
+        "stale": "Daten abgelaufen",
+        "temperatureChange": "Temperaturänderung",
+        "pressureChange": "Luftdruckänderung",
+        "openTemperatureAria": "Temperaturdetails öffnen",
+        "openPressureAria": "Luftdruckdetails öffnen",
+        "temperatureGroup": "Temperatur (°C)",
+        "pressureGroup": "Luftdruck (hPa)"
+      },
+      "pollution": {
+        "stale": "Daten abgelaufen",
+        "empty": "Keine Luftqualitätsdaten",
+        "openDetailsAria": "Details in der Luftqualitätsansicht öffnen"
+      },
+      "todo": {
+        "empty": "Noch keine Todos. Tippe, um welche hinzuzufügen.",
+        "emptyEditor": "Noch keine Todos. Füge dein erstes oben hinzu.",
+        "addLabel": "Todo hinzufügen",
+        "addAria": "Todo hinzufügen",
+        "reorderAria": "Todo neu anordnen",
+        "deleteAria": "Todo löschen",
+        "markDone": "Als erledigt markieren",
+        "markUndone": "Als nicht erledigt markieren"
+      },
+      "quickActions": {
+        "empty": "Noch keine Aktionen. Tippe, um eine hinzuzufügen.",
+        "emptyEditor": "Noch keine Aktionen. Füge eine oben hinzu.",
+        "title": "Aktionen",
+        "addAction": "Aktion hinzufügen",
+        "reorderAria": "Aktion neu anordnen",
+        "editAria": "Aktion bearbeiten",
+        "deleteAria": "Aktion löschen",
+        "actionFallback": "Aktion"
+      },
+      "files": {
+        "empty": "Noch keine Dateien. Tippe, um welche hinzuzufügen.",
+        "emptyEditor": "Noch keine Dateien. Füge eine oben hinzu.",
+        "header": "Dateien",
+        "add": "Dateien hinzufügen",
+        "reorderAria": "Datei neu anordnen",
+        "openAria": "Datei öffnen",
+        "removeAria": "Datei entfernen",
+        "pickerUnsupported": "Der Dateiauswahldialog wird in diesem Browser nicht unterstützt.",
+        "openFailed": "Datei konnte nicht geöffnet werden.",
+        "saveHandlesFailed": "Dateihandles konnten nicht gespeichert werden."
+      }
+    },
+    "tileEdit": {
+      "textTitle": "Text-Tile bearbeiten",
+      "multitextTitle": "Mehrzeiliges Tile bearbeiten",
+      "linkTitle": "Link-Tile bearbeiten",
+      "anniversaryTitle": "Jahrestags-Tile bearbeiten",
+      "todoTitle": "To-do-Liste bearbeiten",
+      "quickActionsTitle": "Schnellaktionen bearbeiten",
+      "actionTitle": "Aktion bearbeiten",
+      "filesTitle": "Dateien bearbeiten",
+      "migraineTitle": "Migräne-Tile bearbeiten",
+      "pollutionTitle": "Luftverschmutzungs-Tile bearbeiten"
+    },
+    "tileFields": {
+      "pickIcon": "Icon auswählen",
+      "title": "Titel",
+      "text": "Text",
+      "linkType": "Linktyp",
+      "target": "Ziel",
+      "invalidTarget": "Gib ein gültiges {{ type }}-Ziel ein",
+      "label": "Label",
+      "type": "Typ",
+      "pickDateError": "Bitte ein Datum auswählen",
+      "warnLevel": "Warnstufe",
+      "alertLevel": "Alarmstufe"
+    },
+    "tileLinkTypes": {
+      "web": "Web",
+      "email": "E-Mail",
+      "phone": "Telefon",
+      "whatsapp": "WhatsApp",
+      "sms": "SMS"
+    },
     "sharedContent": {
       "multimediaTitle": "Geteilter Multimedia-Inhalt empfangen",
       "multimediaHint": "Diesen Inhalt zu einem Beitrag, einer Notiz oder einer Nachricht hinzufügen.",
