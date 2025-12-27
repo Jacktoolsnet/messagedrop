@@ -781,12 +781,12 @@
     "report": {
       "title": "Report content",
       "intro": {
-        "start": "Reporting should be easy. You can submit a",
-        "quick": "Quick report",
+        "start": "Reporting should be simple. You can submit a",
+        "quick": "quick report",
         "middle": "(informal signal) or a",
-        "formal": "Formal DSA report",
-        "end": "(notice under the EU Digital Services Act) -",
-        "emphasis": "no fields are mandatory",
+        "formal": "formal DSA report",
+        "end": "(notice under the EU Digital Services Act).",
+        "emphasis": "None of the fields are required",
         "tail": "We will review the post either way."
       },
       "meta": {
