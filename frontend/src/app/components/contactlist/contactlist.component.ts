@@ -24,7 +24,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
-import { ContactSettingsComponent } from '../contact/contact-settingx/contact-settingx.component';
+import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 import { TileListComponent } from "../tile/tile-list/tile-list.component";
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';

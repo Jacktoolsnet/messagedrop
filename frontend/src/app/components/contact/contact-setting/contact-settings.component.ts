@@ -29,9 +29,9 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
     MatDialogClose,
     MatIconModule,
     TranslocoPipe
-],
-  templateUrl: './contact-settingx.component.html',
-  styleUrl: './contact-settingx.component.css'
+  ],
+  templateUrl: './contact-settings.component.html',
+  styleUrl: './contact-settings.component.css'
 })
 export class ContactSettingsComponent {
   private readonly socketioService = inject(SocketioService);
