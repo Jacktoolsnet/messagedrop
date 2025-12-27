@@ -25,6 +25,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
+const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 
@@ -113,6 +114,31 @@ const io = new Server(server, {
   cors: {
     origin: [process.env.ADMIN_ORIGIN],
     credentials: true
+  }
+});
+
+io.use((socket, next) => {
+  const rawToken = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
+  if (!rawToken) {
+    logger.warn('admin socket auth failed', { error: 'missing_token' });
+    return next(new Error('unauthorized'));
+  }
+  if (!process.env.ADMIN_JWT_SECRET) {
+    logger.error('admin socket auth failed', { error: 'ADMIN_JWT_SECRET not set' });
+    return next(new Error('unauthorized'));
+  }
+  const token = rawToken.startsWith('Bearer ') ? rawToken.slice(7) : rawToken;
+  try {
+    const payload = jwt.verify(token, process.env.ADMIN_JWT_SECRET, {
+      algorithms: ['HS256'],
+      audience: process.env.ADMIN_AUD || 'messagedrop-admin',
+      issuer: process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/'
+    });
+    socket.admin = payload;
+    return next();
+  } catch (err) {
+    logger.warn('admin socket auth failed', { error: err?.message });
+    return next(new Error('unauthorized'));
   }
 });
 

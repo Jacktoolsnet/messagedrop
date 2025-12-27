@@ -44,7 +44,8 @@ export class SocketioService {
     reconnectionDelayMax: 5000,
     randomizationFactor: 0.5,
     transports: ['websocket'] as string[],
-    withCredentials: true
+    withCredentials: true,
+    autoConnect: false
   };
   private ready = false;
   private joinedUserRoom = false;

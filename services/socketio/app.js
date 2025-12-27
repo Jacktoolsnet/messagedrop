@@ -127,11 +127,16 @@ io.use((socket, next) => {
   socket.logger = logger.child({ socketId: socket.id });
   const rawToken = socket.handshake.auth?.token || socket.handshake.headers?.authorization;
   if (!rawToken) {
-    return next();
+    socket.logger.warn('socket auth failed', { error: 'missing_token' });
+    return next(new Error('unauthorized'));
+  }
+  if (!process.env.JWT_SECRET) {
+    socket.logger.error('socket auth failed', { error: 'JWT_SECRET not set' });
+    return next(new Error('unauthorized'));
   }
   const token = rawToken.startsWith('Bearer ') ? rawToken.slice(7) : rawToken;
   try {
-    const payload = jwt.verify(token, process.env.JWT_SECRET);
+    const payload = jwt.verify(token, process.env.JWT_SECRET, { algorithms: ['HS256'] });
     socket.user = payload;
     return next();
   } catch (err) {
