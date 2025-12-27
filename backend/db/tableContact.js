@@ -136,12 +136,12 @@ const create = function (
 
 const updateName = function (db, contactId, name, callback) {
     try {
-        let sql = `
+        const sql = `
         UPDATE ${tableName}
-        SET ${columnName} = '${name}'
+        SET ${columnName} = ?
         WHERE ${columnContactId} = ?;`;
 
-        db.run(sql, [contactId], (err) => {
+        db.run(sql, [name, contactId], (err) => {
             callback(err);
         });
     } catch (error) {

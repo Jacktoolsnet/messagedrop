@@ -139,12 +139,12 @@ const clean = function (db, callback) {
 
 const subscribe = function (db, userId, subscription, callback) {
     try {
-        let sql = `
+        const sql = `
         UPDATE ${tableName}
-        SET ${columnSubscription} = '${subscription}'
+        SET ${columnSubscription} = ?
         WHERE ${columnUserId} = ?;`;
 
-        db.run(sql, [userId], (err) => {
+        db.run(sql, [subscription, userId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -154,12 +154,12 @@ const subscribe = function (db, userId, subscription, callback) {
 
 const unsubscribe = function (db, userId, callback) {
     try {
-        let sql = `
+        const sql = `
         UPDATE ${tableName}
-        SET ${columnSubscription} = ''
+        SET ${columnSubscription} = ?
         WHERE ${columnUserId} = ?;`;
 
-        db.run(sql, [userId], (err) => {
+        db.run(sql, ['', userId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -169,12 +169,12 @@ const unsubscribe = function (db, userId, callback) {
 
 const updatePublicKeys = function (db, userId, signingPublicKey, cryptoPublicKey, callback) {
     try {
-        let sql = `
+        const sql = `
         UPDATE ${tableName}
-        SET ${columnSigningPublicKey} = '${signingPublicKey}', ${columnCryptoPublicKey} = '${cryptoPublicKey}'
+        SET ${columnSigningPublicKey} = ?, ${columnCryptoPublicKey} = ?
         WHERE ${columnUserId} = ?;`;
 
-        db.run(sql, [userId], (err) => {
+        db.run(sql, [signingPublicKey, cryptoPublicKey, userId], (err) => {
             callback(err);
         });
     } catch (error) {

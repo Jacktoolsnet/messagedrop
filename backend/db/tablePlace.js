@@ -81,15 +81,15 @@ const create = function (
 
 const update = function (db, placeId, name, latMin, latMax, lonMin, lonMax, callback) {
     try {
-        let sql = `
+        const sql = `
         UPDATE ${tableName}
-        SET ${columnName} = '${name}',
-            ${columnLatMin} = ${latMin},
-            ${columnLatMax} = ${latMax},
-            ${columnLonMin} = ${lonMin},
-            ${columnLonMax} = ${lonMax}
+        SET ${columnName} = ?,
+            ${columnLatMin} = ?,
+            ${columnLatMax} = ?,
+            ${columnLonMin} = ?,
+            ${columnLonMax} = ?
         WHERE ${columnPlaceId} = ?;`;
-        db.run(sql, [placeId], (err) => {
+        db.run(sql, [name, latMin, latMax, lonMin, lonMax, placeId], (err) => {
             callback(err);
         });
     } catch (error) {
