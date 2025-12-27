@@ -22,20 +22,13 @@ function ensureSameUser(req, res, userId) {
   return true;
 }
 
-function withConnectOwnership(req, res, connectId, handler) {
-  const authUserId = getAuthUserId(req);
-  if (!authUserId) {
-    return res.status(401).json({ status: 401, error: 'unauthorized' });
-  }
+function fetchConnectRecord(req, res, connectId, handler) {
   tableConnect.getById(req.database.db, connectId, (err, row) => {
     if (err) {
       return res.status(500).json({ status: 500, error: err });
     }
     if (!row) {
       return res.status(404).json({ status: 404, error: 'not_found' });
-    }
-    if (String(row.userId) !== String(authUserId)) {
-      return res.status(403).json({ status: 403, error: 'forbidden' });
     }
     handler(row);
   });
@@ -71,7 +64,7 @@ router.get('/get/:connectId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    withConnectOwnership(req, res, req.params.connectId, (row) => {
+    fetchConnectRecord(req, res, req.params.connectId, (row) => {
       response.status = 200;
       response.connect = row;
       res.status(response.status).json(response);
@@ -84,7 +77,7 @@ router.get('/delete/:connectId',
   ]
   , function (req, res) {
     let response = { 'status': 0 };
-    withConnectOwnership(req, res, req.params.connectId, () => {
+    fetchConnectRecord(req, res, req.params.connectId, () => {
       tableConnect.deleteById(req.database.db, req.params.connectId, function (err) {
         if (err) {
           response.status = 500;
