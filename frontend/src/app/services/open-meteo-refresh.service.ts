@@ -15,11 +15,11 @@ export interface DatasetState<T> {
   isLoading: Signal<boolean>;
 }
 
-type DatasetStateInternal<T> = {
+interface DatasetStateInternal<T> {
   data: WritableSignal<T | undefined>;
   isStale: WritableSignal<boolean>;
   isLoading: WritableSignal<boolean>;
-};
+}
 
 @Injectable({
   providedIn: 'root'

@@ -109,7 +109,7 @@ function requireServiceJwt(req, res, next) {
   try {
     req.service = verifyServiceJwt(token);
     return next();
-  } catch (_err) {
+  } catch {
     return res.status(403).json({ error: 'invalid_service_token' });
   }
 }

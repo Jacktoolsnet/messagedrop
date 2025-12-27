@@ -49,7 +49,7 @@ const moderationToggleLimiter = rateLimit({
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
 
 /* --------------------------------- Helper ---------------------------------- */
-async function forwardPost(path, body, reqHeaders = {}) {
+async function forwardPost(path, body) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
     const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
     const headers = {
@@ -107,7 +107,7 @@ function disableLocallyIfPossible(req) {
 router.post('/signals', signalLimiter, async (req, res) => {
     try {
         await disableLocallyIfPossible(req);
-        const resp = await forwardPost('/signals', req.body, req.headers);
+        const resp = await forwardPost('/signals', req.body);
 
         if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
             tableMessage.setDsaStatusToken(
@@ -129,7 +129,7 @@ router.post('/signals', signalLimiter, async (req, res) => {
 router.post('/notices', noticeLimiter, async (req, res) => {
     try {
         await disableLocallyIfPossible(req);
-        const resp = await forwardPost('/notices', req.body, req.headers);
+        const resp = await forwardPost('/notices', req.body);
 
         if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
             tableMessage.setDsaStatusToken(

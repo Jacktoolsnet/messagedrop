@@ -199,7 +199,7 @@ export class RestoreService {
         return null;
       }
       return parsed;
-    } catch (error) {
+    } catch {
       this.snackBar.open(this.i18n.t('common.restore.readFailed'), undefined, {
         duration: 3000,
         horizontalPosition: 'center',
@@ -284,7 +284,7 @@ export class RestoreService {
 
       const decoded = new TextDecoder().decode(decrypted);
       return JSON.parse(decoded) as BackupPayload;
-    } catch (error) {
+    } catch {
       this.snackBar.open(this.i18n.t('common.restore.pinIncorrect'), undefined, {
         duration: 3500,
         horizontalPosition: 'center',

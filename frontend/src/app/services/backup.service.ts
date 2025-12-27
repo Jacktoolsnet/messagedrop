@@ -143,6 +143,8 @@ export class BackupService {
       kind: 'directory',
       name: handle.name,
       async getFileHandle(_name: string, _options?: unknown) {
+        void _name;
+        void _options;
         return handle;
       }
     } as FileSystemDirectoryHandle;

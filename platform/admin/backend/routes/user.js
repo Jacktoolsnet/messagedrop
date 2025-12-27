@@ -180,7 +180,7 @@ router.post('/login/verify', async (req, res) => {
         let payload;
         try {
             payload = JSON.parse(challenge.payload);
-        } catch (_err) {
+        } catch {
             req.logger?.error('OTP payload parse failed', { challengeId });
             return res.status(500).json({ message: 'otp_payload_invalid' });
         }

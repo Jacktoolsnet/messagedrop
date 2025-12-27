@@ -27,7 +27,7 @@ export class TileFileService {
     return supported;
   }
 
-  async pickFiles(): Promise<Array<{ entry: TileFileEntry; handle: FileSystemFileHandle }>> {
+  async pickFiles(): Promise<{ entry: TileFileEntry; handle: FileSystemFileHandle }[]> {
     if (!this.isSupported()) {
       this.lastErrorSignal.set('File System Access API is not supported in this browser or context.');
       return [];
@@ -62,7 +62,7 @@ export class TileFileService {
       return [];
     }
 
-    const entries: Array<{ entry: TileFileEntry; handle: FileSystemFileHandle }> = [];
+    const entries: { entry: TileFileEntry; handle: FileSystemFileHandle }[] = [];
     for (const handle of handles) {
       const entry = await this.buildEntryFromHandle(handle);
       if (entry) {

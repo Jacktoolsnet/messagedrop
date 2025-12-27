@@ -11,6 +11,7 @@ export type LanguageMode = 'system' | SupportedLang;
 export class LanguageService {
   private readonly transloco = inject(TranslocoService);
   private readonly appService = inject(AppService);
+  private readonly defaultLang: SupportedLang = 'en';
 
   private readonly _languageMode = signal<LanguageMode>(this.resolveInitialMode());
   readonly languageMode = this._languageMode.asReadonly();
@@ -72,10 +73,6 @@ export class LanguageService {
     if (mode !== this._languageMode()) {
       this._languageMode.set(mode);
     }
-  }
-
-  private get defaultLang(): SupportedLang {
-    return 'en';
   }
 
   private resolveInitialMode(): LanguageMode {
@@ -157,6 +154,7 @@ export class LanguageService {
     try {
       localStorage.setItem(LANGUAGE_STORAGE_KEY, mode);
     } catch {
+      return;
     }
   }
 

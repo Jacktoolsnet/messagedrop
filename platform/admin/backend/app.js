@@ -9,6 +9,7 @@ const Database = require('./db/database');
 const database = new Database();
 const tableStatistic = require('./db/tableStatistic');
 const tableErrorLog = require('./db/tableErrorLog');
+const tableInfoLog = require('./db/tableInfoLog');
 const root = require('./routes/root');
 const check = require('./routes/check');
 const translate = require('./routes/translate');

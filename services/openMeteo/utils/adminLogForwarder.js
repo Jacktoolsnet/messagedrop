@@ -39,7 +39,7 @@ function createForwarder({ baseUrl, token, audience, source }) {
         timeout: 2000,
         validateStatus: () => true
       });
-    } catch (_err) { /* silent */ }
+    } catch { /* silent */ }
   };
 
   return (level, message) => {
