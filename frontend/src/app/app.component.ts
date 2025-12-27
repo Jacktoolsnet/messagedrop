@@ -162,6 +162,8 @@ export class AppComponent implements OnInit {
   private readonly translation = inject(TranslationHelperService);
   private exitBackupPromptPending = false;
   private exitBackupDialogOpen = false;
+  private exitBackupPromptTimer?: ReturnType<typeof setTimeout>;
+  private exitBackupUnloadInProgress = false;
   readonly userMessagesSignal = computed(() =>
     this.messageService.messagesSignal().filter(
       msg => msg.userId === this.userService.getUser().id
@@ -410,23 +412,49 @@ export class AppComponent implements OnInit {
   }
 
   private setupExitBackupPrompt(): void {
+    const cancelExitBackupPrompt = () => {
+      this.exitBackupUnloadInProgress = true;
+      this.exitBackupPromptPending = false;
+      if (this.exitBackupPromptTimer) {
+        clearTimeout(this.exitBackupPromptTimer);
+        this.exitBackupPromptTimer = undefined;
+      }
+    };
+
+    window.addEventListener('pagehide', cancelExitBackupPrompt);
+    window.addEventListener('unload', cancelExitBackupPrompt);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'hidden') {
+        cancelExitBackupPrompt();
+      }
+    });
+
     window.addEventListener('beforeunload', (event) => {
       if (!this.shouldPromptBackupOnExit()) {
         return;
       }
+      this.exitBackupUnloadInProgress = false;
       this.exitBackupPromptPending = true;
       event.preventDefault();
       event.returnValue = '';
-      setTimeout(() => {
+      if (this.exitBackupPromptTimer) {
+        clearTimeout(this.exitBackupPromptTimer);
+      }
+      this.exitBackupPromptTimer = setTimeout(() => {
         if (!this.exitBackupPromptPending) {
           return;
         }
-        if (document.visibilityState !== 'visible') {
+        if (
+          this.exitBackupUnloadInProgress
+          || document.visibilityState !== 'visible'
+          || !document.hasFocus()
+        ) {
           return;
         }
         this.exitBackupPromptPending = false;
+        this.exitBackupPromptTimer = undefined;
         this.openExitBackupDialog();
-      }, 0);
+      }, 1000);
     });
   }
 
