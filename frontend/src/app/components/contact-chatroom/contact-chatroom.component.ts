@@ -1,5 +1,6 @@
 
-import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, QueryList, ViewChild, ViewChildren, computed, effect, inject, output, signal } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, DestroyRef, ElementRef, QueryList, ViewChild, ViewChildren, computed, effect, inject, output, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogRef } from '@angular/material/dialog';
@@ -53,6 +54,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
   private readonly contactMessageService = inject(ContactMessageService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<ContactChatroomComponent>);
   private readonly contactId = inject<string>(MAT_DIALOG_DATA);
@@ -144,7 +146,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     if (!this.readTrackingEnabled) {
       return;
     }
-    queueMicrotask(() => this.observeUnread());
+    setTimeout(() => this.observeUnread(), 0);
   });
 
   private readonly updatedMessagesEffect = effect(() => {
@@ -217,6 +219,17 @@ export class ContactChatroomComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.contactMessageService.initLiveReceive();
     this.loadMessages(true);
+    this.messageRows?.changes
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (!this.scrolledToFirstUnread && this.loaded()) {
+          setTimeout(() => this.scrollToFirstUnread(), 0);
+          return;
+        }
+        if (this.readTrackingEnabled) {
+          setTimeout(() => this.observeUnread(), 0);
+        }
+      });
   }
 
   get profile() {
@@ -475,6 +488,10 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     const rows = this.messageRows?.toArray() ?? [];
     if (!rows.length) {
+      if (this.messages().length === 0) {
+        this.scrolledToFirstUnread = true;
+        this.readTrackingEnabled = true;
+      }
       return;
     }
     // Messages are sorted newest first; find the oldest unread (last in the list)
