@@ -1,20 +1,26 @@
 <mat-dialog-content>
+  @if (data.messages.length) {
   <button mat-stroked-button [mat-dialog-close]="{type: 'public_message', messages: data.messages}"
     matBadge="{{data.messages.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
     matBadgeOverlap="true">
     <mat-icon>speaker_notes</mat-icon>
     {{ 'common.map.multiMarker.showMessages' | transloco }}
   </button>
+  }
+  @if (data.notes.length) {
   <button mat-stroked-button [mat-dialog-close]="{type: 'private_note', notes: data.notes}"
     matBadge="{{data.notes.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
     matBadgeOverlap="true">
     <mat-icon>clinical_notes</mat-icon>
     {{ 'common.map.multiMarker.showNotes' | transloco }}
   </button>
+  }
+  @if (data.images.length) {
   <button mat-stroked-button [mat-dialog-close]="{type: 'private_image', images: data.images}"
     matBadge="{{data.images.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
     matBadgeOverlap="true">
     <mat-icon>images</mat-icon>
     {{ 'common.map.multiMarker.showImages' | transloco }}
   </button>
+  }
 </mat-dialog-content>

@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } fro
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 @Component({
   selector: 'app-message',
@@ -16,7 +17,8 @@ import { MatMenuModule } from '@angular/material/menu';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatMenuModule
+    MatMenuModule,
+    TranslocoPipe
 ],
   templateUrl: './text.component.html',
   styleUrl: './text.component.css'
