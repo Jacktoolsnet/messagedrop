@@ -43,7 +43,7 @@ export class ContactSettingsComponent {
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
 
   public contact: Contact = this.data.contact;
-  public joinedUserRoom = this.socketioService.hasJoinedUserRoom();
+  readonly joinedUserRoom = this.socketioService.joinedUserRoom;
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
   private readonly oriContact: Contact = structuredClone(this.contact);
 
@@ -101,7 +101,7 @@ export class ContactSettingsComponent {
   }
 
   getProfileFromContact(contact: Contact): void {
-    if (!this.joinedUserRoom) {
+    if (!this.joinedUserRoom()) {
       this.socketioService.getSocket().emit('user:joinUserRoom', contact.userId);
     }
     this.socketioService.receiveProfileForContactEvent(contact);

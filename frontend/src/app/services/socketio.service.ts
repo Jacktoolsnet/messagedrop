@@ -1,4 +1,4 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { io, Socket } from 'socket.io-client';
@@ -48,7 +48,8 @@ export class SocketioService {
     autoConnect: false
   };
   private ready = false;
-  private joinedUserRoom = false;
+  private readonly _joinedUserRoom = signal(false);
+  readonly joinedUserRoom = this._joinedUserRoom.asReadonly();
 
   constructor() {
     this.socket = io(environment.socketIoUrl, this.ioOptions);
@@ -78,6 +79,7 @@ export class SocketioService {
 
     this.socket.on("disconnect", () => {
       this.ready = this.socket.connected;
+      this._joinedUserRoom.set(false);
       /*this.snackBar.open('disconnect', '', {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
@@ -146,7 +148,7 @@ export class SocketioService {
   }
 
   public hasJoinedUserRoom(): boolean {
-    return this.joinedUserRoom;
+    return this._joinedUserRoom();
   }
 
   public initUserSocketEvents(): void {
@@ -154,16 +156,16 @@ export class SocketioService {
     if (!user?.id || !user?.jwt) {
       return;
     }
+    this._joinedUserRoom.set(false);
     this.setAuthToken(user.jwt);
     // User room.
     const userId = user.id;
     const eventName = `${userId}`;
-    this.socket.emit('user:joinUserRoom', userId);
     this.socket.off(eventName);
     this.socket.on(eventName, (payload: UserRoomPayload) => {
       switch (payload.type) {
         case 'joined':
-          this.joinedUserRoom = true;
+          this._joinedUserRoom.set(true);
           /*this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
             horizontalPosition: 'center',
@@ -179,6 +181,7 @@ export class SocketioService {
           break;
       }
     });
+    this.socket.emit('user:joinUserRoom', userId);
   }
 
   private async notifyViaServiceWorker(content: unknown): Promise<void> {

@@ -29,7 +29,7 @@
   </div>
   }
 
-  @if (joinedUserRoom) {
+  @if (joinedUserRoom()) {
   <div class="avatar-area">
     <div class="buttonarea">
       <button mat-flat-button color="primary" class="button_style" (click)="getProfileFromContact(contact)">
