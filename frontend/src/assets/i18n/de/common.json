@@ -813,6 +813,10 @@
         "truthAffirmation": "Ich erkläre, dass die gemachten Angaben nach bestem Wissen korrekt sind. (optional)"
       },
       "evidence": {
+        "linkLabel": "Unterstützenden Link hinzufügen",
+        "linkPlaceholder": "https://beispiel.de/kontext",
+        "linkHint": "http(s)://beispiel.de • Zum Hinzufügen Enter drücken",
+        "filesLabel": "Unterstützende Dokumente hinzufügen",
         "fileFallback": "Datei",
         "hint": "PDF- oder Bilddateien, bis zu 5 MB pro Datei (10 MB gesamt). Aktuell ausgewählte Dateien: {{ size }}."
       },

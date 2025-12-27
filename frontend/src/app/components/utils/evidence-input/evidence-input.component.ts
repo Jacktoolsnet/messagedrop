@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { TranslocoPipe } from '@jsverse/transloco';
 
 export interface EvidenceUrlItem {
   id: string;
@@ -29,7 +30,8 @@ export interface EvidenceFileItem {
     MatIconModule,
     MatButtonModule,
     MatChipsModule,
-    MatTooltipModule
+    MatTooltipModule,
+    TranslocoPipe
   ],
   templateUrl: './evidence-input.component.html',
   styleUrl: './evidence-input.component.css',

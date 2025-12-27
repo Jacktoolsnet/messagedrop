@@ -813,6 +813,10 @@
         "truthAffirmation": "I declare that the information provided is accurate to the best of my knowledge. (optional)"
       },
       "evidence": {
+        "linkLabel": "Add supporting link",
+        "linkPlaceholder": "https://example.com/context",
+        "linkHint": "http(s)://example.com • Press Enter to add",
+        "filesLabel": "Add supporting documents",
         "fileFallback": "File",
         "hint": "PDF or image files, up to 5 MB each (10 MB total). Currently selected files: {{ size }}."
       },

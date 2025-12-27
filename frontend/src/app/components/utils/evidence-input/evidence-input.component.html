@@ -2,16 +2,16 @@
   @if (showUrl()) {
   <div class="url-input">
     <mat-form-field appearance="outline" class="w-full">
-      <mat-label>Add supporting link</mat-label>
+      <mat-label>{{ 'dsa.report.evidence.linkLabel' | transloco }}</mat-label>
       <mat-icon matPrefix>link</mat-icon>
       <input matInput type="url" inputmode="url" autocomplete="url" [formControl]="form.controls.url"
-        placeholder="https://example.com/context" (keydown.enter)="onAddUrl(); $event.preventDefault()"
+        placeholder="{{ 'dsa.report.evidence.linkPlaceholder' | transloco }}" (keydown.enter)="onAddUrl(); $event.preventDefault()"
         [disabled]="disabled()" />
       <button mat-icon-button color="primary" matSuffix type="button" (click)="onAddUrl()"
         [disabled]="disabled() || !(form.controls.url.value || '').trim()">
         <mat-icon>add_link</mat-icon>
       </button>
-      <mat-hint align="start">http(s)://example.com • Press Enter to add</mat-hint>
+      <mat-hint align="start">{{ 'dsa.report.evidence.linkHint' | transloco }}</mat-hint>
     </mat-form-field>
 
     @if (urlItems().length > 0) {
@@ -33,7 +33,7 @@
       <input #fileInput type="file" multiple accept=".pdf,image/*" (change)="onFilesSelected($event)" hidden />
       <button mat-stroked-button color="primary" type="button" (click)="fileInput.click()" [disabled]="disabled()">
         <mat-icon>attach_file</mat-icon>
-        Add supporting documents
+        {{ 'dsa.report.evidence.filesLabel' | transloco }}
       </button>
     </div>
 
