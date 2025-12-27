@@ -1,10 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, catchError, throwError } from 'rxjs';
+import { Observable, catchError, take, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetClientConnect } from '../interfaces/get-client-connect';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root'
@@ -29,6 +30,7 @@ export class ServerService {
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly transloco = inject(TranslocoService);
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -36,20 +38,42 @@ export class ServerService {
   }
 
   init() {
-    this.connect().subscribe({
-      next: (connectResponse: GetClientConnect) => {
-        if (connectResponse.status === 200) {
-          this.cryptoPublicKey = connectResponse.cryptoPublicKey;
-          this.signingPublicKey = connectResponse.signingPublicKey;
-          this.ready = true;
-          this.failed = false;
-          this._serverSet.update(trigger => trigger + 1);
-        }
+    this.transloco.selectTranslation().pipe(take(1)).subscribe({
+      next: () => {
+        this.connect().subscribe({
+          next: (connectResponse: GetClientConnect) => {
+            if (connectResponse.status === 200) {
+              this.cryptoPublicKey = connectResponse.cryptoPublicKey;
+              this.signingPublicKey = connectResponse.signingPublicKey;
+              this.ready = true;
+              this.failed = false;
+              this._serverSet.update(trigger => trigger + 1);
+            }
+          },
+          error: () => {
+            this.ready = false;
+            this.failed = true;
+            this._serverSet.update(trigger => trigger + 1);
+          }
+        });
       },
       error: () => {
-        this.ready = false;
-        this.failed = true;
-        this._serverSet.update(trigger => trigger + 1);
+        this.connect().subscribe({
+          next: (connectResponse: GetClientConnect) => {
+            if (connectResponse.status === 200) {
+              this.cryptoPublicKey = connectResponse.cryptoPublicKey;
+              this.signingPublicKey = connectResponse.signingPublicKey;
+              this.ready = true;
+              this.failed = false;
+              this._serverSet.update(trigger => trigger + 1);
+            }
+          },
+          error: () => {
+            this.ready = false;
+            this.failed = true;
+            this._serverSet.update(trigger => trigger + 1);
+          }
+        });
       }
     });
   }

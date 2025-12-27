@@ -76,7 +76,6 @@ import { PlaceService } from './services/place.service';
 import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
-import { SocketioService } from './services/socketio.service';
 import { SystemNotificationService } from './services/system-notification.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
@@ -152,7 +151,6 @@ export class AppComponent implements OnInit {
   private readonly geolocationService = inject(GeolocationService);
   private readonly localImageService = inject(LocalImageService);
   private readonly messageService = inject(MessageService);
-  private readonly socketioService = inject(SocketioService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
   private readonly geoStatisticService = inject(GeoStatisticService);
@@ -277,13 +275,6 @@ export class AppComponent implements OnInit {
       } else {
         this.unreadContactCounts.set({});
         this.resetBadgeAnimation();
-      }
-    });
-
-    effect(() => {
-      this.contactService.contactsSet(); // <-- track changes
-      if (this.appService.isConsentCompleted()) {
-        this.socketioService.initSocket();
       }
     });
 

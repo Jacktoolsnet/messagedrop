@@ -102,7 +102,7 @@ export class ContactSettingsComponent {
 
   getProfileFromContact(contact: Contact): void {
     if (!this.joinedUserRoom()) {
-      this.socketioService.getSocket().emit('user:joinUserRoom', contact.userId);
+      this.socketioService.initUserSocketEvents();
     }
     this.socketioService.receiveProfileForContactEvent(contact);
     this.socketioService.getSocket().emit('contact:requestProfile', contact);

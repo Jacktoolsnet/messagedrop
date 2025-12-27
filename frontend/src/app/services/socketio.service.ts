@@ -48,6 +48,11 @@ export class SocketioService {
     autoConnect: false
   };
   private ready = false;
+  private currentUserId?: string;
+  private currentToken?: string;
+  private joinInFlight = false;
+  private joinResetTimer?: ReturnType<typeof setTimeout>;
+  private userRoomEventName?: string;
   private readonly _joinedUserRoom = signal(false);
   readonly joinedUserRoom = this._joinedUserRoom.asReadonly();
 
@@ -59,6 +64,7 @@ export class SocketioService {
   private registerConnectionHandlers(): void {
     this.socket.on("connect", () => {
       this.ready = this.socket.connected;
+      this.maybeJoinUserRoom();
       /*this.snackBar.open('connect', '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
@@ -68,6 +74,9 @@ export class SocketioService {
     });
 
     this.socket.on("connect_error", (error: Error) => {
+      this.ready = this.socket.connected;
+      this.joinInFlight = false;
+      this.clearJoinResetTimer();
       console.error('Socket connection error', error);
       /*this.snackBar.open(err.message, "", {
         panelClass: ['snack-warning'],
@@ -80,6 +89,8 @@ export class SocketioService {
     this.socket.on("disconnect", () => {
       this.ready = this.socket.connected;
       this._joinedUserRoom.set(false);
+      this.joinInFlight = false;
+      this.clearJoinResetTimer();
       /*this.snackBar.open('disconnect', '', {
         panelClass: ['snack-warning'],
         horizontalPosition: 'center',
@@ -101,6 +112,7 @@ export class SocketioService {
 
     this.socket.on('reconnect', () => {
       this.ready = this.socket.connected;
+      this.maybeJoinUserRoom();
       /*this.snackBar.open('Reconnected successfully!', '', {
         panelClass: ['snack-info'],
         horizontalPosition: 'center',
@@ -156,15 +168,18 @@ export class SocketioService {
     if (!user?.id || !user?.jwt) {
       return;
     }
-    this._joinedUserRoom.set(false);
-    this.setAuthToken(user.jwt);
-    // User room.
     const userId = user.id;
+    if (this.userRoomEventName && this.userRoomEventName !== userId) {
+      this.socket.off(this.userRoomEventName);
+    }
+    this.userRoomEventName = userId;
     const eventName = `${userId}`;
     this.socket.off(eventName);
     this.socket.on(eventName, (payload: UserRoomPayload) => {
       switch (payload.type) {
         case 'joined':
+          this.joinInFlight = false;
+          this.clearJoinResetTimer();
           this._joinedUserRoom.set(true);
           /*this.snackBar.open(`Joined user room.`, "", {
             panelClass: ['snack-info'],
@@ -181,7 +196,8 @@ export class SocketioService {
           break;
       }
     });
-    this.socket.emit('user:joinUserRoom', userId);
+    this.updateAuthAndConnect(userId, user.jwt);
+    this.maybeJoinUserRoom();
   }
 
   private async notifyViaServiceWorker(content: unknown): Promise<void> {
@@ -295,12 +311,54 @@ export class SocketioService {
     this.socket.emit('contact:reactContactMessage', payload);
   }
 
-  private setAuthToken(token: string): void {
+  private updateAuthAndConnect(userId: string, token: string): void {
+    const userChanged = userId !== this.currentUserId;
+    const tokenChanged = token !== this.currentToken;
+
+    this.currentUserId = userId;
+    this.currentToken = token;
     this.socket.auth = { token };
-    if (this.socket.connected) {
-      this.socket.disconnect();
+
+    if (userChanged || tokenChanged) {
+      this._joinedUserRoom.set(false);
+      this.joinInFlight = false;
+      this.clearJoinResetTimer();
+      if (this.socket.connected) {
+        this.socket.disconnect();
+      }
+      this.socket.connect();
+      return;
     }
-    this.socket.connect();
+
+    if (!this.socket.connected) {
+      this.socket.connect();
+    }
+  }
+
+  private maybeJoinUserRoom(): void {
+    if (!this.currentUserId || !this.socket.connected) {
+      return;
+    }
+    if (this._joinedUserRoom() || this.joinInFlight) {
+      return;
+    }
+    this.joinInFlight = true;
+    this.scheduleJoinReset();
+    this.socket.emit('user:joinUserRoom', this.currentUserId);
+  }
+
+  private scheduleJoinReset(): void {
+    this.clearJoinResetTimer();
+    this.joinResetTimer = setTimeout(() => {
+      this.joinInFlight = false;
+    }, 5000);
+  }
+
+  private clearJoinResetTimer(): void {
+    if (this.joinResetTimer) {
+      clearTimeout(this.joinResetTimer);
+      this.joinResetTimer = undefined;
+    }
   }
 
 }
