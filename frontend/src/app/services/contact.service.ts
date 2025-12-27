@@ -89,7 +89,7 @@ export class ContactService {
       subscribed: raw.subscribed,
       pinned: false,
       hint: raw.hint ?? '',
-      name: raw.name ?? '',
+      name: this.sanitizeContactName(raw.name),
       base64Avatar: raw.base64Avatar ?? '',
       provided: raw.provided ?? false,
       lastMessageFrom: raw.lastMessageFrom ?? '',
@@ -97,10 +97,32 @@ export class ContactService {
     };
   }
 
+  private sanitizeContactName(name?: string | null): string {
+    if (!name) {
+      return '';
+    }
+
+    const trimmed = name.trim();
+    if (!trimmed) {
+      return '';
+    }
+
+    try {
+      const parsed = JSON.parse(trimmed);
+      if (parsed && typeof parsed === 'object' && 'iv' in parsed && 'encryptedData' in parsed && 'encryptedKey' in parsed) {
+        return '';
+      }
+    } catch {
+      // Non-JSON names are valid and should be preserved.
+    }
+
+    return name;
+  }
+
   private async updateContactProfile() {
     await Promise.all(this._contacts().map(async contact => {
       const profile = await this.indexedDbService.getContactProfile(contact.id);
-      contact.name = profile?.name || contact.name || '';
+      contact.name = this.sanitizeContactName(profile?.name ?? contact.name);
       contact.base64Avatar = profile?.base64Avatar || contact.base64Avatar || '';
       contact.pinned = profile?.pinned || false;
       const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
