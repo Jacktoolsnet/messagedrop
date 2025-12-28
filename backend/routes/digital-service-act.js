@@ -152,8 +152,11 @@ function disableLocallyIfPossible(req) {
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, next) => {
     try {
-        await disableLocallyIfPossible(req);
         const resp = await forwardPost('/signals', req.body);
+
+        if (resp?.status >= 200 && resp?.status < 300 && req.body?.contentId && req.database?.db) {
+            await disableLocallyIfPossible(req);
+        }
 
         if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
             tableMessage.setDsaStatusToken(
@@ -174,8 +177,11 @@ router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, nex
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
 router.post('/notices', noticeLimiter, reportHourlyLimiter, noticePow, async (req, res, next) => {
     try {
-        await disableLocallyIfPossible(req);
         const resp = await forwardPost('/notices', req.body);
+
+        if (resp?.status >= 200 && resp?.status < 300 && req.body?.contentId && req.database?.db) {
+            await disableLocallyIfPossible(req);
+        }
 
         if (resp?.status >= 200 && resp?.status < 300 && resp?.data?.token && req.body?.contentId && req.database?.db) {
             tableMessage.setDsaStatusToken(

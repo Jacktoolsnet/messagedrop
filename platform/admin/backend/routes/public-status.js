@@ -129,6 +129,23 @@ async function countFileEvidence(dbInstance, noticeId) {
   });
 }
 
+async function hasOpenAppeal(dbInstance, decisionId) {
+  return new Promise((resolve, reject) => {
+    dbInstance.get(
+      `SELECT ${tableAppeal.columns.id} AS id
+       FROM ${tableAppeal.tableName}
+       WHERE ${tableAppeal.columns.decisionId} = ?
+         AND ${tableAppeal.columns.resolvedAt} IS NULL
+       LIMIT 1`,
+      [decisionId],
+      (err, row) => {
+        if (err) return reject(err);
+        resolve(Boolean(row));
+      }
+    );
+  });
+}
+
 function parseDetails(entry) {
   if (!entry?.detailsJson) return null;
   try { return JSON.parse(entry.detailsJson); }
@@ -252,6 +269,9 @@ router.post('/status/:token/appeals', appealHourlyLimiter, appealPow, async (req
 
     const decision = await toPromise(tableDecision.getByNoticeId, _db, notice.id);
     if (!decision) return next(apiError.conflict('decision_pending'));
+    if (await hasOpenAppeal(_db, decision.id)) {
+      return next(apiError.conflict('appeal_open'));
+    }
 
     const argsText = String(req.body?.arguments || '').trim();
     if (!argsText) return next(apiError.badRequest('arguments_required'));

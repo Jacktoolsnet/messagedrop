@@ -10,6 +10,8 @@ const { apiError } = require('../middleware/api-error');
 // DB-Tabellen
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
+const tableDecision = require('../db/tableDsaDecision');
+const tableAppeal = require('../db/tableDsaAppeal');
 const tableAudit = require('../db/tableDsaAuditLog');
 
 const router = express.Router();
@@ -66,13 +68,70 @@ function toStringOrNull(v) { return (v === undefined || v === null) ? null : Str
 function toInt01OrNull(v) { return (v === undefined || v === null) ? null : (v ? 1 : 0); }
 function db(req) { return req.database?.db; }
 
+function hasOpenSignal(dbInstance, contentId) {
+    return new Promise((resolve, reject) => {
+        dbInstance.get(
+            `SELECT ${tableSignal.columns.id} AS id
+             FROM ${tableSignal.tableName}
+             WHERE ${tableSignal.columns.contentId} = ?
+               AND dismissedAt IS NULL
+             LIMIT 1`,
+            [contentId],
+            (err, row) => {
+                if (err) return reject(err);
+                resolve(Boolean(row));
+            }
+        );
+    });
+}
+
+function hasOpenNotice(dbInstance, contentId) {
+    return new Promise((resolve, reject) => {
+        const sql = `
+            SELECT n.${tableNotice.columns.id} AS id
+            FROM ${tableNotice.tableName} n
+            LEFT JOIN ${tableDecision.tableName} d
+              ON d.${tableDecision.columns.noticeId} = n.${tableNotice.columns.id}
+            LEFT JOIN ${tableAppeal.tableName} a
+              ON a.${tableAppeal.columns.decisionId} = d.${tableDecision.columns.id}
+             AND a.${tableAppeal.columns.resolvedAt} IS NULL
+            WHERE n.${tableNotice.columns.contentId} = ?
+              AND (d.${tableDecision.columns.id} IS NULL OR a.${tableAppeal.columns.id} IS NOT NULL)
+            LIMIT 1
+        `;
+        dbInstance.get(sql, [contentId], (err, row) => {
+            if (err) return reject(err);
+            resolve(Boolean(row));
+        });
+    });
+}
+
+async function ensureNoOpenCase(dbInstance, contentId, next) {
+    try {
+        const [openSignal, openNotice] = await Promise.all([
+            hasOpenSignal(dbInstance, contentId),
+            hasOpenNotice(dbInstance, contentId)
+        ]);
+        if (openSignal || openNotice) {
+            next(apiError.conflict('case_open'));
+            return true;
+        }
+        return false;
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        next(apiErr);
+        return true;
+    }
+}
+
 /* -------------------------------- Routes -------------------------------- */
 
 /**
  * POST /dsa/frontend/signals
  * Quick report (informelles Signal). Nur contentId ist „sinnvoll“; alles andere optional.
  */
-router.post('/signals', signalLimiter, (req, res, next) => {
+router.post('/signals', signalLimiter, async (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = crypto.randomUUID();
@@ -87,6 +146,7 @@ router.post('/signals', signalLimiter, (req, res, next) => {
     } = req.body || {};
 
     if (!contentId) return next(apiError.badRequest('contentId is required'));
+    if (await ensureNoOpenCase(_db, contentId, next)) return;
 
     let reportedContentJson = 'null';
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
@@ -160,7 +220,7 @@ router.post('/signals', signalLimiter, (req, res, next) => {
  * POST /dsa/frontend/notices
  * Formale DSA-Notice (alle Felder optional außer contentId).
  */
-router.post('/notices', noticeLimiter, (req, res, next) => {
+router.post('/notices', noticeLimiter, async (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = crypto.randomUUID();
@@ -181,6 +241,7 @@ router.post('/notices', noticeLimiter, (req, res, next) => {
     const normalizedReporterName = toStringOrNull(reporterName);
 
     if (!contentId) return next(apiError.badRequest('contentId is required'));
+    if (await ensureNoOpenCase(_db, contentId, next)) return;
 
     let reportedContentJson = 'null';
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
