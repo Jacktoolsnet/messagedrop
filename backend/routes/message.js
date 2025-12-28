@@ -6,6 +6,7 @@ const tableLike = require('../db/tableLike');
 const tableDislike = require('../db/tableDislike');
 const notify = require('../utils/notify');
 const metric = require('../middleware/metric');
+const rateLimit = require('express-rate-limit');
 const { apiError } = require('../middleware/api-error');
 
 function getAuthUserId(req) {
@@ -54,6 +55,18 @@ function normalizeLon(lon) {
 }
 
 const sanitizeSingleQuotes = (value) => String(value ?? '').replace(/'/g, "''");
+
+const messageCreateLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  limit: 3,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    errorCode: 'RATE_LIMIT',
+    message: 'Too many message create requests, please try again later.',
+    error: 'Too many message create requests, please try again later.'
+  }
+});
 
 router.get('/get', function (req, res, next) {
   tableMessage.getAll(req.database.db, function (err, rows) {
@@ -194,6 +207,7 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
 
 router.post('/create',
   [
+    messageCreateLimiter,
     security.authenticate,
     express.json({ type: 'application/json' }),
     metric.count('message.create', { when: 'always', timezone: 'utc', amount: 1 })
