@@ -23,7 +23,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         error instanceof HttpErrorResponse &&
         error.status === 404 &&
         (req.url.includes('/message/get/boundingbox') ||
-          req.url.includes('/place/get/userId'))
+          req.url.includes('/place/get/userId') ||
+          req.url.includes('/contact/get/userId'))
       ) {
         return throwError(() => error);
       }
