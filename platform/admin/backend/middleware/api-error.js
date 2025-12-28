@@ -32,6 +32,8 @@ const STATUS_TO_MESSAGE = {
   504: 'gateway_timeout'
 };
 
+const IS_PROD = process.env.NODE_ENV === 'production';
+
 function errorCodeFromStatus(status) {
   return STATUS_TO_ERROR_CODE[status] || 'INTERNAL_ERROR';
 }
@@ -101,12 +103,46 @@ function attachTraceId(payload, req, res) {
   }
 }
 
+function sanitizeErrorPayload(payload) {
+  if (!payload || typeof payload !== 'object') {
+    return;
+  }
+  if (IS_PROD && Object.prototype.hasOwnProperty.call(payload, 'detail')) {
+    delete payload.detail;
+  }
+}
+
+function buildLogContext(req, payload, status, err) {
+  const context = {
+    traceId: payload?.traceId,
+    status,
+    errorCode: payload?.errorCode,
+    method: req?.method,
+    path: req?.originalUrl || req?.url,
+    ip: req?.ip || (typeof req?.headers?.['x-forwarded-for'] === 'string' ? req.headers['x-forwarded-for'].split(',')[0].trim() : undefined)
+  };
+  const userId = req?.jwtUser?.userId ?? req?.jwtUser?.id;
+  if (userId) {
+    context.userId = userId;
+  }
+  if (req?.admin?.sub) {
+    context.adminId = req.admin.sub;
+  }
+  if (err?.detail !== undefined) {
+    context.detail = err.detail;
+  } else if (payload?.detail !== undefined) {
+    context.detail = payload.detail;
+  }
+  return context;
+}
+
 function normalizeErrorResponses(_req, res, next) {
   const originalJson = res.json.bind(res);
   res.json = (body) => {
     if (res.statusCode >= 400) {
       const payload = normalizeErrorPayload(res.statusCode, body);
       attachTraceId(payload, null, res);
+      sanitizeErrorPayload(payload);
       return originalJson(payload);
     }
     return originalJson(body);
@@ -125,11 +161,13 @@ function errorHandler(err, req, res, next) {
   const status = err?.status || err?.statusCode || 500;
   const payload = normalizeErrorPayload(status, err);
   attachTraceId(payload, req, res);
+  const logContext = buildLogContext(req, payload, status, err);
+  sanitizeErrorPayload(payload);
 
   if (status >= 500) {
-    req?.logger?.error?.('Unhandled error', { traceId: payload.traceId, message: err?.message, stack: err?.stack });
+    req?.logger?.error?.('Unhandled error', { ...logContext, message: err?.message, stack: err?.stack });
   } else {
-    req?.logger?.warn?.('Request error', { traceId: payload.traceId, message: err?.message || payload.message });
+    req?.logger?.warn?.('Request error', { ...logContext, message: err?.message || payload.message });
   }
 
   res.status(status).json(payload);
