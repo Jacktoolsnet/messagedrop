@@ -1,11 +1,16 @@
 <mat-dialog-content class="icon-picker">
   <mat-tab-group>
-    @for (cat of iconCategories; track cat.name) {
+    @for (cat of iconCategories; track cat.nameKey) {
       <mat-tab>
-        <ng-template mat-tab-label>{{ cat.name }}</ng-template>
+        <ng-template mat-tab-label>{{ cat.nameKey | transloco }}</ng-template>
         <div class="icon-grid">
           @for (icon of cat.icons; track icon) {
-            <button type="button" class="icon-button" (click)="pick(icon)" [attr.aria-label]="'Use icon ' + icon">
+            <button
+              type="button"
+              class="icon-button"
+              (click)="pick(icon)"
+              [attr.aria-label]="'common.iconPicker.useIcon' | transloco: { icon: icon }"
+            >
               <mat-icon>{{ icon }}</mat-icon>
             </button>
           }
@@ -16,6 +21,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
-  <button mat-button (click)="pick(null)">No icon</button>
-  <button mat-button mat-dialog-close>Close</button>
+  <button mat-button (click)="pick(null)">{{ 'common.iconPicker.noIcon' | transloco }}</button>
+  <button mat-button mat-dialog-close>{{ 'common.actions.close' | transloco }}</button>
 </mat-dialog-actions>

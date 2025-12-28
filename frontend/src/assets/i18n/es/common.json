@@ -459,6 +459,21 @@
       "warnLevel": "Warn level",
       "alertLevel": "Alert level"
     },
+    "iconPicker": {
+      "categories": {
+        "basics": "Básicos",
+        "placesMap": "Lugares y mapa",
+        "weatherNature": "Clima y naturaleza",
+        "communication": "Comunicación",
+        "media": "Medios",
+        "contentFiles": "Contenido y archivos",
+        "statusActions": "Estado y acciones",
+        "travelTransport": "Viajes y transporte",
+        "homeLifestyle": "Hogar y estilo de vida"
+      },
+      "useIcon": "Usar icono {{ icon }}",
+      "noIcon": "Sin icono"
+    },
     "tileLinkTypes": {
       "web": "Web",
       "email": "Email",
