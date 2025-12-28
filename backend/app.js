@@ -363,10 +363,10 @@ app.use(errorHandler);
 (async () => {
   try {
     await generateOrLoadKeypairs();
+    await database.init(logger);
     const port = Number(process.env.PORT);
     const server = app.listen(port, () => {
       logger.info(`Server läuft auf Port ${port}`);
-      database.init(logger);
     });
     server.on('error', (err) => {
       logger.error('Server-Fehler', err);

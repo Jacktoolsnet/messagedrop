@@ -21,34 +21,46 @@ class Database {
 
   init(logger) {
     this.logger = logger ?? this.logger;
-    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-      if (err) {
-        return;
-      } else {
-        this.db.run('PRAGMA foreign_keys = ON;', [], function (err) {
-          if (err) {
-            logger.error(err.message);
-          }
+    return new Promise((resolve, reject) => {
+      this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+        if (err) {
+          this.logger.error('Failed to open SQLite database.', err);
+          reject(err);
+          return;
+        }
+        this.db.serialize(() => {
+          this.db.run('PRAGMA foreign_keys = ON;', [], (pragmaErr) => {
+            if (pragmaErr) {
+              this.logger.error(pragmaErr.message);
+            }
+          });
+          tableUser.init(this.db);
+          tableConnect.init(this.db);
+          tableContact.init(this.db);
+          tableContactMessage.init(this.db);
+          tableMessage.init(this.db);
+          tableLike.init(this.db);
+          tableDislike.init(this.db);
+          tablePlace.init(this.db);
+          tableGeoStatistic.init(this.db);
+          tableWeatherHistory.init(this.db);
+          tableNotification.init(this.db);
+
+          // Trigger initialisieren
+          this.initTriggers(this.logger);
+
+          this.initIndexes(this.logger);
+
+          this.db.get('SELECT 1;', (readyErr) => {
+            if (readyErr) {
+              reject(readyErr);
+              return;
+            }
+            this.logger.info('Connected to the messagedrop SQlite database.');
+            resolve();
+          });
         });
-        tableUser.init(this.db);
-        tableConnect.init(this.db);
-        tableContact.init(this.db);
-        tableContactMessage.init(this.db);
-        tableMessage.init(this.db);
-        tableLike.init(this.db);
-        tableDislike.init(this.db);
-        tablePlace.init(this.db);
-        tableGeoStatistic.init(this.db);
-        tableWeatherHistory.init(this.db);
-        tableNotification.init(this.db);
-
-        // Trigger initialisieren
-        this.initTriggers(this.logger);
-
-        this.initIndexes(this.logger);
-
-        this.logger.info('Connected to the messagedrop SQlite database.');
-      }
+      });
     });
   };
 
