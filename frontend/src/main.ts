@@ -1,4 +1,4 @@
-import { provideZoneChangeDetection, isDevMode } from "@angular/core";
+import { provideZoneChangeDetection } from "@angular/core";
 import { registerLocaleData } from '@angular/common';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { AppComponent } from './app/app.component';
@@ -15,9 +15,6 @@ import localeKo from '@angular/common/locales/ko';
 import localePt from '@angular/common/locales/pt';
 import localeRu from '@angular/common/locales/ru';
 import localeZh from '@angular/common/locales/zh';
-import { provideHttpClient } from '@angular/common/http';
-import { TranslocoHttpLoader } from './transloco-loader';
-import { provideTransloco } from '@jsverse/transloco';
 
 registerLocaleData(localeDe);
 registerLocaleData(localeFr);
@@ -39,16 +36,10 @@ navigator.serviceWorker.register('/messagedrop-service-worker.js', {
     .catch(err => console.warn('Failed to register share-handler service worker', err));
 }
 
-bootstrapApplication(AppComponent, {...appConfig, providers: [provideZoneChangeDetection(), ...appConfig.providers, provideHttpClient(), provideTransloco({
-        config: { 
-          availableLangs: ['en', 'de'],
-          defaultLang: 'en',
-          // Remove this option if your application doesn't support changing language in runtime.
-          reRenderOnLangChange: true,
-          prodMode: !isDevMode(),
-        },
-        loader: TranslocoHttpLoader
-      })]})
+bootstrapApplication(AppComponent, {
+  ...appConfig,
+  providers: [provideZoneChangeDetection(), ...appConfig.providers]
+})
   .then(appRef => {
     const injector = appRef.injector;
     registerLaunchHandler(injector);
