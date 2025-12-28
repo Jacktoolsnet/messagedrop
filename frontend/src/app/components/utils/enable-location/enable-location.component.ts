@@ -2,13 +2,14 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, inject, Input, OnInit, Output } from '@angular/core';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 
 @Component({
   selector: 'app-enable-location',
   standalone: true,
-  imports: [MatSlideToggleModule, MatIconModule],
+  imports: [MatSlideToggleModule, MatIconModule, TranslocoPipe],
   templateUrl: './enable-location.component.html',
   styleUrl: './enable-location.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush

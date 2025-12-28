@@ -21,6 +21,13 @@
     "optionSpanish": "Espagnol",
     "optionFrench": "Français"
   },
+  "location": {
+    "title": "Localisation au démarrage",
+    "description": "Utiliser votre position actuelle dès l’ouverture de l’app.",
+    "note": "En activant cette option, vous autorisez l’app à accéder à votre localisation immédiatement au démarrage. La localisation sert à afficher du contenu à proximité et n’est pas suivie en continu. Le traitement se fait de préférence sur l’appareil ; des données minimales peuvent être envoyées à notre service uniquement pour fournir la fonctionnalité demandée (p. ex. la météo locale). Vous pouvez retirer l’autorisation à tout moment.",
+    "toggle": "Obtenir la localisation au démarrage",
+    "toggleAria": "Activer la localisation au démarrage"
+  },
   "storage": {
     "title": "Stockage persistant",
     "description": "Protège les données locales du nettoyage automatique.",

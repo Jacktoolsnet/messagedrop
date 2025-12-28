@@ -1,17 +1,16 @@
 <div class="platform-header">
     <mat-icon>my_location</mat-icon>
     <div class="platform-header-copy">
-        <h3 class="platform-name">Device location on startup</h3>
-        <p class="platform-subtitle">Use your current position as soon as the app launches.</p>
+        <h3 class="platform-name">{{ 'settings.location.title' | transloco }}</h3>
+        <p class="platform-subtitle">{{ 'settings.location.description' | transloco }}</p>
     </div>
 </div>
 
 <div class="platform-note">
-    By enabling, you allow the app to access your device location right after launch. The location helps surface nearby
-    content and is not continuously tracked. Processing prefers on-device handling; minimal data may be sent to our
-    service only to deliver the feature you request (e.g., local weather). You can revoke permission anytime.
+    {{ 'settings.location.note' | transloco }}
 </div>
 
-<mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)" aria-label="Enable location on app start">
-    Get location on app start
+<mat-slide-toggle [checked]="enabled" (change)="onToggle($event.checked)"
+    [attr.aria-label]="'settings.location.toggleAria' | transloco">
+    {{ 'settings.location.toggle' | transloco }}
 </mat-slide-toggle>

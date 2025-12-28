@@ -21,6 +21,13 @@
     "optionSpanish": "Spanish",
     "optionFrench": "French"
   },
+  "location": {
+    "title": "Device location on startup",
+    "description": "Use your current position as soon as the app launches.",
+    "note": "By enabling, you allow the app to access your device location right after launch. The location helps surface nearby content and is not continuously tracked. Processing prefers on-device handling; minimal data may be sent to our service only to deliver the feature you request (e.g., local weather). You can revoke permission anytime.",
+    "toggle": "Get location on app start",
+    "toggleAria": "Enable location on app start"
+  },
   "storage": {
     "title": "Persistent storage",
     "description": "Keeps local data safe from automatic cleanup.",

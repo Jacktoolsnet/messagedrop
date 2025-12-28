@@ -21,6 +21,13 @@
     "optionSpanish": "Español",
     "optionFrench": "Francés"
   },
+  "location": {
+    "title": "Ubicación del dispositivo al iniciar",
+    "description": "Usa tu posición actual en cuanto se inicia la app.",
+    "note": "Al activar esta opción, permites que la app acceda a tu ubicación justo al arrancar. La ubicación ayuda a mostrar contenido cercano y no se rastrea de forma continua. El procesamiento se realiza preferentemente en el dispositivo; se pueden enviar datos mínimos a nuestro servicio solo para ofrecer la función solicitada (p. ej., el tiempo local). Puedes revocar el permiso en cualquier momento.",
+    "toggle": "Obtener ubicación al iniciar la app",
+    "toggleAria": "Activar ubicación al iniciar la app"
+  },
   "storage": {
     "title": "Almacenamiento persistente",
     "description": "Mantiene los datos locales a salvo de la limpieza automática.",

@@ -21,6 +21,13 @@
     "optionSpanish": "Spanisch",
     "optionFrench": "Französisch"
   },
+  "location": {
+    "title": "Gerätestandort beim Start",
+    "description": "Nutze deine aktuelle Position direkt beim Start der App.",
+    "note": "Wenn aktiviert, darf die App direkt nach dem Start auf den Standort zugreifen. Der Standort hilft, Inhalte in der Nähe zu zeigen und wird nicht dauerhaft verfolgt. Die Verarbeitung erfolgt bevorzugt auf dem Gerät; minimale Daten können nur zur Bereitstellung der gewünschten Funktion (z. B. lokales Wetter) an unseren Dienst gesendet werden. Du kannst die Berechtigung jederzeit entziehen.",
+    "toggle": "Standort beim App-Start ermitteln",
+    "toggleAria": "Standort beim App-Start aktivieren"
+  },
   "storage": {
     "title": "Persistenter Speicher",
     "description": "Schützt lokale Daten vor automatischer Bereinigung.",
