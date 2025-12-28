@@ -50,8 +50,9 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
   styleUrl: './dsa-case-dialog.component.css'
 })
 export class DsaCaseDialogComponent implements OnInit {
-  private static readonly MAX_FILE_SIZE = 5 * 1024 * 1024;
-  private static readonly MAX_TOTAL_SIZE = 10 * 1024 * 1024;
+  private static readonly MAX_FILES = 4;
+  private static readonly MAX_FILE_SIZE = 1 * 1024 * 1024;
+  private static readonly MAX_TOTAL_SIZE = DsaCaseDialogComponent.MAX_FILES * DsaCaseDialogComponent.MAX_FILE_SIZE;
   private static readonly ALLOWED_TYPES = new Set([
     'application/pdf',
     'image/png',
@@ -77,6 +78,7 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly attachments = signal<File[]>([]);
   readonly attachmentsSize = computed(() => this.attachments().reduce((sum, file) => sum + file.size, 0));
   readonly attachmentsSizeLabel = computed(() => this.formatBytes(this.attachmentsSize()));
+  readonly maxFiles = DsaCaseDialogComponent.MAX_FILES;
   // Appeal URL evidence state
   readonly appealUrls = signal<string[]>([]);
   readonly appealUrlViews = computed<readonly EvidenceUrlItem[]>(() =>
@@ -171,6 +173,15 @@ export class DsaCaseDialogComponent implements OnInit {
       return;
     }
 
+    if (this.attachments().length > DsaCaseDialogComponent.MAX_FILES) {
+      this.snack.open(
+        this.translation.t('dsa.case.filesCountLimit', { max: DsaCaseDialogComponent.MAX_FILES }),
+        this.translation.t('common.actions.ok'),
+        { duration: 4000, verticalPosition: 'top' }
+      );
+      return;
+    }
+
     if (this.attachmentsSize() > DsaCaseDialogComponent.MAX_TOTAL_SIZE) {
       this.snack.open(
         this.translation.t('dsa.case.filesTotalLimit'),
@@ -248,6 +259,11 @@ export class DsaCaseDialogComponent implements OnInit {
     let currentSize = this.attachmentsSize();
 
     for (const file of files) {
+      if (currentFiles.length >= DsaCaseDialogComponent.MAX_FILES) {
+        rejected = true;
+        message = this.translation.t('dsa.case.filesCountLimit', { max: DsaCaseDialogComponent.MAX_FILES });
+        break;
+      }
       if (!this.isAllowedFile(file)) {
         rejected = true;
         message = this.translation.t('dsa.case.filesTypeLimit');

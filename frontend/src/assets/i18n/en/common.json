@@ -870,7 +870,7 @@
         "linkHint": "http(s)://example.com • Press Enter to add",
         "filesLabel": "Add supporting documents",
         "fileFallback": "File",
-        "hint": "PDF or image files, up to 5 MB each (10 MB total). Currently selected files: {{ size }}."
+        "hint": "PDF or image files, up to 1 MB each (max {{ max }} files). Selected: {{ count }}/{{ max }} ({{ size }})."
       },
       "categories": {
         "privacy": "Privacy or personal data (doxxing)",
@@ -974,13 +974,14 @@
         "explanationLabel": "Your explanation",
         "minimumHint": "Minimum 20 characters",
         "error": "Please describe why you believe this decision should be reviewed.",
-        "fileHint": "PDF or image files, up to 5 MB each (10 MB total). Currently selected files: {{ size }}."
+        "fileHint": "PDF or image files, up to 1 MB each (max {{ max }} files). Selected: {{ count }}/{{ max }} ({{ size }})."
       },
       "openPublicPage": "Open public page",
       "submitAppeal": "Submit appeal",
       "filesTypeLimit": "Only PDF or image files are allowed.",
-      "filesSizeLimit": "Each file must be at most 5 MB.",
-      "filesTotalLimit": "Files exceed the total limit of 10 MB.",
+      "filesSizeLimit": "Each file must be at most 1 MB.",
+      "filesTotalLimit": "Files exceed the total limit of 4 MB.",
+      "filesCountLimit": "You can add at most {{ max }} files.",
       "appealSubmitted": "Appeal submitted successfully.",
       "appealSubmittedPartial": "Appeal submitted but some files failed to upload.",
       "appealDecisionPending": "A decision has not been finalized yet. Appeals are only possible afterwards.",

@@ -115,7 +115,7 @@
           <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting"
             [urlItems]="evidenceUrlViews()"
             [fileItems]="evidenceFileViews()"
-            [fileHint]="'dsa.report.evidence.hint' | transloco:{ size: evidenceFilesSizeLabel() }"
+            [fileHint]="'dsa.report.evidence.hint' | transloco:{ size: evidenceFilesSizeLabel(), count: evidenceFileViews().length, max: maxEvidenceFiles }"
             (urlAdd)="addEvidenceUrlFromInput($event)"
             (filesSelect)="onEvidenceFilesPicked($event)"
             (urlRemove)="removeEvidenceById($event)"

@@ -107,7 +107,9 @@ export class DigitalServicesActReportDialogComponent {
   activeTabIndex = 0; // 0 = Quick, 1 = Formal
 
   // Evidence tab state
-  readonly maxEvidenceBytes = 5 * 1024 * 1024;
+  readonly maxEvidenceBytes = 1 * 1024 * 1024;
+  readonly maxEvidenceFiles = 4;
+  readonly maxEvidenceTotalBytes = this.maxEvidenceBytes * this.maxEvidenceFiles;
   evidenceItems = signal<{ id: string; type: 'file' | 'url'; file?: File; url?: string }[]>([]);
 
   // Separate views like in the appeal UI
@@ -156,11 +158,19 @@ export class DigitalServicesActReportDialogComponent {
   onEvidenceFilesPicked(files: File[]): void {
     if (!files || files.length === 0) return;
     const items: { id: string; type: 'file'; file: File }[] = [];
+    let currentCount = this.evidenceItems().filter(e => e.type === 'file' && !!e.file).length;
+    let currentSize = this.evidenceItems()
+      .filter(e => e.type === 'file' && !!e.file)
+      .reduce((sum, item) => sum + (item.file?.size ?? 0), 0);
     for (const f of files) {
+      if (currentCount >= this.maxEvidenceFiles) break;
       if (f.size > this.maxEvidenceBytes) { continue; }
+      if (currentSize + f.size > this.maxEvidenceTotalBytes) break;
       const okType = f.type === 'application/pdf' || f.type.startsWith('image/') || /\.(pdf|png|jpe?g|gif|webp)$/i.test(f.name);
       if (!okType) { continue; }
       items.push({ id: crypto.randomUUID(), type: 'file', file: f });
+      currentCount += 1;
+      currentSize += f.size;
     }
     if (items.length) this.evidenceItems.update(arr => [...arr, ...items]);
   }

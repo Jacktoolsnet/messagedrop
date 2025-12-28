@@ -222,7 +222,7 @@
           <div class="url-upload">
             <app-evidence-input [showUrl]="true" [showFiles]="true" [disabled]="submitting() || uploading()"
               [urlItems]="appealUrlViews()" [fileItems]="attachmentViews()"
-              [fileHint]="'dsa.case.appealForm.fileHint' | transloco:{ size: attachmentsSizeLabel() }"
+              [fileHint]="'dsa.case.appealForm.fileHint' | transloco:{ size: attachmentsSizeLabel(), count: attachments().length, max: maxFiles }"
               (urlAdd)="onAppealUrlAdd($event)" (filesSelect)="onAttachmentsPicked($event)"
               (urlRemove)="onAppealUrlRemove($event)" (fileRemove)="onAttachmentRemove($event)"></app-evidence-input>
           </div>

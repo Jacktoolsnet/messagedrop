@@ -870,7 +870,7 @@
         "linkHint": "http(s)://beispiel.de • Zum Hinzufügen Enter drücken",
         "filesLabel": "Unterstützende Dokumente hinzufügen",
         "fileFallback": "Datei",
-        "hint": "PDF- oder Bilddateien, bis zu 5 MB pro Datei (10 MB gesamt). Aktuell ausgewählte Dateien: {{ size }}."
+        "hint": "PDF- oder Bilddateien, bis zu 1 MB pro Datei (max. {{ max }} Dateien). Ausgewählt: {{ count }}/{{ max }} ({{ size }})."
       },
       "categories": {
         "privacy": "Privatsphäre oder persönliche Daten (Doxxing)",
@@ -974,13 +974,14 @@
         "explanationLabel": "Deine Begründung",
         "minimumHint": "Mindestens 20 Zeichen",
         "error": "Bitte beschreibe, warum du diese Entscheidung überprüfen lassen möchtest.",
-        "fileHint": "PDF- oder Bilddateien, bis zu 5 MB pro Datei (10 MB gesamt). Aktuell ausgewählte Dateien: {{ size }}."
+        "fileHint": "PDF- oder Bilddateien, bis zu 1 MB pro Datei (max. {{ max }} Dateien). Ausgewählt: {{ count }}/{{ max }} ({{ size }})."
       },
       "openPublicPage": "Öffentliche Seite öffnen",
       "submitAppeal": "Einspruch einreichen",
       "filesTypeLimit": "Nur PDF- oder Bilddateien sind erlaubt.",
-      "filesSizeLimit": "Jede Datei darf höchstens 5 MB groß sein.",
-      "filesTotalLimit": "Dateien überschreiten das Gesamtlimit von 10 MB.",
+      "filesSizeLimit": "Jede Datei darf höchstens 1 MB groß sein.",
+      "filesTotalLimit": "Dateien überschreiten das Gesamtlimit von 4 MB.",
+      "filesCountLimit": "Es sind maximal {{ max }} Dateien erlaubt.",
       "appealSubmitted": "Einspruch erfolgreich eingereicht.",
       "appealSubmittedPartial": "Einspruch eingereicht, aber einige Dateien konnten nicht hochgeladen werden.",
       "appealDecisionPending": "Eine Entscheidung ist noch nicht finalisiert. Einsprüche sind erst danach möglich.",
