@@ -18,16 +18,54 @@ const valueLabelPlugin: Plugin = {
 
     ctx.save();
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'bottom';
-    ctx.fillStyle = '#1f2937';
+    ctx.textBaseline = 'middle';
     ctx.font = '12px sans-serif';
+    const paddingX = 6;
+    const paddingY = 3;
+    const radius = 4;
+    const chartArea = chart.chartArea;
+
+    const drawRoundedRect = (x: number, y: number, w: number, h: number) => {
+      ctx.beginPath();
+      ctx.moveTo(x + radius, y);
+      ctx.lineTo(x + w - radius, y);
+      ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+      ctx.lineTo(x + w, y + h - radius);
+      ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+      ctx.lineTo(x + radius, y + h);
+      ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+      ctx.lineTo(x, y + radius);
+      ctx.quadraticCurveTo(x, y, x + radius, y);
+      ctx.closePath();
+    };
 
     meta.data.forEach((bar: Element, index: number) => {
       const value = data[index];
       if (value === null || value === undefined) return;
       const pos = bar.tooltipPosition(true);
       if (pos?.x == null || pos?.y == null) return;
-      ctx.fillText(String(value), pos.x, pos.y - 4);
+      const props = bar.getProps(['x', 'y', 'base'], true) as unknown as {
+        y?: number;
+        base?: number;
+      };
+      const midY = Number.isFinite(props?.y) && Number.isFinite(props?.base)
+        ? (Number(props!.y) + Number(props!.base)) / 2
+        : pos.y;
+      const label = String(value);
+      const textWidth = ctx.measureText(label).width;
+      const boxW = textWidth + paddingX * 2;
+      const boxH = 12 + paddingY * 2;
+      let boxX = pos.x - boxW / 2;
+      let boxY = midY - boxH / 2;
+      if (chartArea) {
+        boxX = Math.min(Math.max(boxX, chartArea.left + 2), chartArea.right - boxW - 2);
+        boxY = Math.min(Math.max(boxY, chartArea.top + 2), chartArea.bottom - boxH - 2);
+      }
+      ctx.fillStyle = 'rgba(0, 0, 0, 0.55)';
+      drawRoundedRect(boxX, boxY, boxW, boxH);
+      ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(label, boxX + boxW / 2, boxY + boxH / 2);
     });
 
     ctx.restore();
