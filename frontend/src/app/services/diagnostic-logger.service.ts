@@ -16,6 +16,11 @@ interface FrontendErrorPayload {
   path?: string;
   status?: number;
   errorName?: string;
+  errorMessage?: string;
+  stack?: string;
+  source?: string;
+  line?: number;
+  column?: number;
   errorCode?: string;
   appVersion?: string;
   environment?: 'dev' | 'prod';
@@ -41,13 +46,19 @@ export class DiagnosticLoggerService {
   logHttpError(req: HttpRequest<unknown>, error: unknown): void {
     const httpError = error instanceof HttpErrorResponse ? error : undefined;
     const status = httpError?.status;
+    const details = this.extractErrorDetails(error);
     const payload: FrontendErrorPayload = {
       client: 'web',
       event: 'http_error',
       severity: 'error',
       path: this.stripUrl(req.url),
       status: typeof status === 'number' ? status : undefined,
-      errorName: this.safeToken(httpError?.name),
+      errorName: details.errorName ?? this.safeToken(httpError?.name),
+      errorMessage: details.errorMessage,
+      stack: details.stack,
+      source: details.source,
+      line: details.line,
+      column: details.column,
       appVersion: APP_VERSION_INFO.version,
       environment: environment.production ? 'prod' : 'dev',
       createdAt: Date.now()
@@ -55,29 +66,40 @@ export class DiagnosticLoggerService {
     this.send(payload);
   }
 
-  logRuntimeError(error: unknown): void {
-    const err = error instanceof Error ? error : undefined;
+  logRuntimeError(error: unknown, overrides?: Partial<FrontendErrorPayload>): void {
+    const details = this.extractErrorDetails(error);
     const payload: FrontendErrorPayload = {
       client: 'web',
       event: 'runtime_error',
       severity: 'error',
       path: this.getCurrentPath(),
-      errorName: this.safeToken(err?.name),
+      errorName: details.errorName,
+      errorMessage: details.errorMessage,
+      stack: details.stack,
+      source: details.source,
+      line: details.line,
+      column: details.column,
       appVersion: APP_VERSION_INFO.version,
       environment: environment.production ? 'prod' : 'dev',
-      createdAt: Date.now()
+      createdAt: Date.now(),
+      ...overrides
     };
     this.send(payload);
   }
 
   logUnhandledRejection(reason: unknown): void {
-    const err = reason instanceof Error ? reason : undefined;
+    const details = this.extractErrorDetails(reason);
     const payload: FrontendErrorPayload = {
       client: 'web',
       event: 'unhandled_rejection',
       severity: 'error',
       path: this.getCurrentPath(),
-      errorName: this.safeToken(err?.name),
+      errorName: details.errorName,
+      errorMessage: details.errorMessage,
+      stack: details.stack,
+      source: details.source,
+      line: details.line,
+      column: details.column,
       appVersion: APP_VERSION_INFO.version,
       environment: environment.production ? 'prod' : 'dev',
       createdAt: Date.now()
@@ -87,7 +109,12 @@ export class DiagnosticLoggerService {
 
   private handleWindowError(event: Event): void {
     if (event instanceof ErrorEvent) {
-      this.logRuntimeError(event.error ?? event.message);
+      this.logRuntimeError(event.error ?? event.message, {
+        errorMessage: event.message,
+        source: event.filename,
+        line: Number.isFinite(event.lineno) ? event.lineno : undefined,
+        column: Number.isFinite(event.colno) ? event.colno : undefined
+      });
       return;
     }
     const target = event.target as HTMLElement | null;
@@ -151,12 +178,83 @@ export class DiagnosticLoggerService {
 
   private safePath(path?: string): string | undefined {
     if (!path) return undefined;
-    return path.split('?')[0].slice(0, 200);
+    return path.split('?')[0].split('#')[0].slice(0, 200);
   }
 
   private safeToken(value?: string): string | undefined {
     if (!value) return undefined;
     return value.replace(/[^a-zA-Z0-9_.+-]/g, '').slice(0, 80) || undefined;
+  }
+
+  private safeMessage(value?: string, maxLen = 300): string | undefined {
+    if (!value) return undefined;
+    return value.replace(/[^\x20-\x7E]/g, '').slice(0, maxLen) || undefined;
+  }
+
+  private safeStack(value?: string, maxLen = 4000): string | undefined {
+    if (!value) return undefined;
+    return value.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '').slice(0, maxLen) || undefined;
+  }
+
+  private safeSource(value?: string): string | undefined {
+    if (!value) return undefined;
+    try {
+      const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
+      const full = parsed.pathname + (parsed.hash ?? '');
+      return this.safePath(full);
+    } catch {
+      return this.safePath(value);
+    }
+  }
+
+  private extractErrorDetails(error: unknown): {
+    errorName?: string;
+    errorMessage?: string;
+    stack?: string;
+    source?: string;
+    line?: number;
+    column?: number;
+  } {
+    if (error instanceof Error) {
+      const location = this.parseStackLocation(error.stack);
+      return {
+        errorName: error.name,
+        errorMessage: error.message,
+        stack: error.stack,
+        ...location
+      };
+    }
+    if (typeof error === 'string') {
+      return { errorMessage: error };
+    }
+    if (error && typeof error === 'object') {
+      const maybe = error as { name?: unknown; message?: unknown; stack?: unknown; fileName?: unknown; lineNumber?: unknown; columnNumber?: unknown };
+      const message = typeof maybe.message === 'string' ? maybe.message : undefined;
+      const stack = typeof maybe.stack === 'string' ? maybe.stack : undefined;
+      const location = this.parseStackLocation(stack);
+      return {
+        errorName: typeof maybe.name === 'string' ? maybe.name : undefined,
+        errorMessage: message,
+        stack,
+        source: typeof maybe.fileName === 'string' ? maybe.fileName : location.source,
+        line: typeof maybe.lineNumber === 'number' ? maybe.lineNumber : location.line,
+        column: typeof maybe.columnNumber === 'number' ? maybe.columnNumber : location.column
+      };
+    }
+    return {};
+  }
+
+  private parseStackLocation(stack?: string): { source?: string; line?: number; column?: number } {
+    if (!stack) return {};
+    const match = stack.match(/(?:at\s+.*\()?(https?:\/\/[^\s)]+|\/[^\s)]+|[A-Za-z]:\\[^\s)]+):(\d+):(\d+)/);
+    if (!match) return {};
+    const line = Number(match[2]);
+    const column = Number(match[3]);
+    return {
+      source: match[1],
+      line: Number.isFinite(line) ? line : undefined,
+      column: Number.isFinite(column) ? column : undefined
+    };
   }
 
   private sanitizePayload(payload: FrontendErrorPayload): FrontendErrorPayload | null {
@@ -173,6 +271,15 @@ export class DiagnosticLoggerService {
       path: this.safePath(payload.path),
       status: typeof payload.status === 'number' ? payload.status : undefined,
       errorName: this.safeToken(payload.errorName),
+      errorMessage: this.safeMessage(payload.errorMessage),
+      stack: this.safeStack(payload.stack),
+      source: this.safeSource(payload.source),
+      line: typeof payload.line === 'number' && Number.isFinite(payload.line)
+        ? Math.max(0, Math.floor(payload.line))
+        : undefined,
+      column: typeof payload.column === 'number' && Number.isFinite(payload.column)
+        ? Math.max(0, Math.floor(payload.column))
+        : undefined,
       errorCode: this.safeToken(payload.errorCode),
       appVersion: this.safeToken(payload.appVersion),
       environment: payload.environment === 'prod' ? 'prod' : 'dev',

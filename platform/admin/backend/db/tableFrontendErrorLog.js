@@ -8,6 +8,11 @@ const columnFeature = 'feature';
 const columnPath = 'path';
 const columnStatus = 'status';
 const columnErrorName = 'errorName';
+const columnErrorMessage = 'errorMessage';
+const columnStack = 'stack';
+const columnSource = 'source';
+const columnLine = 'line';
+const columnColumn = 'column';
 const columnErrorCode = 'errorCode';
 const columnAppVersion = 'appVersion';
 const columnEnvironment = 'environment';
@@ -27,6 +32,11 @@ const init = function (db) {
       ${columnPath} TEXT,
       ${columnStatus} INTEGER,
       ${columnErrorName} TEXT,
+      ${columnErrorMessage} TEXT,
+      ${columnStack} TEXT,
+      ${columnSource} TEXT,
+      ${columnLine} INTEGER,
+      ${columnColumn} INTEGER,
       ${columnErrorCode} TEXT,
       ${columnAppVersion} TEXT,
       ${columnEnvironment} TEXT,
@@ -52,6 +62,11 @@ const create = function (
   path,
   status,
   errorName,
+  errorMessage,
+  stack,
+  source,
+  line,
+  column,
   errorCode,
   appVersion,
   environment,
@@ -68,11 +83,16 @@ const create = function (
       ${columnPath},
       ${columnStatus},
       ${columnErrorName},
+      ${columnErrorMessage},
+      ${columnStack},
+      ${columnSource},
+      ${columnLine},
+      ${columnColumn},
       ${columnErrorCode},
       ${columnAppVersion},
       ${columnEnvironment},
       ${columnCreatedAt}
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `;
   const params = [
     id,
@@ -83,6 +103,11 @@ const create = function (
     path,
     status,
     errorName,
+    errorMessage,
+    stack,
+    source,
+    line,
+    column,
     errorCode,
     appVersion,
     environment,

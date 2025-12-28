@@ -15,9 +15,31 @@ function safeToken(value, maxLen = 80) {
   return cleaned || undefined;
 }
 
+function safeMessage(value, maxLen = 300) {
+  if (typeof value !== 'string') return undefined;
+  const cleaned = value.replace(/[^\x20-\x7E]/g, '').slice(0, maxLen);
+  return cleaned || undefined;
+}
+
+function safeStack(value, maxLen = 4000) {
+  if (typeof value !== 'string') return undefined;
+  const cleaned = value.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '').slice(0, maxLen);
+  return cleaned || undefined;
+}
+
 function safePath(value) {
   if (typeof value !== 'string') return undefined;
-  return value.split('?')[0].slice(0, 200) || undefined;
+  return value.split('?')[0].split('#')[0].slice(0, 200) || undefined;
+}
+
+function safeSource(value) {
+  if (typeof value !== 'string') return undefined;
+  try {
+    const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
+    return safePath(parsed.pathname + (parsed.hash ?? ''));
+  } catch {
+    return safePath(value);
+  }
 }
 
 function sanitizePayload(body) {
@@ -35,6 +57,11 @@ function sanitizePayload(body) {
     path: safePath(body?.path),
     status: Number.isFinite(body?.status) ? Number(body.status) : undefined,
     errorName: safeToken(body?.errorName),
+    errorMessage: safeMessage(body?.errorMessage),
+    stack: safeStack(body?.stack),
+    source: safeSource(body?.source),
+    line: Number.isFinite(body?.line) ? Math.max(0, Math.floor(Number(body.line))) : undefined,
+    column: Number.isFinite(body?.column) ? Math.max(0, Math.floor(Number(body.column))) : undefined,
     errorCode: safeToken(body?.errorCode),
     appVersion: safeToken(body?.appVersion),
     environment: body?.environment === 'prod' ? 'prod' : 'dev',
@@ -60,7 +87,7 @@ async function forwardToAdmin(payload) {
  * POST /frontend-error-log
  * Body: FrontendErrorPayload (sanitized)
  */
-router.post('/', express.json({ limit: '8kb' }), async (req, res, next) => {
+router.post('/', express.json({ limit: '64kb' }), async (req, res, next) => {
   const payload = sanitizePayload(req.body);
   if (!payload) {
     return next(apiError.badRequest('invalid_payload'));

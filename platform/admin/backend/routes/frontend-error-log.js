@@ -27,9 +27,29 @@ function safeToken(value, maxLen = 80) {
   return value.replace(/[^a-zA-Z0-9_.+-]/g, '').slice(0, maxLen);
 }
 
+function safeMessage(value, maxLen = 300) {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[^\x20-\x7E]/g, '').slice(0, maxLen);
+}
+
+function safeStack(value, maxLen = 4000) {
+  if (typeof value !== 'string') return '';
+  return value.replace(/[^\x09\x0A\x0D\x20-\x7E]/g, '').slice(0, maxLen);
+}
+
 function safePath(value) {
   if (typeof value !== 'string') return '';
-  return value.split('?')[0].slice(0, 200);
+  return value.split('?')[0].split('#')[0].slice(0, 200);
+}
+
+function safeSource(value) {
+  if (typeof value !== 'string') return '';
+  try {
+    const parsed = new URL(value, typeof window !== 'undefined' ? window.location.origin : undefined);
+    return safePath(parsed.pathname + (parsed.hash ?? ''));
+  } catch {
+    return safePath(value);
+  }
 }
 
 /**
@@ -54,7 +74,7 @@ router.get('/', (req, res, next) => {
  * POST /frontend-error-log
  * Body: { client, event, severity, feature?, path?, status?, errorName?, errorCode?, appVersion?, environment?, createdAt? }
  */
-router.post('/', express.json({ limit: '32kb' }), (req, res, next) => {
+router.post('/', express.json({ limit: '64kb' }), (req, res, next) => {
   const db = req.database?.db;
   if (!db) return next(apiError.internal('database_unavailable'));
 
@@ -65,6 +85,11 @@ router.post('/', express.json({ limit: '32kb' }), (req, res, next) => {
   const path = safePath(req.body?.path);
   const status = Number.isFinite(req.body?.status) ? Number(req.body.status) : null;
   const errorName = safeToken(req.body?.errorName);
+  const errorMessage = safeMessage(req.body?.errorMessage);
+  const stack = safeStack(req.body?.stack);
+  const source = safeSource(req.body?.source);
+  const line = Number.isFinite(req.body?.line) ? Math.max(0, Math.floor(Number(req.body.line))) : null;
+  const column = Number.isFinite(req.body?.column) ? Math.max(0, Math.floor(Number(req.body.column))) : null;
   const errorCode = safeToken(req.body?.errorCode);
   const appVersion = safeToken(req.body?.appVersion, 60);
   const environment = safeToken(req.body?.environment, 16);
@@ -86,6 +111,11 @@ router.post('/', express.json({ limit: '32kb' }), (req, res, next) => {
     path || null,
     status,
     errorName || null,
+    errorMessage || null,
+    stack || null,
+    source || null,
+    line,
+    column,
     errorCode || null,
     appVersion || null,
     environment || null,

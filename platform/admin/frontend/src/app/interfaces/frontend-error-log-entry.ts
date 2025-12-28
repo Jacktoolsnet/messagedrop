@@ -7,6 +7,11 @@ export interface FrontendErrorLogEntry {
     path?: string;
     status?: number;
     errorName?: string;
+    errorMessage?: string;
+    stack?: string;
+    source?: string;
+    line?: number;
+    column?: number;
     errorCode?: string;
     appVersion?: string;
     environment?: string;
