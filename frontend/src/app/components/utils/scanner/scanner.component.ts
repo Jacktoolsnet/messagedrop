@@ -1,6 +1,7 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Result } from '@zxing/library';
 import { Mode } from '../../../interfaces/mode';
@@ -13,6 +14,7 @@ import { Mode } from '../../../interfaces/mode';
     MatDialogTitle,
     MatDialogActions,
     MatDialogClose,
+    TranslocoPipe,
   ],
   templateUrl: './scanner.component.html',
   styleUrl: './scanner.component.css'

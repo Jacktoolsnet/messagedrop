@@ -2,6 +2,7 @@
 import { Component, ElementRef, ViewChild, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { TranslocoPipe } from '@jsverse/transloco';
 import QRCode from 'qrcode';
 
 @Component({
@@ -11,7 +12,8 @@ import QRCode from 'qrcode';
     MatButtonModule,
     MatDialogTitle,
     MatDialogActions,
-    MatDialogClose
+    MatDialogClose,
+    TranslocoPipe
 ],
   templateUrl: './qrcode.component.html',
   styleUrl: './qrcode.component.css'

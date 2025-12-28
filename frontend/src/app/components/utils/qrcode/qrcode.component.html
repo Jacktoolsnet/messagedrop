@@ -1,8 +1,10 @@
-<h2 mat-dialog-title>Connect-Code</h2>
+<h2 mat-dialog-title>{{ 'common.contact.connect.qrTitle' | transloco }}</h2>
 <mat-dialog-content class="dialog">
     <canvas #canvas class="qrcode center"></canvas>
 </mat-dialog-content>
 
 <mat-dialog-actions>
-    <button mat-button mat-dialog-close [mat-dialog-close]="undefined">Close</button>
+    <button mat-button mat-dialog-close [mat-dialog-close]="undefined">
+        {{ 'common.actions.close' | transloco }}
+    </button>
 </mat-dialog-actions>

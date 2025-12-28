@@ -104,6 +104,8 @@
         "menuConnectWithId": "Connect with connect ID",
         "menuShareQr": "Share QR code",
         "menuConnectQr": "Connect by scanning QR code",
+        "qrTitle": "Code de connexion",
+        "scannerTitle": "Scanner de code de connexion",
         "shareTitle": "MessageDrop - share Connect ID",
         "shareCanceled": "Sharing was canceled.",
         "copied": "The Connect ID has been copied to your clipboard.",
