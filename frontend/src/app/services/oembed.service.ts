@@ -7,6 +7,7 @@ import { Location } from '../interfaces/location';
 import { Multimedia } from '../interfaces/multimedia';
 import { MultimediaType } from '../interfaces/multimedia-type';
 import { GeolocationService } from './geolocation.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 interface ResolveRedirectResponse {
   result: string;
@@ -18,6 +19,7 @@ interface ResolveRedirectResponse {
 export class OembedService {
   private readonly http = inject(HttpClient);
   private readonly geolocationService = inject(GeolocationService);
+  private readonly translation = inject(TranslationHelperService);
   private readonly allowedOembedHosts = [
     'youtube.com',
     'youtu.be',
@@ -125,6 +127,10 @@ export class OembedService {
     return allowedHosts.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
   }
 
+  private poweredBy(platform: string): string {
+    return this.translation.t('common.multimedia.attributionPoweredBy', { platform });
+  }
+
   public async getGoogleMapsLocation(url: string): Promise<Location | undefined> {
     try {
       let currentUrl = url;
@@ -177,7 +183,7 @@ export class OembedService {
           url: '',
           contentId: null != youtubeMatch[5] ? youtubeMatch[5] : '',
           sourceUrl: url,
-          attribution: 'Powered by YouTube',
+          attribution: this.poweredBy('YouTube'),
           title: '',
           description: '',
           oembed: response.result
@@ -206,7 +212,7 @@ export class OembedService {
         url: '',
         contentId: null != tiktokId ? tiktokId : '',
         sourceUrl: url,
-        attribution: 'Powered by TikTok',
+        attribution: this.poweredBy('TikTok'),
         title: '',
         description: '',
         oembed: {
@@ -273,7 +279,7 @@ export class OembedService {
           url: '',
           contentId: pinterestFinalMatch[2],
           sourceUrl: url,
-          attribution: 'Powered by Pinterest',
+          attribution: this.poweredBy('Pinterest'),
           title: '',
           description: '',
           oembed: response.result
@@ -298,7 +304,7 @@ export class OembedService {
           url: '',
           contentId: spotifyMatch[2],
           sourceUrl: spotifyMatch[0],
-          attribution: 'Powered by Spotify',
+          attribution: this.poweredBy('Spotify'),
           title: '',
           description: '',
           oembed: response.result

@@ -12,6 +12,7 @@ import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { AppService } from '../../../services/app.service';
 import { TenorService } from '../../../services/tenor.service';
 import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
 
 @Component({
@@ -43,6 +44,7 @@ export class TenorComponent implements OnInit {
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<TenorComponent>);
   private readonly tenorService = inject(TenorService);
+  private readonly translation = inject(TranslationHelperService);
   private readonly cdRef = inject(ChangeDetectorRef);
 
   ngOnInit(): void {
@@ -93,7 +95,7 @@ export class TenorComponent implements OnInit {
       type: MultimediaType.TENOR,
       url: result.media_formats.gif.url,
       sourceUrl: result.itemurl,
-      attribution: 'Powered by Tenor',
+      attribution: this.translation.t('common.multimedia.attributionPoweredBy', { platform: 'Tenor' }),
       title: result.title,
       description: result.content_description,
       contentId: ''

@@ -262,6 +262,7 @@
       "addFromTenor": "Add from Tenor",
       "addContent": "Add multimedia content",
       "importUrlPlaceholder": "Introduce la URL multimedia",
+      "attributionPoweredBy": "Con tecnología de {{ platform }}",
       "platformDisabled": "{{ platform }} está deshabilitado actualmente. Actívalo abajo para continuar.",
       "urlNotAllowed": "Esta URL no está permitida para insertar."
     },
