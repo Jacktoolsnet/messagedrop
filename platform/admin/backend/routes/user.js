@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const axios = require('axios');
+const rateLimit = require('express-rate-limit');
 
 const tableUser = require('../db/tableUser');
 const tableLoginOtp = require('../db/tableLoginOtp');
@@ -16,6 +17,109 @@ const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/'
 const ADMIN_AUD = process.env.ADMIN_AUD || 'messagedrop-admin';
 const OTP_TTL_MS = Number(process.env.ADMIN_OTP_TTL_MS || 5 * 60 * 1000);
 const OTP_LENGTH = 6;
+
+const rateLimitMessage = (message) => ({
+    errorCode: 'RATE_LIMIT',
+    message,
+    error: message
+});
+
+const toNumber = (value, fallback) => {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+};
+
+const LOGIN_WINDOW_MS = toNumber(process.env.ADMIN_LOGIN_LIMIT_WINDOW_MS, 10 * 60 * 1000);
+const LOGIN_LIMIT = toNumber(process.env.ADMIN_LOGIN_LIMIT, 10);
+const VERIFY_LIMIT = toNumber(process.env.ADMIN_LOGIN_VERIFY_LIMIT, 20);
+const SLOWDOWN_AFTER = toNumber(process.env.ADMIN_LOGIN_SLOWDOWN_AFTER, 5);
+const SLOWDOWN_DELAY_MS = toNumber(process.env.ADMIN_LOGIN_SLOWDOWN_DELAY_MS, 400);
+const SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_SLOWDOWN_MAX_MS, 4000);
+const VERIFY_SLOWDOWN_AFTER = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_AFTER, SLOWDOWN_AFTER);
+const VERIFY_SLOWDOWN_DELAY_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_DELAY_MS, SLOWDOWN_DELAY_MS);
+const VERIFY_SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_MAX_MS, SLOWDOWN_MAX_MS);
+
+function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerator }) {
+    const hits = new Map();
+    const cleanupMs = Math.max(windowMs, 60 * 1000);
+
+    setInterval(() => {
+        const now = Date.now();
+        for (const [key, entry] of hits.entries()) {
+            if (now - entry.start >= windowMs) {
+                hits.delete(key);
+            }
+        }
+    }, cleanupMs).unref();
+
+    return (req, _res, next) => {
+        if (delayMs <= 0 || delayAfter <= 0) {
+            return next();
+        }
+        const key = keyGenerator ? keyGenerator(req) : (req.ip || req.connection?.remoteAddress || 'unknown');
+        const now = Date.now();
+        const entry = hits.get(key);
+        if (!entry || now - entry.start >= windowMs) {
+            hits.set(key, { count: 1, start: now });
+            return next();
+        }
+        entry.count += 1;
+        if (entry.count <= delayAfter) {
+            return next();
+        }
+        const delay = Math.min((entry.count - delayAfter) * delayMs, maxDelayMs);
+        if (delay <= 0) {
+            return next();
+        }
+        setTimeout(next, delay);
+    };
+}
+
+const loginKey = (req) => {
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const username = typeof req.body?.username === 'string' ? req.body.username.trim().toLowerCase() : 'unknown';
+    return `${ip}|${username}`;
+};
+
+const verifyKey = (req) => {
+    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const challengeId = typeof req.body?.challengeId === 'string' ? req.body.challengeId.trim() : 'unknown';
+    return `${ip}|${challengeId}`;
+};
+
+const loginLimiter = rateLimit({
+    windowMs: LOGIN_WINDOW_MS,
+    limit: LOGIN_LIMIT,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: rateLimitMessage('Too many login attempts, please try again later.'),
+    keyGenerator: loginKey
+});
+
+const loginSlowdown = createSlowdown({
+    windowMs: LOGIN_WINDOW_MS,
+    delayAfter: SLOWDOWN_AFTER,
+    delayMs: SLOWDOWN_DELAY_MS,
+    maxDelayMs: SLOWDOWN_MAX_MS,
+    keyGenerator: loginKey
+});
+
+const verifyLimiter = rateLimit({
+    windowMs: LOGIN_WINDOW_MS,
+    limit: VERIFY_LIMIT,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: rateLimitMessage('Too many verification attempts, please try again later.'),
+    keyGenerator: verifyKey
+});
+
+const verifySlowdown = createSlowdown({
+    windowMs: LOGIN_WINDOW_MS,
+    delayAfter: VERIFY_SLOWDOWN_AFTER,
+    delayMs: VERIFY_SLOWDOWN_DELAY_MS,
+    maxDelayMs: VERIFY_SLOWDOWN_MAX_MS,
+    keyGenerator: verifyKey
+});
 
 // Helpers
 const stripUser = (u) => u && ({ id: u.id, username: u.username, role: u.role, createdAt: u.createdAt });
@@ -97,7 +201,7 @@ function createChallenge(db, username, payload, logger) {
 }
 
 // ======================= LOGIN (ohne Guard) =======================
-router.post('/login', async (req, res, next) => {
+router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
     const db = req.database?.db;
     if (!db) return next(apiError.internal('database_unavailable'));
 
@@ -148,7 +252,7 @@ router.post('/login', async (req, res, next) => {
     }
 });
 
-router.post('/login/verify', async (req, res, next) => {
+router.post('/login/verify', [verifyLimiter, verifySlowdown], async (req, res, next) => {
     const db = req.database?.db;
     if (!db) return next(apiError.internal('database_unavailable'));
 
