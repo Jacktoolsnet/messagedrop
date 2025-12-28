@@ -77,9 +77,9 @@ import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
 import { SystemNotificationService } from './services/system-notification.service';
+import { TranslationHelperService } from './services/translation-helper.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
-import { TranslationHelperService } from './services/translation-helper.service';
 
 @Component({
   selector: 'app-root',
@@ -1155,7 +1155,7 @@ export class AppComponent implements OnInit {
       data: { appSettings: this.appService.getAppSettings() },
       closeOnNavigation: true,
       maxHeight: '90vh',
-      width: 'max(800px, 90vw)',
+      width: 'auto',
       maxWidth: '90vw',
       autoFocus: false,
       hasBackdrop: true
