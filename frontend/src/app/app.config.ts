@@ -1,4 +1,4 @@
-import { ApplicationConfig, inject, isDevMode, LOCALE_ID, provideAppInitializer } from '@angular/core';
+import { ApplicationConfig, ErrorHandler, inject, isDevMode, LOCALE_ID, provideAppInitializer } from '@angular/core';
 import { MAT_ICON_DEFAULT_OPTIONS } from '@angular/material/icon';
 import { provideRouter } from '@angular/router';
 
@@ -12,13 +12,17 @@ import { errorInterceptor } from './interceptors/error-interceptor';
 import { loadingInterceptor } from './interceptors/loading-interceptor';
 import { traceIdInterceptor } from './interceptors/trace-id-interceptor';
 import { LanguageService } from './services/language.service';
+import { DiagnosticLoggerService } from './services/diagnostic-logger.service';
+import { GlobalErrorHandler } from './services/global-error-handler';
 import { TranslocoHttpLoader } from '../transloco-loader';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAppInitializer(() => {
       inject(LanguageService);
+      inject(DiagnosticLoggerService).initGlobalHandlers();
     }),
+    { provide: ErrorHandler, useClass: GlobalErrorHandler },
     { provide: LOCALE_ID, useFactory: () => inject(LanguageService).effectiveLanguage() },
     { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } },
     provideHttpClient(

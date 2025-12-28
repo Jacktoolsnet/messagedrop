@@ -28,6 +28,7 @@ const tenor = require('./routes/tenor');
 const digitalServiceAct = require('./routes/digital-service-act');
 const dsaStatus = require('./routes/dsa-status');
 const notification = require('./routes/notification');
+const frontendErrorLog = require('./routes/frontend-error-log');
 const cors = require('cors');
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -325,6 +326,13 @@ const dsaStatusLimit = rateLimit({
   message: rateLimitMessage('Too many DSA status requests, please try again later.')
 });
 
+const frontendErrorLogLimit = rateLimit({
+  windowMs: 5 * 60 * 1000,
+  limit: 300,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many log requests, please slow down.')
+});
+
 // ROUTES
 app.use('/', basicLimit, root);
 app.use('/airquality', airQualtiyLimit, airQualtiy);
@@ -346,6 +354,7 @@ app.use('/translate', translateLimit, translate);
 app.use('/user', userLimit, user);
 app.use('/utils', utilsLimit, utils);
 app.use('/weather', weatherLimit, weather);
+app.use('/frontend-error-log', frontendErrorLogLimit, frontendErrorLog);
 
 // 404 + Error handler (letzte Middleware)
 app.use(notFoundHandler);

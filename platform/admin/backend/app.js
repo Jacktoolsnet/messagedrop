@@ -11,6 +11,7 @@ const database = new Database();
 const tableStatistic = require('./db/tableStatistic');
 const tableErrorLog = require('./db/tableErrorLog');
 const tableInfoLog = require('./db/tableInfoLog');
+const tableFrontendErrorLog = require('./db/tableFrontendErrorLog');
 const root = require('./routes/root');
 const check = require('./routes/check');
 const translate = require('./routes/translate');
@@ -22,6 +23,7 @@ const publicStatus = require('./routes/public-status');
 const statistic = require('./routes/statistic');
 const errorLog = require('./routes/error-log');
 const infoLog = require('./routes/info-log');
+const frontendErrorLog = require('./routes/frontend-error-log');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -339,6 +341,7 @@ app.use('/translate', adminTranslateLimit, translate);
 app.use('/statistic', statistic);
 app.use('/error-log', adminLogLimit, errorLog);
 app.use('/info-log', adminLogLimit, infoLog);
+app.use('/frontend-error-log', adminLogLimit, frontendErrorLog);
 
 
 // DSA
@@ -392,6 +395,16 @@ cron.schedule('15 0 * * *', () => {
   tableErrorLog.cleanupOlderThan(database.db, threshold, (err) => {
     if (err) {
       logger.error('ErrorLog cleanup failed', { error: err?.message });
+    }
+  });
+});
+
+// Clean frontend error logs older than 7 days
+cron.schedule('17 0 * * *', () => {
+  const threshold = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  tableFrontendErrorLog.cleanupOlderThan(database.db, threshold, (err) => {
+    if (err) {
+      logger.error('FrontendErrorLog cleanup failed', { error: err?.message });
     }
   });
 });

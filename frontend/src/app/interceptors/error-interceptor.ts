@@ -4,6 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { catchError, throwError } from 'rxjs';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { ApiErrorService } from '../services/api-error.service';
+import { DiagnosticLoggerService } from '../services/diagnostic-logger.service';
 import { NetworkService } from '../services/network.service';
 import { TranslationHelperService } from '../services/translation-helper.service';
 
@@ -14,6 +15,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const apiErrorService = inject(ApiErrorService);
   const networkService = inject(NetworkService);
   const i18n = inject(TranslationHelperService);
+  const diagnosticLogger = inject(DiagnosticLoggerService);
 
   return next(req).pipe(
     catchError((error: unknown) => {
@@ -25,6 +27,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       ) {
         return throwError(() => error);
       }
+      diagnosticLogger.logHttpError(req, error);
       const status = error instanceof HttpErrorResponse ? error.status : -1;
       const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);
       const title = networkService.getErrorTitle(status);
