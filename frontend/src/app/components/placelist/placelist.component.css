@@ -5,7 +5,7 @@
 /* Inhalt kann scrollen, wenn zu groß */
 .mat-mdc-dialog-content {
   overflow-y: auto;
-  max-height: calc(90vh - 0.5rem);
+  max-height: calc(100% - 2rem);
   /* Abzug für Header/Footer, falls vorhanden */
   width: 100%;
   box-sizing: border-box;
