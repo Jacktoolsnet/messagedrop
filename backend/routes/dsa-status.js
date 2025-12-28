@@ -4,6 +4,7 @@ const multer = require('multer');
 const FormData = require('form-data');
 const rateLimit = require('express-rate-limit');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { createPowGuard } = require('../middleware/pow');
 const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
@@ -37,6 +38,19 @@ const evidenceLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: rateLimitMessage('Too many evidence uploads, please try again later.')
+});
+
+const appealPow = createPowGuard({
+  scope: 'dsa.status.appeal',
+  threshold: 6,
+  suspiciousThreshold: 3
+});
+
+const evidencePow = createPowGuard({
+  scope: 'dsa.status.appeal.evidence',
+  threshold: 4,
+  suspiciousThreshold: 2,
+  difficulty: Number(process.env.POW_EVIDENCE_DIFFICULTY || process.env.POW_DIFFICULTY || 12)
 });
 
 function buildForwardError(err) {
@@ -100,7 +114,7 @@ router.get('/status/:token/evidence/:id', statusLimiter, async (req, res, next) 
   }
 });
 
-router.post('/status/:token/appeals', appealLimiter, express.json({ limit: '2mb' }), async (req, res, next) => {
+router.post('/status/:token/appeals', appealLimiter, appealPow, express.json({ limit: '2mb' }), async (req, res, next) => {
   try {
     const resp = await forwardPost(`/status/${encodeURIComponent(req.params.token)}/appeals`, req.body);
     res.status(resp.status).json(resp.data);
@@ -109,7 +123,7 @@ router.post('/status/:token/appeals', appealLimiter, express.json({ limit: '2mb'
   }
 });
 
-router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload.single('file'), async (req, res, next) => {
+router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, evidencePow, upload.single('file'), async (req, res, next) => {
   if (!req.file) return next(apiError.badRequest('file_required'));
   try {
     const form = new FormData();
@@ -136,7 +150,7 @@ router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload
 });
 
 // Forward adding URL evidence for an appeal (JSON body)
-router.post('/status/:token/appeals/:appealId/evidence/url', evidenceLimiter, express.json({ limit: '1mb' }), async (req, res, next) => {
+router.post('/status/:token/appeals/:appealId/evidence/url', evidenceLimiter, evidencePow, express.json({ limit: '1mb' }), async (req, res, next) => {
   try {
     const resp = await forwardPost(
       `/status/${encodeURIComponent(req.params.token)}/appeals/${encodeURIComponent(req.params.appealId)}/evidence/url`,

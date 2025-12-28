@@ -4,6 +4,7 @@ import { catchError, of } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { ErrorLogEntry } from '../interfaces/error-log-entry';
 import { FrontendErrorLogEntry } from '../interfaces/frontend-error-log-entry';
+import { PowLogEntry } from '../interfaces/pow-log-entry';
 
 export interface LogCountResponse {
     count: number;
@@ -27,6 +28,11 @@ export class LogService {
 
     getFrontendErrorCountSince(since: number) {
         return this.http.get<LogCountResponse>(`${this.baseUrl}/frontend-error-log/count?since=${since}`)
+            .pipe(catchError(() => of({ count: 0, since })));
+    }
+
+    getPowCountSince(since: number) {
+        return this.http.get<LogCountResponse>(`${this.baseUrl}/pow-log/count?since=${since}`)
             .pipe(catchError(() => of({ count: 0, since })));
     }
 
@@ -57,6 +63,16 @@ export class LogService {
 
     deleteFrontendErrorLog(id: string) {
         return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/frontend-error-log/${id}`)
+            .pipe(catchError(() => of({ deleted: false })));
+    }
+
+    listPowLogs(limit = 100, offset = 0) {
+        return this.http.get<{ rows: PowLogEntry[] }>(`${this.baseUrl}/pow-log?limit=${limit}&offset=${offset}`)
+            .pipe(catchError(() => of({ rows: [] })));
+    }
+
+    deletePowLog(id: string) {
+        return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/pow-log/${id}`)
             .pipe(catchError(() => of({ deleted: false })));
     }
 }

@@ -14,6 +14,7 @@ const tableLoginOtp = require('./tableLoginOtp');
 const tableErrorLog = require('./tableErrorLog');
 const tableInfoLog = require('./tableInfoLog');
 const tableFrontendErrorLog = require('./tableFrontendErrorLog');
+const tablePowLog = require('./tablePowLog');
 
 
 class Database {
@@ -48,6 +49,7 @@ class Database {
         tableErrorLog.init(this.db);
         tableInfoLog.init(this.db);
         tableFrontendErrorLog.init(this.db);
+        tablePowLog.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers();

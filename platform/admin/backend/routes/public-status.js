@@ -13,6 +13,8 @@ const multer = require('multer');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
 const { apiError } = require('../middleware/api-error');
+const { createPowGuard } = require('../middleware/pow');
+const { logPowEvent } = require('../utils/powLogger');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
@@ -52,6 +54,29 @@ const upload = multer({
     }
     cb(new Error('unsupported_file_type'));
   }
+});
+
+function handlePowRequire(payload, req) {
+  const db = req.database?.db;
+  if (!db) return;
+  void logPowEvent(db, { ...payload, source: 'admin-backend' }, req.logger).catch((err) => {
+    req.logger?.warn?.('PoW log failed', { error: err?.message });
+  });
+}
+
+const appealPow = createPowGuard({
+  scope: 'public.status.appeal',
+  threshold: 6,
+  suspiciousThreshold: 3,
+  onRequire: handlePowRequire
+});
+
+const evidencePow = createPowGuard({
+  scope: 'public.status.appeal.evidence',
+  threshold: 4,
+  suspiciousThreshold: 2,
+  difficulty: Number(process.env.POW_EVIDENCE_DIFFICULTY || process.env.POW_DIFFICULTY || 12),
+  onRequire: handlePowRequire
 });
 
 function db(req) {
@@ -179,7 +204,7 @@ router.get('/status/:token', async (req, res, next) => {
   }
 });
 
-router.post('/status/:token/appeals', async (req, res, next) => {
+router.post('/status/:token/appeals', appealPow, async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const _db = db(req);
   if (!_db || !token) return next(apiError.badRequest('invalid_token'));
@@ -252,7 +277,7 @@ router.post('/status/:token/appeals', async (req, res, next) => {
   }
 });
 
-router.post('/status/:token/appeals/:appealId/evidence', (req, res, next) => {
+router.post('/status/:token/appeals/:appealId/evidence', evidencePow, (req, res, next) => {
   upload.single('file')(req, res, async (uploadErr) => {
     const token = String(req.params.token || '').trim();
     const appealId = String(req.params.appealId || '').trim();
@@ -326,7 +351,7 @@ router.post('/status/:token/appeals/:appealId/evidence', (req, res, next) => {
 });
 
 // Add general evidence to a notice via public token (no appeal association)
-router.post('/status/:token/evidence', (req, res, next) => {
+router.post('/status/:token/evidence', evidencePow, (req, res, next) => {
   upload.single('file')(req, res, async (uploadErr) => {
     const token = String(req.params.token || '').trim();
     const _db = db(req);
@@ -471,7 +496,7 @@ router.post('/status/:token/evidence/url', async (req, res, next) => {
 });
 
 // Add URL evidence linked to an appeal (JSON body: { url: string })
-router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res, next) => {
+router.post('/status/:token/appeals/:appealId/evidence/url', evidencePow, async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const appealId = String(req.params.appealId || '').trim();
   const _db = db(req);

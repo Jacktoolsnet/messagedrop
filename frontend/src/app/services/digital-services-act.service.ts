@@ -1,10 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { catchError, Observable, throwError } from 'rxjs';
+import { Observable, catchError, defer, from, switchMap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { PowService } from './pow.service';
 
 // deine Interfaces (ggf. Pfade anpassen)
 import { CreateDsaNotice } from '../interfaces/create-dsa-notice.interface';
@@ -30,6 +31,7 @@ export class DigitalServicesActService {
   private readonly http = inject(HttpClient);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly pow = inject(PowService);
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
@@ -62,7 +64,7 @@ export class DigitalServicesActService {
       reportedContent: payload.content
     };
 
-    return this.http.post<DsaSubmissionResponse>(url, body, this.httpOptions)
+    return this.postWithPow<DsaSubmissionResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 
@@ -97,7 +99,7 @@ export class DigitalServicesActService {
       reportedContent: payload.content
     };
 
-    return this.http.post<DsaSubmissionResponse>(url, body, this.httpOptions)
+    return this.postWithPow<DsaSubmissionResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 
@@ -111,14 +113,15 @@ export class DigitalServicesActService {
       const form = new FormData();
       form.append('file', data.file);
       if (data.hash) form.append('hash', data.hash);
-      return this.http.post<{ id: string }>(url, form, { withCredentials: true }).pipe(
-        catchError(this.handleError)
-      );
+      return this.postWithPowFactory<{ id: string }>(url, () => {
+        const nextForm = new FormData();
+        nextForm.append('file', data.file as File);
+        if (data.hash) nextForm.append('hash', data.hash);
+        return nextForm;
+      }, { withCredentials: true }).pipe(catchError(this.handleError));
     }
     const body = { type: data.type, url: data.url ?? null, hash: data.hash ?? null } as const;
-    return this.http.post<{ id: string }>(url, body, this.httpOptions).pipe(
-      catchError(this.handleError)
-    );
+    return this.postWithPow<{ id: string }>(url, body, this.httpOptions).pipe(catchError(this.handleError));
   }
 
   /** Attach evidence to a created signal */
@@ -132,13 +135,53 @@ export class DigitalServicesActService {
       form.append('type', 'file');
       form.append('file', data.file);
       if (data.hash) form.append('hash', data.hash);
-      return this.http.post<{ id: string }>(url, form, { withCredentials: true }).pipe(
-        catchError(this.handleError)
-      );
+      return this.postWithPowFactory<{ id: string }>(url, () => {
+        const nextForm = new FormData();
+        nextForm.append('type', 'file');
+        nextForm.append('file', data.file as File);
+        if (data.hash) nextForm.append('hash', data.hash);
+        return nextForm;
+      }, { withCredentials: true }).pipe(catchError(this.handleError));
     }
     const body = { type: data.type, url: data.url ?? null, hash: data.hash ?? null } as const;
-    return this.http.post<{ id: string }>(url, body, this.httpOptions).pipe(
-      catchError(this.handleError)
+    return this.postWithPow<{ id: string }>(url, body, this.httpOptions).pipe(catchError(this.handleError));
+  }
+
+  private postWithPow<T>(
+    url: string,
+    body: unknown,
+    options?: { headers?: HttpHeaders; withCredentials?: boolean }
+  ) {
+    return defer(() => this.http.post<T>(url, body, options)).pipe(
+      catchError((err) => {
+        const challenge = this.pow.extractChallenge(err);
+        if (!challenge) return throwError(() => err);
+        return from(this.pow.solve(challenge)).pipe(
+          switchMap((solution) => {
+            const headers = (options?.headers || new HttpHeaders()).set('X-PoW', solution.headerValue);
+            return this.http.post<T>(url, body, { ...options, headers });
+          })
+        );
+      })
+    );
+  }
+
+  private postWithPowFactory<T>(
+    url: string,
+    buildBody: () => unknown,
+    options?: { headers?: HttpHeaders; withCredentials?: boolean }
+  ) {
+    return defer(() => this.http.post<T>(url, buildBody(), options)).pipe(
+      catchError((err) => {
+        const challenge = this.pow.extractChallenge(err);
+        if (!challenge) return throwError(() => err);
+        return from(this.pow.solve(challenge)).pipe(
+          switchMap((solution) => {
+            const headers = (options?.headers || new HttpHeaders()).set('X-PoW', solution.headerValue);
+            return this.http.post<T>(url, buildBody(), { ...options, headers });
+          })
+        );
+      })
     );
   }
 

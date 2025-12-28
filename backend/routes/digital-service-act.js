@@ -6,6 +6,7 @@ const multer = require('multer');
 const FormData = require('form-data');
 const tableMessage = require('../db/tableMessage');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { createPowGuard } = require('../middleware/pow');
 const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
@@ -54,6 +55,20 @@ const moderationToggleLimiter = rateLimit({
 });
 
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
+
+const noticeEvidencePow = createPowGuard({
+    scope: 'dsa.notice.evidence',
+    threshold: 5,
+    suspiciousThreshold: 3,
+    difficulty: Number(process.env.POW_EVIDENCE_DIFFICULTY || process.env.POW_DIFFICULTY || 12)
+});
+
+const statusEvidencePow = createPowGuard({
+    scope: 'dsa.status.evidence',
+    threshold: 5,
+    suspiciousThreshold: 3,
+    difficulty: Number(process.env.POW_EVIDENCE_DIFFICULTY || process.env.POW_DIFFICULTY || 12)
+});
 
 function buildForwardError(err) {
     const status = err?.response?.status || 502;
@@ -189,7 +204,7 @@ module.exports = router;
  * POST /digitalserviceact/notices/:id/evidence
  * - Accepts either multipart/form-data with 'file' or JSON { type: 'url'|'hash', url?, hash? }
  */
-router.post('/notices/:id/evidence', evidenceLimiter, (req, res, next) => {
+router.post('/notices/:id/evidence', evidenceLimiter, noticeEvidencePow, (req, res, next) => {
     upload.single('file')(req, res, async (uploadErr) => {
         try {
             if (uploadErr) {
@@ -233,7 +248,7 @@ router.post('/notices/:id/evidence', evidenceLimiter, (req, res, next) => {
  * For attaching evidence to a notice using the public status token.
  * Forwards to admin public endpoint /public/status/:token/evidence
  */
-router.post('/status/:token/evidence', evidenceLimiter, (req, res, next) => {
+router.post('/status/:token/evidence', evidenceLimiter, statusEvidencePow, (req, res, next) => {
     upload.single('file')(req, res, async (uploadErr) => {
         try {
             if (uploadErr) {
