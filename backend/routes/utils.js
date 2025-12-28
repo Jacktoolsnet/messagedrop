@@ -2,8 +2,9 @@ const express = require('express');
 const axios = require('axios');
 const router = express.Router();
 const security = require('../middleware/security');
+const { apiError } = require('../middleware/api-error');
 
-router.get('/resolve/:url', security.authenticate, function (req, res) {
+router.get('/resolve/:url', security.authenticate, function (req, res, next) {
     let response = { 'status': 0 };
     axios.get(req.params.url, { maxRedirects: 0, validateStatus: null })
         .then(axiosResponse => {
@@ -22,14 +23,10 @@ router.get('/resolve/:url', security.authenticate, function (req, res) {
                 res.status(response.status).json(response);
             }
         })
-        .catch(() => {
-            response.status = 500;
-            response.error = 'resolve_failed';
-            res.status(response.status).json(response);
-        });
+        .catch(() => next(apiError.badGateway('resolve_failed')));
 });
 
-router.get('/oembed/:provider/:url', security.authenticate, function (req, res) {
+router.get('/oembed/:provider/:url', security.authenticate, function (req, res, next) {
     let response = { 'status': 0 };
     axios.get(`${req.params.provider}?url=${req.params.url}&format=json`, { maxRedirects: 0, validateStatus: null })
         .then(axiosResponse => {
@@ -43,11 +40,7 @@ router.get('/oembed/:provider/:url', security.authenticate, function (req, res) 
                 res.status(response.status).json(response);
             }
         })
-        .catch(() => {
-            response.status = 500;
-            response.error = 'oembed_failed';
-            res.status(response.status).json(response);
-        });
+        .catch(() => next(apiError.badGateway('oembed_failed')));
 });
 
 module.exports = router

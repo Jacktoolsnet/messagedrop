@@ -40,6 +40,16 @@ function defaultMessageFromStatus(status) {
   return STATUS_TO_MESSAGE[status] || 'unexpected_error';
 }
 
+function createApiError(status, message, errorCode) {
+  const normalizedStatus = Number(status) || 500;
+  const normalizedMessage = message || defaultMessageFromStatus(normalizedStatus);
+  const err = new Error(normalizedMessage);
+  err.status = normalizedStatus;
+  err.statusCode = normalizedStatus;
+  err.errorCode = errorCode || errorCodeFromStatus(normalizedStatus);
+  return err;
+}
+
 function extractMessage(payload, status) {
   if (typeof payload === 'string' && payload.trim()) {
     return payload;
@@ -113,6 +123,24 @@ function errorHandler(err, req, res, next) {
 }
 
 module.exports = {
+  createApiError,
+  apiError: {
+    badRequest: (message) => createApiError(400, message, 'BAD_REQUEST'),
+    unauthorized: (message) => createApiError(401, message, 'UNAUTHORIZED'),
+    forbidden: (message) => createApiError(403, message, 'FORBIDDEN'),
+    notFound: (message) => createApiError(404, message, 'NOT_FOUND'),
+    conflict: (message) => createApiError(409, message, 'CONFLICT'),
+    payloadTooLarge: (message) => createApiError(413, message, 'PAYLOAD_TOO_LARGE'),
+    unsupportedMediaType: (message) => createApiError(415, message, 'UNSUPPORTED_MEDIA_TYPE'),
+    unprocessableEntity: (message) => createApiError(422, message, 'UNPROCESSABLE_ENTITY'),
+    rateLimit: (message) => createApiError(429, message, 'RATE_LIMIT'),
+    internal: (message) => createApiError(500, message, 'INTERNAL_ERROR'),
+    badGateway: (message) => createApiError(502, message, 'BAD_GATEWAY'),
+    serviceUnavailable: (message) => createApiError(503, message, 'SERVICE_UNAVAILABLE'),
+    gatewayTimeout: (message) => createApiError(504, message, 'GATEWAY_TIMEOUT'),
+    custom: (status, errorCode, message) => createApiError(status, message, errorCode),
+    fromStatus: (status, message) => createApiError(status, message)
+  },
   normalizeErrorResponses,
   notFoundHandler,
   errorHandler,
