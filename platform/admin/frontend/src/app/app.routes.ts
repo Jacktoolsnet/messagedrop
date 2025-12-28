@@ -16,6 +16,7 @@ import { authGuard } from './guards/auth/auth-guard';
 import { StatisticComponent } from './components/statistic/statistic.component';
 import { ErrorLogsComponent } from './components/logs/error-logs/error-logs.component';
 import { InfoLogsComponent } from './components/logs/info-logs/info-logs.component';
+import { AppLogsComponent } from './components/logs/app-logs/app-logs.component';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
@@ -88,6 +89,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/logs/info',
         component: InfoLogsComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/logs/app',
+        component: AppLogsComponent,
         canActivate: [authGuard]
     },
     { path: '**', redirectTo: '' }

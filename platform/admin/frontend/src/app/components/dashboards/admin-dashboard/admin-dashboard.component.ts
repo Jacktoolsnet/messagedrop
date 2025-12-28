@@ -34,6 +34,7 @@ export class AdminDashboardComponent implements OnInit {
 
   errorCountToday: number | null = null;
   infoCountToday: number | null = null;
+  appErrorCountToday: number | null = null;
 
   readonly dsaOpenCount = computed(() => {
     const noticesOpen = this.dsaService.noticeStats()?.open ?? 0;
@@ -65,6 +66,9 @@ export class AdminDashboardComponent implements OnInit {
     });
     this.logService.getInfoCountSince(since).subscribe(res => {
       this.infoCountToday = res.count;
+    });
+    this.logService.getFrontendErrorCountSince(since).subscribe(res => {
+      this.appErrorCountToday = res.count;
     });
   }
 
