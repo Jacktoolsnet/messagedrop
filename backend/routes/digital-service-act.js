@@ -13,7 +13,9 @@ const router = express.Router();
 
 router.use(express.json({ limit: '1mb' }));
 
-const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
+const maxEvidenceFileMb = Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1);
+const maxEvidenceFileBytes = Math.max(1, maxEvidenceFileMb) * 1024 * 1024;
+const upload = multer({ limits: { fileSize: maxEvidenceFileBytes } });
 
 const rateLimitMessage = (message) => ({
     errorCode: 'RATE_LIMIT',
@@ -54,7 +56,22 @@ const moderationToggleLimiter = rateLimit({
     message: rateLimitMessage('Too many moderation toggle requests. Please try again later.')
 });
 
+const reportsPerHour = Math.max(1, Number(process.env.DSA_REPORTS_PER_IP_PER_HOUR || 1));
+const reportHourlyLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000,
+    limit: reportsPerHour,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: rateLimitMessage('Too many DSA reports, please try again later.')
+});
+
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
+
+const noticePow = createPowGuard({
+    scope: 'dsa.notice',
+    threshold: 6,
+    suspiciousThreshold: 3
+});
 
 const noticeEvidencePow = createPowGuard({
     scope: 'dsa.notice.evidence',
@@ -133,7 +150,7 @@ function disableLocallyIfPossible(req) {
 /* --------------------------------- Routes ---------------------------------- */
 
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
-router.post('/signals', signalLimiter, async (req, res, next) => {
+router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, next) => {
     try {
         await disableLocallyIfPossible(req);
         const resp = await forwardPost('/signals', req.body);
@@ -155,7 +172,7 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
 });
 
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
-router.post('/notices', noticeLimiter, async (req, res, next) => {
+router.post('/notices', noticeLimiter, reportHourlyLimiter, noticePow, async (req, res, next) => {
     try {
         await disableLocallyIfPossible(req);
         const resp = await forwardPost('/notices', req.body);
@@ -209,7 +226,9 @@ router.post('/notices/:id/evidence', evidenceLimiter, noticeEvidencePow, (req, r
         try {
             if (uploadErr) {
                 if (uploadErr.code === 'LIMIT_FILE_SIZE') {
-                    return next(apiError.badRequest('file_too_large'));
+                    const apiErr = apiError.badRequest('file_too_large');
+                    apiErr.maxBytes = maxEvidenceFileBytes;
+                    return next(apiErr);
                 }
                 const apiErr = apiError.badRequest('upload_failed');
                 apiErr.detail = uploadErr.message;
@@ -253,7 +272,9 @@ router.post('/status/:token/evidence', evidenceLimiter, statusEvidencePow, (req,
         try {
             if (uploadErr) {
                 if (uploadErr.code === 'LIMIT_FILE_SIZE') {
-                    return next(apiError.badRequest('file_too_large'));
+                    const apiErr = apiError.badRequest('file_too_large');
+                    apiErr.maxBytes = maxEvidenceFileBytes;
+                    return next(apiErr);
                 }
                 const apiErr = apiError.badRequest('upload_failed');
                 apiErr.detail = uploadErr.message;

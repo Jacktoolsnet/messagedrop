@@ -104,6 +104,15 @@
     }
 </mat-menu>
 
+@if (powService.solving()) {
+<div class="pow-overlay" role="status" aria-live="polite">
+    <div class="pow-dialog">
+        <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+        <div class="pow-text">{{ 'common.powSolving' | transloco }}</div>
+    </div>
+</div>
+}
+
 <mat-menu #appMenu="matMenu">
     <button mat-menu-item (click)="editAppSettings()">
         <mat-icon>settings_applications</mat-icon>

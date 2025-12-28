@@ -5,6 +5,7 @@
     "cancel": "Cancelar",
     "language": "Idioma",
     "unknown": "Desconocido",
+    "powSolving": "Resolviendo verificación de seguridad...",
     "actions": {
       "ok": "OK",
       "retry": "Reintentar",

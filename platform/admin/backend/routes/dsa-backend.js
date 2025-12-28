@@ -25,6 +25,9 @@ router.use(requireAdminJwt, requireRole('moderator', 'legal', 'admin', 'root'));
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 fs.mkdirSync(evidenceUploadDir, { recursive: true });
+const maxEvidenceFiles = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILES || 4));
+const maxEvidenceFileBytes = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1)) * 1024 * 1024;
+const minFreeStorageMb = Math.max(0, Number(process.env.DSA_EVIDENCE_MIN_FREE_MB || 1000));
 
 const allowedMime = new Set([
     'application/pdf',
@@ -45,7 +48,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
     storage,
-    limits: { fileSize: 5 * 1024 * 1024 },
+    limits: { fileSize: maxEvidenceFileBytes },
     fileFilter: (_req, file, cb) => {
         if (file.mimetype.startsWith('image/') || allowedMime.has(file.mimetype)) {
             return cb(null, true);
@@ -57,6 +60,30 @@ const upload = multer({
 function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
+
+async function hasStorageCapacity() {
+    if (!minFreeStorageMb) return true;
+    try {
+        const stats = await fs.promises.statfs(evidenceUploadDir);
+        const freeBytes = Number(stats.bavail) * Number(stats.bsize);
+        return freeBytes >= minFreeStorageMb * 1024 * 1024;
+    } catch {
+        return true;
+    }
+}
+
+async function countFileEvidence(dbInstance, noticeId) {
+    return new Promise((resolve, reject) => {
+        dbInstance.get(
+            `SELECT COUNT(*) AS count FROM ${tableEvidence.tableName} WHERE ${tableEvidence.columns.noticeId} = ? AND ${tableEvidence.columns.type} = ?`,
+            [noticeId, 'file'],
+            (err, row) => {
+                if (err) return reject(err);
+                resolve(row?.count || 0);
+            }
+        );
+    });
+}
 
 const dayMs = 24 * 60 * 60 * 1000;
 const statusBaseUrl = (process.env.PUBLIC_STATUS_BASE_URL || '').replace(/\/+$/, '') || null;
@@ -815,7 +842,7 @@ router.post('/notices/:id/evidence', (req, res, next) => {
         if (uploadErr) {
             if (uploadErr.code === 'LIMIT_FILE_SIZE') {
                 const apiErr = apiError.badRequest('file_too_large');
-                apiErr.maxBytes = 5 * 1024 * 1024;
+                apiErr.maxBytes = maxEvidenceFileBytes;
                 return next(apiErr);
             }
             const apiErr = apiError.badRequest('upload_failed');
@@ -844,37 +871,62 @@ router.post('/notices/:id/evidence', (req, res, next) => {
         const fileName = hasFile ? req.file.originalname : null;
         const storedName = hasFile ? req.file.filename : null;
 
-        tableEvidence.create(
-            _db,
-            id,
-            req.params.id,
-            type,
-            url,
-            hash,
-            fileName,
-            storedName,
-            addedAt,
-            (err, row) => {
-                if (err) {
-                    if (hasFile) {
-                        fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
-                    }
-                    const apiErr = apiError.internal('db_error');
-                    apiErr.detail = err.message;
-                    return next(apiErr);
-                }
-
-                const auditId = crypto.randomUUID();
-                tableAudit.create(
-                    _db, auditId, 'notice', req.params.id, 'evidence_add',
-                    `admin:${req.admin?.sub || 'unknown'}`, addedAt,
-                    JSON.stringify({ evidenceId: id, type }),
-                    () => { }
-                );
-
-                res.status(201).json(row);
+        const enforceFileLimits = async () => {
+            if (!hasFile) return;
+            if (!(await hasStorageCapacity())) {
+                await fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
+                throw apiError.custom(507, 'INSUFFICIENT_STORAGE', 'insufficient_storage');
             }
-        );
+            const existingFileCount = await countFileEvidence(_db, req.params.id);
+            if (existingFileCount >= maxEvidenceFiles) {
+                await fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
+                throw apiError.conflict('evidence_limit_reached');
+            }
+        };
+
+        Promise.resolve()
+            .then(enforceFileLimits)
+            .then(() => {
+                tableEvidence.create(
+                    _db,
+                    id,
+                    req.params.id,
+                    type,
+                    url,
+                    hash,
+                    fileName,
+                    storedName,
+                    addedAt,
+                    (err, row) => {
+                        if (err) {
+                            if (hasFile) {
+                                fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
+                            }
+                            const apiErr = apiError.internal('db_error');
+                            apiErr.detail = err.message;
+                            return next(apiErr);
+                        }
+
+                        const auditId = crypto.randomUUID();
+                        tableAudit.create(
+                            _db, auditId, 'notice', req.params.id, 'evidence_add',
+                            `admin:${req.admin?.sub || 'unknown'}`, addedAt,
+                            JSON.stringify({ evidenceId: id, type }),
+                            () => { }
+                        );
+
+                        res.status(201).json(row);
+                    }
+                );
+            })
+            .catch((err) => {
+                if (err?.status || err?.statusCode) {
+                    return next(err);
+                }
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err?.message || err;
+                return next(apiErr);
+            });
     });
 });
 
@@ -925,6 +977,20 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
     };
     if (isPrivateIp(hostLc)) {
         return next(apiError.badRequest('blocked_destination'));
+    }
+
+    try {
+        const existingFileCount = await countFileEvidence(_db, req.params.id);
+        if (existingFileCount >= maxEvidenceFiles) {
+            return next(apiError.conflict('evidence_limit_reached'));
+        }
+        if (!(await hasStorageCapacity())) {
+            return next(apiError.custom(507, 'INSUFFICIENT_STORAGE', 'insufficient_storage'));
+        }
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        return next(apiErr);
     }
 
     // Lazy-load Playwright. Try full package then chromium-only.
@@ -1037,6 +1103,19 @@ router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
             }
         } else {
             await page.screenshot({ path: outPath, fullPage });
+        }
+        try {
+            const stat = await fs.promises.stat(outPath);
+            if (stat.size > maxEvidenceFileBytes) {
+                await fs.promises.unlink(outPath).catch(() => { });
+                const apiErr = apiError.payloadTooLarge('file_too_large');
+                apiErr.maxBytes = maxEvidenceFileBytes;
+                return next(apiErr);
+            }
+        } catch {
+            await fs.promises.unlink(outPath).catch(() => { });
+            const apiErr = apiError.internal('file_access_failed');
+            return next(apiErr);
         }
         await context.close();
     } catch (err) {

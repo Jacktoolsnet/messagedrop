@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, signal } from '@angular/core';
 
 export interface PowChallenge {
   nonce: string;
@@ -18,6 +18,10 @@ export interface PowSolution {
 export class PowService {
   private readonly encoder = new TextEncoder();
   private readonly maxSolveMs = 4000;
+  private activeSolves = 0;
+  private showTimer?: ReturnType<typeof setTimeout>;
+
+  readonly solving = signal(false);
 
   extractChallenge(err: unknown): PowChallenge | null {
     const anyErr = err as { status?: number; error?: { errorCode?: string; challenge?: PowChallenge } };
@@ -37,26 +41,52 @@ export class PowService {
     if (!crypto?.subtle) {
       throw new Error('pow_unavailable');
     }
+    this.beginSolve();
     const scope = challenge.scope || 'unknown';
     const start = Date.now();
     let counter = 0;
 
-    while (Date.now() - start < this.maxSolveMs) {
-      const text = `${challenge.nonce}.${counter}.${scope}`;
-      const hash = await this.sha256(text);
-      if (this.leadingZeroBits(hash) >= challenge.difficulty) {
-        const solution = String(counter);
-        return {
-          solution,
-          headerValue: this.buildHeader(challenge, solution)
-        };
+    try {
+      while (Date.now() - start < this.maxSolveMs) {
+        const text = `${challenge.nonce}.${counter}.${scope}`;
+        const hash = await this.sha256(text);
+        if (this.leadingZeroBits(hash) >= challenge.difficulty) {
+          const solution = String(counter);
+          return {
+            solution,
+            headerValue: this.buildHeader(challenge, solution)
+          };
+        }
+        counter += 1;
+        if (counter % 500 === 0) {
+          await new Promise(resolve => setTimeout(resolve));
+        }
       }
-      counter += 1;
-      if (counter % 500 === 0) {
-        await new Promise(resolve => setTimeout(resolve));
-      }
+      throw new Error('pow_timeout');
+    } finally {
+      this.endSolve();
     }
-    throw new Error('pow_timeout');
+  }
+
+  private beginSolve() {
+    this.activeSolves += 1;
+    if (this.showTimer) return;
+    this.showTimer = setTimeout(() => {
+      if (this.activeSolves > 0) {
+        this.solving.set(true);
+      }
+    }, 1000);
+  }
+
+  private endSolve() {
+    this.activeSolves = Math.max(0, this.activeSolves - 1);
+    if (this.activeSolves === 0) {
+      if (this.showTimer) {
+        clearTimeout(this.showTimer);
+        this.showTimer = undefined;
+      }
+      this.solving.set(false);
+    }
   }
 
   private async sha256(text: string): Promise<Uint8Array> {

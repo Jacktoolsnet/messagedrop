@@ -83,3 +83,30 @@
     70% { transform: scale(1.04) rotate(-2deg); }
     100% { transform: scale(1) rotate(0deg); }
 }
+
+.pow-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.35);
+    backdrop-filter: blur(2px);
+}
+
+.pow-dialog {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1.1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.96);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 20px 45px rgba(15, 23, 42, 0.2);
+}
+
+.pow-text {
+    font-weight: 600;
+    color: #1f2937;
+}

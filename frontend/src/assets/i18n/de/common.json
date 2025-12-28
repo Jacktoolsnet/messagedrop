@@ -5,6 +5,7 @@
     "cancel": "Abbrechen",
     "language": "Sprache",
     "unknown": "Unbekannt",
+    "powSolving": "Sicherheitsprüfung wird gelöst...",
     "actions": {
       "ok": "OK",
       "retry": "Erneut versuchen",

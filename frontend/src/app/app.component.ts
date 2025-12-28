@@ -9,6 +9,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -73,6 +74,7 @@ import { NetworkService } from './services/network.service';
 import { NoteService } from './services/note.service';
 import { OembedService } from './services/oembed.service';
 import { PlaceService } from './services/place.service';
+import { PowService } from './services/pow.service';
 import { RestoreService } from './services/restore.service';
 import { ServerService } from './services/server.service';
 import { SharedContentService } from './services/shared-content.service';
@@ -93,7 +95,8 @@ import { WeatherService } from './services/weather.service';
     MatTooltipModule,
     MatIconModule,
     ShortNumberPipe,
-    MatMenuModule
+    MatMenuModule,
+    MatProgressSpinnerModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
@@ -158,6 +161,7 @@ export class AppComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
   private readonly translation = inject(TranslationHelperService);
+  readonly powService = inject(PowService);
   private exitBackupPromptPending = false;
   private exitBackupDialogOpen = false;
   private exitBackupPromptTimer?: ReturnType<typeof setTimeout>;

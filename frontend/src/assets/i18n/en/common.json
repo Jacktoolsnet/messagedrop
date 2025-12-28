@@ -5,6 +5,7 @@
     "cancel": "Cancel",
     "language": "Language",
     "unknown": "Unknown",
+    "powSolving": "Solving security check...",
     "actions": {
       "ok": "OK",
       "retry": "Retry",

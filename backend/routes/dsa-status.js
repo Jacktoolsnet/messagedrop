@@ -8,7 +8,9 @@ const { createPowGuard } = require('../middleware/pow');
 const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
-const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
+const maxEvidenceFileMb = Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1);
+const maxEvidenceFileBytes = Math.max(1, maxEvidenceFileMb) * 1024 * 1024;
+const upload = multer({ limits: { fileSize: maxEvidenceFileBytes } });
 
 const rateLimitMessage = (message) => ({
   errorCode: 'RATE_LIMIT',
@@ -38,6 +40,15 @@ const evidenceLimiter = rateLimit({
   standardHeaders: true,
   legacyHeaders: false,
   message: rateLimitMessage('Too many evidence uploads, please try again later.')
+});
+
+const reportsPerHour = Math.max(1, Number(process.env.DSA_REPORTS_PER_IP_PER_HOUR || 1));
+const appealHourlyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: reportsPerHour,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: rateLimitMessage('Too many appeal requests, please try again later.')
 });
 
 const appealPow = createPowGuard({
@@ -114,7 +125,7 @@ router.get('/status/:token/evidence/:id', statusLimiter, async (req, res, next) 
   }
 });
 
-router.post('/status/:token/appeals', appealLimiter, appealPow, express.json({ limit: '2mb' }), async (req, res, next) => {
+router.post('/status/:token/appeals', appealLimiter, appealHourlyLimiter, appealPow, express.json({ limit: '2mb' }), async (req, res, next) => {
   try {
     const resp = await forwardPost(`/status/${encodeURIComponent(req.params.token)}/appeals`, req.body);
     res.status(resp.status).json(resp.data);

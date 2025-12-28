@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
+const rateLimit = require('express-rate-limit');
 
 const tableNotice = require('../db/tableDsaNotice');
 const tableSignal = require('../db/tableDsaSignal');
@@ -22,6 +23,18 @@ const router = express.Router();
 router.use(express.json({ limit: '2mb' }));
 
 const statusBaseUrl = (process.env.PUBLIC_STATUS_BASE_URL || '').replace(/\/+$/, '') || null;
+const maxEvidenceFiles = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILES || 4));
+const maxEvidenceFileBytes = Math.max(1, Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1)) * 1024 * 1024;
+const minFreeStorageMb = Math.max(0, Number(process.env.DSA_EVIDENCE_MIN_FREE_MB || 1000));
+const reportsPerHour = Math.max(1, Number(process.env.DSA_REPORTS_PER_IP_PER_HOUR || 1));
+
+const appealHourlyLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: reportsPerHour,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { errorCode: 'RATE_LIMIT', message: 'Too many appeals, please try again later.', error: 'Too many appeals, please try again later.' }
+});
 
 function buildStatusUrl(token) {
   if (!token || !statusBaseUrl) return null;
@@ -47,7 +60,7 @@ const storage = multer.diskStorage({
 
 const upload = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: maxEvidenceFileBytes },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith('image/') || allowedMime.has(file.mimetype)) {
       return cb(null, true);
@@ -89,6 +102,30 @@ function toPromise(fn, ...params) {
       if (err) reject(err);
       else resolve(result || null);
     });
+  });
+}
+
+async function hasStorageCapacity() {
+  if (!minFreeStorageMb) return true;
+  try {
+    const stats = await fs.promises.statfs(evidenceUploadDir);
+    const freeBytes = Number(stats.bavail) * Number(stats.bsize);
+    return freeBytes >= minFreeStorageMb * 1024 * 1024;
+  } catch {
+    return true;
+  }
+}
+
+async function countFileEvidence(dbInstance, noticeId) {
+  return new Promise((resolve, reject) => {
+    dbInstance.get(
+      `SELECT COUNT(*) AS count FROM ${tableEvidence.tableName} WHERE ${tableEvidence.columns.noticeId} = ? AND ${tableEvidence.columns.type} = ?`,
+      [noticeId, 'file'],
+      (err, row) => {
+        if (err) return reject(err);
+        resolve(row?.count || 0);
+      }
+    );
   });
 }
 
@@ -204,7 +241,7 @@ router.get('/status/:token', async (req, res, next) => {
   }
 });
 
-router.post('/status/:token/appeals', appealPow, async (req, res, next) => {
+router.post('/status/:token/appeals', appealHourlyLimiter, appealPow, async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const _db = db(req);
   if (!_db || !token) return next(apiError.badRequest('invalid_token'));
@@ -277,7 +314,10 @@ router.post('/status/:token/appeals', appealPow, async (req, res, next) => {
   }
 });
 
-router.post('/status/:token/appeals/:appealId/evidence', evidencePow, (req, res, next) => {
+router.post('/status/:token/appeals/:appealId/evidence', evidencePow, async (req, res, next) => {
+  if (!(await hasStorageCapacity())) {
+    return next(apiError.custom(507, 'INSUFFICIENT_STORAGE', 'insufficient_storage'));
+  }
   upload.single('file')(req, res, async (uploadErr) => {
     const token = String(req.params.token || '').trim();
     const appealId = String(req.params.appealId || '').trim();
@@ -288,7 +328,11 @@ router.post('/status/:token/appeals/:appealId/evidence', evidencePow, (req, res,
     }
 
     if (uploadErr) {
-      if (uploadErr.code === 'LIMIT_FILE_SIZE') return next(apiError.badRequest('file_too_large'));
+      if (uploadErr.code === 'LIMIT_FILE_SIZE') {
+        const apiErr = apiError.badRequest('file_too_large');
+        apiErr.maxBytes = maxEvidenceFileBytes;
+        return next(apiErr);
+      }
       const apiErr = apiError.badRequest('upload_failed');
       apiErr.detail = uploadErr.message;
       return next(apiErr);
@@ -306,6 +350,12 @@ router.post('/status/:token/appeals/:appealId/evidence', evidencePow, (req, res,
       });
 
       if (!appeals) return next(apiError.notFound('appeal_not_found'));
+
+      const existingFileCount = await countFileEvidence(_db, notice.id);
+      if (existingFileCount >= maxEvidenceFiles) {
+        await fs.promises.unlink(path.join(evidenceUploadDir, file.filename)).catch(() => { });
+        return next(apiError.conflict('evidence_limit_reached'));
+      }
 
       const id = crypto.randomUUID();
       const now = Date.now();
@@ -361,7 +411,11 @@ router.post('/status/:token/evidence', evidencePow, (req, res, next) => {
     }
 
     if (uploadErr) {
-      if (uploadErr.code === 'LIMIT_FILE_SIZE') return next(apiError.badRequest('file_too_large'));
+      if (uploadErr.code === 'LIMIT_FILE_SIZE') {
+        const apiErr = apiError.badRequest('file_too_large');
+        apiErr.maxBytes = maxEvidenceFileBytes;
+        return next(apiErr);
+      }
       const apiErr = apiError.badRequest('upload_failed');
       apiErr.detail = uploadErr.message;
       return next(apiErr);
@@ -390,6 +444,18 @@ router.post('/status/:token/evidence', evidencePow, (req, res, next) => {
     try {
       const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
       if (!notice) return next(apiError.notFound('not_found'));
+
+      if (hasFile) {
+        if (!(await hasStorageCapacity())) {
+          await fs.promises.unlink(path.join(evidenceUploadDir, req.file.filename)).catch(() => { });
+          return next(apiError.custom(507, 'INSUFFICIENT_STORAGE', 'insufficient_storage'));
+        }
+        const existingFileCount = await countFileEvidence(_db, notice.id);
+        if (existingFileCount >= maxEvidenceFiles) {
+          await fs.promises.unlink(path.join(evidenceUploadDir, req.file.filename)).catch(() => { });
+          return next(apiError.conflict('evidence_limit_reached'));
+        }
+      }
 
       const id = crypto.randomUUID();
       const now = Date.now();
