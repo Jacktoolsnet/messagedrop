@@ -1,6 +1,6 @@
 {
   "common": {
-    "appName": "MessageDrop (DE)",
+    "appName": "MessageDrop",
     "save": "Speichern",
     "cancel": "Abbrechen",
     "language": "Sprache",
@@ -74,7 +74,7 @@
       "message": "Nachricht wird übersetzt"
     },
     "connect": {
-      "title": "Connect-Service",
+      "title": "Connect-Dienst",
       "creatingInfo": "Connect-Informationen werden erstellt",
       "loadingInfo": "Connect-Informationen werden geladen",
       "invalidData": "Connect-Daten sind ungültig.",
@@ -85,7 +85,7 @@
       "deleteUnavailable": "Connect-Eintrag konnte nicht gelöscht werden."
     },
     "contact": {
-      "title": "Kontakt-Service",
+      "title": "Kontakt-Dienst",
       "creating": "Kontakt wird erstellt",
       "created": "Kontakt erfolgreich erstellt.",
       "updatingName": "Kontaktname wird aktualisiert",
@@ -125,7 +125,7 @@
         "nameFallback": "Ohne Namen",
         "pinAria": "Kontakt anpinnen",
         "unpinAria": "Kontakt nicht mehr anpinnen",
-        "openChatroomAria": "Chatroom öffnen",
+        "openChatroomAria": "Chatraum öffnen",
         "editAria": "Kontakt bearbeiten",
         "subscribeAria": "Kontakt abonnieren",
         "unsubscribeAria": "Kontakt-Abo beenden"
@@ -135,10 +135,10 @@
         "nameLabel": "Kontaktname",
         "setAvatar": "Kontakt-Avatar festlegen.",
         "avatarAlt": "Kontakt-Avatar",
-        "avatarAltName": "{{ name }}-Avatar",
+        "avatarAltName": "Avatar von {{ name }}",
         "askProfile": "Kontakt nach Profil fragen",
-        "tileSettings": "Tile-Einstellungen",
-        "tileSettingsAria": "Tile-Einstellungen für {{ name }} öffnen",
+        "tileSettings": "Kachel-Einstellungen",
+        "tileSettingsAria": "Kachel-Einstellungen für {{ name }} öffnen",
         "nameFallback": "Kontakt",
         "policy": "Kontakt-Profil-ID und Abo-Status werden auf dem Server gespeichert. Name und Avatar bleiben lokal.",
         "requestSent": "Profilanfrage gesendet.",
@@ -147,9 +147,9 @@
         "fileReadError": "Fehler beim Lesen der Datei."
       },
       "chatroom": {
-        "closeAria": "Chatroom schließen",
+        "closeAria": "Chatraum schließen",
         "composeAria": "Nachricht schreiben",
-        "avatarAltName": "{{ name }}-Avatar",
+        "avatarAltName": "Avatar von {{ name }}",
         "avatarAltMe": "Mein Avatar",
         "meLabel": "Ich",
         "avatarAltContact": "Kontakt-Avatar",
@@ -159,7 +159,7 @@
         "showOriginalAria": "Originalnachricht anzeigen",
         "translateAria": "Nachricht übersetzen",
         "firstMessage": "Erste Nachricht senden",
-        "loading": "Chatroom wird geladen...",
+        "loading": "Chatraum wird geladen...",
         "translateFailed": "Übersetzung fehlgeschlagen.",
         "storeTranslationFailed": "Übersetzte Nachricht konnte nicht gespeichert werden.",
         "deleteMessage": {
@@ -175,12 +175,12 @@
       }
     },
     "geoStatistic": {
-      "title": "Geo-Statistik-Service",
+      "title": "Geo-Statistik-Dienst",
       "loading": "Standortdaten werden geladen",
       "unexpectedResponse": "Unerwartete Antwort."
     },
     "message": {
-      "title": "Nachrichten-Service",
+      "title": "Nachrichten-Dienst",
       "addText": "Text hinzufügen",
       "updateAria": "Nachricht aktualisieren",
       "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar.",
@@ -252,7 +252,7 @@
       "editAria": "Nachricht bearbeiten",
       "deleteAria": "Nachricht löschen",
       "blockAria": "Nachricht melden",
-      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltName": "Avatar von {{ name }}",
       "avatarAltFallback": "Profil-Avatar",
       "nameFallback": "Ohne Namen",
       "myself": "Ich",
@@ -272,7 +272,7 @@
       "title": "Profil bearbeiten",
       "nameLabel": "Profilname",
       "addAvatar": "Dem Profil einen Avatar geben",
-      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltName": "Avatar von {{ name }}",
       "avatarAltFallback": "Profil-Avatar",
       "deleteAvatarAria": "Avatar entfernen",
       "fileReadFailed": "Die ausgewählte Datei konnte nicht gelesen werden. Bitte versuche es erneut.",
@@ -311,7 +311,7 @@
       "addFirstPlace": "Ersten Ort hinzufügen",
       "addPlaceAria": "Ort hinzufügen",
       "nameFallback": "Ohne Namen",
-      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltName": "Avatar von {{ name }}",
       "avatarAltFallback": "Ort-Avatar",
       "pinAria": "Ort anheften",
       "unpinAria": "Ort lösen",
@@ -336,11 +336,11 @@
       "editTitle": "Ortseinstellungen",
       "nameLabel": "Ortsname",
       "setAvatar": "Ort-Avatar festlegen.",
-      "avatarAltName": "{{ name }}-Avatar",
+      "avatarAltName": "Avatar von {{ name }}",
       "avatarAltFallback": "Ort-Avatar",
       "deleteAvatarAria": "Avatar entfernen",
-      "tileSettings": "Tile-Einstellungen",
-      "openTileSettingsAria": "Tile-Einstellungen für {{ name }} öffnen",
+      "tileSettings": "Kachel-Einstellungen",
+      "openTileSettingsAria": "Kachel-Einstellungen für {{ name }} öffnen",
       "nameFallback": "Ort",
       "imageInvalid": "Bitte wähle eine gültige Bilddatei aus.",
       "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: 5 MB.",
@@ -348,18 +348,18 @@
       "savePolicy": "Ort-ID, Ortsname (gehasht), die hinzugefügten Standorte und das Abonnement-Flag werden auf unserem Server gespeichert. Der lesbare Name und der Avatar werden auf deinem Gerät gespeichert."
     },
     "tileList": {
-      "empty": "Keine Tiles sichtbar.",
-      "openSettings": "Tile-Einstellungen öffnen"
+      "empty": "Keine Kacheln sichtbar.",
+      "openSettings": "Kachel-Einstellungen öffnen"
     },
     "tileSettings": {
-      "title": "Tile-Einstellungen",
-      "addTile": "Tile hinzufügen",
+      "title": "Kachel-Einstellungen",
+      "addTile": "Kachel hinzufügen",
       "reorderAria": "{{ label }} neu anordnen",
-      "editAria": "Tile bearbeiten",
-      "deleteAria": "Tile löschen",
+      "editAria": "Kachel bearbeiten",
+      "deleteAria": "Kachel löschen",
       "toggleAria": "{{ label }} umschalten",
       "visible": "Sichtbar",
-      "editLabelPrompt": "Tile-Label bearbeiten"
+      "editLabelPrompt": "Kachel-Label bearbeiten"
     },
     "tileTypes": {
       "datetime": "Datum & Uhrzeit",
@@ -369,18 +369,18 @@
       "message": "Nachrichten",
       "image": "Bilder",
       "text": "Text",
-      "multitext": "Multitext",
+      "multitext": "Mehrzeiliger Text",
       "link": "Link",
       "anniversary": "Jahrestag",
-      "todo": "To-do-Liste",
+      "todo": "Aufgabenliste",
       "quickActions": "Schnellaktionen",
       "files": "Dateien",
       "migraine": "Migräne-Alarm",
       "pollution": "Luftverschmutzung"
     },
     "tileDelete": {
-      "title": "Tile löschen",
-      "confirm": "Möchtest du dieses Tile wirklich löschen?",
+      "title": "Kachel löschen",
+      "confirm": "Möchtest du diese Kachel wirklich löschen?",
       "confirmYes": "Ja, löschen"
     },
     "tiles": {
@@ -427,12 +427,12 @@
         "openDetailsAria": "Details in der Luftqualitätsansicht öffnen"
       },
       "todo": {
-        "empty": "Noch keine Todos. Tippe, um welche hinzuzufügen.",
-        "emptyEditor": "Noch keine Todos. Füge dein erstes oben hinzu.",
-        "addLabel": "Todo hinzufügen",
-        "addAria": "Todo hinzufügen",
-        "reorderAria": "Todo neu anordnen",
-        "deleteAria": "Todo löschen",
+        "empty": "Noch keine Aufgaben. Tippe, um welche hinzuzufügen.",
+        "emptyEditor": "Noch keine Aufgaben. Füge dein erstes oben hinzu.",
+        "addLabel": "Aufgabe hinzufügen",
+        "addAria": "Aufgabe hinzufügen",
+        "reorderAria": "Aufgabe neu anordnen",
+        "deleteAria": "Aufgabe löschen",
         "markDone": "Als erledigt markieren",
         "markUndone": "Als nicht erledigt markieren"
       },
@@ -460,16 +460,16 @@
       }
     },
     "tileEdit": {
-      "textTitle": "Text-Tile bearbeiten",
-      "multitextTitle": "Mehrzeiliges Tile bearbeiten",
-      "linkTitle": "Link-Tile bearbeiten",
-      "anniversaryTitle": "Jahrestags-Tile bearbeiten",
-      "todoTitle": "To-do-Liste bearbeiten",
+      "textTitle": "Text-Kachel bearbeiten",
+      "multitextTitle": "Mehrzeilige Text-Kachel bearbeiten",
+      "linkTitle": "Link-Kachel bearbeiten",
+      "anniversaryTitle": "Jahrestags-Kachel bearbeiten",
+      "todoTitle": "Aufgabenliste bearbeiten",
       "quickActionsTitle": "Schnellaktionen bearbeiten",
       "actionTitle": "Aktion bearbeiten",
       "filesTitle": "Dateien bearbeiten",
-      "migraineTitle": "Migräne-Tile bearbeiten",
-      "pollutionTitle": "Luftverschmutzungs-Tile bearbeiten"
+      "migraineTitle": "Migräne-Kachel bearbeiten",
+      "pollutionTitle": "Luftverschmutzungs-Kachel bearbeiten"
     },
     "tileFields": {
       "pickIcon": "Icon auswählen",
@@ -643,15 +643,15 @@
       "connectingMessage": "Verbindung zum Backend wird hergestellt..."
     },
     "moderation": {
-      "title": "Moderationsservice",
+      "title": "Moderationsdienst",
       "message": "Nachricht wird mit OpenAI-Moderation geprüft"
     },
     "tenor": {
-      "title": "Tenor-Service",
+      "title": "Tenor-Dienst",
       "loading": "Laden"
     },
     "place": {
-      "title": "Ort-Service",
+      "title": "Ort-Dienst",
       "creating": "Ort wird erstellt",
       "updating": "Ort wird aktualisiert",
       "loadingList": "Orte werden geladen",
@@ -706,7 +706,7 @@
       "locatingMessage": "Bitte warte, während dein Gerät deinen Standort ermittelt...",
       "authorizationRequired": "Bitte Standortfreigabe erteilen.",
       "failed": "Standort konnte nicht bestimmt werden. Bitte später erneut versuchen.",
-      "nominatimTitle": "Nominatim-Service",
+      "nominatimTitle": "Nominatim-Dienst",
       "fetchingNominatim": "Nominatim-Daten werden geladen",
       "searchTitle": "Ort wird gesucht",
       "searching": "Suche nach \"{{ term }}\"",
@@ -737,7 +737,7 @@
       "pickerUnsupported": "Dateiauswahl wird in diesem Browser nicht unterstützt."
     },
     "media": {
-      "tenorAttribution": "Powered by Tenor"
+      "tenorAttribution": "Bereitgestellt von Tenor"
     },
     "user": {
       "deleteSuccess": "Benutzer und zugehörige Daten wurden dauerhaft entfernt.",
@@ -823,7 +823,7 @@
     }
   },
   "auth": {
-    "serviceTitle": "Benutzer-Service",
+    "serviceTitle": "Benutzer-Dienst",
     "hashingPin": "PIN wird gehasht",
     "accountCreated": "Dein Konto wurde erstellt. Du kannst dich jetzt anmelden.",
     "userCreationFailed": "Ups! Beim Erstellen deines Benutzers ist etwas schiefgelaufen. Bitte versuche es später erneut.",

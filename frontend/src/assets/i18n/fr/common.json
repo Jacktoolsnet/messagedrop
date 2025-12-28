@@ -23,9 +23,9 @@
       "close": "Fermer"
     },
     "clipboard": {
-      "pasteLabel": "Paste from clipboard",
-      "unavailable": "Clipboard access is not available in this browser.",
-      "readFailed": "Could not read clipboard content."
+      "pasteLabel": "Coller depuis le presse-papiers",
+      "unavailable": "L'accès au presse-papiers n'est pas disponible dans ce navigateur.",
+      "readFailed": "Impossible de lire le contenu du presse-papiers."
     },
     "aria": {
       "wait": "Attendre",
@@ -67,144 +67,144 @@
       "ogTitle": "MessageDrop",
       "ogDescription": "Votre passerelle vers des histoires sociales, des lieux et des mises à jour.",
       "twitterTitle": "MessageDrop",
-      "twitterDescription": "Découvrez votre monde - plus intelligent."
+      "twitterDescription": "Découvrez votre monde — plus intelligent."
     },
     "translate": {
-      "title": "Translate service",
-      "message": "Translating message"
+      "title": "Service de traduction",
+      "message": "Traduction du message"
     },
     "connect": {
-      "title": "Connect service",
-      "creatingInfo": "Creating connect information",
-      "loadingInfo": "Loading connect information",
-      "invalidData": "Connect data is invalid.",
-      "selfAddBlocked": "It is not possible to add my user to the contact list.",
-      "notFound": "Connect ID not found.",
-      "deletingInfo": "Deleting connect information",
-      "deleteFailed": "Failed to delete connect record.",
-      "deleteUnavailable": "Unable to delete connect record."
+      "title": "Service de connexion",
+      "creatingInfo": "Création des informations de connexion",
+      "loadingInfo": "Chargement des informations de connexion",
+      "invalidData": "Les données de connexion ne sont pas valides.",
+      "selfAddBlocked": "Il n'est pas possible d'ajouter mon utilisateur à la liste de contacts.",
+      "notFound": "ID de connexion introuvable.",
+      "deletingInfo": "Suppression des informations de connexion",
+      "deleteFailed": "Échec de la suppression de l'enregistrement de connexion.",
+      "deleteUnavailable": "Impossible de supprimer l'enregistrement de connexion."
     },
     "contact": {
-      "title": "Contact service",
-      "creating": "Creating contact",
-      "created": "Contact successfully created.",
-      "updatingName": "Updating contact name",
-      "updateNameFailed": "Failed to update contact name.",
-      "loading": "Loading contact",
-      "hintDecryptFailed": "Hint cannot be decrypted!",
-      "notSet": "Not set",
-      "profileRequestDeclined": "The contact declined the profile information request.",
+      "title": "Service de contacts",
+      "creating": "Création du contact",
+      "created": "Contact créé avec succès.",
+      "updatingName": "Mise à jour du nom du contact",
+      "updateNameFailed": "Échec de la mise à jour du nom du contact.",
+      "loading": "Chargement du contact",
+      "hintDecryptFailed": "L'indice ne peut pas être déchiffré !",
+      "notSet": "Non défini",
+      "profileRequestDeclined": "Le contact a refusé la demande d'informations de profil.",
       "connect": {
-        "title": "Add a connection",
-        "description": "The connect ID I want to import.",
-        "label": "Connect ID",
-        "placeholder": "The connect ID.",
-        "start": "Start connecting",
-        "addAria": "Add connection",
-        "menuShare": "Share connect ID",
-        "menuConnectWithId": "Connect with connect ID",
-        "menuShareQr": "Share QR code",
-        "menuConnectQr": "Connect by scanning QR code",
+        "title": "Ajouter une connexion",
+        "description": "L'ID de connexion que je veux importer.",
+        "label": "ID de connexion",
+        "placeholder": "L'ID de connexion.",
+        "start": "Commencer la connexion",
+        "addAria": "Ajouter une connexion",
+        "menuShare": "Partager l'ID de connexion",
+        "menuConnectWithId": "Se connecter avec un ID de connexion",
+        "menuShareQr": "Partager le code QR",
+        "menuConnectQr": "Se connecter en scannant un code QR",
         "qrTitle": "Partager le code QR",
         "scannerTitle": "Scanner un code QR",
-        "shareTitle": "MessageDrop - share Connect ID",
-        "shareCanceled": "Sharing was canceled.",
-        "copied": "The Connect ID has been copied to your clipboard.",
-        "copyFailed": "Copying failed. Please use the QR code to connect.",
-        "abortAria": "Abort import",
-        "applyAria": "Apply connection",
-        "policy": "Contact ID, user ID, contact user ID, and the subscribed flag are saved on our server. This information is essential for the app to work."
+        "shareTitle": "MessageDrop - partager l'ID de connexion",
+        "shareCanceled": "Le partage a été annulé.",
+        "copied": "L'ID de connexion a été copié dans votre presse-papiers.",
+        "copyFailed": "Échec de la copie. Veuillez utiliser le code QR pour vous connecter.",
+        "abortAria": "Annuler l'importation",
+        "applyAria": "Appliquer la connexion",
+        "policy": "L'ID de contact, l'ID utilisateur, l'ID utilisateur du contact et l'indicateur d'abonnement sont enregistrés sur notre serveur. Ces informations sont essentielles au fonctionnement de l'application."
       },
       "delete": {
-        "title": "Delete contact",
-        "confirm": "This contact and all related data will be permanently deleted. Are you sure?",
-        "success": "Contact deleted.",
-        "failed": "Failed to delete contact."
+        "title": "Supprimer le contact",
+        "confirm": "Ce contact et toutes les données associées seront supprimés définitivement. Êtes-vous sûr ?",
+        "success": "Contact supprimé.",
+        "failed": "Échec de la suppression du contact."
       },
       "list": {
-        "nameFallback": "Unnamed",
-        "pinAria": "Pin contact",
-        "unpinAria": "Unpin contact",
-        "openChatroomAria": "Open chatroom",
-        "editAria": "Edit contact",
-        "subscribeAria": "Subscribe to contact",
-        "unsubscribeAria": "Unsubscribe from contact"
+        "nameFallback": "Sans nom",
+        "pinAria": "Épingler le contact",
+        "unpinAria": "Désépingler le contact",
+        "openChatroomAria": "Ouvrir la discussion",
+        "editAria": "Modifier le contact",
+        "subscribeAria": "S'abonner au contact",
+        "unsubscribeAria": "Se désabonner du contact"
       },
       "profile": {
-        "title": "Contact profile",
-        "nameLabel": "Contact name",
-        "setAvatar": "Set the contact avatar.",
-        "avatarAlt": "Contact avatar",
-        "avatarAltName": "{{ name }} avatar",
-        "askProfile": "Ask contact for profile",
-        "tileSettings": "Tile settings",
-        "tileSettingsAria": "Open tile settings for {{ name }}",
+        "title": "Profil du contact",
+        "nameLabel": "Nom du contact",
+        "setAvatar": "Définir l'avatar du contact.",
+        "avatarAlt": "Avatar du contact",
+        "avatarAltName": "Avatar de {{ name }}",
+        "askProfile": "Demander le profil au contact",
+        "tileSettings": "Paramètres des tuiles",
+        "tileSettingsAria": "Ouvrir les paramètres des tuiles pour {{ name }}",
         "nameFallback": "contact",
-        "policy": "The contact profile ID and subscription are stored on the server. Name and avatar remain local.",
-        "requestSent": "Profile request sent.",
-        "imageInvalid": "Please select a valid image file.",
-        "imageTooLarge": "The image is too large. Maximum allowed size is {{ maxMb }} MB.",
-        "fileReadError": "Error reading the file."
+        "policy": "L'ID du profil du contact et l'abonnement sont stockés sur le serveur. Le nom et l'avatar restent locaux.",
+        "requestSent": "Demande de profil envoyée.",
+        "imageInvalid": "Veuillez sélectionner un fichier image valide.",
+        "imageTooLarge": "L'image est trop grande. Taille maximale autorisée : {{ maxMb }} Mo.",
+        "fileReadError": "Erreur lors de la lecture du fichier."
       },
       "chatroom": {
-        "closeAria": "Close chatroom",
-        "composeAria": "Compose message",
-        "avatarAltName": "{{ name }} avatar",
-        "avatarAltMe": "My avatar",
-        "meLabel": "Me",
-        "avatarAltContact": "Contact avatar",
+        "closeAria": "Fermer la discussion",
+        "composeAria": "Rédiger un message",
+        "avatarAltName": "Avatar de {{ name }}",
+        "avatarAltMe": "Mon avatar",
+        "meLabel": "Moi",
+        "avatarAltContact": "Avatar du contact",
         "contactLabel": "Contact",
-        "editAria": "Edit message",
-        "deleteAria": "Delete message",
-        "showOriginalAria": "Show original message",
-        "translateAria": "Translate message",
-        "firstMessage": "Send the first message",
-        "loading": "Loading chatroom...",
-        "translateFailed": "Translation failed.",
-        "storeTranslationFailed": "Translated message could not be stored.",
+        "editAria": "Modifier le message",
+        "deleteAria": "Supprimer le message",
+        "showOriginalAria": "Afficher l'original",
+        "translateAria": "Traduire le message",
+        "firstMessage": "Envoyer le premier message",
+        "loading": "Chargement de la discussion...",
+        "translateFailed": "La traduction a échoué.",
+        "storeTranslationFailed": "Le message traduit n'a pas pu être enregistré.",
         "deleteMessage": {
-          "title": "Delete message",
-          "confirm": "This message will be permanently deleted. Are you sure?"
+          "title": "Supprimer le message",
+          "confirm": "Ce message sera supprimé définitivement. Êtes-vous sûr ?"
         }
       },
       "message": {
-        "addText": "Add a text",
-        "dropNewAria": "Drop a new message",
-        "applyAria": "Drop your message",
-        "policy": "This information is stored on our server and is visible to everyone."
+        "addText": "Ajouter du texte",
+        "dropNewAria": "Publier un nouveau message",
+        "applyAria": "Publier votre message",
+        "policy": "Ces informations sont stockées sur notre serveur et sont visibles par tous."
       }
     },
     "geoStatistic": {
-      "title": "GeoStatistic Service",
-      "loading": "Fetching location data",
-      "unexpectedResponse": "Unexpected response."
+      "title": "Service GeoStatistic",
+      "loading": "Récupération des données de localisation",
+      "unexpectedResponse": "Réponse inattendue."
     },
     "message": {
-      "title": "Message service",
-      "addText": "Add a text",
-      "updateAria": "Update your message",
-      "policy": "This information is stored on our server and is visible to everyone.",
-      "personalInfoBlocked": "My message will not be published because it appears to contain personal information.",
-      "moderationRejected": "Content will not be published because it was rejected by the moderation AI.",
-      "moderationFailed": "Moderation failed. Please try again later.",
-      "creating": "Creating message",
-      "created": "Message successfully dropped.",
-      "updating": "Updating message",
-      "togglingLike": "Toggling like",
-      "togglingDislike": "Toggling dislike",
-      "loading": "Loading message",
-      "disabling": "Disabling message",
-      "disableFailed": "Failed to disable message.",
-      "deleting": "Deleting message",
-      "deleteFailed": "Failed to delete message.",
-      "loadingComments": "Loading comments"
+      "title": "Service de messages",
+      "addText": "Ajouter du texte",
+      "updateAria": "Mettre à jour votre message",
+      "policy": "Ces informations sont stockées sur notre serveur et sont visibles par tous.",
+      "personalInfoBlocked": "Mon message ne sera pas publié car il semble contenir des informations personnelles.",
+      "moderationRejected": "Le contenu ne sera pas publié car il a été rejeté par l'IA de modération.",
+      "moderationFailed": "La modération a échoué. Veuillez réessayer plus tard.",
+      "creating": "Création du message",
+      "created": "Message publié avec succès.",
+      "updating": "Mise à jour du message",
+      "togglingLike": "Mise à jour du j'aime",
+      "togglingDislike": "Mise à jour du je n'aime pas",
+      "loading": "Chargement du message",
+      "disabling": "Désactivation du message",
+      "disableFailed": "Échec de la désactivation du message.",
+      "deleting": "Suppression du message",
+      "deleteFailed": "Échec de la suppression du message.",
+      "loadingComments": "Chargement des commentaires"
     },
     "comment": {
-      "created": "Comment successfully dropped."
+      "created": "Commentaire publié avec succès."
     },
     "note": {
-      "addText": "Add a text",
-      "policy": "This information is stored on your device and is only visible to you."
+      "addText": "Ajouter du texte",
+      "policy": "Ces informations sont stockées sur votre appareil et ne sont visibles que par vous."
     },
     "images": {
       "imported": "Image(s) importée(s) localement.",
@@ -232,257 +232,257 @@
     },
     "map": {
       "multiMarker": {
-        "showMessages": "Show messages",
-        "showNotes": "Show notes",
-        "showImages": "Show images"
+        "showMessages": "Afficher les messages",
+        "showNotes": "Afficher les notes",
+        "showImages": "Afficher les images"
       }
     },
     "messageList": {
-      "addFirstMessage": "Add my first public message",
-      "addMessageAria": "Add message",
-      "addFirstComment": "Add my first public comment",
-      "addCommentAria": "Add comment",
-      "commentsAria": "Show or add comments",
-      "likeAria": "Like message",
-      "dislikeAria": "Dislike message",
-      "translateAria": "Translate message",
-      "flyToAria": "Fly to message",
-      "navigateAria": "Navigate to message location",
-      "editProfileAria": "Edit profile",
-      "editAria": "Edit message",
-      "deleteAria": "Delete message",
-      "blockAria": "Report message",
-      "avatarAltName": "{{ name }} avatar",
-      "avatarAltFallback": "Profile avatar",
-      "nameFallback": "Unnamed",
-      "myself": "Myself",
-      "blockedMarked": "The content was hidden and marked for review.",
-      "blockedRemoved": "The content was hidden and removed from the view.",
-      "translateFailed": "Translation failed.",
+      "addFirstMessage": "Ajouter mon premier message public",
+      "addMessageAria": "Ajouter un message",
+      "addFirstComment": "Ajouter mon premier commentaire public",
+      "addCommentAria": "Ajouter un commentaire",
+      "commentsAria": "Afficher ou ajouter des commentaires",
+      "likeAria": "Aimer le message",
+      "dislikeAria": "Ne pas aimer le message",
+      "translateAria": "Traduire le message",
+      "flyToAria": "Aller au message",
+      "navigateAria": "Naviguer vers l'emplacement du message",
+      "editProfileAria": "Modifier le profil",
+      "editAria": "Modifier le message",
+      "deleteAria": "Supprimer le message",
+      "blockAria": "Signaler le message",
+      "avatarAltName": "Avatar de {{ name }}",
+      "avatarAltFallback": "Avatar du profil",
+      "nameFallback": "Sans nom",
+      "myself": "Moi-même",
+      "blockedMarked": "Le contenu a été masqué et marqué pour examen.",
+      "blockedRemoved": "Le contenu a été masqué et retiré de l'affichage.",
+      "translateFailed": "La traduction a échoué.",
       "blockDialog": {
-        "title": "Block message",
-        "confirm": "The message will be blocked for everyone. Are you sure the message violates the rules?"
+        "title": "Signaler le message",
+        "confirm": "Le message sera bloqué pour tout le monde. Êtes-vous sûr qu'il enfreint les règles ?"
       },
       "deleteDialog": {
-        "title": "Delete message",
-        "confirm": "The message and all related comments will be permanently deleted. Are you sure?"
+        "title": "Supprimer le message",
+        "confirm": "Le message et tous les commentaires associés seront supprimés définitivement. Êtes-vous sûr ?"
       }
     },
     "messageProfile": {
-      "title": "Edit profile",
-      "nameLabel": "Profile name",
-      "addAvatar": "Give the profile an avatar",
-      "avatarAltName": "{{ name }} avatar",
-      "avatarAltFallback": "Profile avatar",
-      "deleteAvatarAria": "Remove avatar",
-      "fileReadFailed": "Could not read the selected file. Please try again.",
-      "policy": "Profile name and avatar are stored on the device."
+      "title": "Modifier le profil",
+      "nameLabel": "Nom du profil",
+      "addAvatar": "Ajouter un avatar au profil",
+      "avatarAltName": "Avatar de {{ name }}",
+      "avatarAltFallback": "Avatar du profil",
+      "deleteAvatarAria": "Supprimer l'avatar",
+      "fileReadFailed": "Impossible de lire le fichier sélectionné. Veuillez réessayer.",
+      "policy": "Le nom du profil et l'avatar sont stockés sur l'appareil."
     },
     "multimedia": {
-      "embeddedAlt": "Embedded media",
-      "addFromTenor": "Add from Tenor",
-      "addContent": "Add multimedia content",
+      "embeddedAlt": "Média intégré",
+      "addFromTenor": "Ajouter depuis Tenor",
+      "addContent": "Ajouter du contenu multimédia",
       "importUrlPlaceholder": "Saisissez l'URL multimédia",
       "attributionPoweredBy": "Propulsé par {{ platform }}",
       "platformDisabled": "{{ platform }} est actuellement désactivé. Activez-le ci-dessous pour continuer.",
       "urlNotAllowed": "Cette URL n'est pas autorisée pour l'intégration."
     },
     "noteList": {
-      "addFirstNote": "Add my first private note",
-      "addNoteAria": "Add note",
-      "editAria": "Edit note",
-      "deleteAria": "Delete note",
-      "flyToAria": "Fly to note",
-      "navigateAria": "Navigate to note location",
+      "addFirstNote": "Ajouter ma première note privée",
+      "addNoteAria": "Ajouter une note",
+      "editAria": "Modifier la note",
+      "deleteAria": "Supprimer la note",
+      "flyToAria": "Aller à la note",
+      "navigateAria": "Naviguer vers l'emplacement de la note",
       "deleteDialog": {
-        "title": "Delete note",
-        "confirm": "The note will be permanently deleted. Are you sure?"
+        "title": "Supprimer la note",
+        "confirm": "La note sera supprimée définitivement. Êtes-vous sûr ?"
       }
     },
     "pin": {
-      "enterTitle": "Enter PIN",
-      "createTitle": "Create PIN",
-      "confirmTitle": "Confirm PIN",
-      "hintTitle": "PIN hint",
-      "hintBody": "To use MessageDrop, I have to choose a PIN. I can't forget it, since there's no way to recover it. The PIN is encrypted, hashed, and stored only on my device.",
-      "mismatch": "PINs do not match."
+      "enterTitle": "Saisir le code PIN",
+      "createTitle": "Créer un code PIN",
+      "confirmTitle": "Confirmer le code PIN",
+      "hintTitle": "Indice de PIN",
+      "hintBody": "Pour utiliser MessageDrop, je dois choisir un code PIN. Je ne peux pas l'oublier, car il n'existe aucun moyen de récupération. Le PIN est chiffré, haché et stocké uniquement sur mon appareil.",
+      "mismatch": "Les codes PIN ne correspondent pas."
     },
     "placeList": {
-      "addFirstPlace": "Add my first place",
-      "addPlaceAria": "Add place",
-      "nameFallback": "Unnamed",
-      "avatarAltName": "{{ name }} avatar",
-      "avatarAltFallback": "Place avatar",
-      "pinAria": "Pin place",
-      "unpinAria": "Unpin place",
-      "editAria": "Edit place",
-      "deleteAria": "Delete place",
-      "subscribeAria": "Subscribe to place",
-      "unsubscribeAria": "Unsubscribe from place",
-      "flyToAria": "Fly to place",
+      "addFirstPlace": "Ajouter mon premier lieu",
+      "addPlaceAria": "Ajouter un lieu",
+      "nameFallback": "Sans nom",
+      "avatarAltName": "Avatar de {{ name }}",
+      "avatarAltFallback": "Avatar du lieu",
+      "pinAria": "Épingler le lieu",
+      "unpinAria": "Désépingler le lieu",
+      "editAria": "Modifier le lieu",
+      "deleteAria": "Supprimer le lieu",
+      "subscribeAria": "S'abonner au lieu",
+      "unsubscribeAria": "Se désabonner du lieu",
+      "flyToAria": "Aller au lieu",
       "deleteDialog": {
-        "title": "Delete place",
-        "confirm": "The place will be permanently deleted. Are you sure?"
+        "title": "Supprimer le lieu",
+        "confirm": "Le lieu sera supprimé définitivement. Êtes-vous sûr ?"
       },
-      "deleteFailed": "Could not delete the place.",
-      "subscribeFailed": "Subscribing failed.",
-      "unsubscribeFailed": "Unsubscribing failed.",
-      "createSuccess": "Place successfully created.",
+      "deleteFailed": "Impossible de supprimer le lieu.",
+      "subscribeFailed": "Échec de l'abonnement.",
+      "unsubscribeFailed": "Échec du désabonnement.",
+      "createSuccess": "Lieu créé avec succès.",
       "createFailed": "La création du lieu a échoué. Veuillez réessayer.",
-      "resolveFailed": "Could not determine the current place."
+      "resolveFailed": "Impossible de déterminer le lieu actuel."
     },
     "placeSettings": {
-      "addTitle": "Add a place",
-      "editTitle": "Place settings",
-      "nameLabel": "Place name",
-      "setAvatar": "Set the place avatar.",
-      "avatarAltName": "{{ name }} avatar",
-      "avatarAltFallback": "Place avatar",
-      "deleteAvatarAria": "Remove avatar",
-      "tileSettings": "Tile settings",
-      "openTileSettingsAria": "Open tile settings for {{ name }}",
-      "nameFallback": "place",
-      "imageInvalid": "Please select a valid image file.",
-      "imageTooLarge": "The image is too large. Maximum allowed size is 5 MB.",
-      "imageReadError": "Error reading the file.",
-      "savePolicy": "Place id, place name (hashed), the added locations, and the subscribed flag are saved on our server. The readable name and the avatar are saved on your device."
+      "addTitle": "Ajouter un lieu",
+      "editTitle": "Paramètres du lieu",
+      "nameLabel": "Nom du lieu",
+      "setAvatar": "Définir l'avatar du lieu.",
+      "avatarAltName": "Avatar de {{ name }}",
+      "avatarAltFallback": "Avatar du lieu",
+      "deleteAvatarAria": "Supprimer l'avatar",
+      "tileSettings": "Paramètres des tuiles",
+      "openTileSettingsAria": "Ouvrir les paramètres des tuiles pour {{ name }}",
+      "nameFallback": "lieu",
+      "imageInvalid": "Veuillez sélectionner un fichier image valide.",
+      "imageTooLarge": "L'image est trop grande. Taille maximale autorisée : 5 Mo.",
+      "imageReadError": "Erreur lors de la lecture du fichier.",
+      "savePolicy": "L'ID du lieu, le nom du lieu (haché), les emplacements ajoutés et l'indicateur d'abonnement sont enregistrés sur notre serveur. Le nom lisible et l'avatar sont stockés sur votre appareil."
     },
     "tileList": {
-      "empty": "No tiles visible.",
-      "openSettings": "Open tile settings"
+      "empty": "Aucune tuile visible.",
+      "openSettings": "Ouvrir les paramètres des tuiles"
     },
     "tileSettings": {
-      "title": "Tile settings",
-      "addTile": "Add tile",
-      "reorderAria": "Reorder {{ label }}",
-      "editAria": "Edit tile",
-      "deleteAria": "Delete tile",
-      "toggleAria": "Toggle {{ label }}",
+      "title": "Paramètres des tuiles",
+      "addTile": "Ajouter une tuile",
+      "reorderAria": "Réorganiser {{ label }}",
+      "editAria": "Modifier la tuile",
+      "deleteAria": "Supprimer la tuile",
+      "toggleAria": "Afficher/masquer {{ label }}",
       "visible": "Visible",
-      "editLabelPrompt": "Edit tile label"
+      "editLabelPrompt": "Modifier le libellé de la tuile"
     },
     "tileTypes": {
-      "datetime": "Date & time",
-      "weather": "Weather",
-      "airQuality": "Air quality",
+      "datetime": "Date et heure",
+      "weather": "Météo",
+      "airQuality": "Qualité de l'air",
       "note": "Notes",
       "message": "Messages",
       "image": "Images",
-      "text": "Text",
-      "multitext": "Multitext",
-      "link": "Link",
-      "anniversary": "Anniversary",
-      "todo": "Todo list",
-      "quickActions": "Quick actions",
-      "files": "Files",
-      "migraine": "Migraine alert",
+      "text": "Texte",
+      "multitext": "Texte multiligne",
+      "link": "Lien",
+      "anniversary": "Anniversaire",
+      "todo": "Liste de tâches",
+      "quickActions": "Actions rapides",
+      "files": "Fichiers",
+      "migraine": "Alerte migraine",
       "pollution": "Pollution"
     },
     "tileDelete": {
-      "title": "Delete tile",
-      "confirm": "Do you really want to delete this tile?",
-      "confirmYes": "Yes, delete"
+      "title": "Supprimer la tuile",
+      "confirm": "Voulez-vous vraiment supprimer cette tuile ?",
+      "confirmYes": "Oui, supprimer"
     },
     "tiles": {
-      "noData": "No data",
-      "airQualityUnavailable": "Air quality unavailable",
-      "weatherUnavailable": "Weather unavailable",
-      "dataExpiredCached": "Data expired - showing cached values",
+      "noData": "Aucune donnée",
+      "airQualityUnavailable": "Qualité de l'air indisponible",
+      "weatherUnavailable": "Météo indisponible",
+      "dataExpiredCached": "Données expirées — affichage des valeurs en cache",
       "images": {
-        "title": "Private images",
-        "notFound": "Not found",
-        "previewAlt": "Image preview",
-        "empty": "No images found."
+        "title": "Images privées",
+        "notFound": "Introuvable",
+        "previewAlt": "Aperçu de l'image",
+        "empty": "Aucune image trouvée."
       },
       "messages": {
         "title": "Messages",
-        "empty": "No messages found."
+        "empty": "Aucun message trouvé."
       },
       "notes": {
-        "title": "Private notes",
-        "empty": "No notes found."
+        "title": "Notes privées",
+        "empty": "Aucune note trouvée."
       },
       "text": {
-        "empty": "No text yet. Tap to add one."
+        "empty": "Pas encore de texte. Appuyez pour en ajouter."
       },
       "link": {
-        "add": "Add link"
+        "add": "Ajouter un lien"
       },
       "anniversary": {
-        "addDate": "Add a date",
-        "invalidDate": "Invalid date"
+        "addDate": "Ajouter une date",
+        "invalidDate": "Date invalide"
       },
       "migraine": {
-        "stale": "Data expired",
-        "temperatureChange": "Temperature change",
-        "pressureChange": "Pressure change",
-        "openTemperatureAria": "Open temperature details",
-        "openPressureAria": "Open pressure details",
-        "temperatureGroup": "Temperature (°C)",
-        "pressureGroup": "Pressure (hPa)"
+        "stale": "Données expirées",
+        "temperatureChange": "Variation de température",
+        "pressureChange": "Variation de pression",
+        "openTemperatureAria": "Ouvrir les détails de température",
+        "openPressureAria": "Ouvrir les détails de pression",
+        "temperatureGroup": "Température (°C)",
+        "pressureGroup": "Pression (hPa)"
       },
       "pollution": {
-        "stale": "Data expired",
-        "empty": "No air quality data",
-        "openDetailsAria": "Open details in air quality view"
+        "stale": "Données expirées",
+        "empty": "Aucune donnée sur la qualité de l'air",
+        "openDetailsAria": "Ouvrir les détails dans la vue qualité de l'air"
       },
       "todo": {
-        "empty": "No todos yet. Tap to add.",
-        "emptyEditor": "No todos yet. Add your first one above.",
-        "addLabel": "Add todo",
-        "addAria": "Add todo",
-        "reorderAria": "Reorder todo",
-        "deleteAria": "Delete todo",
-        "markDone": "Mark as done",
-        "markUndone": "Mark as not done"
+        "empty": "Aucune tâche pour l'instant. Appuyez pour en ajouter.",
+        "emptyEditor": "Aucune tâche pour l'instant. Ajoutez votre première ci-dessus.",
+        "addLabel": "Ajouter une tâche",
+        "addAria": "Ajouter une tâche",
+        "reorderAria": "Réorganiser la tâche",
+        "deleteAria": "Supprimer la tâche",
+        "markDone": "Marquer comme terminé",
+        "markUndone": "Marquer comme non terminé"
       },
       "quickActions": {
-        "empty": "No actions yet. Tap to add.",
-        "emptyEditor": "No actions yet. Add one above.",
+        "empty": "Aucune action pour l'instant. Appuyez pour en ajouter.",
+        "emptyEditor": "Aucune action pour l'instant. Ajoutez-en une ci-dessus.",
         "title": "Actions",
-        "addAction": "Add action",
-        "reorderAria": "Reorder action",
-        "editAria": "Edit action",
-        "deleteAria": "Delete action",
+        "addAction": "Ajouter une action",
+        "reorderAria": "Réorganiser l'action",
+        "editAria": "Modifier l'action",
+        "deleteAria": "Supprimer l'action",
         "actionFallback": "Action"
       },
       "files": {
-        "empty": "No files yet. Tap to add.",
-        "emptyEditor": "No files yet. Add one above.",
-        "header": "Files",
-        "add": "Add files",
-        "reorderAria": "Reorder file",
-        "openAria": "Open file",
-        "removeAria": "Remove file",
-        "pickerUnsupported": "File picker is not supported in this browser.",
-        "openFailed": "Unable to open the file.",
-        "saveHandlesFailed": "Unable to save file handles."
+        "empty": "Aucun fichier pour l'instant. Appuyez pour en ajouter.",
+        "emptyEditor": "Aucun fichier pour l'instant. Ajoutez votre premier ci-dessus.",
+        "header": "Fichiers",
+        "add": "Ajouter des fichiers",
+        "reorderAria": "Réorganiser le fichier",
+        "openAria": "Ouvrir le fichier",
+        "removeAria": "Retirer le fichier",
+        "pickerUnsupported": "Le sélecteur de fichiers n'est pas pris en charge par ce navigateur.",
+        "openFailed": "Impossible d'ouvrir le fichier.",
+        "saveHandlesFailed": "Impossible d'enregistrer les références de fichiers."
       }
     },
     "tileEdit": {
-      "textTitle": "Edit text tile",
-      "multitextTitle": "Edit multi-line tile",
-      "linkTitle": "Edit link tile",
-      "anniversaryTitle": "Edit anniversary tile",
-      "todoTitle": "Edit todo list",
-      "quickActionsTitle": "Edit quick actions",
-      "actionTitle": "Edit action",
-      "filesTitle": "Edit files",
-      "migraineTitle": "Edit migraine tile",
-      "pollutionTitle": "Edit pollution tile"
+      "textTitle": "Modifier la tuile de texte",
+      "multitextTitle": "Modifier la tuile de texte multiligne",
+      "linkTitle": "Modifier la tuile de lien",
+      "anniversaryTitle": "Modifier la tuile d'anniversaire",
+      "todoTitle": "Modifier la liste de tâches",
+      "quickActionsTitle": "Modifier les actions rapides",
+      "actionTitle": "Modifier l'action",
+      "filesTitle": "Modifier les fichiers",
+      "migraineTitle": "Modifier la tuile migraine",
+      "pollutionTitle": "Modifier la tuile pollution"
     },
     "tileFields": {
-      "pickIcon": "Pick an icon",
-      "title": "Title",
-      "text": "Text",
-      "linkType": "Link type",
-      "target": "Target",
-      "invalidTarget": "Enter a valid {{ type }} target",
-      "label": "Label",
+      "pickIcon": "Choisir une icône",
+      "title": "Titre",
+      "text": "Texte",
+      "linkType": "Type de lien",
+      "target": "Cible",
+      "invalidTarget": "Saisissez une cible {{ type }} valide",
+      "label": "Libellé",
       "type": "Type",
-      "pickDateError": "Please pick a date",
-      "warnLevel": "Warn level",
-      "alertLevel": "Alert level"
+      "pickDateError": "Veuillez choisir une date",
+      "warnLevel": "Niveau d'avertissement",
+      "alertLevel": "Niveau d'alerte"
     },
     "iconPicker": {
       "categories": {
@@ -501,18 +501,18 @@
     },
     "tileLinkTypes": {
       "web": "Web",
-      "email": "Email",
-      "phone": "Phone",
+      "email": "E-mail",
+      "phone": "Téléphone",
       "whatsapp": "WhatsApp",
       "sms": "SMS"
     },
     "sharedContent": {
-      "multimediaTitle": "Shared multimedia content received",
-      "multimediaHint": "Add this content to a post, note, or message.",
-      "removeContent": "Remove shared content",
-      "locationTitle": "Shared location received",
-      "locationHint": "Jumping to the shared location on the map.",
-      "removeLocation": "Remove shared location"
+      "multimediaTitle": "Contenu multimédia partagé reçu",
+      "multimediaHint": "Ajoutez ce contenu à une publication, une note ou un message.",
+      "removeContent": "Supprimer le contenu partagé",
+      "locationTitle": "Localisation partagée reçue",
+      "locationHint": "Aller à la localisation partagée sur la carte.",
+      "removeLocation": "Supprimer la localisation partagée"
     },
     "systemMessages": {
       "title": "Messages système",
@@ -559,143 +559,143 @@
     },
     "legal": {
       "language": {
-        "de": "Deutsch",
-        "en": "English"
+        "de": "Allemand",
+        "en": "Anglais"
       },
       "notice": {
-        "title": "Imprint (Legal Notice)",
-        "loading": "Loading legal notice...",
-        "loadFailed": "Could not load the legal notice file.",
-        "ariaLabel": "Legal notice"
+        "title": "Mentions légales",
+        "loading": "Chargement des mentions légales...",
+        "loadFailed": "Impossible de charger le fichier des mentions légales.",
+        "ariaLabel": "Mentions légales"
       },
       "disclaimer": {
-        "title": "Disclaimer",
-        "loading": "Loading disclaimer...",
-        "loadFailed": "Could not load the disclaimer file.",
-        "ariaLabel": "Disclaimer",
-        "acceptAria": "Accept disclaimer",
-        "acceptText": "I have read and accept this disclaimer."
+        "title": "Avertissement",
+        "loading": "Chargement de l'avertissement...",
+        "loadFailed": "Impossible de charger le fichier d'avertissement.",
+        "ariaLabel": "Avertissement",
+        "acceptAria": "Accepter l'avertissement",
+        "acceptText": "J'ai lu et j'accepte cet avertissement."
       },
       "terms": {
-        "title": "Terms of Service",
-        "loading": "Loading terms of service...",
-        "loadFailed": "Could not load the terms of service file.",
-        "ariaLabel": "Terms of service",
-        "acceptAria": "Accept terms of service",
-        "acceptText": "I have read and accept these Terms of Service."
+        "title": "Conditions d'utilisation",
+        "loading": "Chargement des conditions d'utilisation...",
+        "loadFailed": "Impossible de charger le fichier des conditions d'utilisation.",
+        "ariaLabel": "Conditions d'utilisation",
+        "acceptAria": "Accepter les conditions",
+        "acceptText": "J'ai lu et j'accepte ces Conditions d'utilisation."
       },
       "privacy": {
-        "title": "Privacy Policy",
-        "loading": "Loading privacy policy...",
-        "loadFailed": "Could not load the privacy policy file.",
-        "ariaLabel": "Privacy policy",
-        "acceptAria": "Accept privacy policy",
-        "acceptText": "I have read and accept this Privacy Policy."
+        "title": "Politique de confidentialité",
+        "loading": "Chargement de la politique de confidentialité...",
+        "loadFailed": "Impossible de charger le fichier de politique de confidentialité.",
+        "ariaLabel": "Politique de confidentialité",
+        "acceptAria": "Accepter la politique de confidentialité",
+        "acceptText": "J'ai lu et j'accepte cette Politique de confidentialité."
       },
       "thirdParty": {
-        "title": "Third-Party Licenses",
-        "loading": "Loading licenses...",
-        "loadFailed": "Could not load the license file.",
-        "ariaLabel": "Third-party licenses"
+        "title": "Licences tierces",
+        "loading": "Chargement des licences...",
+        "loadFailed": "Impossible de charger le fichier de licences.",
+        "ariaLabel": "Licences tierces"
       },
       "externalContent": {
-        "title": "External content settings",
-        "platformTitle": "External content: {{ platform }}",
-        "platformSubtitle": "Allow embeds, previews, and widgets from this provider.",
-        "platformNote": "By enabling, you allow loading content from {{ platform }} and agree to the provider's",
+        "title": "Paramètres des contenus externes",
+        "platformTitle": "Contenu externe : {{ platform }}",
+        "platformSubtitle": "Autoriser les intégrations, aperçus et widgets de ce fournisseur.",
+        "platformNote": "En activant, vous autorisez le chargement de contenu depuis {{ platform }} et acceptez la",
         "platformNoteEnd": ".",
-        "platformWarning": "This may send your IP address and usage data to {{ platform }}.",
-        "terms": "Terms",
-        "privacy": "Privacy Policy",
-        "and": "and",
-        "enableLabel": "Enable {{ platform }}",
-        "enableAria": "Enable {{ platform }}"
+        "platformWarning": "Cela peut envoyer votre adresse IP et des données d'utilisation à {{ platform }}.",
+        "terms": "Conditions",
+        "privacy": "Politique de confidentialité",
+        "and": "et",
+        "enableLabel": "Activer {{ platform }}",
+        "enableAria": "Activer {{ platform }}"
       },
       "consent": {
-        "regionAria": "Action required: missing consents",
-        "welcome": "Welcome to MessageDrop 👋",
-        "beforeStart": "Before we start",
-        "ageNote": "You must be at least 16 years old to use MessageDrop.",
-        "ageConfirm": "Confirmer l’âge minimum (16+)",
-        "externalTitle": "External content",
-        "externalSubtitle": "Choose which external content you want to see. You can change these settings anytime.",
-        "externalButton": "Edit external content settings",
+        "regionAria": "Action requise : consentements manquants",
+        "welcome": "Bienvenue sur MessageDrop 👋",
+        "beforeStart": "Avant de commencer",
+        "ageNote": "Vous devez avoir au moins 16 ans pour utiliser MessageDrop.",
+        "ageConfirm": "Confirmer l'âge minimum (16+)",
+        "externalTitle": "Contenu externe",
+        "externalSubtitle": "Choisissez le contenu externe que vous souhaitez voir. Vous pouvez modifier ces paramètres à tout moment.",
+        "externalButton": "Modifier les paramètres de contenu externe",
         "loggingTitle": "Diagnostic",
-        "loggingSubtitle": "Aidez-nous à améliorer la stabilité en envoyant des rapports d’erreur anonymes.",
+        "loggingSubtitle": "Aidez-nous à améliorer la stabilité en envoyant des rapports d'erreur anonymes.",
         "loggingToggle": "Partager des diagnostics anonymes",
         "loggingNote": "Seules des métadonnées techniques sont envoyées, sans données personnelles.",
         "appIntroTitle": "Bienvenue sur MessageDrop 👋",
         "appIntroBody": "Découvrez des lieux, partagez des histoires et restez connecté aux personnes et lieux qui comptent. Confirmez votre âge minimum et vérifiez les réglages pour commencer.",
         "backupTitle": "Sauvegardes",
-        "backupSubtitle": "Me rappeler de créer des sauvegardes à la fermeture de l’application.",
+        "backupSubtitle": "Me rappeler de créer des sauvegardes à la fermeture de l'application.",
         "backupToggle": "Demander avant de fermer",
         "backupNote": "Vous pourrez modifier cela plus tard dans les paramètres.",
-        "legalTitle": "Legal",
-        "legalSubtitle": "Please review and accept the following items to continue.",
+        "legalTitle": "Légal",
+        "legalSubtitle": "Veuillez consulter et accepter les éléments suivants pour continuer.",
         "status": {
-          "review": "(review and accept)",
-          "accepted": "(accepted)"
+          "review": "(à consulter et accepter)",
+          "accepted": "(accepté)"
         }
       }
     },
     "server": {
-      "connectingTitle": "Connecting",
-      "connectingMessage": "Connecting to backend..."
+      "connectingTitle": "Connexion",
+      "connectingMessage": "Connexion au backend..."
     },
     "moderation": {
-      "title": "Moderation service",
-      "message": "Moderating message using OpenAI moderation AI"
+      "title": "Service de modération",
+      "message": "Modération du message via l'IA de modération OpenAI"
     },
     "tenor": {
-      "title": "Tenor service",
-      "loading": "Loading"
+      "title": "Service Tenor",
+      "loading": "Chargement"
     },
     "place": {
-      "title": "Place service",
-      "creating": "Creating place",
-      "updating": "Updating place",
-      "loadingList": "Loading places",
-      "loadingSingle": "Loading place",
-      "deleting": "Deleting place",
-      "subscribing": "Subscribing to place",
-      "unsubscribing": "Unsubscribing from place",
-      "loadingTimezone": "Loading timezone"
+      "title": "Service de lieux",
+      "creating": "Création du lieu",
+      "updating": "Mise à jour du lieu",
+      "loadingList": "Chargement des lieux",
+      "loadingSingle": "Chargement du lieu",
+      "deleting": "Suppression du lieu",
+      "subscribing": "Abonnement au lieu",
+      "unsubscribing": "Désabonnement du lieu",
+      "loadingTimezone": "Chargement du fuseau horaire"
     },
     "backup": {
-      "title": "Backup",
-      "signInRequired": "Please sign in before creating a backup.",
-      "createdSuccess": "Backup created successfully.",
-      "failed": "Backup failed. Please try again.",
-      "folderSelectionFailed": "Folder selection failed.",
-      "folderSelectionUnsupported": "Folder selection is not supported. Save the backup file instead.",
-      "fileTypeDescription": "MessageDrop Backup",
-      "fileSelectionFailed": "File selection failed.",
-      "notSupported": "Backup is not supported in this browser.",
-      "collectingServerData": "Collecting your data from the server"
+      "title": "Sauvegarde",
+      "signInRequired": "Veuillez vous connecter avant de créer une sauvegarde.",
+      "createdSuccess": "Sauvegarde créée avec succès.",
+      "failed": "Échec de la sauvegarde. Veuillez réessayer.",
+      "folderSelectionFailed": "Échec de la sélection du dossier.",
+      "folderSelectionUnsupported": "La sélection de dossier n'est pas prise en charge. Enregistrez plutôt le fichier de sauvegarde.",
+      "fileTypeDescription": "Sauvegarde MessageDrop",
+      "fileSelectionFailed": "Échec de la sélection du fichier.",
+      "notSupported": "La sauvegarde n'est pas prise en charge dans ce navigateur.",
+      "collectingServerData": "Collecte de vos données depuis le serveur"
     },
     "restore": {
-      "title": "Restore",
-      "versionUnsupported": "This backup version is not supported.",
-      "missingData": "Backup file is missing data.",
-      "completed": "Restore completed. Please log in with your PIN.",
-      "failed": "Restore failed. Please try again.",
-      "fileSelectionFailed": "File selection failed.",
-      "invalidFile": "This file is not a valid backup.",
-      "readFailed": "Backup file could not be read.",
-      "corrupted": "Backup file is corrupted.",
-      "encryptedNotSupported": "Encrypted backups are not supported in this browser.",
-      "pinIncorrect": "PIN is incorrect or the backup is corrupted.",
-      "overwriteTitle": "Restore backup",
-      "overwriteMessage": "Restoring this backup will delete the current user and all related data on this device and on the server. Continue?",
-      "overwriteUserHint": "The backup belongs to user {{ userId }}.",
-      "deleteUserFailed": "Unable to delete the current user.",
-      "restoringServerData": "Restoring server data",
-      "imageRestoreUnsupported": "Image restore is not supported in this browser.",
-      "imageRestoreSkipped": "Image restore was skipped."
+      "title": "Restauration",
+      "versionUnsupported": "Cette version de sauvegarde n'est pas prise en charge.",
+      "missingData": "Le fichier de sauvegarde ne contient pas toutes les données.",
+      "completed": "Restauration terminée. Veuillez vous connecter avec votre PIN.",
+      "failed": "Échec de la restauration. Veuillez réessayer.",
+      "fileSelectionFailed": "Échec de la sélection du fichier.",
+      "invalidFile": "Ce fichier n'est pas une sauvegarde valide.",
+      "readFailed": "Impossible de lire le fichier de sauvegarde.",
+      "corrupted": "Le fichier de sauvegarde est corrompu.",
+      "encryptedNotSupported": "Les sauvegardes chiffrées ne sont pas prises en charge dans ce navigateur.",
+      "pinIncorrect": "Le PIN est incorrect ou la sauvegarde est corrompue.",
+      "overwriteTitle": "Restaurer une sauvegarde",
+      "overwriteMessage": "Restaurer cette sauvegarde supprimera l'utilisateur actuel et toutes les données associées sur cet appareil et sur le serveur. Continuer ?",
+      "overwriteUserHint": "La sauvegarde appartient à l'utilisateur {{ userId }}.",
+      "deleteUserFailed": "Impossible de supprimer l'utilisateur actuel.",
+      "restoringServerData": "Restauration des données serveur",
+      "imageRestoreUnsupported": "La restauration des images n'est pas prise en charge dans ce navigateur.",
+      "imageRestoreSkipped": "La restauration des images a été ignorée."
     },
     "serverDown": {
       "title": "Oups ! Notre serveur est parti prendre un café...",
-      "message": "Apparemment, notre backend avait besoin d'un peu de \"temps pour lui\".\n\nNe vous inquiétez pas, nous avons envoyé un pigeon voyageur pour le ramener."
+      "message": "Apparemment, notre backend avait besoin d'un peu de « temps pour lui ».\n\nNe vous inquiétez pas, nous avons envoyé un pigeon voyageur pour le ramener."
     },
     "backupExit": {
       "title": "Créer une sauvegarde avant de quitter ?",
@@ -706,12 +706,12 @@
       "locatingMessage": "Veuillez patienter pendant que votre appareil détermine votre position actuelle...",
       "authorizationRequired": "Veuillez autoriser la localisation.",
       "failed": "La position n'a pas pu être déterminée. Veuillez réessayer plus tard.",
-      "nominatimTitle": "Nominatim service",
-      "fetchingNominatim": "Fetching Nominatim data",
-      "searchTitle": "Searching location",
-      "searching": "Searching for \"{{ term }}\"",
-      "searchingNear": "Searching for \"{{ term }}\" near your location",
-      "searchingWithArea": "Searching for \"{{ term }}\" {{ area }}",
+      "nominatimTitle": "Service Nominatim",
+      "fetchingNominatim": "Récupération des données Nominatim",
+      "searchTitle": "Recherche de localisation",
+      "searching": "Recherche de « {{ term }} »",
+      "searchingNear": "Recherche de « {{ term }} » près de votre position",
+      "searchingWithArea": "Recherche de « {{ term }} » {{ area }}",
       "searchPlaceholder": "Rechercher dans OpenStreetMap",
       "distanceLabel": "Distance",
       "searchFailed": "La recherche a échoué. Veuillez réessayer plus tard.",
@@ -724,8 +724,8 @@
         "kilometers": "{{ value }} km"
       },
       "area": {
-        "defined": "in defined area",
-        "nearby": "around your location"
+        "defined": "dans la zone définie",
+        "nearby": "autour de votre position"
       }
     },
     "notifications": {
@@ -737,7 +737,7 @@
       "pickerUnsupported": "Le sélecteur de fichiers n'est pas pris en charge dans ce navigateur."
     },
     "media": {
-      "tenorAttribution": "Powered by Tenor"
+      "tenorAttribution": "Propulsé par Tenor"
     },
     "user": {
       "deleteSuccess": "L'utilisateur et les données associées ont été supprimés définitivement.",
@@ -750,7 +750,7 @@
       },
       "deleteDialog": {
         "title": "Supprimer l'utilisateur",
-        "confirm": "Cet utilisateur et toutes les données associées seront définitivement supprimés. Êtes-vous sûr ?"
+        "confirm": "Cet utilisateur et toutes les données associées seront supprimés définitivement. Êtes-vous sûr ?"
       },
       "resetDialog": {
         "title": "Réinitialiser l'utilisateur",
@@ -769,421 +769,421 @@
         "styleSample": "Mon style de police sélectionné",
         "policyHint": "Votre nom de profil et votre avatar sont stockés localement sur votre appareil.",
         "fileTypeInvalid": "Veuillez sélectionner un fichier image valide.",
-        "fileTooLarge": "L'image est trop grande. La taille maximale autorisée est de {{ maxSizeMb }} Mo.",
+        "fileTooLarge": "L'image est trop grande. Taille maximale autorisée : {{ maxSizeMb }} Mo.",
         "fileReadError": "Erreur lors de la lecture du fichier."
       }
     }
   },
   "errors": {
-    "unknown": "Something went wrong. Please try again later.",
-    "noteTooLarge": "Note is too large. Maximum {{ maxChars }} characters.",
-    "unauthorized": "You need to sign in to continue.",
-    "rateLimit": "Too many requests. Please wait and try again.",
+    "unknown": "Une erreur est survenue. Veuillez réessayer plus tard.",
+    "noteTooLarge": "La note est trop grande. Maximum {{ maxChars }} caractères.",
+    "unauthorized": "Vous devez vous connecter pour continuer.",
+    "rateLimit": "Trop de requêtes. Veuillez patienter puis réessayer.",
     "offline": {
-      "title": "Oops! You're offline.",
-      "message": "Apparently, your network needed some \"me time\"."
+      "title": "Oups ! Vous êtes hors ligne.",
+      "message": "Apparemment, votre réseau avait besoin d'un peu de « temps pour lui »."
     },
     "http": {
       "title": {
-        "noConnection": "No Connection",
-        "badRequest": "Bad Request",
-        "unauthorized": "Unauthorized",
-        "forbidden": "Forbidden",
-        "notFound": "Not Found",
-        "requestTimeout": "Request Timeout",
+        "noConnection": "Aucune connexion",
+        "badRequest": "Requête incorrecte",
+        "unauthorized": "Non autorisé",
+        "forbidden": "Interdit",
+        "notFound": "Introuvable",
+        "requestTimeout": "Délai dépassé",
         "conflict": "Conflit",
         "payloadTooLarge": "Charge utile trop volumineuse",
         "unsupportedMediaType": "Type de média non pris en charge",
         "unprocessableEntity": "Entité non traitable",
-        "tooManyRequests": "Too Many Requests",
-        "serverError": "Server Error",
-        "badGateway": "Bad Gateway",
-        "serviceUnavailable": "Service Unavailable",
-        "gatewayTimeout": "Gateway Timeout",
-        "unexpected": "Unexpected Error"
+        "tooManyRequests": "Trop de requêtes",
+        "serverError": "Erreur serveur",
+        "badGateway": "Passerelle incorrecte",
+        "serviceUnavailable": "Service indisponible",
+        "gatewayTimeout": "Délai de la passerelle dépassé",
+        "unexpected": "Erreur inattendue"
       },
       "message": {
-        "noConnection": "Please check your internet connection.",
-        "badRequest": "The request could not be processed.",
-        "unauthorized": "You need to sign in to continue.",
-        "forbidden": "You are not allowed to access this resource.",
-        "notFound": "The requested resource was not found.",
-        "requestTimeout": "The request took too long to complete.",
+        "noConnection": "Veuillez vérifier votre connexion Internet.",
+        "badRequest": "La requête n'a pas pu être traitée.",
+        "unauthorized": "Vous devez vous connecter pour continuer.",
+        "forbidden": "Vous n'êtes pas autorisé à accéder à cette ressource.",
+        "notFound": "La ressource demandée est introuvable.",
+        "requestTimeout": "La requête a mis trop de temps à se terminer.",
         "conflict": "La requête est en conflit avec l'état actuel.",
         "payloadTooLarge": "La charge utile de la requête est trop volumineuse.",
         "unsupportedMediaType": "Le type de contenu de la requête n'est pas pris en charge.",
         "unprocessableEntity": "La requête n'a pas pu être traitée.",
-        "tooManyRequests": "You sent too many requests. Please wait a moment.",
-        "serverError": "An unexpected server error occurred.",
-        "badGateway": "The server received an invalid response.",
-        "serviceUnavailable": "The service is temporarily unavailable.",
-        "gatewayTimeout": "The server took too long to respond.",
-        "unexpected": "Something went wrong. Please try again later."
+        "tooManyRequests": "Vous avez envoyé trop de requêtes. Veuillez patienter un moment.",
+        "serverError": "Une erreur serveur inattendue s'est produite.",
+        "badGateway": "Le serveur a reçu une réponse invalide.",
+        "serviceUnavailable": "Le service est temporairement indisponible.",
+        "gatewayTimeout": "Le serveur a mis trop de temps à répondre.",
+        "unexpected": "Une erreur est survenue. Veuillez réessayer plus tard."
       }
     }
   },
   "auth": {
-    "serviceTitle": "User service",
-    "hashingPin": "Hashing your PIN",
-    "accountCreated": "Your account has been created. You can log in now.",
-    "userCreationFailed": "Oops! Something went wrong while creating your user. Please try again later.",
-    "creatingUser": "Creating user",
-    "confirmingUser": "Confirming user",
-    "sessionExpiredTitle": "Session expired",
-    "sessionExpiredMessage": "Your session has expired for security reasons. Please log in again to continue.",
-    "gettingUserInfo": "Getting user information",
-    "gettingUserMessages": "Getting user messages",
-    "deletingUser": "Deleting user",
-    "subscribingUser": "Subscribing to user",
-    "unsubscribingUser": "Unsubscribing from user",
-    "createUserTitle": "Want to create a user? It's that easy.",
-    "createUserMessage": "Just choose a PIN - no username and no password required.\n\nPlease keep this PIN safe. We do not store it, cannot reset it, and cannot recover it for you.\n\nIf the PIN is lost, access to this user is permanently lost as well.\n\nYou can delete your user at any time in the app.\n\nIf the user is not used for 90 days, it will be automatically and permanently deleted, including all associated data.",
-    "createUserAction": "Get started",
-    "pinIncorrect": "PIN is not correct. Please try again.",
-    "userNotFoundTitle": "User not found",
-    "userNotFoundMessage": "Looks like this user has been inactive for a while.\n\nTo keep things clean and simple, users are automatically deleted after 90 days of inactivity.\n\nYou can create a new one anytime - no signup, no hassle.",
-    "userNotFoundAction": "Create new user",
-    "backendErrorTitle": "Oops! Backend error!",
-    "backendErrorMessage": "Something went wrong. Please try again later."
+    "serviceTitle": "Service utilisateur",
+    "hashingPin": "Hachage de votre PIN",
+    "accountCreated": "Votre compte a été créé. Vous pouvez maintenant vous connecter.",
+    "userCreationFailed": "Oups ! Une erreur s'est produite lors de la création de votre utilisateur. Veuillez réessayer plus tard.",
+    "creatingUser": "Création de l'utilisateur",
+    "confirmingUser": "Confirmation de l'utilisateur",
+    "sessionExpiredTitle": "Session expirée",
+    "sessionExpiredMessage": "Votre session a expiré pour des raisons de sécurité. Veuillez vous reconnecter pour continuer.",
+    "gettingUserInfo": "Récupération des informations utilisateur",
+    "gettingUserMessages": "Récupération des messages utilisateur",
+    "deletingUser": "Suppression de l'utilisateur",
+    "subscribingUser": "Abonnement à l'utilisateur",
+    "unsubscribingUser": "Désabonnement de l'utilisateur",
+    "createUserTitle": "Envie de créer un utilisateur ? C'est aussi simple que ça.",
+    "createUserMessage": "Choisissez simplement un PIN — aucun nom d'utilisateur et aucun mot de passe requis.\n\nVeuillez conserver ce PIN précieusement. Nous ne le stockons pas, ne pouvons pas le réinitialiser et ne pouvons pas le récupérer.\n\nSi le PIN est perdu, l'accès à cet utilisateur est également perdu définitivement.\n\nVous pouvez supprimer votre utilisateur à tout moment dans l'application.\n\nSi l'utilisateur n'est pas utilisé pendant 90 jours, il sera automatiquement et définitivement supprimé, ainsi que toutes les données associées.",
+    "createUserAction": "Commencer",
+    "pinIncorrect": "Le PIN est incorrect. Veuillez réessayer.",
+    "userNotFoundTitle": "Utilisateur introuvable",
+    "userNotFoundMessage": "Il semble que cet utilisateur ait été inactif pendant un certain temps.\n\nPour garder les choses simples et propres, les utilisateurs sont automatiquement supprimés après 90 jours d'inactivité.\n\nVous pouvez en créer un nouveau à tout moment — sans inscription, sans tracas.",
+    "userNotFoundAction": "Créer un nouvel utilisateur",
+    "backendErrorTitle": "Oups ! Erreur du backend !",
+    "backendErrorMessage": "Une erreur est survenue. Veuillez réessayer plus tard."
   },
   "dsa": {
     "title": "DSA",
-    "sendingQuickReport": "Sending quick report...",
-    "submittingNotice": "Submitting DSA notice...",
+    "sendingQuickReport": "Envoi du signalement rapide...",
+    "submittingNotice": "Envoi du rapport DSA...",
     "report": {
-      "title": "Report content",
+      "title": "Signaler un contenu",
       "intro": {
-        "start": "Reporting should be simple. You can submit a",
-        "quick": "quick report",
-        "middle": "(informal signal) or a",
-        "formal": "formal DSA report",
-        "end": "(notice under the EU Digital Services Act).",
-        "emphasis": "None of the fields are required",
-        "tail": "We will review the post either way."
+        "start": "Le signalement doit être simple. Vous pouvez soumettre un",
+        "quick": "signalement rapide",
+        "middle": "(signal informel) ou un",
+        "formal": "rapport DSA formel",
+        "end": "(notification au titre du Digital Services Act de l'UE).",
+        "emphasis": "Aucun champ n'est obligatoire",
+        "tail": "Nous examinerons la publication dans tous les cas."
       },
       "meta": {
-        "reportedContent": "Reported content",
-        "contentId": "Content ID",
-        "link": "Link"
+        "reportedContent": "Contenu signalé",
+        "contentId": "ID du contenu",
+        "link": "Lien"
       },
       "tabs": {
-        "quick": "Quick report",
-        "formal": "Formal DSA report"
+        "quick": "Signalement rapide",
+        "formal": "Rapport DSA formel"
       },
       "fields": {
-        "categoryLabel": "Category (optional)",
-        "reasonLabelQuick": "Why is this content problematic? (optional)",
-        "reasonPlaceholderQuick": "Share any details that help us understand the issue...",
-        "reasonLabelFormal": "Why is this content illegal? (optional)",
-        "reasonPlaceholderFormal": "Describe the issue and provide any relevant facts or references...",
-        "emailLabel": "Your email (optional)",
-        "emailHintProvided": "We will notify you at {{ email }}",
-        "emailHintMissing": "We can only notify you if you provide an email.",
-        "emailInvalid": "Please enter a valid email address or leave this field empty.",
-        "nameLabel": "Your name (optional)",
+        "categoryLabel": "Catégorie (optionnel)",
+        "reasonLabelQuick": "Pourquoi ce contenu pose-t-il problème ? (optionnel)",
+        "reasonPlaceholderQuick": "Partagez tout détail utile pour comprendre le problème...",
+        "reasonLabelFormal": "Pourquoi ce contenu est-il illégal ? (optionnel)",
+        "reasonPlaceholderFormal": "Décrivez le problème et fournissez des faits ou références pertinentes...",
+        "emailLabel": "Votre e-mail (optionnel)",
+        "emailHintProvided": "Nous vous informerons à {{ email }}",
+        "emailHintMissing": "Nous ne pouvons vous informer que si vous fournissez un e-mail.",
+        "emailInvalid": "Veuillez saisir une adresse e-mail valide ou laisser ce champ vide.",
+        "nameLabel": "Votre nom (optionnel)",
         "namePlaceholder": "Jane Doe",
-        "truthAffirmation": "I declare that the information provided is accurate to the best of my knowledge. (optional)"
+        "truthAffirmation": "Je déclare que les informations fournies sont exactes au mieux de ma connaissance. (optionnel)"
       },
       "evidence": {
-        "linkLabel": "Add supporting link",
+        "linkLabel": "Ajouter un lien de preuve",
         "linkPlaceholder": "https://example.com/context",
-        "linkHint": "http(s)://example.com • Press Enter to add",
-        "filesLabel": "Add supporting documents",
-        "fileFallback": "File",
-        "hint": "PDF or image files, up to 1 MB each (max {{ max }} files). Selected: {{ count }}/{{ max }} ({{ size }})."
+        "linkHint": "http(s)://example.com • Appuyez sur Entrée pour ajouter",
+        "filesLabel": "Ajouter des documents justificatifs",
+        "fileFallback": "Fichier",
+        "hint": "Fichiers PDF ou images, jusqu'à 1 Mo chacun (max {{ max }} fichiers). Sélectionnés : {{ count }}/{{ max }} ({{ size }})."
       },
       "categories": {
-        "privacy": "Privacy or personal data (doxxing)",
-        "ipRights": "Copyright or other third-party rights",
-        "violenceCrime": "Violence, threats, or criminal incitement",
-        "hateHarass": "Hate, harassment, or discrimination",
-        "sexual": "Pornographic or sexual content",
-        "childSafety": "Sexual content involving minors",
-        "fraud": "Fraud, deception, or impersonation",
-        "malware": "Malware or security circumvention",
-        "spamAbuse": "Spam or abusive automation",
-        "illegalSource": "Leaked or unauthorized sources",
-        "other": "Other illegal or prohibited content"
+        "privacy": "Vie privée ou données personnelles (doxxing)",
+        "ipRights": "Droit d'auteur ou autres droits de tiers",
+        "violenceCrime": "Violence, menaces ou incitation criminelle",
+        "hateHarass": "Haine, harcèlement ou discrimination",
+        "sexual": "Contenu pornographique ou sexuel",
+        "childSafety": "Contenu sexuel impliquant des mineurs",
+        "fraud": "Fraude, tromperie ou usurpation d'identité",
+        "malware": "Logiciels malveillants ou contournement de sécurité",
+        "spamAbuse": "Spam ou automatisation abusive",
+        "illegalSource": "Fuites ou sources non autorisées",
+        "other": "Autre contenu illégal ou interdit"
       },
-      "submitButton": "Submit",
-      "submitFailed": "Submitting failed. Please try again.",
-      "submitFailedTitle": "Submission failed",
-      "successSignalTitle": "Report sent",
-      "successSignalMessage": "Thanks! Your quick report was submitted successfully. Our team will review it.",
-      "successNoticeTitle": "Notice submitted",
-      "successNoticeMessageWithEmail": "Your DSA notice was submitted successfully. We will contact you via email after the review.",
-      "successNoticeMessageNoEmail": "Your DSA notice was submitted successfully. If you would like to receive updates, please provide an email address next time."
+      "submitButton": "Envoyer",
+      "submitFailed": "L'envoi a échoué. Veuillez réessayer.",
+      "submitFailedTitle": "Échec de l'envoi",
+      "successSignalTitle": "Signalement envoyé",
+      "successSignalMessage": "Merci ! Votre signalement rapide a bien été envoyé. Notre équipe va l'examiner.",
+      "successNoticeTitle": "Rapport envoyé",
+      "successNoticeMessageWithEmail": "Votre rapport DSA a été envoyé. Nous vous contacterons par e-mail après examen.",
+      "successNoticeMessageNoEmail": "Votre rapport DSA a été envoyé. Si vous souhaitez des mises à jour, veuillez fournir un e-mail la prochaine fois."
     },
     "status": {
-      "title": "Report sent successfully",
-      "primarySignal": "Your report was sent successfully.",
-      "primaryNotice": "Your notice was submitted successfully.",
-      "secondarySignal": "Keep the link below to follow up on the review progress at any time.",
-      "secondaryNoticeEmail": "We will also try to reach out via email when the review is complete. You can check the latest status using this link.",
-      "secondaryNotice": "If you want to keep track of the review, save this link. You can come back to it whenever you need the latest status.",
-      "copySuccess": "Link copied to clipboard.",
-      "copyFailed": "Could not copy the link automatically. Please copy it manually.",
-      "statusUrlTitle": "Status URL",
-      "openInBrowser": "Open in browser",
-      "statusTokenTitle": "Status token",
-      "tokenLabel": "Token"
+      "title": "Signalement envoyé avec succès",
+      "primarySignal": "Votre signalement a été envoyé avec succès.",
+      "primaryNotice": "Votre rapport a été envoyé avec succès.",
+      "secondarySignal": "Conservez le lien ci-dessous pour suivre l'avancement de l'examen à tout moment.",
+      "secondaryNoticeEmail": "Nous essaierons aussi de vous contacter par e-mail lorsque l'examen sera terminé. Vous pouvez consulter le statut via ce lien.",
+      "secondaryNotice": "Si vous souhaitez suivre l'examen, enregistrez ce lien. Vous pourrez revenir à tout moment pour voir le statut le plus récent.",
+      "copySuccess": "Lien copié dans le presse-papiers.",
+      "copyFailed": "Impossible de copier automatiquement le lien. Veuillez le copier manuellement.",
+      "statusUrlTitle": "URL de statut",
+      "openInBrowser": "Ouvrir dans le navigateur",
+      "statusTokenTitle": "Jeton de statut",
+      "tokenLabel": "Jeton"
     },
     "case": {
-      "title": "Moderation status",
-      "loading": "Loading status...",
-      "loadLatestFailed": "We could not load the latest information.",
-      "loadNotFound": "No case information was found for this token.",
-      "loadFailed": "Could not load the current status. Please try again later.",
+      "title": "Statut de modération",
+      "loading": "Chargement du statut...",
+      "loadLatestFailed": "Nous n'avons pas pu charger les dernières informations.",
+      "loadNotFound": "Aucune information de dossier trouvée pour ce jeton.",
+      "loadFailed": "Impossible de charger le statut actuel. Veuillez réessayer plus tard.",
       "summary": {
-        "title": "Case summary",
-        "status": "Status",
-        "contentId": "Content ID",
-        "submitted": "Submitted"
+        "title": "Résumé du dossier",
+        "status": "Statut",
+        "contentId": "ID du contenu",
+        "submitted": "Soumis"
       },
       "noticeStatus": {
-        "received": "Received",
-        "underReview": "Under review",
-        "decided": "Decided"
+        "received": "Reçu",
+        "underReview": "En cours d'examen",
+        "decided": "Décidé"
       },
-      "statusUnavailable": "Status unavailable",
-      "statusAria": "Moderation status: {{ status }}",
-      "signalReceived": "Signal received",
+      "statusUnavailable": "Statut indisponible",
+      "statusAria": "Statut de modération : {{ status }}",
+      "signalReceived": "Signalement reçu",
       "reportDetails": {
-        "title": "Report details",
+        "title": "Détails du signalement",
         "type": "Type",
-        "category": "Category",
-        "reason": "Reason",
-        "link": "Content link"
+        "category": "Catégorie",
+        "reason": "Motif",
+        "link": "Lien vers le contenu"
       },
       "contentType": {
-        "publicMessage": "Public message"
+        "publicMessage": "Message public"
       },
       "decision": {
-        "title": "Decision",
-        "outcome": "Outcome",
-        "reviewedOn": "Reviewed on",
-        "statement": "Statement"
+        "title": "Décision",
+        "outcome": "Résultat",
+        "reviewedOn": "Examiné le",
+        "statement": "Justification"
       },
       "evidence": {
-        "title": "Evidence collected",
-        "label": "Evidence",
-        "added": "Added",
-        "download": "Download file",
-        "openLink": "Open link",
-        "hash": "Hash",
+        "title": "Preuves collectées",
+        "label": "Preuve",
+        "added": "Ajouté",
+        "download": "Télécharger le fichier",
+        "openLink": "Ouvrir le lien",
+        "hash": "Hachage",
         "type": {
-          "file": "File",
-          "link": "Link"
+          "file": "Fichier",
+          "link": "Lien"
         }
       },
       "appeals": {
-        "title": "Submitted appeals",
-        "label": "Appeal",
-        "filed": "Filed",
+        "title": "Recours soumis",
+        "label": "Recours",
+        "filed": "Déposé",
         "arguments": "Arguments",
-        "decision": "Decision",
-        "resolved": "Resolved",
-        "reviewer": "Reviewer"
+        "decision": "Décision",
+        "resolved": "Résolu",
+        "reviewer": "Examinateur"
       },
       "tabs": {
-        "overview": "Overview",
-        "submitAppeal": "Submit appeal"
+        "overview": "Aperçu",
+        "submitAppeal": "Déposer un recours"
       },
-      "appealHint": "You can provide additional context and optional contact details. Supporting documents help us review faster.",
+      "appealHint": "Vous pouvez fournir un contexte supplémentaire et des coordonnées optionnelles. Les documents justificatifs aident à accélérer l'examen.",
       "appealForm": {
-        "explanationLabel": "Your explanation",
-        "minimumHint": "Minimum 20 characters",
-        "error": "Please describe why you believe this decision should be reviewed.",
-        "fileHint": "PDF or image files, up to 1 MB each (max {{ max }} files). Selected: {{ count }}/{{ max }} ({{ size }})."
+        "explanationLabel": "Votre explication",
+        "minimumHint": "Minimum 20 caractères",
+        "error": "Veuillez décrire pourquoi vous pensez que cette décision doit être réexaminée.",
+        "fileHint": "Fichiers PDF ou images, jusqu'à 1 Mo chacun (max {{ max }} fichiers). Sélectionnés : {{ count }}/{{ max }} ({{ size }})."
       },
-      "openPublicPage": "Open public page",
-      "submitAppeal": "Submit appeal",
-      "filesTypeLimit": "Only PDF or image files are allowed.",
-      "filesSizeLimit": "Each file must be at most 1 MB.",
-      "filesTotalLimit": "Files exceed the total limit of 4 MB.",
-      "filesCountLimit": "You can add at most {{ max }} files.",
-      "appealSubmitted": "Appeal submitted successfully.",
-      "appealSubmittedPartial": "Appeal submitted but some files failed to upload.",
-      "appealDecisionPending": "A decision has not been finalized yet. Appeals are only possible afterwards.",
-      "appealSubmitFailed": "Could not submit the appeal. Please try again later.",
-      "urlAlreadyAdded": "This link is already added.",
-      "downloadFailed": "Could not download the file.",
+      "openPublicPage": "Ouvrir la page publique",
+      "submitAppeal": "Envoyer le recours",
+      "filesTypeLimit": "Seuls les fichiers PDF ou images sont autorisés.",
+      "filesSizeLimit": "Chaque fichier doit faire au maximum 1 Mo.",
+      "filesTotalLimit": "Les fichiers dépassent la limite totale de 4 Mo.",
+      "filesCountLimit": "Vous pouvez ajouter au maximum {{ max }} fichiers.",
+      "appealSubmitted": "Recours envoyé avec succès.",
+      "appealSubmittedPartial": "Recours envoyé, mais certains fichiers n'ont pas pu être téléversés.",
+      "appealDecisionPending": "Aucune décision finale n'a été prise. Les recours ne sont possibles qu'après la décision.",
+      "appealSubmitFailed": "Impossible d'envoyer le recours. Veuillez réessayer plus tard.",
+      "urlAlreadyAdded": "Ce lien a déjà été ajouté.",
+      "downloadFailed": "Impossible de télécharger le fichier.",
       "appealOutcome": {
-        "pending": "Pending",
-        "upheld": "Decision upheld",
-        "revised": "Decision revised",
-        "partial": "Partially revised",
-        "withdrawn": "Withdrawn"
+        "pending": "En attente",
+        "upheld": "Décision maintenue",
+        "revised": "Décision révisée",
+        "partial": "Partiellement révisée",
+        "withdrawn": "Retiré"
       }
     }
   },
   "weather": {
-    "title": "Weather",
-    "titleForLocation": "Weather for {{ location }}",
-    "selectedHour": "Selected hour: {{ hour }}:00",
-    "dataSource": "Weather data provided by",
+    "title": "Météo",
+    "titleForLocation": "Météo pour {{ location }}",
+    "selectedHour": "Heure sélectionnée : {{ hour }}:00",
+    "dataSource": "Données météo fournies par",
     "location": {
-      "unknown": "Unknown place"
+      "unknown": "Lieu inconnu"
     },
     "tiles": {
-      "temperature": "Temperature",
-      "precipitationProbability": "Rain chance",
-      "precipitation": "Rainfall",
-      "uvIndex": "UV Index",
-      "wind": "Wind",
-      "pressure": "Pressure"
+      "temperature": "Température",
+      "precipitationProbability": "Probabilité de pluie",
+      "precipitation": "Précipitations",
+      "uvIndex": "Indice UV",
+      "wind": "Vent",
+      "pressure": "Pression"
     },
     "chart": {
-      "temperature": "Temperature (°C)",
-      "uvIndex": "UV Index",
-      "precipitationProbability": "Rain chance (%)",
-      "precipitation": "Rainfall (mm/h)",
-      "wind": "Wind (km/h)",
-      "pressure": "Pressure (hPa)"
+      "temperature": "Température (°C)",
+      "uvIndex": "Indice UV",
+      "precipitationProbability": "Probabilité de pluie (%)",
+      "precipitation": "Précipitations (mm/h)",
+      "wind": "Vent (km/h)",
+      "pressure": "Pression (hPa)"
     },
     "axis": {
-      "time": "Time"
+      "time": "Heure"
     },
     "service": {
-      "title": "Weather service",
-      "loading": "Fetching weather data"
+      "title": "Service météo",
+      "loading": "Récupération des données météo"
     },
     "level": {
       "temperature": {
-        "freezing": "Freezing",
-        "cold": "Cold",
-        "cool": "Cool",
-        "warm": "Warm",
-        "hot": "Hot",
-        "extremeHeat": "Extreme heat"
+        "freezing": "Glacial",
+        "cold": "Froid",
+        "cool": "Frais",
+        "warm": "Doux",
+        "hot": "Chaud",
+        "extremeHeat": "Chaleur extrême"
       },
       "uvIndex": {
-        "low": "Low",
-        "moderate": "Moderate",
-        "high": "High",
-        "veryHigh": "Very high",
-        "extreme": "Extreme"
+        "low": "Faible",
+        "moderate": "Modéré",
+        "high": "Élevé",
+        "veryHigh": "Très élevé",
+        "extreme": "Extrême"
       },
       "precipitationProbability": {
-        "unlikely": "Unlikely",
+        "unlikely": "Peu probable",
         "possible": "Possible",
-        "likely": "Likely",
-        "veryLikely": "Very likely"
+        "likely": "Probable",
+        "veryLikely": "Très probable"
       },
       "precipitation": {
-        "dry": "Dry",
-        "lightRain": "Light rain",
-        "rain": "Rain",
-        "heavyRain": "Heavy rain",
-        "downpour": "Downpour"
+        "dry": "Sec",
+        "lightRain": "Pluie légère",
+        "rain": "Pluie",
+        "heavyRain": "Forte pluie",
+        "downpour": "Averse"
       },
       "wind": {
-        "calm": "Calm",
-        "breezy": "Breezy",
-        "windy": "Windy",
-        "strongWind": "Strong wind",
-        "storm": "Storm"
+        "calm": "Calme",
+        "breezy": "Brise",
+        "windy": "Venteux",
+        "strongWind": "Vent fort",
+        "storm": "Tempête"
       },
       "pressure": {
-        "low": "Low",
-        "moderate": "Moderate",
-        "high": "High",
-        "veryHigh": "Very high"
+        "low": "Basse",
+        "moderate": "Modérée",
+        "high": "Élevée",
+        "veryHigh": "Très élevée"
       }
     },
     "airQuality": {
-      "serviceTitle": "Air quality service",
-      "loading": "Fetching air quality data...",
-      "title": "Air quality",
+      "serviceTitle": "Service de qualité de l'air",
+      "loading": "Récupération des données de qualité de l'air...",
+      "title": "Qualité de l'air",
       "header": "{{ category }}",
-      "headerFor": "{{ category }} for {{ location }}",
-      "selectedHour": "Selected hour: {{ hour }}:00",
-      "dataSource": "Air quality data provided by",
-      "noDescription": "No description available.",
+      "headerFor": "{{ category }} pour {{ location }}",
+      "selectedHour": "Heure sélectionnée : {{ hour }}:00",
+      "dataSource": "Données de qualité de l'air fournies par",
+      "noDescription": "Aucune description disponible.",
       "category": {
         "pollen": "Pollen",
-        "particulateMatter": "Particulate matter",
-        "pollutants": "Pollutants"
+        "particulateMatter": "Particules",
+        "pollutants": "Polluants"
       },
       "metric": {
-        "alderPollen": "Alder pollen",
-        "birchPollen": "Birch pollen",
-        "grassPollen": "Grass pollen",
-        "mugwortPollen": "Mugwort pollen",
-        "olivePollen": "Olive pollen",
-        "ragweedPollen": "Ragweed pollen",
+        "alderPollen": "Pollen d'aulne",
+        "birchPollen": "Pollen de bouleau",
+        "grassPollen": "Pollen de graminées",
+        "mugwortPollen": "Pollen d'armoise",
+        "olivePollen": "Pollen d'olivier",
+        "ragweedPollen": "Pollen d'ambroisie",
         "pm10": "PM10",
         "pm2_5": "PM2.5",
         "carbonMonoxide": "CO",
         "nitrogenDioxide": "NO2",
         "sulphurDioxide": "SO2",
         "ozone": "Ozone",
-        "unknown": "Unknown"
+        "unknown": "Inconnu"
       },
       "axis": {
-        "time": "Time"
+        "time": "Heure"
       },
       "description": {
         "pollen": {
-          "none": "No pollen exposure expected.",
-          "low": "Low pollen concentration.",
-          "moderate": "Moderate pollen concentration.",
-          "high": "High pollen concentration.",
-          "veryHigh": "Very high pollen concentration."
+          "none": "Aucune exposition au pollen attendue.",
+          "low": "Faible concentration de pollen.",
+          "moderate": "Concentration modérée de pollen.",
+          "high": "Forte concentration de pollen.",
+          "veryHigh": "Très forte concentration de pollen."
         },
         "pm10": {
-          "low": "Low PM10 level. Air quality is good.",
-          "moderate": "Moderate PM10 level.",
-          "sensitive": "Unhealthy for sensitive groups.",
-          "high": "High PM10 level. Consider limiting outdoor activity."
+          "low": "Faible niveau de PM10. La qualité de l'air est bonne.",
+          "moderate": "Niveau modéré de PM10.",
+          "sensitive": "Nocif pour les personnes sensibles.",
+          "high": "Niveau élevé de PM10. Envisagez de limiter les activités extérieures."
         },
         "pm2_5": {
-          "low": "Low PM2.5 level. Air is clean.",
-          "moderate": "Moderate PM2.5 level.",
-          "high": "High PM2.5. Avoid prolonged exposure.",
-          "veryHigh": "Very high PM2.5. Unhealthy air quality."
+          "low": "Faible niveau de PM2.5. L'air est propre.",
+          "moderate": "Niveau modéré de PM2.5.",
+          "high": "PM2.5 élevé. Évitez une exposition prolongée.",
+          "veryHigh": "PM2.5 très élevé. Qualité de l'air malsaine."
         },
         "pollutants": {
-          "default": "Air pollutant level.",
-          "carbonMonoxide": "Carbon monoxide (CO) - a colorless, odorless gas harmful in high concentrations.",
-          "nitrogenDioxide": "Nitrogen dioxide (NO2) - a pollutant from traffic and combustion.",
-          "sulphurDioxide": "Sulphur dioxide (SO2) - can irritate airways and affect lung function.",
-          "ozone": "Ozone (O3) - high levels can lead to respiratory problems."
+          "default": "Niveau de polluants atmosphériques.",
+          "carbonMonoxide": "Monoxyde de carbone (CO) — gaz incolore et inodore, dangereux à fortes concentrations.",
+          "nitrogenDioxide": "Dioxyde d'azote (NO2) — polluant issu du trafic et de la combustion.",
+          "sulphurDioxide": "Dioxyde de soufre (SO2) — peut irriter les voies respiratoires et affecter la fonction pulmonaire.",
+          "ozone": "Ozone (O3) — des niveaux élevés peuvent entraîner des problèmes respiratoires."
         }
       },
       "tooltips": {
-        "alderPollen": "Alder pollen can cause allergic reactions like sneezing or itchy eyes.",
-        "birchPollen": "Birch pollen is a common allergen, especially in spring.",
-        "grassPollen": "Grass pollen is a major cause of hay fever during the summer months.",
-        "mugwortPollen": "Mugwort pollen is active late summer and may trigger asthma.",
-        "olivePollen": "Olive pollen is common in Mediterranean areas.",
-        "ragweedPollen": "Ragweed pollen is highly allergenic and spreads easily.",
-        "pm10": "PM10 refers to coarse particles that can enter the lungs and cause respiratory issues.",
-        "pm2_5": "PM2.5 are fine particles that penetrate deep into the lungs and bloodstream.",
-        "carbonMonoxide": "CO is a toxic gas that can impair oxygen transport in the body.",
-        "nitrogenDioxide": "NO2 is produced by traffic emissions and affects lung function.",
-        "sulphurDioxide": "SO2 can cause respiratory symptoms and aggravate asthma.",
-        "ozone": "O3 is a reactive gas that can cause airway inflammation and breathing issues."
+        "alderPollen": "Le pollen d'aulne peut provoquer des réactions allergiques comme des éternuements ou des démangeaisons oculaires.",
+        "birchPollen": "Le pollen de bouleau est un allergène courant, surtout au printemps.",
+        "grassPollen": "Le pollen de graminées est une cause majeure de rhume des foins en été.",
+        "mugwortPollen": "Le pollen d'armoise est actif en fin d'été et peut déclencher de l'asthme.",
+        "olivePollen": "Le pollen d'olivier est fréquent dans les régions méditerranéennes.",
+        "ragweedPollen": "Le pollen d'ambroisie est très allergène et se propage facilement.",
+        "pm10": "PM10 désigne des particules grossières pouvant pénétrer dans les poumons et causer des problèmes respiratoires.",
+        "pm2_5": "Les PM2.5 sont des particules fines qui pénètrent profondément dans les poumons et la circulation sanguine.",
+        "carbonMonoxide": "Le CO est un gaz toxique pouvant perturber le transport de l'oxygène dans l'organisme.",
+        "nitrogenDioxide": "Le NO2 est produit par les émissions du trafic et affecte la fonction pulmonaire.",
+        "sulphurDioxide": "Le SO2 peut provoquer des symptômes respiratoires et aggraver l'asthme.",
+        "ozone": "L'O3 est un gaz réactif pouvant provoquer une inflammation des voies respiratoires."
       },
       "pollen": {
-        "none": "None",
-        "low": "Low",
-        "moderate": "Moderate",
-        "high": "High",
-        "veryHigh": "Very high"
+        "none": "Aucun",
+        "low": "Faible",
+        "moderate": "Modéré",
+        "high": "Élevé",
+        "veryHigh": "Très élevé"
       },
       "particulateMatter": {
-        "good": "Good",
-        "moderate": "Moderate",
-        "unhealthySensitive": "Unhealthy for sensitive",
-        "unhealthy": "Unhealthy",
-        "veryUnhealthy": "Very unhealthy"
+        "good": "Bon",
+        "moderate": "Modéré",
+        "unhealthySensitive": "Malsain pour les personnes sensibles",
+        "unhealthy": "Malsain",
+        "veryUnhealthy": "Très malsain"
       },
       "pollutants": {
-        "good": "Good",
-        "moderate": "Moderate",
-        "unhealthy": "Unhealthy",
-        "veryUnhealthy": "Very unhealthy"
+        "good": "Bon",
+        "moderate": "Modéré",
+        "unhealthy": "Malsain",
+        "veryUnhealthy": "Très malsain"
       }
     }
   }
