@@ -11,6 +11,7 @@ const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder'
 const security = require('./middleware/security');
 const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
+const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
 const contactHandlers = require('./socketIo/contactHandlers');
 const userHandlers = require('./socketIo/userHandlers');
@@ -19,6 +20,7 @@ const app = express();
 
 app.use(helmet());
 app.use(express.json({ limit: '1mb' }));
+app.use(normalizeErrorResponses);
 
 const healthWindowMs = 10 * 60 * 1000;
 const healthLimit = 60;
@@ -78,6 +80,10 @@ app.post('/emit/user', security.checkToken, (req, res) => {
   io.to(String(userId)).emit(eventName, payload ?? {});
   return res.json({ ok: true });
 });
+
+// 404 + Error handler (letzte Middleware)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 const logFormat = winston.format.combine(
   winston.format.timestamp(),

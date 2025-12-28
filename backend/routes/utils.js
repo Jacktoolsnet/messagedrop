@@ -22,9 +22,9 @@ router.get('/resolve/:url', security.authenticate, function (req, res) {
                 res.status(response.status).json(response);
             }
         })
-        .catch(error => {
+        .catch(() => {
             response.status = 500;
-            response.result = error;
+            response.error = 'resolve_failed';
             res.status(response.status).json(response);
         });
 });
@@ -43,9 +43,9 @@ router.get('/oembed/:provider/:url', security.authenticate, function (req, res) 
                 res.status(response.status).json(response);
             }
         })
-        .catch(error => {
+        .catch(() => {
             response.status = 500;
-            response.result = error;
+            response.error = 'oembed_failed';
             res.status(response.status).json(response);
         });
 });

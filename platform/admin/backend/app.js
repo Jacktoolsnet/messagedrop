@@ -29,6 +29,7 @@ const rateLimit = require('express-rate-limit');
 const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
+const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -242,6 +243,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
+app.use(normalizeErrorResponses);
 
 const rateLimitDefaults = {
   standardHeaders: true,
@@ -316,8 +318,9 @@ app.use('/dsa/backend', adminDsaLimit, dsaBackend);
 // Public status endpoints
 app.use('/public', adminPublicLimit, publicStatus);
 
-// 404 (letzte Route)
-app.use((req, res) => res.status(404).json({ error: 'not_found' }));
+// 404 + Error handler (letzte Middleware)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 (async () => {
   try {

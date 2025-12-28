@@ -34,6 +34,7 @@ const winston = require('winston');
 const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
+const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
 // Tables for cronjobs
 const tableUser = require('./db/tableUser');
@@ -161,6 +162,7 @@ app.use(cors(corsOptions))
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
+app.use(normalizeErrorResponses);
 
 // Route ratelimit
 const rateLimitDefaults = {
@@ -315,8 +317,9 @@ app.use('/user', userLimit, user);
 app.use('/utils', utilsLimit, utils);
 app.use('/weather', weatherLimit, weather);
 
-// 404 (letzte Route)
-app.use((req, res) => res.status(404).json({ error: 'not_found' }));
+// 404 + Error handler (letzte Middleware)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 (async () => {
   try {

@@ -16,6 +16,7 @@ const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const nominatim = require('./routes/nominatim');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
+const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
 // Tables für Cron-Jobs
 const tableNominatimCache = require('./db/tableNominatimCache.js');
@@ -120,6 +121,7 @@ app.use(express.json({ limit: '1mb' }));
 app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
+app.use(normalizeErrorResponses);
 
 const rateLimitDefaults = {
   standardHeaders: true,
@@ -144,8 +146,9 @@ app.use('/', root);
 app.use('/check', check);
 app.use('/nominatim', nominatimLimit, nominatim);
 
-// 404 (letzte Route)
-app.use((req, res) => res.status(404).json({ error: 'not_found' }));
+// 404 + Error handler (letzte Middleware)
+app.use(notFoundHandler);
+app.use(errorHandler);
 
 (async () => {
   try {
