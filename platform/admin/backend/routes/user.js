@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 const axios = require('axios');
-const rateLimit = require('express-rate-limit');
+const { rateLimit, ipKeyGenerator } = require('express-rate-limit');
 
 const tableUser = require('../db/tableUser');
 const tableLoginOtp = require('../db/tableLoginOtp');
@@ -56,7 +56,7 @@ function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerato
         if (delayMs <= 0 || delayAfter <= 0) {
             return next();
         }
-        const key = keyGenerator ? keyGenerator(req) : (req.ip || req.connection?.remoteAddress || 'unknown');
+        const key = keyGenerator ? keyGenerator(req) : (ipKeyGenerator(req) || req.ip || req.connection?.remoteAddress || 'unknown');
         const now = Date.now();
         const entry = hits.get(key);
         if (!entry || now - entry.start >= windowMs) {
@@ -76,13 +76,13 @@ function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerato
 }
 
 const loginKey = (req) => {
-    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const ip = ipKeyGenerator(req) || req.ip || req.connection?.remoteAddress || 'unknown';
     const username = typeof req.body?.username === 'string' ? req.body.username.trim().toLowerCase() : 'unknown';
     return `${ip}|${username}`;
 };
 
 const verifyKey = (req) => {
-    const ip = req.ip || req.connection?.remoteAddress || 'unknown';
+    const ip = ipKeyGenerator(req) || req.ip || req.connection?.remoteAddress || 'unknown';
     const challengeId = typeof req.body?.challengeId === 'string' ? req.body.challengeId.trim() : 'unknown';
     return `${ip}|${challengeId}`;
 };
