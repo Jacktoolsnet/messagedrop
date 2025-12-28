@@ -50,7 +50,7 @@ const logFormat = winston.format.combine(
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-info-%DATE%.log',
+  filename: 'logs/nominatim-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
@@ -59,7 +59,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/admin-error-%DATE%.log',
+  filename: 'logs/nominatim-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: '2d',
