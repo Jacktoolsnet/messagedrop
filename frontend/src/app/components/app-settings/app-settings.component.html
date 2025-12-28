@@ -103,6 +103,22 @@
       }
       </div>
     }
+    <div class="platform-tile logging-settings-tile">
+      <div class="logging-settings-header">
+        <mat-icon>bug_report</mat-icon>
+        <div>
+          <h3>{{ 'settings.logging.title' | transloco }}</h3>
+          <p class="logging-settings-subtitle">{{ 'settings.logging.description' | transloco }}</p>
+        </div>
+      </div>
+      <p class="logging-settings-note">
+        {{ 'settings.logging.note' | transloco }}
+      </p>
+      <mat-slide-toggle color="primary" [checked]="appSettings.diagnosticLogging"
+        (change)="setDiagnosticLogging($event.checked)">
+        {{ 'settings.logging.toggle' | transloco }}
+      </mat-slide-toggle>
+    </div>
     <div class="platform-tile backup-exit-tile">
       <div class="backup-exit-header">
         <mat-icon>save</mat-icon>

@@ -128,6 +128,20 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
     this.computeMissing();
   }
 
+  toggleDiagnosticLogging(enabled: boolean): void {
+    const current = this.appService.getAppSettings();
+    this.appService.setAppSettings({ ...current, diagnosticLogging: enabled });
+  }
+
+  toggleBackupOnExit(enabled: boolean): void {
+    const current = this.appService.getAppSettings();
+    this.appService.setAppSettings({ ...current, backupOnExit: enabled });
+  }
+
+  get isAgeConfirmed(): boolean {
+    return this.appService.getAppSettings().consentSettings.ageConfirmed === true;
+  }
+
   public editExternalContentSettings() {
     const dialogRef = this.dialog.open(ExternalContentComponent, {
       data: { appSettings: this.appService.getAppSettings() },

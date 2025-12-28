@@ -1,77 +1,131 @@
 <div class="gate" role="region" [attr.aria-label]="'common.legal.consent.regionAria' | transloco">
     <div class="card" role="dialog" aria-modal="true" aria-labelledby="consent-title">
-        <div class="head">
-            <div class="titles">
-                <div class="welcome">{{ 'common.legal.consent.welcome' | transloco }}</div>
-                <div id="consent-title" class="title">{{ 'common.legal.consent.beforeStart' | transloco }}</div>
-                <p class="age-note">
-                    {{ 'common.legal.consent.ageNote' | transloco }}
-                </p>
+        <div class="tile-grid">
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>travel_explore</mat-icon>
+                    <div>
+                        <div id="consent-title" class="tile-title">{{ 'common.legal.consent.appIntroTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.appIntroBody' | transloco }}</div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>how_to_reg</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.ageConfirm' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.ageNote' | transloco }}</div>
+                    </div>
+                </div>
                 <mat-slide-toggle class="age-toggle" color="primary"
                     [checked]="appService.getAppSettings().consentSettings.ageConfirmed"
                     (change)="toggleAgeConfirmed($event.checked)">
                     {{ 'common.legal.consent.ageConfirm' | transloco }}
                 </mat-slide-toggle>
-            </div>
-        </div>
+            </section>
 
-        <div class="head">
-            <div class="titles">
-                <div id="consent-title" class="title">{{ 'common.legal.consent.externalTitle' | transloco }}</div>
-                <div class="subtitle">
-                    {{ 'common.legal.consent.externalSubtitle' | transloco }}
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>public</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.externalTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.externalSubtitle' | transloco }}</div>
+                    </div>
                 </div>
-            </div>
+                <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()"
+                    [disabled]="!isAgeConfirmed">
+                    {{ 'common.legal.consent.externalButton' | transloco }}
+                </button>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>bug_report</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.loggingTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.loggingSubtitle' | transloco }}</div>
+                    </div>
+                </div>
+                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
+                    [checked]="appService.getAppSettings().diagnosticLogging"
+                    (change)="toggleDiagnosticLogging($event.checked)">
+                    {{ 'common.legal.consent.loggingToggle' | transloco }}
+                </mat-slide-toggle>
+                <p class="age-note">
+                    {{ 'common.legal.consent.loggingNote' | transloco }}
+                </p>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>save</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.backupTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.backupSubtitle' | transloco }}</div>
+                    </div>
+                </div>
+                <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
+                    [checked]="appService.getAppSettings().backupOnExit"
+                    (change)="toggleBackupOnExit($event.checked)">
+                    {{ 'common.legal.consent.backupToggle' | transloco }}
+                </mat-slide-toggle>
+                <p class="age-note">
+                    {{ 'common.legal.consent.backupNote' | transloco }}
+                </p>
+            </section>
+
+            <section class="tile">
+                <div class="tile-header">
+                    <mat-icon>gavel</mat-icon>
+                    <div>
+                        <div class="tile-title">{{ 'common.legal.consent.legalTitle' | transloco }}</div>
+                        <div class="tile-subtitle">{{ 'common.legal.consent.legalSubtitle' | transloco }}</div>
+                    </div>
+                </div>
+                <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')"
+                    [disabled]="!isAgeConfirmed">
+                    <mat-icon>
+                        {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
+                        'check_box'}}
+                    </mat-icon>
+                    {{ 'common.legal.terms.title' | transloco }}
+                    {{
+                    !appService.getAppSettings().consentSettings.termsOfService
+                    ? ('common.legal.consent.status.review' | transloco)
+                    : ('common.legal.consent.status.accepted' | transloco)
+                    }}
+                </button>
+
+                <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')"
+                    [disabled]="!isAgeConfirmed">
+                    <mat-icon>
+                        {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
+                        'check_box'}}
+                    </mat-icon>
+                    {{ 'common.legal.privacy.title' | transloco }}
+                    {{
+                    !appService.getAppSettings().consentSettings.privacyPolicy
+                    ? ('common.legal.consent.status.review' | transloco)
+                    : ('common.legal.consent.status.accepted' | transloco)
+                    }}
+                </button>
+
+                <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')"
+                    [disabled]="!isAgeConfirmed">
+                    <mat-icon>
+                        {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box'
+                        }}
+                    </mat-icon>
+                    {{ 'common.legal.disclaimer.title' | transloco }}
+                    {{
+                    !appService.getAppSettings().consentSettings.disclaimer
+                    ? ('common.legal.consent.status.review' | transloco)
+                    : ('common.legal.consent.status.accepted' | transloco)
+                    }}
+                </button>
+            </section>
         </div>
-        <button type="button" class="consent-button" mat-flat-button (click)="editExternalContentSettings()">
-            <mat-icon>public</mat-icon>
-            {{ 'common.legal.consent.externalButton' | transloco }}
-        </button>
-
-        <div class="head">
-            <div id="consent-title" class="title">{{ 'common.legal.consent.legalTitle' | transloco }}</div>
-            <div class="subtitle">
-                {{ 'common.legal.consent.legalSubtitle' | transloco }}
-            </div>
-        </div>
-
-        <button type="button" class="consent-button" mat-flat-button (click)="review('termsOfService')">
-            <mat-icon>
-                {{ !appService.getAppSettings().consentSettings.termsOfService ? 'check_box_outline_blank' :
-                'check_box'}}
-            </mat-icon>
-            {{ 'common.legal.terms.title' | transloco }}
-            {{
-            !appService.getAppSettings().consentSettings.termsOfService
-            ? ('common.legal.consent.status.review' | transloco)
-            : ('common.legal.consent.status.accepted' | transloco)
-            }}
-        </button>
-
-        <button type="button" class="consent-button" mat-flat-button (click)="review('privacyPolicy')">
-            <mat-icon>
-                {{ !appService.getAppSettings().consentSettings.privacyPolicy ? 'check_box_outline_blank' :
-                'check_box'}}
-            </mat-icon>
-            {{ 'common.legal.privacy.title' | transloco }}
-            {{
-            !appService.getAppSettings().consentSettings.privacyPolicy
-            ? ('common.legal.consent.status.review' | transloco)
-            : ('common.legal.consent.status.accepted' | transloco)
-            }}
-        </button>
-
-        <button type="button" class="consent-button" mat-flat-button (click)="review('disclaimer')">
-            <mat-icon>
-                {{ !appService.getAppSettings().consentSettings.disclaimer ? 'check_box_outline_blank' : 'check_box'
-                }}
-            </mat-icon>
-            {{ 'common.legal.disclaimer.title' | transloco }}
-            {{
-            !appService.getAppSettings().consentSettings.disclaimer
-            ? ('common.legal.consent.status.review' | transloco)
-            : ('common.legal.consent.status.accepted' | transloco)
-            }}
-        </button>
     </div>
 </div>

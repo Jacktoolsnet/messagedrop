@@ -112,6 +112,11 @@ export class AppSettingsComponent implements OnInit {
     this.appService.setAppSettings(this.appSettings);
   }
 
+  setDiagnosticLogging(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, diagnosticLogging: enabled };
+    this.appService.setAppSettings(this.appSettings);
+  }
+
   setLanguageMode(mode: LanguageMode): void {
     this.appSettings = { ...this.appSettings, languageMode: mode };
     this.languageService.setLanguageMode(mode);

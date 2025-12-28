@@ -35,5 +35,11 @@
     "description": "Demander avant de fermer si de nouvelles données doivent être sauvegardées.",
     "note": "Lorsque c'est activé, vous serez invité à confirmer avant de quitter s'il y a de nouvelles modifications.",
     "toggle": "Demander avant de fermer"
+  },
+  "logging": {
+    "title": "Diagnostic",
+    "description": "Autoriser des rapports d’erreurs anonymes pour améliorer la stabilité.",
+    "note": "Seules des métadonnées techniques sont envoyées. Vous pouvez modifier cela à tout moment.",
+    "toggle": "Partager des diagnostics anonymes"
   }
 }

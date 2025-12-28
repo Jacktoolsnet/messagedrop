@@ -35,5 +35,11 @@
     "description": "Vor dem Schließen fragen, ob neue Daten gesichert werden sollen.",
     "note": "Wenn aktiviert, wirst du beim Verlassen der App gefragt, falls neue Änderungen vorliegen.",
     "toggle": "Vor dem Schließen fragen"
+  },
+  "logging": {
+    "title": "Diagnose",
+    "description": "Erlaube anonyme Fehlerberichte zur Verbesserung der Stabilität.",
+    "note": "Es werden nur technische Metadaten gesendet. Du kannst das jederzeit ändern.",
+    "toggle": "Anonyme Diagnose teilen"
   }
 }

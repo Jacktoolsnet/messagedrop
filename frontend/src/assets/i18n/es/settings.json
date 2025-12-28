@@ -35,5 +35,11 @@
     "description": "Preguntar antes de cerrar si hay datos nuevos para respaldar.",
     "note": "Cuando está activado, se te preguntará antes de salir si hay cambios nuevos.",
     "toggle": "Preguntar antes de cerrar"
+  },
+  "logging": {
+    "title": "Diagnóstico",
+    "description": "Permite informes de errores anónimos para mejorar la estabilidad.",
+    "note": "Solo se envían metadatos técnicos. Puedes cambiarlo en cualquier momento.",
+    "toggle": "Compartir diagnósticos anónimos"
   }
 }

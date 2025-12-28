@@ -35,5 +35,11 @@
     "description": "Ask before closing if new data should be backed up.",
     "note": "When enabled, you will be prompted before leaving the app if there are new changes.",
     "toggle": "Ask before closing"
+  },
+  "logging": {
+    "title": "Diagnostics",
+    "description": "Allow anonymous error reports to improve stability.",
+    "note": "Only technical metadata is sent. You can change this anytime.",
+    "toggle": "Share anonymous diagnostics"
   }
 }
