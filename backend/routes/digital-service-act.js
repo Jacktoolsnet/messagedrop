@@ -13,13 +13,19 @@ router.use(express.json({ limit: '1mb' }));
 
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
 
+const rateLimitMessage = (message) => ({
+    errorCode: 'RATE_LIMIT',
+    message,
+    error: message
+});
+
 /* -------------------------------- Rate Limits ------------------------------- */
 const signalLimiter = rateLimit({
     windowMs: 10 * 60 * 1000,
     limit: 150,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many DSA report requests. Please try again later.' }
+    message: rateLimitMessage('Too many DSA report requests. Please try again later.')
 });
 
 const noticeLimiter = rateLimit({
@@ -27,7 +33,7 @@ const noticeLimiter = rateLimit({
     limit: 90,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many DSA notice requests. Please try again later.' }
+    message: rateLimitMessage('Too many DSA notice requests. Please try again later.')
 });
 
 const evidenceLimiter = rateLimit({
@@ -35,7 +41,7 @@ const evidenceLimiter = rateLimit({
     limit: 20,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many evidence uploads. Please try again later.' }
+    message: rateLimitMessage('Too many evidence uploads. Please try again later.')
 });
 
 const moderationToggleLimiter = rateLimit({
@@ -43,7 +49,7 @@ const moderationToggleLimiter = rateLimit({
     limit: 60,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many moderation toggle requests. Please try again later.' }
+    message: rateLimitMessage('Too many moderation toggle requests. Please try again later.')
 });
 
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';

@@ -168,157 +168,129 @@ const rateLimitDefaults = {
   legacyHeaders: false
 };
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 const basicLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many requests, please try again later.')
 });
 
 const translateLimit = rateLimit({
   windowMs: 15 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many translate requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many translate requests, please try again later.')
 });
 
 const userLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 20,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many user requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many user requests, please try again later.')
 });
 
 const geoStatisticLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 30,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many geostatistic requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many geostatistic requests, please try again later.')
 });
 
 const airQualtiyLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many air quality requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many air quality requests, please try again later.')
 });
 
 const weatherLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 240,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many weather requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many weather requests, please try again later.')
 });
 
 const notificationLimit = rateLimit({
   windowMs: 1 * 60 * 1000,
   limit: 60,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many notification requests, please slow down.'
-  }
+  message: rateLimitMessage('Too many notification requests, please slow down.')
 });
 
 const openAiLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 30,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many OpenAI requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many OpenAI requests, please try again later.')
 });
 
 const nominatimLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many nominatim requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many nominatim requests, please try again later.')
 });
 
 const tenorLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many tenor requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many tenor requests, please try again later.')
 });
 
 const messageLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many message requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many message requests, please try again later.')
 });
 
 const contactLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many contact requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many contact requests, please try again later.')
 });
 
 const contactMessageLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 600,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many chat requests, please slow down.'
-  }
+  message: rateLimitMessage('Too many chat requests, please slow down.')
 });
 
 const placeLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 240,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many place requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many place requests, please try again later.')
 });
 
 const connectLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many connection requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many connection requests, please try again later.')
 });
 
 const utilsLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many util requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many util requests, please try again later.')
 });
 
 const dsaStatusLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
   ...rateLimitDefaults,
-  message: {
-    error: 'Too many DSA status requests, please try again later.'
-  }
+  message: rateLimitMessage('Too many DSA status requests, please try again later.')
 });
 
 // ROUTES

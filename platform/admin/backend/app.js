@@ -248,46 +248,52 @@ const rateLimitDefaults = {
   legacyHeaders: false
 };
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 const adminDefaultLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 600,
   ...rateLimitDefaults,
-  message: { error: 'Too many requests, please slow down.' }
+  message: rateLimitMessage('Too many requests, please slow down.')
 });
 
 const adminPublicLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
   ...rateLimitDefaults,
-  message: { error: 'Too many public status requests, please try again later.' }
+  message: rateLimitMessage('Too many public status requests, please try again later.')
 });
 
 const adminDsaLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: { error: 'Too many DSA requests, please try again later.' }
+  message: rateLimitMessage('Too many DSA requests, please try again later.')
 });
 
 const adminTranslateLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
   ...rateLimitDefaults,
-  message: { error: 'Too many translate requests, please try again later.' }
+  message: rateLimitMessage('Too many translate requests, please try again later.')
 });
 
 const adminUserLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 30,
   ...rateLimitDefaults,
-  message: { error: 'Too many user requests, please try again later.' }
+  message: rateLimitMessage('Too many user requests, please try again later.')
 });
 
 const adminLogLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
   ...rateLimitDefaults,
-  message: { error: 'Too many log requests, please try again later.' }
+  message: rateLimitMessage('Too many log requests, please try again later.')
 });
 
 app.use(adminDefaultLimit);

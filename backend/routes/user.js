@@ -321,18 +321,24 @@ const rateLimitDefaults = {
   legacyHeaders: false
 };
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 const userCreateLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 5,
   ...rateLimitDefaults,
-  message: { error: 'Too many user create requests, please try again later.' }
+  message: rateLimitMessage('Too many user create requests, please try again later.')
 });
 
 const userConfirmLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 10,
   ...rateLimitDefaults,
-  message: { error: 'Too many user confirm requests, please try again later.' }
+  message: rateLimitMessage('Too many user confirm requests, please try again later.')
 });
 
 router.get('/get/:userId',

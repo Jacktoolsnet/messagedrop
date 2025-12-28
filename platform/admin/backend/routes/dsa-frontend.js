@@ -16,6 +16,12 @@ router.use(checkToken);
 
 const statusBaseUrl = (process.env.PUBLIC_STATUS_BASE_URL || '').replace(/\/+$/, '') || null;
 
+const rateLimitMessage = (message) => ({
+    errorCode: 'RATE_LIMIT',
+    message,
+    error: message
+});
+
 function generateStatusToken() {
     return crypto.randomBytes(24).toString('base64url');
 }
@@ -43,7 +49,7 @@ const signalLimiter = rateLimit({
     limit: 100,               // 100 Signals / 10 min / IP
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many reports (signals). Please try again later.' }
+    message: rateLimitMessage('Too many reports (signals). Please try again later.')
 });
 
 const noticeLimiter = rateLimit({
@@ -51,7 +57,7 @@ const noticeLimiter = rateLimit({
     limit: 60,                // 60 Notices / 10 min / IP
     standardHeaders: true,
     legacyHeaders: false,
-    message: { error: 'Too many notices. Please try again later.' }
+    message: rateLimitMessage('Too many notices. Please try again later.')
 });
 
 /* ------------------------------ Helpers ------------------------------ */

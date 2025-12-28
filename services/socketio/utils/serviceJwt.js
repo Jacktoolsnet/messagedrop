@@ -104,13 +104,21 @@ function extractBearerToken(req) {
 function requireServiceJwt(req, res, next) {
   const token = extractBearerToken(req);
   if (!token) {
-    return res.status(401).json({ error: 'missing_service_token' });
+    return res.status(401).json({
+      errorCode: 'UNAUTHORIZED',
+      message: 'missing_service_token',
+      error: 'missing_service_token'
+    });
   }
   try {
     req.service = verifyServiceJwt(token);
     return next();
   } catch {
-    return res.status(403).json({ error: 'invalid_service_token' });
+    return res.status(403).json({
+      errorCode: 'UNAUTHORIZED',
+      message: 'invalid_service_token',
+      error: 'invalid_service_token'
+    });
   }
 }
 

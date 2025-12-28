@@ -34,7 +34,13 @@ function authenticateOptionalUser(req, _res, next) {
  */
 function requireAdminJwt(req, res, next) {
   const token = req.token;
-  if (!token) return res.status(401).json({ error: 'missing_admin_token' });
+  if (!token) {
+    return res.status(401).json({
+      errorCode: 'UNAUTHORIZED',
+      message: 'missing_admin_token',
+      error: 'missing_admin_token'
+    });
+  }
 
   try {
     const payload = jwt.verify(token, process.env.ADMIN_JWT_SECRET, {
@@ -46,7 +52,11 @@ function requireAdminJwt(req, res, next) {
     next();
   } catch (error) {
     req.logger?.warn('Invalid admin token', { error: error?.message });
-    return res.status(401).json({ error: 'invalid_admin_token' });
+    return res.status(401).json({
+      errorCode: 'UNAUTHORIZED',
+      message: 'invalid_admin_token',
+      error: 'invalid_admin_token'
+    });
   }
 }
 
@@ -59,7 +69,13 @@ function requireRole(...allowed) {
   return (req, res, next) => {
     const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
     const ok = roles.some(r => allowedSet.includes(r));
-    if (!ok) return res.status(403).json({ error: 'insufficient_role' });
+    if (!ok) {
+      return res.status(403).json({
+        errorCode: 'FORBIDDEN',
+        message: 'insufficient_role',
+        error: 'insufficient_role'
+      });
+    }
     next();
   };
 }

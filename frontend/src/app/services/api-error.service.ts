@@ -13,14 +13,14 @@ const ERROR_CODE_TO_KEY: Record<ApiErrorCode, string> = {
 export class ApiErrorService {
   private readonly translator = inject(TranslationHelperService);
 
-  getErrorMessage(error: unknown): string {
+  getErrorMessage(error: unknown): string | null {
     const payload = this.extractApiErrorPayload(error);
     if (payload) {
       const key = ERROR_CODE_TO_KEY[payload.errorCode];
       return this.translator.t(key, payload.params);
     }
 
-    return this.translator.t('errors.unknown');
+    return null;
   }
 
   private extractApiErrorPayload(error: unknown): ApiErrorPayload | null {

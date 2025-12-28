@@ -129,18 +129,24 @@ const rateLimitDefaults = {
   legacyHeaders: false
 };
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 const weatherLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: { error: 'Too many weather requests, please try again later.' }
+  message: rateLimitMessage('Too many weather requests, please try again later.')
 });
 
 const airQualityLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
   ...rateLimitDefaults,
-  message: { error: 'Too many air quality requests, please try again later.' }
+  message: rateLimitMessage('Too many air quality requests, please try again later.')
 });
 
 // ROUTES

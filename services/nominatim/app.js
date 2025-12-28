@@ -126,11 +126,17 @@ const rateLimitDefaults = {
   legacyHeaders: false
 };
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 const nominatimLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: { error: 'Too many nominatim requests, please try again later.' }
+  message: rateLimitMessage('Too many nominatim requests, please try again later.')
 });
 
 // ROUTES

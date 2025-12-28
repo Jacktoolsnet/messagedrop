@@ -8,12 +8,18 @@ const { signServiceJwt } = require('../utils/serviceJwt');
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 const statusLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many status requests, please try again later.' }
+  message: rateLimitMessage('Too many status requests, please try again later.')
 });
 
 const appealLimiter = rateLimit({
@@ -21,7 +27,7 @@ const appealLimiter = rateLimit({
   limit: 20,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many appeal requests, please try again later.' }
+  message: rateLimitMessage('Too many appeal requests, please try again later.')
 });
 
 const evidenceLimiter = rateLimit({
@@ -29,7 +35,7 @@ const evidenceLimiter = rateLimit({
   limit: 10,
   standardHeaders: true,
   legacyHeaders: false,
-  message: { error: 'Too many evidence uploads, please try again later.' }
+  message: rateLimitMessage('Too many evidence uploads, please try again later.')
 });
 
 function adminBase(path) {

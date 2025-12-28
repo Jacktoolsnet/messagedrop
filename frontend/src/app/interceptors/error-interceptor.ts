@@ -25,8 +25,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       ) {
         return throwError(() => error);
       }
-      const message = apiErrorService.getErrorMessage(error);
       const status = error instanceof HttpErrorResponse ? error.status : -1;
+      const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);
       const title = networkService.getErrorTitle(status);
       const icon = networkService.getErrorIcon(status);
 

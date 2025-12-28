@@ -24,6 +24,12 @@ const healthWindowMs = 10 * 60 * 1000;
 const healthLimit = 60;
 const healthHits = new Map();
 
+const rateLimitMessage = (message) => ({
+  errorCode: 'RATE_LIMIT',
+  message,
+  error: message
+});
+
 function healthLimiter(req, res, next) {
   const now = Date.now();
   const key = req.ip || req.connection?.remoteAddress || 'unknown';
@@ -35,7 +41,7 @@ function healthLimiter(req, res, next) {
   entry.count += 1;
   healthHits.set(key, entry);
   if (entry.count > healthLimit) {
-    return res.status(429).json({ error: 'Too many health requests, please try again later.' });
+    return res.status(429).json(rateLimitMessage('Too many health requests, please try again later.'));
   }
   next();
 }
