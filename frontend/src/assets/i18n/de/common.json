@@ -208,7 +208,27 @@
     },
     "images": {
       "imported": "Bild(er) lokal importiert.",
-      "importFailed": "Bild konnte nicht importiert werden."
+      "importSuccess": "Bild(er) lokal importiert.",
+      "importFailed": "Bild konnte nicht importiert werden.",
+      "filePickerUnsupported": "Die Bildauswahl wird in diesem Browser nicht unterstützt.",
+      "addFirst": "Erstes privates Bild hinzufügen",
+      "addAria": "Bild hinzufügen",
+      "deleteAria": "Bild löschen",
+      "flyToAria": "Zum Bild springen",
+      "navigateAria": "Zur Bildposition navigieren",
+      "notFound": "Bild nicht gefunden.",
+      "delete": {
+        "title": "Bild löschen",
+        "confirm": "Das Bild wird dauerhaft gelöscht. Bist du sicher?"
+      },
+      "exif": {
+        "title": "Bildposition verwenden?",
+        "body": "Dieses Bild enthält Standortdaten. Soll diese Position statt der Kartenposition genutzt werden?",
+        "remember": "Auswahl merken",
+        "keep": "Kartenposition behalten",
+        "useMap": "Bildposition verwenden",
+        "previewAlt": "Bildvorschau"
+      }
     },
     "map": {
       "multiMarker": {

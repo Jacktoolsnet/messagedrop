@@ -208,7 +208,27 @@
     },
     "images": {
       "imported": "Imagen(es) importadas localmente.",
-      "importFailed": "No se pudo importar la imagen."
+      "importSuccess": "Imagen(es) importadas localmente.",
+      "importFailed": "No se pudo importar la imagen.",
+      "filePickerUnsupported": "El selector de imágenes no es compatible con este navegador.",
+      "addFirst": "Añadir mi primera imagen privada",
+      "addAria": "Añadir imagen",
+      "deleteAria": "Eliminar imagen",
+      "flyToAria": "Ir a la imagen",
+      "navigateAria": "Navegar a la ubicación de la imagen",
+      "notFound": "Imagen no encontrada.",
+      "delete": {
+        "title": "Eliminar imagen",
+        "confirm": "La imagen se eliminará permanentemente. ¿Estás seguro?"
+      },
+      "exif": {
+        "title": "¿Usar la ubicación de la imagen?",
+        "body": "Esta imagen contiene datos de ubicación. ¿Usar esa ubicación en lugar de la del mapa?",
+        "remember": "Recordar mi elección",
+        "keep": "Mantener ubicación del mapa",
+        "useMap": "Usar ubicación de la imagen",
+        "previewAlt": "Vista previa de la imagen"
+      }
     },
     "map": {
       "multiMarker": {

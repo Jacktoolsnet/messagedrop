@@ -208,7 +208,27 @@
     },
     "images": {
       "imported": "Image(s) importée(s) localement.",
-      "importFailed": "Impossible d'importer l'image."
+      "importSuccess": "Image(s) importée(s) localement.",
+      "importFailed": "Impossible d'importer l'image.",
+      "filePickerUnsupported": "Le sélecteur d'images n'est pas pris en charge par ce navigateur.",
+      "addFirst": "Ajouter ma première image privée",
+      "addAria": "Ajouter une image",
+      "deleteAria": "Supprimer l'image",
+      "flyToAria": "Aller à l'image",
+      "navigateAria": "Naviguer vers l'emplacement de l'image",
+      "notFound": "Image introuvable.",
+      "delete": {
+        "title": "Supprimer l'image",
+        "confirm": "L'image sera supprimée définitivement. Voulez-vous continuer ?"
+      },
+      "exif": {
+        "title": "Utiliser la position de l'image ?",
+        "body": "Cette image contient des données de localisation. Utiliser cette position à la place de celle de la carte ?",
+        "remember": "Se souvenir de mon choix",
+        "keep": "Conserver la position de la carte",
+        "useMap": "Utiliser la position de l'image",
+        "previewAlt": "Aperçu de l'image"
+      }
     },
     "map": {
       "multiMarker": {

@@ -208,7 +208,27 @@
     },
     "images": {
       "imported": "Image(s) imported locally.",
-      "importFailed": "Unable to import the image."
+      "importSuccess": "Image(s) imported locally.",
+      "importFailed": "Unable to import the image.",
+      "filePickerUnsupported": "Image picker is not supported in this browser.",
+      "addFirst": "Add my first private image",
+      "addAria": "Add image",
+      "deleteAria": "Delete image",
+      "flyToAria": "Fly to image",
+      "navigateAria": "Navigate to image location",
+      "notFound": "Image not found.",
+      "delete": {
+        "title": "Delete image",
+        "confirm": "The image will be permanently deleted. Are you sure?"
+      },
+      "exif": {
+        "title": "Use image location?",
+        "body": "This image contains location data. Use it instead of the map location?",
+        "remember": "Remember my choice",
+        "keep": "Keep map location",
+        "useMap": "Use image location",
+        "previewAlt": "Image preview"
+      }
     },
     "map": {
       "multiMarker": {
