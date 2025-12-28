@@ -183,14 +183,6 @@ export class ContactService {
     );
   }
 
-  updateContactTileSettings(contactId: string, tileSettings: TileSetting[]): void {
-    // Backward compatibility: Delegiere auf saveContactTileSettings mit Dummy-Contact
-    const contact = this._contacts().find(c => c.id === contactId);
-    if (contact) {
-      void this.saveContactTileSettings(contact, tileSettings);
-    }
-  }
-
   createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {
     const url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {

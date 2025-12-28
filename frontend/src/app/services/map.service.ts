@@ -4,7 +4,6 @@ import { BoundingBox } from '../interfaces/bounding-box';
 import { Location } from '../interfaces/location';
 import { MarkerLocation } from '../interfaces/marker-location';
 import { MarkerType } from '../interfaces/marker-type';
-import { PlusCodeArea } from '../interfaces/plus-code-area';
 import { GeolocationService } from './geolocation.service';
 
 const messageMarker = leaflet.icon({
@@ -23,13 +22,6 @@ const noteMarker = leaflet.icon({
 
 const multiMarker = leaflet.icon({
   iconUrl: 'assets/markers/multi-marker.svg',
-
-  iconSize: [32, 40], // size of the icon
-  iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
-});
-
-const userMarker = leaflet.icon({
-  iconUrl: 'assets/markers/user-marker.svg',
 
   iconSize: [32, 40], // size of the icon
   iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
@@ -136,15 +128,6 @@ export class MapService {
     this.map.fitBounds(bounds, { padding: [paddingX, paddingY] });
     this.setMaplocation(this.geolocationService.getCenterOfBoundingBox(boundingBox));
     this.setCircleMarker();
-  }
-
-  public setMapMinMaxZoom(minZoom: number, maxZoom: number) {
-    this.map?.setMinZoom(minZoom);
-    this.map?.setMaxZoom(maxZoom);
-  }
-
-  public setMapZoom(zoom: number) {
-    this.map?.setZoom(zoom);
   }
 
   public getMapZoom(): number {
@@ -287,17 +270,6 @@ export class MapService {
     this.map.panTo(new leaflet.LatLng(location.latitude, location.longitude));
   }
 
-  public setUserMarker(location: Location): void {
-    if (!this.map) {
-      return;
-    }
-    if (!this.userMarker) {
-      this.userMarker = leaflet.marker([location.latitude, location.longitude], { icon: userMarker, zIndexOffset: 0 }).addTo(this.map);
-      return;
-    }
-    this.userMarker.setLatLng([location.latitude, location.longitude]);
-  }
-
   public restoreUserMarker(): void {
     if (!this.map) {
       return;
@@ -315,31 +287,6 @@ export class MapService {
     }
     this.circleMarker?.remove();
     this.circleMarker = leaflet.circleMarker([this.location.latitude, this.location.longitude]).addTo(this.map);
-  }
-
-  public drawSearchRectange(location: Location): void {
-    if (!this.map || !this.searchRectangle) {
-      return;
-    }
-    const zoom = this.map.getZoom();
-    const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, zoom);
-    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
-    const bounds: leaflet.LatLngBoundsLiteral = [
-      [plusCodeArea.latitudeLo, plusCodeArea.longitudeLo],
-      [plusCodeArea.latitudeHi, plusCodeArea.longitudeHi]
-    ];
-    this.searchRectangle.setBounds(bounds);
-  }
-
-  public getSearchRectangeCenter(location: Location): [number, number] {
-    const zoom = this.map?.getZoom() ?? 3;
-    const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, zoom);
-    const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
-    const center: [number, number] = [
-      (plusCodeArea.latitudeLo + plusCodeArea.latitudeHi) / 2,
-      (plusCodeArea.longitudeLo + plusCodeArea.longitudeHi) / 2
-    ];
-    return center;
   }
 
   public createMarkers(markerLocations: Map<string, MarkerLocation>): void {

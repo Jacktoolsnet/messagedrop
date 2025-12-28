@@ -169,22 +169,6 @@ export class ContactMessageService {
     ).pipe(catchError(this.handleError));
   }
 
-  markRead(messageIds: string[]) {
-    return this.http.post<{ status: number; updated?: number }>(
-      `${environment.apiUrl}/contactMessage/read`,
-      { messageIds },
-      this.httpOptions
-    ).pipe(catchError(this.handleError));
-  }
-
-  markAllRead(contactId: string, before?: string) {
-    return this.http.post<{ status: number }>(
-      `${environment.apiUrl}/contactMessage/read`,
-      { contactId, before },
-      this.httpOptions
-    ).pipe(catchError(this.handleError));
-  }
-
   unreadCount(contactId: string) {
     return this.http.get<{ status: number; unread: number }>(
       `${environment.apiUrl}/contactMessage/unread/${contactId}`,

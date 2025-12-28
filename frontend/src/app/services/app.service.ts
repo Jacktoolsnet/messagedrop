@@ -137,10 +137,6 @@ export class AppService {
     return this.notificationAction;
   }
 
-  public clearNotificationAction(): void {
-    this.notificationAction = undefined;
-  }
-
   setTheme(appSettings: AppSettings): void {
     const themeClass = Array.from(document.body.classList).find(cls => cls.startsWith('theme-'));
     if (themeClass) document.body.classList.remove(themeClass);

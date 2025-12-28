@@ -50,26 +50,6 @@ export class NominatimService {
       );
   }
 
-  getNominatimPlaceBySearchTerm(searchTerm: string, limit = 100, showAlways = false): Observable<{ sattus: number, result: NominatimPlace[] }> {
-    const encodedTerm = encodeURIComponent(searchTerm);
-    const url = `${environment.apiUrl}/nominatim/search/${encodedTerm}/${limit}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: this.i18n.t('common.location.searchTitle'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.location.searching', { term: searchTerm }),
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-
-    return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
-      catchError(this.handleError)
-    );
-  }
-
   getNominatimPlaceBySearchTermWithViewbox(searchTerm: string, latitude: number, longitude: number, limit = 100, boxSize = 5000, showAlways = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
     const viewbox = this.calculateViewbox(latitude, longitude, boxSize);
     const encodedTerm = encodeURIComponent(searchTerm);

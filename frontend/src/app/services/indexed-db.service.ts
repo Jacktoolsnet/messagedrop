@@ -506,29 +506,6 @@ export class IndexedDbService {
   }
 
   /**
-   * Deletes a contact profile by ID.
-   * @param contactProfileId The contact profile ID.
-   * @returns Promise that resolves when the contact profile is deleted.
-   */
-  async deleteContactProfile(contactProfileId: string): Promise<void> {
-    const db = await this.openDB();
-
-    return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction(this.contactProfileStore, 'readwrite');
-      const store = tx.objectStore(this.contactProfileStore);
-      const request = store.delete(contactProfileId);
-
-      request.onsuccess = () => {
-        this.backupState.markDirty();
-        resolve();
-      };
-      request.onerror = () => {
-        reject(request.error);
-      };
-    });
-  }
-
-  /**
    * Stores a place profile.
    * @param placeId The place ID.
    * @param place The place object to store.
@@ -712,22 +689,6 @@ export class IndexedDbService {
   }
 
   /**
-   * Retrieves a note by ID.
-   * @param id The note ID.
-   * @returns Promise that resolves with the note or undefined if not found.
-   */
-  async getNote(id: string): Promise<Note | undefined> {
-    const db = await this.openDB();
-    return new Promise<Note | undefined>((resolve, reject) => {
-      const tx = db.transaction(this.noteStore, 'readonly');
-      const store = tx.objectStore(this.noteStore);
-      const request = store.get(id);
-      request.onsuccess = () => resolve(this.decompress<Note>(request.result));
-      request.onerror = () => reject(request.error);
-    });
-  }
-
-  /**
    * Deletes a note by ID.
    * @param id The note ID.
    * @returns Promise that resolves when the note is deleted.
@@ -786,45 +747,6 @@ export class IndexedDbService {
       handleStore.put(image.handle, image.id);
 
       tx.oncomplete = () => resolve(image.id);
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  /**
-   * Updates an existing local image entry and refreshes updatedAt.
-   */
-  async updateImage(image: LocalImage): Promise<void> {
-    const db = await this.openDB();
-
-    return new Promise<void>((resolve, reject) => {
-      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readwrite');
-      const metaStore = tx.objectStore(this.imageStore);
-      const handleStore = tx.objectStore(this.imageHandleStore);
-
-      metaStore.put(this.encodeImageEntry(image), image.id);
-      handleStore.put(image.handle, image.id);
-
-      tx.oncomplete = () => resolve();
-      tx.onerror = () => reject(tx.error);
-    });
-  }
-
-  /**
-   * Retrieves a local image entry by ID.
-   */
-  async getImage(id: string): Promise<LocalImage | undefined> {
-    const db = await this.openDB();
-    return new Promise<LocalImage | undefined>((resolve, reject) => {
-      const tx = db.transaction([this.imageStore, this.imageHandleStore], 'readonly');
-      const metaStore = tx.objectStore(this.imageStore);
-      const handleStore = tx.objectStore(this.imageHandleStore);
-
-      const metaReq = metaStore.get(id);
-      const handleReq = handleStore.get(id);
-
-      tx.oncomplete = () => {
-        resolve(this.decodeImageEntry(metaReq.result, handleReq.result));
-      };
       tx.onerror = () => reject(tx.error);
     });
   }

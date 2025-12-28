@@ -5,7 +5,6 @@ import { catchError, forkJoin, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { GetMessageResponse } from '../interfaces/get-message-response';
-import { Location } from '../interfaces/location';
 import { Message } from '../interfaces/message';
 import { RawMessage } from '../interfaces/raw-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
@@ -67,10 +66,6 @@ export class MessageService {
 
   clearSelectedMessages() {
     this.selectedMessagesSignal.set([]);
-  }
-
-  getLastSearchedLocation(): string {
-    return this.lastSearchedLocation;
   }
 
   getCommentsSignalForMessage(parentUuid: string): WritableSignal<Message[]> {
@@ -301,43 +296,6 @@ export class MessageService {
       });
   }
 
-  getByPlusCode(location: Location, showAlways = false) {
-    const plusCode = this.geolocationService.getPlusCodeBasedOnMapZoom(location, this.mapService.getMapZoom());
-    const url = `${environment.apiUrl}/message/get/pluscode/${plusCode}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.loading'),
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-
-    this.http.get<GetMessageResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (getMessageResponse) => {
-          // lastSearchedLocation aktualisieren
-          this.lastSearchedLocation = plusCode;
-
-          // Messages neu setzen
-          const mappedMessages = getMessageResponse.rows.map(raw => this.mapRawMessage(raw));
-          this.messagesSignal.set(mappedMessages);
-
-          this._messageSet.update(trigger => trigger + 1);
-        },
-        error: () => {
-          // Fehlerfall: Location trotzdem aktualisieren, Messages leeren
-          this.lastSearchedLocation = plusCode;
-          this.messagesSignal.set([]);
-          this._messageSet.update(trigger => trigger + 1);
-        }
-      });
-  }
-
   getByVisibleMapBoundingBox(showAlways = false) {
     const boundingBoxes = this.mapService.getVisibleMapBoundingBoxes();
     if (boundingBoxes.length === 0) {
@@ -410,63 +368,6 @@ export class MessageService {
   navigateToMessageLocation(message: Message) {
     const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(message.location.plusCode)}`;
     window.open(url, '_blank');
-  }
-
-  countView(message: Message) {
-    const url = `${environment.apiUrl}/message/countview/${message.id}`;
-
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.messagesSignal.update(messages => {
-              return messages.map(m => m.id === message.id
-                ? { ...m, views: m.views + 1 }
-                : m
-              );
-            });
-          }
-        },
-        error: (err) => {
-          console.error('Failed to record message view', err);
-        }
-      });
-  }
-
-  disableMessage(message: Message, showAlways = false) {
-    const url = `${environment.apiUrl}/message/disable/${message.id}`;
-
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways,
-      title: this.i18n.t('common.message.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.message.disabling'),
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-
-    this.http.get<SimpleStatusResponse>(url, this.httpOptions)
-      .pipe(catchError(this.handleError))
-      .subscribe({
-        next: (simpleStatusResponse) => {
-          if (simpleStatusResponse.status === 200) {
-            this.messagesSignal.update(messages => messages.filter(m => m.id !== message.id));
-
-            this.selectedMessagesSignal.update(selected => {
-              const newSelected = [...selected];
-              newSelected.pop();
-              return newSelected;
-            });
-          }
-        },
-        error: (err) => {
-          const message = err.message ?? this.i18n.t('common.message.disableFailed');
-          this.snackBar.open(message, this.i18n.t('common.actions.ok'));
-        }
-      });
   }
 
   deleteMessage(message: Message, showAlways = false) {

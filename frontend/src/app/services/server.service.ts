@@ -107,8 +107,4 @@ export class ServerService {
   public getCryptoPublicKey(): JsonWebKey | undefined {
     return this.cryptoPublicKey;
   }
-
-  public getSigningPublicKey(): JsonWebKey | undefined {
-    return this.signingPublicKey;
-  }
 }

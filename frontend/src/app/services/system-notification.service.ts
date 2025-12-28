@@ -49,14 +49,6 @@ export class SystemNotificationService {
     return this.loadingSig.asReadonly();
   }
 
-  getErrorSignal() {
-    return this.errorSig.asReadonly();
-  }
-
-  getCurrentFilter(): SystemNotificationFilter {
-    return this.filterSig();
-  }
-
   reset(): void {
     this.notificationsSig.set([]);
     this.unreadCountSig.set(0);

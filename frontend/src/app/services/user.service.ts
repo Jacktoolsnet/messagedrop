@@ -14,7 +14,6 @@ import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
-import { GetUserResponse } from '../interfaces/get-user-response';
 import { Profile } from '../interfaces/profile';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
@@ -405,24 +404,6 @@ export class UserService {
     this.tokenRenewalTimeout = setTimeout(() => {
       this.renewJwt();
     }, delay);
-  }
-
-  getUserById(userId: string, showAlways = false): Observable<GetUserResponse> {
-    const url = `${environment.apiUrl}/user/get/${userId}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: this.i18n.t('auth.serviceTitle'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('auth.gettingUserInfo'),
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    return this.http.get<GetUserResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
   }
 
   getUserMessages(user: User, showAlways = false): Observable<GetMessageResponse> {

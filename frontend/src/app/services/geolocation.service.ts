@@ -203,19 +203,6 @@ export class GeolocationService {
     return plusCodeArea;
   }
 
-  public getGridFromCompletePlusCode(plusCode: string): PlusCodeArea {
-    const decoded = OpenLocationCode.decode(plusCode);
-    return {
-      latitudeLo: decoded.latitudeLo,
-      longitudeLo: decoded.longitudeLo,
-      latitudeHi: decoded.latitudeHi,
-      longitudeHi: decoded.longitudeHi,
-      codeLength: plusCode.length,
-      latitudeCenter: decoded.latitudeCenter,
-      longitudeCenter: decoded.longitudeCenter
-    };
-  }
-
   public getBoundingBoxFromPlusCodes(plusCodes: string[]): BoundingBox {
     if (!plusCodes.length) return {
       latMin: 0,

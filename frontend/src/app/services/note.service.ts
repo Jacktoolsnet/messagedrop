@@ -44,13 +44,6 @@ export class NoteService {
     this.notesSignal.update(notes => notes.filter(n => n.id !== note.id));
   }
 
-  async filterByPlusCode(plusCode: string): Promise<Note[]> {
-    const allNotes = await this.indexedDbService.getAllNotes();
-    const filteredNotes = allNotes.filter(note => note.location.plusCode.startsWith(plusCode));
-    this.notesSignal.set(filteredNotes);
-    return filteredNotes;
-  }
-
   async getNotesInBoundingBox(boundingBox: BoundingBox): Promise<Note[]> {
     const notes = await this.indexedDbService.getNotesInBoundingBox(boundingBox);
     this.notesSignal.set(notes);

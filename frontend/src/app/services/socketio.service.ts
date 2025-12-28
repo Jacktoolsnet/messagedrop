@@ -159,10 +159,6 @@ export class SocketioService {
     return this.ready;
   }
 
-  public hasJoinedUserRoom(): boolean {
-    return this._joinedUserRoom();
-  }
-
   public initUserSocketEvents(): void {
     const user = this.userService.getUser();
     if (!user?.id || !user?.jwt) {
@@ -294,10 +290,6 @@ export class SocketioService {
   }
 
   // Legacy receiveContactMessage is unused; live messaging handled by ContactMessageService
-
-  public sendUpdatedContactMessage(envelope: Envelope) {
-    this.socket.emit('contact:updateContactMessage', envelope);
-  }
 
   public sendDeletedContactMessage(payload: { contactId: string; userId: string; contactUserId: string; messageId: string; remove?: boolean }) {
     this.socket.emit('contact:deleteContactMessage', payload);

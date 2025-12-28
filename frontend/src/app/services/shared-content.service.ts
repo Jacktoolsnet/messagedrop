@@ -1,4 +1,4 @@
-import { computed, Injectable, inject, signal } from '@angular/core';
+import { Injectable, inject, signal } from '@angular/core';
 import { Message } from '../interfaces/message';
 import { Multimedia } from '../interfaces/multimedia';
 import { Note } from '../interfaces/note';
@@ -32,10 +32,6 @@ export class SharedContentService {
 
   public getSharedContentSignal() {
     return this.sharedContentSignal.asReadonly();
-  }
-
-  public getIsSharedAvailableSignal() {
-    return computed(() => this.sharedContentSignal() !== null);
   }
 
   private openDB(): Promise<IDBDatabase> {

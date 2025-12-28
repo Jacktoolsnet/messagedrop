@@ -111,10 +111,6 @@ export class PlaceService {
     this._places.set(places);
   }
 
-  setSelectedPlace(place: Place) {
-    this._selectedPlace.set(place);
-  }
-
   async saveAdditionalPlaceInfos(place: Place) {
     const normalizedPlace = this.normalizePlaceTileSettings(place);
     const places = this._places();
@@ -211,24 +207,6 @@ export class PlaceService {
       image: '',
       icon: '',
       message: this.i18n.t('common.place.loadingSingle'),
-      button: '',
-      delay: 0,
-      showSpinner: true
-    });
-    return this.http.get<GetPlaceResponse>(url, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
-  }
-
-  getByUserIdAndName(userId: string, name: string, showAlways = false) {
-    const url = `${environment.apiUrl}/place/get/userId/${userId}/name/${name}`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: this.i18n.t('common.place.title'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('common.place.loadingList'),
       button: '',
       delay: 0,
       showSpinner: true
