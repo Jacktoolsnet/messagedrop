@@ -7,8 +7,9 @@
 
 .platform-header {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
+    flex-wrap: wrap;
     width: 100%;
     text-align: left;
 }
@@ -17,12 +18,15 @@
     font-size: 1.75rem;
     width: 1.75rem;
     height: 1.75rem;
+    flex: 0 0 auto;
 }
 
 .platform-header-copy {
     display: flex;
     flex-direction: column;
     gap: 0.15rem;
+    flex: 1 1 12rem;
+    min-width: 0;
 }
 
 .platform-name {
