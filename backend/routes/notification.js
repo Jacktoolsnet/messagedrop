@@ -4,6 +4,7 @@ const axios = require('axios');
 const security = require('../middleware/security');
 const tableNotification = require('../db/tableNotification');
 const { signServiceJwt, verifyServiceJwt } = require('../utils/serviceJwt');
+const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
 
@@ -109,14 +110,11 @@ router.post('/create', [
         }
         return security.authenticate(req, res, next);
     }
-], (req, res) => {
+], (req, res, next) => {
     const { userId, title, body } = req.body || {};
 
     if (!userId || !title || !body) {
-        return res.status(400).json({
-            status: 400,
-            error: 'missing_required_fields'
-        });
+        return next(apiError.badRequest('missing_required_fields'));
     }
 
     if (!ensureSameUser(req, res, userId)) {
@@ -156,10 +154,7 @@ router.post('/create', [
         },
         (err, notification) => {
             if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    error: err.message || 'failed_to_create_notification'
-                });
+                return next(apiError.internal('failed_to_create_notification'));
             }
 
             void emitSystemNotification(userId, {
@@ -183,7 +178,7 @@ router.post('/create', [
     );
 });
 
-router.get('/list/:userId', [security.authenticate], (req, res) => {
+router.get('/list/:userId', [security.authenticate], (req, res, next) => {
     const userId = req.params.userId;
     if (!ensureSameUser(req, res, userId)) {
         return;
@@ -214,10 +209,7 @@ router.get('/list/:userId', [security.authenticate], (req, res) => {
         { status, limit, offset },
         (err, notifications) => {
             if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    error: err.message || 'failed_to_load_notifications'
-                });
+                return next(apiError.internal('failed_to_load_notifications'));
             }
 
             return res.status(200).json({
@@ -228,7 +220,7 @@ router.get('/list/:userId', [security.authenticate], (req, res) => {
     );
 });
 
-router.get('/count/unread/:userId', [security.authenticate], (req, res) => {
+router.get('/count/unread/:userId', [security.authenticate], (req, res, next) => {
     const userId = req.params.userId;
     if (!ensureSameUser(req, res, userId)) {
         return;
@@ -240,10 +232,7 @@ router.get('/count/unread/:userId', [security.authenticate], (req, res) => {
         tableNotification.notificationStatus.UNREAD,
         (err, total) => {
             if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    error: err.message || 'failed_to_count_notifications'
-                });
+                return next(apiError.internal('failed_to_count_notifications'));
             }
 
             return res.status(200).json({
@@ -254,10 +243,10 @@ router.get('/count/unread/:userId', [security.authenticate], (req, res) => {
     );
 });
 
-function handleMarkStatus(req, res, targetStatus) {
+function handleMarkStatus(req, res, next, targetStatus) {
     const userId = getAuthenticatedUserId(req);
     if (!userId) {
-        return res.status(401).json({ status: 401, error: 'unauthorized' });
+        return next(apiError.unauthorized('unauthorized'));
     }
 
     const uuids = Array.isArray(req.body?.uuids)
@@ -265,7 +254,7 @@ function handleMarkStatus(req, res, targetStatus) {
         : [];
 
     if (uuids.length === 0) {
-        return res.status(400).json({ status: 400, error: 'invalid_request' });
+        return next(apiError.badRequest('invalid_request'));
     }
 
     const markFn = targetStatus === tableNotification.notificationStatus.UNREAD
@@ -278,10 +267,7 @@ function handleMarkStatus(req, res, targetStatus) {
         uuids,
         (err) => {
             if (err) {
-                return res.status(500).json({
-                    status: 500,
-                    error: err.message || 'failed_to_mark_notifications'
-                });
+                return next(apiError.internal('failed_to_mark_notifications'));
             }
 
             tableNotification.getByUuids(
@@ -289,10 +275,7 @@ function handleMarkStatus(req, res, targetStatus) {
                 uuids,
                 (fetchErr, updated) => {
                     if (fetchErr) {
-                        return res.status(500).json({
-                            status: 500,
-                            error: fetchErr.message || 'failed_to_fetch_notifications'
-                        });
+                        return next(apiError.internal('failed_to_fetch_notifications'));
                     }
 
                     const filtered = updated.filter((item) => item && item.userId === userId);
@@ -309,15 +292,15 @@ function handleMarkStatus(req, res, targetStatus) {
     );
 }
 
-router.patch('/mark-read', [security.authenticate], (req, res) => {
-    handleMarkStatus(req, res, tableNotification.notificationStatus.READ);
+router.patch('/mark-read', [security.authenticate], (req, res, next) => {
+    handleMarkStatus(req, res, next, tableNotification.notificationStatus.READ);
 });
 
-router.patch('/mark-unread', [security.authenticate], (req, res) => {
-    handleMarkStatus(req, res, tableNotification.notificationStatus.UNREAD);
+router.patch('/mark-unread', [security.authenticate], (req, res, next) => {
+    handleMarkStatus(req, res, next, tableNotification.notificationStatus.UNREAD);
 });
 
-router.patch('/mark', [security.authenticate], (req, res) => {
+router.patch('/mark', [security.authenticate], (req, res, next) => {
     const requestedStatus = typeof req.body?.status === 'string'
         ? req.body.status.toLowerCase()
         : tableNotification.notificationStatus.READ;
@@ -326,13 +309,13 @@ router.patch('/mark', [security.authenticate], (req, res) => {
         ? tableNotification.notificationStatus.UNREAD
         : tableNotification.notificationStatus.READ;
 
-    handleMarkStatus(req, res, targetStatus);
+    handleMarkStatus(req, res, next, targetStatus);
 });
 
-router.delete('/delete', [security.authenticate], (req, res) => {
+router.delete('/delete', [security.authenticate], (req, res, next) => {
     const userId = getAuthenticatedUserId(req);
     if (!userId) {
-        return res.status(401).json({ status: 401, error: 'unauthorized' });
+        return next(apiError.unauthorized('unauthorized'));
     }
 
     const uuids = Array.isArray(req.body?.uuids)
@@ -340,15 +323,12 @@ router.delete('/delete', [security.authenticate], (req, res) => {
         : [];
 
     if (uuids.length === 0) {
-        return res.status(400).json({ status: 400, error: 'invalid_request' });
+        return next(apiError.badRequest('invalid_request'));
     }
 
     tableNotification.deleteMany(req.database.db, userId, uuids, (err, changes) => {
         if (err) {
-            return res.status(500).json({
-                status: 500,
-                error: err.message || 'failed_to_delete_notifications'
-            });
+            return next(apiError.internal('failed_to_delete_notifications'));
         }
 
         return res.status(200).json({

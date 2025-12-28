@@ -4,6 +4,7 @@ const crypto = require('crypto');
 const security = require('../middleware/security');
 const tableConnect = require('../db/tableConnect');
 const metric = require('../middleware/metric');
+const { apiError } = require('../middleware/api-error');
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -22,13 +23,13 @@ function ensureSameUser(req, res, userId) {
   return true;
 }
 
-function fetchConnectRecord(req, res, connectId, handler) {
+function fetchConnectRecord(req, res, connectId, handler, next) {
   tableConnect.getById(req.database.db, connectId, (err, row) => {
     if (err) {
-      return res.status(500).json({ status: 500, error: err });
+      return next(apiError.internal('db_error'));
     }
     if (!row) {
-      return res.status(404).json({ status: 404, error: 'not_found' });
+      return next(apiError.notFound('not_found'));
     }
     handler(row);
   });
@@ -40,7 +41,7 @@ router.post('/create',
     express.json({ type: 'application/json' }),
     metric.count('connect.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
-  , function (req, res) {
+  , function (req, res, next) {
     let response = { 'status': 0 };
     if (!ensureSameUser(req, res, req.body.userId)) {
       return;
@@ -48,13 +49,11 @@ router.post('/create',
     let connectId = crypto.randomUUID();
     tableConnect.create(req.database.db, connectId, req.body.userId, req.body.hint, req.body.encryptionPublicKey, req.body.signingPublicKey, req.body.signature, function (err) {
       if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-        response.connectId = connectId;
+        return next(apiError.internal('db_error'));
       }
-      res.status(response.status).json(response);
+      response.status = 200;
+      response.connectId = connectId;
+      res.status(200).json(response);
     });
   });
 
@@ -62,32 +61,30 @@ router.get('/get/:connectId',
   [
     security.authenticate
   ]
-  , function (req, res) {
+  , function (req, res, next) {
     let response = { 'status': 0 };
     fetchConnectRecord(req, res, req.params.connectId, (row) => {
       response.status = 200;
       response.connect = row;
       res.status(response.status).json(response);
-    });
+    }, next);
   });
 
 router.get('/delete/:connectId',
   [
     security.authenticate
   ]
-  , function (req, res) {
+  , function (req, res, next) {
     let response = { 'status': 0 };
     fetchConnectRecord(req, res, req.params.connectId, () => {
       tableConnect.deleteById(req.database.db, req.params.connectId, function (err) {
         if (err) {
-          response.status = 500;
-          response.error = err;
-        } else {
-          response.status = 200;
+          return next(apiError.internal('db_error'));
         }
-        res.status(response.status).json(response);
+        response.status = 200;
+        res.status(200).json(response);
       });
-    });
+    }, next);
   });
 
 module.exports = router

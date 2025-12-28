@@ -66,13 +66,17 @@ function extractMessage(payload, status) {
 }
 
 function normalizeErrorPayload(status, payload) {
-  const message = extractMessage(payload, status);
+  const normalizedStatus = Number(status) || 500;
+  const message = extractMessage(payload, normalizedStatus);
   const normalized = (payload && typeof payload === 'object' && !Array.isArray(payload)) ? { ...payload } : {};
   const errorCode = typeof normalized.errorCode === 'string'
     ? normalized.errorCode
-    : errorCodeFromStatus(status);
+    : errorCodeFromStatus(normalizedStatus);
 
   normalized.errorCode = errorCode;
+  if (typeof normalized.status !== 'number') {
+    normalized.status = normalizedStatus;
+  }
   normalized.message = typeof normalized.message === 'string' && normalized.message.trim()
     ? normalized.message
     : message;
@@ -110,16 +114,15 @@ function errorHandler(err, req, res, next) {
     return next(err);
   }
   const status = err?.status || err?.statusCode || 500;
-  const message = extractMessage(err, status);
-  const errorCode = typeof err?.errorCode === 'string' ? err.errorCode : errorCodeFromStatus(status);
+  const payload = normalizeErrorPayload(status, err);
 
   if (status >= 500) {
     req?.logger?.error?.('Unhandled error', { message: err?.message, stack: err?.stack });
   } else {
-    req?.logger?.warn?.('Request error', { message: err?.message || message });
+    req?.logger?.warn?.('Request error', { message: err?.message || payload.message });
   }
 
-  res.status(status).json({ errorCode, message, error: message });
+  res.status(status).json(payload);
 }
 
 module.exports = {
