@@ -156,7 +156,8 @@ async function notifyReporter(req, { event, notice, statusUrl, extras = {} }) {
             },
             meta,
             sentAt: Date.now(),
-            auditActor: actor
+            auditActor: actor,
+            logger: req?.logger
         });
     }
 

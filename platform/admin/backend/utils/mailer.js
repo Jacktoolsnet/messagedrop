@@ -21,8 +21,7 @@ function getTransport(logger) {
 
     if (!host || !port || !user || !pass) {
         const message = 'Mail transport not configured: missing host/port/user/password';
-        if (logger?.warn) logger.warn(message);
-        else console.warn(message);
+        logger?.warn?.(message);
         return null;
     }
 
@@ -37,8 +36,7 @@ function getTransport(logger) {
     });
 
     transporter.once('error', (err) => {
-        if (logger?.error) logger.error('Mail transport error', { error: err.message });
-        else console.error('Mail transport error', err);
+        logger?.error?.('Mail transport error', { error: err.message });
         transporter = null;
     });
     return transporter;
@@ -46,8 +44,7 @@ function getTransport(logger) {
 
 async function sendMail({ to, subject, text, html, from, logger }) {
     if (!to || !subject || (!text && !html)) {
-        if (logger?.warn) logger.warn('sendMail called without required fields', { to, subject });
-        else console.warn('sendMail called without required fields', { to, subject });
+        logger?.warn?.('sendMail called without required fields', { to, subject });
         return false;
     }
 
@@ -66,11 +63,7 @@ async function sendMail({ to, subject, text, html, from, logger }) {
         const info = await transport.sendMail(payload);
         return { success: true, info };
     } catch (err) {
-        if (logger?.warn) {
-            logger.warn('Failed to send mail', { to, subject, error: err.message });
-        } else {
-            console.warn('Failed to send mail', { to, subject, error: err.message });
-        }
+        logger?.warn?.('Failed to send mail', { to, subject, error: err.message });
         return { success: false, error: err };
     }
 }

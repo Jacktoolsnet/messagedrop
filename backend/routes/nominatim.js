@@ -43,7 +43,7 @@ router.get('/countryCode/:pluscode/:latitude/:longitude', [
         });
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        console.error('[nominatim.proxy countryCode] upstream error:', err?.message || err);
+        req.logger?.error?.('nominatim proxy countryCode upstream error', { error: err?.message || err });
         return next(buildUpstreamError(err));
     }
 });
@@ -68,7 +68,7 @@ router.get('/search/:searchTerm/:limit', [
         });
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        console.error('[nominatim.proxy search] upstream error:', err?.message || err);
+        req.logger?.error?.('nominatim proxy search upstream error', { error: err?.message || err });
         return next(buildUpstreamError(err));
     }
 });
@@ -94,7 +94,7 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', [
         });
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        console.error('[nominatim.proxy noboundedsearch] upstream error:', err?.message || err);
+        req.logger?.error?.('nominatim proxy noboundedsearch upstream error', { error: err?.message || err });
         return next(buildUpstreamError(err));
     }
 });
@@ -119,7 +119,7 @@ router.get('/boundedsearch/:searchTerm/:limit/:viewbox', [
         });
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        console.error('[nominatim.proxy boundedsearch] upstream error:', err?.message || err);
+        req.logger?.error?.('nominatim proxy boundedsearch upstream error', { error: err?.message || err });
         return next(buildUpstreamError(err));
     }
 });

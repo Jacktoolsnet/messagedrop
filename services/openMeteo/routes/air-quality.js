@@ -58,13 +58,13 @@ router.get('/:pluscode/:latitude/:longitude/:days', async (req, res) => {
 
                 airQualityCache.setAirQualityData(db, cacheKey, JSON.stringify(apiResult.data), (err) => {
                     if (err) {
-                        console.warn('Cache write failed:', err);
+                        req.logger?.warn?.('Air quality cache write failed', { cacheKey, error: err?.message || err });
                     }
                 });
 
                 return res.status(200).json(response);
             } catch (apiErr) {
-                console.error('Axios error:', apiErr);
+                req.logger?.error?.('Air quality upstream error', { error: apiErr?.message || apiErr });
                 if (apiErr.response?.status === 404) {
                     response.status = 204; // No content
                     response.error = 'No air quality data available for this location';
@@ -76,7 +76,7 @@ router.get('/:pluscode/:latitude/:longitude/:days', async (req, res) => {
             }
         });
     } catch (err) {
-        console.error('Request error:', err);
+        req.logger?.error?.('Air quality request error', { error: err?.message || err });
         response.status = 500;
         response.error = 'Internal server error';
         return res.status(response.status).json(response);

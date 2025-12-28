@@ -19,7 +19,8 @@ function recordNotification(db, {
     meta = null,
     sentAt = Date.now(),
     auditActor = 'system:notifications',
-    auditEvent = 'notification_send'
+    auditEvent = 'notification_send',
+    logger = null
 }) {
     if (!db) return Promise.resolve(null);
 
@@ -40,7 +41,7 @@ function recordNotification(db, {
             metaJson,
             (err) => {
                 if (err) {
-                    console.error('Failed to persist notification record', err.message || err);
+                    logger?.error?.('Failed to persist notification record', { error: err.message || err });
                     return resolve(null);
                 }
 

@@ -134,7 +134,8 @@ async function notifyContentOwner(req, notification) {
                 payload: recordPayload,
                 meta,
                 sentAt: Date.now(),
-                auditActor: 'system:messagedrop'
+                auditActor: 'system:messagedrop',
+                logger: req?.logger
             });
         }
 
@@ -164,19 +165,16 @@ async function notifyContentOwner(req, notification) {
                     error: String(error?.message || error)
                 },
                 sentAt: Date.now(),
-                auditActor: 'system:messagedrop'
+                auditActor: 'system:messagedrop',
+                logger: req?.logger
             });
         }
 
-        if (req.logger?.warn) {
-            req.logger.warn('Failed to send system notification to uploader', {
-                error: error.message,
-                event: notification.event || notification.type,
-                contentId
-            });
-        } else {
-            console.warn('Failed to send system notification to uploader', error.message);
-        }
+        req.logger?.warn?.('Failed to send system notification to uploader', {
+            error: error.message,
+            event: notification.event || notification.type,
+            contentId
+        });
         return false;
     }
 }

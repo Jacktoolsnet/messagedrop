@@ -58,12 +58,15 @@ const logFormat = winston.format.combine(
   })
 );
 
+const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '7d';
+const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '30d';
+
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
   filename: 'logs/admin-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  maxFiles: '2d',
+  maxFiles: LOG_RETENTION_INFO,
   level: 'info'
 });
 
@@ -72,7 +75,7 @@ const errorTransport = new winston.transports.DailyRotateFile({
   filename: 'logs/admin-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
-  maxFiles: '2d',
+  maxFiles: LOG_RETENTION_ERROR,
   level: 'error'
 });
 
@@ -92,6 +95,31 @@ if (process.env.NODE_ENV !== 'production') {
     format: winston.format.simple()
   }));
 }
+
+function registerProcessHandlers() {
+  const logProcessError = (label, err) => {
+    const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
+    const traceId = err?.traceId;
+    logger.error(label, {
+      service: 'admin-backend',
+      traceId,
+      message: error.message,
+      stack: error.stack
+    });
+  };
+
+  process.on('unhandledRejection', (reason) => {
+    logProcessError('Unhandled promise rejection', reason);
+    setTimeout(() => process.exit(1), 100);
+  });
+
+  process.on('uncaughtException', (err) => {
+    logProcessError('Uncaught exception', err);
+    setTimeout(() => process.exit(1), 100);
+  });
+}
+
+registerProcessHandlers();
 
 // Forward logs to admin backend DB (self or external)
 const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT, process.env.ADMIN_LOG_URL);

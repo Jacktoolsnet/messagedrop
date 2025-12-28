@@ -38,7 +38,7 @@ router.get('/featured/:country/:locale',
             response.data = tenorResponse.data;
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
-            console.error('Request error:', err);
+            req.logger?.error?.('Tenor request failed', { error: err?.message || err });
             return handleTenorError(err, next);
         }
     });
@@ -72,7 +72,7 @@ router.get('/featured/:country/:locale/:next',
             response.data = tenorResponse.data;
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
-            console.error('Request error:', err);
+            req.logger?.error?.('Tenor request failed', { error: err?.message || err });
             return handleTenorError(err, next);
         }
     });
@@ -105,7 +105,7 @@ router.get('/search/:country/:locale/:searchTerm',
             response.data = tenorResponse.data;
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
-            console.error('Request error:', err);
+            req.logger?.error?.('Tenor request failed', { error: err?.message || err });
             return handleTenorError(err, next);
         }
     });
@@ -139,7 +139,7 @@ router.get('/search/:country/:locale/:searchTerm/:next',
             response.data = tenorResponse.data;
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
-            console.error('Request error:', err);
+            req.logger?.error?.('Tenor request failed', { error: err?.message || err });
             return handleTenorError(err, next);
         }
     });

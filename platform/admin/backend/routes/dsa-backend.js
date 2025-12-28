@@ -1159,7 +1159,8 @@ router.post('/notifications', async (req, res, next) => {
         payload,
         meta,
         sentAt,
-        auditActor: actor
+        auditActor: actor,
+        logger: req.logger
     });
 
     if (!id) return next(apiError.internal('db_error'));
@@ -1193,7 +1194,8 @@ router.post('/notifications', async (req, res, next) => {
                     payload: { to, subject, text, html, from, event: payload.event || meta?.event || null },
                     meta: deliveredMeta,
                     sentAt: Date.now(),
-                    auditActor: actor
+                    auditActor: actor,
+                    logger: req.logger
                 });
             }
         }
@@ -1341,7 +1343,8 @@ router.post('/notifications/:id/resend', async (req, res, next) => {
             payload: { to, subject, text, html, from, event: payload.event || baseMeta?.event || null },
             meta,
             sentAt: resentAt,
-            auditActor: actor
+            auditActor: actor,
+            logger: req.logger
         });
     } else if (mapped.channel === 'inapp') {
         const destination = payload.destination;
@@ -1412,7 +1415,8 @@ router.post('/notifications/:id/resend', async (req, res, next) => {
             payload: { ...payload, event: payload.event || baseMeta?.event || null },
             meta,
             sentAt: resentAt,
-            auditActor: actor
+            auditActor: actor,
+            logger: req.logger
         });
     } else {
         const apiErr = apiError.badRequest('resend_not_supported');
