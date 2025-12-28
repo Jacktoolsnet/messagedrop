@@ -14,6 +14,7 @@ import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Note } from '../../interfaces/note';
+import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -48,6 +49,7 @@ export class EditNoteComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly oembedService = inject(OembedService);
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
@@ -101,7 +103,9 @@ export class EditNoteComponent implements OnInit {
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.note.multimedia = newMultimedia;
     const html = newMultimedia?.oembed?.html ?? '';
-    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.safeHtml = this.oembedService.isAllowedOembedSource(newMultimedia?.sourceUrl, newMultimedia?.oembed?.provider_url)
+      ? this.sanitizer.bypassSecurityTrustHtml(html)
+      : undefined;
     this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }
 

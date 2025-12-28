@@ -16,6 +16,7 @@ import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
 import { MessageService } from '../../services/message.service';
 import { OpenAiService } from '../../services/open-ai.service';
+import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -51,6 +52,7 @@ export class EditMessageComponent implements OnInit {
   private readonly userService = inject(UserService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly sanitizer = inject(DomSanitizer);
+  private readonly oembedService = inject(OembedService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
   private readonly messageService = inject(MessageService);
@@ -149,7 +151,9 @@ export class EditMessageComponent implements OnInit {
   applyNewMultimedia(newMultimedia: Multimedia) {
     this.data.message.multimedia = newMultimedia;
     const html = newMultimedia?.oembed?.html ?? '';
-    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    this.safeHtml = this.oembedService.isAllowedOembedSource(newMultimedia?.sourceUrl, newMultimedia?.oembed?.provider_url)
+      ? this.sanitizer.bypassSecurityTrustHtml(html)
+      : undefined;
     this.showSaveHtml = newMultimedia.type !== MultimediaType.TENOR;
   }
 

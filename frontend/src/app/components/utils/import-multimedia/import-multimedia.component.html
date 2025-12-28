@@ -1,5 +1,6 @@
 <div class="url-container">
-    <input type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()" placeholder="Enter multimedia url" />
+    <input type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()"
+        [placeholder]="'common.multimedia.importUrlPlaceholder' | transloco" />
 
     @if (!urlInvalid) {
     <button mat-icon-button (click)="onApplyClick()">

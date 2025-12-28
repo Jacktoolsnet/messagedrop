@@ -260,7 +260,10 @@
     "multimedia": {
       "embeddedAlt": "Embedded media",
       "addFromTenor": "Add from Tenor",
-      "addContent": "Add multimedia content"
+      "addContent": "Add multimedia content",
+      "importUrlPlaceholder": "Saisissez l'URL multimédia",
+      "platformDisabled": "{{ platform }} est actuellement désactivé. Activez-le ci-dessous pour continuer.",
+      "urlNotAllowed": "Cette URL n'est pas autorisée pour l'intégration."
     },
     "noteList": {
       "addFirstNote": "Add my first private note",

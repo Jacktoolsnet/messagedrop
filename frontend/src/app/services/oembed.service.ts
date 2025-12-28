@@ -18,6 +18,16 @@ interface ResolveRedirectResponse {
 export class OembedService {
   private readonly http = inject(HttpClient);
   private readonly geolocationService = inject(GeolocationService);
+  private readonly allowedOembedHosts = [
+    'youtube.com',
+    'youtu.be',
+    'tiktok.com',
+    'vm.tiktok.com',
+    'pinterest.com',
+    'pin.it',
+    'open.spotify.com'
+  ];
+  private readonly allowedGoogleMapsHosts = ['maps.app.goo.gl'];
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -56,24 +66,63 @@ export class OembedService {
   }
 
   public async getObjectFromUrl(url: string): Promise<Multimedia | Location | undefined> {
-    const lowerUrl = url.toLowerCase();
-
-    if (lowerUrl.includes('youtube.com') || lowerUrl.includes('youtu.be')) {
+    if (this.isYouTubeUrl(url)) {
       return await this.getYouTubeMultimedia(url);
     }
-    if (lowerUrl.includes('tiktok.com') || lowerUrl.includes('vm.tiktok.com')) {
+    if (this.isTikTokUrl(url)) {
       return await this.getTikTokMultimedia(url);
     }
-    if (lowerUrl.includes('pinterest.com') || lowerUrl.includes('pin.it')) {
+    if (this.isPinterestUrl(url)) {
       return await this.getPinterestMultimedia(url);
     }
-    if (lowerUrl.includes('spotify.com')) {
+    if (this.isSpotifyUrl(url)) {
       return await this.getSpotifyMultimedia(url);
     }
-    if (lowerUrl.includes('maps.app.goo.gl')) {
+    if (this.isGoogleMapsUrl(url)) {
       return await this.getGoogleMapsLocation(url);
     }
     return undefined;
+  }
+
+  public isAllowedOembedSource(sourceUrl?: string, providerUrl?: string): boolean {
+    const sourceHost = this.getHostname(sourceUrl);
+    const providerHost = this.getHostname(providerUrl);
+    return this.isAllowedHost(sourceHost, this.allowedOembedHosts)
+      || this.isAllowedHost(providerHost, this.allowedOembedHosts);
+  }
+
+  private isYouTubeUrl(url: string): boolean {
+    return this.isAllowedHost(this.getHostname(url), ['youtube.com', 'youtu.be']);
+  }
+
+  private isTikTokUrl(url: string): boolean {
+    return this.isAllowedHost(this.getHostname(url), ['tiktok.com', 'vm.tiktok.com']);
+  }
+
+  private isPinterestUrl(url: string): boolean {
+    return this.isAllowedHost(this.getHostname(url), ['pinterest.com', 'pin.it']);
+  }
+
+  private isSpotifyUrl(url: string): boolean {
+    return this.isAllowedHost(this.getHostname(url), ['open.spotify.com']);
+  }
+
+  private isGoogleMapsUrl(url: string): boolean {
+    return this.isAllowedHost(this.getHostname(url), this.allowedGoogleMapsHosts);
+  }
+
+  private getHostname(url?: string): string | undefined {
+    if (!url) return undefined;
+    try {
+      return new URL(url).hostname.toLowerCase();
+    } catch {
+      return undefined;
+    }
+  }
+
+  private isAllowedHost(host: string | undefined, allowedHosts: string[]): boolean {
+    if (!host) return false;
+    return allowedHosts.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
   }
 
   public async getGoogleMapsLocation(url: string): Promise<Location | undefined> {

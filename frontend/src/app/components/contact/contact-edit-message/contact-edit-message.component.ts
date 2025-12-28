@@ -18,6 +18,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { StyleService } from '../../../services/style.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
+import { OembedService } from '../../../services/oembed.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
 import { TenorComponent } from '../../utils/tenor/tenor.component';
@@ -55,6 +56,7 @@ interface TextDialogResult {
 export class ContactEditMessageComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
   readonly userService = inject(UserService);
+  private readonly oembedService = inject(OembedService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<ContactEditMessageComponent>);
@@ -171,7 +173,10 @@ export class ContactEditMessageComponent implements OnInit {
   }
 
   private updateSafeHtml(): void {
-    const html = this.data.shortMessage.multimedia?.oembed?.html ?? '';
-    this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(html);
+    const multimedia = this.data.shortMessage.multimedia;
+    const html = multimedia?.oembed?.html ?? '';
+    this.safeHtml = this.oembedService.isAllowedOembedSource(multimedia?.sourceUrl, multimedia?.oembed?.provider_url)
+      ? this.sanitizer.bypassSecurityTrustHtml(html)
+      : undefined;
   }
 }

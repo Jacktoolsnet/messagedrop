@@ -4,6 +4,51 @@ const router = express.Router();
 const security = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
 
+const OEMBED_PROVIDERS = [
+    {
+        name: 'youtube',
+        providerUrl: 'https://www.youtube.com/oembed',
+        allowedHosts: ['youtube.com', 'youtu.be']
+    },
+    {
+        name: 'spotify',
+        providerUrl: 'https://open.spotify.com/oembed',
+        allowedHosts: ['open.spotify.com']
+    },
+    {
+        name: 'pinterest',
+        providerUrl: 'https://www.pinterest.com/oembed.json',
+        allowedHosts: ['pinterest.com', 'pin.it']
+    },
+    {
+        name: 'tiktok',
+        providerUrl: 'https://www.tiktok.com/oembed',
+        allowedHosts: ['tiktok.com', 'vm.tiktok.com']
+    }
+];
+
+function isAllowedHost(host, allowedHosts) {
+    if (!host) return false;
+    const normalized = host.toLowerCase();
+    return allowedHosts.some((allowed) => normalized === allowed || normalized.endsWith(`.${allowed}`));
+}
+
+function parseUrl(value) {
+    try {
+        return new URL(value);
+    } catch {
+        return null;
+    }
+}
+
+function safeDecode(value) {
+    try {
+        return decodeURIComponent(value);
+    } catch {
+        return value;
+    }
+}
+
 router.get('/resolve/:url', security.authenticate, function (req, res, next) {
     let response = { 'status': 0 };
     axios.get(req.params.url, { maxRedirects: 0, validateStatus: null })
@@ -28,7 +73,31 @@ router.get('/resolve/:url', security.authenticate, function (req, res, next) {
 
 router.get('/oembed/:provider/:url', security.authenticate, function (req, res, next) {
     let response = { 'status': 0 };
-    axios.get(`${req.params.provider}?url=${req.params.url}&format=json`, { maxRedirects: 0, validateStatus: null })
+    const providerParam = req.params.provider;
+    const urlParam = req.params.url;
+    const providerUrl = providerParam ? safeDecode(providerParam) : '';
+    const targetUrl = urlParam ? safeDecode(urlParam) : '';
+
+    const provider = OEMBED_PROVIDERS.find((entry) => entry.providerUrl === providerUrl);
+    if (!provider) {
+        return next(apiError.badRequest('oembed_provider_not_allowed'));
+    }
+
+    const parsedTarget = parseUrl(targetUrl);
+    if (!parsedTarget || !/^https?:$/i.test(parsedTarget.protocol)) {
+        return next(apiError.badRequest('oembed_url_invalid'));
+    }
+
+    if (!isAllowedHost(parsedTarget.hostname, provider.allowedHosts)) {
+        return next(apiError.badRequest('oembed_url_not_allowed'));
+    }
+
+    axios.get(provider.providerUrl, {
+        params: { url: targetUrl, format: 'json' },
+        timeout: 5000,
+        maxRedirects: 0,
+        validateStatus: null
+    })
         .then(axiosResponse => {
             if (axiosResponse.status === 200) {
                 response.status = axiosResponse.status;

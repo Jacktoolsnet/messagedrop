@@ -7,9 +7,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
 
 type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
@@ -23,7 +25,8 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    EnableExternalContentComponent
+    EnableExternalContentComponent,
+    TranslocoPipe
 ],
   templateUrl: './import-multimedia.component.html',
   styleUrl: './import-multimedia.component.css'
@@ -39,17 +42,47 @@ export class ImportMultimediaComponent {
   private readonly oembedService = inject(OembedService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly appService = inject(AppService);
+  private readonly translation = inject(TranslationHelperService);
+  private readonly youtubeHosts = ['youtube.com', 'youtu.be'];
+  private readonly spotifyHosts = ['open.spotify.com'];
+  private readonly tiktokHosts = ['tiktok.com', 'vm.tiktok.com'];
+  private readonly pinterestHosts = ['pinterest.com', 'pin.it'];
 
   private getPlatformFromUrl(url: string): PlatformKey | undefined {
-    try {
-      const u = new URL(url.toLowerCase());
-      const h = u.hostname;
-      if (h.includes('youtube.com') || h.includes('youtu.be')) return 'youtube';
-      if (h.includes('spotify.com')) return 'spotify';
-      if (h.includes('tiktok.com')) return 'tiktok';
-      if (h.includes('pinterest.com') || h.includes('pin.it')) return 'pinterest';
-    } catch { /* ignore parse errors */ }
+    const host = this.getHostname(url);
+    if (!host) {
+      return undefined;
+    }
+    if (this.isAllowedHost(host, this.youtubeHosts)) return 'youtube';
+    if (this.isAllowedHost(host, this.spotifyHosts)) return 'spotify';
+    if (this.isAllowedHost(host, this.tiktokHosts)) return 'tiktok';
+    if (this.isAllowedHost(host, this.pinterestHosts)) return 'pinterest';
     return undefined;
+  }
+
+  private getHostname(url: string): string | undefined {
+    try {
+      return new URL(url).hostname.toLowerCase();
+    } catch {
+      return undefined;
+    }
+  }
+
+  private isAllowedHost(host: string, allowedHosts: string[]): boolean {
+    return allowedHosts.some((allowed) => host === allowed || host.endsWith(`.${allowed}`));
+  }
+
+  private getPlatformLabel(platform: PlatformKey): string {
+    switch (platform) {
+      case 'youtube':
+        return 'YouTube';
+      case 'spotify':
+        return 'Spotify';
+      case 'tiktok':
+        return 'TikTok';
+      case 'pinterest':
+        return 'Pinterest';
+    }
   }
 
   async validateUrl(): Promise<void> {
@@ -78,13 +111,25 @@ export class ImportMultimediaComponent {
     if (platform && !platformEnabled) {
       this.urlInvalid = true;
       this.safeHtml = undefined;
-      this.disabledReason = `This platform (${platform}) is currently disabled. Enable it below to continue.`;
+      this.disabledReason = this.translation.t('common.multimedia.platformDisabled', {
+        platform: this.getPlatformLabel(platform)
+      });
       return;
     }
 
     // OEmbed nur, wenn Plattform erlaubt (oder unbekannt)
     this.multimedia = await this.oembedService.getObjectFromUrl(this.multimediaUrl) as Multimedia;
     if (this.multimedia) {
+      const isAllowed = this.oembedService.isAllowedOembedSource(
+        this.multimedia.sourceUrl,
+        this.multimedia.oembed?.provider_url
+      );
+      if (!isAllowed) {
+        this.urlInvalid = true;
+        this.safeHtml = undefined;
+        this.disabledReason = this.translation.t('common.multimedia.urlNotAllowed');
+        return;
+      }
       this.disabledReason = '';
       this.urlInvalid = false;
       this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia.oembed?.html ?? '');

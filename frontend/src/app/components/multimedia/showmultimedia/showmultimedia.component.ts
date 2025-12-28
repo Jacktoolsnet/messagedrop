@@ -5,6 +5,7 @@ import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-brows
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
+import { OembedService } from '../../../services/oembed.service';
 import { EnableExternalContentComponent } from '../../utils/enable-external-content/enable-external-content.component';
 
 @Component({
@@ -30,6 +31,7 @@ export class ShowmultimediaComponent implements OnChanges {
 
   private readonly sanitizer = inject(DomSanitizer);
   private readonly appService = inject(AppService);
+  private readonly oembedService = inject(OembedService);
 
   ngOnChanges(changes: SimpleChanges) {
     if ('multimedia' in changes) {
@@ -60,7 +62,7 @@ export class ShowmultimediaComponent implements OnChanges {
         break;
     }
 
-    this.safeHtml = this.isPlatformEnabled
+    this.safeHtml = this.isPlatformEnabled && this.isOembedAllowed()
       ? this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ?? '')
       : undefined;
   }
@@ -68,8 +70,17 @@ export class ShowmultimediaComponent implements OnChanges {
   onEnabledChange(enabled: boolean) {
     this.isPlatformEnabled = enabled;
     if (enabled) {
-      this.safeHtml = this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ?? '');
+      this.safeHtml = this.isOembedAllowed()
+        ? this.sanitizer.bypassSecurityTrustHtml(this.multimedia?.oembed?.html ?? '')
+        : undefined;
     }
+  }
+
+  private isOembedAllowed(): boolean {
+    return this.oembedService.isAllowedOembedSource(
+      this.multimedia?.sourceUrl,
+      this.multimedia?.oembed?.provider_url
+    );
   }
 
 }
