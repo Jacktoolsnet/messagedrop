@@ -103,7 +103,12 @@ export class NotelistComponent {
 
     const dialogRef = this.dialog.open(EditNoteComponent, {
       data: { note },
-      closeOnNavigation: true
+      closeOnNavigation: true,
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe(async () => {
@@ -133,7 +138,12 @@ export class NotelistComponent {
     this.sharedContentService.addSharedContentToNote(note);
     const dialogRef = this.dialog.open(EditNoteComponent, {
       data: { note },
-      closeOnNavigation: true
+      closeOnNavigation: true,
+      minWidth: '20vw',
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe(async result => {
