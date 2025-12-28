@@ -716,7 +716,7 @@
     "unauthorized": "You need to sign in to continue.",
     "rateLimit": "Too many requests. Please wait and try again.",
     "offline": {
-      "title": "Oops! You are offline..",
+      "title": "Oops! You're offline.",
       "message": "Apparently, your network needed some \"me time\"."
     },
     "http": {
@@ -754,7 +754,7 @@
     "serviceTitle": "User service",
     "hashingPin": "Hashing your PIN",
     "accountCreated": "Your account has been created. You can log in now.",
-    "userCreationFailed": "Uuups! Something went wrong while creating your user. Please try again later.",
+    "userCreationFailed": "Oops! Something went wrong while creating your user. Please try again later.",
     "creatingUser": "Creating user",
     "confirmingUser": "Confirming user",
     "sessionExpiredTitle": "Session expired",

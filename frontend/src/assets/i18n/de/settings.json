@@ -26,9 +26,9 @@
     "description": "Schützt lokale Daten vor automatischer Bereinigung.",
     "note": "Wenn verfügbar, bitten wir den Browser, IndexedDB-Daten dauerhaft zu behalten. Ideal für Offline-Nutzung oder große Archive.",
     "toggle": "Lokale Daten schützen",
-    "applying": "Einstellung wird angewendet ...",
+    "applying": "Einstellung wird angewendet...",
     "warning": "Persistenter Speicher konnte vom Browser nicht gewährt werden.",
-    "confirmDisable": "Wenn du deaktivierst, kann der Browser gespeicherte Daten entfernen. Möchtest du wirklich fortfahren?"
+    "confirmDisable": "Wenn du es deaktivierst, kann der Browser gespeicherte Daten entfernen. Möchtest du wirklich fortfahren?"
   },
   "backup": {
     "title": "Backup-Erinnerung",

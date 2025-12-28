@@ -26,7 +26,7 @@
     "description": "Keeps local data safe from automatic cleanup.",
     "note": "When available, we ask the browser to keep IndexedDB data permanently. Ideal for offline usage or large message archives.",
     "toggle": "Protect local data",
-    "applying": "Applying preference ...",
+    "applying": "Applying preference...",
     "warning": "Persistent storage could not be granted by the browser.",
     "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
   },

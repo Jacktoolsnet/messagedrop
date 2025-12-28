@@ -716,7 +716,7 @@
     "unauthorized": "Bitte melde dich an, um fortzufahren.",
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut.",
     "offline": {
-      "title": "Ups! Du bist offline..",
+      "title": "Ups! Du bist offline.",
       "message": "Offenbar brauchte dein Netzwerk kurz eine Pause."
     },
     "http": {
@@ -754,7 +754,7 @@
     "serviceTitle": "Benutzer-Service",
     "hashingPin": "PIN wird gehasht",
     "accountCreated": "Dein Konto wurde erstellt. Du kannst dich jetzt anmelden.",
-    "userCreationFailed": "Uuups! Beim Erstellen deines Benutzers ist etwas schiefgelaufen. Bitte später erneut versuchen.",
+    "userCreationFailed": "Ups! Beim Erstellen deines Benutzers ist etwas schiefgelaufen. Bitte versuche es später erneut.",
     "creatingUser": "Benutzer wird erstellt",
     "confirmingUser": "Benutzer wird bestätigt",
     "sessionExpiredTitle": "Sitzung abgelaufen",

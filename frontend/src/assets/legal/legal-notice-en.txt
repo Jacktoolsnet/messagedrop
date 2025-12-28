@@ -3,7 +3,7 @@ IMPRINT (LEGAL NOTICE – ENGLISH TRANSLATION)
 Pursuant to Section 5 of the German Digital Services Act (Digitale-Dienste-Gesetz – DDG)
 
 
----
+###
 
 Important notice
 
@@ -12,7 +12,7 @@ The German version (“Impressum”) is the legally binding version.
 In the event of discrepancies, the German text shall prevail.
 
 
----
+###
 
 Service Provider
 
@@ -25,14 +25,14 @@ Phone: +49 (0) 176 / 41 23 57 74
 Email: jacktoolsnet@gmail.com
 
 
----
+###
 
 Authorized Managing Director
 
 Christian Wagner, Dipl.-Inform. (FH)
 
 
----
+###
 
 Commercial Register
 
@@ -40,7 +40,7 @@ Court of registration: Ingolstadt
 Registration number: HRB 5933
 
 
----
+###
 
 VAT Identification Number
 
@@ -49,7 +49,7 @@ In accordance with Section 27a of the German VAT Act (UStG):
 DE277133529
 
 
----
+###
 
 Responsible for Content (Section 18 (2) German State Media Treaty – MStV)
 
@@ -59,14 +59,14 @@ Im Kirchfeld 27
 Germany
 
 
----
+###
 
 Consumer Dispute Resolution
 
 We are neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.
 
 
----
+###
 
 Digital Services Act (DSA) – Central Contact Point
 

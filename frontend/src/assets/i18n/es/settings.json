@@ -26,7 +26,7 @@
     "description": "Mantiene los datos locales a salvo de la limpieza automática.",
     "note": "Cuando es posible, pedimos al navegador que mantenga los datos de IndexedDB de forma permanente. Ideal para uso sin conexión o archivos grandes.",
     "toggle": "Proteger datos locales",
-    "applying": "Aplicando preferencia ...",
+    "applying": "Aplicando la preferencia...",
     "warning": "El navegador no pudo conceder el almacenamiento persistente.",
     "confirmDisable": "Desactivarlo puede permitir que el navegador elimine datos almacenados. ¿Quieres continuar?"
   },
