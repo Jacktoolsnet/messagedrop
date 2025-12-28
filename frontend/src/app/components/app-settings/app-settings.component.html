@@ -1,5 +1,5 @@
 <h2 mat-dialog-title>{{ 'settings.title' | transloco }}</h2>
-<mat-dialog-content>
+<mat-dialog-content class="settings-scroll">
   <div class="platform-tile-container">
     <div class="platform-tile theme-settings-tile">
       <div class="theme-settings-header">
@@ -144,6 +144,7 @@
     </mat-chip>
   </mat-chip-set>
 
-  <mat-dialog-actions>
-    <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">{{ 'common.actions.close' | transloco }}</button>
-  </mat-dialog-actions>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">{{ 'common.actions.close' | transloco }}</button>
+</mat-dialog-actions>

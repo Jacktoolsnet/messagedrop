@@ -13,10 +13,10 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
 import { Place } from '../../../interfaces/place';
-import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
 import { SimpleStatusResponse } from '../../../interfaces/simple-status-response';
 import { createDefaultTileSettings } from '../../../interfaces/tile-settings';
 import { GeolocationService } from '../../../services/geolocation.service';
@@ -59,7 +59,7 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
     MatMenuModule,
     MatDialogContent,
     TranslocoPipe
-],
+  ],
   templateUrl: './nominatim-search.component.html',
   styleUrl: './nominatim-search.component.css'
 })
@@ -156,11 +156,6 @@ export class NominatimSearchComponent {
 
   private handleSearchError(error: unknown): void {
     console.error('Nominatim search failed', error);
-    this.snackBar.open(
-      this.translation.t('common.location.searchFailed'),
-      this.translation.t('common.actions.ok'),
-      { duration: 2000 }
-    );
   }
 
   onApplyClick(): void {
