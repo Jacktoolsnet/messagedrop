@@ -301,6 +301,7 @@
       "subscribeFailed": "Subscribing failed.",
       "unsubscribeFailed": "Unsubscribing failed.",
       "createSuccess": "Place successfully created.",
+      "createFailed": "No se pudo crear el lugar. Inténtalo de nuevo.",
       "resolveFailed": "Could not determine the current place."
     },
     "placeSettings": {
@@ -659,6 +660,17 @@
       "searching": "Searching for \"{{ term }}\"",
       "searchingNear": "Searching for \"{{ term }}\" near your location",
       "searchingWithArea": "Searching for \"{{ term }}\" {{ area }}",
+      "searchPlaceholder": "Buscar en OpenStreetMap",
+      "distanceLabel": "Distancia",
+      "searchFailed": "La búsqueda falló. Inténtalo de nuevo más tarde.",
+      "timezoneResolveFailed": "No se pudo determinar la zona horaria.",
+      "addPlaceAria": "Agregar lugar",
+      "flyToPlaceAria": "Ir al lugar",
+      "navigateToPlaceAria": "Navegar al lugar",
+      "radius": {
+        "worldwide": "En todo el mundo",
+        "kilometers": "{{ value }} km"
+      },
       "area": {
         "defined": "in defined area",
         "nearby": "around your location"

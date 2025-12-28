@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
 import { Place } from '../../../interfaces/place';
@@ -22,6 +23,7 @@ import { GeolocationService } from '../../../services/geolocation.service';
 import { MapService } from '../../../services/map.service';
 import { NominatimService } from '../../../services/nominatim.service';
 import { PlaceService } from '../../../services/place.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
 
 interface SearchValues {
@@ -55,7 +57,8 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
     MatBadgeModule,
     MatCardModule,
     MatMenuModule,
-    MatDialogContent
+    MatDialogContent,
+    TranslocoPipe
 ],
   templateUrl: './nominatim-search.component.html',
   styleUrl: './nominatim-search.component.css'
@@ -66,16 +69,16 @@ export class NominatimSearchComponent {
   readonly searchTerm = new FormControl('', { nonNullable: true });
 
   selectedRadius = 0; // z. B. 1000 = 1 km
-  readonly radiusOptions: readonly { value: number; label: string }[] = [
-    { value: 0, label: 'Worldwide' },
-    { value: 1000, label: '1 km' },
-    { value: 2000, label: '2 km' },
-    { value: 5000, label: '5 km' },
-    { value: 10000, label: '10 km' },
-    { value: 25000, label: '25 km' },
-    { value: 50000, label: '50 km' },
-    { value: 100000, label: '100 km' },
-    { value: 200000, label: '200 km' }
+  readonly radiusOptions: readonly { value: number; labelKey: string; params?: Record<string, number> }[] = [
+    { value: 0, labelKey: 'common.location.radius.worldwide' },
+    { value: 1000, labelKey: 'common.location.radius.kilometers', params: { value: 1 } },
+    { value: 2000, labelKey: 'common.location.radius.kilometers', params: { value: 2 } },
+    { value: 5000, labelKey: 'common.location.radius.kilometers', params: { value: 5 } },
+    { value: 10000, labelKey: 'common.location.radius.kilometers', params: { value: 10 } },
+    { value: 25000, labelKey: 'common.location.radius.kilometers', params: { value: 25 } },
+    { value: 50000, labelKey: 'common.location.radius.kilometers', params: { value: 50 } },
+    { value: 100000, labelKey: 'common.location.radius.kilometers', params: { value: 100 } },
+    { value: 200000, labelKey: 'common.location.radius.kilometers', params: { value: 200 } }
   ];
 
   nominatimPlaces: NominatimPlace[] = [];
@@ -87,6 +90,7 @@ export class NominatimSearchComponent {
   private readonly mapService = inject(MapService);
   private readonly dialogRef = inject(MatDialogRef<NominatimSearchComponent>);
   private readonly snackBar = inject(MatSnackBar);
+  private readonly translation = inject(TranslationHelperService);
   private readonly data = inject<NominatimDialogData>(MAT_DIALOG_DATA);
 
   constructor() {
@@ -152,7 +156,11 @@ export class NominatimSearchComponent {
 
   private handleSearchError(error: unknown): void {
     console.error('Nominatim search failed', error);
-    this.snackBar.open('Search failed. Please try again later.', 'OK', { duration: 2000 });
+    this.snackBar.open(
+      this.translation.t('common.location.searchFailed'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2000 }
+    );
   }
 
   onApplyClick(): void {
@@ -268,13 +276,17 @@ export class NominatimSearchComponent {
                 if (createPlaceResponse.status === 200) {
                   place.id = createPlaceResponse.placeId;
                   this.placeService.saveAdditionalPlaceInfos(place);
-                  this.snackBar.open(`Place succesfully created.`, '', { duration: 1000 });
+                  this.snackBar.open(this.translation.t('common.placeList.createSuccess'), '', { duration: 1000 });
                 }
               },
               error: (err) => this.handleCreatePlaceError(err)
             });
         } else {
-          this.snackBar.open('Failed to resolve timezone for this place.', 'OK', { duration: 2000 });
+          this.snackBar.open(
+            this.translation.t('common.location.timezoneResolveFailed'),
+            this.translation.t('common.actions.ok'),
+            { duration: 2000 }
+          );
         }
       },
       error: (err) => this.handleTimezoneError(err)
@@ -283,11 +295,19 @@ export class NominatimSearchComponent {
 
   private handleCreatePlaceError(error: unknown): void {
     console.error('Failed to create place', error);
-    this.snackBar.open('Creating the place failed. Please try again.', 'OK', { duration: 2000 });
+    this.snackBar.open(
+      this.translation.t('common.placeList.createFailed'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2000 }
+    );
   }
 
   private handleTimezoneError(error: unknown): void {
     console.error('Timezone lookup failed', error);
-    this.snackBar.open('Unable to determine timezone.', 'OK', { duration: 2000 });
+    this.snackBar.open(
+      this.translation.t('common.location.timezoneResolveFailed'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2000 }
+    );
   }
 }

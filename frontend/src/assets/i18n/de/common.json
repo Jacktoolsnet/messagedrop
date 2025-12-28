@@ -301,6 +301,7 @@
       "subscribeFailed": "Abonnieren fehlgeschlagen.",
       "unsubscribeFailed": "Abbestellen fehlgeschlagen.",
       "createSuccess": "Ort erfolgreich erstellt.",
+      "createFailed": "Der Ort konnte nicht erstellt werden. Bitte versuche es erneut.",
       "resolveFailed": "Der aktuelle Ort konnte nicht bestimmt werden."
     },
     "placeSettings": {
@@ -659,6 +660,17 @@
       "searching": "Suche nach \"{{ term }}\"",
       "searchingNear": "Suche nach \"{{ term }}\" in deiner Nähe",
       "searchingWithArea": "Suche nach \"{{ term }}\" {{ area }}",
+      "searchPlaceholder": "In OpenStreetMap suchen",
+      "distanceLabel": "Entfernung",
+      "searchFailed": "Suche fehlgeschlagen. Bitte versuche es später erneut.",
+      "timezoneResolveFailed": "Die Zeitzone konnte nicht ermittelt werden.",
+      "addPlaceAria": "Ort hinzufügen",
+      "flyToPlaceAria": "Zum Ort springen",
+      "navigateToPlaceAria": "Zum Ort navigieren",
+      "radius": {
+        "worldwide": "Weltweit",
+        "kilometers": "{{ value }} km"
+      },
       "area": {
         "defined": "im definierten Gebiet",
         "nearby": "in deiner Umgebung"

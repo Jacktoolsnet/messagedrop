@@ -1,11 +1,11 @@
 <div class="searchTerm-container">
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchTerm" (keyup.enter)="search()"
-        placeholder="Search in OpenStreetMap">
+        [placeholder]="'common.location.searchPlaceholder' | transloco">
 
     <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
         @for (r of radiusOptions; track r.value) {
         <option [value]="r.value">
-            {{ r.label }}
+            {{ r.labelKey | transloco:r.params }}
         </option>
         }
     </select>
@@ -33,23 +33,26 @@
 
                 @if (place.distance !== undefined) {
                 <div class="tile-severity">
-                    Distance: {{ formatDistance(place.distance) }}
+                    {{ 'common.location.distanceLabel' | transloco }}: {{ formatDistance(place.distance) }}
                 </div>
                 }
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
+                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+                    [attr.aria-label]="'common.location.addPlaceAria' | transloco"
                     (click)="!userService.isReady() ? loginAndAddToMyPlaces(place) : addToMyPlaces(place)">
                     <mat-icon>add_location</mat-icon>
                 </button>
 
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Fly to place"
+                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+                    [attr.aria-label]="'common.location.flyToPlaceAria' | transloco"
                     (click)="flyTo(place)">
                     <mat-icon>place</mat-icon>
                 </button>
 
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary" aria-label="Navigate to place"
+                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+                    [attr.aria-label]="'common.location.navigateToPlaceAria' | transloco"
                     (click)="nominatimService.navigateToNominatimPlace(place)">
                     <mat-icon>assistant_direction</mat-icon>
                 </button>
