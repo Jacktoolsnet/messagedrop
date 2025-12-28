@@ -94,11 +94,20 @@ function normalizeErrorPayload(status, payload) {
   return normalized;
 }
 
+function attachTraceId(payload, req, res) {
+  const traceId = req?.traceId || res?.locals?.traceId;
+  if (traceId && typeof payload.traceId !== 'string') {
+    payload.traceId = traceId;
+  }
+}
+
 function normalizeErrorResponses(_req, res, next) {
   const originalJson = res.json.bind(res);
   res.json = (body) => {
     if (res.statusCode >= 400) {
-      return originalJson(normalizeErrorPayload(res.statusCode, body));
+      const payload = normalizeErrorPayload(res.statusCode, body);
+      attachTraceId(payload, null, res);
+      return originalJson(payload);
     }
     return originalJson(body);
   };
@@ -115,11 +124,12 @@ function errorHandler(err, req, res, next) {
   }
   const status = err?.status || err?.statusCode || 500;
   const payload = normalizeErrorPayload(status, err);
+  attachTraceId(payload, req, res);
 
   if (status >= 500) {
-    req?.logger?.error?.('Unhandled error', { message: err?.message, stack: err?.stack });
+    req?.logger?.error?.('Unhandled error', { traceId: payload.traceId, message: err?.message, stack: err?.stack });
   } else {
-    req?.logger?.warn?.('Request error', { message: err?.message || payload.message });
+    req?.logger?.warn?.('Request error', { traceId: payload.traceId, message: err?.message || payload.message });
   }
 
   res.status(status).json(payload);

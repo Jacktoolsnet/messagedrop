@@ -6,38 +6,47 @@ const tableContact = require('../db/tableContact');
 const security = require('../middleware/security');
 const metric = require('../middleware/metric');
 const tableContactMessage = require('../db/tableContactMessage');
+const { apiError } = require('../middleware/api-error');
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
 
-function ensureSameUser(req, res, userId) {
+function ensureSameUser(req, res, userId, next) {
   const authUserId = getAuthUserId(req);
   if (!authUserId) {
-    res.status(401).json({ status: 401, error: 'unauthorized' });
+    if (next) {
+      next(apiError.unauthorized('unauthorized'));
+    } else {
+      res.status(401).json({ status: 401, error: 'unauthorized' });
+    }
     return false;
   }
   if (String(authUserId) !== String(userId)) {
-    res.status(403).json({ status: 403, error: 'forbidden' });
+    if (next) {
+      next(apiError.forbidden('forbidden'));
+    } else {
+      res.status(403).json({ status: 403, error: 'forbidden' });
+    }
     return false;
   }
   return true;
 }
 
-function withContactOwnership(req, res, contactId, handler) {
+function withContactOwnership(req, res, contactId, handler, next) {
   const authUserId = getAuthUserId(req);
   if (!authUserId) {
-    return res.status(401).json({ status: 401, error: 'unauthorized' });
+    return next(apiError.unauthorized('unauthorized'));
   }
   tableContact.getById(req.database.db, contactId, (err, row) => {
     if (err) {
-      return res.status(500).json({ status: 500, error: err });
+      return next(apiError.internal('db_error'));
     }
     if (!row) {
-      return res.status(404).json({ status: 404, error: 'not_found' });
+      return next(apiError.notFound('not_found'));
     }
     if (String(row.userId) !== String(authUserId)) {
-      return res.status(403).json({ status: 403, error: 'forbidden' });
+      return next(apiError.forbidden('forbidden'));
     }
     handler(row);
   });
@@ -62,10 +71,10 @@ router.post('/send',
     express.json({ type: 'application/json' }),
     metric.count('contactMessage.send', { when: 'always', timezone: 'utc', amount: 1 })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const validationError = validateSendBody(req.body);
     if (validationError) {
-      return res.status(400).json({ status: 400, error: validationError });
+      return next(apiError.badRequest(validationError));
     }
 
     const {
@@ -82,7 +91,7 @@ router.post('/send',
       messageId: providedMessageId
     } = req.body;
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
       return;
     }
 
@@ -103,7 +112,7 @@ router.post('/send',
         createdAt
       }, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
         // Try to find reciprocal contact and store mirrored message for recipient
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
@@ -127,7 +136,7 @@ router.post('/send',
           });
         });
       });
-    });
+    }, next);
   }
 );
 
@@ -138,7 +147,7 @@ router.post('/update',
     express.json({ type: 'application/json' }),
     metric.count('contactMessage.update', { when: 'always', timezone: 'utc', amount: 1 })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const {
       messageId,
       contactId,
@@ -151,10 +160,10 @@ router.post('/update',
     } = req.body ?? {};
 
     if (!messageId || !contactId || !encryptedMessageForUser || !encryptedMessageForContact || !signature || !userId || !contactUserId) {
-      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+      return next(apiError.badRequest('missing_required_fields'));
     }
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
       return;
     }
 
@@ -165,7 +174,7 @@ router.post('/update',
         status
       }, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
 
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
@@ -179,7 +188,7 @@ router.post('/update',
           return res.status(200).json({ status: 200, messageId });
         });
       });
-    });
+    }, next);
   }
 );
 
@@ -190,24 +199,24 @@ router.post('/translate',
     express.json({ type: 'application/json' }),
     metric.count('contactMessage.translate', { when: 'always', timezone: 'utc', amount: 1 })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const { messageId, contactId, translatedMessage, userId } = req.body ?? {};
     if (!messageId || !contactId || !translatedMessage || !userId) {
-      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+      return next(apiError.badRequest('missing_required_fields'));
     }
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
       return;
     }
 
     withContactOwnership(req, res, contactId, () => {
       tableContactMessage.setTranslatedMessageForContact(req.database.db, contactId, messageId, translatedMessage, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
         return res.status(200).json({ status: 200, messageId });
       });
-    });
+    }, next);
   }
 );
 
@@ -218,7 +227,7 @@ router.post('/delete',
     express.json({ type: 'application/json' }),
     metric.count('contactMessage.delete', { when: 'always', timezone: 'utc', amount: 1 })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const {
       messageId,
       contactId,
@@ -228,31 +237,31 @@ router.post('/delete',
     } = req.body ?? {};
 
     if (!messageId || !contactId) {
-      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+      return next(apiError.badRequest('missing_required_fields'));
     }
 
     if (scope === 'both') {
-      if (!ensureSameUser(req, res, userId)) {
+      if (!ensureSameUser(req, res, userId, next)) {
         return;
       }
       return withContactOwnership(req, res, contactId, () => {
         tableContactMessage.deleteByMessageId(req.database.db, messageId, (err) => {
           if (err) {
-            return res.status(500).json({ status: 500, error: err.message || err });
+            return next(apiError.internal('db_error'));
           }
           return res.status(200).json({ status: 200, messageId });
         });
-      });
+      }, next);
     }
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
       return;
     }
 
     withContactOwnership(req, res, contactId, () => {
       tableContactMessage.deleteByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
         // Mark reciprocal as deleted (if exists)
         if (userId && contactUserId) {
@@ -266,7 +275,7 @@ router.post('/delete',
         }
         return res.status(200).json({ status: 200, messageId });
       });
-    });
+    }, next);
   }
 );
 
@@ -277,20 +286,20 @@ router.post('/reaction',
     express.json({ type: 'application/json' }),
     metric.count('contactMessage.reaction', { when: 'always', timezone: 'utc', amount: 1 })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const { messageId, contactId, userId, contactUserId, reaction } = req.body ?? {};
     if (!messageId || !contactId || !userId || !contactUserId) {
-      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+      return next(apiError.badRequest('missing_required_fields'));
     }
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
       return;
     }
 
     withContactOwnership(req, res, contactId, () => {
       tableContactMessage.setReactionForContact(req.database.db, contactId, messageId, reaction ?? null, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
           if (!lookupErr && reciprocal?.id) {
@@ -299,7 +308,7 @@ router.post('/reaction',
           return res.status(200).json({ status: 200, messageId, reaction: reaction ?? null });
         });
       });
-    });
+    }, next);
   }
 );
 
@@ -310,20 +319,20 @@ router.post('/status/read',
     express.json({ type: 'application/json' }),
     metric.count('contactMessage.status.read', { when: 'always', timezone: 'utc', amount: 1 })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const { messageId, contactId, userId, contactUserId } = req.body ?? {};
     if (!messageId || !contactId || !userId || !contactUserId) {
-      return res.status(400).json({ status: 400, error: 'Missing required fields' });
+      return next(apiError.badRequest('missing_required_fields'));
     }
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
       return;
     }
 
     withContactOwnership(req, res, contactId, () => {
       tableContactMessage.markAsReadByContactAndMessageId(req.database.db, contactId, messageId, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
         tableContact.getByUserAndContactUser(req.database.db, contactUserId, userId, (lookupErr, reciprocal) => {
           if (!lookupErr && reciprocal?.id) {
@@ -332,7 +341,7 @@ router.post('/status/read',
           return res.status(200).json({ status: 200, messageId });
         });
       });
-    });
+    }, next);
   }
 );
 
@@ -341,7 +350,7 @@ router.get('/list/:contactId',
   [
     security.authenticate
   ],
-  (req, res) => {
+  (req, res, next) => {
     const contactId = req.params.contactId;
     const limit = Math.max(1, Math.min(200, parseInt(req.query.limit, 10) || 100));
     const offset = Math.max(0, parseInt(req.query.offset, 10) || 0);
@@ -349,7 +358,7 @@ router.get('/list/:contactId',
 
     tableContactMessage.getActiveByContact(req.database.db, contactId, limit, offset, before, (err, rows) => {
       if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
+        return next(apiError.internal('db_error'));
       }
       // Auch bei leeren Ergebnissen 200 zurückgeben, damit das Frontend sauber rendern kann
       return res.status(200).json({ status: 200, rows: rows || [] });
@@ -362,10 +371,10 @@ router.get('/unread/:contactId',
   [
     security.authenticate
   ],
-  (req, res) => {
+  (req, res, next) => {
     tableContactMessage.getUnreadCount(req.database.db, req.params.contactId, (err, cnt) => {
       if (err) {
-        return res.status(500).json({ status: 500, error: err.message || err });
+        return next(apiError.internal('db_error'));
       }
       return res.status(200).json({ status: 200, unread: cnt });
     });
@@ -378,7 +387,7 @@ router.post('/read',
     security.authenticate,
     express.json({ type: 'application/json' })
   ],
-  (req, res) => {
+  (req, res, next) => {
     const { messageIds, contactId, before } = req.body;
 
     if (Array.isArray(messageIds) && messageIds.length > 0) {
@@ -391,7 +400,7 @@ router.post('/read',
           }
           if (err) {
             errored = true;
-            return res.status(500).json({ status: 500, error: err.message || err });
+            return next(apiError.internal('db_error'));
           }
           remaining -= 1;
           if (remaining === 0) {
@@ -405,14 +414,14 @@ router.post('/read',
     if (contactId) {
       tableContactMessage.markManyAsReadByContact(req.database.db, contactId, before, (err) => {
         if (err) {
-          return res.status(500).json({ status: 500, error: err.message || err });
+          return next(apiError.internal('db_error'));
         }
         return res.status(200).json({ status: 200 });
       });
       return;
     }
 
-    return res.status(400).json({ status: 400, error: 'Provide messageIds or contactId' });
+    return next(apiError.badRequest('provide_messageIds_or_contactId'));
   }
 );
 

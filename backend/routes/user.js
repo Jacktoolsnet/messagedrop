@@ -9,19 +9,28 @@ const rateLimit = require('express-rate-limit');
 const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
+const { apiError } = require('../middleware/api-error');
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
 
-function ensureSameUser(req, res, userId) {
+function ensureSameUser(req, res, userId, next) {
   const authUserId = getAuthUserId(req);
   if (!authUserId) {
-    res.status(401).json({ status: 401, error: 'unauthorized' });
+    if (next) {
+      next(apiError.unauthorized('unauthorized'));
+    } else {
+      res.status(401).json({ status: 401, error: 'unauthorized' });
+    }
     return false;
   }
   if (String(authUserId) !== String(userId)) {
-    res.status(403).json({ status: 403, error: 'forbidden' });
+    if (next) {
+      next(apiError.forbidden('forbidden'));
+    } else {
+      res.status(403).json({ status: 403, error: 'forbidden' });
+    }
     return false;
   }
   return true;
@@ -371,22 +380,16 @@ router.get('/backup/:userId',
   [
     security.authenticate
   ],
-  async function (req, res) {
-    if (!ensureSameUser(req, res, req.params.userId)) {
+  async function (req, res, next) {
+    if (!ensureSameUser(req, res, req.params.userId, next)) {
       return;
     }
 
-    const response = { status: 0 };
-
     try {
       const backup = await buildUserBackup(req.database.db, req.params.userId);
-      response.status = 200;
-      response.backup = backup;
-      res.status(200).json(response);
+      res.status(200).json({ status: 200, backup });
     } catch (err) {
-      response.status = 500;
-      response.error = err?.message || err;
-      res.status(500).json(response);
+      next(apiError.internal('backup_failed'));
     }
   });
 
@@ -395,12 +398,12 @@ router.post('/restore',
     security.authenticate,
     express.json({ type: 'application/json', limit: '20mb' })
   ],
-  async function (req, res) {
+  async function (req, res, next) {
     const backup = req.body?.backup;
     if (!backup || !backup.tables || !backup.userId) {
-      return res.status(400).json({ status: 400, error: 'invalid_backup' });
+      return next(apiError.badRequest('invalid_backup'));
     }
-    if (!ensureSameUser(req, res, backup.userId)) {
+    if (!ensureSameUser(req, res, backup.userId, next)) {
       return;
     }
 
@@ -408,7 +411,7 @@ router.post('/restore',
       await restoreUserBackup(req.database.db, backup);
       res.status(200).json({ status: 200 });
     } catch (err) {
-      res.status(500).json({ status: 500, error: err?.message || err });
+      next(apiError.internal('restore_failed'));
     }
   });
 
@@ -416,33 +419,23 @@ router.post('/hashpin',
   [
     express.json({ type: 'application/json' })
   ]
-  , async function (req, res) {
-    let response = { 'status': 0 };
-
+  , async function (req, res, next) {
     const pin = await cryptoUtil.decrypt(getEncryptionPrivateKey(), JSON.parse(req.body.pin));
 
     if (!pin || typeof pin !== 'string' || pin.length !== 6) {
-      response.status = 400;
-      response.error = 'Invalid PIN';
-      return res.status(400).json(response);
+      return next(apiError.badRequest('invalid_pin'));
     }
 
     try {
       crypto.scrypt(pin, process.env.PIN_SALT, 64, (err, derivedKey) => {
         if (err) {
-          response.status = 500;
-          response.error = 'Hashing failed';
-          return res.status(500).json(response);
+          return next(apiError.internal('hashing_failed'));
         }
 
-        response.status = 200;
-        response.pinHash = derivedKey.toString('hex');
-        return res.status(200).json(response);
+        return res.status(200).json({ status: 200, pinHash: derivedKey.toString('hex') });
       });
     } catch (err) {
-      response.status = 500;
-      response.error = 'Hashing failed';
-      return res.status(500).json(err);
+      return next(apiError.internal('hashing_failed'));
     }
 
   });

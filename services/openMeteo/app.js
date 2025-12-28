@@ -4,6 +4,7 @@ const compression = require('compression');
 const bearerToken = require('express-bearer-token');
 const databaseMw = require('./middleware/database');
 const loggerMw = require('./middleware/logger');
+const traceId = require('./middleware/trace-id');
 const headerMW = require('./middleware/header')
 const Database = require('./db/database');
 const database = new Database();
@@ -119,6 +120,7 @@ The value from the header Authorization: Bearer <token>.
 If a token is found, it will be stored on req.token. If one has been provided in more than one location, this will abort the request immediately by sending code 400 (per RFC6750).
 */
 app.use(bearerToken());
+app.use(traceId());
 
 app.use(express.json({ limit: '1mb' }));
 app.use(databaseMw(database));

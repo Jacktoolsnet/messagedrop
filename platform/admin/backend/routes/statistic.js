@@ -3,6 +3,7 @@ const router = express.Router();
 const security = require('../middleware/security');
 const statistic = require('../db/tableStatistic');
 const statisticSettings = require('../db/tableStatisticSettings');
+const { apiError } = require('../middleware/api-error');
 
 // ===== Helpers =====
 const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
@@ -36,13 +37,13 @@ const dateUTC = () => new Date().toISOString().slice(0, 10);
 
 // POST /statistic/count
 // Body: { key: string, dateStr?: 'YYYY-MM-DD', amount?: number }
-router.post('/count', [security.checkToken], (req, res) => {
+router.post('/count', [security.checkToken], (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const { key, dateStr, amount } = req.body || {};
     if (typeof key !== 'string' || key.trim() === '') {
-        return res.status(400).json({ error: 'invalid_key' });
+        return next(apiError.badRequest('invalid_key'));
     }
     const safeDate = (typeof dateStr === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(dateStr))
         ? dateStr
@@ -50,7 +51,7 @@ router.post('/count', [security.checkToken], (req, res) => {
     const safeAmount = Number.isFinite(Number(amount)) ? Number(amount) : 1;
 
     statistic.count(db, key, { dateStr: safeDate, amount: safeAmount }, (err) => {
-        if (err) return res.status(500).json({ error: 'db_error', details: err.message });
+        if (err) return next(apiError.internal('db_error'));
         // Kein Payload nötig, das ist nur ein Increment
         return res.sendStatus(204);
     });
@@ -59,13 +60,13 @@ router.post('/count', [security.checkToken], (req, res) => {
 // Optional: Lazy-Cleanup vom Backend triggern
 // POST /statistic/clean
 // Body: { maxDays?: number }
-router.post('/clean', [security.checkToken], (req, res) => {
+router.post('/clean', [security.checkToken], (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const maxDays = Number.isFinite(Number(req.body?.maxDays)) ? Number(req.body.maxDays) : 365;
     statistic.clean(db, maxDays, (err) => {
-        if (err) return res.status(500).json({ error: 'db_error', details: err.message });
+        if (err) return next(apiError.internal('db_error'));
         return res.sendStatus(204);
     });
 });
@@ -85,17 +86,17 @@ function fillMissing(from, to, rows) {
 // ===== Endpoints =====
 
 /** Settings: Admin-JWT protected (not static token) */
-router.get('/settings', [security.requireAdminJwt], (req, res) => {
+router.get('/settings', [security.requireAdminJwt], (req, res, next) => {
     statisticSettings.getAll(req.database.db, (err, rows) => {
-        if (err) return res.status(500).json({ status: 500, error: err.message });
+        if (err) return next(apiError.internal('db_error'));
         res.json({ status: 200, settings: rows });
     });
 });
 
-router.put('/settings', [security.requireAdminJwt], (req, res) => {
+router.put('/settings', [security.requireAdminJwt], (req, res, next) => {
     const items = Array.isArray(req.body?.settings) ? req.body.settings : [];
     statisticSettings.upsertMany(req.database.db, items, (err) => {
-        if (err) return res.status(500).json({ status: 500, error: err.message });
+        if (err) return next(apiError.internal('db_error'));
         res.json({ status: 200, ok: true });
     });
 });
@@ -106,9 +107,9 @@ router.use(security.checkToken);
  * GET /statistic/keys
  * Liefert alle verfügbaren Metric-Keys als Array
  */
-router.get('/keys', (req, res) => {
+router.get('/keys', (req, res, next) => {
     statistic.getKeys(req.database.db, (err, keys) => {
-        if (err) return res.status(500).json({ status: 500, error: err.message });
+        if (err) return next(apiError.internal('db_error'));
         res.json({ status: 200, keys });
     });
 });
@@ -125,9 +126,9 @@ router.get('/keys', (req, res) => {
  *  - Maximal 365 Tage
  *  - Default: 30 Tage
  */
-router.get('/series/:key', (req, res) => {
+router.get('/series/:key', (req, res, next) => {
     const key = String(req.params.key || '').trim();
-    if (!key) return res.status(400).json({ status: 400, error: 'Key required' });
+    if (!key) return next(apiError.badRequest('key_required'));
 
     const { period, days, from, to, fill } = req.query;
 
@@ -135,15 +136,15 @@ router.get('/series/:key', (req, res) => {
 
     if (from && to) {
         if (!isValidDateStr(from) || !isValidDateStr(to)) {
-            return res.status(400).json({ status: 400, error: 'from/to must be YYYY-MM-DD' });
+            return next(apiError.badRequest('invalid_from_to'));
         }
         if (from > to) {
-            return res.status(400).json({ status: 400, error: 'from must be <= to' });
+            return next(apiError.badRequest('invalid_from_to'));
         }
         // clamp auf 365 Tage
         const diffDays = Math.floor((Date.parse(to + 'T00:00:00Z') - Date.parse(from + 'T00:00:00Z')) / 86400000) + 1;
         if (diffDays > 366) {
-            return res.status(400).json({ status: 400, error: 'Range must be <= 365 days' });
+            return next(apiError.badRequest('range_too_large'));
         }
         fromDate = from;
         toDate = to;
@@ -158,7 +159,7 @@ router.get('/series/:key', (req, res) => {
     }
 
     statistic.getRangeBetween(req.database.db, key, fromDate, toDate, (err, rows) => {
-        if (err) return res.status(500).json({ status: 500, error: err.message });
+        if (err) return next(apiError.internal('db_error'));
 
         const doFill = String(fill ?? 'true').toLowerCase() === 'true';
         const points = doFill ? fillMissing(fromDate, toDate, rows) : rows.map(r => ({ date: r.date, value: r.value | 0 }));
@@ -184,9 +185,9 @@ router.get('/series/:key', (req, res) => {
  */
 router.get('/series', (req, res) => {
     const rawKeys = String(req.query.keys || '').trim();
-    if (!rawKeys) return res.status(400).json({ status: 400, error: 'keys query param required' });
+    if (!rawKeys) return res.status(400).json({ status: 400, error: 'keys_query_required' });
     const keys = rawKeys.split(',').map(k => k.trim()).filter(Boolean);
-    if (keys.length === 0) return res.status(400).json({ status: 400, error: 'no valid keys' });
+    if (keys.length === 0) return res.status(400).json({ status: 400, error: 'no_valid_keys' });
 
     // Zeitraum bestimmen (gleich wie oben)
     const { period, days, from, to, fill } = req.query;
@@ -194,11 +195,11 @@ router.get('/series', (req, res) => {
 
     if (from && to) {
         if (!isValidDateStr(from) || !isValidDateStr(to) || from > to) {
-            return res.status(400).json({ status: 400, error: 'invalid from/to' });
+            return res.status(400).json({ status: 400, error: 'invalid_from_to' });
         }
         const diffDays = Math.floor((Date.parse(to + 'T00:00:00Z') - Date.parse(from + 'T00:00:00Z')) / 86400000) + 1;
         if (diffDays > 366) {
-            return res.status(400).json({ status: 400, error: 'Range must be <= 365 days' });
+            return res.status(400).json({ status: 400, error: 'range_too_large' });
         }
         fromDate = from; toDate = to;
     } else {
