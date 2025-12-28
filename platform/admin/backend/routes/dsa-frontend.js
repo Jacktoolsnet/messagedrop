@@ -5,6 +5,7 @@ const { checkToken } = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
+const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
 
 // DB-Tabellen
@@ -106,6 +107,52 @@ function hasOpenNotice(dbInstance, contentId) {
     });
 }
 
+async function ensureContentExists(contentId, next) {
+    const raw = String(contentId ?? '').trim();
+    if (!raw) {
+        next(apiError.badRequest('contentId is required'));
+        return false;
+    }
+    if (!process.env.BASE_URL || !process.env.PORT) {
+        next(apiError.serviceUnavailable('backend_unavailable'));
+        return false;
+    }
+
+    const baseUrl = `${process.env.BASE_URL}:${process.env.PORT}`;
+    const isNumeric = /^\d+$/.test(raw);
+    const path = isNumeric
+        ? `/message/get/id/${encodeURIComponent(raw)}`
+        : `/message/get/uuid/${encodeURIComponent(raw)}`;
+
+    try {
+        const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
+        const serviceToken = await signServiceJwt({ audience: backendAudience });
+        const resp = await axios.get(`${baseUrl}${path}`, {
+            headers: {
+                Authorization: `Bearer ${serviceToken}`,
+                Accept: 'application/json'
+            },
+            timeout: 5000,
+            validateStatus: () => true
+        });
+
+        if (resp.status === 200 && resp.data?.status === 200 && resp.data?.message) {
+            return true;
+        }
+        if (resp.status === 404) {
+            next(apiError.notFound('message_not_found'));
+            return false;
+        }
+        next(apiError.badGateway('message_lookup_failed'));
+        return false;
+    } catch (err) {
+        const apiErr = apiError.badGateway('message_lookup_failed');
+        apiErr.detail = err?.message || err;
+        next(apiErr);
+        return false;
+    }
+}
+
 async function ensureNoOpenCase(dbInstance, contentId, next) {
     try {
         const [openSignal, openNotice] = await Promise.all([
@@ -146,6 +193,7 @@ router.post('/signals', signalLimiter, async (req, res, next) => {
     } = req.body || {};
 
     if (!contentId) return next(apiError.badRequest('contentId is required'));
+    if (!(await ensureContentExists(contentId, next))) return;
     if (await ensureNoOpenCase(_db, contentId, next)) return;
 
     let reportedContentJson = 'null';
@@ -241,6 +289,7 @@ router.post('/notices', noticeLimiter, async (req, res, next) => {
     const normalizedReporterName = toStringOrNull(reporterName);
 
     if (!contentId) return next(apiError.badRequest('contentId is required'));
+    if (!(await ensureContentExists(contentId, next))) return;
     if (await ensureNoOpenCase(_db, contentId, next)) return;
 
     let reportedContentJson = 'null';

@@ -95,6 +95,49 @@ function buildForwardError(err) {
 }
 
 /* --------------------------------- Helper ---------------------------------- */
+function findMessageByIdOrUuid(db, messageId) {
+    return new Promise((resolve, reject) => {
+        const raw = String(messageId ?? '').trim();
+        if (!raw) return resolve(null);
+        const isNumeric = /^\d+$/.test(raw);
+        const handler = (err, row) => {
+            if (err) return reject(err);
+            resolve(row || null);
+        };
+        if (isNumeric) {
+            tableMessage.getById(db, raw, handler);
+        } else {
+            tableMessage.getByUuid(db, raw, handler);
+        }
+    });
+}
+
+async function ensureContentExists(req, contentId, next) {
+    const db = req.database?.db;
+    if (!db) {
+        next(apiError.internal('database_unavailable'));
+        return false;
+    }
+    const raw = String(contentId ?? '').trim();
+    if (!raw) {
+        next(apiError.badRequest('contentId is required'));
+        return false;
+    }
+    try {
+        const row = await findMessageByIdOrUuid(db, raw);
+        if (!row) {
+            next(apiError.notFound('message_not_found'));
+            return false;
+        }
+        return true;
+    } catch (err) {
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err?.message || err;
+        next(apiErr);
+        return false;
+    }
+}
+
 async function forwardPost(path, body) {
     const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
     const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
@@ -152,6 +195,7 @@ function disableLocallyIfPossible(req) {
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
 router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, next) => {
     try {
+        if (!(await ensureContentExists(req, req.body?.contentId, next))) return;
         const resp = await forwardPost('/signals', req.body);
 
         if (resp?.status >= 200 && resp?.status < 300 && req.body?.contentId && req.database?.db) {
@@ -177,6 +221,7 @@ router.post('/signals', signalLimiter, reportHourlyLimiter, async (req, res, nex
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
 router.post('/notices', noticeLimiter, reportHourlyLimiter, noticePow, async (req, res, next) => {
     try {
+        if (!(await ensureContentExists(req, req.body?.contentId, next))) return;
         const resp = await forwardPost('/notices', req.body);
 
         if (resp?.status >= 200 && resp?.status < 300 && req.body?.contentId && req.database?.db) {
