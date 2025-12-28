@@ -128,8 +128,7 @@ export class StatisticComponent {
   }
 
   reload(): void {
-    const ks = this.keys();
-    if (ks.length) this.loadSeries(ks, this.selectedRange());
+    this.loadKeys();
   }
 
   colorFor(key: string): string {

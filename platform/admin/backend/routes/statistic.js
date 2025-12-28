@@ -101,7 +101,7 @@ router.put('/settings', [security.requireAdminJwt], (req, res, next) => {
     });
 });
 
-router.use(security.checkToken);
+router.use(security.requireAdminJwt);
 
 /**
  * GET /statistic/keys

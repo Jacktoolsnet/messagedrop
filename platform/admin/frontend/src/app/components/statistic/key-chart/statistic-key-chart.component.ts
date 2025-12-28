@@ -1,10 +1,40 @@
 import { AfterViewInit, Component, ElementRef, OnDestroy, ViewChild, effect, input } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { Chart, ChartConfiguration, ChartType, registerables } from 'chart.js';
+import { Chart, ChartConfiguration, ChartType, Element, Plugin, registerables } from 'chart.js';
 import { SeriesPoint } from '../../../interfaces/statistic-series-point.interface';
 
-Chart.register(...registerables);
+const valueLabelPlugin: Plugin = {
+  id: 'valueLabel',
+  afterDatasetsDraw(chart) {
+    const chartType = ('type' in chart.config ? chart.config.type : undefined)
+      ?? chart.config.data?.datasets?.[0]?.type;
+    if (chartType !== 'bar') return;
+    const { ctx } = chart;
+    const dataset = chart.data.datasets[0];
+    const data = Array.isArray(dataset?.data) ? dataset.data : [];
+    const meta = chart.getDatasetMeta(0);
+    if (!dataset || !meta?.data?.length) return;
+
+    ctx.save();
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'bottom';
+    ctx.fillStyle = '#1f2937';
+    ctx.font = '12px sans-serif';
+
+    meta.data.forEach((bar: Element, index: number) => {
+      const value = data[index];
+      if (value === null || value === undefined) return;
+      const pos = bar.tooltipPosition(true);
+      if (pos?.x == null || pos?.y == null) return;
+      ctx.fillText(String(value), pos.x, pos.y - 4);
+    });
+
+    ctx.restore();
+  }
+};
+
+Chart.register(...registerables, valueLabelPlugin);
 
 @Component({
   selector: 'app-statistic-key-chart',
