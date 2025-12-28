@@ -2,17 +2,16 @@ const express = require('express');
 const router = express.Router();
 const security = require('../middleware/security');
 const { getEncryptionPublicJwk, getSigningPublicJwk } = require('../utils/keyStore');
+const { apiError } = require('../middleware/api-error');
 
-router.get('/', [security.checkToken], async (req, res) => {
+router.get('/', [security.checkToken], async (req, res, next) => {
     let response = { 'status': 0 };
     try {
         const encryptionPublicKeyJwk = await getEncryptionPublicJwk();
         const signingPublicKeyJwk = await getSigningPublicJwk();
 
         if (!encryptionPublicKeyJwk || !signingPublicKeyJwk) {
-            response.status = 503;
-            response.error = 'Keys not available';
-            return res.status(503).json(response);
+            return next(apiError.serviceUnavailable('keys_unavailable'));
         }
 
         // Optional kannst du zusätzlich Informationen mitgeben (z. B. Algorithmusnamen)
@@ -22,9 +21,9 @@ router.get('/', [security.checkToken], async (req, res) => {
         res.status(200).json(response);
     } catch (err) {
         req.logger?.error('client-connect failed to load keys', { error: err?.message });
-        response.status = 500;
-        response.error = 'Serverfehler beim Key-Zugriff';
-        res.status(500).json(response);
+        const apiErr = apiError.internal('key_access_failed');
+        apiErr.detail = err?.message || err;
+        next(apiErr);
     }
 });
 

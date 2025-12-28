@@ -6,6 +6,7 @@ const axios = require('axios');
 const tableGeoStatistic = require('../db/tableGeoStatistic');
 const tableWeatherHistory = require('../db/tableWeatherHistory');
 const metric = require('../middleware/metric');
+const { apiError } = require('../middleware/api-error');
 
 async function getWorldBankIndicator(countryAlpha3, indicator, years) {
     const url = `http://api.worldbank.org/v2/country/${countryAlpha3}/indicator/${indicator}?format=json&per_page=${years}`;
@@ -23,7 +24,7 @@ async function getWorldBankIndicator(countryAlpha3, indicator, years) {
 router.get('/:pluscode/:latitude/:longitude/:years',
     [
         metric.count('geostatistic.get', { when: 'always', timezone: 'utc', amount: 1 })
-    ], async (req, res) => {
+    ], async (req, res, next) => {
         let response = { status: 0 };
         const db = req.database.db;
 
@@ -256,9 +257,10 @@ router.get('/:pluscode/:latitude/:longitude/:years',
 
             res.status(200).json(response);
         } catch (err) {
-            response.status = err.response?.status || 500;
-            response.error = err.response?.data || err.message || 'Request failed';
-            res.status(response.status).json(response);
+            const status = err?.response?.status || 500;
+            const apiErr = apiError.fromStatus(status);
+            apiErr.detail = err?.response?.data || err?.message || null;
+            return next(apiErr);
         }
     });
 

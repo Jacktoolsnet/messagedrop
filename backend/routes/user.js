@@ -354,25 +354,18 @@ router.get('/get/:userId',
   [
     security.authenticate
   ],
-  function (req, res) {
-  if (!ensureSameUser(req, res, req.params.userId)) {
+  function (req, res, next) {
+  if (!ensureSameUser(req, res, req.params.userId, next)) {
     return;
   }
-  let response = { 'status': 0 };
   tableUser.getById(req.database.db, req.params.userId, function (err, row) {
     if (err) {
-      response.status = 500;
-      response.error = err;
-    } else {
-      if (!row) {
-        response.rawUser = {};
-        response.status = 404;
-      } else {
-        response.rawUser = row;
-        response.status = 200;
-      }
+      return next(apiError.internal('db_error'));
     }
-    res.status(response.status).json(response);
+    if (!row) {
+      return next(apiError.notFound('not_found'));
+    }
+    res.status(200).json({ status: 200, rawUser: row });
   });
 });
 
@@ -446,10 +439,8 @@ router.post('/create',
     express.json({ type: 'application/json' }),
     metric.count('user.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
-  , async function (req, res) {
+  , async function (req, res, next) {
     const { subtle } = crypto;
-
-    let response = { 'status': 0 };
 
     // Create userId
     let userId = crypto.randomUUID();
@@ -484,15 +475,14 @@ router.post('/create',
     // Create user record
     tableUser.create(req.database.db, userId, JSON.stringify(cryptoPrivateKey), JSON.stringify(signingPrivateKey), function (err) {
       if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
-        response.userId = userId;
-        response.cryptoPublicKey = JSON.stringify(cryptoPublicKey);
-        response.signingPublicKey = JSON.stringify(signingPublicKey);
+        return next(apiError.internal('db_error'));
       }
-      res.status(response.status).json(response);
+      res.status(200).json({
+        status: 200,
+        userId,
+        cryptoPublicKey: JSON.stringify(cryptoPublicKey),
+        signingPublicKey: JSON.stringify(signingPublicKey)
+      });
     });
   });
 
@@ -502,126 +492,107 @@ router.post('/confirm',
     express.json({ type: 'application/json' }),
     metric.count('user.confirm', { when: 'always', timezone: 'utc', amount: 1 })
   ]
-  , async function (req, res) {
+  , async function (req, res, next) {
     const secret = process.env.JWT_SECRET;
     const { subtle } = crypto;
+    const cryptedUserPayload = req.body?.cryptedUser;
+    const pinHash = req.body?.pinHash;
 
-    let response = { 'status': 0 };
+    if (!cryptedUserPayload || !cryptedUserPayload.id || !cryptedUserPayload.cryptedUser || !pinHash) {
+      return next(apiError.badRequest('invalid_request'));
+    }
 
-    if (!req.body.cryptedUser && !req.body.cryptedUser.id && !req.body.cryptedUser.pinHash) {
-      response.status = 400;
-      res.status(response.status).json(response);
-    } else {
-      tableUser.getById(req.database.db, req.body.cryptedUser.id, async function (err, row) {
-        if (err) {
-          response.status = 500;
-          response.error = err;
-          res.status(response.status).json(response);
-        } else {
-          if (!row) {
-            response.user = {};
-            response.status = 404;
-            res.status(response.status).json(response);
-          } else {
-            // Decrypt the cryptoKey
-            try {
-              const cryptedUser = JSON.parse(req.body.cryptedUser.cryptedUser);
-              const encryptionPrivateKey = await decryptJsonWebKey(JSON.parse(row.cryptoPrivateKey));
+    tableUser.getById(req.database.db, cryptedUserPayload.id, async function (err, row) {
+      if (err) {
+        return next(apiError.internal('db_error'));
+      }
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      // Decrypt the cryptoKey
+      try {
+        const cryptedUser = JSON.parse(cryptedUserPayload.cryptedUser);
+        const encryptionPrivateKey = await decryptJsonWebKey(JSON.parse(row.cryptoPrivateKey));
               // Payload in ArrayBuffer umwandeln
-              const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedKey));
+        const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedKey));
               // RSA Private Key importieren
-              const rsaHashedImportParams = {
-                name: "RSA-OAEP",
-                hash: "SHA-256"
-              };
+        const rsaHashedImportParams = {
+          name: "RSA-OAEP",
+          hash: "SHA-256"
+        };
 
-              const privateKey = await subtle.importKey(
-                "jwk",
-                encryptionPrivateKey,
-                rsaHashedImportParams,
-                true,
-                ["decrypt"]
-              );
+        const privateKey = await subtle.importKey(
+          "jwk",
+          encryptionPrivateKey,
+          rsaHashedImportParams,
+          true,
+          ["decrypt"]
+        );
 
               // Payload entschlüsseln
-              const decryptedPayload = await subtle.decrypt(
-                {
-                  name: "RSA-OAEP",
-                },
-                privateKey,
-                payloadBuffer
-              );
+        const decryptedPayload = await subtle.decrypt(
+          {
+            name: "RSA-OAEP",
+          },
+          privateKey,
+          payloadBuffer
+        );
 
               // Entschlüsselten AES-Schlüssel importieren
-              const decryptedKeyString = new TextDecoder().decode(decryptedPayload);
-              const aesJwk = JSON.parse(decryptedKeyString);
+        const decryptedKeyString = new TextDecoder().decode(decryptedPayload);
+        const aesJwk = JSON.parse(decryptedKeyString);
 
-              const algorithmIdentifier = {
-                name: "AES-GCM"
-              };
+        const algorithmIdentifier = {
+          name: "AES-GCM"
+        };
 
-              const cryptoKey = await subtle.importKey(
-                'jwk',
-                aesJwk,
-                algorithmIdentifier,
-                true,
-                ['encrypt', 'decrypt']
-              );
+        const cryptoKey = await subtle.importKey(
+          'jwk',
+          aesJwk,
+          algorithmIdentifier,
+          true,
+          ['encrypt', 'decrypt']
+        );
 
               // Decrypt the data.
-              try {
-                const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedData));
-                const decryptedPayload = await crypto.subtle.decrypt(
-                  {
-                    name: 'AES-GCM',
-                    iv: Buffer.from(JSON.parse(cryptedUser.iv))
-                  },
-                  cryptoKey,
-                  payloadBuffer,
-                );
-                let decoder = new TextDecoder('utf-8');
-                const user = JSON.parse(decoder.decode(decryptedPayload));
+        try {
+          const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedData));
+          const decryptedPayload = await crypto.subtle.decrypt(
+            {
+              name: 'AES-GCM',
+              iv: Buffer.from(JSON.parse(cryptedUser.iv))
+            },
+            cryptoKey,
+            payloadBuffer,
+          );
+          let decoder = new TextDecoder('utf-8');
+          const user = JSON.parse(decoder.decode(decryptedPayload));
 
-                if (user.pinHash === req.body.pinHash) {
-                  tableUser.updatePublicKeys(req.database.db, user.id, JSON.stringify(user.signingKeyPair.publicKey), JSON.stringify(user.cryptoKeyPair.publicKey), function (err) {
-                    if (err) {
-                      response.status = 500;
-                      response.error = err;
-                      res.status(response.status).json(response);
-                    }
-                    else {
-                      response.jwt = jwt.sign(
-                        { userId: user.id },
-                        secret,
-                        { expiresIn: '1h' }
-                      );
-                      response.user = user;
-                      response.status = 200;
-                      res.status(response.status).json(response);
-                    }
-                  }
-                  );
-                } else {
-                  response.status = 401;
-                  res.status(response.status).json(response);
-                }
-
-              } catch (err) {
-                response.status = 500;
-                response.error = 'Encryption failed';
-                req.logger?.error('user decrypt payload failed', { error: err?.message });
-                res.status(response.status).json(response);
+          if (user.pinHash === pinHash) {
+            tableUser.updatePublicKeys(req.database.db, user.id, JSON.stringify(user.signingKeyPair.publicKey), JSON.stringify(user.cryptoKeyPair.publicKey), function (err) {
+              if (err) {
+                return next(apiError.internal('db_error'));
               }
-            } catch (err) {
-              response.status = 500;
-              response.error = 'Encryption failed';
-              req.logger?.error('user decrypt crypto key failed', { error: err?.message });
-              res.status(response.status).json(response);
-            }
+              const token = jwt.sign(
+                { userId: user.id },
+                secret,
+                { expiresIn: '1h' }
+              );
+              res.status(200).json({ status: 200, jwt: token, user });
+            });
+          } else {
+            return next(apiError.unauthorized('unauthorized'));
           }
+
+        } catch (err) {
+          req.logger?.error('user decrypt payload failed', { error: err?.message });
+          return next(apiError.internal('encryption_failed'));
         }
-      });
-    }
+      } catch (err) {
+        req.logger?.error('user decrypt crypto key failed', { error: err?.message });
+        return next(apiError.internal('encryption_failed'));
+      }
+    });
 
   });
 
@@ -630,19 +601,15 @@ router.get('/delete/:userId',
     security.authenticate,
     metric.count('user.delete', { when: 'always', timezone: 'utc', amount: 1 })
   ]
-  , function (req, res) {
-    if (!ensureSameUser(req, res, req.params.userId)) {
+  , function (req, res, next) {
+    if (!ensureSameUser(req, res, req.params.userId, next)) {
       return;
     }
-    let response = { 'status': 0 };
     tableUser.deleteById(req.database.db, req.params.userId, function (err) {
       if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
+        return next(apiError.internal('db_error'));
       }
-      res.status(response.status).json(response);
+      res.status(200).json({ status: 200 });
     });
   });
 
@@ -666,19 +633,15 @@ router.post('/subscribe',
     security.authenticate,
     express.json({ type: 'application/json' })
   ]
-  , function (req, res) {
-    let response = { 'status': 0 };
-    if (!ensureSameUser(req, res, req.body.userId)) {
+  , function (req, res, next) {
+    if (!ensureSameUser(req, res, req.body.userId, next)) {
       return;
     }
     tableUser.subscribe(req.database.db, req.body.userId, req.body.subscription, function (err) {
       if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
+        return next(apiError.internal('db_error'));
       }
-      res.status(response.status).json(response);
+      res.status(200).json({ status: 200 });
     });
   });
 
@@ -686,19 +649,15 @@ router.get('/unsubscribe/:userId',
   [
     security.authenticate
   ]
-  , function (req, res) {
-    let response = { 'status': 0 };
-    if (!ensureSameUser(req, res, req.params.userId)) {
+  , function (req, res, next) {
+    if (!ensureSameUser(req, res, req.params.userId, next)) {
       return;
     }
     tableUser.unsubscribe(req.database.db, req.params.userId, function (err) {
       if (err) {
-        response.status = 500;
-        response.error = err;
-      } else {
-        response.status = 200;
+        return next(apiError.internal('db_error'));
       }
-      res.status(response.status).json(response);
+      res.status(200).json({ status: 200 });
     });
   });
 

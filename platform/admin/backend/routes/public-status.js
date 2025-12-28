@@ -12,6 +12,7 @@ const tableAppeal = require('../db/tableDsaAppeal');
 const multer = require('multer');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
+const { apiError } = require('../middleware/api-error');
 
 const evidenceUploadDir = path.join(__dirname, '..', 'uploads', 'evidence');
 
@@ -72,10 +73,10 @@ function parseDetails(entry) {
   catch { return { _raw: entry.detailsJson }; }
 }
 
-router.get('/status/:token', async (req, res) => {
+router.get('/status/:token', async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const _db = db(req);
-  if (!_db || !token) return res.status(400).json({ error: 'invalid_token' });
+  if (!_db || !token) return next(apiError.badRequest('invalid_token'));
 
   try {
     let notice = await toPromise(tableNotice.getByPublicToken, _db, token);
@@ -84,7 +85,7 @@ router.get('/status/:token', async (req, res) => {
     if (!notice) {
       signal = await toPromise(tableSignal.getByPublicToken, _db, token);
       if (!signal) {
-        return res.status(404).json({ error: 'not_found' });
+        return next(apiError.notFound('not_found'));
       }
     }
 
@@ -172,24 +173,26 @@ router.get('/status/:token', async (req, res) => {
       }))
     });
   } catch (err) {
-    res.status(500).json({ error: 'db_error', detail: err.message });
+    const apiErr = apiError.internal('db_error');
+    apiErr.detail = err.message;
+    return next(apiErr);
   }
 });
 
-router.post('/status/:token/appeals', async (req, res) => {
+router.post('/status/:token/appeals', async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const _db = db(req);
-  if (!_db || !token) return res.status(400).json({ error: 'invalid_token' });
+  if (!_db || !token) return next(apiError.badRequest('invalid_token'));
 
   try {
     const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
-    if (!notice) return res.status(404).json({ error: 'not_found' });
+    if (!notice) return next(apiError.notFound('not_found'));
 
     const decision = await toPromise(tableDecision.getByNoticeId, _db, notice.id);
-    if (!decision) return res.status(409).json({ error: 'decision_pending' });
+    if (!decision) return next(apiError.conflict('decision_pending'));
 
     const argsText = String(req.body?.arguments || '').trim();
-    if (!argsText) return res.status(400).json({ error: 'arguments_required' });
+    if (!argsText) return next(apiError.badRequest('arguments_required'));
 
     const filedBy = String(req.body?.contact || req.body?.filedBy || 'anonymous').trim() || 'anonymous';
     const now = Date.now();
@@ -243,37 +246,41 @@ router.post('/status/:token/appeals', async (req, res) => {
 
     res.status(201).json({ id });
   } catch (err) {
-    res.status(500).json({ error: 'db_error', detail: err.message });
+    const apiErr = apiError.internal('db_error');
+    apiErr.detail = err.message;
+    return next(apiErr);
   }
 });
 
-router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
+router.post('/status/:token/appeals/:appealId/evidence', (req, res, next) => {
   upload.single('file')(req, res, async (uploadErr) => {
     const token = String(req.params.token || '').trim();
     const appealId = String(req.params.appealId || '').trim();
     const _db = db(req);
 
     if (!_db || !token || !appealId) {
-      return res.status(400).json({ error: 'invalid_request' });
+      return next(apiError.badRequest('invalid_request'));
     }
 
     if (uploadErr) {
-      if (uploadErr.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'file_too_large' });
-      return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+      if (uploadErr.code === 'LIMIT_FILE_SIZE') return next(apiError.badRequest('file_too_large'));
+      const apiErr = apiError.badRequest('upload_failed');
+      apiErr.detail = uploadErr.message;
+      return next(apiErr);
     }
 
     const file = req.file;
-    if (!file) return res.status(400).json({ error: 'file_required' });
+    if (!file) return next(apiError.badRequest('file_required'));
 
     try {
       const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
-      if (!notice) return res.status(404).json({ error: 'not_found' });
+      if (!notice) return next(apiError.notFound('not_found'));
 
       const appeals = await new Promise((resolve, reject) => {
         tableAppeal.getById(_db, appealId, (err, row) => err ? reject(err) : resolve(row));
       });
 
-      if (!appeals) return res.status(404).json({ error: 'appeal_not_found' });
+      if (!appeals) return next(apiError.notFound('appeal_not_found'));
 
       const id = crypto.randomUUID();
       const now = Date.now();
@@ -289,7 +296,11 @@ router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
         file.filename,
         now,
         (err) => {
-          if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+          if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+          }
 
           tableAudit.create(
             _db,
@@ -307,24 +318,28 @@ router.post('/status/:token/appeals/:appealId/evidence', (req, res) => {
         }
       );
     } catch (err) {
-      res.status(500).json({ error: 'db_error', detail: err.message });
+      const apiErr = apiError.internal('db_error');
+      apiErr.detail = err.message;
+      return next(apiErr);
     }
   });
 });
 
 // Add general evidence to a notice via public token (no appeal association)
-router.post('/status/:token/evidence', (req, res) => {
+router.post('/status/:token/evidence', (req, res, next) => {
   upload.single('file')(req, res, async (uploadErr) => {
     const token = String(req.params.token || '').trim();
     const _db = db(req);
 
     if (!_db || !token) {
-      return res.status(400).json({ error: 'invalid_request' });
+      return next(apiError.badRequest('invalid_request'));
     }
 
     if (uploadErr) {
-      if (uploadErr.code === 'LIMIT_FILE_SIZE') return res.status(400).json({ error: 'file_too_large' });
-      return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+      if (uploadErr.code === 'LIMIT_FILE_SIZE') return next(apiError.badRequest('file_too_large'));
+      const apiErr = apiError.badRequest('upload_failed');
+      apiErr.detail = uploadErr.message;
+      return next(apiErr);
     }
 
     const hasFile = !!req.file;
@@ -334,22 +349,22 @@ router.post('/status/:token/evidence', (req, res) => {
 
     if (!hasFile) {
       if (type === 'url') {
-        if (!url) return res.status(400).json({ error: 'url_required' });
+        if (!url) return next(apiError.badRequest('url_required'));
         try {
           const parsed = new URL(url);
-          if (!/^https?:$/i.test(parsed.protocol)) return res.status(400).json({ error: 'invalid_url_protocol' });
-        } catch { return res.status(400).json({ error: 'invalid_url' }); }
-        if (url.length > 2000) return res.status(400).json({ error: 'url_too_long' });
+          if (!/^https?:$/i.test(parsed.protocol)) return next(apiError.badRequest('invalid_url_protocol'));
+        } catch { return next(apiError.badRequest('invalid_url')); }
+        if (url.length > 2000) return next(apiError.badRequest('url_too_long'));
       } else if (type === 'hash') {
-        if (!hash) return res.status(400).json({ error: 'hash_required' });
+        if (!hash) return next(apiError.badRequest('hash_required'));
       } else {
-        return res.status(400).json({ error: 'unsupported_type' });
+        return next(apiError.badRequest('unsupported_type'));
       }
     }
 
     try {
       const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
-      if (!notice) return res.status(404).json({ error: 'not_found' });
+      if (!notice) return next(apiError.notFound('not_found'));
 
       const id = crypto.randomUUID();
       const now = Date.now();
@@ -367,7 +382,11 @@ router.post('/status/:token/evidence', (req, res) => {
         storedName,
         now,
         (err) => {
-          if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+          if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+          }
 
           tableAudit.create(
             _db,
@@ -385,28 +404,30 @@ router.post('/status/:token/evidence', (req, res) => {
         }
       );
     } catch (err) {
-      res.status(500).json({ error: 'db_error', detail: err.message });
+      const apiErr = apiError.internal('db_error');
+      apiErr.detail = err.message;
+      return next(apiErr);
     }
   });
 });
 
 // Add URL evidence via public token using a dedicated endpoint (no multipart)
-router.post('/status/:token/evidence/url', async (req, res) => {
+router.post('/status/:token/evidence/url', async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const _db = db(req);
-  if (!_db || !token) return res.status(400).json({ error: 'invalid_request' });
+  if (!_db || !token) return next(apiError.badRequest('invalid_request'));
 
   const rawUrl = String(req.body?.url || '').trim();
-  if (!rawUrl) return res.status(400).json({ error: 'url_required' });
+  if (!rawUrl) return next(apiError.badRequest('url_required'));
   try {
     const parsed = new URL(rawUrl);
-    if (!/^https?:$/i.test(parsed.protocol)) return res.status(400).json({ error: 'invalid_url_protocol' });
-  } catch { return res.status(400).json({ error: 'invalid_url' }); }
-  if (rawUrl.length > 2000) return res.status(400).json({ error: 'url_too_long' });
+    if (!/^https?:$/i.test(parsed.protocol)) return next(apiError.badRequest('invalid_url_protocol'));
+  } catch { return next(apiError.badRequest('invalid_url')); }
+  if (rawUrl.length > 2000) return next(apiError.badRequest('url_too_long'));
 
   try {
     const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
-    if (!notice) return res.status(404).json({ error: 'not_found' });
+    if (!notice) return next(apiError.notFound('not_found'));
 
     const id = crypto.randomUUID();
     const now = Date.now();
@@ -421,7 +442,11 @@ router.post('/status/:token/evidence/url', async (req, res) => {
       null,
       now,
       (err) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+          const apiErr = apiError.internal('db_error');
+          apiErr.detail = err.message;
+          return next(apiErr);
+        }
 
         tableAudit.create(
           _db,
@@ -439,38 +464,40 @@ router.post('/status/:token/evidence/url', async (req, res) => {
       }
     );
   } catch (err) {
-    res.status(500).json({ error: 'db_error', detail: err.message });
+    const apiErr = apiError.internal('db_error');
+    apiErr.detail = err.message;
+    return next(apiErr);
   }
 });
 
 // Add URL evidence linked to an appeal (JSON body: { url: string })
-router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res) => {
+router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const appealId = String(req.params.appealId || '').trim();
   const _db = db(req);
-  if (!_db || !token || !appealId) return res.status(400).json({ error: 'invalid_request' });
+  if (!_db || !token || !appealId) return next(apiError.badRequest('invalid_request'));
 
   const rawUrl = String(req.body?.url || '').trim();
-  if (!rawUrl) return res.status(400).json({ error: 'url_required' });
+  if (!rawUrl) return next(apiError.badRequest('url_required'));
 
   // Basic validation: must be http(s) URL
   let parsed;
   try {
     parsed = new URL(rawUrl);
   } catch {
-    return res.status(400).json({ error: 'invalid_url' });
+    return next(apiError.badRequest('invalid_url'));
   }
-  if (!/^https?:$/i.test(parsed.protocol)) return res.status(400).json({ error: 'invalid_url_protocol' });
-  if (rawUrl.length > 2000) return res.status(400).json({ error: 'url_too_long' });
+  if (!/^https?:$/i.test(parsed.protocol)) return next(apiError.badRequest('invalid_url_protocol'));
+  if (rawUrl.length > 2000) return next(apiError.badRequest('url_too_long'));
 
   try {
     const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
-    if (!notice) return res.status(404).json({ error: 'not_found' });
+    if (!notice) return next(apiError.notFound('not_found'));
 
     const appeal = await new Promise((resolve, reject) => {
       tableAppeal.getById(_db, appealId, (err, row) => err ? reject(err) : resolve(row));
     });
-    if (!appeal) return res.status(404).json({ error: 'appeal_not_found' });
+    if (!appeal) return next(apiError.notFound('appeal_not_found'));
 
     const id = crypto.randomUUID();
     const now = Date.now();
@@ -485,7 +512,11 @@ router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res) =>
       null,
       now,
       (err) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+          const apiErr = apiError.internal('db_error');
+          apiErr.detail = err.message;
+          return next(apiErr);
+        }
 
         tableAudit.create(
           _db,
@@ -503,39 +534,43 @@ router.post('/status/:token/appeals/:appealId/evidence/url', async (req, res) =>
       }
     );
   } catch (err) {
-    return res.status(500).json({ error: 'db_error', detail: err.message });
+    const apiErr = apiError.internal('db_error');
+    apiErr.detail = err.message;
+    return next(apiErr);
   }
 });
 
-router.get('/status/:token/evidence/:id', async (req, res) => {
+router.get('/status/:token/evidence/:id', async (req, res, next) => {
   const token = String(req.params.token || '').trim();
   const evidenceId = String(req.params.id || '').trim();
   const _db = db(req);
-  if (!_db || !token || !evidenceId) return res.status(400).json({ error: 'invalid_request' });
+  if (!_db || !token || !evidenceId) return next(apiError.badRequest('invalid_request'));
 
   try {
     const notice = await toPromise(tableNotice.getByPublicToken, _db, token);
-    if (!notice) return res.status(404).json({ error: 'not_found' });
+    if (!notice) return next(apiError.notFound('not_found'));
 
     const evidence = await toPromise(tableEvidence.getById, _db, evidenceId);
     if (!evidence || evidence.noticeId !== notice.id || evidence.type !== 'file') {
-      return res.status(404).json({ error: 'evidence_not_found' });
+      return next(apiError.notFound('evidence_not_found'));
     }
 
     const safeName = evidence.filePath || evidence.fileName;
-    if (!safeName) return res.status(404).json({ error: 'file_missing' });
+    if (!safeName) return next(apiError.notFound('file_missing'));
 
     const fileOnDisk = path.join(evidenceUploadDir, path.basename(safeName));
     fs.access(fileOnDisk, fs.constants.R_OK, (err) => {
-      if (err) return res.status(404).json({ error: 'file_missing' });
+      if (err) return next(apiError.notFound('file_missing'));
       res.download(fileOnDisk, evidence.fileName || path.basename(fileOnDisk), (downloadErr) => {
         if (downloadErr && !res.headersSent) {
-          res.status(500).json({ error: 'download_failed' });
+          return next(apiError.internal('download_failed'));
         }
       });
     });
   } catch (err) {
-    res.status(500).json({ error: 'db_error', detail: err.message });
+    const apiErr = apiError.internal('db_error');
+    apiErr.detail = err.message;
+    return next(apiErr);
   }
 });
 

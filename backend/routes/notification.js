@@ -70,14 +70,22 @@ function isBackendTokenRequest(req) {
     }
 }
 
-function ensureSameUser(req, res, userId) {
+function ensureSameUser(req, res, userId, next) {
     const authUserId = getAuthenticatedUserId(req);
     if (!authUserId) {
-        res.status(401).json({ status: 401, error: 'unauthorized' });
+        if (next) {
+            next(apiError.unauthorized('unauthorized'));
+        } else {
+            res.status(401).json({ status: 401, error: 'unauthorized' });
+        }
         return false;
     }
     if (authUserId !== userId) {
-        res.status(403).json({ status: 403, error: 'forbidden' });
+        if (next) {
+            next(apiError.forbidden('forbidden'));
+        } else {
+            res.status(403).json({ status: 403, error: 'forbidden' });
+        }
         return false;
     }
     return true;
@@ -117,7 +125,7 @@ router.post('/create', [
         return next(apiError.badRequest('missing_required_fields'));
     }
 
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
         return;
     }
 
@@ -180,7 +188,7 @@ router.post('/create', [
 
 router.get('/list/:userId', [security.authenticate], (req, res, next) => {
     const userId = req.params.userId;
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
         return;
     }
 
@@ -222,7 +230,7 @@ router.get('/list/:userId', [security.authenticate], (req, res, next) => {
 
 router.get('/count/unread/:userId', [security.authenticate], (req, res, next) => {
     const userId = req.params.userId;
-    if (!ensureSameUser(req, res, userId)) {
+    if (!ensureSameUser(req, res, userId, next)) {
         return;
     }
 

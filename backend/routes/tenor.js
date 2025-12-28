@@ -2,12 +2,19 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const metric = require('../middleware/metric');
+const { apiError } = require('../middleware/api-error');
+
+function handleTenorError(err, next) {
+    const apiErr = apiError.badGateway('tenor_unavailable');
+    apiErr.detail = err?.message || err;
+    next(apiErr);
+}
 
 router.get('/featured/:country/:locale',
     [
         metric.count('tenor.featured', { when: 'always', timezone: 'utc', amount: 1 })
     ]
-    , async (req, res) => {
+    , async (req, res, next) => {
         const response = { status: 0 };
 
         const params = new URLSearchParams();
@@ -32,9 +39,7 @@ router.get('/featured/:country/:locale',
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
             console.error('Request error:', err);
-            response.status = 503;
-            response.error = 'Bad gateway to Tenor';
-            return res.status(response.status).json(response);
+            return handleTenorError(err, next);
         }
     });
 
@@ -42,7 +47,7 @@ router.get('/featured/:country/:locale/:next',
     [
         metric.count('tenor.featured', { when: 'always', timezone: 'utc', amount: 1 })
     ]
-    , async (req, res) => {
+    , async (req, res, next) => {
         const response = { status: 0 };
 
         const params = new URLSearchParams();
@@ -68,9 +73,7 @@ router.get('/featured/:country/:locale/:next',
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
             console.error('Request error:', err);
-            response.status = 503;
-            response.error = 'Bad gateway to Tenor';
-            return res.status(response.status).json(response);
+            return handleTenorError(err, next);
         }
     });
 
@@ -78,7 +81,7 @@ router.get('/search/:country/:locale/:searchTerm',
     [
         metric.count('tenor.search', { when: 'always', timezone: 'utc', amount: 1 })
     ]
-    , async (req, res) => {
+    , async (req, res, next) => {
         const response = { status: 0 };
         const params = new URLSearchParams();
         params.set('key', process.env.TENOR_API_KEY);
@@ -103,9 +106,7 @@ router.get('/search/:country/:locale/:searchTerm',
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
             console.error('Request error:', err);
-            response.status = 503;
-            response.error = 'Bad gateway to Tenor';
-            return res.status(response.status).json(response);
+            return handleTenorError(err, next);
         }
     });
 
@@ -113,7 +114,7 @@ router.get('/search/:country/:locale/:searchTerm/:next',
     [
         metric.count('tenor.search', { when: 'always', timezone: 'utc', amount: 1 })
     ]
-    , async (req, res) => {
+    , async (req, res, next) => {
         const response = { status: 0 };
         const params = new URLSearchParams();
         params.set('key', process.env.TENOR_API_KEY);
@@ -139,9 +140,7 @@ router.get('/search/:country/:locale/:searchTerm/:next',
             return res.status(tenorResponse.status).send(response);
         } catch (err) {
             console.error('Request error:', err);
-            response.status = 503;
-            response.error = 'Bad gateway to Tenor';
-            return res.status(response.status).json(response);
+            return handleTenorError(err, next);
         }
     });
 

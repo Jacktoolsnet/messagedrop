@@ -9,6 +9,7 @@ const axios = require('axios');
 const tableUser = require('../db/tableUser');
 const tableLoginOtp = require('../db/tableLoginOtp');
 const { requireAdminJwt, requireRole } = require('../middleware/security');
+const { apiError } = require('../middleware/api-error');
 
 const ADMIN_JWT_SECRET = process.env.ADMIN_JWT_SECRET;
 const ADMIN_ISS = process.env.ADMIN_ISS || 'https://admin-auth.messagedrop.app/';
@@ -96,9 +97,9 @@ function createChallenge(db, username, payload, logger) {
 }
 
 // ======================= LOGIN (ohne Guard) =======================
-router.post('/login', async (req, res) => {
+router.post('/login', async (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const { username, password } = req.body || {};
     const envUser = process.env.ADMIN_ROOT_USER;
@@ -112,7 +113,7 @@ router.post('/login', async (req, res) => {
                 return res.json({ status: 'otp_required', challengeId: id, expiresAt });
             } catch (otpErr) {
                 req.logger?.error('Root OTP challenge failed', { error: otpErr?.message });
-                return res.status(500).json({ message: 'otp_failed' });
+                return next(apiError.internal('otp_failed'));
             }
         }
 
@@ -120,12 +121,12 @@ router.post('/login', async (req, res) => {
         tableUser.getByUsername(db, username, async (err, user) => {
             if (err || !user) {
                 await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
-                return res.status(401).json({ message: 'Invalid login' });
+                return next(apiError.unauthorized('Invalid login'));
             }
             const match = await bcrypt.compare(password, user.password);
             if (!match) {
                 await notifyLoginFailure(username, 'invalid_user_or_password', req.logger);
-                return res.status(401).json({ message: 'Invalid login' });
+                return next(apiError.unauthorized('Invalid login'));
             }
 
             try {
@@ -138,43 +139,43 @@ router.post('/login', async (req, res) => {
                 res.json({ status: 'otp_required', challengeId: id, expiresAt });
             } catch (otpErr) {
                 req.logger?.error('OTP challenge failed', { error: otpErr?.message });
-                res.status(500).json({ message: 'otp_failed' });
+                return next(apiError.internal('otp_failed'));
             }
         });
     } catch (error) {
         req.logger?.error('Admin login failed', { error: error?.message });
-        res.status(500).json({ message: 'login_failed' });
+        return next(apiError.internal('login_failed'));
     }
 });
 
-router.post('/login/verify', async (req, res) => {
+router.post('/login/verify', async (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const { challengeId, otp } = req.body || {};
     if (!challengeId || !otp) {
-        return res.status(400).json({ message: 'missing_challenge_or_code' });
+        return next(apiError.badRequest('missing_challenge_or_code'));
     }
 
     const now = Date.now();
     tableLoginOtp.getById(db, challengeId, async (err, challenge) => {
         if (err || !challenge) {
             await notifyLoginFailure(null, 'invalid_challenge', req.logger);
-            return res.status(401).json({ message: 'invalid_challenge' });
+            return next(apiError.unauthorized('invalid_challenge'));
         }
         if (challenge.expiresAt < now) {
             await notifyLoginFailure(challenge.username, 'otp_expired', req.logger);
-            return res.status(401).json({ message: 'otp_expired' });
+            return next(apiError.unauthorized('otp_expired'));
         }
         if (challenge.consumedAt) {
             await notifyLoginFailure(challenge.username, 'otp_used', req.logger);
-            return res.status(401).json({ message: 'otp_used' });
+            return next(apiError.unauthorized('otp_used'));
         }
 
         const hashed = hashOtp(String(otp));
         if (hashed !== challenge.codeHash) {
             await notifyLoginFailure(challenge.username, 'otp_invalid', req.logger);
-            return res.status(401).json({ message: 'otp_invalid' });
+            return next(apiError.unauthorized('otp_invalid'));
         }
 
         let payload;
@@ -182,13 +183,13 @@ router.post('/login/verify', async (req, res) => {
             payload = JSON.parse(challenge.payload);
         } catch {
             req.logger?.error('OTP payload parse failed', { challengeId });
-            return res.status(500).json({ message: 'otp_payload_invalid' });
+            return next(apiError.internal('otp_payload_invalid'));
         }
 
         tableLoginOtp.consume(db, challengeId, (consumeErr) => {
             if (consumeErr) {
                 req.logger?.error('OTP consume failed', { error: consumeErr?.message, challengeId });
-                return res.status(500).json({ message: 'otp_failed' });
+                return next(apiError.internal('otp_failed'));
             }
 
             const token = jwt.sign(
@@ -206,9 +207,9 @@ router.use(requireAdminJwt);
 
 // ======================= GET /user =======================
 // admin/root: alle; sonst: nur eigener
-router.get('/', (req, res) => {
+router.get('/', (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
     const sub = req.admin?.sub;
@@ -216,15 +217,15 @@ router.get('/', (req, res) => {
 
     if (isAdminOrRoot(roles)) {
         tableUser.list(db, {}, (err, users) => {
-            if (err) return res.status(500).json({ message: 'DB error' });
+            if (err) return next(apiError.internal('DB error'));
             res.json(users.map(stripUser));
         });
     } else {
         tableUser.getById(db, sub, (err, u) => {
-            if (err) return res.status(500).json({ message: 'DB error' });
+            if (err) return next(apiError.internal('DB error'));
             if (u) return res.json([stripUser(u)]);
             tableUser.getByUsername(db, uname, (err2, u2) => {
-                if (err2) return res.status(500).json({ message: 'DB error' });
+                if (err2) return next(apiError.internal('DB error'));
                 res.json(u2 ? [stripUser(u2)] : []);
             });
         });
@@ -233,16 +234,16 @@ router.get('/', (req, res) => {
 
 // ======================= POST /user =======================
 // nur admin/root
-router.post('/', requireRole('admin', 'root'), async (req, res) => {
+router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     let { username, password, role = 'moderator' } = req.body || {};
     username = typeof username === 'string' ? username.trim() : '';
     password = typeof password === 'string' ? password.trim() : '';
 
     if (!username || !password) {
-        return res.status(400).json({ message: 'Missing username or password' });
+        return next(apiError.badRequest('Missing username or password'));
     }
 
     const id = crypto.randomUUID();
@@ -253,9 +254,9 @@ router.post('/', requireRole('admin', 'root'), async (req, res) => {
         if (err) {
             const msg = String(err.message || '');
             if (err.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
-                return res.status(409).json({ message: 'Username already exists' });
+                return next(apiError.conflict('Username already exists'));
             }
-            return res.status(500).json({ message: 'Could not create user' });
+            return next(apiError.internal('Could not create user'));
         }
         res.status(201).json(result); // { id }
     });
@@ -263,9 +264,9 @@ router.post('/', requireRole('admin', 'root'), async (req, res) => {
 
 // ======================= PUT /user/:id =======================
 // admin/root: username/role/password; normaler User: nur eigenes password
-router.put('/:id', async (req, res) => {
+router.put('/:id', async (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const { id } = req.params;
     let { username, role, password } = req.body || {};
@@ -274,7 +275,7 @@ router.put('/:id', async (req, res) => {
     if (typeof password === 'string') password = password.trim();
 
     if (!username && !role && !password) {
-        return res.status(400).json({ message: 'Nothing to update' });
+        return next(apiError.badRequest('Nothing to update'));
     }
 
     const roles = Array.isArray(req.admin?.roles) ? req.admin.roles : [];
@@ -282,26 +283,26 @@ router.put('/:id', async (req, res) => {
     const isSelf = req.admin?.sub === id;
 
     tableUser.getById(db, id, async (err, target) => {
-        if (err) return res.status(500).json({ message: 'DB error' });
-        if (!target) return res.status(404).json({ message: 'User not found' });
+        if (err) return next(apiError.internal('DB error'));
+        if (!target) return next(apiError.notFound('User not found'));
 
         if (!isAdminRoot) {
             // normaler User: nur eigenes Passwort
-            if (!isSelf) return res.status(403).json({ message: 'You cannot update other users' });
-            if (username || role) return res.status(403).json({ message: 'You cannot change username or role' });
-            if (!password) return res.status(400).json({ message: 'Nothing to update' });
+            if (!isSelf) return next(apiError.forbidden('You cannot update other users'));
+            if (username || role) return next(apiError.forbidden('You cannot change username or role'));
+            if (!password) return next(apiError.badRequest('Nothing to update'));
         }
 
         const allowedRoles = new Set(['moderator', 'admin', 'root']);
         const fields = {};
 
         if (isAdminRoot && username && username !== target.username) {
-            if (username.length < 3) return res.status(400).json({ message: 'Username must be at least 3 characters' });
+            if (username.length < 3) return next(apiError.badRequest('Username must be at least 3 characters'));
             fields.username = username;
         }
 
         if (isAdminRoot && role && role !== target.role) {
-            if (!allowedRoles.has(role)) return res.status(400).json({ message: 'Invalid role' });
+            if (!allowedRoles.has(role)) return next(apiError.badRequest('Invalid role'));
             fields.role = role;
         }
 
@@ -311,18 +312,18 @@ router.put('/:id', async (req, res) => {
         }
 
         if (Object.keys(fields).length === 0) {
-            return res.status(403).json({ message: 'Nothing to update or insufficient permissions' });
+            return next(apiError.forbidden('Nothing to update or insufficient permissions'));
         }
 
         tableUser.update(db, id, fields, (e, ok) => {
             if (e) {
                 const msg = String(e.message || '');
                 if (e.code === 'SQLITE_CONSTRAINT' || msg.includes('UNIQUE')) {
-                    return res.status(409).json({ message: 'Username already exists' });
+                    return next(apiError.conflict('Username already exists'));
                 }
-                return res.status(500).json({ message: 'Update failed' });
+                return next(apiError.internal('Update failed'));
             }
-            if (!ok) return res.status(404).json({ message: 'User not found' });
+            if (!ok) return next(apiError.notFound('User not found'));
             res.json({ updated: true });
         });
     });
@@ -330,18 +331,18 @@ router.put('/:id', async (req, res) => {
 
 // ======================= DELETE /user/:id =======================
 // nur admin/root; self-delete blockieren
-router.delete('/:id', requireRole('admin', 'root'), (req, res) => {
+router.delete('/:id', requireRole('admin', 'root'), (req, res, next) => {
     const db = req.database?.db;
-    if (!db) return res.status(500).json({ message: 'database_unavailable' });
+    if (!db) return next(apiError.internal('database_unavailable'));
 
     const { id } = req.params;
     if (req.admin?.sub === id) {
-        return res.status(400).json({ message: 'You cannot delete your own account.' });
+        return next(apiError.badRequest('You cannot delete your own account.'));
     }
 
     tableUser.deleteById(db, id, (err, ok) => {
-        if (err) return res.status(500).json({ message: 'Delete failed' });
-        if (!ok) return res.status(404).json({ message: 'User not found' });
+        if (err) return next(apiError.internal('Delete failed'));
+        if (!ok) return next(apiError.notFound('User not found'));
         res.json({ deleted: true });
     });
 });

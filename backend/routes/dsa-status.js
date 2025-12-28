@@ -4,6 +4,7 @@ const multer = require('multer');
 const FormData = require('form-data');
 const rateLimit = require('express-rate-limit');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
 const upload = multer({ limits: { fileSize: 5 * 1024 * 1024 } });
@@ -38,6 +39,13 @@ const evidenceLimiter = rateLimit({
   message: rateLimitMessage('Too many evidence uploads, please try again later.')
 });
 
+function buildForwardError(err) {
+  const status = err?.response?.status || 502;
+  const apiErr = apiError.fromStatus(status);
+  apiErr.detail = err?.response?.data || err?.message || null;
+  return apiErr;
+}
+
 function adminBase(path) {
   const base = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}`.replace(/\/+$/, '');
   return `${base}/public${path}`;
@@ -71,16 +79,16 @@ async function forwardPost(path, body, opts = {}) {
   });
 }
 
-router.get('/status/:token', statusLimiter, async (req, res) => {
+router.get('/status/:token', statusLimiter, async (req, res, next) => {
   try {
     const resp = await forwardGet(`/status/${encodeURIComponent(req.params.token)}`);
     res.status(resp.status).json(resp.data);
   } catch (err) {
-    res.status(err.response?.status || 502).json(err.response?.data || { error: 'bad_gateway' });
+    return next(buildForwardError(err));
   }
 });
 
-router.get('/status/:token/evidence/:id', statusLimiter, async (req, res) => {
+router.get('/status/:token/evidence/:id', statusLimiter, async (req, res, next) => {
   try {
     const resp = await forwardGet(`/status/${encodeURIComponent(req.params.token)}/evidence/${encodeURIComponent(req.params.id)}`, { responseType: 'arraybuffer' });
     Object.entries(resp.headers || {}).forEach(([key, value]) => {
@@ -88,25 +96,21 @@ router.get('/status/:token/evidence/:id', statusLimiter, async (req, res) => {
     });
     res.status(resp.status).send(resp.data);
   } catch (err) {
-    if (err.response) {
-      res.status(err.response.status).json(err.response.data);
-    } else {
-      res.status(502).json({ error: 'bad_gateway' });
-    }
+    return next(buildForwardError(err));
   }
 });
 
-router.post('/status/:token/appeals', appealLimiter, express.json({ limit: '2mb' }), async (req, res) => {
+router.post('/status/:token/appeals', appealLimiter, express.json({ limit: '2mb' }), async (req, res, next) => {
   try {
     const resp = await forwardPost(`/status/${encodeURIComponent(req.params.token)}/appeals`, req.body);
     res.status(resp.status).json(resp.data);
   } catch (err) {
-    res.status(err.response?.status || 502).json(err.response?.data || { error: 'bad_gateway' });
+    return next(buildForwardError(err));
   }
 });
 
-router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload.single('file'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'file_required' });
+router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload.single('file'), async (req, res, next) => {
+  if (!req.file) return next(apiError.badRequest('file_required'));
   try {
     const form = new FormData();
     form.append('file', req.file.buffer, req.file.originalname);
@@ -127,12 +131,12 @@ router.post('/status/:token/appeals/:appealId/evidence', evidenceLimiter, upload
     );
     res.status(resp.status).json(resp.data);
   } catch (err) {
-    res.status(err.response?.status || 502).json(err.response?.data || { error: 'bad_gateway' });
+    return next(buildForwardError(err));
   }
 });
 
 // Forward adding URL evidence for an appeal (JSON body)
-router.post('/status/:token/appeals/:appealId/evidence/url', evidenceLimiter, express.json({ limit: '1mb' }), async (req, res) => {
+router.post('/status/:token/appeals/:appealId/evidence/url', evidenceLimiter, express.json({ limit: '1mb' }), async (req, res, next) => {
   try {
     const resp = await forwardPost(
       `/status/${encodeURIComponent(req.params.token)}/appeals/${encodeURIComponent(req.params.appealId)}/evidence/url`,
@@ -140,7 +144,7 @@ router.post('/status/:token/appeals/:appealId/evidence/url', evidenceLimiter, ex
     );
     res.status(resp.status).json(resp.data);
   } catch (err) {
-    res.status(err.response?.status || 502).json(err.response?.data || { error: 'bad_gateway' });
+    return next(buildForwardError(err));
   }
 });
 

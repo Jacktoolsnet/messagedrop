@@ -4,6 +4,7 @@ const router = express.Router();
 const axios = require('axios');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const metric = require('../middleware/metric');
+const { apiError } = require('../middleware/api-error');
 
 // Ein eigenes Axios-Client mit BaseURL + Backend-Token
 const client = axios.create({
@@ -16,10 +17,17 @@ const client = axios.create({
     }
 });
 
+function buildUpstreamError(err) {
+    const status = err?.response?.status || 502;
+    const apiErr = apiError.fromStatus(status);
+    apiErr.detail = err?.response?.data || err?.message || null;
+    return apiErr;
+}
+
 // GET /airquality/:pluscode/:latitude/:longitude/:days  (alter Pfad beibehalten)
 router.get('/:pluscode/:latitude/:longitude/:days', [
     metric.count('airquality', { when: 'always', timezone: 'utc', amount: 1 })
-], async (req, res) => {
+], async (req, res, next) => {
     const { pluscode, latitude, longitude, days } = req.params;
 
     try {
@@ -46,12 +54,7 @@ router.get('/:pluscode/:latitude/:longitude/:days', [
     } catch (err) {
         // Netzwerk-/Timeout-/Axios-Fehler
         req.logger.error('[airQuality.proxy] upstream error:', err?.message || err);
-        const isAxios = !!err?.isAxiosError;
-        const status = isAxios ? (err.response?.status || 502) : 500;
-        const payload = isAxios
-            ? (err.response?.data || { status, error: 'Upstream request failed' })
-            : { status, error: 'Internal server error' };
-        res.status(status).json(payload);
+        return next(buildUpstreamError(err));
     }
 });
 

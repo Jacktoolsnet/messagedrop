@@ -8,6 +8,7 @@ const { requireAdminJwt, requireRole } = require('../middleware/security');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { apiError } = require('../middleware/api-error');
 
 const tableSignal = require('../db/tableDsaSignal');
 const tableNotice = require('../db/tableDsaNotice');
@@ -386,8 +387,8 @@ function mapNotificationRow(row) {
 
 
 /* ----------------------------- Notices ----------------------------- */
-router.get('/notices', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/notices', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const status = req.query.status;
     const statusFilter = status ? (Array.isArray(status) ? status : [status]) : undefined;
@@ -402,47 +403,67 @@ router.get('/notices', (req, res) => {
             offset: asNum(req.query.offset, 0)
         },
         (err, rows) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+            if (err) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
+            }
             res.json(rows);
         }
     );
 });
 
-router.get('/notices/:id', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/notices/:id', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
     tableNotice.getById(_db, req.params.id, (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!row) return res.status(404).json({ error: 'not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!row) return next(apiError.notFound('not_found'));
         res.json(row);
     });
 });
 
 // Public status URL for a notice
-router.get('/notices/:id/status-url', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/notices/:id/status-url', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
     tableNotice.getById(_db, req.params.id, (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!row) return res.status(404).json({ error: 'not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!row) return next(apiError.notFound('not_found'));
         const statusUrl = buildStatusUrl(row.publicToken);
-        if (!statusUrl) return res.status(404).json({ error: 'status_unavailable' });
+        if (!statusUrl) return next(apiError.notFound('status_unavailable'));
         res.json({ statusUrl });
     });
 });
 
-router.patch('/notices/:id/status', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.patch('/notices/:id/status', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const newStatus = String(req.body?.status || 'UNDER_REVIEW');
     const updatedAt = Date.now();
     const noticeId = String(req.params.id);
 
     tableNotice.getById(_db, noticeId, (lookupErr, noticeRow) => {
-        if (lookupErr) return res.status(500).json({ error: 'db_error', detail: lookupErr.message });
-        if (!noticeRow) return res.status(404).json({ error: 'not_found' });
+        if (lookupErr) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = lookupErr.message;
+            return next(apiErr);
+        }
+        if (!noticeRow) return next(apiError.notFound('not_found'));
 
         tableNotice.updateStatus(_db, noticeId, newStatus, updatedAt, (err, ok) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-            if (!ok) return res.status(404).json({ error: 'not_found' });
+            if (err) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
+            }
+            if (!ok) return next(apiError.notFound('not_found'));
 
             // Audit
             const auditId = crypto.randomUUID();
@@ -491,25 +512,29 @@ router.patch('/notices/:id/status', (req, res) => {
  * GET /dsa/backend/notices/:id/decision
  * Liefert die Entscheidung (falls vorhanden) zu einer Notice.
  */
-router.get('/notices/:id/decision', (req, res) => {
+router.get('/notices/:id/decision', (req, res, next) => {
     const _db = req.database?.db;
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     const noticeId = req.params.id;
-    if (!noticeId) return res.status(400).json({ error: 'missing_notice_id' });
+    if (!noticeId) return next(apiError.badRequest('missing_notice_id'));
 
     const tableDecision = require('../db/tableDsaDecision');
 
     tableDecision.getByNoticeId(_db, noticeId, (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!row) return res.status(404).json({ error: 'decision_not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!row) return next(apiError.notFound('decision_not_found'));
         res.json(row);
     });
 });
 
 /* ---------------------------- Decisions ---------------------------- */
-router.post('/notices/:id/decision', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/notices/:id/decision', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = crypto.randomUUID();
     const decidedAt = Date.now();
@@ -520,8 +545,12 @@ router.post('/notices/:id/decision', (req, res) => {
     const statement = asString(req.body?.statement);
 
     tableNotice.getById(_db, req.params.id, (lookupErr, noticeRow) => {
-        if (lookupErr) return res.status(500).json({ error: 'db_error', detail: lookupErr.message });
-        if (!noticeRow) return res.status(404).json({ error: 'notice_not_found' });
+        if (lookupErr) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = lookupErr.message;
+            return next(apiErr);
+        }
+        if (!noticeRow) return next(apiError.notFound('notice_not_found'));
 
         // Fetch previous decision (if any) to log a clear change event for timelines
         tableDecision.getByNoticeId(_db, req.params.id, (prevErr, prevDecisionRow) => {
@@ -531,7 +560,11 @@ router.post('/notices/:id/decision', (req, res) => {
             _db, id, req.params.id, outcome, legalBasis, tosBasis, automatedUsed,
             `admin:${req.admin?.sub || 'unknown'}`, decidedAt, statement,
             (err, row) => {
-                if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+                if (err) {
+                    const apiErr = apiError.internal('db_error');
+                    apiErr.detail = err.message;
+                    return next(apiErr);
+                }
 
                 // Status -> DECIDED
                 tableNotice.updateStatus(_db, req.params.id, 'DECIDED', decidedAt, () => { });
@@ -610,8 +643,8 @@ router.post('/notices/:id/decision', (req, res) => {
 });
 
 /* ----------------------------- Appeals ----------------------------- */
-router.get('/appeals', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/appeals', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const status = String(req.query?.status || 'open').toLowerCase();
     const noticeId = asString(req.query?.noticeId);
@@ -671,16 +704,20 @@ router.get('/appeals', (req, res) => {
     params.push(offset);
 
     _db.all(sql, params, (err, rows) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         res.json(rows || []);
     });
 });
 
-router.patch('/appeals/:id/resolution', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.patch('/appeals/:id/resolution', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const appealId = String(req.params.id || '').trim();
-    if (!appealId) return res.status(400).json({ error: 'invalid_appeal_id' });
+    if (!appealId) return next(apiError.badRequest('invalid_appeal_id'));
 
     const outcome = asString(req.body?.outcome);
     const reviewer = asString(req.body?.reviewer) || `admin:${req.admin?.sub || 'unknown'}`;
@@ -688,8 +725,12 @@ router.patch('/appeals/:id/resolution', (req, res) => {
     const resolvedAt = outcome ? Date.now() : null;
 
     tableAppeal.updateResolution(_db, appealId, outcome, resolvedAt, reviewer, (err, ok) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!ok) return res.status(404).json({ error: 'appeal_not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!ok) return next(apiError.notFound('appeal_not_found'));
 
         const auditId = crypto.randomUUID();
         tableAudit.create(
@@ -767,15 +808,19 @@ router.patch('/appeals/:id/resolution', (req, res) => {
 });
 
 /* ----------------------------- Evidence ----------------------------- */
-router.post('/notices/:id/evidence', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/notices/:id/evidence', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     upload.single('file')(req, res, (uploadErr) => {
         if (uploadErr) {
             if (uploadErr.code === 'LIMIT_FILE_SIZE') {
-                return res.status(400).json({ error: 'file_too_large', maxBytes: 5 * 1024 * 1024 });
+                const apiErr = apiError.badRequest('file_too_large');
+                apiErr.maxBytes = 5 * 1024 * 1024;
+                return next(apiErr);
             }
-            return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+            const apiErr = apiError.badRequest('upload_failed');
+            apiErr.detail = uploadErr.message;
+            return next(apiErr);
         }
 
         const id = crypto.randomUUID();
@@ -787,13 +832,13 @@ router.post('/notices/:id/evidence', (req, res) => {
         const hash = asString(req.body?.hash);
 
         if (type === 'url' && !url) {
-            return res.status(400).json({ error: 'url_required' });
+            return next(apiError.badRequest('url_required'));
         }
         if (type === 'hash' && !hash) {
-            return res.status(400).json({ error: 'hash_required' });
+            return next(apiError.badRequest('hash_required'));
         }
         if (type === 'file' && !hasFile) {
-            return res.status(400).json({ error: 'file_required' });
+            return next(apiError.badRequest('file_required'));
         }
 
         const fileName = hasFile ? req.file.originalname : null;
@@ -814,7 +859,9 @@ router.post('/notices/:id/evidence', (req, res) => {
                     if (hasFile) {
                         fs.promises.unlink(path.join(evidenceUploadDir, storedName)).catch(() => { });
                     }
-                    return res.status(500).json({ error: 'db_error', detail: err.message });
+                    const apiErr = apiError.internal('db_error');
+                    apiErr.detail = err.message;
+                    return next(apiErr);
                 }
 
                 const auditId = crypto.randomUUID();
@@ -839,8 +886,8 @@ router.post('/notices/:id/evidence', (req, res) => {
  *  - Requires Playwright (or Playwright Chromium) to be installed in the backend runtime.
  *  - Applies basic SSRF protections (scheme/http(s), disallow local/priv ranges, localhost).
  */
-router.post('/notices/:id/evidence/screenshot', async (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/notices/:id/evidence/screenshot', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const rawUrl = asString(req.body?.url);
     const fullPage = Boolean(req.body?.fullPage ?? true);
@@ -854,12 +901,12 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
     const cookies = Array.isArray(req.body?.cookies) ? req.body.cookies : null; // [{ name, value, domain, path }]
     const acceptLanguage = asString(req.body?.acceptLanguage) || 'de-DE,de;q=0.9,en-US;q=0.8,en;q=0.7';
 
-    if (!rawUrl) return res.status(400).json({ error: 'url_required' });
+    if (!rawUrl) return next(apiError.badRequest('url_required'));
 
     let u;
-    try { u = new URL(rawUrl); } catch { return res.status(400).json({ error: 'invalid_url' }); }
+    try { u = new URL(rawUrl); } catch { return next(apiError.badRequest('invalid_url')); }
     if (!/^https?:$/.test(u.protocol)) {
-        return res.status(400).json({ error: 'unsupported_scheme' });
+        return next(apiError.badRequest('unsupported_scheme'));
     }
     const hostLc = u.hostname.toLowerCase();
     // naive SSRF guards (IP-literals and localhost names)
@@ -877,7 +924,7 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
         return false;
     };
     if (isPrivateIp(hostLc)) {
-        return res.status(400).json({ error: 'blocked_destination' });
+        return next(apiError.badRequest('blocked_destination'));
     }
 
     // Lazy-load Playwright. Try full package then chromium-only.
@@ -890,7 +937,9 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
             pw = require('playwright-chromium');
         } catch (chromiumError) {
             req.logger?.error('Playwright not installed', { error: chromiumError?.message });
-            return res.status(501).json({ error: 'screenshot_unavailable', detail: 'playwright not installed' });
+            const apiErr = apiError.custom(501, 'NOT_IMPLEMENTED', 'screenshot_unavailable');
+            apiErr.detail = 'playwright not installed';
+            return next(apiErr);
         }
     }
 
@@ -1000,7 +1049,9 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
         }
         // cleanup any partial file
         fs.promises.unlink(outPath).catch(() => { });
-        return res.status(502).json({ error: 'screenshot_failed', detail: err?.message || String(err) });
+        const apiErr = apiError.badGateway('screenshot_failed');
+        apiErr.detail = err?.message || String(err);
+        return next(apiErr);
     }
 
     try {
@@ -1025,7 +1076,9 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
         (err, row) => {
             if (err) {
                 fs.promises.unlink(outPath).catch(() => { });
-                return res.status(500).json({ error: 'db_error', detail: err.message });
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
             }
 
             const auditId = crypto.randomUUID();
@@ -1041,36 +1094,44 @@ router.post('/notices/:id/evidence/screenshot', async (req, res) => {
     );
 });
 
-router.get('/notices/:id/evidence', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/notices/:id/evidence', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableEvidence.listByNotice(
         _db,
         { noticeId: req.params.id, type: asString(req.query?.type), limit: asNum(req.query.limit, 100), offset: asNum(req.query.offset, 0) },
         (err, rows) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+            if (err) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
+            }
             res.json(rows);
         }
     );
 });
 
-router.get('/evidence/:id/download', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/evidence/:id/download', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableEvidence.getById(_db, String(req.params.id), (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         if (!row || row.type !== 'file' || !row.filePath) {
-            return res.status(404).json({ error: 'file_not_found' });
+            return next(apiError.notFound('file_not_found'));
         }
 
         const safeFile = path.basename(row.filePath);
         const fileOnDisk = path.join(evidenceUploadDir, safeFile);
 
         fs.access(fileOnDisk, fs.constants.R_OK, (accessErr) => {
-            if (accessErr) return res.status(404).json({ error: 'file_not_found' });
+            if (accessErr) return next(apiError.notFound('file_not_found'));
             res.download(fileOnDisk, row.fileName || safeFile, (downloadErr) => {
                 if (downloadErr && !res.headersSent) {
-                    res.status(500).json({ error: 'download_failed' });
+                    return next(apiError.internal('download_failed'));
                 }
             });
         });
@@ -1078,8 +1139,8 @@ router.get('/evidence/:id/download', (req, res) => {
 });
 
 /* --------------------------- Notifications --------------------------- */
-router.post('/notifications', async (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/notifications', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const sentAt = Date.now();
     const noticeId = asString(req.body?.noticeId);
@@ -1101,7 +1162,7 @@ router.post('/notifications', async (req, res) => {
         auditActor: actor
     });
 
-    if (!id) return res.status(500).json({ error: 'db_error' });
+    if (!id) return next(apiError.internal('db_error'));
 
     // Optional immediate delivery for email notifications
     try {
@@ -1144,8 +1205,8 @@ router.post('/notifications', async (req, res) => {
     res.status(201).json({ id });
 });
 
-router.get('/notifications', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/notifications', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const opts = {
         noticeId: asString(req.query.noticeId ?? undefined) || undefined,
@@ -1157,7 +1218,11 @@ router.get('/notifications', (req, res) => {
     };
 
     tableNotification.list(_db, opts, (err, rows) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
 
         const mapped = (rows || []).map(mapNotificationRow);
         const q = asString(req.query.q);
@@ -1199,18 +1264,22 @@ router.get('/notifications', (req, res) => {
     });
 });
 
-router.get('/notifications/:id', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/notifications/:id', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableNotification.getById(_db, String(req.params.id), (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!row) return res.status(404).json({ error: 'not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!row) return next(apiError.notFound('not_found'));
         res.json(mapNotificationRow(row));
     });
 });
 
-router.post('/notifications/:id/resend', async (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/notifications/:id/resend', async (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const notificationId = String(req.params.id);
 
@@ -1220,15 +1289,17 @@ router.post('/notifications/:id/resend', async (req, res) => {
             resolve(value || null);
         });
     }).catch((error) => {
-        res.status(500).json({ error: 'db_error', detail: error.message });
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = error.message;
+        next(apiErr);
         return null;
     });
     if (row === null) return; // response already sent above
-    if (!row) return res.status(404).json({ error: 'not_found' });
+    if (!row) return next(apiError.notFound('not_found'));
 
     const mapped = mapNotificationRow(row);
     if ((mapped.meta?.success === false) && req.body?.skipFailed === true) {
-        return res.status(409).json({ error: 'notification_failed_initially' });
+        return next(apiError.conflict('notification_failed_initially'));
     }
 
     const actor = `admin:${req.admin?.sub || 'unknown'}`;
@@ -1247,7 +1318,7 @@ router.post('/notifications/:id/resend', async (req, res) => {
         const from = mail.from || payload.from || undefined;
 
         if (!to || !subject || (!text && !html)) {
-            return res.status(400).json({ error: 'invalid_mail_payload' });
+            return next(apiError.badRequest('invalid_mail_payload'));
         }
 
         const result = await sendMail({ to, subject, text, html, from, logger: req.logger });
@@ -1279,11 +1350,11 @@ router.post('/notifications/:id/resend', async (req, res) => {
         const metadata = payload.metadata || {};
 
         if (!destination || !body) {
-            return res.status(400).json({ error: 'invalid_inapp_payload' });
+            return next(apiError.badRequest('invalid_inapp_payload'));
         }
 
         if (!process.env.BASE_URL || !process.env.PORT) {
-            return res.status(500).json({ error: 'notification_service_unavailable' });
+            return next(apiError.internal('notification_service_unavailable'));
         }
 
         const deliveryPayload = {
@@ -1344,70 +1415,90 @@ router.post('/notifications/:id/resend', async (req, res) => {
             auditActor: actor
         });
     } else {
-        return res.status(400).json({ error: 'resend_not_supported', channel: mapped.channel });
+        const apiErr = apiError.badRequest('resend_not_supported');
+        apiErr.channel = mapped.channel;
+        return next(apiErr);
     }
 
     res.json({ success: resendSuccess });
 });
 
 /* ------------------------------- Audit ------------------------------- */
-router.get('/audit/:entityType/:entityId', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/audit/:entityType/:entityId', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableAudit.listByEntity(
         _db,
         { entityType: String(req.params.entityType), entityId: String(req.params.entityId), limit: asNum(req.query.limit, 200), offset: asNum(req.query.offset, 0) },
         (err, rows) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+            if (err) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
+            }
             res.json(rows);
         }
     );
 });
 
 /** -------------------- STATS: NOTICES -------------------- **/
-router.get('/stats/notices', (req, res) => {
+router.get('/stats/notices', (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableNotice.stats(_db, (err, result) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         res.json(result); // { total, open, byStatus }
     });
 });
 
 /** -------------------- STATS: APPEALS -------------------- **/
-router.get('/stats/appeals', (req, res) => {
+router.get('/stats/appeals', (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableAppeal.stats(_db, (err, result) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         res.json(result);
     });
 });
 
 /** -------------------- STATS: SIGNALS -------------------- **/
-router.get('/stats/signals', (req, res) => {
+router.get('/stats/signals', (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableSignal.stats(_db, (err, result) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         res.json(result); // { total, last24h, byType }
     });
 });
 
 /* -------------------------- Transparency -------------------------- */
-router.get('/transparency/stats', async (req, res) => {
+router.get('/transparency/stats', async (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     try {
         const range = String(req.query.range || '90d');
         const stats = await buildTransparencyStats(_db, range);
         res.json(stats);
     } catch (err) {
-        res.status(500).json({ error: 'db_error', detail: err instanceof Error ? err.message : String(err) });
+        const apiErr = apiError.internal('db_error');
+        apiErr.detail = err instanceof Error ? err.message : String(err);
+        return next(apiErr);
     }
 });
 
@@ -1461,14 +1552,14 @@ router.get('/transparency/reports', (req, res) => {
     res.json(reports);
 });
 
-router.get('/transparency/reports/:id/download', async (req, res) => {
+router.get('/transparency/reports/:id/download', async (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     const preset = transparencyPresets.find(p => p.id === req.params.id);
     const rangeKey = preset?.range || (req.params.id.startsWith('custom-') ? req.params.id.replace('custom-', '') : null);
     if (!rangeKey) {
-        return res.status(404).json({ error: 'report_not_found' });
+        return next(apiError.notFound('report_not_found'));
     }
 
     try {
@@ -1480,7 +1571,9 @@ router.get('/transparency/reports/:id/download', async (req, res) => {
         res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
         res.send(csv);
     } catch (err) {
-        res.status(500).json({ error: 'report_generation_failed', detail: err instanceof Error ? err.message : String(err) });
+        const apiErr = apiError.internal('report_generation_failed');
+        apiErr.detail = err instanceof Error ? err.message : String(err);
+        return next(apiErr);
     }
 });
 
@@ -1496,8 +1589,8 @@ router.get('/transparency/reports/:id/download', async (req, res) => {
  *  - q: LIKE über reasonText/contentId/reportedContent
  *  - limit, offset
  */
-router.get('/signals', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/signals', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const opts = {
         contentId: req.query.contentId ? String(req.query.contentId) : undefined,
@@ -1510,7 +1603,11 @@ router.get('/signals', (req, res) => {
     };
 
     tableSignal.list(_db, opts, (err, rows) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         res.json(rows);
     });
 });
@@ -1518,24 +1615,32 @@ router.get('/signals', (req, res) => {
 /**
  * GET /signals/:id
  */
-router.get('/signals/:id', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/signals/:id', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     tableSignal.getById(_db, String(req.params.id), (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!row) return res.status(404).json({ error: 'not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!row) return next(apiError.notFound('not_found'));
         res.json(row);
     });
 });
 
 // Public status URL for a signal
-router.get('/signals/:id/status-url', (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.get('/signals/:id/status-url', (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
     tableSignal.getById(_db, String(req.params.id), (err, row) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!row) return res.status(404).json({ error: 'not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!row) return next(apiError.notFound('not_found'));
         const statusUrl = buildStatusUrl(row.publicToken);
-        if (!statusUrl) return res.status(404).json({ error: 'status_unavailable' });
+        if (!statusUrl) return next(apiError.notFound('status_unavailable'));
         res.json({ statusUrl });
     });
 });
@@ -1546,16 +1651,20 @@ router.get('/signals/:id/status-url', (req, res) => {
  * - audit: signal:promote, notice:create
  * - **löscht** das Signal + audit: signal:delete (mit Snapshot)
  */
-router.post('/signals/:id/promote', (req, res) => {
+router.post('/signals/:id/promote', (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     const signalId = String(req.params.id);
     const now = Date.now();
 
     tableSignal.getById(_db, signalId, (err, sig) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
-        if (!sig) return res.status(404).json({ error: 'signal_not_found' });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
+        if (!sig) return next(apiError.notFound('signal_not_found'));
 
         // Notice aus Signal bauen
         const noticeId = crypto.randomUUID();
@@ -1592,7 +1701,11 @@ router.post('/signals/:id/promote', (req, res) => {
             noticeToken,
             noticeTokenCreatedAt,
             (err2) => {
-                if (err2) return res.status(500).json({ error: 'db_error', detail: err2.message });
+                if (err2) {
+                    const apiErr = apiError.internal('db_error');
+                    apiErr.detail = err2.message;
+                    return next(apiErr);
+                }
 
                 // Audit: Signal → promote
                 const auditId1 = crypto.randomUUID();
@@ -1679,9 +1792,9 @@ router.post('/signals/:id/promote', (req, res) => {
  * DELETE /signals/:id
  * - Hard delete + Audit (inkl. optionalem reason aus Body)
  */
-router.delete('/signals/:id', (req, res) => {
+router.delete('/signals/:id', (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = String(req.params.id);
     const reason = (req.body && typeof req.body.reason === 'string') ? req.body.reason : 'dismissed_by_admin';
@@ -1689,26 +1802,35 @@ router.delete('/signals/:id', (req, res) => {
 
     // Für Audit Snapshot holen
     tableSignal.getById(_db, id, async (e1, sig) => {
-        if (e1) return res.status(500).json({ error: 'db_error', detail: e1.message });
-        if (!sig) return res.status(404).json({ error: 'not_found' });
+        if (e1) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = e1.message;
+            return next(apiErr);
+        }
+        if (!sig) return next(apiError.notFound('not_found'));
 
         try {
             const resp = await enablePublicMessage(String(sig.contentId));
             if (!resp.ok) {
-                return res.status(502).json({
-                    error: 'enable_failed',
-                    upstreamStatus: resp.status,
-                    upstream: resp.json
-                });
+                const apiErr = apiError.badGateway('enable_failed');
+                apiErr.upstreamStatus = resp.status;
+                apiErr.upstream = resp.json;
+                return next(apiErr);
             }
         } catch (e) {
-            return res.status(502).json({ error: 'enable_failed', detail: String(e?.message || e) });
+            const apiErr = apiError.badGateway('enable_failed');
+            apiErr.detail = String(e?.message || e);
+            return next(apiErr);
         }
 
         // Soft-dismiss the signal to keep status page accessible via token
         tableSignal.dismiss(_db, id, now, (e2, ok) => {
-            if (e2) return res.status(500).json({ error: 'db_error', detail: e2.message });
-            if (!ok) return res.status(404).json({ error: 'not_found' });
+            if (e2) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = e2.message;
+                return next(apiErr);
+            }
+            if (!ok) return next(apiError.notFound('not_found'));
 
             // Audit: Signal delete + Snapshot
             const auditId = crypto.randomUUID();
@@ -1745,9 +1867,9 @@ router.delete('/signals/:id', (req, res) => {
 });
 
 // dsa-backend routes (Ausschnitt)
-router.get('/audit', (req, res) => {
+router.get('/audit', (req, res, next) => {
     const _db = db(req);
-    if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+    if (!_db) return next(apiError.internal('database_unavailable'));
 
     const opts = {
         entityType: asString(req.query.entityType),    // 'notice' | 'signal' | ...
@@ -1761,7 +1883,11 @@ router.get('/audit', (req, res) => {
     };
 
     tableAudit.search(_db, opts, (err, rows) => {
-        if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+        if (err) {
+            const apiErr = apiError.internal('db_error');
+            apiErr.detail = err.message;
+            return next(apiErr);
+        }
         res.json(rows);
     });
 });

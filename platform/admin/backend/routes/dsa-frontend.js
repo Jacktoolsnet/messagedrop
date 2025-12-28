@@ -5,6 +5,7 @@ const { checkToken } = require('../middleware/security');
 const rateLimit = require('express-rate-limit');
 const { notifyContentOwner } = require('../utils/notifyContentOwner');
 const { notifyReporter } = require('../utils/notifyReporter');
+const { apiError } = require('../middleware/api-error');
 
 // DB-Tabellen
 const tableSignal = require('../db/tableDsaSignal');
@@ -71,8 +72,8 @@ function db(req) { return req.database?.db; }
  * POST /dsa/frontend/signals
  * Quick report (informelles Signal). Nur contentId ist „sinnvoll“; alles andere optional.
  */
-router.post('/signals', signalLimiter, (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/signals', signalLimiter, (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = crypto.randomUUID();
     const now = Date.now();
@@ -85,7 +86,7 @@ router.post('/signals', signalLimiter, (req, res) => {
         reportedContent
     } = req.body || {};
 
-    if (!contentId) return res.status(400).json({ error: 'contentId is required' });
+    if (!contentId) return next(apiError.badRequest('contentId is required'));
 
     let reportedContentJson = 'null';
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
@@ -107,7 +108,11 @@ router.post('/signals', signalLimiter, (req, res) => {
         token,
         now,
         (err, row) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+            if (err) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
+            }
             const responsePayload = { id: row?.id ?? id, token, statusUrl };
 
             tableAudit.create(
@@ -155,8 +160,8 @@ router.post('/signals', signalLimiter, (req, res) => {
  * POST /dsa/frontend/notices
  * Formale DSA-Notice (alle Felder optional außer contentId).
  */
-router.post('/notices', noticeLimiter, (req, res) => {
-    const _db = db(req); if (!_db) return res.status(500).json({ error: 'database_unavailable' });
+router.post('/notices', noticeLimiter, (req, res, next) => {
+    const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
     const id = crypto.randomUUID();
     const now = Date.now();
@@ -175,7 +180,7 @@ router.post('/notices', noticeLimiter, (req, res) => {
     const normalizedReporterEmail = toStringOrNull(reporterEmail);
     const normalizedReporterName = toStringOrNull(reporterName);
 
-    if (!contentId) return res.status(400).json({ error: 'contentId is required' });
+    if (!contentId) return next(apiError.badRequest('contentId is required'));
 
     let reportedContentJson = 'null';
     try { reportedContentJson = JSON.stringify(reportedContent ?? null); }
@@ -204,7 +209,11 @@ router.post('/notices', noticeLimiter, (req, res) => {
         token,
         now,
         (err, row) => {
-            if (err) return res.status(500).json({ error: 'db_error', detail: err.message });
+            if (err) {
+                const apiErr = apiError.internal('db_error');
+                apiErr.detail = err.message;
+                return next(apiErr);
+            }
             const responsePayload = { id: row?.id ?? id, token, statusUrl };
 
             tableAudit.create(

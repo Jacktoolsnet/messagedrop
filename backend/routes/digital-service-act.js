@@ -6,6 +6,7 @@ const multer = require('multer');
 const FormData = require('form-data');
 const tableMessage = require('../db/tableMessage');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
 
@@ -53,6 +54,13 @@ const moderationToggleLimiter = rateLimit({
 });
 
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
+
+function buildForwardError(err) {
+    const status = err?.response?.status || 502;
+    const apiErr = apiError.fromStatus(status);
+    apiErr.detail = err?.response?.data || err?.message || null;
+    return apiErr;
+}
 
 /* --------------------------------- Helper ---------------------------------- */
 async function forwardPost(path, body) {
@@ -110,7 +118,7 @@ function disableLocallyIfPossible(req) {
 /* --------------------------------- Routes ---------------------------------- */
 
 // POST /dsa/signals  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/signals
-router.post('/signals', signalLimiter, async (req, res) => {
+router.post('/signals', signalLimiter, async (req, res, next) => {
     try {
         await disableLocallyIfPossible(req);
         const resp = await forwardPost('/signals', req.body);
@@ -127,12 +135,12 @@ router.post('/signals', signalLimiter, async (req, res) => {
 
         res.status(resp.status).json(resp.data);
     } catch (err) {
-        res.status(502).json({ error: 'bad_gateway', detail: err.message });
+        return next(buildForwardError(err));
     }
 });
 
 // POST /dsa/notices  -> forward an {ADMIN_BASE_URL[:ADMIN_PORT]}/dsa/frontend/notices
-router.post('/notices', noticeLimiter, async (req, res) => {
+router.post('/notices', noticeLimiter, async (req, res, next) => {
     try {
         await disableLocallyIfPossible(req);
         const resp = await forwardPost('/notices', req.body);
@@ -149,34 +157,26 @@ router.post('/notices', noticeLimiter, async (req, res) => {
 
         res.status(resp.status).json(resp.data);
     } catch (err) {
-        res.status(502).json({ error: 'bad_gateway', detail: err.message });
+        return next(buildForwardError(err));
     }
 });
 
 
-router.get('/disable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res) {
-    let response = { 'status': 0 };
+router.get('/disable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res, next) {
     tableMessage.disableMessage(req.database.db, req.params.messageId, function (err) {
         if (err) {
-            response.status = 500;
-            response.error = err;
-        } else {
-            response.status = 200;
+            return next(apiError.internal('db_error'));
         }
-        res.status(response.status).json(response);
+        res.status(200).json({ status: 200 });
     });
 });
 
-router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res) {
-    let response = { 'status': 0 };
+router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security.checkToken, function (req, res, next) {
     tableMessage.enableMessage(req.database.db, req.params.messageId, function (err) {
         if (err) {
-            response.status = 500;
-            response.error = err;
-        } else {
-            response.status = 200;
+            return next(apiError.internal('db_error'));
         }
-        res.status(response.status).json(response);
+        res.status(200).json({ status: 200 });
     });
 });
 
@@ -189,14 +189,16 @@ module.exports = router;
  * POST /digitalserviceact/notices/:id/evidence
  * - Accepts either multipart/form-data with 'file' or JSON { type: 'url'|'hash', url?, hash? }
  */
-router.post('/notices/:id/evidence', evidenceLimiter, (req, res) => {
+router.post('/notices/:id/evidence', evidenceLimiter, (req, res, next) => {
     upload.single('file')(req, res, async (uploadErr) => {
         try {
             if (uploadErr) {
                 if (uploadErr.code === 'LIMIT_FILE_SIZE') {
-                    return res.status(400).json({ error: 'file_too_large' });
+                    return next(apiError.badRequest('file_too_large'));
                 }
-                return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+                const apiErr = apiError.badRequest('upload_failed');
+                apiErr.detail = uploadErr.message;
+                return next(apiErr);
             }
 
             const id = encodeURIComponent(req.params.id);
@@ -221,7 +223,7 @@ router.post('/notices/:id/evidence', evidenceLimiter, (req, res) => {
             const resp = await forwardPostBackend(`/notices/${id}/evidence`, req.body);
             return res.status(resp.status).json(resp.data);
         } catch (err) {
-            return res.status(err?.response?.status || 502).json(err?.response?.data || { error: 'bad_gateway' });
+            return next(buildForwardError(err));
         }
     });
 });
@@ -231,14 +233,16 @@ router.post('/notices/:id/evidence', evidenceLimiter, (req, res) => {
  * For attaching evidence to a notice using the public status token.
  * Forwards to admin public endpoint /public/status/:token/evidence
  */
-router.post('/status/:token/evidence', evidenceLimiter, (req, res) => {
+router.post('/status/:token/evidence', evidenceLimiter, (req, res, next) => {
     upload.single('file')(req, res, async (uploadErr) => {
         try {
             if (uploadErr) {
                 if (uploadErr.code === 'LIMIT_FILE_SIZE') {
-                    return res.status(400).json({ error: 'file_too_large' });
+                    return next(apiError.badRequest('file_too_large'));
                 }
-                return res.status(400).json({ error: 'upload_failed', detail: uploadErr.message });
+                const apiErr = apiError.badRequest('upload_failed');
+                apiErr.detail = uploadErr.message;
+                return next(apiErr);
             }
 
             const token = encodeURIComponent(req.params.token);
@@ -269,7 +273,7 @@ router.post('/status/:token/evidence', evidenceLimiter, (req, res) => {
             });
             return res.status(resp.status).json(resp.data);
         } catch (err) {
-            return res.status(err?.response?.status || 502).json(err?.response?.data || { error: 'bad_gateway' });
+            return next(buildForwardError(err));
         }
     });
 });

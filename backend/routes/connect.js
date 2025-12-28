@@ -10,14 +10,22 @@ function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
 }
 
-function ensureSameUser(req, res, userId) {
+function ensureSameUser(req, res, userId, next) {
   const authUserId = getAuthUserId(req);
   if (!authUserId) {
-    res.status(401).json({ status: 401, error: 'unauthorized' });
+    if (next) {
+      next(apiError.unauthorized('unauthorized'));
+    } else {
+      res.status(401).json({ status: 401, error: 'unauthorized' });
+    }
     return false;
   }
   if (String(authUserId) !== String(userId)) {
-    res.status(403).json({ status: 403, error: 'forbidden' });
+    if (next) {
+      next(apiError.forbidden('forbidden'));
+    } else {
+      res.status(403).json({ status: 403, error: 'forbidden' });
+    }
     return false;
   }
   return true;
@@ -43,7 +51,7 @@ router.post('/create',
   ]
   , function (req, res, next) {
     let response = { 'status': 0 };
-    if (!ensureSameUser(req, res, req.body.userId)) {
+    if (!ensureSameUser(req, res, req.body.userId, next)) {
       return;
     }
     let connectId = crypto.randomUUID();
