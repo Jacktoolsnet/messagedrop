@@ -10,6 +10,7 @@ import { routes } from './app.routes';
 import { authInterceptor } from './interceptors/auth-interceptor';
 import { errorInterceptor } from './interceptors/error-interceptor';
 import { loadingInterceptor } from './interceptors/loading-interceptor';
+import { traceIdInterceptor } from './interceptors/trace-id-interceptor';
 import { LanguageService } from './services/language.service';
 import { TranslocoHttpLoader } from '../transloco-loader';
 
@@ -22,7 +23,7 @@ export const appConfig: ApplicationConfig = {
     { provide: MAT_ICON_DEFAULT_OPTIONS, useValue: { fontSet: 'material-symbols-outlined' } },
     provideHttpClient(
       withFetch(),
-      withInterceptors([authInterceptor, loadingInterceptor, errorInterceptor])
+      withInterceptors([traceIdInterceptor, authInterceptor, loadingInterceptor, errorInterceptor])
     ),
     provideTransloco({
       config: {
