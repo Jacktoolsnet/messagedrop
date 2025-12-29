@@ -621,7 +621,7 @@ export class MessagelistComponent implements OnInit {
   }
 
   public translateMessage(message: Message) {
-    this.translateService.translate(message.message, this.userService.getUser().language).subscribe({
+    this.translateService.translate(message.message, this.userService.getUser().language, false, message.uuid).subscribe({
       next: response => {
         if (response.status === 200) {
           message.translatedMessage = response.result?.text;

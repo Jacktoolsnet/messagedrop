@@ -5,6 +5,7 @@ const tableConnect = require('./tableConnect');
 const tableContact = require('./tableContact');
 const tableContactMessage = require('./tableContactMessage');
 const tableMessage = require('./tableMessage');
+const tableMessageTranslation = require('./tableMessageTranslation');
 const tableLike = require('./tableLike');
 const tableDislike = require('./tableDislike');
 const tablePlace = require('./tablePlace');
@@ -39,6 +40,7 @@ class Database {
           tableContact.init(this.db);
           tableContactMessage.init(this.db);
           tableMessage.init(this.db);
+          tableMessageTranslation.init(this.db);
           tableLike.init(this.db);
           tableDislike.init(this.db);
           tablePlace.init(this.db);

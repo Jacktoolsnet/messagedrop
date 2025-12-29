@@ -37,11 +37,13 @@ export class TranslateService {
     return fallback.toUpperCase();
   }
 
-  public translate(value: string, language: string, showAlways = false) {
+  public translate(value: string, language: string, showAlways = false, messageUuid?: string | null) {
     const targetLang = this.resolveTargetLanguage(language);
     const safeLang = encodeURIComponent(targetLang);
     const safeValue = encodeURIComponent(value);
-    const url = `${environment.apiUrl}/translate/${safeLang}/${safeValue}`;
+    const safeMessageUuid = typeof messageUuid === 'string' ? messageUuid.trim() : '';
+    const query = safeMessageUuid ? `?messageUuid=${encodeURIComponent(safeMessageUuid)}` : '';
+    const url = `${environment.apiUrl}/translate/${safeLang}/${safeValue}${query}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: this.i18n.t('common.translate.title'),
