@@ -24,7 +24,21 @@ function authenticate(req, res, next) {
   });
 }
 
+function authenticateOptional(req, _res, next) {
+  if (!req.token) {
+    return next();
+  }
+  const secret = process.env.JWT_SECRET;
+  jwt.verify(req.token, secret, (err, jwtUser) => {
+    if (!err) {
+      req.jwtUser = jwtUser;
+    }
+    next();
+  });
+}
+
 module.exports = {
   authenticate,
+  authenticateOptional,
   checkToken: requireServiceJwt
 }

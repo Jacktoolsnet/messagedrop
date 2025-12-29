@@ -3,6 +3,7 @@ import { Injectable, inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TranslateResponse } from '../interfaces/translate-response';
+import { LanguageService } from './language.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
 
@@ -19,6 +20,7 @@ export class TranslateService {
   };
 
   private readonly http = inject(HttpClient);
+  private readonly languageService = inject(LanguageService);
   private readonly networkService = inject(NetworkService);
   private readonly i18n = inject(TranslationHelperService);
 
@@ -26,8 +28,20 @@ export class TranslateService {
     return throwError(() => error);
   }
 
+  private resolveTargetLanguage(language: string | null | undefined): string {
+    const trimmed = typeof language === 'string' ? language.trim() : '';
+    if (trimmed) {
+      return trimmed;
+    }
+    const fallback = this.languageService.effectiveLanguage?.() ?? 'en';
+    return fallback.toUpperCase();
+  }
+
   public translate(value: string, language: string, showAlways = false) {
-    const url = `${environment.apiUrl}/translate/${language}/${value}`;
+    const targetLang = this.resolveTargetLanguage(language);
+    const safeLang = encodeURIComponent(targetLang);
+    const safeValue = encodeURIComponent(value);
+    const url = `${environment.apiUrl}/translate/${safeLang}/${safeValue}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: this.i18n.t('common.translate.title'),
