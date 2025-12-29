@@ -21,6 +21,17 @@ function getCallerFile() {
   return 'unknown';
 }
 
+function formatDetail(meta) {
+  if (!meta || typeof meta !== 'object') {
+    return null;
+  }
+  try {
+    return JSON.stringify(meta);
+  } catch {
+    return String(meta);
+  }
+}
+
 function createForwarder({ baseUrl, token, audience, source }) {
   if (!baseUrl) {
     return () => { /* disabled */ };
@@ -44,12 +55,14 @@ function createForwarder({ baseUrl, token, audience, source }) {
     }
   };
 
-  return (level, message) => {
+  return (level, message, meta) => {
     const file = getCallerFile();
+    const detail = formatDetail(meta);
     const body = {
       source: source || 'admin-backend',
       file,
       message: typeof message === 'string' ? message : JSON.stringify(message),
+      detail,
       createdAt: Date.now()
     };
     if (level === 'error') {
@@ -66,7 +79,7 @@ function attachForwarding(logger, opts) {
     if (!orig) return;
     logger[level] = (...args) => {
       orig(...args);
-      forward(level, args[0]);
+      forward(level, args[0], args[1]);
     };
   });
 }

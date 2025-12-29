@@ -39,7 +39,7 @@ router.get('/', (req, res, next) => {
 
 /**
  * POST /error-log
- * Body: { source: string, file: string, message: string, createdAt?: number }
+ * Body: { source: string, file: string, message: string, detail?: string, createdAt?: number }
  */
 router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
   const db = req.database?.db;
@@ -48,6 +48,9 @@ router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
   const source = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
   const file = typeof req.body?.file === 'string' ? req.body.file.trim() : '';
   const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
+  const detail = typeof req.body?.detail === 'string'
+    ? req.body.detail.trim()
+    : (req.body?.detail ? JSON.stringify(req.body.detail) : '');
   const createdAt = Number.isFinite(req.body?.createdAt) ? Number(req.body.createdAt) : Date.now();
 
   if (!source || !file || !message) {
@@ -56,7 +59,7 @@ router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
 
   const id = crypto.randomUUID();
 
-  tableErrorLog.create(db, id, source, file, message, createdAt, (err) => {
+  tableErrorLog.create(db, id, source, file, message, detail || null, createdAt, (err) => {
     if (err) {
       req.logger?.error('Error log insert failed', { error: err?.message });
       return next(apiError.internal('insert_failed'));

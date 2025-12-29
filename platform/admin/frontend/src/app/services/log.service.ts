@@ -56,6 +56,11 @@ export class LogService {
             .pipe(catchError(() => of({ deleted: false })));
     }
 
+    deleteAllInfoLogs() {
+        return this.http.delete<{ deleted: boolean; count?: number }>(`${this.baseUrl}/info-log`)
+            .pipe(catchError(() => of({ deleted: false, count: 0 })));
+    }
+
     listFrontendErrorLogs(limit = 100, offset = 0) {
         return this.http.get<{ rows: FrontendErrorLogEntry[] }>(`${this.baseUrl}/frontend-error-log?limit=${limit}&offset=${offset}`)
             .pipe(catchError(() => of({ rows: [] })));

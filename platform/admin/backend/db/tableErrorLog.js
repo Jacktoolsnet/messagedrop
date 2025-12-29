@@ -4,6 +4,7 @@ const columnId = 'id';
 const columnSource = 'source';
 const columnFile = 'file';
 const columnMessage = 'message';
+const columnDetail = 'detail';
 const columnCreatedAt = 'createdAt';
 
 /**
@@ -16,6 +17,7 @@ const init = function (db) {
       ${columnSource} TEXT NOT NULL,
       ${columnFile} TEXT NOT NULL,
       ${columnMessage} TEXT NOT NULL,
+      ${columnDetail} TEXT DEFAULT NULL,
       ${columnCreatedAt} INTEGER NOT NULL
     );
     CREATE INDEX IF NOT EXISTS idx_${tableName}_createdAt ON ${tableName}(${columnCreatedAt});
@@ -23,22 +25,33 @@ const init = function (db) {
   db.exec(sql, (err) => {
     if (err) throw err;
   });
+
+  db.all(`PRAGMA table_info(${tableName});`, (err, rows) => {
+    if (err || !rows) {
+      return;
+    }
+    const existing = new Set(rows.map((row) => row.name));
+    if (!existing.has(columnDetail)) {
+      db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnDetail} TEXT DEFAULT NULL;`);
+    }
+  });
 };
 
 /**
  * Insert new error log entry.
  */
-const create = function (db, id, source, file, message, createdAt, callback) {
+const create = function (db, id, source, file, message, detail, createdAt, callback) {
   const sql = `
     INSERT INTO ${tableName} (
       ${columnId},
       ${columnSource},
       ${columnFile},
       ${columnMessage},
+      ${columnDetail},
       ${columnCreatedAt}
-    ) VALUES (?, ?, ?, ?, ?)
+    ) VALUES (?, ?, ?, ?, ?, ?)
   `;
-  const params = [id, source, file, message, createdAt];
+  const params = [id, source, file, message, detail ?? null, createdAt];
   db.run(sql, params, function (err) {
     callback(err);
   });
