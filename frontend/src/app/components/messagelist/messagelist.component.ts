@@ -33,8 +33,10 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
+type ModerationStatus = 'published' | 'review' | 'hidden';
 
 @Component({
   selector: 'app-messagelist',
@@ -425,6 +427,141 @@ export class MessagelistComponent implements OnInit {
     return MessagelistComponent.DSA_NOTICE_STATUSES.has(upper)
       ? upper as ResolvedDsaStatus
       : MessagelistComponent.DSA_UNKNOWN;
+  }
+
+  public isOwnPublicMessage(message: Message): boolean {
+    return this.userService.getUser().id === message.userId && message.typ === 'public';
+  }
+
+  private resolveModerationStatus(message: Message): ModerationStatus {
+    if (message.manualModerationDecision === 'rejected') {
+      return 'hidden';
+    }
+    if (message.manualModerationDecision === 'approved') {
+      return 'published';
+    }
+    if (message.status !== 'enabled') {
+      return 'hidden';
+    }
+    if (message.aiModerationDecision === 'review') {
+      return 'review';
+    }
+    return 'published';
+  }
+
+  private getModerationStatusLabel(status: ModerationStatus): string {
+    const base = 'common.messageList.moderationStatus';
+    if (status === 'published') return this.translation.t(`${base}.published`);
+    if (status === 'review') return this.translation.t(`${base}.review`);
+    return this.translation.t(`${base}.hidden`);
+  }
+
+  private formatModerationBool(value: boolean | null | undefined): string {
+    if (value === null || value === undefined) return this.translation.t('common.unknown');
+    return value ? this.translation.t('common.actions.yes') : this.translation.t('common.actions.no');
+  }
+
+  private formatModerationNumber(value: number | null | undefined): string {
+    if (!Number.isFinite(value)) return this.translation.t('common.unknown');
+    return Number(value).toFixed(3);
+  }
+
+  private formatModerationValue(value: string | null | undefined): string {
+    const text = String(value ?? '').trim();
+    return text ? text : this.translation.t('common.unknown');
+  }
+
+  private resolveModerationReason(message: Message): string {
+    const base = 'common.messageList.moderationStatus';
+    if (message.manualModerationReason) {
+      return message.manualModerationReason;
+    }
+    if (message.manualModerationDecision) {
+      return this.translation.t(`${base}.reasonManual`);
+    }
+    if (message.patternMatch) {
+      return this.translation.t(`${base}.reasonPattern`);
+    }
+    if (message.aiModerationDecision === 'rejected') {
+      return this.translation.t(`${base}.reasonAi`);
+    }
+    if (message.aiModerationDecision === 'review') {
+      return this.translation.t(`${base}.reasonReview`);
+    }
+    return this.translation.t('common.unknown');
+  }
+
+  public getModerationStatusIcon(message: Message): string {
+    if (!this.isOwnPublicMessage(message)) return 'public';
+    const status = this.resolveModerationStatus(message);
+    if (status === 'published') return 'public';
+    if (status === 'review') return 'hourglass_top';
+    return 'visibility_off';
+  }
+
+  public getModerationStatusColor(message: Message): 'primary' | 'accent' | 'warn' {
+    const status = this.resolveModerationStatus(message);
+    if (status === 'published') return 'primary';
+    if (status === 'review') return 'accent';
+    return 'warn';
+  }
+
+  public getModerationStatusAriaLabel(message: Message): string {
+    const status = this.getModerationStatusLabel(this.resolveModerationStatus(message));
+    const base = 'common.messageList.moderationStatus';
+    return this.translation.t(`${base}.aria`, { status });
+  }
+
+  public openModerationStatus(message: Message): void {
+    if (!this.isOwnPublicMessage(message)) return;
+    const base = 'common.messageList.moderationStatus';
+    const statusLabel = this.getModerationStatusLabel(this.resolveModerationStatus(message));
+    const reason = this.resolveModerationReason(message);
+    const lines = [
+      `${this.translation.t(`${base}.status`)}: ${statusLabel}`,
+      `${this.translation.t(`${base}.reason`)}: ${reason}`
+    ];
+
+    const detailLines = [];
+    const hasAiDecision = message.aiModerationDecision !== null && message.aiModerationDecision !== undefined && message.aiModerationDecision !== '';
+    const hasAiScore = message.aiModerationScore !== null && message.aiModerationScore !== undefined;
+    const hasAiFlagged = message.aiModerationFlagged !== null && message.aiModerationFlagged !== undefined;
+    if (hasAiDecision || hasAiScore || hasAiFlagged) {
+      detailLines.push(`${this.translation.t(`${base}.aiDecision`)}: ${this.formatModerationValue(message.aiModerationDecision)}`);
+      detailLines.push(`${this.translation.t(`${base}.aiScore`)}: ${this.formatModerationNumber(message.aiModerationScore)}`);
+      detailLines.push(`${this.translation.t(`${base}.aiFlagged`)}: ${this.formatModerationBool(message.aiModerationFlagged)}`);
+    }
+    if (message.patternMatch !== null && message.patternMatch !== undefined) {
+      detailLines.push(`${this.translation.t(`${base}.patternMatch`)}: ${this.formatModerationBool(message.patternMatch)}`);
+    }
+    if (message.manualModerationDecision || message.manualModerationReason) {
+      detailLines.push(`${this.translation.t(`${base}.manualDecision`)}: ${this.formatModerationValue(message.manualModerationDecision)}`);
+      detailLines.push(`${this.translation.t(`${base}.manualReason`)}: ${this.formatModerationValue(message.manualModerationReason)}`);
+    }
+
+    if (detailLines.length) {
+      lines.push('');
+      lines.push(this.translation.t(`${base}.details`));
+      lines.push(...detailLines);
+    }
+
+    this.dialog.open(DisplayMessage, {
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t(`${base}.title`),
+        image: '',
+        icon: this.getModerationStatusIcon(message),
+        message: lines.join('\n'),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
   }
 
   public editMessageAfterLoginClick(message: Message) {

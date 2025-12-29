@@ -270,6 +270,26 @@
       "deleteDialog": {
         "title": "Eliminar mensaje",
         "confirm": "El mensaje y todos los comentarios relacionados se eliminarán permanentemente. ¿Estás seguro?"
+      },
+      "moderationStatus": {
+        "title": "Estado de moderación",
+        "aria": "Mostrar estado de moderación: {{ status }}",
+        "status": "Estado",
+        "published": "Publicado",
+        "review": "En revisión",
+        "hidden": "No público",
+        "reason": "Motivo",
+        "reasonPattern": "Datos personales detectados",
+        "reasonAi": "Rechazado por la IA",
+        "reasonReview": "En espera de revisión manual",
+        "reasonManual": "Moderación manual",
+        "details": "Detalles",
+        "aiDecision": "Decisión de IA",
+        "aiScore": "Puntuación de IA",
+        "aiFlagged": "Marcado por IA",
+        "patternMatch": "Coincidencia de datos personales",
+        "manualDecision": "Decisión manual",
+        "manualReason": "Motivo manual"
       }
     },
     "messageProfile": {

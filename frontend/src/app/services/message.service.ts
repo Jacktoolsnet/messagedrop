@@ -59,6 +59,19 @@ export class MessageService {
     return throwError(() => error);
   }
 
+  private toNullableBool(value: unknown): boolean | null {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'boolean') return value;
+    if (typeof value === 'number') return value !== 0;
+    if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+    return null;
+  }
+
+  private toNullableNumber(value: unknown): number | null {
+    const num = Number(value);
+    return Number.isFinite(num) ? num : null;
+  }
+
   private showModerationRejected(message: string): void {
     this.moderationDialogRef?.close();
     const ref = this.dialog.open(DisplayMessage, {
@@ -208,6 +221,16 @@ export class MessageService {
       comments: [],
       commentsNumber: raw.commentsNumber,
       status: raw.status,
+      aiModerationDecision: raw.aiModerationDecision ?? null,
+      aiModerationScore: this.toNullableNumber(raw.aiModerationScore),
+      aiModerationFlagged: this.toNullableBool(raw.aiModerationFlagged),
+      aiModerationAt: this.toNullableNumber(raw.aiModerationAt),
+      patternMatch: this.toNullableBool(raw.patternMatch),
+      patternMatchAt: this.toNullableNumber(raw.patternMatchAt),
+      manualModerationDecision: raw.manualModerationDecision ?? null,
+      manualModerationReason: raw.manualModerationReason ?? null,
+      manualModerationAt: this.toNullableNumber(raw.manualModerationAt),
+      manualModerationBy: raw.manualModerationBy ?? null,
       dsaStatusToken: raw.dsaStatusToken,
       userId: raw.userId,
       multimedia: JSON.parse(raw.multimedia)

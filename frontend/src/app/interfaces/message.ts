@@ -20,6 +20,16 @@ export interface Message {
     comments: Message[],
     commentsNumber: number,
     status: string,
+    aiModerationDecision?: string | null,
+    aiModerationScore?: number | null,
+    aiModerationFlagged?: boolean | null,
+    aiModerationAt?: number | null,
+    patternMatch?: boolean | null,
+    patternMatchAt?: number | null,
+    manualModerationDecision?: string | null,
+    manualModerationReason?: string | null,
+    manualModerationAt?: number | null,
+    manualModerationBy?: string | null,
     dsaStatusToken?: string,
     userId: string
     multimedia: Multimedia

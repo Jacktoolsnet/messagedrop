@@ -270,6 +270,26 @@
       "deleteDialog": {
         "title": "Delete message",
         "confirm": "The message and all related comments will be permanently deleted. Are you sure?"
+      },
+      "moderationStatus": {
+        "title": "Moderation status",
+        "aria": "Show moderation status: {{ status }}",
+        "status": "Status",
+        "published": "Published",
+        "review": "Under review",
+        "hidden": "Not public",
+        "reason": "Reason",
+        "reasonPattern": "Personal data detected",
+        "reasonAi": "Rejected by AI",
+        "reasonReview": "Awaiting manual review",
+        "reasonManual": "Manual moderation",
+        "details": "Details",
+        "aiDecision": "AI decision",
+        "aiScore": "AI score",
+        "aiFlagged": "AI flagged",
+        "patternMatch": "Personal data match",
+        "manualDecision": "Manual decision",
+        "manualReason": "Manual reason"
       }
     },
     "messageProfile": {

@@ -109,6 +109,13 @@
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
+                @if (isOwnPublicMessage(message)) {
+                <button mat-mini-fab [color]="getModerationStatusColor(message)"
+                    [attr.aria-label]="getModerationStatusAriaLabel(message)"
+                    (click)="openModerationStatus(message)">
+                    <mat-icon aria-hidden="false">{{ getModerationStatusIcon(message) }}</mat-icon>
+                </button>
+                }
                 }
                 @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.blockAria' | transloco"
@@ -242,6 +249,13 @@
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
+                @if (isOwnPublicMessage(message)) {
+                <button mat-mini-fab [color]="getModerationStatusColor(message)"
+                    [attr.aria-label]="getModerationStatusAriaLabel(message)"
+                    (click)="openModerationStatus(message)">
+                    <mat-icon aria-hidden="false">{{ getModerationStatusIcon(message) }}</mat-icon>
+                </button>
+                }
                 }
                 @if (this.userService.getUser().id !== message.userId) {
                 <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.blockAria' | transloco"

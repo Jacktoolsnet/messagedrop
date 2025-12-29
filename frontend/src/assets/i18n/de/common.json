@@ -270,6 +270,26 @@
       "deleteDialog": {
         "title": "Nachricht löschen",
         "confirm": "Die Nachricht und alle zugehörigen Kommentare werden dauerhaft gelöscht. Bist du sicher?"
+      },
+      "moderationStatus": {
+        "title": "Moderationsstatus",
+        "aria": "Moderationsstatus anzeigen: {{ status }}",
+        "status": "Status",
+        "published": "Veröffentlicht",
+        "review": "In Prüfung",
+        "hidden": "Nicht öffentlich",
+        "reason": "Grund",
+        "reasonPattern": "Personenbezogene Daten erkannt",
+        "reasonAi": "Von der KI abgelehnt",
+        "reasonReview": "Wartet auf manuelle Prüfung",
+        "reasonManual": "Manuelle Moderation",
+        "details": "Details",
+        "aiDecision": "KI-Entscheidung",
+        "aiScore": "KI-Score",
+        "aiFlagged": "KI markiert",
+        "patternMatch": "Personenbezogene Daten",
+        "manualDecision": "Manuelle Entscheidung",
+        "manualReason": "Manueller Grund"
       }
     },
     "messageProfile": {
