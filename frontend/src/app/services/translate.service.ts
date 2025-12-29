@@ -36,7 +36,8 @@ export class TranslateService {
       message: this.i18n.t('common.translate.message'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<TranslateResponse>(url, this.httpOptions)
       .pipe(

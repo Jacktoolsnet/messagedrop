@@ -7,8 +7,8 @@ import { NotificationCountResponse } from '../interfaces/notification-count-resp
 import { NotificationListResponse } from '../interfaces/notification-list-response';
 import { SystemNotification, SystemNotificationFilter } from '../interfaces/system-notification';
 import { NetworkService } from './network.service';
-import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -82,7 +82,8 @@ export class SystemNotificationService {
       message: this.i18n.t('common.systemMessages.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     try {
@@ -119,7 +120,8 @@ export class SystemNotificationService {
       message: this.i18n.t('common.systemMessages.updatingStatus'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     try {
@@ -170,7 +172,8 @@ export class SystemNotificationService {
       message: this.i18n.t('common.systemMessages.updatingStatus'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     try {
@@ -216,7 +219,8 @@ export class SystemNotificationService {
       message: this.i18n.t('common.systemMessages.removing'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     try {

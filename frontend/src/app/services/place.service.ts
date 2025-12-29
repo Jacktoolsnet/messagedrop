@@ -9,12 +9,12 @@ import { GetPlaceResponse } from '../interfaces/get-place-response';
 import { GetPlacesResponse } from '../interfaces/get-places-response';
 import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
-import { normalizeTileSettings } from '../interfaces/tile-settings';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { normalizeTileSettings } from '../interfaces/tile-settings';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
-import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -139,7 +139,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.creating'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'userId': place.userId,
@@ -165,7 +166,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.updating'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'id': place.id,
@@ -191,7 +193,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.loadingList'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<GetPlacesResponse>(url, this.httpOptions)
       .pipe(
@@ -209,7 +212,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.loadingSingle'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<GetPlaceResponse>(url, this.httpOptions)
       .pipe(
@@ -227,7 +231,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.deleting'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
@@ -256,7 +261,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.subscribing'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
@@ -274,7 +280,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.unsubscribing'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
@@ -292,7 +299,8 @@ export class PlaceService {
       message: this.i18n.t('common.place.loadingTimezone'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(

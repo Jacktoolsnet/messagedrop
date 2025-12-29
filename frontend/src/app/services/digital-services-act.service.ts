@@ -4,8 +4,8 @@ import { Observable, catchError, defer, from, switchMap, throwError } from 'rxjs
 import { environment } from '../../environments/environment';
 
 import { NetworkService } from './network.service';
-import { TranslationHelperService } from './translation-helper.service';
 import { PowService } from './pow.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 // deine Interfaces (ggf. Pfade anpassen)
 import { CreateDsaNotice } from '../interfaces/create-dsa-notice.interface';
@@ -52,7 +52,8 @@ export class DigitalServicesActService {
       message: this.i18n.t('dsa.sendingQuickReport'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     const body = {
@@ -83,7 +84,8 @@ export class DigitalServicesActService {
       message: this.i18n.t('dsa.submittingNotice'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     // Body entsprechend unserer Backend-Route (alle Felder optional außer contentId)

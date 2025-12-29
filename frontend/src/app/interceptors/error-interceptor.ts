@@ -48,7 +48,8 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           message,
           button: i18n.t('common.actions.ok'),
           delay: 2000,
-          showSpinner: true
+          showSpinner: false,
+          autoclose: true
         },
         maxWidth: '90vw',
         maxHeight: '90vh',

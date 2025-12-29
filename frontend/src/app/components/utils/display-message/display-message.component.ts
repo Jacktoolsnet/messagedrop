@@ -12,7 +12,7 @@ import { DisplayMessageConfig } from '../../../interfaces/display-message-config
     MatButtonModule,
     MatProgressSpinnerModule,
     MatIcon
-],
+  ],
   templateUrl: './display-message.component.html',
   styleUrl: './display-message.component.css'
 })
@@ -25,6 +25,9 @@ export class DisplayMessage implements OnInit {
   ngOnInit(): void {
     setTimeout(() => {
       this.showOk = true;
+      if (this.data.autoclose) {
+        this.dialogRef.close();
+      }
     }, this.data.delay);
   }
 }

@@ -1,8 +1,10 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal, WritableSignal } from '@angular/core';
+import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, forkJoin, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { Message } from '../interfaces/message';
@@ -27,6 +29,8 @@ export class MessageService {
   readonly commentsSignals = new Map<string, WritableSignal<Message[]>>();
   readonly commentCountsSignal = signal<Record<string, number>>({});
 
+  private moderationDialogRef: MatDialogRef<DisplayMessage> | null = null;
+
   private _messageSet = signal(0);
   readonly messageSet = this._messageSet.asReadonly();
 
@@ -42,6 +46,7 @@ export class MessageService {
   };
 
   private readonly snackBar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   private readonly http = inject(HttpClient);
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
@@ -50,6 +55,34 @@ export class MessageService {
 
   private handleError(error: HttpErrorResponse) {
     return throwError(() => error);
+  }
+
+  private showModerationRejected(): void {
+    this.moderationDialogRef?.close();
+    const ref = this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('common.moderation.title'),
+        image: '',
+        icon: 'block',
+        message: this.i18n.t('common.message.moderationRejected'),
+        button: this.i18n.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+    this.moderationDialogRef = ref;
+    ref.afterClosed().subscribe(() => {
+      if (this.moderationDialogRef === ref) {
+        this.moderationDialogRef = null;
+      }
+    });
   }
 
   setMessages(messages: Message[]) {
@@ -121,7 +154,8 @@ export class MessageService {
       message: this.i18n.t('common.message.creating'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       uuid: message.uuid,
@@ -145,10 +179,7 @@ export class MessageService {
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
           if (decision === 'rejected') {
-            this.snackBar.open(this.i18n.t('common.message.moderationRejected'), this.i18n.t('common.actions.ok'), {
-              horizontalPosition: 'center',
-              verticalPosition: 'top'
-            });
+            this.showModerationRejected();
             return;
           }
           this.messagesSignal.update(messages => [message, ...messages]);
@@ -172,7 +203,8 @@ export class MessageService {
       message: this.i18n.t('common.message.creating'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     const body = {
@@ -196,10 +228,7 @@ export class MessageService {
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
           if (decision === 'rejected') {
-            this.snackBar.open(this.i18n.t('common.message.moderationRejected'), this.i18n.t('common.actions.ok'), {
-              horizontalPosition: 'center',
-              verticalPosition: 'top'
-            });
+            this.showModerationRejected();
             return;
           }
 
@@ -230,7 +259,8 @@ export class MessageService {
       message: this.i18n.t('common.message.updating'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     const body = {
@@ -281,7 +311,8 @@ export class MessageService {
       message: this.i18n.t('common.message.togglingLike'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     this.http.get<ToggleResponse>(url, this.httpOptions)
@@ -306,7 +337,8 @@ export class MessageService {
       message: this.i18n.t('common.message.togglingDislike'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     this.http.get<ToggleResponse>(url, this.httpOptions)
@@ -381,7 +413,8 @@ export class MessageService {
       message: this.i18n.t('common.message.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<GetMessageResponse>(url, this.httpOptions)
@@ -406,7 +439,8 @@ export class MessageService {
       message: this.i18n.t('common.message.deleting'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
@@ -449,7 +483,8 @@ export class MessageService {
       message: this.i18n.t('common.message.loadingComments'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     const commentsSignal = this.getCommentsSignalForMessage(message.uuid);

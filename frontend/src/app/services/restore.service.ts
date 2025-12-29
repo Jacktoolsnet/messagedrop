@@ -13,8 +13,8 @@ import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
-import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 
 type FilePickerWindow = typeof window & {
   showOpenFilePicker?: (options?: {
@@ -356,7 +356,8 @@ export class RestoreService {
       message: this.i18n.t('common.restore.restoringServerData'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     try {

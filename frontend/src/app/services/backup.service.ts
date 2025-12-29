@@ -3,16 +3,16 @@ import { Injectable, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../../environments/environment';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
 import { BackupEnvelope, BackupLocalImage, BackupPayload } from '../interfaces/backup';
 import { GetUserBackupResponse } from '../interfaces/get-user-backup-response';
 import { LocalImage } from '../interfaces/local-image';
-import { environment } from '../../environments/environment';
+import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
-import { UserService } from './user.service';
-import { BackupStateService } from './backup-state.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 
 type DirectoryPickerWindow = typeof window & {
   showDirectoryPicker?: () => Promise<FileSystemDirectoryHandle>;
@@ -185,7 +185,8 @@ export class BackupService {
       message: this.i18n.t('common.backup.collectingServerData'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     try {
       const response = await firstValueFrom(this.http.get<GetUserBackupResponse>(url, this.httpOptions));

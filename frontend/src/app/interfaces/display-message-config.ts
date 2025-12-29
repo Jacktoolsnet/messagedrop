@@ -6,5 +6,6 @@ export interface DisplayMessageConfig {
     message: string,
     button: string,
     delay: number,
-    showSpinner: boolean
+    showSpinner: boolean,
+    autoclose: boolean
 }

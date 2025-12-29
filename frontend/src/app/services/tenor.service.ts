@@ -4,8 +4,8 @@ import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { TenorApiResponse } from '../interfaces/tenor-response';
 import { NetworkService } from './network.service';
-import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -58,7 +58,8 @@ export class TenorService {
       message: this.i18n.t('common.tenor.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<TenorApiResponse>(url, this.httpOptions)
       .pipe(
@@ -90,7 +91,8 @@ export class TenorService {
       message: this.i18n.t('common.tenor.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<TenorApiResponse>(url, this.httpOptions)
       .pipe(

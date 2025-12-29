@@ -1,19 +1,19 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { computed, Injectable, inject, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
-import { TileSetting, normalizeTileSettings } from '../interfaces/tile-settings';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
 import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { RawContact } from '../interfaces/raw-contact';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { TileSetting, normalizeTileSettings } from '../interfaces/tile-settings';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
-import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { UserService } from './user.service';
 
 @Injectable({
   providedIn: 'root'
@@ -193,7 +193,8 @@ export class ContactService {
       message: this.i18n.t('common.contact.creating'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'userId': contact.userId,
@@ -229,7 +230,8 @@ export class ContactService {
       message: this.i18n.t('common.contact.updatingName'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'contactId': contact.id,
@@ -262,7 +264,8 @@ export class ContactService {
       message: this.i18n.t('common.contact.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get(url, this.httpOptions).pipe(
       catchError(this.handleError)

@@ -18,11 +18,11 @@ import { Profile } from '../interfaces/profile';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
+import { BackupStateService } from './backup-state.service';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { ServerService } from './server.service';
-import { BackupStateService } from './backup-state.service';
 import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
@@ -133,7 +133,8 @@ export class UserService {
       message: this.i18n.t('auth.hashingPin'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = { pin: pin };
     return this.http.post<GetPinHashResponse>(url, body, this.httpOptions)
@@ -287,7 +288,8 @@ export class UserService {
       message: this.i18n.t('auth.creatingUser'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {};
     return this.http.post<CreateUserResponse>(url, body, this.httpOptions)
@@ -306,7 +308,8 @@ export class UserService {
       message: this.i18n.t('auth.confirmingUser'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       pinHash: pinHash,
@@ -416,7 +419,8 @@ export class UserService {
       message: this.i18n.t('auth.gettingUserMessages'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<GetMessageResponse>(url, this.httpOptions)
       .pipe(
@@ -434,7 +438,8 @@ export class UserService {
       message: this.i18n.t('auth.deletingUser'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(
@@ -452,7 +457,8 @@ export class UserService {
       message: this.i18n.t('auth.subscribingUser'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'userId': user.id,
@@ -474,7 +480,8 @@ export class UserService {
       message: this.i18n.t('auth.unsubscribingUser'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     return this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(

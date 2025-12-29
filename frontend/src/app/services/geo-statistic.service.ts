@@ -36,7 +36,8 @@ export class GeoStatisticService {
       message: this.i18n.t('common.geoStatistic.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<GetGeoStatisticResponse>(url, this.httpOptions)

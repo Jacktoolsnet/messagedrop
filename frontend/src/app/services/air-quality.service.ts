@@ -35,7 +35,8 @@ export class AirQualityService {
       message: this.i18n.t('weather.airQuality.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<{ status: number, data: AirQualityData }>(url, this.httpOptions)

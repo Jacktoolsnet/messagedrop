@@ -41,7 +41,8 @@ export class NominatimService {
       message: this.i18n.t('common.location.fetchingNominatim'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<GetNominatimAddressResponse>(url, this.httpOptions)
@@ -63,7 +64,8 @@ export class NominatimService {
       message: this.i18n.t('common.location.searchingNear', { term: searchTerm }),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
@@ -105,7 +107,8 @@ export class NominatimService {
       message: this.i18n.t('common.location.searchingWithArea', { term: searchTerm, area }),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(

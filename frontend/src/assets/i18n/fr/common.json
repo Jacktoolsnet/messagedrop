@@ -186,6 +186,7 @@
       "policy": "Ces informations sont stockées sur notre serveur et sont visibles par tous.",
       "personalInfoBlocked": "Mon message ne sera pas publié car il semble contenir des informations personnelles.",
       "moderationRejected": "Le contenu ne sera pas publié car il a été rejeté par l'IA de modération.",
+      "moderationReview": "Le contenu est publié, mais marqué pour un examen manuel.",
       "moderationFailed": "La modération a échoué. Veuillez réessayer plus tard.",
       "creating": "Création du message",
       "created": "Message publié avec succès.",

@@ -47,7 +47,8 @@ export class ConnectService {
       message: this.i18n.t('common.connect.creatingInfo'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     const body = {
       'userId': connect.userId,
@@ -72,7 +73,8 @@ export class ConnectService {
       message: this.i18n.t('common.connect.loadingInfo'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     this.http.get<GetConnectResponse>(url, this.httpOptions)
       .pipe(
@@ -130,7 +132,8 @@ export class ConnectService {
       message: this.i18n.t('common.connect.deletingInfo'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
     this.http.get<SimpleStatusResponse>(url, this.httpOptions)
       .pipe(

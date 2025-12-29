@@ -1,11 +1,11 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
+import { TranslocoService } from '@jsverse/transloco';
 import { Observable, catchError, take, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { GetClientConnect } from '../interfaces/get-client-connect';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
-import { TranslocoService } from '@jsverse/transloco';
 
 @Injectable({
   providedIn: 'root'
@@ -89,6 +89,7 @@ export class ServerService {
       button: '',
       delay: 0,
       showSpinner: true,
+      autoclose: false
     });
     return this.http.get<GetClientConnect>(url, this.httpOptions)
       .pipe(

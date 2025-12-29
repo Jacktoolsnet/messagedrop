@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, inject } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Weather } from '../interfaces/weather';
@@ -60,7 +60,8 @@ export class WeatherService {
       message: this.i18n.t('weather.service.loading'),
       button: '',
       delay: 0,
-      showSpinner: true
+      showSpinner: true,
+      autoclose: false
     });
 
     return this.http.get<{ status: number; data: WeatherApiResponse }>(url, this.httpOptions)
