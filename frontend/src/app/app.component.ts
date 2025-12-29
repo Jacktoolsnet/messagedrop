@@ -904,7 +904,7 @@ export class AppComponent implements OnInit {
       const dialogRef = this.dialog.open(NotelistComponent, {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
-        data: { location: this.mapService.getMapLocation(), notesSignal: this.noteService.getNotesSignal() },
+        data: { location: this.mapService.getMapLocation(), notesSignal: this.noteService.getNotesWritableSignal() },
         minWidth: '20vw',
         maxWidth: '95vw',
         width: 'auto',

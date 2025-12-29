@@ -17,6 +17,11 @@ export class NoteService {
     return this.notesSignal.asReadonly();
   }
 
+  /** Writable signal for internal dialogs that need to update the list. */
+  getNotesWritableSignal() {
+    return this.notesSignal;
+  }
+
   logout(): void {
     this.notesSignal.set([]);
   }
