@@ -31,9 +31,9 @@ import { DigitalServicesActReportDialogComponent } from '../legal/digital-servic
 import { DsaCaseDialogComponent } from '../legal/digital-services-act-report-dialog/dsa-case-dialog/dsa-case-dialog.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
-import { DisplayMessage } from '../utils/display-message/display-message.component';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';

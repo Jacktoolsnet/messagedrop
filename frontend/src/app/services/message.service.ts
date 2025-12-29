@@ -63,13 +63,35 @@ export class MessageService {
     if (value === null || value === undefined) return null;
     if (typeof value === 'boolean') return value;
     if (typeof value === 'number') return value !== 0;
-    if (typeof value === 'string') return value === '1' || value.toLowerCase() === 'true';
+    if (typeof value === 'string') {
+      const normalized = value.trim().toLowerCase();
+      if (!normalized) return null;
+      if (normalized === '1' || normalized === 'true') return true;
+      if (normalized === '0' || normalized === 'false') return false;
+    }
     return null;
   }
 
   private toNullableNumber(value: unknown): number | null {
+    if (value === null || value === undefined) return null;
+    if (typeof value === 'string' && !value.trim()) return null;
     const num = Number(value);
     return Number.isFinite(num) ? num : null;
+  }
+
+  private buildModerationPatch(moderation?: MessageCreateResponse['moderation'] | null): Partial<Message> {
+    if (!moderation) return {};
+    return {
+      aiModerationDecision: moderation.decision ?? null,
+      aiModerationScore: this.toNullableNumber(moderation.score),
+      aiModerationFlagged: this.toNullableBool(moderation.flagged),
+      patternMatch: this.toNullableBool(moderation.patternMatch),
+      aiModerationAt: Date.now(),
+      manualModerationDecision: null,
+      manualModerationReason: null,
+      manualModerationAt: null,
+      manualModerationBy: null
+    };
   }
 
   private showModerationRejected(message: string): void {
@@ -271,11 +293,12 @@ export class MessageService {
       .subscribe({
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
+          const moderationPatch = this.buildModerationPatch(res?.moderation);
           if (decision === 'rejected') {
             this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
             return;
           }
-          this.messagesSignal.update(messages => [message, ...messages]);
+          this.messagesSignal.update(messages => [{ ...message, ...moderationPatch }, ...messages]);
           if (decision === 'review') {
             this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else {
@@ -320,13 +343,14 @@ export class MessageService {
       .subscribe({
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
+          const moderationPatch = this.buildModerationPatch(res?.moderation);
           if (decision === 'rejected') {
             this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
             return;
           }
 
           const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
-          commentsSignal.set([...commentsSignal(), message]);
+          commentsSignal.set([...commentsSignal(), { ...message, ...moderationPatch }]);
           this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
 
           if (decision === 'review') {
@@ -369,13 +393,14 @@ export class MessageService {
       .subscribe({
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
+          const moderationPatch = this.buildModerationPatch(res?.moderation);
           if (decision === 'rejected') {
             this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
-            this.patchMessageSnapshotSmart(message, { status: 'disabled' });
+            this.patchMessageSnapshotSmart(message, { status: 'disabled', ...moderationPatch });
             return;
           }
 
-          this.patchMessageSnapshotSmart(message, { ...message, status: 'enabled' });
+          this.patchMessageSnapshotSmart(message, { ...message, status: 'enabled', ...moderationPatch });
           if (decision === 'review') {
             this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else if (wasDisabled) {
