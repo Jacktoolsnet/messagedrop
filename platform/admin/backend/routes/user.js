@@ -38,6 +38,7 @@ const SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_SLOWDOWN_MAX_MS, 4000);
 const VERIFY_SLOWDOWN_AFTER = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_AFTER, SLOWDOWN_AFTER);
 const VERIFY_SLOWDOWN_DELAY_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_DELAY_MS, SLOWDOWN_DELAY_MS);
 const VERIFY_SLOWDOWN_MAX_MS = toNumber(process.env.ADMIN_LOGIN_VERIFY_SLOWDOWN_MAX_MS, SLOWDOWN_MAX_MS);
+const ALLOWED_ROLES = new Set(['moderator', 'legal', 'admin', 'root']);
 
 function createSlowdown({ windowMs, delayAfter, delayMs, maxDelayMs, keyGenerator }) {
     const hits = new Map();
@@ -345,13 +346,23 @@ router.post('/', requireRole('admin', 'root'), async (req, res, next) => {
     let { username, password, role = 'moderator' } = req.body || {};
     username = typeof username === 'string' ? username.trim() : '';
     password = typeof password === 'string' ? password.trim() : '';
+    role = typeof role === 'string' ? role.trim() : 'moderator';
 
     if (!username || !password) {
         return next(apiError.badRequest('Missing username or password'));
     }
+    if (!ALLOWED_ROLES.has(role)) {
+        return next(apiError.badRequest('Invalid role'));
+    }
 
     const id = crypto.randomUUID();
-    const hashed = await bcrypt.hash(password, 12);
+    let hashed;
+    try {
+        hashed = await bcrypt.hash(password, 12);
+    } catch (error) {
+        req.logger?.error?.('Password hash failed', { error: error?.message });
+        return next(apiError.internal('Could not create user'));
+    }
     const createdAt = Date.now();
 
     tableUser.create(db, id, username, hashed, role, createdAt, (err, result) => {
@@ -397,7 +408,6 @@ router.put('/:id', async (req, res, next) => {
             if (!password) return next(apiError.badRequest('Nothing to update'));
         }
 
-        const allowedRoles = new Set(['moderator', 'admin', 'root']);
         const fields = {};
 
         if (isAdminRoot && username && username !== target.username) {
@@ -406,7 +416,7 @@ router.put('/:id', async (req, res, next) => {
         }
 
         if (isAdminRoot && role && role !== target.role) {
-            if (!allowedRoles.has(role)) return next(apiError.badRequest('Invalid role'));
+            if (!ALLOWED_ROLES.has(role)) return next(apiError.badRequest('Invalid role'));
             fields.role = role;
         }
 

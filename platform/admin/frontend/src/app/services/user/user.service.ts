@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, throwError } from 'rxjs';
+import { catchError, of, throwError } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { CreateUserPayload } from '../../interfaces/create-user-payload.interface';
 import { UpdateUserPayload } from '../../interfaces/update-user-payload.interface';
@@ -30,7 +30,10 @@ export class UserService {
 
   loadUsers() {
     this.http.get<User[]>(this.baseUrl)
-      .pipe(catchError(this.handleError))
+      .pipe(catchError((error) => {
+        this.handleError(error);
+        return of([]);
+      }))
       .subscribe({
         next: (users) => this._users.set(users)
       });
