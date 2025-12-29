@@ -672,7 +672,9 @@ export class MessageService {
       /\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\b/,
       /\b(?:\d{1,3}\.){3}\d{1,3}\b/,
       /\b(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+\b/,
-      /\b\d{3}-\d{2}-\d{4}\b/
+      /\b\d{3}-\d{2}-\d{4}\b/,
+      /\b(?:https?:\/\/|www\.)[^\s]+/i,
+      /\b(?:[a-z0-9-]+\.)+[a-z]{2,}(?:\/[^\s]*)?/i
     ];
 
     if (patterns.some((pattern) => pattern.test(text))) {

@@ -5,6 +5,7 @@
     "ng": "ng",
     "start": "ng serve",
     "build": "ng build",
+    "install:prod": "npm install --omit=dev",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"

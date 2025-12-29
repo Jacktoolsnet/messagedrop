@@ -7,6 +7,7 @@
     "start": "npm run gen:version && ng serve",
     "prebuild": "npm run gen:version",
     "build": "ng build",
+    "install:prod": "npm install --omit=dev",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "lint": "ng lint"
