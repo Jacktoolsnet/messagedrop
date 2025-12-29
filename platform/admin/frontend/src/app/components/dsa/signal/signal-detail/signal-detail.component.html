@@ -92,6 +92,57 @@
             }
         </div>
 
+        @if (hasModeration()) {
+        <div class="snippet">
+            <div class="snippet-header">
+                <mat-icon>verified_user</mat-icon>
+                <span>Moderation ratings</span>
+            </div>
+            <div class="meta">
+                <div class="kv">
+                    <mat-icon>memory</mat-icon>
+                    <span><strong>AI decision:</strong> {{ msg()?.aiModerationDecision || '—' }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>bar_chart</mat-icon>
+                    <span><strong>AI score:</strong> {{ formatScore(msg()?.aiModerationScore) }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>flag</mat-icon>
+                    <span><strong>AI flagged:</strong> {{ formatBool(msg()?.aiModerationFlagged) }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>schedule</mat-icon>
+                    <span><strong>AI checked:</strong> {{ formatTimestamp(msg()?.aiModerationAt) }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>fingerprint</mat-icon>
+                    <span><strong>Pattern match:</strong> {{ formatBool(msg()?.patternMatch) }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>schedule</mat-icon>
+                    <span><strong>Pattern checked:</strong> {{ formatTimestamp(msg()?.patternMatchAt) }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>gavel</mat-icon>
+                    <span><strong>Manual decision:</strong> {{ msg()?.manualModerationDecision || '—' }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>notes</mat-icon>
+                    <span><strong>Manual reason:</strong> {{ msg()?.manualModerationReason || '—' }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>schedule</mat-icon>
+                    <span><strong>Manual reviewed:</strong> {{ formatTimestamp(msg()?.manualModerationAt) }}</span>
+                </div>
+                <div class="kv">
+                    <mat-icon>person</mat-icon>
+                    <span><strong>Manual reviewer:</strong> {{ msg()?.manualModerationBy || '—' }}</span>
+                </div>
+            </div>
+        </div>
+        }
+
         <!-- Meta -->
         <div class="meta">
             <div class="kv">

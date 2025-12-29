@@ -214,6 +214,16 @@ export class DigitalServicesActReportDialogComponent {
       dislikes: msg.dislikes ?? null,
       commentsNumber: msg.commentsNumber ?? null,
       status: msg.status ?? null,
+      aiModerationDecision: msg.aiModerationDecision ?? null,
+      aiModerationScore: msg.aiModerationScore ?? null,
+      aiModerationFlagged: msg.aiModerationFlagged ?? null,
+      aiModerationAt: msg.aiModerationAt ?? null,
+      patternMatch: msg.patternMatch ?? null,
+      patternMatchAt: msg.patternMatchAt ?? null,
+      manualModerationDecision: msg.manualModerationDecision ?? null,
+      manualModerationReason: msg.manualModerationReason ?? null,
+      manualModerationAt: msg.manualModerationAt ?? null,
+      manualModerationBy: msg.manualModerationBy ?? null,
       multimedia: msg.multimedia ?? null
     };
   }

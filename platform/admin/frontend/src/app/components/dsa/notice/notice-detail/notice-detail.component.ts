@@ -87,6 +87,22 @@ export class NoticeDetailComponent implements OnInit {
 
   // Hilfen
   isPublicMessage = computed(() => (this.notice()?.reportedContentType || '').toLowerCase().includes('public'));
+  hasModeration = computed(() => {
+    const c = this.contentObj();
+    if (!c) return false;
+    return [
+      c.aiModerationDecision,
+      c.aiModerationScore,
+      c.aiModerationFlagged,
+      c.aiModerationAt,
+      c.patternMatch,
+      c.patternMatchAt,
+      c.manualModerationDecision,
+      c.manualModerationReason,
+      c.manualModerationAt,
+      c.manualModerationBy
+    ].some(value => value !== undefined && value !== null && value !== '');
+  });
 
   close(ok = false) {
     this.ref.close(ok || this.dirty);
@@ -164,6 +180,25 @@ export class NoticeDetailComponent implements OnInit {
           state.update(s => ({ ...s, error: 'Network error while translating', loading: false }));
         }
       });
+  }
+
+  formatScore(value?: number | null): string {
+    return Number.isFinite(value) ? Number(value).toFixed(3) : '—';
+  }
+
+  formatBool(value?: boolean | number | null): string {
+    if (value === undefined || value === null) return '—';
+    return value === true || value === 1 ? 'Yes' : 'No';
+  }
+
+  formatTimestamp(value?: number | null): string {
+    if (!Number.isFinite(value)) return '—';
+    const ts = Number(value);
+    try {
+      return new Date(ts).toLocaleString(navigator.language || undefined);
+    } catch {
+      return new Date(ts).toISOString();
+    }
   }
 
   /** kleine Embed-Helfer */

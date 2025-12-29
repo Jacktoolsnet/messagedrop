@@ -60,6 +60,128 @@ const upload = multer({
 function db(req) { return req.database?.db; }
 function asString(v) { return (v === undefined || v === null) ? null : String(v); }
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
+function resolveBackendBase() {
+    const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
+    const port = process.env.PORT;
+    if (!base || !port) return null;
+    return `${base}:${port}`;
+}
+
+async function fetchMessageByContentId(contentId) {
+    const base = resolveBackendBase();
+    const raw = String(contentId ?? '').trim();
+    if (!base || !raw) return null;
+
+    const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
+    let token = null;
+    try {
+        token = await signServiceJwt({ audience: backendAudience });
+    } catch {
+        token = null;
+    }
+
+    const headers = {
+        Accept: 'application/json'
+    };
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    const isNumeric = /^\d+$/.test(raw);
+    const path = isNumeric
+        ? `/message/get/id/${encodeURIComponent(raw)}`
+        : `/message/get/uuid/${encodeURIComponent(raw)}`;
+
+    try {
+        const resp = await axios.get(`${base}${path}`, {
+            headers,
+            timeout: 5000,
+            validateStatus: () => true
+        });
+        if (resp.status >= 200 && resp.status < 300) {
+            return resp.data?.message ?? null;
+        }
+    } catch {
+        return null;
+    }
+
+    return null;
+}
+
+function extractModerationFields(message) {
+    if (!message) return null;
+    return {
+        aiModerationDecision: message.aiModerationDecision ?? null,
+        aiModerationScore: message.aiModerationScore ?? null,
+        aiModerationFlagged: message.aiModerationFlagged ?? null,
+        aiModerationAt: message.aiModerationAt ?? null,
+        patternMatch: message.patternMatch ?? null,
+        patternMatchAt: message.patternMatchAt ?? null,
+        manualModerationDecision: message.manualModerationDecision ?? null,
+        manualModerationReason: message.manualModerationReason ?? null,
+        manualModerationAt: message.manualModerationAt ?? null,
+        manualModerationBy: message.manualModerationBy ?? null
+    };
+}
+
+function hasModerationFields(moderation) {
+    if (!moderation) return false;
+    return Object.values(moderation).some(value => value !== null && value !== undefined && value !== '');
+}
+
+function mergeReportedContentWithModeration(raw, moderation) {
+    if (!moderation) return raw;
+    let payload = {};
+
+    if (raw && typeof raw === 'object') {
+        payload = raw;
+    } else if (typeof raw === 'string' && raw.trim().length) {
+        try {
+            const parsed = JSON.parse(raw);
+            if (parsed && typeof parsed === 'object') payload = parsed;
+        } catch {
+            payload = { _raw: raw };
+        }
+    }
+
+    const merged = { ...payload };
+    for (const [key, value] of Object.entries(moderation)) {
+        if (value !== null && value !== undefined && value !== '') {
+            merged[key] = value;
+        }
+    }
+
+    try {
+        return JSON.stringify(merged);
+    } catch {
+        return raw;
+    }
+}
+
+async function enrichRowWithModeration(row, cache) {
+    if (!row?.contentId) return row;
+    const key = String(row.contentId);
+    if (!key) return row;
+
+    if (!cache.has(key)) {
+        const message = await fetchMessageByContentId(key);
+        cache.set(key, extractModerationFields(message));
+    }
+
+    const moderation = cache.get(key);
+    if (!hasModerationFields(moderation)) return row;
+
+    return {
+        ...row,
+        reportedContent: mergeReportedContentWithModeration(row.reportedContent, moderation)
+    };
+}
+
+async function enrichRowsWithModeration(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) return rows;
+    const cache = new Map();
+    return Promise.all(rows.map(row => enrichRowWithModeration(row, cache)));
+}
 
 async function hasStorageCapacity() {
     if (!minFreeStorageMb) return true;
@@ -429,27 +551,43 @@ router.get('/notices', (req, res, next) => {
             limit: asNum(req.query.limit, 100),
             offset: asNum(req.query.offset, 0)
         },
-        (err, rows) => {
+        async (err, rows) => {
             if (err) {
                 const apiErr = apiError.internal('db_error');
                 apiErr.detail = err.message;
                 return next(apiErr);
             }
-            res.json(rows);
+            try {
+                const enriched = await enrichRowsWithModeration(rows || []);
+                res.json(enriched);
+            } catch (error) {
+                req.logger?.warn?.('Failed to enrich notice moderation data', {
+                    error: error?.message || error
+                });
+                res.json(rows);
+            }
         }
     );
 });
 
 router.get('/notices/:id', (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
-    tableNotice.getById(_db, req.params.id, (err, row) => {
+    tableNotice.getById(_db, req.params.id, async (err, row) => {
         if (err) {
             const apiErr = apiError.internal('db_error');
             apiErr.detail = err.message;
             return next(apiErr);
         }
         if (!row) return next(apiError.notFound('not_found'));
-        res.json(row);
+        try {
+            const enriched = await enrichRowWithModeration(row, new Map());
+            res.json(enriched);
+        } catch (error) {
+            req.logger?.warn?.('Failed to enrich notice moderation data', {
+                error: error?.message || error
+            });
+            res.json(row);
+        }
     });
 });
 
@@ -1685,13 +1823,21 @@ router.get('/signals', (req, res, next) => {
         offset: asNum(req.query.offset, 0)
     };
 
-    tableSignal.list(_db, opts, (err, rows) => {
+    tableSignal.list(_db, opts, async (err, rows) => {
         if (err) {
             const apiErr = apiError.internal('db_error');
             apiErr.detail = err.message;
             return next(apiErr);
         }
-        res.json(rows);
+        try {
+            const enriched = await enrichRowsWithModeration(rows || []);
+            res.json(enriched);
+        } catch (error) {
+            req.logger?.warn?.('Failed to enrich signal moderation data', {
+                error: error?.message || error
+            });
+            res.json(rows);
+        }
     });
 });
 
@@ -1701,14 +1847,22 @@ router.get('/signals', (req, res, next) => {
 router.get('/signals/:id', (req, res, next) => {
     const _db = db(req); if (!_db) return next(apiError.internal('database_unavailable'));
 
-    tableSignal.getById(_db, String(req.params.id), (err, row) => {
+    tableSignal.getById(_db, String(req.params.id), async (err, row) => {
         if (err) {
             const apiErr = apiError.internal('db_error');
             apiErr.detail = err.message;
             return next(apiErr);
         }
         if (!row) return next(apiError.notFound('not_found'));
-        res.json(row);
+        try {
+            const enriched = await enrichRowWithModeration(row, new Map());
+            res.json(enriched);
+        } catch (error) {
+            req.logger?.warn?.('Failed to enrich signal moderation data', {
+                error: error?.message || error
+            });
+            res.json(row);
+        }
     });
 });
 

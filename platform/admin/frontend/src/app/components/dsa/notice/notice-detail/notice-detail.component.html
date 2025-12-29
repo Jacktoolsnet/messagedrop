@@ -142,6 +142,53 @@
                         <div class="placeholder"><mat-icon>info</mat-icon> No content payload attached.</div>
                         }
                     </div>
+                    @if (hasModeration()) {
+                    <div class="block">
+                        <h4><mat-icon>verified_user</mat-icon> Moderation ratings</h4>
+                        <div class="meta">
+                            <div class="kv">
+                                <div class="k">AI decision</div>
+                                <div class="v">{{ contentObj()?.aiModerationDecision || '—' }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">AI score</div>
+                                <div class="v">{{ formatScore(contentObj()?.aiModerationScore) }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">AI flagged</div>
+                                <div class="v">{{ formatBool(contentObj()?.aiModerationFlagged) }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">AI checked</div>
+                                <div class="v">{{ formatTimestamp(contentObj()?.aiModerationAt) }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Pattern match</div>
+                                <div class="v">{{ formatBool(contentObj()?.patternMatch) }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Pattern checked</div>
+                                <div class="v">{{ formatTimestamp(contentObj()?.patternMatchAt) }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Manual decision</div>
+                                <div class="v">{{ contentObj()?.manualModerationDecision || '—' }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Manual reason</div>
+                                <div class="v">{{ contentObj()?.manualModerationReason || '—' }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Manual reviewed</div>
+                                <div class="v">{{ formatTimestamp(contentObj()?.manualModerationAt) }}</div>
+                            </div>
+                            <div class="kv">
+                                <div class="k">Manual reviewer</div>
+                                <div class="v">{{ contentObj()?.manualModerationBy || '—' }}</div>
+                            </div>
+                        </div>
+                    </div>
+                    }
                 </div>
             </section>
 

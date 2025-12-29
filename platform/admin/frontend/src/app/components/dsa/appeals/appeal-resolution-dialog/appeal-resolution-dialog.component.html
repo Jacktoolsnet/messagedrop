@@ -22,13 +22,13 @@
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>Legal basis</mat-label>
-        <input matInput formControlName="legalBasis" placeholder="e.g. Terms of Service violation" />
+        <input matInput formControlName="legalBasis" placeholder="e.g. Terms of Use violation (Section 9)" />
       </mat-form-field>
       <mat-form-field appearance="outline">
-        <mat-label>ToS basis</mat-label>
-        <input matInput formControlName="tosBasis" placeholder="e.g. §4.1 Hate Speech" />
+        <mat-label>Terms of Use clause</mat-label>
+        <input matInput formControlName="tosBasis" placeholder="e.g. Section 9 - Hate speech, harassment, or threats" />
       </mat-form-field>
-      <mat-slide-toggle formControlName="automatedUsed">Automated tools used</mat-slide-toggle>
+      <mat-slide-toggle formControlName="automatedUsed">Automated tools used to support the decision</mat-slide-toggle>
       <mat-form-field appearance="outline">
         <mat-label>Decision statement</mat-label>
         <textarea matInput rows="3" formControlName="statement" placeholder="Reasoning for the revised decision"></textarea>

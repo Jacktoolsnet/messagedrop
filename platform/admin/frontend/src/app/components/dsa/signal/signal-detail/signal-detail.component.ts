@@ -52,6 +52,22 @@ export class SignalDetailComponent implements OnInit {
     const u = d?.contentUrl || m?.multimedia?.sourceUrl || m?.multimedia?.url;
     return (u && u.trim()) ? u : null;
   });
+  readonly hasModeration = computed(() => {
+    const m = this.msg();
+    if (!m) return false;
+    return [
+      m.aiModerationDecision,
+      m.aiModerationScore,
+      m.aiModerationFlagged,
+      m.aiModerationAt,
+      m.patternMatch,
+      m.patternMatchAt,
+      m.manualModerationDecision,
+      m.manualModerationReason,
+      m.manualModerationAt,
+      m.manualModerationBy
+    ].some(value => value !== undefined && value !== null && value !== '');
+  });
 
   // Übersetzen-State
   tMsg = signal<string | null>(null);
@@ -199,6 +215,25 @@ export class SignalDetailComponent implements OnInit {
       error: () => this.snack.open('Translation failed.', 'OK', { duration: 2500 }),
       complete: () => this.loadingReason.set(false)
     });
+  }
+
+  formatScore(value?: number | null): string {
+    return Number.isFinite(value) ? Number(value).toFixed(3) : '—';
+  }
+
+  formatBool(value?: boolean | number | null): string {
+    if (value === undefined || value === null) return '—';
+    return value === true || value === 1 ? 'Yes' : 'No';
+  }
+
+  formatTimestamp(value?: number | null): string {
+    if (!Number.isFinite(value)) return '—';
+    const ts = Number(value);
+    try {
+      return new Date(ts).toLocaleString(navigator.language || undefined);
+    } catch {
+      return new Date(ts).toISOString();
+    }
   }
 
   // Helpers

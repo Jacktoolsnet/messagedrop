@@ -71,7 +71,7 @@ export class AppealResolutionDialogComponent {
   });
 
   isRevised = computed(() => this.form.controls.outcome.value === 'REVISED');
-  decisionOutcomes: DecisionOutcome[] = ['NO_ACTION', 'RESTRICT', 'REMOVE_CONTENT', 'FORWARD_TO_AUTHORITY'];
+  decisionOutcomes: DecisionOutcome[] = ['NO_ACTION', 'RESTRICT', 'FORWARD_TO_AUTHORITY'];
 
   constructor() {
     const data = this.data;

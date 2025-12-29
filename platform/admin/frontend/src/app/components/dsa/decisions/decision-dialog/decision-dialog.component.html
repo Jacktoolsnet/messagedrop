@@ -9,10 +9,10 @@
     <mat-label>Outcome</mat-label>
     <mat-select formControlName="outcome" required>
       @for (o of outcomes; track o) {
-        <mat-option [value]="o.value">
-          <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
-          {{ o.label }}
-        </mat-option>
+      <mat-option [value]="o.value">
+        <mat-icon class="opt-icon" aria-hidden="true">{{ o.icon }}</mat-icon>
+        {{ o.label }}
+      </mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -21,55 +21,55 @@
   <mat-form-field appearance="outline" class="full">
     <mat-label>Legal basis</mat-label>
     <input type="text" matInput [formControl]="legalCtrl" [matAutocomplete]="legalAuto"
-      placeholder="e.g. Terms of Service violation" spellcheck="false" />
+      placeholder="e.g. Terms of Use violation (Section 9)" spellcheck="false" />
     @if (selectedLegalDesc) {
-      <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" aria-label="Info">
-        <mat-icon>info</mat-icon>
-      </button>
+    <button mat-icon-button matSuffix [matTooltip]="selectedLegalDesc" aria-label="Info">
+      <mat-icon>info</mat-icon>
+    </button>
     }
     <mat-autocomplete #legalAuto="matAutocomplete" (optionSelected)="onSelectLegal($event)" autoActiveFirstOption>
       @for (o of filteredLegal$ | async; track o) {
-        <mat-option [value]="o.label">
-          <div class="opt-line">
-            <span class="opt-label">{{ o.label }}</span>
-            <span class="opt-desc">{{ o.desc }}</span>
-          </div>
-        </mat-option>
+      <mat-option [value]="o.label">
+        <div class="opt-line">
+          <span class="opt-label">{{ o.label }}</span>
+          <span class="opt-desc">{{ o.desc }}</span>
+        </div>
+      </mat-option>
       }
     </mat-autocomplete>
     @if (selectedLegalDesc) {
-      <mat-hint class="hint-desc">{{ selectedLegalDesc }}</mat-hint>
+    <mat-hint class="hint-desc">{{ selectedLegalDesc }}</mat-hint>
     }
   </mat-form-field>
 
   <!-- ToS clause (combo + free text) -->
   <mat-form-field appearance="outline" class="full">
-    <mat-label>Terms of Service clause (optional)</mat-label>
+    <mat-label>Terms of Use clause (optional)</mat-label>
     <input type="text" matInput [formControl]="tosCtrl" [matAutocomplete]="tosAuto"
-      placeholder="e.g. §3.2 Abuse / Harassment" spellcheck="false" />
+      placeholder="e.g. Section 9 - Privacy or personal data disclosure" spellcheck="false" />
     @if (selectedTosDesc) {
-      <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" aria-label="Info">
-        <mat-icon>info</mat-icon>
-      </button>
+    <button mat-icon-button matSuffix [matTooltip]="selectedTosDesc" aria-label="Info">
+      <mat-icon>info</mat-icon>
+    </button>
     }
     <mat-autocomplete #tosAuto="matAutocomplete" (optionSelected)="onSelectTos($event)" autoActiveFirstOption>
       @for (o of filteredTos$ | async; track o) {
-        <mat-option [value]="o.label">
-          <div class="opt-line">
-            <span class="opt-label">{{ o.label }}</span>
-            <span class="opt-desc">{{ o.desc }}</span>
-          </div>
-        </mat-option>
+      <mat-option [value]="o.label">
+        <div class="opt-line">
+          <span class="opt-label">{{ o.label }}</span>
+          <span class="opt-desc">{{ o.desc }}</span>
+        </div>
+      </mat-option>
       }
     </mat-autocomplete>
     @if(selectedTosDesc){
-      <mat-hint class="hint-desc">{{ selectedTosDesc }}</mat-hint>
+    <mat-hint class="hint-desc">{{ selectedTosDesc }}</mat-hint>
     }
   </mat-form-field>
 
   <div class="toggle-row" id="automatedHelp">
     <mat-slide-toggle [formControl]="form.controls.automatedUsed" aria-describedby="automatedHelp">
-      Automated tools used to support decision
+      Automated tools used to support the decision
     </mat-slide-toggle>
   </div>
   <p class="help-text">
@@ -83,12 +83,11 @@
     <mat-select [(value)]="selectedTemplate" (selectionChange)="onTemplateChange($event.value)">
       <mat-option [value]="''">None</mat-option>
       @for (t of reasoningTemplates; track t) {
-        <mat-option [value]="t.label">
-          <div class="opt-line">
-            <span class="opt-label">{{ t.label }}</span>
-            <span class="opt-desc">{{ t.desc }}</span>
-          </div>
-        </mat-option>
+      <mat-option [value]="t.label">
+        <div class="opt-line">
+          <span class="opt-label">{{ t.label}}</span>
+        </div>
+      </mat-option>
       }
     </mat-select>
   </mat-form-field>
@@ -96,8 +95,7 @@
   <!-- Statement -->
   <mat-form-field appearance="outline" class="full">
     <mat-label>Statement / reasoning (optional)</mat-label>
-    <textarea matInput formControlName="statement" rows="5"
-    placeholder="Short reasoning for the decision"></textarea>
+    <textarea matInput formControlName="statement" rows="5" placeholder="Short reasoning for the decision"></textarea>
     <mat-hint align="end">{{ (form.get('statement')?.value || '').length }}/2000</mat-hint>
   </mat-form-field>
 
@@ -105,7 +103,7 @@
     <button mat-stroked-button type="button" (click)="close()">Cancel</button>
     <button mat-raised-button color="primary" type="submit" [disabled]="submitting()">
       @if (submitting()) {
-        <mat-icon class="spin">autorenew</mat-icon>
+      <mat-icon class="spin">autorenew</mat-icon>
       }
       Save
     </button>
