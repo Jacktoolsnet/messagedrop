@@ -20,8 +20,7 @@ type TileKey =
   | 'notifications'
   | 'appeals'
   | 'audit'
-  | 'transparency'
-  | 'moderation';
+  | 'transparency';
 
 interface DsaTile {
   key: TileKey;
@@ -77,7 +76,6 @@ export class DsaDashboardComponent {
     { key: 'notifications', title: 'Notifications', subtitle: 'Notify stakeholders', icon: 'notifications', route: '/dashboard/dsa/notifications' },
     { key: 'appeals', title: 'Appeals', subtitle: 'Handle appeals', icon: 'feedback', route: '/dashboard/dsa/appeals' },
     { key: 'audit', title: 'Audit Log', subtitle: 'Trace all actions', icon: 'history', route: '/dashboard/dsa/audits' },
-    { key: 'moderation', title: 'Moderation', subtitle: 'Review AI flagged content', icon: 'policy', route: '/dashboard/dsa/moderation' },
     { key: 'transparency', title: 'Transparency', subtitle: 'Public stats & reports', icon: 'insights', route: '/dashboard/dsa/transparency' }
   ];
 
@@ -92,8 +90,6 @@ export class DsaDashboardComponent {
         return this.noticeStats()?.open ?? 0;
       case 'appeals':
         return this.appealStats()?.open ?? 0;
-      case 'moderation':
-        return 0;
       default:
         return 0; // für die anderen später erweitern
     }

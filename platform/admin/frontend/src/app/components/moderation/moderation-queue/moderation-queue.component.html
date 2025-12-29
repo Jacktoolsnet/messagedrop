@@ -1,5 +1,5 @@
 <mat-toolbar>
-    <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+    <button mat-icon-button routerLink="/dashboard" aria-label="Back">
         <mat-icon>arrow_back</mat-icon>
     </button>
     <span class="toolbar-title">Moderation Queue</span>
@@ -76,8 +76,22 @@
                     </div>
                     <mat-divider class="section-divider"></mat-divider>
                     <div class="block">
-                        <div class="block-title">Message</div>
+                        <div class="block-header">
+                            <div class="block-title">Message</div>
+                            <button mat-stroked-button color="primary" class="translate-btn"
+                                (click)="translateSelected()" [disabled]="translateLoading()">
+                                <mat-icon>translate</mat-icon>
+                                Translate to German
+                            </button>
+                        </div>
                         <div class="block-body">{{ sel.messageText }}</div>
+                        @if (translateLoading()) {
+                        <div class="translate-loading">Translating...</div>
+                        }
+                        @if (translatedText()) {
+                        <div class="block-title">Translation (DE)</div>
+                        <div class="block-body">{{ translatedText() }}</div>
+                        }
                     </div>
                     <div class="block">
                         <div class="block-title">AI Moderation Response</div>

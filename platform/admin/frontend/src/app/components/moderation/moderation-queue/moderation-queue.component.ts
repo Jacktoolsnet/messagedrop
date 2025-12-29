@@ -13,6 +13,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { RouterLink } from '@angular/router';
 import { ModerationRequest } from '../../../interfaces/moderation-request.interface';
 import { ModerationService } from '../../../services/moderation.service';
+import { TranslateService } from '../../../services/translate-service/translate-service.service';
 
 @Component({
   selector: 'app-moderation-queue',
@@ -36,11 +37,14 @@ import { ModerationService } from '../../../services/moderation.service';
 export class ModerationQueueComponent implements OnInit {
   private readonly moderationService = inject(ModerationService);
   private readonly snack = inject(MatSnackBar);
+  private readonly translator = inject(TranslateService);
 
   readonly loading = signal(false);
   readonly actionLoading = signal(false);
+  readonly translateLoading = signal(false);
   readonly requests = signal<ModerationRequest[]>([]);
   readonly selected = signal<ModerationRequest | null>(null);
+  readonly translatedText = signal<string>('');
 
   rejectionReason = '';
 
@@ -65,7 +69,7 @@ export class ModerationQueueComponent implements OnInit {
       next: (res) => {
         this.requests.set(res.rows ?? []);
         if (this.requests().length && !this.selected()) {
-          this.selected.set(this.requests()[0]);
+          this.select(this.requests()[0]);
         }
       },
       error: () => {
@@ -77,7 +81,8 @@ export class ModerationQueueComponent implements OnInit {
 
   select(entry: ModerationRequest): void {
     this.selected.set(entry);
-    this.rejectionReason = '';
+    this.rejectionReason = this.suggestReason(entry);
+    this.translatedText.set('');
   }
 
   isSelected(entry: ModerationRequest): boolean {
@@ -113,6 +118,72 @@ export class ModerationQueueComponent implements OnInit {
       return JSON.stringify(JSON.parse(value), null, 2);
     } catch {
       return value;
+    }
+  }
+
+  translateSelected(): void {
+    const current = this.selected();
+    const text = current?.messageText?.trim() ?? '';
+    if (!text) {
+      this.snack.open('No text to translate.', 'OK', { duration: 2000 });
+      return;
+    }
+    this.translateLoading.set(true);
+    this.translator.translateToGerman(text).subscribe({
+      next: (result) => {
+        this.translatedText.set(result || 'Translation failed.');
+      },
+      error: () => {
+        this.snack.open('Translation failed.', 'OK', { duration: 3000 });
+      },
+      complete: () => this.translateLoading.set(false)
+    });
+  }
+
+  private suggestReason(entry: ModerationRequest): string {
+    if (entry.patternMatch === true || entry.patternMatch === 1) {
+      return 'Privacy or personal data';
+    }
+    const category = this.extractTopCategory(entry.aiResponse);
+    if (!category) return '';
+    const key = category.toLowerCase();
+    if (key.includes('hate') || key.includes('harassment')) return 'Hate speech or harassment';
+    if (key.includes('violence')) return 'Violence or threats';
+    if (key.includes('sexual')) return 'Sexual content';
+    if (key.includes('illicit')) return 'Illegal activity';
+    if (key.includes('spam') || key.includes('scam')) return 'Spam or scams';
+    if (key.includes('privacy') || key.includes('personal')) return 'Privacy or personal data';
+    if (key.includes('copyright') || key.includes('intellectual')) return 'Copyright infringement';
+    if (key.includes('self-harm')) return 'Other Terms of Use violation';
+    return 'Other Terms of Use violation';
+  }
+
+  private extractTopCategory(aiResponse?: string | null): string | null {
+    if (!aiResponse) return null;
+    try {
+      const parsed = JSON.parse(aiResponse);
+      const result = parsed?.results?.[0];
+      const scores = result?.category_scores;
+      if (scores && typeof scores === 'object') {
+        let topKey = null;
+        let topScore = -1;
+        for (const [key, value] of Object.entries(scores)) {
+          const numeric = Number(value);
+          if (Number.isFinite(numeric) && numeric > topScore) {
+            topScore = numeric;
+            topKey = key;
+          }
+        }
+        if (topKey) return topKey;
+      }
+      const categories = result?.categories;
+      if (categories && typeof categories === 'object') {
+        const flagged = Object.entries(categories).find(([, value]) => value === true);
+        return flagged ? flagged[0] : null;
+      }
+      return null;
+    } catch {
+      return null;
     }
   }
 

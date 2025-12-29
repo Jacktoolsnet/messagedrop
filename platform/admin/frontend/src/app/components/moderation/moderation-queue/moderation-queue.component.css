@@ -1,12 +1,12 @@
 :host {
-    --primary: #f59e0b;
+    --primary: #05a51d;
     --text: #1f2937;
     --muted: #6b7280;
     --border: rgba(0, 0, 0, .08);
     --card: rgba(255, 255, 255, .94);
     display: block;
     min-height: 100%;
-    background: linear-gradient(135deg, #fff7ed, #fed7aa);
+    background: linear-gradient(135deg, #eafde8, #bff7c4);
     color: var(--text);
 }
 
@@ -175,6 +175,23 @@ mat-progress-bar {
     display: grid;
     gap: .35rem;
     margin-bottom: 1rem;
+}
+
+.block-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    flex-wrap: wrap;
+}
+
+.translate-btn mat-icon {
+    margin-right: .35rem;
+}
+
+.translate-loading {
+    color: var(--muted);
+    font-size: .85rem;
 }
 
 .block-title {

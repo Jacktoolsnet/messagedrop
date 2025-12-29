@@ -8,6 +8,7 @@ import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../services/auth/auth.service';
 import { LogService } from '../../../services/log.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
+import { ModerationService } from '../../../services/moderation.service';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -28,6 +29,7 @@ export class AdminDashboardComponent implements OnInit {
   private authService = inject(AuthService);
   private logService = inject(LogService);
   private dsaService = inject(DsaService);
+  private moderationService = inject(ModerationService);
 
   readonly username = this.authService.username;
   readonly role = this.authService.role;
@@ -36,6 +38,7 @@ export class AdminDashboardComponent implements OnInit {
   infoCountToday: number | null = null;
   appErrorCountToday: number | null = null;
   powCountToday: number | null = null;
+  moderationCountPending: number | null = null;
 
   readonly dsaOpenCount = computed(() => {
     const noticesOpen = this.dsaService.noticeStats()?.open ?? 0;
@@ -73,6 +76,14 @@ export class AdminDashboardComponent implements OnInit {
     });
     this.logService.getPowCountSince(since).subscribe(res => {
       this.powCountToday = res.count;
+    });
+    this.moderationService.listRequests('pending', 500, 0).subscribe({
+      next: (res) => {
+        this.moderationCountPending = res.rows?.length ?? 0;
+      },
+      error: () => {
+        this.moderationCountPending = 0;
+      }
     });
   }
 
