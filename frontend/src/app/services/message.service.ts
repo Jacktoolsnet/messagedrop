@@ -582,22 +582,46 @@ export class MessageService {
   }
 
   detectPersonalInformation(text: string): boolean {
-    // 🔍 Regex-Muster für verschiedene PII-Typen
     const patterns: RegExp[] = [
-      /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/,  // E-Mail-Adresse
-      /\b(?:\+?\d{1,3}[-.\s]?)?\(?\d{1,4}\)?[-.\s]?\d{1,4}[-.\s]?\d{1,9}\b/,  // Internationale Telefonnummern
-      /\b(?:\d[ -]*?){13,19}\b/,  // Kreditkarten (Visa, Mastercard, Amex, etc.)
-      /\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\b/,  // IBAN (international)
-      /\b(?:\d{1,3}\.){3}\d{1,3}\b/,  // IPv4-Adresse
-      /\b(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+\b/,  // IPv6-Adresse
-      /\b\d{3}-\d{2}-\d{4}\b/,  // US Social Security Number (SSN)
-      /\b\d{2}-\d{7}|\d{9}|\d{10}\b/,  // Steuernummern
-      /\b\d{1,2}[./-]\d{1,2}[./-]\d{2,4}\b/,  // Datum
-      /\b(?:Name|Vorname|Nachname|Adresse|Straße|Telefon|Konto|IBAN|Passnummer|PLZ|Personalausweis|Steuernummer)\b/i  // Relevante Begriffe
+      /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/,
+      /\b(?:\d[ -]*?){13,19}\b/,
+      /\b[A-Z]{2}[0-9]{2}[A-Z0-9]{11,30}\b/,
+      /\b(?:\d{1,3}\.){3}\d{1,3}\b/,
+      /\b(?:[a-fA-F0-9:]+:+)+[a-fA-F0-9]+\b/,
+      /\b\d{3}-\d{2}-\d{4}\b/
     ];
 
-    // Prüfen, ob irgendein Muster im Text gefunden wird
-    return patterns.some(pattern => pattern.test(text));
+    if (patterns.some((pattern) => pattern.test(text))) {
+      return true;
+    }
+
+    const phoneCandidates = String(text ?? '').match(/\+?[0-9][0-9()\s.-]{6,}[0-9]/g);
+    if (!phoneCandidates) {
+      return false;
+    }
+
+    const dateLike = /^(\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4})$/;
+    return phoneCandidates.some((candidate) => {
+      const trimmed = candidate.trim();
+      const digits = trimmed.replace(/\D/g, '');
+      if (digits.length < 10) {
+        return false;
+      }
+      if (dateLike.test(trimmed)) {
+        return false;
+      }
+      const hasPlus = trimmed.startsWith('+');
+      const hasSeparator = /[()\s-]/.test(trimmed);
+      const hasOnlyDigitsAndDots = /^[0-9.]+$/.test(trimmed);
+      if (hasOnlyDigitsAndDots) {
+        const dotCount = (trimmed.match(/\./g) || []).length;
+        return dotCount >= 2;
+      }
+      if (!hasPlus && !hasSeparator) {
+        return false;
+      }
+      return true;
+    });
   }
 
 }
