@@ -14,8 +14,6 @@ import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
-import { MessageService } from '../../services/message.service';
-import { OpenAiService } from '../../services/open-ai.service';
 import { OembedService } from '../../services/oembed.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { StyleService } from '../../services/style.service';
@@ -55,8 +53,6 @@ export class EditMessageComponent implements OnInit {
   private readonly oembedService = inject(OembedService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
-  private readonly messageService = inject(MessageService);
-  private readonly openAiService = inject(OpenAiService);
   private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   private readonly style = inject(StyleService);
@@ -79,42 +75,9 @@ export class EditMessageComponent implements OnInit {
       case 'edit_public_message':
       case 'add_comment':
       case 'edit_comment':
-        if (this.messageService.detectPersonalInformation(this.data.message.message)) {
-          this.snackBar.open(
-            this.translation.t('common.message.personalInfoBlocked'),
-            this.translation.t('common.actions.ok'),
-            { horizontalPosition: 'center', verticalPosition: 'top' }
-          );
-        } else {
-          if (this.data.message.message !== '') {
-            this.openAiService.moderateMessage(this.data.message)
-              .subscribe({
-                next: openAiModerateResponse => {
-                  if (!openAiModerateResponse.results[0].flagged) {
-                    this.data.message.userId = this.userService.getUser().id;
-                    this.dialogRef.close(this.data);
-                  } else {
-                    // abgelehnt
-                    this.snackBar.open(
-                      this.translation.t('common.message.moderationRejected'),
-                      this.translation.t('common.actions.ok'),
-                      { horizontalPosition: 'center', verticalPosition: 'top' }
-                    );
-                  }
-                },
-                error: () => {
-                  this.snackBar.open(this.translation.t('common.message.moderationFailed'), this.translation.t('common.actions.ok'), {
-                    horizontalPosition: 'center',
-                    verticalPosition: 'top'
-                  });
-                }
-              });
-          } else {
-            this.data.message.userId = this.userService.getUser().id;
-            this.data.message.message = ''
-            this.dialogRef.close(this.data);
-          }
-        }
+        this.data.message.userId = this.userService.getUser().id;
+        this.data.message.message = this.data.message.message ?? '';
+        this.dialogRef.close(this.data);
         break;
       default:
         this.data.message.userId = this.userService.getUser().id;

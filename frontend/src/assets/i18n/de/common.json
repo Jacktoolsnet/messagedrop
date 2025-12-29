@@ -186,6 +186,7 @@
       "policy": "Diese Information wird auf unserem Server gespeichert und ist für alle sichtbar.",
       "personalInfoBlocked": "Meine Nachricht wird nicht veröffentlicht, da sie offenbar persönliche Informationen enthält.",
       "moderationRejected": "Inhalt wird nicht veröffentlicht, da er von der Moderations-KI abgelehnt wurde.",
+      "moderationReview": "Inhalt wird veröffentlicht, aber für eine manuelle Prüfung markiert.",
       "moderationFailed": "Moderation fehlgeschlagen. Bitte später erneut versuchen.",
       "creating": "Nachricht wird erstellt",
       "created": "Nachricht erfolgreich gesendet.",

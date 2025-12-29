@@ -26,6 +26,7 @@ const errorLog = require('./routes/error-log');
 const infoLog = require('./routes/info-log');
 const frontendErrorLog = require('./routes/frontend-error-log');
 const powLog = require('./routes/pow-log');
+const moderation = require('./routes/moderation');
 const cors = require('cors')
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -345,6 +346,7 @@ app.use('/error-log', adminLogLimit, errorLog);
 app.use('/info-log', adminLogLimit, infoLog);
 app.use('/frontend-error-log', adminLogLimit, frontendErrorLog);
 app.use('/pow-log', adminLogLimit, powLog);
+app.use('/moderation', adminLogLimit, moderation);
 
 
 // DSA

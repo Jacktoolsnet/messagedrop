@@ -186,6 +186,7 @@
       "policy": "This information is stored on our server and is visible to everyone.",
       "personalInfoBlocked": "My message will not be published because it appears to contain personal information.",
       "moderationRejected": "Content will not be published because it was rejected by the moderation AI.",
+      "moderationReview": "Content is published but requires manual review.",
       "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
       "created": "Message successfully dropped.",

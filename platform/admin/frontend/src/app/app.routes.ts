@@ -18,6 +18,7 @@ import { ErrorLogsComponent } from './components/logs/error-logs/error-logs.comp
 import { InfoLogsComponent } from './components/logs/info-logs/info-logs.component';
 import { AppLogsComponent } from './components/logs/app-logs/app-logs.component';
 import { PowLogsComponent } from './components/logs/pow-logs/pow-logs.component';
+import { ModerationQueueComponent } from './components/moderation/moderation-queue/moderation-queue.component';
 
 export const routes: Routes = [
     { path: 'status/:token', component: PublicStatusComponent },
@@ -80,6 +81,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/dsa/audits',
         component: AuditsComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/dsa/moderation',
+        component: ModerationQueueComponent,
         canActivate: [authGuard]
     },
     {

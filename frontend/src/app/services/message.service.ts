@@ -1,11 +1,12 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { Injectable, inject, signal, WritableSignal } from '@angular/core';
+import { inject, Injectable, signal, WritableSignal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { catchError, forkJoin, Observable, of, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { GetMessageResponse } from '../interfaces/get-message-response';
 import { Message } from '../interfaces/message';
+import { MessageCreateResponse } from '../interfaces/message-create-response';
 import { RawMessage } from '../interfaces/raw-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { ToggleResponse } from '../interfaces/toggle-response';
@@ -136,14 +137,26 @@ export class MessageService {
       messageUserId: user.id,
       multimedia: JSON.stringify(message.multimedia)
     };
-    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
+    this.http.post<MessageCreateResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
       .subscribe({
-        next: () => {
+        next: (res) => {
+          const decision = res?.moderation?.decision ?? 'approved';
+          if (decision === 'rejected') {
+            this.snackBar.open(this.i18n.t('common.message.moderationRejected'), this.i18n.t('common.actions.ok'), {
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            });
+            return;
+          }
           this.messagesSignal.update(messages => [message, ...messages]);
-          this.snackBar.open(this.i18n.t('common.message.created'), '', { duration: 1000 });
+          if (decision === 'review') {
+            this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
+          } else {
+            this.snackBar.open(this.i18n.t('common.message.created'), '', { duration: 1000 });
+          }
         },
         error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
@@ -177,16 +190,28 @@ export class MessageService {
       multimedia: JSON.stringify(message.multimedia)
     };
 
-    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
+    this.http.post<MessageCreateResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: () => {
+        next: (res) => {
+          const decision = res?.moderation?.decision ?? 'approved';
+          if (decision === 'rejected') {
+            this.snackBar.open(this.i18n.t('common.message.moderationRejected'), this.i18n.t('common.actions.ok'), {
+              horizontalPosition: 'center',
+              verticalPosition: 'top'
+            });
+            return;
+          }
+
           const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
           commentsSignal.set([...commentsSignal(), message]);
-
           this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
 
-          this.snackBar.open(this.i18n.t('common.comment.created'), '', { duration: 1000 });
+          if (decision === 'review') {
+            this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
+          } else {
+            this.snackBar.open(this.i18n.t('common.comment.created'), '', { duration: 1000 });
+          }
         },
         error: (err) => {
           this.snackBar.open(err.message, this.i18n.t('common.actions.ok'))

@@ -1,0 +1,113 @@
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard/dsa" aria-label="Back">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">Moderation Queue</span>
+    <span class="spacer"></span>
+    <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+    </button>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+    <div class="split">
+        <div class="list-pane">
+            @if (!loading() && requests().length === 0) {
+            <div class="empty">
+                <mat-icon>inbox</mat-icon>
+                <div>No moderation requests.</div>
+            </div>
+            }
+            @for (req of requests(); track trackById($index, req)) {
+            <div class="row" [class.active]="isSelected(req)" role="button" tabindex="0" (click)="select(req)"
+                (keydown.enter)="select(req)" (keydown.space)="select(req)">
+                <div class="avatar"><mat-icon color="warn">policy</mat-icon></div>
+                <div class="head">
+                    <div class="title">{{ req.messageText }}</div>
+                    <div class="meta">
+                        <span class="file">{{ formatLocal(req.createdAt || req.messageCreatedAt) }}</span>
+                        <span class="dot">•</span>
+                        <span class="msg">Score {{ formatScore(req.aiScore) }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="detail-pane" *ngIf="selected() as sel">
+            <mat-card>
+                <mat-card-header>
+                    <div mat-card-avatar class="avatar"><mat-icon color="warn">policy</mat-icon></div>
+                    <mat-card-title>Moderation request</mat-card-title>
+                    <mat-card-subtitle>{{ formatLocal(sel.createdAt || sel.messageCreatedAt) }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <mat-progress-bar *ngIf="actionLoading()" mode="indeterminate"></mat-progress-bar>
+                    <div class="kv">
+                        <span class="k">Message UUID</span>
+                        <span class="v">{{ sel.messageUuid }}</span>
+                        <span class="k">User ID</span>
+                        <span class="v">{{ sel.messageUserId }}</span>
+                        <span class="k">Message Type</span>
+                        <span class="v">{{ sel.messageType || '-' }}</span>
+                        <span class="k">Created</span>
+                        <span class="v">{{ formatLocal(sel.messageCreatedAt) }}</span>
+                        <span class="k">AI Score</span>
+                        <span class="v">{{ formatScore(sel.aiScore) }}</span>
+                        <span class="k">AI Decision</span>
+                        <span class="v">{{ sel.aiDecision || '-' }}</span>
+                        <span class="k">AI Flagged</span>
+                        <span class="v">{{ boolLabel(sel.aiFlagged) }}</span>
+                        <span class="k">Pattern Match</span>
+                        <span class="v">{{ boolLabel(sel.patternMatch) }}</span>
+                        <span class="k">Pattern Checked</span>
+                        <span class="v">{{ formatLocal(sel.patternMatchAt) }}</span>
+                        <span class="k">Coordinates</span>
+                        <span class="v">{{ sel.latitude ?? '-' }}, {{ sel.longitude ?? '-' }}</span>
+                        <span class="k">Plus Code</span>
+                        <span class="v">{{ sel.plusCode || '-' }}</span>
+                        <span class="k">Marker</span>
+                        <span class="v">{{ sel.markerType || '-' }}</span>
+                    </div>
+                    <mat-divider class="section-divider"></mat-divider>
+                    <div class="block">
+                        <div class="block-title">Message</div>
+                        <div class="block-body">{{ sel.messageText }}</div>
+                    </div>
+                    <div class="block">
+                        <div class="block-title">AI Moderation Response</div>
+                        <pre class="block-pre">{{ formattedAiResponse(sel.aiResponse) }}</pre>
+                    </div>
+                    <div class="block">
+                        <div class="block-title">Rejection reason</div>
+                        <mat-form-field appearance="fill" class="reason-field">
+                            <mat-label>Select reason</mat-label>
+                            <mat-select [(ngModel)]="rejectionReason">
+                                @for (reason of reasons; track reason) {
+                                <mat-option [value]="reason">{{ reason }}</mat-option>
+                                }
+                            </mat-select>
+                        </mat-form-field>
+                        <div class="hint">Selected reason will be sent to the user as a system message.</div>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions align="end">
+                    <button mat-stroked-button color="primary" (click)="approveSelected()" [disabled]="actionLoading()">
+                        <mat-icon>check_circle</mat-icon>
+                        Approve
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="rejectSelected()"
+                        [disabled]="actionLoading() || !rejectionReason">
+                        <mat-icon>block</mat-icon>
+                        Reject
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>

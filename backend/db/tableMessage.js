@@ -34,6 +34,17 @@ const columnUserId = 'userId';
 const columnMultimedia = 'multimedia';
 const columnDsaStatusToken = 'dsaStatusToken';
 const columnDsaStatusTokenCreatedAt = 'dsaStatusTokenCreatedAt';
+const columnAiModeration = 'aiModeration';
+const columnAiModerationScore = 'aiModerationScore';
+const columnAiModerationFlagged = 'aiModerationFlagged';
+const columnAiModerationDecision = 'aiModerationDecision';
+const columnAiModerationAt = 'aiModerationAt';
+const columnPatternMatch = 'patternMatch';
+const columnPatternMatchAt = 'patternMatchAt';
+const columnManualModerationDecision = 'manualModerationDecision';
+const columnManualModerationReason = 'manualModerationReason';
+const columnManualModerationAt = 'manualModerationAt';
+const columnManualModerationBy = 'manualModerationBy';
 
 const init = function (db) {
     try {
@@ -41,7 +52,7 @@ const init = function (db) {
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnMessageId} INTEGER PRIMARY KEY NOT NULL,
             ${columnUuid} TEXT NOT NULL UNIQUE,
-            ${columnParentUuid} TEXT DEFAUTL NULL,
+            ${columnParentUuid} TEXT DEFAULT NULL,
             ${columnMessageType} TEXT NOT NULL,
             ${columnMessageCreateDateTime} INTEGER NOT NULL, 
             ${columnMessageDeleteDateTime} INTEGER NOT NULL,
@@ -60,6 +71,17 @@ const init = function (db) {
             ${columnMultimedia} TEXT DEFAULT NULL,
             ${columnDsaStatusToken} TEXT DEFAULT NULL,
             ${columnDsaStatusTokenCreatedAt} INTEGER DEFAULT NULL,
+            ${columnAiModeration} TEXT DEFAULT NULL,
+            ${columnAiModerationScore} REAL DEFAULT NULL,
+            ${columnAiModerationFlagged} INTEGER DEFAULT NULL,
+            ${columnAiModerationDecision} TEXT DEFAULT NULL,
+            ${columnAiModerationAt} INTEGER DEFAULT NULL,
+            ${columnPatternMatch} INTEGER DEFAULT NULL,
+            ${columnPatternMatchAt} INTEGER DEFAULT NULL,
+            ${columnManualModerationDecision} TEXT DEFAULT NULL,
+            ${columnManualModerationReason} TEXT DEFAULT NULL,
+            ${columnManualModerationAt} INTEGER DEFAULT NULL,
+            ${columnManualModerationBy} TEXT DEFAULT NULL,
             CONSTRAINT FK_USER_ID FOREIGN KEY (${columnUserId}) 
             REFERENCES tableUser (id) 
             ON UPDATE CASCADE ON DELETE CASCADE,
@@ -73,13 +95,56 @@ const init = function (db) {
                 throw err;
             }
         });
+
+        db.all(`PRAGMA table_info(${tableName});`, (err, rows) => {
+            if (err || !rows) {
+                return;
+            }
+            const existing = new Set(rows.map((row) => row.name));
+            const addColumn = (name, type) => {
+                if (!existing.has(name)) {
+                    db.run(`ALTER TABLE ${tableName} ADD COLUMN ${name} ${type};`);
+                }
+            };
+            addColumn(columnAiModeration, 'TEXT DEFAULT NULL');
+            addColumn(columnAiModerationScore, 'REAL DEFAULT NULL');
+            addColumn(columnAiModerationFlagged, 'INTEGER DEFAULT NULL');
+            addColumn(columnAiModerationDecision, 'TEXT DEFAULT NULL');
+            addColumn(columnAiModerationAt, 'INTEGER DEFAULT NULL');
+            addColumn(columnPatternMatch, 'INTEGER DEFAULT NULL');
+            addColumn(columnPatternMatchAt, 'INTEGER DEFAULT NULL');
+            addColumn(columnManualModerationDecision, 'TEXT DEFAULT NULL');
+            addColumn(columnManualModerationReason, 'TEXT DEFAULT NULL');
+            addColumn(columnManualModerationAt, 'INTEGER DEFAULT NULL');
+            addColumn(columnManualModerationBy, 'TEXT DEFAULT NULL');
+        });
     } catch (error) {
         throw error;
     }
 };
 
-const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, callback) {
+const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, plusCode, message, markerType, style, userId, multimedia, options, callback) {
+    let opts = options || {};
+    let cb = callback;
+    if (typeof options === 'function') {
+        cb = options;
+        opts = {};
+    }
     try {
+        const moderation = opts.moderation || {};
+        const aiModeration = moderation.aiModeration ?? null;
+        const aiModerationScore = Number.isFinite(moderation.aiScore) ? moderation.aiScore : null;
+        const aiModerationFlagged = moderation.aiFlagged === undefined || moderation.aiFlagged === null
+            ? null
+            : (moderation.aiFlagged ? 1 : 0);
+        const aiModerationDecision = moderation.aiDecision ?? null;
+        const aiModerationAt = Number.isFinite(moderation.aiCheckedAt) ? moderation.aiCheckedAt : null;
+        const patternMatch = moderation.patternMatch === undefined || moderation.patternMatch === null
+            ? null
+            : (moderation.patternMatch ? 1 : 0);
+        const patternMatchAt = Number.isFinite(moderation.patternMatchAt) ? moderation.patternMatchAt : null;
+        const status = opts.status || messageStatus.ENABLED;
+
         const insertSql = `
       INSERT INTO ${tableName} (
         ${columnUuid},
@@ -92,14 +157,26 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
         ${columnPlusCode},
         ${columnMessage},
         ${columnMarkerType},
-      ${columnStyle},
-      ${columnUserId},
-      ${columnMultimedia},
-      ${columnDsaStatusToken},
-      ${columnDsaStatusTokenCreatedAt}
+        ${columnStyle},
+        ${columnUserId},
+        ${columnMultimedia},
+        ${columnDsaStatusToken},
+        ${columnDsaStatusTokenCreatedAt},
+        ${columnStatus},
+        ${columnAiModeration},
+        ${columnAiModerationScore},
+        ${columnAiModerationFlagged},
+        ${columnAiModerationDecision},
+        ${columnAiModerationAt},
+        ${columnPatternMatch},
+        ${columnPatternMatchAt},
+        ${columnManualModerationDecision},
+        ${columnManualModerationReason},
+        ${columnManualModerationAt},
+        ${columnManualModerationBy}
     ) VALUES (
       ?, ?, ?, strftime('%s','now'), strftime('%s','now','+30 days'),
-      ?, ?, UPPER(?), ?, ?, ?, ?, ?, NULL, NULL
+      ?, ?, UPPER(?), ?, ?, ?, ?, ?, NULL, NULL, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?
     );`;
 
         const params = [
@@ -113,14 +190,30 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
             markerType,
             style !== undefined ? style : '',
             userId,
-            multimedia !== '' ? multimedia : null
+            multimedia !== '' ? multimedia : null,
+            status,
+            aiModeration,
+            aiModerationScore,
+            aiModerationFlagged,
+            aiModerationDecision,
+            aiModerationAt,
+            patternMatch,
+            patternMatchAt,
+            null,
+            null,
+            null,
+            null
         ];
 
-        db.run(insertSql, params, (err) => {
-            callback(err || null);
+        db.run(insertSql, params, function (err) {
+            cb(err || null, { id: this?.lastID ?? null });
         });
     } catch (error) {
-        callback(error);
+        if (typeof cb === 'function') {
+            cb(error);
+            return;
+        }
+        throw error;
     }
 };
 
@@ -335,6 +428,23 @@ const setDsaStatusToken = function (db, uuid, token, createdAt, callback) {
     }
 };
 
+const setManualModeration = function (db, uuid, decision, reason, decidedAt, decidedBy, status, callback) {
+    try {
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnManualModerationDecision} = ?,
+            ${columnManualModerationReason} = ?,
+            ${columnManualModerationAt} = ?,
+            ${columnManualModerationBy} = ?,
+            ${columnStatus} = COALESCE(?, ${columnStatus})
+        WHERE ${columnUuid} = ?;
+        `;
+        db.run(sql, [decision, reason, decidedAt, decidedBy, status ?? null, uuid], (err) => callback(err || null));
+    } catch (error) {
+        callback(error);
+    }
+};
+
 const disableMessage = function (db, messageId, callback) {
     try {
         let sql = `
@@ -443,5 +553,8 @@ module.exports = {
     countComment,
     deleteById,
     cleanPublic,
-    setDsaStatusToken
+    setDsaStatusToken,
+    setManualModeration,
+    messageType,
+    messageStatus
 }
