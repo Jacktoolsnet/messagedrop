@@ -213,7 +213,11 @@ export class MessagelistComponent implements OnInit {
   }
 
   public onMessageCardActivate(message: Message): void {
-    if (!this.userService.isReady() && this.userService.getUser().id === message.userId) {
+    const userId = this.userService.getUser().id;
+    if (!userId || userId !== message.userId) {
+      return;
+    }
+    if (!this.userService.isReady()) {
       this.editMessageAfterLoginClick(message);
       return;
     }
