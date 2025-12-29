@@ -40,7 +40,7 @@
             tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar" [matBadge]="moderationCountPending ?? 0" matBadgeColor="warn"
-                    matBadgeOverlap="false" [matBadgeHidden]="(moderationCountPending ?? 0) === 0">
+                    matBadgeOverlap="false">
                     <mat-icon>policy</mat-icon>
                 </div>
                 <mat-card-title class="tile-title">Moderation</mat-card-title>
@@ -77,7 +77,7 @@
             tabindex="0">
             <mat-card-header>
                 <div mat-card-avatar class="avatar" [matBadge]="infoCountToday ?? 0" matBadgeColor="primary"
-                    matBadgeOverlap="false" [matBadgeHidden]="(infoCountToday ?? 0) === 0">
+                    matBadgeOverlap="false">
                     <mat-icon>info</mat-icon>
                 </div>
                 <mat-card-title class="tile-title">Info Logs</mat-card-title>
