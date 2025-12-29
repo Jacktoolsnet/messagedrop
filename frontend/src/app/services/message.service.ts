@@ -31,6 +31,7 @@ export class MessageService {
 
   private moderationDialogRef: MatDialogRef<DisplayMessage> | null = null;
   private publishDialogRef: MatDialogRef<DisplayMessage> | null = null;
+  private reviewDialogRef: MatDialogRef<DisplayMessage> | null = null;
 
   private _messageSet = signal(0);
   readonly messageSet = this._messageSet.asReadonly();
@@ -121,6 +122,35 @@ export class MessageService {
     ref.afterClosed().subscribe(() => {
       if (this.publishDialogRef === ref) {
         this.publishDialogRef = null;
+      }
+    });
+  }
+
+  private showModerationReviewMessage(message: string): void {
+    this.reviewDialogRef?.close();
+    const ref = this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('common.moderation.title'),
+        image: '',
+        icon: 'info',
+        message,
+        button: '',
+        delay: 2000,
+        showSpinner: false,
+        autoclose: true
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
+    this.reviewDialogRef = ref;
+    ref.afterClosed().subscribe(() => {
+      if (this.reviewDialogRef === ref) {
+        this.reviewDialogRef = null;
       }
     });
   }
@@ -224,7 +254,7 @@ export class MessageService {
           }
           this.messagesSignal.update(messages => [message, ...messages]);
           if (decision === 'review') {
-            this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
+            this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else {
             this.showPublishedMessage(this.i18n.t('common.message.created'));
           }
@@ -277,7 +307,7 @@ export class MessageService {
           this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
 
           if (decision === 'review') {
-            this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
+            this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else {
             this.showPublishedMessage(this.i18n.t('common.comment.created'));
           }
@@ -324,7 +354,7 @@ export class MessageService {
 
           this.patchMessageSnapshotSmart(message, { ...message, status: 'enabled' });
           if (decision === 'review') {
-            this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
+            this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
           } else if (wasDisabled) {
             this.showPublishedMessage(this.i18n.t('common.message.republished'));
           }

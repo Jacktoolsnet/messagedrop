@@ -454,8 +454,10 @@ export class MessagelistComponent implements OnInit {
         autoFocus: false
       });
 
-      dialogRef.afterClosed().subscribe(() => {
-        this.messageService.updateMessage(this.clickedMessage!);
+      dialogRef.afterClosed().subscribe((result?: { mode: Mode; message: Message }) => {
+        if (result?.message) {
+          this.messageService.updateMessage(result.message);
+        }
       });
     }
   }
