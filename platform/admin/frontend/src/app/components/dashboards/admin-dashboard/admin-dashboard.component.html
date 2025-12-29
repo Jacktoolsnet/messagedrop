@@ -39,7 +39,7 @@
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/dsa/moderation" role="button"
             tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="moderationCountPending ?? 0" matBadgeColor="warn"
+                <div mat-card-avatar class="avatar" [matBadge]="moderationCountPending() ?? 0" matBadgeColor="warn"
                     matBadgeOverlap="false">
                     <mat-icon>policy</mat-icon>
                 </div>
@@ -64,7 +64,7 @@
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/errors" role="button"
             tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="errorCountToday ?? 0" matBadgeColor="warn"
+                <div mat-card-avatar class="avatar" [matBadge]="errorCountToday() ?? 0" matBadgeColor="warn"
                     matBadgeOverlap="false">
                     <mat-icon>error_outline</mat-icon>
                 </div>
@@ -76,7 +76,7 @@
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/info" role="button"
             tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="infoCountToday ?? 0" matBadgeColor="primary"
+                <div mat-card-avatar class="avatar" [matBadge]="infoCountToday() ?? 0" matBadgeColor="primary"
                     matBadgeOverlap="false">
                     <mat-icon>info</mat-icon>
                 </div>
@@ -88,7 +88,7 @@
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/app" role="button"
             tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="appErrorCountToday ?? 0" matBadgeColor="warn"
+                <div mat-card-avatar class="avatar" [matBadge]="appErrorCountToday() ?? 0" matBadgeColor="warn"
                     matBadgeOverlap="false">
                     <mat-icon>bug_report</mat-icon>
                 </div>
@@ -100,7 +100,7 @@
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/pow" role="button"
             tabindex="0">
             <mat-card-header>
-                <div mat-card-avatar class="avatar" [matBadge]="powCountToday ?? 0" matBadgeColor="warn"
+                <div mat-card-avatar class="avatar" [matBadge]="powCountToday() ?? 0" matBadgeColor="warn"
                     matBadgeOverlap="false">
                     <mat-icon>shield</mat-icon>
                 </div>

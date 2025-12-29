@@ -1,4 +1,4 @@
-import { Component, OnInit, computed, inject } from '@angular/core';
+import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,11 +34,11 @@ export class AdminDashboardComponent implements OnInit {
   readonly username = this.authService.username;
   readonly role = this.authService.role;
 
-  errorCountToday: number | null = null;
-  infoCountToday: number | null = null;
-  appErrorCountToday: number | null = null;
-  powCountToday: number | null = null;
-  moderationCountPending: number | null = null;
+  readonly errorCountToday = signal<number | null>(null);
+  readonly infoCountToday = signal<number | null>(null);
+  readonly appErrorCountToday = signal<number | null>(null);
+  readonly powCountToday = signal<number | null>(null);
+  readonly moderationCountPending = signal<number | null>(null);
 
   readonly dsaOpenCount = computed(() => {
     const noticesOpen = this.dsaService.noticeStats()?.open ?? 0;
@@ -66,27 +66,28 @@ export class AdminDashboardComponent implements OnInit {
   refreshCounts() {
     const since = this.startOfTodayUtc();
     this.logService.getErrorCountSince(since).subscribe(res => {
-      this.errorCountToday = res.count;
+      this.errorCountToday.set(res.count);
     });
     this.logService.getInfoCountSince(since).subscribe(res => {
-      this.infoCountToday = res.count;
+      this.infoCountToday.set(res.count);
     });
     this.logService.getFrontendErrorCountSince(since).subscribe(res => {
-      this.appErrorCountToday = res.count;
+      this.appErrorCountToday.set(res.count);
     });
     this.logService.getPowCountSince(since).subscribe(res => {
-      this.powCountToday = res.count;
+      this.powCountToday.set(res.count);
     });
     this.moderationService.countRequests('pending').subscribe({
       next: (res) => {
         const count = Number(res.count);
-        this.moderationCountPending = Number.isFinite(count) ? count : 0;
-        if (this.moderationCountPending === 0) {
+        const safeCount = Number.isFinite(count) ? count : 0;
+        this.moderationCountPending.set(safeCount);
+        if (safeCount === 0) {
           this.moderationService.listRequests('pending', 200, 0).subscribe({
             next: (fallback) => {
               const fallbackCount = fallback.rows?.length ?? 0;
               if (fallbackCount > 0) {
-                this.moderationCountPending = fallbackCount;
+                this.moderationCountPending.set(fallbackCount);
               }
             },
             error: () => { }
@@ -94,7 +95,7 @@ export class AdminDashboardComponent implements OnInit {
         }
       },
       error: () => {
-        this.moderationCountPending = 0;
+        this.moderationCountPending.set(0);
       }
     });
   }
