@@ -247,7 +247,8 @@ module.exports = {
         reportedContent: columnReportedContent,
         createdAt: columnCreatedAt,
         publicToken: columnPublicToken,
-        publicTokenCreatedAt: columnPublicTokenCreatedAt
+        publicTokenCreatedAt: columnPublicTokenCreatedAt,
+        dismissedAt: columnDismissedAt
     },
     init,
     create,

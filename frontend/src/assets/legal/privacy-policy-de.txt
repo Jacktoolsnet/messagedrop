@@ -403,7 +403,11 @@ Die Statistik enthält keine personenbezogenen Daten und lässt keine Rückschl�
 
 DSA-bezogene Moderations-, Entscheidungs- und Verfahrensdaten werden gespeichert, soweit dies zur Erfüllung gesetzlicher Dokumentations-, Nachweis- und Rechenschaftspflichten erforderlich ist.
 
-Belege (Dateien/Links) können – abhängig von ihrer Erforderlichkeit für Dokumentations- und Nachweispflichten – für die Dauer des jeweiligen Verfahrens und darüber hinaus im gesetzlich zulässigen Rahmen gespeichert werden.
+Sofern kein behördliches oder gerichtliches Verfahren anhängig ist, werden DSA-bezogene Verfahrensdaten (z. B. Notices, Entscheidungen und zugehörige Metadaten) spätestens sechs Monate nach Abschluss des jeweiligen Verfahrens gelöscht.
+
+Belege (Dateien und externe Links), die im Rahmen eines DSA-Verfahrens freiwillig bereitgestellt wurden, werden nur solange gespeichert, wie sie für die Durchführung des Verfahrens sowie für gesetzliche Nachweis- und Dokumentationspflichten erforderlich sind, und ebenfalls spätestens sechs Monate nach Abschluss des Verfahrens gelöscht, sofern keine weitergehende Aufbewahrung erforderlich ist.
+
+Wird im Zusammenhang mit einem DSA-Verfahren ein behördliches oder gerichtliches Verfahren eingeleitet oder ist ein solches absehbar, können die betroffenen Daten für die Dauer dieses Verfahrens sowie darüber hinaus im gesetzlich zulässigen Rahmen gespeichert werden (sog. Legal Hold). In diesem Fall erfolgt die Löschung unverzüglich nach Wegfall des Aufbewahrungsgrundes.
 
 Eine Weitergabe an zuständige Behörden, Gerichte oder sonstige hierzu befugte Stellen erfolgt ausschließlich im rechtlich erforderlichen und zulässigen Rahmen.
 

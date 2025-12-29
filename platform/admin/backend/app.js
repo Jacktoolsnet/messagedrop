@@ -36,6 +36,7 @@ const jwt = require('jsonwebtoken');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
+const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -431,5 +432,12 @@ cron.schedule('23 0 * * *', () => {
     if (err) {
       logger.error('PoW log cleanup failed', { error: err?.message });
     }
+  });
+});
+
+// Clean closed DSA cases older than 6 months
+cron.schedule('30 0 * * *', () => {
+  cleanupClosedDsaCases(database.db, logger).catch((err) => {
+    logger.error('DSA cleanup failed', { error: err?.message || err });
   });
 });

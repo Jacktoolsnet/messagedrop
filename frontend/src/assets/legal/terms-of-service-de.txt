@@ -174,9 +174,20 @@ Hinweis: Soweit Inhalte im Rahmen gesetzlicher Verfahren (z. B. DSA) vorübergeh
 
 Wir behalten uns vor, Inhalte ganz oder teilweise zu entfernen, zu sperren oder in ihrer Sichtbarkeit einzuschränken, insbesondere bei rechtswidrigen Inhalten, Verstößen gegen diese Nutzungsbedingungen oder Meldungen im Rahmen gesetzlicher Verfahren (z. B. Digital Services Act).
 
-Zur Unterstützung der Moderation können automatisierte Verfahren, einschließlich KI-gestützter Prüfungen, eingesetzt werden.
+Zur Unterstützung der Moderation setzen wir automatisierte Prüfverfahren ein, einschließlich regelbasierter Prüfungen (z. B. auf bestimmte Muster oder Inhalte) sowie KI-gestützter Bewertungen.
 
-Eine vollständige Vorabkontrolle sämtlicher Inhalte findet nicht statt.
+Automatisierte Prüfungen werden beim Erstellen öffentlicher Inhalte sowie bei jeder inhaltlichen Änderung erneut angestoßen. Werden dabei private oder personenbezogene Daten erkannt, kann der jeweilige Inhalt unabhängig von einer KI-Bewertung vorübergehend nicht öffentlich sichtbar gestellt werden.
+
+Die automatisierten Verfahren dienen ausschließlich der Unterstützung der Moderation und stellen keine abschließende inhaltliche Bewertung im rechtlichen Sinne dar. Automatisierte Prüfungen können fehlerhaft sein oder Inhalte unzutreffend bewerten.
+
+Im Rahmen des Dienstes kann dem Nutzer das Ergebnis einer automatisierten Bewertung (z. B. ein Bewertungswert/Score) angezeigt werden. Eine Veröffentlichung oder Nichtveröffentlichung stellt keine Aussage über die Rechtmäßigkeit oder Unzulässigkeit eines Inhalts dar.
+
+Abhängig vom Ergebnis automatisierter Prüfungen können Inhalte:
+- veröffentlicht werden,
+- als moderationsbedürftig gekennzeichnet und veröffentlicht bleiben oder
+- vorübergehend nicht öffentlich sichtbar gestellt werden.
+
+Wird ein Inhalt auf Grundlage automatisierter Prüfungen nicht öffentlich sichtbar gestellt, wird hierfür kein manueller Moderationsprozess angestoßen. Eine manuelle Prüfung erfolgt ausschließlich freiwillig durch den Anbieter. Ein Anspruch des Nutzers auf eine manuelle Prüfung, Überprüfung oder eine bestimmte Entscheidung besteht nicht.
 
 ###
 9. Verfahren nach dem Digital Services Act (DSA)
@@ -323,6 +334,8 @@ Der Dienst ersetzt keine Aufmerksamkeit, Vorsicht oder verantwortungsbewusstes V
 ###
 16. Verfügbarkeit und Wartung
 ###
+
+Zur Verbesserung der Stabilität, Sicherheit und Funktionalität der Anwendung können – nach ausdrücklicher Zustimmung des Nutzers – anonymisierte technische Logmeldungen an uns übermittelt werden. Diese Logmeldungen dienen ausschließlich der Fehleranalyse und Optimierung des Dienstes. Die erteilte Zustimmung kann vom Nutzer jederzeit mit Wirkung für die Zukunft widerrufen werden.
 
 Der Dienst kann zeitweise eingeschränkt oder unterbrochen sein, insbesondere aufgrund von Wartungsarbeiten, technischen Störungen, Ausfällen externer Dienste oder höherer Gewalt.
 

@@ -1,137 +1,191 @@
 PRIVACY POLICY
-Status: December 14, 2025
+Version: 22 December 2025
 
-IMPORTANT NOTICE:
-This English version is provided for convenience only. Legally binding is solely the current and complete German version of this Privacy Policy. In the event of discrepancies, the German version shall prevail.
+IMPORTANT NOTE ON LANGUAGE
+This English translation is provided for convenience only and is not legally binding. The legally binding version is exclusively the current complete German version of this Privacy Policy, including all supplements related to the Digital Services Act (DSA).
 
 ###
-Summary (non-binding)
+Short Version (not legally binding)
 ###
 
-MessageDrop is a privacy-oriented web application for publishing user-generated content, private communication, and location-based organization of information.
+MessageDrop is a privacy-oriented web app for publishing user-generated content, private communication, and location-based organization of information.
 
-The service can be used without creating a user account. Certain features require the voluntary creation of a user account.
+The service can be used without a user account. Certain features require the voluntary creation of a user account.
 
-The use of MessageDrop is permitted exclusively for persons who are at least 16 years old.
+Use of MessageDrop is permitted only for persons who are at least 16 years old.
 
-A large portion of the data is deliberately stored exclusively locally on the user’s end device (e.g., browser or app storage) in order to ensure data minimization and a high level of data protection. Full control over locally stored data lies with the user. Local data may be lost or deleted at any time.
+A large portion of data is deliberately stored primarily locally on the user’s device (e.g., in browser or app storage) to ensure data minimization and a high level of data protection. Control over locally stored data generally lies with the user. Local data may be lost or deleted at any time.
 
-Public content and comments are created by users and may be reported, reviewed, and moderated in accordance with the requirements of the Digital Services Act (DSA). Content for which a DSA procedure has been initiated is temporarily made not publicly visible.
+Public content and comments are created by users and may be reported, reviewed, and moderated in accordance with the Digital Services Act (DSA). Content for which a DSA procedure is initiated is temporarily made not publicly visible.
 
-MessageDrop does not use a personalized recommendation or ranking system. Public content is not filtered or prioritized algorithmically but is displayed solely based on the currently viewed geographic area and the time of publication.
+MessageDrop does not use personalized recommendation or ranking systems. Public content is not algorithmically filtered or prioritized, but displayed solely based on the viewed geographic area and the time of publication.
 
-Private chat messages are transmitted in encrypted form and are generally not readable by us in plain text.
+Private chat messages are transmitted using end-to-end encryption and are generally not readable by us in plain text.
 
-External content (e.g., YouTube, TikTok, Spotify) is activated only at the explicit request of the user and is loaded directly from the respective third-party providers. The privacy policies and terms of use of those providers apply.
+External content (e.g., YouTube, TikTok, Spotify) is activated only at the user’s explicit request and loaded directly from the respective third-party providers. Their privacy and usage policies apply.
+
+System messages (e.g., notices regarding DSA procedures or planned maintenance) are generated exclusively by authorized administrative systems and displayed in the user frontend. System messages are always active; users cannot currently reply to them.
+
+Profiles (name/avatar) may be used locally for better assignment. When contacting another user, a profile-sharing request may optionally be sent; the other user must actively consent. After consent, name and avatar are stored locally on the contact’s device.
+
+Users may follow places; where technically possible and supported by the device, push notifications may be received when new public content appears at followed places. Technically required push tokens are processed solely for delivery. There is no entitlement to delivery of push notifications.
 
 MessageDrop does not provide access to emergency services.
 
-Only the current, complete German version of this Privacy Policy, including the supplements relating to the Digital Services Act (DSA), is legally binding.
+Only the current complete German version of this Privacy Policy is authoritative.
 
 ###
 Full Version
 ###
 
 ###
-1. Controller within the meaning of the GDPR
+Glossary
 ###
 
-The controller pursuant to Art. 4 no. 7 GDPR is:
+User
+Natural person who uses MessageDrop, regardless of whether a user account has been created.
 
-JackTools.Net UG (limited liability)  
-Im Kirchfeld 27  
-38304 Wolfenbüttel  
-Germany  
+User account
+Technical, pseudonymous access unit that a user may voluntarily create and that is identified by a user ID.
 
-Represented by the Managing Director:  
+User ID
+Technical identifier of a user account. The user ID is pseudonymous and does not, by itself, allow direct identification of a person.
+
+Visitor
+User who uses MessageDrop without creating a user account.
+
+Public content
+Content created by users (e.g., public messages and comments) that is generally publicly visible unless restricted or removed.
+
+Private communication
+Communication between users that is transmitted in encrypted form (e.g., private chats).
+
+External content / third-party providers
+Content provided by third parties that is embedded only after the user’s active decision (e.g., iFrames/oEmbed). Activation involves data transfer to the respective provider.
+
+System messages
+Internal notifications generated exclusively by authorized administrative systems and displayed in the frontend (e.g., regarding DSA procedures or maintenance). System messages are not an email inbox.
+
+DSA procedure
+Procedure under the Digital Services Act (DSA), in particular notices (“Notice”) and complaints (“Appeal”) in connection with public content.
+
+Public case page
+Publicly accessible page relating to a DSA procedure on which only anonymized or non-personal information is published.
+
+Push notifications / push token
+Technical feature for delivering notifications to a device. Push tokens are technical identifiers that may be required for delivery.
+
+Local storage
+Storage of data on the user’s device (e.g., IndexedDB, app storage, cache). This data may be deleted by the user or due to technical circumstances.
+
+###
+1. Controller under the GDPR
+###
+
+The controller within the meaning of Art. 4(7) GDPR is:
+
+JackTools.Net UG (limited liability)
+Im Kirchfeld 27
+38304 Wolfenbüttel
+Germany
+
+Represented by the Managing Director:
 Christian Wagner, Dipl.-Inform. (FH)
 
-Email: jacktoolsnet@gmail.com  
-Phone: +49 (0) 176 / 41 23 57 74  
+Email: jacktoolsnet@gmail.com
+Phone: +49 (0) 176 / 41 23 57 74
 
 (hereinafter “we”, “us”, or “provider”)
 
 This Privacy Policy applies to MessageDrop (messagedrop.de), associated mobile applications, Progressive Web Apps (PWA), as well as internal admin and moderation interfaces.
 
 ###
-2. Use as a visitor (without a user account)
+2. Use as a Visitor (without user account)
 ###
 
 ###
 2.1 General use
 ###
 
-MessageDrop can be used without creating a user account. In particular, public content can be viewed.
+MessageDrop can be used without creating a user account. In this case, public content may be viewed insofar as it is available.
 
 ###
 2.2 Technical data processing
 ###
 
-When used as a visitor, technically necessary data is processed, in particular the IP address, timestamps, and technical header information.
+When used as a visitor, technically necessary data is processed, in particular:
+- IP address,
+- timestamps,
+- technical header information (e.g., user agent in server logs, insofar as technically transmitted),
+- request metadata for delivery and protection of the service.
 
-The purpose of processing is the technical delivery of the service, system security, abuse and fraud prevention, as well as error analysis and stability.
+The purpose of processing is technical delivery of the service, system security, abuse and fraud prevention, error analysis, and stability.
 
-The legal basis is Art. 6(1)(f) GDPR.
+The legal basis is Art. 6(1)(f) GDPR (legitimate interest in secure and stable operation).
 
 ###
 2.3 External content and third-party providers
 ###
 
-MessageDrop enables the optional integration of external content from third-party providers (e.g., videos, music, animated content, or embedded media).
+MessageDrop enables optional embedding of external content from third-party providers (e.g., videos, music, animated content, embedded media).
 
-External content is disabled by default. Instead of the external content, an information notice is displayed informing the user that content from a third-party provider is available, along with an active decision option (e.g., a toggle) by which the respective provider can be explicitly activated.
+External content is disabled by default. Instead, a notice is displayed informing the user that content from a third-party provider is available, together with an active decision option (e.g., toggle) to explicitly activate the provider.
 
-External content is technically integrated only after a conscious and voluntary activation by the user.
+Only after conscious and voluntary activation by the user is external content technically embedded.
 
-Integration is carried out via embedding techniques such as iFrames or oEmbed. The content is loaded directly from the servers of the respective third-party provider. We have no influence over the type, scope, or purpose of data processing by these providers.
+Embedding is performed via techniques such as iFrames or oEmbed. Content is loaded directly from the servers of the respective third-party provider. We have no influence on the nature, scope, or purpose of data processing by these providers.
 
-By activating an external content provider, the following data in particular may be transmitted to the respective provider: IP address, technical device and browser information (e.g., user agent, language settings), time of access, referrer information (if transmitted by the browser), and any other technically required request information.
+By activating an external content provider, the following data may in particular be transmitted to the provider:
+- IP address,
+- technical device and browser information (e.g., user agent, language settings),
+- time of access,
+- referrer information (if transmitted by the browser),
+- other technically necessary request information.
 
-At the same time, the respective provider may technically transmit data to or store data on the user’s end device, in particular cookies or comparable identifiers (e.g., local storage, session storage), pixel, tracking, or measurement technologies (where used by the provider and technically possible), as well as cache data or other technically necessary content required for delivery of the embedded content.
+At the same time, the provider may technically transmit data to or store data on the user’s device, in particular:
+- cookies or comparable identifiers (e.g., local storage, session storage),
+- pixel, tracking, or measurement technologies (where used by the provider),
+- cache data or other technically required content for delivery.
 
-We have no influence over the type, scope, or purpose of this data processing by the external provider. Processing is carried out exclusively under the responsibility of the respective third-party provider. The privacy policies and terms of use of the respective provider apply.
+We have no influence over this data processing, which is carried out solely under the responsibility of the respective provider. The provider’s privacy and usage policies apply.
 
-The following external providers are known at the time of creation of this Privacy Policy:
+Known external providers at the time of creation include:
+- YouTube (Google Ireland Limited)
+- TikTok (TikTok Technology Limited / TikTok Information Technologies UK Limited)
+- Pinterest (Pinterest Europe Ltd.)
+- Spotify (Spotify AB)
+- Tenor (Google Ireland Limited)
 
-YouTube (Google Ireland Limited)  
-Privacy Policy: https://policies.google.com/privacy  
-Imprint / Contact: https://www.google.com/about/company/
+The list may be expanded or adjusted for technical reasons. New providers will be added in an updated version of this Privacy Policy.
 
-TikTok (TikTok Technology Limited / TikTok Information Technologies UK Limited)  
-Privacy Policy: https://www.tiktok.com/legal/page/eea/privacy-policy/de  
-Imprint / Contact: https://www.tiktok.com/legal/page/global/impressum
+The legal basis is Art. 6(1)(a) GDPR (consent). Consent may be revoked at any time with effect for the future by deactivating the provider in the settings.
 
-Pinterest (Pinterest Europe Ltd.)  
-Privacy Policy: https://policy.pinterest.com/de/privacy-policy  
-Contact: https://help.pinterest.com/de/contact
+###
+2.4 Local profiles without user account (optional)
+###
 
-Spotify (Spotify AB)  
-Privacy Policy: https://www.spotify.com/de/legal/privacy-policy/  
-Imprint: https://www.spotify.com/de/legal/imprint/
+When using the service without a user account, users may optionally create local profiles for better organization and recognition. A profile may consist of a freely chosen name and an avatar (image).
 
-Tenor (Google Ireland Limited)  
-Privacy Policy: https://policies.google.com/privacy  
-Imprint / Contact: https://www.google.com/about/company/
+These profiles are stored exclusively locally on the user’s device and are visible only to the respective user. No transmission to our servers or publication to other users takes place.
 
-The above links are provided for informational purposes only. We assume no responsibility or liability for the content, accuracy, availability, or changes of external websites.
-
-The list of external providers may be expanded or adjusted for technical reasons without requiring an amendment to this Privacy Policy.
-
-The legal basis is Art. 6(1)(a) GDPR (consent).
+The legal basis is Art. 6(1)(f) GDPR (legitimate interest in user-friendly presentation) or Art. 6(1)(b) GDPR where processing is required to provide a feature used by the user.
 
 ###
 3. Use with a user account
 ###
 
 ###
-3.1 User registration
+3.1 Creation of a user account
 ###
 
-User registration is voluntary and осуществляется exclusively by assigning a PIN.
+Creation of a user account is voluntary and requires only the assignment of a PIN.
 
-The following data is stored on the server side: a pseudonymous user ID, the user status (e.g., enabled or disabled), and the date of the last login.
+Stored server-side:
+- a pseudonymous user ID,
+- a user status (e.g., enabled or disabled),
+- date of last login.
 
-Further user data is stored exclusively in encrypted form on the user’s end device.
+Further user data is generally stored exclusively in encrypted form locally on the user’s device.
 
 The legal basis is Art. 6(1)(b) GDPR.
 
@@ -139,65 +193,97 @@ The legal basis is Art. 6(1)(b) GDPR.
 3.2 Login and authentication
 ###
 
-For login, the encrypted user data set is temporarily transmitted to the backend and processed solely to verify the validity of the PIN. No permanent storage of decrypted user data or the PIN takes place.
+For login, the encrypted user dataset is temporarily transmitted to the backend and processed solely to verify PIN validity. No permanent storage of decrypted user data or the PIN takes place.
+
+Legal basis: Art. 6(1)(b) GDPR.
 
 ###
 3.3 Deletion and inactivity
 ###
 
-Users who do not log in for a period of 90 days are removed from the backend without prior notice.
+User accounts without login for 90 days are removed from the backend without prior notice.
 
-Upon removal of the user, all associated server-side data records are deleted, in particular the user ID, user status, login and activity information, as well as any other uniquely attributable server-side references.
+Upon removal, all associated server-side records are deleted, including:
+- user ID,
+- user status,
+- login and activity information,
+- other uniquely attributable server-side references.
 
-Deletion is final and cannot be reversed.
+Deletion is final unless the user has a previously created backup.
 
-Independently of this, the user may delete their user account at any time via the app. In this case, immediate and permanent deletion of all server-side and local data records takes place.
+Users may delete their account at any time via the app. In this case, immediate and final deletion of all server-side and local data occurs, subject to statutory retention obligations (e.g., DSA procedures).
+
+Legal basis: Art. 6(1)(b) GDPR and Art. 6(1)(c) GDPR.
 
 ###
 3.4 Public content and comments
 ###
 
-Users may create public messages and public comments.
+Users may create public messages and comments.
 
-These contents are processed for display, moderation, abuse prevention, and enforcement of legal obligations.
+Processing occurs for:
+- provision and display of content,
+- moderation and enforcement of usage rules,
+- abuse and fraud prevention,
+- compliance with legal obligations, in particular under the DSA.
 
-Public messages and public comments are deleted after 30 days. There is no entitlement to permanent availability or archiving.
+Public messages and comments are deleted after 30 days.
 
-Public content may be rated (e.g., like / dislike). There is no entitlement to a specific reach, visibility, or rating outcome.
-
-The legal basis is Art. 6(1)(b) and (f) GDPR.
+Legal basis: Art. 6(1)(b), Art. 6(1)(f), and Art. 6(1)(c) GDPR.
 
 ###
 3.5 Private communication
 ###
 
-Private chat messages are transmitted using end-to-end encryption.
+Private chat messages are transmitted end-to-end encrypted.
 
-Read private messages are automatically deleted after 7 days. There is no entitlement to archiving or restoration.
+Read private messages are automatically deleted after 7 days.
 
-The content of private communication is the sole responsibility of the participating users. No prior content review or ongoing monitoring takes place.
-
-The legal basis is Art. 6(1)(b) GDPR.
+Legal basis: Art. 6(1)(b) GDPR.
 
 ###
-3.6 Local data storage on the end device
+3.6 Local data storage on the device
 ###
 
-MessageDrop follows a privacy-oriented approach in which a large portion of data is stored exclusively locally on the user’s end device.
+MessageDrop follows a privacy-oriented approach in which most data is stored locally on the user’s device.
 
-This includes in particular local user data, settings and preferences, contacts and associations, locally cached content, cryptographic keys, and temporary working data.
+We have no access to locally stored data without the user’s cooperation.
 
-Depending on the platform, storage is carried out in particular via browser IndexedDB, local app storage, and cache mechanisms of the operating system or browser.
+Loss of local data may result in loss of access or content. Restoration without a user-created backup is not possible.
 
-This data is not automatically synchronized with our servers, not centrally stored, and not managed by us.
+###
+3.6.1 Backup and restore function (optional)
+###
 
-Full control over locally stored data lies with the user. The user may delete this data at any time, in particular via functions within the app, by deleting app or browser data, uninstalling the app or PWA, or resetting the browser or end device.
+An optional backup and restore function is provided. Backups are encrypted and protected by a user-defined PIN known only to the user.
 
-We have no access to locally stored data and no ability to view, back up, export, or restore such data.
+Legal basis: Art. 6(1)(b) GDPR.
 
-If locally stored data is deleted by the user or due to technical circumstances, this may result in the loss of content, settings, or access. Restoration by us is not possible.
+###
+3.7 Local profile, profile sharing, and contact profiles
+###
 
-Responsibility for safeguarding, maintaining, and managing locally stored data lies exclusively with the user.
+Profiles are stored locally. Profile sharing requires explicit consent by the receiving contact.
+
+After transfer, we cannot retrieve or delete profile data from the recipient’s device.
+
+Legal basis: Art. 6(1)(b) GDPR and Art. 6(1)(a) GDPR (consent).
+
+###
+3.8 System messages
+###
+
+System messages are generated by authorized administrative systems and are always active.
+
+Legal basis: Art. 6(1)(b) GDPR and Art. 6(1)(c) GDPR.
+
+###
+3.9 Following places and push notifications
+###
+
+Push tokens are processed solely for delivery purposes.
+
+Legal basis: Art. 6(1)(b) GDPR and Art. 6(1)(a) GDPR where consent is required.
 
 ###
 4. Digital Services Act (DSA)
@@ -207,74 +293,65 @@ Responsibility for safeguarding, maintaining, and managing locally stored data l
 4.1 DSA procedures
 ###
 
-For public content and comments, a procedure under the Digital Services Act (DSA) may be initiated, in particular by notices or appeals.
+DSA procedures may be initiated for public content. Data processed includes:
+- user ID (if available),
+- reported content,
+- timestamps,
+- procedure status,
+- decisions and reasons.
 
-In this context, we process in particular the user ID, information on the reported content, timestamps and status of the procedure, as well as decisions and reasoning.
-
-The legal basis is Art. 6(1)(c) GDPR and Art. 6(1)(f) GDPR.
+Legal basis: Art. 6(1)(c) GDPR and Art. 6(1)(f) GDPR.
 
 ###
 4.2 Public case page
 ###
 
-For each DSA-relevant procedure, a publicly accessible case page is provided.
-
-This page contains exclusively anonymized or non-personal information, in particular the procedural status, the type of reported content, decisions taken, and legal reasoning pursuant to the DSA.
-
-No personal data is published. Publication takes place solely to fulfill statutory transparency obligations.
+Only anonymized or non-personal information is published.
 
 ###
 4.3 Public DSA statistics
 ###
 
-MessageDrop provides a publicly accessible, aggregated statistic showing the number of initiated procedures, the type of decisions, and the ratio of notices to measures taken.
-
-The statistics contain no personal data and do not allow conclusions to be drawn about individual users.
+Only aggregated, non-personal statistics are published.
 
 ###
 4.4 Storage and disclosure
 ###
 
-DSA-related moderation, decision, and procedural data is stored permanently insofar as this is required to fulfill statutory documentation, evidence, and accountability obligations.
-
-Disclosure to competent authorities takes place exclusively within the legally required and permissible framework.
+DSA-related data is deleted no later than six months after procedure completion unless a legal hold applies.
 
 ###
-5. Retention period
+5. Storage periods
 ###
 
-Personal data is stored only for as long as required for the respective purpose or as long as statutory obligations exist.
-
-DSA procedural data subject to statutory retention obligations is excluded from this.
+Personal data is stored only as long as necessary for the respective purpose or required by law.
 
 ###
 6. Data security
 ###
 
-We implement appropriate technical and organizational measures to protect personal data against loss, misuse, or unauthorized access. However, complete protection cannot be guaranteed.
+We implement appropriate technical and organizational measures. Complete protection cannot be guaranteed.
 
 ###
-7. Rights of data subjects
+7. Data subject rights
 ###
 
-You have the right to access (Art. 15 GDPR), rectification (Art. 16 GDPR), erasure (Art. 17 GDPR), restriction of processing (Art. 18 GDPR), data portability (Art. 20 GDPR), and objection (Art. 21 GDPR).
-
-Consents given may be withdrawn at any time with effect for the future.
+Users have rights under Arts. 15–21 GDPR.
 
 ###
 8. Minimum age
 ###
 
-The service is not directed at persons under 16 years of age (Art. 8 GDPR).
+The service is not directed at persons under 16 years of age.
 
 ###
 9. No emergency services
 ###
 
-The service does not replace emergency services and does not provide access to such services.
+The service does not provide emergency access.
 
 ###
 10. Changes to this Privacy Policy
 ###
 
-We reserve the right to amend this Privacy Policy. The version valid at the time of publication shall apply.
+The version current at the time of publication applies.
