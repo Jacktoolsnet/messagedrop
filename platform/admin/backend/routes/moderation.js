@@ -4,6 +4,7 @@ const axios = require('axios');
 const { requireAdminJwt, requireRole, checkToken } = require('../middleware/security');
 const { verifyServiceJwt, signServiceJwt } = require('../utils/serviceJwt');
 const tableModerationRequest = require('../db/tableModerationRequest');
+const { formatExcerpt, sendPushbulletNotification } = require('../utils/pushbullet');
 const { apiError } = require('../middleware/api-error');
 
 const router = express.Router();
@@ -99,6 +100,14 @@ router.post('/requests', (req, res, next) => {
             req.logger?.error?.('Moderation request insert failed', { error: err.message });
             return next(apiError.internal('db_error'));
         }
+        const title = 'Moderation request';
+        const body = [
+            `User: ${messageUserId}`,
+            `UUID: ${messageUuid}`,
+            `Type: ${payload.messageType || 'unknown'}`,
+            `Excerpt: ${formatExcerpt(messageText)}`
+        ].join('\n');
+        void sendPushbulletNotification({ title, body, logger: req.logger });
         res.status(201).json({ id });
     });
 });
