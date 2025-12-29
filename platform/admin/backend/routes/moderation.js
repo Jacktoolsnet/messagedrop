@@ -120,6 +120,20 @@ router.get('/requests', (req, res, next) => {
     });
 });
 
+router.get('/requests/count', (req, res, next) => {
+    const db = req.database?.db;
+    if (!db) return next(apiError.internal('database_unavailable'));
+
+    const status = normalizeString(req.query?.status) || tableModerationRequest.statusValues.PENDING;
+    tableModerationRequest.count(db, status, (err, count) => {
+        if (err) {
+            req.logger?.error?.('Moderation request count failed', { error: err.message });
+            return next(apiError.internal('db_error'));
+        }
+        res.json({ count });
+    });
+});
+
 router.get('/requests/:id', (req, res, next) => {
     const db = req.database?.db;
     if (!db) return next(apiError.internal('database_unavailable'));

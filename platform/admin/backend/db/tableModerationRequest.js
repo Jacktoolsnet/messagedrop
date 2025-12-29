@@ -162,6 +162,21 @@ const deleteById = function (db, id, callback) {
     });
 };
 
+const count = function (db, status, callback) {
+    const params = [];
+    let where = '';
+    if (status && status !== 'all') {
+        where = `WHERE ${columnStatus} = ?`;
+        params.push(status);
+    }
+    const sql = `
+    SELECT COUNT(*) AS count
+    FROM ${tableName}
+    ${where};
+    `;
+    db.get(sql, params, (err, row) => callback(err, row?.count ?? 0));
+};
+
 module.exports = {
     tableName,
     statusValues,
@@ -170,5 +185,6 @@ module.exports = {
     list,
     getById,
     updateResolution,
-    deleteById
+    deleteById,
+    count
 };

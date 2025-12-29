@@ -301,6 +301,7 @@ router.post('/create',
     let moderationDecision = null;
     let moderationScore = null;
     let moderationFlagged = null;
+    let moderationReason = null;
     let moderationRequestSent = false;
     let moderationRequestId = null;
 
@@ -315,21 +316,34 @@ router.post('/create',
       moderation.patternMatch = patternMatch;
       moderation.patternMatchAt = patternMatchAt;
 
+      if (patternMatch) {
+        moderationScore = null;
+        moderationFlagged = true;
+        moderationDecision = 'rejected';
+        moderationReason = 'pattern';
+        status = tableMessage.messageStatus.DISABLED;
+      }
+
       try {
-        const moderationResult = await openai.moderations.create({
-          model: moderationModel,
-          input: rawMessage
-        });
-        moderationScore = extractModerationScore(moderationResult);
-        moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-        moderationDecision = decideModeration(moderationScore);
-        moderation.aiModeration = JSON.stringify(moderationResult);
-        moderation.aiScore = moderationScore;
-        moderation.aiFlagged = moderationFlagged;
-        moderation.aiDecision = moderationDecision;
-        moderation.aiCheckedAt = Date.now();
-        if (moderationDecision === 'rejected') {
-          status = tableMessage.messageStatus.DISABLED;
+        if (!patternMatch) {
+          const moderationResult = await openai.moderations.create({
+            model: moderationModel,
+            input: rawMessage
+          });
+          moderationScore = extractModerationScore(moderationResult);
+          moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
+          moderationDecision = decideModeration(moderationScore);
+          if (moderationDecision === 'rejected') {
+            moderationReason = 'ai';
+          }
+          moderation.aiModeration = JSON.stringify(moderationResult);
+          moderation.aiScore = moderationScore;
+          moderation.aiFlagged = moderationFlagged;
+          moderation.aiDecision = moderationDecision;
+          moderation.aiCheckedAt = Date.now();
+          if (moderationDecision === 'rejected') {
+            status = tableMessage.messageStatus.DISABLED;
+          }
         }
       } catch (err) {
         const apiErr = apiError.internal('openai_failed');
@@ -408,6 +422,7 @@ router.post('/create',
     response.status = 200;
     response.moderation = requiresModeration ? {
       decision: moderationDecision,
+      reason: moderationReason,
       score: moderationScore,
       flagged: moderationFlagged,
       patternMatch: moderation.patternMatch ?? null,
@@ -464,27 +479,41 @@ router.post('/update',
       let moderationDecision = null;
       let moderationScore = null;
       let moderationFlagged = null;
+      let moderationReason = null;
       let moderationRequestSent = false;
       let moderationRequestId = null;
 
       moderation.patternMatch = detectPersonalInformation(rawMessage);
       moderation.patternMatchAt = Date.now();
 
+      if (moderation.patternMatch) {
+        moderationScore = null;
+        moderationFlagged = true;
+        moderationDecision = 'rejected';
+        moderationReason = 'pattern';
+        status = tableMessage.messageStatus.DISABLED;
+      }
+
       try {
-        const moderationResult = await openai.moderations.create({
-          model: moderationModel,
-          input: rawMessage
-        });
-        moderationScore = extractModerationScore(moderationResult);
-        moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
-        moderationDecision = decideModeration(moderationScore);
-        moderation.aiModeration = JSON.stringify(moderationResult);
-        moderation.aiScore = moderationScore;
-        moderation.aiFlagged = moderationFlagged;
-        moderation.aiDecision = moderationDecision;
-        moderation.aiCheckedAt = Date.now();
-        if (moderationDecision === 'rejected') {
-          status = tableMessage.messageStatus.DISABLED;
+        if (!moderation.patternMatch) {
+          const moderationResult = await openai.moderations.create({
+            model: moderationModel,
+            input: rawMessage
+          });
+          moderationScore = extractModerationScore(moderationResult);
+          moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
+          moderationDecision = decideModeration(moderationScore);
+          if (moderationDecision === 'rejected') {
+            moderationReason = 'ai';
+          }
+          moderation.aiModeration = JSON.stringify(moderationResult);
+          moderation.aiScore = moderationScore;
+          moderation.aiFlagged = moderationFlagged;
+          moderation.aiDecision = moderationDecision;
+          moderation.aiCheckedAt = Date.now();
+          if (moderationDecision === 'rejected') {
+            status = tableMessage.messageStatus.DISABLED;
+          }
         }
       } catch (err) {
         const apiErr = apiError.internal('openai_failed');
@@ -534,6 +563,7 @@ router.post('/update',
             status: 200,
             moderation: {
               decision: moderationDecision,
+              reason: moderationReason,
               score: moderationScore,
               flagged: moderationFlagged,
               patternMatch: moderation.patternMatch ?? null,

@@ -58,7 +58,7 @@ export class MessageService {
     return throwError(() => error);
   }
 
-  private showModerationRejected(): void {
+  private showModerationRejected(message: string): void {
     this.moderationDialogRef?.close();
     const ref = this.dialog.open(DisplayMessage, {
       panelClass: '',
@@ -68,7 +68,7 @@ export class MessageService {
         title: this.i18n.t('common.moderation.title'),
         image: '',
         icon: 'block',
-        message: this.i18n.t('common.message.moderationRejected'),
+        message,
         button: this.i18n.t('common.actions.ok'),
         delay: 0,
         showSpinner: false
@@ -84,6 +84,16 @@ export class MessageService {
         this.moderationDialogRef = null;
       }
     });
+  }
+
+  private getModerationRejectedMessage(reason?: string | null): string {
+    if (reason === 'pattern') {
+      return this.i18n.t('common.message.moderationRejectedPattern');
+    }
+    if (reason === 'ai') {
+      return this.i18n.t('common.message.moderationRejectedAi');
+    }
+    return this.i18n.t('common.message.moderationRejected');
   }
 
   private showPublishedMessage(message: string): void {
@@ -209,7 +219,7 @@ export class MessageService {
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
           if (decision === 'rejected') {
-            this.showModerationRejected();
+            this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
             return;
           }
           this.messagesSignal.update(messages => [message, ...messages]);
@@ -258,7 +268,7 @@ export class MessageService {
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
           if (decision === 'rejected') {
-            this.showModerationRejected();
+            this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
             return;
           }
 
@@ -307,7 +317,7 @@ export class MessageService {
         next: (res) => {
           const decision = res?.moderation?.decision ?? 'approved';
           if (decision === 'rejected') {
-            this.showModerationRejected();
+            this.showModerationRejected(this.getModerationRejectedMessage(res?.moderation?.reason ?? null));
             this.patchMessageSnapshotSmart(message, { status: 'disabled' });
             return;
           }

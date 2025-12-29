@@ -77,9 +77,21 @@ export class AdminDashboardComponent implements OnInit {
     this.logService.getPowCountSince(since).subscribe(res => {
       this.powCountToday = res.count;
     });
-    this.moderationService.listRequests('pending', 500, 0).subscribe({
+    this.moderationService.countRequests('pending').subscribe({
       next: (res) => {
-        this.moderationCountPending = res.rows?.length ?? 0;
+        const count = Number(res.count);
+        this.moderationCountPending = Number.isFinite(count) ? count : 0;
+        if (this.moderationCountPending === 0) {
+          this.moderationService.listRequests('pending', 200, 0).subscribe({
+            next: (fallback) => {
+              const fallbackCount = fallback.rows?.length ?? 0;
+              if (fallbackCount > 0) {
+                this.moderationCountPending = fallbackCount;
+              }
+            },
+            error: () => { }
+          });
+        }
       },
       error: () => {
         this.moderationCountPending = 0;

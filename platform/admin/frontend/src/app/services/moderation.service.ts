@@ -15,6 +15,12 @@ export class ModerationService {
         ).pipe(catchError(() => of({ rows: [] })));
     }
 
+    countRequests(status = 'pending') {
+        return this.http.get<{ count: number }>(
+            `${this.baseUrl}/moderation/requests/count?status=${encodeURIComponent(status)}`
+        ).pipe(catchError(() => of({ count: 0 })));
+    }
+
     approveRequest(id: string) {
         return this.http.post<{ approved: boolean }>(`${this.baseUrl}/moderation/requests/${id}/approve`, {})
             .pipe(catchError(() => of({ approved: false })));
