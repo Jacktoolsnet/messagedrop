@@ -234,6 +234,63 @@ const update = function (db, messageId, message, style, multimedia, callback) {
     }
 };
 
+const updateWithModeration = function (db, messageId, message, style, multimedia, moderation, status, callback) {
+    try {
+        const aiModeration = moderation?.aiModeration ?? null;
+        const aiModerationScore = Number.isFinite(moderation?.aiScore) ? moderation.aiScore : null;
+        const aiModerationFlagged = moderation?.aiFlagged === undefined || moderation?.aiFlagged === null
+            ? null
+            : (moderation.aiFlagged ? 1 : 0);
+        const aiModerationDecision = moderation?.aiDecision ?? null;
+        const aiModerationAt = Number.isFinite(moderation?.aiCheckedAt) ? moderation.aiCheckedAt : null;
+        const patternMatch = moderation?.patternMatch === undefined || moderation?.patternMatch === null
+            ? null
+            : (moderation.patternMatch ? 1 : 0);
+        const patternMatchAt = Number.isFinite(moderation?.patternMatchAt) ? moderation.patternMatchAt : null;
+        const normalizedStatus = status || messageStatus.ENABLED;
+
+        const sql = `
+        UPDATE ${tableName}
+        SET ${columnMessage} = ?,
+            ${columnStyle} = ?,
+            ${columnMultimedia} = ?,
+            ${columnStatus} = ?,
+            ${columnAiModeration} = ?,
+            ${columnAiModerationScore} = ?,
+            ${columnAiModerationFlagged} = ?,
+            ${columnAiModerationDecision} = ?,
+            ${columnAiModerationAt} = ?,
+            ${columnPatternMatch} = ?,
+            ${columnPatternMatchAt} = ?,
+            ${columnManualModerationDecision} = NULL,
+            ${columnManualModerationReason} = NULL,
+            ${columnManualModerationAt} = NULL,
+            ${columnManualModerationBy} = NULL
+        WHERE ${columnMessageId} = ?;`;
+
+        const params = [
+            message,
+            style,
+            multimedia,
+            normalizedStatus,
+            aiModeration,
+            aiModerationScore,
+            aiModerationFlagged,
+            aiModerationDecision,
+            aiModerationAt,
+            patternMatch,
+            patternMatchAt,
+            messageId
+        ];
+
+        db.run(sql, params, (err) => {
+            callback(err);
+        });
+    } catch (error) {
+        callback(error);
+    }
+};
+
 const getAll = function (db, callback) {
     try {
         let sql = `SELECT * FROM ${tableName};`;
@@ -540,6 +597,7 @@ module.exports = {
     init,
     create,
     update,
+    updateWithModeration,
     disableMessage,
     enableMessage,
     getAll,

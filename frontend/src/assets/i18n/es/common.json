@@ -190,6 +190,7 @@
       "moderationFailed": "La moderación falló. Inténtalo de nuevo más tarde.",
       "creating": "Creando mensaje",
       "created": "Mensaje publicado correctamente.",
+      "republished": "El mensaje ya está publicado.",
       "updating": "Actualizando mensaje",
       "togglingLike": "Cambiando “me gusta”",
       "togglingDislike": "Cambiando “no me gusta”",

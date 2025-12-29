@@ -190,6 +190,7 @@
       "moderationFailed": "La modération a échoué. Veuillez réessayer plus tard.",
       "creating": "Création du message",
       "created": "Message publié avec succès.",
+      "republished": "Le message est désormais publié.",
       "updating": "Mise à jour du message",
       "togglingLike": "Mise à jour du j'aime",
       "togglingDislike": "Mise à jour du je n'aime pas",

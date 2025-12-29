@@ -30,6 +30,7 @@ export class MessageService {
   readonly commentCountsSignal = signal<Record<string, number>>({});
 
   private moderationDialogRef: MatDialogRef<DisplayMessage> | null = null;
+  private publishDialogRef: MatDialogRef<DisplayMessage> | null = null;
 
   private _messageSet = signal(0);
   readonly messageSet = this._messageSet.asReadonly();
@@ -81,6 +82,35 @@ export class MessageService {
     ref.afterClosed().subscribe(() => {
       if (this.moderationDialogRef === ref) {
         this.moderationDialogRef = null;
+      }
+    });
+  }
+
+  private showPublishedMessage(message: string): void {
+    this.publishDialogRef?.close();
+    const ref = this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('common.message.title'),
+        image: '',
+        icon: 'check_circle',
+        message,
+        button: '',
+        delay: 2000,
+        showSpinner: false,
+        autoclose: true
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
+    this.publishDialogRef = ref;
+    ref.afterClosed().subscribe(() => {
+      if (this.publishDialogRef === ref) {
+        this.publishDialogRef = null;
       }
     });
   }
@@ -186,7 +216,7 @@ export class MessageService {
           if (decision === 'review') {
             this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
           } else {
-            this.snackBar.open(this.i18n.t('common.message.created'), '', { duration: 1000 });
+            this.showPublishedMessage(this.i18n.t('common.message.created'));
           }
         },
         error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
@@ -239,7 +269,7 @@ export class MessageService {
           if (decision === 'review') {
             this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
           } else {
-            this.snackBar.open(this.i18n.t('common.comment.created'), '', { duration: 1000 });
+            this.showPublishedMessage(this.i18n.t('common.comment.created'));
           }
         },
         error: (err) => {
@@ -250,6 +280,7 @@ export class MessageService {
 
   updateMessage(message: Message, showAlways = false) {
     const url = `${environment.apiUrl}/message/update`;
+    const wasDisabled = message.status === 'disabled';
 
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -270,14 +301,23 @@ export class MessageService {
       'multimedia': JSON.stringify(message.multimedia)
     };
 
-    this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
+    this.http.post<MessageCreateResponse>(url, body, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: () => {
-          // Update der Nachricht im State
-          this.messagesSignal.update(messages => {
-            return messages.map(m => m.id === message.id ? { ...m, ...message } : m);
-          });
+        next: (res) => {
+          const decision = res?.moderation?.decision ?? 'approved';
+          if (decision === 'rejected') {
+            this.showModerationRejected();
+            this.patchMessageSnapshotSmart(message, { status: 'disabled' });
+            return;
+          }
+
+          this.patchMessageSnapshotSmart(message, { ...message, status: 'enabled' });
+          if (decision === 'review') {
+            this.snackBar.open(this.i18n.t('common.message.moderationReview'), '', { duration: 2000 });
+          } else if (wasDisabled) {
+            this.showPublishedMessage(this.i18n.t('common.message.republished'));
+          }
         },
         error: err => this.snackBar.open(err.message, this.i18n.t('common.actions.ok'))
       });

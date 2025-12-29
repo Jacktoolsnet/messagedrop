@@ -422,9 +422,9 @@ router.post('/update',
     security.authenticate,
     express.json({ type: 'application/json' })
   ],
-  function (req, res, next) {
+  async function (req, res, next) {
     const messageId = req.body.id;
-    findMessageByIdOrUuid(req.database.db, messageId, (lookupErr, row) => {
+    findMessageByIdOrUuid(req.database.db, messageId, async (lookupErr, row) => {
       if (lookupErr) {
         return next(apiError.internal('db_error'));
       }
@@ -434,18 +434,115 @@ router.post('/update',
       if (!ensureSameUser(req, res, row.userId, next)) {
         return;
       }
-      tableMessage.update(
+
+      const rawMessage = String(req.body.message ?? '');
+      const sanitizedMessage = sanitizeSingleQuotes(rawMessage);
+      const sanitizedMultimedia = sanitizeSingleQuotes(req.body.multimedia);
+      const requiresModeration = [
+        tableMessage.messageType.PUBLIC,
+        tableMessage.messageType.COMMENT
+      ].includes(row.typ);
+
+      if (!requiresModeration) {
+        tableMessage.update(
+          req.database.db,
+          row.id,
+          sanitizedMessage,
+          req.body.style,
+          sanitizedMultimedia,
+          function (err) {
+            if (err) {
+              return next(apiError.internal('db_error'));
+            }
+            res.status(200).json({ status: 200 });
+          });
+        return;
+      }
+
+      const moderation = {};
+      let status = tableMessage.messageStatus.ENABLED;
+      let moderationDecision = null;
+      let moderationScore = null;
+      let moderationFlagged = null;
+      let moderationRequestSent = false;
+      let moderationRequestId = null;
+
+      moderation.patternMatch = detectPersonalInformation(rawMessage);
+      moderation.patternMatchAt = Date.now();
+
+      try {
+        const moderationResult = await openai.moderations.create({
+          model: moderationModel,
+          input: rawMessage
+        });
+        moderationScore = extractModerationScore(moderationResult);
+        moderationFlagged = moderationResult?.results?.[0]?.flagged ?? false;
+        moderationDecision = decideModeration(moderationScore);
+        moderation.aiModeration = JSON.stringify(moderationResult);
+        moderation.aiScore = moderationScore;
+        moderation.aiFlagged = moderationFlagged;
+        moderation.aiDecision = moderationDecision;
+        moderation.aiCheckedAt = Date.now();
+        if (moderationDecision === 'rejected') {
+          status = tableMessage.messageStatus.DISABLED;
+        }
+      } catch (err) {
+        const apiErr = apiError.internal('openai_failed');
+        apiErr.detail = err?.message || err;
+        return next(apiErr);
+      }
+
+      tableMessage.updateWithModeration(
         req.database.db,
         row.id,
-        sanitizeSingleQuotes(req.body.message),
+        sanitizedMessage,
         req.body.style,
-        sanitizeSingleQuotes(req.body.multimedia),
-        function (err) {
+        sanitizedMultimedia,
+        moderation,
+        status,
+        async function (err) {
           if (err) {
             return next(apiError.internal('db_error'));
           }
-          res.status(200).json({ status: 200 });
-        });
+
+          if (moderationDecision === 'review') {
+            const moderationPayload = {
+              messageId: row.id,
+              messageUuid: row.uuid,
+              messageUserId: row.userId,
+              messageText: rawMessage,
+              messageType: row.typ,
+              messageCreatedAt: row.createDateTime,
+              latitude: row.latitude,
+              longitude: row.longitude,
+              plusCode: row.plusCode,
+              markerType: row.markerType,
+              style: req.body.style,
+              aiScore: moderationScore,
+              aiFlagged: moderationFlagged,
+              aiDecision: moderationDecision,
+              aiResponse: moderation.aiModeration,
+              patternMatch: moderation.patternMatch ?? null,
+              patternMatchAt: moderation.patternMatchAt ?? null
+            };
+            const forward = await forwardModerationRequest(moderationPayload, req.logger);
+            moderationRequestSent = forward.sent;
+            moderationRequestId = forward.id ?? null;
+          }
+
+          res.status(200).json({
+            status: 200,
+            moderation: {
+              decision: moderationDecision,
+              score: moderationScore,
+              flagged: moderationFlagged,
+              patternMatch: moderation.patternMatch ?? null,
+              requestSent: moderationRequestSent,
+              requestId: moderationRequestId
+            }
+          });
+        }
+      );
     });
   });
 

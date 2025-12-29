@@ -190,6 +190,7 @@
       "moderationFailed": "Moderation failed. Please try again later.",
       "creating": "Creating message",
       "created": "Message successfully dropped.",
+      "republished": "Message is now published.",
       "updating": "Updating message",
       "togglingLike": "Toggling like",
       "togglingDislike": "Toggling dislike",

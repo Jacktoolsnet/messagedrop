@@ -190,6 +190,7 @@
       "moderationFailed": "Moderation fehlgeschlagen. Bitte später erneut versuchen.",
       "creating": "Nachricht wird erstellt",
       "created": "Nachricht erfolgreich gesendet.",
+      "republished": "Die Nachricht ist jetzt veröffentlicht.",
       "updating": "Nachricht wird aktualisiert",
       "togglingLike": "Gefällt mir wird umgeschaltet",
       "togglingDislike": "Gefällt mir nicht wird umgeschaltet",
