@@ -148,13 +148,13 @@
             <div class="kv">
                 <mat-icon>schedule</mat-icon>
                 <span>
-                    <strong>Created:</strong> {{ (data.createdAt || msg()?.createDateTime) | date:'medium' }}
+                    <strong>Created:</strong> {{ normalizeEpoch(data.createdAt || msg()?.createDateTime) | date:'medium' }}
                 </span>
             </div>
             @if (msg()?.deleteDateTime) {
             <div class="kv">
                 <mat-icon>hourglass_bottom</mat-icon>
-                <span><strong>Expires:</strong> {{ msg()?.deleteDateTime | date:'medium' }}</span>
+                <span><strong>Expires:</strong> {{ normalizeEpoch(msg()?.deleteDateTime) | date:'medium' }}</span>
             </div>
             }
             @if (msg()?.location?.plusCode) {

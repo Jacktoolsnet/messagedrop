@@ -236,6 +236,13 @@ export class SignalDetailComponent implements OnInit {
     }
   }
 
+  normalizeEpoch(value?: number | string | null): number | null {
+    if (value === undefined || value === null || value === '') return null;
+    const num = Number(value);
+    if (!Number.isFinite(num)) return null;
+    return num < 1_000_000_000_000 ? num * 1000 : num;
+  }
+
   // Helpers
   private safeParse(json: string): PublicMessage | null {
     try { return JSON.parse(json); } catch { return null; }

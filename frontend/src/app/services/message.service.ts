@@ -79,6 +79,12 @@ export class MessageService {
     return Number.isFinite(num) ? num : null;
   }
 
+  private toEpochMs(value: unknown): number | null {
+    const num = this.toNullableNumber(value);
+    if (num === null) return null;
+    return num < 1_000_000_000_000 ? num * 1000 : num;
+  }
+
   private buildModerationPatch(moderation?: MessageCreateResponse['moderation'] | null): Partial<Message> {
     if (!moderation) return {};
     return {
@@ -227,8 +233,8 @@ export class MessageService {
       parentId: raw.parentId,
       parentUuid: raw.parentUuid,
       typ: raw.typ,
-      createDateTime: raw.createDateTime,
-      deleteDateTime: raw.deleteDateTime,
+      createDateTime: this.toEpochMs(raw.createDateTime),
+      deleteDateTime: this.toEpochMs(raw.deleteDateTime),
       location: {
         latitude: raw.latitude,
         longitude: raw.longitude,
@@ -627,8 +633,8 @@ export class MessageService {
             parentId: rawMessage.parentId,
             parentUuid: rawMessage.parentUuid,
             typ: rawMessage.typ,
-            createDateTime: rawMessage.createDateTime,
-            deleteDateTime: rawMessage.deleteDateTime,
+            createDateTime: this.toEpochMs(rawMessage.createDateTime),
+            deleteDateTime: this.toEpochMs(rawMessage.deleteDateTime),
             location: {
               latitude: rawMessage.latitude,
               longitude: rawMessage.longitude,
