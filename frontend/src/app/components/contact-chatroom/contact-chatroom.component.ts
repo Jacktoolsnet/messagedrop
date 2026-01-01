@@ -78,6 +78,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private visibilityObserver?: IntersectionObserver;
   private currentContactId?: string;
   private lastLiveMessageId?: string;
+  private lastResetToken?: number;
   readonly reactions: readonly string[] = [
     // faces/emotions
     '😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '🙂', '😉', '😎',
@@ -214,6 +215,21 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.contactMessageService.emitUnreadCountUpdate(contact.id);
     }
     this.contactMessageService.deletedMessage.set(null);
+  });
+
+  private readonly resetMessagesEffect = effect(() => {
+    const reset = this.contactService.contactReset();
+    const contact = this.contact();
+    if (!reset || !contact) {
+      return;
+    }
+    if (reset.token === this.lastResetToken) {
+      return;
+    }
+    if (reset.scope === 'all' || reset.contactUserId === contact.contactUserId) {
+      this.lastResetToken = reset.token;
+      this.loadMessages(true);
+    }
   });
 
   ngAfterViewInit(): void {

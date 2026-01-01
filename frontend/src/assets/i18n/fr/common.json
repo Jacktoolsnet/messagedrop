@@ -160,6 +160,7 @@
         "translateAria": "Traduire le message",
         "firstMessage": "Envoyer le premier message",
         "loading": "Chargement de la discussion...",
+        "messageUnreadable": "Le message ne peut pas être affiché (signature ou déchiffrement échoué).",
         "translateFailed": "La traduction a échoué.",
         "storeTranslationFailed": "Le message traduit n'a pas pu être enregistré.",
         "deleteMessage": {

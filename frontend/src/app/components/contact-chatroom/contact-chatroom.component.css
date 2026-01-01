@@ -214,6 +214,24 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
+.message-warning {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.75rem;
+  border: 1px dashed color-mix(in srgb, var(--mat-warn-color) 60%, transparent);
+  background: color-mix(in srgb, var(--mat-warn-color) 12%, transparent);
+  color: color-mix(in srgb, var(--mat-warn-color) 80%, var(--mat-app-text-color) 20%);
+}
+
+.message-warning__icon {
+  font-size: 1.1rem;
+  width: 1.1rem;
+  height: 1.1rem;
+}
+
 .bubble--me {
   text-align: right;
 }

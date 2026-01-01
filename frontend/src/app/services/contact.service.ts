@@ -22,6 +22,8 @@ export class ContactService {
   private _contacts = signal<Contact[]>([]);
   private _contactsSet = signal(0);
   readonly contactsSet = this._contactsSet.asReadonly();
+  private _contactReset = signal<{ scope: 'all' | 'contactUser'; contactUserId?: string; token: number } | null>(null);
+  readonly contactReset = this._contactReset.asReadonly();
   private ready = false;
 
   httpOptions = {
@@ -188,6 +190,17 @@ export class ContactService {
     this.persistContacts();
   }
 
+  emitContactResetAll(): void {
+    this._contactReset.set({ scope: 'all', token: Date.now() });
+  }
+
+  emitContactResetForContactUser(contactUserId: string): void {
+    if (!contactUserId) {
+      return;
+    }
+    this._contactReset.set({ scope: 'contactUser', contactUserId, token: Date.now() });
+  }
+
   refreshContact(contactId: string) {
     this._contacts.update((contacts) =>
       contacts.map(contact => contact.id === contactId ? { ...contact } : contact)
@@ -214,6 +227,7 @@ export class ContactService {
     );
     if (changed) {
       this.persistContacts();
+      this.emitContactResetForContactUser(contactUserId);
     }
   }
 

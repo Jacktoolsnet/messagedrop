@@ -160,6 +160,7 @@
         "translateAria": "Translate message",
         "firstMessage": "Send the first message",
         "loading": "Loading chatroom...",
+        "messageUnreadable": "Message can't be displayed (signature or decryption failed).",
         "translateFailed": "Translation failed.",
         "storeTranslationFailed": "Translated message could not be stored.",
         "deleteMessage": {

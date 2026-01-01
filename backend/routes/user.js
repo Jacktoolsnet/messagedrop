@@ -673,6 +673,13 @@ router.post('/reset-keys',
           cryptoPublicKey: cryptoKeyValue
         }
       });
+      emitKeyUpdate([userId], {
+        status: 200,
+        type: 'security_reset',
+        content: {
+          userId
+        }
+      });
 
       res.status(200).json({ status: 200 });
     } catch (err) {

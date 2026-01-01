@@ -40,11 +40,18 @@
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
           <div class="bubble bubble--me">
+            @if (!msg.payload) {
+            <div class="message-warning">
+              <mat-icon class="message-warning__icon">warning</mat-icon>
+              <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
+            </div>
+            } @else {
             @if (msg.payload?.multimedia?.type !== 'undefined') {
             <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
             }
             @if (msg.payload?.message?.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
+            }
             }
             <div class="reaction-chip reaction-chip--me">
               <span>{{ msg.reaction || '🫥' }}</span>
@@ -52,10 +59,12 @@
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
+              @if (msg.payload) {
               <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.editAria' | transloco"
                 (click)="editMessage(msg)">
                 <mat-icon>edit</mat-icon>
               </button>
+              }
               <button mat-mini-fab color="warn" [attr.aria-label]="'common.contact.chatroom.deleteAria' | transloco"
                 (click)="deleteMessage(msg)">
                 <mat-icon>delete</mat-icon>
@@ -78,11 +87,18 @@
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
           <div class="bubble bubble--them">
+            @if (!msg.payload) {
+            <div class="message-warning">
+              <mat-icon class="message-warning__icon">warning</mat-icon>
+              <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
+            </div>
+            } @else {
             @if (msg.payload?.multimedia?.type !== 'undefined') {
             <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
             }
             @if (msg.payload?.message?.trim() !== '') {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
+            }
             }
             <div class="reaction-chip reaction-chip--them" role="button" tabindex="0"
               (click)="openReactionPicker(msg, $event)" (keyup.enter)="openReactionPicker(msg, $event)"

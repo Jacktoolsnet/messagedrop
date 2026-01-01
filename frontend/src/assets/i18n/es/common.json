@@ -160,6 +160,7 @@
         "translateAria": "Traducir mensaje",
         "firstMessage": "Enviar el primer mensaje",
         "loading": "Cargando chat...",
+        "messageUnreadable": "El mensaje no se puede mostrar (falló la firma o el descifrado).",
         "translateFailed": "Falló la traducción.",
         "storeTranslationFailed": "No se pudo guardar el mensaje traducido.",
         "deleteMessage": {

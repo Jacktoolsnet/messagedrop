@@ -209,6 +209,9 @@ export class SocketioService {
           }
           break;
         }
+        case 'security_reset':
+          this.contactService.emitContactResetAll();
+          break;
       }
     });
     this.updateAuthAndConnect(userId, user.jwt);

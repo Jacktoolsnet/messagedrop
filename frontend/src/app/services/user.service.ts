@@ -21,6 +21,7 @@ import { UserType } from '../interfaces/user-type';
 import { UserServerBackup } from '../interfaces/backup';
 import { BackupStateService } from './backup-state.service';
 import { CryptoService } from './crypto.service';
+import { ContactService } from './contact.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { ServerService } from './server.service';
@@ -1128,6 +1129,7 @@ export class UserService {
       this.user.cryptoKeyPair = newCryptoKeys;
       this.user.signingKeyPair = newSigningKeys;
       await this.saveUser();
+      this.injector.get(ContactService).emitContactResetAll();
 
       const infoDialog = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
