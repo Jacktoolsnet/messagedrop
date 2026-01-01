@@ -390,14 +390,14 @@ const rateLimitMessage = (message) => ({
 
 const userCreateLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
-  limit: 5,
+  limit: 20,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many user create requests, please try again later.')
 });
 
 const userConfirmLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
-  limit: 10,
+  limit: 60,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many user auth requests, please try again later.')
 });

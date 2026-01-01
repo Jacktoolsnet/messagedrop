@@ -224,7 +224,7 @@ const translateLimit = rateLimit({
 
 const userLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
-  limit: 20,
+  limit: 120,
   ...rateLimitDefaults,
   message: rateLimitMessage('Too many user requests, please try again later.')
 });
