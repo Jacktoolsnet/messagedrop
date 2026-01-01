@@ -770,6 +770,7 @@
         "title": "Mi usuario",
         "userIdLabel": "ID de usuario:",
         "backup": "Hacer copia de seguridad",
+        "changePin": "Cambiar PIN",
         "delete": "Eliminar mi usuario"
       },
       "deleteDialog": {
@@ -869,6 +870,7 @@
     "pinForgotMessage": "Sin el PIN no podemos desbloquear tus datos en este dispositivo.\n\nPuedes restaurar desde un backup si tienes uno, o crear un nuevo usuario.",
     "pinForgotRestore": "Restaurar backup",
     "pinForgotNewUser": "Crear nuevo usuario",
+    "pinChangedMessage": "El PIN se actualizó. Inicia sesión de nuevo con el nuevo PIN.",
     "userNotFoundTitle": "Usuario no encontrado",
     "userNotFoundMessage": "Este usuario no está disponible en el servidor.\n\nPodemos restaurar tus datos desde este dispositivo para que puedas continuar.",
     "userNotFoundAction": "Restaurar desde el dispositivo",

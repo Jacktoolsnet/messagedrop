@@ -987,6 +987,82 @@ export class UserService {
     }
   }
 
+  public async changePin(): Promise<void> {
+    if (!this.isReady()) {
+      return;
+    }
+    const dialogRef = this.createPinDialog.open(CreatePinComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: {},
+      hasBackdrop: true
+    });
+    const pin = await firstValueFrom(dialogRef.afterClosed());
+    if (!pin) {
+      return;
+    }
+    this.blocked = true;
+
+    try {
+      const encrypted = await this.cryptoService.encryptWithPin(pin, JSON.stringify(this.user), this.pinIterations);
+      this.pinKey = encrypted.key;
+      this.pinSalt = encrypted.salt;
+      this.pinIterations = encrypted.iterations;
+
+      const cryptedUser: CryptedUser = {
+        id: this.user.id,
+        cryptedUser: encrypted.envelope
+      };
+      await this.indexedDbService.setUser(cryptedUser);
+
+      const infoDialog = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('auth.serviceTitle'),
+          image: '',
+          icon: 'verified_user',
+          message: this.i18n.t('auth.pinChangedMessage'),
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+
+      infoDialog.afterClosed().subscribe(() => {
+        this.logout();
+      });
+    } catch (err) {
+      console.error('Change PIN failed', err);
+      const errorDialog = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('auth.backendErrorTitle'),
+          image: '',
+          icon: 'bug_report',
+          message: this.i18n.t('auth.backendErrorMessage'),
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+      errorDialog.afterClosed().subscribe(() => {
+        this.blocked = false;
+      });
+    }
+  }
+
   public openCreatePinDialog(): void {
     const dialogRef = this.createPinDialog.open(CreatePinComponent, {
       panelClass: '',

@@ -1248,6 +1248,9 @@ export class AppComponent implements OnInit {
         case "backup":
           this.backupService.startBackup();
           break;
+        case "changePin":
+          this.userService.changePin();
+          break;
       }
     });
   }
