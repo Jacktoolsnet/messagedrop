@@ -151,23 +151,19 @@ Wir übernehmen keine Gewähr für Richtigkeit, Vollständigkeit oder Angemessen
 
 Sofern ein Nutzer freiwillig ein Nutzerkonto anlegt, ist hierfür ausschließlich die Vergabe eines PINs erforderlich. Alternativ kann der Nutzer jederzeit ein neues Nutzerkonto anlegen und die App ohne Bezug zu einem zuvor bestehenden Nutzerkonto neu verwenden.
 
-Beim Anlegen des Nutzerkontos wird serverseitig:
-- eine eindeutige User-ID erzeugt,
-- ein Nutzerstatus (z. B. enabled oder disabled) geführt,
-- das Datum des letzten Logins gespeichert,
-- sowie kryptografische Schlüssel erzeugt, die für die Verschlüsselung und Signierung im Rahmen des Login-Prozesses erforderlich sind.
-
-Darüber hinaus erzeugt das lokale Endgerät des Nutzers eigene kryptografische Schlüssel (Verschlüsselungs- und Signaturschlüssel), die ausschließlich für die private Kommunikation (z. B. verschlüsselte Chaträume) verwendet werden.
+Beim Anlegen des Nutzerkontos erzeugt der Server eine eindeutige User-ID. Auf dem Endgerät werden kryptografische Schlüsselpaare für Verschlüsselung und Signatur erzeugt; die öffentlichen Schlüssel werden im Nutzerkonto auf dem Server gespeichert. Private Schlüssel verbleiben ausschließlich lokal.
 
 Die vollständigen Nutzerdaten werden ausschließlich verschlüsselt auf dem Endgerät des Nutzers gespeichert.
 
-Der vom Nutzer vergebene PIN ist integraler Bestandteil dieses verschlüsselten Nutzerdatensatzes und wird nicht separat gespeichert.
+Der vom Nutzer vergebene PIN ist integraler Bestandteil dieses verschlüsselten Nutzerdatensatzes und wird nicht separat gespeichert oder an den Server übertragen.
 
-Zum Anmeldevorgang wird der verschlüsselte Nutzerdatensatz temporär an das Backend übertragen und dort ausschließlich für die Dauer der Prüfung entschlüsselt, um zu überprüfen, ob der eingegebene PIN korrekt ist.
+Zum Login wird der PIN ausschließlich lokal verwendet, um den verschlüsselten Nutzerdatensatz zu entschlüsseln. Anschließend fordert das Endgerät beim Backend eine einmalige Challenge an, die mit dem lokalen privaten Signaturschlüssel signiert wird. Das Backend prüft die Signatur und gibt bei Erfolg ein JWT für die weitere Kommunikation zurück.
 
 Eine dauerhafte Speicherung der entschlüsselten Nutzerdaten oder des PINs auf dem Server erfolgt nicht.
 
 Nach erfolgreicher Anmeldung wird der entschlüsselte Nutzerdatensatz ausschließlich im Arbeitsspeicher des Endgeräts vorgehalten und bleibt dort nur bis zum Logout oder bis zum Schließen der App verfügbar.
+
+Aus Sicherheitsgründen kann der Nutzer die Schlüssel neu erzeugen (Sicherheits-Reset). Dabei werden die öffentlichen Schlüssel im Nutzerkonto aktualisiert; der Chatverlauf wird gelöscht, Kontakte bleiben erhalten.
 
 Wird der PIN vergessen, besteht keine Möglichkeit, das Nutzerkonto oder die lokal gespeicherten Nutzerdaten ohne ein zuvor erstelltes Backup wiederherzustellen, da weder der PIN noch eine entschlüsselbare Kopie der Nutzerdaten serverseitig vorgehalten werden.
 
@@ -224,6 +220,8 @@ Die im Backup enthaltenen Daten entsprechen dem zum Zeitpunkt der Erstellung dem
 Beim Einspielen eines Backups (Restore) wird ein eventuell vorhandenes Nutzerkonto sowohl lokal als auch serverseitig endgültig gelöscht. Sämtliche zugehörigen Daten werden entfernt und anschließend auf Basis des Backups neu angelegt. Eine Zusammenführung („Merge“) von bestehenden und wiederhergestellten Daten erfolgt nicht.
 
 Im Rahmen des Restore-Vorgangs werden die im Backup enthaltenen Daten erneut an den Server übertragen und dort – soweit technisch vorgesehen – neu erzeugt. Abweichungen zwischen dem ursprünglichen Serverzustand und dem nach dem Restore hergestellten Zustand sind möglich.
+
+Backups sind an den Schlüsselstand zum Zeitpunkt der Erstellung gebunden. Nach einem Sicherheits-Reset können ältere Backups als veraltet gelten und ggf. nicht wiederhergestellt werden.
 
 Die Wiederherstellung eines Backups kann – insbesondere aufgrund technischer Einschränkungen, fehlerhafter Backups, inkompatibler Umgebungen, zwischenzeitlicher Änderungen der Anwendung oder unvollständiger Datensätze – fehlschlagen oder zu Abweichungen vom erwarteten Datenbestand führen. Ein Anspruch auf vollständige, fehlerfreie oder erfolgreiche Wiederherstellung aller Daten besteht nicht.
 

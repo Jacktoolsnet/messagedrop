@@ -154,6 +154,8 @@ Du bist für sämtliche Aktivitäten verantwortlich, die über dein Nutzerkonto 
 
 Du bist dafür verantwortlich, dein Endgerät und deine lokalen Daten (z. B. PIN, Schlüsselmaterial, lokale Datensätze) vor unbefugtem Zugriff zu schützen.
 
+Die Anmeldung erfolgt lokal über den PIN; der PIN wird nicht an den Server übertragen. Aus Sicherheitsgründen kann ein Sicherheits-Reset neue Schlüssel erzeugen; dabei wird der Chatverlauf gelöscht, Kontakte bleiben erhalten. Nach einem Sicherheits-Reset können ältere Backups veraltet sein.
+
 Hinweis: Wird dein PIN vergessen, kann ein Nutzerkonto ohne zuvor erstelltes Backup nicht wiederhergestellt werden.
 
 ###

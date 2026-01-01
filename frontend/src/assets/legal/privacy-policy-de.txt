@@ -8,6 +8,7 @@ Kurzfassung (nicht rechtsverbindlich)
 MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
 Der Dienst kann ohne Nutzerkonto verwendet werden. Bestimmte Funktionen erfordern die freiwillige Anlage eines Nutzerkontos.
+Die Anmeldung erfolgt lokal über einen PIN; der PIN wird nicht an den Server übertragen. Serverseitig werden nur die pseudonyme User-ID, öffentliche Schlüssel und Statusdaten gespeichert.
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
@@ -194,10 +195,15 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an nutzer
 
 Die Anlage eines Nutzerkontos erfolgt freiwillig und ausschließlich über die Vergabe eines PINs.
 
+Der Server legt zunächst nur eine pseudonyme User-ID an.
+
+Auf dem Endgerät werden kryptografische Schlüsselpaare für Verschlüsselung und Signatur erzeugt. Die öffentlichen Schlüssel werden im Nutzerkonto auf dem Server gespeichert; private Schlüssel verbleiben ausschließlich lokal.
+
 Serverseitig werden gespeichert:
-- eine pseudonyme User-ID,
+- die pseudonyme User-ID,
+- öffentliche Signatur- und Verschlüsselungsschlüssel,
 - ein Nutzerstatus (z. B. enabled oder disabled),
-- das Datum des letzten Logins.
+- das Datum des letzten Logins sowie technisch notwendige Status- oder Metadaten.
 
 Weitere Nutzerdaten werden grundsätzlich ausschließlich verschlüsselt lokal auf dem Endgerät gespeichert.
 
@@ -207,9 +213,21 @@ Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Vertragserfüllung bzw. Durchfü
 3.2 Login und Authentifizierung
 ###
 
-Zum Login wird der verschlüsselte Nutzerdatensatz temporär an das Backend übertragen und ausschließlich zur Prüfung der PIN-Gültigkeit verarbeitet. Eine dauerhafte Speicherung entschlüsselter Nutzerdaten oder des PINs erfolgt nicht.
+Zum Login wird der PIN ausschließlich lokal verwendet, um den verschlüsselten Nutzerdatensatz auf dem Endgerät zu entschlüsseln.
+
+Anschließend fordert das Endgerät beim Backend eine einmalige Challenge an, die mit dem lokalen privaten Signaturschlüssel signiert wird. Das Backend prüft die Signatur und gibt bei Erfolg ein JWT für die weitere Kommunikation zurück.
+
+Der PIN und der entschlüsselte Nutzerdatensatz werden nicht an den Server übertragen.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO.
+
+###
+3.2.1 Sicherheits-Reset (Schlüssel-Neuerzeugung)
+###
+
+Nutzer können aus Sicherheitsgründen neue Schlüsselpaare erzeugen (Sicherheits-Reset). Dabei werden die öffentlichen Schlüssel im Nutzerkonto aktualisiert; private Schlüssel verbleiben lokal.
+
+Im Zuge des Sicherheits-Resets wird der Chatverlauf gelöscht, Kontakte bleiben erhalten. Kontakte, die online sind, erhalten die neuen öffentlichen Schlüssel unmittelbar; andere Kontakte erhalten sie bei der nächsten Aktualisierung.
 
 ###
 3.3 Löschung und Inaktivität
@@ -298,6 +316,8 @@ Die im Backup enthaltenen Daten entsprechen dem zum Zeitpunkt der Erstellung dem
 Beim Einspielen eines Backups (Restore) wird ein ggf. vorhandenes Nutzerkonto sowohl lokal als auch serverseitig endgültig gelöscht. Sämtliche zugehörigen Daten werden entfernt und anschließend auf Basis des Backups wiederhergestellt. Eine Zusammenführung („Merge“) von bestehenden und wiederhergestellten Daten erfolgt nicht.
 
 Im Rahmen des Restore-Vorgangs werden die im Backup enthaltenen Daten erneut an den Server übertragen und dort – soweit technisch vorgesehen – erzeugt oder wiederhergestellt. Abweichungen zwischen dem ursprünglichen Zustand und dem nach dem Restore hergestellten Zustand sind möglich.
+
+Backups sind an den Schlüsselstand zum Zeitpunkt der Erstellung gebunden. Nach einem Sicherheits-Reset können ältere Backups als veraltet gelten und ggf. nicht wiederhergestellt werden.
 
 Rechtsgrundlage ist Art. 6 Abs. 1 lit. b DSGVO (Bereitstellung und Nutzung der Backup-/Restore-Funktion auf Anfrage des Nutzers).
 
