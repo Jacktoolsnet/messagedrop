@@ -653,12 +653,29 @@ router.post('/reset-keys',
       );
       await runQuery(
         req.database.db,
-        "UPDATE tableContact SET lastMessageFrom = '', lastMessageAt = NULL WHERE userId = ?;",
+        "DELETE FROM tableContactMessage WHERE contactId IN (SELECT id FROM tableContact WHERE userId = ?) AND direction = 'user';",
         [userId]
       );
       await runQuery(
         req.database.db,
-        'DELETE FROM tableContactMessage WHERE contactId IN (SELECT id FROM tableContact WHERE userId = ?);',
+        `
+        UPDATE tableContact
+        SET lastMessageFrom = COALESCE((
+          SELECT direction
+          FROM tableContactMessage cm
+          WHERE cm.contactId = tableContact.id
+          ORDER BY cm.createdAt DESC
+          LIMIT 1
+        ), ''),
+        lastMessageAt = (
+          SELECT createdAt
+          FROM tableContactMessage cm
+          WHERE cm.contactId = tableContact.id
+          ORDER BY cm.createdAt DESC
+          LIMIT 1
+        )
+        WHERE userId = ?;
+        `,
         [userId]
       );
       await runQuery(req.database.db, 'DELETE FROM tableConnect WHERE userId = ?;', [userId]);
