@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { Buffer } from 'buffer';
 import { CryptoData } from '../interfaces/crypto-data';
 import { Keypair } from '../interfaces/keypair';
+import { PinEncryptedPayload } from '../interfaces/pin-encrypted-payload';
 
 @Injectable({
   providedIn: 'root'
@@ -182,6 +183,111 @@ export class CryptoService {
       return decoder.decode(decryptedPayload);
     } catch {
       return "";
+    }
+  }
+
+  private bytesToBase64(bytes: Uint8Array): string {
+    return Buffer.from(bytes).toString('base64');
+  }
+
+  private base64ToBytes(value: string): Uint8Array {
+    return new Uint8Array(Buffer.from(value, 'base64'));
+  }
+
+  private async derivePinKey(pin: string, salt: Uint8Array, iterations: number): Promise<CryptoKey> {
+    const encoder = new TextEncoder();
+    const keyMaterial = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(pin),
+      'PBKDF2',
+      false,
+      ['deriveKey']
+    );
+    return await crypto.subtle.deriveKey(
+      {
+        name: 'PBKDF2',
+        salt,
+        iterations,
+        hash: 'SHA-256'
+      },
+      keyMaterial,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  async encryptWithPin(
+    pin: string,
+    payload: string,
+    iterations = 250000
+  ): Promise<{ envelope: PinEncryptedPayload; key: CryptoKey; salt: Uint8Array; iterations: number }> {
+    const salt = crypto.getRandomValues(new Uint8Array(16));
+    const key = await this.derivePinKey(pin, salt, iterations);
+    const envelope = await this.encryptWithKey(key, payload, salt, iterations);
+    return { envelope, key, salt, iterations };
+  }
+
+  async encryptWithKey(
+    key: CryptoKey,
+    payload: string,
+    salt: Uint8Array,
+    iterations: number
+  ): Promise<PinEncryptedPayload> {
+    const encoder = new TextEncoder();
+    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const encrypted = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      key,
+      encoder.encode(payload)
+    );
+
+    return {
+      format: 'messagedrop-user',
+      version: 1,
+      payload: this.bytesToBase64(new Uint8Array(encrypted)),
+      payloadEncoding: 'base64',
+      kdf: {
+        name: 'PBKDF2',
+        salt: this.bytesToBase64(salt),
+        iterations,
+        hash: 'SHA-256'
+      },
+      cipher: {
+        name: 'AES-GCM',
+        iv: this.bytesToBase64(iv)
+      }
+    };
+  }
+
+  async decryptWithPin(
+    pin: string,
+    envelope: PinEncryptedPayload
+  ): Promise<{ plaintext: string; key: CryptoKey; salt: Uint8Array; iterations: number } | null> {
+    if (!envelope?.kdf || !envelope?.cipher || envelope.payloadEncoding !== 'base64') {
+      return null;
+    }
+    const salt = this.base64ToBytes(envelope.kdf.salt);
+    const iterations = envelope.kdf.iterations;
+    const key = await this.derivePinKey(pin, salt, iterations);
+    const iv = this.base64ToBytes(envelope.cipher.iv);
+    const payloadBytes = this.base64ToBytes(envelope.payload);
+
+    try {
+      const decrypted = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv },
+        key,
+        payloadBytes
+      );
+      const decoder = new TextDecoder('utf-8');
+      return {
+        plaintext: decoder.decode(decrypted),
+        key,
+        salt,
+        iterations
+      };
+    } catch {
+      return null;
     }
   }
 

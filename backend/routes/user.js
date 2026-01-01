@@ -1,7 +1,9 @@
 require('dotenv').config();
-const { encryptJsonWebKey, decryptJsonWebKey, getEncryptionPrivateKey } = require('../utils/keyStore');
+const { getEncryptionPrivateKey } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 const crypto = require('crypto');
+const { webcrypto } = crypto;
+const { subtle } = webcrypto;
 const jwt = require('jsonwebtoken');
 const express = require('express');
 const router = express.Router();
@@ -325,6 +327,58 @@ async function restoreUserBackup(db, backup) {
   }
 }
 
+const loginChallenges = new Map();
+const CHALLENGE_TTL_MS = 5 * 60 * 1000;
+
+function issueLoginChallenge(userId) {
+  const challenge = crypto.randomBytes(32).toString('base64url');
+  loginChallenges.set(String(userId), {
+    challenge,
+    expiresAt: Date.now() + CHALLENGE_TTL_MS
+  });
+  return challenge;
+}
+
+function validateLoginChallenge(userId, challenge) {
+  const key = String(userId);
+  const entry = loginChallenges.get(key);
+  if (!entry) {
+    return false;
+  }
+  if (Date.now() > entry.expiresAt) {
+    loginChallenges.delete(key);
+    return false;
+  }
+  const matches = entry.challenge === challenge;
+  if (matches) {
+    loginChallenges.delete(key);
+  }
+  return matches;
+}
+
+async function verifySignedChallenge(signingPublicKey, challenge, signature) {
+  const payloadBuffer = Buffer.from(challenge);
+  let signatureBuffer;
+  try {
+    signatureBuffer = Buffer.from(JSON.parse(signature));
+  } catch {
+    return false;
+  }
+  const publicKey = await subtle.importKey(
+    'jwk',
+    signingPublicKey,
+    { name: 'ECDSA', namedCurve: 'P-384' },
+    true,
+    ['verify']
+  );
+  return await subtle.verify(
+    { name: 'ECDSA', hash: 'SHA-384' },
+    publicKey,
+    signatureBuffer,
+    payloadBuffer
+  );
+}
+
 const rateLimitDefaults = {
   standardHeaders: true,
   legacyHeaders: false
@@ -347,7 +401,7 @@ const userConfirmLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 10,
   ...rateLimitDefaults,
-  message: rateLimitMessage('Too many user confirm requests, please try again later.')
+  message: rateLimitMessage('Too many user auth requests, please try again later.')
 });
 
 router.get('/get/:userId',
@@ -439,161 +493,145 @@ router.post('/create',
     express.json({ type: 'application/json' }),
     metric.count('user.create', { when: 'always', timezone: 'utc', amount: 1 })
   ]
-  , async function (req, res, next) {
-    const { subtle } = crypto;
+  , function (req, res, next) {
+    const userId = crypto.randomUUID();
 
-    // Create userId
-    let userId = crypto.randomUUID();
-
-    // generate crypto key
-    const cryptoKeyPair = await subtle.generateKey(
-      {
-        name: "RSA-OAEP",
-        modulusLength: 4096,
-        publicExponent: new Uint8Array([1, 0, 1]),
-        hash: "SHA-256"
-      },
-      true,
-      ["encrypt", "decrypt"]
-    );
-    const cryptoPublicKey = await subtle.exportKey("jwk", cryptoKeyPair.publicKey);
-    const cryptoPrivateKey = await encryptJsonWebKey(await subtle.exportKey("jwk", cryptoKeyPair.privateKey));
-
-    // generate signing key
-    const signingKeyPair = await subtle.generateKey(
-      {
-        name: "ECDSA",
-        namedCurve: "P-384",
-      },
-      true,
-      ["sign", "verify"]
-    );
-
-    const signingPublicKey = await subtle.exportKey("jwk", signingKeyPair.publicKey);
-    const signingPrivateKey = await encryptJsonWebKey(await subtle.exportKey("jwk", signingKeyPair.privateKey));
-
-    // Create user record
-    tableUser.create(req.database.db, userId, JSON.stringify(cryptoPrivateKey), JSON.stringify(signingPrivateKey), function (err) {
+    tableUser.create(req.database.db, userId, function (err) {
       if (err) {
         return next(apiError.internal('db_error'));
       }
       res.status(200).json({
         status: 200,
-        userId,
-        cryptoPublicKey: JSON.stringify(cryptoPublicKey),
-        signingPublicKey: JSON.stringify(signingPublicKey)
+        userId
       });
     });
   });
 
-router.post('/confirm',
+router.post('/register',
   [
     userConfirmLimit,
     express.json({ type: 'application/json' }),
-    metric.count('user.confirm', { when: 'always', timezone: 'utc', amount: 1 })
+    metric.count('user.register', { when: 'always', timezone: 'utc', amount: 1 })
   ]
-  , async function (req, res, next) {
-    const secret = process.env.JWT_SECRET;
-    const { subtle } = crypto;
-    const cryptedUserPayload = req.body?.cryptedUser;
-    const pinHash = req.body?.pinHash;
+  , function (req, res, next) {
+    const { userId, signingPublicKey, cryptoPublicKey } = req.body ?? {};
 
-    if (!cryptedUserPayload || !cryptedUserPayload.id || !cryptedUserPayload.cryptedUser || !pinHash) {
+    if (!userId || !signingPublicKey || !cryptoPublicKey) {
       return next(apiError.badRequest('invalid_request'));
     }
 
-    tableUser.getById(req.database.db, cryptedUserPayload.id, async function (err, row) {
+    tableUser.getById(req.database.db, userId, function (err, row) {
       if (err) {
         return next(apiError.internal('db_error'));
       }
       if (!row) {
         return next(apiError.notFound('not_found'));
       }
-      // Decrypt the cryptoKey
-      try {
-        const cryptedUser = JSON.parse(cryptedUserPayload.cryptedUser);
-        const encryptionPrivateKey = await decryptJsonWebKey(JSON.parse(row.cryptoPrivateKey));
-              // Payload in ArrayBuffer umwandeln
-        const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedKey));
-              // RSA Private Key importieren
-        const rsaHashedImportParams = {
-          name: "RSA-OAEP",
-          hash: "SHA-256"
-        };
-
-        const privateKey = await subtle.importKey(
-          "jwk",
-          encryptionPrivateKey,
-          rsaHashedImportParams,
-          true,
-          ["decrypt"]
-        );
-
-              // Payload entschlüsseln
-        const decryptedPayload = await subtle.decrypt(
-          {
-            name: "RSA-OAEP",
-          },
-          privateKey,
-          payloadBuffer
-        );
-
-              // Entschlüsselten AES-Schlüssel importieren
-        const decryptedKeyString = new TextDecoder().decode(decryptedPayload);
-        const aesJwk = JSON.parse(decryptedKeyString);
-
-        const algorithmIdentifier = {
-          name: "AES-GCM"
-        };
-
-        const cryptoKey = await subtle.importKey(
-          'jwk',
-          aesJwk,
-          algorithmIdentifier,
-          true,
-          ['encrypt', 'decrypt']
-        );
-
-              // Decrypt the data.
-        try {
-          const payloadBuffer = Buffer.from(JSON.parse(cryptedUser.encryptedData));
-          const decryptedPayload = await crypto.subtle.decrypt(
-            {
-              name: 'AES-GCM',
-              iv: Buffer.from(JSON.parse(cryptedUser.iv))
-            },
-            cryptoKey,
-            payloadBuffer,
-          );
-          let decoder = new TextDecoder('utf-8');
-          const user = JSON.parse(decoder.decode(decryptedPayload));
-
-          if (user.pinHash === pinHash) {
-            tableUser.updatePublicKeys(req.database.db, user.id, JSON.stringify(user.signingKeyPair.publicKey), JSON.stringify(user.cryptoKeyPair.publicKey), function (err) {
-              if (err) {
-                return next(apiError.internal('db_error'));
-              }
-              const token = jwt.sign(
-                { userId: user.id },
-                secret,
-                { expiresIn: '1h' }
-              );
-              res.status(200).json({ status: 200, jwt: token, user });
-            });
-          } else {
-            return next(apiError.unauthorized('unauthorized'));
-          }
-
-        } catch (err) {
-          req.logger?.error('user decrypt payload failed', { error: err?.message });
-          return next(apiError.internal('encryption_failed'));
-        }
-      } catch (err) {
-        req.logger?.error('user decrypt crypto key failed', { error: err?.message });
-        return next(apiError.internal('encryption_failed'));
+      if (row.signingPublicKey || row.cryptoPublicKey) {
+        return next(apiError.conflict('already_registered'));
       }
-    });
 
+      const signingKeyValue = typeof signingPublicKey === 'string'
+        ? signingPublicKey
+        : JSON.stringify(signingPublicKey);
+      const cryptoKeyValue = typeof cryptoPublicKey === 'string'
+        ? cryptoPublicKey
+        : JSON.stringify(cryptoPublicKey);
+
+      tableUser.updatePublicKeys(req.database.db, userId, signingKeyValue, cryptoKeyValue, function (updateErr) {
+        if (updateErr) {
+          return next(apiError.internal('db_error'));
+        }
+        res.status(200).json({ status: 200 });
+      });
+    });
+  });
+
+router.post('/challenge',
+  [
+    userConfirmLimit,
+    express.json({ type: 'application/json' }),
+    metric.count('user.challenge', { when: 'always', timezone: 'utc', amount: 1 })
+  ]
+  , async function (req, res, next) {
+    const { userId } = req.body ?? {};
+    if (!userId) {
+      return next(apiError.badRequest('invalid_request'));
+    }
+
+    try {
+      const row = await queryGet(req.database.db, 'SELECT signingPublicKey FROM tableUser WHERE id = ?;', [userId]);
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      if (!row.signingPublicKey) {
+        return next(apiError.conflict('missing_public_key'));
+      }
+
+      const challenge = issueLoginChallenge(userId);
+      res.status(200).json({ status: 200, challenge });
+    } catch (err) {
+      return next(apiError.internal('db_error'));
+    }
+  });
+
+router.post('/login',
+  [
+    userConfirmLimit,
+    express.json({ type: 'application/json' }),
+    metric.count('user.login', { when: 'always', timezone: 'utc', amount: 1 })
+  ]
+  , async function (req, res, next) {
+    const secret = process.env.JWT_SECRET;
+    const { userId, challenge, signature } = req.body ?? {};
+
+    if (!userId || !challenge || !signature) {
+      return next(apiError.badRequest('invalid_request'));
+    }
+
+    try {
+      const row = await queryGet(req.database.db, 'SELECT signingPublicKey FROM tableUser WHERE id = ?;', [userId]);
+      if (!row) {
+        return next(apiError.notFound('not_found'));
+      }
+      if (!row.signingPublicKey) {
+        return next(apiError.conflict('missing_public_key'));
+      }
+      if (!validateLoginChallenge(userId, challenge)) {
+        return next(apiError.unauthorized('unauthorized'));
+      }
+
+      let signingPublicKey;
+      try {
+        signingPublicKey = JSON.parse(row.signingPublicKey);
+      } catch (err) {
+        return next(apiError.internal('invalid_public_key'));
+      }
+
+      let verified = false;
+      try {
+        verified = await verifySignedChallenge(signingPublicKey, challenge, signature);
+      } catch (err) {
+        req.logger?.error('user signature verification failed', { error: err?.message });
+        return next(apiError.internal('signature_failed'));
+      }
+
+      if (!verified) {
+        return next(apiError.unauthorized('unauthorized'));
+      }
+
+      await runQuery(req.database.db, `UPDATE tableUser SET lastSignOfLife = strftime('%s','now') WHERE id = ?;`, [userId]);
+
+      const token = jwt.sign(
+        { userId },
+        secret,
+        { expiresIn: '1h' }
+      );
+
+      res.status(200).json({ status: 200, jwt: token });
+    } catch (err) {
+      return next(apiError.internal('db_error'));
+    }
   });
 
 router.get('/delete/:userId',

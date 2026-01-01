@@ -9,20 +9,19 @@ import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
-import { ConfirmUserResponse } from '../interfaces/confirm-user-response';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
-import { GetPinHashResponse } from '../interfaces/get-pin-hash-response';
 import { Profile } from '../interfaces/profile';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { UserChallengeResponse } from '../interfaces/user-challenge-response';
+import { UserLoginResponse } from '../interfaces/user-login-response';
 import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
 import { BackupStateService } from './backup-state.service';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
-import { ServerService } from './server.service';
 import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
@@ -34,7 +33,6 @@ export class UserService {
 
   private user: User = {
     id: '',
-    pinHash: '',
     location: {
       latitude: 0,
       longitude: 0,
@@ -51,8 +49,6 @@ export class UserService {
       publicKey: {},
       privateKey: {}
     },
-    serverCryptoPublicKey: '',
-    serverSigningPublicKey: '',
     type: UserType.USER
   };
 
@@ -62,6 +58,9 @@ export class UserService {
   };
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
+  private pinKey: CryptoKey | null = null;
+  private pinSalt: Uint8Array | null = null;
+  private pinIterations = 250000;
 
   private ready = false;
   private blocked = false;
@@ -81,7 +80,6 @@ export class UserService {
   private readonly displayMessage = inject(MatDialog);
   private readonly createPinDialog = this.displayMessage;
   private readonly checkPinDialog = this.displayMessage;
-  private readonly serverService = inject(ServerService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
@@ -95,7 +93,6 @@ export class UserService {
     this.clearJwtRenewal();
     this.user = {
       id: '',
-      pinHash: '',
       location: {
         latitude: 0,
         longitude: 0,
@@ -112,35 +109,14 @@ export class UserService {
         publicKey: {},
         privateKey: {}
       },
-      serverCryptoPublicKey: '',
-      serverSigningPublicKey: '',
       type: UserType.USER
     };
     this.ready = false;
     this.blocked = false;
+    this.pinKey = null;
+    this.pinSalt = null;
     this.backupState.clearDirty();
     this.initUserId();
-  }
-
-  getPinHash(pin: string, showAlways = false): Observable<GetPinHashResponse> {
-    this.blocked = true;
-    const url = `${environment.apiUrl}/user/hashpin`;
-    this.networkService.setNetworkMessageConfig(url, {
-      showAlways: showAlways,
-      title: this.i18n.t('auth.serviceTitle'),
-      image: '',
-      icon: '',
-      message: this.i18n.t('auth.hashingPin'),
-      button: '',
-      delay: 0,
-      showSpinner: true,
-      autoclose: false
-    });
-    const body = { pin: pin };
-    return this.http.post<GetPinHashResponse>(url, body, this.httpOptions)
-      .pipe(
-        catchError(this.handleError)
-      );
   }
 
   setUser(user: User, jwt: string) {
@@ -165,50 +141,74 @@ export class UserService {
     }
   }
 
-  async initUser(createUserResponse: CreateUserResponse, pinHash: string) {
+  async initUser(createUserResponse: CreateUserResponse, pin: string) {
     this.user.id = createUserResponse.userId;
-    this.user.serverCryptoPublicKey = createUserResponse.cryptoPublicKey;
-    this.user.serverSigningPublicKey = createUserResponse.signingPublicKey;
     this.user.cryptoKeyPair = await this.cryptoService.createEncryptionKey();
     this.user.signingKeyPair = await this.cryptoService.createSigningKey();
-    const cryptedUser: CryptedUser = {
-      id: this.user.id,
-      cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
-    };
-    this.confirmUser(pinHash, cryptedUser)
+    this.registerUser(this.user.id, this.user.signingKeyPair.publicKey, this.user.cryptoKeyPair.publicKey)
       .subscribe({
-        next: (confirmUserResponse: ConfirmUserResponse) => {
-          if (confirmUserResponse.status === 200) {
-            this.indexedDbService.setUser(cryptedUser)
-              .then(() => {
-                const dialogRef = this.displayMessage.open(DisplayMessage, {
-                  panelClass: '',
-                  closeOnNavigation: false,
-                  data: {
-                    showAlways: true,
-                    title: this.i18n.t('auth.serviceTitle'),
-                    image: '',
-                    icon: 'verified_user',
-                    message: this.i18n.t('auth.accountCreated'),
-                    button: this.i18n.t('common.actions.ok'),
-                    delay: 0,
-                    showSpinner: false
-                  },
-                  maxWidth: '90vw',
-                  maxHeight: '90vh',
-                  hasBackdrop: true,
-                  autoFocus: false
-                });
+        next: async () => {
+          try {
+            const encrypted = await this.cryptoService.encryptWithPin(pin, JSON.stringify(this.user), this.pinIterations);
+            this.pinKey = encrypted.key;
+            this.pinSalt = encrypted.salt;
+            this.pinIterations = encrypted.iterations;
+            const cryptedUser: CryptedUser = {
+              id: this.user.id,
+              cryptedUser: encrypted.envelope
+            };
+            await this.indexedDbService.setUser(cryptedUser);
 
-                dialogRef.afterClosed().subscribe(() => {
-                  // Optional: Aktionen nach Schließen
-                  this.blocked = false;
-                });
-              });
+            const dialogRef = this.displayMessage.open(DisplayMessage, {
+              panelClass: '',
+              closeOnNavigation: false,
+              data: {
+                showAlways: true,
+                title: this.i18n.t('auth.serviceTitle'),
+                image: '',
+                icon: 'verified_user',
+                message: this.i18n.t('auth.accountCreated'),
+                button: this.i18n.t('common.actions.ok'),
+                delay: 0,
+                showSpinner: false
+              },
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              hasBackdrop: true,
+              autoFocus: false
+            });
+
+            dialogRef.afterClosed().subscribe(() => {
+              this.blocked = false;
+            });
+          } catch (err) {
+            console.error('User encryption failed', err);
+            const dialogRef = this.displayMessage.open(DisplayMessage, {
+              panelClass: '',
+              closeOnNavigation: false,
+              data: {
+                showAlways: true,
+                title: this.i18n.t('auth.serviceTitle'),
+                image: '',
+                icon: 'bug_report',
+                message: this.i18n.t('auth.userCreationFailed'),
+                button: this.i18n.t('common.actions.ok'),
+                delay: 0,
+                showSpinner: false
+              },
+              maxWidth: '90vw',
+              maxHeight: '90vh',
+              hasBackdrop: true,
+              autoFocus: false
+            });
+
+            dialogRef.afterClosed().subscribe(() => {
+              this.blocked = false;
+            });
           }
         },
         error: (err) => {
-          console.error('Failed to hash PIN', err);
+          console.error('User register failed', err);
           const dialogRef = this.displayMessage.open(DisplayMessage, {
             panelClass: '',
             closeOnNavigation: false,
@@ -229,7 +229,6 @@ export class UserService {
           });
 
           dialogRef.afterClosed().subscribe(() => {
-            // Optional: Aktionen nach Schließen
             this.blocked = false;
           });
         }
@@ -261,9 +260,17 @@ export class UserService {
   }
 
   async saveUser() {
+    if (!this.pinKey || !this.pinSalt) {
+      return;
+    }
     const cryptedUser: CryptedUser = {
       id: this.user.id,
-      cryptedUser: await this.cryptoService.encrypt(JSON.parse(this.user.serverCryptoPublicKey), JSON.stringify(this.user))
+      cryptedUser: await this.cryptoService.encryptWithKey(
+        this.pinKey,
+        JSON.stringify(this.user),
+        this.pinSalt,
+        this.pinIterations
+      )
     };
     await this.indexedDbService.setUser(cryptedUser);
   }
@@ -298,8 +305,13 @@ export class UserService {
       );
   }
 
-  confirmUser(pinHash: string, cryptedUser: CryptedUser, showAlways = true): Observable<ConfirmUserResponse> {
-    const url = `${environment.apiUrl}/user/confirm`;
+  registerUser(
+    userId: string,
+    signingPublicKey: JsonWebKey,
+    cryptoPublicKey: JsonWebKey,
+    showAlways = true
+  ): Observable<SimpleStatusResponse> {
+    const url = `${environment.apiUrl}/user/register`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways: showAlways,
       title: this.i18n.t('auth.serviceTitle'),
@@ -312,10 +324,55 @@ export class UserService {
       autoclose: false
     });
     const body = {
-      pinHash: pinHash,
-      cryptedUser: cryptedUser,
+      userId,
+      signingPublicKey,
+      cryptoPublicKey
     };
-    return this.http.post<ConfirmUserResponse>(url, body, this.httpOptions)
+    return this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  requestLoginChallenge(userId: string, showAlways = false): Observable<UserChallengeResponse> {
+    const url = `${environment.apiUrl}/user/challenge`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: this.i18n.t('auth.serviceTitle'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('auth.confirmingUser'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    const body = { userId };
+    return this.http.post<UserChallengeResponse>(url, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  loginUser(userId: string, challenge: string, signature: string, showAlways = true): Observable<UserLoginResponse> {
+    const url = `${environment.apiUrl}/user/login`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: this.i18n.t('auth.serviceTitle'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('auth.confirmingUser'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    const body = {
+      userId,
+      challenge,
+      signature
+    };
+    return this.http.post<UserLoginResponse>(url, body, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );
@@ -670,50 +727,35 @@ export class UserService {
         this.blocked = false;
         return;
       }
-      const encrypted = await this.cryptoService.encrypt(
-        this.serverService.getCryptoPublicKey()!,
-        pin
-      );
-
-      this.getPinHash(encrypted).subscribe({
-        next: (getPinHashResponse: GetPinHashResponse) => {
-          this.blocked = true;
-          this.getUser().pinHash = getPinHashResponse.pinHash;
-
-          this.createUser().subscribe({
-            next: (createUserResponse: CreateUserResponse) => {
-              this.initUser(createUserResponse, getPinHashResponse.pinHash);
-            },
-            error: (err) => {
-              console.error('User creation via createPinDialog failed', err);
-              const dialogRef = this.displayMessage.open(DisplayMessage, {
-                panelClass: '',
-                closeOnNavigation: false,
-                data: {
-                  showAlways: true,
-                  title: this.i18n.t('auth.serviceTitle'),
-                  image: '',
-                  icon: 'bug_report',
-                  message: this.i18n.t('auth.userCreationFailed'),
-                  button: this.i18n.t('common.actions.ok'),
-                  delay: 0,
-                  showSpinner: false
-                },
-                maxWidth: '90vw',
-                maxHeight: '90vh',
-                hasBackdrop: true,
-                autoFocus: false
-              });
-
-              dialogRef.afterClosed().subscribe(() => {
-                this.blocked = false;
-              });
-            }
-          });
+      this.blocked = true;
+      this.createUser().subscribe({
+        next: (createUserResponse: CreateUserResponse) => {
+          this.initUser(createUserResponse, pin);
         },
         error: (err) => {
-          console.error('getPinHash failed during create pin', err);
-          this.blocked = false;
+          console.error('User creation via createPinDialog failed', err);
+          const dialogRef = this.displayMessage.open(DisplayMessage, {
+            panelClass: '',
+            closeOnNavigation: false,
+            data: {
+              showAlways: true,
+              title: this.i18n.t('auth.serviceTitle'),
+              image: '',
+              icon: 'bug_report',
+              message: this.i18n.t('auth.userCreationFailed'),
+              button: this.i18n.t('common.actions.ok'),
+              delay: 0,
+              showSpinner: false
+            },
+            maxWidth: '90vw',
+            maxHeight: '90vh',
+            hasBackdrop: true,
+            autoFocus: false
+          });
+
+          dialogRef.afterClosed().subscribe(() => {
+            this.blocked = false;
+          });
         }
       });
     });
@@ -749,16 +791,40 @@ export class UserService {
       if (!data) {
         return;
       }
+      this.blocked = true;
+      const cryptedUser = await this.indexedDbService.getUser();
+      if (!cryptedUser) {
+        this.blocked = false;
+        return;
+      }
+      const decrypted = await this.cryptoService.decryptWithPin(data, cryptedUser.cryptedUser);
+      if (!decrypted) {
+        this.snackBar.open(this.i18n.t('auth.pinIncorrect'), undefined, {
+          panelClass: ['snack-warning'],
+          horizontalPosition: 'center',
+          verticalPosition: 'top',
+          duration: 3000
+        });
+        this.blocked = false;
+        return;
+      }
 
-      this.getPinHash(await this.cryptoService.encrypt(this.serverService.getCryptoPublicKey()!, data))
-        .subscribe(async (getPinHashResponse: GetPinHashResponse) => {
-          this.getUser().pinHash = getPinHashResponse.pinHash;
-          const cryptedUser = await this.indexedDbService.getUser();
-          if (cryptedUser) {
-            this.confirmUser(getPinHashResponse.pinHash, cryptedUser)
+      const user = JSON.parse(decrypted.plaintext) as User;
+      this.pinKey = decrypted.key;
+      this.pinSalt = decrypted.salt;
+      this.pinIterations = decrypted.iterations;
+
+      this.requestLoginChallenge(user.id)
+        .subscribe({
+          next: async (challengeResponse: UserChallengeResponse) => {
+            const signature = await this.cryptoService.createSignature(
+              user.signingKeyPair.privateKey,
+              challengeResponse.challenge
+            );
+            this.loginUser(user.id, challengeResponse.challenge, signature)
               .subscribe({
-                next: (confirmUserResponse: ConfirmUserResponse) => {
-                  this.setUser(confirmUserResponse.user, confirmUserResponse.jwt);
+                next: (loginResponse: UserLoginResponse) => {
+                  this.setUser(user, loginResponse.jwt);
                   if (Notification.permission === "granted") {
                     if (this.getUser().subscription !== '') {
                       this.indexedDbService.setSetting('subscription', this.getUser().subscription);
@@ -772,7 +838,7 @@ export class UserService {
                   }
                 },
                 error: (err) => {
-                  console.error('Confirm user failed during login', err);
+                  console.error('Login user failed during login', err);
                   if (err.status === 401) {
                     this.snackBar.open(this.i18n.t('auth.pinIncorrect'), undefined, {
                       panelClass: ['snack-warning'],
@@ -833,6 +899,59 @@ export class UserService {
                   }
                 }
               });
+          },
+          error: (err) => {
+            console.error('Login challenge failed during login', err);
+            if (err.status === 404) {
+              const dialogRef = this.displayMessage.open(DisplayMessage, {
+                panelClass: '',
+                closeOnNavigation: false,
+                data: {
+                  showAlways: true,
+                  title: this.i18n.t('auth.userNotFoundTitle'),
+                  image: '',
+                  icon: 'person_remove',
+                  message: this.i18n.t('auth.userNotFoundMessage'),
+                  button: this.i18n.t('auth.userNotFoundAction'),
+                  delay: 200,
+                  showSpinner: false
+                },
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                hasBackdrop: true,
+                autoFocus: false
+              });
+
+              dialogRef.afterClosed().subscribe((result) => {
+                this.blocked = false;
+                this.indexedDbService.clearAllData();
+                if (result) {
+                  this.openCreatePinDialog();
+                }
+              });
+            } else {
+              const dialogRef = this.displayMessage.open(DisplayMessage, {
+                panelClass: '',
+                closeOnNavigation: false,
+                data: {
+                  showAlways: true,
+                  title: this.i18n.t('auth.backendErrorTitle'),
+                  image: '',
+                  icon: 'bug_report',
+                  message: this.i18n.t('auth.backendErrorMessage'),
+                  button: this.i18n.t('common.actions.retry'),
+                  delay: 10000,
+                  showSpinner: false
+                },
+                maxWidth: '90vw',
+                maxHeight: '90vh',
+                hasBackdrop: true,
+                autoFocus: false
+              });
+              dialogRef.afterClosed().subscribe(() => {
+                this.blocked = false;
+              });
+            }
           }
         });
     });

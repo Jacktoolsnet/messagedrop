@@ -1,4 +1,6 @@
+import { PinEncryptedPayload } from './pin-encrypted-payload';
+
 export interface CryptedUser {
-    id: string,
-    cryptedUser: string
+  id: string;
+  cryptedUser: PinEncryptedPayload;
 }

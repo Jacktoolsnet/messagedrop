@@ -52,8 +52,6 @@ const init = function (db) {
 const create = function (
     db,
     userId,
-    cryptoPrivateKey,
-    signingPrivateKey,
     callback
 ) {
     try {
@@ -70,8 +68,8 @@ const create = function (
 
         const params = [
             userId,
-            cryptoPrivateKey,
-            signingPrivateKey,
+            '',
+            '',
             userType.USER
         ];
 

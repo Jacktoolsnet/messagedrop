@@ -2,6 +2,8 @@
 logs
 *.log
 *.txt
+# Keys
+keys
 # keep legal text assets
 !frontend/src/assets/legal/*.txt
 npm-debug.log*
