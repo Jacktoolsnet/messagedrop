@@ -146,6 +146,12 @@ export class ContactService {
     }));
   }
 
+  private persistContacts(): void {
+    this.indexedDbService.replaceContacts(this._contacts()).catch((storeErr) => {
+      console.error('Failed to cache contacts', storeErr);
+    });
+  }
+
   async saveContactTileSettings(contact: Contact, tileSettings?: TileSetting[]): Promise<void> {
     const normalized = normalizeTileSettings(tileSettings ?? contact.tileSettings ?? [], {
       includeDefaults: false,
@@ -180,6 +186,7 @@ export class ContactService {
 
   setContacts(contacts: Contact[]) {
     this._contacts.set(contacts);
+    this.persistContacts();
   }
 
   refreshContact(contactId: string) {
@@ -216,9 +223,10 @@ export class ContactService {
         next: createContactResponse => {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
+            this._contacts.update(contacts => [...contacts, contact]);
+            this.persistContacts();
             this.saveAditionalContactInfos();
             this.snackBar.open(this.i18n.t('common.contact.created'), '', { duration: 1000 });
-            this._contacts.update(contacts => [...contacts, contact]);
           }
         },
         error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
@@ -250,7 +258,9 @@ export class ContactService {
         next: (response) => {
           if (response.status !== 200) {
             this.snackBar.open(this.i18n.t('common.contact.updateNameFailed'), this.i18n.t('common.actions.ok'));
+            return;
           }
+          this.persistContacts();
         },
         error: (err) => {
           const message = err?.message ?? this.i18n.t('common.contact.updateNameFailed');
@@ -299,7 +309,10 @@ export class ContactService {
     this.http.get<boolean>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: () => { contact.subscribed = true; },
+        next: () => {
+          contact.subscribed = true;
+          this.persistContacts();
+        },
         error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
   }
@@ -310,7 +323,10 @@ export class ContactService {
     this.http.get<boolean>(url, this.httpOptions)
       .pipe(catchError(this.handleError))
       .subscribe({
-        next: () => { contact.subscribed = false; },
+        next: () => {
+          contact.subscribed = false;
+          this.persistContacts();
+        },
         error: (err) => { this.snackBar.open(err.message, this.i18n.t('common.actions.ok')); }
       });
   }
