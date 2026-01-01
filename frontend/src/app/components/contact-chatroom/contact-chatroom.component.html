@@ -46,10 +46,10 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (msg.payload?.multimedia?.type !== 'undefined') {
-            <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
+            @if (msg.payload.multimedia.type !== 'undefined') {
+            <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
             }
-            @if (msg.payload?.message?.trim() !== '') {
+            @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             }
@@ -93,10 +93,10 @@
               <span>{{ 'common.contact.chatroom.messageUnreadable' | transloco }}</span>
             </div>
             } @else {
-            @if (msg.payload?.multimedia?.type !== 'undefined') {
-            <app-showmultimedia [multimedia]="msg.payload?.multimedia"></app-showmultimedia>
+            @if (msg.payload.multimedia.type !== 'undefined') {
+            <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
             }
-            @if (msg.payload?.message?.trim() !== '') {
+            @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
             }
             }

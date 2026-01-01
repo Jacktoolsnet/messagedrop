@@ -224,6 +224,8 @@
   border: 1px dashed color-mix(in srgb, var(--mat-warn-color) 60%, transparent);
   background: color-mix(in srgb, var(--mat-warn-color) 12%, transparent);
   color: color-mix(in srgb, var(--mat-warn-color) 80%, var(--mat-app-text-color) 20%);
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 }
 
 .message-warning__icon {
