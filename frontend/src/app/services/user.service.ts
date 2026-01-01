@@ -11,7 +11,9 @@ import { DisplayMessage } from '../components/utils/display-message/display-mess
 import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
+import { Contact } from '../interfaces/contact';
 import { GetMessageResponse } from '../interfaces/get-message-response';
+import { RawContact } from '../interfaces/raw-contact';
 import { Profile } from '../interfaces/profile';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { UserChallengeResponse } from '../interfaces/user-challenge-response';
@@ -1204,7 +1206,10 @@ export class UserService {
     const contactService = this.injector.get(ContactService);
     const contactMessageService = this.injector.get(ContactMessageService);
     const socketioService = this.injector.get(SocketioService);
-    const contacts = contactService.sortedContactsSignal();
+    let contacts = contactService.sortedContactsSignal();
+    if (!Array.isArray(contacts) || contacts.length === 0) {
+      contacts = await this.fetchContactsForSystemMessages(contactService);
+    }
     if (!Array.isArray(contacts) || contacts.length === 0) {
       return;
     }
@@ -1240,6 +1245,50 @@ export class UserService {
         console.error('Failed to send key reset notice', err);
       }
     }));
+  }
+
+  private async fetchContactsForSystemMessages(contactService: ContactService): Promise<Contact[]> {
+    if (!this.user?.id) {
+      return [];
+    }
+    try {
+      const response = await firstValueFrom(contactService.getByUserId(this.user.id));
+      const rows = response?.rows ?? [];
+      return rows.map((raw) => this.mapRawContactForSystemMessage(raw));
+    } catch {
+      return [];
+    }
+  }
+
+  private mapRawContactForSystemMessage(raw: RawContact): Contact {
+    let signingKey: JsonWebKey | undefined;
+    let cryptoKey: JsonWebKey | undefined;
+    try {
+      signingKey = raw.contactUserSigningPublicKey ? JSON.parse(raw.contactUserSigningPublicKey) : undefined;
+    } catch {
+      signingKey = undefined;
+    }
+    try {
+      cryptoKey = raw.contactUserEncryptionPublicKey ? JSON.parse(raw.contactUserEncryptionPublicKey) : undefined;
+    } catch {
+      cryptoKey = undefined;
+    }
+
+    return {
+      id: raw.id,
+      userId: raw.userId,
+      contactUserId: raw.contactUserId,
+      contactUserSigningPublicKey: signingKey,
+      contactUserEncryptionPublicKey: cryptoKey,
+      hint: raw.hint ?? '',
+      name: raw.name ?? '',
+      base64Avatar: raw.base64Avatar ?? '',
+      subscribed: raw.subscribed ?? false,
+      pinned: false,
+      provided: raw.provided ?? false,
+      lastMessageFrom: raw.lastMessageFrom ?? '',
+      lastMessageAt: raw.lastMessageAt ?? null
+    };
   }
 
   public openCreatePinDialog(): void {
