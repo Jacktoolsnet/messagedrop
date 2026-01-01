@@ -1,6 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
 import { BoundingBox } from '../interfaces/bounding-box';
+import { Contact } from '../interfaces/contact';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { IndexedDbBackup, IndexedDbBackupEntry } from '../interfaces/indexed-db-backup';
@@ -23,10 +24,11 @@ type StoredLocalImageMeta = string;
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 4;
+  private dbVersion = 5;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
+  private contactStore = 'contact';
   private contactProfileStore = 'contactprofile';
   private placeStore = 'place';
   private tileSettingsStore = 'tileSettings';
@@ -75,6 +77,9 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.profileStore)) {
           db.createObjectStore(this.profileStore);
+        }
+        if (!db.objectStoreNames.contains(this.contactStore)) {
+          db.createObjectStore(this.contactStore);
         }
         if (!db.objectStoreNames.contains(this.contactProfileStore)) {
           db.createObjectStore(this.contactProfileStore);
@@ -506,6 +511,93 @@ export class IndexedDbService {
   }
 
   /**
+   * Stores the full contact list for recovery purposes.
+   */
+  async replaceContacts(contacts: Contact[]): Promise<void> {
+    const db = await this.openDB();
+
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(this.contactStore, 'readwrite');
+      const store = tx.objectStore(this.contactStore);
+      const clearRequest = store.clear();
+
+      clearRequest.onsuccess = () => {
+        contacts.forEach((contact) => {
+          store.put(this.compress(contact), contact.id);
+        });
+      };
+
+      tx.oncomplete = () => {
+        this.backupState.markDirty();
+        resolve();
+      };
+
+      tx.onerror = () => {
+        reject(tx.error);
+      };
+    });
+  }
+
+  /**
+   * Retrieves all cached contacts.
+   */
+  async getAllContacts(): Promise<Contact[]> {
+    const db = await this.openDB();
+
+    return new Promise<Contact[]>((resolve, reject) => {
+      const tx = db.transaction(this.contactStore, 'readonly');
+      const store = tx.objectStore(this.contactStore);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const values = request.result as string[];
+        const contacts = values
+          .map((value) => this.decompress<Contact>(value))
+          .filter((value): value is Contact => Boolean(value));
+        resolve(contacts);
+      };
+
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  /**
+   * Retrieves all contact profiles as a Map of contactId to ContactProfile.
+   */
+  async getAllContactProfilesAsMap(): Promise<Map<string, ContactProfile>> {
+    const db = await this.openDB();
+
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction(this.contactProfileStore, 'readonly');
+      const store = tx.objectStore(this.contactProfileStore);
+
+      const keysRequest = store.getAllKeys();
+      const valuesRequest = store.getAll();
+
+      keysRequest.onsuccess = () => {
+        valuesRequest.onsuccess = () => {
+          const keys = keysRequest.result as string[];
+          const values = valuesRequest.result as string[];
+
+          const map = new Map<string, ContactProfile>();
+          for (let i = 0; i < keys.length; i++) {
+            const profile = this.decompress<ContactProfile>(values[i]);
+            if (profile) {
+              map.set(keys[i], profile);
+            }
+          }
+
+          resolve(map);
+        };
+
+        valuesRequest.onerror = () => reject(valuesRequest.error);
+      };
+
+      keysRequest.onerror = () => reject(keysRequest.error);
+    });
+  }
+
+  /**
    * Stores a place profile.
    * @param placeId The place ID.
    * @param place The place object to store.
@@ -550,6 +642,29 @@ export class IndexedDbService {
       request.onerror = () => {
         reject(request.error);
       };
+    });
+  }
+
+  /**
+   * Retrieves all stored places.
+   */
+  async getAllPlaces(): Promise<Place[]> {
+    const db = await this.openDB();
+
+    return new Promise<Place[]>((resolve, reject) => {
+      const tx = db.transaction(this.placeStore, 'readonly');
+      const store = tx.objectStore(this.placeStore);
+      const request = store.getAll();
+
+      request.onsuccess = () => {
+        const values = request.result as string[];
+        const places = values
+          .map((value) => this.decompress<Place>(value))
+          .filter((value): value is Place => Boolean(value));
+        resolve(places);
+      };
+
+      request.onerror = () => reject(request.error);
     });
   }
 

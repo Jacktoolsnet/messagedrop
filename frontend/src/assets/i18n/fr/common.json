@@ -865,8 +865,8 @@
     "createUserAction": "Commencer",
     "pinIncorrect": "Le PIN est incorrect. Veuillez réessayer.",
     "userNotFoundTitle": "Utilisateur introuvable",
-    "userNotFoundMessage": "Il semble que cet utilisateur ait été inactif pendant un certain temps.\n\nPour garder les choses simples et propres, les utilisateurs sont automatiquement supprimés après 90 jours d'inactivité.\n\nVous pouvez en créer un nouveau à tout moment — sans inscription, sans tracas.",
-    "userNotFoundAction": "Créer un nouvel utilisateur",
+    "userNotFoundMessage": "Cet utilisateur n'est pas disponible sur le serveur.\n\nNous pouvons restaurer vos données depuis cet appareil pour que vous puissiez continuer.",
+    "userNotFoundAction": "Restaurer depuis l'appareil",
     "backendErrorTitle": "Oups ! Erreur du backend !",
     "backendErrorMessage": "Une erreur est survenue. Veuillez réessayer plus tard."
   },

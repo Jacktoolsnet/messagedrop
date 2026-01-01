@@ -11,9 +11,7 @@ const userType = {
 
 const tableName = 'tableUser';
 const columnUserId = 'id';
-const columnCryptoPrivateKey = 'cryptoPrivateKey';
 const columnCryptoPublicKey = 'cryptoPublicKey';
-const columnSigningPrivateKey = 'signingPrivateKey';
 const columnSigningPublicKey = 'signingPublicKey';
 const columnNumberOfMessages = 'numberOfMessages';
 const columnNumberOfBlockedMessages = 'numberOfBlockedMessages';
@@ -27,9 +25,7 @@ const init = function (db) {
         const sql = `
         CREATE TABLE IF NOT EXISTS ${tableName} (
             ${columnUserId} TEXT PRIMARY KEY NOT NULL, 
-            ${columnCryptoPrivateKey} TEXT NOT NULL,
             ${columnCryptoPublicKey} TEXT DEFAULT NULL,
-            ${columnSigningPrivateKey} TEXT NOT NULL,
             ${columnSigningPublicKey} TEXT DEFAULT NULL, 
             ${columnNumberOfMessages} INTEGER DEFAULT 0,
             ${columnNumberOfBlockedMessages} INTEGER DEFAULT 0,
@@ -58,18 +54,14 @@ const create = function (
         const sql = `
       INSERT INTO ${tableName} (
         ${columnUserId}, 
-        ${columnCryptoPrivateKey},
-        ${columnSigningPrivateKey},
         ${columnType},
         ${columnLastSignOfLife}
       ) 
-      VALUES (?, ?, ?, ?, strftime('%s','now'));
+      VALUES (?, ?, strftime('%s','now'));
     `;
 
         const params = [
             userId,
-            '',
-            '',
             userType.USER
         ];
 

@@ -55,10 +55,15 @@ export class ContactService {
     }
     this.getByUserId(userId)
       .subscribe({
-        next: (getContactsResponse: GetContactsResponse) => {
+        next: async (getContactsResponse: GetContactsResponse) => {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
           this._contacts.set(contacts);
-          this.updateContactProfile();
+          await this.updateContactProfile();
+          try {
+            await this.indexedDbService.replaceContacts(this._contacts());
+          } catch (storeErr) {
+            console.error('Failed to cache contacts', storeErr);
+          }
           this.ready = true;
           this._contactsSet.update(trigger => trigger + 1);
         },

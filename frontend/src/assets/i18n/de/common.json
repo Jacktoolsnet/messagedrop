@@ -865,8 +865,8 @@
     "createUserAction": "Los geht's",
     "pinIncorrect": "PIN ist falsch. Bitte erneut versuchen.",
     "userNotFoundTitle": "Benutzer nicht gefunden",
-    "userNotFoundMessage": "Es sieht so aus, als wäre dieser Benutzer eine Weile inaktiv gewesen.\n\nUm alles sauber und einfach zu halten, werden Benutzer nach 90 Tagen Inaktivität automatisch gelöscht.\n\nDu kannst jederzeit einen neuen erstellen - ohne Registrierung, ohne Aufwand.",
-    "userNotFoundAction": "Neuen Benutzer erstellen",
+    "userNotFoundMessage": "Dieser Benutzer ist auf dem Server nicht vorhanden.\n\nWir können deine Daten von diesem Gerät wiederherstellen, damit du weitermachen kannst.",
+    "userNotFoundAction": "Vom Gerät wiederherstellen",
     "backendErrorTitle": "Ups! Backend-Fehler!",
     "backendErrorMessage": "Es ist etwas schiefgelaufen. Bitte später erneut versuchen."
   },

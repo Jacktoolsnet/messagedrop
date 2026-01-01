@@ -147,9 +147,7 @@ async function restoreUserBackup(db, backup) {
 
   const userColumns = [
     'id',
-    'cryptoPrivateKey',
     'cryptoPublicKey',
-    'signingPrivateKey',
     'signingPublicKey',
     'numberOfMessages',
     'numberOfBlockedMessages',
@@ -524,12 +522,6 @@ router.post('/register',
       if (err) {
         return next(apiError.internal('db_error'));
       }
-      if (!row) {
-        return next(apiError.notFound('not_found'));
-      }
-      if (row.signingPublicKey || row.cryptoPublicKey) {
-        return next(apiError.conflict('already_registered'));
-      }
 
       const signingKeyValue = typeof signingPublicKey === 'string'
         ? signingPublicKey
@@ -538,12 +530,29 @@ router.post('/register',
         ? cryptoPublicKey
         : JSON.stringify(cryptoPublicKey);
 
-      tableUser.updatePublicKeys(req.database.db, userId, signingKeyValue, cryptoKeyValue, function (updateErr) {
-        if (updateErr) {
-          return next(apiError.internal('db_error'));
-        }
-        res.status(200).json({ status: 200 });
-      });
+      const updateKeys = () => {
+        tableUser.updatePublicKeys(req.database.db, userId, signingKeyValue, cryptoKeyValue, function (updateErr) {
+          if (updateErr) {
+            return next(apiError.internal('db_error'));
+          }
+          res.status(200).json({ status: 200 });
+        });
+      };
+
+      if (!row) {
+        return tableUser.create(req.database.db, userId, function (createErr) {
+          if (createErr) {
+            return next(apiError.internal('db_error'));
+          }
+          updateKeys();
+        });
+      }
+
+      if (row.signingPublicKey || row.cryptoPublicKey) {
+        return next(apiError.conflict('already_registered'));
+      }
+
+      return updateKeys();
     });
   });
 

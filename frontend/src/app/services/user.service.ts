@@ -1,10 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { SwPush } from '@angular/service-worker';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
-import { catchError, Observable, take, throwError } from 'rxjs';
+import { catchError, firstValueFrom, Observable, take, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
@@ -18,10 +17,12 @@ import { UserChallengeResponse } from '../interfaces/user-challenge-response';
 import { UserLoginResponse } from '../interfaces/user-login-response';
 import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
+import { UserServerBackup } from '../interfaces/backup';
 import { BackupStateService } from './backup-state.service';
 import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
+import { ServerService } from './server.service';
 import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
@@ -80,7 +81,7 @@ export class UserService {
   private readonly displayMessage = inject(MatDialog);
   private readonly createPinDialog = this.displayMessage;
   private readonly checkPinDialog = this.displayMessage;
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly serverService = inject(ServerService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
 
@@ -715,6 +716,194 @@ export class UserService {
     }
   }
 
+  private async ensureServerCryptoPublicKey(): Promise<JsonWebKey> {
+    const existingKey = this.serverService.getCryptoPublicKey();
+    if (existingKey) {
+      return existingKey;
+    }
+    const response = await firstValueFrom(this.serverService.connect());
+    if (response.status === 200 && response.cryptoPublicKey) {
+      return response.cryptoPublicKey;
+    }
+    throw new Error('server_key_unavailable');
+  }
+
+  private buildUserRow(
+    userId: string,
+    signingPublicKey: JsonWebKey | string,
+    cryptoPublicKey: JsonWebKey | string,
+    lastSignOfLife: number,
+    subscription?: string,
+    type?: UserType | null
+  ) {
+    return {
+      id: userId,
+      cryptoPublicKey: typeof cryptoPublicKey === 'string' ? cryptoPublicKey : JSON.stringify(cryptoPublicKey),
+      signingPublicKey: typeof signingPublicKey === 'string' ? signingPublicKey : JSON.stringify(signingPublicKey),
+      numberOfMessages: 0,
+      numberOfBlockedMessages: 0,
+      userStatus: 'enabled',
+      lastSignOfLife,
+      subscription: subscription ?? '',
+      type: type ?? null
+    };
+  }
+
+  private async buildServerRestoreBackup(user: User): Promise<UserServerBackup> {
+    const [places, contacts, contactProfiles] = await Promise.all([
+      this.indexedDbService.getAllPlaces(),
+      this.indexedDbService.getAllContacts(),
+      this.indexedDbService.getAllContactProfilesAsMap()
+    ]);
+
+    const cryptoPublicKey = await this.ensureServerCryptoPublicKey();
+    const lastSignOfLife = Math.floor(Date.now() / 1000);
+
+    const userRows = [this.buildUserRow(
+      user.id,
+      user.signingKeyPair.publicKey,
+      user.cryptoKeyPair.publicKey,
+      lastSignOfLife,
+      user.subscription,
+      user.type
+    )];
+
+    const contactUserIds = new Set<string>();
+    contacts.forEach((contact) => {
+      if (!contact.contactUserId || !contact.contactUserSigningPublicKey || !contact.contactUserEncryptionPublicKey) {
+        return;
+      }
+      if (contactUserIds.has(contact.contactUserId)) {
+        return;
+      }
+      contactUserIds.add(contact.contactUserId);
+      userRows.push(this.buildUserRow(
+        contact.contactUserId,
+        contact.contactUserSigningPublicKey,
+        contact.contactUserEncryptionPublicKey,
+        lastSignOfLife
+      ));
+    });
+
+    const placeRows = await Promise.all(places.map(async (place) => {
+      const boundingBox = place.boundingBox;
+      if (!boundingBox) {
+        return null;
+      }
+      const encryptedName = await this.cryptoService.encrypt(cryptoPublicKey, place.name ?? '');
+      return {
+        id: place.id,
+        userId: user.id,
+        name: encryptedName,
+        subscribed: place.subscribed ? 1 : 0,
+        latMin: boundingBox.latMin,
+        latMax: boundingBox.latMax,
+        lonMin: boundingBox.lonMin,
+        lonMax: boundingBox.lonMax
+      };
+    }));
+
+    const contactRows = await Promise.all(contacts.map(async (contact) => {
+      if (!contact.contactUserId || !contact.contactUserSigningPublicKey || !contact.contactUserEncryptionPublicKey) {
+        return null;
+      }
+      const profile = contactProfiles.get(contact.id);
+      const nameValue = profile?.name || contact.name || '';
+      const encryptedName = nameValue ? await this.cryptoService.encrypt(cryptoPublicKey, nameValue) : null;
+      return {
+        id: contact.id,
+        userId: user.id,
+        contactUserId: contact.contactUserId,
+        contactUserSigningPublicKey: JSON.stringify(contact.contactUserSigningPublicKey),
+        contactUserEncryptionPublicKey: JSON.stringify(contact.contactUserEncryptionPublicKey),
+        subscribed: contact.subscribed ? 1 : 0,
+        hint: contact.hint ?? '',
+        name: encryptedName,
+        lastMessageFrom: contact.lastMessageFrom ?? '',
+        lastMessageAt: contact.lastMessageAt ?? null
+      };
+    }));
+
+    return {
+      schemaVersion: 1,
+      createdAt: new Date().toISOString(),
+      userId: user.id,
+      tables: {
+        tableUser: userRows,
+        tableMessage: [],
+        tableContact: contactRows.filter((row): row is NonNullable<typeof row> => Boolean(row)),
+        tableContactMessage: [],
+        tablePlace: placeRows.filter((row): row is NonNullable<typeof row> => Boolean(row)),
+        tableNotification: [],
+        tableLike: [],
+        tableDislike: [],
+        tableConnect: []
+      }
+    };
+  }
+
+  private async restoreServerFromIndexedDb(user: User, jwt: string): Promise<void> {
+    const backup = await this.buildServerRestoreBackup(user);
+    const url = `${environment.apiUrl}/user/restore`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: true,
+      title: this.i18n.t('common.restore.title'),
+      image: '',
+      icon: 'cloud_download',
+      message: this.i18n.t('common.restore.restoringServerData'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      withCredentials: 'true',
+      Authorization: `Bearer ${jwt}`
+    });
+    const response = await firstValueFrom(this.http.post<SimpleStatusResponse>(url, { backup }, { headers }));
+    if (response.status !== 200) {
+      throw new Error('restore_failed');
+    }
+  }
+
+  private async recoverUserFromDevice(user: User, afterLogin?: () => void): Promise<void> {
+    this.blocked = true;
+    try {
+      await firstValueFrom(this.registerUser(
+        user.id,
+        user.signingKeyPair.publicKey,
+        user.cryptoKeyPair.publicKey,
+        true
+      ));
+    } catch (err) {
+      const status = (err as { status?: number } | null)?.status;
+      if (status !== 409) {
+        throw err;
+      }
+    }
+
+    const challengeResponse = await firstValueFrom(this.requestLoginChallenge(user.id, true));
+    const signature = await this.cryptoService.createSignature(
+      user.signingKeyPair.privateKey,
+      challengeResponse.challenge
+    );
+    const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, true));
+    await this.restoreServerFromIndexedDb(user, loginResponse.jwt);
+    this.setUser(user, loginResponse.jwt);
+    if (Notification.permission === "granted") {
+      if (this.getUser().subscription !== '') {
+        this.indexedDbService.setSetting('subscription', this.getUser().subscription);
+      } else {
+        this.indexedDbService.deleteSetting('subscription');
+        this.registerSubscription(this.getUser());
+      }
+    }
+    if (afterLogin) {
+      afterLogin();
+    }
+  }
+
   public openCreatePinDialog(): void {
     const dialogRef = this.createPinDialog.open(CreatePinComponent, {
       panelClass: '',
@@ -897,12 +1086,32 @@ export class UserService {
                       autoFocus: false
                     });
 
-                    dialogRef.afterClosed().subscribe((result) => {
-                      this.blocked = false;
-                      this.indexedDbService.clearAllData();
-                      if (result) {
-                        this.openCreatePinDialog();
-                      }
+                    dialogRef.afterClosed().subscribe(() => {
+                      this.recoverUserFromDevice(user, callback)
+                        .catch((recoverErr) => {
+                          console.error('User recovery failed', recoverErr);
+                          const errorDialog = this.displayMessage.open(DisplayMessage, {
+                            panelClass: '',
+                            closeOnNavigation: false,
+                            data: {
+                              showAlways: true,
+                              title: this.i18n.t('auth.backendErrorTitle'),
+                              image: '',
+                              icon: 'bug_report',
+                              message: this.i18n.t('common.restore.failed'),
+                              button: this.i18n.t('common.actions.retry'),
+                              delay: 0,
+                              showSpinner: false
+                            },
+                            maxWidth: '90vw',
+                            maxHeight: '90vh',
+                            hasBackdrop: true,
+                            autoFocus: false
+                          });
+                          errorDialog.afterClosed().subscribe(() => {
+                            this.blocked = false;
+                          });
+                        });
                     });
                   } else {
                     const dialogRef = this.displayMessage.open(DisplayMessage, {
@@ -952,12 +1161,32 @@ export class UserService {
                 autoFocus: false
               });
 
-              dialogRef.afterClosed().subscribe((result) => {
-                this.blocked = false;
-                this.indexedDbService.clearAllData();
-                if (result) {
-                  this.openCreatePinDialog();
-                }
+              dialogRef.afterClosed().subscribe(() => {
+                this.recoverUserFromDevice(user, callback)
+                  .catch((recoverErr) => {
+                    console.error('User recovery failed', recoverErr);
+                    const errorDialog = this.displayMessage.open(DisplayMessage, {
+                      panelClass: '',
+                      closeOnNavigation: false,
+                      data: {
+                        showAlways: true,
+                        title: this.i18n.t('auth.backendErrorTitle'),
+                        image: '',
+                        icon: 'bug_report',
+                        message: this.i18n.t('common.restore.failed'),
+                        button: this.i18n.t('common.actions.retry'),
+                        delay: 0,
+                        showSpinner: false
+                      },
+                      maxWidth: '90vw',
+                      maxHeight: '90vh',
+                      hasBackdrop: true,
+                      autoFocus: false
+                    });
+                    errorDialog.afterClosed().subscribe(() => {
+                      this.blocked = false;
+                    });
+                  });
               });
             } else {
               const dialogRef = this.displayMessage.open(DisplayMessage, {
