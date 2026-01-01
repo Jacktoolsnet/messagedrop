@@ -1,5 +1,5 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable, Injector, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { SwPush } from '@angular/service-worker';
 import { jwtDecode, JwtPayload } from 'jwt-decode';
@@ -8,6 +8,7 @@ import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
+import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { GetMessageResponse } from '../interfaces/get-message-response';
@@ -24,6 +25,7 @@ import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { ServerService } from './server.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { RestoreService } from './restore.service';
 
 @Injectable({
   providedIn: 'root'
@@ -81,6 +83,7 @@ export class UserService {
   private readonly displayMessage = inject(MatDialog);
   private readonly createPinDialog = this.displayMessage;
   private readonly checkPinDialog = this.displayMessage;
+  private readonly injector = inject(Injector);
   private readonly serverService = inject(ServerService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
@@ -728,6 +731,86 @@ export class UserService {
     throw new Error('server_key_unavailable');
   }
 
+  private async handleForgotPinFlow(): Promise<void> {
+    const dialogRef = this.displayMessage.open(DeleteUserComponent, {
+      data: {
+        title: this.i18n.t('auth.pinForgotTitle'),
+        message: this.i18n.t('auth.pinForgotMessage'),
+        confirmLabel: this.i18n.t('auth.pinForgotRestore'),
+        cancelLabel: this.i18n.t('auth.pinForgotNewUser')
+      },
+      closeOnNavigation: true,
+      hasBackdrop: true
+    });
+
+    const result = await firstValueFrom(dialogRef.afterClosed());
+    if (result === true) {
+      const restoreService = this.injector.get(RestoreService);
+      await restoreService.startRestore();
+      this.blocked = false;
+      return;
+    }
+    if (result === false) {
+      await this.indexedDbService.clearAllData();
+      this.logout();
+      this.openCreatePinDialog();
+      return;
+    }
+    this.blocked = false;
+  }
+
+  private showPinIncorrectDialog(): void {
+    const dialogRef = this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.i18n.t('auth.serviceTitle'),
+        image: '',
+        icon: 'warning',
+        message: this.i18n.t('auth.pinIncorrect'),
+        button: this.i18n.t('auth.pinForgotAction'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((result) => {
+      if (result !== true) {
+        this.blocked = false;
+        return;
+      }
+      this.handleForgotPinFlow().catch((err) => {
+        console.error('Forgot PIN flow failed', err);
+        const errorDialog = this.displayMessage.open(DisplayMessage, {
+          panelClass: '',
+          closeOnNavigation: false,
+          data: {
+            showAlways: true,
+            title: this.i18n.t('auth.backendErrorTitle'),
+            image: '',
+            icon: 'bug_report',
+            message: this.i18n.t('auth.backendErrorMessage'),
+            button: this.i18n.t('common.actions.ok'),
+            delay: 0,
+            showSpinner: false
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: true,
+          autoFocus: false
+        });
+        errorDialog.afterClosed().subscribe(() => {
+          this.blocked = false;
+        });
+      });
+    });
+  }
+
   private buildUserRow(
     userId: string,
     signingPublicKey: JsonWebKey | string,
@@ -988,28 +1071,7 @@ export class UserService {
       }
       const decrypted = await this.cryptoService.decryptWithPin(data, cryptedUser.cryptedUser);
       if (!decrypted) {
-        const dialogRef = this.displayMessage.open(DisplayMessage, {
-          panelClass: '',
-          closeOnNavigation: false,
-          data: {
-            showAlways: true,
-            title: this.i18n.t('auth.serviceTitle'),
-            image: '',
-            icon: 'warning',
-            message: this.i18n.t('auth.pinIncorrect'),
-            button: this.i18n.t('common.actions.ok'),
-            delay: 0,
-            showSpinner: false
-          },
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          hasBackdrop: true,
-          autoFocus: false
-        });
-
-        dialogRef.afterClosed().subscribe(() => {
-          this.blocked = false;
-        });
+        this.showPinIncorrectDialog();
         return;
       }
 
@@ -1044,28 +1106,7 @@ export class UserService {
                 error: (err) => {
                   console.error('Login user failed during login', err);
                   if (err.status === 401) {
-                    const dialogRef = this.displayMessage.open(DisplayMessage, {
-                      panelClass: '',
-                      closeOnNavigation: false,
-                      data: {
-                        showAlways: true,
-                        title: this.i18n.t('auth.serviceTitle'),
-                        image: '',
-                        icon: 'warning',
-                        message: this.i18n.t('auth.pinIncorrect'),
-                        button: this.i18n.t('common.actions.ok'),
-                        delay: 0,
-                        showSpinner: false
-                      },
-                      maxWidth: '90vw',
-                      maxHeight: '90vh',
-                      hasBackdrop: true,
-                      autoFocus: false
-                    });
-
-                    dialogRef.afterClosed().subscribe(() => {
-                      this.blocked = false;
-                    });
+                    this.showPinIncorrectDialog();
                   } else if (err.status === 404) {
                     const dialogRef = this.displayMessage.open(DisplayMessage, {
                       panelClass: '',

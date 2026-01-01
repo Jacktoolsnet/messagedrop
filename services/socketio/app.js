@@ -7,6 +7,7 @@ const cors = require('cors');
 const helmet = require('helmet');
 const winston = require('winston');
 const { Server } = require('socket.io');
+const root = require('./routes/root');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const security = require('./middleware/security');
 const jwt = require('jsonwebtoken');
@@ -83,6 +84,7 @@ app.post('/emit/user', security.checkToken, (req, res) => {
   return res.json({ ok: true });
 });
 
+app.use('/', root);
 // 404 + Error handler (letzte Middleware)
 app.use(notFoundHandler);
 app.use(errorHandler);
