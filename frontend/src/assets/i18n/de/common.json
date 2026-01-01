@@ -161,6 +161,7 @@
         "firstMessage": "Erste Nachricht senden",
         "loading": "Chatraum wird geladen...",
         "messageUnreadable": "Nachricht kann nicht angezeigt werden (Signatur oder Entschlüsselung fehlgeschlagen).",
+        "messageUnverified": "Signatur konnte nicht geprüft werden.",
         "keyResetNotice": "System: Ich habe meine Sicherheitsschlüssel erneuert. Ältere Nachrichten können eventuell nicht mehr gelesen werden.",
         "translateFailed": "Übersetzung fehlgeschlagen.",
         "storeTranslationFailed": "Übersetzte Nachricht konnte nicht gespeichert werden.",

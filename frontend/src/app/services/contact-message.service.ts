@@ -313,6 +313,13 @@ export class ContactMessageService {
       );
       if (!decrypted) return null;
 
+      let payload: ShortMessage;
+      try {
+        payload = JSON.parse(decrypted) as ShortMessage;
+      } catch {
+        return null;
+      }
+
       // Signatur prüfen
       const signatureBuffer = Buffer.from(JSON.parse(msg.signature));
       // Convert Buffer to ArrayBuffer for WebCrypto verify
@@ -328,13 +335,12 @@ export class ContactMessageService {
         decrypted,
         signatureArrayBuffer
       );
-      if (!valid) return null;
-      const payload = JSON.parse(decrypted) as ShortMessage;
+
       const translated = await this.decryptTranslation(msg.translatedMessage);
       if (translated) {
-        payload.translatedMessage = translated;
+        payload = { ...payload, translatedMessage: translated };
       }
-      return payload;
+      return { ...payload, verified: valid };
     } catch {
       return null;
     }

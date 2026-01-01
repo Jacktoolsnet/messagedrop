@@ -49,6 +49,12 @@
             @if (msg.payload.multimedia.type !== 'undefined') {
             <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
             }
+            @if (msg.payload.verified === false) {
+            <div class="message-warning">
+              <mat-icon class="message-warning__icon">gpp_bad</mat-icon>
+              <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
+            </div>
+            }
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
@@ -95,6 +101,12 @@
             } @else {
             @if (msg.payload.multimedia.type !== 'undefined') {
             <app-showmultimedia [multimedia]="msg.payload.multimedia"></app-showmultimedia>
+            }
+            @if (msg.payload.verified === false) {
+            <div class="message-warning">
+              <mat-icon class="message-warning__icon">gpp_bad</mat-icon>
+              <span>{{ 'common.contact.chatroom.messageUnverified' | transloco }}</span>
+            </div>
             }
             @if (msg.payload.message.trim() !== '') {
             <app-showmessage [message]="getDisplayedMessage(msg)" [style]="msg.payload!.style"></app-showmessage>
