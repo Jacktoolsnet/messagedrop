@@ -161,6 +161,7 @@
         "firstMessage": "Send the first message",
         "loading": "Loading chatroom...",
         "messageUnreadable": "Message can't be displayed (signature or decryption failed).",
+        "keyResetNotice": "System: I reset my security keys. Older messages may no longer be readable.",
         "translateFailed": "Translation failed.",
         "storeTranslationFailed": "Translated message could not be stored.",
         "deleteMessage": {

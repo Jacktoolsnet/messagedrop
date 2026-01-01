@@ -161,6 +161,7 @@
         "firstMessage": "Enviar el primer mensaje",
         "loading": "Cargando chat...",
         "messageUnreadable": "El mensaje no se puede mostrar (falló la firma o el descifrado).",
+        "keyResetNotice": "Sistema: He restablecido mis claves de seguridad. Los mensajes antiguos puede que ya no se puedan leer.",
         "translateFailed": "Falló la traducción.",
         "storeTranslationFailed": "No se pudo guardar el mensaje traducido.",
         "deleteMessage": {

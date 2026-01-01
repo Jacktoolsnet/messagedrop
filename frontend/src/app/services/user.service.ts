@@ -19,7 +19,10 @@ import { UserLoginResponse } from '../interfaces/user-login-response';
 import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
 import { UserServerBackup } from '../interfaces/backup';
+import { MultimediaType } from '../interfaces/multimedia-type';
+import { ShortMessage } from '../interfaces/short-message';
 import { BackupStateService } from './backup-state.service';
+import { ContactMessageService } from './contact-message.service';
 import { CryptoService } from './crypto.service';
 import { ContactService } from './contact.service';
 import { IndexedDbService } from './indexed-db.service';
@@ -27,6 +30,7 @@ import { NetworkService } from './network.service';
 import { ServerService } from './server.service';
 import { TranslationHelperService } from './translation-helper.service';
 import { RestoreService } from './restore.service';
+import { SocketioService } from './socketio.service';
 
 @Injectable({
   providedIn: 'root'
@@ -1129,6 +1133,7 @@ export class UserService {
       this.user.cryptoKeyPair = newCryptoKeys;
       this.user.signingKeyPair = newSigningKeys;
       await this.saveUser();
+      await this.sendKeyResetSystemMessages();
       this.injector.get(ContactService).emitContactResetAll();
 
       const infoDialog = this.displayMessage.open(DisplayMessage, {
@@ -1177,6 +1182,64 @@ export class UserService {
         this.blocked = false;
       });
     }
+  }
+
+  private buildKeyResetSystemMessage(): ShortMessage {
+    return {
+      message: this.i18n.t('common.contact.chatroom.keyResetNotice'),
+      style: 'font-style: italic; color: var(--mat-card-subtitle-text-color);',
+      multimedia: {
+        type: MultimediaType.UNDEFINED,
+        attribution: '',
+        title: '',
+        description: '',
+        url: '',
+        sourceUrl: '',
+        contentId: ''
+      }
+    };
+  }
+
+  private async sendKeyResetSystemMessages(): Promise<void> {
+    const contactService = this.injector.get(ContactService);
+    const contactMessageService = this.injector.get(ContactMessageService);
+    const socketioService = this.injector.get(SocketioService);
+    const contacts = contactService.sortedContactsSignal();
+    if (!Array.isArray(contacts) || contacts.length === 0) {
+      return;
+    }
+
+    const payload = this.buildKeyResetSystemMessage();
+    await Promise.all(contacts.map(async (contact) => {
+      if (!contact?.id || !contact.userId || !contact.contactUserId || !contact.contactUserEncryptionPublicKey) {
+        return;
+      }
+      try {
+        const { encryptedMessageForUser, encryptedMessageForContact, signature } =
+          await contactMessageService.encryptMessageForContact(contact, payload);
+        const res = await firstValueFrom(contactMessageService.send({
+          contactId: contact.id,
+          userId: contact.userId,
+          contactUserId: contact.contactUserId,
+          direction: 'user',
+          encryptedMessageForUser,
+          encryptedMessageForContact,
+          signature
+        }));
+        socketioService.sendContactMessage({
+          id: res.mirrorMessageId ?? res.messageId,
+          messageId: res.sharedMessageId,
+          contactId: contact.id,
+          userId: contact.userId,
+          contactUserId: contact.contactUserId,
+          messageSignature: signature,
+          userEncryptedMessage: encryptedMessageForUser,
+          contactUserEncryptedMessage: encryptedMessageForContact
+        });
+      } catch (err) {
+        console.error('Failed to send key reset notice', err);
+      }
+    }));
   }
 
   public openCreatePinDialog(): void {

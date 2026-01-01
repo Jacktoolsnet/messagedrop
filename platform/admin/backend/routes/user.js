@@ -208,7 +208,7 @@ router.post('/login', [loginLimiter, loginSlowdown], async (req, res, next) => {
 
     const { username, password } = req.body || {};
     const envUser = process.env.ADMIN_ROOT_USER;
-    const envPass = process.env.ADMIN_ROOT_PASSWORD || process.env.ADMIN_ROOT_PASSWORT; // Fallback
+    const envPass = process.env.ADMIN_ROOT_PASSWORD;
 
     try {
         // Root via ENV
