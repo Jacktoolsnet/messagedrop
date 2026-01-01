@@ -59,7 +59,7 @@ export class UserService {
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
   private pinKey: CryptoKey | null = null;
-  private pinSalt: Uint8Array | null = null;
+  private pinSalt: Uint8Array<ArrayBuffer> | null = null;
   private pinIterations = 250000;
 
   private ready = false;
@@ -799,13 +799,28 @@ export class UserService {
       }
       const decrypted = await this.cryptoService.decryptWithPin(data, cryptedUser.cryptedUser);
       if (!decrypted) {
-        this.snackBar.open(this.i18n.t('auth.pinIncorrect'), undefined, {
-          panelClass: ['snack-warning'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
-          duration: 3000
+        const dialogRef = this.displayMessage.open(DisplayMessage, {
+          panelClass: '',
+          closeOnNavigation: false,
+          data: {
+            showAlways: true,
+            title: this.i18n.t('auth.serviceTitle'),
+            image: '',
+            icon: 'warning',
+            message: this.i18n.t('auth.pinIncorrect'),
+            button: this.i18n.t('common.actions.ok'),
+            delay: 0,
+            showSpinner: false
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: true,
+          autoFocus: false
         });
-        this.blocked = false;
+
+        dialogRef.afterClosed().subscribe(() => {
+          this.blocked = false;
+        });
         return;
       }
 
@@ -840,13 +855,28 @@ export class UserService {
                 error: (err) => {
                   console.error('Login user failed during login', err);
                   if (err.status === 401) {
-                    this.snackBar.open(this.i18n.t('auth.pinIncorrect'), undefined, {
-                      panelClass: ['snack-warning'],
-                      horizontalPosition: 'center',
-                      verticalPosition: 'top',
-                      duration: 3000
+                    const dialogRef = this.displayMessage.open(DisplayMessage, {
+                      panelClass: '',
+                      closeOnNavigation: false,
+                      data: {
+                        showAlways: true,
+                        title: this.i18n.t('auth.serviceTitle'),
+                        image: '',
+                        icon: 'warning',
+                        message: this.i18n.t('auth.pinIncorrect'),
+                        button: this.i18n.t('common.actions.ok'),
+                        delay: 0,
+                        showSpinner: false
+                      },
+                      maxWidth: '90vw',
+                      maxHeight: '90vh',
+                      hasBackdrop: true,
+                      autoFocus: false
                     });
-                    this.blocked = false;
+
+                    dialogRef.afterClosed().subscribe(() => {
+                      this.blocked = false;
+                    });
                   } else if (err.status === 404) {
                     const dialogRef = this.displayMessage.open(DisplayMessage, {
                       panelClass: '',

@@ -101,11 +101,43 @@
             "type": "node"
         },
         {
-            "name": "Generate Service JWKs",
+            "name": "Generate Service (T) JWKs",
             "type": "node",
             "request": "launch",
             "cwd": "${workspaceFolder}",
             "program": "${workspaceFolder}/tools/generate-service-jwks.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Generate Service (Q) JWKs",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/tools/generate-stage-service-jwks.js",
+            "console": "integratedTerminal",
+            "args": [
+                "--stage",
+                "q"
+            ],
+            "internalConsoleOptions": "neverOpen",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "name": "Generate Service (P) JWKs",
+            "type": "node",
+            "request": "launch",
+            "cwd": "${workspaceFolder}",
+            "program": "${workspaceFolder}/tools/generate-stage-service-jwks.js",
+            "console": "integratedTerminal",
+            "args": [
+                "--stage",
+                "p"
+            ],
+            "internalConsoleOptions": "neverOpen",
             "skipFiles": [
                 "<node_internals>/**"
             ]

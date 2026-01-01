@@ -190,11 +190,17 @@ export class CryptoService {
     return Buffer.from(bytes).toString('base64');
   }
 
-  private base64ToBytes(value: string): Uint8Array {
-    return new Uint8Array(Buffer.from(value, 'base64'));
+  private base64ToBytes(value: string): Uint8Array<ArrayBuffer> {
+    return new Uint8Array(Buffer.from(value, 'base64').buffer as ArrayBuffer);
   }
 
-  private async derivePinKey(pin: string, salt: Uint8Array, iterations: number): Promise<CryptoKey> {
+  private createRandomBytes(length: number): Uint8Array<ArrayBuffer> {
+    const bytes = new Uint8Array(length) as Uint8Array<ArrayBuffer>;
+    crypto.getRandomValues(bytes);
+    return bytes;
+  }
+
+  private async derivePinKey(pin: string, salt: Uint8Array<ArrayBuffer>, iterations: number): Promise<CryptoKey> {
     const encoder = new TextEncoder();
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
@@ -221,8 +227,8 @@ export class CryptoService {
     pin: string,
     payload: string,
     iterations = 250000
-  ): Promise<{ envelope: PinEncryptedPayload; key: CryptoKey; salt: Uint8Array; iterations: number }> {
-    const salt = crypto.getRandomValues(new Uint8Array(16));
+  ): Promise<{ envelope: PinEncryptedPayload; key: CryptoKey; salt: Uint8Array<ArrayBuffer>; iterations: number }> {
+    const salt = this.createRandomBytes(16);
     const key = await this.derivePinKey(pin, salt, iterations);
     const envelope = await this.encryptWithKey(key, payload, salt, iterations);
     return { envelope, key, salt, iterations };
@@ -231,11 +237,11 @@ export class CryptoService {
   async encryptWithKey(
     key: CryptoKey,
     payload: string,
-    salt: Uint8Array,
+    salt: Uint8Array<ArrayBuffer>,
     iterations: number
   ): Promise<PinEncryptedPayload> {
     const encoder = new TextEncoder();
-    const iv = crypto.getRandomValues(new Uint8Array(12));
+    const iv = this.createRandomBytes(12);
     const encrypted = await crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       key,
@@ -263,7 +269,7 @@ export class CryptoService {
   async decryptWithPin(
     pin: string,
     envelope: PinEncryptedPayload
-  ): Promise<{ plaintext: string; key: CryptoKey; salt: Uint8Array; iterations: number } | null> {
+  ): Promise<{ plaintext: string; key: CryptoKey; salt: Uint8Array<ArrayBuffer>; iterations: number } | null> {
     if (!envelope?.kdf || !envelope?.cipher || envelope.payloadEncoding !== 'base64') {
       return null;
     }
