@@ -8,7 +8,7 @@ Kurzfassung (nicht rechtsverbindlich)
 MessageDrop ist eine datenschutzorientierte Web-App zur Veröffentlichung nutzergenerierter Inhalte, zur privaten Kommunikation sowie zur ortsbezogenen Organisation von Informationen.
 
 Der Dienst kann ohne Nutzerkonto verwendet werden. Bestimmte Funktionen erfordern die freiwillige Anlage eines Nutzerkontos.
-Die Anmeldung erfolgt lokal über einen PIN; der PIN wird nicht an den Server übertragen. Serverseitig werden nur die pseudonyme User-ID, öffentliche Schlüssel und Statusdaten gespeichert.
+Die Anmeldung erfolgt lokal über einen PIN; der PIN wird nicht an den Server übertragen. Im Nutzerkonto werden serverseitig nur die pseudonyme User-ID, öffentliche Schlüssel und Statusdaten gespeichert.
 
 Die Nutzung von MessageDrop ist ausschließlich Personen gestattet, die mindestens 16 Jahre alt sind.
 
