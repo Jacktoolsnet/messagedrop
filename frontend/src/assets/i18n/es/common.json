@@ -771,6 +771,7 @@
         "userIdLabel": "ID de usuario:",
         "backup": "Hacer copia de seguridad",
         "changePin": "Cambiar PIN",
+        "resetKeys": "Restablecimiento de seguridad",
         "delete": "Eliminar mi usuario"
       },
       "deleteDialog": {
@@ -871,6 +872,12 @@
     "pinForgotRestore": "Restaurar backup",
     "pinForgotNewUser": "Crear nuevo usuario",
     "pinChangedMessage": "El PIN se actualizó. Inicia sesión de nuevo con el nuevo PIN.",
+    "resetKeysTitle": "Restablecimiento de seguridad",
+    "resetKeysMessage": "Se regenerarán tus claves de seguridad. Esto eliminará el historial de chat, pero mantendrá tus contactos. ¿Deseas continuar?",
+    "resetKeysAction": "Ejecutar restablecimiento",
+    "resetKeysInProgress": "Restableciendo claves de seguridad",
+    "resetKeysSuccess": "Restablecimiento de seguridad completado. El historial de chat se eliminó.",
+    "resetKeysFailed": "El restablecimiento de seguridad falló. Inténtalo de nuevo más tarde.",
     "userNotFoundTitle": "Usuario no encontrado",
     "userNotFoundMessage": "Este usuario no está disponible en el servidor.\n\nPodemos restaurar tus datos desde este dispositivo para que puedas continuar.",
     "userNotFoundAction": "Restaurar desde el dispositivo",

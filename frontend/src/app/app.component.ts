@@ -1251,6 +1251,9 @@ export class AppComponent implements OnInit {
         case "changePin":
           this.userService.changePin();
           break;
+        case "resetKeys":
+          this.userService.resetKeys();
+          break;
       }
     });
   }

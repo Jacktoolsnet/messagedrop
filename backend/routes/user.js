@@ -556,6 +556,71 @@ router.post('/register',
     });
   });
 
+router.post('/reset-keys',
+  [
+    security.authenticate,
+    userConfirmLimit,
+    express.json({ type: 'application/json' }),
+    metric.count('user.resetKeys', { when: 'always', timezone: 'utc', amount: 1 })
+  ]
+  , async function (req, res, next) {
+    const { userId, signingPublicKey, cryptoPublicKey } = req.body ?? {};
+
+    if (!userId || !signingPublicKey || !cryptoPublicKey) {
+      return next(apiError.badRequest('invalid_request'));
+    }
+    if (!ensureSameUser(req, res, userId, next)) {
+      return;
+    }
+
+    const signingKeyValue = typeof signingPublicKey === 'string'
+      ? signingPublicKey
+      : JSON.stringify(signingPublicKey);
+    const cryptoKeyValue = typeof cryptoPublicKey === 'string'
+      ? cryptoPublicKey
+      : JSON.stringify(cryptoPublicKey);
+
+    try {
+      const userRow = await queryGet(req.database.db, 'SELECT id FROM tableUser WHERE id = ?;', [userId]);
+      if (!userRow) {
+        return next(apiError.notFound('not_found'));
+      }
+
+      await runQuery(req.database.db, 'BEGIN IMMEDIATE');
+      await runQuery(
+        req.database.db,
+        'UPDATE tableUser SET signingPublicKey = ?, cryptoPublicKey = ? WHERE id = ?;',
+        [signingKeyValue, cryptoKeyValue, userId]
+      );
+      await runQuery(
+        req.database.db,
+        'UPDATE tableContact SET contactUserSigningPublicKey = ?, contactUserEncryptionPublicKey = ? WHERE contactUserId = ?;',
+        [signingKeyValue, cryptoKeyValue, userId]
+      );
+      await runQuery(
+        req.database.db,
+        "UPDATE tableContact SET lastMessageFrom = '', lastMessageAt = NULL WHERE userId = ?;",
+        [userId]
+      );
+      await runQuery(
+        req.database.db,
+        'DELETE FROM tableContactMessage WHERE contactId IN (SELECT id FROM tableContact WHERE userId = ?);',
+        [userId]
+      );
+      await runQuery(req.database.db, 'DELETE FROM tableConnect WHERE userId = ?;', [userId]);
+      await runQuery(req.database.db, 'COMMIT');
+
+      res.status(200).json({ status: 200 });
+    } catch (err) {
+      try {
+        await runQuery(req.database.db, 'ROLLBACK');
+      } catch {
+        // ignore rollback errors
+      }
+      return next(apiError.internal('reset_keys_failed'));
+    }
+  });
+
 router.post('/challenge',
   [
     userConfirmLimit,

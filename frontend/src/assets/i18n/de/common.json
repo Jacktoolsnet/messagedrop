@@ -771,6 +771,7 @@
         "userIdLabel": "User-ID:",
         "backup": "Daten sichern",
         "changePin": "PIN ändern",
+        "resetKeys": "Sicherheits-Reset",
         "delete": "Meinen Benutzer löschen"
       },
       "deleteDialog": {
@@ -871,6 +872,12 @@
     "pinForgotRestore": "Backup wiederherstellen",
     "pinForgotNewUser": "Neuen Benutzer erstellen",
     "pinChangedMessage": "PIN wurde aktualisiert. Bitte melde dich mit der neuen PIN erneut an.",
+    "resetKeysTitle": "Sicherheits-Reset",
+    "resetKeysMessage": "Deine Sicherheitsschlüssel werden neu erzeugt. Dabei wird der Chatverlauf gelöscht, Kontakte bleiben erhalten. Möchtest du fortfahren?",
+    "resetKeysAction": "Reset ausführen",
+    "resetKeysInProgress": "Sicherheitsschlüssel werden zurückgesetzt",
+    "resetKeysSuccess": "Sicherheits-Reset abgeschlossen. Der Chatverlauf wurde gelöscht.",
+    "resetKeysFailed": "Sicherheits-Reset fehlgeschlagen. Bitte später erneut versuchen.",
     "userNotFoundTitle": "Benutzer nicht gefunden",
     "userNotFoundMessage": "Dieser Benutzer ist auf dem Server nicht vorhanden.\n\nWir können deine Daten von diesem Gerät wiederherstellen, damit du weitermachen kannst.",
     "userNotFoundAction": "Vom Gerät wiederherstellen",

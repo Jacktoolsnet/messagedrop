@@ -771,6 +771,7 @@
         "userIdLabel": "ID utilisateur :",
         "backup": "Sauvegarder les données",
         "changePin": "Modifier le PIN",
+        "resetKeys": "Réinitialisation de sécurité",
         "delete": "Supprimer mon utilisateur"
       },
       "deleteDialog": {
@@ -871,6 +872,12 @@
     "pinForgotRestore": "Restaurer la sauvegarde",
     "pinForgotNewUser": "Créer un nouvel utilisateur",
     "pinChangedMessage": "Le PIN a été mis à jour. Veuillez vous reconnecter avec le nouveau PIN.",
+    "resetKeysTitle": "Réinitialisation de sécurité",
+    "resetKeysMessage": "Vos clés de sécurité vont être régénérées. Cela supprimera l'historique des discussions, mais conservera vos contacts. Voulez-vous continuer ?",
+    "resetKeysAction": "Lancer la réinitialisation",
+    "resetKeysInProgress": "Réinitialisation des clés de sécurité",
+    "resetKeysSuccess": "Réinitialisation de sécurité terminée. L'historique des discussions a été supprimé.",
+    "resetKeysFailed": "La réinitialisation de sécurité a échoué. Veuillez réessayer plus tard.",
     "userNotFoundTitle": "Utilisateur introuvable",
     "userNotFoundMessage": "Cet utilisateur n'est pas disponible sur le serveur.\n\nNous pouvons restaurer vos données depuis cet appareil pour que vous puissiez continuer.",
     "userNotFoundAction": "Restaurer depuis l'appareil",

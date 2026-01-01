@@ -12,6 +12,11 @@
     <mat-icon>lock_reset</mat-icon>
     <span>{{ 'common.user.dialog.changePin' | transloco }}</span>
   </button>
+  <button mat-stroked-button color="warn" [attr.aria-hidden]="false" class="button"
+    [mat-dialog-close]="{'action': 'resetKeys'}">
+    <mat-icon>security</mat-icon>
+    <span>{{ 'common.user.dialog.resetKeys' | transloco }}</span>
+  </button>
   <button mat-flat-button color="warn" [attr.aria-hidden]="false" class="button button-danger"
     [mat-dialog-close]="{'action': 'deleteUserId'}">
     <mat-icon>delete</mat-icon>

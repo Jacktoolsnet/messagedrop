@@ -771,6 +771,7 @@
         "userIdLabel": "User ID:",
         "backup": "Backup data",
         "changePin": "Change PIN",
+        "resetKeys": "Security reset",
         "delete": "Delete my user"
       },
       "deleteDialog": {
@@ -871,6 +872,12 @@
     "pinForgotRestore": "Restore backup",
     "pinForgotNewUser": "Create new user",
     "pinChangedMessage": "PIN updated. Please log in again with your new PIN.",
+    "resetKeysTitle": "Security reset",
+    "resetKeysMessage": "Your security keys will be regenerated. This will delete your chat history, but keep your contacts. Do you want to continue?",
+    "resetKeysAction": "Run reset",
+    "resetKeysInProgress": "Resetting security keys",
+    "resetKeysSuccess": "Security reset completed. Chat history has been deleted.",
+    "resetKeysFailed": "Security reset failed. Please try again later.",
     "userNotFoundTitle": "User not found",
     "userNotFoundMessage": "This user is missing on the server.\n\nWe can restore your data from this device so you can continue.",
     "userNotFoundAction": "Restore from device",

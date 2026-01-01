@@ -338,6 +338,35 @@ export class UserService {
       );
   }
 
+  resetUserKeys(
+    userId: string,
+    signingPublicKey: JsonWebKey,
+    cryptoPublicKey: JsonWebKey,
+    showAlways = true
+  ): Observable<SimpleStatusResponse> {
+    const url = `${environment.apiUrl}/user/reset-keys`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: this.i18n.t('auth.serviceTitle'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('auth.resetKeysInProgress'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+    const body = {
+      userId,
+      signingPublicKey,
+      cryptoPublicKey
+    };
+    return this.http.post<SimpleStatusResponse>(url, body, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   requestLoginChallenge(userId: string, showAlways = false): Observable<UserChallengeResponse> {
     const url = `${environment.apiUrl}/user/challenge`;
     this.networkService.setNetworkMessageConfig(url, {
@@ -1048,6 +1077,91 @@ export class UserService {
           image: '',
           icon: 'bug_report',
           message: this.i18n.t('auth.backendErrorMessage'),
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+      errorDialog.afterClosed().subscribe(() => {
+        this.blocked = false;
+      });
+    }
+  }
+
+  public async resetKeys(): Promise<void> {
+    if (!this.isReady()) {
+      return;
+    }
+
+    const dialogRef = this.displayMessage.open(DeleteUserComponent, {
+      data: {
+        title: this.i18n.t('auth.resetKeysTitle'),
+        message: this.i18n.t('auth.resetKeysMessage'),
+        confirmLabel: this.i18n.t('auth.resetKeysAction')
+      },
+      closeOnNavigation: true,
+      hasBackdrop: true
+    });
+
+    const confirmed = await firstValueFrom(dialogRef.afterClosed());
+    if (!confirmed) {
+      return;
+    }
+
+    this.blocked = true;
+
+    try {
+      const newCryptoKeys = await this.cryptoService.createEncryptionKey();
+      const newSigningKeys = await this.cryptoService.createSigningKey();
+
+      await firstValueFrom(this.resetUserKeys(
+        this.user.id,
+        newSigningKeys.publicKey,
+        newCryptoKeys.publicKey,
+        true
+      ));
+
+      this.user.cryptoKeyPair = newCryptoKeys;
+      this.user.signingKeyPair = newSigningKeys;
+      await this.saveUser();
+
+      const infoDialog = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('auth.resetKeysTitle'),
+          image: '',
+          icon: 'verified_user',
+          message: this.i18n.t('auth.resetKeysSuccess'),
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+
+      infoDialog.afterClosed().subscribe(() => {
+        this.blocked = false;
+      });
+    } catch (err) {
+      console.error('Reset keys failed', err);
+      const errorDialog = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('auth.backendErrorTitle'),
+          image: '',
+          icon: 'bug_report',
+          message: this.i18n.t('auth.resetKeysFailed'),
           button: this.i18n.t('common.actions.ok'),
           delay: 0,
           showSpinner: false
