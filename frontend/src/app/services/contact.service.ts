@@ -194,6 +194,29 @@ export class ContactService {
     );
   }
 
+  updateContactKeysByContactUserId(contactUserId: string, signingPublicKey: JsonWebKey, cryptoPublicKey: JsonWebKey) {
+    if (!contactUserId) {
+      return;
+    }
+    let changed = false;
+    this._contacts.update((contacts) =>
+      contacts.map((contact) => {
+        if (contact.contactUserId !== contactUserId) {
+          return contact;
+        }
+        changed = true;
+        return {
+          ...contact,
+          contactUserSigningPublicKey: signingPublicKey,
+          contactUserEncryptionPublicKey: cryptoPublicKey
+        };
+      })
+    );
+    if (changed) {
+      this.persistContacts();
+    }
+  }
+
   createContact(contact: Contact, socketioService: SocketioService, showAlways = false) {
     const url = `${environment.apiUrl}/contact/create`;
     this.networkService.setNetworkMessageConfig(url, {

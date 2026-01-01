@@ -709,6 +709,7 @@
       "corrupted": "Backup-Datei ist beschädigt.",
       "encryptedNotSupported": "Verschlüsselte Backups werden in diesem Browser nicht unterstützt.",
       "pinIncorrect": "PIN ist falsch oder das Backup ist beschädigt.",
+      "keysMismatch": "Dieses Backup wurde mit anderen Sicherheitsschlüsseln erstellt. Es ist veraltet und kann nicht wiederhergestellt werden.",
       "overwriteTitle": "Backup wiederherstellen",
       "overwriteMessage": "Das Wiederherstellen löscht den aktuellen Benutzer und alle zugehörigen Daten auf diesem Gerät und auf dem Server. Fortfahren?",
       "overwriteUserHint": "Das Backup gehört zu Benutzer {{ userId }}.",

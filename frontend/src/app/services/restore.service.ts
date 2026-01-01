@@ -105,6 +105,14 @@ export class RestoreService {
       }
 
       if (hasUser && this.userService.isReady()) {
+        if (this.hasKeyMismatch(payload)) {
+          this.snackBar.open(this.i18n.t('common.restore.keysMismatch'), undefined, {
+            duration: 3500,
+            horizontalPosition: 'center',
+            verticalPosition: 'top'
+          });
+          return;
+        }
         const confirmed = await this.confirmOverwrite(payload.userId);
         if (!confirmed) {
           return;
@@ -437,6 +445,62 @@ export class RestoreService {
 
       await this.indexedDbService.saveImage(entry);
     }
+  }
+
+  private hasKeyMismatch(payload: BackupPayload): boolean {
+    if (!this.userService.isReady()) {
+      return false;
+    }
+    const currentUser = this.userService.getUser();
+    if (!currentUser?.id || currentUser.id !== payload.userId) {
+      return false;
+    }
+    const tableUser = (payload.server?.tables?.tableUser ?? []) as Array<Record<string, unknown>>;
+    const backupRow = tableUser.find((row) => row.id === payload.userId) ?? tableUser[0];
+    if (!backupRow) {
+      return false;
+    }
+
+    const backupSigning = this.normalizeKeyValue(backupRow.signingPublicKey);
+    const backupCrypto = this.normalizeKeyValue(backupRow.cryptoPublicKey);
+    const currentSigning = this.normalizeKeyValue(currentUser.signingKeyPair?.publicKey);
+    const currentCrypto = this.normalizeKeyValue(currentUser.cryptoKeyPair?.publicKey);
+
+    if (!backupSigning || !backupCrypto || !currentSigning || !currentCrypto) {
+      return false;
+    }
+
+    return backupSigning !== currentSigning || backupCrypto !== currentCrypto;
+  }
+
+  private normalizeKeyValue(value: unknown): string | null {
+    if (!value) {
+      return null;
+    }
+    if (typeof value === 'string') {
+      try {
+        return this.stableStringify(JSON.parse(value));
+      } catch {
+        return value;
+      }
+    }
+    return this.stableStringify(value);
+  }
+
+  private stableStringify(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (Array.isArray(value)) {
+      return `[${value.map((entry) => this.stableStringify(entry)).join(',')}]`;
+    }
+    if (typeof value === 'object') {
+      const entries = Object.entries(value as Record<string, unknown>)
+        .sort(([a], [b]) => a.localeCompare(b))
+        .map(([key, val]) => `"${key}":${this.stableStringify(val)}`);
+      return `{${entries.join(',')}}`;
+    }
+    return JSON.stringify(value);
   }
 
   private buildImageFileName(image: BackupLocalImage): string {

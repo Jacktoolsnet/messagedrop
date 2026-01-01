@@ -709,6 +709,7 @@
       "corrupted": "Le fichier de sauvegarde est corrompu.",
       "encryptedNotSupported": "Les sauvegardes chiffrées ne sont pas prises en charge dans ce navigateur.",
       "pinIncorrect": "Le PIN est incorrect ou la sauvegarde est corrompue.",
+      "keysMismatch": "Cette sauvegarde a été créée avec des clés de sécurité différentes. Elle est obsolète et ne peut pas être restaurée.",
       "overwriteTitle": "Restaurer une sauvegarde",
       "overwriteMessage": "Restaurer cette sauvegarde supprimera l'utilisateur actuel et toutes les données associées sur cet appareil et sur le serveur. Continuer ?",
       "overwriteUserHint": "La sauvegarde appartient à l'utilisateur {{ userId }}.",

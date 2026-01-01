@@ -709,6 +709,7 @@
       "corrupted": "Backup file is corrupted.",
       "encryptedNotSupported": "Encrypted backups are not supported in this browser.",
       "pinIncorrect": "PIN is incorrect or the backup is corrupted.",
+      "keysMismatch": "This backup was created with different security keys. It is outdated and cannot be restored.",
       "overwriteTitle": "Restore backup",
       "overwriteMessage": "Restoring this backup will delete the current user and all related data on this device and on the server. Continue?",
       "overwriteUserHint": "The backup belongs to user {{ userId }}.",

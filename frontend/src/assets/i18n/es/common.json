@@ -709,6 +709,7 @@
       "corrupted": "El archivo de copia de seguridad está corrupto.",
       "encryptedNotSupported": "Las copias de seguridad cifradas no son compatibles con este navegador.",
       "pinIncorrect": "El PIN no es correcto o la copia de seguridad está corrupta.",
+      "keysMismatch": "Esta copia de seguridad se creó con claves de seguridad diferentes. Está desactualizada y no se puede restaurar.",
       "overwriteTitle": "Restaurar copia de seguridad",
       "overwriteMessage": "Restaurar esta copia de seguridad eliminará el usuario actual y todos los datos relacionados en este dispositivo y en el servidor. ¿Continuar?",
       "overwriteUserHint": "La copia de seguridad pertenece al usuario {{ userId }}.",

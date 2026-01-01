@@ -6,12 +6,59 @@ const { webcrypto } = crypto;
 const { subtle } = webcrypto;
 const jwt = require('jsonwebtoken');
 const express = require('express');
+const axios = require('axios');
 const router = express.Router();
 const rateLimit = require('express-rate-limit');
 const security = require('../middleware/security');
 const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
+const { signServiceJwt } = require('../utils/serviceJwt');
+
+const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
+
+function resolveSocketIoBaseUrl() {
+  const base = (process.env.SOCKETIO_BASE_URL || process.env.BASE_URL || '').replace(/\/+$/, '');
+  const port = process.env.SOCKETIO_PORT;
+  if (!base || !port) {
+    return null;
+  }
+  return `${base}:${port}`;
+}
+
+async function emitKeyUpdate(userIds, payload) {
+  const baseUrl = resolveSocketIoBaseUrl();
+  if (!baseUrl || !Array.isArray(userIds) || !userIds.length) {
+    return;
+  }
+  let token;
+  try {
+    token = await signServiceJwt({ audience: SOCKET_AUDIENCE });
+  } catch {
+    return;
+  }
+  await Promise.all(userIds.map(async (userId) => {
+    if (!userId) {
+      return;
+    }
+    try {
+      await axios.post(`${baseUrl}/emit/user`, {
+        userId,
+        event: String(userId),
+        payload
+      }, {
+        headers: {
+          'content-type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        timeout: 3000,
+        validateStatus: () => true
+      });
+    } catch {
+      // best-effort only
+    }
+  }));
+}
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -586,6 +633,13 @@ router.post('/reset-keys',
         return next(apiError.notFound('not_found'));
       }
 
+      const contactRows = await queryAll(
+        req.database.db,
+        'SELECT DISTINCT userId FROM tableContact WHERE contactUserId = ?;',
+        [userId]
+      );
+      const contactUserIds = contactRows.map((row) => row.userId).filter(Boolean);
+
       await runQuery(req.database.db, 'BEGIN IMMEDIATE');
       await runQuery(
         req.database.db,
@@ -609,6 +663,16 @@ router.post('/reset-keys',
       );
       await runQuery(req.database.db, 'DELETE FROM tableConnect WHERE userId = ?;', [userId]);
       await runQuery(req.database.db, 'COMMIT');
+
+      emitKeyUpdate(contactUserIds, {
+        status: 200,
+        type: 'contact_keys_updated',
+        content: {
+          userId,
+          signingPublicKey: signingKeyValue,
+          cryptoPublicKey: cryptoKeyValue
+        }
+      });
 
       res.status(200).json({ status: 200 });
     } catch (err) {

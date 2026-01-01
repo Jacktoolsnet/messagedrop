@@ -18,6 +18,12 @@ interface UserRoomPayload {
   content?: unknown;
 }
 
+interface ContactKeysUpdatedPayload {
+  userId?: string;
+  signingPublicKey?: JsonWebKey | string;
+  cryptoPublicKey?: JsonWebKey | string;
+}
+
 interface ProfileRequestPayload {
   status: number;
   contact: Contact;
@@ -190,6 +196,19 @@ export class SocketioService {
           void this.systemNotificationService.refreshUnreadCount();
           void this.notifyViaServiceWorker(payload?.content);
           break;
+        case 'contact_keys_updated': {
+          const content = payload?.content as ContactKeysUpdatedPayload | undefined;
+          const contactUserId = content?.userId;
+          if (!contactUserId) {
+            break;
+          }
+          const signingKey = this.normalizeKey(content?.signingPublicKey);
+          const cryptoKey = this.normalizeKey(content?.cryptoPublicKey);
+          if (signingKey && cryptoKey) {
+            this.contactService.updateContactKeysByContactUserId(contactUserId, signingKey, cryptoKey);
+          }
+          break;
+        }
       }
     });
     this.updateAuthAndConnect(userId, user.jwt);
@@ -351,6 +370,20 @@ export class SocketioService {
       clearTimeout(this.joinResetTimer);
       this.joinResetTimer = undefined;
     }
+  }
+
+  private normalizeKey(key?: JsonWebKey | string): JsonWebKey | null {
+    if (!key) {
+      return null;
+    }
+    if (typeof key === 'string') {
+      try {
+        return JSON.parse(key) as JsonWebKey;
+      } catch {
+        return null;
+      }
+    }
+    return key;
   }
 
 }
