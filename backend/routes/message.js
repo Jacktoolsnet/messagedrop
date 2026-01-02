@@ -297,10 +297,7 @@ router.get('/get/boundingbox/:latMin/:lonMin/:latMax/:lonMax',
         if (err) {
           return next(apiError.internal('db_error'));
         }
-        if (!rows || rows.length === 0) {
-          return next(apiError.notFound('not_found'));
-        }
-        response.rows = rows;
+        response.rows = rows || [];
         response.status = 200;
         res.status(200).json(response);
       }

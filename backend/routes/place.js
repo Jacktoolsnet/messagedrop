@@ -146,10 +146,7 @@ router.get('/get/userId/:userId',
         return next(apiError.internal('db_error'));
       }
       response.status = 200;
-      if (!rows || rows.length == 0) {
-        return next(apiError.notFound('not_found'));
-      }
-      rows.forEach((row) => {
+      (rows || []).forEach((row) => {
         response.rows.push({
           'id': row.id,
           'userId': row.userId,
