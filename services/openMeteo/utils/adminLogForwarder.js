@@ -53,13 +53,16 @@ function createForwarder({ baseUrl, token, audience, source }) {
     if (level === 'error') {
       return post('/error-log', body);
     }
+    if (level === 'warn') {
+      return post('/warn-log', body);
+    }
     return post('/info-log', body);
   };
 }
 
 function attachForwarding(logger, opts) {
   const forward = createForwarder(opts);
-  ['info', 'error'].forEach(level => {
+  ['info', 'warn', 'error'].forEach(level => {
     const orig = logger[level]?.bind(logger);
     if (!orig) return;
     logger[level] = (...args) => {

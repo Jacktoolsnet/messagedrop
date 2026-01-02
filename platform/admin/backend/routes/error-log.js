@@ -5,6 +5,7 @@ const { requireAdminJwt, checkToken } = require('../middleware/security');
 const { verifyServiceJwt } = require('../utils/serviceJwt');
 const tableErrorLog = require('../db/tableErrorLog');
 const { apiError } = require('../middleware/api-error');
+const { parseRetentionMs, DAY_MS } = require('../utils/logRetention');
 
 // Allow internal services via static token and admins via JWT
 router.use((req, res, next) => {
@@ -95,19 +96,20 @@ router.get('/count', (req, res, next) => {
 
 /**
  * DELETE /error-log/cleanup
- * Removes entries older than 7 days.
+ * Removes entries older than configured retention (LOG_RETENTION_ERROR).
  */
 router.delete('/cleanup', (req, res, next) => {
   const db = req.database?.db;
   if (!db) return next(apiError.internal('database_unavailable'));
 
-  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
-  tableErrorLog.cleanupOlderThan(db, sevenDaysAgo, (err) => {
+  const retentionMs = parseRetentionMs(process.env.LOG_RETENTION_ERROR || '30d', 30 * DAY_MS);
+  const threshold = Date.now() - retentionMs;
+  tableErrorLog.cleanupOlderThan(db, threshold, (err) => {
     if (err) {
       req.logger?.error('Error log cleanup failed', { error: err?.message });
       return next(apiError.internal('cleanup_failed'));
     }
-    res.json({ cleaned: true, threshold: sevenDaysAgo });
+    res.json({ cleaned: true, threshold });
   });
 });
 

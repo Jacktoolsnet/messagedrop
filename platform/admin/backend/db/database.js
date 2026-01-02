@@ -13,6 +13,7 @@ const tableStatisticSettings = require('./tableStatisticSettings');
 const tableLoginOtp = require('./tableLoginOtp');
 const tableErrorLog = require('./tableErrorLog');
 const tableInfoLog = require('./tableInfoLog');
+const tableWarnLog = require('./tableWarnLog');
 const tableFrontendErrorLog = require('./tableFrontendErrorLog');
 const tablePowLog = require('./tablePowLog');
 const tableModerationRequest = require('./tableModerationRequest');
@@ -49,6 +50,7 @@ class Database {
         tableLoginOtp.init(this.db);
         tableErrorLog.init(this.db);
         tableInfoLog.init(this.db);
+        tableWarnLog.init(this.db);
         tableFrontendErrorLog.init(this.db);
         tablePowLog.init(this.db);
         tableModerationRequest.init(this.db);

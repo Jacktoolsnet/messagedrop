@@ -3,7 +3,7 @@ const crypto = require('crypto');
 const router = express.Router();
 const { requireAdminJwt, checkToken } = require('../middleware/security');
 const { verifyServiceJwt } = require('../utils/serviceJwt');
-const tableInfoLog = require('../db/tableInfoLog');
+const tableWarnLog = require('../db/tableWarnLog');
 const { apiError } = require('../middleware/api-error');
 const { parseRetentionMs, DAY_MS } = require('../utils/logRetention');
 
@@ -21,8 +21,8 @@ router.use((req, res, next) => {
 });
 
 /**
- * POST /info-log
- * Body: { source: string, file: string, message: string, createdAt?: number }
+ * POST /warn-log
+ * Body: { source: string, file: string, message: string, detail?: string, createdAt?: number }
  */
 router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
   const db = req.database?.db;
@@ -31,6 +31,9 @@ router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
   const source = typeof req.body?.source === 'string' ? req.body.source.trim() : '';
   const file = typeof req.body?.file === 'string' ? req.body.file.trim() : '';
   const message = typeof req.body?.message === 'string' ? req.body.message.trim() : '';
+  const detail = typeof req.body?.detail === 'string'
+    ? req.body.detail.trim()
+    : (req.body?.detail ? JSON.stringify(req.body.detail) : '');
   const createdAt = Number.isFinite(req.body?.createdAt) ? Number(req.body.createdAt) : Date.now();
 
   if (!source || !file || !message) {
@@ -39,9 +42,9 @@ router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
 
   const id = crypto.randomUUID();
 
-  tableInfoLog.create(db, id, source, file, message, createdAt, (err) => {
+  tableWarnLog.create(db, id, source, file, message, detail || null, createdAt, (err) => {
     if (err) {
-      req.logger?.error('Info log insert failed', { error: err?.message });
+      req.logger?.error('Warn log insert failed', { error: err?.message });
       return next(apiError.internal('insert_failed'));
     }
     res.status(201).json({ id, createdAt });
@@ -49,7 +52,7 @@ router.post('/', express.json({ limit: '256kb' }), (req, res, next) => {
 });
 
 /**
- * GET /info-log
+ * GET /warn-log
  * Query: limit?, offset?
  */
 router.get('/', (req, res, next) => {
@@ -57,9 +60,9 @@ router.get('/', (req, res, next) => {
   if (!db) return next(apiError.internal('database_unavailable'));
   const limit = Number(req.query?.limit);
   const offset = Number(req.query?.offset);
-  tableInfoLog.list(db, limit, offset, (err, rows) => {
+  tableWarnLog.list(db, limit, offset, (err, rows) => {
     if (err) {
-      req.logger?.error('Info log list failed', { error: err?.message });
+      req.logger?.error('Warn log list failed', { error: err?.message });
       return next(apiError.internal('list_failed'));
     }
     res.json({ rows });
@@ -67,7 +70,7 @@ router.get('/', (req, res, next) => {
 });
 
 /**
- * GET /info-log/count?since=<ts>
+ * GET /warn-log/count?since=<ts>
  * Returns count of entries since timestamp (ms). Default: start of current day (UTC).
  */
 router.get('/count', (req, res, next) => {
@@ -82,9 +85,9 @@ router.get('/count', (req, res, next) => {
   })();
   const sinceTs = Number.isFinite(since) ? since : defaultSince;
 
-  tableInfoLog.countSince(db, sinceTs, (err, count) => {
+  tableWarnLog.countSince(db, sinceTs, (err, count) => {
     if (err) {
-      req.logger?.error('Info log count failed', { error: err?.message });
+      req.logger?.error('Warn log count failed', { error: err?.message });
       return next(apiError.internal('count_failed'));
     }
     res.json({ count, since: sinceTs });
@@ -92,7 +95,7 @@ router.get('/count', (req, res, next) => {
 });
 
 /**
- * DELETE /info-log/cleanup
+ * DELETE /warn-log/cleanup
  * Removes entries older than configured retention (LOG_RETENTION_INFO).
  */
 router.delete('/cleanup', (req, res, next) => {
@@ -101,9 +104,9 @@ router.delete('/cleanup', (req, res, next) => {
 
   const retentionMs = parseRetentionMs(process.env.LOG_RETENTION_INFO || '7d', 7 * DAY_MS);
   const threshold = Date.now() - retentionMs;
-  tableInfoLog.cleanupOlderThan(db, threshold, (err) => {
+  tableWarnLog.cleanupOlderThan(db, threshold, (err) => {
     if (err) {
-      req.logger?.error('Info log cleanup failed', { error: err?.message });
+      req.logger?.error('Warn log cleanup failed', { error: err?.message });
       return next(apiError.internal('cleanup_failed'));
     }
     res.json({ cleaned: true, threshold });
@@ -111,30 +114,14 @@ router.delete('/cleanup', (req, res, next) => {
 });
 
 /**
- * DELETE /info-log
- * Deletes all entries.
- */
-router.delete('/', (req, res, next) => {
-  const db = req.database?.db;
-  if (!db) return next(apiError.internal('database_unavailable'));
-  tableInfoLog.deleteAll(db, (err, count) => {
-    if (err) {
-      req.logger?.error('Info log delete all failed', { error: err?.message });
-      return next(apiError.internal('delete_failed'));
-    }
-    res.json({ deleted: true, count });
-  });
-});
-
-/**
- * DELETE /info-log/:id
+ * DELETE /warn-log/:id
  */
 router.delete('/:id', (req, res, next) => {
   const db = req.database?.db;
   if (!db) return next(apiError.internal('database_unavailable'));
-  tableInfoLog.deleteById(db, req.params.id, (err, ok) => {
+  tableWarnLog.deleteById(db, req.params.id, (err, ok) => {
     if (err) {
-      req.logger?.error('Info log delete failed', { error: err?.message });
+      req.logger?.error('Warn log delete failed', { error: err?.message });
       return next(apiError.internal('delete_failed'));
     }
     if (!ok) return next(apiError.notFound('not_found'));

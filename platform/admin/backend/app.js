@@ -11,6 +11,7 @@ const database = new Database();
 const tableStatistic = require('./db/tableStatistic');
 const tableErrorLog = require('./db/tableErrorLog');
 const tableInfoLog = require('./db/tableInfoLog');
+const tableWarnLog = require('./db/tableWarnLog');
 const tableFrontendErrorLog = require('./db/tableFrontendErrorLog');
 const tablePowLog = require('./db/tablePowLog');
 const root = require('./routes/root');
@@ -24,6 +25,7 @@ const publicStatus = require('./routes/public-status');
 const statistic = require('./routes/statistic');
 const errorLog = require('./routes/error-log');
 const infoLog = require('./routes/info-log');
+const warnLog = require('./routes/warn-log');
 const frontendErrorLog = require('./routes/frontend-error-log');
 const powLog = require('./routes/pow-log');
 const moderation = require('./routes/moderation');
@@ -37,6 +39,7 @@ const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const { cleanupClosedDsaCases } = require('./utils/dsaCleanup');
+const { parseRetentionMs, DAY_MS } = require('./utils/logRetention');
 
 // ExpressJs
 const { createServer } = require('node:http');
@@ -361,6 +364,7 @@ app.use('/translate', adminTranslateLimit, translate);
 app.use('/statistic', statistic);
 app.use('/error-log', adminLogLimit, errorLog);
 app.use('/info-log', adminLogLimit, infoLog);
+app.use('/warn-log', adminLogLimit, warnLog);
 app.use('/frontend-error-log', adminLogLimit, frontendErrorLog);
 app.use('/pow-log', adminLogLimit, powLog);
 app.use('/moderation', adminLogLimit, moderation);
@@ -411,9 +415,12 @@ cron.schedule('5 0 * * *', () => {
   });
 });
 
-// Clean error logs older than 7 days
+const infoRetentionMs = parseRetentionMs(LOG_RETENTION_INFO, 7 * DAY_MS);
+const errorRetentionMs = parseRetentionMs(LOG_RETENTION_ERROR, 30 * DAY_MS);
+
+// Clean error logs older than configured retention
 cron.schedule('15 0 * * *', () => {
-  const threshold = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const threshold = Date.now() - errorRetentionMs;
   tableErrorLog.cleanupOlderThan(database.db, threshold, (err) => {
     if (err) {
       logger.error('ErrorLog cleanup failed', { error: err?.message });
@@ -431,12 +438,22 @@ cron.schedule('17 0 * * *', () => {
   });
 });
 
-// Clean info logs older than 7 days
+// Clean info logs older than configured retention
 cron.schedule('20 0 * * *', () => {
-  const threshold = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const threshold = Date.now() - infoRetentionMs;
   tableInfoLog.cleanupOlderThan(database.db, threshold, (err) => {
     if (err) {
       logger.error('InfoLog cleanup failed', { error: err?.message });
+    }
+  });
+});
+
+// Clean warn logs older than configured retention
+cron.schedule('21 0 * * *', () => {
+  const threshold = Date.now() - infoRetentionMs;
+  tableWarnLog.cleanupOlderThan(database.db, threshold, (err) => {
+    if (err) {
+      logger.error('WarnLog cleanup failed', { error: err?.message });
     }
   });
 });
