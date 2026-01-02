@@ -51,6 +51,11 @@ export class LogService {
             .pipe(catchError(() => of({ deleted: false })));
     }
 
+    deleteAllErrorLogs() {
+        return this.http.delete<{ deleted: boolean; count?: number }>(`${this.baseUrl}/error-log`)
+            .pipe(catchError(() => of({ deleted: false, count: 0 })));
+    }
+
     listInfoLogs(limit = 100, offset = 0) {
         return this.http.get<{ rows: ErrorLogEntry[] }>(`${this.baseUrl}/info-log?limit=${limit}&offset=${offset}`)
             .pipe(catchError(() => of({ rows: [] })));

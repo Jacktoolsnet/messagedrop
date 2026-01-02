@@ -114,6 +114,22 @@ router.delete('/cleanup', (req, res, next) => {
 });
 
 /**
+ * DELETE /error-log
+ * Deletes all entries.
+ */
+router.delete('/', (req, res, next) => {
+  const db = req.database?.db;
+  if (!db) return next(apiError.internal('database_unavailable'));
+  tableErrorLog.deleteAll(db, (err, count) => {
+    if (err) {
+      req.logger?.error('Error log delete all failed', { error: err?.message });
+      return next(apiError.internal('delete_failed'));
+    }
+    res.json({ deleted: true, count });
+  });
+});
+
+/**
  * DELETE /error-log/:id
  */
 router.delete('/:id', (req, res, next) => {
