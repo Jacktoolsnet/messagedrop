@@ -53,7 +53,7 @@ export class PlaceService {
     }
     this.getByUserId(userId).subscribe({
       next: async (response) => {
-        const places = await Promise.all(response.rows.map(row => this.loadPlaceFromIndexedDb(row.id)));
+        const places = await Promise.all((response.rows ?? []).map(row => this.loadPlaceFromIndexedDb(row.id)));
         this._places.set(places as Place[]);
         this.ready = true;
       },

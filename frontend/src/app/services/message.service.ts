@@ -516,7 +516,7 @@ export class MessageService {
 
         const uniqueMessages = new Map<number, RawMessage>();
         successfulResponses.forEach(response => {
-          response.rows.forEach(raw => {
+          (response.rows ?? []).forEach(raw => {
             uniqueMessages.set(raw.id, raw);
           });
         });
@@ -627,7 +627,7 @@ export class MessageService {
       .pipe(catchError(this.handleError))
       .subscribe({
         next: (getMessageResponse) => {
-          const comments = getMessageResponse.rows.map((rawMessage: RawMessage) => ({
+          const comments = (getMessageResponse.rows ?? []).map((rawMessage: RawMessage) => ({
             id: rawMessage.id,
             uuid: rawMessage.uuid,
             parentId: rawMessage.parentId,
