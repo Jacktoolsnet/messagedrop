@@ -217,10 +217,14 @@ io.on('connection', (socket) => {
 });
 
 io.engine.on('connection_error', (err) => {
+  const ip = err.req?.socket?.remoteAddress;
+  if (err.code === 3 && (ip === '127.0.0.1' || ip === '::1')) {
+    return;
+  }
   logger.error('connection error', {
     code: err.code,
     message: err.message,
-    ip: err.req?.socket?.remoteAddress
+    ip
   });
 });
 
