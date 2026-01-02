@@ -3,12 +3,14 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 
 // Axios-Client für Upstream
+const openMeteoBase = resolveBaseUrl(process.env.OPENMETEO_BASE_URL, process.env.OPENMETEO_PORT);
 const client = axios.create({
-    baseURL: `${process.env.OPENMETEO_BASE_URL}:${process.env.OPENMETEO_PORT}/weather`,
+    baseURL: `${openMeteoBase}/weather`,
     timeout: 5000,
     validateStatus: () => true, // wir geben Statuscodes transparent weiter
     headers: {

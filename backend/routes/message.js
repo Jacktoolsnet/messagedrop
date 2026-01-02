@@ -11,6 +11,7 @@ const axios = require('axios');
 const OpenAI = require('openai');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 function getAuthUserId(req) {
   return req.jwtUser?.userId ?? req.jwtUser?.id ?? null;
@@ -132,12 +133,11 @@ function decideModeration(score) {
 }
 
 async function forwardModerationRequest(payload, logger) {
-  const base = (process.env.ADMIN_BASE_URL || '').replace(/\/+$/, '');
-  const port = process.env.ADMIN_PORT;
-  if (!base || !port) {
+  const baseUrl = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
+  if (!baseUrl) {
     return { sent: false };
   }
-  const url = `${base}:${port}/moderation/requests`;
+  const url = `${baseUrl}/moderation/requests`;
   try {
     const serviceToken = await signServiceJwt({ audience: adminAudience });
     const resp = await axios.post(url, payload, {

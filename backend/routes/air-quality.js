@@ -3,12 +3,14 @@ const express = require('express');
 const router = express.Router();
 const axios = require('axios');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 
 // Ein eigenes Axios-Client mit BaseURL + Backend-Token
+const openMeteoBase = resolveBaseUrl(process.env.OPENMETEO_BASE_URL, process.env.OPENMETEO_PORT);
 const client = axios.create({
-    baseURL: `${process.env.OPENMETEO_BASE_URL}:${process.env.OPENMETEO_PORT}/airquality`,
+    baseURL: `${openMeteoBase}/airquality`,
     timeout: 5000,
     // wir wollen Fehlerstatus manuell durchreichen
     validateStatus: () => true,

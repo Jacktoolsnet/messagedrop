@@ -5,6 +5,7 @@ const security = require('../middleware/security');
 const tableNotification = require('../db/tableNotification');
 const { signServiceJwt, verifyServiceJwt } = require('../utils/serviceJwt');
 const { apiError } = require('../middleware/api-error');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const router = express.Router();
 
@@ -14,12 +15,7 @@ const ALLOWED_STATUSES = new Set(Object.values(tableNotification.notificationSta
 const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
 
 function resolveSocketIoBaseUrl() {
-    const base = (process.env.SOCKETIO_BASE_URL || process.env.BASE_URL || '').replace(/\/+$/, '');
-    const port = process.env.SOCKETIO_PORT;
-    if (!base || !port) {
-        return null;
-    }
-    return `${base}:${port}`;
+    return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
 }
 
 async function emitSystemNotification(userId, payload) {

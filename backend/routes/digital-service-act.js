@@ -8,6 +8,7 @@ const tableMessage = require('../db/tableMessage');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { createPowGuard } = require('../middleware/pow');
 const { apiError } = require('../middleware/api-error');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const router = express.Router();
 
@@ -66,6 +67,7 @@ const reportHourlyLimiter = rateLimit({
 });
 
 const ADMIN_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend';
+const adminBaseUrl = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
 
 const noticePow = createPowGuard({
     scope: 'dsa.notice',
@@ -139,7 +141,7 @@ async function ensureContentExists(req, contentId, next) {
 }
 
 async function forwardPost(path, body) {
-    const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend${path}`;
+    const url = `${adminBaseUrl}/dsa/frontend${path}`;
     const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
     const headers = {
         'content-type': 'application/json',
@@ -155,7 +157,7 @@ async function forwardPost(path, body) {
 }
 
 async function forwardPostBackend(path, body, extraHeaders = {}) {
-    const url = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/backend${path}`;
+    const url = `${adminBaseUrl}/dsa/backend${path}`;
     const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
     const headers = {
         Authorization: `Bearer ${serviceToken}`,
@@ -263,7 +265,7 @@ router.get('/enable/publicmessage/:messageId', moderationToggleLimiter, security
     });
 });
 
-router.get('/health', moderationToggleLimiter, (_req, res) => res.json({ ok: true, adminBase: `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/frontend` }));
+router.get('/health', moderationToggleLimiter, (_req, res) => res.json({ ok: true, adminBase: `${adminBaseUrl}/dsa/frontend` }));
 
 module.exports = router;
 
@@ -294,7 +296,7 @@ router.post('/notices/:id/evidence', evidenceLimiter, noticeEvidencePow, (req, r
                 if (req.body?.hash) form.append('hash', String(req.body.hash));
                 const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
                 const headers = form.getHeaders({ Authorization: `Bearer ${serviceToken}` });
-                const resp = await axios.post(`${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/dsa/backend/notices/${id}/evidence`, form, {
+                const resp = await axios.post(`${adminBaseUrl}/dsa/backend/notices/${id}/evidence`, form, {
                     headers,
                     timeout: 10000,
                     validateStatus: () => true,
@@ -339,7 +341,7 @@ router.post('/status/:token/evidence', evidenceLimiter, statusEvidencePow, (req,
                 if (req.body?.hash) form.append('hash', String(req.body.hash));
                 const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
                 const headers = form.getHeaders({ Authorization: `Bearer ${serviceToken}` });
-                const resp = await axios.post(`${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/public/status/${token}/evidence`, form, {
+                const resp = await axios.post(`${adminBaseUrl}/public/status/${token}/evidence`, form, {
                     headers,
                     timeout: 10000,
                     validateStatus: () => true,
@@ -353,7 +355,7 @@ router.post('/status/:token/evidence', evidenceLimiter, statusEvidencePow, (req,
             const serviceToken = await signServiceJwt({ audience: ADMIN_AUDIENCE });
             const headers = { Authorization: `Bearer ${serviceToken}` };
             const endpoint = req.body?.type === 'hash' ? 'evidence' : 'evidence/url';
-            const resp = await axios.post(`${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}/public/status/${token}/${endpoint}`, req.body, {
+            const resp = await axios.post(`${adminBaseUrl}/public/status/${token}/${endpoint}`, req.body, {
                 headers,
                 timeout: 10000,
                 validateStatus: () => true

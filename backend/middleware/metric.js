@@ -14,8 +14,11 @@ const dateLocal = () => {
     return `${y}-${m}-${day}`;
 };
 
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
+
+const adminBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
 const adminStatistic = axios.create({
-    baseURL: `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}`,
+    baseURL: adminBase || '',
     timeout: 2500
 });
 
@@ -40,6 +43,9 @@ function count(key, opts = {}) {
                 : Number(amountOpt) || 1;
 
             // Fire-and-forget: kein await/then, nur catch fürs Log
+            if (!adminBase) {
+                return;
+            }
             setImmediate(async () => {
                 try {
                     const token = await signServiceJwt({ audience });

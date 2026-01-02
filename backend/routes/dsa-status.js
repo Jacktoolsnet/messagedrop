@@ -6,6 +6,7 @@ const rateLimit = require('express-rate-limit');
 const { signServiceJwt } = require('../utils/serviceJwt');
 const { createPowGuard } = require('../middleware/pow');
 const { apiError } = require('../middleware/api-error');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const router = express.Router();
 const maxEvidenceFileMb = Number(process.env.DSA_EVIDENCE_MAX_FILE_MB || 1);
@@ -71,9 +72,10 @@ function buildForwardError(err) {
   return apiErr;
 }
 
+const adminBaseUrl = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMIN_PORT);
+
 function adminBase(path) {
-  const base = `${process.env.ADMIN_BASE_URL}:${process.env.ADMIN_PORT}`.replace(/\/+$/, '');
-  return `${base}/public${path}`;
+  return `${adminBaseUrl}/public${path}`;
 }
 
 async function forwardGet(path, opts = {}) {

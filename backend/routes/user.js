@@ -14,16 +14,12 @@ const tableUser = require('../db/tableUser');
 const metric = require('../middleware/metric');
 const { apiError } = require('../middleware/api-error');
 const { signServiceJwt } = require('../utils/serviceJwt');
+const { resolveBaseUrl } = require('../utils/adminLogForwarder');
 
 const SOCKET_AUDIENCE = process.env.SERVICE_JWT_AUDIENCE_SOCKET || 'service.socketio';
 
 function resolveSocketIoBaseUrl() {
-  const base = (process.env.SOCKETIO_BASE_URL || process.env.BASE_URL || '').replace(/\/+$/, '');
-  const port = process.env.SOCKETIO_PORT;
-  if (!base || !port) {
-    return null;
-  }
-  return `${base}:${port}`;
+  return resolveBaseUrl(process.env.SOCKETIO_BASE_URL || process.env.BASE_URL, process.env.SOCKETIO_PORT);
 }
 
 async function emitKeyUpdate(userIds, payload) {
