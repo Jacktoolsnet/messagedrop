@@ -174,6 +174,22 @@ router.delete('/cleanup', (req, res, next) => {
 });
 
 /**
+ * DELETE /frontend-error-log
+ * Deletes all entries.
+ */
+router.delete('/', (req, res, next) => {
+  const db = req.database?.db;
+  if (!db) return next(apiError.internal('database_unavailable'));
+  tableFrontendErrorLog.deleteAll(db, (err, count) => {
+    if (err) {
+      req.logger?.error('Frontend error log delete all failed', { error: err?.message });
+      return next(apiError.internal('delete_failed'));
+    }
+    res.json({ deleted: true, count });
+  });
+});
+
+/**
  * DELETE /frontend-error-log/:id
  */
 router.delete('/:id', (req, res, next) => {

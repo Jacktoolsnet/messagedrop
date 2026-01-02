@@ -96,6 +96,11 @@ export class LogService {
             .pipe(catchError(() => of({ deleted: false })));
     }
 
+    deleteAllFrontendErrorLogs() {
+        return this.http.delete<{ deleted: boolean; count?: number }>(`${this.baseUrl}/frontend-error-log`)
+            .pipe(catchError(() => of({ deleted: false, count: 0 })));
+    }
+
     listPowLogs(limit = 100, offset = 0) {
         return this.http.get<{ rows: PowLogEntry[] }>(`${this.baseUrl}/pow-log?limit=${limit}&offset=${offset}`)
             .pipe(catchError(() => of({ rows: [] })));
@@ -104,5 +109,10 @@ export class LogService {
     deletePowLog(id: string) {
         return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/pow-log/${id}`)
             .pipe(catchError(() => of({ deleted: false })));
+    }
+
+    deleteAllPowLogs() {
+        return this.http.delete<{ deleted: boolean; count?: number }>(`${this.baseUrl}/pow-log`)
+            .pipe(catchError(() => of({ deleted: false, count: 0 })));
     }
 }

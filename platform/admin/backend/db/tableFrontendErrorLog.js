@@ -135,6 +135,13 @@ const deleteById = function (db, id, callback) {
   });
 };
 
+const deleteAll = function (db, callback) {
+  const sql = `DELETE FROM ${tableName}`;
+  db.run(sql, function (err) {
+    callback(err, this?.changes || 0);
+  });
+};
+
 /**
  * Delete entries older than provided timestamp.
  */
@@ -154,6 +161,7 @@ module.exports = {
   create,
   list,
   deleteById,
+  deleteAll,
   cleanupOlderThan,
   countSince
 };

@@ -99,6 +99,22 @@ router.delete('/cleanup', (req, res, next) => {
 });
 
 /**
+ * DELETE /pow-log
+ * Deletes all entries.
+ */
+router.delete('/', (req, res, next) => {
+  const db = req.database?.db;
+  if (!db) return next(apiError.internal('database_unavailable'));
+  tablePowLog.deleteAll(db, (err, count) => {
+    if (err) {
+      req.logger?.error('PoW log delete all failed', { error: err?.message });
+      return next(apiError.internal('delete_failed'));
+    }
+    res.json({ deleted: true, count });
+  });
+});
+
+/**
  * DELETE /pow-log/:id
  */
 router.delete('/:id', (req, res, next) => {
