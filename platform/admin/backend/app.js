@@ -65,7 +65,11 @@ const logFormat = winston.format.combine(
 );
 
 const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '7d';
+const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
 const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '30d';
+
+const infoOnlyFilter = winston.format((info) => (info.level === 'info' ? info : false));
+const warnOnlyFilter = winston.format((info) => (info.level === 'warn' ? info : false));
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
@@ -73,7 +77,18 @@ const infoTransport = new winston.transports.DailyRotateFile({
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_INFO,
-  level: 'info'
+  level: 'info',
+  format: winston.format.combine(infoOnlyFilter(), logFormat)
+});
+
+// Transport für Warn-Logs
+const warnTransport = new winston.transports.DailyRotateFile({
+  filename: 'logs/admin-warn-%DATE%.log',
+  datePattern: 'YYYY-MM-DD',
+  zippedArchive: false,
+  maxFiles: LOG_RETENTION_WARN,
+  level: 'warn',
+  format: winston.format.combine(warnOnlyFilter(), logFormat)
 });
 
 // Transport für Error-Logs
@@ -91,6 +106,7 @@ const logger = winston.createLogger({
   format: logFormat,
   transports: [
     infoTransport,
+    warnTransport,
     errorTransport
   ]
 });

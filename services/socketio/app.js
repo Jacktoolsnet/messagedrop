@@ -97,7 +97,11 @@ const logFormat = winston.format.combine(
 );
 
 const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '7d';
+const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
 const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '30d';
+
+const infoOnlyFilter = winston.format((info) => (info.level === 'info' ? info : false));
+const warnOnlyFilter = winston.format((info) => (info.level === 'warn' ? info : false));
 
 const logger = winston.createLogger({
   level: 'info',
@@ -107,7 +111,15 @@ const logger = winston.createLogger({
       filename: 'logs/socketio-info-%DATE%.log',
       datePattern: 'YYYY-MM-DD',
       maxFiles: LOG_RETENTION_INFO,
-      level: 'info'
+      level: 'info',
+      format: winston.format.combine(infoOnlyFilter(), logFormat)
+    }),
+    new winston.transports.DailyRotateFile({
+      filename: 'logs/socketio-warn-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxFiles: LOG_RETENTION_WARN,
+      level: 'warn',
+      format: winston.format.combine(warnOnlyFilter(), logFormat)
     }),
     new winston.transports.DailyRotateFile({
       filename: 'logs/socketio-error-%DATE%.log',
