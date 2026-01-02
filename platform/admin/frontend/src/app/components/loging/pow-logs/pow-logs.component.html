@@ -1,0 +1,120 @@
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard" aria-label="Back">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">PoW Logs</span>
+    <span class="spacer"></span>
+    <div class="desktop-controls">
+        <mat-button-toggle-group class="toggle-group" [value]="filterScope()" (change)="setFilter($event.value)">
+            @for (s of scopes(); track s) {
+            <mat-button-toggle [value]="s">{{ s === 'all' ? 'All scopes' : s }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+        <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+        <button mat-stroked-button color="warn" (click)="deleteAll()" [disabled]="loading() || logs().length === 0">
+            <mat-icon>delete_sweep</mat-icon>
+            Delete all
+        </button>
+    </div>
+
+    <div class="mobile-controls">
+        <button mat-icon-button [matMenuTriggerFor]="powLogMenu" aria-label="PoW log menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #powLogMenu="matMenu">
+            <button mat-menu-item disabled>Scope</button>
+            @for (s of scopes(); track s) {
+            <button mat-menu-item (click)="setFilter(s)">
+                <mat-icon>{{ filterScope() === s ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ s === 'all' ? 'All scopes' : s }}</span>
+            </button>
+            }
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="load()">
+                <mat-icon>refresh</mat-icon>
+                <span>Refresh</span>
+            </button>
+            <button mat-menu-item (click)="deleteAll()" [disabled]="loading() || logs().length === 0">
+                <mat-icon>delete_sweep</mat-icon>
+                <span>Delete all</span>
+            </button>
+        </mat-menu>
+    </div>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+    <div class="split">
+        <div class="list-pane">
+            @if (!loading() && logs().length === 0) {
+            <div class="empty">
+                <mat-icon>inbox</mat-icon>
+                <div>No entries.</div>
+            </div>
+            }
+            @for (log of visibleLogs(); track trackById($index, log)) {
+            <div class="row" [class.active]="isSelected(log)" role="button" tabindex="0" (click)="select(log)"
+                (keydown.enter)="select(log)" (keydown.space)="select(log)">
+                <div class="avatar"><mat-icon color="warn">{{ iconForScope(log.scope) }}</mat-icon></div>
+                <div class="head">
+                    <div class="title">{{ log.scope }}</div>
+                    <div class="meta">
+                        <span class="file">{{ formatLocal(log.createdAt) }}</span>
+                        <span class="dot">•</span>
+                        <span class="msg">{{ log.path }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="detail-pane" *ngIf="selected() as sel">
+            <mat-card>
+                <mat-card-header>
+                    <div mat-card-avatar class="avatar"><mat-icon color="warn">{{ iconForScope(sel.scope) }}</mat-icon></div>
+                    <mat-card-title>{{ sel.scope }}</mat-card-title>
+                    <mat-card-subtitle>{{ formatLocal(sel.createdAt) }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <mat-progress-bar *ngIf="rightLoading()" mode="indeterminate"></mat-progress-bar>
+                    <div class="kv">
+                        <span class="k">Scope</span>
+                        <span class="v">{{ sel.scope }}</span>
+                        <span class="k">Source</span>
+                        <span class="v">{{ sel.source }}</span>
+                        <span class="k">Path</span>
+                        <span class="v">{{ sel.path }}</span>
+                        <span class="k">Method</span>
+                        <span class="v">{{ sel.method }}</span>
+                        <span class="k">IP</span>
+                        <span class="v">{{ sel.ip || '-' }}</span>
+                        <span class="k">User Agent</span>
+                        <span class="v">{{ sel.userAgent || '-' }}</span>
+                        <span class="k">Reason</span>
+                        <span class="v">{{ sel.reason || '-' }}</span>
+                        <span class="k">Difficulty</span>
+                        <span class="v">{{ sel.difficulty ?? '-' }}</span>
+                        <span class="k">Required Until</span>
+                        <span class="v">{{ sel.requiredUntil ? formatLocal(sel.requiredUntil) : '-' }}</span>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-stroked-button (click)="copySelected()" [disabled]="rightLoading()">
+                        <mat-icon>content_copy</mat-icon>
+                        Copy
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="deleteSelected()" [disabled]="rightLoading()">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>

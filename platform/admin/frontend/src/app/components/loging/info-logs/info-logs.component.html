@@ -1,0 +1,108 @@
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard" aria-label="Back">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">Info Logs</span>
+    <span class="spacer"></span>
+    <div class="desktop-controls">
+        <mat-button-toggle-group class="toggle-group" [value]="filterSource()" (change)="setFilter($event.value)">
+            @for (s of sources(); track s) {
+            <mat-button-toggle [value]="s">{{ s === 'all' ? 'All sources' : s }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+        <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+        <button mat-stroked-button color="warn" (click)="deleteAll()" [disabled]="loading() || logs().length === 0">
+            <mat-icon>delete_sweep</mat-icon>
+            Delete all
+        </button>
+    </div>
+
+    <div class="mobile-controls">
+        <button mat-icon-button [matMenuTriggerFor]="infoLogMenu" aria-label="Info log menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #infoLogMenu="matMenu">
+            <button mat-menu-item disabled>Source</button>
+            @for (s of sources(); track s) {
+            <button mat-menu-item (click)="setFilter(s)">
+                <mat-icon>{{ filterSource() === s ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ s === 'all' ? 'All sources' : s }}</span>
+            </button>
+            }
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="load()">
+                <mat-icon>refresh</mat-icon>
+                <span>Refresh</span>
+            </button>
+            <button mat-menu-item (click)="deleteAll()" [disabled]="loading() || logs().length === 0">
+                <mat-icon>delete_sweep</mat-icon>
+                <span>Delete all</span>
+            </button>
+        </mat-menu>
+    </div>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+    <div class="split">
+        <div class="list-pane">
+            @if (!loading() && logs().length === 0) {
+            <div class="empty">
+                <mat-icon>inbox</mat-icon>
+                <div>No entries.</div>
+            </div>
+            }
+            @for (log of visibleLogs(); track trackById($index, log)) {
+            <div class="row" [class.active]="isSelected(log)" role="button" tabindex="0" (click)="select(log)"
+                (keydown.enter)="select(log)" (keydown.space)="select(log)">
+                <div class="avatar info"><mat-icon color="primary">{{ iconForSource(log.source) }}</mat-icon></div>
+                <div class="head">
+                    <div class="title">{{ log.source }}</div>
+                    <div class="meta">
+                        <span class="file">{{ formatLocal(log.createdAt) }}</span>
+                        <span class="dot">•</span>
+                        <span class="date">{{ log.message }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="detail-pane" *ngIf="selected() as sel">
+            <mat-card>
+                <mat-card-header>
+                    <div mat-card-avatar class="avatar info"><mat-icon color="primary">{{ iconForSource(sel.source) }}</mat-icon></div>
+                    <mat-card-title>{{ sel.source }}</mat-card-title>
+                    <mat-card-subtitle>{{ formatLocal(sel.createdAt) }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <mat-progress-bar *ngIf="rightLoading()" mode="indeterminate"></mat-progress-bar>
+                    <div class="kv">
+                        <span class="k">Source</span>
+                        <span class="v">{{ sel.source }}</span>
+                        <span class="k">Datei</span>
+                        <span class="v">{{ sel.file }}</span>
+                        <span class="k">Nachricht</span>
+                        <span class="v message">{{ sel.message }}</span>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-stroked-button (click)="copySelected()" [disabled]="rightLoading()">
+                        <mat-icon>content_copy</mat-icon>
+                        Copy
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="deleteSelected()" [disabled]="rightLoading()">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>

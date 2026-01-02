@@ -1,0 +1,130 @@
+<mat-toolbar>
+    <button mat-icon-button routerLink="/dashboard" aria-label="Back">
+        <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="toolbar-title">App Logs</span>
+    <span class="spacer"></span>
+    <div class="desktop-controls">
+        <mat-button-toggle-group class="toggle-group" [value]="filterEvent()" (change)="setFilter($event.value)">
+            @for (e of events(); track e) {
+            <mat-button-toggle [value]="e">{{ e === 'all' ? 'All events' : e }}</mat-button-toggle>
+            }
+        </mat-button-toggle-group>
+        <button mat-stroked-button color="primary" (click)="load()" [disabled]="loading()">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
+        <button mat-stroked-button color="warn" (click)="deleteAll()" [disabled]="loading() || logs().length === 0">
+            <mat-icon>delete_sweep</mat-icon>
+            Delete all
+        </button>
+    </div>
+
+    <div class="mobile-controls">
+        <button mat-icon-button [matMenuTriggerFor]="appLogMenu" aria-label="App log menu">
+            <mat-icon>more_vert</mat-icon>
+        </button>
+        <mat-menu #appLogMenu="matMenu">
+            <button mat-menu-item disabled>Event</button>
+            @for (e of events(); track e) {
+            <button mat-menu-item (click)="setFilter(e)">
+                <mat-icon>{{ filterEvent() === e ? 'radio_button_checked' : 'radio_button_unchecked' }}</mat-icon>
+                <span>{{ e === 'all' ? 'All events' : e }}</span>
+            </button>
+            }
+            <mat-divider></mat-divider>
+            <button mat-menu-item (click)="load()">
+                <mat-icon>refresh</mat-icon>
+                <span>Refresh</span>
+            </button>
+            <button mat-menu-item (click)="deleteAll()" [disabled]="loading() || logs().length === 0">
+                <mat-icon>delete_sweep</mat-icon>
+                <span>Delete all</span>
+            </button>
+        </mat-menu>
+    </div>
+</mat-toolbar>
+
+@if (loading()) {
+<mat-progress-bar mode="indeterminate"></mat-progress-bar>
+}
+
+<div class="page">
+    <div class="split">
+        <div class="list-pane">
+            @if (!loading() && logs().length === 0) {
+            <div class="empty">
+                <mat-icon>inbox</mat-icon>
+                <div>No entries.</div>
+            </div>
+            }
+            @for (log of visibleLogs(); track trackById($index, log)) {
+            <div class="row" [class.active]="isSelected(log)" role="button" tabindex="0" (click)="select(log)"
+                (keydown.enter)="select(log)" (keydown.space)="select(log)">
+                <div class="avatar"><mat-icon color="warn">{{ iconForEvent(log.event) }}</mat-icon></div>
+                <div class="head">
+                    <div class="title">{{ log.event }}</div>
+                    <div class="meta">
+                        <span class="file">{{ formatLocal(log.createdAt) }}</span>
+                        <span class="dot">•</span>
+                        <span class="msg">{{ log.path || 'unknown' }}</span>
+                    </div>
+                </div>
+            </div>
+            }
+        </div>
+
+        <div class="detail-pane" *ngIf="selected() as sel">
+            <mat-card>
+                <mat-card-header>
+                    <div mat-card-avatar class="avatar"><mat-icon color="warn">{{ iconForEvent(sel.event) }}</mat-icon></div>
+                    <mat-card-title>{{ sel.event }}</mat-card-title>
+                    <mat-card-subtitle>{{ formatLocal(sel.createdAt) }}</mat-card-subtitle>
+                </mat-card-header>
+                <mat-card-content>
+                    <mat-progress-bar *ngIf="rightLoading()" mode="indeterminate"></mat-progress-bar>
+                    <div class="kv">
+                        <span class="k">Event</span>
+                        <span class="v">{{ sel.event }}</span>
+                        <span class="k">Severity</span>
+                        <span class="v">{{ sel.severity }}</span>
+                        <span class="k">Path</span>
+                        <span class="v">{{ sel.path || '-' }}</span>
+                        <span class="k">Status</span>
+                        <span class="v">{{ sel.status ?? '-' }}</span>
+                        <span class="k">Feature</span>
+                        <span class="v">{{ sel.feature || '-' }}</span>
+                        <span class="k">Error Name</span>
+                        <span class="v">{{ sel.errorName || '-' }}</span>
+                        <span class="k">Message</span>
+                        <span class="v">{{ sel.errorMessage || '-' }}</span>
+                        <span class="k">Source</span>
+                        <span class="v">{{ sel.source || '-' }}</span>
+                        <span class="k">Line</span>
+                        <span class="v">{{ sel.line ?? '-' }}</span>
+                        <span class="k">Column</span>
+                        <span class="v">{{ sel.column ?? '-' }}</span>
+                        <span class="k">Error Code</span>
+                        <span class="v">{{ sel.errorCode || '-' }}</span>
+                        <span class="k">Stack</span>
+                        <span class="v stack">{{ sel.stack || '-' }}</span>
+                        <span class="k">App Version</span>
+                        <span class="v">{{ sel.appVersion || '-' }}</span>
+                        <span class="k">Environment</span>
+                        <span class="v">{{ sel.environment || '-' }}</span>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-stroked-button (click)="copySelected()" [disabled]="rightLoading()">
+                        <mat-icon>content_copy</mat-icon>
+                        Copy
+                    </button>
+                    <button mat-stroked-button color="warn" (click)="deleteSelected()" [disabled]="rightLoading()">
+                        <mat-icon>delete</mat-icon>
+                        Delete
+                    </button>
+                </mat-card-actions>
+            </mat-card>
+        </div>
+    </div>
+</div>
