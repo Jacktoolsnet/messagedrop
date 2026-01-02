@@ -528,7 +528,7 @@ export class IndexedDbService {
   /**
    * Stores the full contact list for recovery purposes.
    */
-  async replaceContacts(contacts: Contact[]): Promise<void> {
+  async replaceContacts(contacts: Contact[], markDirty = true): Promise<void> {
     const db = await this.openDB();
 
     return new Promise<void>((resolve, reject) => {
@@ -543,7 +543,9 @@ export class IndexedDbService {
       };
 
       tx.oncomplete = () => {
-        this.backupState.markDirty();
+        if (markDirty) {
+          this.backupState.markDirty();
+        }
         resolve();
       };
 

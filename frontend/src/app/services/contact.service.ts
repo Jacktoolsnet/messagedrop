@@ -61,7 +61,7 @@ export class ContactService {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
           this._contacts.set(contacts);
           await this.updateContactProfile();
-          this.persistContacts();
+          this.persistContacts(false);
           this.ready = true;
           this._contactsSet.update(trigger => trigger + 1);
         },
@@ -144,11 +144,11 @@ export class ContactService {
     }));
   }
 
-  private persistContacts(): void {
+  private persistContacts(markDirty = true): void {
     if (!this.userService.isReady() || !this.userService.getUser().id) {
       return;
     }
-    this.indexedDbService.replaceContacts(this._contacts()).catch((storeErr) => {
+    this.indexedDbService.replaceContacts(this._contacts(), markDirty).catch((storeErr) => {
       console.error('Failed to cache contacts', storeErr);
     });
   }
