@@ -92,6 +92,9 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', [
                 'x-forwarded-proto': req.protocol,
             },
         });
+        if (upstream.status === 404) {
+            return res.status(200).json({ status: 200, result: [] });
+        }
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
         req.logger?.error?.('nominatim proxy noboundedsearch upstream error', { error: err?.message || err });
@@ -117,6 +120,9 @@ router.get('/boundedsearch/:searchTerm/:limit/:viewbox', [
                 'x-forwarded-proto': req.protocol,
             },
         });
+        if (upstream.status === 404) {
+            return res.status(200).json({ status: 200, result: [] });
+        }
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
         req.logger?.error?.('nominatim proxy boundedsearch upstream error', { error: err?.message || err });

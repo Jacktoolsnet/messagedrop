@@ -19,17 +19,6 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: unknown) => {
-      if (
-        error instanceof HttpErrorResponse &&
-        error.status === 404 &&
-        (req.url.includes('/message/get/boundingbox') ||
-          req.url.includes('/place/get/userId') ||
-          req.url.includes('/contact/get/userId') ||
-          req.url.includes('/nominatim/noboundedsearch') ||
-          req.url.includes('/nominatim/boundedsearch'))
-      ) {
-        return throwError(() => error);
-      }
       diagnosticLogger.logHttpError(req, error);
       const status = error instanceof HttpErrorResponse ? error.status : -1;
       const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);

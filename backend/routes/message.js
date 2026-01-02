@@ -230,10 +230,7 @@ router.get('/get/comment/:parentUuid', function (req, res, next) {
     if (err) {
       return next(apiError.internal('db_error'));
     }
-    if (!rows || rows.length === 0) {
-      return next(apiError.notFound('not_found'));
-    }
-    res.status(200).json({ status: 200, rows });
+    res.status(200).json({ status: 200, rows: rows || [] });
   });
 });
 
