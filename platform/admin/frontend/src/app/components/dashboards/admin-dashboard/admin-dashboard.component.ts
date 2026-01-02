@@ -36,6 +36,7 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly errorCountToday = signal<number | null>(null);
   readonly infoCountToday = signal<number | null>(null);
+  readonly warnCountToday = signal<number | null>(null);
   readonly appErrorCountToday = signal<number | null>(null);
   readonly powCountToday = signal<number | null>(null);
   readonly moderationCountPending = signal<number | null>(null);
@@ -70,6 +71,9 @@ export class AdminDashboardComponent implements OnInit {
     });
     this.logService.getInfoCountSince(since).subscribe(res => {
       this.infoCountToday.set(res.count);
+    });
+    this.logService.getWarnCountSince(since).subscribe(res => {
+      this.warnCountToday.set(res.count);
     });
     this.logService.getFrontendErrorCountSince(since).subscribe(res => {
       this.appErrorCountToday.set(res.count);

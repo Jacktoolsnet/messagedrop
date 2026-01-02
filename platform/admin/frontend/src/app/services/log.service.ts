@@ -26,6 +26,11 @@ export class LogService {
             .pipe(catchError(() => of({ count: 0, since })));
     }
 
+    getWarnCountSince(since: number) {
+        return this.http.get<LogCountResponse>(`${this.baseUrl}/warn-log/count?since=${since}`)
+            .pipe(catchError(() => of({ count: 0, since })));
+    }
+
     getFrontendErrorCountSince(since: number) {
         return this.http.get<LogCountResponse>(`${this.baseUrl}/frontend-error-log/count?since=${since}`)
             .pipe(catchError(() => of({ count: 0, since })));
@@ -58,6 +63,21 @@ export class LogService {
 
     deleteAllInfoLogs() {
         return this.http.delete<{ deleted: boolean; count?: number }>(`${this.baseUrl}/info-log`)
+            .pipe(catchError(() => of({ deleted: false, count: 0 })));
+    }
+
+    listWarnLogs(limit = 100, offset = 0) {
+        return this.http.get<{ rows: ErrorLogEntry[] }>(`${this.baseUrl}/warn-log?limit=${limit}&offset=${offset}`)
+            .pipe(catchError(() => of({ rows: [] })));
+    }
+
+    deleteWarnLog(id: string) {
+        return this.http.delete<{ deleted: boolean }>(`${this.baseUrl}/warn-log/${id}`)
+            .pipe(catchError(() => of({ deleted: false })));
+    }
+
+    deleteAllWarnLogs() {
+        return this.http.delete<{ deleted: boolean; count?: number }>(`${this.baseUrl}/warn-log`)
             .pipe(catchError(() => of({ deleted: false, count: 0 })));
     }
 

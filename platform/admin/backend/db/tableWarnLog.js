@@ -68,6 +68,13 @@ const deleteById = function (db, id, callback) {
   });
 };
 
+const deleteAll = function (db, callback) {
+  const sql = `DELETE FROM ${tableName}`;
+  db.run(sql, function (err) {
+    callback(err, this?.changes || 0);
+  });
+};
+
 const cleanupOlderThan = function (db, threshold, callback) {
   const sql = `DELETE FROM ${tableName} WHERE ${columnCreatedAt} < ?`;
   db.run(sql, [threshold], (err) => callback(err));
@@ -84,6 +91,7 @@ module.exports = {
   create,
   list,
   deleteById,
+  deleteAll,
   cleanupOlderThan,
   countSince
 };

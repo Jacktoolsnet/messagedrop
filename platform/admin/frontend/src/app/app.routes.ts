@@ -16,6 +16,7 @@ import { authGuard } from './guards/auth/auth-guard';
 import { StatisticComponent } from './components/statistic/statistic.component';
 import { ErrorLogsComponent } from './components/logs/error-logs/error-logs.component';
 import { InfoLogsComponent } from './components/logs/info-logs/info-logs.component';
+import { WarnLogsComponent } from './components/logs/warn-logs/warn-logs.component';
 import { AppLogsComponent } from './components/logs/app-logs/app-logs.component';
 import { PowLogsComponent } from './components/logs/pow-logs/pow-logs.component';
 import { ModerationQueueComponent } from './components/moderation/moderation-queue/moderation-queue.component';
@@ -91,6 +92,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/logs/errors',
         component: ErrorLogsComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/logs/warn',
+        component: WarnLogsComponent,
         canActivate: [authGuard]
     },
     {

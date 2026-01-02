@@ -72,6 +72,18 @@
             </mat-card-header>
         </mat-card>
 
+        <!-- Warn Logs -->
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/warn" role="button"
+            tabindex="0">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar" [matBadge]="warnCountToday() ?? 0" matBadgeColor="warn"
+                    matBadgeOverlap="false">
+                    <mat-icon>warning</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Warn Logs</mat-card-title>
+            </mat-card-header>
+        </mat-card>
+
         <!-- Info Logs -->
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/logs/info" role="button"
             tabindex="0">
