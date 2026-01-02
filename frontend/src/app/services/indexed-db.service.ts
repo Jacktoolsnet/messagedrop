@@ -1,5 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { compressToUTF16, decompressFromUTF16 } from 'lz-string';
+import { environment } from '../../environments/environment';
 import { BoundingBox } from '../interfaces/bounding-box';
 import { Contact } from '../interfaces/contact';
 import { ContactProfile } from '../interfaces/contact-profile';
@@ -38,15 +39,29 @@ export class IndexedDbService {
   private fileHandleStore = 'fileHandle';
 
   private compress<T>(value: T): string {
-    return compressToUTF16(JSON.stringify(value));
+    const json = JSON.stringify(value);
+    if (!environment.production) {
+      return json;
+    }
+    return compressToUTF16(json);
   }
 
   private decompress<T>(data: string | undefined): T | undefined {
     if (typeof data !== 'string') {
       return undefined;
     }
+
     try {
-      return JSON.parse(decompressFromUTF16(data)) as T;
+      const decompressed = decompressFromUTF16(data);
+      if (typeof decompressed === 'string') {
+        return JSON.parse(decompressed) as T;
+      }
+    } catch {
+      // fall through to plain JSON parsing
+    }
+
+    try {
+      return JSON.parse(data) as T;
     } catch {
       return undefined;
     }
