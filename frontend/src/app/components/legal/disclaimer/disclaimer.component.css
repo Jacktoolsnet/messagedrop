@@ -4,6 +4,10 @@
     line-height: 1.35;
 }
 
+h2[mat-dialog-title].dialog-title {
+    margin-bottom: 0;
+}
+
 .mat-mdc-dialog-content.content {
     max-height: 75vh;
     min-width: min(320px, 90vw);
