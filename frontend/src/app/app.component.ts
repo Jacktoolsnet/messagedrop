@@ -964,8 +964,9 @@ export class AppComponent implements OnInit {
   }
 
   public openPlaceListDialog(): void {
+    const hasPlaces = this.placeService.isReady() && this.placeService.getPlaces().length > 0;
     const dialogRef = this.dialog.open(PlacelistComponent, {
-      panelClass: 'PalceListDialog',
+      panelClass: hasPlaces ? 'PalceListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
       minWidth: '20vw',
@@ -999,8 +1000,9 @@ export class AppComponent implements OnInit {
   }
 
   public openContactListDialog(): void {
+    const hasContacts = this.contactService.isReady() && this.contactService.contactsSignal().length > 0;
     const dialogRef = this.dialog.open(ContactlistComponent, {
-      panelClass: 'ContactListDialog',
+      panelClass: hasContacts ? 'ContactListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
       minWidth: '20vw',

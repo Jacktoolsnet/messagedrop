@@ -3,7 +3,7 @@ import { Component, Signal, effect, inject, signal } from '@angular/core';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
@@ -42,6 +42,7 @@ interface ConnectDialogResult {
     MatBadgeModule,
     MatButtonModule,
     MatDialogContent,
+    MatDialogActions,
     MatIcon,
     MatMenuModule,
     MatExpansionModule,

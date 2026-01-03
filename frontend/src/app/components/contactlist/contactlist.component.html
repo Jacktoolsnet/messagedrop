@@ -1,99 +1,98 @@
-<mat-dialog-content class="dialog">
-    @if (contactsSignal().length === 0) {
-    <div class="no-content">
-        <div class="toolbar">
-            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-        </div>
-        <button class="first-button" mat-flat-button color="primary" [matMenuTriggerFor]="connectionMenu">
-            <span>{{ 'common.contact.connect.start' | transloco }}</span>
-        </button>
-    </div>
-    } @else {
-    <div class="content">
-        <div class="toolbar">
-            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-            <button mat-mini-fab color="primary" class="button_add"
-                [attr.aria-label]="'common.contact.connect.addAria' | transloco"
-                [matMenuTriggerFor]="connectionMenu">
-                <mat-icon>connect_without_contact</mat-icon>
-            </button>
-        </div>
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="dialog-title__icon" aria-hidden="true">contacts</mat-icon>
+    <span class="dialog-title__text">{{ 'common.menu.myContacts' | transloco }}</span>
+</h2>
 
-        @for (contact of contactsSignal(); track contact.id){
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
-                    [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true" matBadgeColor="warn">
-                    @if (contact.base64Avatar) {
-                    <img class="avatar" [src]="contact.base64Avatar"
-                        [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" />
-                    } @else {
-                    <mat-icon>person</mat-icon>
-                    }
-                </span>
-                <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
-            </mat-expansion-panel-header>
-            <mat-card>
-                <mat-card-content>
-                    <div class="tile-grid">
-                        <app-tile-list [contact]="contact"></app-tile-list>
-                    </div>
-                </mat-card-content>
+<mat-dialog-content class="contact-dialog-content">
+    <div class="contact-scroll">
+        @if (contactsSignal().length === 0) {
+        <div class="empty-state">
+            <p class="empty-text">{{ 'common.contact.connect.start' | transloco }}</p>
+        </div>
+        } @else {
+        <div class="content">
+            @for (contact of contactsSignal(); track contact.id){
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
+                        [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true" matBadgeColor="warn">
+                        @if (contact.base64Avatar) {
+                        <img class="avatar" [src]="contact.base64Avatar"
+                            [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" />
+                        } @else {
+                        <mat-icon>person</mat-icon>
+                        }
+                    </span>
+                    <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
+                </mat-expansion-panel-header>
+                <mat-card>
+                    <mat-card-content>
+                        <div class="tile-grid">
+                            <app-tile-list [contact]="contact"></app-tile-list>
+                        </div>
+                    </mat-card-content>
 
-                <mat-card-actions class="buttonbar">
-                    @if (contact.pinned) {
-                    <button mat-mini-fab [ngClass]="'active-button'"
-                        [attr.aria-label]="'common.contact.list.unpinAria' | transloco" (click)="unpinContact(contact)">
-                        <mat-icon>keep_off</mat-icon>
-                    </button>
-                    } @else {
-                    <button mat-mini-fab [ngClass]="'inactive-button'"
-                        [attr.aria-label]="'common.contact.list.pinAria' | transloco" (click)="pinContact(contact)">
-                        <mat-icon>keep</mat-icon>
-                    </button>
-                    }
-                    <button mat-mini-fab color="secondary"
-                        [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
-                        [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
-                        matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
-                        <mat-icon>forum</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary"
-                        [attr.aria-label]="'common.contact.list.editAria' | transloco" (click)="editContact(contact)">
-                        <mat-icon>settings_account_box</mat-icon>
-                    </button>
-                    @if (!subscriptionError) {
-                    @if (contact.subscribed) {
-                    <button mat-mini-fab [color]="'active-button'"
-                        [attr.aria-label]="'common.contact.list.unsubscribeAria' | transloco"
-                        (click)="subscribe(contact)">
-                        <mat-icon>bookmark_remove</mat-icon>
-                    </button>
-                    } @else {
-                    <button mat-mini-fab [color]="'inactive-button'"
-                        [attr.aria-label]="'common.contact.list.subscribeAria' | transloco"
-                        (click)="subscribe(contact)">
-                        <mat-icon>bookmark_add</mat-icon>
-                    </button>
-                    }
-                    }
-                    <button mat-mini-fab color="secondary"
-                        [attr.aria-label]="'common.contact.delete.title' | transloco"
-                        (click)="deleteContact(contact)">
-                        <mat-icon>delete_forever</mat-icon>
-                    </button>
-                </mat-card-actions>
-            </mat-card>
-        </mat-expansion-panel>
+                    <mat-card-actions class="buttonbar">
+                        @if (contact.pinned) {
+                        <button mat-mini-fab [ngClass]="'active-button'"
+                            [attr.aria-label]="'common.contact.list.unpinAria' | transloco" (click)="unpinContact(contact)">
+                            <mat-icon>keep_off</mat-icon>
+                        </button>
+                        } @else {
+                        <button mat-mini-fab [ngClass]="'inactive-button'"
+                            [attr.aria-label]="'common.contact.list.pinAria' | transloco" (click)="pinContact(contact)">
+                            <mat-icon>keep</mat-icon>
+                        </button>
+                        }
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
+                            [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
+                            matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
+                            <mat-icon>forum</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.contact.list.editAria' | transloco" (click)="editContact(contact)">
+                            <mat-icon>settings_account_box</mat-icon>
+                        </button>
+                        @if (!subscriptionError) {
+                        @if (contact.subscribed) {
+                        <button mat-mini-fab [color]="'active-button'"
+                            [attr.aria-label]="'common.contact.list.unsubscribeAria' | transloco"
+                            (click)="subscribe(contact)">
+                            <mat-icon>bookmark_remove</mat-icon>
+                        </button>
+                        } @else {
+                        <button mat-mini-fab [color]="'inactive-button'"
+                            [attr.aria-label]="'common.contact.list.subscribeAria' | transloco"
+                            (click)="subscribe(contact)">
+                            <mat-icon>bookmark_add</mat-icon>
+                        </button>
+                        }
+                        }
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.contact.delete.title' | transloco"
+                            (click)="deleteContact(contact)">
+                            <mat-icon>delete_forever</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </mat-expansion-panel>
+            }
+        </div>
         }
     </div>
-
-    }
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-icon-button class="action-close" (click)="goBack()"
+        [attr.aria-label]="'common.actions.close' | transloco">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.connect.addAria' | transloco"
+        [matMenuTriggerFor]="connectionMenu">
+        <mat-icon>connect_without_contact</mat-icon>
+    </button>
+</mat-dialog-actions>
 
 <mat-menu #connectionMenu="matMenu">
     <button mat-menu-item (click)="shareConnectId()">
