@@ -3,6 +3,7 @@ import { BoundingBox } from '../interfaces/bounding-box';
 import { LocalImage } from '../interfaces/local-image';
 import { Location } from '../interfaces/location';
 import { User } from '../interfaces/user';
+import { FileCacheService } from './file-cache.service';
 import { GeolocationService } from './geolocation.service';
 import { IndexedDbService } from './indexed-db.service';
 
@@ -28,6 +29,7 @@ export class LocalImageService {
 
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly geoLocationService = inject(GeolocationService);
+  private readonly fileCacheService = inject(FileCacheService);
   readonly isSupportedSignal = signal<boolean>(this.detectSupport());
   readonly lastErrorSignal = signal<string | null>(null);
 
@@ -117,6 +119,7 @@ export class LocalImageService {
       return null;
     }
 
+    const id = crypto.randomUUID();
     const dimensions = await this.readImageDimensions(file);
     if (!dimensions) {
       return null;
@@ -129,9 +132,10 @@ export class LocalImageService {
     const location = this.resolveLocation(exifLocation, fallbackLocation);
     const now = Date.now();
 
+    const cachedHandle = await this.fileCacheService.writeImageFile(id, file, file.name, file.type);
     const entry: LocalImage = {
-      id: crypto.randomUUID(),
-      handle,
+      id,
+      handle: cachedHandle ?? handle,
       fileName: file.name,
       mimeType: file.type,
       width: dimensions.width,
@@ -151,20 +155,44 @@ export class LocalImageService {
       return cached;
     }
 
-    if (!entry.handle || typeof entry.handle.getFile !== 'function') {
+    const cachedHandle = await this.fileCacheService.getImageHandle(entry.id, entry.fileName, entry.mimeType);
+    if (cachedHandle && entry.handle !== cachedHandle) {
+      entry.handle = cachedHandle;
+      try {
+        await this.indexedDbService.saveImage(entry);
+      } catch (error) {
+        console.warn('Failed to persist cached image handle', error);
+      }
+    }
+
+    const resolvedHandle = cachedHandle ?? entry.handle;
+    if (!resolvedHandle || typeof resolvedHandle.getFile !== 'function') {
       this.lastErrorSignal.set('Missing file handle for the image.');
       return Promise.reject(new Error('Missing file handle for the image.'));
     }
 
-    const hasPermission = await this.ensureReadPermission(entry.handle);
-    if (!hasPermission) {
-      return Promise.reject(new Error('Read permission not granted for image.'));
+    if (!cachedHandle) {
+      const hasPermission = await this.ensureReadPermission(resolvedHandle);
+      if (!hasPermission) {
+        return Promise.reject(new Error('Read permission not granted for image.'));
+      }
     }
 
     try {
-      const file = await entry.handle.getFile();
+      const file = await resolvedHandle.getFile();
       const objectUrl = URL.createObjectURL(file);
       this.objectUrlCache.set(entry.id, objectUrl);
+      if (!cachedHandle) {
+        const updatedHandle = await this.fileCacheService.writeImageFile(entry.id, file, entry.fileName, entry.mimeType);
+        if (updatedHandle) {
+          entry.handle = updatedHandle;
+          try {
+            await this.indexedDbService.saveImage(entry);
+          } catch (error) {
+            console.warn('Failed to persist cached image handle', error);
+          }
+        }
+      }
       return objectUrl;
     } catch (error) {
       console.error('Failed to create object URL for image', error);
@@ -328,6 +356,7 @@ export class LocalImageService {
 
   async deleteImage(image: LocalImage): Promise<void> {
     await this.indexedDbService.deleteImage(image.id);
+    await this.fileCacheService.deleteImageFile(image.id, image.fileName, image.mimeType);
     this.imagesSignal.update(images => images.filter(n => n.id !== image.id));
   }
 
