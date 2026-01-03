@@ -1,3 +1,4 @@
+import { LocalDocument } from "./local-document";
 import { LocalImage } from "./local-image";
 import { Location } from "./location";
 import { MarkerType } from "./marker-type";
@@ -9,5 +10,6 @@ export interface MarkerLocation {
     messages: Message[],
     notes: Note[];
     images: LocalImage[];
+    documents: LocalDocument[];
     type: MarkerType
 }

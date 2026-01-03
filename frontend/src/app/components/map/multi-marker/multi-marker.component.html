@@ -23,4 +23,12 @@
     {{ 'common.map.multiMarker.showImages' | transloco }}
   </button>
   }
+  @if (data.documents.length) {
+  <button mat-stroked-button [mat-dialog-close]="{type: 'private_document', documents: data.documents}"
+    matBadge="{{data.documents.length | shortNumber}}" matBadgePosition="after" matBadgeColor="accent"
+    matBadgeOverlap="true">
+    <mat-icon>description</mat-icon>
+    {{ 'common.map.multiMarker.showDocuments' | transloco }}
+  </button>
+  }
 </mat-dialog-content>

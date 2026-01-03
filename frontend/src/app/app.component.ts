@@ -17,6 +17,7 @@ import { firstValueFrom } from 'rxjs';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
+import { DocumentlistComponent } from './components/documentlist/documentlist.component';
 import { EditMessageComponent } from './components/editmessage/edit-message.component';
 import { EditNoteComponent } from './components/editnote/edit-note.component';
 import { GeoStatisticComponent } from './components/geo-statistic/geo-statistic.component';
@@ -43,6 +44,7 @@ import { DisplayMessage } from './components/utils/display-message/display-messa
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
+import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
 import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
@@ -67,6 +69,7 @@ import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
+import { LocalDocumentService } from './services/local-document.service';
 import { LocalImageService } from './services/local-image.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
@@ -82,6 +85,7 @@ import { SystemNotificationService } from './services/system-notification.servic
 import { TranslationHelperService } from './services/translation-helper.service';
 import { UserService } from './services/user.service';
 import { WeatherService } from './services/weather.service';
+import { isQuotaExceededError } from './utils/storage-error.util';
 
 @Component({
   selector: 'app-root',
@@ -153,6 +157,7 @@ export class AppComponent implements OnInit {
   readonly systemNotificationService = inject(SystemNotificationService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly localImageService = inject(LocalImageService);
+  private readonly localDocumentService = inject(LocalDocumentService);
   private readonly messageService = inject(MessageService);
   private readonly airQualityService = inject(AirQualityService);
   private readonly weatherService = inject(WeatherService);
@@ -621,6 +626,7 @@ export class AppComponent implements OnInit {
     if (this.userService.isReady()) {
       await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
       await this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      await this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox());
     }
     // Messages
     this.messageService.getByVisibleMapBoundingBox();
@@ -651,8 +657,15 @@ export class AppComponent implements OnInit {
           });
         }
         break;
+      case MarkerType.PRIVATE_DOCUMENT:
+        if (this.userService.isReady()) {
+          this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox()).then(() => {
+            this.openMarkerDocumentListDialog(event.documents);
+          });
+        }
+        break;
       case MarkerType.MULTI:
-        this.openMarkerMultiDialog(event.messages, event.notes, event.images);
+        this.openMarkerMultiDialog(event.messages, event.notes, event.images, event.documents);
         break;
     }
   }
@@ -784,6 +797,31 @@ export class AppComponent implements OnInit {
     } catch (error) {
       console.error('Failed to add image', error);
       this.snackBar.open(this.translation.t('common.images.importFailed'), undefined, { duration: 4000 });
+    }
+  }
+
+  async openAddDocumentDialog(): Promise<void> {
+    if (!this.localDocumentService.isSupported()) {
+      this.snackBar.open(this.translation.t('common.documents.pickerUnsupported'), undefined, { duration: 4000 });
+      return;
+    }
+
+    try {
+      const entries = await this.localDocumentService.createDocumentEntries(this.mapService.getMapLocation());
+
+      if (!entries.length) {
+        return;
+      }
+
+      await Promise.all(entries.map(entry => this.localDocumentService.saveDocument(entry)));
+      this.snackBar.open(this.translation.t('common.documents.imported'), undefined, { duration: 3000 });
+      this.updateDataForLocation();
+    } catch (error) {
+      console.error('Failed to add document', error);
+      const message = isQuotaExceededError(error)
+        ? this.translation.t('common.documents.storageFull')
+        : this.translation.t('common.documents.importFailed');
+      this.snackBar.open(message, undefined, { duration: 4000 });
     }
   }
 
@@ -981,9 +1019,9 @@ export class AppComponent implements OnInit {
 
   }
 
-  public openMarkerMultiDialog(messages: Message[], notes: Note[], images: LocalImage[]) {
+  public openMarkerMultiDialog(messages: Message[], notes: Note[], images: LocalImage[], documents: LocalDocument[]) {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
-      data: { messages: messages, notes: notes, images: images },
+      data: { messages: messages, notes: notes, images: images, documents: documents },
       closeOnNavigation: true,
       hasBackdrop: true
     });
@@ -1005,6 +1043,9 @@ export class AppComponent implements OnInit {
             break
           case 'private_image':
             this.openMarkerImageListDialog(result.images);
+            break
+          case 'private_document':
+            this.openMarkerDocumentListDialog(result.documents);
             break
         }
       }
@@ -1082,6 +1123,34 @@ export class AppComponent implements OnInit {
 
     dialogRef.afterOpened().subscribe(() => {
       this.myHistory.push("imageList");
+      window.history.replaceState(this.myHistory, '', '');
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.updateDataForLocation();
+    });
+  }
+
+  public openMarkerDocumentListDialog(documents: LocalDocument[]) {
+    const documentsSignal = signal<LocalDocument[]>(documents);
+    const dialogRef = this.dialog.open(DocumentlistComponent, {
+      panelClass: 'DocumentListDialog',
+      closeOnNavigation: true,
+      data: {
+        location: documentsSignal()[0].location,
+        documentsSignal: documentsSignal
+      },
+      minWidth: '20vw',
+      maxWidth: '95vw',
+      width: 'auto',
+      maxHeight: 'none',
+      height: 'auto',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterOpened().subscribe(() => {
+      this.myHistory.push("documentList");
       window.history.replaceState(this.myHistory, '', '');
     });
 
@@ -1460,6 +1529,7 @@ export class AppComponent implements OnInit {
           messages: [message],
           notes: [],
           images: [],
+          documents: [],
           type: MarkerType.PUBLIC_MESSAGE
         });
       } else {
@@ -1499,6 +1569,7 @@ export class AppComponent implements OnInit {
           messages: [],
           notes: [note],
           images: [],
+          documents: [],
           type: MarkerType.PRIVATE_NOTE
         });
       }
@@ -1534,7 +1605,44 @@ export class AppComponent implements OnInit {
           messages: [],
           notes: [],
           images: [image],
+          documents: [],
           type: MarkerType.PRIVATE_IMAGE
+        });
+      }
+    });
+
+    // Process documents
+    const documents = this.localDocumentService.getDocumentsSignal()();
+    documents.forEach((document) => {
+      const documentLocation: Location = {
+        latitude: document.location.latitude,
+        longitude: document.location.longitude,
+        plusCode: document.location.plusCode
+      };
+      if (this.mapService.getMapZoom() > 17) {
+        center = documentLocation;
+      } else {
+        const plusCode: string = this.geolocationService.getGroupedPlusCodeBasedOnMapZoom(documentLocation, this.mapService.getMapZoom());
+        const plusCodeArea: PlusCodeArea = this.geolocationService.getGridFromPlusCode(plusCode);
+        center = {
+          latitude: plusCodeArea.latitudeCenter,
+          longitude: plusCodeArea.longitudeCenter,
+          plusCode: plusCode
+        };
+      }
+      if (this.markerLocations.has(center.plusCode)) {
+        this.markerLocations.get(center.plusCode)!.documents.push(document)
+        if (this.markerLocations.get(center.plusCode)?.type != MarkerType.PRIVATE_DOCUMENT) {
+          this.markerLocations.get(center.plusCode)!.type = MarkerType.MULTI;
+        }
+      } else {
+        this.markerLocations.set(center.plusCode, {
+          location: center,
+          messages: [],
+          notes: [],
+          images: [],
+          documents: [document],
+          type: MarkerType.PRIVATE_DOCUMENT
         });
       }
     });

@@ -34,6 +34,12 @@ const imageMarker = leaflet.icon({
   iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
 });
 
+const documentMarker = leaflet.icon({
+  iconUrl: 'assets/markers/document-marker.svg',
+
+  iconSize: [32, 40], // size of the icon
+  iconAnchor: [16, 40], // point of the icon which will correspond to marker's location
+});
 @Injectable({
   providedIn: 'root'
 })
@@ -323,6 +329,8 @@ export class MapService {
         return leaflet.marker(latLng, { icon: noteMarker, zIndexOffset: 15 });
       case MarkerType.PRIVATE_IMAGE:
         return leaflet.marker(latLng, { icon: imageMarker, zIndexOffset: 15 });
+      case MarkerType.PRIVATE_DOCUMENT:
+        return leaflet.marker(latLng, { icon: documentMarker, zIndexOffset: 15 });
       case MarkerType.MULTI:
         return leaflet.marker(latLng, { icon: multiMarker, zIndexOffset: 5 });
       default:

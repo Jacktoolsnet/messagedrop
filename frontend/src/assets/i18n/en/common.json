@@ -55,6 +55,7 @@
       "publicMessage": "Public message",
       "privateNote": "Private note",
       "privateImage": "Private image",
+      "privateDocument": "Private document",
       "contactsMessage": "Contacts message",
       "weather": "Weather",
       "airQuality": "Air quality",
@@ -238,11 +239,30 @@
         "previewAlt": "Image preview"
       }
     },
+    "documents": {
+      "imported": "Document(s) imported locally.",
+      "importSuccess": "Document(s) imported locally.",
+      "importFailed": "Unable to import the document.",
+      "storageFull": "Storage is full. Free up space and try again.",
+      "pickerUnsupported": "Document picker is not supported in this browser.",
+      "addFirst": "Add my first private document",
+      "addAria": "Add document",
+      "deleteAria": "Delete document",
+      "openAria": "Open document",
+      "flyToAria": "Fly to document",
+      "navigateAria": "Navigate to document location",
+      "openFailed": "Unable to open the document.",
+      "delete": {
+        "title": "Delete document",
+        "confirm": "The document will be permanently deleted. Are you sure?"
+      }
+    },
     "map": {
       "multiMarker": {
         "showMessages": "Show messages",
         "showNotes": "Show notes",
-        "showImages": "Show images"
+        "showImages": "Show images",
+        "showDocuments": "Show documents"
       }
     },
     "messageList": {

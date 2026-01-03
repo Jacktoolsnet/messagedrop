@@ -1,0 +1,12 @@
+<h2 mat-dialog-title>{{ 'common.documents.delete.title' | transloco }}</h2>
+<mat-dialog-content>
+  {{ 'common.documents.delete.confirm' | transloco }}
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">
+    {{ 'common.actions.abort' | transloco }}
+  </button>
+  <button mat-button mat-dialog-close [mat-dialog-close]="true">
+    {{ 'common.actions.yes' | transloco }}
+  </button>
+</mat-dialog-actions>

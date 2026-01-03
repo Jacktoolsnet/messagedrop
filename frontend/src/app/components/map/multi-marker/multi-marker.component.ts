@@ -8,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { LocalDocument } from '../../../interfaces/local-document';
 import { LocalImage } from '../../../interfaces/local-image';
 import { Message } from '../../../interfaces/message';
 import { Note } from '../../../interfaces/note';
@@ -32,5 +33,5 @@ import { ShortNumberPipe } from '../../../pipes/short-number.pipe';
 })
 export class MultiMarkerComponent {
     readonly dialogRef = inject(MatDialogRef<MultiMarkerComponent>);
-    readonly data = inject<{ messages: Message[]; notes: Note[]; images: LocalImage[] }>(MAT_DIALOG_DATA);
+    readonly data = inject<{ messages: Message[]; notes: Note[]; images: LocalImage[]; documents: LocalDocument[] }>(MAT_DIALOG_DATA);
 }

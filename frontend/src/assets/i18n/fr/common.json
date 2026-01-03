@@ -55,6 +55,7 @@
       "publicMessage": "Message public",
       "privateNote": "Note privée",
       "privateImage": "Image privée",
+      "privateDocument": "Document privé",
       "contactsMessage": "Message aux contacts",
       "weather": "Météo",
       "airQuality": "Qualité de l'air",
@@ -238,11 +239,30 @@
         "previewAlt": "Aperçu de l'image"
       }
     },
+    "documents": {
+      "imported": "Document(s) importé(s) localement.",
+      "importSuccess": "Document(s) importé(s) localement.",
+      "importFailed": "Impossible d'importer le document.",
+      "storageFull": "Le stockage est plein. Libérez de l'espace et réessayez.",
+      "pickerUnsupported": "Le sélecteur de documents n'est pas pris en charge par ce navigateur.",
+      "addFirst": "Ajouter mon premier document privé",
+      "addAria": "Ajouter un document",
+      "deleteAria": "Supprimer le document",
+      "openAria": "Ouvrir le document",
+      "flyToAria": "Aller au document",
+      "navigateAria": "Naviguer vers l'emplacement du document",
+      "openFailed": "Impossible d'ouvrir le document.",
+      "delete": {
+        "title": "Supprimer le document",
+        "confirm": "Le document sera supprimé définitivement. Voulez-vous continuer ?"
+      }
+    },
     "map": {
       "multiMarker": {
         "showMessages": "Afficher les messages",
         "showNotes": "Afficher les notes",
-        "showImages": "Afficher les images"
+        "showImages": "Afficher les images",
+        "showDocuments": "Afficher les documents"
       }
     },
     "messageList": {

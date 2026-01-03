@@ -55,6 +55,7 @@
       "publicMessage": "Öffentliche Nachricht",
       "privateNote": "Private Notiz",
       "privateImage": "Privates Bild",
+      "privateDocument": "Privates Dokument",
       "contactsMessage": "Kontakt-Nachricht",
       "weather": "Wetter",
       "airQuality": "Luftqualität",
@@ -238,11 +239,30 @@
         "previewAlt": "Bildvorschau"
       }
     },
+    "documents": {
+      "imported": "Dokument(e) lokal importiert.",
+      "importSuccess": "Dokument(e) lokal importiert.",
+      "importFailed": "Dokument konnte nicht importiert werden.",
+      "storageFull": "Speicher ist voll. Bitte gib Platz frei und versuche es erneut.",
+      "pickerUnsupported": "Die Dokumentenauswahl wird in diesem Browser nicht unterstützt.",
+      "addFirst": "Erstes privates Dokument hinzufügen",
+      "addAria": "Dokument hinzufügen",
+      "deleteAria": "Dokument löschen",
+      "openAria": "Dokument öffnen",
+      "flyToAria": "Zum Dokument springen",
+      "navigateAria": "Zur Dokumentenposition navigieren",
+      "openFailed": "Dokument konnte nicht geöffnet werden.",
+      "delete": {
+        "title": "Dokument löschen",
+        "confirm": "Das Dokument wird dauerhaft gelöscht. Bist du sicher?"
+      }
+    },
     "map": {
       "multiMarker": {
         "showMessages": "Nachrichten anzeigen",
         "showNotes": "Notizen anzeigen",
-        "showImages": "Bilder anzeigen"
+        "showImages": "Bilder anzeigen",
+        "showDocuments": "Dokumente anzeigen"
       }
     },
     "messageList": {

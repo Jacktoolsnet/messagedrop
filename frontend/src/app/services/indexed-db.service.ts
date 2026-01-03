@@ -6,6 +6,7 @@ import { Contact } from '../interfaces/contact';
 import { ContactProfile } from '../interfaces/contact-profile';
 import { CryptedUser } from '../interfaces/crypted-user';
 import { IndexedDbBackup, IndexedDbBackupEntry } from '../interfaces/indexed-db-backup';
+import { LocalDocument } from '../interfaces/local-document';
 import { LocalImage } from '../interfaces/local-image';
 import { Note } from '../interfaces/note';
 import { Place } from '../interfaces/place';
@@ -14,6 +15,7 @@ import { TileSetting } from '../interfaces/tile-settings';
 import { BackupStateService } from './backup-state.service';
 
 type StoredLocalImageMeta = string;
+type StoredLocalDocumentMeta = string;
 
 /**
  * Service for managing data in IndexedDB for the MessageDrop application.
@@ -25,7 +27,7 @@ type StoredLocalImageMeta = string;
 export class IndexedDbService {
   private readonly backupState = inject(BackupStateService);
   private dbName = 'MessageDrop';
-  private dbVersion = 5;
+  private dbVersion = 6;
   private settingStore = 'setting';
   private userStore = 'user';
   private profileStore = 'profile';
@@ -36,6 +38,8 @@ export class IndexedDbService {
   private noteStore = 'note';
   private imageStore = 'image';
   private imageHandleStore = 'imageHandle';
+  private documentStore = 'document';
+  private documentHandleStore = 'documentHandle';
   private fileHandleStore = 'fileHandle';
 
   private compress<T>(value: T): string {
@@ -113,6 +117,12 @@ export class IndexedDbService {
         }
         if (!db.objectStoreNames.contains(this.imageHandleStore)) {
           db.createObjectStore(this.imageHandleStore);
+        }
+        if (!db.objectStoreNames.contains(this.documentStore)) {
+          db.createObjectStore(this.documentStore);
+        }
+        if (!db.objectStoreNames.contains(this.documentHandleStore)) {
+          db.createObjectStore(this.documentHandleStore);
         }
         if (!db.objectStoreNames.contains(this.fileHandleStore)) {
           db.createObjectStore(this.fileHandleStore);
@@ -898,6 +908,39 @@ export class IndexedDbService {
   }
 
   /**
+   * Stores or updates a local document entry (including the file handle).
+   * Returns the entry id to mirror the note API.
+   */
+  async saveDocument(document: LocalDocument): Promise<string> {
+    const db = await this.openDB();
+    return new Promise<string>((resolve, reject) => {
+      const tx = db.transaction([this.documentStore, this.documentHandleStore], 'readwrite');
+      const metaStore = tx.objectStore(this.documentStore);
+      const handleStore = tx.objectStore(this.documentHandleStore);
+
+      metaStore.put(this.encodeDocumentEntry(document), document.id);
+      handleStore.put(document.handle, document.id);
+
+      tx.oncomplete = () => resolve(document.id);
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  /**
+   * Deletes a local document entry by ID.
+   */
+  async deleteDocument(id: string): Promise<void> {
+    const db = await this.openDB();
+    return new Promise<void>((resolve, reject) => {
+      const tx = db.transaction([this.documentStore, this.documentHandleStore], 'readwrite');
+      tx.objectStore(this.documentStore).delete(id);
+      tx.objectStore(this.documentHandleStore).delete(id);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  /**
    * Stores a file handle by ID for file tiles.
    */
   async setFileHandle(id: string, handle: FileSystemFileHandle): Promise<void> {
@@ -1020,6 +1063,43 @@ export class IndexedDbService {
     return undefined;
   }
 
+  private encodeDocumentEntry(entry: LocalDocument): StoredLocalDocumentMeta {
+    const { handle: _handle, ...rest } = entry;
+    void _handle;
+    return this.compress(rest);
+  }
+
+  private decodeDocumentEntry(rawMeta: unknown, handle: unknown): LocalDocument | undefined {
+    if (typeof rawMeta === 'string') {
+      const decoded = this.decompress<Omit<LocalDocument, 'handle'>>(rawMeta);
+      if (decoded && handle && typeof (handle as FileSystemFileHandle).getFile === 'function') {
+        return {
+          ...decoded,
+          handle: handle as FileSystemFileHandle
+        };
+      }
+      return undefined;
+    }
+
+    if (rawMeta && typeof rawMeta === 'object') {
+      const typed = rawMeta as Partial<LocalDocument> & { meta?: string; handle?: FileSystemFileHandle };
+      if (typed.meta && typed.handle) {
+        const decoded = this.decompress<LocalDocument>(typed.meta);
+        if (!decoded || typeof typed.handle.getFile !== 'function') {
+          return undefined;
+        }
+        return {
+          ...decoded,
+          handle: typed.handle
+        };
+      }
+      if ('handle' in typed && typed.handle && typeof typed.handle.getFile === 'function') {
+        return typed as LocalDocument;
+      }
+    }
+    return undefined;
+  }
+
   private normalizeLon(lon: number): number {
     const normalized = ((lon + 180) % 360 + 360) % 360 - 180;
     const epsilon = 1e-9;
@@ -1084,6 +1164,66 @@ export class IndexedDbService {
         return this.inLonRangeWithWrap(lon, lonMin, lonMax);
       })
       .sort((a, b) => b.timestamp - a.timestamp); // newest first
+    return result;
+  }
+
+  /**
+   * Retrieves all local document entries, newest first.
+   */
+  async getAllDocuments(): Promise<LocalDocument[]> {
+    const db = await this.openDB();
+    return new Promise((resolve, reject) => {
+      const tx = db.transaction([this.documentStore, this.documentHandleStore], 'readonly');
+      const metaStore = tx.objectStore(this.documentStore);
+      const handleStore = tx.objectStore(this.documentHandleStore);
+
+      const metaReq = metaStore.getAll();
+      const metaKeysReq = metaStore.getAllKeys();
+      const handleReq = handleStore.getAll();
+      const handleKeysReq = handleStore.getAllKeys();
+
+      tx.oncomplete = () => {
+        const metas = (metaReq.result as unknown[]) ?? [];
+        const metaKeys = (metaKeysReq.result as IDBValidKey[]) ?? [];
+        const handles = (handleReq.result as FileSystemFileHandle[]) ?? [];
+        const handleKeys = (handleKeysReq.result as IDBValidKey[]) ?? [];
+        const handleMap = new Map<string, FileSystemFileHandle>();
+        handleKeys.forEach((key, idx) => {
+          handleMap.set(String(key), handles[idx]);
+        });
+
+        const decoded: LocalDocument[] = [];
+        metas.forEach((meta, idx) => {
+          const key = String(metaKeys[idx]);
+          const entry = this.decodeDocumentEntry(meta, handleMap.get(key));
+          if (entry) {
+            decoded.push(entry);
+          }
+        });
+
+        resolve(decoded.sort((a, b) => b.timestamp - a.timestamp));
+      };
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async getDocumentsInBoundingBox(boundingBox: BoundingBox): Promise<LocalDocument[]> {
+    const allDocuments = await this.getAllDocuments();
+
+    const latMin = Math.min(boundingBox.latMin, boundingBox.latMax);
+    const latMax = Math.max(boundingBox.latMin, boundingBox.latMax);
+    const lonMin = this.normalizeLon(boundingBox.lonMin);
+    const lonMax = this.normalizeLon(boundingBox.lonMax);
+
+    const result = allDocuments
+      .filter(documentEntry => {
+        const lat = documentEntry.location.latitude;
+        const lon = this.normalizeLon(documentEntry.location.longitude);
+
+        if (!this.inLatRange(lat, latMin, latMax)) return false;
+        return this.inLonRangeWithWrap(lon, lonMin, lonMax);
+      })
+      .sort((a, b) => b.timestamp - a.timestamp);
     return result;
   }
 
