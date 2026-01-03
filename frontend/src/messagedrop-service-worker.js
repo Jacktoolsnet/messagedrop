@@ -26,8 +26,8 @@ self.addEventListener('message', (event) => {
     event.waitUntil(
         self.registration.showNotification(title, {
             body,
-            icon: '/assets/icons/notify-icon.png',
-            badge: '/assets/icons/icon-72x72.png',
+            icon: '/icons/notify-icon.png',
+            badge: '/icons/icon-72x72.png',
             data: { url },
             tag,
             renotify: true,

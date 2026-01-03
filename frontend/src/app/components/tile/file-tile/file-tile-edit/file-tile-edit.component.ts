@@ -132,16 +132,15 @@ export class FileTileEditComponent {
   async save(): Promise<void> {
     const title = this.titleControl.value.trim() || this.translation.t('common.tileTypes.files');
     const files = this.normalizeFiles(this.files()).map((file, index) => ({ ...file, order: index }));
-    const removedIds = this.initialFiles
-      .filter(initial => !files.some(current => current.id === initial.id))
-      .map(initial => initial.id);
+    const removedFiles = this.initialFiles
+      .filter(initial => !files.some(current => current.id === initial.id));
 
     try {
       for (const [id, handle] of this.pendingHandles.entries()) {
         await this.fileTileService.storeHandle(id, handle);
       }
 
-      await Promise.all(removedIds.map(id => this.fileTileService.deleteHandle(id)));
+      await Promise.all(removedFiles.map(file => this.fileTileService.deleteHandle(file)));
     } catch (error) {
       console.error('Failed to persist file handles', error);
       this.snackBar.open(this.translation.t('common.tiles.files.saveHandlesFailed'), undefined, { duration: 4000 });

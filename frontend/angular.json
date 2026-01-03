@@ -86,9 +86,11 @@
             ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
-              "src/favicon.ico",
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
               "src/assets",
-              "src/manifest.webmanifest",
               {
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",
@@ -169,9 +171,11 @@
             ],
             "tsConfig": "tsconfig.spec.json",
             "assets": [
-              "src/favicon.ico",
+              {
+                "glob": "**/*",
+                "input": "public"
+              },
               "src/assets",
-              "src/manifest.webmanifest",
               {
                 "glob": "**/*",
                 "input": "node_modules/leaflet/dist/images/",

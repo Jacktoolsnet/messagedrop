@@ -26,7 +26,7 @@
         "files": [
           "/assets/**",
           "/assets/fonts/*.ttf",
-          "/assets/icons/*.png",
+          "/icons/*.png",
           "/assets/markers/*.svg",
           "/assets/weather-icons/css/*.css",
           "/assets/weather-icons/fonts/*.ttf",

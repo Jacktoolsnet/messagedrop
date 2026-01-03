@@ -360,7 +360,7 @@ export class AppComponent implements OnInit {
         // Open Graph / Twitter
         this.metaService.updateTag({ property: 'og:title', content: meta.ogTitle ?? '' });
         this.metaService.updateTag({ property: 'og:description', content: meta.ogDescription ?? '' });
-        this.metaService.updateTag({ property: 'og:image', content: 'https://messagedrop.de/assets/icons/icon-512x512.png' });
+        this.metaService.updateTag({ property: 'og:image', content: 'https://messagedrop.de/icons/icon-512x512.png' });
 
         this.metaService.updateTag({ name: 'twitter:card', content: 'summary_large_image' });
         this.metaService.updateTag({ name: 'twitter:title', content: meta.twitterTitle ?? '' });

@@ -1,4 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
+import { FileCacheService } from './file-cache.service';
 import { IndexedDbService } from './indexed-db.service';
 import { TileFileEntry } from '../interfaces/tile-settings';
 
@@ -16,6 +17,7 @@ type FilePickerWindow = typeof window & {
 @Injectable({ providedIn: 'root' })
 export class TileFileService {
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly fileCacheService = inject(FileCacheService);
   readonly isSupportedSignal = signal<boolean>(this.detectSupport());
   readonly lastErrorSignal = signal<string | null>(null);
 
@@ -64,9 +66,9 @@ export class TileFileService {
 
     const entries: { entry: TileFileEntry; handle: FileSystemFileHandle }[] = [];
     for (const handle of handles) {
-      const entry = await this.buildEntryFromHandle(handle);
-      if (entry) {
-        entries.push({ entry, handle });
+      const built = await this.buildEntryFromHandle(handle);
+      if (built) {
+        entries.push(built);
       }
     }
 
@@ -77,8 +79,9 @@ export class TileFileService {
     await this.indexedDbService.setFileHandle(id, handle);
   }
 
-  async deleteHandle(id: string): Promise<void> {
-    await this.indexedDbService.deleteFileHandle(id);
+  async deleteHandle(entry: TileFileEntry): Promise<void> {
+    await this.indexedDbService.deleteFileHandle(entry.id);
+    await this.fileCacheService.deleteTileFile(entry.id, entry.fileName, entry.mimeType);
   }
 
   async getHandle(id: string): Promise<FileSystemFileHandle | undefined> {
@@ -86,15 +89,18 @@ export class TileFileService {
   }
 
   async openFile(entry: TileFileEntry, handle?: FileSystemFileHandle): Promise<void> {
-    const resolvedHandle = handle ?? (await this.getHandle(entry.id));
+    const cachedHandle = await this.fileCacheService.getTileHandle(entry.id, entry.fileName, entry.mimeType);
+    const resolvedHandle = cachedHandle ?? handle ?? (await this.getHandle(entry.id));
     if (!resolvedHandle || typeof resolvedHandle.getFile !== 'function') {
       this.lastErrorSignal.set('Missing file handle for the selected file.');
       throw new Error('Missing file handle.');
     }
 
-    const hasPermission = await this.ensureReadPermission(resolvedHandle);
-    if (!hasPermission) {
-      throw new Error('Read permission not granted for file.');
+    if (!cachedHandle) {
+      const hasPermission = await this.ensureReadPermission(resolvedHandle);
+      if (!hasPermission) {
+        throw new Error('Read permission not granted for file.');
+      }
     }
 
     try {
@@ -102,6 +108,12 @@ export class TileFileService {
       const url = URL.createObjectURL(file);
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 60_000);
+      if (!cachedHandle) {
+        const cached = await this.fileCacheService.writeTileFile(entry.id, file, entry.fileName, entry.mimeType);
+        if (cached) {
+          await this.indexedDbService.setFileHandle(entry.id, cached);
+        }
+      }
     } catch (error) {
       console.error('Failed to open file', error);
       this.lastErrorSignal.set('Unable to open the selected file.');
@@ -109,7 +121,9 @@ export class TileFileService {
     }
   }
 
-  private async buildEntryFromHandle(handle: FileSystemFileHandle): Promise<TileFileEntry | null> {
+  private async buildEntryFromHandle(
+    handle: FileSystemFileHandle
+  ): Promise<{ entry: TileFileEntry; handle: FileSystemFileHandle } | null> {
     const hasPermission = await this.ensureReadPermission(handle);
     if (!hasPermission) {
       return null;
@@ -126,7 +140,7 @@ export class TileFileService {
 
     const now = Date.now();
 
-    return {
+    const entry: TileFileEntry = {
       id: this.createFileId(),
       fileName: file.name,
       mimeType: file.type,
@@ -135,6 +149,9 @@ export class TileFileService {
       addedAt: now,
       order: 0
     };
+
+    const cachedHandle = await this.fileCacheService.writeTileFile(entry.id, file, file.name, file.type);
+    return { entry, handle: cachedHandle ?? handle };
   }
 
   private async ensureReadPermission(handle: FileSystemFileHandle): Promise<boolean> {
