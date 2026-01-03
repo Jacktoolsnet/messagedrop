@@ -30,7 +30,7 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
     MatFormFieldModule,
     MatInputModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './place-settings.component.html',
   styleUrl: './place-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -127,7 +127,7 @@ export class PlaceProfileComponent {
   openTileSettings(): void {
     const dialogRef = this.dialog.open(TileSettingsComponent, {
       width: 'auto',
-      minWidth: '450px',
+      minWidth: 'min(450px, 95vws',
       maxWidth: '90vw',
       maxHeight: '90vh',
       data: { place: this.data.place }

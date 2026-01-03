@@ -219,7 +219,7 @@ router.get('/get/userId/:userId',
       return next(apiError.internal('db_error'));
     }
     if (!rows || rows.length === 0) {
-      return next(apiError.notFound('not_found'));
+      return res.status(200).json({ status: 200, rows: [] });
     }
     res.status(200).json({ status: 200, rows });
   });

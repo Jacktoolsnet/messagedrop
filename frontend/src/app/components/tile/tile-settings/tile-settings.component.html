@@ -1,9 +1,14 @@
-<div class="title-row">
-  <h2 mat-dialog-title>{{ 'common.tileSettings.title' | transloco }}</h2>
-  <button mat-mini-fab color="primary" [matMenuTriggerFor]="addMenu"
-    [attr.aria-label]="'common.tileSettings.addTile' | transloco">
-    <mat-icon>add</mat-icon>
-  </button>
+<h2 mat-dialog-title class="tile-settings-title">
+  <span class="title-left">
+    <mat-icon aria-hidden="true">tune</mat-icon>
+    <span>{{ 'common.tileSettings.title' | transloco }}</span>
+  </span>
+  <span class="title-actions">
+    <button mat-mini-fab color="primary" [matMenuTriggerFor]="addMenu"
+      [attr.aria-label]="'common.tileSettings.addTile' | transloco">
+      <mat-icon>add</mat-icon>
+    </button>
+  </span>
   <mat-menu #addMenu="matMenu">
     @for (tile of addableTiles; track tile.type) {
     <button mat-menu-item (click)="addTile(tile)">
@@ -12,8 +17,7 @@
     </button>
     }
   </mat-menu>
-</div>
-
+</h2>
 <mat-dialog-content class="tile-settings-content">
 
   <div cdkDropList class="tile-list" (cdkDropListDropped)="drop($event)">

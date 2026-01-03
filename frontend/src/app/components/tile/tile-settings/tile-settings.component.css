@@ -1,3 +1,25 @@
+.tile-settings-title {
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 3;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+  width: 100%;
+}
+
+.title-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.title-actions {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+}
+
 .hint {
   margin: 0 0 12px 0;
   font-size: 0.9rem;
@@ -21,8 +43,9 @@
   display: flex;
   flex-direction: column;
   gap: 8px;
-  max-height: 60vh;
+  max-height: calc(90vh - 12rem);
   overflow: hidden;
+  min-height: 0;
 }
 
 .toolbar {
@@ -48,6 +71,10 @@
   padding-top: 8px;
   margin-top: 8px;
   padding-bottom: 8px;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  width: 100%;
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
 }
 
 .tile-row {

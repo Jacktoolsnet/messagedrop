@@ -1,29 +1,29 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, inject } from '@angular/core';
-import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
-import { Place } from '../../../interfaces/place';
-import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
-import { PlaceService } from '../../../services/place.service';
-import { Contact } from '../../../interfaces/contact';
-import { ContactService } from '../../../services/contact.service';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
+import { Contact } from '../../../interfaces/contact';
+import { Place } from '../../../interfaces/place';
+import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { ContactService } from '../../../services/contact.service';
+import { PlaceService } from '../../../services/place.service';
 import { AirQualityTileComponent } from "../air-quality-tile/air-quality-tile.component";
 import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.component";
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
-import { ImageTileComponent } from "../image-tile/image-tile.component";
 import { FileTileComponent } from "../file-tile/file-tile.component";
+import { ImageTileComponent } from "../image-tile/image-tile.component";
 import { LinkTileComponent } from "../link-tile/link-tile.component";
-import { MigraineTileComponent } from "../migraine-tile/migraine-tile.component";
-import { PollutionTileComponent } from "../pollution-tile/pollution-tile.component";
 import { MessageTileComponent } from "../message-tile/messagetile.component";
+import { MigraineTileComponent } from "../migraine-tile/migraine-tile.component";
 import { MultitextTileComponent } from "../multitext-tile/multitext-tile.component";
 import { NoteTileComponent } from "../note-tile/note-tile.component";
+import { PollutionTileComponent } from "../pollution-tile/pollution-tile.component";
 import { QuickActionTileComponent } from "../quick-action-tile/quick-action-tile.component";
 import { TextTileComponent } from "../text-tile/text-tile.component";
+import { TileSettingsComponent } from '../tile-settings/tile-settings.component';
 import { TodoTileComponent } from "../todo-tile/todo-tile.component";
 import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
-import { TileSettingsComponent } from '../tile-settings/tile-settings.component';
 
 @Component({
   selector: 'app-tile-list',
@@ -58,7 +58,7 @@ export class TileListComponent {
   openTileSettings(): void {
     const dialogRef = this.dialog.open(TileSettingsComponent, {
       width: 'auto',
-      minWidth: '450px',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
       data: this.contact ? { contact: this.contact } : { place: this.place }

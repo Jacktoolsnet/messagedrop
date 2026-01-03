@@ -118,7 +118,7 @@ export class ContactSettingsComponent {
   openTileSettings(): void {
     const dialogRef = this.dialog.open(TileSettingsComponent, {
       width: 'auto',
-      minWidth: '450px',
+      minWidth: 'min(450px, 95vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
       data: { contact: this.data.contact }
