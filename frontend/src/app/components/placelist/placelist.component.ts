@@ -204,6 +204,16 @@ export class PlacelistComponent {
     this.dialogRef.close();
   }
 
+  openPlaceInMaps(place: Place): void {
+    const location = place.location;
+    if (!location) {
+      return;
+    }
+    const query = location.plusCode || `${location.latitude},${location.longitude}`;
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    window.open(url, '_blank');
+  }
+
   async addPlace(): Promise<void> {
     const place: Place = {
       id: '',

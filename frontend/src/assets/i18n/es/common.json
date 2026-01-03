@@ -371,6 +371,7 @@
       "subscribeAria": "Suscribirse al lugar",
       "unsubscribeAria": "Cancelar suscripción al lugar",
       "flyToAria": "Ir al lugar",
+      "openInMaps": "Abrir en Google Maps",
       "deleteDialog": {
         "title": "Eliminar lugar",
         "confirm": "El lugar se eliminará permanentemente. ¿Estás seguro?"

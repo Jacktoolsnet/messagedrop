@@ -371,6 +371,7 @@
       "subscribeAria": "Subscribe to place",
       "unsubscribeAria": "Unsubscribe from place",
       "flyToAria": "Fly to place",
+      "openInMaps": "Open in Google Maps",
       "deleteDialog": {
         "title": "Delete place",
         "confirm": "The place will be permanently deleted. Are you sure?"

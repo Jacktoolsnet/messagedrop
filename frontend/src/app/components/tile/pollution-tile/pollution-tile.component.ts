@@ -1,19 +1,19 @@
 import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
 
-import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { AirQualityData } from '../../../interfaces/air-quality-data';
+import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
-import { AirQualityData } from '../../../interfaces/air-quality-data';
-import { PlaceService } from '../../../services/place.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
-import { MatDialog } from '@angular/material/dialog';
-import { PollutionTileEditComponent } from './pollution-tile-edit/pollution-tile-edit.component';
-import { AirQualityComponent } from '../../air-quality/air-quality.component';
-import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
-import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
+import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
+import { AirQualityComponent } from '../../air-quality/air-quality.component';
+import { PollutionTileEditComponent } from './pollution-tile-edit/pollution-tile-edit.component';
 
 @Component({
   selector: 'app-pollution-tile',
@@ -181,7 +181,11 @@ export class PollutionTileComponent {
     if (!tile) return;
     const availableKeys = Array.from(this.getAvailableKeys());
     const ref = this.dialog.open(PollutionTileEditComponent, {
-      width: '520px',
+      panelClass: 'pollution-edit-dialog',
+      width: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      height: 'auto',
       data: { tile, availableKeys }
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -206,9 +210,9 @@ export class PollutionTileComponent {
       minWidth: '90vw',
       width: '90vw',
       maxWidth: '90vw',
-      minHeight: '90vh',
-      height: '90vh',
-      maxHeight: '90vh',
+      minHeight: '95vh',
+      height: '95vh',
+      maxHeight: '95vh',
       hasBackdrop: true,
       autoFocus: false
     });

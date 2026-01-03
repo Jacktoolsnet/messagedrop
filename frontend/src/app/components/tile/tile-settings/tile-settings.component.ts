@@ -267,7 +267,11 @@ export class TileSettingsComponent {
 
     if (tile.type === 'custom-pollution') {
       const ref = this.dialog.open(PollutionTileEditComponent, {
-        width: '520px',
+        panelClass: 'pollution-edit-dialog',
+        width: 'min(520px, 95vw)',
+        maxWidth: '95vw',
+        maxHeight: '95vh',
+        height: 'auto',
         data: { tile }
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {

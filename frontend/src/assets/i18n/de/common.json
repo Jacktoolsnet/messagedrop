@@ -371,6 +371,7 @@
       "subscribeAria": "Ort abonnieren",
       "unsubscribeAria": "Ort abbestellen",
       "flyToAria": "Zum Ort springen",
+      "openInMaps": "In Google Maps öffnen",
       "deleteDialog": {
         "title": "Ort löschen",
         "confirm": "Der Ort wird dauerhaft gelöscht. Bist du sicher?"

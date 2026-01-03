@@ -62,6 +62,10 @@
                                 <mat-icon>settings_account_box</mat-icon>
                                 <span>{{ 'common.placeList.editAria' | transloco }}</span>
                             </button>
+                            <button mat-menu-item (click)="openPlaceInMaps(place)">
+                                <mat-icon>map</mat-icon>
+                                <span>{{ 'common.placeList.openInMaps' | transloco }}</span>
+                            </button>
                             @if (!subscriptionError) {
                             @if (place.subscribed) {
                             <button mat-menu-item (click)="handleSubscription(place)">

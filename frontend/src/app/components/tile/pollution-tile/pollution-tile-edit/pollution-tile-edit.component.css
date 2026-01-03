@@ -27,3 +27,7 @@
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 8px;
 }
+
+:host ::ng-deep .pollution-edit-dialog .mat-mdc-dialog-content {
+  max-height: calc(95vh - 8rem);
+}
