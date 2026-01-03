@@ -217,6 +217,7 @@
       "imported": "Image(s) importée(s) localement.",
       "importSuccess": "Image(s) importée(s) localement.",
       "importFailed": "Impossible d'importer l'image.",
+      "storageFull": "Le stockage est plein. Libérez de l'espace et réessayez.",
       "filePickerUnsupported": "Le sélecteur d'images n'est pas pris en charge par ce navigateur.",
       "addFirst": "Ajouter ma première image privée",
       "addAria": "Ajouter une image",
@@ -483,7 +484,8 @@
         "removeAria": "Retirer le fichier",
         "pickerUnsupported": "Le sélecteur de fichiers n'est pas pris en charge par ce navigateur.",
         "openFailed": "Impossible d'ouvrir le fichier.",
-        "saveHandlesFailed": "Impossible d'enregistrer les références de fichiers."
+        "saveHandlesFailed": "Impossible d'enregistrer les références de fichiers.",
+        "storageFull": "Le stockage est plein. Libérez de l'espace et réessayez."
       }
     },
     "tileEdit": {

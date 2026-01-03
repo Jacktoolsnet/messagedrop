@@ -14,6 +14,7 @@ import { TileFileService } from '../../../../services/tile-file.service';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { getFileIcon } from '../../../../utils/file-icon.util';
+import { isQuotaExceededError } from '../../../../utils/storage-error.util';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface FileTileDialogData {
@@ -84,7 +85,16 @@ export class FileTileEditComponent {
       return;
     }
 
-    const picked = await this.fileTileService.pickFiles();
+    let picked: { entry: TileFileEntry; handle: FileSystemFileHandle }[] = [];
+    try {
+      picked = await this.fileTileService.pickFiles();
+    } catch (error) {
+      const message = isQuotaExceededError(error)
+        ? this.translation.t('common.tiles.files.storageFull')
+        : this.fileTileService.lastErrorSignal() ?? this.translation.t('common.tiles.files.saveHandlesFailed');
+      this.snackBar.open(message, undefined, { duration: 4000 });
+      return;
+    }
     if (!picked.length) {
       const message = this.fileTileService.lastErrorSignal();
       if (message) {
@@ -143,7 +153,10 @@ export class FileTileEditComponent {
       await Promise.all(removedFiles.map(file => this.fileTileService.deleteHandle(file)));
     } catch (error) {
       console.error('Failed to persist file handles', error);
-      this.snackBar.open(this.translation.t('common.tiles.files.saveHandlesFailed'), undefined, { duration: 4000 });
+      const message = isQuotaExceededError(error)
+        ? this.translation.t('common.tiles.files.storageFull')
+        : this.translation.t('common.tiles.files.saveHandlesFailed');
+      this.snackBar.open(message, undefined, { duration: 4000 });
       return;
     }
 

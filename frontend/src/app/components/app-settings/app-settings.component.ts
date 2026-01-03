@@ -72,6 +72,8 @@ export class AppSettingsComponent implements OnInit {
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
   public storagePersistenceWarning = '';
+  public storageQuotaWarning = '';
+  private readonly storageWarningThreshold = 0.9;
 
   ngOnInit(): void {
     if ('permissions' in navigator && navigator.permissions?.query) {
@@ -84,6 +86,7 @@ export class AppSettingsComponent implements OnInit {
           this.showDetectLocationOnStart = false;
         });
     }
+    void this.refreshStorageEstimate();
   }
 
   onCloseClick(): void {
@@ -159,6 +162,51 @@ export class AppSettingsComponent implements OnInit {
         this.storagePersistenceWarning = '';
       }
     }
+  }
+
+  private async refreshStorageEstimate(): Promise<void> {
+    if (typeof navigator === 'undefined' || !navigator.storage?.estimate) {
+      this.storageQuotaWarning = '';
+      return;
+    }
+
+    try {
+      const estimate = await navigator.storage.estimate();
+      const usage = estimate.usage;
+      const quota = estimate.quota;
+      if (typeof usage !== 'number' || typeof quota !== 'number' || quota <= 0) {
+        this.storageQuotaWarning = '';
+        return;
+      }
+
+      const ratio = usage / quota;
+      if (ratio >= this.storageWarningThreshold) {
+        const percent = Math.round(ratio * 100);
+        const usedLabel = this.formatBytes(usage);
+        const totalLabel = this.formatBytes(quota);
+        this.storageQuotaWarning = this.translation.t('settings.storage.quotaWarning', {
+          percent,
+          used: usedLabel,
+          total: totalLabel
+        });
+      } else {
+        this.storageQuotaWarning = '';
+      }
+    } catch {
+      this.storageQuotaWarning = '';
+    }
+  }
+
+  private formatBytes(bytes: number): string {
+    if (!bytes) return '0 B';
+    const units = ['B', 'KB', 'MB', 'GB'];
+    let value = bytes;
+    let unitIndex = 0;
+    while (value >= 1024 && unitIndex < units.length - 1) {
+      value /= 1024;
+      unitIndex++;
+    }
+    return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
   }
 
 }

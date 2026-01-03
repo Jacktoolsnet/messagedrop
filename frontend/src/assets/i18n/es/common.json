@@ -217,6 +217,7 @@
       "imported": "Imagen(es) importadas localmente.",
       "importSuccess": "Imagen(es) importadas localmente.",
       "importFailed": "No se pudo importar la imagen.",
+      "storageFull": "El almacenamiento está lleno. Libera espacio e inténtalo de nuevo.",
       "filePickerUnsupported": "El selector de imágenes no es compatible con este navegador.",
       "addFirst": "Añadir mi primera imagen privada",
       "addAria": "Añadir imagen",
@@ -483,7 +484,8 @@
         "removeAria": "Eliminar archivo",
         "pickerUnsupported": "El selector de archivos no es compatible con este navegador.",
         "openFailed": "No se puede abrir el archivo.",
-        "saveHandlesFailed": "No se pudieron guardar los identificadores de archivos."
+        "saveHandlesFailed": "No se pudieron guardar los identificadores de archivos.",
+        "storageFull": "El almacenamiento está lleno. Libera espacio e inténtalo de nuevo."
       }
     },
     "tileEdit": {

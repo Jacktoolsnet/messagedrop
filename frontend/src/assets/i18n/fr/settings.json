@@ -35,6 +35,7 @@
     "toggle": "Protéger les données locales",
     "applying": "Application de la préférence...",
     "warning": "Le navigateur n'a pas pu accorder le stockage persistant.",
+    "quotaWarning": "Stockage presque plein ({{ percent }}% utilisés : {{ used }} sur {{ total }}).",
     "confirmDisable": "La désactivation peut permettre au navigateur de supprimer des données stockées. Voulez-vous continuer ?"
   },
   "backup": {

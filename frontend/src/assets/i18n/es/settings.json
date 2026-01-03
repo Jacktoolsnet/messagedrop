@@ -35,6 +35,7 @@
     "toggle": "Proteger datos locales",
     "applying": "Aplicando la preferencia...",
     "warning": "El navegador no pudo conceder el almacenamiento persistente.",
+    "quotaWarning": "Almacenamiento casi lleno ({{ percent }}% usado: {{ used }} de {{ total }}).",
     "confirmDisable": "Desactivarlo puede permitir que el navegador elimine datos almacenados. ¿Quieres continuar?"
   },
   "backup": {

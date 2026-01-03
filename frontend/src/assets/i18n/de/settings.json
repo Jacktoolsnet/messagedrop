@@ -35,6 +35,7 @@
     "toggle": "Lokale Daten schützen",
     "applying": "Einstellung wird angewendet...",
     "warning": "Persistenter Speicher konnte vom Browser nicht gewährt werden.",
+    "quotaWarning": "Speicher fast voll ({{ percent }}% belegt: {{ used }} von {{ total }}).",
     "confirmDisable": "Wenn du es deaktivierst, kann der Browser gespeicherte Daten entfernen. Möchtest du wirklich fortfahren?"
   },
   "backup": {

@@ -1,4 +1,5 @@
 import { Injectable, signal } from '@angular/core';
+import { isQuotaExceededError } from '../utils/storage-error.util';
 
 type CacheScope = 'images' | 'files';
 
@@ -22,8 +23,14 @@ export class FileCacheService {
     return this.getHandle('images', id, fileName, mimeType);
   }
 
-  async writeImageFile(id: string, file: Blob, fileName?: string, mimeType?: string): Promise<FileSystemFileHandle | undefined> {
-    return this.writeFile('images', id, file, fileName, mimeType);
+  async writeImageFile(
+    id: string,
+    file: Blob,
+    fileName?: string,
+    mimeType?: string,
+    options?: { throwOnQuota?: boolean }
+  ): Promise<FileSystemFileHandle | undefined> {
+    return this.writeFile('images', id, file, fileName, mimeType, options);
   }
 
   async deleteImageFile(id: string, fileName?: string, mimeType?: string): Promise<void> {
@@ -34,8 +41,14 @@ export class FileCacheService {
     return this.getHandle('files', id, fileName, mimeType);
   }
 
-  async writeTileFile(id: string, file: Blob, fileName?: string, mimeType?: string): Promise<FileSystemFileHandle | undefined> {
-    return this.writeFile('files', id, file, fileName, mimeType);
+  async writeTileFile(
+    id: string,
+    file: Blob,
+    fileName?: string,
+    mimeType?: string,
+    options?: { throwOnQuota?: boolean }
+  ): Promise<FileSystemFileHandle | undefined> {
+    return this.writeFile('files', id, file, fileName, mimeType, options);
   }
 
   async deleteTileFile(id: string, fileName?: string, mimeType?: string): Promise<void> {
@@ -69,7 +82,8 @@ export class FileCacheService {
     id: string,
     file: Blob,
     fileName?: string,
-    mimeType?: string
+    mimeType?: string,
+    options?: { throwOnQuota?: boolean }
   ): Promise<FileSystemFileHandle | undefined> {
     const directory = await this.getScopeDirectory(scope);
     if (!directory) {
@@ -84,6 +98,9 @@ export class FileCacheService {
       await writable.close();
       return handle;
     } catch (error) {
+      if (options?.throwOnQuota && isQuotaExceededError(error)) {
+        throw error;
+      }
       console.warn('Failed to cache file in app storage', error);
       return undefined;
     }

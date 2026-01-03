@@ -132,7 +132,13 @@ export class LocalImageService {
     const location = this.resolveLocation(exifLocation, fallbackLocation);
     const now = Date.now();
 
-    const cachedHandle = await this.fileCacheService.writeImageFile(id, file, file.name, file.type);
+    const cachedHandle = await this.fileCacheService.writeImageFile(
+      id,
+      file,
+      file.name,
+      file.type,
+      { throwOnQuota: true }
+    );
     const entry: LocalImage = {
       id,
       handle: cachedHandle ?? handle,

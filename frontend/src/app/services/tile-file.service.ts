@@ -150,7 +150,13 @@ export class TileFileService {
       order: 0
     };
 
-    const cachedHandle = await this.fileCacheService.writeTileFile(entry.id, file, file.name, file.type);
+    const cachedHandle = await this.fileCacheService.writeTileFile(
+      entry.id,
+      file,
+      file.name,
+      file.type,
+      { throwOnQuota: true }
+    );
     return { entry, handle: cachedHandle ?? handle };
   }
 

@@ -217,6 +217,7 @@
       "imported": "Bild(er) lokal importiert.",
       "importSuccess": "Bild(er) lokal importiert.",
       "importFailed": "Bild konnte nicht importiert werden.",
+      "storageFull": "Speicher ist voll. Bitte gib Platz frei und versuche es erneut.",
       "filePickerUnsupported": "Die Bildauswahl wird in diesem Browser nicht unterstützt.",
       "addFirst": "Erstes privates Bild hinzufügen",
       "addAria": "Bild hinzufügen",
@@ -483,7 +484,8 @@
         "removeAria": "Datei entfernen",
         "pickerUnsupported": "Der Dateiauswahldialog wird in diesem Browser nicht unterstützt.",
         "openFailed": "Datei konnte nicht geöffnet werden.",
-        "saveHandlesFailed": "Dateihandles konnten nicht gespeichert werden."
+        "saveHandlesFailed": "Dateihandles konnten nicht gespeichert werden.",
+        "storageFull": "Speicher ist voll. Bitte gib Platz frei und versuche es erneut."
       }
     },
     "tileEdit": {

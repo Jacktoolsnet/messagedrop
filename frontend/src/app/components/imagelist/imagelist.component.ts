@@ -24,6 +24,7 @@ import { MapService } from '../../services/map.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { isQuotaExceededError } from '../../utils/storage-error.util';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
 
@@ -190,7 +191,10 @@ export class ImagelistComponent implements OnInit, OnDestroy {
       this.snackBar.open(this.translation.t('common.images.importSuccess'), undefined, { duration: 3000 });
     } catch (error) {
       console.error('Failed to add image', error);
-      this.snackBar.open(this.translation.t('common.images.importFailed'), undefined, { duration: 4000 });
+      const message = isQuotaExceededError(error)
+        ? this.translation.t('common.images.storageFull')
+        : this.translation.t('common.images.importFailed');
+      this.snackBar.open(message, undefined, { duration: 4000 });
     }
   }
 

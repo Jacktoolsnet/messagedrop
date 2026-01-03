@@ -217,6 +217,7 @@
       "imported": "Image(s) imported locally.",
       "importSuccess": "Image(s) imported locally.",
       "importFailed": "Unable to import the image.",
+      "storageFull": "Storage is full. Free up space and try again.",
       "filePickerUnsupported": "Image picker is not supported in this browser.",
       "addFirst": "Add my first private image",
       "addAria": "Add image",
@@ -483,7 +484,8 @@
         "removeAria": "Remove file",
         "pickerUnsupported": "File picker is not supported in this browser.",
         "openFailed": "Unable to open the file.",
-        "saveHandlesFailed": "Unable to save file handles."
+        "saveHandlesFailed": "Unable to save file handles.",
+        "storageFull": "Storage is full. Free up space and try again."
       }
     },
     "tileEdit": {

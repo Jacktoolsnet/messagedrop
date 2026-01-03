@@ -35,6 +35,7 @@
     "toggle": "Protect local data",
     "applying": "Applying preference...",
     "warning": "Persistent storage could not be granted by the browser.",
+    "quotaWarning": "Storage almost full ({{ percent }}% used: {{ used }} of {{ total }}).",
     "confirmDisable": "Disabling may allow the browser to prune stored data. Do you really want to continue?"
   },
   "backup": {
