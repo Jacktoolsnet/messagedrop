@@ -964,14 +964,16 @@ export class AppComponent implements OnInit {
   }
 
   public openPlaceListDialog(): void {
-    const hasPlaces = this.placeService.isReady() && this.placeService.getPlaces().length > 0;
+    const placeCount = this.placeService.isReady() ? this.placeService.getPlaces().length : 0;
+    const hasPlaces = placeCount > 0;
+    const dialogWidth = placeCount > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
     const dialogRef = this.dialog.open(PlacelistComponent, {
       panelClass: hasPlaces ? 'PalceListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
       minWidth: 'min(360px, 95vw)',
-      maxWidth: 'min(520px, 95vw)',
-      width: 'min(520px, 95vw)',
+      maxWidth: dialogWidth,
+      width: dialogWidth,
       maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,
@@ -1000,14 +1002,16 @@ export class AppComponent implements OnInit {
   }
 
   public openContactListDialog(): void {
-    const hasContacts = this.contactService.isReady() && this.contactService.contactsSignal().length > 0;
+    const contactCount = this.contactService.isReady() ? this.contactService.contactsSignal().length : 0;
+    const hasContacts = contactCount > 0;
+    const dialogWidth = contactCount > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
     const dialogRef = this.dialog.open(ContactlistComponent, {
       panelClass: hasContacts ? 'ContactListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
       minWidth: 'min(360px, 95vw)',
-      maxWidth: 'min(520px, 95vw)',
-      width: 'min(520px, 95vw)',
+      maxWidth: dialogWidth,
+      width: dialogWidth,
       maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,
