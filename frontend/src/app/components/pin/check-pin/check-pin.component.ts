@@ -6,7 +6,6 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { ResetUserComponent } from '../../user/reset-user/reset-user.component';
 
 @Component({
   selector: 'app-check-pin',
@@ -86,16 +85,7 @@ export class CheckPinComponent {
     }
   }
 
-  resetUser(): void {
-    const dialogRef = this.resetDialog.open(ResetUserComponent, {
-      closeOnNavigation: true,
-      hasBackdrop: true
-    });
-
-    dialogRef.afterClosed().subscribe(result => {
-      if (result) {
-        this.dialogRef.close('reset');
-      }
-    });
+  cancel(): void {
+    this.dialogRef.close();
   }
 }

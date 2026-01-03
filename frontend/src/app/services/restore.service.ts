@@ -225,9 +225,6 @@ export class RestoreService {
       hasBackdrop: true
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
-    if (!pin || pin === 'reset') {
-      return undefined;
-    }
     return pin;
   }
 

@@ -7,32 +7,32 @@ import { catchError, firstValueFrom, Observable, take, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
-import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
+import { DisplayMessage } from '../components/utils/display-message/display-message.component';
+import { UserServerBackup } from '../interfaces/backup';
+import { Contact } from '../interfaces/contact';
 import { CreateUserResponse } from '../interfaces/create-user-response';
 import { CryptedUser } from '../interfaces/crypted-user';
-import { Contact } from '../interfaces/contact';
 import { GetMessageResponse } from '../interfaces/get-message-response';
-import { RawContact } from '../interfaces/raw-contact';
+import { MultimediaType } from '../interfaces/multimedia-type';
 import { Profile } from '../interfaces/profile';
+import { RawContact } from '../interfaces/raw-contact';
+import { ShortMessage } from '../interfaces/short-message';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
+import { User } from '../interfaces/user';
 import { UserChallengeResponse } from '../interfaces/user-challenge-response';
 import { UserLoginResponse } from '../interfaces/user-login-response';
-import { User } from '../interfaces/user';
 import { UserType } from '../interfaces/user-type';
-import { UserServerBackup } from '../interfaces/backup';
-import { MultimediaType } from '../interfaces/multimedia-type';
-import { ShortMessage } from '../interfaces/short-message';
 import { BackupStateService } from './backup-state.service';
 import { ContactMessageService } from './contact-message.service';
-import { CryptoService } from './crypto.service';
 import { ContactService } from './contact.service';
+import { CryptoService } from './crypto.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
-import { ServerService } from './server.service';
-import { TranslationHelperService } from './translation-helper.service';
 import { RestoreService } from './restore.service';
+import { ServerService } from './server.service';
 import { SocketioService } from './socketio.service';
+import { TranslationHelperService } from './translation-helper.service';
 
 @Injectable({
   providedIn: 'root'
@@ -1345,25 +1345,6 @@ export class UserService {
       hasBackdrop: true
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
-      if (data === 'reset') {
-        const cryptedUser: CryptedUser | undefined = await this.indexedDbService.getUser()
-        if (cryptedUser) {
-          this.deleteUser(cryptedUser.id)
-            .subscribe({
-              next: () => {
-                this.indexedDbService.clearAllData();
-                this.openCreatePinDialog();
-              },
-              error: (err) => {
-                console.error('Failed to delete user during reset', err);
-                this.indexedDbService.clearAllData();
-                this.openCreatePinDialog();
-              }
-            });
-        }
-        return;
-      }
-
       if (!data) {
         return;
       }
