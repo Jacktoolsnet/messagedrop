@@ -1,0 +1,36 @@
+<h2 mat-dialog-title class="tile-dialog-title">
+  @if (contact) {
+    <span class="tile-dialog-title__avatar">
+      @if (contact.base64Avatar) {
+        <img class="tile-dialog-title__image" [src]="contact.base64Avatar"
+          [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" />
+      } @else {
+        <mat-icon aria-hidden="true">person</mat-icon>
+      }
+    </span>
+    <span class="tile-dialog-title__text">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
+  } @else if (place) {
+    <span class="tile-dialog-title__avatar">
+      @if (place.base64Avatar) {
+        <img class="tile-dialog-title__image" [src]="place.base64Avatar"
+          [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
+      } @else {
+        <mat-icon aria-hidden="true">{{ place.icon || 'location' }}</mat-icon>
+      }
+    </span>
+    <span class="tile-dialog-title__text">{{ place.name || ('common.placeList.nameFallback' | transloco) }}</span>
+  }
+</h2>
+
+<mat-dialog-content class="tile-dialog-content">
+  <app-tile-list [contact]="contact" [place]="place"></app-tile-list>
+</mat-dialog-content>
+
+<mat-dialog-actions class="tile-dialog-actions">
+  <button mat-icon-button mat-dialog-close class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="openTileSettings()" [attr.aria-label]="tileSettingsAriaLabel">
+    <mat-icon>settings</mat-icon>
+  </button>
+</mat-dialog-actions>

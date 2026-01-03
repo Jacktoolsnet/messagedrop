@@ -400,7 +400,8 @@
     },
     "tileList": {
       "empty": "Aucune tuile visible.",
-      "openSettings": "Ouvrir les paramètres des tuiles"
+      "openSettings": "Ouvrir les paramètres des tuiles",
+      "openAria": "Ouvrir les tuiles de {{ name }}"
     },
     "tileSettings": {
       "title": "Paramètres des tuiles",

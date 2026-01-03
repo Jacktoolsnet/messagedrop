@@ -400,7 +400,8 @@
     },
     "tileList": {
       "empty": "Keine Kacheln sichtbar.",
-      "openSettings": "Kachel-Einstellungen öffnen"
+      "openSettings": "Kachel-Einstellungen öffnen",
+      "openAria": "Kacheln für {{ name }} öffnen"
     },
     "tileSettings": {
       "title": "Kachel-Einstellungen",

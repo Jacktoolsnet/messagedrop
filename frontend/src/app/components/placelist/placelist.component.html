@@ -27,12 +27,6 @@
                     }
                 </mat-expansion-panel-header>
                 <mat-card>
-                    <mat-card-content>
-                        <div class="tile-grid">
-                            <app-tile-list [place]="place"></app-tile-list>
-                        </div>
-                    </mat-card-content>
-
                     <mat-card-actions class="buttonbar">
                         @if(place.pinned) {
                         <button mat-mini-fab [attr.aria-label]="'common.placeList.unpinAria' | transloco"
@@ -48,6 +42,10 @@
                         <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.editAria' | transloco"
                             (click)="editPlace(place)">
                             <mat-icon>settings_account_box</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" (click)="openTileList(place)"
+                            [attr.aria-label]="tileListAriaLabel(place)">
+                            <mat-icon>dashboard</mat-icon>
                         </button>
                         <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.deleteAria' | transloco"
                             (click)="deletePlace(place)">

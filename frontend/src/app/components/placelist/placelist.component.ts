@@ -26,7 +26,7 @@ import { PlaceService } from '../../services/place.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
-import { TileListComponent } from "../tile/tile-list/tile-list.component";
+import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
 import { PlaceProfileComponent } from './place-settings/place-settings.component';
 
 interface TimezoneResponse { status: number; timezone: string }
@@ -47,7 +47,6 @@ interface TimezoneResponse { status: number; timezone: string }
     MatMenuModule,
     MatInputModule,
     MatExpansionModule,
-    TileListComponent,
     TranslocoPipe
   ],
   templateUrl: './placelist.component.html',
@@ -166,6 +165,23 @@ export class PlacelistComponent {
         }
       });
     }
+  }
+
+  openTileList(place: Place): void {
+    this.matDialog.open(TileListDialogComponent, {
+      data: { place },
+      minWidth: 'min(500px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+  }
+
+  tileListAriaLabel(place: Place): string {
+    const name = place.name || this.translation.t('common.placeList.nameFallback');
+    return this.translation.t('common.tileList.openAria', { name });
   }
 
   public pinPlace(place: Place) {

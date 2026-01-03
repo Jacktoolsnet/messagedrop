@@ -26,12 +26,6 @@
                     <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
                 </mat-expansion-panel-header>
                 <mat-card>
-                    <mat-card-content>
-                        <div class="tile-grid">
-                            <app-tile-list [contact]="contact"></app-tile-list>
-                        </div>
-                    </mat-card-content>
-
                     <mat-card-actions class="buttonbar">
                         @if (contact.pinned) {
                         <button mat-mini-fab [ngClass]="'active-button'"
@@ -53,6 +47,10 @@
                         <button mat-mini-fab color="secondary"
                             [attr.aria-label]="'common.contact.list.editAria' | transloco" (click)="editContact(contact)">
                             <mat-icon>settings_account_box</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" (click)="openTileList(contact)"
+                            [attr.aria-label]="tileListAriaLabel(contact)">
+                            <mat-icon>dashboard</mat-icon>
                         </button>
                         @if (!subscriptionError) {
                         @if (contact.subscribed) {

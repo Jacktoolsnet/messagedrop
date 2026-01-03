@@ -26,7 +26,7 @@ import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.c
 import { ConnectComponent } from '../contact/connect/connect.component';
 import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
-import { TileListComponent } from "../tile/tile-list/tile-list.component";
+import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 
@@ -46,7 +46,6 @@ interface ConnectDialogResult {
     MatIcon,
     MatMenuModule,
     MatExpansionModule,
-    TileListComponent,
     TranslocoPipe
   ],
   templateUrl: './contactlist.component.html',
@@ -215,6 +214,23 @@ export class ContactlistComponent {
       this.contactService.updateContactName(contact);
       this.contactService.saveAditionalContactInfos();
     });
+  }
+
+  openTileList(contact: Contact): void {
+    this.matDialog.open(TileListDialogComponent, {
+      data: { contact },
+      minWidth: 'min(500px, 95vw)',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+  }
+
+  tileListAriaLabel(contact: Contact): string {
+    const name = contact.name || this.translation.t('common.contact.list.nameFallback');
+    return this.translation.t('common.tileList.openAria', { name });
   }
 
   public goBack() {

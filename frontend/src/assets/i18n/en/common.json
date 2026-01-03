@@ -400,7 +400,8 @@
     },
     "tileList": {
       "empty": "No tiles visible.",
-      "openSettings": "Open tile settings"
+      "openSettings": "Open tile settings",
+      "openAria": "Open tiles for {{ name }}"
     },
     "tileSettings": {
       "title": "Tile settings",
