@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>{{ 'dsa.report.title' | transloco }}</h2>
+<h2 mat-dialog-title class="dialog-title">{{ 'dsa.report.title' | transloco }}</h2>
 
 <mat-dialog-content>
   <p class="intro">
@@ -130,7 +130,7 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="sticky-actions" align="end">
   <button mat-button (click)="cancel()" [disabled]="submitting">{{ 'common.cancel' | transloco }}</button>
   <button color="primary" mat-flat-button (click)="submit()"
     [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">

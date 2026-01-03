@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>
+<h2 mat-dialog-title class="dialog-title">
   {{ 'dsa.status.title' | transloco }}
 </h2>
 
@@ -21,7 +21,7 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="sticky-actions" align="end">
   <button mat-stroked-button color="primary" class="copy-btn" (click)="copy()">
     <mat-icon>content_copy</mat-icon>
     {{ 'common.actions.copy' | transloco }}

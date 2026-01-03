@@ -53,6 +53,58 @@ h2[mat-dialog-title] {
   box-shadow: 0 6px 16px var(--mat-card-outlined-outline-color);
 }
 
+h2[mat-dialog-title] mat-icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+h2[mat-dialog-title].dialog-title {
+  height: 3rem;
+  padding: 0.35rem 1rem;
+}
+
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.dialog-title__text {
+  font-weight: 600;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sticky-actions > :first-child {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.sticky-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.sticky-actions button {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
 /* === SNACKBAR STYLES === */
 .snack-error {
   --mdc-snackbar-container-color: rgba(233, 64, 64, 0.75);

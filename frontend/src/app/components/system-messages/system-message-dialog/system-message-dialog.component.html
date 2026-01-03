@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>
+<h2 mat-dialog-title class="dialog-title">
   @if (selectedNotification(); as detail) {
   <div class="dialog-title">
     <button mat-icon-button class="back-button" (click)="backToList()"
@@ -168,7 +168,7 @@
   </div>
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="sticky-actions" align="end">
   @if (!selectedNotification()) {
   <button mat-button color="warn" [matTooltip]="'common.systemMessages.deleteAll' | transloco"
     (click)="confirmDeleteAll($event)" [attr.aria-label]="'common.systemMessages.deleteAll' | transloco"

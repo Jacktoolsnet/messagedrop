@@ -1,4 +1,4 @@
-<h2 mat-dialog-title>
+<h2 mat-dialog-title class="dialog-title">
   {{ 'dsa.case.title' | transloco }}
 </h2>
 
@@ -240,7 +240,7 @@
   }
 </mat-dialog-content>
 
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="sticky-actions" align="end">
   <button mat-flat-button color="primary" (click)="close()">{{ 'common.actions.close' | transloco }}</button>
   @if (!loading() && !error() && activeTab() === 0) {
   <button mat-stroked-button color="primary" (click)="openPublicStatus()" [disabled]="!publicStatusUrl()">

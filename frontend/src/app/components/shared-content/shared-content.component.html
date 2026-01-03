@@ -1,10 +1,10 @@
 @if (multimedia) {
-<h2 mat-dialog-title>{{ 'common.sharedContent.multimediaTitle' | transloco }}</h2>
+<h2 mat-dialog-title class="dialog-title">{{ 'common.sharedContent.multimediaTitle' | transloco }}</h2>
 <mat-dialog-content class="full-width">
     <app-showmultimedia [multimedia]="multimedia"></app-showmultimedia>
     <h4>{{ 'common.sharedContent.multimediaHint' | transloco }}</h4>
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions class="sticky-actions" align="end">
     <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">
         {{ 'common.actions.close' | transloco }}
     </button>
@@ -15,11 +15,11 @@
 }
 
 @else if (location) {
-<h2 mat-dialog-title>{{ 'common.sharedContent.locationTitle' | transloco }}</h2>
+<h2 mat-dialog-title class="dialog-title">{{ 'common.sharedContent.locationTitle' | transloco }}</h2>
 <mat-dialog-content class="full-width">
     <h4>{{ 'common.sharedContent.locationHint' | transloco }}</h4>
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions class="sticky-actions" align="end">
     <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">
         {{ 'common.actions.close' | transloco }}
     </button>

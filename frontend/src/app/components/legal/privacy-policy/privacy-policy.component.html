@@ -1,9 +1,9 @@
-<h2 mat-dialog-title>
+<h2 mat-dialog-title class="dialog-title">
     <mat-icon aria-hidden="true">privacy_tip</mat-icon>
     {{ 'common.legal.privacy.title' | transloco }}
 </h2>
 
-<mat-dialog-actions class="lang-actions" align="start">
+<mat-dialog-actions class="lang-actions sticky-actions" align="start">
     <button mat-stroked-button [color]="lang() === 'de' ? 'primary' : undefined" (click)="setLanguage('de')"
         [disabled]="loading()" [class.active]="lang() === 'de'">{{ 'common.legal.language.de' | transloco }}</button>
     <button mat-stroked-button [color]="lang() === 'en' ? 'primary' : undefined" (click)="setLanguage('en')"
@@ -29,14 +29,14 @@
     }
 </mat-dialog-content>
 
-<mat-dialog-actions class="consent" align="start">
+<mat-dialog-actions class="consent sticky-actions" align="start">
     <mat-slide-toggle [checked]="accepted" [disabled]="loading() || error()" (change)="onToggle($event.checked)"
         [attr.aria-label]="'common.legal.privacy.acceptAria' | transloco">
         {{ 'common.legal.privacy.acceptText' | transloco }}
     </mat-slide-toggle>
 </mat-dialog-actions>
 
-<mat-dialog-actions class="actions" align="end">
+<mat-dialog-actions class="actions sticky-actions" align="end">
     <button mat-button (click)="openInNewTab()" [disabled]="loading() || error()">
         {{ 'common.actions.openInNewTab' | transloco }}
     </button>

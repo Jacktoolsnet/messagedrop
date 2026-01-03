@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>{{ 'common.contact.chatroom.deleteMessage.title' | transloco }}</h2>
+<h2 mat-dialog-title class="dialog-title">{{ 'common.contact.chatroom.deleteMessage.title' | transloco }}</h2>
 <mat-dialog-content>{{ 'common.contact.chatroom.deleteMessage.confirm' | transloco }}</mat-dialog-content>
-<mat-dialog-actions align="end">
+<mat-dialog-actions class="sticky-actions" align="end">
   <button mat-stroked-button color="primary" [mat-dialog-close]="true">{{ 'common.actions.delete' | transloco }}</button>
   <button mat-button [mat-dialog-close]="false">{{ 'common.cancel' | transloco }}</button>
 </mat-dialog-actions>

@@ -42,7 +42,7 @@
     </div>
 </mat-dialog-content>
 
-<mat-dialog-actions>
+<mat-dialog-actions class="sticky-actions" align="end">
     <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">{{ 'common.actions.abort' | transloco
         }}</button>
     @if (data.note.note !== '' || data.note.multimedia.type !== 'undefined') {

@@ -1,8 +1,8 @@
-<h2 mat-dialog-title>{{ 'common.messageList.blockDialog.title' | transloco }}</h2>
+<h2 mat-dialog-title class="dialog-title">{{ 'common.messageList.blockDialog.title' | transloco }}</h2>
 <mat-dialog-content>
   {{ 'common.messageList.blockDialog.confirm' | transloco }}
 </mat-dialog-content>
-<mat-dialog-actions>
+<mat-dialog-actions class="sticky-actions" align="end">
   <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">
     {{ 'common.actions.no' | transloco }}
   </button>
