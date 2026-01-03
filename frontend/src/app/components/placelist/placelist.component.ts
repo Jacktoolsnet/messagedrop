@@ -178,6 +178,7 @@ export class PlacelistComponent {
       data: { place },
       minWidth: 'min(500px, 95vw)',
       maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,

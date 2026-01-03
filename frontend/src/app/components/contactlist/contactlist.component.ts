@@ -225,6 +225,7 @@ export class ContactlistComponent {
       data: { contact },
       minWidth: 'min(500px, 95vw)',
       maxWidth: '95vw',
+      width: 'min(900px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
