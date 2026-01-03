@@ -212,17 +212,32 @@ button,
 }
 
 .buttonbar {
-  display: flex;
-  justify-content: flex-end;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
   width: 100%;
-  gap: 0.35rem;
+  column-gap: 0.75rem;
+  row-gap: 0.5rem;
   margin-top: auto;
 }
 
+.buttonbar button {
+  margin: 0;
+}
+
 .buttonbar .button-delete {
-  margin-right: auto;
-  margin-inline-end: auto;
+  justify-self: start;
+}
+
+.buttonbar .button-group {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(2.5rem, max-content));
+  justify-content: end;
+  justify-items: end;
+  gap: 0.35rem 0.5rem;
+  max-width: min(100%, 20rem);
+  justify-self: end;
 }
 
 .buttonbar .dsa-status-button {
