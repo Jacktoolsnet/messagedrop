@@ -2,50 +2,67 @@
   color: var(--mat-app-text-color);
 }
 
-/* === Dialog content: scroll if needed === */
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.dialog-title__text {
+  font-weight: 600;
+}
+
+h2[mat-dialog-title].dialog-title {
+  height: 3rem;
+  padding: 0.35rem 1rem;
+}
+
+/* === Dialog content: scroll under header/actions === */
 .mat-mdc-dialog-content {
-  overflow-y: auto;
-  max-height: calc(90vh - 0.5rem);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(90vh - 10rem);
   width: 100%;
   box-sizing: border-box;
+  padding: 0;
 }
 
-.no-content {
-  justify-content: center;
-  align-items: center;
-  margin: auto;
-  display: block;
-  padding-right: 3rem;
+.document-dialog-content {
+  padding: 0;
 }
 
-.first-button {
-  width: 95%;
-  max-width: 600px;
-  padding: 1rem;
-  font-size: 1rem;
+/* remove top padding bar from dialog container */
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.document-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+  min-height: 0;
+}
+
+.empty-state {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.5rem;
+  min-height: 200px;
+  text-align: center;
 }
 
-.toolbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 3.5rem;
-  height: 100%;
-  background-color: var(--mat-fab-foreground-color);
-  z-index: 200;
+.empty-text {
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.95rem;
 }
 
 /* === Masonry grid container (works with the directive) === */
 .content {
-  width: auto;
-  max-width: 95vw;
-  --toolbar-gap: 0.5rem;
-  padding-top: 1rem;
-  padding-right: calc(2.5rem + var(--toolbar-gap));
+  width: 100%;
+  max-width: 100%;
+  padding-top: 0;
+  padding-right: 0;
 
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
@@ -76,9 +93,9 @@
   display: flex;
   align-items: flex-start;
   gap: 0.75rem;
-  padding-top: 1.25rem;
-  margin-top: 1rem;
-  margin-bottom: 1.25rem;
+  padding-top: 0;
+  margin-top: 0;
+  margin-bottom: 1rem;
 }
 
 .file-icon {
@@ -106,25 +123,39 @@
 
 .buttonbar {
   display: flex;
-  justify-content: left;
+  justify-content: flex-end;
   flex-wrap: wrap;
   margin-top: auto;
+  gap: 0.35rem;
 }
 
-.button_back {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 100;
-  width: 2.5rem;
-  height: 2.5rem;
+.buttonbar .button-delete {
+  margin-right: auto;
+  margin-inline-end: auto;
 }
 
-.button_add {
-  position: absolute;
+.sticky-actions {
+  position: sticky;
   bottom: 0;
-  right: 0;
-  z-index: 100;
-  width: 2.5rem;
-  height: 2.5rem;
+  z-index: 3;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sticky-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.sticky-actions button {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }

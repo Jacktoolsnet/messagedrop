@@ -2,7 +2,7 @@ import { Component, computed, effect, inject, OnInit, WritableSignal } from '@an
 import { DatePipe } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -33,6 +33,7 @@ interface DocumentDialogData {
     MatCardModule,
     MatButtonModule,
     MatDialogContent,
+    MatDialogActions,
     MatIcon,
     MasonryItemDirective,
     TranslocoPipe

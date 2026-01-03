@@ -240,6 +240,8 @@
       }
     },
     "documents": {
+      "title": "Private Dokumente",
+      "empty": "Keine Dokumente gefunden.",
       "imported": "Dokument(e) lokal importiert.",
       "importSuccess": "Dokument(e) lokal importiert.",
       "importFailed": "Dokument konnte nicht importiert werden.",

@@ -27,21 +27,21 @@
                 </mat-card-content>
                 <mat-card-actions class="buttonbar">
                     @if (userService.isReady()) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.deleteAria' | transloco"
-                        (click)="deleteImage(image)">
-                        <mat-icon>delete_forever</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.flyToAria' | transloco"
-                        (click)="flyTo(image)">
-                        <mat-icon>place</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.navigateAria' | transloco"
-                        (click)="navigateToNoteLocation(image)">
-                        <mat-icon>assistant_direction</mat-icon>
-                    </button>
-                    }
-                </mat-card-actions>
-            </mat-card>
+                <button mat-mini-fab color="secondary" class="button-delete"
+                    [attr.aria-label]="'common.images.deleteAria' | transloco" (click)="deleteImage(image)">
+                    <mat-icon>delete_forever</mat-icon>
+                </button>
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.flyToAria' | transloco"
+                    (click)="flyTo(image)">
+                    <mat-icon>place</mat-icon>
+                </button>
+                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.images.navigateAria' | transloco"
+                    (click)="navigateToNoteLocation(image)">
+                    <mat-icon>assistant_direction</mat-icon>
+                </button>
+                }
+            </mat-card-actions>
+        </mat-card>
             }
         </div>
         }

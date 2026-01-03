@@ -1,66 +1,66 @@
-<mat-dialog-content>
-  @if (!hasDocuments()) {
-  <div class="no-content">
-    <div class="toolbar">
-      <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-    </div>
-    <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-      (click)="!userService.isReady() ? userService.login(openAddDocumentDialog.bind(this)) : openAddDocumentDialog()">
-      <span>{{ 'common.documents.addFirst' | transloco }}</span>
-    </button>
-  </div>
-  } @else {
-  <div class="content">
-    <div class="toolbar">
-      <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-        <mat-icon>arrow_back</mat-icon>
-      </button>
-      <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
-        [attr.aria-label]="'common.documents.addAria' | transloco" (click)="openAddDocumentDialog()">
-        <mat-icon [attr.aria-hidden]="false">description</mat-icon>
-      </button>
-    </div>
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon" aria-hidden="true">description</mat-icon>
+  <span class="dialog-title__text">{{ 'common.documents.title' | transloco }}</span>
+</h2>
 
-    @for (document of sortedDocuments(); track document.id) {
-    <mat-card class="item" appMasonryItem>
-      <mat-card-content>
-        <div class="document-content">
-          <mat-icon class="file-icon">{{ getFileIcon(document) }}</mat-icon>
-          <div class="file-details">
-            <div class="file-name">{{ document.fileName }}</div>
-            <div class="file-meta">
-              {{ getFileDate(document) | date: 'mediumDate' }}
-              @if (formatBytes(document.size)) {
-              <span> · {{ formatBytes(document.size) }}</span>
-              }
+<mat-dialog-content class="document-dialog-content">
+  <div class="document-scroll">
+    @if (!hasDocuments()) {
+    <div class="empty-state">
+      <p class="empty-text">{{ 'common.documents.empty' | transloco }}</p>
+    </div>
+    } @else {
+    <div class="content">
+      @for (document of sortedDocuments(); track document.id) {
+      <mat-card class="item" appMasonryItem>
+        <mat-card-content>
+          <div class="document-content">
+            <mat-icon class="file-icon">{{ getFileIcon(document) }}</mat-icon>
+            <div class="file-details">
+              <div class="file-name">{{ document.fileName }}</div>
+              <div class="file-meta">
+                {{ getFileDate(document) | date: 'mediumDate' }}
+                @if (formatBytes(document.size)) {
+                <span> · {{ formatBytes(document.size) }}</span>
+                }
+              </div>
             </div>
           </div>
-        </div>
-      </mat-card-content>
-      <mat-card-actions class="buttonbar">
-        @if (userService.isReady()) {
-        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.openAria' | transloco"
-          (click)="openDocument(document)">
-          <mat-icon>open_in_new</mat-icon>
-        </button>
-        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.deleteAria' | transloco"
-          (click)="deleteDocument(document)">
-          <mat-icon>delete_forever</mat-icon>
-        </button>
-        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.flyToAria' | transloco"
-          (click)="flyTo(document)">
-          <mat-icon>place</mat-icon>
-        </button>
-        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.navigateAria' | transloco"
-          (click)="navigateToDocumentLocation(document)">
-          <mat-icon>assistant_direction</mat-icon>
-        </button>
-        }
-      </mat-card-actions>
-    </mat-card>
+        </mat-card-content>
+        <mat-card-actions class="buttonbar">
+          @if (userService.isReady()) {
+          <button mat-mini-fab color="secondary" class="button-delete"
+            [attr.aria-label]="'common.documents.deleteAria' | transloco" (click)="deleteDocument(document)">
+            <mat-icon>delete_forever</mat-icon>
+          </button>
+          <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.openAria' | transloco"
+            (click)="openDocument(document)">
+            <mat-icon>open_in_new</mat-icon>
+          </button>
+          <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.flyToAria' | transloco"
+            (click)="flyTo(document)">
+            <mat-icon>place</mat-icon>
+          </button>
+          <button mat-mini-fab color="secondary" [attr.aria-label]="'common.documents.navigateAria' | transloco"
+            (click)="navigateToDocumentLocation(document)">
+            <mat-icon>assistant_direction</mat-icon>
+          </button>
+          }
+        </mat-card-actions>
+      </mat-card>
+      }
+    </div>
     }
   </div>
-  }
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" (click)="goBack()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" [attr.aria-label]="'common.documents.addAria' | transloco"
+    (click)="!userService.isReady() ? userService.login(openAddDocumentDialog.bind(this)) : openAddDocumentDialog()">
+    <mat-icon>description</mat-icon>
+  </button>
+</mat-dialog-actions>
