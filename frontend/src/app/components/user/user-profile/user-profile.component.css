@@ -2,6 +2,48 @@
   color: var(--mat-app-text-color);
 }
 
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.dialog-title__text {
+  font-weight: 600;
+}
+
+h2[mat-dialog-title].dialog-title {
+  height: 3rem;
+  padding: 0.35rem 1rem;
+}
+
+/* === Dialog content: scroll under header/actions === */
+.mat-mdc-dialog-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(90vh - 10rem);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.profile-dialog-content {
+  padding: 0;
+}
+
+/* remove top padding bar from dialog container */
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.profile-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+  min-height: 0;
+}
+
 h4 {
   padding: 0.5rem;
 }
@@ -106,4 +148,31 @@ button {
   min-width: 200px;
   max-width: 100%;
   width: 100%;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sticky-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.sticky-actions button {
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
 }

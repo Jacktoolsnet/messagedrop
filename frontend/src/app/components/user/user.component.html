@@ -55,7 +55,9 @@
     </mat-card>
   </div>
 </mat-dialog-content>
-<mat-dialog-actions>
-  <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial
-    [mat-dialog-close]="{'action': 'back'}">{{ 'common.actions.close' | transloco }}</button>
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" cdkFocusInitial [attr.aria-label]="'common.actions.close' | transloco"
+    [mat-dialog-close]="{'action': 'back'}">
+    <mat-icon>close</mat-icon>
+  </button>
 </mat-dialog-actions>

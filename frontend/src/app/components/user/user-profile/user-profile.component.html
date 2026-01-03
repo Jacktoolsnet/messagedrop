@@ -1,8 +1,9 @@
-<h2 mat-dialog-title>
-  <mat-icon aria-hidden="true">badge</mat-icon>
-  {{ 'common.user.profile.title' | transloco }}
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon" aria-hidden="true">badge</mat-icon>
+  <span class="dialog-title__text">{{ 'common.user.profile.title' | transloco }}</span>
 </h2>
-<mat-dialog-content>
+<mat-dialog-content class="profile-dialog-content">
+  <div class="profile-scroll">
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>{{ 'common.user.profile.nameLabel' | transloco }}</mat-label>
     <input matInput maxlength="64" [(ngModel)]="userService.getProfile().name" />
@@ -41,11 +42,16 @@
       <mat-icon>cycle</mat-icon>
     </button>
   </div>
+</div>
 </mat-dialog-content>
 
-<mat-dialog-actions>
-  <button mat-button cdkFocusInitial (click)="onAbortClick()">{{ 'common.actions.abort' | transloco }}</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="userService.getProfile()">
-    {{ 'common.actions.apply' | transloco }}
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" cdkFocusInitial [attr.aria-label]="'common.actions.abort' | transloco"
+    (click)="onAbortClick()">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
+    mat-dialog-close [mat-dialog-close]="userService.getProfile()">
+    <mat-icon>check</mat-icon>
   </button>
 </mat-dialog-actions>
