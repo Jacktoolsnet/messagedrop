@@ -1,27 +1,56 @@
 <h2 mat-dialog-title>{{ 'common.user.dialog.title' | transloco }}</h2>
 <mat-dialog-content class="dialog">
-  <p>{{ 'common.user.dialog.userIdLabel' | transloco }}</p>
-  <p>{{userService.getUser().id}}</p>
-  <button mat-stroked-button color="primary" [attr.aria-hidden]="false" class="button"
-    [mat-dialog-close]="{'action': 'backup'}">
-    <mat-icon>download</mat-icon>
-    <span>{{ 'common.user.dialog.backup' | transloco }}</span>
-  </button>
-  <button mat-stroked-button color="primary" [attr.aria-hidden]="false" class="button"
-    [mat-dialog-close]="{'action': 'changePin'}">
-    <mat-icon>lock_reset</mat-icon>
-    <span>{{ 'common.user.dialog.changePin' | transloco }}</span>
-  </button>
-  <button mat-stroked-button color="warn" [attr.aria-hidden]="false" class="button"
-    [mat-dialog-close]="{'action': 'resetKeys'}">
-    <mat-icon>security</mat-icon>
-    <span>{{ 'common.user.dialog.resetKeys' | transloco }}</span>
-  </button>
-  <button mat-flat-button color="warn" [attr.aria-hidden]="false" class="button button-danger"
-    [mat-dialog-close]="{'action': 'deleteUserId'}">
-    <mat-icon>delete</mat-icon>
-    <span>{{ 'common.user.dialog.delete' | transloco }}</span>
-  </button>
+  <div class="tile-grid">
+    <mat-card class="tile tile-info">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>badge</mat-icon>
+          <span class="tile-title">{{ 'common.user.dialog.userIdLabel' | transloco }}</span>
+        </div>
+        <div class="tile-body tile-id">{{ userService.getUser().id }}</div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tile tile-action" role="button" tabindex="0"
+      (click)="triggerAction('backup')" (keyup.enter)="triggerAction('backup')" (keyup.space)="triggerAction('backup')">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>download</mat-icon>
+          <span class="tile-title">{{ 'common.user.dialog.backup' | transloco }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tile tile-action" role="button" tabindex="0"
+      (click)="triggerAction('changePin')" (keyup.enter)="triggerAction('changePin')" (keyup.space)="triggerAction('changePin')">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>lock_reset</mat-icon>
+          <span class="tile-title">{{ 'common.user.dialog.changePin' | transloco }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tile tile-action" role="button" tabindex="0"
+      (click)="triggerAction('resetKeys')" (keyup.enter)="triggerAction('resetKeys')" (keyup.space)="triggerAction('resetKeys')">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>security</mat-icon>
+          <span class="tile-title">{{ 'common.user.dialog.resetKeys' | transloco }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="tile tile-action tile-danger" role="button" tabindex="0"
+      (click)="triggerAction('deleteUserId')" (keyup.enter)="triggerAction('deleteUserId')" (keyup.space)="triggerAction('deleteUserId')">
+      <mat-card-content>
+        <div class="tile-header">
+          <mat-icon>delete</mat-icon>
+          <span class="tile-title">{{ 'common.user.dialog.delete' | transloco }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button mat-dialog-close [attr.aria-hidden]="false" cdkFocusInitial
