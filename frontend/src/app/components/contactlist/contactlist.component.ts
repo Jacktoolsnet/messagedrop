@@ -74,6 +74,12 @@ export class ContactlistComponent {
 
   constructor() {
     effect(() => {
+      const count = this.contactsSignal().length;
+      const width = count > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
+      this.dialogRef.updateSize(width);
+    });
+
+    effect(() => {
       this.contactService.contactsSet();
       const contacts = this.contactsSignal();
       contacts.forEach(contact => {

@@ -1,4 +1,4 @@
-import { Component, computed, inject, Signal } from '@angular/core';
+import { Component, computed, effect, inject, Signal } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
@@ -69,6 +69,14 @@ export class PlacelistComponent {
   public mode: typeof Mode = Mode;
   private snackBarRef?: MatSnackBarRef<SimpleSnackBar>;
   public subscriptionError = false;
+
+  constructor() {
+    effect(() => {
+      const count = this.placesSignal().length;
+      const width = count > 1 ? 'min(900px, 95vw)' : 'min(520px, 95vw)';
+      this.dialogRef.updateSize(width);
+    });
+  }
 
   public deletePlace(place: Place) {
     this.placeToDelete = place;

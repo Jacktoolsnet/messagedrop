@@ -63,11 +63,20 @@
   align-items: center;
   gap: 10px;
   border: 1px solid transparent;
+  min-width: 0;
+}
+
+.metric-text {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .metric-text .label {
   font-size: 0.9rem;
   color: var(--mat-card-subtitle-text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .metric-text .value {
@@ -78,6 +87,7 @@
 
 .metric-action {
   margin-left: auto;
+  flex: 0 0 auto;
 }
 
 .metric.warn {
