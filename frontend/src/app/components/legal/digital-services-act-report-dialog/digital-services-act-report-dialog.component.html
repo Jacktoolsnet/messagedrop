@@ -131,10 +131,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button (click)="cancel()" [disabled]="submitting">{{ 'common.cancel' | transloco }}</button>
-  <button color="primary" mat-flat-button (click)="submit()"
-    [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)">
-    <mat-icon>send</mat-icon>
-    {{ 'dsa.report.submitButton' | transloco }}
-  </button>
+  <button (click)="cancel()" [disabled]="submitting" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button color="primary" (click)="submit()" [disabled]="submitting || (activeTabIndex===1 && isFormalEmailInvalid)" mat-icon-button [attr.aria-label]="'dsa.report.submitButton' | transloco"><mat-icon>send</mat-icon></button>
 </mat-dialog-actions>

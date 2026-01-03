@@ -21,6 +21,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button (click)="pick(null)">{{ 'common.iconPicker.noIcon' | transloco }}</button>
-  <button mat-button mat-dialog-close>{{ 'common.actions.close' | transloco }}</button>
+  <button mat-dialog-close mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button (click)="pick(null)" mat-icon-button [attr.aria-label]="'common.iconPicker.noIcon' | transloco"><mat-icon>block</mat-icon></button>
 </mat-dialog-actions>

@@ -14,10 +14,6 @@
   </div>
 </mat-dialog-content>
 <mat-dialog-actions class="actions sticky-actions" align="end">
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="{ useMap: false, applyToAll }">
-    {{ 'common.images.exif.keep' | transloco }}
-  </button>
-  <button mat-button mat-dialog-close color="primary" [mat-dialog-close]="{ useMap: true, applyToAll }">
-    {{ 'common.images.exif.useMap' | transloco }}
-  </button>
+  <button mat-dialog-close cdkFocusInitial [mat-dialog-close]="{ useMap: false, applyToAll }" mat-icon-button [attr.aria-label]="'common.images.exif.keep' | transloco"><mat-icon>map</mat-icon></button>
+  <button mat-dialog-close color="primary" [mat-dialog-close]="{ useMap: true, applyToAll }" mat-icon-button [attr.aria-label]="'common.images.exif.useMap' | transloco"><mat-icon>image</mat-icon></button>
 </mat-dialog-actions>

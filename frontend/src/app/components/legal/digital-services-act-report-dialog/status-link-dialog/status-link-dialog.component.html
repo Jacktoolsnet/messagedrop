@@ -22,9 +22,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-stroked-button color="primary" class="copy-btn" (click)="copy()">
-    <mat-icon>content_copy</mat-icon>
-    {{ 'common.actions.copy' | transloco }}
-  </button>
-  <button mat-flat-button color="primary" (click)="close()">{{ 'common.actions.close' | transloco }}</button>
+  <button color="primary" (click)="close()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button color="primary" class="copy-btn" (click)="copy()" mat-icon-button [attr.aria-label]="'common.actions.copy' | transloco"><mat-icon>content_copy</mat-icon></button>
 </mat-dialog-actions>

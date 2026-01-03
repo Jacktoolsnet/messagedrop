@@ -169,13 +169,8 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
+  <button (click)="close()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
   @if (!selectedNotification()) {
-  <button mat-button color="warn" [matTooltip]="'common.systemMessages.deleteAll' | transloco"
-    (click)="confirmDeleteAll($event)" [attr.aria-label]="'common.systemMessages.deleteAll' | transloco"
-    [disabled]="notifications().length === 0">
-    {{ 'common.systemMessages.deleteAll' | transloco }}
-    <mat-icon>delete_sweep</mat-icon>
-  </button>
+  <button color="warn" [matTooltip]="'common.systemMessages.deleteAll' | transloco" (click)="confirmDeleteAll($event)" [attr.aria-label]="'common.systemMessages.deleteAll' | transloco" [disabled]="notifications().length === 0" mat-icon-button><mat-icon>delete_sweep</mat-icon></button>
   }
-  <button mat-button (click)="close()">{{ 'common.actions.close' | transloco }}</button>
 </mat-dialog-actions>

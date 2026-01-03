@@ -5,12 +5,8 @@
     <h4>{{ 'common.sharedContent.multimediaHint' | transloco }}</h4>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-    <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">
-        {{ 'common.actions.close' | transloco }}
-    </button>
-    <button mat-button color="warn" (click)="deleteSharedContent()">
-        {{ 'common.sharedContent.removeContent' | transloco }}
-    </button>
+    <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button color="warn" (click)="deleteSharedContent()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
 </mat-dialog-actions>
 }
 
@@ -20,11 +16,7 @@
     <h4>{{ 'common.sharedContent.locationHint' | transloco }}</h4>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-    <button mat-button color="primary" mat-dialog-close [mat-dialog-close]="undefined">
-        {{ 'common.actions.close' | transloco }}
-    </button>
-    <button mat-button color="warn" (click)="deleteSharedLocation()">
-        {{ 'common.sharedContent.removeLocation' | transloco }}
-    </button>
+    <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button color="warn" (click)="deleteSharedLocation()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeLocation' | transloco"><mat-icon>location_off</mat-icon></button>
 </mat-dialog-actions>
 }

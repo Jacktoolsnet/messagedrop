@@ -3,8 +3,6 @@
   <p>{{ 'common.systemMessages.deleteAllConfirm' | transloco }}</p>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button [mat-dialog-close]="false">{{ 'common.cancel' | transloco }}</button>
-  <button mat-button color="warn" [mat-dialog-close]="true" cdkFocusInitial>
-    {{ 'common.systemMessages.deleteAll' | transloco }}
-  </button>
+  <button [mat-dialog-close]="false" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button color="warn" [mat-dialog-close]="true" cdkFocusInitial mat-icon-button [attr.aria-label]="'common.systemMessages.deleteAll' | transloco"><mat-icon>delete_sweep</mat-icon></button>
 </mat-dialog-actions>

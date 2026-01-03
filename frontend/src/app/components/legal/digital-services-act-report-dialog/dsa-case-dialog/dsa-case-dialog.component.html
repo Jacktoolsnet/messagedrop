@@ -241,17 +241,11 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-flat-button color="primary" (click)="close()">{{ 'common.actions.close' | transloco }}</button>
+  <button color="primary" (click)="close()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
   @if (!loading() && !error() && activeTab() === 0) {
-  <button mat-stroked-button color="primary" (click)="openPublicStatus()" [disabled]="!publicStatusUrl()">
-    <mat-icon>open_in_new</mat-icon>
-    {{ 'dsa.case.openPublicPage' | transloco }}
-  </button>
+  <button color="primary" (click)="openPublicStatus()" [disabled]="!publicStatusUrl()" mat-icon-button [attr.aria-label]="'dsa.case.openPublicPage' | transloco"><mat-icon>open_in_new</mat-icon></button>
   }
   @if (!loading() && !error() && canSubmitAppeal() && activeTab() === 1) {
-  <button mat-flat-button color="primary" type="submit" form="appeal-form" [disabled]="submitting() || uploading()">
-    <mat-icon>send</mat-icon>
-    {{ 'dsa.case.submitAppeal' | transloco }}
-  </button>
+  <button color="primary" type="submit" form="appeal-form" [disabled]="submitting() || uploading()" mat-icon-button [attr.aria-label]="'dsa.case.submitAppeal' | transloco"><mat-icon>send</mat-icon></button>
   }
 </mat-dialog-actions>

@@ -43,10 +43,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="onAbortClick()">
-    {{ 'common.actions.abort' | transloco }}
-  </button>
-  <button mat-button mat-dialog-close (click)="onApplyClick()">
-    {{ 'common.actions.apply' | transloco }}
-  </button>
+  <button mat-dialog-close cdkFocusInitial (click)="onAbortClick()" mat-icon-button [attr.aria-label]="'common.actions.abort' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-dialog-close (click)="onApplyClick()" mat-icon-button [attr.aria-label]="'common.actions.apply' | transloco"><mat-icon>check</mat-icon></button>
 </mat-dialog-actions>

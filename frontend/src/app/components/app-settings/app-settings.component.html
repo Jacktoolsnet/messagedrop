@@ -152,5 +152,5 @@
 
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button mat-dialog-close cdkFocusInitial (click)="onCloseClick()">{{ 'common.actions.close' | transloco }}</button>
+  <button mat-dialog-close cdkFocusInitial (click)="onCloseClick()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
 </mat-dialog-actions>

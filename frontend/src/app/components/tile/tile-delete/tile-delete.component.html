@@ -3,8 +3,6 @@
   {{ 'common.tileDelete.confirm' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button mat-dialog-close>{{ 'common.actions.no' | transloco }}</button>
-  <button mat-flat-button color="warn" [mat-dialog-close]="true">
-    {{ 'common.tileDelete.confirmYes' | transloco }}
-  </button>
+  <button mat-dialog-close mat-icon-button [attr.aria-label]="'common.actions.no' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button color="warn" [mat-dialog-close]="true" mat-icon-button [attr.aria-label]="'common.tileDelete.confirmYes' | transloco"><mat-icon>delete</mat-icon></button>
 </mat-dialog-actions>

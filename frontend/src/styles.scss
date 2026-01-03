@@ -89,9 +89,8 @@ h2[mat-dialog-title].dialog-title {
   flex-wrap: wrap;
 }
 
-.sticky-actions > :first-child {
-  margin-right: auto;
-  margin-inline-end: auto;
+.sticky-actions[align="start"] {
+  justify-content: flex-start;
 }
 
 .sticky-actions .action-close {

@@ -2,6 +2,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Location } from '../../interfaces/location';
 import { Multimedia } from '../../interfaces/multimedia';
@@ -20,6 +21,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
     MatDialogClose,
     ShowmultimediaComponent,
     MatDialogModule,
+    MatIcon,
     TranslocoPipe
 ],
   templateUrl: './shared-content.component.html',

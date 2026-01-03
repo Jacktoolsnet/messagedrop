@@ -58,6 +58,6 @@
 </mat-dialog-content>
 
 <mat-dialog-actions align="end" class="sticky-actions">
-  <button mat-button (click)="close()">{{ 'common.cancel' | transloco }}</button>
-  <button mat-flat-button color="primary" (click)="save()">{{ 'common.actions.apply' | transloco }}</button>
+  <button (click)="close()" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button color="primary" (click)="save()" mat-icon-button [attr.aria-label]="'common.actions.apply' | transloco"><mat-icon>check</mat-icon></button>
 </mat-dialog-actions>

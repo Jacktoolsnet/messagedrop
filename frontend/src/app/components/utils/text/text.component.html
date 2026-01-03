@@ -5,7 +5,6 @@
     </div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-    <button mat-flat-button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()">
-        {{ 'common.actions.apply' | transloco }}
-    </button>
+    <button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()"
+        mat-icon-button><mat-icon>check</mat-icon></button>
 </mat-dialog-actions>

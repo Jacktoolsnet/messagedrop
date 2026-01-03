@@ -3,6 +3,6 @@
   {{ 'common.user.profileShare.body' | transloco: { userId: contact.userId } }}
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false">{{ 'common.actions.no' | transloco }}</button>
-  <button mat-button mat-dialog-close [mat-dialog-close]="true">{{ 'common.actions.yes' | transloco }}</button>
+  <button mat-dialog-close cdkFocusInitial [mat-dialog-close]="false" mat-icon-button [attr.aria-label]="'common.actions.no' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-dialog-close [mat-dialog-close]="true" mat-icon-button [attr.aria-label]="'common.actions.yes' | transloco"><mat-icon>check</mat-icon></button>
 </mat-dialog-actions>
