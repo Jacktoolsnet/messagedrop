@@ -12,8 +12,8 @@
         } @else {
         <div class="content">
             @for (contact of contactsSignal(); track contact.id){
-            <mat-expansion-panel>
-                <mat-expansion-panel-header>
+            <mat-card class="contact-tile">
+                <div class="tile-header">
                     <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
                         [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true"
                         matBadgeColor="warn">
@@ -25,9 +25,16 @@
                         }
                     </span>
                     <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
-                </mat-expansion-panel-header>
-                <mat-card>
-                    <mat-card-actions class="buttonbar">
+                </div>
+                <mat-card-actions class="tile-actions">
+                    <div class="tile-actions__left">
+                        <button mat-mini-fab color="secondary"
+                            [attr.aria-label]="'common.contact.delete.title' | transloco"
+                            (click)="deleteContact(contact)">
+                            <mat-icon>delete_forever</mat-icon>
+                        </button>
+                    </div>
+                    <div class="tile-actions__right">
                         @if (contact.pinned) {
                         <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.contact.list.unpinAria' | transloco"
@@ -46,38 +53,36 @@
                             matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
                             <mat-icon>forum</mat-icon>
                         </button>
-                        <button mat-mini-fab color="secondary"
-                            [attr.aria-label]="'common.contact.list.editAria' | transloco"
-                            (click)="editContact(contact)">
-                            <mat-icon>settings_account_box</mat-icon>
-                        </button>
                         <button mat-mini-fab color="secondary" (click)="openTileList(contact)"
                             [attr.aria-label]="tileListAriaLabel(contact)">
                             <mat-icon>dashboard</mat-icon>
                         </button>
-                        @if (!subscriptionError) {
-                        @if (contact.subscribed) {
-                        <button mat-mini-fab [color]="'active-button'"
-                            [attr.aria-label]="'common.contact.list.unsubscribeAria' | transloco"
-                            (click)="subscribe(contact)">
-                            <mat-icon>bookmark_remove</mat-icon>
+                        <button mat-mini-fab color="secondary" [matMenuTriggerFor]="contactMenu"
+                            [attr.aria-label]="'common.actions.more' | transloco">
+                            <mat-icon>more_horiz</mat-icon>
                         </button>
-                        } @else {
-                        <button mat-mini-fab [color]="'active-button'"
-                            [attr.aria-label]="'common.contact.list.subscribeAria' | transloco"
-                            (click)="subscribe(contact)">
-                            <mat-icon>bookmark_add</mat-icon>
-                        </button>
-                        }
-                        }
-                        <button mat-mini-fab color="secondary"
-                            [attr.aria-label]="'common.contact.delete.title' | transloco"
-                            (click)="deleteContact(contact)">
-                            <mat-icon>delete_forever</mat-icon>
-                        </button>
-                    </mat-card-actions>
-                </mat-card>
-            </mat-expansion-panel>
+                        <mat-menu #contactMenu="matMenu" panelClass="accent-menu">
+                            <button mat-menu-item (click)="editContact(contact)">
+                                <mat-icon>settings_account_box</mat-icon>
+                                <span>{{ 'common.contact.list.editAria' | transloco }}</span>
+                            </button>
+                            @if (!subscriptionError) {
+                            @if (contact.subscribed) {
+                            <button mat-menu-item (click)="subscribe(contact)">
+                                <mat-icon>bookmark_remove</mat-icon>
+                                <span>{{ 'common.contact.list.unsubscribeAria' | transloco }}</span>
+                            </button>
+                            } @else {
+                            <button mat-menu-item (click)="subscribe(contact)">
+                                <mat-icon>bookmark_add</mat-icon>
+                                <span>{{ 'common.contact.list.subscribeAria' | transloco }}</span>
+                            </button>
+                            }
+                            }
+                        </mat-menu>
+                    </div>
+                </mat-card-actions>
+            </mat-card>
             }
         </div>
         }

@@ -97,19 +97,13 @@ h4 {
     }
 }
 
-.version-chipset mat-chip {
-    width: 100%;
-    text-align: center;
-    display: inline;
-}
-
 .platform-tile-container {
     display: grid;
     /*grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));*/
     grid-template-columns: repeat(auto-fill, 1fr);
     justify-content: center;
     gap: 1rem;
-    padding: 0.5rem;
+    padding: 0 0.5rem 1rem;
     width: 100%;
     max-width: 100%;
     min-width: 0;
@@ -391,4 +385,46 @@ h4 {
 
 .backup-exit-note {
     color: var(--mat-card-subtitle-text-color);
+}
+
+.platform-tile.version-info-tile {
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.version-info-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.version-info-header mat-icon {
+    font-size: 1.75rem;
+    width: 1.75rem;
+    height: 1.75rem;
+    flex: 0 0 auto;
+}
+
+.version-info-header > div {
+    min-width: 0;
+    flex: 1 1 0;
+}
+
+.version-info-header h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--mat-app-text-color);
+}
+
+.version-info-value {
+    margin: 0;
+    font-size: 0.9rem;
+    line-height: 1.35;
+    color: var(--mat-card-subtitle-text-color);
+    font-variant-numeric: tabular-nums;
+    overflow-wrap: anywhere;
 }

@@ -2,18 +2,15 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
-import { TileSetting } from '../../../interfaces/tile-settings';
-import { ContactService } from '../../../services/contact.service';
 import { SocketioService } from '../../../services/socketio.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
   selector: 'app-profile',
@@ -35,11 +32,9 @@ import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.co
 })
 export class ContactSettingsComponent {
   private readonly socketioService = inject(SocketioService);
-  private readonly contactService = inject(ContactService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
-  private readonly dialog = inject(MatDialog);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
 
   public contact: Contact = this.data.contact;
@@ -112,24 +107,6 @@ export class ContactSettingsComponent {
       duration: 1500,
       horizontalPosition: 'center',
       verticalPosition: 'top'
-    });
-  }
-
-  openTileSettings(): void {
-    const dialogRef = this.dialog.open(TileSettingsComponent, {
-      width: 'auto',
-      minWidth: 'min(450px, 95vw',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      data: { contact: this.data.contact }
-    });
-
-    dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
-      if (updatedSettings?.length) {
-        this.data.contact.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
-        this.contactService.saveContactTileSettings(this.data.contact);
-        this.contactService.refreshContact(this.data.contact.id);
-      }
     });
   }
 

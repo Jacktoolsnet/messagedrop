@@ -4,7 +4,6 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-import { MatExpansionModule } from '@angular/material/expansion';
 import { MatIcon } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
@@ -45,7 +44,6 @@ interface ConnectDialogResult {
     MatDialogActions,
     MatIcon,
     MatMenuModule,
-    MatExpansionModule,
     TranslocoPipe
   ],
   templateUrl: './contactlist.component.html',

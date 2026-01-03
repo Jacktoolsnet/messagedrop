@@ -141,14 +141,18 @@
         {{ 'settings.backup.toggle' | transloco }}
       </mat-slide-toggle>
     </div>
+    <div class="platform-tile version-info-tile">
+      <div class="version-info-header">
+        <mat-icon>info</mat-icon>
+        <div>
+          <h3>{{ 'settings.versionLabel' | transloco }}</h3>
+          <p class="version-info-value">
+            {{ versionInfo.semver }}-{{ versionInfo.build }}-{{ versionInfo.commit }}-{{ versionInfo.timestamp }}
+          </p>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <mat-chip-set class="version-chipset">
-    <mat-chip appearance="outlined" color="primary" disableRipple>
-      {{ 'settings.versionLabel' | transloco }} {{ versionInfo.semver }}-{{ versionInfo.build }}-{{ versionInfo.commit }}-{{ versionInfo.timestamp
-      }}
-    </mat-chip>
-  </mat-chip-set>
 
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">

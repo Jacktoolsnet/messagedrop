@@ -33,13 +33,6 @@
     </div>
   </div>
   }
-  <div class="avatar-area">
-    <button mat-flat-button color="warn" class="button" type="button" (click)="openTileSettings()"
-      [attr.aria-label]="'common.placeSettings.openTileSettingsAria' | transloco:{ name: data.place.name || ('common.placeSettings.nameFallback' | transloco) }">
-      <mat-icon>settings</mat-icon>
-      <span>{{ 'common.placeSettings.tileSettings' | transloco }}</span>
-    </button>
-  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">

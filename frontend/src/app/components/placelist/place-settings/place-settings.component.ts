@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 
 import { FormsModule } from '@angular/forms';
@@ -12,9 +12,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
-import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { TileSettingsComponent } from '../../tile/tile-settings/tile-settings.component';
 
 @Component({
   selector: 'app-place',
@@ -46,8 +44,6 @@ export class PlaceProfileComponent {
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
-  private readonly dialog = inject(MatDialog);
-  private readonly placeService = inject(PlaceService);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
@@ -122,23 +118,6 @@ export class PlaceProfileComponent {
 
   deleteAvatar() {
     this.data.place.base64Avatar = '';
-  }
-
-  openTileSettings(): void {
-    const dialogRef = this.dialog.open(TileSettingsComponent, {
-      width: 'auto',
-      minWidth: 'min(450px, 95vws',
-      maxWidth: '90vw',
-      maxHeight: '90vh',
-      data: { place: this.data.place }
-    });
-
-    dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
-      if (updatedSettings?.length) {
-        this.data.place.tileSettings = updatedSettings.map((tile: TileSetting) => ({ ...tile }));
-        this.placeService.saveAdditionalPlaceInfos(this.data.place);
-      }
-    });
   }
 
   public showPolicy() {

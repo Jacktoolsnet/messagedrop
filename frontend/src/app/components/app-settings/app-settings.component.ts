@@ -3,7 +3,6 @@ import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { MatChipsModule } from '@angular/material/chips';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -36,7 +35,6 @@ import { EnableLocationComponent } from "../utils/enable-location/enable-locatio
     MatSelectModule,
     MatFormFieldModule,
     MatButtonToggleModule,
-    MatChipsModule,
     MatSlideToggleModule,
     TranslocoPipe,
     EnableLocationComponent

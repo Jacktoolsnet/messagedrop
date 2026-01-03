@@ -6,7 +6,6 @@ import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatExpansionModule } from "@angular/material/expansion";
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -46,7 +45,6 @@ interface TimezoneResponse { status: number; timezone: string }
     MatFormFieldModule,
     MatMenuModule,
     MatInputModule,
-    MatExpansionModule,
     TranslocoPipe
   ],
   templateUrl: './placelist.component.html',

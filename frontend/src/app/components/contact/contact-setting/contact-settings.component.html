@@ -40,15 +40,6 @@
   </div>
   }
 
-  <div class="avatar-area">
-    <div class="buttonarea">
-      <button mat-flat-button color="warn" class="button_style" type="button" (click)="openTileSettings()"
-        [attr.aria-label]="'common.contact.profile.tileSettingsAria' | transloco:{ name: data.contact.name || ('common.contact.profile.nameFallback' | transloco) }">
-        <mat-icon>settings</mat-icon>
-        <span>{{ 'common.contact.profile.tileSettings' | transloco }}</span>
-      </button>
-    </div>
-  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
