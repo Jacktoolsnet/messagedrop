@@ -1,6 +1,6 @@
 <h2 mat-dialog-title class="dialog-title">{{ 'common.systemMessages.deleteTitle' | transloco }}</h2>
-<mat-dialog-content>
-  <p>{{ 'common.systemMessages.deleteConfirm' | transloco }}</p>
+<mat-dialog-content class="confirm-content">
+  <div class="confirm-box"><p>{{ 'common.systemMessages.deleteConfirm' | transloco }}</p></div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
   <button [mat-dialog-close]="false" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>

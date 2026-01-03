@@ -93,6 +93,24 @@ h2[mat-dialog-title].dialog-title {
   justify-content: flex-start;
 }
 
+.confirm-content {
+  padding: 0 1rem 1rem;
+  box-sizing: border-box;
+}
+
+.confirm-box {
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  background-color: var(--mat-card-filled-container-color);
+  color: var(--mat-app-text-color);
+  line-height: 1.5;
+  box-shadow: 0 2px 6px var(--mat-card-outlined-outline-color);
+}
+
+.confirm-box p {
+  margin: 0;
+}
 .sticky-actions .action-close {
   margin-right: auto;
   margin-inline-end: auto;
