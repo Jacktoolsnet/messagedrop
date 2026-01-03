@@ -15,7 +15,8 @@
             <mat-expansion-panel>
                 <mat-expansion-panel-header>
                     <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
-                        [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true" matBadgeColor="warn">
+                        [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true"
+                        matBadgeColor="warn">
                         @if (contact.base64Avatar) {
                         <img class="avatar" [src]="contact.base64Avatar"
                             [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" />
@@ -28,24 +29,26 @@
                 <mat-card>
                     <mat-card-actions class="buttonbar">
                         @if (contact.pinned) {
-                        <button mat-mini-fab [ngClass]="'active-button'"
-                            [attr.aria-label]="'common.contact.list.unpinAria' | transloco" (click)="unpinContact(contact)">
+                        <button mat-mini-fab color="'active-button'"
+                            [attr.aria-label]="'common.contact.list.unpinAria' | transloco"
+                            (click)="unpinContact(contact)">
                             <mat-icon>keep_off</mat-icon>
                         </button>
                         } @else {
-                        <button mat-mini-fab [ngClass]="'inactive-button'"
+                        <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.contact.list.pinAria' | transloco" (click)="pinContact(contact)">
                             <mat-icon>keep</mat-icon>
                         </button>
                         }
-                        <button mat-mini-fab color="secondary"
+                        <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
                             [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
                             matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
                             <mat-icon>forum</mat-icon>
                         </button>
                         <button mat-mini-fab color="secondary"
-                            [attr.aria-label]="'common.contact.list.editAria' | transloco" (click)="editContact(contact)">
+                            [attr.aria-label]="'common.contact.list.editAria' | transloco"
+                            (click)="editContact(contact)">
                             <mat-icon>settings_account_box</mat-icon>
                         </button>
                         <button mat-mini-fab color="secondary" (click)="openTileList(contact)"
@@ -60,7 +63,7 @@
                             <mat-icon>bookmark_remove</mat-icon>
                         </button>
                         } @else {
-                        <button mat-mini-fab [color]="'inactive-button'"
+                        <button mat-mini-fab [color]="'active-button'"
                             [attr.aria-label]="'common.contact.list.subscribeAria' | transloco"
                             (click)="subscribe(contact)">
                             <mat-icon>bookmark_add</mat-icon>
@@ -92,7 +95,7 @@
     </button>
 </mat-dialog-actions>
 
-<mat-menu #connectionMenu="matMenu">
+<mat-menu #connectionMenu="matMenu" panelClass="accent-menu">
     <button mat-menu-item (click)="shareConnectId()">
         <mat-icon>share</mat-icon>
         <span>{{ 'common.contact.connect.menuShare' | transloco }}</span>

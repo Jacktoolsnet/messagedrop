@@ -165,6 +165,12 @@ mat-expansion-panel-header {
   white-space: nowrap;
 }
 
+:host ::ng-deep .accent-menu .mat-mdc-menu-item,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item .mdc-list-item__primary-text,
+:host ::ng-deep .accent-menu .mat-mdc-menu-item mat-icon {
+  color: var(--mat-select-focused-arrow-color);
+}
+
 .active-button {
   background-color: var(--mat-select-focused-arrow-color);
   color: var(--mat-pseudo-checkbox-full-selected-checkmark-color);

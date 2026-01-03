@@ -29,45 +29,43 @@
                 <mat-card>
                     <mat-card-actions class="buttonbar">
                         @if(place.pinned) {
-                        <button mat-mini-fab [attr.aria-label]="'common.placeList.unpinAria' | transloco"
-                            [ngClass]="'active-button'" (click)="unpinPlace(place)">
+                        <button mat-mini-fab color="'active-button'"
+                            [attr.aria-label]="'common.placeList.unpinAria' | transloco" (click)="unpinPlace(place)">
                             <mat-icon>keep_off</mat-icon>
                         </button>
                         } @else {
-                        <button mat-mini-fab [attr.aria-label]="'common.placeList.pinAria' | transloco"
-                            [ngClass]="'inactiv-button'" (click)="pinPlace(place)">
+                        <button mat-mini-fab color="'active-button'"
+                            [attr.aria-label]="'common.placeList.pinAria' | transloco" (click)="pinPlace(place)">
                             <mat-icon>keep</mat-icon>
                         </button>
                         }
-                        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.editAria' | transloco"
-                            (click)="editPlace(place)">
+                        <button mat-mini-fab color="'active-button'"
+                            [attr.aria-label]="'common.placeList.editAria' | transloco" (click)="editPlace(place)">
                             <mat-icon>settings_account_box</mat-icon>
                         </button>
-                        <button mat-mini-fab color="secondary" (click)="openTileList(place)"
+                        <button mat-mini-fab color="'active-button'" (click)="openTileList(place)"
                             [attr.aria-label]="tileListAriaLabel(place)">
                             <mat-icon>dashboard</mat-icon>
                         </button>
-                        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.deleteAria' | transloco"
-                            (click)="deletePlace(place)">
+                        <button mat-mini-fab color="'active-button'"
+                            [attr.aria-label]="'common.placeList.deleteAria' | transloco" (click)="deletePlace(place)">
                             <mat-icon>delete_forever</mat-icon>
                         </button>
                         @if (!subscriptionError) {
                         @if (place.subscribed) {
                         <button mat-mini-fab [attr.aria-label]="'common.placeList.unsubscribeAria' | transloco"
-                            [ngClass]="'active-button'"
-                            (click)="handleSubscription(place)">
+                            [ngClass]="'active-button'" (click)="handleSubscription(place)">
                             <mat-icon>bookmark_remove</mat-icon>
                         </button>
                         } @else {
                         <button mat-mini-fab [attr.aria-label]="'common.placeList.subscribeAria' | transloco"
-                            [ngClass]="'inactiv-button'"
-                            (click)="handleSubscription(place)">
+                            color="'active-button'" (click)="handleSubscription(place)">
                             <mat-icon>bookmark_add</mat-icon>
                         </button>
                         }
                         }
-                        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.flyToAria' | transloco"
-                            (click)="flyTo(place)">
+                        <button mat-mini-fab color="'active-button'"
+                            [attr.aria-label]="'common.placeList.flyToAria' | transloco" (click)="flyTo(place)">
                             <mat-icon>place</mat-icon>
                         </button>
                     </mat-card-actions>
