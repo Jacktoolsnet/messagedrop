@@ -7,9 +7,9 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarRef } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
@@ -520,7 +520,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(SharedContentComponent, {
       data: { multimedia, location },
       closeOnNavigation: true,
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
@@ -710,7 +710,7 @@ export class AppComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_PUBLIC_MESSAGE, message: message },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
@@ -753,7 +753,7 @@ export class AppComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_NOTE, user: this.userService.getUser(), note: note },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
@@ -890,7 +890,7 @@ export class AppComponent implements OnInit {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { location: this.mapService.getMapLocation() },
-            minWidth: '20vw',
+            minWidth: 'min(450px, 95vw)',
             maxWidth: '95vw',
             width: 'auto',
             maxHeight: '95vh',
@@ -915,7 +915,7 @@ export class AppComponent implements OnInit {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { location: this.mapService.getMapLocation() },
-            minWidth: '20vw',
+            minWidth: 'min(450px, 95vw)',
             maxWidth: '95vw',
             width: 'auto',
             maxHeight: 'none',
@@ -943,7 +943,7 @@ export class AppComponent implements OnInit {
         panelClass: 'NoteListDialog',
         closeOnNavigation: true,
         data: { location: this.mapService.getMapLocation(), notesSignal: this.noteService.getNotesWritableSignal() },
-        minWidth: '20vw',
+        minWidth: 'min(450px, 95vw)',
         maxWidth: '95vw',
         width: 'auto',
         maxHeight: 'none',
@@ -969,7 +969,7 @@ export class AppComponent implements OnInit {
       panelClass: hasPlaces ? 'PalceListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
       width: 'auto',
       maxHeight: '95vh',
@@ -1005,7 +1005,7 @@ export class AppComponent implements OnInit {
       panelClass: hasContacts ? 'ContactListDialog' : undefined,
       closeOnNavigation: true,
       data: {},
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
       width: 'auto',
       maxHeight: 'none',
@@ -1059,7 +1059,7 @@ export class AppComponent implements OnInit {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { location: messages[0].location },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
       width: 'auto',
       maxHeight: 'none',
@@ -1085,7 +1085,7 @@ export class AppComponent implements OnInit {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { location: notesSignal()[0].location, notesSignal: notesSignal },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
       width: 'auto',
       maxHeight: 'none',
@@ -1114,7 +1114,7 @@ export class AppComponent implements OnInit {
         imagesSignal: imagesSignal,
         skipExifOverride: false
       },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
       width: 'auto',
       maxHeight: 'none',
@@ -1142,7 +1142,7 @@ export class AppComponent implements OnInit {
         location: documentsSignal()[0].location,
         documentsSignal: documentsSignal
       },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       maxWidth: '95vw',
       width: 'auto',
       maxHeight: 'none',
@@ -1476,7 +1476,7 @@ export class AppComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { location: this.mapService.getMapLocation(), searchValues: searchValues ?? undefined },
-      minWidth: '20vw',
+      minWidth: 'min(450px, 95vw)',
       width: '90vw',
       maxWidth: '90vw',
       height: '90vh',
