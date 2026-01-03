@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -35,6 +35,7 @@ import { DeleteNoteComponent } from './delete-note/delete-note.component';
     FormsModule,
     MatButtonModule,
     MatDialogContent,
+    MatDialogActions,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
@@ -151,9 +152,11 @@ export class NotelistComponent {
         result.note.latitude = this.location.latitude;
         result.note.longitude = this.location.longitude;
         result.note.plusCode = this.location.plusCode;
-        await this.noteService.addNote(result.note);
-        const updatedNotes = [result.note, ...this.notesSignal()];
-        this.notesSignal.set(updatedNotes);
+        const createdNote = await this.noteService.addNote(result.note);
+        const currentNotes = this.notesSignal();
+        if (!currentNotes.some(noteItem => noteItem.id === createdNote.id)) {
+          this.notesSignal.set([createdNote, ...currentNotes]);
+        }
       }
     });
   }

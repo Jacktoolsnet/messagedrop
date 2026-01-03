@@ -1,59 +1,58 @@
-<mat-dialog-content>
-    @if (!hasNotes()) {
-    <div class="no-content">
-        <div class="toolbar">
-            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-        </div>
-        <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-            (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
-            <span>{{ 'common.noteList.addFirstNote' | transloco }}</span>
-        </button>
-    </div>
-    } @else {
-    <div class="content">
-        <div class="toolbar">
-            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-            <button [attr.aria-hidden]="false" class="button_add" mat-mini-fab color="primary"
-                [attr.aria-label]="'common.noteList.addNoteAria' | transloco"
-                (click)="openNoteDialog()">
-                <mat-icon [attr.aria-hidden]="false">add_notes</mat-icon>
-            </button>
-        </div>
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="dialog-title__icon" aria-hidden="true">clinical_notes</mat-icon>
+    <span class="dialog-title__text">{{ 'common.tiles.notes.title' | transloco }}</span>
+</h2>
 
-        @for (note of notesSignal(); track note.id) {
-        <mat-card class="item" appMasonryItem>
-            <mat-card-content (click)="editNote(note)">
-                <div class="message-content">
-                    <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
-                    <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
-                </div>
-            </mat-card-content>
-            <mat-card-actions class="buttonbar">
-                @if (userService.isReady()) {
-                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.editAria' | transloco"
-                    (click)="editNote(note)">
-                    <mat-icon>edit</mat-icon>
-                </button>
-                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.deleteAria' | transloco"
-                    (click)="deleteNote(note)">
-                    <mat-icon>delete_forever</mat-icon>
-                </button>
-                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.flyToAria' | transloco"
-                    (click)="flyTo(note)">
-                    <mat-icon>place</mat-icon>
-                </button>
-                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.navigateAria' | transloco"
-                    (click)="navigateToNoteLocation(note)">
-                    <mat-icon>assistant_direction</mat-icon>
-                </button>
-                }
-            </mat-card-actions>
-        </mat-card>
+<mat-dialog-content class="note-dialog-content">
+    <div class="note-scroll">
+        @if (!hasNotes()) {
+        <div class="empty-state">
+            <p class="empty-text">{{ 'common.tiles.notes.empty' | transloco }}</p>
+        </div>
+        } @else {
+        <div class="content">
+            @for (note of notesSignal(); track note.id) {
+            <mat-card class="item" appMasonryItem>
+                <mat-card-content (click)="editNote(note)">
+                    <div class="message-content">
+                        <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>
+                        <app-showmessage [message]="note.note" [style]="note.style"></app-showmessage>
+                    </div>
+                </mat-card-content>
+                <mat-card-actions class="buttonbar">
+                    @if (userService.isReady()) {
+                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.editAria' | transloco"
+                        (click)="editNote(note)">
+                        <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.deleteAria' | transloco"
+                        (click)="deleteNote(note)">
+                        <mat-icon>delete_forever</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.flyToAria' | transloco"
+                        (click)="flyTo(note)">
+                        <mat-icon>place</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.navigateAria' | transloco"
+                        (click)="navigateToNoteLocation(note)">
+                        <mat-icon>assistant_direction</mat-icon>
+                    </button>
+                    }
+                </mat-card-actions>
+            </mat-card>
+            }
+        </div>
         }
     </div>
-    }
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-icon-button class="action-close" (click)="goBack()"
+        [attr.aria-label]="'common.actions.close' | transloco">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.noteList.addNoteAria' | transloco"
+        (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
+        <mat-icon>add_notes</mat-icon>
+    </button>
+</mat-dialog-actions>
