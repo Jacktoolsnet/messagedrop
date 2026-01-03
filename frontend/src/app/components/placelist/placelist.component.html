@@ -1,91 +1,93 @@
-<mat-dialog-content class="dialog">
-    @if (!hasPlaces()) {
-    <div class="no-content">
-        <div class="toolbar">
-            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-        </div>
-        <button class="first-button" mat-flat-button color="primary" (click)="addPlace()">
-            <span>{{ 'common.placeList.addFirstPlace' | transloco }}</span>
-        </button>
-    </div>
-    } @else {
-    <div class="content">
-        <div class="toolbar">
-            <button mat-mini-fab color="accent" class="button_back" (click)="goBack()">
-                <mat-icon>arrow_back</mat-icon>
-            </button>
-            <button class="button_add" mat-mini-fab color="primary"
-                [attr.aria-label]="'common.placeList.addPlaceAria' | transloco" (click)="addPlace()">
-                <mat-icon>add_location</mat-icon>
-            </button>
-        </div>
-        @for (place of placesSignal(); track place.id){
-        <mat-expansion-panel>
-            <mat-expansion-panel-header>
-                @if (place.base64Avatar) {
-                <img class="avatar" [src]="place.base64Avatar"
-                    [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
-                } @else {
-                <mat-icon>{{ place.icon || 'location' }}</mat-icon>
-                }
-                @if (place.name) {
-                <span class="name">{{ place.name }}</span>
-                } @else {
-                <span class="name">{{ 'common.placeList.nameFallback' | transloco }}</span>
-                }
-            </mat-expansion-panel-header>
-            <mat-card>
-                <mat-card-content>
-                    <div class="tile-grid">
-                        <app-tile-list [place]="place"></app-tile-list>
-                    </div>
-                </mat-card-content>
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="dialog-title__icon" aria-hidden="true">place</mat-icon>
+    <span class="dialog-title__text">{{ 'common.menu.myPlaces' | transloco }}</span>
+</h2>
 
-                <mat-card-actions class="buttonbar">
-                    @if(place.pinned) {
-                    <button mat-mini-fab [attr.aria-label]="'common.placeList.unpinAria' | transloco"
-                        [ngClass]="'active-button'" (click)="unpinPlace(place)">
-                        <mat-icon>keep_off</mat-icon>
-                    </button>
+<mat-dialog-content class="place-dialog-content">
+    <div class="place-scroll">
+        @if (!hasPlaces()) {
+        <div class="empty-state">
+            <p class="empty-text">{{ 'common.placeList.addFirstPlace' | transloco }}</p>
+        </div>
+        } @else {
+        <div class="content">
+            @for (place of placesSignal(); track place.id){
+            <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                    @if (place.base64Avatar) {
+                    <img class="avatar" [src]="place.base64Avatar"
+                        [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
                     } @else {
-                    <button mat-mini-fab [attr.aria-label]="'common.placeList.pinAria' | transloco"
-                        [ngClass]="'inactiv-button'" (click)="pinPlace(place)">
-                        <mat-icon>keep</mat-icon>
-                    </button>
+                    <mat-icon>{{ place.icon || 'location' }}</mat-icon>
                     }
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.editAria' | transloco"
-                        (click)="editPlace(place)">
-                        <mat-icon>settings_account_box</mat-icon>
-                    </button>
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.deleteAria' | transloco"
-                        (click)="deletePlace(place)">
-                        <mat-icon>delete_forever</mat-icon>
-                    </button>
-                    @if (!subscriptionError) {
-                    @if (place.subscribed) {
-                    <button mat-mini-fab [attr.aria-label]="'common.placeList.unsubscribeAria' | transloco"
-                        [ngClass]="'active-button'"
-                        (click)="handleSubscription(place)">
-                        <mat-icon>bookmark_remove</mat-icon>
-                    </button>
+                    @if (place.name) {
+                    <span class="name">{{ place.name }}</span>
                     } @else {
-                    <button mat-mini-fab [attr.aria-label]="'common.placeList.subscribeAria' | transloco"
-                        [ngClass]="'inactiv-button'"
-                        (click)="handleSubscription(place)">
-                        <mat-icon>bookmark_add</mat-icon>
-                    </button>
+                    <span class="name">{{ 'common.placeList.nameFallback' | transloco }}</span>
                     }
-                    }
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.flyToAria' | transloco"
-                        (click)="flyTo(place)">
-                        <mat-icon>place</mat-icon>
-                    </button>
-                </mat-card-actions>
-            </mat-card>
-        </mat-expansion-panel>
+                </mat-expansion-panel-header>
+                <mat-card>
+                    <mat-card-content>
+                        <div class="tile-grid">
+                            <app-tile-list [place]="place"></app-tile-list>
+                        </div>
+                    </mat-card-content>
+
+                    <mat-card-actions class="buttonbar">
+                        @if(place.pinned) {
+                        <button mat-mini-fab [attr.aria-label]="'common.placeList.unpinAria' | transloco"
+                            [ngClass]="'active-button'" (click)="unpinPlace(place)">
+                            <mat-icon>keep_off</mat-icon>
+                        </button>
+                        } @else {
+                        <button mat-mini-fab [attr.aria-label]="'common.placeList.pinAria' | transloco"
+                            [ngClass]="'inactiv-button'" (click)="pinPlace(place)">
+                            <mat-icon>keep</mat-icon>
+                        </button>
+                        }
+                        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.editAria' | transloco"
+                            (click)="editPlace(place)">
+                            <mat-icon>settings_account_box</mat-icon>
+                        </button>
+                        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.deleteAria' | transloco"
+                            (click)="deletePlace(place)">
+                            <mat-icon>delete_forever</mat-icon>
+                        </button>
+                        @if (!subscriptionError) {
+                        @if (place.subscribed) {
+                        <button mat-mini-fab [attr.aria-label]="'common.placeList.unsubscribeAria' | transloco"
+                            [ngClass]="'active-button'"
+                            (click)="handleSubscription(place)">
+                            <mat-icon>bookmark_remove</mat-icon>
+                        </button>
+                        } @else {
+                        <button mat-mini-fab [attr.aria-label]="'common.placeList.subscribeAria' | transloco"
+                            [ngClass]="'inactiv-button'"
+                            (click)="handleSubscription(place)">
+                            <mat-icon>bookmark_add</mat-icon>
+                        </button>
+                        }
+                        }
+                        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.placeList.flyToAria' | transloco"
+                            (click)="flyTo(place)">
+                            <mat-icon>place</mat-icon>
+                        </button>
+                    </mat-card-actions>
+                </mat-card>
+            </mat-expansion-panel>
+            }
+        </div>
         }
     </div>
-    }
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-icon-button class="action-close" (click)="goBack()"
+        [attr.aria-label]="'common.actions.close' | transloco">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.placeList.addPlaceAria' | transloco"
+        (click)="addPlace()">
+        <mat-icon>add_location</mat-icon>
+    </button>
+</mat-dialog-actions>

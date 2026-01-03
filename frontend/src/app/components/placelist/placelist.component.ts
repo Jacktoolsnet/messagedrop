@@ -1,5 +1,5 @@
 import { Component, computed, inject, Signal } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -40,6 +40,7 @@ interface TimezoneResponse { status: number; timezone: string }
     FormsModule,
     MatButtonModule,
     MatDialogContent,
+    MatDialogActions,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
