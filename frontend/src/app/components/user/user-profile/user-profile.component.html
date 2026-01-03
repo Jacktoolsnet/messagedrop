@@ -1,4 +1,7 @@
-<h2 mat-dialog-title>{{ 'common.user.profile.title' | transloco }}</h2>
+<h2 mat-dialog-title>
+  <mat-icon aria-hidden="true">badge</mat-icon>
+  {{ 'common.user.profile.title' | transloco }}
+</h2>
 <mat-dialog-content>
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>{{ 'common.user.profile.nameLabel' | transloco }}</mat-label>

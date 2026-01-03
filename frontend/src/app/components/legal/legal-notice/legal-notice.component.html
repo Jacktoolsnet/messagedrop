@@ -1,4 +1,7 @@
-<h1 mat-dialog-title>{{ 'common.legal.notice.title' | transloco }}</h1>
+<h2 mat-dialog-title>
+    <mat-icon aria-hidden="true">gavel</mat-icon>
+    {{ 'common.legal.notice.title' | transloco }}
+</h2>
 
 <mat-dialog-actions class="lang-actions" align="start">
     <button mat-stroked-button [color]="lang() === 'de' ? 'primary' : undefined" (click)="setLanguage('de')"
@@ -21,7 +24,8 @@
     }
 
     @if (!loading() && !error()) {
-    <pre class="legal-text" [textContent]="text()" [attr.aria-label]="'common.legal.notice.ariaLabel' | transloco"></pre>
+    <pre class="legal-text" [textContent]="text()"
+        [attr.aria-label]="'common.legal.notice.ariaLabel' | transloco"></pre>
     }
 </mat-dialog-content>
 

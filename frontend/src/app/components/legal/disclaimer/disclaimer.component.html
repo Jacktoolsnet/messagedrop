@@ -1,4 +1,7 @@
-<h1 mat-dialog-title>{{ 'common.legal.disclaimer.title' | transloco }}</h1>
+<h2 mat-dialog-title>
+    <mat-icon aria-hidden="true">policy</mat-icon>
+    {{ 'common.legal.disclaimer.title' | transloco }}
+</h2>
 
 <mat-dialog-actions class="lang-actions" align="start">
     <button mat-stroked-button [color]="lang() === 'de' ? 'primary' : undefined" (click)="setLanguage('de')"

@@ -9,6 +9,7 @@ import {
   MatDialogRef,
   MatDialogTitle
 } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 
@@ -21,6 +22,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
+    MatIconModule,
     MatProgressBarModule,
     TranslocoPipe
   ],

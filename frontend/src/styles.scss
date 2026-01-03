@@ -37,6 +37,22 @@ body {
   font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* === DIALOG TITLES === */
+h2[mat-dialog-title] {
+  height: 3.5rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1rem;
+  border-radius: 1rem 1rem 0 0;
+  background-color: var(--mat-card-filled-container-color);
+  color: var(--mat-app-text-color);
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  box-shadow: 0 6px 16px var(--mat-card-outlined-outline-color);
+}
+
 /* === SNACKBAR STYLES === */
 .snack-error {
   --mdc-snackbar-container-color: rgba(233, 64, 64, 0.75);

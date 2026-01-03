@@ -2,19 +2,6 @@
   color: var(--mat-app-text-color);
 }
 
-.dialog-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.85rem 1rem;
-  margin: 0 0 0.75rem 0;
-  border-radius: 0.9rem 0.9rem 0 0;
-  background-color: var(--mat-card-filled-container-color);
-  color: var(--mat-app-text-color);
-  border: 1px solid var(--mat-card-outlined-outline-color);
-  box-shadow: 0 6px 16px var(--mat-card-outlined-outline-color);
-}
-
 .dialog-title__icon {
   font-size: 1.8rem;
   width: 1.8rem;

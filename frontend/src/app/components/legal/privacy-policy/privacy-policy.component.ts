@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
@@ -16,6 +17,7 @@ import { AppService } from '../../../services/app.service';
     MatDialogContent,
     MatDialogActions,
     MatButtonModule,
+    MatIconModule,
     MatSlideToggleModule,
     MatProgressBarModule,
     TranslocoPipe
