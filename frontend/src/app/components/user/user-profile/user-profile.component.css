@@ -40,6 +40,7 @@ h2[mat-dialog-title].dialog-title {
 .profile-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 0 1rem 1rem;
   min-height: 0;
 }
@@ -57,7 +58,7 @@ h4 {
 }
 
 button {
-  margin-right: 8px;
+  margin-right: 0;
   z-index: 1000;
 }
 
@@ -137,7 +138,7 @@ button {
   position: absolute;
   bottom: 0;
   right: 0;
-  transform: translate(50%, 50%);
+  transform: translate(0, 50%);
 }
 
 .full-width {
