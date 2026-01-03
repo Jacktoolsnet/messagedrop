@@ -332,7 +332,7 @@
       "createTitle": "Créer un code PIN",
       "confirmTitle": "Confirmer le code PIN",
       "hintTitle": "Indice de PIN",
-      "hintBody": "Pour utiliser MessageDrop, je dois choisir un code PIN. Je ne peux pas l'oublier, car il n'existe aucun moyen de récupération. Le PIN est chiffré, haché et stocké uniquement sur mon appareil.",
+      "hintBody": "Petit rappel : garde bien ton code PIN. Il est stocké uniquement sur cet appareil et ne peut pas être réinitialisé.",
       "mismatch": "Les codes PIN ne correspondent pas."
     },
     "placeList": {

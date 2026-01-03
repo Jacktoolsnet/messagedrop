@@ -332,7 +332,7 @@
       "createTitle": "PIN erstellen",
       "confirmTitle": "PIN bestätigen",
       "hintTitle": "PIN-Hinweis",
-      "hintBody": "Um MessageDrop zu nutzen, muss ich eine PIN wählen. Ich darf sie nicht vergessen, denn es gibt keine Möglichkeit, sie wiederherzustellen. Die PIN wird verschlüsselt, gehasht und nur auf meinem Gerät gespeichert.",
+      "hintBody": "Kleiner Hinweis: Merke dir deine PIN gut. Sie bleibt nur auf diesem Gerät gespeichert und kann nicht zurückgesetzt werden.",
       "mismatch": "PINs stimmen nicht überein."
     },
     "placeList": {
