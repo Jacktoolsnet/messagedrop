@@ -99,7 +99,8 @@
                     (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                     <mat-icon aria-hidden="false">edit</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.deleteAria' | transloco"
+                <button mat-mini-fab color="secondary" class="button-delete"
+                    [attr.aria-label]="'common.messageList.deleteAria' | transloco"
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
@@ -219,7 +220,8 @@
                     (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                     <mat-icon aria-hidden="false">edit</mat-icon>
                 </button>
-                <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.deleteAria' | transloco"
+                <button mat-mini-fab color="secondary" class="button-delete"
+                    [attr.aria-label]="'common.messageList.deleteAria' | transloco"
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>

@@ -213,9 +213,14 @@ button,
 
 .buttonbar {
   display: flex;
-  justify-content: left;
+  justify-content: flex-end;
   flex-wrap: wrap;
   margin-top: auto;
+}
+
+.buttonbar button:first-child {
+  margin-right: auto;
+  margin-inline-end: auto;
 }
 
 .sticky-actions {

@@ -213,9 +213,16 @@ button,
 
 .buttonbar {
   display: flex;
-  justify-content: left;
+  justify-content: flex-end;
   flex-wrap: wrap;
+  width: 100%;
+  gap: 0.35rem;
   margin-top: auto;
+}
+
+.buttonbar .button-delete {
+  margin-right: auto;
+  margin-inline-end: auto;
 }
 
 .buttonbar .dsa-status-button {

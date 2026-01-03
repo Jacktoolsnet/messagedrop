@@ -21,13 +21,13 @@
                 </mat-card-content>
                 <mat-card-actions class="buttonbar">
                     @if (userService.isReady()) {
-                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.editAria' | transloco"
-                        (click)="editNote(note)">
-                        <mat-icon>edit</mat-icon>
-                    </button>
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.deleteAria' | transloco"
                         (click)="deleteNote(note)">
                         <mat-icon>delete_forever</mat-icon>
+                    </button>
+                    <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.editAria' | transloco"
+                        (click)="editNote(note)">
+                        <mat-icon>edit</mat-icon>
                     </button>
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.noteList.flyToAria' | transloco"
                         (click)="flyTo(note)">
