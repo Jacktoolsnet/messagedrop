@@ -747,3 +747,15 @@ h2[mat-dialog-title].dialog-title {
   -moz-osx-font-smoothing: grayscale;
   font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
 }
+/* Ensure dialog titles don't wrap across the app. */
+h2[mat-dialog-title].dialog-title .dialog-title__text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+h2[mat-dialog-title].dialog-title {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
