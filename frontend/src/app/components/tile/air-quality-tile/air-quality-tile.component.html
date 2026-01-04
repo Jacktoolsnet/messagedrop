@@ -1,5 +1,9 @@
 @if (!airQuality) {
 <div class="tile airQuality-tile">
+    <div class="tile-header">
+        <mat-icon class="tile-icon">air</mat-icon>
+        <span class="tile-title">{{ 'common.tileTypes.airQuality' | transloco }}</span>
+    </div>
     <div class="tile-info">
         <i class="wi wi-na" style="font-size: 1.5rem"></i>
         <div class="tile-content">
@@ -11,6 +15,10 @@
 } @else {
 <div class="tile airQuality-tile" role="button" tabindex="0" (click)="openAirQualityDetails()"
     (keyup.enter)="openAirQualityDetails()" (keyup.space)="openAirQualityDetails()">
+    <div class="tile-header">
+        <mat-icon class="tile-icon">air</mat-icon>
+        <span class="tile-title">{{ 'common.tileTypes.airQuality' | transloco }}</span>
+    </div>
     <div class="tile-info">
         <mat-icon>{{ airQualityIcon }}</mat-icon>
         <div class="tile-content">

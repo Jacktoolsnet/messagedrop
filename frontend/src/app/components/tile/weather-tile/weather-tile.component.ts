@@ -1,5 +1,6 @@
 import { Component, Input, inject } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { BoundingBox } from '../../../interfaces/bounding-box';
 import { Place } from '../../../interfaces/place';
@@ -11,7 +12,7 @@ import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
 
 @Component({
   selector: 'app-weather-tile',
-  imports: [TranslocoPipe],
+  imports: [MatIcon, TranslocoPipe],
   templateUrl: './weather-tile.component.html',
   styleUrl: './weather-tile.component.css'
 })

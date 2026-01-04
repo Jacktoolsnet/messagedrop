@@ -1,10 +1,11 @@
 import { Component, Input, OnDestroy, OnInit, inject } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { PlaceService } from '../../../services/place.service';
 
 @Component({
   selector: 'app-datetime-tile',
-  imports: [MatIcon],
+  imports: [MatIcon, TranslocoPipe],
   templateUrl: './datetime-tile.component.html',
   styleUrl: './datetime-tile.component.css'
 })

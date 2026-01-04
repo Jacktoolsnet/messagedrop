@@ -18,6 +18,28 @@
     transition: background-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
+.tile-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.tile-icon {
+    width: 1.5rem;
+    height: 1.5rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    font-size: 1.5rem;
+}
+
+.tile-title {
+    vertical-align: middle;
+}
+
 .tile-info {
     display: flex;
     align-items: center;

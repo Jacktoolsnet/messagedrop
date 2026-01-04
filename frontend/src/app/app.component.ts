@@ -1264,7 +1264,8 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -1312,7 +1313,8 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(UserComponent, {
       data: {},
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: true,
+      autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
