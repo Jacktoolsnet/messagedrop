@@ -103,10 +103,9 @@ h4 {
     grid-template-columns: repeat(auto-fill, 1fr);
     justify-content: center;
     gap: 1rem;
-    padding: 0 0.5rem 1rem;
-    width: 100%;
+    padding: 1rem;
+    width: auto;
     max-width: 100%;
-    min-width: 0;
     box-sizing: border-box;
     margin: 0;
 }
@@ -116,13 +115,11 @@ h4 {
     padding: 1rem;
     text-align: center;
     font-weight: 500;
-    font-size: 1.05rem;
+    font-size: 1.0rem;
     color: var(--mat-card-subtitle-text-color);
     background-color: var(--mat-card-filled-container-color);
     box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-    width: 100%;
-    max-width: 100%;
-    min-width: 0;
+    width: auto;
     box-sizing: border-box;
 }
 
@@ -147,7 +144,7 @@ h4 {
     flex: 0 0 auto;
 }
 
-.theme-settings-header > div {
+.theme-settings-header>div {
     min-width: 0;
     flex: 1 1 0;
 }
@@ -186,7 +183,7 @@ h4 {
     flex: 0 0 auto;
 }
 
-.language-settings-header > div {
+.language-settings-header>div {
     min-width: 0;
     flex: 1 1 0;
 }
@@ -264,7 +261,7 @@ h4 {
     flex: 0 0 auto;
 }
 
-.storage-persistence-header > div {
+.storage-persistence-header>div {
     min-width: 0;
     flex: 1 1 0;
 }
@@ -320,7 +317,7 @@ h4 {
     flex: 0 0 auto;
 }
 
-.logging-settings-header > div {
+.logging-settings-header>div {
     min-width: 0;
     flex: 1 1 0;
 }
@@ -364,7 +361,7 @@ h4 {
     flex: 0 0 auto;
 }
 
-.backup-exit-header > div {
+.backup-exit-header>div {
     min-width: 0;
     flex: 1 1 0;
 }
@@ -408,7 +405,7 @@ h4 {
     flex: 0 0 auto;
 }
 
-.version-info-header > div {
+.version-info-header>div {
     min-width: 0;
     flex: 1 1 0;
 }
