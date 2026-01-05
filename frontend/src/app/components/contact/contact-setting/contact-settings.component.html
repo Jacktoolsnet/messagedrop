@@ -41,7 +41,9 @@
   </div>
   } @else {
   <div class="avatar-area background-area">
-    <div class="background-preview" [style.backgroundImage]="getChatBackgroundPreview()"></div>
+    <div class="background-preview"
+      [style.--chat-bg-image]="getChatBackgroundPreviewImage()"
+      [style.--chat-bg-opacity]="getChatBackgroundPreviewOpacity()"></div>
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteChatBackground()"
         [attr.aria-label]="'common.contact.profile.deleteChatBackgroundAria' | transloco">

@@ -140,8 +140,14 @@ export class ContactSettingsComponent {
     this.contact.chatBackgroundImage = '';
   }
 
-  getChatBackgroundPreview(): string {
+  getChatBackgroundPreviewImage(): string {
     return this.contact.chatBackgroundImage ? `url(${this.contact.chatBackgroundImage})` : 'none';
+  }
+
+  getChatBackgroundPreviewOpacity(): number {
+    const transparency = this.contact.chatBackgroundTransparency ?? 40;
+    const clamped = Math.min(Math.max(transparency, 0), 100);
+    return 1 - clamped / 100;
   }
 
   showPolicy(): void {
