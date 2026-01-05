@@ -1,0 +1,37 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon aria-hidden="true">crop_square</mat-icon>
+  <span>{{ 'common.avatarCropper.title' | transloco }}</span>
+</h2>
+
+<mat-dialog-content class="dialog-content">
+  <div class="cropper-card" [class.is-loading]="isLoading">
+    <image-cropper
+      [imageBase64]="imageBase64"
+      [output]="'base64'"
+      [maintainAspectRatio]="true"
+      [aspectRatio]="1"
+      [containWithinAspectRatio]="true"
+      [resizeToWidth]="resizeToWidth"
+      [onlyScaleDown]="true"
+      [alignImage]="'center'"
+      format="jpeg"
+      [imageQuality]="90"
+      [backgroundColor]="'#fff'"
+      (imageCropped)="onImageCropped($event)"
+      (imageLoaded)="onImageLoaded()"
+      (cropperReady)="onCropperReady()"
+      (loadImageFailed)="onLoadImageFailed()">
+    </image-cropper>
+  </div>
+  <p class="cropper-hint">{{ 'common.avatarCropper.hint' | transloco }}</p>
+</mat-dialog-content>
+
+<mat-dialog-actions class="dialog-actions">
+  <button mat-icon-button (click)="onAbort()" [attr.aria-label]="'common.actions.abort' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" (click)="onApply()" [disabled]="isLoading"
+    [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>

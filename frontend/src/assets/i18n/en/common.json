@@ -23,6 +23,12 @@
       "more": "More",
       "close": "Close"
     },
+    "avatarCropper": {
+      "title": "Crop avatar",
+      "hint": "Move and zoom the image to set the square avatar.",
+      "loadFailed": "Could not load the image. Please try another file.",
+      "tooLarge": "The cropped image is too large. Maximum allowed size is {{ maxMb }} MB."
+    },
     "clipboard": {
       "pasteLabel": "Paste from clipboard",
       "unavailable": "Clipboard access is not available in this browser.",

@@ -23,6 +23,12 @@
       "more": "Mehr",
       "close": "Schließen"
     },
+    "avatarCropper": {
+      "title": "Avatar zuschneiden",
+      "hint": "Bild bewegen oder zoomen, um den quadratischen Ausschnitt festzulegen.",
+      "loadFailed": "Das Bild konnte nicht geladen werden. Bitte wähle eine andere Datei.",
+      "tooLarge": "Der Zuschnitt ist zu groß. Maximale Größe: {{ maxMb }} MB."
+    },
     "clipboard": {
       "pasteLabel": "Aus Zwischenablage einfügen",
       "unavailable": "Zwischenablage ist in diesem Browser nicht verfügbar.",

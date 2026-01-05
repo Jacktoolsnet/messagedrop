@@ -23,6 +23,12 @@
       "more": "Más",
       "close": "Cerrar"
     },
+    "avatarCropper": {
+      "title": "Recortar avatar",
+      "hint": "Mueve o amplía la imagen para definir el recorte cuadrado.",
+      "loadFailed": "No se pudo cargar la imagen. Por favor elige otro archivo.",
+      "tooLarge": "El recorte es demasiado grande. El tamaño máximo permitido es {{ maxMb }} MB."
+    },
     "clipboard": {
       "pasteLabel": "Pegar desde el portapapeles",
       "unavailable": "El acceso al portapapeles no está disponible en este navegador.",

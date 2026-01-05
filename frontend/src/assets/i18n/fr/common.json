@@ -23,6 +23,12 @@
       "more": "Plus",
       "close": "Fermer"
     },
+    "avatarCropper": {
+      "title": "Recadrer l'avatar",
+      "hint": "Déplacez ou zoomez l'image pour définir le cadrage carré.",
+      "loadFailed": "Impossible de charger l'image. Veuillez choisir un autre fichier.",
+      "tooLarge": "Le recadrage est trop grand. Taille maximale autorisée : {{ maxMb }} Mo."
+    },
     "clipboard": {
       "pasteLabel": "Coller depuis le presse-papiers",
       "unavailable": "L'accès au presse-papiers n'est pas disponible dans ce navigateur.",

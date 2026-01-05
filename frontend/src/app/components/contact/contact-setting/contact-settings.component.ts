@@ -2,7 +2,7 @@
 import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -12,6 +12,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { SocketioService } from '../../../services/socketio.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 
 @Component({
   selector: 'app-profile',
@@ -36,13 +37,15 @@ export class ContactSettingsComponent {
   private readonly socketioService = inject(SocketioService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  private readonly dialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
 
   public contact: Contact = this.data.contact;
   readonly joinedUserRoom = this.socketioService.joinedUserRoom;
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
-  private readonly maxAvatarBytes = 2 * 1024 * 1024; // 2MB
+  private readonly maxAvatarMb = 2;
+  private readonly maxAvatarBytes = this.maxAvatarMb * 1024 * 1024; // 2MB
   private readonly maxAvatarDimension = 256;
   private readonly maxBackgroundBytes = 2 * 1024 * 1024; // 2MB
   private readonly maxBackgroundDimension = 1600;
@@ -73,33 +76,29 @@ export class ContactSettingsComponent {
 
     if (file.size > this.maxAvatarBytes) {
       this.snackBar.open(
-        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 2 }),
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: this.maxAvatarMb }),
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
       return;
     }
 
-    this.resizeAndCompressImage(file, this.maxAvatarDimension, this.maxAvatarBytes)
-      .then((dataUrl) => {
-        this.contact.base64Avatar = dataUrl;
-        input.value = '';
-      })
-      .catch((error: Error) => {
-        if (error.message === 'too_large') {
-          this.snackBar.open(
-            this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 2 }),
-            this.translation.t('common.actions.ok'),
-            { duration: 2000 }
-          );
-          return;
-        }
-        this.snackBar.open(
-          this.translation.t('common.contact.profile.fileReadError'),
-          this.translation.t('common.actions.ok'),
-          { duration: 2000 }
-        );
-      });
+    const dialogRef = this.dialog.open(AvatarCropperComponent, {
+      data: {
+        file,
+        maxSizeMb: this.maxAvatarMb,
+        resizeToWidth: this.maxAvatarDimension
+      },
+      maxWidth: '95vw',
+      width: '420px'
+    });
+
+    dialogRef.afterClosed().subscribe((croppedImage?: string) => {
+      if (croppedImage) {
+        this.contact.base64Avatar = croppedImage;
+      }
+      input.value = '';
+    });
   }
 
   onBackgroundFileSelected(event: Event): void {

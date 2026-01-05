@@ -1,0 +1,57 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.6rem 1rem;
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0 1rem 1rem;
+}
+
+.cropper-card {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1rem;
+  border-radius: 1rem;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.cropper-card.is-loading {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+image-cropper {
+  width: min(80vw, 320px);
+  height: min(80vw, 320px);
+}
+
+.cropper-hint {
+  margin: 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.dialog-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1rem 1rem;
+  gap: 1rem;
+}

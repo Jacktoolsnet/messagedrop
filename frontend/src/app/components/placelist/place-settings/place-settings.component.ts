@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,7 @@ import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 
 @Component({
   selector: 'app-place',
@@ -38,7 +39,8 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 export class PlaceProfileComponent {
 
   private maxFileSize = 5 * 1024 * 1024; // 5MB
-  private readonly maxAvatarBytes = 2 * 1024 * 1024; // 2MB
+  private readonly maxAvatarMb = 2;
+  private readonly maxAvatarBytes = this.maxAvatarMb * 1024 * 1024; // 2MB
   private readonly maxAvatarDimension = 256;
   private readonly maxBackgroundBytes = 2 * 1024 * 1024; // 2MB
   private readonly maxBackgroundDimension = 1600;
@@ -54,6 +56,7 @@ export class PlaceProfileComponent {
   private readonly translation = inject(TranslationHelperService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
+  private readonly dialog = inject(MatDialog);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
@@ -111,38 +114,32 @@ export class PlaceProfileComponent {
 
     if (file.size > this.maxAvatarBytes) {
       this.snackBar.open(
-        this.translation.t('common.placeSettings.imageTooLarge', { maxMb: 2 }),
+        this.translation.t('common.placeSettings.imageTooLarge', { maxMb: this.maxAvatarMb }),
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
       return;
     }
 
-    this.resizeAndCompressImage(file, this.maxAvatarDimension, this.maxAvatarBytes)
-      .then((dataUrl) => {
-        this.ngZone.run(() => {
-          this.data.place.base64Avatar = dataUrl;
-          this.cdr.markForCheck();
-          input.value = '';
-        });
-      })
-      .catch((error: Error) => {
-        this.ngZone.run(() => {
-          if (error.message === 'too_large') {
-            this.snackBar.open(
-              this.translation.t('common.placeSettings.imageTooLarge', { maxMb: 2 }),
-              this.translation.t('common.actions.ok'),
-              { duration: 2000 }
-            );
-            return;
-          }
-          this.snackBar.open(
-            this.translation.t('common.placeSettings.imageReadError'),
-            this.translation.t('common.actions.ok'),
-            { duration: 2000 }
-          );
-        });
+    const dialogRef = this.dialog.open(AvatarCropperComponent, {
+      data: {
+        file,
+        maxSizeMb: this.maxAvatarMb,
+        resizeToWidth: this.maxAvatarDimension
+      },
+      maxWidth: '95vw',
+      width: '420px'
+    });
+
+    dialogRef.afterClosed().subscribe((croppedImage?: string) => {
+      this.ngZone.run(() => {
+        if (croppedImage) {
+          this.data.place.base64Avatar = croppedImage;
+        }
+        this.cdr.markForCheck();
+        input.value = '';
       });
+    });
   }
 
   onBackgroundFileSelected(event: Event): void {
