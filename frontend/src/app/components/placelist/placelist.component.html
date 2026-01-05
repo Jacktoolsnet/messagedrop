@@ -16,17 +16,19 @@
                 <div class="tile-header"
                     [style.--place-header-bg-image]="getPlaceHeaderBackgroundImage(place)"
                     [style.--place-header-bg-opacity]="getPlaceHeaderBackgroundOpacity(place)">
-                    @if (place.base64Avatar) {
-                    <img class="avatar" [src]="place.base64Avatar"
-                        [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
-                    } @else {
-                    <mat-icon>{{ place.icon || 'location' }}</mat-icon>
-                    }
-                    @if (place.name) {
-                    <span class="name">{{ place.name }}</span>
-                    } @else {
-                    <span class="name">{{ 'common.placeList.nameFallback' | transloco }}</span>
-                    }
+                    <div class="place-identity">
+                        @if (place.base64Avatar) {
+                        <img class="avatar" [src]="place.base64Avatar"
+                            [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
+                        } @else {
+                        <mat-icon>{{ place.icon || 'location' }}</mat-icon>
+                        }
+                        @if (place.name) {
+                        <span class="name">{{ place.name }}</span>
+                        } @else {
+                        <span class="name">{{ 'common.placeList.nameFallback' | transloco }}</span>
+                        }
+                    </div>
                 </div>
                 <mat-card-actions class="tile-actions">
                     <div class="tile-actions__left">
