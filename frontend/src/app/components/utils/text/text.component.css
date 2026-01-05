@@ -2,21 +2,8 @@
     padding: 0rem;
 }
 
-.mat-mdc-dialog-title {
-    padding-bottom: 0px !important;
-}
-
 .mat-mdc-dialog-content {
     padding: 0px !important;
-}
-
-.mat-mdc-dialog-actions {
-    padding: 0px !important;
-}
-
-.button_drop {
-    margin: auto;
-    width: 70%;
 }
 
 .textarea_container {

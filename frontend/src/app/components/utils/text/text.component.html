@@ -1,3 +1,8 @@
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="dialog-title__icon" aria-hidden="true">{{ titleIcon }}</mat-icon>
+    <span class="dialog-title__text">{{ titleKey | transloco }}</span>
+</h2>
+
 <mat-dialog-content>
     <div class="textarea_container">
         <textarea cdkFocusInitial maxlength="512" type="text" [(ngModel)]="data.text" matInput>
@@ -5,6 +10,12 @@
     </div>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-    <button class="button_drop" color="primary" aria-label="Drop your message" (click)="onApplyClick()"
-        mat-icon-button><mat-icon>check</mat-icon></button>
+    <button mat-dialog-close cdkFocusInitial (click)="onAbortClick()" mat-icon-button
+        [attr.aria-label]="'common.actions.abort' | transloco" class="action-close">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button color="primary" [attr.aria-label]="'common.actions.apply' | transloco" (click)="onApplyClick()"
+        mat-icon-button>
+        <mat-icon>check</mat-icon>
+    </button>
 </mat-dialog-actions>

@@ -215,6 +215,9 @@
       "addText": "Ajouter du texte",
       "policy": "Ces informations sont stockées sur votre appareil et ne sont visibles que par vous."
     },
+    "textDialog": {
+      "editTitle": "Modifier le texte"
+    },
     "images": {
       "imported": "Image(s) importée(s) localement.",
       "importSuccess": "Image(s) importée(s) localement.",
