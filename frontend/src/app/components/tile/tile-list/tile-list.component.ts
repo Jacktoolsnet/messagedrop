@@ -55,11 +55,19 @@ export class TileListComponent {
     return this.visibleTiles.length > 0;
   }
 
-  getPlaceTileBackgroundImage(): string {
+  getTileBackgroundImage(): string {
+    if (this.contact?.chatBackgroundImage) {
+      return `url(${this.contact.chatBackgroundImage})`;
+    }
     return this.place?.placeBackgroundImage ? `url(${this.place.placeBackgroundImage})` : 'none';
   }
 
-  getPlaceTileBackgroundOpacity(): number {
+  getTileBackgroundOpacity(): number {
+    if (this.contact?.chatBackgroundImage) {
+      const transparency = this.contact.chatBackgroundTransparency ?? 40;
+      const clamped = Math.min(Math.max(transparency, 0), 100);
+      return 1 - clamped / 100;
+    }
     if (!this.place?.placeBackgroundImage) {
       return 0;
     }

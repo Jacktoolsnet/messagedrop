@@ -1,7 +1,7 @@
 @if (hasVisibleTiles) {
   <div class="tile-area"
-    [style.--place-tile-bg-image]="getPlaceTileBackgroundImage()"
-    [style.--place-tile-bg-opacity]="getPlaceTileBackgroundOpacity()">
+    [style.--place-tile-bg-image]="getTileBackgroundImage()"
+    [style.--place-tile-bg-opacity]="getTileBackgroundOpacity()">
     <div class="tile-grid">
       @for (tile of visibleTiles; track trackByTile($index, tile)) {
         @switch (tile.type) {
@@ -56,8 +56,8 @@
   </div>
 } @else {
   <div class="tile-area tile-area--empty"
-    [style.--place-tile-bg-image]="getPlaceTileBackgroundImage()"
-    [style.--place-tile-bg-opacity]="getPlaceTileBackgroundOpacity()">
+    [style.--place-tile-bg-image]="getTileBackgroundImage()"
+    [style.--place-tile-bg-opacity]="getTileBackgroundOpacity()">
     <div class="tile-empty">
       <p>{{ 'common.tileList.empty' | transloco }}</p>
     </div>
