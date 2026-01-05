@@ -37,6 +37,7 @@ body {
   font-family: Roboto, "Helvetica Neue", Arial, sans-serif;
   overscroll-behavior-x: none;
   overscroll-behavior-y: none;
+  touch-action: manipulation;
 }
 
 /* === DIALOG TITLES === */
