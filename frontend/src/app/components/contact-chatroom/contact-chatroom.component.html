@@ -10,7 +10,9 @@
 </h2>
 
 <mat-card class="chatroom-card">
-  <mat-card-content #messageScroll class="chatroom-card__content">
+  <mat-card-content #messageScroll class="chatroom-card__content"
+    [style.--chatroom-bg-image]="getChatBackgroundImage(activeContact)"
+    [style.--chatroom-bg-opacity]="getChatBackgroundOpacity(activeContact)">
     <div class="message-content">
       @for (msg of messages(); track msg.id; let last = $last; let idx = $index) {
       @if (isNewDay(idx)) {

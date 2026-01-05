@@ -17,6 +17,8 @@ export interface Contact {
     hint?: string,
     name?: string,
     base64Avatar?: string,
+    chatBackgroundImage?: string,
+    chatBackgroundTransparency?: number,
     subscribed: boolean,
     pinned: boolean,
     provided: boolean,

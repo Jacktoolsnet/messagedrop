@@ -117,6 +117,16 @@ export class ContactlistComponent {
     return count > 99 ? '99+' : `${count}`;
   }
 
+  getContactHeaderBackgroundImage(contact: Contact): string {
+    return contact.chatBackgroundImage ? `url(${contact.chatBackgroundImage})` : 'none';
+  }
+
+  getContactHeaderBackgroundOpacity(contact: Contact): number {
+    const transparency = contact.chatBackgroundTransparency ?? 40;
+    const clamped = Math.min(Math.max(transparency, 0), 100);
+    return 1 - clamped / 100;
+  }
+
   openConnectDialog(): void {
     const contact: Contact = {
       id: "",

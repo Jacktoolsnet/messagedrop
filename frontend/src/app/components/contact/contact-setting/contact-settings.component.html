@@ -29,6 +29,36 @@
   </div>
   }
 
+  <input type="file" id="chat-background" name="chat-background" accept="image/png, image/jpeg" class="file-input"
+    (change)="onBackgroundFileSelected($event)" #backgroundUpload />
+
+  @if (!contact.chatBackgroundImage) {
+  <div class="avatar-area">
+    <button mat-flat-button class="button-set-avatar" (click)="backgroundUpload.click()">
+      <mat-icon>wallpaper</mat-icon>
+      <span>{{ 'common.contact.profile.setChatBackground' | transloco }}</span>
+    </button>
+  </div>
+  } @else {
+  <div class="avatar-area background-area">
+    <div class="background-preview" [style.backgroundImage]="getChatBackgroundPreview()"></div>
+    <div class="button-style">
+      <button mat-mini-fab color="primary" class="upload-button" (click)="deleteChatBackground()"
+        [attr.aria-label]="'common.contact.profile.deleteChatBackgroundAria' | transloco">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  }
+
+  <div class="background-slider">
+    <span class="slider-label">{{ 'common.contact.profile.chatBackgroundTransparency' | transloco }}</span>
+    <mat-slider min="0" max="100" step="5" thumbLabel tickInterval="20"
+      [disabled]="!contact.chatBackgroundImage">
+      <input matSliderThumb [(ngModel)]="contact.chatBackgroundTransparency" />
+    </mat-slider>
+  </div>
+
   @if (joinedUserRoom()) {
   <div class="avatar-area">
     <div class="buttonarea">

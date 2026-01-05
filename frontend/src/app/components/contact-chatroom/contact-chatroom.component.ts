@@ -111,6 +111,16 @@ export class ContactChatroomComponent implements AfterViewInit {
     '🇦🇺', '🇳🇿', '🇸🇪', '🇳🇴', '🇫🇮', '🇳🇱', '🇧🇪', '🇨🇿', '🇵🇱', '🇵🇹', '🇬🇷', '🇷🇺', '🇲🇽', '🇦🇷'
   ];
 
+  getChatBackgroundImage(contact: Contact): string {
+    return contact.chatBackgroundImage ? `url(${contact.chatBackgroundImage})` : 'none';
+  }
+
+  getChatBackgroundOpacity(contact: Contact): number {
+    const transparency = contact.chatBackgroundTransparency ?? 40;
+    const clamped = Math.min(Math.max(transparency, 0), 100);
+    return 1 - clamped / 100;
+  }
+
   private readonly liveMessagesEffect = effect(async () => {
     const incoming = this.contactMessageService.liveMessages();
     const contact = this.contact();

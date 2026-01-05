@@ -13,7 +13,9 @@
         <div class="content">
             @for (contact of contactsSignal(); track contact.id){
             <mat-card class="contact-tile">
-                <div class="tile-header">
+                <div class="tile-header"
+                    [style.--contact-header-bg-image]="getContactHeaderBackgroundImage(contact)"
+                    [style.--contact-header-bg-opacity]="getContactHeaderBackgroundOpacity(contact)">
                     <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
                         [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true"
                         matBadgeColor="warn">

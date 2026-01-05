@@ -127,6 +127,8 @@ export class ContactService {
       const profile = await this.indexedDbService.getContactProfile(contact.id);
       contact.name = this.sanitizeContactName(profile?.name ?? contact.name);
       contact.base64Avatar = profile?.base64Avatar || contact.base64Avatar || '';
+      contact.chatBackgroundImage = profile?.chatBackgroundImage || contact.chatBackgroundImage || '';
+      contact.chatBackgroundTransparency = profile?.chatBackgroundTransparency ?? contact.chatBackgroundTransparency;
       contact.pinned = profile?.pinned || false;
       const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
       contact.tileSettings = tileSettings ?? contact.tileSettings ?? [];
@@ -139,6 +141,8 @@ export class ContactService {
       this.indexedDbService.setContactProfile(contact.id, {
         name: contact.name ? contact.name : '',
         base64Avatar: contact.base64Avatar ? contact.base64Avatar : '',
+        chatBackgroundImage: contact.chatBackgroundImage ? contact.chatBackgroundImage : '',
+        chatBackgroundTransparency: contact.chatBackgroundTransparency ?? 40,
         pinned: contact.pinned
       });
     }));

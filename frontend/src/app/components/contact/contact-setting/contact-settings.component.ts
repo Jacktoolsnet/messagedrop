@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
@@ -25,6 +26,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
     MatDialogActions,
     MatDialogClose,
     MatIconModule,
+    MatSliderModule,
     TranslocoPipe
   ],
   templateUrl: './contact-settings.component.html',
@@ -41,6 +43,12 @@ export class ContactSettingsComponent {
   readonly joinedUserRoom = this.socketioService.joinedUserRoom;
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
   private readonly oriContact: Contact = structuredClone(this.contact);
+
+  constructor() {
+    if (this.contact.chatBackgroundTransparency == null) {
+      this.contact.chatBackgroundTransparency = 40;
+    }
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -83,8 +91,57 @@ export class ContactSettingsComponent {
     reader.readAsDataURL(file);
   }
 
+  onBackgroundFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageInvalid'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+
+    if (file.size > this.maxFileSize) {
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 5 }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.contact.chatBackgroundImage = (e.target as FileReader).result as string;
+    };
+    reader.onerror = () => {
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.fileReadError'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+    };
+
+    reader.readAsDataURL(file);
+  }
+
   deleteAvatar(): void {
     this.contact.base64Avatar = undefined;
+  }
+
+  deleteChatBackground(): void {
+    this.contact.chatBackgroundImage = '';
+  }
+
+  getChatBackgroundPreview(): string {
+    return this.contact.chatBackgroundImage ? `url(${this.contact.chatBackgroundImage})` : 'none';
   }
 
   showPolicy(): void {
