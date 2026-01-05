@@ -43,6 +43,7 @@
       <mat-icon>wallpaper</mat-icon>
       <span>{{ 'common.placeSettings.setTileBackground' | transloco }}</span>
     </button>
+    <p class="background-hint">{{ 'common.placeSettings.backgroundHint' | transloco }}</p>
   </div>
   } @else {
   <div class="avatar-area background-area">
@@ -58,8 +59,14 @@
   </div>
   }
 
-  <div class="background-slider">
-    <span class="slider-label">{{ 'common.placeSettings.tileBackgroundTransparency' | transloco }}</span>
+  <div class="background-slider avatar-area">
+    <div class="slider-header">
+      <div class="slider-title">
+        <mat-icon>opacity</mat-icon>
+        <span>{{ 'common.placeSettings.tileBackgroundTransparency' | transloco }}</span>
+      </div>
+      <span class="slider-value">{{ data.place.placeBackgroundTransparency ?? 0 }}%</span>
+    </div>
     <mat-slider min="0" max="100" step="5" thumbLabel tickInterval="20"
       [disabled]="!data.place.placeBackgroundImage">
       <input matSliderThumb [(ngModel)]="data.place.placeBackgroundTransparency" />

@@ -38,6 +38,7 @@
       <mat-icon>wallpaper</mat-icon>
       <span>{{ 'common.contact.profile.setChatBackground' | transloco }}</span>
     </button>
+    <p class="background-hint">{{ 'common.contact.profile.backgroundHint' | transloco }}</p>
   </div>
   } @else {
   <div class="avatar-area background-area">
@@ -53,8 +54,14 @@
   </div>
   }
 
-  <div class="background-slider">
-    <span class="slider-label">{{ 'common.contact.profile.chatBackgroundTransparency' | transloco }}</span>
+  <div class="background-slider avatar-area">
+    <div class="slider-header">
+      <div class="slider-title">
+        <mat-icon>opacity</mat-icon>
+        <span>{{ 'common.contact.profile.chatBackgroundTransparency' | transloco }}</span>
+      </div>
+      <span class="slider-value">{{ contact.chatBackgroundTransparency ?? 0 }}%</span>
+    </div>
     <mat-slider min="0" max="100" step="5" thumbLabel tickInterval="20"
       [disabled]="!contact.chatBackgroundImage">
       <input matSliderThumb [(ngModel)]="contact.chatBackgroundTransparency" />
