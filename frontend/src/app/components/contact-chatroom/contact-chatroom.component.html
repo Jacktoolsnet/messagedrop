@@ -1,19 +1,15 @@
-<mat-card class="chatroom-card">
-  <div class="chatroom-card__toolbar">
-    <button class="button_back" mat-mini-fab color="accent" [attr.aria-label]="'common.contact.chatroom.closeAria' | transloco"
-      (click)="closeChatroom()">
-      <mat-icon>arrow_back</mat-icon>
-    </button>
-    @if (messages().length !== 0) {
-    <button class="button_add" mat-mini-fab color="primary"
-      [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"
-      (click)="requestCompose()">
-      <mat-icon>add_comment</mat-icon>
-    </button>
-    }
-  </div>
+@if (contact(); as activeContact) {
+<h2 mat-dialog-title class="dialog-title chatroom-title">
+  @if (activeContact.base64Avatar) {
+  <img class="chatroom-title__avatar" [src]="activeContact.base64Avatar"
+    [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
+  } @else {
+  <mat-icon class="dialog-title__icon">person</mat-icon>
+  }
+  <span class="dialog-title__text">{{ activeContact.name || ('common.contact.chatroom.contactLabel' | transloco) }}</span>
+</h2>
 
-  @if (contact(); as activeContact) {
+<mat-card class="chatroom-card">
   <mat-card-content #messageScroll class="chatroom-card__content">
     <div class="message-content">
       @for (msg of messages(); track msg.id; let last = $last; let idx = $index) {
@@ -144,17 +140,28 @@
       </div>
       }
 
-      @if (loaded() && messages().length === 0) {
-      <button class="first-button" mat-flat-button color="primary" [attr.aria-hidden]="false"
-        (click)="requestCompose()">
-        <span>{{ 'common.contact.chatroom.firstMessage' | transloco }}</span>
-      </button>
-      }
     </div>
   </mat-card-content>
-  } @else {
+</mat-card>
+} @else {
+<h2 mat-dialog-title class="dialog-title chatroom-title">
+  <mat-icon class="dialog-title__icon">person</mat-icon>
+  <span class="dialog-title__text">{{ 'common.contact.chatroom.loading' | transloco }}</span>
+</h2>
+<mat-card class="chatroom-card">
   <mat-card-content class="chatroom-card__content chatroom-card__content--empty">
     <span>{{ 'common.contact.chatroom.loading' | transloco }}</span>
   </mat-card-content>
-  }
 </mat-card>
+}
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" [attr.aria-label]="'common.contact.chatroom.closeAria' | transloco"
+    (click)="closeChatroom()">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"
+    (click)="requestCompose()">
+    <mat-icon>add_comment</mat-icon>
+  </button>
+</mat-dialog-actions>

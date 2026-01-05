@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, NgZone, inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 
@@ -44,6 +44,8 @@ export class PlaceProfileComponent {
   readonly dialogRef = inject(MatDialogRef<PlaceProfileComponent>);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  private readonly cdr = inject(ChangeDetectorRef);
+  private readonly ngZone = inject(NgZone);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
@@ -103,14 +105,19 @@ export class PlaceProfileComponent {
 
     const reader = new FileReader();
     reader.onload = (e: ProgressEvent<FileReader>) => {
-      this.data.place.base64Avatar = (e.target as FileReader).result as string;
+      this.ngZone.run(() => {
+        this.data.place.base64Avatar = (e.target as FileReader).result as string;
+        this.cdr.markForCheck();
+      });
     };
     reader.onerror = () => {
-      this.snackBar.open(
-        this.translation.t('common.placeSettings.imageReadError'),
-        this.translation.t('common.actions.ok'),
-        { duration: 2000 }
-      );
+      this.ngZone.run(() => {
+        this.snackBar.open(
+          this.translation.t('common.placeSettings.imageReadError'),
+          this.translation.t('common.actions.ok'),
+          { duration: 2000 }
+        );
+      });
     };
 
     reader.readAsDataURL(file);
@@ -118,6 +125,7 @@ export class PlaceProfileComponent {
 
   deleteAvatar() {
     this.data.place.base64Avatar = '';
+    this.cdr.markForCheck();
   }
 
   public showPolicy() {

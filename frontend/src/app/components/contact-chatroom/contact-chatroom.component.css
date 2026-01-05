@@ -19,7 +19,6 @@
 
 .chatroom-card {
   position: relative;
-  padding-right: 4rem;
   min-height: 4rem;
   height: 100%;
   max-height: 100%;
@@ -27,16 +26,6 @@
   display: flex;
   flex-direction: column;
   flex: 1;
-}
-
-.chatroom-card__toolbar {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 3.5rem;
-  height: 100%;
-  background-color: var(--mat-fab-foreground-color);
-  z-index: 200;
 }
 
 .chatroom-card__content {
@@ -51,7 +40,7 @@
   overscroll-behavior: contain;
   overflow-anchor: none;
   flex: 1;
-  padding: 0 1rem 1rem 0.5rem;
+  padding: 0 1rem 1rem;
   box-sizing: border-box;
 }
 
@@ -72,22 +61,9 @@
   font-size: 0.95rem;
   min-height: 4rem;
   margin-left: 0.5rem;
-  padding-right: 3.5rem;
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
   box-sizing: border-box;
-}
-
-.button_back {
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-
-.button_add {
-  position: absolute;
-  bottom: 0.5rem;
-  right: 0.5rem;
 }
 
 .first-button {
@@ -97,7 +73,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: calc(100% - 3.5rem);
+  width: 100%;
+}
+
+.chatroom-title {
+  margin-bottom: 0.5rem;
+}
+
+.chatroom-title__avatar {
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .message-content {
