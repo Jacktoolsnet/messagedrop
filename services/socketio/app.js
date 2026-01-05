@@ -134,6 +134,8 @@ if (process.env.NODE_ENV !== 'production') {
   logger.add(new winston.transports.Console({ format: winston.format.simple() }));
 }
 
+const logSocketConnections = process.env.SOCKETIO_LOG_CONNECTIONS === 'true';
+
 function registerProcessHandlers() {
   const logProcessError = (label, err) => {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
@@ -202,10 +204,14 @@ io.use((socket, next) => {
 });
 
 io.on('connection', (socket) => {
-  socket.logger.info('socket connected');
+  if (logSocketConnections) {
+    socket.logger.info('socket connected');
+  }
 
   socket.on('disconnect', (reason) => {
-    socket.logger.info('socket disconnected', { reason });
+    if (logSocketConnections) {
+      socket.logger.info('socket disconnected', { reason });
+    }
   });
 
   socket.on('error', (err) => {
