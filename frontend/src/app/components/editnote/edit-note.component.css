@@ -20,12 +20,6 @@
     box-sizing: border-box;
 }
 
-/* === TITEL === */
-h2 {
-    padding: 0.5rem;
-    color: floralwhite;
-}
-
 /* === GRID-LAYOUT FÜR DEN CONTENT === */
 .content {
     display: grid;

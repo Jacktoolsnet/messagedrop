@@ -2,7 +2,7 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -27,6 +27,11 @@ interface TextDialogResult {
   text: string;
 }
 
+type DialogHeaderConfig = {
+  icon: string;
+  labelKey: string;
+};
+
 @Component({
   selector: 'app-message',
   imports: [
@@ -36,6 +41,7 @@ interface TextDialogResult {
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
+    MatDialogTitle,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
@@ -57,6 +63,7 @@ export class EditMessageComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
+  readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
@@ -67,6 +74,20 @@ export class EditMessageComponent implements OnInit {
 
   ngOnInit(): void {
     this.applyNewMultimedia(this.data.message.multimedia);
+  }
+
+  private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
+    switch (mode) {
+      case Mode.EDIT_PUBLIC_MESSAGE:
+        return { icon: 'edit', labelKey: 'common.messageList.editAria' };
+      case Mode.ADD_COMMENT:
+        return { icon: 'add_comment', labelKey: 'common.messageList.addCommentAria' };
+      case Mode.EDIT_COMMENT:
+        return { icon: 'mode_comment', labelKey: 'common.messageList.editCommentAria' };
+      case Mode.ADD_PUBLIC_MESSAGE:
+      default:
+        return { icon: 'chat_add_on', labelKey: 'common.messageList.addMessageAria' };
+    }
   }
 
   onApplyClick(): void {

@@ -281,6 +281,7 @@
       "navigateAria": "Navegar a la ubicación del mensaje",
       "editProfileAria": "Editar perfil",
       "editAria": "Editar mensaje",
+      "editCommentAria": "Editar comentario",
       "deleteAria": "Eliminar mensaje",
       "blockAria": "Reportar mensaje",
       "avatarAltName": "Avatar de {{ name }}",

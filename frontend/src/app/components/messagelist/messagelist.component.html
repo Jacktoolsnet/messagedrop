@@ -282,9 +282,11 @@
         <mat-icon>add_comment</mat-icon>
     </button>
     }
+    @if (messageService.selectedMessagesSignal().length === 0) {
     <button mat-icon-button color="primary"
         [attr.aria-label]="'common.messageList.addMessageAria' | transloco"
         (click)="!userService.isReady() ? userService.login(addMessagDialog.bind(this)) : addMessagDialog()">
         <mat-icon>chat_add_on</mat-icon>
     </button>
+    }
 </mat-dialog-actions>

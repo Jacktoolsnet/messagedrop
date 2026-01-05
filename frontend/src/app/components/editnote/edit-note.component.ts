@@ -1,5 +1,5 @@
 import { Component, OnInit, inject } from '@angular/core';
-import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 
 
 import { FormsModule } from '@angular/forms';
@@ -27,6 +27,11 @@ interface TextDialogResult {
   text: string;
 }
 
+type DialogHeaderConfig = {
+  icon: string;
+  labelKey: string;
+};
+
 @Component({
   selector: 'app-note',
   imports: [
@@ -36,6 +41,7 @@ interface TextDialogResult {
     MatButtonModule,
     MatDialogActions,
     MatDialogContent,
+    MatDialogTitle,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
@@ -56,6 +62,7 @@ export class EditNoteComponent implements OnInit {
   readonly dialogRef = inject(MatDialogRef<EditNoteComponent>);
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; note: Note }>(MAT_DIALOG_DATA);
+  readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
@@ -69,6 +76,16 @@ export class EditNoteComponent implements OnInit {
       this.data.note.style = this.userService.getProfile().defaultStyle ?? '';
     }
     this.applyNewMultimedia(this.data.note.multimedia);
+  }
+
+  private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
+    switch (mode) {
+      case Mode.EDIT_NOTE:
+        return { icon: 'edit_note', labelKey: 'common.noteList.editAria' };
+      case Mode.ADD_NOTE:
+      default:
+        return { icon: 'add_notes', labelKey: 'common.noteList.addNoteAria' };
+    }
   }
 
   onApplyClick(): void {
