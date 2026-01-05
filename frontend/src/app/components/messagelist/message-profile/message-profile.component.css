@@ -80,6 +80,13 @@ select {
   border-radius: 4rem;
 }
 
+.background-hint {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--mat-card-subtitle-text-color);
+  text-align: center;
+}
+
 .button_legal {
   position: absolute;
   bottom: 0;
