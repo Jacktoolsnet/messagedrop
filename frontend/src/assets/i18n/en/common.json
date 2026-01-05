@@ -23,6 +23,9 @@
       "more": "More",
       "close": "Close"
     },
+    "media": {
+      "storageUnsupported": "This feature is not supported on this device."
+    },
     "avatarCropper": {
       "title": "Crop avatar",
       "hint": "Move and zoom the image to set the square avatar.",

@@ -11,6 +11,7 @@ import { Location } from '../interfaces/location';
 import { Place } from '../interfaces/place';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { normalizeTileSettings } from '../interfaces/tile-settings';
+import { AvatarStorageService } from './avatar-storage.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
@@ -37,6 +38,7 @@ export class PlaceService {
   private readonly networkService = inject(NetworkService);
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly avatarStorage = inject(AvatarStorageService);
 
   get getPlaces() { return this._places.asReadonly(); }
   get selectedPlace() { return this._selectedPlace.asReadonly(); }
@@ -79,6 +81,18 @@ export class PlaceService {
     }
     if (!place) {
       return null;
+    }
+
+    if (this.avatarStorage.isSupported()) {
+      place.base64Avatar = place.avatarFileId
+        ? (await this.avatarStorage.getImageUrl(place.avatarFileId)) || ''
+        : '';
+      place.placeBackgroundImage = place.placeBackgroundFileId
+        ? (await this.avatarStorage.getImageUrl(place.placeBackgroundFileId)) || ''
+        : '';
+    } else {
+      place.base64Avatar = '';
+      place.placeBackgroundImage = '';
     }
 
     const mergedPlace: Place = tileSettings ? { ...place, tileSettings } : place;

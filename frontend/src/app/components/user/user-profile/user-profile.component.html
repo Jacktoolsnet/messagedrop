@@ -52,7 +52,7 @@
     <mat-icon>close</mat-icon>
   </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
-    mat-dialog-close [mat-dialog-close]="userService.getProfile()">
+    (click)="onApplyClick()">
     <mat-icon>check</mat-icon>
   </button>
 </mat-dialog-actions>

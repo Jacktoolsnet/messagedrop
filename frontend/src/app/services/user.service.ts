@@ -24,6 +24,7 @@ import { UserChallengeResponse } from '../interfaces/user-challenge-response';
 import { UserLoginResponse } from '../interfaces/user-login-response';
 import { UserType } from '../interfaces/user-type';
 import { BackupStateService } from './backup-state.service';
+import { AvatarStorageService } from './avatar-storage.service';
 import { ContactMessageService } from './contact-message.service';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
@@ -85,6 +86,7 @@ export class UserService {
   private readonly http = inject(HttpClient);
   private readonly swPush = inject(SwPush);
   private readonly indexedDbService = inject(IndexedDbService);
+  private readonly avatarStorage = inject(AvatarStorageService);
   private readonly cryptoService = inject(CryptoService);
   private readonly networkService = inject(NetworkService);
   private readonly displayMessage = inject(MatDialog);
@@ -293,7 +295,16 @@ export class UserService {
   }
 
   private async loadProfile() {
-    this.profile = await this.indexedDbService.getProfile(this.user.id)
+    this.profile = await this.indexedDbService.getProfile(this.user.id);
+    if (!this.profile) {
+      this.profile = { name: '', base64Avatar: '' };
+      return;
+    }
+    if (this.profile.avatarFileId && this.avatarStorage.isSupported()) {
+      this.profile.base64Avatar = (await this.avatarStorage.getImageUrl(this.profile.avatarFileId)) || '';
+    } else {
+      this.profile.base64Avatar = '';
+    }
   }
 
   createUser(showAlways = true): Observable<CreateUserResponse> {

@@ -5,9 +5,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CreatePinComponent } from '../components/pin/create-pin/create-pin.component';
-import { BackupEnvelope, BackupLocalImage, BackupPayload } from '../interfaces/backup';
+import { BackupEnvelope, BackupLocalImage, BackupMediaFile, BackupPayload } from '../interfaces/backup';
 import { GetUserBackupResponse } from '../interfaces/get-user-backup-response';
 import { LocalImage } from '../interfaces/local-image';
+import { AvatarStorageService } from './avatar-storage.service';
 import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
@@ -34,6 +35,7 @@ export class BackupService {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly avatarStorage = inject(AvatarStorageService);
 
   private httpOptions = {
     headers: new HttpHeaders({
@@ -164,6 +166,7 @@ export class BackupService {
     const serverBackup = await this.fetchServerBackup(userId);
     const indexedDb = await this.indexedDbService.exportAllData(['imageHandle']);
     const localImages = await this.exportLocalImages();
+    const mediaFiles = await this.exportMediaFiles();
 
     return {
       schemaVersion: 1,
@@ -171,7 +174,8 @@ export class BackupService {
       userId,
       server: serverBackup,
       indexedDb,
-      localImages: localImages.length ? localImages : undefined
+      localImages: localImages.length ? localImages : undefined,
+      mediaFiles: mediaFiles.length ? mediaFiles : undefined
     };
   }
 
@@ -218,6 +222,85 @@ export class BackupService {
       });
     }
     return results;
+  }
+
+  private async exportMediaFiles(): Promise<BackupMediaFile[]> {
+    if (!this.avatarStorage.isSupported()) {
+      return [];
+    }
+
+    const ids = await this.collectMediaIds();
+    if (!ids.length) {
+      return [];
+    }
+
+    const results: BackupMediaFile[] = [];
+    for (const id of ids) {
+      try {
+        const fileBase64 = await this.avatarStorage.getImageBase64(id);
+        results.push({
+          id,
+          mimeType: 'image/jpeg',
+          fileBase64: fileBase64 ?? undefined,
+          fileMissingReason: fileBase64 ? undefined : 'missing'
+        });
+      } catch (error) {
+        console.warn('Failed to export cached media file', error);
+        results.push({
+          id,
+          mimeType: 'image/jpeg',
+          fileMissingReason: 'read_failed'
+        });
+      }
+    }
+
+    return results;
+  }
+
+  private async collectMediaIds(): Promise<string[]> {
+    const [profiles, contactProfiles, places, contacts] = await Promise.all([
+      this.indexedDbService.getAllProfilesAsMap(),
+      this.indexedDbService.getAllContactProfilesAsMap(),
+      this.indexedDbService.getAllPlaces(),
+      this.indexedDbService.getAllContacts()
+    ]);
+
+    const ids = new Set<string>();
+
+    profiles.forEach((profile) => {
+      if (profile.avatarFileId) {
+        ids.add(profile.avatarFileId);
+      }
+    });
+
+    contactProfiles.forEach((profile) => {
+      if (profile.avatarFileId) {
+        ids.add(profile.avatarFileId);
+      }
+      if (profile.chatBackgroundFileId) {
+        ids.add(profile.chatBackgroundFileId);
+      }
+    });
+
+    places.forEach((place) => {
+      if (place.avatarFileId) {
+        ids.add(place.avatarFileId);
+      }
+      if (place.placeBackgroundFileId) {
+        ids.add(place.placeBackgroundFileId);
+      }
+    });
+
+    contacts.forEach((contact) => {
+      if (contact.avatarFileId) {
+        ids.add(contact.avatarFileId);
+      }
+      if (contact.chatBackgroundFileId) {
+        ids.add(contact.chatBackgroundFileId);
+      }
+    });
+
+    return Array.from(ids);
   }
 
   private async readImageBase64(image: LocalImage): Promise<{ fileBase64?: string; fileMissingReason?: string }> {

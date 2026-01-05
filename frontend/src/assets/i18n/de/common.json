@@ -23,6 +23,9 @@
       "more": "Mehr",
       "close": "Schließen"
     },
+    "media": {
+      "storageUnsupported": "Funktion wird nicht unterstützt."
+    },
     "avatarCropper": {
       "title": "Avatar zuschneiden",
       "hint": "Bild bewegen oder zoomen, um den quadratischen Ausschnitt festzulegen.",

@@ -6,11 +6,12 @@ import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { CheckPinComponent } from '../components/pin/check-pin/check-pin.component';
 import { DeleteUserComponent } from '../components/user/delete-user/delete-user.component';
-import { BackupEnvelope, BackupLocalImage, BackupPayload, UserServerBackup } from '../interfaces/backup';
+import { BackupEnvelope, BackupLocalImage, BackupMediaFile, BackupPayload, UserServerBackup } from '../interfaces/backup';
 import { IndexedDbBackup } from '../interfaces/indexed-db-backup';
 import { LocalImage } from '../interfaces/local-image';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { BackupStateService } from './backup-state.service';
+import { AvatarStorageService } from './avatar-storage.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
@@ -38,6 +39,7 @@ export class RestoreService {
   private readonly dialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly userService = inject(UserService);
+  private readonly avatarStorage = inject(AvatarStorageService);
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly networkService = inject(NetworkService);
   private readonly backupState = inject(BackupStateService);
@@ -128,6 +130,7 @@ export class RestoreService {
       await this.restoreServerData(payload.server);
       await this.restoreIndexedDb(payload.indexedDb);
       await this.restoreLocalImages(payload.localImages || []);
+      await this.restoreMediaFiles(payload.mediaFiles || []);
 
       this.backupState.clearDirty();
       this.userService.logout();
@@ -441,6 +444,28 @@ export class RestoreService {
       };
 
       await this.indexedDbService.saveImage(entry);
+    }
+  }
+
+  private async restoreMediaFiles(mediaFiles: BackupMediaFile[]): Promise<void> {
+    if (!mediaFiles.length) {
+      return;
+    }
+    if (!this.avatarStorage.isSupported()) {
+      this.snackBar.open(this.i18n.t('common.media.storageUnsupported'), undefined, {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top'
+      });
+      return;
+    }
+
+    for (const file of mediaFiles) {
+      if (!file.fileBase64) {
+        continue;
+      }
+      const kind = file.id.startsWith('background-') ? 'background' : 'avatar';
+      await this.avatarStorage.saveImageFromBase64(kind, file.fileBase64, file.id);
     }
   }
 

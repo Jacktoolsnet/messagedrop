@@ -23,6 +23,9 @@
       "more": "Más",
       "close": "Cerrar"
     },
+    "media": {
+      "storageUnsupported": "Esta función no es compatible con este dispositivo."
+    },
     "avatarCropper": {
       "title": "Recortar avatar",
       "hint": "Mueve o amplía la imagen para definir el recorte cuadrado.",

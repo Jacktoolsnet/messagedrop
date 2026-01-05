@@ -22,6 +22,13 @@ export interface BackupLocalImage {
   fileMissingReason?: string;
 }
 
+export interface BackupMediaFile {
+  id: string;
+  mimeType: string;
+  fileBase64?: string;
+  fileMissingReason?: string;
+}
+
 export interface BackupPayload {
   schemaVersion: number;
   createdAt: string;
@@ -29,6 +36,7 @@ export interface BackupPayload {
   server: UserServerBackup;
   indexedDb: IndexedDbBackup;
   localImages?: BackupLocalImage[];
+  mediaFiles?: BackupMediaFile[];
 }
 
 export interface BackupEnvelope {

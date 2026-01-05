@@ -10,6 +10,7 @@ import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
+import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { SocketioService } from '../../../services/socketio.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
@@ -37,6 +38,7 @@ export class ContactSettingsComponent {
   private readonly socketioService = inject(SocketioService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  private readonly avatarStorage = inject(AvatarStorageService);
   private readonly dialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
@@ -50,6 +52,8 @@ export class ContactSettingsComponent {
   private readonly maxBackgroundBytes = 2 * 1024 * 1024; // 2MB
   private readonly maxBackgroundDimension = 1600;
   private readonly oriContact: Contact = structuredClone(this.contact);
+  private readonly originalAvatarFileId = this.oriContact.avatarFileId;
+  private readonly originalBackgroundFileId = this.oriContact.chatBackgroundFileId;
 
   constructor() {
     if (this.contact.chatBackgroundTransparency == null) {
@@ -93,10 +97,27 @@ export class ContactSettingsComponent {
       width: '420px'
     });
 
-    dialogRef.afterClosed().subscribe((croppedImage?: string) => {
-      if (croppedImage) {
-        this.contact.base64Avatar = croppedImage;
+    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
+      if (!croppedImage) {
+        input.value = '';
+        return;
       }
+      if (!this.avatarStorage.isSupported()) {
+        this.showStorageUnsupported();
+        input.value = '';
+        return;
+      }
+      if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
+        await this.avatarStorage.deleteImage(this.contact.avatarFileId);
+      }
+      const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
+      if (!saved) {
+        this.showStorageUnsupported();
+        input.value = '';
+        return;
+      }
+      this.contact.avatarFileId = saved.id;
+      this.contact.base64Avatar = saved.url;
       input.value = '';
     });
   }
@@ -128,8 +149,23 @@ export class ContactSettingsComponent {
     }
 
     this.resizeAndCompressImage(file, this.maxBackgroundDimension, this.maxBackgroundBytes)
-      .then((dataUrl) => {
-        this.contact.chatBackgroundImage = dataUrl;
+      .then(async (dataUrl) => {
+        if (!this.avatarStorage.isSupported()) {
+          this.showStorageUnsupported();
+          input.value = '';
+          return;
+        }
+        if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
+          await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
+        }
+        const saved = await this.avatarStorage.saveImageFromDataUrl('background', dataUrl);
+        if (!saved) {
+          this.showStorageUnsupported();
+          input.value = '';
+          return;
+        }
+        this.contact.chatBackgroundFileId = saved.id;
+        this.contact.chatBackgroundImage = saved.url;
         if (this.contact.chatBackgroundTransparency == null) {
           this.contact.chatBackgroundTransparency = 40;
         }
@@ -152,11 +188,19 @@ export class ContactSettingsComponent {
       });
   }
 
-  deleteAvatar(): void {
+  async deleteAvatar(): Promise<void> {
+    if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
+      await this.avatarStorage.deleteImage(this.contact.avatarFileId);
+    }
+    this.contact.avatarFileId = undefined;
     this.contact.base64Avatar = undefined;
   }
 
-  deleteChatBackground(): void {
+  async deleteChatBackground(): Promise<void> {
+    if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
+      await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
+    }
+    this.contact.chatBackgroundFileId = undefined;
     this.contact.chatBackgroundImage = '';
   }
 
@@ -168,6 +212,14 @@ export class ContactSettingsComponent {
     const transparency = this.contact.chatBackgroundTransparency ?? 40;
     const clamped = Math.min(Math.max(transparency, 0), 100);
     return 1 - clamped / 100;
+  }
+
+  private showStorageUnsupported(): void {
+    this.snackBar.open(
+      this.translation.t('common.media.storageUnsupported'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2500 }
+    );
   }
 
   private async resizeAndCompressImage(file: File, maxDimension: number, maxBytes: number): Promise<string> {
@@ -246,12 +298,24 @@ export class ContactSettingsComponent {
     });
   }
 
-  onAbortClick() {
+  async onAbortClick() {
+    if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
+      await this.avatarStorage.deleteImage(this.contact.avatarFileId);
+    }
+    if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
+      await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
+    }
     Object.assign(this.data.contact, this.oriContact);
     this.dialogRef.close();
   }
 
-  onApplyClick() {
+  async onApplyClick() {
+    if (this.originalAvatarFileId && this.originalAvatarFileId !== this.contact.avatarFileId) {
+      await this.avatarStorage.deleteImage(this.originalAvatarFileId);
+    }
+    if (this.originalBackgroundFileId && this.originalBackgroundFileId !== this.contact.chatBackgroundFileId) {
+      await this.avatarStorage.deleteImage(this.originalBackgroundFileId);
+    }
     this.dialogRef.close();
   }
 }

@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Profile } from '../../../interfaces/profile';
+import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 
@@ -36,6 +37,7 @@ export class MessageProfileComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
   private readonly dialog = inject(MatDialog);
+  private readonly avatarStorage = inject(AvatarStorageService);
   readonly dialogRef = inject(MatDialogRef<MessageProfileComponent>);
   readonly data = inject<{ profile: Profile; userId: string }>(MAT_DIALOG_DATA);
 
@@ -49,12 +51,21 @@ export class MessageProfileComponent {
     this.userId = this.data.userId;
   }
 
-  onAbortClick(): void {
+  async onAbortClick(): Promise<void> {
+    const currentId = this.profile.avatarFileId;
+    if (currentId && currentId !== this.oriProfile.avatarFileId) {
+      await this.avatarStorage.deleteImage(currentId);
+    }
     Object.assign(this.profile, this.oriProfile);
     this.dialogRef.close();
   }
 
-  onApplyClick(): void {
+  async onApplyClick(): Promise<void> {
+    const originalId = this.oriProfile.avatarFileId;
+    const currentId = this.profile.avatarFileId;
+    if (originalId && originalId !== currentId) {
+      await this.avatarStorage.deleteImage(originalId);
+    }
     Object.assign(this.data.profile, this.profile);
     this.dialogRef.close();
   }
@@ -84,6 +95,11 @@ export class MessageProfileComponent {
       return;
     }
 
+    if (!this.avatarStorage.isSupported()) {
+      this.showStorageUnsupported();
+      return;
+    }
+
     const dialogRef = this.dialog.open(AvatarCropperComponent, {
       data: {
         file,
@@ -94,17 +110,39 @@ export class MessageProfileComponent {
       width: '420px'
     });
 
-    dialogRef.afterClosed().subscribe((croppedImage?: string) => {
-      if (croppedImage) {
-        this.profile.base64Avatar = croppedImage;
+    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
+      if (!croppedImage) {
+        if (input) {
+          input.value = '';
+        }
+        return;
       }
+      const currentId = this.profile.avatarFileId;
+      if (currentId && currentId !== this.oriProfile.avatarFileId) {
+        await this.avatarStorage.deleteImage(currentId);
+      }
+      const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
+      if (!saved) {
+        this.showStorageUnsupported();
+        if (input) {
+          input.value = '';
+        }
+        return;
+      }
+      this.profile.avatarFileId = saved.id;
+      this.profile.base64Avatar = saved.url;
       if (input) {
         input.value = '';
       }
     });
   }
 
-  deleteAvatar() {
+  async deleteAvatar() {
+    const currentId = this.profile.avatarFileId;
+    if (currentId && currentId !== this.oriProfile.avatarFileId) {
+      await this.avatarStorage.deleteImage(currentId);
+    }
+    this.profile.avatarFileId = undefined;
     this.profile.base64Avatar = '';
   }
 
@@ -113,6 +151,14 @@ export class MessageProfileComponent {
       this.translation.t('common.messageProfile.policy'),
       this.translation.t('common.actions.ok'),
       {}
+    );
+  }
+
+  private showStorageUnsupported(): void {
+    this.snackBar.open(
+      this.translation.t('common.media.storageUnsupported'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2500 }
     );
   }
 }

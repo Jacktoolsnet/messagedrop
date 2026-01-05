@@ -11,7 +11,9 @@ export interface Place {
     location: Location,
     name: string,
     base64Avatar: string
+    avatarFileId?: string,
     placeBackgroundImage?: string,
+    placeBackgroundFileId?: string,
     placeBackgroundTransparency?: number,
     icon: string,
     subscribed: boolean,

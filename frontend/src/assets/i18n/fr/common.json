@@ -23,6 +23,9 @@
       "more": "Plus",
       "close": "Fermer"
     },
+    "media": {
+      "storageUnsupported": "Cette fonctionnalité n'est pas prise en charge sur cet appareil."
+    },
     "avatarCropper": {
       "title": "Recadrer l'avatar",
       "hint": "Déplacez ou zoomez l'image pour définir le cadrage carré.",

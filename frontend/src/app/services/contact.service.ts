@@ -9,6 +9,7 @@ import { GetContactsResponse } from '../interfaces/get-contacts-response';
 import { RawContact } from '../interfaces/raw-contact';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
 import { TileSetting, normalizeTileSettings } from '../interfaces/tile-settings';
+import { AvatarStorageService } from './avatar-storage.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { SocketioService } from './socketio.service';
@@ -38,6 +39,7 @@ export class ContactService {
   private readonly indexedDbService = inject(IndexedDbService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly networkService = inject(NetworkService);
+  private readonly avatarStorage = inject(AvatarStorageService);
   private readonly i18n = inject(TranslationHelperService);
 
   get contactsSignal() { return this._contacts.asReadonly(); }
@@ -59,6 +61,7 @@ export class ContactService {
       .subscribe({
         next: async (getContactsResponse: GetContactsResponse) => {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
+          await this.storeContactAvatarsFromServer(contacts);
           this._contacts.set(contacts);
           await this.updateContactProfile();
           this.persistContacts(false);
@@ -100,6 +103,24 @@ export class ContactService {
     };
   }
 
+  private async storeContactAvatarsFromServer(contacts: Contact[]): Promise<void> {
+    if (!this.avatarStorage.isSupported()) {
+      return;
+    }
+    await Promise.all(contacts.map(async (contact) => {
+      if (!contact.base64Avatar) {
+        return;
+      }
+      const saved = await this.avatarStorage.saveImageFromBase64('avatar', contact.base64Avatar, contact.avatarFileId);
+      if (saved) {
+        contact.avatarFileId = saved.id;
+        contact.base64Avatar = saved.url;
+      } else {
+        contact.base64Avatar = '';
+      }
+    }));
+  }
+
   private sanitizeContactName(name?: string | null): string {
     if (!name) {
       return '';
@@ -126,8 +147,14 @@ export class ContactService {
     await Promise.all(this._contacts().map(async contact => {
       const profile = await this.indexedDbService.getContactProfile(contact.id);
       contact.name = this.sanitizeContactName(profile?.name ?? contact.name);
-      contact.base64Avatar = profile?.base64Avatar || contact.base64Avatar || '';
-      contact.chatBackgroundImage = profile?.chatBackgroundImage || contact.chatBackgroundImage || '';
+      contact.avatarFileId = profile?.avatarFileId ?? contact.avatarFileId;
+      contact.chatBackgroundFileId = profile?.chatBackgroundFileId ?? contact.chatBackgroundFileId;
+      contact.base64Avatar = contact.avatarFileId
+        ? (await this.avatarStorage.getImageUrl(contact.avatarFileId)) || ''
+        : '';
+      contact.chatBackgroundImage = contact.chatBackgroundFileId
+        ? (await this.avatarStorage.getImageUrl(contact.chatBackgroundFileId)) || ''
+        : '';
       contact.chatBackgroundTransparency = profile?.chatBackgroundTransparency ?? contact.chatBackgroundTransparency;
       contact.pinned = profile?.pinned || false;
       const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
@@ -140,8 +167,10 @@ export class ContactService {
     await Promise.all(this._contacts().map(contact => {
       this.indexedDbService.setContactProfile(contact.id, {
         name: contact.name ? contact.name : '',
-        base64Avatar: contact.base64Avatar ? contact.base64Avatar : '',
-        chatBackgroundImage: contact.chatBackgroundImage ? contact.chatBackgroundImage : '',
+        base64Avatar: '',
+        avatarFileId: contact.avatarFileId,
+        chatBackgroundImage: '',
+        chatBackgroundFileId: contact.chatBackgroundFileId,
         chatBackgroundTransparency: contact.chatBackgroundTransparency ?? 40,
         pinned: contact.pinned
       });

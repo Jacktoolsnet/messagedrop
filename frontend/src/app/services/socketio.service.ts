@@ -11,6 +11,7 @@ import { CryptoService } from './crypto.service';
 import { SystemNotificationService } from './system-notification.service';
 import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { AvatarStorageService } from './avatar-storage.service';
 
 interface UserRoomPayload {
   status: number;
@@ -38,6 +39,7 @@ export class SocketioService {
   private readonly snackBar = inject(MatSnackBar);
   private readonly userService = inject(UserService);
   private readonly contactService = inject(ContactService);
+  private readonly avatarStorage = inject(AvatarStorageService);
   private readonly cryptoService = inject(CryptoService);
   private readonly systemNotificationService = inject(SystemNotificationService);
   private readonly i18n = inject(TranslationHelperService);
@@ -270,10 +272,12 @@ export class SocketioService {
             hasBackdrop: true
           });
 
-          dialogRef.afterClosed().subscribe(result => {
+          dialogRef.afterClosed().subscribe(async result => {
             if (result) {
               payload.contact.name = this.userService.getProfile().name;
-              payload.contact.base64Avatar = this.userService.getProfile().base64Avatar;
+              payload.contact.base64Avatar = (await this.avatarStorage.getImageBase64(
+                this.userService.getProfile().avatarFileId
+              )) || '';
               payload.contact.provided = true;
               this.socket.emit('contact:provideUserProfile', payload.contact);
             } else {
@@ -291,8 +295,21 @@ export class SocketioService {
     this.socket.on(`receiveProfileForContact:${contact.id}`, (payload: { status: number, contact: Contact }) => {
       if (payload.status == 200) {
         contact.name = payload.contact.name !== '' ? payload.contact.name : this.i18n.t('common.contact.notSet');
-        contact.base64Avatar = payload.contact.base64Avatar !== '' ? payload.contact.base64Avatar : undefined;
-        this.contactService.saveAditionalContactInfos();
+        const incomingAvatar = payload.contact.base64Avatar || '';
+        if (incomingAvatar !== '' && this.avatarStorage.isSupported()) {
+          this.avatarStorage.saveImageFromBase64('avatar', incomingAvatar).then((saved) => {
+            if (saved) {
+              contact.avatarFileId = saved.id;
+              contact.base64Avatar = saved.url;
+            } else {
+              contact.base64Avatar = undefined;
+            }
+            this.contactService.saveAditionalContactInfos();
+          });
+        } else {
+          contact.base64Avatar = undefined;
+          this.contactService.saveAditionalContactInfos();
+        }
       } else {
         this.snackBar.open(
           this.i18n.t('common.contact.profileRequestDeclined'),

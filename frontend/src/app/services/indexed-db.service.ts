@@ -42,6 +42,37 @@ export class IndexedDbService {
   private documentHandleStore = 'documentHandle';
   private fileHandleStore = 'fileHandle';
 
+  private stripContactMedia(contact: Contact): Contact {
+    return {
+      ...contact,
+      base64Avatar: '',
+      chatBackgroundImage: ''
+    };
+  }
+
+  private stripContactProfileMedia(profile: ContactProfile): ContactProfile {
+    return {
+      ...profile,
+      base64Avatar: '',
+      chatBackgroundImage: ''
+    };
+  }
+
+  private stripProfileMedia(profile: Profile): Profile {
+    return {
+      ...profile,
+      base64Avatar: ''
+    };
+  }
+
+  private stripPlaceMedia(place: Place): Place {
+    return {
+      ...place,
+      base64Avatar: '',
+      placeBackgroundImage: ''
+    };
+  }
+
   private compress<T>(value: T): string {
     const json = JSON.stringify(value);
     if (!environment.production) {
@@ -391,7 +422,7 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.profileStore, 'readwrite');
       const store = tx.objectStore(this.profileStore);
-      const compressed = this.compress(profile);
+      const compressed = this.compress(this.stripProfileMedia(profile));
       const request = store.put(compressed, userId);
 
       request.onsuccess = () => {
@@ -499,7 +530,7 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.contactProfileStore, 'readwrite');
       const store = tx.objectStore(this.contactProfileStore);
-      const compressed = this.compress(contactProfile);
+      const compressed = this.compress(this.stripContactProfileMedia(contactProfile));
       const request = store.put(compressed, contactProfileId);
 
       request.onsuccess = () => {
@@ -548,7 +579,7 @@ export class IndexedDbService {
 
       clearRequest.onsuccess = () => {
         contacts.forEach((contact) => {
-          store.put(this.compress(contact), contact.id);
+          store.put(this.compress(this.stripContactMedia(contact)), contact.id);
         });
       };
 
@@ -636,7 +667,7 @@ export class IndexedDbService {
     return new Promise<void>((resolve, reject) => {
       const tx = db.transaction(this.placeStore, 'readwrite');
       const store = tx.objectStore(this.placeStore);
-      const compressed = this.compress(place);
+      const compressed = this.compress(this.stripPlaceMedia(place));
       const request = store.put(compressed, placeId);
 
       request.onsuccess = () => {

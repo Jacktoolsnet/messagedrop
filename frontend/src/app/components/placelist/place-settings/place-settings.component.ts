@@ -13,6 +13,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 
@@ -46,7 +47,9 @@ export class PlaceProfileComponent {
   private readonly maxBackgroundDimension = 1600;
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
+  private oriAvatarFileId: string | undefined = undefined;
   private oriBackgroundImage: string | undefined = undefined;
+  private oriBackgroundFileId: string | undefined = undefined;
   private oriBackgroundTransparency: number | undefined = undefined;
   private oriIcon: string | undefined = undefined;
   private oriTileSettings: TileSetting[] | undefined = undefined;
@@ -57,12 +60,15 @@ export class PlaceProfileComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly dialog = inject(MatDialog);
+  private readonly avatarStorage = inject(AvatarStorageService);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
     this.oriName = this.data.place.name;
     this.oriBase64Avatar = this.data.place.base64Avatar;
+    this.oriAvatarFileId = this.data.place.avatarFileId;
     this.oriBackgroundImage = this.data.place.placeBackgroundImage;
+    this.oriBackgroundFileId = this.data.place.placeBackgroundFileId;
     this.oriBackgroundTransparency = this.data.place.placeBackgroundTransparency;
     this.oriIcon = this.data.place.icon;
     const normalizedTileSettings = normalizeTileSettings(this.data.place.tileSettings);
@@ -73,18 +79,32 @@ export class PlaceProfileComponent {
     }
   }
 
-  onApplyClick(): void {
+  async onApplyClick(): Promise<void> {
+    if (this.oriAvatarFileId && this.oriAvatarFileId !== this.data.place.avatarFileId) {
+      await this.avatarStorage.deleteImage(this.oriAvatarFileId);
+    }
+    if (this.oriBackgroundFileId && this.oriBackgroundFileId !== this.data.place.placeBackgroundFileId) {
+      await this.avatarStorage.deleteImage(this.oriBackgroundFileId);
+    }
     this.dialogRef.close();
   }
 
-  onAbortClick(): void {
+  async onAbortClick(): Promise<void> {
+    if (this.data.place.avatarFileId && this.data.place.avatarFileId !== this.oriAvatarFileId) {
+      await this.avatarStorage.deleteImage(this.data.place.avatarFileId);
+    }
+    if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
+      await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
+    }
     if (undefined != this.oriName) {
       this.data.place.name = this.oriName;
     }
     if (undefined != this.oriBase64Avatar) {
       this.data.place.base64Avatar = this.oriBase64Avatar;
     }
+    this.data.place.avatarFileId = this.oriAvatarFileId;
     this.data.place.placeBackgroundImage = this.oriBackgroundImage;
+    this.data.place.placeBackgroundFileId = this.oriBackgroundFileId;
     this.data.place.placeBackgroundTransparency = this.oriBackgroundTransparency;
     if (undefined != this.oriIcon) {
       this.data.place.icon = this.oriIcon;
@@ -131,11 +151,28 @@ export class PlaceProfileComponent {
       width: '420px'
     });
 
-    dialogRef.afterClosed().subscribe((croppedImage?: string) => {
-      this.ngZone.run(() => {
-        if (croppedImage) {
-          this.data.place.base64Avatar = croppedImage;
+    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
+      this.ngZone.run(async () => {
+        if (!croppedImage) {
+          input.value = '';
+          return;
         }
+        if (!this.avatarStorage.isSupported()) {
+          this.showStorageUnsupported();
+          input.value = '';
+          return;
+        }
+        if (this.data.place.avatarFileId && this.data.place.avatarFileId !== this.oriAvatarFileId) {
+          await this.avatarStorage.deleteImage(this.data.place.avatarFileId);
+        }
+        const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
+        if (!saved) {
+          this.showStorageUnsupported();
+          input.value = '';
+          return;
+        }
+        this.data.place.avatarFileId = saved.id;
+        this.data.place.base64Avatar = saved.url;
         this.cdr.markForCheck();
         input.value = '';
       });
@@ -169,9 +206,24 @@ export class PlaceProfileComponent {
     }
 
     this.resizeAndCompressImage(file, this.maxBackgroundDimension, this.maxBackgroundBytes)
-      .then((dataUrl) => {
-        this.ngZone.run(() => {
-          this.data.place.placeBackgroundImage = dataUrl;
+      .then(async (dataUrl) => {
+        this.ngZone.run(async () => {
+          if (!this.avatarStorage.isSupported()) {
+            this.showStorageUnsupported();
+            input.value = '';
+            return;
+          }
+          if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
+            await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
+          }
+          const saved = await this.avatarStorage.saveImageFromDataUrl('background', dataUrl);
+          if (!saved) {
+            this.showStorageUnsupported();
+            input.value = '';
+            return;
+          }
+          this.data.place.placeBackgroundFileId = saved.id;
+          this.data.place.placeBackgroundImage = saved.url;
           if (this.data.place.placeBackgroundTransparency == null) {
             this.data.place.placeBackgroundTransparency = 40;
           }
@@ -198,12 +250,20 @@ export class PlaceProfileComponent {
       });
   }
 
-  deleteAvatar() {
+  async deleteAvatar() {
+    if (this.data.place.avatarFileId && this.data.place.avatarFileId !== this.oriAvatarFileId) {
+      await this.avatarStorage.deleteImage(this.data.place.avatarFileId);
+    }
+    this.data.place.avatarFileId = undefined;
     this.data.place.base64Avatar = '';
     this.cdr.markForCheck();
   }
 
-  deletePlaceBackground() {
+  async deletePlaceBackground() {
+    if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
+      await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
+    }
+    this.data.place.placeBackgroundFileId = undefined;
     this.data.place.placeBackgroundImage = '';
     this.cdr.markForCheck();
   }
@@ -216,6 +276,14 @@ export class PlaceProfileComponent {
     const transparency = this.data.place.placeBackgroundTransparency ?? 40;
     const clamped = Math.min(Math.max(transparency, 0), 100);
     return 1 - clamped / 100;
+  }
+
+  private showStorageUnsupported(): void {
+    this.snackBar.open(
+      this.translation.t('common.media.storageUnsupported'),
+      this.translation.t('common.actions.ok'),
+      { duration: 2500 }
+    );
   }
 
   private async resizeAndCompressImage(file: File, maxDimension: number, maxBytes: number): Promise<string> {
