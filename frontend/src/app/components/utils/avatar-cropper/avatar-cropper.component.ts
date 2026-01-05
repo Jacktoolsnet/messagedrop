@@ -1,4 +1,4 @@
-import { Component, ViewChild, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -41,8 +41,6 @@ export class AvatarCropperComponent {
   croppedImage = '';
   isLoading = true;
 
-  @ViewChild(ImageCropperComponent) private cropper?: ImageCropperComponent;
-
   constructor() {
     this.loadFile(this.data.file);
   }
@@ -50,16 +48,12 @@ export class AvatarCropperComponent {
   onImageCropped(event: ImageCroppedEvent): void {
     if (event.base64) {
       this.croppedImage = event.base64;
+      this.isLoading = false;
     }
   }
 
   onImageLoaded(): void {
     this.isLoading = false;
-    this.ensureInitialCrop();
-  }
-
-  onCropperReady(): void {
-    this.ensureInitialCrop();
   }
 
   onLoadImageFailed(): void {
@@ -76,7 +70,7 @@ export class AvatarCropperComponent {
   }
 
   onApply(): void {
-    const image = this.croppedImage || this.cropper?.crop('base64')?.base64 || '';
+    const image = this.croppedImage;
     if (!image) {
       return;
     }
@@ -100,16 +94,6 @@ export class AvatarCropperComponent {
       this.onLoadImageFailed();
     };
     reader.readAsDataURL(file);
-  }
-
-  private ensureInitialCrop(): void {
-    if (this.croppedImage || !this.cropper) {
-      return;
-    }
-    const cropped = this.cropper.crop('base64');
-    if (cropped?.base64) {
-      this.croppedImage = cropped.base64;
-    }
   }
 
   private isTooLarge(dataUrl: string): boolean {

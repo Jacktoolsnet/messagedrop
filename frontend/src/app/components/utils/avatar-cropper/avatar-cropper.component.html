@@ -8,6 +8,7 @@
     <image-cropper
       [imageBase64]="imageBase64"
       [output]="'base64'"
+      [autoCrop]="true"
       [maintainAspectRatio]="true"
       [aspectRatio]="1"
       [containWithinAspectRatio]="true"
@@ -19,7 +20,6 @@
       [backgroundColor]="'#fff'"
       (imageCropped)="onImageCropped($event)"
       (imageLoaded)="onImageLoaded()"
-      (cropperReady)="onCropperReady()"
       (loadImageFailed)="onLoadImageFailed()">
     </image-cropper>
   </div>
