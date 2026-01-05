@@ -7,6 +7,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Mode } from '../../../interfaces/mode';
@@ -27,6 +28,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
     MatIcon,
     MatFormFieldModule,
     MatInputModule,
+    MatSliderModule,
     TranslocoPipe
   ],
   templateUrl: './place-settings.component.html',
@@ -38,6 +40,8 @@ export class PlaceProfileComponent {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
+  private oriBackgroundImage: string | undefined = undefined;
+  private oriBackgroundTransparency: number | undefined = undefined;
   private oriIcon: string | undefined = undefined;
   private oriTileSettings: TileSetting[] | undefined = undefined;
 
@@ -51,10 +55,15 @@ export class PlaceProfileComponent {
   constructor() {
     this.oriName = this.data.place.name;
     this.oriBase64Avatar = this.data.place.base64Avatar;
+    this.oriBackgroundImage = this.data.place.placeBackgroundImage;
+    this.oriBackgroundTransparency = this.data.place.placeBackgroundTransparency;
     this.oriIcon = this.data.place.icon;
     const normalizedTileSettings = normalizeTileSettings(this.data.place.tileSettings);
     this.oriTileSettings = normalizedTileSettings.map((tile: TileSetting) => ({ ...tile }));
     this.data.place.tileSettings = normalizedTileSettings;
+    if (this.data.place.placeBackgroundTransparency == null) {
+      this.data.place.placeBackgroundTransparency = 40;
+    }
   }
 
   onApplyClick(): void {
@@ -68,6 +77,8 @@ export class PlaceProfileComponent {
     if (undefined != this.oriBase64Avatar) {
       this.data.place.base64Avatar = this.oriBase64Avatar;
     }
+    this.data.place.placeBackgroundImage = this.oriBackgroundImage;
+    this.data.place.placeBackgroundTransparency = this.oriBackgroundTransparency;
     if (undefined != this.oriIcon) {
       this.data.place.icon = this.oriIcon;
     }
@@ -123,9 +134,73 @@ export class PlaceProfileComponent {
     reader.readAsDataURL(file);
   }
 
+  onBackgroundFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input?.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    if (!file.type.startsWith('image/')) {
+      this.snackBar.open(
+        this.translation.t('common.placeSettings.imageInvalid'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+
+    if (file.size > this.maxFileSize) {
+      this.snackBar.open(
+        this.translation.t('common.placeSettings.imageTooLarge'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e: ProgressEvent<FileReader>) => {
+      this.ngZone.run(() => {
+        this.data.place.placeBackgroundImage = (e.target as FileReader).result as string;
+        if (this.data.place.placeBackgroundTransparency == null) {
+          this.data.place.placeBackgroundTransparency = 40;
+        }
+        this.cdr.markForCheck();
+      });
+    };
+    reader.onerror = () => {
+      this.ngZone.run(() => {
+        this.snackBar.open(
+          this.translation.t('common.placeSettings.imageReadError'),
+          this.translation.t('common.actions.ok'),
+          { duration: 2000 }
+        );
+      });
+    };
+
+    reader.readAsDataURL(file);
+  }
+
   deleteAvatar() {
     this.data.place.base64Avatar = '';
     this.cdr.markForCheck();
+  }
+
+  deletePlaceBackground() {
+    this.data.place.placeBackgroundImage = '';
+    this.cdr.markForCheck();
+  }
+
+  getPlaceBackgroundPreviewImage(): string {
+    return this.data.place.placeBackgroundImage ? `url(${this.data.place.placeBackgroundImage})` : 'none';
+  }
+
+  getPlaceBackgroundPreviewOpacity(): number {
+    const transparency = this.data.place.placeBackgroundTransparency ?? 40;
+    const clamped = Math.min(Math.max(transparency, 0), 100);
+    return 1 - clamped / 100;
   }
 
   public showPolicy() {

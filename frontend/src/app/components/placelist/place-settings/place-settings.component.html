@@ -33,6 +33,38 @@
     </div>
   </div>
   }
+
+  <input type="file" id="place-background" name="place-background" accept="image/png, image/jpeg" class="file-input"
+    (change)="onBackgroundFileSelected($event)" #backgroundUpload />
+
+  @if (!data.place.placeBackgroundImage) {
+  <div class="avatar-area">
+    <button mat-flat-button class="button-set-avatar" (click)="backgroundUpload.click()">
+      <mat-icon>wallpaper</mat-icon>
+      <span>{{ 'common.placeSettings.setTileBackground' | transloco }}</span>
+    </button>
+  </div>
+  } @else {
+  <div class="avatar-area background-area">
+    <div class="background-preview"
+      [style.--place-bg-image]="getPlaceBackgroundPreviewImage()"
+      [style.--place-bg-opacity]="getPlaceBackgroundPreviewOpacity()"></div>
+    <div class="button-style">
+      <button mat-mini-fab color="primary" class="upload-button" (click)="deletePlaceBackground()"
+        [attr.aria-label]="'common.placeSettings.deleteTileBackgroundAria' | transloco">
+        <mat-icon>delete</mat-icon>
+      </button>
+    </div>
+  </div>
+  }
+
+  <div class="background-slider">
+    <span class="slider-label">{{ 'common.placeSettings.tileBackgroundTransparency' | transloco }}</span>
+    <mat-slider min="0" max="100" step="5" thumbLabel tickInterval="20"
+      [disabled]="!data.place.placeBackgroundImage">
+      <input matSliderThumb [(ngModel)]="data.place.placeBackgroundTransparency" />
+    </mat-slider>
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">

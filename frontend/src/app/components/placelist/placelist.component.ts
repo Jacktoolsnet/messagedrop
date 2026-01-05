@@ -191,6 +191,19 @@ export class PlacelistComponent {
     return this.translation.t('common.tileList.openAria', { name });
   }
 
+  getPlaceHeaderBackgroundImage(place: Place): string {
+    return place.placeBackgroundImage ? `url(${place.placeBackgroundImage})` : 'none';
+  }
+
+  getPlaceHeaderBackgroundOpacity(place: Place): number {
+    if (!place.placeBackgroundImage) {
+      return 0;
+    }
+    const transparency = place.placeBackgroundTransparency ?? 40;
+    const clamped = Math.min(Math.max(transparency, 0), 100);
+    return 1 - clamped / 100;
+  }
+
   public pinPlace(place: Place) {
     place.pinned = true;
     this.placeService.saveAdditionalPlaceInfos(place);
@@ -234,6 +247,8 @@ export class PlacelistComponent {
         plusCode: ''
       },
       base64Avatar: '',
+      placeBackgroundImage: '',
+      placeBackgroundTransparency: 40,
       icon: '',
       subscribed: false,
       pinned: false,

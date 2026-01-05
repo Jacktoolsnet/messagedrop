@@ -48,6 +48,19 @@ export class TileListDialogComponent {
     return this.translation.t('common.placeSettings.openTileSettingsAria', { name });
   }
 
+  getPlaceHeaderBackgroundImage(): string {
+    return this.place?.placeBackgroundImage ? `url(${this.place.placeBackgroundImage})` : 'none';
+  }
+
+  getPlaceHeaderBackgroundOpacity(): number {
+    if (!this.place?.placeBackgroundImage) {
+      return 0;
+    }
+    const transparency = this.place.placeBackgroundTransparency ?? 40;
+    const clamped = Math.min(Math.max(transparency, 0), 100);
+    return 1 - clamped / 100;
+  }
+
   openTileSettings(): void {
     this.tileList?.openTileSettings();
   }

@@ -13,7 +13,9 @@
         <div class="content">
             @for (place of placesSignal(); track place.id){
             <mat-card class="place-tile">
-                <div class="tile-header">
+                <div class="tile-header"
+                    [style.--place-header-bg-image]="getPlaceHeaderBackgroundImage(place)"
+                    [style.--place-header-bg-opacity]="getPlaceHeaderBackgroundOpacity(place)">
                     @if (place.base64Avatar) {
                     <img class="avatar" [src]="place.base64Avatar"
                         [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />

@@ -9,6 +9,25 @@ h2[mat-dialog-title].tile-dialog-title {
   min-height: 3rem;
   padding: 0.5rem 1rem;
   margin: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+h2[mat-dialog-title].tile-dialog-title::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--place-header-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--place-header-bg-opacity, 0);
+  z-index: 0;
+}
+
+h2[mat-dialog-title].tile-dialog-title > * {
+  position: relative;
+  z-index: 1;
 }
 
 .tile-dialog-title__avatar {

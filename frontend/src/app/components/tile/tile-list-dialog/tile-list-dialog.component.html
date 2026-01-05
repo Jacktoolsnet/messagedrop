@@ -1,4 +1,6 @@
-<h2 mat-dialog-title class="tile-dialog-title">
+<h2 mat-dialog-title class="tile-dialog-title"
+  [style.--place-header-bg-image]="getPlaceHeaderBackgroundImage()"
+  [style.--place-header-bg-opacity]="getPlaceHeaderBackgroundOpacity()">
   @if (contact) {
     <span class="tile-dialog-title__avatar">
       @if (contact.base64Avatar) {

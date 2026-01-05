@@ -97,6 +97,25 @@ button,
   gap: 0.5rem;
   padding: 1rem 1rem 0.5rem;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.tile-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--place-header-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--place-header-bg-opacity, 0);
+  z-index: 0;
+}
+
+.tile-header > * {
+  position: relative;
+  z-index: 1;
 }
 
 .tile-header mat-icon {
