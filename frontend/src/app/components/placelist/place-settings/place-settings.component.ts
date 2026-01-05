@@ -38,6 +38,8 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 export class PlaceProfileComponent {
 
   private maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly maxAvatarBytes = 2 * 1024 * 1024; // 2MB
+  private readonly maxAvatarDimension = 256;
   private readonly maxBackgroundBytes = 2 * 1024 * 1024; // 2MB
   private readonly maxBackgroundDimension = 1600;
   private oriName: string | undefined = undefined;
@@ -107,33 +109,40 @@ export class PlaceProfileComponent {
       return;
     }
 
-    if (file.size > this.maxFileSize) {
+    if (file.size > this.maxAvatarBytes) {
       this.snackBar.open(
-        this.translation.t('common.placeSettings.imageTooLarge'),
+        this.translation.t('common.placeSettings.imageTooLarge', { maxMb: 2 }),
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      this.ngZone.run(() => {
-        this.data.place.base64Avatar = (e.target as FileReader).result as string;
-        this.cdr.markForCheck();
+    this.resizeAndCompressImage(file, this.maxAvatarDimension, this.maxAvatarBytes)
+      .then((dataUrl) => {
+        this.ngZone.run(() => {
+          this.data.place.base64Avatar = dataUrl;
+          this.cdr.markForCheck();
+          input.value = '';
+        });
+      })
+      .catch((error: Error) => {
+        this.ngZone.run(() => {
+          if (error.message === 'too_large') {
+            this.snackBar.open(
+              this.translation.t('common.placeSettings.imageTooLarge', { maxMb: 2 }),
+              this.translation.t('common.actions.ok'),
+              { duration: 2000 }
+            );
+            return;
+          }
+          this.snackBar.open(
+            this.translation.t('common.placeSettings.imageReadError'),
+            this.translation.t('common.actions.ok'),
+            { duration: 2000 }
+          );
+        });
       });
-    };
-    reader.onerror = () => {
-      this.ngZone.run(() => {
-        this.snackBar.open(
-          this.translation.t('common.placeSettings.imageReadError'),
-          this.translation.t('common.actions.ok'),
-          { duration: 2000 }
-        );
-      });
-    };
-
-    reader.readAsDataURL(file);
   }
 
   onBackgroundFileSelected(event: Event): void {

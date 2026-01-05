@@ -334,6 +334,8 @@
       "avatarAltName": "{{ name }} avatar",
       "avatarAltFallback": "Profile avatar",
       "deleteAvatarAria": "Remove avatar",
+      "fileTypeInvalid": "Please select a valid image file.",
+      "fileTooLarge": "The image is too large. Maximum allowed size is {{ maxMb }} MB.",
       "fileReadFailed": "Could not read the selected file. Please try again.",
       "policy": "Profile name and avatar are stored on the device."
     },
@@ -408,7 +410,7 @@
       "openTileSettingsAria": "Open tile settings for {{ name }}",
       "nameFallback": "place",
       "imageInvalid": "Please select a valid image file.",
-      "imageTooLarge": "The image is too large. Maximum allowed size is 5 MB.",
+      "imageTooLarge": "The image is too large. Maximum allowed size is {{ maxMb }} MB.",
       "imageReadError": "Error reading the file.",
       "savePolicy": "Place id, place name (hashed), the added locations, and the subscribed flag are saved on our server. The readable name and the avatar are saved on your device."
     },

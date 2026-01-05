@@ -334,6 +334,8 @@
       "avatarAltName": "Avatar de {{ name }}",
       "avatarAltFallback": "Avatar de perfil",
       "deleteAvatarAria": "Eliminar avatar",
+      "fileTypeInvalid": "Por favor selecciona un archivo de imagen válido.",
+      "fileTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es {{ maxMb }} MB.",
       "fileReadFailed": "No se pudo leer el archivo seleccionado. Inténtalo de nuevo.",
       "policy": "El nombre de perfil y el avatar se almacenan en el dispositivo."
     },
@@ -408,7 +410,7 @@
       "openTileSettingsAria": "Abrir ajustes de tiles para {{ name }}",
       "nameFallback": "lugar",
       "imageInvalid": "Por favor selecciona un archivo de imagen válido.",
-      "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es 5 MB.",
+      "imageTooLarge": "La imagen es demasiado grande. El tamaño máximo permitido es {{ maxMb }} MB.",
       "imageReadError": "Error al leer el archivo.",
       "savePolicy": "El id del lugar, el nombre del lugar (hasheado), las ubicaciones añadidas y la marca de suscripción se guardan en nuestro servidor. El nombre legible y el avatar se guardan en tu dispositivo."
     },

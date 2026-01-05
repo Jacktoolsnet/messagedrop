@@ -29,6 +29,9 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
   styleUrl: './message-profile.component.css'
 })
 export class MessageProfileComponent {
+  private readonly maxAvatarMb = 2;
+  private readonly maxAvatarBytes = this.maxAvatarMb * 1024 * 1024;
+  private readonly maxAvatarDimension = 256;
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
   readonly dialogRef = inject(MatDialogRef<MessageProfileComponent>);
@@ -61,17 +64,42 @@ export class MessageProfileComponent {
       return;
     }
 
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = this.handleFile.bind(this);
-    reader.onerror = this.handleFileError.bind(this);
-  }
-
-  handleFile(event: ProgressEvent<FileReader>): void {
-    const result = event.target?.result;
-    if (typeof result === 'string') {
-      this.profile.base64Avatar = result;
+    if (!file.type.startsWith('image/')) {
+      this.snackBar.open(
+        this.translation.t('common.messageProfile.fileTypeInvalid'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2500 }
+      );
+      return;
     }
+
+    if (file.size > this.maxAvatarBytes) {
+      this.snackBar.open(
+        this.translation.t('common.messageProfile.fileTooLarge', { maxMb: this.maxAvatarMb }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2500 }
+      );
+      return;
+    }
+
+    this.resizeAndCompressImage(file, this.maxAvatarDimension, this.maxAvatarBytes)
+      .then((dataUrl) => {
+        this.profile.base64Avatar = dataUrl;
+        if (input) {
+          input.value = '';
+        }
+      })
+      .catch((error: Error) => {
+        if (error.message === 'too_large') {
+          this.snackBar.open(
+            this.translation.t('common.messageProfile.fileTooLarge', { maxMb: this.maxAvatarMb }),
+            this.translation.t('common.actions.ok'),
+            { duration: 2500 }
+          );
+          return;
+        }
+        this.handleFileError();
+      });
   }
 
   handleFileError(): void {
@@ -80,6 +108,59 @@ export class MessageProfileComponent {
       this.translation.t('common.actions.ok'),
       { duration: 2500 }
     );
+  }
+
+  private async resizeAndCompressImage(file: File, maxDimension: number, maxBytes: number): Promise<string> {
+    const image = await this.loadImage(file);
+    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
+    const targetWidth = Math.max(1, Math.round(image.width * scale));
+    const targetHeight = Math.max(1, Math.round(image.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = targetWidth;
+    canvas.height = targetHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+      throw new Error('canvas');
+    }
+
+    ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
+
+    let quality = 0.9;
+    let dataUrl = canvas.toDataURL('image/jpeg', quality);
+    let bytes = this.estimateDataUrlBytes(dataUrl);
+
+    while (bytes > maxBytes && quality > 0.6) {
+      quality = Math.max(quality - 0.08, 0.6);
+      dataUrl = canvas.toDataURL('image/jpeg', quality);
+      bytes = this.estimateDataUrlBytes(dataUrl);
+    }
+
+    if (bytes > maxBytes) {
+      throw new Error('too_large');
+    }
+
+    return dataUrl;
+  }
+
+  private loadImage(file: File): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const image = new Image();
+      image.onload = () => {
+        URL.revokeObjectURL(url);
+        resolve(image);
+      };
+      image.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('load_failed'));
+      };
+      image.src = url;
+    });
+  }
+
+  private estimateDataUrlBytes(dataUrl: string): number {
+    const base64 = dataUrl.split(',')[1] ?? '';
+    return Math.floor((base64.length * 3) / 4);
   }
 
   deleteAvatar() {

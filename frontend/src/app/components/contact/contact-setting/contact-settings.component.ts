@@ -42,6 +42,8 @@ export class ContactSettingsComponent {
   public contact: Contact = this.data.contact;
   readonly joinedUserRoom = this.socketioService.joinedUserRoom;
   private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly maxAvatarBytes = 2 * 1024 * 1024; // 2MB
+  private readonly maxAvatarDimension = 256;
   private readonly maxBackgroundBytes = 2 * 1024 * 1024; // 2MB
   private readonly maxBackgroundDimension = 1600;
   private readonly oriContact: Contact = structuredClone(this.contact);
@@ -69,28 +71,35 @@ export class ContactSettingsComponent {
       return;
     }
 
-    if (file.size > this.maxFileSize) {
+    if (file.size > this.maxAvatarBytes) {
       this.snackBar.open(
-        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 5 }),
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 2 }),
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (e: ProgressEvent<FileReader>) => {
-      this.contact.base64Avatar = (e.target as FileReader).result as string;
-    };
-    reader.onerror = () => {
-      this.snackBar.open(
-        this.translation.t('common.contact.profile.fileReadError'),
-        this.translation.t('common.actions.ok'),
-        { duration: 2000 }
-      );
-    };
-
-    reader.readAsDataURL(file);
+    this.resizeAndCompressImage(file, this.maxAvatarDimension, this.maxAvatarBytes)
+      .then((dataUrl) => {
+        this.contact.base64Avatar = dataUrl;
+        input.value = '';
+      })
+      .catch((error: Error) => {
+        if (error.message === 'too_large') {
+          this.snackBar.open(
+            this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 2 }),
+            this.translation.t('common.actions.ok'),
+            { duration: 2000 }
+          );
+          return;
+        }
+        this.snackBar.open(
+          this.translation.t('common.contact.profile.fileReadError'),
+          this.translation.t('common.actions.ok'),
+          { duration: 2000 }
+        );
+      });
   }
 
   onBackgroundFileSelected(event: Event): void {

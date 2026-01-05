@@ -334,6 +334,8 @@
       "avatarAltName": "Avatar von {{ name }}",
       "avatarAltFallback": "Profil-Avatar",
       "deleteAvatarAria": "Avatar entfernen",
+      "fileTypeInvalid": "Bitte wähle eine gültige Bilddatei aus.",
+      "fileTooLarge": "Das Bild ist zu groß. Maximale Größe: {{ maxMb }} MB.",
       "fileReadFailed": "Die ausgewählte Datei konnte nicht gelesen werden. Bitte versuche es erneut.",
       "policy": "Profilname und Avatar werden auf dem Gerät gespeichert."
     },
@@ -408,7 +410,7 @@
       "openTileSettingsAria": "Kachel-Einstellungen für {{ name }} öffnen",
       "nameFallback": "Ort",
       "imageInvalid": "Bitte wähle eine gültige Bilddatei aus.",
-      "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: 5 MB.",
+      "imageTooLarge": "Das Bild ist zu groß. Maximale Größe: {{ maxMb }} MB.",
       "imageReadError": "Fehler beim Lesen der Datei.",
       "savePolicy": "Ort-ID, Ortsname (gehasht), die hinzugefügten Standorte und das Abonnement-Flag werden auf unserem Server gespeichert. Der lesbare Name und der Avatar werden auf deinem Gerät gespeichert."
     },
