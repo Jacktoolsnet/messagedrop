@@ -26,6 +26,7 @@ const weather = require('./routes/weather');
 const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
 const tenor = require('./routes/tenor');
+const unsplash = require('./routes/unsplash');
 const digitalServiceAct = require('./routes/digital-service-act');
 const dsaStatus = require('./routes/dsa-status');
 const notification = require('./routes/notification');
@@ -291,6 +292,13 @@ const tenorLimit = rateLimit({
   message: rateLimitMessage('Too many tenor requests, please try again later.')
 });
 
+const unsplashLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 60,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many unsplash requests, please try again later.')
+});
+
 const messageLimit = rateLimit({
   windowMs: 5 * 60 * 1000,
   limit: 300,
@@ -365,6 +373,7 @@ app.use('/nominatim', nominatimLimit, nominatim);
 app.use('/openai', openAiLimit, openAi);
 app.use('/place', placeLimit, place);
 app.use('/tenor', tenorLimit, tenor);
+app.use('/unsplash', unsplashLimit, unsplash);
 app.use('/translate', translateLimit, translate);
 app.use('/user', userLimit, user);
 app.use('/utils', utilsLimit, utils);
