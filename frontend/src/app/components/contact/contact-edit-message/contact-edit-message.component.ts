@@ -7,18 +7,18 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { ShortMessage } from '../../../interfaces/short-message';
-import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { OembedService } from '../../../services/oembed.service';
 import { StyleService } from '../../../services/style.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
-import { OembedService } from '../../../services/oembed.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
 import { TenorComponent } from '../../utils/tenor/tenor.component';
@@ -49,7 +49,7 @@ interface TextDialogResult {
     MatInputModule,
     ShowmultimediaComponent,
     TranslocoPipe
-],
+  ],
   templateUrl: './contact-edit-message.component.html',
   styleUrl: './contact-edit-message.component.css'
 })
@@ -158,7 +158,7 @@ export class ContactEditMessageComponent implements OnInit {
       closeOnNavigation: true,
       data: { text: this.data.shortMessage.message },
       hasBackdrop: true,
-      autoFocus: false
+      autoFocus: true
     });
 
     textDialogRef.afterClosed().subscribe((result?: TextDialogResult) => {

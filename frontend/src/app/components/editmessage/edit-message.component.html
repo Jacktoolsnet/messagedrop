@@ -28,15 +28,14 @@
         } @else {
         <div class="text_container">
             <button mat-mini-fab class="button_random" color="secondary"
-                [attr.aria-label]="'common.actions.randomizeStyle' | transloco"
-                (click)="onNewFontClick()">
+                [attr.aria-label]="'common.actions.randomizeStyle' | transloco" (click)="onNewFontClick()">
                 <mat-icon>cycle</mat-icon>
             </button>
             <button mat-mini-fab color="primary" class="button_remove_text" (click)="removeText()">
                 <mat-icon>delete</mat-icon>
             </button>
-            <p class="text" role="button" tabindex="0" (click)="openTextDialog()"
-                (keyup.enter)="openTextDialog()" (keyup.space)="openTextDialog()" [style]="data.message.style">
+            <p class="text" role="button" tabindex="0" (click)="openTextDialog()" (keyup.enter)="openTextDialog()"
+                (keyup.space)="openTextDialog()" [style]="data.message.style">
                 {{ data.message.message }}
             </p>
         </div>
@@ -46,9 +45,11 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-    <button mat-dialog-close cdkFocusInitial (click)="onAbortClick()" mat-icon-button [attr.aria-label]="'common.actions.abort' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button mat-dialog-close cdkFocusInitial (click)="onAbortClick()" mat-icon-button
+        [attr.aria-label]="'common.actions.abort' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
 
     @if (data.message.message !== '' || data.message.multimedia.type !== 'undefined') {
-    <button [attr.aria-label]="'common.message.updateAria' | transloco" (click)="onApplyClick()" mat-icon-button><mat-icon>check</mat-icon></button>
+    <button [attr.aria-label]="'common.message.updateAria' | transloco" (click)="onApplyClick()"
+        mat-icon-button><mat-icon>send</mat-icon></button>
     }
 </mat-dialog-actions>

@@ -48,7 +48,7 @@ type DialogHeaderConfig = {
     MatInputModule,
     MatMenuModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './edit-message.component.html',
   styleUrl: './edit-message.component.css'
 })
@@ -162,7 +162,7 @@ export class EditMessageComponent implements OnInit {
       closeOnNavigation: true,
       data: { text: this.data.message.message },
       hasBackdrop: true,
-      autoFocus: false
+      autoFocus: true
     });
 
     dialogRef.afterClosed().subscribe((result?: TextDialogResult) => {

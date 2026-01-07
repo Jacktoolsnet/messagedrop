@@ -47,7 +47,7 @@ type DialogHeaderConfig = {
     MatFormFieldModule,
     MatInputModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './edit-note.component.html',
   styleUrl: './edit-note.component.css'
 })
@@ -147,7 +147,7 @@ export class EditNoteComponent implements OnInit {
       closeOnNavigation: true,
       data: { text: this.data.note.note },
       hasBackdrop: true,
-      autoFocus: false
+      autoFocus: true
     });
 
     dialogRef.afterClosed().subscribe((result?: TextDialogResult) => {
