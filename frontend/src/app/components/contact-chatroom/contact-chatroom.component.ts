@@ -18,8 +18,10 @@ import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
+import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
@@ -270,6 +272,37 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   closeChatroom(): void {
     this.dialogRef.close();
+  }
+
+  openUserProfile(): void {
+    const dialogRef = this.matDialog.open(UserProfileComponent, {
+      data: {},
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.userService.saveProfile();
+    });
+  }
+
+  openContactSettings(contact: Contact): void {
+    const dialogRef = this.matDialog.open(ContactSettingsComponent, {
+      data: { contact },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.contactService.updateContactName(contact);
+      this.contactService.saveAditionalContactInfos();
+    });
   }
 
   requestCompose(): void {
