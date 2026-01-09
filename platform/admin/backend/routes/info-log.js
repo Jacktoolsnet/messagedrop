@@ -99,7 +99,7 @@ router.delete('/cleanup', (req, res, next) => {
   const db = req.database?.db;
   if (!db) return next(apiError.internal('database_unavailable'));
 
-  const retentionMs = parseRetentionMs(process.env.LOG_RETENTION_INFO || '7d', 7 * DAY_MS);
+  const retentionMs = parseRetentionMs(process.env.LOG_RETENTION_INFO || '2d', 2 * DAY_MS);
   const threshold = Date.now() - retentionMs;
   tableInfoLog.cleanupOlderThan(db, threshold, (err) => {
     if (err) {

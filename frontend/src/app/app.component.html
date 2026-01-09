@@ -53,7 +53,7 @@
 
     @if (userService.isReady()) {
     @if (!userService.hasJwt()) {
-    <button mat-menu-item (click)="connectToBackend()">
+    <button mat-menu-item (click)="connectToBackend()" [disabled]="userService.isConnectingToBackend()">
         <mat-icon>cloud_sync</mat-icon>
         <span>{{ 'common.menu.connectBackend' | transloco }}</span>
     </button>

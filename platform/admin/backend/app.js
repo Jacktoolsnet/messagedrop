@@ -67,9 +67,9 @@ const logFormat = winston.format.combine(
   })
 );
 
-const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '7d';
+const LOG_RETENTION_INFO = process.env.LOG_RETENTION_INFO || '2d';
 const LOG_RETENTION_WARN = process.env.LOG_RETENTION_WARN || LOG_RETENTION_INFO;
-const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '30d';
+const LOG_RETENTION_ERROR = process.env.LOG_RETENTION_ERROR || '2d';
 
 const infoOnlyFilter = winston.format((info) => (info.level === 'info' ? info : false));
 const warnOnlyFilter = winston.format((info) => (info.level === 'warn' ? info : false));
@@ -424,8 +424,8 @@ cron.schedule('5 0 * * *', () => {
   });
 });
 
-const infoRetentionMs = parseRetentionMs(LOG_RETENTION_INFO, 7 * DAY_MS);
-const errorRetentionMs = parseRetentionMs(LOG_RETENTION_ERROR, 30 * DAY_MS);
+const infoRetentionMs = parseRetentionMs(LOG_RETENTION_INFO, 2 * DAY_MS);
+const errorRetentionMs = parseRetentionMs(LOG_RETENTION_ERROR, 2 * DAY_MS);
 
 // Clean error logs older than configured retention
 cron.schedule('15 0 * * *', () => {

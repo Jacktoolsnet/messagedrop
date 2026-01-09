@@ -74,6 +74,7 @@ export class UserService {
   private pinKey: CryptoKey | null = null;
   private pinSalt: Uint8Array<ArrayBuffer> | null = null;
   private pinIterations = 250000;
+  private connectInProgress = false;
 
   private ready = false;
   private blocked = false;
@@ -297,6 +298,10 @@ export class UserService {
 
   isBlocked(): boolean {
     return this.blocked;
+  }
+
+  isConnectingToBackend(): boolean {
+    return this.connectInProgress;
   }
 
   getUser(): User {
@@ -1624,9 +1629,14 @@ export class UserService {
     if (!this.isReady() || this.hasJwt()) {
       return;
     }
+    if (this.connectInProgress) {
+      return;
+    }
+    this.connectInProgress = true;
 
     const user = this.getUser();
     if (!user?.id || !user.signingKeyPair?.privateKey) {
+      this.connectInProgress = false;
       return;
     }
 
@@ -1661,8 +1671,8 @@ export class UserService {
           image: '',
           icon: 'bug_report',
           message: this.i18n.t('auth.backendErrorMessage'),
-          button: this.i18n.t('common.actions.retry'),
-          delay: 10000,
+          button: this.i18n.t('common.actions.ok'),
+          delay: 0,
           showSpinner: false
         },
         maxWidth: '90vw',
@@ -1673,6 +1683,11 @@ export class UserService {
       dialogRef.afterClosed().subscribe(() => {
         this.blocked = false;
       });
+    } finally {
+      this.connectInProgress = false;
+      if (!this.hasJwt()) {
+        this.blocked = false;
+      }
     }
   }
 
