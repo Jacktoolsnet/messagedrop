@@ -5,7 +5,10 @@
 ::ng-deep mat-dialog-content {
   max-height: calc(95vh - 9rem) !important;
   overflow-y: auto !important;
+  overflow-x: hidden !important;
   display: block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 ::ng-deep mat-dialog-container {
@@ -211,7 +214,7 @@
   position: absolute;
   bottom: 0;
   right: 0;
-  transform: translate(50%, 50%);
+  transform: translate(0, 50%);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
