@@ -78,6 +78,11 @@ export class AppSettingsComponent implements OnInit {
     this.dialogRef.beforeClosed().subscribe(() => {
       this.resetPreviewState();
     });
+    const initialLanguage = this.appSettings.languageMode ?? this.languageService.languageMode();
+    if (initialLanguage !== this.appSettings.languageMode) {
+      this.appSettings = { ...this.appSettings, languageMode: initialLanguage };
+      this.baselineSettings = { ...this.baselineSettings, languageMode: initialLanguage };
+    }
     if ('permissions' in navigator && navigator.permissions?.query) {
       navigator.permissions
         .query({ name: 'geolocation' })
@@ -121,6 +126,7 @@ export class AppSettingsComponent implements OnInit {
     this.appService.setTheme(nextSettings);
     this.appSettings = nextSettings;
     this.baselineSettings = structuredClone(nextSettings);
+    this.languageService.endLanguagePreview();
 
     if (shouldClose) {
       this.dialogRef.close();
