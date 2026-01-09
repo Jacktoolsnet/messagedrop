@@ -22,6 +22,7 @@ export interface UnsplashPhoto {
   user: UnsplashUser;
   links?: {
     html?: string;
+    download_location?: string;
   };
 }
 

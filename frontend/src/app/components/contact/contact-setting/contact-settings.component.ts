@@ -18,6 +18,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
+import { UnsplashService } from '../../../services/unsplash.service';
 
 @Component({
   selector: 'app-profile',
@@ -43,6 +44,7 @@ export class ContactSettingsComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
   private readonly avatarStorage = inject(AvatarStorageService);
+  private readonly unsplashService = inject(UnsplashService);
   private readonly dialog = inject(MatDialog);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
@@ -425,6 +427,12 @@ export class ContactSettingsComponent {
 
   private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {
     try {
+      const downloadLocation = photo.links?.download_location;
+      if (downloadLocation) {
+        this.unsplashService.trackDownload(downloadLocation).subscribe({
+          error: () => undefined
+        });
+      }
       const response = await fetch(photo.urls.regular);
       if (!response.ok) {
         return null;

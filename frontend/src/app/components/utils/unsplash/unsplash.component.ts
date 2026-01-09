@@ -104,6 +104,12 @@ export class UnsplashComponent implements OnInit {
       this.dialogRef.close(result);
       return;
     }
+    const downloadLocation = result.links?.download_location;
+    if (downloadLocation) {
+      this.unsplashService.trackDownload(downloadLocation).subscribe({
+        error: () => undefined
+      });
+    }
     const description = result.description || result.alt_description || '';
     const multimedia: Multimedia = {
       type: MultimediaType.UNSPLASH,

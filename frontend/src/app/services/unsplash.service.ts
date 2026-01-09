@@ -70,4 +70,12 @@ export class UnsplashService {
         catchError(this.handleError)
       );
   }
+
+  trackDownload(downloadLocation: string): Observable<UnsplashApiResponse<unknown>> {
+    const url = `${environment.apiUrl}/unsplash/download`;
+    return this.http.post<UnsplashApiResponse<unknown>>(url, { downloadLocation }, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }

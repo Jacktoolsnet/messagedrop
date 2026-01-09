@@ -20,6 +20,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
+import { UnsplashService } from '../../../services/unsplash.service';
 
 @Component({
   selector: 'app-place',
@@ -66,6 +67,7 @@ export class PlaceProfileComponent {
   private readonly ngZone = inject(NgZone);
   private readonly dialog = inject(MatDialog);
   private readonly avatarStorage = inject(AvatarStorageService);
+  private readonly unsplashService = inject(UnsplashService);
   readonly data = inject<{ mode: Mode, place: Place }>(MAT_DIALOG_DATA);
 
   constructor() {
@@ -501,6 +503,12 @@ export class PlaceProfileComponent {
 
   private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {
     try {
+      const downloadLocation = photo.links?.download_location;
+      if (downloadLocation) {
+        this.unsplashService.trackDownload(downloadLocation).subscribe({
+          error: () => undefined
+        });
+      }
       const response = await fetch(photo.urls.regular);
       if (!response.ok) {
         return null;

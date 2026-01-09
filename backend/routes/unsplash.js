@@ -44,6 +44,31 @@ function buildSearchParams(query, page) {
     return params;
 }
 
+function getUnsplashBaseUrl() {
+    const base = process.env.UNSPLASH_BASE_URL;
+    if (!base) {
+        return null;
+    }
+    try {
+        return new URL(base);
+    } catch {
+        return null;
+    }
+}
+
+function isAllowedDownloadLocation(downloadLocation) {
+    try {
+        const url = new URL(downloadLocation);
+        const baseUrl = getUnsplashBaseUrl();
+        if (baseUrl) {
+            return url.protocol === baseUrl.protocol && url.host === baseUrl.host;
+        }
+        return url.host === 'api.unsplash.com';
+    } catch {
+        return false;
+    }
+}
+
 router.get('/featured',
     [
         metric.count('unsplash.featured', { when: 'always', timezone: 'utc', amount: 1 })
@@ -120,6 +145,39 @@ router.get('/search/:searchTerm/:page',
             return res.status(unsplashResponse.status).send(response);
         } catch (err) {
             req.logger?.error?.('Unsplash request failed', { error: err?.message || err });
+            return handleUnsplashError(err, next);
+        }
+    });
+
+router.post('/download',
+    [
+        metric.count('unsplash.download', { when: 'always', timezone: 'utc', amount: 1 })
+    ],
+    async (req, res, next) => {
+        const downloadLocation = typeof req.body?.downloadLocation === 'string'
+            ? req.body.downloadLocation.trim()
+            : typeof req.body?.download_location === 'string'
+                ? req.body.download_location.trim()
+                : '';
+
+        if (!downloadLocation) {
+            return next(apiError.badRequest('invalid_download_location'));
+        }
+
+        if (!isAllowedDownloadLocation(downloadLocation)) {
+            return next(apiError.badRequest('download_location_not_allowed'));
+        }
+
+        const response = { status: 0 };
+        const axiosClient = createUnsplashClient();
+
+        try {
+            const unsplashResponse = await axiosClient.get(downloadLocation);
+            response.status = unsplashResponse.status;
+            response.data = unsplashResponse.data;
+            return res.status(unsplashResponse.status).send(response);
+        } catch (err) {
+            req.logger?.error?.('Unsplash download tracking failed', { error: err?.message || err });
             return handleUnsplashError(err, next);
         }
     });
