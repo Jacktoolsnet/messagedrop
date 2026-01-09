@@ -1,7 +1,7 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { catchError, throwError } from 'rxjs';
+import { catchError, finalize, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { Contact } from '../interfaces/contact';
 import { CreateContactResponse } from '../interfaces/create-contact-response';
@@ -26,6 +26,9 @@ export class ContactService {
   private _contactReset = signal<{ scope: 'all' | 'contactUser'; contactUserId?: string; token: number } | null>(null);
   readonly contactReset = this._contactReset.asReadonly();
   private ready = false;
+  private initInProgress = false;
+  private lastInitUserId: string | null = null;
+  private lastInitHadJwt: boolean | null = null;
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -49,19 +52,31 @@ export class ContactService {
   }
 
   initContacts(force = false) {
-    if (this.ready && !force) {
-      return;
-    }
     const userId = this.userService.getUser().id;
     if (!this.userService.isReady() || !userId) {
       this.ready = false;
       return;
     }
-    if (!this.userService.hasJwt()) {
+    const hasJwt = this.userService.hasJwt();
+    const sameUser = this.lastInitUserId === userId;
+    const sameJwtState = this.lastInitHadJwt === hasJwt;
+    if (this.ready && (!force || (sameUser && sameJwtState))) {
+      return;
+    }
+    if (this.initInProgress) {
+      return;
+    }
+    this.lastInitUserId = userId;
+    this.lastInitHadJwt = hasJwt;
+    if (!hasJwt) {
       void this.loadCachedContacts();
       return;
     }
+    this.initInProgress = true;
     this.getByUserId(userId)
+      .pipe(finalize(() => {
+        this.initInProgress = false;
+      }))
       .subscribe({
         next: async (getContactsResponse: GetContactsResponse) => {
           const contacts = (getContactsResponse.rows || []).map(raw => this.mapRawContact(raw));
