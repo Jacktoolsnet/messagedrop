@@ -41,6 +41,9 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
   /** Optional: start with toggle focused/checked style, defaults to current settings */
   @Input() checkedOverride?: boolean;
 
+  /** Optional: persist settings when toggled (default true) */
+  @Input() persistOnToggle = true;
+
   /** Emits when the enabled state is changed (true/false) */
   @Output() enabledChange = new EventEmitter<boolean>();
 
@@ -72,9 +75,11 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
   async onToggle(enabled: boolean): Promise<void> {
     this.enabled = enabled;
 
-    const current = this.appService.getAppSettings();
-    const updated: AppSettings = { ...current, [this.settingsKey]: enabled } as AppSettings;
-    await this.appService.setAppSettings(updated);
+    if (this.persistOnToggle) {
+      const current = this.appService.getAppSettings();
+      const updated: AppSettings = { ...current, [this.settingsKey]: enabled } as AppSettings;
+      await this.appService.setAppSettings(updated);
+    }
 
     this.enabledChange.emit(enabled);
   }

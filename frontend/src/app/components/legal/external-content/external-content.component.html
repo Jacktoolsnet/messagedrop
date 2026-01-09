@@ -6,32 +6,45 @@
 <mat-dialog-content class="content">
     <div class="platform-tile-container">
         <div class="platform-tile">
-            <app-enable-external-content [platform]="'pinterest'" (enabledChange)="setAllowPinterestContent($event)">
+            <app-enable-external-content [platform]="'pinterest'" [checkedOverride]="appSettings.enablePinterestContent"
+                [persistOnToggle]="false" (enabledChange)="setAllowPinterestContent($event)">
             </app-enable-external-content>
         </div>
         <div class="platform-tile">
-            <app-enable-external-content [platform]="'spotify'" (enabledChange)="setAllowSpotifyContent($event)">
+            <app-enable-external-content [platform]="'spotify'" [checkedOverride]="appSettings.enableSpotifyContent"
+                [persistOnToggle]="false" (enabledChange)="setAllowSpotifyContent($event)">
             </app-enable-external-content>
         </div>
         <div class="platform-tile">
-            <app-enable-external-content [platform]="'tenor'" (enabledChange)="setAllowTenorContent($event)">
+            <app-enable-external-content [platform]="'tenor'" [checkedOverride]="appSettings.enableTenorContent"
+                [persistOnToggle]="false" (enabledChange)="setAllowTenorContent($event)">
             </app-enable-external-content>
         </div>
         <div class="platform-tile">
-            <app-enable-external-content [platform]="'unsplash'" (enabledChange)="setAllowUnsplashContent($event)">
+            <app-enable-external-content [platform]="'unsplash'" [checkedOverride]="appSettings.enableUnsplashContent"
+                [persistOnToggle]="false" (enabledChange)="setAllowUnsplashContent($event)">
             </app-enable-external-content>
         </div>
         <div class="platform-tile">
-            <app-enable-external-content [platform]="'tiktok'" (enabledChange)="setAllowTikTokContent($event)">
+            <app-enable-external-content [platform]="'tiktok'" [checkedOverride]="appSettings.enableTikTokContent"
+                [persistOnToggle]="false" (enabledChange)="setAllowTikTokContent($event)">
             </app-enable-external-content>
         </div>
         <div class="platform-tile">
-            <app-enable-external-content [platform]="'youtube'" (enabledChange)="setAllowYoutubeContent($event)">
+            <app-enable-external-content [platform]="'youtube'" [checkedOverride]="appSettings.enableYoutubeContent"
+                [persistOnToggle]="false" (enabledChange)="setAllowYoutubeContent($event)">
             </app-enable-external-content>
         </div>
     </div>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-    <button mat-dialog-close cdkFocusInitial (click)="onCloseClick()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button mat-dialog-close cdkFocusInitial (click)="onCloseClick()" mat-icon-button
+        [attr.aria-label]="'common.actions.close' | transloco" class="action-close">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
+        (click)="onApplyClick()">
+        <mat-icon>check</mat-icon>
+    </button>
 </mat-dialog-actions>

@@ -44,40 +44,39 @@ export class ExternalContentComponent {
   private readonly dialogRef = inject(MatDialogRef<ExternalContentComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
 
-  public appSettings: AppSettings = this.dialogData.appSettings;
+  public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
 
   onCloseClick(): void {
     this.dialogRef.close();
   }
 
+  async onApplyClick(): Promise<void> {
+    await this.appService.setAppSettings(this.appSettings);
+    this.dialogRef.close();
+  }
+
   setAllowYoutubeContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableYoutubeContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowPinterestContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enablePinterestContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowSpotifyContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableSpotifyContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowTikTokContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableTikTokContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowTenorContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableTenorContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setAllowUnsplashContent(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, enableUnsplashContent: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
 }
