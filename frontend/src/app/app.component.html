@@ -6,6 +6,13 @@
     (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
 
+@if (!networkService.backendOnline()) {
+<button mat-fab class="button_backend_status" (click)="showBackendOfflineInfo()"
+    [attr.aria-label]="'common.serverDown.title' | transloco">
+    <mat-icon aria-hidden="false">cloud_off</mat-icon>
+</button>
+}
+
 @if (userService.isBlocked()) {
 <button aria-hidden="false" class="button_profile" mat-fab color="accent"
     [attr.aria-label]="'common.aria.wait' | transloco">
@@ -50,7 +57,7 @@
     }
 
     @if (userService.isReady()) {
-    @if (!userService.hasJwt()) {
+    @if (!userService.hasJwt() && networkService.backendOnline()) {
     <button mat-menu-item (click)="connectToBackend()" [disabled]="userService.isConnectingToBackend()">
         <mat-icon>cloud_sync</mat-icon>
         <span>{{ 'common.menu.connectBackend' | transloco }}</span>
@@ -211,6 +218,7 @@
     </button>
     }
 
+    @if (networkService.backendOnline()) {
     <button mat-menu-item (click)="showWeather()">
         <mat-icon>weather_mix</mat-icon>
         <span>{{ 'common.menu.weather' | transloco }}</span>
@@ -220,6 +228,7 @@
         <mat-icon>eco</mat-icon>
         <span>{{ 'common.menu.airQuality' | transloco }}</span>
     </button>
+    }
 
     <!--button mat-menu-item (click)="showGeoStatistic()">
         <mat-icon >data_exploration</mat-icon>

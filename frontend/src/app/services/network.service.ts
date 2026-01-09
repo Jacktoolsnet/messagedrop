@@ -1,7 +1,9 @@
-import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { DisplayMessageConfig } from '../interfaces/display-message-config';
+import { environment } from '../../environments/environment';
 import { TranslationHelperService } from './translation-helper.service';
 
 interface LiteNetworkInformation {
@@ -17,9 +19,15 @@ export class NetworkService {
   private networkDialogRef: MatDialogRef<DisplayMessage> | undefined;
 
   private readonly displayMessage = inject(MatDialog);
+  private readonly http = inject(HttpClient);
   private readonly i18n = inject(TranslationHelperService);
 
   online = true;
+  private readonly backendOnlineSig = signal(true);
+  readonly backendOnline = this.backendOnlineSig.asReadonly();
+  private backendCheckTimer?: ReturnType<typeof setTimeout>;
+  private backendCheckAttempts = 0;
+  private backendCheckInFlight = false;
   private networkMessageMap = new Map<string, DisplayMessageConfig>();
   private readonly errorTitleKeyMap: Record<number, string> = {
     0: 'errors.http.title.noConnection',
@@ -131,6 +139,80 @@ export class NetworkService {
 
   isOnline(): boolean {
     return this.online;
+  }
+
+  setBackendOnline(online: boolean): void {
+    if (this.backendOnlineSig() === online) {
+      return;
+    }
+    this.backendOnlineSig.set(online);
+    if (online) {
+      this.stopBackendMonitoring();
+    } else {
+      this.scheduleBackendCheck();
+    }
+  }
+
+  private scheduleBackendCheck(): void {
+    if (this.backendCheckTimer || this.backendCheckInFlight) {
+      return;
+    }
+    if (this.backendOnlineSig()) {
+      return;
+    }
+    const delay = this.getBackendRetryDelay();
+    this.backendCheckTimer = setTimeout(() => {
+      this.backendCheckTimer = undefined;
+      this.checkBackendOnline();
+    }, delay);
+  }
+
+  private stopBackendMonitoring(): void {
+    if (this.backendCheckTimer) {
+      clearTimeout(this.backendCheckTimer);
+      this.backendCheckTimer = undefined;
+    }
+    this.backendCheckAttempts = 0;
+    this.backendCheckInFlight = false;
+  }
+
+  private getBackendRetryDelay(): number {
+    if (this.backendCheckAttempts < 6) {
+      return 30_000;
+    }
+    if (this.backendCheckAttempts < 12) {
+      return 60_000;
+    }
+    if (this.backendCheckAttempts < 24) {
+      return 300_000;
+    }
+    return 600_000;
+  }
+
+  private checkBackendOnline(): void {
+    if (this.backendCheckInFlight || this.backendOnlineSig()) {
+      return;
+    }
+    if (typeof navigator !== 'undefined' && navigator.onLine === false) {
+      this.scheduleBackendCheck();
+      return;
+    }
+    this.backendCheckInFlight = true;
+    this.backendCheckAttempts += 1;
+    const url = `${environment.apiUrl}/clientconnect`;
+    const headers = new HttpHeaders({ 'x-skip-ui': 'true' });
+    this.http.get(url, { headers, withCredentials: true }).subscribe({
+      next: () => {
+        this.backendCheckInFlight = false;
+        this.setBackendOnline(true);
+      },
+      error: () => {
+        this.backendCheckInFlight = false;
+        if (!this.backendOnlineSig()) {
+          this.scheduleBackendCheck();
+        }
+      }
+    });
   }
 
   getErrorTitle(status: number): string {

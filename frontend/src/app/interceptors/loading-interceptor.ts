@@ -7,6 +7,9 @@ import { NetworkService } from '../services/network.service';
 
 export const loadingInterceptor: HttpInterceptorFn = (req, next) => {
     const networkService = inject(NetworkService);
+    if (req.headers.has('x-skip-ui')) {
+        return next(req);
+    }
     let loadingDialogRef: MatDialogRef<DisplayMessage> | undefined = undefined;
     if (networkService.isShowAlways(req.url) || networkService.isSlowConnection()) {
         loadingDialogRef = networkService.showLoadingDialog(req.url);

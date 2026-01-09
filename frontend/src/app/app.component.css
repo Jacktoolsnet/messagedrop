@@ -35,6 +35,19 @@
     margin-bottom: 6rem;
 }
 
+.button_backend_status {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    margin-top: 2rem;
+    --mdc-fab-container-color: #f59e0b;
+    --mdc-fab-icon-color: #fff;
+    background-color: #f59e0b;
+    color: #fff;
+}
+
 .button_goToLocation {
     position: absolute;
     right: 0;

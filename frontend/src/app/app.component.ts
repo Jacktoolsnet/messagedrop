@@ -522,6 +522,27 @@ export class AppComponent implements OnInit {
     }
   }
 
+  public showBackendOfflineInfo(): void {
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        showAlways: true,
+        title: this.translation.t('common.serverDown.title'),
+        image: '',
+        icon: 'cloud_off',
+        message: this.translation.t('common.serverDown.message'),
+        button: this.translation.t('common.actions.ok'),
+        delay: 0,
+        showSpinner: false
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+  }
+
   public loadLocalDataAfterLogin(): void {
     this.updateDataForLocation();
   }
