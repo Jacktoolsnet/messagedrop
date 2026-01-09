@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { FileCacheService } from './file-cache.service';
 
-type StoredImageKind = 'avatar' | 'background';
+type StoredImageKind = 'avatar' | 'background' | 'avatar-original' | 'background-original';
 
 @Injectable({ providedIn: 'root' })
 export class AvatarStorageService {
@@ -30,6 +30,22 @@ export class AvatarStorageService {
     }
     const url = this.createObjectUrl(id, blob);
     return { id, url };
+  }
+
+  async saveImageFromFile(
+    kind: StoredImageKind,
+    file: Blob,
+    existingId?: string
+  ): Promise<{ id: string; url: string } | null> {
+    if (!this.isSupported()) {
+      return null;
+    }
+    try {
+      const dataUrl = await this.fileToDataUrl(file);
+      return this.saveImageFromDataUrl(kind, dataUrl, existingId);
+    } catch {
+      return null;
+    }
   }
 
   async saveImageFromBase64(

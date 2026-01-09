@@ -148,8 +148,10 @@ export class ContactService {
       const profile = await this.indexedDbService.getContactProfile(contact.id);
       contact.name = this.sanitizeContactName(profile?.name ?? contact.name);
       contact.avatarFileId = profile?.avatarFileId ?? contact.avatarFileId;
+      contact.avatarOriginalFileId = profile?.avatarOriginalFileId ?? contact.avatarOriginalFileId;
       contact.avatarAttribution = profile?.avatarAttribution ?? contact.avatarAttribution;
       contact.chatBackgroundFileId = profile?.chatBackgroundFileId ?? contact.chatBackgroundFileId;
+      contact.chatBackgroundOriginalFileId = profile?.chatBackgroundOriginalFileId ?? contact.chatBackgroundOriginalFileId;
       contact.chatBackgroundAttribution = profile?.chatBackgroundAttribution ?? contact.chatBackgroundAttribution;
       contact.base64Avatar = contact.avatarFileId
         ? (await this.avatarStorage.getImageUrl(contact.avatarFileId)) || ''
@@ -172,9 +174,11 @@ export class ContactService {
         name: contact.name ? contact.name : '',
         base64Avatar: '',
         avatarFileId: contact.avatarFileId,
+        avatarOriginalFileId: contact.avatarOriginalFileId,
         avatarAttribution: contact.avatarAttribution,
         chatBackgroundImage: '',
         chatBackgroundFileId: contact.chatBackgroundFileId,
+        chatBackgroundOriginalFileId: contact.chatBackgroundOriginalFileId,
         chatBackgroundAttribution: contact.chatBackgroundAttribution,
         chatBackgroundTransparency: contact.chatBackgroundTransparency ?? 40,
         pinned: contact.pinned

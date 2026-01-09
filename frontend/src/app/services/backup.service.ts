@@ -271,14 +271,23 @@ export class BackupService {
       if (profile.avatarFileId) {
         ids.add(profile.avatarFileId);
       }
+      if (profile.avatarOriginalFileId) {
+        ids.add(profile.avatarOriginalFileId);
+      }
     });
 
     contactProfiles.forEach((profile) => {
       if (profile.avatarFileId) {
         ids.add(profile.avatarFileId);
       }
+      if (profile.avatarOriginalFileId) {
+        ids.add(profile.avatarOriginalFileId);
+      }
       if (profile.chatBackgroundFileId) {
         ids.add(profile.chatBackgroundFileId);
+      }
+      if (profile.chatBackgroundOriginalFileId) {
+        ids.add(profile.chatBackgroundOriginalFileId);
       }
     });
 
@@ -286,8 +295,14 @@ export class BackupService {
       if (place.avatarFileId) {
         ids.add(place.avatarFileId);
       }
+      if (place.avatarOriginalFileId) {
+        ids.add(place.avatarOriginalFileId);
+      }
       if (place.placeBackgroundFileId) {
         ids.add(place.placeBackgroundFileId);
+      }
+      if (place.placeBackgroundOriginalFileId) {
+        ids.add(place.placeBackgroundOriginalFileId);
       }
     });
 
@@ -295,8 +310,14 @@ export class BackupService {
       if (contact.avatarFileId) {
         ids.add(contact.avatarFileId);
       }
+      if (contact.avatarOriginalFileId) {
+        ids.add(contact.avatarOriginalFileId);
+      }
       if (contact.chatBackgroundFileId) {
         ids.add(contact.chatBackgroundFileId);
+      }
+      if (contact.chatBackgroundOriginalFileId) {
+        ids.add(contact.chatBackgroundOriginalFileId);
       }
     });
 

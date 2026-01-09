@@ -51,7 +51,8 @@ export class ContactSettingsComponent {
 
   public contact: Contact = this.data.contact;
   readonly joinedUserRoom = this.socketioService.joinedUserRoom;
-  private readonly maxFileSize = 5 * 1024 * 1024; // 5MB
+  private readonly maxOriginalMb = 10;
+  private readonly maxOriginalBytes = this.maxOriginalMb * 1024 * 1024;
   private readonly maxAvatarMb = 2;
   private readonly maxAvatarDimension = 256;
   private readonly maxBackgroundMb = 2;
@@ -59,6 +60,8 @@ export class ContactSettingsComponent {
   private readonly oriContact: Contact = structuredClone(this.contact);
   private readonly originalAvatarFileId = this.oriContact.avatarFileId;
   private readonly originalBackgroundFileId = this.oriContact.chatBackgroundFileId;
+  private readonly originalAvatarOriginalFileId = this.oriContact.avatarOriginalFileId;
+  private readonly originalBackgroundOriginalFileId = this.oriContact.chatBackgroundOriginalFileId;
 
   constructor() {
     if (this.contact.chatBackgroundTransparency == null) {
@@ -122,6 +125,17 @@ export class ContactSettingsComponent {
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
+      input.value = '';
+      return;
+    }
+
+    if (file.size > this.maxOriginalBytes) {
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: this.maxOriginalMb }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      input.value = '';
       return;
     }
 
@@ -146,9 +160,9 @@ export class ContactSettingsComponent {
       return;
     }
 
-    if (file.size > this.maxFileSize) {
+    if (file.size > this.maxOriginalBytes) {
       this.snackBar.open(
-        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 5 }),
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: this.maxOriginalMb }),
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
@@ -163,7 +177,11 @@ export class ContactSettingsComponent {
     if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
       await this.avatarStorage.deleteImage(this.contact.avatarFileId);
     }
+    if (this.contact.avatarOriginalFileId && this.contact.avatarOriginalFileId !== this.originalAvatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.contact.avatarOriginalFileId);
+    }
     this.contact.avatarFileId = undefined;
+    this.contact.avatarOriginalFileId = undefined;
     this.contact.base64Avatar = undefined;
     this.contact.avatarAttribution = undefined;
   }
@@ -172,7 +190,11 @@ export class ContactSettingsComponent {
     if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
       await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
     }
+    if (this.contact.chatBackgroundOriginalFileId && this.contact.chatBackgroundOriginalFileId !== this.originalBackgroundOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.contact.chatBackgroundOriginalFileId);
+    }
     this.contact.chatBackgroundFileId = undefined;
+    this.contact.chatBackgroundOriginalFileId = undefined;
     this.contact.chatBackgroundImage = '';
     this.contact.chatBackgroundAttribution = undefined;
   }
@@ -243,6 +265,14 @@ export class ContactSettingsComponent {
       );
       return;
     }
+    if (file.size > this.maxOriginalBytes) {
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: this.maxOriginalMb }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
     this.openAvatarCropper(file, this.buildUnsplashAttribution(photo));
   }
 
@@ -251,6 +281,14 @@ export class ContactSettingsComponent {
     if (!file) {
       this.snackBar.open(
         this.translation.t('common.avatarCropper.loadFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+    if (file.size > this.maxOriginalBytes) {
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: this.maxOriginalMb }),
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
@@ -291,7 +329,7 @@ export class ContactSettingsComponent {
     };
   }
 
-  private openBackgroundCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement): void {
+  private openBackgroundCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement, originalId?: string): void {
     const dialogRef = this.dialog.open(AvatarCropperComponent, {
       data: {
         file,
@@ -317,15 +355,32 @@ export class ContactSettingsComponent {
         this.showStorageUnsupported();
         return;
       }
+      let savedOriginalId = originalId;
+      if (!savedOriginalId) {
+        const existingOriginalId = this.contact.chatBackgroundOriginalFileId;
+        if (existingOriginalId && existingOriginalId !== this.originalBackgroundOriginalFileId) {
+          await this.avatarStorage.deleteImage(existingOriginalId);
+        }
+        const savedOriginal = await this.saveOriginalImage(file, 'background-original');
+        if (!savedOriginal) {
+          this.showStorageUnsupported();
+          return;
+        }
+        savedOriginalId = savedOriginal.id;
+      }
       if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
         await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
       }
       const saved = await this.avatarStorage.saveImageFromDataUrl('background', croppedImage);
       if (!saved) {
+        if (!originalId && savedOriginalId) {
+          await this.avatarStorage.deleteImage(savedOriginalId);
+        }
         this.showStorageUnsupported();
         return;
       }
       this.contact.chatBackgroundFileId = saved.id;
+      this.contact.chatBackgroundOriginalFileId = savedOriginalId;
       this.contact.chatBackgroundImage = saved.url;
       this.contact.chatBackgroundAttribution = attribution;
       if (this.contact.chatBackgroundTransparency == null) {
@@ -335,7 +390,11 @@ export class ContactSettingsComponent {
   }
 
   async editAvatar(): Promise<void> {
-    const file = await this.loadStoredImageFile(this.contact.avatarFileId, this.contact.base64Avatar, 'avatar-edit.jpg');
+    const file = await this.loadStoredImageFile(
+      this.contact.avatarOriginalFileId ?? this.contact.avatarFileId,
+      this.contact.base64Avatar,
+      'avatar-edit.jpg'
+    );
     if (!file) {
       this.snackBar.open(
         this.translation.t('common.avatarCropper.loadFailed'),
@@ -344,12 +403,12 @@ export class ContactSettingsComponent {
       );
       return;
     }
-    this.openAvatarCropper(file, this.contact.avatarAttribution);
+    this.openAvatarCropper(file, this.contact.avatarAttribution, undefined, this.contact.avatarOriginalFileId);
   }
 
   async editChatBackground(): Promise<void> {
     const file = await this.loadStoredImageFile(
-      this.contact.chatBackgroundFileId,
+      this.contact.chatBackgroundOriginalFileId ?? this.contact.chatBackgroundFileId,
       this.contact.chatBackgroundImage,
       'background-edit.jpg'
     );
@@ -361,10 +420,10 @@ export class ContactSettingsComponent {
       );
       return;
     }
-    this.openBackgroundCropper(file, this.contact.chatBackgroundAttribution);
+    this.openBackgroundCropper(file, this.contact.chatBackgroundAttribution, undefined, this.contact.chatBackgroundOriginalFileId);
   }
 
-  private openAvatarCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement): void {
+  private openAvatarCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement, originalId?: string): void {
     const dialogRef = this.dialog.open(AvatarCropperComponent, {
       data: {
         file,
@@ -386,18 +445,42 @@ export class ContactSettingsComponent {
         this.showStorageUnsupported();
         return;
       }
+      let savedOriginalId = originalId;
+      if (!savedOriginalId) {
+        const existingOriginalId = this.contact.avatarOriginalFileId;
+        if (existingOriginalId && existingOriginalId !== this.originalAvatarOriginalFileId) {
+          await this.avatarStorage.deleteImage(existingOriginalId);
+        }
+        const savedOriginal = await this.saveOriginalImage(file, 'avatar-original');
+        if (!savedOriginal) {
+          this.showStorageUnsupported();
+          return;
+        }
+        savedOriginalId = savedOriginal.id;
+      }
       if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
         await this.avatarStorage.deleteImage(this.contact.avatarFileId);
       }
       const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
       if (!saved) {
+        if (!originalId && savedOriginalId) {
+          await this.avatarStorage.deleteImage(savedOriginalId);
+        }
         this.showStorageUnsupported();
         return;
       }
       this.contact.avatarFileId = saved.id;
+      this.contact.avatarOriginalFileId = savedOriginalId;
       this.contact.base64Avatar = saved.url;
       this.contact.avatarAttribution = attribution;
     });
+  }
+
+  private saveOriginalImage(
+    file: File,
+    kind: 'avatar-original' | 'background-original'
+  ): Promise<{ id: string; url: string } | null> {
+    return this.avatarStorage.saveImageFromFile(kind, file);
   }
 
   private async loadStoredImageFile(fileId?: string | null, fallbackUrl?: string | null, name = 'image.jpg'): Promise<File | null> {
@@ -453,8 +536,14 @@ export class ContactSettingsComponent {
     if (this.contact.avatarFileId && this.contact.avatarFileId !== this.originalAvatarFileId) {
       await this.avatarStorage.deleteImage(this.contact.avatarFileId);
     }
+    if (this.contact.avatarOriginalFileId && this.contact.avatarOriginalFileId !== this.originalAvatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.contact.avatarOriginalFileId);
+    }
     if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
       await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
+    }
+    if (this.contact.chatBackgroundOriginalFileId && this.contact.chatBackgroundOriginalFileId !== this.originalBackgroundOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.contact.chatBackgroundOriginalFileId);
     }
     Object.assign(this.data.contact, this.oriContact);
     this.dialogRef.close();
@@ -464,8 +553,14 @@ export class ContactSettingsComponent {
     if (this.originalAvatarFileId && this.originalAvatarFileId !== this.contact.avatarFileId) {
       await this.avatarStorage.deleteImage(this.originalAvatarFileId);
     }
+    if (this.originalAvatarOriginalFileId && this.originalAvatarOriginalFileId !== this.contact.avatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.originalAvatarOriginalFileId);
+    }
     if (this.originalBackgroundFileId && this.originalBackgroundFileId !== this.contact.chatBackgroundFileId) {
       await this.avatarStorage.deleteImage(this.originalBackgroundFileId);
+    }
+    if (this.originalBackgroundOriginalFileId && this.originalBackgroundOriginalFileId !== this.contact.chatBackgroundOriginalFileId) {
+      await this.avatarStorage.deleteImage(this.originalBackgroundOriginalFileId);
     }
     this.dialogRef.close();
   }

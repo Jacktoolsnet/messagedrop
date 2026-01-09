@@ -43,6 +43,8 @@ import { UnsplashService } from '../../../services/unsplash.service';
 export class UserProfileComponent {
   private readonly maxAvatarMb = 2;
   private readonly maxAvatarDimension = 256;
+  private readonly maxOriginalMb = 10;
+  private readonly maxOriginalBytes = this.maxOriginalMb * 1024 * 1024;
   private oriProfile: Profile;
 
   readonly userService = inject(UserService);
@@ -82,6 +84,10 @@ export class UserProfileComponent {
     if (currentId && currentId !== this.oriProfile.avatarFileId) {
       await this.avatarStorage.deleteImage(currentId);
     }
+    const currentOriginalId = this.userService.getProfile().avatarOriginalFileId;
+    if (currentOriginalId && currentOriginalId !== this.oriProfile.avatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(currentOriginalId);
+    }
     Object.assign(this.userService.getProfile(), this.oriProfile);
     this.userService.notifyProfileChanged();
     this.dialogRef.close();
@@ -99,11 +105,17 @@ export class UserProfileComponent {
       this.snackBar.open(this.translation.t('common.user.profile.fileTypeInvalid'), this.translation.t('common.actions.ok'), {
         duration: 2000
       });
+      input.value = '';
       return;
     }
 
-    if (!this.avatarStorage.isSupported()) {
-      this.showStorageUnsupported();
+    if (file.size > this.maxOriginalBytes) {
+      this.snackBar.open(
+        this.translation.t('common.user.profile.fileTooLarge', { maxSizeMb: this.maxOriginalMb }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      input.value = '';
       return;
     }
 
@@ -115,7 +127,12 @@ export class UserProfileComponent {
     if (currentId && currentId !== this.oriProfile.avatarFileId) {
       await this.avatarStorage.deleteImage(currentId);
     }
+    const currentOriginalId = this.userService.getProfile().avatarOriginalFileId;
+    if (currentOriginalId && currentOriginalId !== this.oriProfile.avatarOriginalFileId) {
+      await this.avatarStorage.deleteImage(currentOriginalId);
+    }
     this.userService.getProfile().avatarFileId = undefined;
+    this.userService.getProfile().avatarOriginalFileId = undefined;
     this.userService.getProfile().base64Avatar = '';
     this.userService.getProfile().avatarAttribution = undefined;
     this.userService.notifyProfileChanged();
@@ -126,6 +143,11 @@ export class UserProfileComponent {
     const currentId = this.userService.getProfile().avatarFileId;
     if (originalId && originalId !== currentId) {
       await this.avatarStorage.deleteImage(originalId);
+    }
+    const originalOriginalId = this.oriProfile.avatarOriginalFileId;
+    const currentOriginalId = this.userService.getProfile().avatarOriginalFileId;
+    if (originalOriginalId && originalOriginalId !== currentOriginalId) {
+      await this.avatarStorage.deleteImage(originalOriginalId);
     }
     this.userService.notifyProfileChanged();
     this.dialogRef.close(this.userService.getProfile());
@@ -169,6 +191,14 @@ export class UserProfileComponent {
       });
       return;
     }
+    if (file.size > this.maxOriginalBytes) {
+      this.snackBar.open(
+        this.translation.t('common.user.profile.fileTooLarge', { maxSizeMb: this.maxOriginalMb }),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
     this.openAvatarCropper(file, this.buildUnsplashAttribution(photo));
   }
 
@@ -206,17 +236,21 @@ export class UserProfileComponent {
 
   async editAvatar(): Promise<void> {
     const profile = this.userService.getProfile();
-    const file = await this.loadStoredImageFile(profile.avatarFileId, profile.base64Avatar, 'avatar-edit.jpg');
+    const file = await this.loadStoredImageFile(
+      profile.avatarOriginalFileId ?? profile.avatarFileId,
+      profile.base64Avatar,
+      'avatar-edit.jpg'
+    );
     if (!file) {
       this.snackBar.open(this.translation.t('common.avatarCropper.loadFailed'), this.translation.t('common.actions.ok'), {
         duration: 2000
       });
       return;
     }
-    this.openAvatarCropper(file, profile.avatarAttribution);
+    this.openAvatarCropper(file, profile.avatarAttribution, undefined, profile.avatarOriginalFileId);
   }
 
-  private openAvatarCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement): void {
+  private openAvatarCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement, originalId?: string): void {
     const dialogRef = this.dialog.open(AvatarCropperComponent, {
       data: {
         file,
@@ -238,21 +272,45 @@ export class UserProfileComponent {
         this.showStorageUnsupported();
         return;
       }
-      const currentId = this.userService.getProfile().avatarFileId;
+      const profile = this.userService.getProfile();
+      let savedOriginalId = originalId;
+      if (!savedOriginalId) {
+        const existingOriginalId = profile.avatarOriginalFileId;
+        if (existingOriginalId && existingOriginalId !== this.oriProfile.avatarOriginalFileId) {
+          await this.avatarStorage.deleteImage(existingOriginalId);
+        }
+        const savedOriginal = await this.saveOriginalImage(file, 'avatar-original');
+        if (!savedOriginal) {
+          this.showStorageUnsupported();
+          return;
+        }
+        savedOriginalId = savedOriginal.id;
+      }
+      const currentId = profile.avatarFileId;
       if (currentId && currentId !== this.oriProfile.avatarFileId) {
         await this.avatarStorage.deleteImage(currentId);
       }
       const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
       if (!saved) {
+        if (!originalId && savedOriginalId) {
+          await this.avatarStorage.deleteImage(savedOriginalId);
+        }
         this.showStorageUnsupported();
         return;
       }
-      const profile = this.userService.getProfile();
       profile.avatarFileId = saved.id;
+      profile.avatarOriginalFileId = savedOriginalId;
       profile.base64Avatar = saved.url;
       profile.avatarAttribution = attribution;
       this.userService.notifyProfileChanged();
     });
+  }
+
+  private saveOriginalImage(
+    file: File,
+    kind: 'avatar-original' | 'background-original'
+  ): Promise<{ id: string; url: string } | null> {
+    return this.avatarStorage.saveImageFromFile(kind, file);
   }
 
   private async loadStoredImageFile(fileId?: string | null, fallbackUrl?: string | null, name = 'image.jpg'): Promise<File | null> {

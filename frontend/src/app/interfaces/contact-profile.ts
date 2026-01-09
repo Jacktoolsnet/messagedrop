@@ -4,9 +4,11 @@ export interface ContactProfile {
     name: string,
     base64Avatar: string
     avatarFileId?: string,
+    avatarOriginalFileId?: string,
     avatarAttribution?: AvatarAttribution,
     chatBackgroundImage?: string,
     chatBackgroundFileId?: string,
+    chatBackgroundOriginalFileId?: string,
     chatBackgroundAttribution?: AvatarAttribution,
     chatBackgroundTransparency?: number,
     defaultStyle?: string,

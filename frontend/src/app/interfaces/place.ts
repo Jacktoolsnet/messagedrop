@@ -13,9 +13,11 @@ export interface Place {
     name: string,
     base64Avatar: string
     avatarFileId?: string,
+    avatarOriginalFileId?: string,
     avatarAttribution?: AvatarAttribution,
     placeBackgroundImage?: string,
     placeBackgroundFileId?: string,
+    placeBackgroundOriginalFileId?: string,
     placeBackgroundAttribution?: AvatarAttribution,
     placeBackgroundTransparency?: number,
     icon: string,
