@@ -790,7 +790,7 @@ export class UserService {
     return language;
   }
 
-  public async login(afterLogin?: () => void, options?: { requireJwt?: boolean }) {
+  public async login(afterLogin?: () => void, options?: { requireJwt?: boolean; attemptBackend?: boolean }) {
     if (await this.indexedDbService.hasUser()) {
       this.openCheckPinDialog(afterLogin, options);
     } else {
@@ -1407,7 +1407,7 @@ export class UserService {
     });
   }
 
-  public openCheckPinDialog(callback?: () => void, options?: { requireJwt?: boolean }): void {
+  public openCheckPinDialog(callback?: () => void, options?: { requireJwt?: boolean; attemptBackend?: boolean }): void {
     const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -1416,6 +1416,7 @@ export class UserService {
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
       const requireJwt = options?.requireJwt ?? false;
+      const attemptBackend = options?.attemptBackend ?? true;
       let callbackCalled = false;
       const runCallback = () => {
         if (callback && !callbackCalled) {
@@ -1445,6 +1446,9 @@ export class UserService {
       this.setLocalUser(user);
       if (!requireJwt) {
         runCallback();
+        if (attemptBackend && !this.hasJwt()) {
+          void this.attemptBackendLogin(user, { showAlways: false, showError: false, blockUi: false });
+        }
         return;
       }
 
@@ -1625,29 +1629,32 @@ export class UserService {
     });
   }
 
-  public async connectToBackend(afterLogin?: () => void): Promise<void> {
-    if (!this.isReady() || this.hasJwt()) {
-      return;
+  private async attemptBackendLogin(
+    user: User,
+    options?: { showAlways?: boolean; showError?: boolean; blockUi?: boolean; afterLogin?: () => void }
+  ): Promise<boolean> {
+    if (!user?.id || !user.signingKeyPair?.privateKey) {
+      return false;
+    }
+    if (this.hasJwt()) {
+      return true;
     }
     if (this.connectInProgress) {
-      return;
+      return false;
     }
     this.connectInProgress = true;
-
-    const user = this.getUser();
-    if (!user?.id || !user.signingKeyPair?.privateKey) {
-      this.connectInProgress = false;
-      return;
+    if (options?.blockUi) {
+      this.blocked = true;
     }
 
-    this.blocked = true;
     try {
-      const challengeResponse = await firstValueFrom(this.requestLoginChallenge(user.id, true));
+      const showAlways = options?.showAlways ?? false;
+      const challengeResponse = await firstValueFrom(this.requestLoginChallenge(user.id, showAlways));
       const signature = await this.cryptoService.createSignature(
         user.signingKeyPair.privateKey,
         challengeResponse.challenge
       );
-      const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, true));
+      const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, showAlways));
       this.setUser(user, loginResponse.jwt);
       if (Notification.permission === "granted") {
         if (this.getUser().subscription !== '') {
@@ -1657,38 +1664,57 @@ export class UserService {
           this.registerSubscription(this.getUser());
         }
       }
-      if (afterLogin) {
-        afterLogin();
+      if (options?.afterLogin) {
+        options.afterLogin();
       }
+      return true;
     } catch (err) {
       console.error('Backend login failed', err);
-      const dialogRef = this.displayMessage.open(DisplayMessage, {
-        panelClass: '',
-        closeOnNavigation: false,
-        data: {
-          showAlways: true,
-          title: this.i18n.t('auth.backendErrorTitle'),
-          image: '',
-          icon: 'bug_report',
-          message: this.i18n.t('auth.backendErrorMessage'),
-          button: this.i18n.t('common.actions.ok'),
-          delay: 0,
-          showSpinner: false
-        },
-        maxWidth: '90vw',
-        maxHeight: '90vh',
-        hasBackdrop: true,
-        autoFocus: false
-      });
-      dialogRef.afterClosed().subscribe(() => {
-        this.blocked = false;
-      });
+      if (options?.showError ?? true) {
+        const dialogRef = this.displayMessage.open(DisplayMessage, {
+          panelClass: '',
+          closeOnNavigation: false,
+          data: {
+            showAlways: true,
+            title: this.i18n.t('auth.backendErrorTitle'),
+            image: '',
+            icon: 'bug_report',
+            message: this.i18n.t('auth.backendErrorMessage'),
+            button: this.i18n.t('common.actions.ok'),
+            delay: 0,
+            showSpinner: false
+          },
+          maxWidth: '90vw',
+          maxHeight: '90vh',
+          hasBackdrop: true,
+          autoFocus: false
+        });
+        dialogRef.afterClosed().subscribe(() => {
+          if (options?.blockUi) {
+            this.blocked = false;
+          }
+        });
+      }
+      return false;
     } finally {
       this.connectInProgress = false;
-      if (!this.hasJwt()) {
+      if (options?.blockUi && !this.hasJwt()) {
         this.blocked = false;
       }
     }
+  }
+
+  public async connectToBackend(afterLogin?: () => void): Promise<void> {
+    if (!this.isReady() || this.hasJwt()) {
+      return;
+    }
+    const user = this.getUser();
+    await this.attemptBackendLogin(user, {
+      showAlways: true,
+      showError: true,
+      blockUi: true,
+      afterLogin
+    });
   }
 
 }
