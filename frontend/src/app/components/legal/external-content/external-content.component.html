@@ -18,6 +18,10 @@
             </app-enable-external-content>
         </div>
         <div class="platform-tile">
+            <app-enable-external-content [platform]="'unsplash'" (enabledChange)="setAllowUnsplashContent($event)">
+            </app-enable-external-content>
+        </div>
+        <div class="platform-tile">
             <app-enable-external-content [platform]="'tiktok'" (enabledChange)="setAllowTikTokContent($event)">
             </app-enable-external-content>
         </div>

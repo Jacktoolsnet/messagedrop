@@ -164,7 +164,8 @@ export class ContactService {
   }
 
   async saveAditionalContactInfos() {
-    await Promise.all(this._contacts().map(contact => {
+    const contacts = this._contacts();
+    await Promise.all(contacts.map(contact => {
       this.indexedDbService.setContactProfile(contact.id, {
         name: contact.name ? contact.name : '',
         base64Avatar: '',
@@ -175,6 +176,7 @@ export class ContactService {
         pinned: contact.pinned
       });
     }));
+    this._contacts.set(contacts.slice());
   }
 
   private persistContacts(markDirty = true): void {

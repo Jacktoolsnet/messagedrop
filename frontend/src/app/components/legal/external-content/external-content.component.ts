@@ -75,4 +75,9 @@ export class ExternalContentComponent {
     this.appService.setAppSettings(this.appSettings);
   }
 
+  setAllowUnsplashContent(enabled: boolean): void {
+    this.appSettings = { ...this.appSettings, enableUnsplashContent: enabled };
+    this.appService.setAppSettings(this.appSettings);
+  }
+
 }

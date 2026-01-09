@@ -67,6 +67,8 @@ export class UserService {
     name: '',
     base64Avatar: ''
   };
+  private readonly profileVersionSignal = signal(0);
+  readonly profileVersion = this.profileVersionSignal.asReadonly();
 
   private tokenRenewalTimeout: ReturnType<typeof setTimeout> | null = null;
   private pinKey: CryptoKey | null = null;
@@ -268,8 +270,13 @@ export class UserService {
         name: '',
         base64Avatar: ''
       };
+      this.notifyProfileChanged();
       return this.profile;
     }
+  }
+
+  notifyProfileChanged(): void {
+    this.profileVersionSignal.update((version) => version + 1);
   }
 
   async saveUser() {
@@ -298,6 +305,7 @@ export class UserService {
     this.profile = await this.indexedDbService.getProfile(this.user.id);
     if (!this.profile) {
       this.profile = { name: '', base64Avatar: '' };
+      this.notifyProfileChanged();
       return;
     }
     if (this.profile.avatarFileId && this.avatarStorage.isSupported()) {
@@ -305,6 +313,7 @@ export class UserService {
     } else {
       this.profile.base64Avatar = '';
     }
+    this.notifyProfileChanged();
   }
 
   createUser(showAlways = true): Observable<CreateUserResponse> {

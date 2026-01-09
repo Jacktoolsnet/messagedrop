@@ -1,6 +1,6 @@
 <!-- Show existing content when the platform is enabled. -->
 @if (isPlatformEnabled) {
-@if (multimedia?.type === 'tenor') {
+@if (multimedia?.type === 'tenor' || multimedia?.type === 'unsplash') {
 <div class="media_block">
     <div class="multimedia_container">
         <img class="multimedia_image" [src]="multimedia!.url"
@@ -38,6 +38,9 @@
 </app-enable-external-content>
 } @else if(multimedia?.type === 'tenor') {
 <app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
+</app-enable-external-content>
+} @else if(multimedia?.type === 'unsplash') {
+<app-enable-external-content [platform]="'unsplash'" (enabledChange)="onEnabledChange($event)">
 </app-enable-external-content>
 }
 }

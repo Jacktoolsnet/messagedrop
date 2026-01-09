@@ -10,6 +10,7 @@ export interface AppSettings {
     enablePinterestContent: boolean,
     enableSpotifyContent: boolean,
     enableTenorContent: boolean,
+    enableUnsplashContent: boolean,
     enableTikTokContent: boolean,
     enableYoutubeContent: boolean,
     diagnosticLogging: boolean,

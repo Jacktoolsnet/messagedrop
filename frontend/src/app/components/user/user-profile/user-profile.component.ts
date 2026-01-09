@@ -59,6 +59,7 @@ export class UserProfileComponent {
       await this.avatarStorage.deleteImage(currentId);
     }
     Object.assign(this.userService.getProfile(), this.oriProfile);
+    this.userService.notifyProfileChanged();
     this.dialogRef.close();
   }
 
@@ -118,6 +119,7 @@ export class UserProfileComponent {
       }
       this.userService.getProfile().avatarFileId = saved.id;
       this.userService.getProfile().base64Avatar = saved.url;
+      this.userService.notifyProfileChanged();
       input.value = '';
     });
   }
@@ -129,6 +131,7 @@ export class UserProfileComponent {
     }
     this.userService.getProfile().avatarFileId = undefined;
     this.userService.getProfile().base64Avatar = '';
+    this.userService.notifyProfileChanged();
   }
 
   async onApplyClick(): Promise<void> {
@@ -137,6 +140,7 @@ export class UserProfileComponent {
     if (originalId && originalId !== currentId) {
       await this.avatarStorage.deleteImage(originalId);
     }
+    this.userService.notifyProfileChanged();
     this.dialogRef.close(this.userService.getProfile());
   }
 
@@ -148,6 +152,7 @@ export class UserProfileComponent {
 
   changeDefaultStyle(): void {
     this.userService.getProfile().defaultStyle = this.styleService.getRandomStyle();
+    this.userService.notifyProfileChanged();
   }
 
   private showStorageUnsupported(): void {

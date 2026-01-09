@@ -6,7 +6,8 @@
   <div class="profile-scroll">
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>{{ 'common.user.profile.nameLabel' | transloco }}</mat-label>
-    <input matInput maxlength="64" [(ngModel)]="userService.getProfile().name" />
+    <input matInput maxlength="64" [(ngModel)]="userService.getProfile().name"
+      (ngModelChange)="userService.notifyProfileChanged()" />
   </mat-form-field>
 
   <input type="file" id="avatar" name="avatar" accept="image/png, image/jpeg" class="file-input"

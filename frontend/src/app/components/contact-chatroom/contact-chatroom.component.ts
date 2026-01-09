@@ -72,6 +72,10 @@ export class ContactChatroomComponent implements AfterViewInit {
   readonly contact = computed(() =>
     this.contactService.sortedContactsSignal().find(contact => contact.id === this.contactId)
   );
+  readonly profile = computed(() => {
+    this.userService.profileVersion();
+    return this.userService.getProfile();
+  });
   readonly composeMessage = output<Contact>();
   readonly messages = signal<ChatroomMessage[]>([]);
   readonly loading = signal<boolean>(false);
@@ -260,10 +264,6 @@ export class ContactChatroomComponent implements AfterViewInit {
           setTimeout(() => this.observeUnread(), 0);
         }
       });
-  }
-
-  get profile() {
-    return this.userService.getProfile();
   }
 
   canCompose(): boolean {

@@ -1,6 +1,7 @@
 export enum MultimediaType {
     UNDEFINED = 'undefined',
     TENOR = 'tenor',
+    UNSPLASH = 'unsplash',
     GIPHY = 'giphy',
     YOUTUBE = 'youtube',
     INSTAGRAM = 'instagram',
@@ -11,4 +12,3 @@ export enum MultimediaType {
     PINTEREST = 'pinterest',
     FLICKR = 'flickr'
 }
-

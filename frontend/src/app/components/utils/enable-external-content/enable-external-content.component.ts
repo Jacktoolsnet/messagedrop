@@ -1,13 +1,13 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, HostListener, Input, OnChanges, OnInit, Output, inject } from '@angular/core';
-import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 
-type PlatformKey = 'tenor' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
-type SettingsKey = 'enableTenorContent' | 'enableYoutubeContent' | 'enableSpotifyContent' | 'enableTikTokContent' | 'enablePinterestContent';
+type PlatformKey = 'tenor' | 'unsplash' | 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
+type SettingsKey = 'enableTenorContent' | 'enableUnsplashContent' | 'enableYoutubeContent' | 'enableSpotifyContent' | 'enableTikTokContent' | 'enablePinterestContent';
 
 interface PlatformMeta {
   name: string;
@@ -18,8 +18,9 @@ interface PlatformMeta {
 }
 
 const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
-  tenor: { name: 'Tenor', icon: 'gif_box', settingsKey: 'enableTenorContent', terms: 'https://policies.google.com/terms', privacy: 'https://policies.google.com/privacy' },
-  youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: 'enableYoutubeContent', terms: 'https://www.youtube.com/t/terms', privacy: 'https://policies.google.com/privacy' },
+  tenor: { name: 'Tenor', icon: 'gif_box', settingsKey: 'enableTenorContent', terms: 'https://tenor.com/legal-terms', privacy: 'https://policies.google.com/privacy' },
+  unsplash: { name: 'Unsplash', icon: 'photo', settingsKey: 'enableUnsplashContent', terms: 'https://unsplash.com/terms', privacy: 'https://unsplash.com/privacy' },
+  youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: 'enableYoutubeContent', terms: 'https://www.youtube.com/t/terms', privacy: 'https://www.youtube.com/intl/ALL/howyoutubeworks/privacy/' },
   spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: 'enableSpotifyContent', terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
   tiktok: { name: 'TikTok', icon: 'music_note', settingsKey: 'enableTikTokContent', terms: 'https://www.tiktok.com/legal/terms-of-service', privacy: 'https://www.tiktok.com/legal/privacy-policy' },
   pinterest: { name: 'Pinterest', icon: 'push_pin', settingsKey: 'enablePinterestContent', terms: 'https://policy.pinterest.com/terms-of-service', privacy: 'https://policy.pinterest.com/privacy-policy' }

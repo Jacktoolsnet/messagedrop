@@ -1,0 +1,36 @@
+@if (showUnsplash) {
+<div class="url-container">
+    <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
+        placeholder="Search on Unsplash" />
+
+    <button (click)="search()">
+        @if (showSearchIcon) {
+        <mat-icon>search</mat-icon>
+        } @else {
+        <mat-icon>arrow_circle_right</mat-icon>
+        }
+    </button>
+
+</div>
+
+<mat-dialog-content>
+    @if (results.length > 0) {
+    <div class="gallery">
+        @for (result of results; track result.id) {
+        <div>
+            <button type="button" class="photo-button" (click)="onApplyClick(result)" aria-label="Select photo">
+                <img [src]="result.urls.small" [attr.alt]="result.alt_description || 'Photo result'" />
+            </button>
+        </div>
+        }
+    </div>
+    }
+</mat-dialog-content>
+} @else {
+<div class="platform-tile-container">
+    <div class="platform-tile">
+        <app-enable-external-content [platform]="'unsplash'" (enabledChange)="onEnabledChange($event)">
+        </app-enable-external-content>
+    </div>
+</div>
+}

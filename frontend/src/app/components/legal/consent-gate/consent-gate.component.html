@@ -47,11 +47,11 @@
                     <div>
                         <div class="tile-title">{{ 'common.legal.consent.loggingTitle' | transloco }}</div>
                         <div class="tile-subtitle">{{ 'common.legal.consent.loggingSubtitle' | transloco }}</div>
+                        <p class="age-note">
+                            {{ 'common.legal.consent.loggingNote' | transloco }}
+                        </p>
                     </div>
                 </div>
-                <p class="age-note">
-                    {{ 'common.legal.consent.loggingNote' | transloco }}
-                </p>
                 <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
                     [checked]="appService.getAppSettings().diagnosticLogging"
                     (change)="toggleDiagnosticLogging($event.checked)">
@@ -65,11 +65,11 @@
                     <div>
                         <div class="tile-title">{{ 'common.legal.consent.backupTitle' | transloco }}</div>
                         <div class="tile-subtitle">{{ 'common.legal.consent.backupSubtitle' | transloco }}</div>
+                        <p class="age-note">
+                            {{ 'common.legal.consent.backupNote' | transloco }}
+                        </p>
                     </div>
                 </div>
-                <p class="age-note">
-                    {{ 'common.legal.consent.backupNote' | transloco }}
-                </p>
                 <mat-slide-toggle color="primary" [disabled]="!isAgeConfirmed"
                     [checked]="appService.getAppSettings().backupOnExit" (change)="toggleBackupOnExit($event.checked)">
                     {{ 'common.legal.consent.backupToggle' | transloco }}

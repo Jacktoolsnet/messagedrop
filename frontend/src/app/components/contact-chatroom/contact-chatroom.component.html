@@ -31,13 +31,13 @@
         <div class="bubble-row me">
           <button type="button" class="avatar-me" (click)="openUserProfile()" (keyup.enter)="openUserProfile()"
             (keyup.space)="openUserProfile()" [attr.aria-label]="'common.user.profile.title' | transloco">
-            @if (profile.base64Avatar) {
-            <img class="avatar" [src]="profile.base64Avatar"
-              [attr.alt]="profile.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: profile.name }) : ('common.contact.chatroom.avatarAltMe' | transloco)" />
+            @if (profile().base64Avatar) {
+            <img class="avatar" [src]="profile().base64Avatar"
+              [attr.alt]="profile().name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: profile().name }) : ('common.contact.chatroom.avatarAltMe' | transloco)" />
             } @else {
             <mat-icon>person</mat-icon>
             }
-            <span class="name">{{ profile.name || ('common.contact.chatroom.meLabel' | transloco) }}</span>
+            <span class="name">{{ profile().name || ('common.contact.chatroom.meLabel' | transloco) }}</span>
           </button>
           <div class="status-chip status-chip--me">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>

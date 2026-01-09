@@ -57,6 +57,9 @@ export class ShowmultimediaComponent implements OnChanges {
       case 'tenor':
         this.isPlatformEnabled = settings.enableTenorContent;
         break;
+      case 'unsplash':
+        this.isPlatformEnabled = settings.enableUnsplashContent;
+        break;
       default:
         this.isPlatformEnabled = true; // Unknown -> do not block.
         break;
