@@ -731,6 +731,10 @@
       "title": "Service Tenor",
       "loading": "Chargement"
     },
+    "unsplash": {
+      "title": "Service Unsplash",
+      "loading": "Chargement"
+    },
     "place": {
       "title": "Service de lieux",
       "creating": "Création du lieu",

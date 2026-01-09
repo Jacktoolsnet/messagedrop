@@ -731,6 +731,10 @@
       "title": "Tenor service",
       "loading": "Loading"
     },
+    "unsplash": {
+      "title": "Unsplash service",
+      "loading": "Loading"
+    },
     "place": {
       "title": "Place service",
       "creating": "Creating place",

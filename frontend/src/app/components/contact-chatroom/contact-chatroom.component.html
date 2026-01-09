@@ -1,12 +1,16 @@
 @if (contact(); as activeContact) {
 <h2 mat-dialog-title class="dialog-title chatroom-title">
-  @if (activeContact.base64Avatar) {
-  <img class="chatroom-title__avatar" [src]="activeContact.base64Avatar"
-    [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
-  } @else {
-  <mat-icon class="dialog-title__icon">person</mat-icon>
-  }
-  <span class="dialog-title__text">{{ activeContact.name || ('common.contact.chatroom.contactLabel' | transloco) }}</span>
+  <button type="button" class="chatroom-title__profile" (click)="openContactSettings(activeContact)"
+    (keyup.enter)="openContactSettings(activeContact)" (keyup.space)="openContactSettings(activeContact)"
+    [attr.aria-label]="'common.contact.profile.title' | transloco">
+    @if (activeContact.base64Avatar) {
+    <img class="chatroom-title__avatar" [src]="activeContact.base64Avatar"
+      [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
+    } @else {
+    <mat-icon class="dialog-title__icon">person</mat-icon>
+    }
+    <span class="dialog-title__text">{{ activeContact.name || ('common.contact.chatroom.contactLabel' | transloco) }}</span>
+  </button>
 </h2>
 
 <mat-card class="chatroom-card">
@@ -25,7 +29,8 @@
       <div class="message" #messageRow [attr.data-message-id]="msg.messageId" [class.message--unread]="isUnread(msg)">
         @if (msg.direction === 'user') {
         <div class="bubble-row me">
-          <div class="avatar-me">
+          <button type="button" class="avatar-me" (click)="openUserProfile()" (keyup.enter)="openUserProfile()"
+            (keyup.space)="openUserProfile()" [attr.aria-label]="'common.user.profile.title' | transloco">
             @if (profile.base64Avatar) {
             <img class="avatar" [src]="profile.base64Avatar"
               [attr.alt]="profile.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: profile.name }) : ('common.contact.chatroom.avatarAltMe' | transloco)" />
@@ -33,7 +38,7 @@
             <mat-icon>person</mat-icon>
             }
             <span class="name">{{ profile.name || ('common.contact.chatroom.meLabel' | transloco) }}</span>
-          </div>
+          </button>
           <div class="status-chip status-chip--me">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>
@@ -78,7 +83,9 @@
         </div>
         } @else {
         <div class="bubble-row them">
-          <div class="avatar-them">
+          <button type="button" class="avatar-them" (click)="openContactSettings(activeContact)"
+            (keyup.enter)="openContactSettings(activeContact)" (keyup.space)="openContactSettings(activeContact)"
+            [attr.aria-label]="'common.contact.profile.title' | transloco">
             @if (activeContact.base64Avatar) {
             <img class="avatar" [src]="activeContact.base64Avatar"
               [attr.alt]="activeContact.name ? ('common.contact.chatroom.avatarAltName' | transloco:{ name: activeContact.name }) : ('common.contact.chatroom.avatarAltContact' | transloco)" />
@@ -86,7 +93,7 @@
             <mat-icon>person</mat-icon>
             }
             <span class="name">{{ activeContact.name || ('common.contact.chatroom.contactLabel' | transloco) }}</span>
-          </div>
+          </button>
           <div class="status-chip status-chip--them">
             <mat-icon>{{ mapStatus(msg.status) }}</mat-icon>
           </div>

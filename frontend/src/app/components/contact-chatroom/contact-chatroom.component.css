@@ -99,6 +99,20 @@
   margin-bottom: 0.5rem;
 }
 
+.chatroom-title__profile {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: none;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
 .chatroom-title__avatar {
   width: 2.25rem;
   height: 2.25rem;
@@ -418,6 +432,10 @@
   max-width: min(82%, 22rem);
   overflow: hidden;
   pointer-events: auto;
+  border: none;
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
 }
 
 .bubble-row.them .avatar-them {
@@ -458,4 +476,11 @@ avatar-them mat-icon {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.chatroom-title__profile:focus-visible,
+.avatar-me:focus-visible,
+.avatar-them:focus-visible {
+  outline: 2px solid var(--mat-primary-color);
+  outline-offset: 2px;
 }
