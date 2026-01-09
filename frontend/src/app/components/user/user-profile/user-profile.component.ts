@@ -14,7 +14,11 @@ import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { StyleService } from '../../../services/style.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
+import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
+import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
+import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
   selector: 'app-profile',
@@ -37,7 +41,6 @@ import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-croppe
 })
 export class UserProfileComponent {
   private readonly maxAvatarMb = 2;
-  private readonly maxAvatarBytes = this.maxAvatarMb * 1024 * 1024;
   private readonly maxAvatarDimension = 256;
   private oriProfile: Profile;
 
@@ -51,6 +54,25 @@ export class UserProfileComponent {
 
   constructor() {
     this.oriProfile = structuredClone(this.userService.getProfile());
+  }
+
+  openAvatarSourceDialog(fileInput: HTMLInputElement): void {
+    const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+      if (choice === 'file') {
+        fileInput.click();
+        return;
+      }
+      if (choice === 'unsplash') {
+        this.openUnsplashAvatar();
+      }
+    });
   }
 
   async onAbortClick(): Promise<void> {
@@ -110,6 +132,7 @@ export class UserProfileComponent {
       }
       this.userService.getProfile().avatarFileId = saved.id;
       this.userService.getProfile().base64Avatar = saved.url;
+      this.userService.getProfile().avatarAttribution = undefined;
       this.userService.notifyProfileChanged();
       input.value = '';
     });
@@ -122,6 +145,7 @@ export class UserProfileComponent {
     }
     this.userService.getProfile().avatarFileId = undefined;
     this.userService.getProfile().base64Avatar = '';
+    this.userService.getProfile().avatarAttribution = undefined;
     this.userService.notifyProfileChanged();
   }
 
@@ -144,6 +168,94 @@ export class UserProfileComponent {
   changeDefaultStyle(): void {
     this.userService.getProfile().defaultStyle = this.styleService.getRandomStyle();
     this.userService.notifyProfileChanged();
+  }
+
+  private openUnsplashAvatar(): void {
+    const dialogRef = this.dialog.open(UnsplashComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { returnType: 'photo' },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((photo?: UnsplashPhoto) => {
+      if (!photo) {
+        return;
+      }
+      void this.applyUnsplashPhoto(photo);
+    });
+  }
+
+  private async applyUnsplashPhoto(photo: UnsplashPhoto): Promise<void> {
+    const file = await this.loadUnsplashFile(photo);
+    if (!file) {
+      this.snackBar.open(this.translation.t('common.avatarCropper.loadFailed'), this.translation.t('common.actions.ok'), {
+        duration: 2000
+      });
+      return;
+    }
+
+    const dialogRef = this.dialog.open(AvatarCropperComponent, {
+      data: {
+        file,
+        maxSizeMb: this.maxAvatarMb,
+        resizeToWidth: this.maxAvatarDimension
+      },
+      maxWidth: '95vw',
+      width: '420px'
+    });
+
+    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
+      if (!croppedImage) {
+        return;
+      }
+      if (!this.avatarStorage.isSupported()) {
+        this.showStorageUnsupported();
+        return;
+      }
+      const currentId = this.userService.getProfile().avatarFileId;
+      if (currentId && currentId !== this.oriProfile.avatarFileId) {
+        await this.avatarStorage.deleteImage(currentId);
+      }
+      const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
+      if (!saved) {
+        this.showStorageUnsupported();
+        return;
+      }
+      this.userService.getProfile().avatarFileId = saved.id;
+      this.userService.getProfile().base64Avatar = saved.url;
+      this.userService.getProfile().avatarAttribution = this.buildUnsplashAttribution(photo);
+      this.userService.notifyProfileChanged();
+    });
+  }
+
+  private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {
+    try {
+      const response = await fetch(photo.urls.regular);
+      if (!response.ok) {
+        return null;
+      }
+      const blob = await response.blob();
+      return new File([blob], `unsplash-${photo.id}.jpg`, { type: blob.type || 'image/jpeg' });
+    } catch {
+      return null;
+    }
+  }
+
+  private buildUnsplashAttribution(photo: UnsplashPhoto): AvatarAttribution {
+    const authorName = photo.user?.name || photo.user?.username || 'Unsplash';
+    const baseUrl = photo.links?.html ?? `https://unsplash.com/photos/${photo.id}`;
+    const url = new URL(baseUrl);
+    url.searchParams.set('utm_source', 'messagedrop');
+    url.searchParams.set('utm_medium', 'referral');
+    return {
+      source: 'unsplash',
+      authorName,
+      photoUrl: url.toString()
+    };
   }
 
   private showStorageUnsupported(): void {

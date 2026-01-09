@@ -157,6 +157,27 @@ button {
   text-align: center;
 }
 
+.avatar-attribution {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--mat-card-subtitle-text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.avatar-attribution__link {
+  color: var(--mat-primary-color);
+  text-decoration: none;
+}
+
+.avatar-attribution__link:hover {
+  text-decoration: underline;
+}
+
 .button_legal {
   position: absolute;
   bottom: 0;

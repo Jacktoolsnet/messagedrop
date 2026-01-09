@@ -1,0 +1,29 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+.source-grid {
+  display: grid;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem;
+}
+
+.source-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem;
+  width: 100%;
+}
+
+.platform-tile {
+  border-radius: 1rem;
+  padding: 0.75rem;
+  text-align: center;
+  font-weight: 500;
+  font-size: 1rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}

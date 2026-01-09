@@ -32,6 +32,14 @@
       "loadFailed": "Impossible de charger l'image. Veuillez choisir un autre fichier.",
       "tooLarge": "Le recadrage est trop grand. Taille maximale autorisée : {{ maxMb }} Mo."
     },
+    "avatarSource": {
+      "title": "Choisir la source de l'avatar",
+      "file": "Télécharger une photo",
+      "unsplash": "Utiliser Unsplash"
+    },
+    "avatarAttribution": {
+      "creatorLink": "{{ name }} @ Unsplash"
+    },
     "clipboard": {
       "pasteLabel": "Coller depuis le presse-papiers",
       "unavailable": "L'accès au presse-papiers n'est pas disponible dans ce navigateur.",

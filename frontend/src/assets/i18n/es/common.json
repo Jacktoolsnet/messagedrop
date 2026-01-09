@@ -32,6 +32,14 @@
       "loadFailed": "No se pudo cargar la imagen. Por favor elige otro archivo.",
       "tooLarge": "El recorte es demasiado grande. El tamaño máximo permitido es {{ maxMb }} MB."
     },
+    "avatarSource": {
+      "title": "Elige la fuente del avatar",
+      "file": "Subir foto",
+      "unsplash": "Usar Unsplash"
+    },
+    "avatarAttribution": {
+      "creatorLink": "{{ name }} @ Unsplash"
+    },
     "clipboard": {
       "pasteLabel": "Pegar desde el portapapeles",
       "unavailable": "El acceso al portapapeles no está disponible en este navegador.",

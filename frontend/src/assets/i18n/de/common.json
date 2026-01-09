@@ -32,6 +32,14 @@
       "loadFailed": "Das Bild konnte nicht geladen werden. Bitte wähle eine andere Datei.",
       "tooLarge": "Der Zuschnitt ist zu groß. Maximale Größe: {{ maxMb }} MB."
     },
+    "avatarSource": {
+      "title": "Avatar-Quelle wählen",
+      "file": "Foto hochladen",
+      "unsplash": "Unsplash verwenden"
+    },
+    "avatarAttribution": {
+      "creatorLink": "{{ name }} @ Unsplash"
+    },
     "clipboard": {
       "pasteLabel": "Aus Zwischenablage einfügen",
       "unavailable": "Zwischenablage ist in diesem Browser nicht verfügbar.",

@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -43,6 +43,7 @@ export class UnsplashComponent implements OnInit {
 
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<UnsplashComponent>);
+  private readonly dialogData = inject<{ returnType?: 'multimedia' | 'photo' } | null>(MAT_DIALOG_DATA, { optional: true });
   private readonly unsplashService = inject(UnsplashService);
   private readonly translation = inject(TranslationHelperService);
   private readonly cdRef = inject(ChangeDetectorRef);
@@ -99,6 +100,10 @@ export class UnsplashComponent implements OnInit {
   }
 
   onApplyClick(result: UnsplashPhoto): void {
+    if (this.dialogData?.returnType === 'photo') {
+      this.dialogRef.close(result);
+      return;
+    }
     const description = result.description || result.alt_description || '';
     const multimedia: Multimedia = {
       type: MultimediaType.UNSPLASH,

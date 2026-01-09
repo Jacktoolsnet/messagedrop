@@ -1,4 +1,5 @@
 import { AirQualityData } from "./air-quality-data"
+import { AvatarAttribution } from "./avatar-attribution"
 import { BoundingBox } from "./bounding-box"
 import { Dataset } from "./dataset"
 import { Location } from "./location"
@@ -12,6 +13,7 @@ export interface Place {
     name: string,
     base64Avatar: string
     avatarFileId?: string,
+    avatarAttribution?: AvatarAttribution,
     placeBackgroundImage?: string,
     placeBackgroundFileId?: string,
     placeBackgroundTransparency?: number,

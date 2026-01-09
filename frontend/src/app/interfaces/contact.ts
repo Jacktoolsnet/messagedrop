@@ -1,3 +1,5 @@
+import { AvatarAttribution } from './avatar-attribution';
+
 export interface Contact {
     id: string,
     userId: string,
@@ -18,6 +20,7 @@ export interface Contact {
     name?: string,
     base64Avatar?: string,
     avatarFileId?: string,
+    avatarAttribution?: AvatarAttribution,
     chatBackgroundImage?: string,
     chatBackgroundFileId?: string,
     chatBackgroundTransparency?: number,

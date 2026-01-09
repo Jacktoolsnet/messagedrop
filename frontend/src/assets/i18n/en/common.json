@@ -32,6 +32,14 @@
       "loadFailed": "Could not load the image. Please try another file.",
       "tooLarge": "The cropped image is too large. Maximum allowed size is {{ maxMb }} MB."
     },
+    "avatarSource": {
+      "title": "Choose avatar source",
+      "file": "Upload photo",
+      "unsplash": "Use Unsplash"
+    },
+    "avatarAttribution": {
+      "creatorLink": "{{ name }} @ Unsplash"
+    },
     "clipboard": {
       "pasteLabel": "Paste from clipboard",
       "unavailable": "Clipboard access is not available in this browser.",

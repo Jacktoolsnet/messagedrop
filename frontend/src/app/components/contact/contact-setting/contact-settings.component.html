@@ -11,7 +11,7 @@
 
   @if (!contact.base64Avatar) {
   <div class="avatar-area">
-    <button mat-flat-button class="button-set-avatar" (click)="fileUpload.click()">
+    <button mat-flat-button class="button-set-avatar" (click)="openAvatarSourceDialog(fileUpload)">
       <span>{{ 'common.contact.profile.setAvatar' | transloco }}</span>
     </button>
     <p class="background-hint">{{ 'common.contact.profile.avatarHint' | transloco }}</p>
@@ -22,6 +22,18 @@
       <img class="avatar" [src]="contact.base64Avatar"
         [attr.alt]="contact.name ? ('common.contact.profile.avatarAltName' | transloco:{ name: contact.name }) : ('common.contact.profile.avatarAlt' | transloco)" /><br />
     </div>
+    @if (contact.avatarAttribution?.source === 'unsplash') {
+    <p class="avatar-attribution">
+      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+        target="_blank" rel="noopener">
+        {{ 'common.multimedia.attributionPoweredBy' | transloco:{ platform: 'Unsplash' } }}
+      </a>
+      <span>·</span>
+      <a class="avatar-attribution__link" [href]="contact.avatarAttribution?.photoUrl" target="_blank" rel="noopener">
+        {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: contact.avatarAttribution?.authorName } }}
+      </a>
+    </p>
+    }
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
         <mat-icon>delete</mat-icon>
