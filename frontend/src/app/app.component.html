@@ -1,7 +1,6 @@
 @if (appService.isSettingsReady() && !appService.isConsentCompleted()) {
 <app-consent-gate></app-consent-gate>
 } @else {
-@if (networkService.isOnline() && serverService.isReady()) {
 <app-map [lastMarkerUpdate]="lastMarkerUpdate" [location]="mapService.getMapLocation()"
     [markerLocations]="markerLocations" (clickEvent)="handleClickEvent($event)" (moveEndEvent)="handleMoveEndEvent()"
     (markerClickEvent)="handleMarkerClickEvent($event)">
@@ -41,7 +40,6 @@
     [attr.aria-label]="'common.aria.search' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false">search</mat-icon>
 </button>
-}
 
 <mat-menu #userMenu="matMenu">
     @if (userService.isReady()) {

@@ -134,11 +134,17 @@ export class NetworkService {
   }
 
   getErrorTitle(status: number): string {
+    if (status === 0 && this.isBrowserOnline()) {
+      return this.i18n.t('common.serverDown.title');
+    }
     const key = this.errorTitleKeyMap[status] ?? 'errors.http.title.unexpected';
     return this.i18n.t(key);
   }
 
   getErrorIcon(status: number): string {
+    if (status === 0 && this.isBrowserOnline()) {
+      return 'cloud_off';
+    }
     switch (status) {
       case 0: return 'wifi_off';             // Kein Internet
       case 400: return 'error_outline';      // Bad Request
@@ -156,8 +162,18 @@ export class NetworkService {
   }
 
   getErrorMessage(status: number): string {
+    if (status === 0 && this.isBrowserOnline()) {
+      return this.i18n.t('common.serverDown.message');
+    }
     const key = this.errorMessageKeyMap[status] ?? 'errors.http.message.unexpected';
     return this.i18n.t(key);
+  }
+
+  private isBrowserOnline(): boolean {
+    if (typeof navigator === 'undefined') {
+      return true;
+    }
+    return navigator.onLine;
   }
 
 }

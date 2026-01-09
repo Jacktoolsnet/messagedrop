@@ -25,6 +25,10 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
       const title = networkService.getErrorTitle(status);
       const icon = networkService.getErrorIcon(status);
 
+      const isBackendOffline = status === 0 && (typeof navigator === 'undefined' || navigator.onLine);
+      const autoClose = !isBackendOffline;
+      const delay = isBackendOffline ? 0 : 2000;
+
       errorDialogRef?.close();
       const ref = dialog.open(DisplayMessage, {
         panelClass: '',
@@ -36,9 +40,9 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
           icon,
           message,
           button: i18n.t('common.actions.ok'),
-          delay: 2000,
+          delay,
           showSpinner: false,
-          autoclose: true
+          autoclose: autoClose
         },
         maxWidth: '90vw',
         maxHeight: '90vh',

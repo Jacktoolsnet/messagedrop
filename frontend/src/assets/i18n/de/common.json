@@ -798,7 +798,7 @@
     },
     "serverDown": {
       "title": "Ups! Unser Server macht eine Kaffeepause...",
-      "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge, wir haben eine Brieftaube geschickt."
+      "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge: Offline-Funktionen (Kontakte, private Notizen usw.) bleiben verfügbar."
     },
     "backupExit": {
       "title": "Backup vor dem Beenden erstellen?",

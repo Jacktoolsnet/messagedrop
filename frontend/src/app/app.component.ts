@@ -198,47 +198,15 @@ export class AppComponent implements OnInit {
         // Clear cache
         this.indexedDbService.deleteSetting('nominatimSelectedPlace')
         this.indexedDbService.deleteSetting('nominatimSearch')
-        // Check network
-        this.networkService.init();
+        if (!this.mapService.isReady()) {
+          this.mapService.initMap();
+        }
         // Init the server connection
         this.serverService.init();
         // Get user id if avaliable
         this.userService.initUserId();
       } else {
         this.logout();
-      }
-    });
-
-    effect(() => {
-      this.serverService.serverSet(); // <-- track changes
-      if (this.serverService.isReady() && this.appService.isConsentCompleted()) {
-        // Init the map
-        this.mapService.initMap();
-      }
-      if (this.serverService.isFailed()) {
-        const dialogRef = this.dialog.open(DisplayMessage, {
-          panelClass: '',
-          closeOnNavigation: false,
-          data: {
-            showAlways: true,
-            title: this.translation.t('common.serverDown.title'),
-            image: '',
-            icon: 'cloud_off',
-            message: this.translation.t('common.serverDown.message'),
-            button: this.translation.t('common.actions.retry'),
-            delay: 10000,
-            showSpinner: false
-          },
-          maxWidth: '90vw',
-          maxHeight: '90vh',
-          hasBackdrop: false,
-          autoFocus: false
-        });
-
-        dialogRef.afterClosed().subscribe(() => {
-          // Notification Action
-          this.handleNotification();
-        });
       }
     });
 

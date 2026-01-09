@@ -798,7 +798,7 @@
     },
     "serverDown": {
       "title": "¡Vaya! Nuestro servidor se fue por un café...",
-      "message": "Parece que nuestro backend necesitaba un poco de \"tiempo para sí\".\n\nNo te preocupes, enviamos una paloma mensajera para traerlo de vuelta."
+      "message": "Parece que nuestro backend necesitaba un poco de \"tiempo para sí\".\n\nNo te preocupes: las funciones sin conexión (contactos, notas privadas, etc.) siguen disponibles."
     },
     "backupExit": {
       "title": "¿Crear copia de seguridad antes de salir?",

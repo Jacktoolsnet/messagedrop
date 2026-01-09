@@ -798,7 +798,7 @@
     },
     "serverDown": {
       "title": "Oops! Our server went on a coffee break...",
-      "message": "Apparently, our backend needed some \"me time\".\n\nDon't worry, we sent a carrier pigeon to bring it back."
+      "message": "Apparently, our backend needed some \"me time\".\n\nNo worries: offline features (contacts, private notes, etc.) are still available."
     },
     "backupExit": {
       "title": "Create backup before leaving?",

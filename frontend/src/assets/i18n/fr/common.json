@@ -798,7 +798,7 @@
     },
     "serverDown": {
       "title": "Oups ! Notre serveur est parti prendre un café...",
-      "message": "Apparemment, notre backend avait besoin d'un peu de « temps pour lui ».\n\nNe vous inquiétez pas, nous avons envoyé un pigeon voyageur pour le ramener."
+      "message": "Apparemment, notre backend avait besoin d'un peu de « temps pour lui ».\n\nPas d'inquiétude : les fonctions hors ligne (contacts, notes privées, etc.) restent disponibles."
     },
     "backupExit": {
       "title": "Créer une sauvegarde avant de quitter ?",
