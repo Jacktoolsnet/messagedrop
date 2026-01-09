@@ -914,7 +914,7 @@
   "auth": {
     "serviceTitle": "Benutzer-Dienst",
     "hashingPin": "PIN wird gehasht",
-    "accountCreated": "Dein Konto wurde erstellt. Du kannst dich jetzt anmelden.",
+    "accountCreated": "Dein Konto wurde erstellt und du bist jetzt angemeldet.",
     "userCreationFailed": "Ups! Beim Erstellen deines Benutzers ist etwas schiefgelaufen. Bitte versuche es später erneut.",
     "creatingUser": "Benutzer wird erstellt",
     "confirmingUser": "Benutzer wird bestätigt",

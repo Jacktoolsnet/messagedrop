@@ -174,6 +174,24 @@ export class UserService {
             };
             await this.indexedDbService.setUser(cryptedUser);
 
+            const challengeResponse = await firstValueFrom(this.requestLoginChallenge(this.user.id, true));
+            const signature = await this.cryptoService.createSignature(
+              this.user.signingKeyPair.privateKey,
+              challengeResponse.challenge
+            );
+            const loginResponse = await firstValueFrom(
+              this.loginUser(this.user.id, challengeResponse.challenge, signature, true)
+            );
+            this.setUser(this.user, loginResponse.jwt);
+            if (Notification.permission === "granted") {
+              if (this.getUser().subscription !== '') {
+                this.indexedDbService.setSetting('subscription', this.getUser().subscription);
+              } else {
+                this.indexedDbService.deleteSetting('subscription');
+                this.registerSubscription(this.getUser());
+              }
+            }
+
             const dialogRef = this.displayMessage.open(DisplayMessage, {
               panelClass: '',
               closeOnNavigation: false,
@@ -183,9 +201,10 @@ export class UserService {
                 image: '',
                 icon: 'verified_user',
                 message: this.i18n.t('auth.accountCreated'),
-                button: this.i18n.t('common.actions.ok'),
-                delay: 0,
-                showSpinner: false
+                button: '',
+                delay: 2000,
+                showSpinner: false,
+                autoclose: true
               },
               maxWidth: '90vw',
               maxHeight: '90vh',
@@ -197,7 +216,7 @@ export class UserService {
               this.blocked = false;
             });
           } catch (err) {
-            console.error('User encryption failed', err);
+            console.error('User initialization failed', err);
             const dialogRef = this.displayMessage.open(DisplayMessage, {
               panelClass: '',
               closeOnNavigation: false,
