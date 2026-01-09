@@ -94,7 +94,7 @@ button {
 }
 
 .upload-button {
-  margin-left: 0.5rem;
+  margin-left: 0;
 }
 
 .avatar {
@@ -167,6 +167,9 @@ button {
   bottom: 0;
   right: 0;
   transform: translate(0, 50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .full-width {

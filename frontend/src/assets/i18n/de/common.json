@@ -21,7 +21,8 @@
       "download": "Herunterladen",
       "copy": "Kopieren",
       "more": "Mehr",
-      "close": "Schließen"
+      "close": "Schließen",
+      "edit": "Bearbeiten"
     },
     "media": {
       "storageUnsupported": "Funktion wird nicht unterstützt."

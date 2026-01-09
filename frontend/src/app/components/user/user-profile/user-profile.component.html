@@ -42,6 +42,10 @@
     </p>
     }
     <div class="button-style">
+      <button mat-mini-fab color="primary" class="upload-button" (click)="editAvatar()"
+        [attr.aria-label]="'common.actions.edit' | transloco">
+        <mat-icon>edit</mat-icon>
+      </button>
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()">
         <mat-icon>delete</mat-icon>
       </button>

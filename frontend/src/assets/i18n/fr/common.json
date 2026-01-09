@@ -21,7 +21,8 @@
       "download": "Télécharger",
       "copy": "Copier",
       "more": "Plus",
-      "close": "Fermer"
+      "close": "Fermer",
+      "edit": "Modifier"
     },
     "media": {
       "storageUnsupported": "Cette fonctionnalité n'est pas prise en charge sur cet appareil."

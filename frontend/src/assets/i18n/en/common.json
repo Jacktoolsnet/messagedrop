@@ -21,7 +21,8 @@
       "download": "Download",
       "copy": "Copy",
       "more": "More",
-      "close": "Close"
+      "close": "Close",
+      "edit": "Edit"
     },
     "media": {
       "storageUnsupported": "This feature is not supported on this device."

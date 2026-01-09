@@ -107,37 +107,7 @@ export class UserProfileComponent {
       return;
     }
 
-    const dialogRef = this.dialog.open(AvatarCropperComponent, {
-      data: {
-        file,
-        maxSizeMb: this.maxAvatarMb,
-        resizeToWidth: this.maxAvatarDimension
-      },
-      maxWidth: '95vw',
-      width: '420px'
-    });
-
-    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
-      if (!croppedImage) {
-        input.value = '';
-        return;
-      }
-      const currentId = this.userService.getProfile().avatarFileId;
-      if (currentId && currentId !== this.oriProfile.avatarFileId) {
-        await this.avatarStorage.deleteImage(currentId);
-      }
-      const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
-      if (!saved) {
-        this.showStorageUnsupported();
-        input.value = '';
-        return;
-      }
-      this.userService.getProfile().avatarFileId = saved.id;
-      this.userService.getProfile().base64Avatar = saved.url;
-      this.userService.getProfile().avatarAttribution = undefined;
-      this.userService.notifyProfileChanged();
-      input.value = '';
-    });
+    this.openAvatarCropper(file, undefined, input);
   }
 
   async deleteAvatar(): Promise<void> {
@@ -199,39 +169,7 @@ export class UserProfileComponent {
       });
       return;
     }
-
-    const dialogRef = this.dialog.open(AvatarCropperComponent, {
-      data: {
-        file,
-        maxSizeMb: this.maxAvatarMb,
-        resizeToWidth: this.maxAvatarDimension
-      },
-      maxWidth: '95vw',
-      width: '420px'
-    });
-
-    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
-      if (!croppedImage) {
-        return;
-      }
-      if (!this.avatarStorage.isSupported()) {
-        this.showStorageUnsupported();
-        return;
-      }
-      const currentId = this.userService.getProfile().avatarFileId;
-      if (currentId && currentId !== this.oriProfile.avatarFileId) {
-        await this.avatarStorage.deleteImage(currentId);
-      }
-      const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
-      if (!saved) {
-        this.showStorageUnsupported();
-        return;
-      }
-      this.userService.getProfile().avatarFileId = saved.id;
-      this.userService.getProfile().base64Avatar = saved.url;
-      this.userService.getProfile().avatarAttribution = this.buildUnsplashAttribution(photo);
-      this.userService.notifyProfileChanged();
-    });
+    this.openAvatarCropper(file, this.buildUnsplashAttribution(photo));
   }
 
   private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {
@@ -264,6 +202,83 @@ export class UserProfileComponent {
       authorName,
       photoUrl: url.toString()
     };
+  }
+
+  async editAvatar(): Promise<void> {
+    const profile = this.userService.getProfile();
+    const file = await this.loadStoredImageFile(profile.avatarFileId, profile.base64Avatar, 'avatar-edit.jpg');
+    if (!file) {
+      this.snackBar.open(this.translation.t('common.avatarCropper.loadFailed'), this.translation.t('common.actions.ok'), {
+        duration: 2000
+      });
+      return;
+    }
+    this.openAvatarCropper(file, profile.avatarAttribution);
+  }
+
+  private openAvatarCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement): void {
+    const dialogRef = this.dialog.open(AvatarCropperComponent, {
+      data: {
+        file,
+        maxSizeMb: this.maxAvatarMb,
+        resizeToWidth: this.maxAvatarDimension
+      },
+      maxWidth: '95vw',
+      width: '420px'
+    });
+
+    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
+      if (input) {
+        input.value = '';
+      }
+      if (!croppedImage) {
+        return;
+      }
+      if (!this.avatarStorage.isSupported()) {
+        this.showStorageUnsupported();
+        return;
+      }
+      const currentId = this.userService.getProfile().avatarFileId;
+      if (currentId && currentId !== this.oriProfile.avatarFileId) {
+        await this.avatarStorage.deleteImage(currentId);
+      }
+      const saved = await this.avatarStorage.saveImageFromDataUrl('avatar', croppedImage);
+      if (!saved) {
+        this.showStorageUnsupported();
+        return;
+      }
+      const profile = this.userService.getProfile();
+      profile.avatarFileId = saved.id;
+      profile.base64Avatar = saved.url;
+      profile.avatarAttribution = attribution;
+      this.userService.notifyProfileChanged();
+    });
+  }
+
+  private async loadStoredImageFile(fileId?: string | null, fallbackUrl?: string | null, name = 'image.jpg'): Promise<File | null> {
+    try {
+      let sourceUrl = '';
+      if (fileId && this.avatarStorage.isSupported()) {
+        const dataUrl = await this.avatarStorage.getImageBase64(fileId);
+        if (dataUrl) {
+          sourceUrl = dataUrl;
+        }
+      }
+      if (!sourceUrl && fallbackUrl) {
+        sourceUrl = fallbackUrl;
+      }
+      if (!sourceUrl) {
+        return null;
+      }
+      const response = await fetch(sourceUrl);
+      if (!response.ok) {
+        return null;
+      }
+      const blob = await response.blob();
+      return new File([blob], name, { type: blob.type || 'image/jpeg' });
+    } catch {
+      return null;
+    }
   }
 
   private showStorageUnsupported(): void {
