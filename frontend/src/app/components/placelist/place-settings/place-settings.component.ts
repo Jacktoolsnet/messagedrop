@@ -132,15 +132,6 @@ export class PlaceProfileComponent {
       return;
     }
 
-    if (file.size > this.maxAvatarBytes) {
-      this.snackBar.open(
-        this.translation.t('common.placeSettings.imageTooLarge', { maxMb: this.maxAvatarMb }),
-        this.translation.t('common.actions.ok'),
-        { duration: 2000 }
-      );
-      return;
-    }
-
     const dialogRef = this.dialog.open(AvatarCropperComponent, {
       data: {
         file,

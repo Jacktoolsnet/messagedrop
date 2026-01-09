@@ -78,15 +78,6 @@ export class UserProfileComponent {
       return;
     }
 
-    if (file.size > this.maxAvatarBytes) {
-      this.snackBar.open(
-        this.translation.t('common.user.profile.fileTooLarge', { maxSizeMb: this.maxAvatarMb }),
-        this.translation.t('common.actions.ok'),
-        { duration: 2000 }
-      );
-      return;
-    }
-
     if (!this.avatarStorage.isSupported()) {
       this.showStorageUnsupported();
       return;

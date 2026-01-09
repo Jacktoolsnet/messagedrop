@@ -78,15 +78,6 @@ export class ContactSettingsComponent {
       return;
     }
 
-    if (file.size > this.maxAvatarBytes) {
-      this.snackBar.open(
-        this.translation.t('common.contact.profile.imageTooLarge', { maxMb: this.maxAvatarMb }),
-        this.translation.t('common.actions.ok'),
-        { duration: 2000 }
-      );
-      return;
-    }
-
     const dialogRef = this.dialog.open(AvatarCropperComponent, {
       data: {
         file,
