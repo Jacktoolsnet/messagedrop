@@ -45,7 +45,7 @@
   position: relative;
 }
 
-.chatroom-card__content::before {
+.chatroom-card::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -58,7 +58,7 @@
   z-index: 0;
 }
 
-.chatroom-card__content > .message-content {
+.chatroom-card__content {
   position: relative;
   z-index: 1;
 }
