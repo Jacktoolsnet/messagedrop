@@ -103,7 +103,7 @@ button {
   inset: 0;
   background-image: var(--chat-bg-image, none);
   background-size: cover;
-  background-position: center;
+  background-position: left top;
   background-repeat: no-repeat;
   opacity: var(--chat-bg-opacity, 0);
   transition: opacity 0.2s ease;

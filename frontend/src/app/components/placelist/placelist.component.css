@@ -107,7 +107,7 @@ button,
   inset: 0;
   background-image: var(--place-header-bg-image, none);
   background-size: cover;
-  background-position: center;
+  background-position: left top;
   background-repeat: no-repeat;
   opacity: var(--place-header-bg-opacity, 0);
   z-index: 0;
