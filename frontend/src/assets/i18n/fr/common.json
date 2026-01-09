@@ -40,6 +40,10 @@
     "backgroundSource": {
       "title": "Choisir la source du fond"
     },
+    "backgroundCropper": {
+      "title": "Recadrer le fond",
+      "hint": "Déplacez ou zoomez l'image pour choisir la zone souhaitée."
+    },
     "avatarAttribution": {
       "creatorLink": "{{ name }} @ Unsplash"
     },

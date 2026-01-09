@@ -1,6 +1,6 @@
 <h2 mat-dialog-title class="dialog-title">
   <mat-icon aria-hidden="true">crop_square</mat-icon>
-  <span>{{ 'common.avatarCropper.title' | transloco }}</span>
+  <span>{{ titleKey | transloco }}</span>
 </h2>
 
 <mat-dialog-content class="dialog-content">
@@ -9,9 +9,9 @@
       [imageBase64]="imageBase64"
       [output]="'base64'"
       [autoCrop]="true"
-      [maintainAspectRatio]="true"
-      [aspectRatio]="1"
-      [containWithinAspectRatio]="true"
+      [maintainAspectRatio]="maintainAspectRatio"
+      [aspectRatio]="aspectRatio"
+      [containWithinAspectRatio]="containWithinAspectRatio"
       [resizeToWidth]="resizeToWidth"
       [onlyScaleDown]="true"
       [alignImage]="'center'"
@@ -23,7 +23,7 @@
       (loadImageFailed)="onLoadImageFailed()">
     </image-cropper>
   </div>
-  <p class="cropper-hint">{{ 'common.avatarCropper.hint' | transloco }}</p>
+  <p class="cropper-hint">{{ hintKey | transloco }}</p>
 </mat-dialog-content>
 
 <mat-dialog-actions class="dialog-actions">

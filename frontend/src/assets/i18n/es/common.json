@@ -40,6 +40,10 @@
     "backgroundSource": {
       "title": "Elige la fuente del fondo"
     },
+    "backgroundCropper": {
+      "title": "Recortar fondo",
+      "hint": "Mueve o amplía la imagen para seleccionar el área deseada."
+    },
     "avatarAttribution": {
       "creatorLink": "{{ name }} @ Unsplash"
     },

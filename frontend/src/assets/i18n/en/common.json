@@ -40,6 +40,10 @@
     "backgroundSource": {
       "title": "Choose background source"
     },
+    "backgroundCropper": {
+      "title": "Crop background",
+      "hint": "Move and zoom the image to select the area you want."
+    },
     "avatarAttribution": {
       "creatorLink": "{{ name }} @ Unsplash"
     },

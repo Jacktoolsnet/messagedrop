@@ -47,7 +47,7 @@ export class PlaceProfileComponent {
   private maxFileSize = 5 * 1024 * 1024; // 5MB
   private readonly maxAvatarMb = 2;
   private readonly maxAvatarDimension = 256;
-  private readonly maxBackgroundBytes = 2 * 1024 * 1024; // 2MB
+  private readonly maxBackgroundMb = 2;
   private readonly maxBackgroundDimension = 1600;
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;
@@ -196,6 +196,7 @@ export class PlaceProfileComponent {
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
+      input.value = '';
       return;
     }
 
@@ -205,53 +206,11 @@ export class PlaceProfileComponent {
         this.translation.t('common.actions.ok'),
         { duration: 2000 }
       );
+      input.value = '';
       return;
     }
 
-    this.resizeAndCompressImage(file, this.maxBackgroundDimension, this.maxBackgroundBytes)
-      .then(async (dataUrl) => {
-        this.ngZone.run(async () => {
-          if (!this.avatarStorage.isSupported()) {
-            this.showStorageUnsupported();
-            input.value = '';
-            return;
-          }
-          if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
-            await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
-          }
-          const saved = await this.avatarStorage.saveImageFromDataUrl('background', dataUrl);
-          if (!saved) {
-            this.showStorageUnsupported();
-            input.value = '';
-            return;
-          }
-          this.data.place.placeBackgroundFileId = saved.id;
-          this.data.place.placeBackgroundImage = saved.url;
-          this.data.place.placeBackgroundAttribution = undefined;
-          if (this.data.place.placeBackgroundTransparency == null) {
-            this.data.place.placeBackgroundTransparency = 40;
-          }
-          this.cdr.markForCheck();
-          input.value = '';
-        });
-      })
-      .catch((error: Error) => {
-        this.ngZone.run(() => {
-          if (error.message === 'too_large') {
-            this.snackBar.open(
-              this.translation.t('common.placeSettings.backgroundTooLarge', { maxMb: 2 }),
-              this.translation.t('common.actions.ok'),
-              { duration: 2000 }
-            );
-            return;
-          }
-          this.snackBar.open(
-            this.translation.t('common.placeSettings.imageReadError'),
-            this.translation.t('common.actions.ok'),
-            { duration: 2000 }
-          );
-        });
-      });
+    this.openBackgroundCropper(file, undefined, input);
   }
 
   async deleteAvatar() {
@@ -290,38 +249,6 @@ export class PlaceProfileComponent {
       this.translation.t('common.actions.ok'),
       { duration: 2500 }
     );
-  }
-
-  private async resizeAndCompressImage(file: File, maxDimension: number, maxBytes: number): Promise<string> {
-    const image = await this.loadImage(file);
-    const scale = Math.min(1, maxDimension / Math.max(image.width, image.height));
-    const targetWidth = Math.max(1, Math.round(image.width * scale));
-    const targetHeight = Math.max(1, Math.round(image.height * scale));
-    const canvas = document.createElement('canvas');
-    canvas.width = targetWidth;
-    canvas.height = targetHeight;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-      throw new Error('canvas');
-    }
-
-    ctx.drawImage(image, 0, 0, targetWidth, targetHeight);
-
-    let quality = 0.86;
-    let dataUrl = canvas.toDataURL('image/jpeg', quality);
-    let bytes = this.estimateDataUrlBytes(dataUrl);
-
-    while (bytes > maxBytes && quality > 0.6) {
-      quality = Math.max(quality - 0.08, 0.6);
-      dataUrl = canvas.toDataURL('image/jpeg', quality);
-      bytes = this.estimateDataUrlBytes(dataUrl);
-    }
-
-    if (bytes > maxBytes) {
-      throw new Error('too_large');
-    }
-
-    return dataUrl;
   }
 
   openAvatarSourceDialog(fileInput: HTMLInputElement): void {
@@ -458,47 +385,7 @@ export class PlaceProfileComponent {
       );
       return;
     }
-
-    try {
-      const dataUrl = await this.resizeAndCompressImage(file, this.maxBackgroundDimension, this.maxBackgroundBytes);
-      this.ngZone.run(async () => {
-        if (!this.avatarStorage.isSupported()) {
-          this.showStorageUnsupported();
-          return;
-        }
-        if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
-          await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
-        }
-        const saved = await this.avatarStorage.saveImageFromDataUrl('background', dataUrl);
-        if (!saved) {
-          this.showStorageUnsupported();
-          return;
-        }
-        this.data.place.placeBackgroundFileId = saved.id;
-        this.data.place.placeBackgroundImage = saved.url;
-        this.data.place.placeBackgroundAttribution = this.buildUnsplashAttribution(photo);
-        if (this.data.place.placeBackgroundTransparency == null) {
-          this.data.place.placeBackgroundTransparency = 40;
-        }
-        this.cdr.markForCheck();
-      });
-    } catch (error) {
-      this.ngZone.run(() => {
-        if (error instanceof Error && error.message === 'too_large') {
-          this.snackBar.open(
-            this.translation.t('common.placeSettings.backgroundTooLarge', { maxMb: 2 }),
-            this.translation.t('common.actions.ok'),
-            { duration: 2000 }
-          );
-          return;
-        }
-        this.snackBar.open(
-          this.translation.t('common.placeSettings.imageReadError'),
-          this.translation.t('common.actions.ok'),
-          { duration: 2000 }
-        );
-      });
-    }
+    this.openBackgroundCropper(file, this.buildUnsplashAttribution(photo));
   }
 
   private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {
@@ -533,25 +420,50 @@ export class PlaceProfileComponent {
     };
   }
 
-  private loadImage(file: File): Promise<HTMLImageElement> {
-    return new Promise((resolve, reject) => {
-      const url = URL.createObjectURL(file);
-      const image = new Image();
-      image.onload = () => {
-        URL.revokeObjectURL(url);
-        resolve(image);
-      };
-      image.onerror = () => {
-        URL.revokeObjectURL(url);
-        reject(new Error('load_failed'));
-      };
-      image.src = url;
+  private openBackgroundCropper(file: File, attribution?: AvatarAttribution, input?: HTMLInputElement): void {
+    const dialogRef = this.dialog.open(AvatarCropperComponent, {
+      data: {
+        file,
+        maxSizeMb: this.maxBackgroundMb,
+        resizeToWidth: this.maxBackgroundDimension,
+        maintainAspectRatio: false,
+        containWithinAspectRatio: false,
+        titleKey: 'common.backgroundCropper.title',
+        hintKey: 'common.backgroundCropper.hint'
+      },
+      maxWidth: '95vw',
+      width: '520px'
     });
-  }
 
-  private estimateDataUrlBytes(dataUrl: string): number {
-    const base64 = dataUrl.split(',')[1] ?? '';
-    return Math.floor((base64.length * 3) / 4);
+    dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
+      if (input) {
+        input.value = '';
+      }
+      if (!croppedImage) {
+        return;
+      }
+      this.ngZone.run(async () => {
+        if (!this.avatarStorage.isSupported()) {
+          this.showStorageUnsupported();
+          return;
+        }
+        if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
+          await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
+        }
+        const saved = await this.avatarStorage.saveImageFromDataUrl('background', croppedImage);
+        if (!saved) {
+          this.showStorageUnsupported();
+          return;
+        }
+        this.data.place.placeBackgroundFileId = saved.id;
+        this.data.place.placeBackgroundImage = saved.url;
+        this.data.place.placeBackgroundAttribution = attribution;
+        if (this.data.place.placeBackgroundTransparency == null) {
+          this.data.place.placeBackgroundTransparency = 40;
+        }
+        this.cdr.markForCheck();
+      });
+    });
   }
 
   public showPolicy() {

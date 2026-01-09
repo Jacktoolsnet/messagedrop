@@ -40,6 +40,10 @@
     "backgroundSource": {
       "title": "Hintergrundquelle wählen"
     },
+    "backgroundCropper": {
+      "title": "Hintergrund zuschneiden",
+      "hint": "Bild verschieben oder zoomen, um den gewünschten Ausschnitt zu wählen."
+    },
     "avatarAttribution": {
       "creatorLink": "{{ name }} @ Unsplash"
     },

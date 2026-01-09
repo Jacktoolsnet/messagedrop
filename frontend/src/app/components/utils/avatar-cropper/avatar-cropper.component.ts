@@ -11,6 +11,11 @@ export interface AvatarCropperData {
   file: File;
   maxSizeMb?: number;
   resizeToWidth?: number;
+  maintainAspectRatio?: boolean;
+  aspectRatio?: number;
+  containWithinAspectRatio?: boolean;
+  titleKey?: string;
+  hintKey?: string;
 }
 
 @Component({
@@ -36,6 +41,11 @@ export class AvatarCropperComponent {
 
   readonly resizeToWidth = this.data.resizeToWidth ?? 256;
   readonly maxBytes = (this.data.maxSizeMb ?? 2) * 1024 * 1024;
+  readonly maintainAspectRatio = this.data.maintainAspectRatio ?? true;
+  readonly aspectRatio = this.data.aspectRatio ?? 1;
+  readonly containWithinAspectRatio = this.data.containWithinAspectRatio ?? true;
+  readonly titleKey = this.data.titleKey ?? 'common.avatarCropper.title';
+  readonly hintKey = this.data.hintKey ?? 'common.avatarCropper.hint';
 
   imageBase64 = '';
   croppedImage = '';
