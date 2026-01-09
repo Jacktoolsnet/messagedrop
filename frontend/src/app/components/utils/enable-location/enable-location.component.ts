@@ -18,6 +18,9 @@ export class EnableLocationComponent implements OnInit {
   /** Optional: überschreibt den initialen Checked-Status rein visuell */
   @Input() checkedOverride?: boolean;
 
+  /** Optional: persist settings when toggled (default true) */
+  @Input() persistOnToggle = true;
+
   /** Optional: Privacy-Policy URL (default: '/privacy') */
   @Input() privacyUrl = '/privacy';
 
@@ -37,9 +40,11 @@ export class EnableLocationComponent implements OnInit {
   onToggle(enabled: boolean): void {
     this.enabled = enabled;
 
-    const current = this.app.getAppSettings();
-    const updated: AppSettings = { ...current, detectLocationOnStart: enabled };
-    this.app.setAppSettings(updated);
+    if (this.persistOnToggle) {
+      const current = this.app.getAppSettings();
+      const updated: AppSettings = { ...current, detectLocationOnStart: enabled };
+      this.app.setAppSettings(updated);
+    }
 
     this.enabledChange.emit(enabled);
   }

@@ -925,7 +925,7 @@
     "deletingUser": "Eliminando usuario",
     "subscribingUser": "Suscribiéndose al usuario",
     "unsubscribingUser": "Cancelando suscripción al usuario",
-    "createUserTitle": "¿Quieres crear un usuario? Así de fácil.",
+    "createUserTitle": "¿Quieres crear un usuario? Así de fácil:",
     "createUserMessage": "Solo elige un PIN: no se requiere nombre de usuario ni contraseña.\n\nPor favor guarda este PIN en un lugar seguro. No lo almacenamos, no podemos restablecerlo ni recuperarlo.\n\nSi pierdes el PIN, el acceso a este usuario se pierde para siempre.\n\nPuedes eliminar tu usuario en cualquier momento dentro de la app.\n\nSi el usuario no se utiliza durante 90 días, se eliminará automáticamente y de forma permanente, incluidos todos los datos asociados.",
     "createUserAction": "Empezar",
     "pinIncorrect": "El PIN no es correcto. Inténtalo de nuevo.",

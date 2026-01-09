@@ -194,6 +194,10 @@ export class AppService {
     return granted;
   }
 
+  public async requestStoragePersistence(): Promise<boolean> {
+    return this.requestPersistentStorage();
+  }
+
   private storagePersistenceAvailable(): boolean {
     return typeof navigator !== 'undefined'
       && !!navigator.storage

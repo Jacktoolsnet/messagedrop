@@ -46,7 +46,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<AppSettingsComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
-  readonly languageService = inject(LanguageService);
+  private readonly languageService = inject(LanguageService);
   private readonly translation = inject(TranslationHelperService);
 
   public versionInfo = APP_VERSION_INFO;
@@ -65,7 +65,8 @@ export class AppSettingsComponent implements OnInit {
     'violet',
     'yellow'
   ];
-  public appSettings: AppSettings = this.dialogData.appSettings;
+  public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
+  private baselineSettings: AppSettings = structuredClone(this.dialogData.appSettings);
   public showDetectLocationOnStart = false;
   public storagePersistenceSupported = this.appService.isStoragePersistenceSupported();
   public storagePersistenceBusy = false;
@@ -74,6 +75,9 @@ export class AppSettingsComponent implements OnInit {
   private readonly storageWarningThreshold = 0.9;
 
   ngOnInit(): void {
+    this.dialogRef.beforeClosed().subscribe(() => {
+      this.resetPreviewState();
+    });
     if ('permissions' in navigator && navigator.permissions?.query) {
       navigator.permissions
         .query({ name: 'geolocation' })
@@ -91,40 +95,66 @@ export class AppSettingsComponent implements OnInit {
     this.dialogRef.close();
   }
 
+  async onApplyClick(): Promise<void> {
+    let nextSettings = { ...this.appSettings };
+    let shouldClose = true;
+
+    if (this.storagePersistenceSupported) {
+      const wantsPersistence = !!nextSettings.persistStorage;
+      if (wantsPersistence) {
+        this.storagePersistenceBusy = true;
+        const granted = await this.appService.requestStoragePersistence();
+        this.storagePersistenceBusy = false;
+        nextSettings = { ...nextSettings, persistStorage: granted };
+        if (!granted) {
+          this.storagePersistenceWarning = this.translation.t('settings.storage.warning');
+          shouldClose = false;
+        } else {
+          this.storagePersistenceWarning = '';
+        }
+      } else {
+        this.storagePersistenceWarning = '';
+      }
+    }
+
+    await this.appService.setAppSettings(nextSettings);
+    this.appService.setTheme(nextSettings);
+    this.appSettings = nextSettings;
+    this.baselineSettings = structuredClone(nextSettings);
+
+    if (shouldClose) {
+      this.dialogRef.close();
+    }
+  }
+
   setTheme(themeName: string): void {
-    this.appSettings.defaultTheme = themeName;
+    this.appSettings = { ...this.appSettings, defaultTheme: themeName };
     this.appService.setTheme(this.appSettings);
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setThemeMode(mode: 'light' | 'dark' | 'system') {
-    this.appSettings.themeMode = mode;
+    this.appSettings = { ...this.appSettings, themeMode: mode };
     this.appService.setTheme(this.appSettings);
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setDetectLocationOnStart(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, detectLocationOnStart: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setBackupOnExit(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, backupOnExit: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setDiagnosticLogging(enabled: boolean): void {
     this.appSettings = { ...this.appSettings, diagnosticLogging: enabled };
-    this.appService.setAppSettings(this.appSettings);
   }
 
   setLanguageMode(mode: LanguageMode): void {
     this.appSettings = { ...this.appSettings, languageMode: mode };
-    this.languageService.setLanguageMode(mode);
-    this.appService.setAppSettings(this.appSettings);
+    this.languageService.setLanguageModePreview(mode);
   }
 
-  async onStoragePersistenceToggle(event: MatSlideToggleChange): Promise<void> {
+  onStoragePersistenceToggle(event: MatSlideToggleChange): void {
     if (!this.storagePersistenceSupported) {
       event.source.checked = false;
       return;
@@ -143,23 +173,8 @@ export class AppSettingsComponent implements OnInit {
       }
     }
 
-    this.storagePersistenceBusy = true;
-
-    try {
-      const granted = await this.appService.updateStoragePersistencePreference(targetState);
-      this.appSettings = { ...this.appSettings, persistStorage: granted };
-      if (targetState && !granted) {
-        console.warn('Persistent storage could not be granted by the browser.');
-      }
-    } finally {
-      this.storagePersistenceBusy = false;
-      event.source.checked = this.appSettings.persistStorage;
-      if (targetState && !this.appSettings.persistStorage) {
-        this.storagePersistenceWarning = this.translation.t('settings.storage.warning');
-      } else {
-        this.storagePersistenceWarning = '';
-      }
-    }
+    this.appSettings = { ...this.appSettings, persistStorage: targetState };
+    this.storagePersistenceWarning = '';
   }
 
   private async refreshStorageEstimate(): Promise<void> {
@@ -205,6 +220,15 @@ export class AppSettingsComponent implements OnInit {
       unitIndex++;
     }
     return `${value.toFixed(unitIndex === 0 ? 0 : 1)} ${units[unitIndex]}`;
+  }
+
+  private resetPreviewState(): void {
+    const baseline = structuredClone(this.baselineSettings);
+    this.appSettings = baseline;
+    this.appService.setTheme(baseline);
+    const languageMode = baseline.languageMode ?? 'system';
+    this.languageService.setLanguageModePreview(languageMode);
+    this.languageService.endLanguagePreview();
   }
 
 }

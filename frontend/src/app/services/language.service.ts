@@ -16,6 +16,7 @@ export class LanguageService {
   private readonly _languageMode = signal<LanguageMode>(this.resolveInitialMode());
   readonly languageMode = this._languageMode.asReadonly();
   readonly availableLangs = SUPPORTED_LANGS;
+  private readonly previewMode = signal(false);
   readonly effectiveLanguage = computed<SupportedLang>(() => {
     const mode = this._languageMode();
     if (mode === 'system') {
@@ -48,6 +49,9 @@ export class LanguageService {
 
     effect(() => {
       const persisted = this.persistedMode();
+      if (this.previewMode()) {
+        return;
+      }
       if (persisted && persisted !== this._languageMode()) {
         this._languageMode.set(persisted);
       }
@@ -56,6 +60,9 @@ export class LanguageService {
     effect(() => {
       const mode = this._languageMode();
       this.appService.settingsSet();
+      if (this.previewMode()) {
+        return;
+      }
       if (!this.appService.isSettingsReady()) {
         return;
       }
@@ -73,6 +80,15 @@ export class LanguageService {
     if (mode !== this._languageMode()) {
       this._languageMode.set(mode);
     }
+  }
+
+  setLanguageModePreview(mode: LanguageMode): void {
+    this.previewMode.set(true);
+    this.setLanguageMode(mode);
+  }
+
+  endLanguagePreview(): void {
+    this.previewMode.set(false);
   }
 
   private resolveInitialMode(): LanguageMode {

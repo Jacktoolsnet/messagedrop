@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="languageService.languageMode()"
+      <mat-button-toggle-group [hideSingleSelectionIndicator]="true" [value]="appSettings.languageMode"
         (change)="setLanguageMode($event.value)" class="language-toggle-group" exclusive
         [attr.aria-label]="'settings.language.title' | transloco">
         <mat-button-toggle value="system">
@@ -79,7 +79,8 @@
 
     @if(showDetectLocationOnStart){
       <div class="platform-tile">
-        <app-enable-location (enabledChange)="setDetectLocationOnStart($event)"></app-enable-location>
+        <app-enable-location [checkedOverride]="appSettings.detectLocationOnStart" [persistOnToggle]="false"
+          (enabledChange)="setDetectLocationOnStart($event)"></app-enable-location>
       </div>
     }
     @if(storagePersistenceSupported){
@@ -156,5 +157,12 @@
 
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-dialog-close cdkFocusInitial (click)="onCloseClick()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-dialog-close cdkFocusInitial (click)="onCloseClick()" mat-icon-button
+    [attr.aria-label]="'common.actions.close' | transloco" class="action-close">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
+    (click)="onApplyClick()" [disabled]="storagePersistenceBusy">
+    <mat-icon>check</mat-icon>
+  </button>
 </mat-dialog-actions>
