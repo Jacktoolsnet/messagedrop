@@ -54,6 +54,7 @@ export class PlaceProfileComponent {
   private oriBackgroundImage: string | undefined = undefined;
   private oriBackgroundFileId: string | undefined = undefined;
   private oriBackgroundTransparency: number | undefined = undefined;
+  private oriBackgroundAttribution: AvatarAttribution | undefined = undefined;
   private oriIcon: string | undefined = undefined;
   private oriTileSettings: TileSetting[] | undefined = undefined;
   private oriAvatarAttribution: AvatarAttribution | undefined = undefined;
@@ -74,6 +75,7 @@ export class PlaceProfileComponent {
     this.oriBackgroundImage = this.data.place.placeBackgroundImage;
     this.oriBackgroundFileId = this.data.place.placeBackgroundFileId;
     this.oriBackgroundTransparency = this.data.place.placeBackgroundTransparency;
+    this.oriBackgroundAttribution = this.data.place.placeBackgroundAttribution;
     this.oriIcon = this.data.place.icon;
     this.oriAvatarAttribution = this.data.place.avatarAttribution;
     const normalizedTileSettings = normalizeTileSettings(this.data.place.tileSettings);
@@ -112,6 +114,7 @@ export class PlaceProfileComponent {
     this.data.place.placeBackgroundImage = this.oriBackgroundImage;
     this.data.place.placeBackgroundFileId = this.oriBackgroundFileId;
     this.data.place.placeBackgroundTransparency = this.oriBackgroundTransparency;
+    this.data.place.placeBackgroundAttribution = this.oriBackgroundAttribution;
     if (undefined != this.oriIcon) {
       this.data.place.icon = this.oriIcon;
     }
@@ -222,6 +225,7 @@ export class PlaceProfileComponent {
           }
           this.data.place.placeBackgroundFileId = saved.id;
           this.data.place.placeBackgroundImage = saved.url;
+          this.data.place.placeBackgroundAttribution = undefined;
           if (this.data.place.placeBackgroundTransparency == null) {
             this.data.place.placeBackgroundTransparency = 40;
           }
@@ -264,6 +268,7 @@ export class PlaceProfileComponent {
     }
     this.data.place.placeBackgroundFileId = undefined;
     this.data.place.placeBackgroundImage = '';
+    this.data.place.placeBackgroundAttribution = undefined;
     this.cdr.markForCheck();
   }
 
@@ -336,6 +341,29 @@ export class PlaceProfileComponent {
     });
   }
 
+  openBackgroundSourceDialog(fileInput: HTMLInputElement): void {
+    const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      autoFocus: false,
+      data: {
+        titleKey: 'common.backgroundSource.title',
+        icon: 'wallpaper'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+      if (choice === 'file') {
+        fileInput.click();
+        return;
+      }
+      if (choice === 'unsplash') {
+        this.openUnsplashBackground();
+      }
+    });
+  }
+
   private openUnsplashAvatar(): void {
     const dialogRef = this.dialog.open(UnsplashComponent, {
       panelClass: '',
@@ -352,6 +380,25 @@ export class PlaceProfileComponent {
         return;
       }
       void this.applyUnsplashPhoto(photo);
+    });
+  }
+
+  private openUnsplashBackground(): void {
+    const dialogRef = this.dialog.open(UnsplashComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { returnType: 'photo' },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((photo?: UnsplashPhoto) => {
+      if (!photo) {
+        return;
+      }
+      void this.applyUnsplashBackground(photo);
     });
   }
 
@@ -397,6 +444,59 @@ export class PlaceProfileComponent {
       this.data.place.avatarAttribution = this.buildUnsplashAttribution(photo);
       this.cdr.markForCheck();
     });
+  }
+
+  private async applyUnsplashBackground(photo: UnsplashPhoto): Promise<void> {
+    const file = await this.loadUnsplashFile(photo);
+    if (!file) {
+      this.snackBar.open(
+        this.translation.t('common.avatarCropper.loadFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+
+    try {
+      const dataUrl = await this.resizeAndCompressImage(file, this.maxBackgroundDimension, this.maxBackgroundBytes);
+      this.ngZone.run(async () => {
+        if (!this.avatarStorage.isSupported()) {
+          this.showStorageUnsupported();
+          return;
+        }
+        if (this.data.place.placeBackgroundFileId && this.data.place.placeBackgroundFileId !== this.oriBackgroundFileId) {
+          await this.avatarStorage.deleteImage(this.data.place.placeBackgroundFileId);
+        }
+        const saved = await this.avatarStorage.saveImageFromDataUrl('background', dataUrl);
+        if (!saved) {
+          this.showStorageUnsupported();
+          return;
+        }
+        this.data.place.placeBackgroundFileId = saved.id;
+        this.data.place.placeBackgroundImage = saved.url;
+        this.data.place.placeBackgroundAttribution = this.buildUnsplashAttribution(photo);
+        if (this.data.place.placeBackgroundTransparency == null) {
+          this.data.place.placeBackgroundTransparency = 40;
+        }
+        this.cdr.markForCheck();
+      });
+    } catch (error) {
+      this.ngZone.run(() => {
+        if (error instanceof Error && error.message === 'too_large') {
+          this.snackBar.open(
+            this.translation.t('common.placeSettings.backgroundTooLarge', { maxMb: 2 }),
+            this.translation.t('common.actions.ok'),
+            { duration: 2000 }
+          );
+          return;
+        }
+        this.snackBar.open(
+          this.translation.t('common.placeSettings.imageReadError'),
+          this.translation.t('common.actions.ok'),
+          { duration: 2000 }
+        );
+      });
+    }
   }
 
   private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {

@@ -150,6 +150,7 @@ export class ContactService {
       contact.avatarFileId = profile?.avatarFileId ?? contact.avatarFileId;
       contact.avatarAttribution = profile?.avatarAttribution ?? contact.avatarAttribution;
       contact.chatBackgroundFileId = profile?.chatBackgroundFileId ?? contact.chatBackgroundFileId;
+      contact.chatBackgroundAttribution = profile?.chatBackgroundAttribution ?? contact.chatBackgroundAttribution;
       contact.base64Avatar = contact.avatarFileId
         ? (await this.avatarStorage.getImageUrl(contact.avatarFileId)) || ''
         : '';
@@ -174,6 +175,7 @@ export class ContactService {
         avatarAttribution: contact.avatarAttribution,
         chatBackgroundImage: '',
         chatBackgroundFileId: contact.chatBackgroundFileId,
+        chatBackgroundAttribution: contact.chatBackgroundAttribution,
         chatBackgroundTransparency: contact.chatBackgroundTransparency ?? 40,
         pinned: contact.pinned
       });

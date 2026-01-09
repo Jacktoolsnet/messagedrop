@@ -23,6 +23,7 @@ export interface Contact {
     avatarAttribution?: AvatarAttribution,
     chatBackgroundImage?: string,
     chatBackgroundFileId?: string,
+    chatBackgroundAttribution?: AvatarAttribution,
     chatBackgroundTransparency?: number,
     subscribed: boolean,
     pinned: boolean,

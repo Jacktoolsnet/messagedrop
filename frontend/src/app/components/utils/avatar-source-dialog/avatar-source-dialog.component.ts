@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
@@ -8,6 +8,13 @@ import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
 
 export type AvatarSourceChoice = 'file' | 'unsplash';
+
+export interface AvatarSourceDialogData {
+  titleKey?: string;
+  icon?: string;
+  fileLabelKey?: string;
+  unsplashLabelKey?: string;
+}
 
 @Component({
   selector: 'app-avatar-source-dialog',
@@ -29,6 +36,12 @@ export type AvatarSourceChoice = 'file' | 'unsplash';
 export class AvatarSourceDialogComponent {
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<AvatarSourceDialogComponent>);
+  private readonly data = inject<AvatarSourceDialogData | null>(MAT_DIALOG_DATA, { optional: true });
+
+  readonly titleKey = this.data?.titleKey ?? 'common.avatarSource.title';
+  readonly icon = this.data?.icon ?? 'account_circle';
+  readonly fileLabelKey = this.data?.fileLabelKey ?? 'common.avatarSource.file';
+  readonly unsplashLabelKey = this.data?.unsplashLabelKey ?? 'common.avatarSource.unsplash';
 
   showUnsplash = this.appService.getAppSettings().enableUnsplashContent;
 

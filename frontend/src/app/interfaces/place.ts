@@ -16,6 +16,7 @@ export interface Place {
     avatarAttribution?: AvatarAttribution,
     placeBackgroundImage?: string,
     placeBackgroundFileId?: string,
+    placeBackgroundAttribution?: AvatarAttribution,
     placeBackgroundTransparency?: number,
     icon: string,
     subscribed: boolean,

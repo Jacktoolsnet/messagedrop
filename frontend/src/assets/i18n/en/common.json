@@ -37,6 +37,9 @@
       "file": "Upload photo",
       "unsplash": "Use Unsplash"
     },
+    "backgroundSource": {
+      "title": "Choose background source"
+    },
     "avatarAttribution": {
       "creatorLink": "{{ name }} @ Unsplash"
     },

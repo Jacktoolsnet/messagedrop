@@ -7,6 +7,7 @@ export interface ContactProfile {
     avatarAttribution?: AvatarAttribution,
     chatBackgroundImage?: string,
     chatBackgroundFileId?: string,
+    chatBackgroundAttribution?: AvatarAttribution,
     chatBackgroundTransparency?: number,
     defaultStyle?: string,
     pinned: boolean

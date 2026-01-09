@@ -83,6 +83,29 @@ export class ContactSettingsComponent {
     });
   }
 
+  openBackgroundSourceDialog(fileInput: HTMLInputElement): void {
+    const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      hasBackdrop: true,
+      autoFocus: false,
+      data: {
+        titleKey: 'common.backgroundSource.title',
+        icon: 'wallpaper'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((choice?: AvatarSourceChoice) => {
+      if (choice === 'file') {
+        fileInput.click();
+        return;
+      }
+      if (choice === 'unsplash') {
+        this.openUnsplashBackground();
+      }
+    });
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     const file = input?.files?.[0];
@@ -180,6 +203,7 @@ export class ContactSettingsComponent {
         }
         this.contact.chatBackgroundFileId = saved.id;
         this.contact.chatBackgroundImage = saved.url;
+        this.contact.chatBackgroundAttribution = undefined;
         if (this.contact.chatBackgroundTransparency == null) {
           this.contact.chatBackgroundTransparency = 40;
         }
@@ -217,6 +241,7 @@ export class ContactSettingsComponent {
     }
     this.contact.chatBackgroundFileId = undefined;
     this.contact.chatBackgroundImage = '';
+    this.contact.chatBackgroundAttribution = undefined;
   }
 
   getChatBackgroundPreviewImage(): string {
@@ -288,6 +313,25 @@ export class ContactSettingsComponent {
     });
   }
 
+  private openUnsplashBackground(): void {
+    const dialogRef = this.dialog.open(UnsplashComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      data: { returnType: 'photo' },
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((photo?: UnsplashPhoto) => {
+      if (!photo) {
+        return;
+      }
+      void this.applyUnsplashBackground(photo);
+    });
+  }
+
   private async applyUnsplashPhoto(photo: UnsplashPhoto): Promise<void> {
     const file = await this.loadUnsplashFile(photo);
     if (!file) {
@@ -329,6 +373,54 @@ export class ContactSettingsComponent {
       this.contact.base64Avatar = saved.url;
       this.contact.avatarAttribution = this.buildUnsplashAttribution(photo);
     });
+  }
+
+  private async applyUnsplashBackground(photo: UnsplashPhoto): Promise<void> {
+    const file = await this.loadUnsplashFile(photo);
+    if (!file) {
+      this.snackBar.open(
+        this.translation.t('common.avatarCropper.loadFailed'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+      return;
+    }
+
+    try {
+      const dataUrl = await this.resizeAndCompressImage(file, this.maxBackgroundDimension, this.maxBackgroundBytes);
+      if (!this.avatarStorage.isSupported()) {
+        this.showStorageUnsupported();
+        return;
+      }
+      if (this.contact.chatBackgroundFileId && this.contact.chatBackgroundFileId !== this.originalBackgroundFileId) {
+        await this.avatarStorage.deleteImage(this.contact.chatBackgroundFileId);
+      }
+      const saved = await this.avatarStorage.saveImageFromDataUrl('background', dataUrl);
+      if (!saved) {
+        this.showStorageUnsupported();
+        return;
+      }
+      this.contact.chatBackgroundFileId = saved.id;
+      this.contact.chatBackgroundImage = saved.url;
+      this.contact.chatBackgroundAttribution = this.buildUnsplashAttribution(photo);
+      if (this.contact.chatBackgroundTransparency == null) {
+        this.contact.chatBackgroundTransparency = 40;
+      }
+    } catch (error) {
+      if (error instanceof Error && error.message === 'too_large') {
+        this.snackBar.open(
+          this.translation.t('common.contact.profile.imageTooLarge', { maxMb: 2 }),
+          this.translation.t('common.actions.ok'),
+          { duration: 2000 }
+        );
+        return;
+      }
+      this.snackBar.open(
+        this.translation.t('common.contact.profile.fileReadError'),
+        this.translation.t('common.actions.ok'),
+        { duration: 2000 }
+      );
+    }
   }
 
   private async loadUnsplashFile(photo: UnsplashPhoto): Promise<File | null> {

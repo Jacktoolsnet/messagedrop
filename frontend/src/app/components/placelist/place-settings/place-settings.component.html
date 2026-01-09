@@ -52,7 +52,7 @@
 
   @if (!data.place.placeBackgroundImage) {
   <div class="avatar-area">
-    <button mat-flat-button class="button-set-avatar" (click)="backgroundUpload.click()">
+    <button mat-flat-button class="button-set-avatar" (click)="openBackgroundSourceDialog(backgroundUpload)">
       <mat-icon>wallpaper</mat-icon>
       <span>{{ 'common.placeSettings.setTileBackground' | transloco }}</span>
     </button>
@@ -63,6 +63,19 @@
     <div class="background-preview"
       [style.--place-bg-image]="getPlaceBackgroundPreviewImage()"
       [style.--place-bg-opacity]="getPlaceBackgroundPreviewOpacity()"></div>
+    @if (data.place.placeBackgroundAttribution?.source === 'unsplash') {
+    <p class="avatar-attribution">
+      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+        target="_blank" rel="noopener">
+        {{ 'common.multimedia.attributionPoweredBy' | transloco:{ platform: 'Unsplash' } }}
+      </a>
+      <span>·</span>
+      <a class="avatar-attribution__link" [href]="data.place.placeBackgroundAttribution?.photoUrl" target="_blank"
+        rel="noopener">
+        {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: data.place.placeBackgroundAttribution?.authorName } }}
+      </a>
+    </p>
+    }
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deletePlaceBackground()"
         [attr.aria-label]="'common.placeSettings.deleteTileBackgroundAria' | transloco">
