@@ -53,6 +53,10 @@ export class PlaceService {
       this.ready = false;
       return;
     }
+    if (!this.userService.hasJwt()) {
+      void this.loadCachedPlaces();
+      return;
+    }
     this.getByUserId(userId).subscribe({
       next: async (response) => {
         const places = await Promise.all((response.rows ?? []).map(row => this.loadPlaceFromIndexedDb(row.id)));
@@ -61,8 +65,7 @@ export class PlaceService {
       },
       error: (err) => {
         console.error('Failed to load places', err);
-        this._places.set([]);
-        this.ready = true;
+        void this.loadCachedPlaces();
       }
     });
   }
@@ -77,7 +80,9 @@ export class PlaceService {
     const place = await this.indexedDbService.getPlace(placeId);
     const tileSettings = await this.indexedDbService.getTileSettings(placeId);
     if (!place) {
-      this.deletePlace(placeId).subscribe();
+      if (this.userService.hasJwt()) {
+        this.deletePlace(placeId).subscribe();
+      }
     }
     if (!place) {
       return null;
@@ -97,6 +102,19 @@ export class PlaceService {
 
     const mergedPlace: Place = tileSettings ? { ...place, tileSettings } : place;
     return this.normalizePlaceTileSettings(mergedPlace);
+  }
+
+  private async loadCachedPlaces(): Promise<void> {
+    try {
+      const cached = await this.indexedDbService.getAllPlaces();
+      const places = await Promise.all(cached.map(place => this.loadPlaceFromIndexedDb(place.id)));
+      this._places.set(places.filter((place): place is Place => Boolean(place)));
+      this.ready = true;
+    } catch (err) {
+      console.error('Failed to load cached places', err);
+      this._places.set([]);
+      this.ready = false;
+    }
   }
 
   private normalizePlaceTileSettings(place: Place): Place {

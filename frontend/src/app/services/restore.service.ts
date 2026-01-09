@@ -59,7 +59,7 @@ export class RestoreService {
 
     const hasUser = await this.indexedDbService.hasUser();
     if (hasUser && !this.userService.isReady()) {
-      this.userService.login(() => {
+      this.userService.loginWithBackend(() => {
         this.startRestore();
       });
       return;

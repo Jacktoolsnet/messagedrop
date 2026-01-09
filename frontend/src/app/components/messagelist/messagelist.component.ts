@@ -218,8 +218,10 @@ export class MessagelistComponent implements OnInit {
     if (!userId || userId !== message.userId) {
       return;
     }
-    if (!this.userService.isReady()) {
-      this.editMessageAfterLoginClick(message);
+    if (!this.userService.hasJwt()) {
+      if (!this.userService.isReady()) {
+        this.editMessageAfterLoginClick(message);
+      }
       return;
     }
     this.editMessageClick(message);
@@ -227,7 +229,7 @@ export class MessagelistComponent implements OnInit {
 
   public likeMessageAfterLoginClick(message: Message) {
     this.clickedMessage = message;
-    this.userService.login(this.likeMessage.bind(this))
+    this.userService.loginWithBackend(this.likeMessage.bind(this))
   }
 
   public likeMessageClick(message: Message) {
@@ -236,6 +238,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public likeMessage() {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     if (undefined != this.clickedMessage) {
       this.messageService.likeToggle(this.clickedMessage, this.userService.getUser());
     }
@@ -243,7 +248,7 @@ export class MessagelistComponent implements OnInit {
 
   public dislikeMessageAfterLoginClick(message: Message) {
     this.clickedMessage = message;
-    this.userService.login(this.dislikeMessage.bind(this))
+    this.userService.loginWithBackend(this.dislikeMessage.bind(this))
   }
 
   public dislikeMessageClick(message: Message) {
@@ -252,6 +257,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public dislikeMessage() {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     if (undefined != this.clickedMessage) {
       this.messageService.dislikeToggle(this.clickedMessage, this.userService.getUser());
     }
@@ -291,7 +299,7 @@ export class MessagelistComponent implements OnInit {
 
   public deleteMessageAfterLoginClick(message: Message) {
     this.clickedMessage = message;
-    this.userService.login(this.deleteMessage.bind(this))
+    this.userService.loginWithBackend(this.deleteMessage.bind(this))
   }
 
   public deleteMessageClick(message: Message) {
@@ -300,6 +308,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public deleteMessage() {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     if (this.clickedMessage) {
       const dialogRef = this.dialog.open(DeleteMessageComponent, {
         closeOnNavigation: true,
@@ -571,7 +582,7 @@ export class MessagelistComponent implements OnInit {
 
   public editMessageAfterLoginClick(message: Message) {
     this.clickedMessage = message;
-    this.userService.login(this.editMessage.bind(this))
+    this.userService.loginWithBackend(this.editMessage.bind(this))
   }
 
   public editMessageClick(message: Message) {
@@ -580,6 +591,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public editMessage() {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     if (this.clickedMessage) {
       if (this.clickedMessage.multimedia.type !== MultimediaType.UNDEFINED) {
         this.sharedContentService.addSharedContentToMessage(this.clickedMessage);
@@ -640,6 +654,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   addMessagDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const message: Message = {
       id: 0,
       uuid: crypto.randomUUID(),
@@ -693,7 +710,7 @@ export class MessagelistComponent implements OnInit {
   public handleCommentAfterLoginClick(message: Message) {
     this.clickedMessage = message;
     if (this.getCommentBadge(message.uuid) === 0) {
-      this.userService.login(this.handleComment.bind(this))
+      this.userService.loginWithBackend(this.handleComment.bind(this))
     } else {
       this.handleComment();
     }
@@ -717,7 +734,7 @@ export class MessagelistComponent implements OnInit {
 
       // Sonderfall: Noch keine Comments → Direkt einen Kommentar erstellen
       if (comments.length === 0 && this.clickedMessage.commentsNumber === 0) {
-        if (this.userService.isReady()) {
+        if (this.userService.hasJwt()) {
           this.addComment(this.clickedMessage);
         }
       }
@@ -729,6 +746,9 @@ export class MessagelistComponent implements OnInit {
   }
 
   public addComment(parentMessage: Message) {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const message: Message = {
       id: 0,
       uuid: crypto.randomUUID(),

@@ -62,6 +62,7 @@
     },
     "menu": {
       "logout": "Se déconnecter",
+      "connectBackend": "Se connecter au backend",
       "myUser": "Mon utilisateur",
       "myProfile": "Mon profil",
       "systemMessages": "Messages système",

@@ -58,7 +58,7 @@ export class SystemNotificationService {
   }
 
   async loadNotifications(filter: SystemNotificationFilter = this.filterSig(), limit = 50, offset = 0): Promise<SystemNotification[]> {
-    if (!this.userService.isReady()) {
+    if (!this.userService.hasJwt()) {
       this.notificationsSig.set([]);
       return [];
     }
@@ -104,7 +104,7 @@ export class SystemNotificationService {
   }
 
   async markAsRead(uuids: string[]): Promise<SystemNotification[]> {
-    if (!this.userService.isReady() || uuids.length === 0) {
+    if (!this.userService.hasJwt() || uuids.length === 0) {
       return [];
     }
 
@@ -156,7 +156,7 @@ export class SystemNotificationService {
   }
 
   async markAsUnread(uuids: string[]): Promise<SystemNotification[]> {
-    if (!this.userService.isReady() || uuids.length === 0) {
+    if (!this.userService.hasJwt() || uuids.length === 0) {
       return [];
     }
 
@@ -203,7 +203,7 @@ export class SystemNotificationService {
   }
 
   async deleteNotifications(uuids: string[]): Promise<number> {
-    if (!this.userService.isReady() || uuids.length === 0) {
+    if (!this.userService.hasJwt() || uuids.length === 0) {
       return 0;
     }
 
@@ -241,7 +241,7 @@ export class SystemNotificationService {
   }
 
   async refreshUnreadCount(): Promise<number> {
-    if (!this.userService.isReady()) {
+    if (!this.userService.hasJwt()) {
       this.unreadCountSig.set(0);
       return 0;
     }

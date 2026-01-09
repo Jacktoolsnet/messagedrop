@@ -39,11 +39,13 @@
             </mat-card-content>
 
             <mat-card-actions class="buttonbar">
+                @if (!userService.isReady() || userService.hasJwt()) {
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
                     [attr.aria-label]="'common.location.addPlaceAria' | transloco"
                     (click)="!userService.isReady() ? loginAndAddToMyPlaces(place) : addToMyPlaces(place)">
                     <mat-icon>add_location</mat-icon>
                 </button>
+                }
 
                 <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
                     [attr.aria-label]="'common.location.flyToPlaceAria' | transloco"

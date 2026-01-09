@@ -629,7 +629,7 @@ export class ContactChatroomComponent implements AfterViewInit {
 
   setReaction(message: ChatroomMessage, reaction: string | null): void {
     const contact = this.contact();
-    if (!contact || !this.userService.isReady()) {
+    if (!contact || !this.userService.hasJwt()) {
       return;
     }
     this.messages.update((msgs) =>

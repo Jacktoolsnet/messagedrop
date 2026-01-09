@@ -32,11 +32,13 @@
                 </div>
                 <mat-card-actions class="tile-actions">
                     <div class="tile-actions__left">
+                        @if (userService.hasJwt()) {
                         <button mat-mini-fab color="secondary"
                             [attr.aria-label]="'common.contact.delete.title' | transloco"
                             (click)="deleteContact(contact)">
                             <mat-icon>delete_forever</mat-icon>
                         </button>
+                        }
                     </div>
                     <div class="tile-actions__right">
                         @if (contact.pinned) {
@@ -51,12 +53,14 @@
                             <mat-icon>keep</mat-icon>
                         </button>
                         }
+                        @if (userService.hasJwt()) {
                         <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
                             [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
                             matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
                             <mat-icon>forum</mat-icon>
                         </button>
+                        }
                         <button mat-mini-fab color="secondary" (click)="openTileList(contact)"
                             [attr.aria-label]="tileListAriaLabel(contact)">
                             <mat-icon>dashboard</mat-icon>
@@ -70,7 +74,7 @@
                                 <mat-icon>settings_account_box</mat-icon>
                                 <span>{{ 'common.contact.list.editAria' | transloco }}</span>
                             </button>
-                            @if (!subscriptionError) {
+                            @if (!subscriptionError && userService.hasJwt()) {
                             @if (contact.subscribed) {
                             <button mat-menu-item (click)="subscribe(contact)">
                                 <mat-icon>bookmark_remove</mat-icon>
@@ -98,10 +102,12 @@
         [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
     </button>
+    @if (userService.hasJwt()) {
     <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.connect.addAria' | transloco"
         [matMenuTriggerFor]="connectionMenu">
         <mat-icon>connect_without_contact</mat-icon>
     </button>
+    }
 </mat-dialog-actions>
 
 <mat-menu #connectionMenu="matMenu" panelClass="accent-menu">

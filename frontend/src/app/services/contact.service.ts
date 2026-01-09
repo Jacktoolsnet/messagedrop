@@ -57,6 +57,10 @@ export class ContactService {
       this.ready = false;
       return;
     }
+    if (!this.userService.hasJwt()) {
+      void this.loadCachedContacts();
+      return;
+    }
     this.getByUserId(userId)
       .subscribe({
         next: async (getContactsResponse: GetContactsResponse) => {
@@ -72,10 +76,10 @@ export class ContactService {
           if (err.status === 404) {
             this._contacts.set([]);
             this.ready = true;
+            this._contactsSet.update(trigger => trigger + 1);
           } else {
-            this.ready = false;
+            void this.loadCachedContacts();
           }
-          this._contactsSet.update(trigger => trigger + 1);
         }
       });
   }
@@ -185,6 +189,21 @@ export class ContactService {
       });
     }));
     this._contacts.set(contacts.slice());
+  }
+
+  private async loadCachedContacts(): Promise<void> {
+    try {
+      const contacts = await this.indexedDbService.getAllContacts();
+      this._contacts.set(contacts);
+      await this.updateContactProfile();
+      this.ready = true;
+    } catch (err) {
+      console.error('Failed to load cached contacts', err);
+      this._contacts.set([]);
+      this.ready = false;
+    } finally {
+      this._contactsSet.update(trigger => trigger + 1);
+    }
   }
 
   private persistContacts(markDirty = true): void {

@@ -52,6 +52,15 @@
     }
 
     @if (userService.isReady()) {
+    @if (!userService.hasJwt()) {
+    <button mat-menu-item (click)="connectToBackend()">
+        <mat-icon>cloud_sync</mat-icon>
+        <span>{{ 'common.menu.connectBackend' | transloco }}</span>
+    </button>
+    }
+    }
+
+    @if (userService.isReady()) {
     <button mat-menu-item (click)="showUser()">
         <mat-icon>account_circle</mat-icon>
         <span>{{ 'common.menu.myUser' | transloco }}</span>
@@ -65,7 +74,7 @@
     </button>
     }
 
-    @if (userService.isReady()) {
+    @if (userService.hasJwt()) {
     <button mat-menu-item (click)="openSystemMessages()">
         <mat-icon [attr.aria-hidden]="false"
             [matBadge]="hasUnreadSystemNotifications() ? (unreadSystemNotificationCount() | shortNumber) : null"
@@ -74,7 +83,7 @@
     </button>
     }
 
-    @if (userService.isReady()) {
+    @if (userService.hasJwt()) {
     <button mat-menu-item (click)="openUserMessagListDialog()">
         <mat-icon>speaker_notes</mat-icon>
         <span>{{ 'common.menu.myPublicMessages' | transloco }}</span>
@@ -154,8 +163,9 @@
         <span>{{ 'common.menu.locateMe' | transloco }}</span>
     </button>
 
+    @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-menu-item
-        (click)="!userService.isReady() ? userService.login(openMessagDialog.bind(this)) : openMessagDialog()">
+        (click)="!userService.isReady() ? userService.loginWithBackend(openMessagDialog.bind(this)) : openMessagDialog()">
         @if (!userService.isReady()){
         <mat-icon>locked</mat-icon>
         } @else {
@@ -163,6 +173,7 @@
         }
         <span>{{ 'common.menu.publicMessage' | transloco }}</span>
     </button>
+    }
     <button mat-menu-item
         (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
         @if (!userService.isReady()){
@@ -190,8 +201,9 @@
         }
         <span>{{ 'common.menu.privateDocument' | transloco }}</span>
     </button>
+    @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-menu-item
-        (click)="!userService.isReady() ? userService.login(openContactListDialog.bind(this)) : openContactListDialog()">
+        (click)="!userService.isReady() ? userService.loginWithBackend(openContactListDialog.bind(this)) : openContactListDialog()">
         @if (!userService.isReady()){
         <mat-icon>locked</mat-icon>
         } @else {
@@ -199,6 +211,7 @@
         }
         <span>{{ 'common.menu.contactsMessage' | transloco }}</span>
     </button>
+    }
 
     <button mat-menu-item (click)="showWeather()">
         <mat-icon>weather_mix</mat-icon>

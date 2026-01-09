@@ -57,11 +57,13 @@
 
             <mat-card-actions class="buttonbar">
                 @if (this.userService.getUser().id === message.userId) {
+                @if (userService.hasJwt()) {
                 <button mat-mini-fab color="secondary" class="button-delete"
                     [attr.aria-label]="'common.messageList.deleteAria' | transloco"
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
+                }
                 }
                 <div class="button-group">
                     <button mat-mini-fab color="secondary"
@@ -71,6 +73,7 @@
                             matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
                             matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                     </button>
+                    @if (!userService.isReady() || userService.hasJwt()) {
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.likeAria' | transloco"
                         (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
                         <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}"
@@ -81,11 +84,14 @@
                         <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
                             matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
                     </button>
+                    }
                     @if (this.userService.getUser().id === message.userId) {
+                    @if (userService.hasJwt()) {
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.editAria' | transloco"
                         (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                         <mat-icon aria-hidden="false">edit</mat-icon>
                     </button>
+                    }
                     }
                     <button mat-mini-fab color="secondary" [matMenuTriggerFor]="messageMenu"
                         [attr.aria-label]="'common.actions.more' | transloco">
@@ -186,11 +192,13 @@
 
             <mat-card-actions class="buttonbar">
                 @if (this.userService.getUser().id === message.userId) {
+                @if (userService.hasJwt()) {
                 <button mat-mini-fab color="secondary" class="button-delete"
                     [attr.aria-label]="'common.messageList.deleteAria' | transloco"
                     (click)="!userService.isReady() ? deleteMessageAfterLoginClick(message) : deleteMessageClick(message)">
                     <mat-icon aria-hidden="false">delete_forever</mat-icon>
                 </button>
+                }
                 }
                 <div class="button-group">
                     <button mat-mini-fab color="secondary"
@@ -200,6 +208,7 @@
                             matBadge="{{ getCommentBadge(message.uuid) === 0 ? '' : getCommentBadge(message.uuid)}}"
                             matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">forum</mat-icon>
                     </button>
+                    @if (!userService.isReady() || userService.hasJwt()) {
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.likeAria' | transloco"
                         (click)="!userService.isReady() ? likeMessageAfterLoginClick(message) : likeMessageClick(message)">
                         <mat-icon aria-hidden="false" matBadge="{{ message.likes | shortNumber }}"
@@ -210,11 +219,14 @@
                         <mat-icon aria-hidden="false" matBadge="{{ message.dislikes | shortNumber }}"
                             matBadgePosition="after" matBadgeColor="accent" matBadgeOverlap="true">thumb_down</mat-icon>
                     </button>
+                    }
                     @if (this.userService.getUser().id === message.userId) {
+                    @if (userService.hasJwt()) {
                     <button mat-mini-fab color="secondary" [attr.aria-label]="'common.messageList.editAria' | transloco"
                         (click)="!userService.isReady() ? editMessageAfterLoginClick(message) : editMessageClick(message)">
                         <mat-icon aria-hidden="false">edit</mat-icon>
                     </button>
+                    }
                     }
                     <button mat-mini-fab color="secondary" [matMenuTriggerFor]="commentMenu"
                         [attr.aria-label]="'common.actions.more' | transloco">
@@ -276,17 +288,21 @@
         <mat-icon>close</mat-icon>
     </button>
     @if (messageService.selectedMessagesSignal().length !== 0) {
+    @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-icon-button color="primary"
         [attr.aria-label]="'common.messageList.addCommentAria' | transloco"
-        (click)="!userService.isReady() ? userService.login(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
+        (click)="!userService.isReady() ? userService.loginWithBackend(addCommentAfterLogin.bind(this)) : addComment(currentParentSignal()!)">
         <mat-icon>add_comment</mat-icon>
     </button>
     }
+    }
     @if (messageService.selectedMessagesSignal().length === 0) {
+    @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-icon-button color="primary"
         [attr.aria-label]="'common.messageList.addMessageAria' | transloco"
-        (click)="!userService.isReady() ? userService.login(addMessagDialog.bind(this)) : addMessagDialog()">
+        (click)="!userService.isReady() ? userService.loginWithBackend(addMessagDialog.bind(this)) : addMessagDialog()">
         <mat-icon>chat_add_on</mat-icon>
     </button>
+    }
     }
 </mat-dialog-actions>

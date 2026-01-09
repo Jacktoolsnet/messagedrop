@@ -9,7 +9,7 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
         return next(req);
     }
 
-    if (userService.isReady()) {
+    if (userService.hasJwt()) {
         const authReq = req.clone({
             setHeaders: {
                 Authorization: `Bearer ${userService.getUser().jwt}`

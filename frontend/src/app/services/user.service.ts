@@ -148,6 +148,18 @@ export class UserService {
     this.blocked = false;
   }
 
+  private setLocalUser(user: User) {
+    this.user = user;
+    this.user.jwt = undefined;
+    this.user.jwtExpiresAt = undefined;
+    this.user.locale = navigator.language;
+    this.user.language = this.getLanguageForLocation(this.user.locale);
+    this.loadProfile();
+    this.ready = true;
+    this._userSet.update(trigger => trigger + 1);
+    this.blocked = false;
+  }
+
   async initUserId() {
     const user = await this.indexedDbService.getUser();
     if (user) {
@@ -271,6 +283,16 @@ export class UserService {
 
   isReady(): boolean {
     return this.ready;
+  }
+
+  hasJwt(): boolean {
+    if (!this.user?.jwt) {
+      return false;
+    }
+    if (this.user.jwtExpiresAt && this.user.jwtExpiresAt <= Date.now()) {
+      return false;
+    }
+    return true;
   }
 
   isBlocked(): boolean {
@@ -763,9 +785,9 @@ export class UserService {
     return language;
   }
 
-  public async login(afterLogin?: () => void) {
+  public async login(afterLogin?: () => void, options?: { requireJwt?: boolean }) {
     if (await this.indexedDbService.hasUser()) {
-      this.openCheckPinDialog(afterLogin);
+      this.openCheckPinDialog(afterLogin, options);
     } else {
       const dialogRef = this.displayMessage.open(DisplayMessage, {
         panelClass: '',
@@ -792,6 +814,10 @@ export class UserService {
         }
       });
     }
+  }
+
+  public loginWithBackend(afterLogin?: () => void) {
+    return this.login(afterLogin, { requireJwt: true });
   }
 
   private async ensureServerCryptoPublicKey(): Promise<JsonWebKey> {
@@ -1139,7 +1165,7 @@ export class UserService {
   }
 
   public async resetKeys(): Promise<void> {
-    if (!this.isReady()) {
+    if (!this.hasJwt()) {
       return;
     }
 
@@ -1376,7 +1402,7 @@ export class UserService {
     });
   }
 
-  public openCheckPinDialog(callback?: () => void): void {
+  public openCheckPinDialog(callback?: () => void, options?: { requireJwt?: boolean }): void {
     const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
@@ -1384,6 +1410,14 @@ export class UserService {
       hasBackdrop: true
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
+      const requireJwt = options?.requireJwt ?? false;
+      let callbackCalled = false;
+      const runCallback = () => {
+        if (callback && !callbackCalled) {
+          callbackCalled = true;
+          callback();
+        }
+      };
       if (!data) {
         return;
       }
@@ -1403,6 +1437,11 @@ export class UserService {
       this.pinKey = decrypted.key;
       this.pinSalt = decrypted.salt;
       this.pinIterations = decrypted.iterations;
+      this.setLocalUser(user);
+      if (!requireJwt) {
+        runCallback();
+        return;
+      }
 
       this.requestLoginChallenge(user.id)
         .subscribe({
@@ -1423,8 +1462,8 @@ export class UserService {
                       this.registerSubscription(this.getUser());
                     }
                   }
-                  if (callback) {
-                    callback();
+                  if (requireJwt) {
+                    runCallback();
                   }
                 },
                 error: (err) => {
@@ -1579,6 +1618,62 @@ export class UserService {
           }
         });
     });
+  }
+
+  public async connectToBackend(afterLogin?: () => void): Promise<void> {
+    if (!this.isReady() || this.hasJwt()) {
+      return;
+    }
+
+    const user = this.getUser();
+    if (!user?.id || !user.signingKeyPair?.privateKey) {
+      return;
+    }
+
+    this.blocked = true;
+    try {
+      const challengeResponse = await firstValueFrom(this.requestLoginChallenge(user.id, true));
+      const signature = await this.cryptoService.createSignature(
+        user.signingKeyPair.privateKey,
+        challengeResponse.challenge
+      );
+      const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, true));
+      this.setUser(user, loginResponse.jwt);
+      if (Notification.permission === "granted") {
+        if (this.getUser().subscription !== '') {
+          this.indexedDbService.setSetting('subscription', this.getUser().subscription);
+        } else {
+          this.indexedDbService.deleteSetting('subscription');
+          this.registerSubscription(this.getUser());
+        }
+      }
+      if (afterLogin) {
+        afterLogin();
+      }
+    } catch (err) {
+      console.error('Backend login failed', err);
+      const dialogRef = this.displayMessage.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.i18n.t('auth.backendErrorTitle'),
+          image: '',
+          icon: 'bug_report',
+          message: this.i18n.t('auth.backendErrorMessage'),
+          button: this.i18n.t('common.actions.retry'),
+          delay: 10000,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+      dialogRef.afterClosed().subscribe(() => {
+        this.blocked = false;
+      });
+    }
   }
 
 }

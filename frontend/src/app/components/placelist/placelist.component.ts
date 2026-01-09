@@ -79,6 +79,9 @@ export class PlacelistComponent {
   }
 
   public deletePlace(place: Place) {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     this.placeToDelete = place;
     const dialogRef = this.matDialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
@@ -109,6 +112,9 @@ export class PlacelistComponent {
   }
 
   public editPlace(place: Place) {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
 
     const dialogRef = this.matDialog.open(PlaceProfileComponent, {
       panelClass: '',
@@ -133,6 +139,9 @@ export class PlacelistComponent {
   }
 
   public handleSubscription(place: Place) {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     if (Notification.permission !== "granted") {
       this.userService.registerSubscription(this.userService.getUser());
     }
@@ -237,6 +246,9 @@ export class PlacelistComponent {
   }
 
   async addPlace(): Promise<void> {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const place: Place = {
       id: '',
       userId: this.userService.getUser().id,

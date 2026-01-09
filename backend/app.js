@@ -128,6 +128,7 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 function registerProcessHandlers() {
+  const exitOnUnhandled = process.env.EXIT_ON_UNHANDLED === 'true';
   const logProcessError = (label, err) => {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
     const traceId = err?.traceId;
@@ -141,13 +142,21 @@ function registerProcessHandlers() {
 
   process.on('unhandledRejection', (reason) => {
     logProcessError('Unhandled promise rejection', reason);
-    setTimeout(() => process.exit(1), 100);
+    if (exitOnUnhandled) {
+      setTimeout(() => process.exit(1), 100);
+    }
   });
 
   process.on('uncaughtException', (err) => {
     logProcessError('Uncaught exception', err);
-    setTimeout(() => process.exit(1), 100);
+    if (exitOnUnhandled) {
+      setTimeout(() => process.exit(1), 100);
+    }
   });
+
+  if (!exitOnUnhandled) {
+    logger.warn('Unhandled errors will not terminate the process. Set EXIT_ON_UNHANDLED=true to restore fail-fast.');
+  }
 }
 
 registerProcessHandlers();

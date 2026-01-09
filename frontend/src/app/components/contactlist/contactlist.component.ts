@@ -81,6 +81,11 @@ export class ContactlistComponent {
 
     effect(() => {
       this.contactService.contactsSet();
+      if (!this.userService.hasJwt()) {
+        this.unreadLoaded.clear();
+        this.unreadCounts.set({});
+        return;
+      }
       const contacts = this.contactsSignal();
       contacts.forEach(contact => {
         if (this.unreadLoaded.has(contact.id)) {
@@ -98,6 +103,9 @@ export class ContactlistComponent {
 
     effect(() => {
       const update = this.contactMessageService.unreadCountUpdate();
+      if (!this.userService.hasJwt()) {
+        return;
+      }
       if (update) {
         this.unreadCounts.update((map: Record<string, number>) => ({ ...map, [update.contactId]: update.unread }));
         const contact = this.contactsSignal().find((c) => c.id === update.contactId);
@@ -128,6 +136,9 @@ export class ContactlistComponent {
   }
 
   openConnectDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const contact: Contact = {
       id: "",
       userId: this.userService.getUser().id,
@@ -159,6 +170,9 @@ export class ContactlistComponent {
   }
 
   openScannerDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const contact: Contact = {
       id: "",
       userId: this.userService.getUser().id,
@@ -186,6 +200,9 @@ export class ContactlistComponent {
   }
 
   public deleteContact(contact: Contact) {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     this.contactToDelete = contact;
     const dialogRef = this.matDialog.open(DeleteContactComponent, {
       closeOnNavigation: true,
@@ -253,6 +270,9 @@ export class ContactlistComponent {
   }
 
   public subscribe(contact: Contact) {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     if (Notification.permission !== "granted") {
       this.userService.registerSubscription(this.userService.getUser());
     }
@@ -284,6 +304,9 @@ export class ContactlistComponent {
   }
 
   openContactChatroom(contact: Contact): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const dialogRef = this.matDialog.open(ContactChatroomComponent, {
       closeOnNavigation: true,
       data: contact.id,
@@ -297,6 +320,9 @@ export class ContactlistComponent {
     });
 
     dialogRef.afterClosed().subscribe(() => {
+      if (!this.userService.hasJwt()) {
+        return;
+      }
       // Nach dem Schließen neu laden, damit Badge/Unread stimmen (MarkRead passiert im Chatroom)
       this.contactMessageService.unreadCount(contact.id).subscribe({
         next: (res) => {
@@ -308,6 +334,9 @@ export class ContactlistComponent {
   }
 
   public shareConnectId(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const user = this.userService.getUser();
     const encryptionPublicKey = user.cryptoKeyPair?.publicKey ? JSON.stringify(user.cryptoKeyPair.publicKey) : '';
     const signingPublicKey = user.signingKeyPair?.publicKey ? JSON.stringify(user.signingKeyPair.publicKey) : '';
@@ -369,6 +398,9 @@ export class ContactlistComponent {
   }
 
   public openQrDialog() {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     const user = this.userService.getUser();
     const encryptionPublicKey = user.cryptoKeyPair?.publicKey ? JSON.stringify(user.cryptoKeyPair.publicKey) : '';
     const signingPublicKey = user.signingKeyPair?.publicKey ? JSON.stringify(user.signingKeyPair.publicKey) : '';

@@ -32,10 +32,12 @@
                 </div>
                 <mat-card-actions class="tile-actions">
                     <div class="tile-actions__left">
+                        @if (userService.hasJwt()) {
                         <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.placeList.deleteAria' | transloco" (click)="deletePlace(place)">
                             <mat-icon>delete_forever</mat-icon>
                         </button>
+                        }
                     </div>
                     <div class="tile-actions__right">
                         @if(place.pinned) {
@@ -62,15 +64,17 @@
                             <mat-icon>more_horiz</mat-icon>
                         </button>
                         <mat-menu #placeMenu="matMenu" panelClass="accent-menu">
+                            @if (userService.hasJwt()) {
                             <button mat-menu-item (click)="editPlace(place)">
                                 <mat-icon>settings_account_box</mat-icon>
                                 <span>{{ 'common.placeList.editAria' | transloco }}</span>
                             </button>
+                            }
                             <button mat-menu-item (click)="openPlaceInMaps(place)">
                                 <mat-icon>map</mat-icon>
                                 <span>{{ 'common.placeList.openInMaps' | transloco }}</span>
                             </button>
-                            @if (!subscriptionError) {
+                            @if (!subscriptionError && userService.hasJwt()) {
                             @if (place.subscribed) {
                             <button mat-menu-item (click)="handleSubscription(place)">
                                 <mat-icon>bookmark_remove</mat-icon>
@@ -98,8 +102,10 @@
         [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
     </button>
+    @if (userService.hasJwt()) {
     <button mat-icon-button color="primary" [attr.aria-label]="'common.placeList.addPlaceAria' | transloco"
         (click)="addPlace()">
         <mat-icon>add_location</mat-icon>
     </button>
+    }
 </mat-dialog-actions>

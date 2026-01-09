@@ -263,12 +263,16 @@ export class AppComponent implements OnInit {
       this.userService.userSet(); // <-- track changes
       if (this.appService.isConsentCompleted()) {
         if (this.userService.isReady()) {
-          this.contactService.initContacts();
+          this.contactService.initContacts(this.userService.hasJwt());
           if (!this.placeService.isReady()) {
             this.placeService.initPlaces();
           }
-          this.contactMessageService.initLiveReceive();
-          void this.systemNotificationService.refreshUnreadCount();
+          if (this.userService.hasJwt()) {
+            this.contactMessageService.initLiveReceive();
+            void this.systemNotificationService.refreshUnreadCount();
+          } else {
+            this.systemNotificationService.reset();
+          }
         } else {
           this.systemNotificationService.reset();
         }
@@ -279,7 +283,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       this.contactService.contactsSet(); // track changes for unread badge
-      if (this.appService.isConsentCompleted() && this.userService.isReady()) {
+      if (this.appService.isConsentCompleted() && this.userService.hasJwt()) {
         this.refreshContactUnreadCounts();
       } else {
         this.unreadContactCounts.set({});
@@ -295,7 +299,7 @@ export class AppComponent implements OnInit {
     });
 
     effect(() => {
-      if (!this.userService.isReady() || !this.appService.isConsentCompleted()) {
+      if (!this.userService.hasJwt() || !this.appService.isConsentCompleted()) {
         this.resetBadgeAnimation();
         this.lastUnreadTotal = 0;
         return;
@@ -312,7 +316,7 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       const incoming = this.contactMessageService.liveMessages();
-      if (!incoming || !this.userService.isReady() || !this.appService.isConsentCompleted()) {
+      if (!incoming || !this.userService.hasJwt() || !this.appService.isConsentCompleted()) {
         return;
       }
       if (incoming.id !== this.lastLiveMessageId && incoming.direction === 'contactUser') {
@@ -390,6 +394,10 @@ export class AppComponent implements OnInit {
     this.noteService.logout();
     this.systemNotificationService.reset();
     this.resetBadgeAnimation();
+  }
+
+  public connectToBackend(): void {
+    void this.userService.connectToBackend();
   }
 
   private refreshContactUnreadCounts(): void {
@@ -862,7 +870,7 @@ export class AppComponent implements OnInit {
 
 
   public openSystemMessages(): void {
-    if (!this.userService.isReady()) {
+    if (!this.userService.hasJwt()) {
       return;
     }
 
@@ -882,6 +890,9 @@ export class AppComponent implements OnInit {
   }
 
   public openUserMessagListDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
     this.userService.getUserMessages(this.userService.getUser())
       .subscribe({
         next: (getMessageResponse) => {
@@ -986,7 +997,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe((places: Place[]) => {
-      if (places) {
+      if (places && this.userService.hasJwt()) {
         places.forEach(place => {
           this.placeService.updatePlace(place).subscribe({
             next: simpleResponse => {

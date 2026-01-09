@@ -34,6 +34,7 @@
       </mat-card-content>
     </mat-card>
 
+    @if (userService.hasJwt()) {
     <mat-card class="tile tile-action" role="button" tabindex="0"
       (click)="triggerAction('resetKeys')" (keyup.enter)="triggerAction('resetKeys')" (keyup.space)="triggerAction('resetKeys')">
       <mat-card-content>
@@ -43,6 +44,7 @@
         </div>
       </mat-card-content>
     </mat-card>
+    }
 
     <mat-card class="tile tile-action tile-danger" role="button" tabindex="0"
       (click)="triggerAction('deleteUserId')" (keyup.enter)="triggerAction('deleteUserId')" (keyup.space)="triggerAction('deleteUserId')">

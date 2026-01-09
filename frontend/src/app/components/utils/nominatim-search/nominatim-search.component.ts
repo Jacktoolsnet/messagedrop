@@ -220,7 +220,7 @@ export class NominatimSearchComponent {
   }
 
   loginAndAddToMyPlaces(nominatimPlace: NominatimPlace): void {
-    this.userService.login(() => this.addToMyPlaces(nominatimPlace));
+    this.userService.loginWithBackend(() => this.addToMyPlaces(nominatimPlace));
   }
 
   addToMyPlaces(nominatimPlace: NominatimPlace): void {
