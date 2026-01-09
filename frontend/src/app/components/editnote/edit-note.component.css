@@ -61,6 +61,7 @@
     margin: 1rem;
     text-align: center;
     word-break: break-word;
+    white-space: pre-wrap;
 }
 
 /* === MULTIMEDIA-BILD === */
