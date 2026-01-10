@@ -18,6 +18,8 @@
 /* === Dialog Container === */
 .confirm-wrap {
     width: min(420px, 92vw);
+    max-width: 100%;
+    box-sizing: border-box;
     background: var(--card);
     border: 1px solid var(--border);
     border-radius: 16px;
@@ -83,6 +85,8 @@
     justify-content: flex-end;
     gap: .6rem;
     margin-top: .85rem;
+    flex-wrap: wrap;
+    box-sizing: border-box;
 
     /* Buttons leicht veredeln */
     button[mat-stroked-button] {

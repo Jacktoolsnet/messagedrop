@@ -16,6 +16,15 @@
 <mat-card class="chatroom-card"
   [style.--chatroom-bg-image]="getChatBackgroundImage(activeContact)"
   [style.--chatroom-bg-opacity]="getChatBackgroundOpacity(activeContact)">
+  @if (activeContact.chatBackgroundAttribution ?? activeContact.avatarAttribution; as attribution) {
+  @if (attribution.source === 'unsplash') {
+  <div class="unsplash-badge unsplash-badge--chatroom">
+    <a class="unsplash-badge__link" [href]="attribution.photoUrl" target="_blank" rel="noopener">
+      {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: attribution.authorName } }}
+    </a>
+  </div>
+  }
+  }
   <mat-card-content #messageScroll class="chatroom-card__content">
     <div class="message-content">
       @for (msg of messages(); track msg.id; let last = $last; let idx = $index) {

@@ -151,6 +151,7 @@ router.get('/search/:searchTerm/:page',
 
 router.post('/download',
     [
+        express.json({ limit: '64kb' }),
         metric.count('unsplash.download', { when: 'always', timezone: 'utc', amount: 1 })
     ],
     async (req, res, next) => {

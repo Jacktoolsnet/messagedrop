@@ -29,6 +29,15 @@
                         <span class="name">{{ 'common.placeList.nameFallback' | transloco }}</span>
                         }
                     </div>
+                    @if (place.placeBackgroundAttribution ?? place.avatarAttribution; as attribution) {
+                    @if (attribution.source === 'unsplash') {
+                    <div class="unsplash-badge">
+                        <a class="unsplash-badge__link" [href]="attribution.photoUrl" target="_blank" rel="noopener">
+                            {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: attribution.authorName } }}
+                        </a>
+                    </div>
+                    }
+                    }
                 </div>
                 <mat-card-actions class="tile-actions">
                     <div class="tile-actions__left">
