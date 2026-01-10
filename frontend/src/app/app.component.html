@@ -6,7 +6,7 @@
     (markerClickEvent)="handleMarkerClickEvent($event)">
 </app-map>
 
-@if (!networkService.backendOnline()) {
+@if (!networkService.backendOnline() || maintenanceActive()) {
 <button mat-fab class="button_backend_status" (click)="showBackendOfflineInfo()"
     [attr.aria-label]="maintenanceActive() ? ('common.maintenance.title' | transloco) : ('common.serverDown.title' | transloco)">
     <mat-icon aria-hidden="false">{{ maintenanceActive() ? 'construction' : 'cloud_off' }}</mat-icon>
@@ -57,7 +57,7 @@
     }
 
     @if (userService.isReady()) {
-    @if (!userService.hasJwt() && networkService.backendOnline()) {
+    @if (!userService.hasJwt() && networkService.backendOnline() && !maintenanceActive()) {
     <button mat-menu-item (click)="connectToBackend()" [disabled]="userService.isConnectingToBackend()">
         <mat-icon>cloud_sync</mat-icon>
         <span>{{ 'common.menu.connectBackend' | transloco }}</span>
@@ -218,7 +218,7 @@
     </button>
     }
 
-    @if (networkService.backendOnline()) {
+    @if (networkService.backendOnline() && !maintenanceActive()) {
     <button mat-menu-item (click)="showWeather()">
         <mat-icon>weather_mix</mat-icon>
         <span>{{ 'common.menu.weather' | transloco }}</span>
