@@ -13,7 +13,16 @@
 <div class="page">
     <div class="tiles-container">
         @if (canManageMaintenance()) {
-        <app-maintenance-card></app-maintenance-card>
+        <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/maintenance" role="button"
+            tabindex="0">
+            <mat-card-header>
+                <div mat-card-avatar class="avatar">
+                    <mat-icon>construction</mat-icon>
+                </div>
+                <mat-card-title class="tile-title">Maintenance</mat-card-title>
+                <mat-card-subtitle class="tile-subtitle"></mat-card-subtitle>
+            </mat-card-header>
+        </mat-card>
         }
         <!-- Users -->
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/user" role="button" tabindex="0">

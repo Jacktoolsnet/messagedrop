@@ -9,7 +9,6 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { LogService } from '../../../services/log.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { ModerationService } from '../../../services/moderation.service';
-import { MaintenanceCardComponent } from '../../shared/maintenance-card/maintenance-card.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -20,8 +19,7 @@ import { MaintenanceCardComponent } from '../../shared/maintenance-card/maintena
     MatBadgeModule,
     MatButtonModule,
     MatCardModule,
-    MatToolbarModule,
-    MaintenanceCardComponent
+    MatToolbarModule
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']

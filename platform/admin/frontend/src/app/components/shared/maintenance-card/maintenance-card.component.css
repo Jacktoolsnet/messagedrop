@@ -44,8 +44,51 @@
   margin-top: 0.5rem;
 }
 
+.date-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
 .full {
   width: 100%;
+}
+
+.translations {
+  margin-top: 0.25rem;
+  padding: 0.85rem 1rem;
+  border-radius: 12px;
+  border: 1px dashed var(--border, rgba(0, 0, 0, 0.1));
+  background: color-mix(in srgb, var(--card, #ffffff) 80%, transparent);
+}
+
+.translations-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted, #6b7280);
+  margin-bottom: 0.5rem;
+}
+
+.translations-grid {
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 0.4rem 0.75rem;
+}
+
+.translations-grid .label {
+  font-weight: 600;
+  color: var(--muted, #6b7280);
+}
+
+.translations-grid .value {
+  white-space: pre-line;
+}
+
+.translations-empty {
+  color: var(--muted, #6b7280);
+  font-style: italic;
 }
 
 .maintenance-actions {

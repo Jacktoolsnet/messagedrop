@@ -11,15 +11,37 @@
     <form [formGroup]="form" class="maintenance-form">
       <mat-slide-toggle formControlName="enabled">Maintenance mode</mat-slide-toggle>
 
-      <mat-form-field appearance="outline" class="full">
-        <mat-label>Planned start</mat-label>
-        <input matInput type="datetime-local" formControlName="startsAt" />
-      </mat-form-field>
+      <div class="date-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Planned start</mat-label>
+          <input matInput [matDatepicker]="startDatePicker" formControlName="startDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="startDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #startDatePicker></mat-datepicker>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="full">
-        <mat-label>Planned end</mat-label>
-        <input matInput type="datetime-local" formControlName="endsAt" />
-      </mat-form-field>
+        <mat-form-field appearance="outline">
+          <mat-label>Start time</mat-label>
+          <input matInput [matTimepicker]="startTimePicker" formControlName="startTime" />
+          <mat-timepicker-toggle matIconSuffix [for]="startTimePicker"></mat-timepicker-toggle>
+          <mat-timepicker #startTimePicker></mat-timepicker>
+        </mat-form-field>
+      </div>
+
+      <div class="date-row">
+        <mat-form-field appearance="outline">
+          <mat-label>Planned end</mat-label>
+          <input matInput [matDatepicker]="endDatePicker" formControlName="endDate" />
+          <mat-datepicker-toggle matIconSuffix [for]="endDatePicker"></mat-datepicker-toggle>
+          <mat-datepicker #endDatePicker></mat-datepicker>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>End time</mat-label>
+          <input matInput [matTimepicker]="endTimePicker" formControlName="endTime" />
+          <mat-timepicker-toggle matIconSuffix [for]="endTimePicker"></mat-timepicker-toggle>
+          <mat-timepicker #endTimePicker></mat-timepicker>
+        </mat-form-field>
+      </div>
 
       <mat-form-field appearance="outline" class="full">
         <mat-label>Reason</mat-label>
@@ -29,6 +51,22 @@
         <mat-error>Reason is required when maintenance is active.</mat-error>
         }
       </mat-form-field>
+
+      <div class="translations">
+        <div class="translations-title">Translations</div>
+        @if (maintenance()?.reasonEn || maintenance()?.reasonEs || maintenance()?.reasonFr) {
+        <div class="translations-grid">
+          <div class="label">English</div>
+          <div class="value">{{ maintenance()?.reasonEn || '—' }}</div>
+          <div class="label">Spanish</div>
+          <div class="value">{{ maintenance()?.reasonEs || '—' }}</div>
+          <div class="label">French</div>
+          <div class="value">{{ maintenance()?.reasonFr || '—' }}</div>
+        </div>
+        } @else {
+        <div class="translations-empty">No translations yet.</div>
+        }
+      </div>
     </form>
   </mat-card-content>
 

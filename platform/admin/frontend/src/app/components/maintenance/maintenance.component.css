@@ -1,0 +1,52 @@
+/* ==== Theme Tokens (Light/Dark) – konsistent zum Admin-Dashboard ==== */
+:host {
+  color-scheme: light;
+  --primary: #05a51d;
+
+  /* Light palette */
+  --bg-gradient-start: #eafde8;
+  --bg-gradient-end: #bff7c4;
+  --surface: #ffffff;
+  --card: rgba(255, 255, 255, 0.94);
+  --text: #1f2937;
+  --muted: #6b7280;
+  --border: rgba(0, 0, 0, 0.08);
+  --outline: color-mix(in srgb, var(--text) 28%, transparent);
+
+  display: block;
+  min-height: 100%;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-end));
+  color: var(--text);
+}
+
+/* ==== Toolbar (glass + dezente Tiefe) ==== */
+mat-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.90);
+  color: #1f2937;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Roboto', system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+
+  .toolbar-title {
+    margin-inline: auto;
+    font-size: 1.5rem;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* ==== Page Container ==== */
+.page {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 2.5rem;
+  display: grid;
+  gap: 1.25rem;
+}

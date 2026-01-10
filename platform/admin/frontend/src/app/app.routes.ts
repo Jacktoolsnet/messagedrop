@@ -16,6 +16,7 @@ import { ErrorLogsComponent } from './components/loging/error-logs/error-logs.co
 import { InfoLogsComponent } from './components/loging/info-logs/info-logs.component';
 import { PowLogsComponent } from './components/loging/pow-logs/pow-logs.component';
 import { WarnLogsComponent } from './components/loging/warn-logs/warn-logs.component';
+import { MaintenanceComponent } from './components/maintenance/maintenance.component';
 import { ModerationQueueComponent } from './components/moderation/moderation-queue/moderation-queue.component';
 import { PublicStatusComponent } from './components/public-status/public-status.component';
 import { StatisticComponent } from './components/statistic/statistic.component';
@@ -32,6 +33,11 @@ export const routes: Routes = [
     {
         path: 'dashboard/statistic',
         component: StatisticComponent,
+        canActivate: [authGuard]
+    },
+    {
+        path: 'dashboard/maintenance',
+        component: MaintenanceComponent,
         canActivate: [authGuard]
     },
     {
