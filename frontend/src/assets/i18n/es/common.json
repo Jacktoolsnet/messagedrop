@@ -803,8 +803,8 @@
     "maintenance": {
       "title": "Modo de mantenimiento",
       "message": "Nuestro backend está actualmente en mantenimiento.",
-      "start": "Inicio",
-      "end": "Fin",
+      "start": "Inicio programado",
+      "end": "Fin programado",
       "reason": "Motivo"
     },
     "backupExit": {

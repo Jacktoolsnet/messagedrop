@@ -545,7 +545,7 @@ export class AppComponent implements OnInit {
     if (lang === 'fr') {
       return maintenance.reasonFr || maintenance.reason;
     }
-    return maintenance.reason || maintenance.reasonEn || maintenance.reasonEs || maintenance.reasonFr;
+    return maintenance.reasonEn || maintenance.reason || maintenance.reasonEs || maintenance.reasonFr;
   }
 
   private buildMaintenanceMessage(maintenance: MaintenanceInfo): string {

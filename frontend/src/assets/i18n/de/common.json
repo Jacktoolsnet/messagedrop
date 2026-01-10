@@ -803,8 +803,8 @@
     "maintenance": {
       "title": "Im Wartungsmodus",
       "message": "Unser Backend befindet sich gerade im Wartungsmodus.",
-      "start": "Start",
-      "end": "Ende",
+      "start": "Geplanter Start",
+      "end": "Geplantes Ende",
       "reason": "Grund"
     },
     "backupExit": {
