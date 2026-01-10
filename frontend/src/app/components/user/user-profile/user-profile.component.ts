@@ -227,9 +227,18 @@ export class UserProfileComponent {
     const url = new URL(baseUrl);
     url.searchParams.set('utm_source', 'messagedrop');
     url.searchParams.set('utm_medium', 'referral');
+    const authorUsername = photo.user?.username;
+    let authorUrl = url.toString();
+    if (authorUsername) {
+      const profileUrl = new URL(`https://unsplash.com/@${authorUsername}`);
+      profileUrl.searchParams.set('utm_source', 'messagedrop');
+      profileUrl.searchParams.set('utm_medium', 'referral');
+      authorUrl = profileUrl.toString();
+    }
     return {
       source: 'unsplash',
       authorName,
+      authorUrl,
       photoUrl: url.toString()
     };
   }

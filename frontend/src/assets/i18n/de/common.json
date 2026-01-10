@@ -46,7 +46,8 @@
       "hint": "Bild verschieben oder zoomen, um den gewünschten Ausschnitt zu wählen."
     },
     "avatarAttribution": {
-      "creatorLink": "{{ name }} @ Unsplash"
+      "photoBy": "Bild von",
+      "onUnsplash": "auf"
     },
     "clipboard": {
       "pasteLabel": "Aus Zwischenablage einfügen",

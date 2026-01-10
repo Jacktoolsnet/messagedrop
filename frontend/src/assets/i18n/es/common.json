@@ -46,7 +46,8 @@
       "hint": "Mueve o amplía la imagen para seleccionar el área deseada."
     },
     "avatarAttribution": {
-      "creatorLink": "{{ name }} @ Unsplash"
+      "photoBy": "Foto de",
+      "onUnsplash": "en"
     },
     "clipboard": {
       "pasteLabel": "Pegar desde el portapapeles",

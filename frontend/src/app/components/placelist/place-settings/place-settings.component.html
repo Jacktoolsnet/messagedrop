@@ -28,8 +28,16 @@
     </div>
     @if (data.place.avatarAttribution?.source === 'unsplash') {
     <p class="avatar-attribution">
-      <a class="avatar-attribution__link" [href]="data.place.avatarAttribution?.photoUrl" target="_blank" rel="noopener">
-        {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: data.place.avatarAttribution?.authorName } }}
+      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+      <a class="avatar-attribution__link"
+        [href]="data.place.avatarAttribution?.authorUrl || data.place.avatarAttribution?.photoUrl" target="_blank"
+        rel="noopener">
+        {{ data.place.avatarAttribution?.authorName }}
+      </a>
+      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+        target="_blank" rel="noopener">
+        Unsplash
       </a>
     </p>
     }
@@ -64,9 +72,16 @@
       [style.--place-bg-opacity]="getPlaceBackgroundPreviewOpacity()"></div>
     @if (data.place.placeBackgroundAttribution?.source === 'unsplash') {
     <p class="avatar-attribution">
-      <a class="avatar-attribution__link" [href]="data.place.placeBackgroundAttribution?.photoUrl" target="_blank"
-        rel="noopener">
-        {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: data.place.placeBackgroundAttribution?.authorName } }}
+      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+      <a class="avatar-attribution__link"
+        [href]="data.place.placeBackgroundAttribution?.authorUrl || data.place.placeBackgroundAttribution?.photoUrl"
+        target="_blank" rel="noopener">
+        {{ data.place.placeBackgroundAttribution?.authorName }}
+      </a>
+      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+        target="_blank" rel="noopener">
+        Unsplash
       </a>
     </p>
     }

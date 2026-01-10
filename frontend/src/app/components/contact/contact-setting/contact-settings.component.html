@@ -24,8 +24,16 @@
     </div>
     @if (contact.avatarAttribution?.source === 'unsplash') {
     <p class="avatar-attribution">
-      <a class="avatar-attribution__link" [href]="contact.avatarAttribution?.photoUrl" target="_blank" rel="noopener">
-        {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: contact.avatarAttribution?.authorName } }}
+      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+      <a class="avatar-attribution__link"
+        [href]="contact.avatarAttribution?.authorUrl || contact.avatarAttribution?.photoUrl" target="_blank"
+        rel="noopener">
+        {{ contact.avatarAttribution?.authorName }}
+      </a>
+      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+        target="_blank" rel="noopener">
+        Unsplash
       </a>
     </p>
     }
@@ -59,9 +67,16 @@
       [style.--chat-bg-opacity]="getChatBackgroundPreviewOpacity()"></div>
     @if (contact.chatBackgroundAttribution?.source === 'unsplash') {
     <p class="avatar-attribution">
-      <a class="avatar-attribution__link" [href]="contact.chatBackgroundAttribution?.photoUrl"
+      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+      <a class="avatar-attribution__link"
+        [href]="contact.chatBackgroundAttribution?.authorUrl || contact.chatBackgroundAttribution?.photoUrl"
         target="_blank" rel="noopener">
-        {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: contact.chatBackgroundAttribution?.authorName } }}
+        {{ contact.chatBackgroundAttribution?.authorName }}
+      </a>
+      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+        target="_blank" rel="noopener">
+        Unsplash
       </a>
     </p>
     }

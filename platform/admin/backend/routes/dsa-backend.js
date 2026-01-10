@@ -62,9 +62,8 @@ function asString(v) { return (v === undefined || v === null) ? null : String(v)
 function asNum(v, d) { const n = Number(v); return Number.isFinite(n) ? n : d; }
 function resolveBackendBase() {
     const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
-    const port = process.env.PORT;
-    if (!base || !port) return null;
-    return `${base}:${port}`;
+    if (!base) return null;
+    return process.env.PORT ? `${base}:${process.env.PORT}` : base;
 }
 
 async function fetchMessageByContentId(contentId) {
@@ -414,7 +413,11 @@ router.get('/health', (_req, res) => res.json({ ok: true, service: 'dsa-backend'
 
 /* ----------------------------- Helper ----------------------------- */
 async function enablePublicMessage(messageId) {
-    const url = `${process.env.BASE_URL}:${process.env.PORT}/digitalserviceact/enable/publicmessage/${encodeURIComponent(messageId)}`;
+    const base = resolveBackendBase();
+    if (!base) {
+        throw new Error('backend_unavailable');
+    }
+    const url = `${base}/digitalserviceact/enable/publicmessage/${encodeURIComponent(messageId)}`;
     const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
     const serviceToken = await signServiceJwt({ audience: backendAudience });
     const res = await fetch(url, {
@@ -1573,7 +1576,8 @@ router.post('/notifications/:id/resend', async (req, res, next) => {
             return next(apiError.badRequest('invalid_inapp_payload'));
         }
 
-        if (!process.env.BASE_URL || !process.env.PORT) {
+        const baseUrl = resolveBackendBase();
+        if (!baseUrl) {
             return next(apiError.internal('notification_service_unavailable'));
         }
 
@@ -1590,7 +1594,7 @@ router.post('/notifications/:id/resend', async (req, res, next) => {
             const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
             const serviceToken = await signServiceJwt({ audience: backendAudience });
             const response = await axios.post(
-                `${process.env.BASE_URL}:${process.env.PORT}/notification/create`,
+                `${baseUrl}/notification/create`,
                 deliveryPayload,
                 {
                     headers: {

@@ -19,8 +19,14 @@
   @if (activeContact.chatBackgroundAttribution ?? activeContact.avatarAttribution; as attribution) {
   @if (attribution.source === 'unsplash') {
   <div class="unsplash-badge unsplash-badge--chatroom">
-    <a class="unsplash-badge__link" [href]="attribution.photoUrl" target="_blank" rel="noopener">
-      {{ 'common.avatarAttribution.creatorLink' | transloco:{ name: attribution.authorName } }}
+    <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+    <a class="unsplash-badge__link" [href]="attribution.authorUrl || attribution.photoUrl" target="_blank" rel="noopener">
+      {{ attribution.authorName }}
+    </a>
+    <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+    <a class="unsplash-badge__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+      target="_blank" rel="noopener">
+      Unsplash
     </a>
   </div>
   }

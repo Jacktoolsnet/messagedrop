@@ -83,7 +83,8 @@
 }
 
 .unsplash-badge__link:hover {
-  color: var(--mat-select-focused-arrow-color);
+  color: inherit;
+  text-decoration: underline;
 }
 
 

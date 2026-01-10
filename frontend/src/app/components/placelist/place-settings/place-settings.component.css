@@ -173,7 +173,7 @@
 }
 
 .avatar-attribution__link {
-  color: var(--mat-primary-color);
+  color: inherit;
   text-decoration: none;
 }
 

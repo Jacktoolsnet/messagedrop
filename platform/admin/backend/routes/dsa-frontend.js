@@ -35,6 +35,12 @@ function buildStatusUrl(token) {
     return `${statusBaseUrl}/${token}`;
 }
 
+function resolveBackendBase() {
+    const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
+    if (!base) return null;
+    return process.env.PORT ? `${base}:${process.env.PORT}` : base;
+}
+
 /* ---------------------- Minimaler Make-Notifier (axios) ---------------------- */
 function notifyMake(title, text) {
     const url = process.env.MAKE_PUSHBULLET_WEBHOOK_URL;
@@ -113,12 +119,12 @@ async function ensureContentExists(contentId, next) {
         next(apiError.badRequest('contentId is required'));
         return false;
     }
-    if (!process.env.BASE_URL || !process.env.PORT) {
+    const baseUrl = resolveBackendBase();
+    if (!baseUrl) {
         next(apiError.serviceUnavailable('backend_unavailable'));
         return false;
     }
 
-    const baseUrl = `${process.env.BASE_URL}:${process.env.PORT}`;
     const isNumeric = /^\d+$/.test(raw);
     const path = isNumeric
         ? `/message/get/id/${encodeURIComponent(raw)}`

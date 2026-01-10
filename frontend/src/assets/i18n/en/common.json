@@ -46,7 +46,8 @@
       "hint": "Move and zoom the image to select the area you want."
     },
     "avatarAttribution": {
-      "creatorLink": "{{ name }} @ Unsplash"
+      "photoBy": "Photo by",
+      "onUnsplash": "on"
     },
     "clipboard": {
       "pasteLabel": "Paste from clipboard",

@@ -9,13 +9,19 @@ function truncate(text, maxLength = 160) {
     return `${text.slice(0, maxLength - 1)}…`;
 }
 
+function resolveBackendBase() {
+    const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
+    if (!base) return null;
+    return process.env.PORT ? `${base}:${process.env.PORT}` : base;
+}
+
 async function notifyContentOwner(req, notification) {
     const { contentId } = notification || {};
-    if (!contentId || !process.env.BASE_URL || !process.env.PORT) {
+    const baseUrl = resolveBackendBase();
+    if (!contentId || !baseUrl) {
         return false;
     }
 
-    const baseUrl = `${process.env.BASE_URL}:${process.env.PORT}`;
     const backendAudience = process.env.SERVICE_JWT_AUDIENCE_BACKEND || 'service.backend';
 
     try {

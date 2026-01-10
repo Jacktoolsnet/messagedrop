@@ -35,8 +35,9 @@ function normalizeString(value) {
 }
 
 function resolveBackendBase() {
-    if (!process.env.BASE_URL || !process.env.PORT) return null;
-    return `${process.env.BASE_URL}:${process.env.PORT}`;
+    const base = (process.env.BASE_URL || '').replace(/\/+$/, '');
+    if (!base) return null;
+    return process.env.PORT ? `${base}:${process.env.PORT}` : base;
 }
 
 async function postToBackend(path, payload) {
