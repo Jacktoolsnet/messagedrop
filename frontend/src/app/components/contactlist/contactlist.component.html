@@ -29,7 +29,26 @@
                         </span>
                         <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
                     </div>
-                    @if (contact.chatBackgroundAttribution ?? contact.avatarAttribution; as attribution) {
+                    @if (contact.avatarAttribution?.source === 'unsplash' && contact.chatBackgroundAttribution?.source === 'unsplash') {
+                    <div class="unsplash-badge">
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photosBy' | transloco }}</span>
+                        <a class="unsplash-badge__link" [href]="contact.avatarAttribution?.authorUrl" target="_blank"
+                            rel="noopener">
+                            {{ contact.avatarAttribution?.authorName }}
+                        </a>
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.and' | transloco }}</span>
+                        <a class="unsplash-badge__link" [href]="contact.chatBackgroundAttribution?.authorUrl"
+                            target="_blank" rel="noopener">
+                            {{ contact.chatBackgroundAttribution?.authorName }}
+                        </a>
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+                        <a class="unsplash-badge__link"
+                            [href]="contact.avatarAttribution?.unsplashUrl || contact.chatBackgroundAttribution?.unsplashUrl"
+                            target="_blank" rel="noopener">
+                            Unsplash
+                        </a>
+                    </div>
+                    } @else if (contact.chatBackgroundAttribution ?? contact.avatarAttribution; as attribution) {
                     @if (attribution.source === 'unsplash') {
                     <div class="unsplash-badge">
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photoBy' | transloco }}</span>

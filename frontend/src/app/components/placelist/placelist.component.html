@@ -29,7 +29,26 @@
                         <span class="name">{{ 'common.placeList.nameFallback' | transloco }}</span>
                         }
                     </div>
-                    @if (place.placeBackgroundAttribution ?? place.avatarAttribution; as attribution) {
+                    @if (place.avatarAttribution?.source === 'unsplash' && place.placeBackgroundAttribution?.source === 'unsplash') {
+                    <div class="unsplash-badge">
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photosBy' | transloco }}</span>
+                        <a class="unsplash-badge__link" [href]="place.avatarAttribution?.authorUrl" target="_blank"
+                            rel="noopener">
+                            {{ place.avatarAttribution?.authorName }}
+                        </a>
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.and' | transloco }}</span>
+                        <a class="unsplash-badge__link" [href]="place.placeBackgroundAttribution?.authorUrl"
+                            target="_blank" rel="noopener">
+                            {{ place.placeBackgroundAttribution?.authorName }}
+                        </a>
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+                        <a class="unsplash-badge__link"
+                            [href]="place.avatarAttribution?.unsplashUrl || place.placeBackgroundAttribution?.unsplashUrl"
+                            target="_blank" rel="noopener">
+                            Unsplash
+                        </a>
+                    </div>
+                    } @else if (place.placeBackgroundAttribution ?? place.avatarAttribution; as attribution) {
                     @if (attribution.source === 'unsplash') {
                     <div class="unsplash-badge">
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photoBy' | transloco }}</span>

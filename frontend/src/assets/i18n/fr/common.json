@@ -47,6 +47,8 @@
     },
     "avatarAttribution": {
       "photoBy": "Photo de",
+      "photosBy": "Photos de",
+      "and": "et",
       "onUnsplash": "sur"
     },
     "clipboard": {

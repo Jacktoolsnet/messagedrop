@@ -16,7 +16,26 @@
 <mat-card class="chatroom-card"
   [style.--chatroom-bg-image]="getChatBackgroundImage(activeContact)"
   [style.--chatroom-bg-opacity]="getChatBackgroundOpacity(activeContact)">
-  @if (activeContact.chatBackgroundAttribution ?? activeContact.avatarAttribution; as attribution) {
+  @if (activeContact.avatarAttribution?.source === 'unsplash' && activeContact.chatBackgroundAttribution?.source === 'unsplash') {
+  <div class="unsplash-badge unsplash-badge--chatroom">
+    <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photosBy' | transloco }}</span>
+    <a class="unsplash-badge__link" [href]="activeContact.avatarAttribution?.authorUrl" target="_blank"
+      rel="noopener">
+      {{ activeContact.avatarAttribution?.authorName }}
+    </a>
+    <span class="unsplash-badge__text">{{ 'common.avatarAttribution.and' | transloco }}</span>
+    <a class="unsplash-badge__link" [href]="activeContact.chatBackgroundAttribution?.authorUrl" target="_blank"
+      rel="noopener">
+      {{ activeContact.chatBackgroundAttribution?.authorName }}
+    </a>
+    <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+    <a class="unsplash-badge__link"
+      [href]="activeContact.avatarAttribution?.unsplashUrl || activeContact.chatBackgroundAttribution?.unsplashUrl"
+      target="_blank" rel="noopener">
+      Unsplash
+    </a>
+  </div>
+  } @else if (activeContact.chatBackgroundAttribution ?? activeContact.avatarAttribution; as attribution) {
   @if (attribution.source === 'unsplash') {
   <div class="unsplash-badge unsplash-badge--chatroom">
     <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
