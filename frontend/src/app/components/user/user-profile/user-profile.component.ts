@@ -20,6 +20,7 @@ import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-croppe
 import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { UnsplashService } from '../../../services/unsplash.service';
+import { LanguageService } from '../../../services/language.service';
 
 @Component({
   selector: 'app-profile',
@@ -54,6 +55,7 @@ export class UserProfileComponent {
   private readonly dialog = inject(MatDialog);
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly unsplashService = inject(UnsplashService);
+  private readonly languageService = inject(LanguageService);
   readonly dialogRef = inject(MatDialogRef<UserProfileComponent>);
 
   constructor() {
@@ -223,22 +225,29 @@ export class UserProfileComponent {
 
   private buildUnsplashAttribution(photo: UnsplashPhoto): AvatarAttribution {
     const authorName = photo.user?.name || photo.user?.username || 'Unsplash';
+    const lang = this.languageService.effectiveLanguage();
+    const localeSegment = lang ? `/${lang}` : '';
+    const unsplashBase = `https://unsplash.com${localeSegment}`;
     const baseUrl = photo.links?.html ?? `https://unsplash.com/photos/${photo.id}`;
     const url = new URL(baseUrl);
     url.searchParams.set('utm_source', 'messagedrop');
     url.searchParams.set('utm_medium', 'referral');
     const authorUsername = photo.user?.username;
-    let authorUrl = url.toString();
+    let authorUrl: string | undefined;
     if (authorUsername) {
-      const profileUrl = new URL(`https://unsplash.com/@${authorUsername}`);
+      const profileUrl = new URL(`${unsplashBase}/@${encodeURIComponent(authorUsername)}`);
       profileUrl.searchParams.set('utm_source', 'messagedrop');
       profileUrl.searchParams.set('utm_medium', 'referral');
       authorUrl = profileUrl.toString();
     }
+    const unsplashUrl = new URL(`${unsplashBase}/`);
+    unsplashUrl.searchParams.set('utm_source', 'messagedrop');
+    unsplashUrl.searchParams.set('utm_medium', 'referral');
     return {
       source: 'unsplash',
       authorName,
       authorUrl,
+      unsplashUrl: unsplashUrl.toString(),
       photoUrl: url.toString()
     };
   }

@@ -26,12 +26,12 @@
     <p class="avatar-attribution">
       <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
       <a class="avatar-attribution__link"
-        [href]="contact.avatarAttribution?.authorUrl || contact.avatarAttribution?.photoUrl" target="_blank"
+        [href]="contact.avatarAttribution?.authorUrl || contact.avatarAttribution?.unsplashUrl || 'https://unsplash.com/?utm_source=messagedrop&utm_medium=referral'" target="_blank"
         rel="noopener">
         {{ contact.avatarAttribution?.authorName }}
       </a>
       <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+      <a class="avatar-attribution__link" [href]="contact.avatarAttribution?.unsplashUrl || 'https://unsplash.com/?utm_source=messagedrop&utm_medium=referral'"
         target="_blank" rel="noopener">
         Unsplash
       </a>
@@ -69,12 +69,12 @@
     <p class="avatar-attribution">
       <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
       <a class="avatar-attribution__link"
-        [href]="contact.chatBackgroundAttribution?.authorUrl || contact.chatBackgroundAttribution?.photoUrl"
+        [href]="contact.chatBackgroundAttribution?.authorUrl || contact.chatBackgroundAttribution?.unsplashUrl || 'https://unsplash.com/?utm_source=messagedrop&utm_medium=referral'"
         target="_blank" rel="noopener">
         {{ contact.chatBackgroundAttribution?.authorName }}
       </a>
       <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
-      <a class="avatar-attribution__link" href="https://unsplash.com/?utm_source=messagedrop&utm_medium=referral"
+      <a class="avatar-attribution__link" [href]="contact.chatBackgroundAttribution?.unsplashUrl || 'https://unsplash.com/?utm_source=messagedrop&utm_medium=referral'"
         target="_blank" rel="noopener">
         Unsplash
       </a>
