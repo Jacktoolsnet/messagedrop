@@ -48,8 +48,8 @@ export class UnsplashService {
       );
   }
 
-  searchPhotos(searchTerm: string, page?: number | string, showAlways = true): Observable<UnsplashApiResponse<UnsplashSearchResults>> {
-    const base = `${environment.apiUrl}/unsplash/search/${encodeURIComponent(searchTerm)}`;
+  getTopicPhotos(topic: string, page?: number | string, showAlways = true): Observable<UnsplashApiResponse<UnsplashPhoto[]>> {
+    const base = `${environment.apiUrl}/unsplash/topic/${encodeURIComponent(topic)}`;
     const pageValue = page !== undefined && page !== null ? String(page).trim() : '';
     const url = pageValue.length > 0 ? `${base}/${encodeURIComponent(pageValue)}` : base;
 
@@ -65,7 +65,31 @@ export class UnsplashService {
       autoclose: false
     });
 
-    return this.http.get<UnsplashApiResponse<UnsplashSearchResults>>(url, this.httpOptions)
+    return this.http.get<UnsplashApiResponse<UnsplashPhoto[]>>(url, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  searchPhotos(searchTerm: string, page?: number | string, showAlways = true, topics?: string): Observable<UnsplashApiResponse<UnsplashSearchResults>> {
+    const base = `${environment.apiUrl}/unsplash/search/${encodeURIComponent(searchTerm)}`;
+    const pageValue = page !== undefined && page !== null ? String(page).trim() : '';
+    const url = pageValue.length > 0 ? `${base}/${encodeURIComponent(pageValue)}` : base;
+    const urlWithTopics = topics ? `${url}?topics=${encodeURIComponent(topics)}` : url;
+
+    this.networkService.setNetworkMessageConfig(urlWithTopics, {
+      showAlways: showAlways,
+      title: this.i18n.t('common.unsplash.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.unsplash.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<UnsplashApiResponse<UnsplashSearchResults>>(urlWithTopics, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       );

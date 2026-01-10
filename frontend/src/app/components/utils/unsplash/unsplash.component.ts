@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogContent, MatDialogRef } from '@angular/materi
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
@@ -24,7 +25,8 @@ import { EnableExternalContentComponent } from '../enable-external-content/enabl
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    EnableExternalContentComponent
+    EnableExternalContentComponent,
+    TranslocoPipe
   ],
   templateUrl: './unsplash.component.html',
   styleUrl: './unsplash.component.css',
@@ -34,8 +36,26 @@ export class UnsplashComponent implements OnInit {
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
   readonly searchControl = new FormControl('', { nonNullable: true });
+  readonly topicOptions = [
+    { value: '', labelKey: 'common.unsplash.topicAll', query: '' },
+    { value: 'wallpapers', labelKey: 'common.unsplash.topics.wallpapers', query: 'wallpapers' },
+    { value: 'nature', labelKey: 'common.unsplash.topics.nature', query: 'nature' },
+    { value: 'architecture-interior', labelKey: 'common.unsplash.topics.architecture', query: 'architecture' },
+    { value: 'travel', labelKey: 'common.unsplash.topics.travel', query: 'travel' },
+    { value: 'textures-patterns', labelKey: 'common.unsplash.topics.textures', query: 'textures patterns' },
+    { value: 'street-photography', labelKey: 'common.unsplash.topics.street', query: 'street photography' },
+    { value: 'food-drink', labelKey: 'common.unsplash.topics.food', query: 'food and drink' },
+    { value: 'animals', labelKey: 'common.unsplash.topics.animals', query: 'animals' },
+    { value: 'people', labelKey: 'common.unsplash.topics.people', query: 'people' },
+    { value: 'sports', labelKey: 'common.unsplash.topics.sports', query: 'sports' },
+    { value: 'technology', labelKey: 'common.unsplash.topics.technology', query: 'technology' },
+    { value: 'health', labelKey: 'common.unsplash.topics.health', query: 'health' }
+  ];
+  selectedTopic = '';
   lastSearchTerm = '';
+  lastTopic = '';
   featuredPage = 1;
+  topicPage = 1;
   searchPage = 1;
   hasMoreSearch = false;
   results: UnsplashPhoto[] = [];
@@ -62,7 +82,7 @@ export class UnsplashComponent implements OnInit {
     if (!term) {
       return true;
     }
-    return term !== this.lastSearchTerm || !this.hasMoreSearch;
+    return term !== this.lastSearchTerm || this.selectedTopic !== this.lastTopic || !this.hasMoreSearch;
   }
 
   loadFeaturedPhotos(): void {
@@ -73,12 +93,50 @@ export class UnsplashComponent implements OnInit {
     });
   }
 
+  loadTopicPhotos(topic: string): void {
+    const page = this.topicPage;
+    this.unsplashService.getTopicPhotos(topic, page).subscribe({
+      next: (unsplashResponse: UnsplashApiResponse<UnsplashPhoto[]>) => {
+        const results = Array.isArray(unsplashResponse.data) ? unsplashResponse.data : [];
+        if (results.length === 0) {
+          const fallbackQuery = this.getTopicQuery(topic);
+          if (fallbackQuery) {
+            this.lastSearchTerm = fallbackQuery;
+            this.lastTopic = topic;
+            this.searchPage = 1;
+            this.hasMoreSearch = false;
+            this.loadSearchPhotos(fallbackQuery);
+            return;
+          }
+        }
+        this.updateTopicResults(unsplashResponse, page);
+      },
+      error: (error) => {
+        const fallbackQuery = this.getTopicQuery(topic);
+        if (fallbackQuery) {
+          this.lastSearchTerm = fallbackQuery;
+          this.lastTopic = topic;
+          this.searchPage = 1;
+          this.hasMoreSearch = false;
+          this.loadSearchPhotos(fallbackQuery);
+          return;
+        }
+        this.handleUnsplashError(error);
+      }
+    });
+  }
+
   loadSearchPhotos(term: string): void {
     const page = this.searchPage;
-    this.unsplashService.searchPhotos(term, page).subscribe({
+    this.unsplashService.searchPhotos(term, page, true, this.selectedTopic || undefined).subscribe({
       next: (unsplashResponse: UnsplashApiResponse<UnsplashSearchResults>) => this.updateSearchResults(unsplashResponse, page),
       error: (error) => this.handleUnsplashError(error)
     });
+  }
+
+  onTopicChange(): void {
+    this.topicPage = 1;
+    this.search();
   }
 
   search(): void {
@@ -86,17 +144,26 @@ export class UnsplashComponent implements OnInit {
     const currentTerm = this.searchControl.value.trim();
     if (!currentTerm) {
       this.lastSearchTerm = '';
-      this.loadFeaturedPhotos();
+      this.lastTopic = '';
+      if (this.selectedTopic) {
+        this.lastTopic = this.selectedTopic;
+        this.loadTopicPhotos(this.selectedTopic);
+      } else {
+        this.loadFeaturedPhotos();
+      }
       return;
     }
 
-    if (currentTerm !== this.lastSearchTerm) {
+    if (currentTerm !== this.lastSearchTerm || this.selectedTopic !== this.lastTopic) {
       this.lastSearchTerm = currentTerm;
+      this.lastTopic = this.selectedTopic;
+      this.topicPage = 1;
       this.searchPage = 1;
       this.hasMoreSearch = false;
     }
 
-    this.loadSearchPhotos(currentTerm);
+    const effectiveTerm = this.buildSearchTerm(currentTerm);
+    this.loadSearchPhotos(effectiveTerm);
   }
 
   onApplyClick(result: UnsplashPhoto): void {
@@ -139,6 +206,16 @@ export class UnsplashComponent implements OnInit {
   private updateFeaturedResults(response: UnsplashApiResponse<UnsplashPhoto[]>, page: number): void {
     this.results = response.data;
     this.featuredPage = page + 1;
+    this.topicPage = 1;
+    this.searchPage = 1;
+    this.hasMoreSearch = false;
+    this.cdRef.markForCheck();
+  }
+
+  private updateTopicResults(response: UnsplashApiResponse<UnsplashPhoto[]>, page: number): void {
+    this.results = response.data;
+    this.topicPage = page + 1;
+    this.featuredPage = 1;
     this.searchPage = 1;
     this.hasMoreSearch = false;
     this.cdRef.markForCheck();
@@ -151,6 +228,20 @@ export class UnsplashComponent implements OnInit {
     this.searchPage = this.hasMoreSearch ? page + 1 : 1;
     this.featuredPage = 1;
     this.cdRef.markForCheck();
+  }
+
+  private getTopicQuery(topic: string): string | null {
+    const option = this.topicOptions.find((item) => item.value === topic);
+    const query = option?.query?.trim() ?? '';
+    return query ? query : null;
+  }
+
+  private buildSearchTerm(term: string): string {
+    const topicQuery = this.getTopicQuery(this.selectedTopic);
+    if (!topicQuery) {
+      return term;
+    }
+    return `${term} ${topicQuery}`.trim();
   }
 
   private handleUnsplashError(error: unknown): void {

@@ -753,7 +753,23 @@
     },
     "unsplash": {
       "title": "Unsplash service",
-      "loading": "Loading"
+      "loading": "Loading",
+      "searchPlaceholder": "Search on Unsplash",
+      "topicAll": "All topics",
+      "topics": {
+        "wallpapers": "Wallpapers",
+        "nature": "Nature",
+        "architecture": "Architecture",
+        "travel": "Travel",
+        "textures": "Textures",
+        "street": "Street photography",
+        "food": "Food & drink",
+        "animals": "Animals",
+        "people": "People",
+        "sports": "Sports",
+        "technology": "Technology",
+        "health": "Health"
+      }
     },
     "place": {
       "title": "Place service",

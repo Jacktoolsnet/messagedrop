@@ -36,11 +36,22 @@ function buildFeaturedParams(page) {
     return params;
 }
 
-function buildSearchParams(query, page) {
+function buildSearchParams(query, page, topics) {
     const params = new URLSearchParams();
     params.set('query', query);
     params.set('page', String(page));
     params.set('per_page', String(PER_PAGE));
+    if (typeof topics === 'string' && topics.trim()) {
+        params.set('topics', topics.trim());
+    }
+    return params;
+}
+
+function buildTopicParams(page) {
+    const params = new URLSearchParams();
+    params.set('page', String(page));
+    params.set('per_page', String(PER_PAGE));
+    params.set('order_by', 'popular');
     return params;
 }
 
@@ -115,7 +126,7 @@ router.get('/search/:searchTerm',
     ]
     , async (req, res, next) => {
         const response = { status: 0 };
-        const params = buildSearchParams(req.params.searchTerm, 1);
+        const params = buildSearchParams(req.params.searchTerm, 1, req.query?.topics);
         const axiosClient = createUnsplashClient();
 
         try {
@@ -135,7 +146,7 @@ router.get('/search/:searchTerm/:page',
     ]
     , async (req, res, next) => {
         const response = { status: 0 };
-        const params = buildSearchParams(req.params.searchTerm, normalizePage(req.params.page));
+        const params = buildSearchParams(req.params.searchTerm, normalizePage(req.params.page), req.query?.topics);
         const axiosClient = createUnsplashClient();
 
         try {
@@ -145,6 +156,48 @@ router.get('/search/:searchTerm/:page',
             return res.status(unsplashResponse.status).send(response);
         } catch (err) {
             req.logger?.error?.('Unsplash request failed', { error: err?.message || err });
+            return handleUnsplashError(err, next);
+        }
+    });
+
+router.get('/topic/:topic',
+    [
+        metric.count('unsplash.topic', { when: 'always', timezone: 'utc', amount: 1 })
+    ],
+    async (req, res, next) => {
+        const response = { status: 0 };
+        const params = buildTopicParams(1);
+        const axiosClient = createUnsplashClient();
+
+        try {
+            const topic = encodeURIComponent(req.params.topic);
+            const unsplashResponse = await axiosClient.get(`/topics/${topic}/photos`, { params });
+            response.status = unsplashResponse.status;
+            response.data = unsplashResponse.data;
+            return res.status(unsplashResponse.status).send(response);
+        } catch (err) {
+            req.logger?.error?.('Unsplash topic request failed', { error: err?.message || err });
+            return handleUnsplashError(err, next);
+        }
+    });
+
+router.get('/topic/:topic/:page',
+    [
+        metric.count('unsplash.topic', { when: 'always', timezone: 'utc', amount: 1 })
+    ],
+    async (req, res, next) => {
+        const response = { status: 0 };
+        const params = buildTopicParams(normalizePage(req.params.page));
+        const axiosClient = createUnsplashClient();
+
+        try {
+            const topic = encodeURIComponent(req.params.topic);
+            const unsplashResponse = await axiosClient.get(`/topics/${topic}/photos`, { params });
+            response.status = unsplashResponse.status;
+            response.data = unsplashResponse.data;
+            return res.status(unsplashResponse.status).send(response);
+        } catch (err) {
+            req.logger?.error?.('Unsplash topic request failed', { error: err?.message || err });
             return handleUnsplashError(err, next);
         }
     });

@@ -753,7 +753,23 @@
     },
     "unsplash": {
       "title": "Service Unsplash",
-      "loading": "Chargement"
+      "loading": "Chargement",
+      "searchPlaceholder": "Rechercher sur Unsplash",
+      "topicAll": "Tous les thèmes",
+      "topics": {
+        "wallpapers": "Fonds d’écran",
+        "nature": "Nature",
+        "architecture": "Architecture",
+        "travel": "Voyage",
+        "textures": "Textures",
+        "street": "Photo de rue",
+        "food": "Cuisine et boissons",
+        "animals": "Animaux",
+        "people": "Personnes",
+        "sports": "Sports",
+        "technology": "Technologie",
+        "health": "Santé"
+      }
     },
     "place": {
       "title": "Service de lieux",

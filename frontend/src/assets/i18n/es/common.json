@@ -753,7 +753,23 @@
     },
     "unsplash": {
       "title": "Servicio Unsplash",
-      "loading": "Cargando"
+      "loading": "Cargando",
+      "searchPlaceholder": "Buscar en Unsplash",
+      "topicAll": "Todos los temas",
+      "topics": {
+        "wallpapers": "Fondos de pantalla",
+        "nature": "Naturaleza",
+        "architecture": "Arquitectura",
+        "travel": "Viajes",
+        "textures": "Texturas",
+        "street": "Fotografía urbana",
+        "food": "Comida y bebida",
+        "animals": "Animales",
+        "people": "Personas",
+        "sports": "Deportes",
+        "technology": "Tecnología",
+        "health": "Salud"
+      }
     },
     "place": {
       "title": "Servicio de lugares",

@@ -753,7 +753,23 @@
     },
     "unsplash": {
       "title": "Unsplash-Dienst",
-      "loading": "Laden"
+      "loading": "Laden",
+      "searchPlaceholder": "Bei Unsplash suchen",
+      "topicAll": "Alle Themen",
+      "topics": {
+        "wallpapers": "Hintergründe",
+        "nature": "Natur",
+        "architecture": "Architektur",
+        "travel": "Reisen",
+        "textures": "Texturen",
+        "street": "Street‑Fotografie",
+        "food": "Essen & Trinken",
+        "animals": "Tiere",
+        "people": "Menschen",
+        "sports": "Sport",
+        "technology": "Technologie",
+        "health": "Gesundheit"
+      }
     },
     "place": {
       "title": "Ort-Dienst",

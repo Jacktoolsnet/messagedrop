@@ -1,7 +1,15 @@
 @if (showUnsplash) {
-<div class="url-container">
+<div class="searchTerm-container">
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="search()"
-        placeholder="Search on Unsplash" />
+        [placeholder]="'common.unsplash.searchPlaceholder' | transloco" />
+
+    <select [(ngModel)]="selectedTopic" (change)="onTopicChange()">
+        @for (topic of topicOptions; track topic.value) {
+        <option [value]="topic.value">
+            {{ topic.labelKey | transloco }}
+        </option>
+        }
+    </select>
 
     <button (click)="search()">
         @if (showSearchIcon) {
