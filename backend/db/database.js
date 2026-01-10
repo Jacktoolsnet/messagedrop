@@ -12,6 +12,7 @@ const tablePlace = require('./tablePlace');
 const tableWeatherHistory = require('./tableWeatherHistory');
 const tableNotification = require('./tableNotification');
 const tableGeoStatistic = require('./tableGeoStatistic');
+const tableMaintenance = require('./tableMaintenance');
 
 class Database {
 
@@ -47,6 +48,7 @@ class Database {
           tableGeoStatistic.init(this.db);
           tableWeatherHistory.init(this.db);
           tableNotification.init(this.db);
+          tableMaintenance.init(this.db);
 
           // Trigger initialisieren
           this.initTriggers(this.logger);

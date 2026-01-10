@@ -12,6 +12,9 @@
 
 <div class="page">
     <div class="tiles-container">
+        @if (canManageMaintenance()) {
+        <app-maintenance-card></app-maintenance-card>
+        }
         <!-- Users -->
         <mat-card class="tile clickable" appearance="raised" routerLink="/dashboard/user" role="button" tabindex="0">
             <mat-card-header>

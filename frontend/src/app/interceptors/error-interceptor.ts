@@ -8,6 +8,7 @@ import { ApiErrorService } from '../services/api-error.service';
 import { DiagnosticLoggerService } from '../services/diagnostic-logger.service';
 import { NetworkService } from '../services/network.service';
 import { TranslationHelperService } from '../services/translation-helper.service';
+import { MaintenanceInfo } from '../interfaces/maintenance';
 
 let errorDialogRef: MatDialogRef<DisplayMessage> | null = null;
 const backendOfflineStatuses = new Set([0, 502, 503, 504]);
@@ -17,6 +18,38 @@ const isBackendRequest = (url: string): boolean => {
     return false;
   }
   return url.startsWith(environment.apiUrl);
+};
+
+const normalizeNumber = (value: unknown): number | null => {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+};
+
+const normalizeText = (value: unknown): string | null => {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed ? trimmed : null;
+};
+
+const parseMaintenanceInfo = (error: unknown): MaintenanceInfo | null => {
+  if (!(error instanceof HttpErrorResponse)) return null;
+  const payload = error.error;
+  if (!payload || typeof payload !== 'object') return null;
+  const errorCode = (payload as { errorCode?: unknown }).errorCode;
+  if (errorCode !== 'MAINTENANCE') return null;
+  const maintenanceRaw = (payload as { maintenance?: unknown }).maintenance;
+  if (!maintenanceRaw || typeof maintenanceRaw !== 'object') return null;
+  const data = maintenanceRaw as Partial<Record<keyof MaintenanceInfo, unknown>>;
+  return {
+    enabled: Boolean(data.enabled),
+    startsAt: normalizeNumber(data.startsAt),
+    endsAt: normalizeNumber(data.endsAt),
+    reason: normalizeText(data.reason),
+    reasonEn: normalizeText(data.reasonEn),
+    reasonEs: normalizeText(data.reasonEs),
+    reasonFr: normalizeText(data.reasonFr),
+    updatedAt: normalizeNumber(data.updatedAt)
+  };
 };
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
@@ -37,13 +70,16 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
     catchError((error: unknown) => {
       diagnosticLogger.logHttpError(req, error);
       const status = error instanceof HttpErrorResponse ? error.status : -1;
+      const maintenanceInfo = backendRequest ? parseMaintenanceInfo(error) : null;
       const message = apiErrorService.getErrorMessage(error) ?? networkService.getErrorMessage(status);
       if (backendRequest) {
         if (backendOfflineStatuses.has(status)) {
           networkService.setBackendOnline(false);
+          networkService.setMaintenanceInfo(maintenanceInfo);
           return throwError(() => error);
         }
         networkService.setBackendOnline(true);
+        networkService.clearMaintenanceInfo();
       }
       if (skipUi) {
         return throwError(() => error);

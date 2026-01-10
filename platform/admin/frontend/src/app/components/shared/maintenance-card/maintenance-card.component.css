@@ -1,0 +1,56 @@
+:host {
+  display: block;
+}
+
+.maintenance-card {
+  border-radius: 16px;
+  background: var(--card, #ffffff);
+  border: 1px solid var(--border, rgba(0, 0, 0, 0.08));
+  box-shadow: 0 10px 30px rgba(2, 8, 20, 0.06);
+  overflow: hidden;
+}
+
+.maintenance-avatar {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--primary, #05a51d) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary, #05a51d) 25%, transparent);
+}
+
+.maintenance-avatar mat-icon {
+  width: 28px;
+  height: 28px;
+  font-size: 28px;
+  color: var(--primary, #05a51d);
+}
+
+.maintenance-avatar.active {
+  background: color-mix(in srgb, #d97706 22%, transparent);
+  border-color: color-mix(in srgb, #d97706 35%, transparent);
+}
+
+.maintenance-avatar.active mat-icon {
+  color: #d97706;
+}
+
+.maintenance-form {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 0.5rem;
+}
+
+.full {
+  width: 100%;
+}
+
+.maintenance-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding: 0 16px 16px;
+}

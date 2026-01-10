@@ -9,6 +9,7 @@ import { AuthService } from '../../../services/auth/auth.service';
 import { LogService } from '../../../services/log.service';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { ModerationService } from '../../../services/moderation.service';
+import { MaintenanceCardComponent } from '../../shared/maintenance-card/maintenance-card.component';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -19,7 +20,8 @@ import { ModerationService } from '../../../services/moderation.service';
     MatBadgeModule,
     MatButtonModule,
     MatCardModule,
-    MatToolbarModule
+    MatToolbarModule,
+    MaintenanceCardComponent
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
@@ -33,6 +35,10 @@ export class AdminDashboardComponent implements OnInit {
 
   readonly username = this.authService.username;
   readonly role = this.authService.role;
+  readonly canManageMaintenance = computed(() => {
+    const role = this.role();
+    return role === 'admin' || role === 'root';
+  });
 
   readonly errorCountToday = signal<number | null>(null);
   readonly infoCountToday = signal<number | null>(null);

@@ -31,6 +31,7 @@ const digitalServiceAct = require('./routes/digital-service-act');
 const dsaStatus = require('./routes/dsa-status');
 const notification = require('./routes/notification');
 const frontendErrorLog = require('./routes/frontend-error-log');
+const maintenance = require('./routes/maintenance');
 const cors = require('cors');
 const helmet = require('helmet');
 const cron = require('node-cron');
@@ -39,6 +40,7 @@ const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
+const maintenanceMode = require('./middleware/maintenance');
 
 // Tables for cronjobs
 const tableUser = require('./db/tableUser');
@@ -218,6 +220,7 @@ app.use(databaseMw(database));
 app.use(loggerMw(logger));
 app.use(headerMW())
 app.use(normalizeErrorResponses);
+app.use(maintenanceMode());
 
 // Route ratelimit
 const rateLimitDefaults = {
@@ -388,6 +391,7 @@ app.use('/user', userLimit, user);
 app.use('/utils', utilsLimit, utils);
 app.use('/weather', weatherLimit, weather);
 app.use('/frontend-error-log', frontendErrorLogLimit, frontendErrorLog);
+app.use('/maintenance', basicLimit, maintenance);
 
 // 404 + Error handler (letzte Middleware)
 app.use(notFoundHandler);

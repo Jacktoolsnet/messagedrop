@@ -800,6 +800,13 @@
       "title": "Ups! Unser Server macht eine Kaffeepause...",
       "message": "Offenbar brauchte unser Backend kurz eine Pause.\n\nKeine Sorge: Offline-Funktionen (Kontakte, private Notizen usw.) bleiben verfügbar."
     },
+    "maintenance": {
+      "title": "Im Wartungsmodus",
+      "message": "Unser Backend befindet sich gerade im Wartungsmodus.",
+      "start": "Start",
+      "end": "Ende",
+      "reason": "Grund"
+    },
     "backupExit": {
       "title": "Backup vor dem Beenden erstellen?",
       "message": "Du hast ungespeicherte Änderungen. Möchtest du jetzt ein Backup erstellen?"
@@ -885,6 +892,7 @@
     "noteTooLarge": "Notiz ist zu lang. Maximal {{ maxChars }} Zeichen.",
     "unauthorized": "Bitte melde dich an, um fortzufahren.",
     "rateLimit": "Zu viele Anfragen. Bitte warte kurz und versuche es erneut.",
+    "maintenance": "Der Dienst befindet sich im Wartungsmodus.",
     "offline": {
       "title": "Ups! Du bist offline.",
       "message": "Offenbar brauchte dein Netzwerk kurz eine Pause."

@@ -13,7 +13,8 @@ export type ApiErrorCode =
   | 'INTERNAL_ERROR'
   | 'BAD_GATEWAY'
   | 'SERVICE_UNAVAILABLE'
-  | 'GATEWAY_TIMEOUT';
+  | 'GATEWAY_TIMEOUT'
+  | 'MAINTENANCE';
 
 export interface ApiErrorPayload {
   errorCode: ApiErrorCode;

@@ -1,0 +1,39 @@
+<mat-card class="maintenance-card">
+  <mat-card-header>
+    <div mat-card-avatar class="maintenance-avatar" [class.active]="isActive()">
+      <mat-icon>{{ isActive() ? 'construction' : 'build_circle' }}</mat-icon>
+    </div>
+    <mat-card-title class="maintenance-title">Maintenance</mat-card-title>
+    <mat-card-subtitle class="maintenance-subtitle">{{ statusLabel() }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <form [formGroup]="form" class="maintenance-form">
+      <mat-slide-toggle formControlName="enabled">Maintenance mode</mat-slide-toggle>
+
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Planned start</mat-label>
+        <input matInput type="datetime-local" formControlName="startsAt" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Planned end</mat-label>
+        <input matInput type="datetime-local" formControlName="endsAt" />
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full">
+        <mat-label>Reason</mat-label>
+        <textarea matInput rows="3" formControlName="reason"></textarea>
+        <mat-hint>Translated automatically to EN, ES, and FR.</mat-hint>
+        @if (form.controls.reason.invalid && form.controls.reason.touched) {
+        <mat-error>Reason is required when maintenance is active.</mat-error>
+        }
+      </mat-form-field>
+    </form>
+  </mat-card-content>
+
+  <mat-card-actions class="maintenance-actions">
+    <button mat-stroked-button type="button" (click)="refresh()" [disabled]="loading()">Refresh</button>
+    <button mat-raised-button color="primary" type="button" (click)="submit()" [disabled]="!canSubmit()">Save</button>
+  </mat-card-actions>
+</mat-card>

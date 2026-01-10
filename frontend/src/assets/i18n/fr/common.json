@@ -800,6 +800,13 @@
       "title": "Oups ! Notre serveur est parti prendre un café...",
       "message": "Apparemment, notre backend avait besoin d'un peu de « temps pour lui ».\n\nPas d'inquiétude : les fonctions hors ligne (contacts, notes privées, etc.) restent disponibles."
     },
+    "maintenance": {
+      "title": "Mode maintenance",
+      "message": "Notre backend est actuellement en maintenance.",
+      "start": "Début",
+      "end": "Fin",
+      "reason": "Raison"
+    },
     "backupExit": {
       "title": "Créer une sauvegarde avant de quitter ?",
       "message": "Vous avez des modifications non enregistrées. Voulez-vous créer une sauvegarde maintenant ?"
@@ -885,6 +892,7 @@
     "noteTooLarge": "La note est trop grande. Maximum {{ maxChars }} caractères.",
     "unauthorized": "Vous devez vous connecter pour continuer.",
     "rateLimit": "Trop de requêtes. Veuillez patienter puis réessayer.",
+    "maintenance": "Le service est en mode maintenance.",
     "offline": {
       "title": "Oups ! Vous êtes hors ligne.",
       "message": "Apparemment, votre réseau avait besoin d'un peu de « temps pour lui »."

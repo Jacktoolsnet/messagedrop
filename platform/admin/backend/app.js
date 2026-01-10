@@ -22,6 +22,7 @@ const dsaFrontend = require('./routes/dsa-frontend');
 const dsaBackend = require('./routes/dsa-backend');
 const user = require('./routes/user');
 const publicStatus = require('./routes/public-status');
+const maintenance = require('./routes/maintenance');
 const statistic = require('./routes/statistic');
 const errorLog = require('./routes/error-log');
 const infoLog = require('./routes/info-log');
@@ -377,6 +378,7 @@ app.use('/warn-log', adminLogLimit, warnLog);
 app.use('/frontend-error-log', adminLogLimit, frontendErrorLog);
 app.use('/pow-log', adminLogLimit, powLog);
 app.use('/moderation', adminLogLimit, moderation);
+app.use('/maintenance', adminUserLimit, maintenance);
 
 
 // DSA

@@ -8,8 +8,8 @@
 
 @if (!networkService.backendOnline()) {
 <button mat-fab class="button_backend_status" (click)="showBackendOfflineInfo()"
-    [attr.aria-label]="'common.serverDown.title' | transloco">
-    <mat-icon aria-hidden="false">cloud_off</mat-icon>
+    [attr.aria-label]="maintenanceActive() ? ('common.maintenance.title' | transloco) : ('common.serverDown.title' | transloco)">
+    <mat-icon aria-hidden="false">{{ maintenanceActive() ? 'construction' : 'cloud_off' }}</mat-icon>
 </button>
 }
 

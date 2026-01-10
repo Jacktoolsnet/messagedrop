@@ -15,6 +15,7 @@ const ERROR_CODE_TO_KEY: Record<ApiErrorCode, string> = {
   UNPROCESSABLE_ENTITY: 'errors.http.message.unprocessableEntity',
   REQUEST_TIMEOUT: 'errors.http.message.requestTimeout',
   RATE_LIMIT: 'errors.rateLimit',
+  MAINTENANCE: 'errors.maintenance',
   INTERNAL_ERROR: 'errors.http.message.serverError',
   BAD_GATEWAY: 'errors.http.message.badGateway',
   SERVICE_UNAVAILABLE: 'errors.http.message.serviceUnavailable',

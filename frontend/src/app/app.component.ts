@@ -1,6 +1,6 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
-import { PlatformLocation } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, OnInit, signal } from '@angular/core';
+import { formatDate, PlatformLocation } from '@angular/common';
+import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -50,6 +50,7 @@ import { Location } from './interfaces/location';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
 import { Message } from './interfaces/message';
+import { MaintenanceInfo } from './interfaces/maintenance';
 import { Mode } from './interfaces/mode';
 import { Multimedia } from './interfaces/multimedia';
 import { MultimediaType } from './interfaces/multimedia-type';
@@ -69,6 +70,7 @@ import { ContactService } from './services/contact.service';
 import { GeoStatisticService } from './services/geo-statistic.service';
 import { GeolocationService } from './services/geolocation.service';
 import { IndexedDbService } from './services/indexed-db.service';
+import { LanguageService } from './services/language.service';
 import { LocalDocumentService } from './services/local-document.service';
 import { LocalImageService } from './services/local-image.service';
 import { MapService } from './services/map.service';
@@ -166,6 +168,8 @@ export class AppComponent implements OnInit {
   private readonly dialog = inject(MatDialog);
   private readonly platformLocation = inject(PlatformLocation);
   private readonly translation = inject(TranslationHelperService);
+  private readonly languageService = inject(LanguageService);
+  private readonly locale = inject<string>(LOCALE_ID);
   readonly powService = inject(PowService);
   private exitBackupPromptPending = false;
   private exitBackupDialogOpen = false;
@@ -183,6 +187,7 @@ export class AppComponent implements OnInit {
     Object.values(this.unreadContactCounts()).reduce((acc, val) => acc + (val || 0), 0)
   );
   readonly unreadTotalAll = computed(() => this.unreadContactsTotal() + this.unreadSystemNotificationCount());
+  readonly maintenanceActive = computed(() => this.networkService.maintenanceInfo()?.enabled ?? false);
   readonly animateUserBadgeTick = signal<number>(0);
   private lastUnreadTotal = 0;
   private badgeAnimationTimer?: ReturnType<typeof setTimeout>;
@@ -522,7 +527,73 @@ export class AppComponent implements OnInit {
     }
   }
 
+  private formatMaintenanceTimestamp(seconds: number | null | undefined): string | null {
+    if (!seconds) {
+      return null;
+    }
+    return formatDate(seconds * 1000, 'medium', this.locale);
+  }
+
+  private getMaintenanceReason(maintenance: MaintenanceInfo): string | null {
+    const lang = this.languageService.effectiveLanguage();
+    if (lang === 'en') {
+      return maintenance.reasonEn || maintenance.reason;
+    }
+    if (lang === 'es') {
+      return maintenance.reasonEs || maintenance.reason;
+    }
+    if (lang === 'fr') {
+      return maintenance.reasonFr || maintenance.reason;
+    }
+    return maintenance.reason || maintenance.reasonEn || maintenance.reasonEs || maintenance.reasonFr;
+  }
+
+  private buildMaintenanceMessage(maintenance: MaintenanceInfo): string {
+    const details: string[] = [];
+    const startsAt = this.formatMaintenanceTimestamp(maintenance.startsAt);
+    const endsAt = this.formatMaintenanceTimestamp(maintenance.endsAt);
+    const reason = this.getMaintenanceReason(maintenance);
+
+    if (startsAt) {
+      details.push(`${this.translation.t('common.maintenance.start')}: ${startsAt}`);
+    }
+    if (endsAt) {
+      details.push(`${this.translation.t('common.maintenance.end')}: ${endsAt}`);
+    }
+    if (reason) {
+      details.push(`${this.translation.t('common.maintenance.reason')}: ${reason}`);
+    }
+
+    const baseMessage = this.translation.t('common.maintenance.message');
+    if (!details.length) {
+      return baseMessage;
+    }
+    return `${baseMessage}\n\n${details.join('\n')}`;
+  }
+
   public showBackendOfflineInfo(): void {
+    const maintenance = this.networkService.maintenanceInfo();
+    if (maintenance?.enabled) {
+      this.dialog.open(DisplayMessage, {
+        panelClass: '',
+        closeOnNavigation: false,
+        data: {
+          showAlways: true,
+          title: this.translation.t('common.maintenance.title'),
+          image: '',
+          icon: 'construction',
+          message: this.buildMaintenanceMessage(maintenance),
+          button: this.translation.t('common.actions.ok'),
+          delay: 0,
+          showSpinner: false
+        },
+        maxWidth: '90vw',
+        maxHeight: '90vh',
+        hasBackdrop: true,
+        autoFocus: false
+      });
+      return;
+    }
     this.dialog.open(DisplayMessage, {
       panelClass: '',
       closeOnNavigation: false,

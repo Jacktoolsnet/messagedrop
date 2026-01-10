@@ -800,6 +800,13 @@
       "title": "Oops! Our server went on a coffee break...",
       "message": "Apparently, our backend needed some \"me time\".\n\nNo worries: offline features (contacts, private notes, etc.) are still available."
     },
+    "maintenance": {
+      "title": "Maintenance mode",
+      "message": "Our backend is currently in maintenance mode.",
+      "start": "Start",
+      "end": "End",
+      "reason": "Reason"
+    },
     "backupExit": {
       "title": "Create backup before leaving?",
       "message": "You have unsaved changes. Do you want to create a backup now?"
@@ -885,6 +892,7 @@
     "noteTooLarge": "Note is too large. Maximum {{ maxChars }} characters.",
     "unauthorized": "You need to sign in to continue.",
     "rateLimit": "Too many requests. Please wait and try again.",
+    "maintenance": "The service is in maintenance mode.",
     "offline": {
       "title": "Oops! You're offline.",
       "message": "Apparently, your network needed some \"me time\"."

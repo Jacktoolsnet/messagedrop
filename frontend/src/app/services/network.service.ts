@@ -3,6 +3,7 @@ import { Injectable, inject, signal } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { DisplayMessageConfig } from '../interfaces/display-message-config';
+import { MaintenanceInfo } from '../interfaces/maintenance';
 import { environment } from '../../environments/environment';
 import { TranslationHelperService } from './translation-helper.service';
 
@@ -25,6 +26,8 @@ export class NetworkService {
   online = true;
   private readonly backendOnlineSig = signal(true);
   readonly backendOnline = this.backendOnlineSig.asReadonly();
+  private readonly maintenanceInfoSig = signal<MaintenanceInfo | null>(null);
+  readonly maintenanceInfo = this.maintenanceInfoSig.asReadonly();
   private backendCheckTimer?: ReturnType<typeof setTimeout>;
   private backendCheckAttempts = 0;
   private backendCheckInFlight = false;
@@ -147,10 +150,19 @@ export class NetworkService {
     }
     this.backendOnlineSig.set(online);
     if (online) {
+      this.clearMaintenanceInfo();
       this.stopBackendMonitoring();
     } else {
       this.scheduleBackendCheck();
     }
+  }
+
+  setMaintenanceInfo(info: MaintenanceInfo | null): void {
+    this.maintenanceInfoSig.set(info);
+  }
+
+  clearMaintenanceInfo(): void {
+    this.maintenanceInfoSig.set(null);
   }
 
   private scheduleBackendCheck(): void {
