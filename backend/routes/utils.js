@@ -3,6 +3,7 @@ const axios = require('axios');
 const router = express.Router();
 const security = require('../middleware/security');
 const { apiError } = require('../middleware/api-error');
+const { getVapidKeys } = require('../utils/keyStore');
 
 const OEMBED_PROVIDERS = [
     {
@@ -118,6 +119,20 @@ router.get('/oembed', security.authenticate, function (req, res, next) {
     const providerUrl = safeDecode(getQueryParam(req.query.provider));
     const targetUrl = safeDecode(getQueryParam(req.query.url));
     return handleOembedRequest(providerUrl, targetUrl, res, next);
+});
+
+router.get('/vapid-public-key', security.authenticateOptional, function (_req, res) {
+    const { publicKey } = getVapidKeys();
+    if (!publicKey) {
+        return res.status(500).json({
+            status: 500,
+            message: 'vapid_public_key_missing'
+        });
+    }
+    return res.status(200).json({
+        status: 200,
+        publicKey
+    });
 });
 
 module.exports = router

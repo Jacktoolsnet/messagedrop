@@ -35,6 +35,12 @@ import { ServerService } from './server.service';
 import { SocketioService } from './socketio.service';
 import { TranslationHelperService } from './translation-helper.service';
 
+interface VapidPublicKeyResponse {
+  status?: number;
+  publicKey?: string;
+  message?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -99,6 +105,8 @@ export class UserService {
   private readonly serverService = inject(ServerService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
+  private vapidPublicKey?: string;
+  private vapidKeyFetch?: Promise<string>;
 
   private handleError(error: HttpErrorResponse) {
     // Return an observable with a user-facing error message.
@@ -652,9 +660,10 @@ export class UserService {
       );
   }
 
-  registerSubscription(user: User) {
+  async registerSubscription(user: User): Promise<void> {
+    const publicKey = await this.getVapidPublicKey();
     this.swPush.requestSubscription({
-      serverPublicKey: environment.vapid_public_key
+      serverPublicKey: publicKey
     })
       .then(subscription => {
         const subscriptionJson = JSON.stringify(subscription);
@@ -678,6 +687,36 @@ export class UserService {
         user.subscription = '';
         this.saveUser();
       });
+  }
+
+  private async getVapidPublicKey(): Promise<string> {
+    if (this.vapidPublicKey) {
+      return this.vapidPublicKey;
+    }
+    if (this.vapidKeyFetch) {
+      return this.vapidKeyFetch;
+    }
+
+    this.vapidKeyFetch = (async () => {
+      try {
+        const response = await firstValueFrom(
+          this.http.get<VapidPublicKeyResponse>(
+            `${environment.apiUrl}/utils/vapid-public-key`,
+            this.httpOptions
+          ).pipe(catchError(this.handleError))
+        );
+        if (response?.publicKey) {
+          this.vapidPublicKey = response.publicKey;
+          return response.publicKey;
+        }
+      } catch (error) {
+        console.warn('Failed to load VAPID public key from backend', error);
+      }
+      this.vapidPublicKey = environment.vapid_public_key;
+      return this.vapidPublicKey;
+    })();
+
+    return this.vapidKeyFetch;
   }
 
   getLanguageForLocation(location: string): string {
