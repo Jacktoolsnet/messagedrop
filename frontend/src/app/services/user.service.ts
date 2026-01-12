@@ -34,6 +34,7 @@ import { RestoreService } from './restore.service';
 import { ServerService } from './server.service';
 import { SocketioService } from './socketio.service';
 import { TranslationHelperService } from './translation-helper.service';
+import { DiagnosticLoggerService } from './diagnostic-logger.service';
 
 interface VapidPublicKeyResponse {
   status?: number;
@@ -105,6 +106,7 @@ export class UserService {
   private readonly serverService = inject(ServerService);
   private readonly backupState = inject(BackupStateService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly diagnosticLogger = inject(DiagnosticLoggerService);
   private vapidPublicKey?: string;
   private vapidKeyFetch?: Promise<string>;
 
@@ -661,7 +663,17 @@ export class UserService {
   }
 
   async registerSubscription(user: User): Promise<void> {
-    const publicKey = await this.getVapidPublicKey();
+    let publicKey: string;
+    try {
+      publicKey = await this.getVapidPublicKey();
+    } catch (error) {
+      console.error('Failed to load VAPID public key', error);
+      this.diagnosticLogger.logHealthCheckError('vapid_key', error, {
+        errorCode: 'vapid_key_fetch'
+      });
+      return;
+    }
+
     this.swPush.requestSubscription({
       serverPublicKey: publicKey
     })
@@ -689,6 +701,17 @@ export class UserService {
       });
   }
 
+  public async preloadVapidPublicKey(): Promise<void> {
+    try {
+      await this.getVapidPublicKey();
+    } catch (error) {
+      console.error('Failed to preload VAPID public key', error);
+      this.diagnosticLogger.logHealthCheckError('vapid_key', error, {
+        errorCode: 'vapid_key_preload'
+      });
+    }
+  }
+
   private async getVapidPublicKey(): Promise<string> {
     if (this.vapidPublicKey) {
       return this.vapidPublicKey;
@@ -705,15 +728,15 @@ export class UserService {
             this.httpOptions
           ).pipe(catchError(this.handleError))
         );
-        if (response?.publicKey) {
-          this.vapidPublicKey = response.publicKey;
-          return response.publicKey;
+        if (!response?.publicKey) {
+          throw new Error('vapid_public_key_missing');
         }
+        this.vapidPublicKey = response.publicKey;
+        return response.publicKey;
       } catch (error) {
-        console.warn('Failed to load VAPID public key from backend', error);
+        this.vapidKeyFetch = undefined;
+        throw error;
       }
-      this.vapidPublicKey = environment.vapid_public_key;
-      return this.vapidPublicKey;
     })();
 
     return this.vapidKeyFetch;

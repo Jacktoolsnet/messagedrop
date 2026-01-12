@@ -107,6 +107,30 @@ export class DiagnosticLoggerService {
     this.send(payload);
   }
 
+  logHealthCheckError(feature: string, error: unknown, overrides?: Partial<FrontendErrorPayload>): void {
+    const httpError = error instanceof HttpErrorResponse ? error : undefined;
+    const details = this.extractErrorDetails(error);
+    const payload: FrontendErrorPayload = {
+      client: 'web',
+      event: 'runtime_error',
+      severity: 'error',
+      feature: this.safeToken(feature),
+      path: this.getCurrentPath(),
+      status: typeof httpError?.status === 'number' ? httpError.status : undefined,
+      errorName: details.errorName ?? this.safeToken(httpError?.name),
+      errorMessage: details.errorMessage ?? this.safeMessage(httpError?.message),
+      stack: details.stack,
+      source: details.source,
+      line: details.line,
+      column: details.column,
+      appVersion: APP_VERSION_INFO.version,
+      environment: environment.production ? 'prod' : 'dev',
+      createdAt: Date.now(),
+      ...overrides
+    };
+    this.send(payload, true);
+  }
+
   private handleWindowError(event: Event): void {
     if (event instanceof ErrorEvent) {
       this.logRuntimeError(event.error ?? event.message, {
@@ -138,8 +162,8 @@ export class DiagnosticLoggerService {
     this.send(payload);
   }
 
-  private send(payload: FrontendErrorPayload): void {
-    if (!this.canSend()) {
+  private send(payload: FrontendErrorPayload, force = false): void {
+    if (!force && !this.canSend()) {
       return;
     }
     const sanitized = this.sanitizePayload(payload);

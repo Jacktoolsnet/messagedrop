@@ -329,6 +329,7 @@ export class AppComponent implements OnInit {
 
   async initApp() {
     await this.appService.loadAppSettings();
+    await this.userService.preloadVapidPublicKey();
   }
 
   public ngOnInit(): void {
