@@ -193,6 +193,9 @@ export class AppComponent implements OnInit {
   private badgeAnimationTimer?: ReturnType<typeof setTimeout>;
   private badgeAnimationRunning = false;
   private lastLiveMessageId?: string;
+  private pendingSharedContent?: SharedContent;
+  private lastSharedContentTimestamp?: string;
+  private sharedContentDialogOpen = false;
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -307,10 +310,16 @@ export class AppComponent implements OnInit {
 
     // Shared Content
     effect(() => {
+      this.appService.settingsSet(); // <-- track changes
       const content = this.sharedContentService.getSharedContentSignal()();
-      if (content && this.appService.isConsentCompleted()) {
-        this.handleSharedContent(content);
+      if (!content) {
+        return;
       }
+      this.pendingSharedContent = content;
+      if (!this.appService.isConsentCompleted()) {
+        return;
+      }
+      this.handleSharedContent(content);
     });
 
     this.initApp();
@@ -481,6 +490,14 @@ export class AppComponent implements OnInit {
   }
 
   private async handleSharedContent(content: SharedContent) {
+    if (this.sharedContentDialogOpen) {
+      this.pendingSharedContent = content;
+      return;
+    }
+    if (this.lastSharedContentTimestamp === content.timestamp) {
+      this.pendingSharedContent = undefined;
+      return;
+    }
     let multimedia: Multimedia | undefined = undefined;
     let location: Location | undefined = undefined;
 
@@ -498,6 +515,8 @@ export class AppComponent implements OnInit {
       }
     }
 
+    this.sharedContentDialogOpen = true;
+    this.lastSharedContentTimestamp = content.timestamp;
     const dialogRef = this.dialog.open(SharedContentComponent, {
       data: { multimedia, location },
       closeOnNavigation: true,
@@ -509,8 +528,18 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(result => {
+      this.sharedContentDialogOpen = false;
       if (result) {
         this.userService.saveProfile();
+      }
+      if (this.pendingSharedContent) {
+        if (this.pendingSharedContent.timestamp !== this.lastSharedContentTimestamp) {
+          const pending = this.pendingSharedContent;
+          this.pendingSharedContent = undefined;
+          this.handleSharedContent(pending);
+        } else {
+          this.pendingSharedContent = undefined;
+        }
       }
     });
   }

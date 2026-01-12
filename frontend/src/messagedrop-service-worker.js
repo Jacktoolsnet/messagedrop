@@ -152,11 +152,27 @@ function detectContentType(url) {
 
 async function deliverToClientAndSave(content, type) {
     await saveSharedContentToDB(content, type);
-    await delay(10000);
+    await notifyClients(content);
 
-    const bc = new BroadcastChannel('shared-content');
-    bc.postMessage({ type: 'shared', content });
-    bc.close();
+    try {
+        const bc = new BroadcastChannel('shared-content');
+        bc.postMessage({ type: 'shared', content });
+        bc.close();
+    } catch {
+        // BroadcastChannel not available in all environments
+    }
+}
+
+async function notifyClients(content) {
+    if (!self.clients?.matchAll) return;
+    try {
+        const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true });
+        for (const client of clientList) {
+            client.postMessage({ type: 'shared', content });
+        }
+    } catch {
+        // Ignore notification failures
+    }
 }
 
 function saveSharedContentToDB(data, type) {
@@ -185,8 +201,4 @@ function saveSharedContentToDB(data, type) {
 
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
-}
-
-function delay(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
 }

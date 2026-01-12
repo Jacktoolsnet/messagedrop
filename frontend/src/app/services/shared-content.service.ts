@@ -22,6 +22,14 @@ export class SharedContentService {
       }
     });
 
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.addEventListener('message', (event) => {
+        if (event.data?.type === 'shared' && event.data.content) {
+          this.sharedContentSignal.set(event.data.content);
+        }
+      });
+    }
+
     this.openDB().then(async () => {
       const content = await this.getSharedContent('last');
       if (content) {
