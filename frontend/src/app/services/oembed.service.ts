@@ -319,7 +319,9 @@ export class OembedService {
   }
 
   public getYoutubeEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
-    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://www.youtube.com/oembed')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
+    const providerUrl = encodeURIComponent('https://www.youtube.com/oembed');
+    const targetUrl = encodeURIComponent(sourceUrl);
+    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed?provider=${providerUrl}&url=${targetUrl}`, this.httpOptions)
       .pipe(
         map((response: GetOembedResponse) => {
           return response;
@@ -335,14 +337,18 @@ export class OembedService {
   }
 
   public getTikTokVmEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
-    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://www.tiktok.com/oembed')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
+    const providerUrl = encodeURIComponent('https://www.tiktok.com/oembed');
+    const targetUrl = encodeURIComponent(sourceUrl);
+    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed?provider=${providerUrl}&url=${targetUrl}`, this.httpOptions)
       .pipe(
         catchError(this.handleError)
       )
   }
 
   public getPinterestEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
-    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://www.pinterest.com/oembed.json')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
+    const providerUrl = encodeURIComponent('https://www.pinterest.com/oembed.json');
+    const targetUrl = encodeURIComponent(sourceUrl);
+    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed?provider=${providerUrl}&url=${targetUrl}`, this.httpOptions)
       .pipe(
         map((response: GetOembedResponse) => {
           return response;
@@ -354,7 +360,9 @@ export class OembedService {
   }
 
   public getSpotifyEmbedCode(sourceUrl: string): Observable<GetOembedResponse> {
-    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed/${encodeURIComponent('https://open.spotify.com/oembed')}/${encodeURIComponent(sourceUrl)}`, this.httpOptions)
+    const providerUrl = encodeURIComponent('https://open.spotify.com/oembed');
+    const targetUrl = encodeURIComponent(sourceUrl);
+    return this.http.get<GetOembedResponse>(`${environment.apiUrl}/utils/oembed?provider=${providerUrl}&url=${targetUrl}`, this.httpOptions)
       .pipe(
         map((response: GetOembedResponse) => {
           //response.result.html = response.result.html?.replace(/width="\d+"/g, 'width="100%" style="aspect-ratio: 16 / 9; resize: both;"');

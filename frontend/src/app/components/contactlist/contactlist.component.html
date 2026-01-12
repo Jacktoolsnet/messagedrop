@@ -16,7 +16,7 @@
                 <div class="tile-header"
                     [style.--contact-header-bg-image]="getContactHeaderBackgroundImage(contact)"
                     [style.--contact-header-bg-opacity]="getContactHeaderBackgroundOpacity(contact)">
-                    <div class="contact-identity">
+                    <div class="identity-badge">
                         <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
                             [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true"
                             matBadgeColor="warn">

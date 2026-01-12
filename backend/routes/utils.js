@@ -49,35 +49,15 @@ function safeDecode(value) {
     }
 }
 
-router.get('/resolve/:url', security.authenticate, function (req, res, next) {
-    let response = { 'status': 0 };
-    axios.get(req.params.url, { maxRedirects: 0, validateStatus: null })
-        .then(axiosResponse => {
-            if (axiosResponse.status >= 300 && axiosResponse.status < 400 && axiosResponse.headers.location) {
-                response.status = 200;
-                response.result = axiosResponse.headers.location;
-                res.status(response.status).json(response);
-            } else if (axiosResponse.status === 200) {
-                // Endgültige URL ermitteln
-                response.status = axiosResponse.status;
-                response.result = response.config.url;
-                res.status(response.status).json(response);
-            } else {
-                response.status = 200;
-                response.result = req.params.shorturl;
-                res.status(response.status).json(response);
-            }
-        })
-        .catch(() => next(apiError.badGateway('resolve_failed')));
-});
+function getQueryParam(value) {
+    if (Array.isArray(value)) {
+        return value[0] ?? '';
+    }
+    return typeof value === 'string' ? value : '';
+}
 
-router.get('/oembed/:provider/:url', security.authenticate, function (req, res, next) {
+function handleOembedRequest(providerUrl, targetUrl, res, next) {
     let response = { 'status': 0 };
-    const providerParam = req.params.provider;
-    const urlParam = req.params.url;
-    const providerUrl = providerParam ? safeDecode(providerParam) : '';
-    const targetUrl = urlParam ? safeDecode(urlParam) : '';
-
     const provider = OEMBED_PROVIDERS.find((entry) => entry.providerUrl === providerUrl);
     if (!provider) {
         return next(apiError.badRequest('oembed_provider_not_allowed'));
@@ -110,6 +90,34 @@ router.get('/oembed/:provider/:url', security.authenticate, function (req, res, 
             }
         })
         .catch(() => next(apiError.badGateway('oembed_failed')));
+}
+
+router.get('/resolve/:url', security.authenticate, function (req, res, next) {
+    let response = { 'status': 0 };
+    axios.get(req.params.url, { maxRedirects: 0, validateStatus: null })
+        .then(axiosResponse => {
+            if (axiosResponse.status >= 300 && axiosResponse.status < 400 && axiosResponse.headers.location) {
+                response.status = 200;
+                response.result = axiosResponse.headers.location;
+                res.status(response.status).json(response);
+            } else if (axiosResponse.status === 200) {
+                // Endgültige URL ermitteln
+                response.status = axiosResponse.status;
+                response.result = response.config.url;
+                res.status(response.status).json(response);
+            } else {
+                response.status = 200;
+                response.result = req.params.shorturl;
+                res.status(response.status).json(response);
+            }
+        })
+        .catch(() => next(apiError.badGateway('resolve_failed')));
+});
+
+router.get('/oembed', security.authenticate, function (req, res, next) {
+    const providerUrl = safeDecode(getQueryParam(req.query.provider));
+    const targetUrl = safeDecode(getQueryParam(req.query.url));
+    return handleOembedRequest(providerUrl, targetUrl, res, next);
 });
 
 module.exports = router
