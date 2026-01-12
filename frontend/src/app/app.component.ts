@@ -196,6 +196,7 @@ export class AppComponent implements OnInit {
   private pendingSharedContent?: SharedContent;
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
+  private initialPublicMessagesRequested = false;
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -220,19 +221,25 @@ export class AppComponent implements OnInit {
 
     effect(() => {
       const mapSetTrigger = this.mapService.mapSet(); // <-- track changes
-      if (this.appService.isConsentCompleted() && mapSetTrigger === 1) {
-        /**
-         * Only on app init.
-         * Fly to position if user alrady allowed location.
-         */
-        navigator.permissions.query({ name: 'geolocation' }).then((result) => {
+      if (!this.appService.isConsentCompleted() || mapSetTrigger < 2 || this.initialPublicMessagesRequested) {
+        return;
+      }
+      this.initialPublicMessagesRequested = true;
+      /**
+       * Only on app init.
+       * Fly to position if user already allowed location.
+       */
+      navigator.permissions.query({ name: 'geolocation' })
+        .then((result) => {
           if (result.state === 'granted' && this.appService.getAppSettings().detectLocationOnStart) {
             this.getCurrentPosition();
           } else {
             this.updateDataForLocation();
           }
+        })
+        .catch(() => {
+          this.updateDataForLocation();
         });
-      }
     });
 
     effect(() => {
@@ -708,6 +715,7 @@ export class AppComponent implements OnInit {
               duration: 1000
             });
           }
+          this.updateDataForLocation();
         }
       });
     });
@@ -1757,7 +1765,7 @@ export class AppComponent implements OnInit {
     });
 
     // Save last markerupdet to fire the angular change listener
-    this.lastMarkerUpdate = new Date().getMilliseconds();
+    this.lastMarkerUpdate = Date.now();
   }
 
   private resetBadgeAnimation(): void {
