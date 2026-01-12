@@ -1,6 +1,6 @@
 // https://angular.dev/ecosystem/service-workers/push-notifications
 const webpush = require('web-push');
-const { getEncryptionPrivateKey } = require('../utils/keyStore');
+const { getEncryptionPrivateKey, getVapidKeys } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
 
 
@@ -40,7 +40,17 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
                                 }
                             }
                         };
-                        sendNotification(logger, JSON.parse(row.subscription), payload);
+                        try {
+                            const subscription = JSON.parse(row.subscription);
+                            sendNotification(logger, subscription, payload);
+                        } catch (parseError) {
+                            logger.error('placeSubscriptions: invalid subscription JSON', {
+                                error: parseError?.message,
+                                subscription: row.subscription,
+                                placeId: row.id,
+                                userId: row.userId
+                            });
+                        }
                     }
                 });
             }
@@ -86,7 +96,17 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                                 }
                             }
                         };
-                        sendNotification(logger, JSON.parse(row.subscription), payload);
+                        try {
+                            const subscription = JSON.parse(row.subscription);
+                            sendNotification(logger, subscription, payload);
+                        } catch (parseError) {
+                            logger.error('contactSubscriptions: invalid subscription JSON', {
+                                error: parseError?.message,
+                                subscription: row.subscription,
+                                contactId: row.id,
+                                userId: row.userId
+                            });
+                        }
                     }
                 });
             }
@@ -98,19 +118,31 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
 
 function sendNotification(logger, subscription, payload) {
     try {
+        const { publicKey, privateKey } = getVapidKeys();
+        if (!publicKey || !privateKey) {
+            logger.error('sendNotification: missing VAPID keys', { endpoint: subscription?.endpoint });
+            return;
+        }
         webpush.setVapidDetails(
-            'https://messagedrop.de',
-            process.env.VAPID_PUBLIC_KEY,
-            process.env.VAPID_PRIVATE_KEY
+            process.env.VAPID_SUBJECT || 'https://messagedrop.de',
+            publicKey,
+            privateKey
         );
         webpush
             .sendNotification(subscription, JSON.stringify(payload))
             .then(() => {
                 logger.info('webpush notification queued', { endpoint: subscription?.endpoint });
             })
-            .catch((error) => { logger.error(`webpush.sendNotification: ${error}`); });
+            .catch((error) => {
+                logger.error('webpush.sendNotification failed', {
+                    endpoint: subscription?.endpoint,
+                    statusCode: error?.statusCode,
+                    body: error?.body,
+                    message: error?.message
+                });
+            });
     } catch (error) {
-        logger.error(`sendNotification: ${error}`);
+        logger.error('sendNotification failed', { error: error?.message, endpoint: subscription?.endpoint });
     }
 }
 

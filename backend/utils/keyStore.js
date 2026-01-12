@@ -7,6 +7,7 @@ const {
     randomBytes,
     scryptSync,
 } = require('crypto');
+const webpush = require('web-push');
 require('dotenv').config();
 
 const { subtle } = webcrypto;
@@ -15,10 +16,12 @@ const { subtle } = webcrypto;
 const KEYS_DIR = path.join(__dirname, '../keys');
 const ENCRYPTION_KEY_PATH = path.join(KEYS_DIR, 'encryption.key.enc');
 const SIGNING_KEY_PATH = path.join(KEYS_DIR, 'signing.key.enc');
+const VAPID_KEYS_PATH = path.join(KEYS_DIR, 'vapid.keys.enc');
 
 // Schlüssel im Speicher
 let encryptionKey = { publicKey: null, privateKey: null };
 let signingKey = { publicKey: null, privateKey: null };
+let vapidKeys = { publicKey: null, privateKey: null };
 
 // Hilfsfunktionen zur Verschlüsselung/Entschlüsselung
 function getAesKey(password, salt) {
@@ -44,6 +47,26 @@ function decryptData(buffer, password) {
     const decipher = createDecipheriv('aes-256-gcm', key, iv);
     decipher.setAuthTag(tag);
     return Buffer.concat([decipher.update(encrypted), decipher.final()]);
+}
+
+function resolveVapidPassword() {
+    return process.env.VAPID_KEY_PASSWORD || process.env.ENCRYPTION_KEY_PASSWORD;
+}
+
+function parseVapidKeys(raw) {
+    if (!raw || typeof raw !== 'object') return null;
+    const publicKey = raw.publicKey;
+    const privateKey = raw.privateKey;
+    if (typeof publicKey !== 'string' || typeof privateKey !== 'string') {
+        return null;
+    }
+    return { publicKey, privateKey };
+}
+
+function saveVapidKeys(filePath, password, keys) {
+    const json = JSON.stringify(keys);
+    const encrypted = encryptData(Buffer.from(json), password);
+    fs.writeFileSync(filePath, encrypted);
 }
 
 // Datei laden oder neuen Key erzeugen
@@ -122,6 +145,39 @@ async function generateOrLoadKeypairs() {
         process.env.SIGNING_KEY_PASSWORD,
         'signing'
     );
+}
+
+async function generateOrLoadVapidKeys() {
+    if (!fs.existsSync(KEYS_DIR)) fs.mkdirSync(KEYS_DIR);
+    const password = resolveVapidPassword();
+    if (!password) {
+        throw new Error('Missing environment variable for VAPID key password!');
+    }
+
+    if (fs.existsSync(VAPID_KEYS_PATH)) {
+        const encData = fs.readFileSync(VAPID_KEYS_PATH);
+        const decrypted = decryptData(encData, password);
+        const parsed = parseVapidKeys(JSON.parse(decrypted.toString()));
+        if (!parsed) {
+            throw new Error('Invalid VAPID key file format');
+        }
+        vapidKeys = parsed;
+        return;
+    }
+
+    const envKeys = parseVapidKeys({
+        publicKey: process.env.VAPID_PUBLIC_KEY,
+        privateKey: process.env.VAPID_PRIVATE_KEY
+    });
+    if (envKeys) {
+        vapidKeys = envKeys;
+        saveVapidKeys(VAPID_KEYS_PATH, password, envKeys);
+        return;
+    }
+
+    const generated = webpush.generateVAPIDKeys();
+    vapidKeys = { publicKey: generated.publicKey, privateKey: generated.privateKey };
+    saveVapidKeys(VAPID_KEYS_PATH, password, vapidKeys);
 }
 
 async function encryptJsonWebKey(jwk) {
@@ -212,10 +268,12 @@ async function getSigningPublicJwk() {
 // Exporte
 module.exports = {
     generateOrLoadKeypairs,
+    generateOrLoadVapidKeys,
     getEncryptionPublicKey: () => encryptionKey.publicKey,
     getEncryptionPrivateKey: () => encryptionKey.privateKey,
     getSigningPublicKey: () => signingKey.publicKey,
     getSigningPrivateKey: () => signingKey.privateKey,
+    getVapidKeys: () => ({ ...vapidKeys }),
     encryptJsonWebKey,
     decryptJsonWebKey,
     getEncryptionPublicJwk,

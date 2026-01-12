@@ -37,7 +37,7 @@ const helmet = require('helmet');
 const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
-const { generateOrLoadKeypairs } = require('./utils/keyStore');
+const { generateOrLoadKeypairs, generateOrLoadVapidKeys } = require('./utils/keyStore');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 const maintenanceMode = require('./middleware/maintenance');
@@ -400,6 +400,7 @@ app.use(errorHandler);
 (async () => {
   try {
     await generateOrLoadKeypairs();
+    await generateOrLoadVapidKeys();
     await database.init(logger);
     const port = Number(process.env.PORT);
     const server = app.listen(port, () => {
