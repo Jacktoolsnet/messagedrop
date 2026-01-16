@@ -42,6 +42,11 @@
         </div>
         }
 
+        @if (isAddMode) {
+        <app-location-picker-tile [location]="data.note.location" markerType="note"
+            (locationChange)="updateLocation($event)"></app-location-picker-tile>
+        }
+
     </div>
 </mat-dialog-content>
 

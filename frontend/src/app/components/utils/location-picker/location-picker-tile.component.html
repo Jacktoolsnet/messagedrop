@@ -1,0 +1,10 @@
+<div class="location-tile">
+  <div class="location-tile__header">
+    <span class="location-tile__title">{{ 'common.locationPicker.title' | transloco }}</span>
+    <button mat-icon-button type="button" class="location-tile__edit"
+      (click)="openPicker()" [attr.aria-label]="'common.locationPicker.editAria' | transloco">
+      <mat-icon>edit</mat-icon>
+    </button>
+  </div>
+  <div class="location-tile__map" [id]="mapId"></div>
+</div>

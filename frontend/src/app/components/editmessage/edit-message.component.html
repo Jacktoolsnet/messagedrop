@@ -39,6 +39,11 @@
         </div>
         }
 
+        @if (data.mode === mode.ADD_PUBLIC_MESSAGE) {
+        <app-location-picker-tile [location]="data.message.location" markerType="message"
+            (locationChange)="updateLocation($event)"></app-location-picker-tile>
+        }
+
     </div>
 </mat-dialog-content>
 

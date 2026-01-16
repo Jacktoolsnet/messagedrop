@@ -10,6 +10,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
 import { MultimediaType } from '../../interfaces/multimedia-type';
@@ -21,6 +22,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
 
 interface TextDialogResult {
@@ -37,6 +39,7 @@ type DialogHeaderConfig = {
   imports: [
     SelectMultimediaComponent,
     ShowmultimediaComponent,
+    LocationPickerTileComponent,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
@@ -63,6 +66,8 @@ export class EditNoteComponent implements OnInit {
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; note: Note }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
+  readonly mode = Mode;
+  readonly isAddMode = !this.data.mode || this.data.mode === Mode.ADD_NOTE;
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
@@ -159,6 +164,10 @@ export class EditNoteComponent implements OnInit {
 
   public removeText(): void {
     this.data.note.note = '';
+  }
+
+  public updateLocation(location: Location): void {
+    this.data.note.location = { ...location };
   }
 
 }

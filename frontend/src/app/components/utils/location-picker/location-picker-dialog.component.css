@@ -1,0 +1,21 @@
+.location-picker-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.location-picker-hint {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.location-picker-map {
+  width: 100%;
+  height: min(70vh, 520px);
+  border-radius: 0.75rem;
+  overflow: hidden;
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}

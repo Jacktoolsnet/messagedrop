@@ -10,6 +10,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { Location } from '../../interfaces/location';
 import { Message } from '../../interfaces/message';
 import { Mode } from '../../interfaces/mode';
 import { Multimedia } from '../../interfaces/multimedia';
@@ -21,6 +22,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
 
 interface TextDialogResult {
@@ -37,6 +39,7 @@ type DialogHeaderConfig = {
   imports: [
     SelectMultimediaComponent,
     ShowmultimediaComponent,
+    LocationPickerTileComponent,
     FormsModule,
     MatButtonModule,
     MatDialogActions,
@@ -64,6 +67,7 @@ export class EditMessageComponent implements OnInit {
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
+  readonly mode = Mode;
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
@@ -178,6 +182,10 @@ export class EditMessageComponent implements OnInit {
 
   public removeText(): void {
     this.data.message.message = '';
+  }
+
+  public updateLocation(location: Location): void {
+    this.data.message.location = { ...location };
   }
 
 

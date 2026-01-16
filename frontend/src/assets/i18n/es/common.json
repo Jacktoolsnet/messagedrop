@@ -860,6 +860,12 @@
         "nearby": "alrededor de tu ubicación"
       }
     },
+    "locationPicker": {
+      "title": "Ubicación",
+      "editAria": "Editar ubicación",
+      "dialogTitle": "Elegir ubicación",
+      "hint": "Haz clic en el mapa para establecer la ubicación."
+    },
     "notifications": {
       "received": "Notificación recibida: {{ action }}",
       "systemTitle": "Mensaje del sistema",

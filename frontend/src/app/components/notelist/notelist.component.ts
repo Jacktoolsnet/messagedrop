@@ -149,9 +149,6 @@ export class NotelistComponent {
 
     dialogRef.afterClosed().subscribe(async result => {
       if (result?.note) {
-        result.note.latitude = this.location.latitude;
-        result.note.longitude = this.location.longitude;
-        result.note.plusCode = this.location.plusCode;
         const createdNote = await this.noteService.addNote(result.note);
         const currentNotes = this.notesSignal();
         if (!currentNotes.some(noteItem => noteItem.id === createdNote.id)) {

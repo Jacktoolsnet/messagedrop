@@ -1,0 +1,35 @@
+.location-tile {
+  width: 100%;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 0.25rem;
+  padding: 0.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  box-sizing: border-box;
+}
+
+.location-tile__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.location-tile__title {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.location-tile__edit {
+  flex: 0 0 auto;
+}
+
+.location-tile__map {
+  width: 100%;
+  height: 170px;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}

@@ -1,0 +1,20 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon" aria-hidden="true">place</mat-icon>
+  <span class="dialog-title__text">{{ 'common.locationPicker.dialogTitle' | transloco }}</span>
+</h2>
+
+<mat-dialog-content class="location-picker-content">
+  <p class="location-picker-hint">{{ 'common.locationPicker.hint' | transloco }}</p>
+  <div class="location-picker-map" [id]="mapId"></div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button type="button" (click)="cancel()"
+    [attr.aria-label]="'common.actions.abort' | transloco" class="action-close">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" type="button" (click)="apply()"
+    [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>
