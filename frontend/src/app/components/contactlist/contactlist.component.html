@@ -13,8 +13,7 @@
         <div class="content">
             @for (contact of contactsSignal(); track contact.id){
             <mat-card class="contact-tile">
-                <div class="tile-header"
-                    [style.--contact-header-bg-image]="getContactHeaderBackgroundImage(contact)"
+                <div class="tile-header" [style.--contact-header-bg-image]="getContactHeaderBackgroundImage(contact)"
                     [style.--contact-header-bg-opacity]="getContactHeaderBackgroundOpacity(contact)">
                     <div class="identity-badge">
                         <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
@@ -29,7 +28,8 @@
                         </span>
                         <span class="name">{{ contact.name || ('common.contact.list.nameFallback' | transloco) }}</span>
                     </div>
-                    @if (contact.avatarAttribution?.source === 'unsplash' && contact.chatBackgroundAttribution?.source === 'unsplash') {
+                    @if (contact.avatarAttribution?.source === 'unsplash' && contact.chatBackgroundAttribution?.source
+                    === 'unsplash') {
                     <div class="unsplash-badge">
                         <span class="unsplash-badge__text">{{ 'common.avatarAttribution.photosBy' | transloco }}</span>
                         <a class="unsplash-badge__link" [href]="contact.avatarAttribution?.authorUrl" target="_blank"
@@ -41,7 +41,8 @@
                             target="_blank" rel="noopener">
                             {{ contact.chatBackgroundAttribution?.authorName }}
                         </a>
-                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco
+                            }}</span>
                         <a class="unsplash-badge__link"
                             [href]="contact.avatarAttribution?.unsplashUrl || contact.chatBackgroundAttribution?.unsplashUrl"
                             target="_blank" rel="noopener">
@@ -55,7 +56,8 @@
                         <a class="unsplash-badge__link" [href]="attribution.authorUrl" target="_blank" rel="noopener">
                             {{ attribution.authorName }}
                         </a>
-                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+                        <span class="unsplash-badge__text">{{ 'common.avatarAttribution.onUnsplash' | transloco
+                            }}</span>
                         <a class="unsplash-badge__link" [href]="attribution.unsplashUrl" target="_blank" rel="noopener">
                             Unsplash
                         </a>
@@ -91,7 +93,7 @@
                             [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
                             [matBadge]="getUnreadBadge(contact.id)" [matBadgeHidden]="getUnreadBadge(contact.id) === ''"
                             matBadgeOverlap="true" matBadgeColor="warn" (click)="openContactChatroom(contact)">
-                            <mat-icon>forum</mat-icon>
+                            <mat-icon>conversation</mat-icon>
                         </button>
                         }
                         <button mat-mini-fab color="secondary" (click)="openTileList(contact)"

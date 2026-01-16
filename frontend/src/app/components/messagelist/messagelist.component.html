@@ -285,7 +285,9 @@
 <mat-dialog-actions class="sticky-actions" align="end">
     <button mat-icon-button class="action-close" (click)="goBack()"
         [attr.aria-label]="'common.actions.close' | transloco">
-        <mat-icon>close</mat-icon>
+        <mat-icon>
+            @if (messageService.selectedMessagesSignal().length !== 0) { arrow_back } @else { close }
+        </mat-icon>
     </button>
     @if (messageService.selectedMessagesSignal().length !== 0) {
     @if (!userService.isReady() || userService.hasJwt()) {

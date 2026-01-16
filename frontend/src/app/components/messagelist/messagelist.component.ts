@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, effect, inject, OnInit, signal, WritableSignal } from '@angular/core';
+import { Component, computed, effect, inject, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -61,7 +61,7 @@ type ModerationStatus = 'published' | 'review' | 'hidden';
   templateUrl: './messagelist.component.html',
   styleUrl: './messagelist.component.css'
 })
-export class MessagelistComponent implements OnInit {
+export class MessagelistComponent implements OnInit, OnDestroy {
 
   private static readonly DSA_NOTICE_STATUSES = new Set(['RECEIVED', 'UNDER_REVIEW', 'DECIDED']);
   private static readonly STATUS_LABELS: Record<'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN', string> = {
@@ -167,6 +167,10 @@ export class MessagelistComponent implements OnInit {
 
   async ngOnInit() {
     await this.profileService.loadAllProfiles();
+  }
+
+  ngOnDestroy() {
+    this.messageService.clearSelectedMessages();
   }
 
   getCommentBadge(uuid: string): number {
