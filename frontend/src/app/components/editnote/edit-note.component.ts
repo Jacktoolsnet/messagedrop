@@ -67,7 +67,9 @@ export class EditNoteComponent implements OnInit {
   readonly data = inject<{ mode: Mode; note: Note }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
   readonly mode = Mode;
-  readonly isAddMode = !this.data.mode || this.data.mode === Mode.ADD_NOTE;
+  readonly isLocationEditable = !this.data.mode
+    || this.data.mode === Mode.ADD_NOTE
+    || this.data.mode === Mode.EDIT_NOTE;
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;

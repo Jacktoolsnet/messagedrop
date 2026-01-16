@@ -68,6 +68,8 @@ export class EditMessageComponent implements OnInit {
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);
   readonly headerConfig = this.resolveHeaderConfig(this.data.mode);
   readonly mode = Mode;
+  readonly isLocationEditable = this.data.mode === Mode.ADD_PUBLIC_MESSAGE
+    || this.data.mode === Mode.EDIT_PUBLIC_MESSAGE;
 
   safeHtml: SafeHtml | undefined = undefined;
   showSaveHtml = false;
