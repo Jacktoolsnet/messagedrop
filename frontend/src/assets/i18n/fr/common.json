@@ -376,7 +376,8 @@
       "addContent": "Ajouter du contenu multimédia",
       "importUrlPlaceholder": "Saisissez l'URL multimédia",
       "attributionPoweredBy": "Propulsé par {{ platform }}",
-      "platformDisabled": "{{ platform }} est actuellement désactivé. Activez-le ci-dessous pour continuer.",
+      "platformDisabled": "{{ platform }} est actuellement désactivé. Activez-le dans les paramètres de contenu externe pour continuer.",
+      "openExternalContentSettings": "Ouvrir les paramètres de contenu externe",
       "urlNotAllowed": "Cette URL n'est pas autorisée pour l'intégration."
     },
     "noteList": {

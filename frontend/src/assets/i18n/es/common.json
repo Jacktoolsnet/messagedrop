@@ -376,7 +376,8 @@
       "addContent": "Añadir contenido multimedia",
       "importUrlPlaceholder": "Introduce la URL multimedia",
       "attributionPoweredBy": "Con tecnología de {{ platform }}",
-      "platformDisabled": "{{ platform }} está deshabilitado actualmente. Actívalo abajo para continuar.",
+      "platformDisabled": "{{ platform }} está deshabilitado actualmente. Actívalo en los ajustes de contenido externo para continuar.",
+      "openExternalContentSettings": "Abrir ajustes de contenido externo",
       "urlNotAllowed": "Esta URL no está permitida para incrustar."
     },
     "noteList": {

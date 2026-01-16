@@ -128,3 +128,9 @@
     word-break: break-word;
     hyphens: auto;
 }
+
+.disabled-hint__actions {
+    display: flex;
+    justify-content: center;
+    padding: 0 0 0.75rem;
+}

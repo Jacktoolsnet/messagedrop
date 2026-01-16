@@ -1,8 +1,8 @@
 
-import { Component, inject } from '@angular/core';
+import { Component, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -12,7 +12,7 @@ import { Multimedia } from '../../../interfaces/multimedia';
 import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
+import { ExternalContentComponent } from '../../legal/external-content/external-content.component';
 
 type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
 @Component({
@@ -25,7 +25,6 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    EnableExternalContentComponent,
     TranslocoPipe
 ],
   templateUrl: './import-multimedia.component.html',
@@ -37,8 +36,10 @@ export class ImportMultimediaComponent {
   urlInvalid = true;
   safeHtml?: SafeHtml;
   disabledReason = '';
+  showExternalSettingsButton = false;
 
   readonly dialogRef = inject(MatDialogRef<ImportMultimediaComponent>);
+  private readonly dialog = inject(MatDialog);
   private readonly oembedService = inject(OembedService);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly appService = inject(AppService);
@@ -47,6 +48,12 @@ export class ImportMultimediaComponent {
   private readonly spotifyHosts = ['open.spotify.com'];
   private readonly tiktokHosts = ['tiktok.com', 'vm.tiktok.com'];
   private readonly pinterestHosts = ['pinterest.com', 'pin.it'];
+  private readonly settingsEffect = effect(() => {
+    this.appService.settingsSet();
+    if (this.multimediaUrl.trim()) {
+      void this.validateUrl();
+    }
+  });
 
   private getPlatformFromUrl(url: string): PlatformKey | undefined {
     const host = this.getHostname(url);
@@ -87,6 +94,7 @@ export class ImportMultimediaComponent {
 
   async validateUrl(): Promise<void> {
     this.disabledReason = '';
+    this.showExternalSettingsButton = false;
     this.safeHtml = undefined;
     this.multimedia = undefined;
 
@@ -114,6 +122,7 @@ export class ImportMultimediaComponent {
       this.disabledReason = this.translation.t('common.multimedia.platformDisabled', {
         platform: this.getPlatformLabel(platform)
       });
+      this.showExternalSettingsButton = true;
       return;
     }
 
@@ -158,8 +167,18 @@ export class ImportMultimediaComponent {
     }
   }
 
-  async onEnabledChange(enabled: boolean): Promise<void> {
-    void enabled;
-    await this.validateUrl();
+  openExternalContentSettings(): void {
+    const dialogRef = this.dialog.open(ExternalContentComponent, {
+      data: { appSettings: this.appService.getAppSettings() },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      width: 'min(700px, 90vw)',
+      height: 'auto',
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      void this.validateUrl();
+    });
   }
 }

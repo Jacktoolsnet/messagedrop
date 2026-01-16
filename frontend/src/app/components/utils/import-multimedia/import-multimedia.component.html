@@ -18,6 +18,13 @@
 <div class="disabled-hint">
     {{ disabledReason }}
 </div>
+@if (showExternalSettingsButton) {
+<div class="disabled-hint__actions">
+    <button mat-stroked-button color="primary" type="button" (click)="openExternalContentSettings()">
+        {{ 'common.multimedia.openExternalContentSettings' | transloco }}
+    </button>
+</div>
+}
 }
 
 <mat-dialog-content class="full-width">
@@ -29,24 +36,4 @@
         </button>
     </div>
     }
-    <div class="content">
-        <div class="platform-tile-container">
-            <div class="platform-tile">
-                <app-enable-external-content [platform]="'pinterest'" (enabledChange)="onEnabledChange($event)">
-                </app-enable-external-content>
-            </div>
-            <div class="platform-tile">
-                <app-enable-external-content [platform]="'spotify'" (enabledChange)="onEnabledChange($event)">
-                </app-enable-external-content>
-            </div>
-            <div class="platform-tile">
-                <app-enable-external-content [platform]="'tiktok'" (enabledChange)="onEnabledChange($event)">
-                </app-enable-external-content>
-            </div>
-            <div class="platform-tile">
-                <app-enable-external-content [platform]="'youtube'" (enabledChange)="onEnabledChange($event)">
-                </app-enable-external-content>
-            </div>
-        </div>
-    </div>
 </mat-dialog-content>
