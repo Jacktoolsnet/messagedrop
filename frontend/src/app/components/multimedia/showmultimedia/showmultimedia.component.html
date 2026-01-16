@@ -23,24 +23,16 @@
 </div>
 }
 } @else {
-<!-- Activation tile when the platform is disabled. -->
-@if(multimedia?.type === 'youtube') {
-<app-enable-external-content [platform]="'youtube'" (enabledChange)="onEnabledChange($event)">
-</app-enable-external-content>
-} @else if(multimedia?.type === 'spotify') {
-<app-enable-external-content [platform]="'spotify'" (enabledChange)="onEnabledChange($event)">
-</app-enable-external-content>
-} @else if(multimedia?.type === 'pinterest') {
-<app-enable-external-content [platform]="'pinterest'" (enabledChange)="onEnabledChange($event)">
-</app-enable-external-content>
-} @else if(multimedia?.type === 'tiktok') {
-<app-enable-external-content [platform]="'tiktok'" (enabledChange)="onEnabledChange($event)">
-</app-enable-external-content>
-} @else if(multimedia?.type === 'tenor') {
-<app-enable-external-content [platform]="'tenor'" (enabledChange)="onEnabledChange($event)">
-</app-enable-external-content>
-} @else if(multimedia?.type === 'unsplash') {
-<app-enable-external-content [platform]="'unsplash'" (enabledChange)="onEnabledChange($event)">
-</app-enable-external-content>
+@if (disabledReason !== '') {
+<div class="disabled-hint">
+    {{ disabledReason }}
+</div>
+}
+@if (showExternalSettingsButton) {
+<div class="disabled-hint__actions">
+    <button mat-stroked-button color="primary" type="button" (click)="openExternalContentSettings()">
+        {{ 'common.multimedia.openExternalContentSettings' | transloco }}
+    </button>
+</div>
 }
 }
