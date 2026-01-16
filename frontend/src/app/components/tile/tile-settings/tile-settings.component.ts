@@ -14,7 +14,6 @@ import { ContactService } from '../../../services/contact.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
-import { LinkTileEditComponent } from '../link-tile/link-tile-edit/link-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { PollutionTileEditComponent } from '../pollution-tile/pollution-tile-edit/pollution-tile-edit.component';
 import { QuickActionTileEditComponent } from '../quick-action-tile/quick-action-tile-edit/quick-action-tile-edit.component';
@@ -54,15 +53,14 @@ export class TileSettingsComponent {
   readonly tileSettings = signal<TileSetting[]>(normalizeTileSettings(
     this.data.place?.tileSettings ?? this.data.contact?.tileSettings,
     { includeDefaults: this.isPlaceContext, includeSystem: this.isPlaceContext }
-  ));
+  ).filter(tile => tile.type !== 'custom-link'));
   readonly addableTiles: { type: TileSetting['type']; labelKey: string; icon: string }[] = [
     { type: 'custom-text', labelKey: 'common.tileTypes.text', icon: 'text_fields' },
     { type: 'custom-multitext', labelKey: 'common.tileTypes.multitext', icon: 'notes' },
     { type: 'custom-date', labelKey: 'common.tileTypes.anniversary', icon: 'event' },
     { type: 'custom-todo', labelKey: 'common.tileTypes.todo', icon: 'check_circle' },
     { type: 'custom-quickaction', labelKey: 'common.tileTypes.quickActions', icon: 'bolt' },
-    { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' },
-    { type: 'custom-link', labelKey: 'common.tileTypes.link', icon: 'link' }
+    { type: 'custom-file', labelKey: 'common.tileTypes.files', icon: 'attach_file' }
   ];
 
   private readonly tileTypeLabelKeys: Partial<Record<TileSetting['type'], string>> = {
@@ -74,7 +72,6 @@ export class TileSettingsComponent {
     image: 'common.tileTypes.image',
     'custom-text': 'common.tileTypes.text',
     'custom-multitext': 'common.tileTypes.multitext',
-    'custom-link': 'common.tileTypes.link',
     'custom-date': 'common.tileTypes.anniversary',
     'custom-todo': 'common.tileTypes.todo',
     'custom-quickaction': 'common.tileTypes.quickActions',
@@ -120,15 +117,6 @@ export class TileSettingsComponent {
         title: label,
         date: '',
         icon: 'event'
-      };
-    }
-
-    if (tileToAdd.type === 'custom-link') {
-      baseTile.payload = {
-        title: label,
-        url: '',
-        icon: 'link',
-        linkType: 'web'
       };
     }
 
@@ -202,18 +190,6 @@ export class TileSettingsComponent {
         height: 'auto',
         maxHeight: '95vh',
         autoFocus: false,
-        data: { tile }
-      });
-      ref.afterClosed().subscribe((updated?: TileSetting) => {
-        if (!updated) return;
-        this.tileSettings.set(this.tileSettings().map(t => t.id === updated.id ? updated : t));
-      });
-      return;
-    }
-
-    if (tile.type === 'custom-link') {
-      const ref = this.dialog.open(LinkTileEditComponent, {
-        width: '520px',
         data: { tile }
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {

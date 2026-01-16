@@ -13,7 +13,6 @@ import { AnniversaryTileComponent } from "../anniversary-tile/anniversary-tile.c
 import { DateTimeTileComponent } from "../datetime-tile/datetime-tile.component";
 import { FileTileComponent } from "../file-tile/file-tile.component";
 import { ImageTileComponent } from "../image-tile/image-tile.component";
-import { LinkTileComponent } from "../link-tile/link-tile.component";
 import { MessageTileComponent } from "../message-tile/messagetile.component";
 import { MigraineTileComponent } from "../migraine-tile/migraine-tile.component";
 import { MultitextTileComponent } from "../multitext-tile/multitext-tile.component";
@@ -27,7 +26,7 @@ import { WeatherTileComponent } from "../weather-tile/weather-tile.component";
 
 @Component({
   selector: 'app-tile-list',
-  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, TextTileComponent, MultitextTileComponent, LinkTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
+  imports: [DateTimeTileComponent, WeatherTileComponent, AirQualityTileComponent, NoteTileComponent, MessageTileComponent, ImageTileComponent, FileTileComponent, TextTileComponent, MultitextTileComponent, AnniversaryTileComponent, MigraineTileComponent, PollutionTileComponent, TodoTileComponent, QuickActionTileComponent, MasonryItemDirective, MatButtonModule, TranslocoPipe],
   templateUrl: './tile-list.component.html',
   styleUrl: './tile-list.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -41,7 +40,7 @@ export class TileListComponent {
   private readonly contactService = inject(ContactService);
   private readonly cdr = inject(ChangeDetectorRef);
 
-  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-link', 'custom-date', 'custom-todo', 'custom-quickaction', 'custom-file', 'custom-migraine', 'custom-pollution']);
+  private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-date', 'custom-todo', 'custom-quickaction', 'custom-file', 'custom-migraine', 'custom-pollution']);
 
   get resolvedPlace(): Place | undefined {
     if (!this.place) return undefined;
