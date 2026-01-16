@@ -37,6 +37,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
   readonly mapId = `location-preview-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
   private marker?: leaflet.Marker;
+  private isDialogOpen = false;
 
   private readonly dialog = inject(MatDialog);
 
@@ -55,6 +56,8 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
   }
 
   openPicker(): void {
+    if (this.isDialogOpen) return;
+    this.isDialogOpen = true;
     const dialogRef = this.dialog.open(LocationPickerDialogComponent, {
       data: { location: this.location, markerType: this.markerType },
       maxWidth: '95vw',
@@ -65,6 +68,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
     });
 
     dialogRef.afterClosed().subscribe((result?: Location) => {
+      this.isDialogOpen = false;
       if (!result) return;
       this.locationChange.emit(result);
       this.updateMap(result);
@@ -99,6 +103,8 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
     this.marker = leaflet.marker([latitude, longitude], {
       icon: markerIcons[this.markerType]
     }).addTo(this.map);
+
+    this.map.on('click', () => this.openPicker());
 
     setTimeout(() => this.map?.invalidateSize(), 0);
   }

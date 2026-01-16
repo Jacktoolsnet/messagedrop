@@ -32,4 +32,5 @@
   height: 170px;
   border-radius: 0.5rem;
   overflow: hidden;
+  cursor: pointer;
 }

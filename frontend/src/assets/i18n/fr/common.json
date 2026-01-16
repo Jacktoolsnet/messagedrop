@@ -861,7 +861,7 @@
       }
     },
     "locationPicker": {
-      "title": "Emplacement",
+      "title": "Choisir un emplacement",
       "editAria": "Modifier l'emplacement",
       "dialogTitle": "Choisir un emplacement",
       "hint": "Cliquez sur la carte pour définir l'emplacement."

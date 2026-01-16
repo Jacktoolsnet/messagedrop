@@ -861,7 +861,7 @@
       }
     },
     "locationPicker": {
-      "title": "Ort",
+      "title": "Ort auswählen",
       "editAria": "Ort bearbeiten",
       "dialogTitle": "Ort auswählen",
       "hint": "Klicke auf die Karte, um den Ort festzulegen."

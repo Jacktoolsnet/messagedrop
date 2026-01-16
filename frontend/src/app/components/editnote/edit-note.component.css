@@ -31,6 +31,11 @@
     padding: 1.5rem;
 }
 
+.content app-location-picker-tile {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+}
+
 /* Ab mittleren Bildschirmen zwei Spalten */
 @media (min-width: 800px) {
     .content {

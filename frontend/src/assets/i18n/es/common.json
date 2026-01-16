@@ -861,7 +861,7 @@
       }
     },
     "locationPicker": {
-      "title": "Ubicación",
+      "title": "Seleccionar ubicación",
       "editAria": "Editar ubicación",
       "dialogTitle": "Elegir ubicación",
       "hint": "Haz clic en el mapa para establecer la ubicación."
