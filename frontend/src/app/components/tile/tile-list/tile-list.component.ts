@@ -43,10 +43,22 @@ export class TileListComponent {
 
   private readonly renderableTypes = new Set<TileSetting['type']>(['datetime', 'weather', 'airQuality', 'note', 'message', 'image', 'custom-text', 'custom-multitext', 'custom-link', 'custom-date', 'custom-todo', 'custom-quickaction', 'custom-file', 'custom-migraine', 'custom-pollution']);
 
+  get resolvedPlace(): Place | undefined {
+    if (!this.place) return undefined;
+    return this.placeService.getPlaces().find(p => p.id === this.place?.id) ?? this.place;
+  }
+
+  get resolvedContact(): Contact | undefined {
+    if (!this.contact) return undefined;
+    return this.contactService.contactsSignal().find(c => c.id === this.contact?.id) ?? this.contact;
+  }
+
   get visibleTiles(): TileSetting[] {
     if (!this.place && !this.contact) return [];
-    const sourceTiles = this.contact ? this.contact.tileSettings : this.place?.tileSettings;
-    const opts = this.contact ? { includeDefaults: false, includeSystem: false } : undefined;
+    const contact = this.resolvedContact;
+    const place = this.resolvedPlace;
+    const sourceTiles = contact ? contact.tileSettings : place?.tileSettings;
+    const opts = contact ? { includeDefaults: false, includeSystem: false } : undefined;
     return normalizeTileSettings(sourceTiles, opts)
       .filter((tile: TileSetting) => tile.enabled && this.renderableTypes.has(tile.type));
   }
@@ -56,33 +68,39 @@ export class TileListComponent {
   }
 
   getTileBackgroundImage(): string {
-    if (this.contact?.chatBackgroundImage) {
-      return `url(${this.contact.chatBackgroundImage})`;
+    const contact = this.resolvedContact;
+    const place = this.resolvedPlace;
+    if (contact?.chatBackgroundImage) {
+      return `url(${contact.chatBackgroundImage})`;
     }
-    return this.place?.placeBackgroundImage ? `url(${this.place.placeBackgroundImage})` : 'none';
+    return place?.placeBackgroundImage ? `url(${place.placeBackgroundImage})` : 'none';
   }
 
   getTileBackgroundOpacity(): number {
-    if (this.contact?.chatBackgroundImage) {
-      const transparency = this.contact.chatBackgroundTransparency ?? 40;
+    const contact = this.resolvedContact;
+    const place = this.resolvedPlace;
+    if (contact?.chatBackgroundImage) {
+      const transparency = contact.chatBackgroundTransparency ?? 40;
       const clamped = Math.min(Math.max(transparency, 0), 100);
       return 1 - clamped / 100;
     }
-    if (!this.place?.placeBackgroundImage) {
+    if (!place?.placeBackgroundImage) {
       return 0;
     }
-    const transparency = this.place.placeBackgroundTransparency ?? 40;
+    const transparency = place.placeBackgroundTransparency ?? 40;
     const clamped = Math.min(Math.max(transparency, 0), 100);
     return 1 - clamped / 100;
   }
 
   openTileSettings(): void {
+    const contact = this.resolvedContact;
+    const place = this.resolvedPlace;
     const dialogRef = this.dialog.open(TileSettingsComponent, {
       width: 'auto',
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      data: this.contact ? { contact: this.contact } : { place: this.place }
+      data: contact ? { contact } : { place }
     });
 
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {
@@ -95,12 +113,12 @@ export class TileListComponent {
         includeSystem: !!this.place
       }).map((tile: TileSetting) => ({ ...tile }));
 
-      if (this.contact) {
-        const updatedContact = { ...this.contact, tileSettings: normalized };
+      if (contact) {
+        const updatedContact = { ...contact, tileSettings: normalized };
         this.contact = updatedContact;
         void this.contactService.saveContactTileSettings(updatedContact, normalized);
-      } else if (this.place) {
-        const updatedPlace = { ...this.place, tileSettings: normalized };
+      } else if (place) {
+        const updatedPlace = { ...place, tileSettings: normalized };
         this.place = updatedPlace;
         this.placeService.saveAdditionalPlaceInfos(updatedPlace);
       }

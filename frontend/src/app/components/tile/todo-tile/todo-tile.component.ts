@@ -71,7 +71,8 @@ export class TodoTileComponent implements OnChanges {
     const dialogRef = this.dialog.open(TodoTileEditComponent, {
       width: '560px',
       maxWidth: '95vw',
-      maxHeight: '98vh',
+      height: 'auto',
+      maxHeight: '95vh',
       data: { tile }
     });
 
