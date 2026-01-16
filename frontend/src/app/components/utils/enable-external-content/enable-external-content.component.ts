@@ -15,10 +15,18 @@ interface PlatformMeta {
   settingsKey: SettingsKey;
   terms: string;
   privacy: string;
+  extraTerms?: { url: string; labelKey: string };
 }
 
 const PLATFORM_META: Record<PlatformKey, PlatformMeta> = {
-  tenor: { name: 'Tenor', icon: 'gif_box', settingsKey: 'enableTenorContent', terms: 'https://tenor.com/legal-terms', privacy: 'https://policies.google.com/privacy' },
+  tenor: {
+    name: 'Tenor',
+    icon: 'gif_box',
+    settingsKey: 'enableTenorContent',
+    terms: 'https://tenor.com/legal-terms',
+    privacy: 'https://policies.google.com/privacy',
+    extraTerms: { url: 'https://policies.google.com/terms', labelKey: 'common.legal.externalContent.googleTerms' }
+  },
   unsplash: { name: 'Unsplash', icon: 'photo', settingsKey: 'enableUnsplashContent', terms: 'https://unsplash.com/terms', privacy: 'https://unsplash.com/privacy' },
   youtube: { name: 'YouTube', icon: 'smart_display', settingsKey: 'enableYoutubeContent', terms: 'https://www.youtube.com/t/terms', privacy: 'https://www.youtube.com/intl/ALL/howyoutubeworks/privacy/' },
   spotify: { name: 'Spotify', icon: 'graphic_eq', settingsKey: 'enableSpotifyContent', terms: 'https://www.spotify.com/legal/end-user-agreement/', privacy: 'https://www.spotify.com/legal/privacy-policy/' },
@@ -52,6 +60,8 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
   platformIcon = 'public';
   termsUrl = '';
   privacyUrl = '';
+  extraTermsUrl = '';
+  extraTermsLabelKey = '';
   private settingsKey!: SettingsKey;
   private readonly appService = inject(AppService);
 
@@ -66,6 +76,8 @@ export class EnableExternalContentComponent implements OnInit, OnChanges {
     this.settingsKey = meta.settingsKey;
     this.termsUrl = meta.terms;
     this.privacyUrl = meta.privacy;
+    this.extraTermsUrl = meta.extraTerms?.url ?? '';
+    this.extraTermsLabelKey = meta.extraTerms?.labelKey ?? '';
 
     const settings = this.appService.getAppSettings();
     const current = Boolean((settings as AppSettings)[this.settingsKey]);

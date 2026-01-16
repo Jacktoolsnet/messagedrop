@@ -709,6 +709,8 @@
         "terms": "Conditions",
         "privacy": "Politique de confidentialité",
         "and": "et",
+        "additionalTerms": "Conditions supplémentaires :",
+        "googleTerms": "Conditions d'utilisation de Google",
         "enableLabel": "Activer {{ platform }}",
         "enableAria": "Activer {{ platform }}"
       },

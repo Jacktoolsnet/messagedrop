@@ -709,6 +709,8 @@
         "terms": "Nutzungsbedingungen",
         "privacy": "Datenschutz",
         "and": "und",
+        "additionalTerms": "Zusätzliche Nutzungsbedingungen:",
+        "googleTerms": "Google Nutzungsbedingungen",
         "enableLabel": "{{ platform }} aktivieren",
         "enableAria": "{{ platform }} aktivieren"
       },

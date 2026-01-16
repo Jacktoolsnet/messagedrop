@@ -15,6 +15,11 @@
     {{ 'common.legal.externalContent.and' | transloco }}
     <a class="platform-link" [href]="privacyUrl" target="_blank" rel="noopener"
         (click)="$event.stopPropagation()">{{ 'common.legal.externalContent.privacy' | transloco }}</a>{{ 'common.legal.externalContent.platformNoteEnd' | transloco }}
+    @if (extraTermsUrl) {
+      {{ 'common.legal.externalContent.additionalTerms' | transloco }}
+      <a class="platform-link" [href]="extraTermsUrl" target="_blank" rel="noopener"
+        (click)="$event.stopPropagation()">{{ extraTermsLabelKey | transloco }}</a>.
+    }
     {{ 'common.legal.externalContent.platformWarning' | transloco:{ platform: platformName } }}
 </div>
 

@@ -709,6 +709,8 @@
         "terms": "Términos",
         "privacy": "Política de privacidad",
         "and": "y",
+        "additionalTerms": "Términos adicionales:",
+        "googleTerms": "Términos de Google",
         "enableLabel": "Habilitar {{ platform }}",
         "enableAria": "Habilitar {{ platform }}"
       },
