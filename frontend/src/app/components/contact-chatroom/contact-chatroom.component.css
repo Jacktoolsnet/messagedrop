@@ -77,16 +77,6 @@
   backdrop-filter: blur(6px);
 }
 
-.unsplash-badge__link {
-  color: inherit;
-  text-decoration: none;
-}
-
-.unsplash-badge__link:hover {
-  color: inherit;
-  text-decoration: underline;
-}
-
 
 .unsplash-badge--chatroom {
   left: 50%;

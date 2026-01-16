@@ -100,6 +100,16 @@ h2[mat-dialog-title].dialog-title {
   justify-content: flex-start;
 }
 
+.unsplash-badge__link {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.unsplash-badge__link:hover {
+  color: inherit;
+  text-decoration: underline;
+}
+
 .confirm-content {
   padding: 0.9rem 1rem;
   box-sizing: border-box;

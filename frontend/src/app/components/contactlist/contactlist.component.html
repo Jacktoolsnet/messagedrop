@@ -15,7 +15,8 @@
             <mat-card class="contact-tile">
                 <div class="tile-header" [style.--contact-header-bg-image]="getContactHeaderBackgroundImage(contact)"
                     [style.--contact-header-bg-opacity]="getContactHeaderBackgroundOpacity(contact)">
-                    <div class="identity-badge">
+                    <div class="identity-badge" role="button" tabindex="0" (click)="editContact(contact)"
+                        (keyup.enter)="editContact(contact)" (keyup.space)="editContact(contact)">
                         <span class="avatar-badge" [matBadge]="getUnreadBadge(contact.id)"
                             [matBadgeHidden]="getUnreadBadge(contact.id) === ''" matBadgeOverlap="true"
                             matBadgeColor="warn">
