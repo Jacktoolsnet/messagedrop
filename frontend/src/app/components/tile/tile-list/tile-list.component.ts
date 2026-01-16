@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { MasonryItemDirective } from "../../../directives/masonry-item.directive";
+import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
@@ -64,6 +65,30 @@ export class TileListComponent {
 
   get hasVisibleTiles(): boolean {
     return this.visibleTiles.length > 0;
+  }
+
+  get avatarAttribution(): AvatarAttribution | undefined {
+    return this.resolvedContact?.avatarAttribution ?? this.resolvedPlace?.avatarAttribution;
+  }
+
+  get backgroundAttribution(): AvatarAttribution | undefined {
+    return this.resolvedContact?.chatBackgroundAttribution ?? this.resolvedPlace?.placeBackgroundAttribution;
+  }
+
+  get hasDualUnsplashAttribution(): boolean {
+    return this.avatarAttribution?.source === 'unsplash' && this.backgroundAttribution?.source === 'unsplash';
+  }
+
+  get singleUnsplashAttribution(): AvatarAttribution | undefined {
+    const background = this.backgroundAttribution;
+    if (background?.source === 'unsplash') {
+      return background;
+    }
+    const avatar = this.avatarAttribution;
+    if (avatar?.source === 'unsplash') {
+      return avatar;
+    }
+    return undefined;
   }
 
   getTileBackgroundImage(): string {
