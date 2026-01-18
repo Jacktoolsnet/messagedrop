@@ -5,15 +5,16 @@ import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatOptionModule } from '@angular/material/core';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatSelectModule } from '@angular/material/select';
-import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { DisplayMessage } from '../display-message/display-message.component';
 import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
 import { Place } from '../../../interfaces/place';
@@ -91,7 +92,7 @@ export class NominatimSearchComponent {
   private readonly geolocationService = inject(GeolocationService);
   private readonly mapService = inject(MapService);
   private readonly dialogRef = inject(MatDialogRef<NominatimSearchComponent>);
-  private readonly snackBar = inject(MatSnackBar);
+  private readonly displayMessage = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
   private readonly data = inject<NominatimDialogData>(MAT_DIALOG_DATA);
 
@@ -273,17 +274,33 @@ export class NominatimSearchComponent {
                 if (createPlaceResponse.status === 200) {
                   place.id = createPlaceResponse.placeId;
                   this.placeService.saveAdditionalPlaceInfos(place);
-                  this.snackBar.open(this.translation.t('common.placeList.createSuccess'), '', { duration: 1000 });
+                  this.openDisplayMessage({
+                    showAlways: true,
+                    title: this.translation.t('common.place.title'),
+                    image: '',
+                    icon: 'check_circle',
+                    message: this.translation.t('common.placeList.createSuccess'),
+                    button: '',
+                    delay: 1000,
+                    showSpinner: false,
+                    autoclose: true
+                  }, false);
                 }
               },
               error: (err) => this.handleCreatePlaceError(err)
             });
         } else {
-          this.snackBar.open(
-            this.translation.t('common.location.timezoneResolveFailed'),
-            this.translation.t('common.actions.ok'),
-            { duration: 2000 }
-          );
+          this.openDisplayMessage({
+            showAlways: true,
+            title: this.translation.t('common.place.title'),
+            image: '',
+            icon: 'warning',
+            message: this.translation.t('common.location.timezoneResolveFailed'),
+            button: this.translation.t('common.actions.ok'),
+            delay: 0,
+            showSpinner: false,
+            autoclose: false
+          });
         }
       },
       error: (err) => this.handleTimezoneError(err)
@@ -292,19 +309,43 @@ export class NominatimSearchComponent {
 
   private handleCreatePlaceError(error: unknown): void {
     console.error('Failed to create place', error);
-    this.snackBar.open(
-      this.translation.t('common.placeList.createFailed'),
-      this.translation.t('common.actions.ok'),
-      { duration: 2000 }
-    );
+    this.openDisplayMessage({
+      showAlways: true,
+      title: this.translation.t('common.place.title'),
+      image: '',
+      icon: 'bug_report',
+      message: this.translation.t('common.placeList.createFailed'),
+      button: this.translation.t('common.actions.ok'),
+      delay: 0,
+      showSpinner: false,
+      autoclose: false
+    });
   }
 
   private handleTimezoneError(error: unknown): void {
     console.error('Timezone lookup failed', error);
-    this.snackBar.open(
-      this.translation.t('common.location.timezoneResolveFailed'),
-      this.translation.t('common.actions.ok'),
-      { duration: 2000 }
-    );
+    this.openDisplayMessage({
+      showAlways: true,
+      title: this.translation.t('common.place.title'),
+      image: '',
+      icon: 'warning',
+      message: this.translation.t('common.location.timezoneResolveFailed'),
+      button: this.translation.t('common.actions.ok'),
+      delay: 0,
+      showSpinner: false,
+      autoclose: false
+    });
+  }
+
+  private openDisplayMessage(config: DisplayMessageConfig, hasBackdrop = true): void {
+    this.displayMessage.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop,
+      autoFocus: false
+    });
   }
 }
