@@ -1,5 +1,5 @@
 
-import { ChangeDetectionStrategy, Component, ElementRef, ViewChild, OnInit, inject, ChangeDetectorRef } from '@angular/core';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -9,9 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
+import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response';
 import { AppService } from '../../../services/app.service';
 import { TenorService } from '../../../services/tenor.service';
-import { TenorApiResponse, TenorResult } from '../../../interfaces/tenor-response';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
 
@@ -26,12 +26,12 @@ import { EnableExternalContentComponent } from "../enable-external-content/enabl
     MatFormFieldModule,
     MatInputModule,
     EnableExternalContentComponent
-],
-  templateUrl: './tenor.component.html',
-  styleUrl: './tenor.component.css',
+  ],
+  templateUrl: './tenor-search.component.html',
+  styleUrl: './tenor-search.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TenorComponent implements OnInit {
+export class TenorSearchComponent implements OnInit {
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -42,7 +42,7 @@ export class TenorComponent implements OnInit {
   showTenor = false;
 
   private readonly appService = inject(AppService);
-  private readonly dialogRef = inject(MatDialogRef<TenorComponent>);
+  private readonly dialogRef = inject(MatDialogRef<TenorSearchComponent>);
   private readonly tenorService = inject(TenorService);
   private readonly translation = inject(TranslationHelperService);
   private readonly cdRef = inject(ChangeDetectorRef);

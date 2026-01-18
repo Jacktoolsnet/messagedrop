@@ -4,7 +4,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { ImportMultimediaComponent } from '../../utils/import-multimedia/import-multimedia.component';
-import { TenorComponent } from '../../utils/tenor/tenor.component';
+import { TenorSearchComponent } from '../../utils/tenor-search/tenor-search.component';
 
 @Component({
   selector: 'app-select-multimedia',
@@ -22,7 +22,7 @@ export class SelectMultimediaComponent {
   readonly dialogRef = inject(MatDialogRef<SelectMultimediaComponent>);
 
   public openTenorDialog(): void {
-    const dialogRef = this.matDialog.open(TenorComponent, {
+    const dialogRef = this.matDialog.open(TenorSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},

@@ -21,7 +21,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
-import { TenorComponent } from '../../utils/tenor/tenor.component';
+import { TenorSearchComponent } from '../../utils/tenor-search/tenor-search.component';
 import { TextComponent } from '../../utils/text/text.component';
 
 interface TenorDialogResult {
@@ -101,7 +101,7 @@ export class ContactEditMessageComponent implements OnInit {
   }
 
   public openTenorDialog(): void {
-    const tenorDialogRef = this.matDialog.open(TenorComponent, {
+    const tenorDialogRef = this.matDialog.open(TenorSearchComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
