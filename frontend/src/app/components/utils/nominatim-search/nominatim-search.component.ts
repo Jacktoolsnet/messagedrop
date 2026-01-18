@@ -1,16 +1,9 @@
 
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
-import { MatOptionModule } from '@angular/material/core';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
-import { MatInputModule } from '@angular/material/input';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatSelectModule } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
@@ -26,6 +19,9 @@ import { NominatimService } from '../../../services/nominatim.service';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
+import { NominatimResultDialogComponent } from './components/nominatim-result-dialog/nominatim-result-dialog.component';
+import { NominatimResultsListComponent } from './components/nominatim-results-list/nominatim-results-list.component';
+import { NominatimResultsMapComponent } from './components/nominatim-results-map/nominatim-results-map.component';
 
 interface SearchValues {
   searchterm: string;
@@ -51,17 +47,12 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
     MatButtonModule,
     MatIcon,
     FormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatSelectModule,
-    MatOptionModule,
-    MatBadgeModule,
-    MatCardModule,
-    MatMenuModule,
     MatDialogActions,
     MatDialogClose,
     MatDialogContent,
-    TranslocoPipe
+    TranslocoPipe,
+    NominatimResultsListComponent,
+    NominatimResultsMapComponent
   ],
   templateUrl: './nominatim-search.component.html',
   styleUrl: './nominatim-search.component.css'
@@ -85,6 +76,7 @@ export class NominatimSearchComponent {
   ];
 
   nominatimPlaces: NominatimPlace[] = [];
+  viewMode: 'list' | 'map' = 'list';
 
   readonly userService = inject(UserService);
   readonly nominatimService = inject(NominatimService);
@@ -92,9 +84,9 @@ export class NominatimSearchComponent {
   private readonly geolocationService = inject(GeolocationService);
   private readonly mapService = inject(MapService);
   private readonly dialogRef = inject(MatDialogRef<NominatimSearchComponent>);
-  private readonly displayMessage = inject(MatDialog);
+  private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
-  private readonly data = inject<NominatimDialogData>(MAT_DIALOG_DATA);
+  readonly data = inject<NominatimDialogData>(MAT_DIALOG_DATA);
 
   constructor() {
     const searchValues = this.data.searchValues;
@@ -191,23 +183,6 @@ export class NominatimSearchComponent {
     return Math.round(R * c); // gerundet in Meter
   }
 
-  getIconForPlace(place: NominatimPlace): string {
-    return this.nominatimService.getIconForPlace(place);
-  }
-
-  getFormattedAddress(place: NominatimPlace): string {
-    return this.nominatimService.getFormattedAddress(place);
-  }
-
-  formatDistance(distance: number): string {
-    const locale = navigator.language; // Holt die locale des Browsers (z.B. 'de-DE' für Deutschland)
-    const formattedDistance = new Intl.NumberFormat(locale, {
-      maximumFractionDigits: 1, // Maximale Dezimalstellen (optional anpassbar)
-    }).format(distance >= 1000 ? distance / 1000 : distance);
-
-    return `${formattedDistance} ${distance >= 1000 ? 'km' : 'm'}`;
-  }
-
   public flyTo(place: NominatimPlace): void {
     this.mapService.fitMapToBounds(this.nominatimService.getBoundingBoxFromNominatimPlace(place));
     const result = {
@@ -224,6 +199,14 @@ export class NominatimSearchComponent {
 
   loginAndAddToMyPlaces(nominatimPlace: NominatimPlace): void {
     this.userService.loginWithBackend(() => this.addToMyPlaces(nominatimPlace));
+  }
+
+  onAddPlaceClick(nominatimPlace: NominatimPlace): void {
+    if (!this.userService.isReady()) {
+      this.loginAndAddToMyPlaces(nominatimPlace);
+      return;
+    }
+    this.addToMyPlaces(nominatimPlace);
   }
 
   addToMyPlaces(nominatimPlace: NominatimPlace): void {
@@ -337,8 +320,36 @@ export class NominatimSearchComponent {
     });
   }
 
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'list' ? 'map' : 'list';
+  }
+
+  openPlaceDialog(place: NominatimPlace): void {
+    this.dialog.open(NominatimResultDialogComponent, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: {
+        place,
+        showAddButton: this.showAddButton(),
+        actions: {
+          add: (selected: NominatimPlace) => this.onAddPlaceClick(selected),
+          flyTo: (selected: NominatimPlace) => this.flyTo(selected),
+          navigate: (selected: NominatimPlace) => this.nominatimService.navigateToNominatimPlace(selected)
+        }
+      },
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      autoFocus: false
+    });
+  }
+
+  showAddButton(): boolean {
+    return !this.userService.isReady() || this.userService.hasJwt();
+  }
+
   private openDisplayMessage(config: DisplayMessageConfig, hasBackdrop = true): void {
-    this.displayMessage.open(DisplayMessage, {
+    this.dialog.open(DisplayMessage, {
       panelClass: '',
       closeOnNavigation: false,
       data: config,

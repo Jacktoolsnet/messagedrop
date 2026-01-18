@@ -1,0 +1,13 @@
+.content {
+    width: auto;
+    max-width: none;
+    padding-top: 1rem;
+    padding-right: 1rem;
+    padding-left: 1rem;
+    margin: 0, auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, max-content));
+    justify-content: center;
+    gap: 0.5rem;
+    white-space: normal;
+}

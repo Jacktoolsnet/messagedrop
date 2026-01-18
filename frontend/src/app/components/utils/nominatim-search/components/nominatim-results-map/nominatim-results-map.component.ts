@@ -1,0 +1,109 @@
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import * as leaflet from 'leaflet';
+import { Location } from '../../../../../interfaces/location';
+import { NominatimPlace } from '../../../../../interfaces/nominatim-place';
+
+const markerIcon = leaflet.icon({
+  iconUrl: 'assets/markers/multi-marker.svg',
+  iconSize: [32, 40],
+  iconAnchor: [16, 40]
+});
+
+@Component({
+  selector: 'app-nominatim-results-map',
+  standalone: true,
+  templateUrl: './nominatim-results-map.component.html',
+  styleUrl: './nominatim-results-map.component.css'
+})
+export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, OnDestroy {
+  @Input() places: NominatimPlace[] = [];
+  @Input() center?: Location;
+  @Output() placeSelected = new EventEmitter<NominatimPlace>();
+
+  readonly mapId = `nominatim-results-map-${Math.random().toString(36).slice(2)}`;
+  private map?: leaflet.Map;
+  private markerLayer?: leaflet.LayerGroup;
+
+  ngAfterViewInit(): void {
+    this.initMap();
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['places'] && this.map) {
+      this.updateMarkers();
+    }
+    if (changes['center'] && this.map && (!this.places || this.places.length === 0)) {
+      this.updateCenter();
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.map?.remove();
+  }
+
+  private initMap(): void {
+    const { latitude, longitude } = this.getInitialCenter();
+    const initialZoom = this.places.length > 0 ? 13 : 5;
+
+    this.map = leaflet.map(this.mapId, {
+      center: [latitude, longitude],
+      zoom: initialZoom,
+      worldCopyJump: true
+    });
+
+    this.map.setMaxBounds([[-90, -180], [90, 180]]);
+
+    leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      minZoom: 3,
+      noWrap: true,
+      attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(this.map);
+
+    this.markerLayer = leaflet.layerGroup().addTo(this.map);
+    this.updateMarkers();
+    setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  private getInitialCenter(): Location {
+    if (this.center) {
+      return this.center;
+    }
+    const first = this.places[0];
+    if (first) {
+      return {
+        latitude: Number(first.lat),
+        longitude: Number(first.lon),
+        plusCode: ''
+      };
+    }
+    return { latitude: 0, longitude: 0, plusCode: '' };
+  }
+
+  private updateCenter(): void {
+    if (!this.map || !this.center) return;
+    this.map.setView([this.center.latitude, this.center.longitude], this.map.getZoom());
+  }
+
+  private updateMarkers(): void {
+    if (!this.map || !this.markerLayer) return;
+    this.markerLayer.clearLayers();
+
+    const bounds = leaflet.latLngBounds([]);
+    this.places.forEach(place => {
+      const latitude = Number(place.lat);
+      const longitude = Number(place.lon);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return;
+      }
+      const marker = leaflet.marker([latitude, longitude], { icon: markerIcon });
+      marker.on('click', () => this.placeSelected.emit(place));
+      marker.addTo(this.markerLayer!);
+      bounds.extend([latitude, longitude]);
+    });
+
+    if (bounds.isValid()) {
+      this.map.fitBounds(bounds, { padding: [24, 24] });
+    }
+  }
+}

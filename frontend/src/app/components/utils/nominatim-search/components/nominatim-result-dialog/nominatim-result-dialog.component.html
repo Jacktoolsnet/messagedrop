@@ -1,0 +1,18 @@
+<h2 mat-dialog-title class="dialog-title">
+    <mat-icon class="dialog-title__icon" aria-hidden="true">place</mat-icon>
+    <span class="dialog-title__text">
+        {{ data.place.name || ('common.location.searchTitle' | transloco) }}
+    </span>
+</h2>
+
+<mat-dialog-content class="place-dialog-content">
+    <app-nominatim-result-item [place]="data.place" [showAddButton]="data.showAddButton" (add)="onAdd($event)"
+        (flyTo)="onFlyTo($event)" (navigate)="onNavigate($event)">
+    </app-nominatim-result-item>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
+        <mat-icon>close</mat-icon>
+    </button>
+</mat-dialog-actions>

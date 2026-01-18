@@ -851,6 +851,8 @@
       "addPlaceAria": "Ort hinzufügen",
       "flyToPlaceAria": "Zum Ort springen",
       "navigateToPlaceAria": "Zum Ort navigieren",
+      "switchToMap": "Karte anzeigen",
+      "switchToList": "Liste anzeigen",
       "radius": {
         "worldwide": "Weltweit",
         "kilometers": "{{ value }} km"

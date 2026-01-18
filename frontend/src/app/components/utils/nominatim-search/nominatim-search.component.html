@@ -16,56 +16,23 @@
 </div>
 
 <mat-dialog-content>
-    <div class="content">
-        @for (place of nominatimPlaces; track place.place_id) {
-        <mat-card class="item">
-            <div class="avatar-box">
-                <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
-                @if (place.name) {
-                <span class="name">{{ place.name }}</span>
-                }
-            </div>
-
-            <mat-card-content>
-                <div class="tile-value address-text">
-                    {{ getFormattedAddress(place) }}
-                </div>
-
-                @if (place.distance !== undefined) {
-                <div class="tile-severity">
-                    {{ 'common.location.distanceLabel' | transloco }}: {{ formatDistance(place.distance) }}
-                </div>
-                }
-            </mat-card-content>
-
-            <mat-card-actions class="buttonbar">
-                @if (!userService.isReady() || userService.hasJwt()) {
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
-                    [attr.aria-label]="'common.location.addPlaceAria' | transloco"
-                    (click)="!userService.isReady() ? loginAndAddToMyPlaces(place) : addToMyPlaces(place)">
-                    <mat-icon>add_location</mat-icon>
-                </button>
-                }
-
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
-                    [attr.aria-label]="'common.location.flyToPlaceAria' | transloco"
-                    (click)="flyTo(place)">
-                    <mat-icon>place</mat-icon>
-                </button>
-
-                <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
-                    [attr.aria-label]="'common.location.navigateToPlaceAria' | transloco"
-                    (click)="nominatimService.navigateToNominatimPlace(place)">
-                    <mat-icon>assistant_direction</mat-icon>
-                </button>
-            </mat-card-actions>
-        </mat-card>
-        }
-    </div>
+    @if (viewMode === 'list') {
+    <app-nominatim-results-list [places]="nominatimPlaces" [showAddButton]="showAddButton()"
+        (add)="onAddPlaceClick($event)" (flyTo)="flyTo($event)" (navigate)="nominatimService.navigateToNominatimPlace($event)">
+    </app-nominatim-results-list>
+    } @else {
+    <app-nominatim-results-map [places]="nominatimPlaces" [center]="data.location"
+        (placeSelected)="openPlaceDialog($event)">
+    </app-nominatim-results-map>
+    }
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
     <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button type="button" (click)="toggleViewMode()"
+        [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
+        <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>
     </button>
 </mat-dialog-actions>

@@ -1,0 +1,76 @@
+mat-card-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+mat-card-actions.buttonbar {
+    margin-top: auto;
+    display: flex;
+    justify-content: left;
+    gap: 0.5rem;
+    padding-left: 0.5rem;
+}
+
+.item {
+    margin: 0.75rem;
+    margin-top: 2.25rem;
+    border-radius: 0.75rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+    break-inside: avoid;
+    page-break-inside: avoid;
+    -webkit-column-break-inside: avoid;
+}
+
+.avatar-box {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(-1.75rem, -50%);
+    z-index: 100;
+    max-width: 95%;
+    height: 3rem;
+    padding: 0.25rem 0.75rem;
+    color: var(--mat-card-subtitle-text-color);
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+    border-radius: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    overflow: hidden;
+}
+
+.avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.name {
+    font-size: 1rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 95%;
+}
+
+.message-content {
+    font-size: 0.9rem;
+    margin-top: 2.5rem;
+    margin-bottom: 1.5rem;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.address-text {
+    margin-top: 2.25rem;
+    white-space: pre-line;
+}

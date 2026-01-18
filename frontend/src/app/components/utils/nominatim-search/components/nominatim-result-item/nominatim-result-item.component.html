@@ -1,0 +1,39 @@
+<mat-card class="item">
+    <div class="avatar-box">
+        <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
+        @if (place.name) {
+        <span class="name">{{ place.name }}</span>
+        }
+    </div>
+
+    <mat-card-content>
+        <div class="tile-value address-text">
+            {{ getFormattedAddress(place) }}
+        </div>
+
+        @if (place.distance !== undefined) {
+        <div class="tile-severity">
+            {{ 'common.location.distanceLabel' | transloco }}: {{ formatDistance(place.distance) }}
+        </div>
+        }
+    </mat-card-content>
+
+    <mat-card-actions class="buttonbar">
+        @if (showAddButton) {
+        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+            [attr.aria-label]="'common.location.addPlaceAria' | transloco" (click)="add.emit(place)">
+            <mat-icon>add_location</mat-icon>
+        </button>
+        }
+
+        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+            [attr.aria-label]="'common.location.flyToPlaceAria' | transloco" (click)="flyTo.emit(place)">
+            <mat-icon>place</mat-icon>
+        </button>
+
+        <button [attr.aria-hidden]="false" mat-mini-fab color="secondary"
+            [attr.aria-label]="'common.location.navigateToPlaceAria' | transloco" (click)="navigate.emit(place)">
+            <mat-icon>assistant_direction</mat-icon>
+        </button>
+    </mat-card-actions>
+</mat-card>

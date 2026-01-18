@@ -1,0 +1,7 @@
+<div class="content">
+    @for (place of places; track place.place_id) {
+    <app-nominatim-result-item [place]="place" [showAddButton]="showAddButton" (add)="add.emit($event)"
+        (flyTo)="flyTo.emit($event)" (navigate)="navigate.emit($event)">
+    </app-nominatim-result-item>
+    }
+</div>
