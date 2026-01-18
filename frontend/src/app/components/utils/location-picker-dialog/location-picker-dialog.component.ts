@@ -1,7 +1,6 @@
 import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -41,7 +40,7 @@ const searchMarkerIcon = leaflet.icon({
 @Component({
   selector: 'app-location-picker-dialog',
   standalone: true,
-  imports: [MatDialogContent, MatDialogActions, MatButtonModule, MatCardModule, MatIcon, MatInputModule, ReactiveFormsModule, TranslocoPipe],
+  imports: [MatDialogContent, MatDialogActions, MatButtonModule, MatIcon, MatInputModule, ReactiveFormsModule, TranslocoPipe],
   templateUrl: './location-picker-dialog.component.html',
   styleUrl: './location-picker-dialog.component.css'
 })
@@ -60,6 +59,8 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
   private searchMarkerLayer?: leaflet.LayerGroup;
   private readonly searchMarkers = new Map<number, leaflet.Marker>();
   private selectedPlaceId?: number;
+  private hasAutoZoomed = false;
+  private userChangedZoom = false;
   private location: Location = { ...this.data.location };
 
   ngAfterViewInit(): void {
@@ -137,24 +138,13 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
       return;
     }
 
-    const bounds = this.nominatimService.getBoundingBoxFromNominatimPlace(place);
-    const hasBounds = bounds.latMin !== 0 || bounds.latMax !== 0 || bounds.lonMin !== 0 || bounds.lonMax !== 0;
-    if (hasBounds) {
-      this.map.fitBounds([
-        [bounds.latMin, bounds.lonMin],
-        [bounds.latMax, bounds.lonMax]
-      ], { padding: [24, 24], maxZoom: 15 });
+    if (!this.hasAutoZoomed && !this.userChangedZoom) {
+      this.hasAutoZoomed = true;
+      this.map.setView([latitude, longitude], 15);
       return;
     }
-    this.map.setView([latitude, longitude], Math.max(this.map.getZoom(), 15));
-  }
 
-  getIconForPlace(place: NominatimPlace): string {
-    return this.nominatimService.getIconForPlace(place);
-  }
-
-  getFormattedAddress(place: NominatimPlace): string {
-    return this.nominatimService.getFormattedAddress(place);
+    this.map.panTo([latitude, longitude]);
   }
 
   private handleSearchError(error: unknown): void {
@@ -230,6 +220,13 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
         plusCode: this.geolocationService.getPlusCode(lat, lng)
       };
       this.marker?.setLatLng(event.latlng);
+    });
+
+    this.map.on('zoomstart', (event: leaflet.LeafletEvent) => {
+      const zoomEvent = event as leaflet.LeafletEvent & { originalEvent?: Event };
+      if (zoomEvent.originalEvent) {
+        this.userChangedZoom = true;
+      }
     });
 
     setTimeout(() => this.map?.invalidateSize(), 0);

@@ -13,6 +13,9 @@
         <div class="content">
             @for (note of sortedNotes(); track note.id) {
             <mat-card class="item" appMasonryItem>
+                @if (note.timestamp) {
+                <div class="timestamp-box">{{ note.timestamp | date:'medium' }}</div>
+                }
                 <mat-card-content (click)="editNote(note)">
                     <div class="message-content">
                         <app-showmultimedia [multimedia]="note.multimedia"></app-showmultimedia>

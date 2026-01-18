@@ -43,6 +43,10 @@
             </div>
             }
 
+            @if (message.createDateTime !== null) {
+            <div class="timestamp-box">{{ message.createDateTime | date:'medium' }}</div>
+            }
+
             <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
                 (keyup.enter)="onMessageCardActivate(message)" (keyup.space)="onMessageCardActivate(message)">
                 <div class="message-content">
@@ -176,6 +180,10 @@
                 }
                 <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
             </div>
+            }
+
+            @if (message.createDateTime !== null) {
+            <div class="timestamp-box">{{ message.createDateTime | date:'medium' }}</div>
             }
 
             <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
