@@ -841,6 +841,7 @@
       "nominatimTitle": "Nominatim-Dienst",
       "fetchingNominatim": "Nominatim-Daten werden geladen",
       "searchTitle": "Ort wird gesucht",
+      "searchResultTitle": "Suchergebnis",
       "searching": "Suche nach \"{{ term }}\"",
       "searchingNear": "Suche nach \"{{ term }}\" in deiner Nähe",
       "searchingWithArea": "Suche nach \"{{ term }}\" {{ area }}",

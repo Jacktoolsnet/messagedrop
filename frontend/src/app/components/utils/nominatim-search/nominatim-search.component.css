@@ -44,17 +44,6 @@
     border-bottom-right-radius: 0;
 }
 
-.searchTerm-container select {
-    height: 2.5rem;
-    padding: 0 0.75rem;
-    font-size: 1rem;
-    background: var(--mat-fab-small-container-color);
-    color: var(--mat-fab-small-foreground-color);
-    min-width: 7rem;
-    flex-shrink: 0;
-    border: none;
-}
-
 .searchTerm-container button {
     margin-right: 1rem;
     color: var(--mat-fab-small-foreground-color);

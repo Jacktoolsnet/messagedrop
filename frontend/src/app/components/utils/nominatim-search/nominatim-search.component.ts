@@ -1,12 +1,13 @@
 
 import { Component, ElementRef, ViewChild, inject } from '@angular/core';
-import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
+import { BoundingBox } from '../../../interfaces/bounding-box';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
@@ -25,7 +26,6 @@ import { NominatimResultsMapComponent } from './components/nominatim-results-map
 
 interface SearchValues {
   searchterm: string;
-  selectedRadius: number;
   nominatimPlaces: NominatimPlace[];
 }
 
@@ -46,7 +46,6 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
     ReactiveFormsModule,
     MatButtonModule,
     MatIcon,
-    FormsModule,
     MatDialogActions,
     MatDialogClose,
     MatDialogContent,
@@ -62,21 +61,13 @@ export class NominatimSearchComponent {
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
   readonly searchTerm = new FormControl('', { nonNullable: true });
 
-  selectedRadius = 0; // z. B. 1000 = 1 km
-  readonly radiusOptions: readonly { value: number; labelKey: string; params?: Record<string, number> }[] = [
-    { value: 0, labelKey: 'common.location.radius.worldwide' },
-    { value: 1000, labelKey: 'common.location.radius.kilometers', params: { value: 1 } },
-    { value: 2000, labelKey: 'common.location.radius.kilometers', params: { value: 2 } },
-    { value: 5000, labelKey: 'common.location.radius.kilometers', params: { value: 5 } },
-    { value: 10000, labelKey: 'common.location.radius.kilometers', params: { value: 10 } },
-    { value: 25000, labelKey: 'common.location.radius.kilometers', params: { value: 25 } },
-    { value: 50000, labelKey: 'common.location.radius.kilometers', params: { value: 50 } },
-    { value: 100000, labelKey: 'common.location.radius.kilometers', params: { value: 100 } },
-    { value: 200000, labelKey: 'common.location.radius.kilometers', params: { value: 200 } }
-  ];
-
   nominatimPlaces: NominatimPlace[] = [];
   viewMode: 'list' | 'map' = 'map';
+  currentBounds?: BoundingBox;
+  mapView = {
+    center: { latitude: 0, longitude: 0, plusCode: '' },
+    zoom: 2
+  };
 
   readonly userService = inject(UserService);
   readonly nominatimService = inject(NominatimService);
@@ -92,14 +83,13 @@ export class NominatimSearchComponent {
     const searchValues = this.data.searchValues;
     if (searchValues) {
       this.searchTerm.setValue(searchValues.searchterm);
-      this.selectedRadius = searchValues.selectedRadius;
       this.nominatimPlaces = searchValues.nominatimPlaces;
     }
-  }
-
-  onSelectChange(event: Event): void {
-    const selectElement = event.target as HTMLSelectElement;
-    selectElement.blur();
+    this.currentBounds = this.mapService.getVisibleMapBoundingBox();
+    this.mapView = {
+      center: this.geolocationService.getCenterOfBoundingBox(this.currentBounds),
+      zoom: this.mapService.getMapZoom()
+    };
   }
 
   search(): void {
@@ -111,34 +101,17 @@ export class NominatimSearchComponent {
     }
 
     const limit = 50;
-    const radius = Number(this.selectedRadius);
-    const location = this.data.location;
+    const bounds = this.currentBounds ?? {
+      latMin: -85,
+      lonMin: -180,
+      latMax: 85,
+      lonMax: 180
+    };
 
-    if (radius === 0) {
-      // Umkreissuche ohne Bound
-      this.nominatimService.getNominatimPlaceBySearchTermWithViewbox(
-        term,
-        location.latitude,
-        location.longitude,
-        limit
-      ).subscribe({
-        next: (response) => this.handleSearchResponse(response, location),
-        error: (error) => this.handleSearchError(error)
-      });
-    } else {
-      // Umkreissuche mit Bound
-      this.nominatimService.getNominatimPlaceBySearchTermWithViewboxAndBounded(
-        term,
-        location.latitude,
-        location.longitude,
-        1,      // bounded = true
-        limit,
-        radius
-      ).subscribe({
-        next: (response) => this.handleSearchResponse(response, location),
-        error: (error) => this.handleSearchError(error)
-      });
-    }
+    this.nominatimService.getNominatimPlaceBySearchTermWithBoundingBox(term, bounds, limit).subscribe({
+      next: (response) => this.handleSearchResponse(response, this.data.location),
+      error: (error) => this.handleSearchError(error)
+    });
   }
 
   private handleSearchResponse(response: NominatimSearchResponse, location: Location): void {
@@ -203,7 +176,6 @@ export class NominatimSearchComponent {
       selectedPlace: place,
       searchValues: {
         searchterm: this.searchTerm.value.trim(),
-        selectedRadius: this.selectedRadius,
         nominatimPlaces: this.nominatimPlaces
       }
     };
@@ -331,6 +303,14 @@ export class NominatimSearchComponent {
       showSpinner: false,
       autoclose: false
     });
+  }
+
+  onViewChange(event: { center: Location; zoom: number; bounds: BoundingBox }): void {
+    this.currentBounds = event.bounds;
+    this.mapView = {
+      center: event.center,
+      zoom: event.zoom
+    };
   }
 
   toggleViewMode(): void {

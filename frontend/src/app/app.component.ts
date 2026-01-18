@@ -1584,7 +1584,6 @@ export class AppComponent implements OnInit {
   async showNominatimSearchDialog() {
     const searchValues = await this.indexedDbService.getSetting<{
       searchterm: string;
-      selectedRadius: number;
       nominatimPlaces: NominatimPlace[];
     }>('nominatimSearch');
     const dialogRef = this.dialog.open(NominatimSearchComponent, {
@@ -1605,7 +1604,6 @@ export class AppComponent implements OnInit {
       selectedPlace: NominatimPlace;
       searchValues: {
         searchterm: string,
-        selectedRadius: number,
         nominatimPlaces: NominatimPlace[]
       }
     }) => {

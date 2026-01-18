@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import * as leaflet from 'leaflet';
+import { BoundingBox } from '../../../../../interfaces/bounding-box';
 import { Location } from '../../../../../interfaces/location';
 import { NominatimPlace } from '../../../../../interfaces/nominatim-place';
 
@@ -17,8 +18,10 @@ const markerIcon = leaflet.icon({
 })
 export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, OnDestroy {
   @Input() places: NominatimPlace[] = [];
-  @Input() center?: Location;
+  @Input() initialCenter?: Location;
+  @Input() initialZoom?: number;
   @Output() placeSelected = new EventEmitter<NominatimPlace>();
+  @Output() viewChange = new EventEmitter<{ center: Location; zoom: number; bounds: BoundingBox }>();
 
   readonly mapId = `nominatim-results-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
@@ -32,9 +35,6 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
     if (changes['places'] && this.map) {
       this.updateMarkers();
     }
-    if (changes['center'] && this.map && (!this.places || this.places.length === 0)) {
-      this.updateCenter();
-    }
   }
 
   ngOnDestroy(): void {
@@ -43,7 +43,7 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
 
   private initMap(): void {
     const { latitude, longitude } = this.getInitialCenter();
-    const initialZoom = this.places.length > 0 ? 13 : 5;
+    const initialZoom = this.initialZoom ?? 2;
 
     this.map = leaflet.map(this.mapId, {
       center: [latitude, longitude],
@@ -55,41 +55,29 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
 
     leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
-      minZoom: 3,
+      minZoom: 2,
       noWrap: true,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(this.map);
 
     this.markerLayer = leaflet.layerGroup().addTo(this.map);
     this.updateMarkers();
+    this.map.on('moveend', () => this.emitViewChange());
     setTimeout(() => this.map?.invalidateSize(), 0);
+    this.emitViewChange();
   }
 
   private getInitialCenter(): Location {
-    if (this.center) {
-      return this.center;
-    }
-    const first = this.places[0];
-    if (first) {
-      return {
-        latitude: Number(first.lat),
-        longitude: Number(first.lon),
-        plusCode: ''
-      };
+    if (this.initialCenter) {
+      return this.initialCenter;
     }
     return { latitude: 0, longitude: 0, plusCode: '' };
-  }
-
-  private updateCenter(): void {
-    if (!this.map || !this.center) return;
-    this.map.setView([this.center.latitude, this.center.longitude], this.map.getZoom());
   }
 
   private updateMarkers(): void {
     if (!this.map || !this.markerLayer) return;
     this.markerLayer.clearLayers();
 
-    const bounds = leaflet.latLngBounds([]);
     this.places.forEach(place => {
       const latitude = Number(place.lat);
       const longitude = Number(place.lon);
@@ -99,11 +87,28 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
       const marker = leaflet.marker([latitude, longitude], { icon: markerIcon });
       marker.on('click', () => this.placeSelected.emit(place));
       marker.addTo(this.markerLayer!);
-      bounds.extend([latitude, longitude]);
     });
 
-    if (bounds.isValid()) {
-      this.map.fitBounds(bounds, { padding: [24, 24] });
-    }
+  }
+
+  private emitViewChange(): void {
+    if (!this.map) return;
+    const bounds = this.map.getBounds();
+    const southWest = bounds.getSouthWest();
+    const northEast = bounds.getNorthEast();
+    this.viewChange.emit({
+      center: {
+        latitude: this.map.getCenter().lat,
+        longitude: this.map.getCenter().lng,
+        plusCode: ''
+      },
+      zoom: this.map.getZoom(),
+      bounds: {
+        latMin: southWest.lat,
+        lonMin: southWest.lng,
+        latMax: northEast.lat,
+        lonMax: northEast.lng
+      }
+    });
   }
 }

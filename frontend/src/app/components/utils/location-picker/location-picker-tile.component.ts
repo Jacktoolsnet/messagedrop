@@ -5,7 +5,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
-import { LocationPickerDialogComponent } from './location-picker-dialog.component';
+import { LocationPickerDialogComponent } from '../location-picker-dialog/location-picker-dialog.component';
 
 type MarkerKind = 'message' | 'note';
 

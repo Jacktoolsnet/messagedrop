@@ -2,14 +2,6 @@
     <input #searchInput type="search" enterkeyhint="search" [formControl]="searchTerm" (keyup.enter)="search()"
         [placeholder]="'common.location.searchPlaceholder' | transloco">
 
-    <select [(ngModel)]="selectedRadius" (change)="onSelectChange($event)">
-        @for (r of radiusOptions; track r.value) {
-        <option [value]="r.value">
-            {{ r.labelKey | transloco:r.params }}
-        </option>
-        }
-    </select>
-
     <button (click)="search()">
         <mat-icon>search</mat-icon>
     </button>
@@ -21,7 +13,8 @@
         (add)="onAddPlaceClick($event)" (flyTo)="flyTo($event)" (navigate)="nominatimService.navigateToNominatimPlace($event)">
     </app-nominatim-results-list>
     } @else {
-    <app-nominatim-results-map [places]="nominatimPlaces" [center]="data.location"
+    <app-nominatim-results-map [places]="nominatimPlaces" [initialCenter]="mapView.center"
+        [initialZoom]="mapView.zoom" (viewChange)="onViewChange($event)"
         (placeSelected)="openPlaceDialog($event)">
     </app-nominatim-results-map>
     }

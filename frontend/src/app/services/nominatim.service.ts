@@ -116,6 +116,30 @@ export class NominatimService {
     );
   }
 
+  getNominatimPlaceBySearchTermWithBoundingBox(searchTerm: string, bounds: BoundingBox, limit = 100, showAlways = true): Observable<{ sattus: number, result: NominatimPlace[] }> {
+    const viewbox = `${bounds.lonMin},${bounds.latMax},${bounds.lonMax},${bounds.latMin}`;
+    const encodedTerm = encodeURIComponent(searchTerm);
+    const encodedViewbox = encodeURIComponent(viewbox);
+    const url = `${environment.apiUrl}/nominatim/boundedsearch/${encodedTerm}/${limit}/${encodedViewbox}`;
+    const area = this.i18n.t('common.location.area.defined');
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways: showAlways,
+      title: this.i18n.t('common.location.searchTitle'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.location.searchingWithArea', { term: searchTerm, area }),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<{ sattus: number, result: NominatimPlace[] }>(url, this.httpOptions).pipe(
+      catchError(this.handleError)
+    );
+  }
+
   private calculateViewbox(lat: number, lon: number, radiusMeters: number): string {
     const earthRadius = 6378137; // in Metern (WGS84)
 
