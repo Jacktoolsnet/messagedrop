@@ -2,10 +2,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild, inject } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { Multimedia } from '../../../interfaces/multimedia';
 import { MultimediaType } from '../../../interfaces/multimedia-type';
@@ -20,11 +21,14 @@ import { EnableExternalContentComponent } from "../enable-external-content/enabl
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
+    MatDialogActions,
+    MatDialogClose,
     MatDialogContent,
     MatIcon,
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
+    TranslocoPipe,
     EnableExternalContentComponent
   ],
   templateUrl: './tenor-search.component.html',
