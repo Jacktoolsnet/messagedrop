@@ -62,8 +62,8 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
       data: { location: this.location, markerType: this.markerType },
       maxWidth: '95vw',
       maxHeight: '95vh',
-      width: 'min(800px, 95vw)',
-      height: 'auto',
+      width: '95vw',
+      height: '95vh',
       autoFocus: false
     });
 

@@ -841,6 +841,7 @@
       "nominatimTitle": "Servicio Nominatim",
       "fetchingNominatim": "Obteniendo datos de Nominatim",
       "searchTitle": "Buscando ubicación",
+      "searchResultTitle": "Resultado de búsqueda",
       "searching": "Buscando \"{{ term }}\"",
       "searchingNear": "Buscando \"{{ term }}\" cerca de tu ubicación",
       "searchingWithArea": "Buscando \"{{ term }}\" {{ area }}",
