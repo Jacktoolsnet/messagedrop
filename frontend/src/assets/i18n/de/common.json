@@ -4,6 +4,12 @@
     "save": "Speichern",
     "cancel": "Abbrechen",
     "language": "Sprache",
+    "languageNames": {
+      "de": "Deutsch",
+      "en": "Englisch",
+      "es": "Spanisch",
+      "fr": "Französisch"
+    },
     "unknown": "Unbekannt",
     "powSolving": "Sicherheitsprüfung wird gelöst...",
     "actions": {
@@ -193,7 +199,7 @@
         "editAria": "Nachricht bearbeiten",
         "deleteAria": "Nachricht löschen",
         "showOriginalAria": "Originalnachricht anzeigen",
-        "translateAria": "Nachricht übersetzen",
+        "translateAria": "Übersetzen in {{ language }}",
         "firstMessage": "Erste Nachricht senden",
         "loading": "Chatraum wird geladen...",
         "messageUnreadable": "Nachricht kann nicht angezeigt werden (Signatur oder Entschlüsselung fehlgeschlagen).",
@@ -313,7 +319,7 @@
       "commentsAria": "Kommentare anzeigen oder hinzufügen",
       "likeAria": "Nachricht positiv bewerten",
       "dislikeAria": "Nachricht negativ bewerten",
-      "translateAria": "Nachricht übersetzen",
+      "translateAria": "Übersetzen in {{ language }}",
       "flyToAria": "Zur Nachricht springen",
       "navigateAria": "Zur Nachrichtenposition navigieren",
       "editProfileAria": "Profil bearbeiten",

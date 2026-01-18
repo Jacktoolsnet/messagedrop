@@ -4,6 +4,12 @@
     "save": "Guardar",
     "cancel": "Cancelar",
     "language": "Idioma",
+    "languageNames": {
+      "de": "Alemán",
+      "en": "Inglés",
+      "es": "Español",
+      "fr": "Francés"
+    },
     "unknown": "Desconocido",
     "powSolving": "Resolviendo verificación de seguridad...",
     "actions": {
@@ -193,7 +199,7 @@
         "editAria": "Editar mensaje",
         "deleteAria": "Eliminar mensaje",
         "showOriginalAria": "Mostrar mensaje original",
-        "translateAria": "Traducir mensaje",
+        "translateAria": "Traducir a {{ language }}",
         "firstMessage": "Enviar el primer mensaje",
         "loading": "Cargando chat...",
         "messageUnreadable": "El mensaje no se puede mostrar (falló la firma o el descifrado).",
@@ -313,7 +319,7 @@
       "commentsAria": "Mostrar o añadir comentarios",
       "likeAria": "Me gusta",
       "dislikeAria": "No me gusta",
-      "translateAria": "Traducir mensaje",
+      "translateAria": "Traducir a {{ language }}",
       "flyToAria": "Ir al mensaje",
       "navigateAria": "Navegar a la ubicación del mensaje",
       "editProfileAria": "Editar perfil",

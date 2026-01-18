@@ -31,7 +31,7 @@ export class TranslateService {
   private resolveTargetLanguage(language: string | null | undefined): string {
     const trimmed = typeof language === 'string' ? language.trim() : '';
     if (trimmed) {
-      return trimmed;
+      return trimmed.toUpperCase();
     }
     const fallback = this.languageService.effectiveLanguage?.() ?? 'en';
     return fallback.toUpperCase();

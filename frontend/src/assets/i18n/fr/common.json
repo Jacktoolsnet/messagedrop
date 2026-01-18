@@ -4,6 +4,12 @@
     "save": "Enregistrer",
     "cancel": "Annuler",
     "language": "Langue",
+    "languageNames": {
+      "de": "Allemand",
+      "en": "Anglais",
+      "es": "Espagnol",
+      "fr": "Français"
+    },
     "unknown": "Inconnu",
     "powSolving": "Résolution de la vérification de sécurité...",
     "actions": {
@@ -193,7 +199,7 @@
         "editAria": "Modifier le message",
         "deleteAria": "Supprimer le message",
         "showOriginalAria": "Afficher l'original",
-        "translateAria": "Traduire le message",
+        "translateAria": "Traduire en {{ language }}",
         "firstMessage": "Envoyer le premier message",
         "loading": "Chargement de la discussion...",
         "messageUnreadable": "Le message ne peut pas être affiché (signature ou déchiffrement échoué).",
@@ -313,7 +319,7 @@
       "commentsAria": "Afficher ou ajouter des commentaires",
       "likeAria": "Aimer le message",
       "dislikeAria": "Ne pas aimer le message",
-      "translateAria": "Traduire le message",
+      "translateAria": "Traduire en {{ language }}",
       "flyToAria": "Aller au message",
       "navigateAria": "Naviguer vers l'emplacement du message",
       "editProfileAria": "Modifier le profil",

@@ -95,9 +95,11 @@
             <app-showmessage [message]="msg.payload!.message" [style]="msg.payload!.style"></app-showmessage>
             }
             }
+            @if (msg.reaction) {
             <div class="reaction-chip reaction-chip--me">
-              <span>{{ msg.reaction || '🫥' }}</span>
+              <span>{{ msg.reaction }}</span>
             </div>
+            }
           </div>
           <div class="message-actions-row button-me">
             <div class="message-actions">
@@ -165,7 +167,7 @@
                 <mat-icon>undo</mat-icon>
               </button>
               } @else {
-              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.translateAria' | transloco"
+              <button mat-mini-fab color="primary" [attr.aria-label]="'common.contact.chatroom.translateAria' | transloco:{ language: translationTargetLabel() }"
                 (click)="translateMessage(msg)">
                 <mat-icon>translate</mat-icon>
               </button>

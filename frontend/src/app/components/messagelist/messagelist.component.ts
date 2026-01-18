@@ -19,6 +19,7 @@ import { MultimediaType } from '../../interfaces/multimedia-type';
 import { Profile } from '../../interfaces/profile';
 import { ShortNumberPipe } from '../../pipes/short-number.pipe';
 import { DsaStatusService } from '../../services/dsa-status.service';
+import { LanguageService } from '../../services/language.service';
 import { MapService } from '../../services/map.service';
 import { MessageService } from '../../services/message.service';
 import { ProfileService } from '../../services/profile.service';
@@ -95,6 +96,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
   private readonly dsaStatusService = inject(DsaStatusService);
+  private readonly languageService = inject(LanguageService);
   readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);
 
   readonly messagesSignal = signal<Message[]>([]);
@@ -114,6 +116,9 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   readonly commentCountsSignal = this.messageService.commentCountsSignal;
   readonly commentCountForMessage = (uuid: string) => computed(() =>
     this.commentCountsSignal()[uuid] || 0
+  );
+  readonly translationTargetLabel = computed(() =>
+    this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
   );
 
   private clickedMessage: Message | undefined = undefined;
@@ -644,7 +649,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   }
 
   public translateMessage(message: Message) {
-    this.translateService.translate(message.message, this.userService.getUser().language, false, message.uuid).subscribe({
+    this.translateService.translate(message.message, this.languageService.effectiveLanguage(), false, message.uuid).subscribe({
       next: response => {
         if (response.status === 200) {
           message.translatedMessage = response.result?.text;

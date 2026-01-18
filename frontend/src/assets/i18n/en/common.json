@@ -4,6 +4,12 @@
     "save": "Save",
     "cancel": "Cancel",
     "language": "Language",
+    "languageNames": {
+      "de": "German",
+      "en": "English",
+      "es": "Spanish",
+      "fr": "French"
+    },
     "unknown": "Unknown",
     "powSolving": "Solving security check...",
     "actions": {
@@ -193,7 +199,7 @@
         "editAria": "Edit message",
         "deleteAria": "Delete message",
         "showOriginalAria": "Show original message",
-        "translateAria": "Translate message",
+        "translateAria": "Translate to {{ language }}",
         "firstMessage": "Send the first message",
         "loading": "Loading chatroom...",
         "messageUnreadable": "Message can't be displayed (signature or decryption failed).",
@@ -313,7 +319,7 @@
       "commentsAria": "Show or add comments",
       "likeAria": "Like message",
       "dislikeAria": "Dislike message",
-      "translateAria": "Translate message",
+      "translateAria": "Translate to {{ language }}",
       "flyToAria": "Fly to message",
       "navigateAria": "Navigate to message location",
       "editProfileAria": "Edit profile",

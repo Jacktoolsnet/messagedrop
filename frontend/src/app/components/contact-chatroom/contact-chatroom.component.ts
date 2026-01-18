@@ -13,6 +13,7 @@ import { MultimediaType } from '../../interfaces/multimedia-type';
 import { ShortMessage } from '../../interfaces/short-message';
 import { ContactMessageService } from '../../services/contact-message.service';
 import { ContactService } from '../../services/contact.service';
+import { LanguageService } from '../../services/language.service';
 import { SocketioService } from '../../services/socketio.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
@@ -65,6 +66,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly translateService = inject(TranslateService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  private readonly languageService = inject(LanguageService);
 
   @ViewChild('messageScroll') private messageScroll?: ElementRef<HTMLElement>;
   @ViewChildren('messageRow') private messageRows?: QueryList<ElementRef<HTMLElement>>;
@@ -80,6 +82,9 @@ export class ContactChatroomComponent implements AfterViewInit {
   readonly messages = signal<ChatroomMessage[]>([]);
   readonly loading = signal<boolean>(false);
   readonly loaded = signal<boolean>(false);
+  readonly translationTargetLabel = computed(() =>
+    this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
+  );
   private readonly messageKeys = new Set<string>();
   private scrolledToFirstUnread = false;
   private readTrackingEnabled = false;
@@ -367,7 +372,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       this.setShowOriginal(message.messageId, false);
       return;
     }
-    this.translateService.translate(text, this.userService.getUser().language).subscribe({
+    this.translateService.translate(text, this.languageService.effectiveLanguage()).subscribe({
       next: (response) => {
         if (response.status !== 200) {
           return;
