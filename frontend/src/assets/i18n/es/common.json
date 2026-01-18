@@ -383,6 +383,7 @@
     "noteList": {
       "addFirstNote": "Añadir mi primera nota privada",
       "addNoteAria": "Añadir nota",
+      "editTitle": "Editar nota",
       "editAria": "Editar nota",
       "deleteAria": "Eliminar nota",
       "flyToAria": "Ir a la nota",

@@ -88,7 +88,7 @@ export class EditNoteComponent implements OnInit {
   private resolveHeaderConfig(mode: Mode): DialogHeaderConfig {
     switch (mode) {
       case Mode.EDIT_NOTE:
-        return { icon: 'edit_note', labelKey: 'common.noteList.editAria' };
+        return { icon: 'edit_note', labelKey: 'common.noteList.editTitle' };
       case Mode.ADD_NOTE:
       default:
         return { icon: 'add_notes', labelKey: 'common.noteList.addNoteAria' };
