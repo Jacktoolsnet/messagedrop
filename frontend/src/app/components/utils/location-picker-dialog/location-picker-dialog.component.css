@@ -1,9 +1,21 @@
+.mat-mdc-dialog-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
+  max-height: none;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
 .location-picker-content {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  padding: 1rem;
+  padding: 0 1rem 1rem;
   box-sizing: border-box;
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 .location-picker-hint {
@@ -14,7 +26,8 @@
 
 .location-picker-map {
   width: 100%;
-  height: min(70vh, 520px);
+  flex: 1 1 auto;
+  min-height: 0;
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
