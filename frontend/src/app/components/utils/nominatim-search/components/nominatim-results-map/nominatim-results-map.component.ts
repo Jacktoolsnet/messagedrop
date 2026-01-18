@@ -26,6 +26,8 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
   readonly mapId = `nominatim-results-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
   private markerLayer?: leaflet.LayerGroup;
+  private pendingBounds?: BoundingBox;
+  private pendingView?: { center: Location; zoom?: number };
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -62,6 +64,7 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
 
     this.markerLayer = leaflet.layerGroup().addTo(this.map);
     this.updateMarkers();
+    this.applyPendingView();
     this.map.on('moveend', () => this.emitViewChange());
     setTimeout(() => this.map?.invalidateSize(), 0);
     this.emitViewChange();
@@ -88,7 +91,53 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
       marker.on('click', () => this.placeSelected.emit(place));
       marker.addTo(this.markerLayer!);
     });
+  }
 
+  setView(center: Location, zoom?: number): void {
+    if (!this.map) {
+      this.pendingView = { center, zoom };
+      this.pendingBounds = undefined;
+      return;
+    }
+    this.applyView(center, zoom);
+  }
+
+  fitBounds(bounds: BoundingBox, padding = 24): void {
+    if (!this.map) {
+      this.pendingBounds = bounds;
+      this.pendingView = undefined;
+      return;
+    }
+    this.applyBounds(bounds, padding);
+  }
+
+  private applyPendingView(): void {
+    if (!this.map) return;
+    if (this.pendingBounds) {
+      this.applyBounds(this.pendingBounds, 24);
+      this.pendingBounds = undefined;
+      return;
+    }
+    if (this.pendingView) {
+      this.applyView(this.pendingView.center, this.pendingView.zoom);
+      this.pendingView = undefined;
+    }
+  }
+
+  private applyView(center: Location, zoom?: number): void {
+    if (!this.map) return;
+    const nextZoom = zoom ?? this.map.getZoom();
+    this.map.setView([center.latitude, center.longitude], nextZoom);
+    this.emitViewChange();
+  }
+
+  private applyBounds(bounds: BoundingBox, padding: number): void {
+    if (!this.map) return;
+    this.map.fitBounds([
+      [bounds.latMin, bounds.lonMin],
+      [bounds.latMax, bounds.lonMax]
+    ], { padding: [padding, padding] });
+    this.emitViewChange();
   }
 
   private emitViewChange(): void {

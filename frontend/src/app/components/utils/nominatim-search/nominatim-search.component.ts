@@ -59,11 +59,21 @@ type TimezoneResponse = SimpleStatusResponse & { timezone?: string };
 export class NominatimSearchComponent {
 
   @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
+  @ViewChild(NominatimResultsMapComponent)
+  set mapComponent(component: NominatimResultsMapComponent | undefined) {
+    this._mapComponent = component;
+    if (component && this.pendingBounds) {
+      component.fitBounds(this.pendingBounds);
+      this.pendingBounds = undefined;
+    }
+  }
   readonly searchTerm = new FormControl('', { nonNullable: true });
 
   nominatimPlaces: NominatimPlace[] = [];
   viewMode: 'list' | 'map' = 'map';
   currentBounds?: BoundingBox;
+  private pendingBounds?: BoundingBox;
+  private _mapComponent?: NominatimResultsMapComponent;
   mapView = {
     center: { latitude: 0, longitude: 0, plusCode: '' },
     zoom: 2
@@ -170,16 +180,8 @@ export class NominatimSearchComponent {
   }
 
   public flyTo(place: NominatimPlace): void {
-    this.mapService.fitMapToBounds(this.nominatimService.getBoundingBoxFromNominatimPlace(place));
-    const result = {
-      action: 'saveSearch',
-      selectedPlace: place,
-      searchValues: {
-        searchterm: this.searchTerm.value.trim(),
-        nominatimPlaces: this.nominatimPlaces
-      }
-    };
-    this.dialogRef.close(result);
+    this.viewMode = 'map';
+    this.focusMapOnPlace(place);
   }
 
   loginAndAddToMyPlaces(nominatimPlace: NominatimPlace): void {
@@ -311,6 +313,35 @@ export class NominatimSearchComponent {
       center: event.center,
       zoom: event.zoom
     };
+  }
+
+  private focusMapOnPlace(place: NominatimPlace): void {
+    const bounds = this.nominatimService.getBoundingBoxFromNominatimPlace(place);
+    const hasFallbackBounds = bounds.latMin === 0 && bounds.latMax === 0 && bounds.lonMin === 0 && bounds.lonMax === 0
+      && (Number(place.lat) !== 0 || Number(place.lon) !== 0);
+    if (hasFallbackBounds) {
+      const center = this.nominatimService.getLocationFromNominatimPlace(place);
+      this.mapView = {
+        center,
+        zoom: Math.max(this.mapView.zoom, 14)
+      };
+      if (this._mapComponent) {
+        this._mapComponent.setView(center, this.mapView.zoom);
+      }
+      return;
+    }
+
+    this.currentBounds = bounds;
+    this.mapView = {
+      center: this.geolocationService.getCenterOfBoundingBox(bounds),
+      zoom: this.mapView.zoom
+    };
+
+    if (this._mapComponent) {
+      this._mapComponent.fitBounds(bounds);
+    } else {
+      this.pendingBounds = bounds;
+    }
   }
 
   toggleViewMode(): void {
