@@ -1,11 +1,41 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">place</mat-icon>
-  <span class="dialog-title__text">{{ 'common.locationPicker.dialogTitle' | transloco }}</span>
-</h2>
+<div class="searchTerm-container">
+  <input type="search" enterkeyhint="search" [formControl]="searchControl" (keyup.enter)="searchPlaces()"
+    [placeholder]="'common.location.searchPlaceholder' | transloco">
+  <button type="button" (click)="searchPlaces()" [attr.aria-label]="'common.aria.search' | transloco">
+    <mat-icon>search</mat-icon>
+  </button>
+</div>
 
 <mat-dialog-content class="location-picker-content">
-  <!--p class="location-picker-hint">{{ 'common.locationPicker.hint' | transloco }}</p-->
   <div class="location-picker-map" [id]="mapId"></div>
+
+  @if (searchResults.length > 0) {
+  <div class="location-search-results">
+    @for (place of searchResults; track place.place_id) {
+    <mat-card class="item">
+      <div class="avatar-box">
+        <mat-icon>{{ getIconForPlace(place) || 'location' }}</mat-icon>
+        @if (place.name) {
+        <span class="name">{{ place.name }}</span>
+        }
+      </div>
+
+      <mat-card-content>
+        <div class="tile-value address-text">
+          {{ getFormattedAddress(place) }}
+        </div>
+      </mat-card-content>
+
+      <mat-card-actions class="buttonbar">
+        <button mat-mini-fab color="secondary" [attr.aria-label]="'common.location.flyToPlaceAria' | transloco"
+          (click)="selectResult(place)">
+          <mat-icon>place</mat-icon>
+        </button>
+      </mat-card-actions>
+    </mat-card>
+    }
+  </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
