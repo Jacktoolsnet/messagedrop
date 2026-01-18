@@ -59,6 +59,7 @@ export class NotelistComponent {
   public readonly dialog = inject(MatDialog);
 
   readonly hasNotes = computed(() => this.notesSignal().length > 0);
+  readonly sortedNotes = computed(() => [...this.notesSignal()].sort((a, b) => b.timestamp - a.timestamp));
   public user: User | undefined = this.userService.getUser();
   public notesSignal: WritableSignal<Note[]> = this.dialogData.notesSignal;
   private location: Location = this.dialogData.location;

@@ -33,8 +33,9 @@ export class NoteService {
   }
 
   async addNote(note: Note): Promise<Note> {
-    const id = await this.indexedDbService.saveNote(note);
-    const newNote: Note = { ...note, id };
+    const timestamp = note.timestamp && note.timestamp > 0 ? note.timestamp : Date.now();
+    const id = await this.indexedDbService.saveNote({ ...note, timestamp });
+    const newNote: Note = { ...note, id, timestamp };
     this.notesSignal.update(notes => [newNote, ...notes]);
     return newNote;
   }
