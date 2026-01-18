@@ -846,6 +846,7 @@
       "searchingWithArea": "Suche nach \"{{ term }}\" {{ area }}",
       "searchPlaceholder": "In OpenStreetMap suchen",
       "distanceLabel": "Entfernung",
+      "noResults": "Keine Orte gefunden.",
       "searchFailed": "Suche fehlgeschlagen. Bitte versuche es später erneut.",
       "timezoneResolveFailed": "Die Zeitzone konnte nicht ermittelt werden.",
       "addPlaceAria": "Ort hinzufügen",

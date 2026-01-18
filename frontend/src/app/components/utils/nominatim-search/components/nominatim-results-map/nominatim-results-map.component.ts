@@ -4,7 +4,7 @@ import { Location } from '../../../../../interfaces/location';
 import { NominatimPlace } from '../../../../../interfaces/nominatim-place';
 
 const markerIcon = leaflet.icon({
-  iconUrl: 'assets/markers/multi-marker.svg',
+  iconUrl: 'assets/markers/location-marker.svg',
   iconSize: [32, 40],
   iconAnchor: [16, 40]
 });

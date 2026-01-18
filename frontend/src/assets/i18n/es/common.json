@@ -846,6 +846,7 @@
       "searchingWithArea": "Buscando \"{{ term }}\" {{ area }}",
       "searchPlaceholder": "Buscar en OpenStreetMap",
       "distanceLabel": "Distancia",
+      "noResults": "No se encontraron ubicaciones.",
       "searchFailed": "La búsqueda falló. Inténtalo de nuevo más tarde.",
       "timezoneResolveFailed": "No se pudo determinar la zona horaria.",
       "addPlaceAria": "Agregar lugar",

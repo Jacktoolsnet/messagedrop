@@ -76,7 +76,7 @@ export class NominatimSearchComponent {
   ];
 
   nominatimPlaces: NominatimPlace[] = [];
-  viewMode: 'list' | 'map' = 'list';
+  viewMode: 'list' | 'map' = 'map';
 
   readonly userService = inject(UserService);
   readonly nominatimService = inject(NominatimService);
@@ -147,6 +147,19 @@ export class NominatimSearchComponent {
       location.longitude,
       response.result
     );
+    if (!this.nominatimPlaces.length) {
+      this.openDisplayMessage({
+        showAlways: true,
+        title: this.translation.t('common.location.searchTitle'),
+        image: '',
+        icon: 'info',
+        message: this.translation.t('common.location.noResults'),
+        button: '',
+        delay: 1500,
+        showSpinner: false,
+        autoclose: true
+      }, false);
+    }
   }
 
   private handleSearchError(error: unknown): void {
