@@ -35,6 +35,7 @@ mat-card-actions.buttonbar {
     display: flex;
     align-items: center;
     background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
     overflow: hidden;
     min-height: 4rem;
     width: 100%;
