@@ -865,7 +865,7 @@
       }
     },
     "locationPicker": {
-      "title": "Select location",
+      "title": "Selected location",
       "editAria": "Edit location",
       "dialogTitle": "Choose location",
       "hint": "Click on the map to set the location."
