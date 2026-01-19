@@ -266,10 +266,10 @@ button,
 
 .buttonbar .button-group {
   grid-column: 2;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(2.5rem, max-content));
-  justify-content: end;
-  justify-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: center;
   gap: 0.35rem 0.5rem;
   max-width: min(100%, 20rem);
   justify-self: end;
