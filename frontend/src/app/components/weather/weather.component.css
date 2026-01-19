@@ -37,8 +37,7 @@
 
 .weather-scroll {
     flex: 1 1 auto;
-    overflow-y: auto;
-    overflow-x: hidden;
+    overflow: hidden;
     padding: 0 1rem 1rem;
     min-height: 0;
     display: flex;
@@ -46,8 +45,27 @@
     gap: 1rem;
 }
 
+.tile-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 0.5rem;
+}
+
 .sticky-actions {
     margin-top: auto;
+}
+
+@media (min-width: 1024px) {
+    .weather-scroll {
+        gap: 0.75rem;
+    }
+
+    .tile-scroll {
+        flex: 0 1 auto;
+        max-height: 60vh;
+    }
 }
 
 .day-switch {
@@ -230,7 +248,6 @@ mat-slider {
 }
 
 app-weather-detail {
-    max-height: 52vh;
     display: flex;
     flex-direction: column;
 }
