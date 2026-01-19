@@ -198,6 +198,7 @@ export class AppComponent implements OnInit {
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
   private initialPublicMessagesRequested = false;
+  private markerMessageListOpen = false;
 
   constructor() {
     this.setupExitBackupPrompt();
@@ -736,7 +737,9 @@ export class AppComponent implements OnInit {
       await this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox());
     }
     // Messages
-    this.messageService.getByVisibleMapBoundingBox();
+    if (!this.markerMessageListOpen) {
+      this.messageService.getByVisibleMapBoundingBox();
+    }
   }
 
   public handleMoveEndEvent() {
@@ -1169,6 +1172,7 @@ export class AppComponent implements OnInit {
   }
 
   public openMarkerMessageListDialog(messages: Message[]) {
+    this.markerMessageListOpen = true;
     const dialogRef = this.dialog.open(MessagelistComponent, {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
@@ -1187,6 +1191,7 @@ export class AppComponent implements OnInit {
     });
 
     dialogRef.afterClosed().subscribe(() => {
+      this.markerMessageListOpen = false;
       this.messageService.clearSelectedMessages();
       this.updateDataForLocation();
     });
