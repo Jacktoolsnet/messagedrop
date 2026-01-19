@@ -1,6 +1,6 @@
 import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { formatDate, PlatformLocation } from '@angular/common';
-import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
+import { Component, computed, DestroyRef, effect, HostBinding, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from '@angular/material/button';
@@ -127,6 +127,7 @@ import { isQuotaExceededError } from './utils/storage-error.util';
 })
 
 export class AppComponent implements OnInit {
+  @HostBinding('class.dialog-locked') dialogLocked = false;
   private readonly destroyRef = inject(DestroyRef);
   private readonly transloco = inject(TranslocoService);
   locationReady = false;
@@ -198,6 +199,7 @@ export class AppComponent implements OnInit {
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
   private initialPublicMessagesRequested = false;
+
   private markerMessageListOpen = false;
 
   constructor() {
@@ -342,6 +344,18 @@ export class AppComponent implements OnInit {
   }
 
   public ngOnInit(): void {
+    this.dialog.afterOpened
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.dialogLocked = true;
+      });
+
+    this.dialog.afterAllClosed
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.dialogLocked = false;
+      });
+
     this.transloco.selectTranslation()
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((translation) => {

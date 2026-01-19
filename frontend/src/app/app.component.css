@@ -123,3 +123,7 @@
     font-weight: 600;
     color: #1f2937;
 }
+
+:host.dialog-locked {
+    pointer-events: none;
+}
