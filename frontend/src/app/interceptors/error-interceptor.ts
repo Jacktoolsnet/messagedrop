@@ -2,13 +2,13 @@ import { HttpErrorResponse, HttpInterceptorFn, HttpResponse } from '@angular/com
 import { inject } from '@angular/core';
 import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { catchError, tap, throwError } from 'rxjs';
-import { DisplayMessage } from '../components/utils/display-message/display-message.component';
 import { environment } from '../../environments/environment';
+import { DisplayMessage } from '../components/utils/display-message/display-message.component';
+import { MaintenanceInfo } from '../interfaces/maintenance';
 import { ApiErrorService } from '../services/api-error.service';
 import { DiagnosticLoggerService } from '../services/diagnostic-logger.service';
 import { NetworkService } from '../services/network.service';
 import { TranslationHelperService } from '../services/translation-helper.service';
-import { MaintenanceInfo } from '../interfaces/maintenance';
 
 let errorDialogRef: MatDialogRef<DisplayMessage> | null = null;
 const backendOfflineStatuses = new Set([0, 502, 503, 504]);
@@ -104,7 +104,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
       errorDialogRef = ref;

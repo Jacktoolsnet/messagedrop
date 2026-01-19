@@ -117,7 +117,7 @@ export class MessageService {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
     this.moderationDialogRef = ref;

@@ -1,5 +1,5 @@
 
-import { Component, computed, Input, OnDestroy, OnInit, signal, WritableSignal, inject } from '@angular/core';
+import { Component, computed, inject, Input, OnDestroy, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -17,7 +17,7 @@ import { MessagelistComponent } from '../../messagelist/messagelist.component';
     MatIcon,
     MatButtonModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './messagetile.component.html',
   styleUrl: './messagetile.component.css'
 })
@@ -60,7 +60,7 @@ export class MessageTileComponent implements OnInit, OnDestroy {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }

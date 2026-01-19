@@ -1,10 +1,16 @@
-<mat-dialog-content #dialogContent>
-  @if (weatherSig(); as weather) {
+<h2 mat-dialog-title class="dialog-title">
+  <span class="dialog-title__text">
     @if (locationName$ | async; as locationName) {
-      <div class="header-title">{{ 'weather.titleForLocation' | transloco: { location: locationName } }}</div>
+      {{ 'weather.titleForLocation' | transloco: { location: locationName } }}
     } @else {
-      <div class="header-title">{{ 'weather.title' | transloco }}</div>
+      {{ 'weather.title' | transloco }}
     }
+  </span>
+</h2>
+
+<mat-dialog-content #dialogContent class="weather-dialog-content">
+  <div class="weather-scroll">
+  @if (weatherSig(); as weather) {
 
     <!-- Day Switch -->
     <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="day-toggle-group" [value]="selectedDayIndex"
@@ -75,4 +81,12 @@
     {{ 'weather.dataSource' | transloco }}
     <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
   </div>
+  </div>
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close mat-icon-button class="action-close" cdkFocusInitial
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

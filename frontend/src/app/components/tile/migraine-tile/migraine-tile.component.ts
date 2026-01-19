@@ -1,19 +1,19 @@
 import { ChangeDetectionStrategy, Component, Input, inject, signal } from '@angular/core';
 
-import { MatIcon } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
-import { PlaceService } from '../../../services/place.service';
-import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
-import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-edit.component';
-import { MatDialog } from '@angular/material/dialog';
 import { Weather } from '../../../interfaces/weather';
-import { WeatherComponent } from '../../weather/weather.component';
-import { WeatherTile } from '../../weather/weather-tile.interface';
 import { GeolocationService } from '../../../services/geolocation.service';
+import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
+import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { WeatherTile } from '../../weather/weather-tile.interface';
+import { WeatherComponent } from '../../weather/weather.component';
+import { MigraineTileEditComponent } from './migraine-tile-edit/migraine-tile-edit.component';
 
 @Component({
   selector: 'app-migraine-tile',
@@ -138,7 +138,7 @@ export class MigraineTileComponent {
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

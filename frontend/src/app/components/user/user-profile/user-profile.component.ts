@@ -9,18 +9,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { Profile } from '../../../interfaces/profile';
+import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
 import { AvatarStorageService } from '../../../services/avatar-storage.service';
+import { LanguageService } from '../../../services/language.service';
 import { StyleService } from '../../../services/style.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { UserService } from '../../../services/user.service';
-import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
-import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
-import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
-import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { UnsplashService } from '../../../services/unsplash.service';
-import { LanguageService } from '../../../services/language.service';
+import { UserService } from '../../../services/user.service';
+import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
+import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
   selector: 'app-profile',
@@ -66,7 +66,7 @@ export class UserProfileComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -173,7 +173,7 @@ export class UserProfileComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

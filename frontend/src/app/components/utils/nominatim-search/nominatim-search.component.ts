@@ -5,9 +5,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { DisplayMessage } from '../display-message/display-message.component';
-import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
 import { BoundingBox } from '../../../interfaces/bounding-box';
+import { CreatePlaceResponse } from '../../../interfaces/create-place-response';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
@@ -20,6 +19,7 @@ import { NominatimService } from '../../../services/nominatim.service';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
+import { DisplayMessage } from '../display-message/display-message.component';
 import { NominatimResultDialogComponent } from './components/nominatim-result-dialog/nominatim-result-dialog.component';
 import { NominatimResultsListComponent } from './components/nominatim-results-list/nominatim-results-list.component';
 import { NominatimResultsMapComponent } from './components/nominatim-results-map/nominatim-results-map.component';
@@ -363,7 +363,7 @@ export class NominatimSearchComponent {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }

@@ -108,7 +108,7 @@ export class ContactEditMessageComponent implements OnInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -157,7 +157,7 @@ export class ContactEditMessageComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { text: this.data.shortMessage.message },
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: true
     });
 

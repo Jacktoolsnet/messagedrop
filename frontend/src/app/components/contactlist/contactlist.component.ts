@@ -158,7 +158,7 @@ export class ContactlistComponent {
       maxWidth: '90vw',
       height: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -188,7 +188,7 @@ export class ContactlistComponent {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -255,7 +255,7 @@ export class ContactlistComponent {
       width: 'min(900px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }
@@ -315,7 +315,7 @@ export class ContactlistComponent {
       width: 'max(600px, 95vw)',
       maxHeight: '95vh',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -423,7 +423,7 @@ export class ContactlistComponent {
                     connect.id = createConnectResponse.connectId;
                     this.matDialog.open(QrcodeComponent, {
                       closeOnNavigation: true,
-                      hasBackdrop: true,
+                      hasBackdrop: false,
                       data: { qrData: createConnectResponse.connectId }
                     });
                   }

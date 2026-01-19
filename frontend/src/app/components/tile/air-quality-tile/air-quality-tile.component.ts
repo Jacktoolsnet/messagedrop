@@ -1,15 +1,15 @@
 import { Component, Input, inject } from '@angular/core';
+import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AirQualityData } from '../../../interfaces/air-quality-data';
+import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
 import { Place } from '../../../interfaces/place';
 import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
-import { AirQualityComponent } from '../../air-quality/air-quality.component';
-import { AirQualityMetricKey } from '../../../interfaces/air-quality-tile-value';
-import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { getAirQualityLevelInfo } from '../../../utils/air-quality-level.util';
+import { AirQualityComponent } from '../../air-quality/air-quality.component';
 
 @Component({
   selector: 'app-air-quality-tile',
@@ -259,7 +259,7 @@ export class AirQualityTileComponent {
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe();

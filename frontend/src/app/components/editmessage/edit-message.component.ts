@@ -167,7 +167,7 @@ export class EditMessageComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { text: this.data.message.message },
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: true
     });
 

@@ -49,7 +49,7 @@ interface ChatroomMessage {
     ShowmultimediaComponent,
     ShowmessageComponent,
     TranslocoPipe
-],
+  ],
   templateUrl: './contact-chatroom.component.html',
   styleUrl: './contact-chatroom.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -285,7 +285,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -300,7 +300,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -322,7 +322,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -417,7 +417,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -436,7 +436,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     const dialogRef = this.matDialog.open(DeleteContactMessageComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -836,12 +836,12 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     try {
       const encryptedTranslation = await this.contactMessageService.encryptTranslation(translation);
-        this.contactMessageService.updateTranslation({
-          messageId,
-          contactId: contact.id,
-          translatedMessage: encryptedTranslation,
-          userId: this.userService.getUser().id
-        }).subscribe({
+      this.contactMessageService.updateTranslation({
+        messageId,
+        contactId: contact.id,
+        translatedMessage: encryptedTranslation,
+        userId: this.userService.getUser().id
+      }).subscribe({
         error: (err) => {
           const errorMessage = err?.error?.error ?? this.translation.t('common.contact.chatroom.storeTranslationFailed');
           this.snackBar.open(errorMessage, '', { duration: 3000 });

@@ -9,8 +9,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
-import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../../utils/evidence-input/evidence-input.component';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { EvidenceFileItem, EvidenceInputComponent, EvidenceUrlItem } from '../../utils/evidence-input/evidence-input.component';
 
 import { firstValueFrom } from 'rxjs';
 import { DsaNoticeCategory } from '../../../interfaces/dsa-notice-category.interface';
@@ -42,7 +42,7 @@ interface DigitalServicesActReportDialogData {
     MatIconModule,
     EvidenceInputComponent,
     TranslocoPipe
-],
+  ],
   templateUrl: './digital-services-act-report-dialog.component.html',
   styleUrls: ['./digital-services-act-report-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -307,7 +307,7 @@ export class DigitalServicesActReportDialogComponent {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

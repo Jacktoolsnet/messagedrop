@@ -1,5 +1,5 @@
 
-import { Component, computed, Input, OnInit, signal, WritableSignal, inject } from '@angular/core';
+import { Component, computed, inject, Input, OnInit, signal, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -16,7 +16,7 @@ import { NotelistComponent } from '../../notelist/notelist.component';
     MatIcon,
     MatButtonModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './note-tile.component.html',
   styleUrl: './note-tile.component.css'
 })
@@ -50,7 +50,7 @@ export class NoteTileComponent implements OnInit {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }

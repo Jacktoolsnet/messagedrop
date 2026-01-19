@@ -595,7 +595,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }
@@ -626,7 +626,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         minWidth: '20vw',
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
 
@@ -716,7 +716,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -808,7 +808,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

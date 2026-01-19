@@ -32,7 +32,7 @@ import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
     MatDialogClose,
     MatIcon,
     TranslocoPipe
-],
+  ],
   templateUrl: './message-profile.component.html',
   styleUrl: './message-profile.component.css'
 })
@@ -82,7 +82,7 @@ export class MessageProfileComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -158,7 +158,7 @@ export class MessageProfileComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

@@ -533,7 +533,7 @@ export class AppComponent implements OnInit {
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -628,7 +628,7 @@ export class AppComponent implements OnInit {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
       return;
@@ -648,7 +648,7 @@ export class AppComponent implements OnInit {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }
@@ -681,7 +681,7 @@ export class AppComponent implements OnInit {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -823,7 +823,7 @@ export class AppComponent implements OnInit {
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -866,7 +866,7 @@ export class AppComponent implements OnInit {
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1008,7 +1008,7 @@ export class AppComponent implements OnInit {
             width: 'auto',
             maxHeight: '95vh',
             height: 'auto',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
 
@@ -1033,7 +1033,7 @@ export class AppComponent implements OnInit {
             width: 'auto',
             maxHeight: 'none',
             height: 'auto',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
 
@@ -1061,7 +1061,7 @@ export class AppComponent implements OnInit {
         width: 'auto',
         maxHeight: 'none',
         height: 'auto',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
 
@@ -1089,7 +1089,7 @@ export class AppComponent implements OnInit {
       width: dialogWidth,
       maxHeight: '95vh',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1127,7 +1127,7 @@ export class AppComponent implements OnInit {
       width: dialogWidth,
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1181,7 +1181,7 @@ export class AppComponent implements OnInit {
       maxWidth: '95vw',
       maxHeight: '95vh',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1208,7 +1208,7 @@ export class AppComponent implements OnInit {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1237,7 +1237,7 @@ export class AppComponent implements OnInit {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1265,7 +1265,7 @@ export class AppComponent implements OnInit {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1339,7 +1339,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: true,
+      hasBackdrop: false,
     });
   }
 
@@ -1378,7 +1378,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1427,7 +1427,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(UserComponent, {
       data: {},
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -1469,7 +1469,7 @@ export class AppComponent implements OnInit {
             minHeight: '90vh',
             height: '90vh',
             maxHeight: '90vh',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
         },
@@ -1511,7 +1511,7 @@ export class AppComponent implements OnInit {
             maxWidth: '90vw',
             height: '90vh',
             maxHeight: '90vh',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
         },
@@ -1526,7 +1526,7 @@ export class AppComponent implements OnInit {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
         }
@@ -1581,7 +1581,7 @@ export class AppComponent implements OnInit {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }
@@ -1600,7 +1600,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

@@ -1,14 +1,16 @@
-<mat-dialog-content #dialogContent>
+<h2 mat-dialog-title class="dialog-title">
+    <span class="dialog-title__text">
+        @if (locationName$ | async; as locationName) {
+            {{ 'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName } }}
+        } @else {
+            {{ 'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) } }}
+        }
+    </span>
+</h2>
+
+<mat-dialog-content #dialogContent class="air-quality-dialog-content">
+    <div class="air-quality-scroll">
     @if (airQualitySig()) {
-    @if (locationName$ | async) {
-    <div class="header-title">
-        {{ 'weather.airQuality.headerFor' | transloco:{ category: getCategoryLabel(selectedCategory), location: locationName } }}
-    </div>
-    } @else {
-    <div class="header-title">
-        {{ 'weather.airQuality.header' | transloco:{ category: getCategoryLabel(selectedCategory) } }}
-    </div>
-    }
 
     <mat-button-toggle-group [hideSingleSelectionIndicator]="true" class="day-toggle-group" [value]="selectedDayIndex"
         (change)="onDayChange($event.value)">
@@ -87,4 +89,12 @@
         {{ 'weather.airQuality.dataSource' | transloco }}
         <a href="https://open-meteo.com/" target="_blank" rel="noopener">open-meteo.com</a>.
     </div>
+    </div>
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-dialog-close mat-icon-button class="action-close" cdkFocusInitial
+        [attr.aria-label]="'common.actions.close' | transloco">
+        <mat-icon>close</mat-icon>
+    </button>
+</mat-dialog-actions>

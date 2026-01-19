@@ -16,7 +16,7 @@ import { ImagelistComponent } from '../../imagelist/imagelist.component';
     MatIcon,
     MatButtonModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './image-tile.component.html',
   styleUrl: './image-tile.component.css'
 })
@@ -116,7 +116,7 @@ export class ImageTileComponent implements OnInit, OnDestroy {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }

@@ -213,7 +213,7 @@ export class PollutionTileComponent {
       minHeight: '95vh',
       height: '95vh',
       maxHeight: '95vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }

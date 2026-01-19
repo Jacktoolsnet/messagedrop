@@ -153,7 +153,7 @@ export class EditNoteComponent implements OnInit {
       panelClass: '',
       closeOnNavigation: true,
       data: { text: this.data.note.note },
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: true
     });
 

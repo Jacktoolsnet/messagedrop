@@ -16,10 +16,10 @@ import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { LanguageService } from '../../../services/language.service';
 import { SocketioService } from '../../../services/socketio.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
-import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { UnsplashService } from '../../../services/unsplash.service';
+import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
+import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
   selector: 'app-profile',
@@ -75,7 +75,7 @@ export class ContactSettingsComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -94,7 +94,7 @@ export class ContactSettingsComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false,
       data: {
         titleKey: 'common.backgroundSource.title',
@@ -226,7 +226,7 @@ export class ContactSettingsComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -245,7 +245,7 @@ export class ContactSettingsComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

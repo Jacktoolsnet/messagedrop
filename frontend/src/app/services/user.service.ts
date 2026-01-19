@@ -23,18 +23,18 @@ import { User } from '../interfaces/user';
 import { UserChallengeResponse } from '../interfaces/user-challenge-response';
 import { UserLoginResponse } from '../interfaces/user-login-response';
 import { UserType } from '../interfaces/user-type';
-import { BackupStateService } from './backup-state.service';
 import { AvatarStorageService } from './avatar-storage.service';
+import { BackupStateService } from './backup-state.service';
 import { ContactMessageService } from './contact-message.service';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
+import { DiagnosticLoggerService } from './diagnostic-logger.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { RestoreService } from './restore.service';
 import { ServerService } from './server.service';
 import { SocketioService } from './socketio.service';
 import { TranslationHelperService } from './translation-helper.service';
-import { DiagnosticLoggerService } from './diagnostic-logger.service';
 
 interface VapidPublicKeyResponse {
   status?: number;
@@ -231,7 +231,7 @@ export class UserService {
               },
               maxWidth: '90vw',
               maxHeight: '90vh',
-              hasBackdrop: true,
+              hasBackdrop: false,
               autoFocus: false
             });
 
@@ -255,7 +255,7 @@ export class UserService {
               },
               maxWidth: '90vw',
               maxHeight: '90vh',
-              hasBackdrop: true,
+              hasBackdrop: false,
               autoFocus: false
             });
 
@@ -281,7 +281,7 @@ export class UserService {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
 
@@ -527,7 +527,7 @@ export class UserService {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
 
@@ -554,7 +554,7 @@ export class UserService {
           },
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: true,
+          hasBackdrop: false,
           autoFocus: false
         });
 
@@ -871,7 +871,7 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
 
@@ -943,7 +943,7 @@ export class UserService {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -969,7 +969,7 @@ export class UserService {
           },
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: true,
+          hasBackdrop: false,
           autoFocus: false
         });
         errorDialog.afterClosed().subscribe(() => {
@@ -1198,7 +1198,7 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
 
@@ -1222,7 +1222,7 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
       errorDialog.afterClosed().subscribe(() => {
@@ -1285,7 +1285,7 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
 
@@ -1309,7 +1309,7 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
       errorDialog.afterClosed().subscribe(() => {
@@ -1457,7 +1457,7 @@ export class UserService {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: true,
+            hasBackdrop: false,
             autoFocus: false
           });
 
@@ -1557,7 +1557,7 @@ export class UserService {
                       },
                       maxWidth: '90vw',
                       maxHeight: '90vh',
-                      hasBackdrop: true,
+                      hasBackdrop: false,
                       autoFocus: false
                     });
 
@@ -1580,7 +1580,7 @@ export class UserService {
                             },
                             maxWidth: '90vw',
                             maxHeight: '90vh',
-                            hasBackdrop: true,
+                            hasBackdrop: false,
                             autoFocus: false
                           });
                           errorDialog.afterClosed().subscribe(() => {
@@ -1604,7 +1604,7 @@ export class UserService {
                       },
                       maxWidth: '90vw',
                       maxHeight: '90vh',
-                      hasBackdrop: true,
+                      hasBackdrop: false,
                       autoFocus: false
                     });
                     dialogRef.afterClosed().subscribe(() => {
@@ -1632,7 +1632,7 @@ export class UserService {
                 },
                 maxWidth: '90vw',
                 maxHeight: '90vh',
-                hasBackdrop: true,
+                hasBackdrop: false,
                 autoFocus: false
               });
 
@@ -1655,7 +1655,7 @@ export class UserService {
                       },
                       maxWidth: '90vw',
                       maxHeight: '90vh',
-                      hasBackdrop: true,
+                      hasBackdrop: false,
                       autoFocus: false
                     });
                     errorDialog.afterClosed().subscribe(() => {
@@ -1679,7 +1679,7 @@ export class UserService {
                 },
                 maxWidth: '90vw',
                 maxHeight: '90vh',
-                hasBackdrop: true,
+                hasBackdrop: false,
                 autoFocus: false
               });
               dialogRef.afterClosed().subscribe(() => {
@@ -1748,7 +1748,7 @@ export class UserService {
           },
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: true,
+          hasBackdrop: false,
           autoFocus: false
         });
         dialogRef.afterClosed().subscribe(() => {

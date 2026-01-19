@@ -10,18 +10,18 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { Mode } from '../../../interfaces/mode';
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
+import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
-import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
+import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
 import { AvatarStorageService } from '../../../services/avatar-storage.service';
 import { LanguageService } from '../../../services/language.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
-import { AvatarSourceDialogComponent, AvatarSourceChoice } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
-import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 import { UnsplashService } from '../../../services/unsplash.service';
+import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
+import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
   selector: 'app-place',
@@ -259,7 +259,7 @@ export class PlaceProfileComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -278,7 +278,7 @@ export class PlaceProfileComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false,
       data: {
         titleKey: 'common.backgroundSource.title',
@@ -304,7 +304,7 @@ export class PlaceProfileComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -323,7 +323,7 @@ export class PlaceProfileComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 

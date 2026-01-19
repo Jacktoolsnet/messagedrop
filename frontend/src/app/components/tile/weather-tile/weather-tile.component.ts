@@ -7,8 +7,8 @@ import { Place } from '../../../interfaces/place';
 import { Weather } from '../../../interfaces/weather';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { DatasetState, OpenMeteoRefreshService } from '../../../services/open-meteo-refresh.service';
-import { WeatherComponent } from '../../weather/weather.component';
 import { getWeatherLevelInfo } from '../../../utils/weather-level.util';
+import { WeatherComponent } from '../../weather/weather.component';
 
 @Component({
   selector: 'app-weather-tile',
@@ -100,7 +100,7 @@ export class WeatherTileComponent {
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }

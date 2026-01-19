@@ -190,7 +190,7 @@ export class PlacelistComponent {
       width: 'min(900px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }
@@ -395,15 +395,15 @@ export class PlacelistComponent {
                     );
                   }
                 },
-              error: err => {
-                this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-              }
+                error: err => {
+                  this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+                }
               });
             }
           },
-        error: err => {
-          this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-        }
+          error: err => {
+            this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
+          }
         });
       }
     }

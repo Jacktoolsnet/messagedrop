@@ -30,11 +30,11 @@ import { UserService } from '../../services/user.service';
 import { EditMessageComponent } from '../editmessage/edit-message.component';
 import { DigitalServicesActReportDialogComponent } from '../legal/digital-services-act-report-dialog/digital-services-act-report-dialog.component';
 import { DsaCaseDialogComponent } from '../legal/digital-services-act-report-dialog/dsa-case-dialog/dsa-case-dialog.component';
+import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
+import { MessageProfileComponent } from '../messagelist/message-profile/message-profile.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
-import { DeleteMessageComponent } from '../messagelist/delete-message/delete-message.component';
-import { MessageProfileComponent } from '../messagelist/message-profile/message-profile.component';
 
 type ResolvedDsaStatus = 'RECEIVED' | 'UNDER_REVIEW' | 'DECIDED' | 'UNKNOWN';
 type ModerationStatus = 'published' | 'review' | 'hidden';
@@ -595,7 +595,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
   }
@@ -626,7 +626,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         minWidth: '20vw',
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: true,
+        hasBackdrop: false,
         autoFocus: false
       });
 
@@ -716,7 +716,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
@@ -808,7 +808,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: true,
+      hasBackdrop: false,
       autoFocus: false
     });
 
