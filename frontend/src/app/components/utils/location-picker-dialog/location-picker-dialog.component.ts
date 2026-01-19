@@ -1,15 +1,18 @@
 import { AfterViewInit, Component, inject, OnDestroy } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
+import { DisplayMessage } from '../display-message/display-message.component';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { NominatimService } from '../../../services/nominatim.service';
+import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 type MarkerKind = 'message' | 'note';
 
@@ -46,8 +49,10 @@ const searchMarkerIcon = leaflet.icon({
 })
 export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
   private readonly dialogRef = inject(MatDialogRef<LocationPickerDialogComponent>);
+  private readonly dialog = inject(MatDialog);
   private readonly geolocationService = inject(GeolocationService);
   private readonly nominatimService = inject(NominatimService);
+  private readonly translation = inject(TranslationHelperService);
   readonly data = inject<LocationPickerDialogData>(MAT_DIALOG_DATA);
 
   readonly searchControl = new FormControl('', { nonNullable: true });
@@ -97,8 +102,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
         lonMax: northEast.lng
       }, 25).subscribe({
         next: (response) => {
-          this.searchResults = response.result ?? [];
-          this.updateSearchMarkers();
+          this.applySearchResults(response.result ?? []);
         },
         error: (error) => this.handleSearchError(error)
       });
@@ -113,14 +117,13 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
       20000
     ).subscribe({
       next: (response) => {
-        this.searchResults = response.result ?? [];
-        this.updateSearchMarkers();
+        this.applySearchResults(response.result ?? []);
       },
       error: (error) => this.handleSearchError(error)
     });
   }
 
-  selectResult(place: NominatimPlace): void {
+  selectResult(place: NominatimPlace, shouldNavigate = true): void {
     this.setSelectedSearchMarker(place.place_id);
     const latitude = Number(place.lat);
     const longitude = Number(place.lon);
@@ -134,7 +137,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
     };
     this.marker?.setLatLng([latitude, longitude]);
 
-    if (!this.map) {
+    if (!this.map || !shouldNavigate) {
       return;
     }
 
@@ -149,8 +152,39 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
 
   private handleSearchError(error: unknown): void {
     console.error('Location search failed', error);
-    this.searchResults = [];
+    this.applySearchResults([]);
+  }
+
+  private applySearchResults(results: NominatimPlace[]): void {
+    this.searchResults = results;
     this.updateSearchMarkers();
+    if (results.length === 0) {
+      this.openDisplayMessage({
+        showAlways: true,
+        title: this.translation.t('common.location.searchTitle'),
+        image: '',
+        icon: 'info',
+        message: this.translation.t('common.location.noResults'),
+        button: '',
+        delay: 1500,
+        showSpinner: false,
+        autoclose: true
+      }, false);
+      return;
+    }
+    this.selectResult(results[0], false);
+  }
+
+  private openDisplayMessage(config: DisplayMessageConfig, hasBackdrop = true): void {
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop,
+      autoFocus: false
+    });
   }
 
   private updateSearchMarkers(): void {
