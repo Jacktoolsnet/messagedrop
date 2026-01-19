@@ -48,10 +48,10 @@ import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response
 import { LocalDocument } from './interfaces/local-document';
 import { LocalImage } from './interfaces/local-image';
 import { Location } from './interfaces/location';
+import { MaintenanceInfo } from './interfaces/maintenance';
 import { MarkerLocation } from './interfaces/marker-location';
 import { MarkerType } from './interfaces/marker-type';
 import { Message } from './interfaces/message';
-import { MaintenanceInfo } from './interfaces/maintenance';
 import { Mode } from './interfaces/mode';
 import { Multimedia } from './interfaces/multimedia';
 import { MultimediaType } from './interfaces/multimedia-type';
@@ -1173,10 +1173,9 @@ export class AppComponent implements OnInit {
       panelClass: 'MessageListDialog',
       closeOnNavigation: true,
       data: { location: messages[0].location },
-      minWidth: 'min(450px, 95vw)',
-      maxWidth: '95vw',
       width: 'auto',
-      maxHeight: 'none',
+      maxWidth: '95vw',
+      maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,
       autoFocus: false

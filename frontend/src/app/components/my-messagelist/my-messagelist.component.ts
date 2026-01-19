@@ -120,6 +120,12 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
   readonly translationTargetLabel = computed(() =>
     this.translation.t(`common.languageNames.${this.languageService.effectiveLanguage()}`)
   );
+  readonly listSize = computed(() => {
+    if (this.messageService.selectedMessagesSignal().length > 0) {
+      return this.commentsSignal().length;
+    }
+    return this.filteredMessagesSignal().length;
+  });
 
   private clickedMessage: Message | undefined = undefined;
 
@@ -167,6 +173,11 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       }
 
       tokens.forEach(token => this.ensureDsaStatusLoaded(token));
+    });
+
+    effect(() => {
+      const width = this.listSize() > 1 ? '95vw' : 'auto';
+      this.dialogRef.updateSize(width);
     });
   }
 
