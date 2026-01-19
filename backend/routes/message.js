@@ -475,6 +475,11 @@ router.post('/update',
       const rawMessage = String(req.body.message ?? '');
       const sanitizedMessage = sanitizeSingleQuotes(rawMessage);
       const sanitizedMultimedia = sanitizeSingleQuotes(req.body.multimedia);
+      const latitude = Number.isFinite(Number(req.body.latitude)) ? Number(req.body.latitude) : row.latitude;
+      const longitude = Number.isFinite(Number(req.body.longitude)) ? Number(req.body.longitude) : row.longitude;
+      const plusCode = typeof req.body.plusCode === 'string' && req.body.plusCode.trim()
+        ? req.body.plusCode.trim()
+        : row.plusCode;
       const requiresModeration = [
         tableMessage.messageType.PUBLIC,
         tableMessage.messageType.COMMENT
@@ -487,6 +492,9 @@ router.post('/update',
           sanitizedMessage,
           req.body.style,
           sanitizedMultimedia,
+          latitude,
+          longitude,
+          plusCode,
           function (err) {
             if (err) {
               return next(apiError.internal('db_error'));
@@ -549,6 +557,9 @@ router.post('/update',
         sanitizedMessage,
         req.body.style,
         sanitizedMultimedia,
+        latitude,
+        longitude,
+        plusCode,
         moderation,
         status,
         async function (err) {

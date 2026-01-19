@@ -217,16 +217,19 @@ const create = function (db, uuid, parentUuid, messageTyp, latitude, longitude, 
     }
 };
 
-const update = function (db, messageId, message, style, multimedia, callback) {
+const update = function (db, messageId, message, style, multimedia, latitude, longitude, plusCode, callback) {
     try {
         const sql = `
         UPDATE ${tableName}
         SET ${columnMessage} = ?, 
             ${columnStyle} = ?,
-            ${columnMultimedia} = ?
+            ${columnMultimedia} = ?,
+            ${columnLatitude} = ?,
+            ${columnLongitude} = ?,
+            ${columnPlusCode} = ?
         WHERE ${columnMessageId} = ?;`;
 
-        db.run(sql, [message, style, multimedia, messageId], (err) => {
+        db.run(sql, [message, style, multimedia, latitude, longitude, plusCode, messageId], (err) => {
             callback(err);
         });
     } catch (error) {
@@ -234,7 +237,7 @@ const update = function (db, messageId, message, style, multimedia, callback) {
     }
 };
 
-const updateWithModeration = function (db, messageId, message, style, multimedia, moderation, status, callback) {
+const updateWithModeration = function (db, messageId, message, style, multimedia, latitude, longitude, plusCode, moderation, status, callback) {
     try {
         const aiModeration = moderation?.aiModeration ?? null;
         const aiModerationScore = Number.isFinite(moderation?.aiScore) ? moderation.aiScore : null;
@@ -254,6 +257,9 @@ const updateWithModeration = function (db, messageId, message, style, multimedia
         SET ${columnMessage} = ?,
             ${columnStyle} = ?,
             ${columnMultimedia} = ?,
+            ${columnLatitude} = ?,
+            ${columnLongitude} = ?,
+            ${columnPlusCode} = ?,
             ${columnStatus} = ?,
             ${columnAiModeration} = ?,
             ${columnAiModerationScore} = ?,
@@ -272,6 +278,9 @@ const updateWithModeration = function (db, messageId, message, style, multimedia
             message,
             style,
             multimedia,
+            latitude,
+            longitude,
+            plusCode,
             normalizedStatus,
             aiModeration,
             aiModerationScore,

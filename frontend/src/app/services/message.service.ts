@@ -405,7 +405,10 @@ export class MessageService {
       'id': message.id,
       'message': message.message,
       'style': message.style,
-      'multimedia': JSON.stringify(message.multimedia)
+      'multimedia': JSON.stringify(message.multimedia),
+      'latitude': message.location?.latitude,
+      'longitude': message.location?.longitude,
+      'plusCode': message.location?.plusCode
     };
 
     this.http.post<MessageCreateResponse>(url, body, this.httpOptions)

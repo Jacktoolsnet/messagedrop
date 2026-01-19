@@ -6,13 +6,13 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
 import * as leaflet from 'leaflet';
-import { DisplayMessage } from '../display-message/display-message.component';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
 import { NominatimPlace } from '../../../interfaces/nominatim-place';
-import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { NominatimService } from '../../../services/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { DisplayMessage } from '../display-message/display-message.component';
 
 type MarkerKind = 'message' | 'note';
 
