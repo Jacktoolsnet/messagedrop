@@ -2,16 +2,32 @@
   color: var(--mat-app-text-color);
 }
 
-::ng-deep mat-dialog-content {
-  max-height: unset !important;
-  overflow: visible !important;
-  display: block;
-}
-
-::ng-deep mat-dialog-container {
+/* === Dialog content: scroll under header/actions === */
+.mat-mdc-dialog-content {
   display: flex;
   flex-direction: column;
-  max-height: 95vh;
+  overflow: hidden;
+  max-height: calc(90vh - 10rem);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.profile-dialog-content {
+  padding: 0;
+}
+
+/* remove top padding bar from dialog container */
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.profile-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 1rem 1rem;
+  min-height: 0;
 }
 
 h4 {
@@ -57,9 +73,11 @@ select {
   position: relative;
   display: block;
   border-radius: 1rem;
-  margin-top: 1rem;
+  margin-bottom: 2.5rem;
   padding: 1.5rem;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
 }
 
 .center {
@@ -71,7 +89,7 @@ select {
 }
 
 .upload-button {
-  margin-left: 0.5rem;
+  margin-left: 0;
 }
 
 .avatar {
@@ -87,6 +105,27 @@ select {
   text-align: center;
 }
 
+.avatar-attribution {
+  margin: 0.35rem 0 0;
+  font-size: 0.75rem;
+  color: var(--mat-card-subtitle-text-color);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.4rem;
+  text-align: center;
+  flex-wrap: wrap;
+}
+
+.avatar-attribution__link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.avatar-attribution__link:hover {
+  text-decoration: underline;
+}
+
 .button_legal {
   position: absolute;
   bottom: 0;
@@ -100,7 +139,10 @@ select {
   position: absolute;
   bottom: 0;
   right: 0;
-  transform: translate(50%, 50%);
+  transform: translate(0, 50%);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .full-width {

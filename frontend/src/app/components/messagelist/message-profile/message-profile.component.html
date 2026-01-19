@@ -1,6 +1,7 @@
 <h2 mat-dialog-title class="dialog-title">{{ 'common.messageProfile.title' | transloco }}</h2>
 
-<mat-dialog-content>
+<mat-dialog-content class="profile-dialog-content">
+  <div class="profile-scroll">
   <mat-form-field appearance="fill" class="full-width">
     <mat-label>{{ 'common.messageProfile.nameLabel' | transloco }}</mat-label>
     <input matInput maxlength="64" [(ngModel)]="profile.name" />
@@ -11,7 +12,7 @@
 
   @if (!profile.base64Avatar || profile.base64Avatar === '') {
   <div class="avatar-area">
-    <button mat-flat-button class="button-set-avatar" (click)="fileUpload.click()">
+    <button mat-flat-button class="button-set-avatar" (click)="openAvatarSourceDialog(fileUpload)">
       <span>{{ 'common.messageProfile.addAvatar' | transloco }}</span>
     </button>
     <p class="background-hint">{{ 'common.messageProfile.avatarHint' | transloco }}</p>
@@ -24,6 +25,21 @@
       <img class="avatar" [src]="profile.base64Avatar"
         [attr.alt]="profile.name ? ('common.messageProfile.avatarAltName' | transloco:{ name: profile.name }) : ('common.messageProfile.avatarAltFallback' | transloco)" /><br />
     </div>
+    @if (profile.avatarAttribution?.source === 'unsplash') {
+    <p class="avatar-attribution">
+      <span>{{ 'common.avatarAttribution.photoBy' | transloco }}</span>
+      <a class="avatar-attribution__link"
+        [href]="profile.avatarAttribution?.authorUrl" target="_blank"
+        rel="noopener">
+        {{ profile.avatarAttribution?.authorName }}
+      </a>
+      <span>{{ 'common.avatarAttribution.onUnsplash' | transloco }}</span>
+      <a class="avatar-attribution__link" [href]="profile.avatarAttribution?.unsplashUrl"
+        target="_blank" rel="noopener">
+        Unsplash
+      </a>
+    </p>
+    }
     <div class="button-style">
       <button mat-mini-fab color="primary" class="upload-button" (click)="deleteAvatar()"
         [attr.aria-label]="'common.messageProfile.deleteAvatarAria' | transloco">
@@ -32,6 +48,7 @@
     </div>
   </div>
   }
+  </div>
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
