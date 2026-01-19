@@ -852,7 +852,7 @@
       "searching": "Searching for \"{{ term }}\"",
       "searchingNear": "Searching for \"{{ term }}\" near your location",
       "searchingWithArea": "Searching for \"{{ term }}\" {{ area }}",
-      "searchPlaceholder": "Search in OpenStreetMap",
+      "searchPlaceholder": "Search within the visible map area",
       "distanceLabel": "Distance",
       "noResults": "No locations found.",
       "searchFailed": "Search failed. Please try again later.",
