@@ -600,8 +600,49 @@ export class MessageService {
           const isRootMessage = this.messagesSignal().some(m => m.id === message.id);
 
           if (isRootMessage) {
-            this.messagesSignal.update(messages => messages.filter(m => m.id !== message.id));
+            const parentUuid = message.uuid;
+            const existing = this.messagesSignal();
+            const toRemove = new Set<string>([parentUuid]);
+            const queue: string[] = [parentUuid];
+
+            while (queue.length > 0) {
+              const current = queue.shift();
+              if (!current) {
+                continue;
+              }
+              const directFromMessages = existing
+                .filter(item => item.parentUuid === current)
+                .map(item => item.uuid);
+              const directFromSignals = this.commentsSignals.get(current)?.().map(item => item.uuid) ?? [];
+              [...directFromMessages, ...directFromSignals].forEach(uuid => {
+                if (!toRemove.has(uuid)) {
+                  toRemove.add(uuid);
+                  queue.push(uuid);
+                }
+              });
+            }
+
+            this.messagesSignal.update(messages =>
+              messages.filter(m => !toRemove.has(m.uuid) && !toRemove.has(m.parentUuid))
+            );
             this.selectedMessagesSignal.set([]);
+
+            this.commentCountsSignal.update(counts => {
+              const next = { ...counts };
+              toRemove.forEach(uuid => {
+                delete next[uuid];
+              });
+              return next;
+            });
+
+            toRemove.forEach(uuid => {
+              const sig = this.commentsSignals.get(uuid);
+              if (sig) {
+                sig.set([]);
+                this.commentsSignals.delete(uuid);
+              }
+              delete this.commentCounts[uuid];
+            });
           } else {
             const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
             commentsSignal.set(commentsSignal().filter(c => c.id !== message.id));
