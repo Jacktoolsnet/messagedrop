@@ -28,7 +28,12 @@
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
-                <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
+                <div class="avatar-text">
+                    <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
+                    @if (message.createDateTime !== null) {
+                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                    }
+                </div>
             </div>
             } @else {
             <div class="avatar-box" role="button" tabindex="0" (click)="editMessageUserProfile(message)"
@@ -39,12 +44,13 @@
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
-                <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
+                <div class="avatar-text">
+                    <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
+                    @if (message.createDateTime !== null) {
+                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                    }
+                </div>
             </div>
-            }
-
-            @if (message.createDateTime !== null) {
-            <div class="timestamp-box">{{ message.createDateTime | date:'medium' }}</div>
             }
 
             <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"
@@ -167,7 +173,12 @@
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
-                <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
+                <div class="avatar-text">
+                    <span class="name">{{ userProfile.name || ('common.messageList.myself' | transloco) }}</span>
+                    @if (message.createDateTime !== null) {
+                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                    }
+                </div>
             </div>
             } @else {
             <div class="avatar-box" role="button" tabindex="0" (click)="editMessageUserProfile(message)"
@@ -178,12 +189,13 @@
                 } @else {
                 <mat-icon>person</mat-icon>
                 }
-                <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
+                <div class="avatar-text">
+                    <span class="name">{{ profileService.getProfile(message.userId)?.name || ('common.messageList.nameFallback' | transloco) }}</span>
+                    @if (message.createDateTime !== null) {
+                    <span class="timestamp-inline">{{ message.createDateTime | date:'medium' }}</span>
+                    }
+                </div>
             </div>
-            }
-
-            @if (message.createDateTime !== null) {
-            <div class="timestamp-box">{{ message.createDateTime | date:'medium' }}</div>
             }
 
             <mat-card-content role="button" tabindex="0" (click)="onMessageCardActivate(message)"

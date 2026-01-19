@@ -104,8 +104,7 @@ h2[mat-dialog-title].dialog-title {
 
 /* Add a small top spacer ONLY when a card has an avatar badge:
    prevents the badge from visually colliding with the previous item */
-.item:has(.avatar-box),
-.item:has(.timestamp-box) {
+.item:has(.avatar-box) {
   /* this is outside the grid-gap budget, so keep it small */
   margin-top: 6px;
 }
@@ -120,7 +119,8 @@ h2[mat-dialog-title].dialog-title {
   z-index: 250;
   /* above the toolbar (toolbar: 200) */
 
-  height: 3rem;
+  height: auto;
+  min-height: 3rem;
   padding: 0.25rem 0.75rem;
 
   display: flex;
@@ -128,7 +128,7 @@ h2[mat-dialog-title].dialog-title {
   gap: 0.5rem;
 
   /* single line, clamp width, hide overflow */
-  max-width: min(82%, 22rem);
+  max-width: min(90%, 24rem);
   overflow: hidden;
 
   color: var(--mat-card-subtitle-text-color);
@@ -169,6 +169,13 @@ h2[mat-dialog-title].dialog-title {
 }
 
 /* Avatar name: keep to one line with ellipsis */
+.avatar-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 0.1rem;
+}
+
 .name {
   flex: 1 1 auto;
   min-width: 0;
@@ -180,38 +187,13 @@ h2[mat-dialog-title].dialog-title {
   text-overflow: ellipsis;
 }
 
-/* === Timestamp badge (top-right corner) === */
-.timestamp-box {
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate(0.65rem, -40%);
-  z-index: 240;
-
-  height: 2.5rem;
-  padding: 0.25rem 0.75rem;
-
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-
-  max-width: min(90%, 24rem);
+/* === Timestamp line inside avatar === */
+.timestamp-inline {
+  font-size: 0.8rem;
+  color: var(--mat-card-subtitle-text-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-
-  color: var(--mat-card-subtitle-text-color);
-  background-color: var(--mat-card-filled-container-color);
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  border-radius: 1.5rem;
-  font-size: 0.85rem;
-}
-
-@media (max-width: 600px) {
-  .timestamp-box {
-    transform: translate(0.5rem, -35%);
-    font-size: 0.8rem;
-  }
 }
 
 /* === Message content inside cards === */
