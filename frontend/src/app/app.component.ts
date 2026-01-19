@@ -33,6 +33,7 @@ import { ThirdPartyLicensesComponent } from './components/legal/third-party-lice
 import { MapComponent } from './components/map/map.component';
 import { MultiMarkerComponent } from './components/map/multi-marker/multi-marker.component';
 import { MessagelistComponent } from './components/messagelist/messagelist.component';
+import { MyMessagelistComponent } from './components/my-messagelist/my-messagelist.component';
 import { NotelistComponent } from './components/notelist/notelist.component';
 import { PlacelistComponent } from './components/placelist/placelist.component';
 import { SharedContentComponent } from './components/shared-content/shared-content.component';
@@ -995,7 +996,7 @@ export class AppComponent implements OnInit {
       .subscribe({
         next: (getMessageResponse) => {
           this.messageService.setMessages(this.messageService.mapRawMessages(getMessageResponse.rows));
-          const dialogRef = this.dialog.open(MessagelistComponent, {
+          const dialogRef = this.dialog.open(MyMessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { location: this.mapService.getMapLocation() },
@@ -1020,7 +1021,7 @@ export class AppComponent implements OnInit {
         },
         error: () => {
           this.messageService.clearMessages();
-          const dialogRef = this.dialog.open(MessagelistComponent, {
+          const dialogRef = this.dialog.open(MyMessagelistComponent, {
             panelClass: 'MessageListDialog',
             closeOnNavigation: true,
             data: { location: this.mapService.getMapLocation() },

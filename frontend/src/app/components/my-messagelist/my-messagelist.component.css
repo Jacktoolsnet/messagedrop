@@ -1,0 +1,337 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+h2[mat-dialog-title].dialog-title {
+  height: 3rem;
+  padding: 0.35rem 1rem;
+}
+
+.dialog-title__icon {
+  font-size: 1.8rem;
+  width: 1.8rem;
+  height: 1.8rem;
+}
+
+.dialog-title__text {
+  font-weight: 600;
+}
+
+/* === Dialog content: scroll under header/actions === */
+.mat-mdc-dialog-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(90vh - 10rem);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+}
+
+.message-dialog-content {
+  padding: 0;
+}
+
+/* remove top padding bar from dialog container */
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+}
+
+.message-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0 1rem 1rem;
+  min-height: 0;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 200px;
+  text-align: center;
+}
+
+.empty-text {
+  color: var(--mat-card-subtitle-text-color);
+  font-size: 0.95rem;
+}
+
+/* === Masonry grid container (works with the directive) === */
+.content {
+  /* layout sizing */
+  width: 100%;
+  max-width: 100%;
+  padding-top: 1rem;
+  padding-right: 0;
+
+  /* responsive columns */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr));
+  grid-auto-flow: row;
+
+  /* gaps: directive reads rowGap for vertical math */
+  row-gap: 1.5rem;
+  /* vertical gap between items (larger for badge clearance) */
+  column-gap: 1.5rem;
+  /* horizontal gap between columns */
+
+  /* masonry math unit (in px); grid-auto-rows uses the same */
+  --masonry-row-height: 4;
+  grid-auto-rows: calc(var(--masonry-row-height) * 1px);
+
+  /* prevent stretching; let cards keep natural height */
+  align-items: start;
+  white-space: normal;
+}
+
+/* === Card items inside the grid === */
+.item {
+  position: relative;
+  /* anchor for the avatar badge */
+  margin: 0;
+  /* gaps are controlled by the grid */
+  border-radius: 0.75rem;
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+
+  /* printing/columns safety (harmless in grid) */
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* Add a small top spacer ONLY when a card has an avatar badge:
+   prevents the badge from visually colliding with the previous item */
+.item:has(.avatar-box),
+.item:has(.timestamp-box) {
+  /* this is outside the grid-gap budget, so keep it small */
+  margin-top: 6px;
+}
+
+/* === Avatar badge (overlapping top-left corner) === */
+.avatar-box {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate(-0.65rem, -40%);
+  /* gentler overlap to reduce collisions */
+  z-index: 250;
+  /* above the toolbar (toolbar: 200) */
+
+  height: 3rem;
+  padding: 0.25rem 0.75rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  /* single line, clamp width, hide overflow */
+  max-width: min(82%, 22rem);
+  overflow: hidden;
+
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 1.5rem;
+
+  pointer-events: auto;
+  /* clickable */
+}
+
+/* Slightly smaller overlap on very narrow screens */
+@media (max-width: 600px) {
+  .avatar-box {
+    transform: translate(-0.5rem, -35%);
+    max-width: 85%;
+  }
+}
+
+/* Avatar image style */
+.avatar {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+/* Avatar icon fallback */
+.avatar-box mat-icon {
+  flex: 0 0 2.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  font-size: 2rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+}
+
+/* Avatar name: keep to one line with ellipsis */
+.name {
+  flex: 1 1 auto;
+  min-width: 0;
+  /* required for ellipsis in flex */
+  font-size: 1rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* === Timestamp badge (top-right corner) === */
+.timestamp-box {
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate(0.65rem, -40%);
+  z-index: 240;
+
+  height: 2.5rem;
+  padding: 0.25rem 0.75rem;
+
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  max-width: min(90%, 24rem);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  color: var(--mat-card-subtitle-text-color);
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  border-radius: 1.5rem;
+  font-size: 0.85rem;
+}
+
+@media (max-width: 600px) {
+  .timestamp-box {
+    transform: translate(0.5rem, -35%);
+    font-size: 0.8rem;
+  }
+}
+
+/* === Message content inside cards === */
+.message-content {
+  font-size: 0.9rem;
+  padding-top: 1.5rem;
+  margin-top: 1.25rem;
+  /* breathing room under the overlapping badge */
+  margin-bottom: 1.5rem;
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+/* Scale media only inside the message content (do not affect avatar) */
+.message-content img,
+.message-content video,
+.message-content iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* === Lists and buttons inside cards === */
+.list {
+  border-radius: 1.25rem;
+}
+
+button,
+.buttonbar_icon {
+  padding: 0.5rem;
+  margin: 0.5rem;
+}
+
+.buttonbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: start;
+  width: 100%;
+  column-gap: 0.75rem;
+  row-gap: 0.5rem;
+  margin-top: auto;
+}
+
+.buttonbar button {
+  margin: 0;
+}
+
+.buttonbar .button-delete {
+  justify-self: start;
+}
+
+.buttonbar .button-group {
+  grid-column: 2;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(2.5rem, max-content));
+  justify-content: end;
+  justify-items: end;
+  gap: 0.35rem 0.5rem;
+  max-width: min(100%, 20rem);
+  justify-self: end;
+}
+
+.buttonbar .dsa-status-button {
+  color: #fff;
+  --mdc-fab-icon-color: currentColor;
+  --mdc-fab-container-shape: 14px;
+  font-weight: 600;
+}
+
+.buttonbar .dsa-status-button.dsa-status-received {
+  background: linear-gradient(135deg, #ffb74d, #fb8c00);
+  --mdc-fab-container-color: #fb8c00;
+  --mdc-fab-hover-container-color: #f57c00;
+  --mdc-fab-pressed-container-color: #ef6c00;
+}
+
+.buttonbar .dsa-status-button.dsa-status-under-review {
+  background: linear-gradient(135deg, #ff7043, #f15a24);
+  --mdc-fab-container-color: #f15a24;
+  --mdc-fab-hover-container-color: #e64a19;
+  --mdc-fab-pressed-container-color: #d84315;
+}
+
+.buttonbar .dsa-status-button.dsa-status-decided {
+  background: linear-gradient(135deg, #ef5350, #c62828);
+  --mdc-fab-container-color: #c62828;
+  --mdc-fab-hover-container-color: #b71c1c;
+  --mdc-fab-pressed-container-color: #b71c1c;
+}
+
+.buttonbar .dsa-status-button.dsa-status-unknown {
+  background: linear-gradient(135deg, #9e9e9e, #616161);
+  --mdc-fab-container-color: #757575;
+  --mdc-fab-hover-container-color: #616161;
+  --mdc-fab-pressed-container-color: #424242;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 3;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  padding: 0.3rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.sticky-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
+}
+
+.sticky-actions button {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+}

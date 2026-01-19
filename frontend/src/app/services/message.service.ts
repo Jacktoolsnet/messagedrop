@@ -315,7 +315,7 @@ export class MessageService {
       });
   }
 
-  public createComment(message: Message, user: User, showAlways = false) {
+  public createComment(message: Message, user: User, showAlways = false, includeInRootList = false) {
     const url = `${environment.apiUrl}/message/create`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -355,9 +355,23 @@ export class MessageService {
             return;
           }
 
-          const commentsSignal = this.getCommentsSignalForMessage(message.parentUuid!);
-          commentsSignal.set([...commentsSignal(), { ...message, ...moderationPatch }]);
-          this.commentCounts[message.parentUuid] = this.commentCounts[message.parentUuid] + 1;
+          const parentUuid = message.parentUuid!;
+          const commentsSignal = this.getCommentsSignalForMessage(parentUuid);
+          const nextComments = [...commentsSignal(), { ...message, ...moderationPatch }];
+          commentsSignal.set(nextComments);
+          const nextCount = (this.commentCounts[parentUuid] ?? 0) + 1;
+          this.commentCounts[parentUuid] = nextCount;
+          this.commentCountsSignal.update(counts => ({
+            ...counts,
+            [parentUuid]: nextCount
+          }));
+          if (includeInRootList) {
+            this.messagesSignal.update(messages =>
+              messages.some(item => item.uuid === message.uuid)
+                ? messages
+                : [{ ...message, ...moderationPatch }, ...messages]
+            );
+          }
 
           if (decision === 'review') {
             this.showModerationReviewMessage(this.i18n.t('common.message.moderationReview'));
