@@ -208,6 +208,12 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
       marker.addTo(this.searchMarkerLayer!);
       this.searchMarkers.set(place.place_id, marker);
     });
+    if (this.searchResults.length === 1) {
+      const onlyPlace = this.searchResults[0];
+      if (onlyPlace) {
+        this.setSelectedSearchMarker(onlyPlace.place_id);
+      }
+    }
   }
 
   private setSelectedSearchMarker(placeId: number): void {
@@ -222,6 +228,11 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
       currentMarker.setIcon(markerIcons[this.data.markerType]);
       this.selectedPlaceId = placeId;
     }
+  }
+
+  private resetSearchMarkerIcons(): void {
+    this.searchMarkers.forEach(marker => marker.setIcon(searchMarkerIcon));
+    this.selectedPlaceId = undefined;
   }
 
   private initMap(): void {
@@ -254,6 +265,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
         plusCode: this.geolocationService.getPlusCode(lat, lng)
       };
       this.marker?.setLatLng(event.latlng);
+      this.resetSearchMarkerIcons();
     });
 
     this.map.on('zoomstart', (event: leaflet.LeafletEvent) => {
