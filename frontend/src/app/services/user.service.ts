@@ -908,7 +908,7 @@ export class UserService {
         cancelLabel: this.i18n.t('auth.pinForgotNewUser')
       },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     const result = await firstValueFrom(dialogRef.afterClosed());
@@ -1163,7 +1163,7 @@ export class UserService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
     if (!pin) {
@@ -1243,7 +1243,7 @@ export class UserService {
         confirmLabel: this.i18n.t('auth.resetKeysAction')
       },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -1428,7 +1428,7 @@ export class UserService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (pin: string | undefined) => {
       if (!pin) {
@@ -1474,7 +1474,7 @@ export class UserService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
       const requireJwt = options?.requireJwt ?? false;

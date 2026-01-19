@@ -293,7 +293,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -334,7 +334,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     if (this.clickedMessage) {
       const dialogRef = this.dialog.open(DeleteMessageComponent, {
         closeOnNavigation: true,
-        hasBackdrop: true
+        hasBackdrop: false
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -650,7 +650,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(MessageProfileComponent, {
       data: { profile, userId: message.userId },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(() => {

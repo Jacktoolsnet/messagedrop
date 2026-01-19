@@ -492,7 +492,7 @@ export class AppComponent implements OnInit {
         cancelLabel: this.translation.t('common.actions.no')
       },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -998,7 +998,7 @@ export class AppComponent implements OnInit {
       minWidth: '90vw',
       maxWidth: '90vw',
       autoFocus: false,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -1157,7 +1157,7 @@ export class AppComponent implements OnInit {
     const dialogRef = this.dialog.open(MultiMarkerComponent, {
       data: { messages: messages, notes: notes, images: images, documents: documents },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterOpened().subscribe(() => {
@@ -1302,7 +1302,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: false
     });
   }
 
@@ -1315,7 +1315,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: false
     });
   }
 
@@ -1328,7 +1328,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: false
     });
   }
 
@@ -1341,7 +1341,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: false
     });
   }
 
@@ -1366,7 +1366,7 @@ export class AppComponent implements OnInit {
       width: 'auto',
       maxWidth: '90vw',
       autoFocus: false,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
   }
@@ -1379,7 +1379,7 @@ export class AppComponent implements OnInit {
       width: '800px',
       maxWidth: '90vw',
       autoFocus: false,
-      hasBackdrop: true
+      hasBackdrop: false
     });
   }
 
@@ -1405,7 +1405,7 @@ export class AppComponent implements OnInit {
   public deleteUser() {
     const dialogRef = this.dialog.open(DeleteUserComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -1501,7 +1501,7 @@ export class AppComponent implements OnInit {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: true
+            hasBackdrop: false
           });
         }
       });
@@ -1567,7 +1567,7 @@ export class AppComponent implements OnInit {
               minHeight: '20vh',
               height: '90vh',
               maxHeight: '90vh',
-              hasBackdrop: true
+              hasBackdrop: false
             });
           } else {
             // Bei Fehlerstatus trotzdem Fehlerdialog zeigen

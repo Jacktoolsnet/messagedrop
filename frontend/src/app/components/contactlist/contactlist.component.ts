@@ -206,7 +206,7 @@ export class ContactlistComponent {
     this.contactToDelete = contact;
     const dialogRef = this.matDialog.open(DeleteContactComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe((result?: boolean) => {
@@ -238,7 +238,7 @@ export class ContactlistComponent {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(() => {

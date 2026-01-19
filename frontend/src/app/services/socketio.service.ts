@@ -269,7 +269,7 @@ export class SocketioService {
           const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
             data: { contact: payload.contact },
             closeOnNavigation: true,
-            hasBackdrop: true
+            hasBackdrop: false
           });
 
           dialogRef.afterClosed().subscribe(async result => {

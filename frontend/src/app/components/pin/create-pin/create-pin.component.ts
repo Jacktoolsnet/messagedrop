@@ -124,7 +124,7 @@ export class CreatePinComponent implements OnDestroy {
   showPinHint(): void {
     this.pinHintDialog.open(PinHintComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
   }
 }

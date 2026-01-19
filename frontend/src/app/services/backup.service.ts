@@ -157,7 +157,7 @@ export class BackupService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
     return firstValueFrom(dialogRef.afterClosed());
   }

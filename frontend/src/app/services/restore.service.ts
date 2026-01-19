@@ -225,7 +225,7 @@ export class RestoreService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: true
+      hasBackdrop: false
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
     return pin;
@@ -318,7 +318,7 @@ export class RestoreService {
         cancelLabel: this.i18n.t('common.cancel')
       },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     return (await firstValueFrom(dialogRef.afterClosed())) === true;

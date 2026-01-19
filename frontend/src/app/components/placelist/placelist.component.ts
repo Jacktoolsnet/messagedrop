@@ -85,7 +85,7 @@ export class PlacelistComponent {
     this.placeToDelete = place;
     const dialogRef = this.matDialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -120,7 +120,7 @@ export class PlacelistComponent {
       panelClass: '',
       data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,
-      hasBackdrop: true
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(() => {
