@@ -404,7 +404,8 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       minWidth: '700px',
       maxWidth: '95vw',
-      autoFocus: false
+      autoFocus: false,
+      hasBackdrop: false
     });
   }
 

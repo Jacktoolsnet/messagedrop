@@ -276,7 +276,8 @@ export class UserProfileComponent {
         resizeToWidth: this.maxAvatarDimension
       },
       maxWidth: '95vw',
-      width: '420px'
+      width: '420px',
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {

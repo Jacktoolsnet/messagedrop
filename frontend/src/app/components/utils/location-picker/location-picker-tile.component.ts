@@ -64,7 +64,8 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
       maxHeight: '95vh',
       width: '95vw',
       height: '95vh',
-      autoFocus: false
+      autoFocus: false,
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe((result?: Location) => {

@@ -186,7 +186,8 @@ export class PollutionTileComponent {
       maxWidth: '95vw',
       maxHeight: '95vh',
       height: 'auto',
-      data: { tile, availableKeys }
+      data: { tile, availableKeys },
+      hasBackdrop: false
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;

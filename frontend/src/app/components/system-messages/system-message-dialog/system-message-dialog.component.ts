@@ -134,7 +134,8 @@ export class SystemMessageDialogComponent implements OnInit {
   async confirmDelete(notification: SystemNotification, event?: MouseEvent): Promise<void> {
     event?.stopPropagation();
     const dialogRef = this.dialog.open(DeleteSystemNotificationComponent, {
-      width: '320px'
+      width: '320px',
+      hasBackdrop: false
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -161,7 +162,8 @@ export class SystemMessageDialogComponent implements OnInit {
   async confirmDeleteAll(event?: MouseEvent): Promise<void> {
     event?.stopPropagation();
     const dialogRef = this.dialog.open(DeleteAllSystemNotificationComponent, {
-      width: '320px'
+      width: '320px',
+      hasBackdrop: false
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());

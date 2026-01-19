@@ -53,7 +53,8 @@ export class TextTileEditComponent {
   pickIcon(): void {
     const ref = this.dialog.open(MaticonPickerComponent, {
       width: '520px',
-      data: { current: this.icon() }
+      data: { current: this.icon() },
+      hasBackdrop: false
     });
 
     ref.afterClosed().subscribe((selected?: string | null) => {

@@ -124,7 +124,8 @@ export class TileListComponent {
       minWidth: 'min(450px, 95vw)',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      data: contact ? { contact } : { place }
+      data: contact ? { contact } : { place },
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {

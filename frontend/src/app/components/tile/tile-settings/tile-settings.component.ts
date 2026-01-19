@@ -161,7 +161,8 @@ export class TileSettingsComponent {
     if (tile.type === 'custom-text') {
       const ref = this.dialog.open(TextTileEditComponent, {
         width: '520px',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -173,7 +174,8 @@ export class TileSettingsComponent {
     if (tile.type === 'custom-multitext') {
       const ref = this.dialog.open(MultitextTileEditComponent, {
         width: '520px',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -190,7 +192,8 @@ export class TileSettingsComponent {
         height: 'auto',
         maxHeight: '95vh',
         autoFocus: false,
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -204,7 +207,8 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -218,7 +222,8 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -232,7 +237,8 @@ export class TileSettingsComponent {
         width: '560px',
         maxWidth: '95vw',
         maxHeight: '98vh',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -248,7 +254,8 @@ export class TileSettingsComponent {
         maxWidth: '95vw',
         maxHeight: '95vh',
         height: 'auto',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -260,7 +267,8 @@ export class TileSettingsComponent {
     if (tile.type === 'custom-migraine') {
       const ref = this.dialog.open(MigraineTileEditComponent, {
         width: '520px',
-        data: { tile }
+        data: { tile },
+        hasBackdrop: false
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -280,7 +288,8 @@ export class TileSettingsComponent {
       return;
     }
     const ref = this.dialog.open(TileDeleteComponent, {
-      width: '360px'
+      width: '360px',
+      hasBackdrop: false
     });
     ref.afterClosed().subscribe(result => {
       if (!result) return;

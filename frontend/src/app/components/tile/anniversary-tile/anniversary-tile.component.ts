@@ -64,6 +64,7 @@ export class AnniversaryTileComponent implements OnChanges {
       height: 'auto',
       maxHeight: '95vh',
       autoFocus: false,
+      hasBackdrop: false,
       data: { tile }
     });
 

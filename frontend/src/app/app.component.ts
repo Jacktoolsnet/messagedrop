@@ -961,6 +961,7 @@ export class AppComponent implements OnInit {
           this.dialog.open(OverrideExifDataComponent, {
             data: { fileName: entry.fileName, previewUrl },
             autoFocus: false,
+            hasBackdrop: false
           }).afterClosed()
         );
 

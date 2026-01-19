@@ -73,7 +73,8 @@ export class TodoTileComponent implements OnChanges {
       maxWidth: '95vw',
       height: 'auto',
       maxHeight: '95vh',
-      data: { tile }
+      data: { tile },
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {

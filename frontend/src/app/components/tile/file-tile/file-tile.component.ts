@@ -77,7 +77,8 @@ export class FileTileComponent implements OnChanges {
       width: '560px',
       maxWidth: '95vw',
       maxHeight: '98vh',
-      data: { tile }
+      data: { tile },
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {

@@ -90,7 +90,7 @@ export class NotelistComponent {
   }
 
   deleteNote(note: Note) {
-    const dialogRef = this.dialog.open(DeleteNoteComponent);
+    const dialogRef = this.dialog.open(DeleteNoteComponent, { hasBackdrop: false });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
         await this.noteService.deleteNote(note);

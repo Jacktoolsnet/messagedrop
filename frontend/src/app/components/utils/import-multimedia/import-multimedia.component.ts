@@ -174,7 +174,8 @@ export class ImportMultimediaComponent {
       maxHeight: '90vh',
       width: 'min(700px, 90vw)',
       height: 'auto',
-      autoFocus: false
+      autoFocus: false,
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(() => {

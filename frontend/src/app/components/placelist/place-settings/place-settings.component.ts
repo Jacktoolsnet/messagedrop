@@ -437,7 +437,8 @@ export class PlaceProfileComponent {
         hintKey: 'common.backgroundCropper.hint'
       },
       maxWidth: '95vw',
-      width: '520px'
+      width: '520px',
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
@@ -530,7 +531,8 @@ export class PlaceProfileComponent {
         resizeToWidth: this.maxAvatarDimension
       },
       maxWidth: '95vw',
-      width: '420px'
+      width: '420px',
+      hasBackdrop: false
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {

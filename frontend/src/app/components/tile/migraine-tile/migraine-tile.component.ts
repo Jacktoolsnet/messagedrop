@@ -104,7 +104,8 @@ export class MigraineTileComponent {
     if (!tile) return;
     const ref = this.dialog.open(MigraineTileEditComponent, {
       width: '520px',
-      data: { tile }
+      data: { tile },
+      hasBackdrop: false
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;

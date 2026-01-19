@@ -62,7 +62,8 @@ export class QuickActionTileEditComponent {
   pickIcon(): void {
     const ref = this.dialog.open(MaticonPickerComponent, {
       width: '520px',
-      data: { current: this.icon() }
+      data: { current: this.icon() },
+      hasBackdrop: false
     });
 
     ref.afterClosed().subscribe((selected?: string | null) => {
@@ -137,7 +138,8 @@ export class QuickActionTileEditComponent {
     const ref = this.dialog.open(QuickActionActionEditComponent, {
       width: '520px',
       maxWidth: '95vw',
-      data: { action }
+      data: { action },
+      hasBackdrop: false
     });
 
     ref.afterClosed().subscribe((updated?: TileQuickAction) => {
