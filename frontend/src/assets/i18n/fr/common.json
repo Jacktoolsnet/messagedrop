@@ -312,6 +312,7 @@
       }
     },
     "messageList": {
+      "myTitle": "Mes messages publics",
       "addFirstMessage": "Ajouter mon premier message public",
       "addMessageAria": "Ajouter un message",
       "addFirstComment": "Ajouter mon premier commentaire public",

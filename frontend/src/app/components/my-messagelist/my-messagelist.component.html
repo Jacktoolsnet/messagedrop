@@ -3,7 +3,7 @@
         @if (messageService.selectedMessagesSignal().length === 0) { speaker_notes } @else { forum }
     </mat-icon>
     @if (messageService.selectedMessagesSignal().length === 0) {
-    <span class="dialog-title__text">{{ 'common.tiles.messages.title' | transloco }}</span>
+    <span class="dialog-title__text">{{ 'common.messageList.myTitle' | transloco }}</span>
     } @else {
     <span class="dialog-title__text">{{ 'common.messageList.commentsAria' | transloco }}</span>
     }

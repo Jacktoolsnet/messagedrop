@@ -312,6 +312,7 @@
       }
     },
     "messageList": {
+      "myTitle": "Meine öffentlichen Nachrichten",
       "addFirstMessage": "Erste öffentliche Nachricht hinzufügen",
       "addMessageAria": "Nachricht hinzufügen",
       "addFirstComment": "Ersten öffentlichen Kommentar hinzufügen",
