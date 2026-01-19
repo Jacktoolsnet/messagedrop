@@ -31,7 +31,7 @@ import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-croppe
   styleUrl: './message-profile.component.css'
 })
 export class MessageProfileComponent {
-  private readonly maxAvatarMb = 2;
+  private readonly maxAvatarMb = 10;
   private readonly maxAvatarBytes = this.maxAvatarMb * 1024 * 1024;
   private readonly maxAvatarDimension = 256;
   private readonly snackBar = inject(MatSnackBar);

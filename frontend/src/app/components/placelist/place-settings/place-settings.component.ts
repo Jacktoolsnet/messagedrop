@@ -47,9 +47,9 @@ export class PlaceProfileComponent {
 
   private readonly maxOriginalMb = 10;
   private readonly maxOriginalBytes = this.maxOriginalMb * 1024 * 1024;
-  private readonly maxAvatarMb = 2;
+  private readonly maxAvatarMb = 10;
   private readonly maxAvatarDimension = 256;
-  private readonly maxBackgroundMb = 2;
+  private readonly maxBackgroundMb = 10;
   private readonly maxBackgroundDimension = 1600;
   private oriName: string | undefined = undefined;
   private oriBase64Avatar: string | undefined = undefined;

@@ -40,7 +40,7 @@ export class AvatarCropperComponent {
   readonly data = inject<AvatarCropperData>(MAT_DIALOG_DATA);
 
   readonly resizeToWidth = this.data.resizeToWidth ?? 256;
-  readonly maxBytes = (this.data.maxSizeMb ?? 2) * 1024 * 1024;
+  readonly maxBytes = (this.data.maxSizeMb ?? 10) * 1024 * 1024;
   readonly maintainAspectRatio = this.data.maintainAspectRatio ?? true;
   readonly aspectRatio = this.data.aspectRatio ?? 1;
   readonly containWithinAspectRatio = this.data.containWithinAspectRatio ?? true;
@@ -86,7 +86,7 @@ export class AvatarCropperComponent {
     }
     if (this.isTooLarge(image)) {
       this.snackBar.open(
-        this.translation.t('common.avatarCropper.tooLarge', { maxMb: this.data.maxSizeMb ?? 2 }),
+        this.translation.t('common.avatarCropper.tooLarge', { maxMb: this.data.maxSizeMb ?? 10 }),
         this.translation.t('common.actions.ok'),
         { duration: 2500 }
       );

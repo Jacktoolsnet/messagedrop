@@ -42,7 +42,7 @@ import { LanguageService } from '../../../services/language.service';
   styleUrl: './user-profile.component.css'
 })
 export class UserProfileComponent {
-  private readonly maxAvatarMb = 2;
+  private readonly maxAvatarMb = 10;
   private readonly maxAvatarDimension = 256;
   private readonly maxOriginalMb = 10;
   private readonly maxOriginalBytes = this.maxOriginalMb * 1024 * 1024;
