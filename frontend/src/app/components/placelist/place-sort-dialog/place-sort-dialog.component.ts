@@ -65,7 +65,9 @@ export class PlaceSortDialogComponent {
       panelClass: '',
       data: { mode: Mode.EDIT_PLACE, place },
       closeOnNavigation: true,
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 

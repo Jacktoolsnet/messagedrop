@@ -23,9 +23,18 @@
     </div>
     }
 
-    @if (showOk && data.button) {
-    <button mat-raised-button color="primary" (click)="dialogRef.close(true)">
-        {{ data.button }}
-    </button>
+    @if (showOk && (data.button || data.secondaryButton)) {
+    <div class="dialog-actions">
+        @if (data.secondaryButton) {
+        <button mat-stroked-button color="primary" type="button" (click)="onSecondaryClick()">
+            {{ data.secondaryButton }}
+        </button>
+        }
+        @if (data.button) {
+        <button mat-raised-button color="primary" type="button" (click)="onPrimaryClick()">
+            {{ data.button }}
+        </button>
+        }
+    </div>
     }
 </div>

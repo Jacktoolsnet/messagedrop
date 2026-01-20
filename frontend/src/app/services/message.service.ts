@@ -117,7 +117,9 @@ export class MessageService {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
     this.moderationDialogRef = ref;
@@ -156,7 +158,9 @@ export class MessageService {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
     this.publishDialogRef = ref;
@@ -185,7 +189,9 @@ export class MessageService {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
     this.reviewDialogRef = ref;

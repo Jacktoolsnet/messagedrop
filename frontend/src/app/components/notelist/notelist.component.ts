@@ -90,7 +90,11 @@ export class NotelistComponent {
   }
 
   deleteNote(note: Note) {
-    const dialogRef = this.dialog.open(DeleteNoteComponent, { hasBackdrop: false });
+    const dialogRef = this.dialog.open(DeleteNoteComponent, {
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true
+    });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
         await this.noteService.deleteNote(note);
@@ -111,7 +115,9 @@ export class NotelistComponent {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -146,7 +152,9 @@ export class NotelistComponent {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 

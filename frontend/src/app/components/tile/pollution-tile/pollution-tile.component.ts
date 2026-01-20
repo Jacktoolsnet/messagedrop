@@ -187,7 +187,9 @@ export class PollutionTileComponent {
       maxHeight: '95vh',
       height: 'auto',
       data: { tile, availableKeys },
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
@@ -214,7 +216,9 @@ export class PollutionTileComponent {
       minHeight: '95vh',
       height: '95vh',
       maxHeight: '95vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
   }

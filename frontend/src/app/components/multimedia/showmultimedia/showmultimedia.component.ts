@@ -98,7 +98,9 @@ export class ShowmultimediaComponent implements OnChanges {
       width: 'min(700px, 90vw)',
       height: 'auto',
       autoFocus: false,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(() => {

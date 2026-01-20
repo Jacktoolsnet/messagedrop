@@ -105,7 +105,9 @@ export class MigraineTileComponent {
     const ref = this.dialog.open(MigraineTileEditComponent, {
       width: '520px',
       data: { tile },
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
@@ -139,7 +141,9 @@ export class MigraineTileComponent {
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 

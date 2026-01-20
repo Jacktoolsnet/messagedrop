@@ -135,7 +135,9 @@ export class SystemMessageDialogComponent implements OnInit {
     event?.stopPropagation();
     const dialogRef = this.dialog.open(DeleteSystemNotificationComponent, {
       width: '320px',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -163,7 +165,9 @@ export class SystemMessageDialogComponent implements OnInit {
     event?.stopPropagation();
     const dialogRef = this.dialog.open(DeleteAllSystemNotificationComponent, {
       width: '320px',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());

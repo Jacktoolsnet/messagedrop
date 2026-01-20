@@ -269,7 +269,9 @@ export class SocketioService {
           const dialogRef = this.dialog.open(ProfileConfirmRequestComponent, {
             data: { contact: payload.contact },
             closeOnNavigation: true,
-            hasBackdrop: false
+            hasBackdrop: true,
+            backdropClass: 'dialog-backdrop-transparent',
+            disableClose: true,
           });
 
           dialogRef.afterClosed().subscribe(async result => {
@@ -278,11 +280,13 @@ export class SocketioService {
               payload.contact.base64Avatar = (await this.avatarStorage.getImageBase64(
                 this.userService.getProfile().avatarFileId
               )) || '';
+              payload.contact.avatarAttribution = this.userService.getProfile().avatarAttribution;
               payload.contact.provided = true;
               this.socket.emit('contact:provideUserProfile', payload.contact);
             } else {
               payload.contact.name = '';
               payload.contact.base64Avatar = '';
+              payload.contact.avatarAttribution = undefined;
               payload.contact.provided = false;
               this.socket.emit('contact:provideUserProfile', payload.contact);
             }
@@ -296,6 +300,7 @@ export class SocketioService {
       if (payload.status == 200) {
         contact.name = payload.contact.name !== '' ? payload.contact.name : this.i18n.t('common.contact.notSet');
         const incomingAvatar = payload.contact.base64Avatar || '';
+        contact.avatarAttribution = incomingAvatar ? payload.contact.avatarAttribution : undefined;
         if (incomingAvatar !== '' && this.avatarStorage.isSupported()) {
           this.avatarStorage.saveImageFromBase64('avatar', incomingAvatar).then((saved) => {
             if (saved) {
@@ -303,11 +308,13 @@ export class SocketioService {
               contact.base64Avatar = saved.url;
             } else {
               contact.base64Avatar = undefined;
+              contact.avatarAttribution = undefined;
             }
             this.contactService.saveAditionalContactInfos();
           });
         } else {
           contact.base64Avatar = undefined;
+          contact.avatarAttribution = undefined;
           this.contactService.saveAditionalContactInfos();
         }
       } else {

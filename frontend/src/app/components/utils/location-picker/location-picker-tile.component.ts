@@ -65,7 +65,9 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
       width: '95vw',
       height: '95vh',
       autoFocus: false,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((result?: Location) => {

@@ -259,7 +259,9 @@ export class PlaceProfileComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -278,7 +280,9 @@ export class PlaceProfileComponent {
     const dialogRef = this.dialog.open(AvatarSourceDialogComponent, {
       panelClass: '',
       closeOnNavigation: true,
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false,
       data: {
         titleKey: 'common.backgroundSource.title',
@@ -304,7 +308,9 @@ export class PlaceProfileComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -323,7 +329,9 @@ export class PlaceProfileComponent {
       data: { returnType: 'photo' },
       maxWidth: '95vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -438,7 +446,9 @@ export class PlaceProfileComponent {
       },
       maxWidth: '95vw',
       width: '520px',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
@@ -532,7 +542,9 @@ export class PlaceProfileComponent {
       },
       maxWidth: '95vw',
       width: '420px',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {

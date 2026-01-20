@@ -59,7 +59,9 @@ export class ContactSortDialogComponent {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 

@@ -143,7 +143,11 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   }
 
   deleteImage(image: LocalImage) {
-    const dialogRef = this.dialog.open(DeleteImageComponent, { hasBackdrop: false });
+    const dialogRef = this.dialog.open(DeleteImageComponent, {
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true
+    });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
         await this.localImageService.deleteImage(image);
@@ -218,7 +222,9 @@ export class ImagelistComponent implements OnInit, OnDestroy {
           this.dialog.open(OverrideExifDataComponent, {
             data: { fileName: entry.fileName, previewUrl },
             autoFocus: false,
-            hasBackdrop: false
+            hasBackdrop: true,
+            backdropClass: 'dialog-backdrop-transparent',
+            disableClose: true,
           }).afterClosed()
         );
 

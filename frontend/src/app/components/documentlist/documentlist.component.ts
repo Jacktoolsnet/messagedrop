@@ -107,7 +107,11 @@ export class DocumentlistComponent implements OnInit {
   }
 
   deleteDocument(document: LocalDocument) {
-    const dialogRef = this.dialog.open(DeleteDocumentComponent, { hasBackdrop: false });
+    const dialogRef = this.dialog.open(DeleteDocumentComponent, {
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true
+    });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
         await this.localDocumentService.deleteDocument(document);

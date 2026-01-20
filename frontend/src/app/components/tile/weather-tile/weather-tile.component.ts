@@ -100,7 +100,9 @@ export class WeatherTileComponent {
       minHeight: '90vh',
       height: '90vh',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
   }

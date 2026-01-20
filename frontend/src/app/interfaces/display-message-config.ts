@@ -5,6 +5,7 @@ export interface DisplayMessageConfig {
     icon: string,
     message: string,
     button: string,
+    secondaryButton?: string,
     delay: number,
     showSpinner: boolean,
     autoclose: boolean

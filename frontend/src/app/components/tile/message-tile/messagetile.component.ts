@@ -60,7 +60,9 @@ export class MessageTileComponent implements OnInit, OnDestroy {
       width: 'auto',
       maxHeight: 'none',
       height: 'auto',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
   }

@@ -68,7 +68,9 @@ export class QuickActionTileComponent implements OnChanges {
       maxWidth: '95vw',
       maxHeight: '98vh',
       data: { tile },
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {

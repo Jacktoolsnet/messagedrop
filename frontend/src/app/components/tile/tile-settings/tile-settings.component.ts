@@ -162,7 +162,9 @@ export class TileSettingsComponent {
       const ref = this.dialog.open(TextTileEditComponent, {
         width: '520px',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -175,7 +177,9 @@ export class TileSettingsComponent {
       const ref = this.dialog.open(MultitextTileEditComponent, {
         width: '520px',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -193,7 +197,9 @@ export class TileSettingsComponent {
         maxHeight: '95vh',
         autoFocus: false,
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -208,7 +214,9 @@ export class TileSettingsComponent {
         maxWidth: '95vw',
         maxHeight: '98vh',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -223,7 +231,9 @@ export class TileSettingsComponent {
         maxWidth: '95vw',
         maxHeight: '98vh',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -238,7 +248,9 @@ export class TileSettingsComponent {
         maxWidth: '95vw',
         maxHeight: '98vh',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -255,7 +267,9 @@ export class TileSettingsComponent {
         maxHeight: '95vh',
         height: 'auto',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -268,7 +282,9 @@ export class TileSettingsComponent {
       const ref = this.dialog.open(MigraineTileEditComponent, {
         width: '520px',
         data: { tile },
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -289,7 +305,9 @@ export class TileSettingsComponent {
     }
     const ref = this.dialog.open(TileDeleteComponent, {
       width: '360px',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
     ref.afterClosed().subscribe(result => {
       if (!result) return;

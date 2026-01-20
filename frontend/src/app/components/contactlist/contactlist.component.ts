@@ -159,7 +159,9 @@ export class ContactlistComponent {
       maxWidth: '90vw',
       height: 'auto',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -189,7 +191,9 @@ export class ContactlistComponent {
       panelClass: '',
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -207,7 +211,9 @@ export class ContactlistComponent {
     this.contactToDelete = contact;
     const dialogRef = this.matDialog.open(DeleteContactComponent, {
       closeOnNavigation: true,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((result?: boolean) => {
@@ -239,7 +245,9 @@ export class ContactlistComponent {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -256,7 +264,9 @@ export class ContactlistComponent {
       width: 'min(900px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
   }
@@ -322,7 +332,9 @@ export class ContactlistComponent {
       width: 'max(600px, 95vw)',
       maxHeight: '95vh',
       height: 'auto',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -430,7 +442,9 @@ export class ContactlistComponent {
                     connect.id = createConnectResponse.connectId;
                     this.matDialog.open(QrcodeComponent, {
                       closeOnNavigation: true,
-                      hasBackdrop: false,
+                      hasBackdrop: true,
+                      backdropClass: 'dialog-backdrop-transparent',
+                      disableClose: true,
                       data: { qrData: createConnectResponse.connectId }
                     });
                   }

@@ -80,7 +80,9 @@ export class QuickActionActionEditComponent {
     const ref = this.dialog.open(MaticonPickerComponent, {
       width: '520px',
       data: { current: this.icon() },
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     ref.afterClosed().subscribe((selected?: string | null) => {

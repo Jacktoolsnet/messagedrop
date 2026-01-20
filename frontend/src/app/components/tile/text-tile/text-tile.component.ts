@@ -57,7 +57,9 @@ export class TextTileComponent implements OnChanges {
     const dialogRef = this.dialog.open(TextTileEditComponent, {
       width: '520px',
       data: { tile },
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {

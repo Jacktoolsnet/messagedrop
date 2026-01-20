@@ -285,7 +285,9 @@ export class ContactChatroomComponent implements AfterViewInit {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -300,7 +302,9 @@ export class ContactChatroomComponent implements AfterViewInit {
       closeOnNavigation: true,
       maxHeight: '90vh',
       maxWidth: '90vw',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -322,7 +326,9 @@ export class ContactChatroomComponent implements AfterViewInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -417,7 +423,9 @@ export class ContactChatroomComponent implements AfterViewInit {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -436,7 +444,9 @@ export class ContactChatroomComponent implements AfterViewInit {
     }
     const dialogRef = this.matDialog.open(DeleteContactMessageComponent, {
       closeOnNavigation: true,
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 

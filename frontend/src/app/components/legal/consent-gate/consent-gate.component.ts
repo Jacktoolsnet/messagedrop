@@ -83,11 +83,12 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       this.dialog.open(PrivacyPolicyComponent, {
         closeOnNavigation: true,
         autoFocus: false,
-        disableClose: false,
         maxHeight: '90vh',
         width: '800px',
         maxWidth: '90vw',
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
@@ -95,11 +96,12 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       this.dialog.open(TermsOfServiceComponent, {
         closeOnNavigation: true,
         autoFocus: false,
-        disableClose: false,
         maxHeight: '90vh',
         width: '800px',
         maxWidth: '90vw',
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
@@ -107,11 +109,12 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       this.dialog.open(DisclaimerComponent, {
         closeOnNavigation: true,
         autoFocus: false,
-        disableClose: false,
         maxHeight: '90vh',
         width: '800px',
         maxWidth: '90vw',
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
@@ -150,7 +153,9 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       width: '800px',
       maxWidth: '90vw',
       autoFocus: false,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(() => this.computeMissing());

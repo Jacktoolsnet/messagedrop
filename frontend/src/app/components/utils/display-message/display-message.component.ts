@@ -30,4 +30,12 @@ export class DisplayMessage implements OnInit {
       }
     }, this.data.delay);
   }
+
+  onPrimaryClick(): void {
+    this.dialogRef.close(true);
+  }
+
+  onSecondaryClick(): void {
+    this.dialogRef.close('secondary');
+  }
 }

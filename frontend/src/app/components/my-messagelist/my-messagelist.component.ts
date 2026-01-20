@@ -293,7 +293,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       width: '800px',
       maxWidth: '90vw',
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -334,7 +336,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     if (this.clickedMessage) {
       const dialogRef = this.dialog.open(DeleteMessageComponent, {
         closeOnNavigation: true,
-        hasBackdrop: false
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -405,7 +409,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       minWidth: '700px',
       maxWidth: '95vw',
       autoFocus: false,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
   }
 
@@ -596,7 +602,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
   }
@@ -627,7 +635,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         minWidth: '20vw',
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
         autoFocus: false
       });
 
@@ -650,7 +660,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(MessageProfileComponent, {
       data: { profile, userId: message.userId },
       closeOnNavigation: true,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -721,7 +733,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
@@ -813,7 +827,9 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       minWidth: '20vw',
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 

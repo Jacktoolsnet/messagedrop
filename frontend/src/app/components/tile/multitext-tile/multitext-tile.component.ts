@@ -57,7 +57,9 @@ export class MultitextTileComponent implements OnChanges {
     const dialogRef = this.dialog.open(MultitextTileEditComponent, {
       width: '520px',
       data: { tile },
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {

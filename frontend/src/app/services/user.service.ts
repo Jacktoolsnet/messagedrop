@@ -85,6 +85,8 @@ export class UserService {
 
   private ready = false;
   private blocked = false;
+  private lastPinCallback?: () => void;
+  private lastPinOptions?: { requireJwt?: boolean; attemptBackend?: boolean };
 
   httpOptions = {
     headers: new HttpHeaders({
@@ -231,7 +233,9 @@ export class UserService {
               },
               maxWidth: '90vw',
               maxHeight: '90vh',
-              hasBackdrop: false,
+              hasBackdrop: true,
+              backdropClass: 'dialog-backdrop-transparent',
+              disableClose: true,
               autoFocus: false
             });
 
@@ -255,7 +259,9 @@ export class UserService {
               },
               maxWidth: '90vw',
               maxHeight: '90vh',
-              hasBackdrop: false,
+              hasBackdrop: true,
+              backdropClass: 'dialog-backdrop-transparent',
+              disableClose: true,
               autoFocus: false
             });
 
@@ -281,7 +287,9 @@ export class UserService {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: false,
+            hasBackdrop: true,
+            backdropClass: 'dialog-backdrop-transparent',
+            disableClose: true,
             autoFocus: false
           });
 
@@ -527,7 +535,9 @@ export class UserService {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: false,
+            hasBackdrop: true,
+            backdropClass: 'dialog-backdrop-transparent',
+            disableClose: true,
             autoFocus: false
           });
 
@@ -554,7 +564,9 @@ export class UserService {
           },
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: false,
+          hasBackdrop: true,
+          backdropClass: 'dialog-backdrop-transparent',
+          disableClose: true,
           autoFocus: false
         });
 
@@ -871,7 +883,9 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
         autoFocus: false
       });
 
@@ -908,7 +922,9 @@ export class UserService {
         cancelLabel: this.i18n.t('auth.pinForgotNewUser')
       },
       closeOnNavigation: true,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     const result = await firstValueFrom(dialogRef.afterClosed());
@@ -938,16 +954,24 @@ export class UserService {
         icon: 'warning',
         message: this.i18n.t('auth.pinIncorrect'),
         button: this.i18n.t('auth.pinForgotAction'),
+        secondaryButton: this.i18n.t('common.actions.retry'),
         delay: 0,
         showSpinner: false
       },
       maxWidth: '90vw',
       maxHeight: '90vh',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
     dialogRef.afterClosed().subscribe((result) => {
+      if (result === 'secondary') {
+        this.blocked = false;
+        this.openCheckPinDialog(this.lastPinCallback, this.lastPinOptions);
+        return;
+      }
       if (result !== true) {
         this.blocked = false;
         return;
@@ -969,7 +993,9 @@ export class UserService {
           },
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: false,
+          hasBackdrop: true,
+          backdropClass: 'dialog-backdrop-transparent',
+          disableClose: true,
           autoFocus: false
         });
         errorDialog.afterClosed().subscribe(() => {
@@ -1163,7 +1189,9 @@ export class UserService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
     if (!pin) {
@@ -1198,7 +1226,9 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
         autoFocus: false
       });
 
@@ -1222,7 +1252,9 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
         autoFocus: false
       });
       errorDialog.afterClosed().subscribe(() => {
@@ -1243,7 +1275,9 @@ export class UserService {
         confirmLabel: this.i18n.t('auth.resetKeysAction')
       },
       closeOnNavigation: true,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -1285,7 +1319,9 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
         autoFocus: false
       });
 
@@ -1309,7 +1345,9 @@ export class UserService {
         },
         maxWidth: '90vw',
         maxHeight: '90vh',
-        hasBackdrop: false,
+        hasBackdrop: true,
+        backdropClass: 'dialog-backdrop-transparent',
+        disableClose: true,
         autoFocus: false
       });
       errorDialog.afterClosed().subscribe(() => {
@@ -1428,7 +1466,9 @@ export class UserService {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (pin: string | undefined) => {
       if (!pin) {
@@ -1457,7 +1497,9 @@ export class UserService {
             },
             maxWidth: '90vw',
             maxHeight: '90vh',
-            hasBackdrop: false,
+            hasBackdrop: true,
+            backdropClass: 'dialog-backdrop-transparent',
+            disableClose: true,
             autoFocus: false
           });
 
@@ -1470,11 +1512,15 @@ export class UserService {
   }
 
   public openCheckPinDialog(callback?: () => void, options?: { requireJwt?: boolean; attemptBackend?: boolean }): void {
+    this.lastPinCallback = callback;
+    this.lastPinOptions = options;
     const dialogRef = this.checkPinDialog.open(CheckPinComponent, {
       panelClass: '',
       closeOnNavigation: true,
       data: {},
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
       const requireJwt = options?.requireJwt ?? false;
@@ -1557,7 +1603,9 @@ export class UserService {
                       },
                       maxWidth: '90vw',
                       maxHeight: '90vh',
-                      hasBackdrop: false,
+                      hasBackdrop: true,
+                      backdropClass: 'dialog-backdrop-transparent',
+                      disableClose: true,
                       autoFocus: false
                     });
 
@@ -1580,7 +1628,9 @@ export class UserService {
                             },
                             maxWidth: '90vw',
                             maxHeight: '90vh',
-                            hasBackdrop: false,
+                            hasBackdrop: true,
+                            backdropClass: 'dialog-backdrop-transparent',
+                            disableClose: true,
                             autoFocus: false
                           });
                           errorDialog.afterClosed().subscribe(() => {
@@ -1604,7 +1654,9 @@ export class UserService {
                       },
                       maxWidth: '90vw',
                       maxHeight: '90vh',
-                      hasBackdrop: false,
+                      hasBackdrop: true,
+                      backdropClass: 'dialog-backdrop-transparent',
+                      disableClose: true,
                       autoFocus: false
                     });
                     dialogRef.afterClosed().subscribe(() => {
@@ -1632,7 +1684,9 @@ export class UserService {
                 },
                 maxWidth: '90vw',
                 maxHeight: '90vh',
-                hasBackdrop: false,
+                hasBackdrop: true,
+                backdropClass: 'dialog-backdrop-transparent',
+                disableClose: true,
                 autoFocus: false
               });
 
@@ -1655,7 +1709,9 @@ export class UserService {
                       },
                       maxWidth: '90vw',
                       maxHeight: '90vh',
-                      hasBackdrop: false,
+                      hasBackdrop: true,
+                      backdropClass: 'dialog-backdrop-transparent',
+                      disableClose: true,
                       autoFocus: false
                     });
                     errorDialog.afterClosed().subscribe(() => {
@@ -1679,7 +1735,9 @@ export class UserService {
                 },
                 maxWidth: '90vw',
                 maxHeight: '90vh',
-                hasBackdrop: false,
+                hasBackdrop: true,
+                backdropClass: 'dialog-backdrop-transparent',
+                disableClose: true,
                 autoFocus: false
               });
               dialogRef.afterClosed().subscribe(() => {
@@ -1748,7 +1806,9 @@ export class UserService {
           },
           maxWidth: '90vw',
           maxHeight: '90vh',
-          hasBackdrop: false,
+          hasBackdrop: true,
+          backdropClass: 'dialog-backdrop-transparent',
+          disableClose: true,
           autoFocus: false
         });
         dialogRef.afterClosed().subscribe(() => {

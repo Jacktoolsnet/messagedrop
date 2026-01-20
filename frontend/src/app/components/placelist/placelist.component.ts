@@ -86,7 +86,9 @@ export class PlacelistComponent {
     this.placeToDelete = place;
     const dialogRef = this.matDialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -121,7 +123,9 @@ export class PlacelistComponent {
       panelClass: '',
       data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,
-      hasBackdrop: false
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -191,7 +195,9 @@ export class PlacelistComponent {
       width: 'min(900px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
   }
