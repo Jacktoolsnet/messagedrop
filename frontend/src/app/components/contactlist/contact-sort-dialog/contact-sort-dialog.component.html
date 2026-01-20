@@ -20,6 +20,11 @@
         }
       </span>
       <span class="name">{{ getContactName(contact) }}</span>
+      <button mat-icon-button color="primary" class="settings-button" type="button"
+        [attr.aria-label]="'common.contact.list.editAria' | transloco"
+        (click)="openContactSettings(contact)">
+        <mat-icon>settings</mat-icon>
+      </button>
     </div>
     }
   </div>

@@ -91,11 +91,17 @@ h2[mat-dialog-title].dialog-title {
 }
 
 .name {
+  flex: 1 1 auto;
+  min-width: 0;
   font-weight: 500;
   font-size: 0.95rem;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+}
+
+.settings-button {
+  margin-left: auto;
 }
 
 .sticky-actions {

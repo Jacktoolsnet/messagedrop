@@ -2,11 +2,13 @@ import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } fro
 import { CommonModule } from '@angular/common';
 import { Component, inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
+import { ContactService } from '../../../services/contact.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { ContactSettingsComponent } from '../../contact/contact-setting/contact-settings.component';
 
 interface ContactSortDialogData {
   contacts: Contact[];
@@ -35,9 +37,11 @@ interface ContactSortDialogResult {
 })
 export class ContactSortDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<ContactSortDialogComponent>);
+  private readonly dialog = inject(MatDialog);
+  private readonly contactService = inject(ContactService);
   private readonly translation = inject(TranslationHelperService);
   private readonly data = inject<ContactSortDialogData>(MAT_DIALOG_DATA);
-  readonly contacts = signal<Contact[]>(this.data.contacts.map(contact => ({ ...contact })));
+  readonly contacts = signal<Contact[]>([...this.data.contacts]);
 
   drop(event: CdkDragDrop<Contact[]>) {
     const updated = [...this.contacts()];
@@ -47,6 +51,23 @@ export class ContactSortDialogComponent {
 
   getContactName(contact: Contact): string {
     return contact.name?.trim() || this.translation.t('common.contact.list.nameFallback');
+  }
+
+  openContactSettings(contact: Contact): void {
+    const dialogRef = this.dialog.open(ContactSettingsComponent, {
+      data: { contact },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.contactService.updateContactName(contact);
+      this.contactService.saveAditionalContactInfos();
+      this.contacts.set([...this.contacts()]);
+    });
   }
 
   close(): void {

@@ -20,6 +20,11 @@
         }
       </span>
       <span class="name">{{ getPlaceName(place) }}</span>
+      <button mat-icon-button color="primary" class="settings-button" type="button"
+        [attr.aria-label]="'common.placeList.editAria' | transloco"
+        (click)="openPlaceSettings(place)">
+        <mat-icon>settings</mat-icon>
+      </button>
     </div>
     }
   </div>
