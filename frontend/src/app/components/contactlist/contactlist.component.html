@@ -77,18 +77,6 @@
                         }
                     </div>
                     <div class="tile-actions__right">
-                        @if (contact.pinned) {
-                        <button mat-mini-fab color="'active-button'"
-                            [attr.aria-label]="'common.contact.list.unpinAria' | transloco"
-                            (click)="unpinContact(contact)">
-                            <mat-icon>keep_off</mat-icon>
-                        </button>
-                        } @else {
-                        <button mat-mini-fab color="'active-button'"
-                            [attr.aria-label]="'common.contact.list.pinAria' | transloco" (click)="pinContact(contact)">
-                            <mat-icon>keep</mat-icon>
-                        </button>
-                        }
                         @if (userService.hasJwt()) {
                         <button mat-mini-fab color="'active-button'"
                             [attr.aria-label]="'common.contact.list.openChatroomAria' | transloco"
@@ -139,6 +127,12 @@
         <mat-icon>close</mat-icon>
     </button>
     @if (userService.hasJwt()) {
+    @if (contactsSignal().length > 1) {
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.list.sortAria' | transloco"
+        (click)="openSortDialog()">
+        <mat-icon>swap_vert</mat-icon>
+    </button>
+    }
     <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.connect.addAria' | transloco"
         [matMenuTriggerFor]="connectionMenu">
         <mat-icon>connect_without_contact</mat-icon>

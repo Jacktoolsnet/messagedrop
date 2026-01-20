@@ -74,17 +74,6 @@
                         }
                     </div>
                     <div class="tile-actions__right">
-                        @if(place.pinned) {
-                        <button mat-mini-fab color="'active-button'"
-                            [attr.aria-label]="'common.placeList.unpinAria' | transloco" (click)="unpinPlace(place)">
-                            <mat-icon>keep_off</mat-icon>
-                        </button>
-                        } @else {
-                        <button mat-mini-fab color="'active-button'"
-                            [attr.aria-label]="'common.placeList.pinAria' | transloco" (click)="pinPlace(place)">
-                            <mat-icon>keep</mat-icon>
-                        </button>
-                        }
                         <button mat-mini-fab color="'active-button'" (click)="openTileList(place)"
                             [attr.aria-label]="tileListAriaLabel(place)">
                             <mat-icon>dashboard</mat-icon>
@@ -137,6 +126,12 @@
         <mat-icon>close</mat-icon>
     </button>
     @if (userService.hasJwt()) {
+    @if (placesSignal().length > 1) {
+    <button mat-icon-button color="primary" [attr.aria-label]="'common.placeList.sortAria' | transloco"
+        (click)="openSortDialog()">
+        <mat-icon>swap_vert</mat-icon>
+    </button>
+    }
     <button mat-icon-button color="primary" [attr.aria-label]="'common.placeList.addPlaceAria' | transloco"
         (click)="addPlace()">
         <mat-icon>add_location</mat-icon>

@@ -126,10 +126,11 @@ export class PlaceService {
 
   readonly sortedPlacesSignal = computed(() =>
     this.getPlaces().slice().sort((a, b) => {
-      if (a.pinned !== b.pinned) {
-        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      const orderA = a.sortOrder ?? Number.POSITIVE_INFINITY;
+      const orderB = b.sortOrder ?? Number.POSITIVE_INFINITY;
+      if (orderA !== orderB) {
+        return orderA - orderB;
       }
-
       const nameCompare = a.name.localeCompare(b.name);
       if (nameCompare !== 0) {
         return nameCompare;
@@ -141,6 +142,37 @@ export class PlaceService {
 
   setPlaces(places: Place[]) {
     this._places.set(places);
+  }
+
+  getNextSortOrder(): number {
+    const orders = this._places().map(place => place.sortOrder).filter((order): order is number => typeof order === 'number');
+    if (!orders.length) {
+      return this._places().length;
+    }
+    return Math.max(...orders) + 1;
+  }
+
+  async updatePlaceOrder(orderedIds: string[]): Promise<void> {
+    const orderMap = new Map(orderedIds.map((id, index) => [id, index]));
+    const fallbackStart = orderedIds.length;
+    let fallbackIndex = 0;
+
+    const updated = this._places().map((place) => {
+      const order = orderMap.get(place.id);
+      if (order === undefined) {
+        const value = fallbackStart + fallbackIndex;
+        fallbackIndex += 1;
+        return { ...place, sortOrder: value };
+      }
+      return { ...place, sortOrder: order };
+    }).map(place => this.normalizePlaceTileSettings(place));
+
+    this._places.set(updated);
+
+    await Promise.all(updated.map(async (place) => {
+      await this.indexedDbService.setPlaceProfile(place.id, place);
+      await this.indexedDbService.setTileSettings(place.id, place.tileSettings ?? []);
+    }));
   }
 
   async saveAdditionalPlaceInfos(place: Place) {

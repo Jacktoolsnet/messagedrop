@@ -28,6 +28,7 @@ import { DeleteContactComponent } from '../contact/delete-contact/delete-contact
 import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
+import { ContactSortDialogComponent } from './contact-sort-dialog/contact-sort-dialog.component';
 
 interface ConnectDialogResult {
   connectId?: string;
@@ -285,22 +286,26 @@ export class ContactlistComponent {
     }
   }
 
-  public pinContact(contact: Contact) {
-    contact.pinned = true;
-    this.contactService.saveAditionalContactInfos();
-    const updatedContacts = this.contactService.contactsSignal().map(c =>
-      c.id === contact.id ? { ...c, pinned: true } : c
-    );
-    this.contactService.setContacts(updatedContacts);
-  }
+  openSortDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(ContactSortDialogComponent, {
+      data: { contacts: this.contactsSignal() },
+      minWidth: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(680px, 95vw)',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: false,
+      autoFocus: false
+    });
 
-  public unpinContact(contact: Contact) {
-    contact.pinned = false;
-    this.contactService.saveAditionalContactInfos();
-    const updatedContacts = this.contactService.contactsSignal().map(c =>
-      c.id === contact.id ? { ...c, pinned: false } : c
-    );
-    this.contactService.setContacts(updatedContacts);
+    dialogRef.afterClosed().subscribe((result?: { orderedIds?: string[] }) => {
+      if (result?.orderedIds?.length) {
+        this.contactService.updateContactOrder(result.orderedIds);
+      }
+    });
   }
 
   openContactChatroom(contact: Contact): void {

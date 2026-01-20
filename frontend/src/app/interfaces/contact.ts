@@ -29,6 +29,7 @@ export interface Contact {
     chatBackgroundTransparency?: number,
     subscribed: boolean,
     pinned: boolean,
+    sortOrder?: number,
     provided: boolean,
     lastMessageFrom: string,
     lastMessageAt?: string | null

@@ -210,6 +210,7 @@ export class NominatimSearchComponent {
       icon: '',
       subscribed: false,
       pinned: false,
+      sortOrder: this.placeService.getNextSortOrder(),
       boundingBox: {
         latMin: 0,
         lonMin: 0,

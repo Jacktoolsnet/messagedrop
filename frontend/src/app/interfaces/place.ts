@@ -23,6 +23,7 @@ export interface Place {
     icon: string,
     subscribed: boolean,
     pinned: boolean,
+    sortOrder?: number,
     boundingBox: BoundingBox,
     timezone: string,
     tileSettings?: TileSetting[],

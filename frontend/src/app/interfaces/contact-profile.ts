@@ -12,5 +12,6 @@ export interface ContactProfile {
     chatBackgroundAttribution?: AvatarAttribution,
     chatBackgroundTransparency?: number,
     defaultStyle?: string,
-    pinned: boolean
+    pinned: boolean,
+    sortOrder?: number
 }

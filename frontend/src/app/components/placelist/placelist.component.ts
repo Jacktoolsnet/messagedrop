@@ -27,6 +27,7 @@ import { UserService } from '../../services/user.service';
 import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
 import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
 import { PlaceProfileComponent } from './place-settings/place-settings.component';
+import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.component';
 
 interface TimezoneResponse { status: number; timezone: string }
 
@@ -213,22 +214,26 @@ export class PlacelistComponent {
     return 1 - clamped / 100;
   }
 
-  public pinPlace(place: Place) {
-    place.pinned = true;
-    this.placeService.saveAdditionalPlaceInfos(place);
-    const updatedPlaces = this.placeService.getPlaces().map(p =>
-      p.id === place.id ? { ...p, pinned: true } : p
-    );
-    this.placeService.setPlaces(updatedPlaces);
-  }
+  openSortDialog(): void {
+    if (!this.userService.hasJwt()) {
+      return;
+    }
+    const dialogRef = this.matDialog.open(PlaceSortDialogComponent, {
+      data: { places: this.placesSignal() },
+      minWidth: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(680px, 95vw)',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: false,
+      autoFocus: false
+    });
 
-  public unpinPlace(place: Place) {
-    place.pinned = false;
-    this.placeService.saveAdditionalPlaceInfos(place);
-    const updatedPlaces = this.placeService.getPlaces().map(p =>
-      p.id === place.id ? { ...p, pinned: false } : p
-    );
-    this.placeService.setPlaces(updatedPlaces);
+    dialogRef.afterClosed().subscribe((result?: { orderedIds?: string[] }) => {
+      if (result?.orderedIds?.length) {
+        void this.placeService.updatePlaceOrder(result.orderedIds);
+      }
+    });
   }
 
   public goBack() {
@@ -264,6 +269,7 @@ export class PlacelistComponent {
       icon: '',
       subscribed: false,
       pinned: false,
+      sortOrder: this.placeService.getNextSortOrder(),
       boundingBox: {
         latMin: 0,
         lonMin: 0,

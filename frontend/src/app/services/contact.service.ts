@@ -180,6 +180,7 @@ export class ContactService {
         : '';
       contact.chatBackgroundTransparency = profile?.chatBackgroundTransparency ?? contact.chatBackgroundTransparency;
       contact.pinned = profile?.pinned || false;
+      contact.sortOrder = profile?.sortOrder ?? contact.sortOrder;
       const tileSettings = await this.indexedDbService.getTileSettings(contact.id);
       contact.tileSettings = tileSettings ?? contact.tileSettings ?? [];
     }));
@@ -200,7 +201,8 @@ export class ContactService {
         chatBackgroundOriginalFileId: contact.chatBackgroundOriginalFileId,
         chatBackgroundAttribution: contact.chatBackgroundAttribution,
         chatBackgroundTransparency: contact.chatBackgroundTransparency ?? 40,
-        pinned: contact.pinned
+        pinned: contact.pinned,
+        sortOrder: contact.sortOrder
       });
     }));
     this._contacts.set(contacts.slice());
@@ -253,14 +255,44 @@ export class ContactService {
 
   readonly sortedContactsSignal = computed(() =>
     this._contacts().slice().sort((a, b) => {
-      if (a.pinned !== b.pinned) {
-        return (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0);
+      const orderA = a.sortOrder ?? Number.POSITIVE_INFINITY;
+      const orderB = b.sortOrder ?? Number.POSITIVE_INFINITY;
+      if (orderA !== orderB) {
+        return orderA - orderB;
       }
       const nameA = a.name?.trim().toLowerCase() || 'unnamed';
       const nameB = b.name?.trim().toLowerCase() || 'unnamed';
       return nameA.localeCompare(nameB);
     })
   );
+
+  getNextSortOrder(): number {
+    const orders = this._contacts().map(contact => contact.sortOrder).filter((order): order is number => typeof order === 'number');
+    if (!orders.length) {
+      return this._contacts().length;
+    }
+    return Math.max(...orders) + 1;
+  }
+
+  updateContactOrder(orderedIds: string[]): void {
+    const orderMap = new Map(orderedIds.map((id, index) => [id, index]));
+    const fallbackStart = orderedIds.length;
+    let fallbackIndex = 0;
+
+    this._contacts.update((contacts) =>
+      contacts.map((contact) => {
+        const order = orderMap.get(contact.id);
+        if (order === undefined) {
+          const value = fallbackStart + fallbackIndex;
+          fallbackIndex += 1;
+          return { ...contact, sortOrder: value };
+        }
+        return { ...contact, sortOrder: order };
+      })
+    );
+    this.persistContacts();
+    void this.saveAditionalContactInfos();
+  }
 
   setContacts(contacts: Contact[]) {
     this._contacts.set(contacts);
@@ -336,6 +368,9 @@ export class ContactService {
         next: createContactResponse => {
           if (createContactResponse.status === 200) {
             contact.id = createContactResponse.contactId;
+            if (typeof contact.sortOrder !== 'number') {
+              contact.sortOrder = this.getNextSortOrder();
+            }
             this._contacts.update(contacts => [...contacts, contact]);
             this.persistContacts();
             this.saveAditionalContactInfos();

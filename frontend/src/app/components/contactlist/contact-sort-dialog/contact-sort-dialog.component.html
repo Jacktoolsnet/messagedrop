@@ -1,0 +1,37 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon" aria-hidden="true">swap_vert</mat-icon>
+  <span class="dialog-title__text">{{ 'common.contact.list.sortTitle' | transloco }}</span>
+</h2>
+
+<mat-dialog-content class="sort-dialog-content">
+  <div cdkDropList class="sort-list" (cdkDropListDropped)="drop($event)">
+    @for (contact of contacts(); track contact.id) {
+    <div class="sort-row" cdkDrag>
+      <button type="button" class="drag-handle" cdkDragHandle
+        [attr.aria-label]="'common.contact.list.reorderAria' | transloco:{ name: getContactName(contact) }">
+        <mat-icon>drag_indicator</mat-icon>
+      </button>
+      <span class="avatar">
+        @if (contact.base64Avatar) {
+        <img class="avatar__img" [src]="contact.base64Avatar"
+          [attr.alt]="getContactName(contact)" />
+        } @else {
+        <mat-icon>person</mat-icon>
+        }
+      </span>
+      <span class="name">{{ getContactName(contact) }}</span>
+    </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" (click)="apply()"
+    [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>
