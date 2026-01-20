@@ -54,6 +54,10 @@
         [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
     </button>
+    <button mat-icon-button type="button" (click)="help.open('noteList')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     <button mat-icon-button color="primary" [attr.aria-label]="'common.noteList.addNoteAria' | transloco"
         (click)="!userService.isReady() ? userService.login(openNoteDialog.bind(this)) : openNoteDialog()">
         <mat-icon>add_notes</mat-icon>

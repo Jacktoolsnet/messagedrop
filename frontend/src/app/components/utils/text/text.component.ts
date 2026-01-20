@@ -8,6 +8,7 @@ import { MatIcon } from "@angular/material/icon";
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 type TextDialogData = {
   text: string;
@@ -35,6 +36,7 @@ type TextDialogData = {
 export class TextComponent {
   readonly dialogRef = inject(MatDialogRef<TextComponent>);
   readonly data = inject<TextDialogData>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
   readonly titleKey = this.data.titleKey ?? 'common.textDialog.editTitle';
   readonly titleIcon = this.data.titleIcon ?? 'edit';
 

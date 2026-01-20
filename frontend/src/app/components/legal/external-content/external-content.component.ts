@@ -14,6 +14,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../../utils/enable-external-content/enable-external-content.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-external-content',
@@ -43,6 +44,7 @@ export class ExternalContentComponent {
   private readonly appService = inject(AppService);
   private readonly dialogRef = inject(MatDialogRef<ExternalContentComponent>);
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
 
   public appSettings: AppSettings = structuredClone(this.dialogData.appSettings);
 

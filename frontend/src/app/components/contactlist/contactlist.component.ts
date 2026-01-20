@@ -21,6 +21,7 @@ import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
 import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
@@ -64,6 +65,7 @@ export class ContactlistComponent {
   private readonly matDialog = inject(MatDialog);
   private readonly contactMessageService = inject(ContactMessageService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactlistComponent>);
   readonly contactsSignal: Signal<Contact[]> = this.contactService.sortedContactsSignal;
   readonly unreadCounts = signal<Record<string, number>>({});

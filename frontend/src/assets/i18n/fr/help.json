@@ -1,4 +1,81 @@
 {
+  "common": {
+    "intros": {
+      "list": "Parcourez la liste et ouvrez un élément pour voir les détails ou actions.",
+      "sort": "Réorganisez la liste selon votre préférence.",
+      "editor": "Modifiez le contenu et utilisez la barre d’actions pour valider ou annuler.",
+      "settings": "Ajustez les paramètres de cette section.",
+      "info": "Lisez les informations puis fermez la boîte de dialogue.",
+      "search": "Recherchez et sélectionnez un résultat dans la liste.",
+      "searchMap": "Recherchez et sélectionnez des résultats sur la carte.",
+      "picker": "Choisissez un élément et confirmez votre sélection.",
+      "chat": "Lisez la conversation et utilisez les actions pour répondre ou gérer les messages.",
+      "scan": "Scannez un code et suivez le résultat.",
+      "qr": "Affichez ou partagez ce code QR.",
+      "legal": "Lisez les informations légales et les liens associés.",
+      "report": "Renseignez les détails nécessaires pour envoyer un signalement.",
+      "connect": "Connectez-vous à un contact en scannant ou partageant des codes.",
+      "tileEdit": "Modifiez le contenu et l'apparence de la tuile."
+    },
+    "items": {
+      "selection": {
+        "title": "Sélection",
+        "desc": "Touchez un élément pour ouvrir les détails ou le choisir."
+      },
+      "actions": {
+        "title": "Barre d’actions",
+        "desc": "Utilisez la barre d’actions pour fermer, valider ou confirmer."
+      },
+      "sort": {
+        "title": "Tri",
+        "desc": "Faites glisser les éléments pour changer l'ordre."
+      },
+      "filter": {
+        "title": "Filtres",
+        "desc": "Affichez non lus, lus ou tous."
+      },
+      "search": {
+        "title": "Recherche",
+        "desc": "Saisissez un terme pour trouver des résultats."
+      },
+      "map": {
+        "title": "Carte",
+        "desc": "Déplacez et zoomez la carte pour explorer."
+      },
+      "content": {
+        "title": "Contenu",
+        "desc": "Consultez et modifiez le contenu ici."
+      },
+      "media": {
+        "title": "Médias",
+        "desc": "Ajoutez ou ajustez des images ou autres pièces jointes."
+      },
+      "options": {
+        "title": "Options",
+        "desc": "Modifiez les options disponibles."
+      },
+      "links": {
+        "title": "Liens",
+        "desc": "Ouvrez les liens associés lorsqu’ils sont disponibles."
+      },
+      "chat": {
+        "title": "Conversation",
+        "desc": "Lisez les messages et utilisez les actions pour répondre ou gérer."
+      },
+      "scan": {
+        "title": "Numérisation",
+        "desc": "Pointez la caméra vers un code pour le scanner."
+      },
+      "qr": {
+        "title": "Code QR",
+        "desc": "Affichez ce code pour vous connecter ou partager."
+      },
+      "style": {
+        "title": "Style",
+        "desc": "Ajustez la police ou l'apparence."
+      }
+    }
+  },
   "user": {
     "title": "Mon utilisateur",
     "intro": "Gérez votre utilisateur local, les sauvegardes et les paramètres de sécurité.",
@@ -68,5 +145,167 @@
         "desc": "Supprime tous les messages de la liste actuelle."
       }
     }
+  },
+  "airQuality": {
+    "title": "Qualité de l'air"
+  },
+  "weather": {
+    "title": "Météo"
+  },
+  "appSettings": {
+    "title": "Paramètres de l'app"
+  },
+  "contactChatroom": {
+    "title": "Chat du contact"
+  },
+  "contactConnect": {
+    "title": "Connecter un contact"
+  },
+  "contactEditMessage": {
+    "title": "Modifier le message du chat"
+  },
+  "contactSettings": {
+    "title": "Paramètres du contact"
+  },
+  "contactList": {
+    "title": "Contacts"
+  },
+  "contactSort": {
+    "title": "Trier les contacts"
+  },
+  "documentList": {
+    "title": "Documents"
+  },
+  "editMessage": {
+    "title": "Modifier le message"
+  },
+  "editNote": {
+    "title": "Modifier la note"
+  },
+  "imageList": {
+    "title": "Images"
+  },
+  "imageExif": {
+    "title": "Modifier les données EXIF"
+  },
+  "dsaReport": {
+    "title": "Signaler un contenu"
+  },
+  "dsaCase": {
+    "title": "Détails du dossier"
+  },
+  "dsaStatusLink": {
+    "title": "Statut du dossier"
+  },
+  "legalDisclaimer": {
+    "title": "Avertissement"
+  },
+  "legalExternalContent": {
+    "title": "Contenu externe"
+  },
+  "legalNotice": {
+    "title": "Mentions légales"
+  },
+  "privacyPolicy": {
+    "title": "Politique de confidentialité"
+  },
+  "termsOfService": {
+    "title": "Conditions d'utilisation"
+  },
+  "thirdPartyLicenses": {
+    "title": "Licences tierces"
+  },
+  "messageList": {
+    "title": "Messages"
+  },
+  "myMessageList": {
+    "title": "Mes messages publics"
+  },
+  "messageProfile": {
+    "title": "Profil du message"
+  },
+  "noteList": {
+    "title": "Notes"
+  },
+  "pinHint": {
+    "title": "Indice PIN"
+  },
+  "placeList": {
+    "title": "Lieux"
+  },
+  "placeSettings": {
+    "title": "Paramètres du lieu"
+  },
+  "placeSort": {
+    "title": "Trier les lieux"
+  },
+  "sharedContent": {
+    "title": "Contenu partagé"
+  },
+  "tileList": {
+    "title": "Tuiles"
+  },
+  "tileSettings": {
+    "title": "Paramètres de tuile"
+  },
+  "tileEditAnniversary": {
+    "title": "Tuile anniversaire"
+  },
+  "tileEditFile": {
+    "title": "Tuile fichier"
+  },
+  "tileEditMigraine": {
+    "title": "Tuile migraine"
+  },
+  "tileEditMultitext": {
+    "title": "Tuile texte multiple"
+  },
+  "tileEditPollution": {
+    "title": "Tuile pollution"
+  },
+  "tileEditQuickActionAction": {
+    "title": "Action rapide"
+  },
+  "tileEditQuickAction": {
+    "title": "Tuile action rapide"
+  },
+  "tileEditText": {
+    "title": "Tuile texte"
+  },
+  "tileEditTodo": {
+    "title": "Tuile tâches"
+  },
+  "avatarCropper": {
+    "title": "Rogner l'avatar"
+  },
+  "avatarSource": {
+    "title": "Source de l'avatar"
+  },
+  "emoticonPicker": {
+    "title": "Emojis"
+  },
+  "locationPicker": {
+    "title": "Sélectionner un lieu"
+  },
+  "maticonPicker": {
+    "title": "Sélecteur d'icônes"
+  },
+  "nominatimResult": {
+    "title": "Résultat de recherche"
+  },
+  "nominatimSearch": {
+    "title": "Rechercher des lieux"
+  },
+  "qrCode": {
+    "title": "Code QR"
+  },
+  "scanner": {
+    "title": "Scanner"
+  },
+  "tenorSearch": {
+    "title": "Recherche de GIF"
+  },
+  "textDialog": {
+    "title": "Texte"
   }
 }

@@ -30,6 +30,10 @@
   <button mat-icon-button (click)="onAbort()" [attr.aria-label]="'common.actions.abort' | transloco">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="help.open('avatarCropper')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="primary" (click)="onApply()" [disabled]="isLoading"
     [attr.aria-label]="'common.actions.apply' | transloco">
     <mat-icon>check</mat-icon>

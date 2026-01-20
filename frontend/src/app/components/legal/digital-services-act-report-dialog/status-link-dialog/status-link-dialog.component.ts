@@ -7,6 +7,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 export type DsaStatusKind = 'signal' | 'notice';
 
@@ -28,6 +29,7 @@ export class DsaStatusLinkDialogComponent {
   private readonly dialogRef = inject(MatDialogRef<DsaStatusLinkDialogComponent>);
   private readonly snack = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<DsaStatusLinkDialogData>(MAT_DIALOG_DATA);
 
   readonly primaryText = this.data.kind === 'signal'

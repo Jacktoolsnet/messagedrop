@@ -4,6 +4,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { NominatimPlace } from '../../../../../interfaces/nominatim-place';
+import { HelpDialogService } from '../../../help-dialog/help-dialog.service';
 import { NominatimResultItemComponent } from '../nominatim-result-item/nominatim-result-item.component';
 
 interface NominatimResultDialogActions {
@@ -37,6 +38,7 @@ interface NominatimResultDialogData {
 export class NominatimResultDialogComponent {
   readonly dialogRef = inject(MatDialogRef<NominatimResultDialogComponent>);
   readonly data = inject<NominatimResultDialogData>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
 
   onAdd(place: NominatimPlace): void {
     this.data.actions?.add(place);

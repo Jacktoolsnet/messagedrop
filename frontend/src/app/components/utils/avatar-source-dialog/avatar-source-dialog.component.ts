@@ -6,6 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { AppSettings } from '../../../interfaces/app-settings';
 import { AppService } from '../../../services/app.service';
 import { EnableExternalContentComponent } from '../enable-external-content/enable-external-content.component';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 export type AvatarSourceChoice = 'file' | 'unsplash';
 
@@ -35,6 +36,7 @@ export interface AvatarSourceDialogData {
 })
 export class AvatarSourceDialogComponent {
   private readonly appService = inject(AppService);
+  readonly help = inject(HelpDialogService);
   private readonly dialogRef = inject(MatDialogRef<AvatarSourceDialogComponent>);
   private readonly data = inject<AvatarSourceDialogData | null>(MAT_DIALOG_DATA, { optional: true });
 

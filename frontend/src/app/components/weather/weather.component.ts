@@ -19,6 +19,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { getWeatherLevelInfo } from '../../utils/weather-level.util';
 import { WeatherDetailComponent } from './weather-detail/weather-detail.component';
 import { WeatherTile, WeatherTileType } from './weather-tile.interface';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-weather',
@@ -44,6 +45,7 @@ export class WeatherComponent implements OnInit {
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
   private readonly injector = inject(Injector);
+  readonly help = inject(HelpDialogService);
 
   location: Location = this.dialogData.location;
   private readonly tilesSignal = signal<WeatherTile[]>([]);

@@ -9,6 +9,7 @@ import { Multimedia } from '../../interfaces/multimedia';
 import { MapService } from '../../services/map.service';
 import { SharedContentService } from '../../services/shared-content.service';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 @Component({
   standalone: true,
@@ -32,6 +33,7 @@ export class SharedContentComponent implements OnInit {
   private readonly mapService = inject(MapService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly dialogRef = inject(MatDialogRef<SharedContentComponent>);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<{ multimedia?: Multimedia; location?: Location }>(MAT_DIALOG_DATA);
 
   public multimedia: Multimedia | undefined = this.data.multimedia;

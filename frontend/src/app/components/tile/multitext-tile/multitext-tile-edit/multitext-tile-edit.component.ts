@@ -12,6 +12,7 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 interface MultitextTileDialogData {
   tile: TileSetting;
@@ -41,6 +42,7 @@ export class MultitextTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<MultitextTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<MultitextTileDialogData>(MAT_DIALOG_DATA);
 
   readonly titleControl = new FormControl(

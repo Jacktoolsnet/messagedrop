@@ -13,6 +13,7 @@ import { GeolocationService } from '../../../services/geolocation.service';
 import { NominatimService } from '../../../services/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DisplayMessage } from '../display-message/display-message.component';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 type MarkerKind = 'message' | 'note';
 
@@ -53,6 +54,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
   private readonly geolocationService = inject(GeolocationService);
   private readonly nominatimService = inject(NominatimService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<LocationPickerDialogData>(MAT_DIALOG_DATA);
 
   readonly searchControl = new FormControl('', { nonNullable: true });

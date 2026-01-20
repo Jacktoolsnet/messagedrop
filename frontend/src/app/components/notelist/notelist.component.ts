@@ -25,6 +25,7 @@ import { EditNoteComponent } from '../editnote/edit-note.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { DeleteNoteComponent } from './delete-note/delete-note.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-notelist',
@@ -57,6 +58,7 @@ export class NotelistComponent {
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly sharedContentService = inject(SharedContentService);
+  readonly help = inject(HelpDialogService);
   public readonly dialogRef = inject(MatDialogRef<NotelistComponent>);
   public readonly dialog = inject(MatDialog);
 

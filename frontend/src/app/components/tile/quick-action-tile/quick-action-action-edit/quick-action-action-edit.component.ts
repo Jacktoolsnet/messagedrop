@@ -13,6 +13,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 interface QuickActionDialogData {
   action: TileQuickAction;
@@ -43,6 +44,7 @@ export class QuickActionActionEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionActionEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<QuickActionDialogData>(MAT_DIALOG_DATA);
   private iconAuto = true;
   private lastType: TileLinkType;

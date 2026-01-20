@@ -18,6 +18,7 @@ import { SocketioService } from '../../services/socketio.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
@@ -58,6 +59,7 @@ export class ContactChatroomComponent implements AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly socketioService = inject(SocketioService);
   private readonly contactService = inject(ContactService);
+  readonly help = inject(HelpDialogService);
   private readonly contactMessageService = inject(ContactMessageService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly matDialog = inject(MatDialog);

@@ -1,4 +1,81 @@
 {
+  "common": {
+    "intros": {
+      "list": "Browse the list and open an item to see details or actions.",
+      "sort": "Reorder the list to match your preferred order.",
+      "editor": "Edit the content and use the action bar to apply or cancel.",
+      "settings": "Adjust the available settings for this area.",
+      "info": "Read the information and close the dialog when done.",
+      "search": "Search and select a result from the list.",
+      "searchMap": "Search and select results using the map.",
+      "picker": "Choose an item and confirm your selection.",
+      "chat": "Read the conversation and use actions to respond or manage messages.",
+      "scan": "Scan a code and follow the result.",
+      "qr": "Show or share this QR code.",
+      "legal": "Read the legal information and related links.",
+      "report": "Provide the details needed to submit a report.",
+      "connect": "Connect with a contact by scanning or sharing codes.",
+      "tileEdit": "Edit the tile content and appearance."
+    },
+    "items": {
+      "selection": {
+        "title": "Selection",
+        "desc": "Tap an entry to open details or choose it."
+      },
+      "actions": {
+        "title": "Action bar",
+        "desc": "Use the action bar buttons to close, apply, or confirm."
+      },
+      "sort": {
+        "title": "Sorting",
+        "desc": "Drag items to change their order."
+      },
+      "filter": {
+        "title": "Filters",
+        "desc": "Show unread, read, or all items."
+      },
+      "search": {
+        "title": "Search",
+        "desc": "Enter a term to find results."
+      },
+      "map": {
+        "title": "Map",
+        "desc": "Move and zoom the map to explore."
+      },
+      "content": {
+        "title": "Content",
+        "desc": "Review and edit the content in this dialog."
+      },
+      "media": {
+        "title": "Media",
+        "desc": "Add or adjust images and other attachments."
+      },
+      "options": {
+        "title": "Options",
+        "desc": "Change the available settings."
+      },
+      "links": {
+        "title": "Links",
+        "desc": "Open related links when available."
+      },
+      "chat": {
+        "title": "Conversation",
+        "desc": "Read messages and use actions to reply or manage them."
+      },
+      "scan": {
+        "title": "Scanning",
+        "desc": "Point your camera at a code to scan it."
+      },
+      "qr": {
+        "title": "QR code",
+        "desc": "Show this code to connect or share."
+      },
+      "style": {
+        "title": "Style",
+        "desc": "Adjust font or appearance options."
+      }
+    }
+  },
   "user": {
     "title": "My account",
     "intro": "Manage your local account, backups, and security settings.",
@@ -68,5 +145,167 @@
         "desc": "Removes all messages in the current list."
       }
     }
+  },
+  "airQuality": {
+    "title": "Air quality"
+  },
+  "weather": {
+    "title": "Weather"
+  },
+  "appSettings": {
+    "title": "App settings"
+  },
+  "contactChatroom": {
+    "title": "Contact chat"
+  },
+  "contactConnect": {
+    "title": "Connect contact"
+  },
+  "contactEditMessage": {
+    "title": "Edit chat message"
+  },
+  "contactSettings": {
+    "title": "Contact settings"
+  },
+  "contactList": {
+    "title": "Contacts"
+  },
+  "contactSort": {
+    "title": "Sort contacts"
+  },
+  "documentList": {
+    "title": "Documents"
+  },
+  "editMessage": {
+    "title": "Edit message"
+  },
+  "editNote": {
+    "title": "Edit note"
+  },
+  "imageList": {
+    "title": "Images"
+  },
+  "imageExif": {
+    "title": "Edit EXIF data"
+  },
+  "dsaReport": {
+    "title": "Report content"
+  },
+  "dsaCase": {
+    "title": "Case details"
+  },
+  "dsaStatusLink": {
+    "title": "Case status"
+  },
+  "legalDisclaimer": {
+    "title": "Disclaimer"
+  },
+  "legalExternalContent": {
+    "title": "External content"
+  },
+  "legalNotice": {
+    "title": "Legal notice"
+  },
+  "privacyPolicy": {
+    "title": "Privacy policy"
+  },
+  "termsOfService": {
+    "title": "Terms of service"
+  },
+  "thirdPartyLicenses": {
+    "title": "Third-party licenses"
+  },
+  "messageList": {
+    "title": "Messages"
+  },
+  "myMessageList": {
+    "title": "My public messages"
+  },
+  "messageProfile": {
+    "title": "Message profile"
+  },
+  "noteList": {
+    "title": "Notes"
+  },
+  "pinHint": {
+    "title": "PIN hint"
+  },
+  "placeList": {
+    "title": "Places"
+  },
+  "placeSettings": {
+    "title": "Place settings"
+  },
+  "placeSort": {
+    "title": "Sort places"
+  },
+  "sharedContent": {
+    "title": "Shared content"
+  },
+  "tileList": {
+    "title": "Tiles"
+  },
+  "tileSettings": {
+    "title": "Tile settings"
+  },
+  "tileEditAnniversary": {
+    "title": "Anniversary tile"
+  },
+  "tileEditFile": {
+    "title": "File tile"
+  },
+  "tileEditMigraine": {
+    "title": "Migraine tile"
+  },
+  "tileEditMultitext": {
+    "title": "Multi-text tile"
+  },
+  "tileEditPollution": {
+    "title": "Pollution tile"
+  },
+  "tileEditQuickActionAction": {
+    "title": "Quick action"
+  },
+  "tileEditQuickAction": {
+    "title": "Quick action tile"
+  },
+  "tileEditText": {
+    "title": "Text tile"
+  },
+  "tileEditTodo": {
+    "title": "To-do tile"
+  },
+  "avatarCropper": {
+    "title": "Crop avatar"
+  },
+  "avatarSource": {
+    "title": "Avatar source"
+  },
+  "emoticonPicker": {
+    "title": "Emojis"
+  },
+  "locationPicker": {
+    "title": "Location picker"
+  },
+  "maticonPicker": {
+    "title": "Icon picker"
+  },
+  "nominatimResult": {
+    "title": "Search result"
+  },
+  "nominatimSearch": {
+    "title": "Search places"
+  },
+  "qrCode": {
+    "title": "QR code"
+  },
+  "scanner": {
+    "title": "Scanner"
+  },
+  "tenorSearch": {
+    "title": "GIF search"
+  },
+  "textDialog": {
+    "title": "Text"
   }
 }

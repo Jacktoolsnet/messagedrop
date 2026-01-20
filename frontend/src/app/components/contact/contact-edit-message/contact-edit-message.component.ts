@@ -21,6 +21,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UserService } from '../../../services/user.service';
 import { SelectMultimediaComponent } from '../../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from "../../multimedia/showmultimedia/showmultimedia.component";
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { TenorSearchComponent } from '../../utils/tenor-search/tenor-search.component';
 import { TextComponent } from '../../utils/text/text.component';
 
@@ -59,6 +60,7 @@ export class ContactEditMessageComponent implements OnInit {
   private readonly oembedService = inject(OembedService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
+  readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactEditMessageComponent>);
   private readonly style = inject(StyleService);
   private readonly translation = inject(TranslationHelperService);

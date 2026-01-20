@@ -13,6 +13,10 @@
   </mat-tab-group>
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button type="button" (click)="help.open('emoticonPicker')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="warn" (click)="pick(null)" aria-label="Remove reaction">
     <mat-icon>delete</mat-icon>
   </button>

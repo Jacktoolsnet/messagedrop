@@ -34,6 +34,7 @@ import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultim
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
 
@@ -96,6 +97,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
   public readonly dialog = this.matDialog;
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   private readonly dsaStatusService = inject(DsaStatusService);
   private readonly languageService = inject(LanguageService);
   readonly data = inject<{ location: Location; messageSignal: WritableSignal<Message[]> }>(MAT_DIALOG_DATA);

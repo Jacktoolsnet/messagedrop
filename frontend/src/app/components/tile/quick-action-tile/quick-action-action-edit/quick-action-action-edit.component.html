@@ -37,5 +37,9 @@
 
 <mat-dialog-actions class="sticky-actions" align="end">
   <button type="button" (click)="cancel()" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="help.open('tileEditQuickActionAction')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button color="primary" type="button" (click)="save()" mat-icon-button [attr.aria-label]="'common.save' | transloco"><mat-icon>save</mat-icon></button>
 </mat-dialog-actions>

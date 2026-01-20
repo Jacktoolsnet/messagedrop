@@ -15,6 +15,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { getFileIcon } from '../../../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../../../utils/storage-error.util';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface FileTileDialogData {
@@ -51,6 +52,7 @@ export class FileTileEditComponent {
   private readonly fileTileService = inject(TileFileService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<FileTileDialogData>(MAT_DIALOG_DATA);
 
   private readonly initialFiles = this.normalizeFiles(this.data.tile.payload?.files);

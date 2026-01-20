@@ -23,6 +23,7 @@ import { DsaStatusResponse } from '../../../../interfaces/dsa-status-response.in
 import { Message } from '../../../../interfaces/message';
 import { DsaStatusService } from '../../../../services/dsa-status.service';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-dsa-case-dialog',
@@ -72,6 +73,7 @@ export class DsaCaseDialogComponent implements OnInit {
   readonly uploading = signal(false);
   readonly error = signal<string | null>(null);
   readonly status = signal<DsaStatusResponse | null>(null);
+  readonly help = inject(HelpDialogService);
 
   readonly appeals = computed<DsaStatusAppeal[]>(() => this.status()?.appeals ?? []);
   readonly evidence = computed<DsaStatusEvidence[]>(() => this.status()?.evidence ?? []);

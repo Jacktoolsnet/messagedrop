@@ -26,6 +26,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
 import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from './place-settings/place-settings.component';
 import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.component';
 
@@ -62,6 +63,7 @@ export class PlacelistComponent {
   private readonly matDialog = inject(MatDialog);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   private readonly dialogData = inject<unknown>(MAT_DIALOG_DATA);
 
   readonly placesSignal: Signal<Place[]> = this.placeService.sortedPlacesSignal;

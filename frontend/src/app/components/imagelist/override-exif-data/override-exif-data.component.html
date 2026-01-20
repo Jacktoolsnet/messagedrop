@@ -15,5 +15,9 @@
 </mat-dialog-content>
 <mat-dialog-actions class="actions sticky-actions" align="end">
   <button mat-dialog-close cdkFocusInitial [mat-dialog-close]="{ useMap: false, applyToAll }" mat-icon-button [attr.aria-label]="'common.images.exif.keep' | transloco"><mat-icon>map</mat-icon></button>
+  <button mat-icon-button type="button" (click)="help.open('imageExif')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-dialog-close color="primary" [mat-dialog-close]="{ useMap: true, applyToAll }" mat-icon-button [attr.aria-label]="'common.images.exif.useMap' | transloco"><mat-icon>image</mat-icon></button>
 </mat-dialog-actions>

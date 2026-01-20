@@ -13,6 +13,7 @@ import { TranslationHelperService } from '../../../../services/translation-helpe
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
 import { A11yModule } from '@angular/cdk/a11y';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 interface PollutionTileDialogData {
   tile: TileSetting;
@@ -45,6 +46,7 @@ export class PollutionTileEditComponent {
   private readonly dialog = inject(MatDialog);
   private readonly fb = inject(FormBuilder);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<PollutionTileDialogData>(MAT_DIALOG_DATA);
 
   readonly titleControl = this.fb.control(

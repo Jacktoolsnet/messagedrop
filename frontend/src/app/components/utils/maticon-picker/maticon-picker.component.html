@@ -22,5 +22,9 @@
 
 <mat-dialog-actions class="sticky-actions" align="end">
   <button mat-dialog-close mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="help.open('maticonPicker')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button (click)="pick(null)" mat-icon-button [attr.aria-label]="'common.iconPicker.noIcon' | transloco"><mat-icon>block</mat-icon></button>
 </mat-dialog-actions>

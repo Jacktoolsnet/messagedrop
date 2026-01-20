@@ -8,6 +8,7 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { AppService } from '../../../services/app.service';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-terms-of-service',
@@ -37,6 +38,7 @@ export class TermsOfServiceComponent implements OnInit {
   private http = inject(HttpClient);
   private dialogRef = inject(MatDialogRef<TermsOfServiceComponent>);
   private appService = inject(AppService);
+  readonly help = inject(HelpDialogService);
 
   constructor() { this.load(); }
 

@@ -6,6 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Place } from '../../../interfaces/place';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { TileListComponent } from '../tile-list/tile-list.component';
 
 @Component({
@@ -26,6 +27,7 @@ import { TileListComponent } from '../tile-list/tile-list.component';
 })
 export class TileListDialogComponent {
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<{ contact?: Contact; place?: Place }>(MAT_DIALOG_DATA);
 
   @ViewChild(TileListComponent) private tileList?: TileListComponent;

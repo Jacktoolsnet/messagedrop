@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatIcon } from "@angular/material/icon";
 import { TranslocoPipe } from '@jsverse/transloco';
 import QRCode from 'qrcode';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-qrcode',
@@ -24,6 +25,7 @@ export class QrcodeComponent implements OnInit {
   @ViewChild('canvas', { static: true }) canvasRef!: ElementRef<HTMLCanvasElement>;
 
   private readonly dialogData = inject<{ qrData: string }>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
 
   ngOnInit(): void {
     QRCode.toCanvas(this.canvasRef.nativeElement, this.dialogData.qrData, {

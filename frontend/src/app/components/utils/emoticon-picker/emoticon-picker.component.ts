@@ -4,12 +4,14 @@ import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
+import { TranslocoPipe } from '@jsverse/transloco';
 import { EmoticonPickerData } from '../../../interfaces/emoticon-picker-data';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-emoticon-picker',
   standalone: true,
-  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule],
+  imports: [MatButtonModule, MatDialogModule, MatIconModule, MatTabsModule, TranslocoPipe],
   templateUrl: './emoticon-picker.component.html',
   styleUrls: ['./emoticon-picker.component.css']
 })
@@ -68,6 +70,7 @@ export class EmoticonPickerComponent {
 
   readonly dialogRef = inject(MatDialogRef<EmoticonPickerComponent, string | null>);
   readonly data = inject<EmoticonPickerData>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
 
   pick(reaction: string | null): void {
     this.dialogRef.close(reaction);

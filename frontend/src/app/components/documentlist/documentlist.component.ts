@@ -19,6 +19,7 @@ import { UserService } from '../../services/user.service';
 import { getFileIcon } from '../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../utils/storage-error.util';
 import { DeleteDocumentComponent } from './delete-document/delete-document.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 interface DocumentDialogData {
   location: Location;
@@ -50,6 +51,7 @@ export class DocumentlistComponent implements OnInit {
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   public readonly dialogRef = inject(MatDialogRef<DocumentlistComponent>);
   public readonly dialog = inject(MatDialog);
 

@@ -6,6 +6,10 @@
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
     <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button mat-icon-button type="button" (click)="help.open('sharedContent')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     <button color="warn" (click)="deleteSharedContent()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeContent' | transloco"><mat-icon>delete</mat-icon></button>
 </mat-dialog-actions>
 }
@@ -17,6 +21,10 @@
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
     <button color="primary" mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button mat-icon-button type="button" (click)="help.open('sharedContent')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     <button color="warn" (click)="deleteSharedLocation()" mat-icon-button [attr.aria-label]="'common.sharedContent.removeLocation' | transloco"><mat-icon>location_off</mat-icon></button>
 </mat-dialog-actions>
 }

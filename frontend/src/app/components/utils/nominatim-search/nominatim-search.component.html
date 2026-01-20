@@ -24,6 +24,10 @@
     <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
     </button>
+    <button mat-icon-button type="button" (click)="help.open('nominatimSearch')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     <button mat-icon-button type="button" (click)="toggleViewMode()"
         [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
         <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>

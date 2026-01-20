@@ -18,6 +18,7 @@ import { Message } from '../../../interfaces/message';
 import { DigitalServicesActService, DsaSubmissionResponse } from '../../../services/digital-services-act.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DisplayMessage } from '../../utils/display-message/display-message.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { DsaStatusLinkDialogComponent } from './status-link-dialog/status-link-dialog.component';
 
 interface DigitalServicesActReportDialogData {
@@ -55,6 +56,7 @@ export class DigitalServicesActReportDialogComponent {
   private readonly dsa = inject(DigitalServicesActService);
   private readonly matDialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = this.dialogData;
 
   // Content-ID robust aus der Message ziehen

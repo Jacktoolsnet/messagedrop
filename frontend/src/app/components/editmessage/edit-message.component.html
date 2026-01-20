@@ -50,6 +50,10 @@
 <mat-dialog-actions class="sticky-actions" align="end">
     <button mat-dialog-close cdkFocusInitial (click)="onAbortClick()" mat-icon-button
         [attr.aria-label]="'common.actions.abort' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button mat-icon-button type="button" (click)="help.open('editMessage')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
 
     @if (data.message.message !== '' || data.message.multimedia.type !== 'undefined') {
     <button [attr.aria-label]="'common.message.updateAria' | transloco" (click)="onApplyClick()"

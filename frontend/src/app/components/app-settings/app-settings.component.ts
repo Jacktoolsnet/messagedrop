@@ -16,6 +16,7 @@ import { AppService } from '../../services/app.service';
 import { LanguageMode, LanguageService } from '../../services/language.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { EnableLocationComponent } from "../utils/enable-location/enable-location.component";
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 
 @Component({
@@ -48,6 +49,7 @@ export class AppSettingsComponent implements OnInit {
   private readonly dialogData = inject<{ appSettings: AppSettings }>(MAT_DIALOG_DATA);
   private readonly languageService = inject(LanguageService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
 
   public versionInfo = APP_VERSION_INFO;
 

@@ -59,5 +59,9 @@
 
 <mat-dialog-actions align="end" class="sticky-actions">
   <button (click)="close()" mat-icon-button [attr.aria-label]="'common.cancel' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="help.open('tileSettings')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button color="primary" (click)="save()" mat-icon-button [attr.aria-label]="'common.actions.apply' | transloco"><mat-icon>check</mat-icon></button>
 </mat-dialog-actions>

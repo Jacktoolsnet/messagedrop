@@ -3,6 +3,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatIcon } from "@angular/material/icon";
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-pin-hint',
@@ -12,4 +13,5 @@ import { TranslocoPipe } from '@jsverse/transloco';
 })
 export class PinHintComponent {
   readonly dialogRef = inject(MatDialogRef<PinHintComponent>);
+  readonly help = inject(HelpDialogService);
 }

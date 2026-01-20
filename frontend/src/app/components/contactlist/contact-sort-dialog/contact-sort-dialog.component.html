@@ -35,6 +35,10 @@
     [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="help.open('contactSort')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="primary" (click)="apply()"
     [attr.aria-label]="'common.actions.apply' | transloco">
     <mat-icon>check</mat-icon>

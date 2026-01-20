@@ -6,6 +6,7 @@ import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent, Ma
 import { MatIcon } from '@angular/material/icon';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-override-exif-data',
@@ -17,5 +18,6 @@ import { TranslocoPipe } from '@jsverse/transloco';
 export class OverrideExifDataComponent {
   readonly dialogRef = inject(MatDialogRef<OverrideExifDataComponent>);
   readonly data = inject<{ previewUrl?: string; fileName?: string }>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
   applyToAll = true;
 }

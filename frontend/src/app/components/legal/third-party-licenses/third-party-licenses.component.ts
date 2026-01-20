@@ -6,6 +6,7 @@ import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-third-party-licenses-dialog',
@@ -17,6 +18,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 export class ThirdPartyLicensesComponent {
   private http = inject(HttpClient);
   private dialogRef = inject(MatDialogRef<ThirdPartyLicensesComponent>);
+  readonly help = inject(HelpDialogService);
 
   // robust against sub-path hosting
   readonly url = new URL('assets/legal/3rdpartylicenses.txt', document.baseURI).toString();

@@ -27,6 +27,7 @@ import { UserService } from '../../services/user.service';
 import { isQuotaExceededError } from '../../utils/storage-error.util';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 interface ImageDialogData {
   location: Location;
@@ -66,6 +67,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   private readonly geolocationService = inject(GeolocationService);
   private readonly sharedContentService = inject(SharedContentService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   public readonly dialogRef = inject(MatDialogRef<ImagelistComponent>);
   public readonly dialog = inject(MatDialog);
 

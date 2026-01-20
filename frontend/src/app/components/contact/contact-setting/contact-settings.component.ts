@@ -19,6 +19,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UnsplashService } from '../../../services/unsplash.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
@@ -48,6 +49,7 @@ export class ContactSettingsComponent {
   private readonly unsplashService = inject(UnsplashService);
   private readonly languageService = inject(LanguageService);
   private readonly dialog = inject(MatDialog);
+  readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<ContactSettingsComponent>);
   readonly data = inject<{ contact: Contact }>(MAT_DIALOG_DATA);
 

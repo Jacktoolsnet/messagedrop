@@ -9,6 +9,7 @@ import { Contact } from '../../../interfaces/contact';
 import { ContactService } from '../../../services/contact.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ContactSettingsComponent } from '../../contact/contact-setting/contact-settings.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 interface ContactSortDialogData {
   contacts: Contact[];
@@ -40,6 +41,7 @@ export class ContactSortDialogComponent {
   private readonly dialog = inject(MatDialog);
   private readonly contactService = inject(ContactService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   private readonly data = inject<ContactSortDialogData>(MAT_DIALOG_DATA);
   readonly contacts = signal<Contact[]>([...this.data.contacts]);
 

@@ -3,5 +3,9 @@
     {{ 'common.pin.hintBody' | transloco }}
 </mat-dialog-content>
 <mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-icon-button type="button" (click)="help.open('pinHint')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     <button mat-dialog-close [mat-dialog-close]="" mat-icon-button [attr.aria-label]="'common.actions.ok' | transloco" class="action-close"><mat-icon>check</mat-icon></button>
 </mat-dialog-actions>

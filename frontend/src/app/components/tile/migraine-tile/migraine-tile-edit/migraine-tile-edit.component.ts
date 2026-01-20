@@ -12,6 +12,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { A11yModule } from '@angular/cdk/a11y';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 interface MigraineTileDialogData {
   tile: TileSetting;
@@ -41,6 +42,7 @@ export class MigraineTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<MigraineTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<MigraineTileDialogData>(MAT_DIALOG_DATA);
 
   readonly titleControl = new FormControl(

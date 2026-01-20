@@ -5,6 +5,7 @@ import { MAT_DIALOG_DATA, MatDialogModule, MatDialogRef } from '@angular/materia
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 interface IconCategory {
   nameKey: string;
@@ -20,6 +21,7 @@ interface IconCategory {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MaticonPickerComponent {
+  readonly help = inject(HelpDialogService);
   readonly iconCategories: IconCategory[] = [
     {
       nameKey: 'common.iconPicker.categories.basics',

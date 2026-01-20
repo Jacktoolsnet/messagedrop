@@ -18,6 +18,7 @@ import { Place } from '../../interfaces/place';
 import { DatasetState, OpenMeteoRefreshService } from '../../services/open-meteo-refresh.service';
 import { AirQualityDetailComponent } from './air-quality-detail/air-quality-detail.component';
 import { TranslationHelperService } from '../../services/translation-helper.service';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-air-quality',
@@ -43,6 +44,7 @@ export class AirQualityComponent implements OnInit {
   private readonly refreshService = inject(OpenMeteoRefreshService);
   private readonly translation = inject(TranslationHelperService);
   private readonly injector = inject(Injector);
+  readonly help = inject(HelpDialogService);
 
   private readonly tileValuesSignal = signal<AirQualityTileValue[]>([]);
   private readonly allTileValuesSignal = signal<AirQualityTileValue[]>([]);

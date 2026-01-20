@@ -15,6 +15,7 @@ import { AppService } from '../../../services/app.service';
 import { TenorService } from '../../../services/tenor.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { EnableExternalContentComponent } from "../enable-external-content/enable-external-content.component";
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-multimedia',
@@ -50,6 +51,7 @@ export class TenorSearchComponent implements OnInit {
   private readonly tenorService = inject(TenorService);
   private readonly translation = inject(TranslationHelperService);
   private readonly cdRef = inject(ChangeDetectorRef);
+  readonly help = inject(HelpDialogService);
 
   ngOnInit(): void {
     this.showTenor = this.appService.getAppSettings().enableTenorContent;

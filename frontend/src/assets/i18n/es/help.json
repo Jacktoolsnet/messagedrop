@@ -1,4 +1,81 @@
 {
+  "common": {
+    "intros": {
+      "list": "Explora la lista y abre elementos para ver detalles o acciones.",
+      "sort": "Reordena la lista según tu preferencia.",
+      "editor": "Edita el contenido y usa la barra de acciones para guardar o cancelar.",
+      "settings": "Ajusta la configuración de esta sección.",
+      "info": "Lee la información y cierra el diálogo cuando termines.",
+      "search": "Busca y selecciona un resultado de la lista.",
+      "searchMap": "Busca y selecciona resultados usando el mapa.",
+      "picker": "Elige un elemento y confirma la selección.",
+      "chat": "Lee la conversación y usa acciones para responder o gestionar mensajes.",
+      "scan": "Escanea un código y sigue el resultado.",
+      "qr": "Muestra o comparte este código QR.",
+      "legal": "Lee la información legal y los enlaces relacionados.",
+      "report": "Introduce los detalles necesarios para enviar un reporte.",
+      "connect": "Conecta con un contacto escaneando o compartiendo códigos.",
+      "tileEdit": "Edita el contenido y la apariencia de la tarjeta."
+    },
+    "items": {
+      "selection": {
+        "title": "Selección",
+        "desc": "Toca un elemento para abrir detalles o elegirlo."
+      },
+      "actions": {
+        "title": "Barra de acciones",
+        "desc": "Usa la barra de acciones para cerrar, aplicar o confirmar."
+      },
+      "sort": {
+        "title": "Orden",
+        "desc": "Arrastra los elementos para cambiar el orden."
+      },
+      "filter": {
+        "title": "Filtros",
+        "desc": "Muestra no leídos, leídos o todos."
+      },
+      "search": {
+        "title": "Búsqueda",
+        "desc": "Introduce un término para encontrar resultados."
+      },
+      "map": {
+        "title": "Mapa",
+        "desc": "Mueve y acerca el mapa para explorar."
+      },
+      "content": {
+        "title": "Contenido",
+        "desc": "Revisa y edita el contenido en este diálogo."
+      },
+      "media": {
+        "title": "Multimedia",
+        "desc": "Añade o ajusta imágenes u otros adjuntos."
+      },
+      "options": {
+        "title": "Opciones",
+        "desc": "Cambia las opciones disponibles."
+      },
+      "links": {
+        "title": "Enlaces",
+        "desc": "Abre enlaces relacionados cuando estén disponibles."
+      },
+      "chat": {
+        "title": "Conversación",
+        "desc": "Lee mensajes y usa acciones para responder o gestionarlos."
+      },
+      "scan": {
+        "title": "Escaneo",
+        "desc": "Apunta la cámara a un código para escanearlo."
+      },
+      "qr": {
+        "title": "Código QR",
+        "desc": "Muestra este código para conectar o compartir."
+      },
+      "style": {
+        "title": "Estilo",
+        "desc": "Ajusta la fuente o la apariencia."
+      }
+    }
+  },
   "user": {
     "title": "Mi usuario",
     "intro": "Gestiona tu usuario local, copias de seguridad y ajustes de seguridad.",
@@ -68,5 +145,167 @@
         "desc": "Elimina todos los mensajes de la lista actual."
       }
     }
+  },
+  "airQuality": {
+    "title": "Calidad del aire"
+  },
+  "weather": {
+    "title": "Tiempo"
+  },
+  "appSettings": {
+    "title": "Ajustes de la app"
+  },
+  "contactChatroom": {
+    "title": "Chat de contacto"
+  },
+  "contactConnect": {
+    "title": "Conectar contacto"
+  },
+  "contactEditMessage": {
+    "title": "Editar mensaje de chat"
+  },
+  "contactSettings": {
+    "title": "Ajustes de contacto"
+  },
+  "contactList": {
+    "title": "Contactos"
+  },
+  "contactSort": {
+    "title": "Ordenar contactos"
+  },
+  "documentList": {
+    "title": "Documentos"
+  },
+  "editMessage": {
+    "title": "Editar mensaje"
+  },
+  "editNote": {
+    "title": "Editar nota"
+  },
+  "imageList": {
+    "title": "Imágenes"
+  },
+  "imageExif": {
+    "title": "Editar datos EXIF"
+  },
+  "dsaReport": {
+    "title": "Denunciar contenido"
+  },
+  "dsaCase": {
+    "title": "Detalles del caso"
+  },
+  "dsaStatusLink": {
+    "title": "Estado del caso"
+  },
+  "legalDisclaimer": {
+    "title": "Aviso legal"
+  },
+  "legalExternalContent": {
+    "title": "Contenido externo"
+  },
+  "legalNotice": {
+    "title": "Aviso legal"
+  },
+  "privacyPolicy": {
+    "title": "Política de privacidad"
+  },
+  "termsOfService": {
+    "title": "Términos de servicio"
+  },
+  "thirdPartyLicenses": {
+    "title": "Licencias de terceros"
+  },
+  "messageList": {
+    "title": "Mensajes"
+  },
+  "myMessageList": {
+    "title": "Mis mensajes públicos"
+  },
+  "messageProfile": {
+    "title": "Perfil del mensaje"
+  },
+  "noteList": {
+    "title": "Notas"
+  },
+  "pinHint": {
+    "title": "Ayuda de PIN"
+  },
+  "placeList": {
+    "title": "Lugares"
+  },
+  "placeSettings": {
+    "title": "Ajustes de lugar"
+  },
+  "placeSort": {
+    "title": "Ordenar lugares"
+  },
+  "sharedContent": {
+    "title": "Contenido compartido"
+  },
+  "tileList": {
+    "title": "Tarjetas"
+  },
+  "tileSettings": {
+    "title": "Ajustes de tarjeta"
+  },
+  "tileEditAnniversary": {
+    "title": "Tarjeta de aniversario"
+  },
+  "tileEditFile": {
+    "title": "Tarjeta de archivo"
+  },
+  "tileEditMigraine": {
+    "title": "Tarjeta de migraña"
+  },
+  "tileEditMultitext": {
+    "title": "Tarjeta de texto múltiple"
+  },
+  "tileEditPollution": {
+    "title": "Tarjeta de contaminación"
+  },
+  "tileEditQuickActionAction": {
+    "title": "Acción rápida"
+  },
+  "tileEditQuickAction": {
+    "title": "Tarjeta de acción rápida"
+  },
+  "tileEditText": {
+    "title": "Tarjeta de texto"
+  },
+  "tileEditTodo": {
+    "title": "Tarjeta de tareas"
+  },
+  "avatarCropper": {
+    "title": "Recortar avatar"
+  },
+  "avatarSource": {
+    "title": "Origen del avatar"
+  },
+  "emoticonPicker": {
+    "title": "Emojis"
+  },
+  "locationPicker": {
+    "title": "Seleccionar ubicación"
+  },
+  "maticonPicker": {
+    "title": "Selector de iconos"
+  },
+  "nominatimResult": {
+    "title": "Resultado de búsqueda"
+  },
+  "nominatimSearch": {
+    "title": "Buscar lugares"
+  },
+  "qrCode": {
+    "title": "Código QR"
+  },
+  "scanner": {
+    "title": "Escáner"
+  },
+  "tenorSearch": {
+    "title": "Búsqueda de GIF"
+  },
+  "textDialog": {
+    "title": "Texto"
   }
 }

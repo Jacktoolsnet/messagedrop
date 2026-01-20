@@ -20,6 +20,7 @@ import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { UserService } from '../../../services/user.service';
 import { DisplayMessage } from '../display-message/display-message.component';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { NominatimResultDialogComponent } from './components/nominatim-result-dialog/nominatim-result-dialog.component';
 import { NominatimResultsListComponent } from './components/nominatim-results-list/nominatim-results-list.component';
 import { NominatimResultsMapComponent } from './components/nominatim-results-map/nominatim-results-map.component';
@@ -87,6 +88,7 @@ export class NominatimSearchComponent {
   private readonly dialogRef = inject(MatDialogRef<NominatimSearchComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<NominatimDialogData>(MAT_DIALOG_DATA);
 
   constructor() {

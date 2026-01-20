@@ -161,6 +161,10 @@
     [attr.aria-label]="'common.actions.close' | transloco" class="action-close">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="help.open('appSettings')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
     (click)="onApplyClick()" [disabled]="storagePersistenceBusy">
     <mat-icon>check</mat-icon>

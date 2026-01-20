@@ -126,6 +126,10 @@
         [attr.aria-label]="'common.actions.close' | transloco">
         <mat-icon>close</mat-icon>
     </button>
+    <button mat-icon-button type="button" (click)="help.open('contactList')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     @if (userService.hasJwt()) {
     @if (contactsSignal().length > 1) {
     <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.list.sortAria' | transloco"

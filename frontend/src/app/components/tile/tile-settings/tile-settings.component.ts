@@ -12,6 +12,7 @@ import { Place } from '../../../interfaces/place';
 import { TileSetting, normalizeTileSettings } from '../../../interfaces/tile-settings';
 import { ContactService } from '../../../services/contact.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
@@ -47,6 +48,7 @@ export class TileSettingsComponent {
   private readonly dialog = inject(MatDialog);
   private readonly contactService = inject(ContactService);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<{ place?: Place; contact?: Contact }>(MAT_DIALOG_DATA);
 
   private readonly isPlaceContext = !!this.data.place;

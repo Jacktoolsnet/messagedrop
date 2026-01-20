@@ -5,4 +5,8 @@
 
 <mat-dialog-actions class="sticky-actions" align="end">
     <button mat-dialog-close [mat-dialog-close]="undefined" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+    <button mat-icon-button type="button" (click)="help.open('qrCode')"
+      [attr.aria-label]="'common.actions.help' | transloco">
+      <mat-icon>help</mat-icon>
+    </button>
 </mat-dialog-actions>

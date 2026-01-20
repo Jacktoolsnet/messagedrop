@@ -6,6 +6,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { BrowserMultiFormatReader, IScannerControls } from '@zxing/browser';
 import { Result } from '@zxing/library';
 import { Mode } from '../../../interfaces/mode';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-scanner',
@@ -30,6 +31,7 @@ export class ScannerComponent implements AfterViewInit, OnDestroy {
 
   readonly dialogRef = inject(MatDialogRef<ScannerComponent>);
   readonly data = inject<{ mode: Mode; connectId: string }>(MAT_DIALOG_DATA);
+  readonly help = inject(HelpDialogService);
 
   ngAfterViewInit(): void {
     this.codeReader.decodeFromVideoDevice(

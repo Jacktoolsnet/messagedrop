@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { ImageCroppedEvent, ImageCropperComponent } from 'ngx-image-cropper';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 export interface AvatarCropperData {
   file: File;
@@ -36,6 +37,7 @@ export interface AvatarCropperData {
 export class AvatarCropperComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<AvatarCropperComponent>);
   readonly data = inject<AvatarCropperData>(MAT_DIALOG_DATA);
 

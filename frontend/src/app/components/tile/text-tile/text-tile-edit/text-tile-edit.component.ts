@@ -12,6 +12,7 @@ import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { MatDialog } from '@angular/material/dialog';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 
 interface TextTileDialogData {
   tile: TileSetting;
@@ -41,6 +42,7 @@ export class TextTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<TextTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<TextTileDialogData>(MAT_DIALOG_DATA);
 
   readonly titleControl = new FormControl(

@@ -11,6 +11,7 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { Contact } from '../../../interfaces/contact';
 import { Mode } from '../../../interfaces/mode';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-contact',
@@ -35,6 +36,7 @@ export class ConnectComponent {
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
   private readonly dialogRef = inject(MatDialogRef<ConnectComponent>);
+  readonly help = inject(HelpDialogService);
   public readonly data = inject<{ mode: Mode; contact: Contact; connectId: string }>(MAT_DIALOG_DATA);
   public isPasting = false;
 

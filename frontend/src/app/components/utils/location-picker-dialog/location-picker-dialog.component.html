@@ -15,6 +15,10 @@
     class="action-close">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="help.open('locationPicker')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="primary" type="button" (click)="apply()"
     [attr.aria-label]="'common.actions.apply' | transloco">
     <mat-icon>check</mat-icon>

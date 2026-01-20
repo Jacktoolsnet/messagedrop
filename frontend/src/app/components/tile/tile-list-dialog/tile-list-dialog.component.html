@@ -32,6 +32,10 @@
   <button mat-icon-button mat-dialog-close class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="help.open('tileList')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button type="button" (click)="openTileSettings()" [attr.aria-label]="tileSettingsAriaLabel">
     <mat-icon>settings</mat-icon>
   </button>

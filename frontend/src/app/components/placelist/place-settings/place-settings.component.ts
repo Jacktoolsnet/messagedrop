@@ -21,6 +21,7 @@ import { TranslationHelperService } from '../../../services/translation-helper.s
 import { UnsplashService } from '../../../services/unsplash.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
@@ -70,6 +71,7 @@ export class PlaceProfileComponent {
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly ngZone = inject(NgZone);
   private readonly dialog = inject(MatDialog);
+  readonly help = inject(HelpDialogService);
   private readonly avatarStorage = inject(AvatarStorageService);
   private readonly unsplashService = inject(UnsplashService);
   private readonly languageService = inject(LanguageService);

@@ -204,6 +204,10 @@
     (click)="closeChatroom()">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="help.open('contactChatroom')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.contact.chatroom.composeAria' | transloco"
     (click)="requestCompose()">
     <mat-icon>add_comment</mat-icon>

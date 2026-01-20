@@ -13,6 +13,7 @@ import { A11yModule } from '@angular/cdk/a11y';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface AnniversaryTileDialogData {
@@ -48,6 +49,7 @@ export class AnniversaryTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<AnniversaryTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<AnniversaryTileDialogData>(MAT_DIALOG_DATA);
 
   readonly titleControl = new FormControl(

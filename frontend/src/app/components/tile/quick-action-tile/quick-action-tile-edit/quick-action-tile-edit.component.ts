@@ -12,6 +12,7 @@ import { TileQuickAction, TileSetting } from '../../../../interfaces/tile-settin
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
 import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
+import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
 import { QuickActionActionEditComponent } from '../quick-action-action-edit/quick-action-action-edit.component';
 
 interface QuickActionTileDialogData {
@@ -45,6 +46,7 @@ export class QuickActionTileEditComponent {
   private readonly dialogRef = inject(MatDialogRef<QuickActionTileEditComponent>);
   private readonly dialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly data = inject<QuickActionTileDialogData>(MAT_DIALOG_DATA);
   private readonly allowedActionTypes: TileQuickAction['type'][] = ['web', 'email', 'phone', 'whatsapp', 'sms'];
 

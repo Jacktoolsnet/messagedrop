@@ -22,6 +22,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { SelectMultimediaComponent } from '../multimedia/select-multimedia/select-multimedia.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { LocationPickerTileComponent } from '../utils/location-picker/location-picker-tile.component';
 import { TextComponent } from '../utils/text/text.component';
 
@@ -63,6 +64,7 @@ export class EditMessageComponent implements OnInit {
   private readonly snackBar = inject(MatSnackBar);
   private readonly matDialog = inject(MatDialog);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   readonly dialogRef = inject(MatDialogRef<EditMessageComponent>);
   private readonly style = inject(StyleService);
   readonly data = inject<{ mode: Mode; message: Message }>(MAT_DIALOG_DATA);

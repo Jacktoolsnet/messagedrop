@@ -242,6 +242,10 @@
 
 <mat-dialog-actions class="sticky-actions" align="end">
   <button color="primary" (click)="close()" mat-icon-button [attr.aria-label]="'common.actions.close' | transloco" class="action-close"><mat-icon>close</mat-icon></button>
+  <button mat-icon-button type="button" (click)="help.open('dsaCase')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   @if (!loading() && !error() && activeTab() === 0) {
   <button color="primary" (click)="openPublicStatus()" [disabled]="!publicStatusUrl()" mat-icon-button [attr.aria-label]="'dsa.case.openPublicPage' | transloco"><mat-icon>open_in_new</mat-icon></button>
   }

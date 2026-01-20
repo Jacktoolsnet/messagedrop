@@ -12,6 +12,7 @@ import {
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 @Component({
   selector: 'app-legal-notice',
@@ -39,6 +40,7 @@ export class LegalNoticeComponent {
 
   private http = inject(HttpClient);
   private dialogRef = inject(MatDialogRef<LegalNoticeComponent>);
+  readonly help = inject(HelpDialogService);
 
   constructor() { this.load(); }
 

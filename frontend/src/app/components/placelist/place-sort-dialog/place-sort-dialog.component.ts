@@ -11,6 +11,7 @@ import { Place } from '../../../interfaces/place';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { PlaceProfileComponent } from '../place-settings/place-settings.component';
+import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 
 interface PlaceSortDialogData {
   places: Place[];
@@ -43,6 +44,7 @@ export class PlaceSortDialogComponent {
   private readonly placeService = inject(PlaceService);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
   private readonly data = inject<PlaceSortDialogData>(MAT_DIALOG_DATA);
   readonly places = signal<Place[]>([...this.data.places]);
 

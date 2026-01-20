@@ -313,6 +313,10 @@
             @if (messageService.selectedMessagesSignal().length !== 0) { arrow_back } @else { close }
         </mat-icon>
     </button>
+    <button mat-icon-button type="button" (click)="help.open('myMessageList')"
+        [attr.aria-label]="'common.actions.help' | transloco">
+        <mat-icon>help</mat-icon>
+    </button>
     @if (messageService.selectedMessagesSignal().length !== 0) {
     @if (!userService.isReady() || userService.hasJwt()) {
     <button mat-icon-button color="primary"
