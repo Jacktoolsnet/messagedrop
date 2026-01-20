@@ -297,7 +297,9 @@ export class ContactlistComponent {
       width: 'min(680px, 95vw)',
       maxHeight: '90vh',
       height: 'auto',
-      hasBackdrop: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
       autoFocus: false
     });
 
