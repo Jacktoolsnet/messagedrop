@@ -24,5 +24,23 @@
         "desc": "Elimina este usuario y todos los datos locales."
       }
     }
+  },
+  "profile": {
+    "title": "Mi perfil",
+    "intro": "Tu perfil se guarda solo de forma local y se usa únicamente para tus propios contenidos. Puedes compartirlo opcionalmente con tus contactos.",
+    "items": {
+      "name": {
+        "title": "Nombre visible",
+        "desc": "Se muestra solo en tus mensajes, comentarios y notas de este dispositivo."
+      },
+      "avatar": {
+        "title": "Foto de perfil",
+        "desc": "Elige una imagen del dispositivo o de Unsplash; el avatar es local salvo que lo compartas con contactos."
+      },
+      "style": {
+        "title": "Estilo predeterminado",
+        "desc": "Elige el estilo de letra que se usa en tus mensajes, comentarios, notas, etc."
+      }
+    }
   }
 }

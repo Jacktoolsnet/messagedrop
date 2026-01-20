@@ -24,5 +24,23 @@
         "desc": "Entfernt diesen Benutzer und alle lokalen Daten."
       }
     }
+  },
+  "profile": {
+    "title": "Mein Profil",
+    "intro": "Dein Profil wird nur lokal gespeichert und nur für deine eigenen Inhalte verwendet. Du kannst es optional mit Kontakten teilen.",
+    "items": {
+      "name": {
+        "title": "Anzeigename",
+        "desc": "Wird nur bei deinen eigenen Nachrichten, Kommentaren und Notizen auf diesem Gerät angezeigt."
+      },
+      "avatar": {
+        "title": "Profilbild",
+        "desc": "Wähle ein Bild vom Gerät oder von Unsplash; der Avatar bleibt lokal, außer du teilst ihn mit Kontakten."
+      },
+      "style": {
+        "title": "Standardstil",
+        "desc": "Wähle den Schriftstil, der für deine Nachrichten, Kommentare, Notizen usw. verwendet wird."
+      }
+    }
   }
 }

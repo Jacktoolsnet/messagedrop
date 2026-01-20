@@ -72,6 +72,9 @@
     (click)="onAbortClick()">
     <mat-icon>close</mat-icon>
   </button>
+  <button mat-icon-button type="button" (click)="openHelp()" [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
   <button mat-icon-button color="primary" [attr.aria-label]="'common.actions.apply' | transloco"
     (click)="onApplyClick()">
     <mat-icon>check</mat-icon>

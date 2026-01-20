@@ -24,5 +24,23 @@
         "desc": "Supprime cet utilisateur et toutes les données locales."
       }
     }
+  },
+  "profile": {
+    "title": "Mon profil",
+    "intro": "Votre profil est stocké localement et utilisé uniquement pour vos propres contenus. Vous pouvez le partager avec vos contacts.",
+    "items": {
+      "name": {
+        "title": "Nom affiché",
+        "desc": "Affiché uniquement sur vos messages, commentaires et notes de cet appareil."
+      },
+      "avatar": {
+        "title": "Photo de profil",
+        "desc": "Choisissez une image de l'appareil ou d'Unsplash; l'avatar reste local sauf si vous le partagez avec des contacts."
+      },
+      "style": {
+        "title": "Style par défaut",
+        "desc": "Choisissez le style de police utilisé pour vos messages, commentaires, notes, etc."
+      }
+    }
   }
 }

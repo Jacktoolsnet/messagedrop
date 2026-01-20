@@ -20,6 +20,7 @@ import { UnsplashService } from '../../../services/unsplash.service';
 import { UserService } from '../../../services/user.service';
 import { AvatarCropperComponent } from '../../utils/avatar-cropper/avatar-cropper.component';
 import { AvatarSourceChoice, AvatarSourceDialogComponent } from '../../utils/avatar-source-dialog/avatar-source-dialog.component';
+import { HelpDialogComponent, HelpDialogData } from '../../utils/help-dialog/help-dialog.component';
 import { UnsplashComponent } from '../../utils/unsplash/unsplash.component';
 
 @Component({
@@ -95,6 +96,43 @@ export class UserProfileComponent {
     Object.assign(this.userService.getProfile(), this.oriProfile);
     this.userService.notifyProfileChanged();
     this.dialogRef.close();
+  }
+
+  openHelp(): void {
+    const data: HelpDialogData = {
+      titleKey: 'profile.title',
+      introKey: 'profile.intro',
+      items: [
+        {
+          icon: 'badge',
+          titleKey: 'profile.items.name.title',
+          descriptionKey: 'profile.items.name.desc'
+        },
+        {
+          icon: 'photo_camera',
+          titleKey: 'profile.items.avatar.title',
+          descriptionKey: 'profile.items.avatar.desc'
+        },
+        {
+          icon: 'cycle',
+          titleKey: 'profile.items.style.title',
+          descriptionKey: 'profile.items.style.desc'
+        }
+      ]
+    };
+
+    this.dialog.open(HelpDialogComponent, {
+      data,
+      minWidth: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(680px, 95vw)',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
+      autoFocus: false
+    });
   }
 
   onFileSelected(event: Event): void {
