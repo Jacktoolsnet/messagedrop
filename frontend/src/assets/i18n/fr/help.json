@@ -42,5 +42,31 @@
         "desc": "Choisissez le style de police utilisé pour vos messages, commentaires, notes, etc."
       }
     }
+  },
+  "systemMessages": {
+    "title": "Messages système",
+    "intro": "Les messages système vous informent sur la modération et les événements. Touchez un message pour voir les détails.",
+    "items": {
+      "inbox": {
+        "title": "Boîte de réception",
+        "desc": "Affiche tous les messages; les non lus sont mis en évidence."
+      },
+      "filters": {
+        "title": "Filtres",
+        "desc": "Basculez entre non lus, lus et tous."
+      },
+      "details": {
+        "title": "Détails",
+        "desc": "Ouvrez un message pour voir l'info de dossier, la raison, le type de contenu et l'heure."
+      },
+      "actions": {
+        "title": "Actions",
+        "desc": "Marquer comme lu/non lu, supprimer ou ouvrir le lien de statut si disponible."
+      },
+      "deleteAll": {
+        "title": "Tout supprimer",
+        "desc": "Supprime tous les messages de la liste actuelle."
+      }
+    }
   }
 }

@@ -42,5 +42,31 @@
         "desc": "Wähle den Schriftstil, der für deine Nachrichten, Kommentare, Notizen usw. verwendet wird."
       }
     }
+  },
+  "systemMessages": {
+    "title": "Systemnachrichten",
+    "intro": "Systemnachrichten informieren dich über Moderation und Systemereignisse. Tippe auf eine Nachricht, um Details zu sehen.",
+    "items": {
+      "inbox": {
+        "title": "Posteingang",
+        "desc": "Zeigt alle Systemnachrichten; ungelesene sind hervorgehoben."
+      },
+      "filters": {
+        "title": "Filter",
+        "desc": "Wechsle zwischen ungelesen, gelesen und allen."
+      },
+      "details": {
+        "title": "Details",
+        "desc": "Öffne eine Nachricht, um Fallinfo, Grund, Inhaltstyp und Zeitstempel zu sehen."
+      },
+      "actions": {
+        "title": "Aktionen",
+        "desc": "Als gelesen/ungelesen markieren, löschen oder den Statuslink öffnen (falls vorhanden)."
+      },
+      "deleteAll": {
+        "title": "Alles löschen",
+        "desc": "Entfernt alle Nachrichten aus der aktuellen Liste."
+      }
+    }
   }
 }

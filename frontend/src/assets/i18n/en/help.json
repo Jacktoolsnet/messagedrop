@@ -42,5 +42,31 @@
         "desc": "Choose the font style used for your messages, comments, notes, and more."
       }
     }
+  },
+  "systemMessages": {
+    "title": "System messages",
+    "intro": "System messages keep you informed about moderation and system events. Tap a message to see details.",
+    "items": {
+      "inbox": {
+        "title": "Inbox",
+        "desc": "Shows all system messages; unread ones are highlighted."
+      },
+      "filters": {
+        "title": "Filters",
+        "desc": "Switch between unread, read, and all."
+      },
+      "details": {
+        "title": "Details",
+        "desc": "Open a message to view case info, reason, content type, and timestamp."
+      },
+      "actions": {
+        "title": "Actions",
+        "desc": "Mark as read/unread, delete a message, or open the case status link when available."
+      },
+      "deleteAll": {
+        "title": "Delete all",
+        "desc": "Removes all messages in the current list."
+      }
+    }
   }
 }

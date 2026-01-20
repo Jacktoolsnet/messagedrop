@@ -42,5 +42,31 @@
         "desc": "Elige el estilo de letra que se usa en tus mensajes, comentarios, notas, etc."
       }
     }
+  },
+  "systemMessages": {
+    "title": "Mensajes del sistema",
+    "intro": "Los mensajes del sistema te informan sobre moderación y eventos. Toca un mensaje para ver detalles.",
+    "items": {
+      "inbox": {
+        "title": "Bandeja",
+        "desc": "Muestra todos los mensajes; los no leídos se resaltan."
+      },
+      "filters": {
+        "title": "Filtros",
+        "desc": "Cambia entre no leídos, leídos y todos."
+      },
+      "details": {
+        "title": "Detalles",
+        "desc": "Abre un mensaje para ver información del caso, motivo, tipo de contenido y fecha."
+      },
+      "actions": {
+        "title": "Acciones",
+        "desc": "Marcar como leído/no leído, eliminar o abrir el enlace de estado cuando exista."
+      },
+      "deleteAll": {
+        "title": "Eliminar todo",
+        "desc": "Elimina todos los mensajes de la lista actual."
+      }
+    }
   }
 }

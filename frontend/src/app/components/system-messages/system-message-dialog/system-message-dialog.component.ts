@@ -13,6 +13,7 @@ import { SystemNotification, SystemNotificationFilter } from '../../../interface
 import { SystemNotificationService } from '../../../services/system-notification.service';
 import { DeleteAllSystemNotificationComponent } from '../delete-all-system-notification/delete-all-system-notification.component';
 import { DeleteSystemNotificationComponent } from '../delete-system-notification/delete-system-notification.component';
+import { HelpDialogComponent, HelpDialogData } from '../../utils/help-dialog/help-dialog.component';
 
 @Component({
   selector: 'app-system-message-dialog',
@@ -206,5 +207,52 @@ export class SystemMessageDialogComponent implements OnInit {
 
   close(): void {
     this.dialogRef.close();
+  }
+
+  openHelp(): void {
+    const data: HelpDialogData = {
+      titleKey: 'systemMessages.title',
+      introKey: 'systemMessages.intro',
+      items: [
+        {
+          icon: 'notifications',
+          titleKey: 'systemMessages.items.inbox.title',
+          descriptionKey: 'systemMessages.items.inbox.desc'
+        },
+        {
+          icon: 'filter_alt',
+          titleKey: 'systemMessages.items.filters.title',
+          descriptionKey: 'systemMessages.items.filters.desc'
+        },
+        {
+          icon: 'info',
+          titleKey: 'systemMessages.items.details.title',
+          descriptionKey: 'systemMessages.items.details.desc'
+        },
+        {
+          icon: 'mark_email_read',
+          titleKey: 'systemMessages.items.actions.title',
+          descriptionKey: 'systemMessages.items.actions.desc'
+        },
+        {
+          icon: 'delete_sweep',
+          titleKey: 'systemMessages.items.deleteAll.title',
+          descriptionKey: 'systemMessages.items.deleteAll.desc'
+        }
+      ]
+    };
+
+    this.dialog.open(HelpDialogComponent, {
+      data,
+      minWidth: 'min(520px, 95vw)',
+      maxWidth: '95vw',
+      width: 'min(680px, 95vw)',
+      maxHeight: '90vh',
+      height: 'auto',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop-transparent',
+      disableClose: true,
+      autoFocus: false
+    });
   }
 }
