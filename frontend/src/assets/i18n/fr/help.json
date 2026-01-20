@@ -9,15 +9,15 @@
       },
       "backup": {
         "title": "Sauvegarde",
-        "desc": "Exportez vos données afin de pouvoir les restaurer plus tard."
+        "desc": "Choisissez un emplacement, définissez et confirmez un PIN de sauvegarde, puis enregistrez le fichier. Vous pourrez le restaurer plus tard via la fonction d'import."
       },
       "changePin": {
         "title": "Modifier le PIN",
-        "desc": "Définissez un nouveau PIN pour cet appareil."
+        "desc": "Définissez un nouveau PIN pour cet utilisateur sur cet appareil."
       },
       "resetKeys": {
         "title": "Réinitialiser les clés de sécurité",
-        "desc": "Régénère vos clés et efface l'historique des discussions."
+        "desc": "Régénère les clés utilisées pour chiffrer vos messages et efface l'historique des discussions."
       },
       "delete": {
         "title": "Supprimer l'utilisateur",

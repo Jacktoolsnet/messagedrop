@@ -9,15 +9,15 @@
       },
       "backup": {
         "title": "Backup",
-        "desc": "Export your data to a file, store it somewhere safe, and use it later to restore your account on this device."
+        "desc": "Choose a save location, set and confirm a backup PIN, then store the file safely. You can restore it later via the import/restore option."
       },
       "changePin": {
         "title": "Change PIN",
-        "desc": "Set a new PIN for this device."
+        "desc": "Set a new PIN for this user on this device."
       },
       "resetKeys": {
         "title": "Reset security keys",
-        "desc": "Regenerates your keys and clears chat history."
+        "desc": "Generates new keys used to encrypt your messages and clears chat history."
       },
       "delete": {
         "title": "Delete user",

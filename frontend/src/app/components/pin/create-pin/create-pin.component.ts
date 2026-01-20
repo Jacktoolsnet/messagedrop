@@ -1,12 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, HostListener, OnDestroy, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogRef } from '@angular/material/dialog';
+import { MatDialogRef } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { PinHintComponent } from '../pin-hint/pin-hint.component';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 
 @Component({
@@ -31,7 +30,6 @@ export class CreatePinComponent implements OnDestroy {
   isConfirming = false;
   private dialogClosed = false;
 
-  private readonly pinHintDialog = inject(MatDialog);
   private readonly dialogRef = inject(MatDialogRef<CreatePinComponent>);
   private readonly snackBar = inject(MatSnackBar);
   private readonly translation = inject(TranslationHelperService);
@@ -121,12 +119,8 @@ export class CreatePinComponent implements OnDestroy {
     this.isConfirming = false;
   }
 
-  showPinHint(): void {
-    this.pinHintDialog.open(PinHintComponent, {
-      closeOnNavigation: true,
-      hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
-      disableClose: true,
-    });
+  cancel(): void {
+    this.dialogClosed = true;
+    this.dialogRef.close();
   }
 }

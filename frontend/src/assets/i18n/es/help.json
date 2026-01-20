@@ -9,15 +9,15 @@
       },
       "backup": {
         "title": "Copia de seguridad",
-        "desc": "Exporta tus datos para poder restaurarlos más tarde."
+        "desc": "Elige una ubicación, define y confirma un PIN de copia, luego guarda el archivo. Puedes restaurarlo más adelante mediante la función de importar."
       },
       "changePin": {
         "title": "Cambiar PIN",
-        "desc": "Establece un nuevo PIN para este dispositivo."
+        "desc": "Establece un nuevo PIN para este usuario en este dispositivo."
       },
       "resetKeys": {
         "title": "Restablecer claves de seguridad",
-        "desc": "Regenera tus claves y borra el historial del chat."
+        "desc": "Regenera las claves que se usan para cifrar tus mensajes y borra el historial del chat."
       },
       "delete": {
         "title": "Eliminar usuario",

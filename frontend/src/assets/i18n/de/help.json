@@ -9,15 +9,15 @@
       },
       "backup": {
         "title": "Daten sichern",
-        "desc": "Exportiere deine Daten, um sie später wiederherzustellen."
+        "desc": "Wähle einen Speicherort, lege eine Backup-PIN fest und bestätige sie, dann speichere die Datei. Du kannst sie später über die Importfunktion wiederherstellen."
       },
       "changePin": {
         "title": "PIN ändern",
-        "desc": "Lege eine neue PIN für dieses Gerät fest."
+        "desc": "Lege eine neue PIN für diesen Benutzer auf diesem Gerät fest."
       },
       "resetKeys": {
         "title": "Sicherheits-Reset",
-        "desc": "Erzeugt neue Schlüssel und löscht den Chatverlauf."
+        "desc": "Erzeugt neue Schlüssel für die Verschlüsselung deiner Nachrichten und löscht den Chatverlauf."
       },
       "delete": {
         "title": "Benutzer löschen",
