@@ -36,8 +36,10 @@
                 </div>
             </div>
             } @else {
-            <div class="avatar-box" role="button" tabindex="0" (click)="editMessageUserProfile(message)"
-                (keyup.enter)="editMessageUserProfile(message)" (keyup.space)="editMessageUserProfile(message)">
+            <div class="avatar-box" role="button" tabindex="0"
+                (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
                 <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
                     [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">
@@ -181,8 +183,10 @@
                 </div>
             </div>
             } @else {
-            <div class="avatar-box" role="button" tabindex="0" (click)="editMessageUserProfile(message)"
-                (keyup.enter)="editMessageUserProfile(message)" (keyup.space)="editMessageUserProfile(message)">
+            <div class="avatar-box" role="button" tabindex="0"
+                (click)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                (keyup.enter)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)"
+                (keyup.space)="!userService.isReady() ? editMessageUserProfileAfterLogin(message) : editMessageUserProfile(message)">
                 @if (profileService.getProfile(message.userId)?.base64Avatar) {
                 <img class="avatar" [src]="profileService.getProfile(message.userId)?.base64Avatar"
                     [attr.alt]="profileService.getProfile(message.userId)?.name ? ('common.messageList.avatarAltName' | transloco:{ name: profileService.getProfile(message.userId)?.name }) : ('common.messageList.avatarAltFallback' | transloco)">

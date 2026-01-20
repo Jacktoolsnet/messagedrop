@@ -660,6 +660,10 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
     });
   }
 
+  public editMessageUserProfileAfterLogin(message: Message): void {
+    this.userService.loginWithBackend(() => this.editMessageUserProfile(message));
+  }
+
   public translateMessage(message: Message) {
     this.translateService.translate(message.message, this.languageService.effectiveLanguage(), false, message.uuid).subscribe({
       next: response => {

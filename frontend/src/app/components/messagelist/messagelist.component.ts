@@ -32,6 +32,7 @@ import { DigitalServicesActReportDialogComponent } from '../legal/digital-servic
 import { DsaCaseDialogComponent } from '../legal/digital-services-act-report-dialog/dsa-case-dialog/dsa-case-dialog.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
+import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { DisplayMessage } from '../utils/display-message/display-message.component';
 import { DeleteMessageComponent } from './delete-message/delete-message.component';
 import { MessageProfileComponent } from './message-profile/message-profile.component';
@@ -658,6 +659,29 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         this.profileService.setProfile(message.userId, profile);
       }
     });
+  }
+
+  public editMessageUserProfileAfterLogin(message: Message): void {
+    this.userService.loginWithBackend(() => this.editMessageUserProfile(message));
+  }
+
+  public openOwnProfile(): void {
+    const dialogRef = this.dialog.open(UserProfileComponent, {
+      data: {},
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      maxWidth: '90vw',
+      hasBackdrop: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      this.userService.saveProfile();
+    });
+  }
+
+  public openOwnProfileAfterLogin(): void {
+    this.userService.loginWithBackend(this.openOwnProfile.bind(this));
   }
 
   public translateMessage(message: Message) {
