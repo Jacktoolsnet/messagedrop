@@ -1,0 +1,28 @@
+{
+  "user": {
+    "title": "My account",
+    "intro": "Manage your local account, backups, and security settings.",
+    "items": {
+      "userId": {
+        "title": "User ID",
+        "desc": "Your unique identifier on this device."
+      },
+      "backup": {
+        "title": "Backup",
+        "desc": "Export your data to a file, store it somewhere safe, and use it later to restore your account on this device."
+      },
+      "changePin": {
+        "title": "Change PIN",
+        "desc": "Set a new PIN for this device."
+      },
+      "resetKeys": {
+        "title": "Reset security keys",
+        "desc": "Regenerates your keys and clears chat history."
+      },
+      "delete": {
+        "title": "Delete user",
+        "desc": "Remove this user and all local data."
+      }
+    }
+  }
+}

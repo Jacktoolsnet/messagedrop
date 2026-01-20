@@ -1,0 +1,29 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon class="dialog-title__icon" aria-hidden="true">help</mat-icon>
+  <span class="dialog-title__text">{{ t(data.titleKey) }}</span>
+</h2>
+
+<mat-dialog-content class="help-dialog-content">
+  <p class="help-intro">{{ t(data.introKey) }}</p>
+
+  <div class="help-list">
+    @for (item of data.items; track item.titleKey) {
+    <div class="help-item">
+      <div class="help-item__icon">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+      </div>
+      <div class="help-item__content">
+        <div class="help-item__title">{{ t(item.titleKey) }}</div>
+        <div class="help-item__desc">{{ t(item.descriptionKey) }}</div>
+      </div>
+    </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-icon-button class="action-close" type="button" (click)="close()"
+    [attr.aria-label]="'common.actions.close' | transloco">
+    <mat-icon>close</mat-icon>
+  </button>
+</mat-dialog-actions>

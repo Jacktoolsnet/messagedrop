@@ -28,7 +28,8 @@
       "copy": "Copy",
       "more": "More",
       "close": "Close",
-      "edit": "Edit"
+      "edit": "Edit",
+      "help": "Help"
     },
     "media": {
       "storageUnsupported": "This feature is not supported on this device."

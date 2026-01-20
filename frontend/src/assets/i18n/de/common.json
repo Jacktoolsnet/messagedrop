@@ -28,7 +28,8 @@
       "copy": "Kopieren",
       "more": "Mehr",
       "close": "Schließen",
-      "edit": "Bearbeiten"
+      "edit": "Bearbeiten",
+      "help": "Hilfe"
     },
     "media": {
       "storageUnsupported": "Funktion wird nicht unterstützt."

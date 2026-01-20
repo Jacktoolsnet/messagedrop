@@ -1,0 +1,28 @@
+{
+  "user": {
+    "title": "Mein Benutzer",
+    "intro": "Verwalte deinen lokalen Benutzer, Backups und Sicherheitseinstellungen.",
+    "items": {
+      "userId": {
+        "title": "User-ID",
+        "desc": "Deine eindeutige Kennung auf diesem Gerät."
+      },
+      "backup": {
+        "title": "Daten sichern",
+        "desc": "Exportiere deine Daten, um sie später wiederherzustellen."
+      },
+      "changePin": {
+        "title": "PIN ändern",
+        "desc": "Lege eine neue PIN für dieses Gerät fest."
+      },
+      "resetKeys": {
+        "title": "Sicherheits-Reset",
+        "desc": "Erzeugt neue Schlüssel und löscht den Chatverlauf."
+      },
+      "delete": {
+        "title": "Benutzer löschen",
+        "desc": "Entfernt diesen Benutzer und alle lokalen Daten."
+      }
+    }
+  }
+}

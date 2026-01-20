@@ -28,7 +28,8 @@
       "copy": "Copier",
       "more": "Plus",
       "close": "Fermer",
-      "edit": "Modifier"
+      "edit": "Modifier",
+      "help": "Aide"
     },
     "media": {
       "storageUnsupported": "Cette fonctionnalité n'est pas prise en charge sur cet appareil."

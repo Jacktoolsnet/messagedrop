@@ -1,0 +1,28 @@
+{
+  "user": {
+    "title": "Mon utilisateur",
+    "intro": "Gérez votre utilisateur local, les sauvegardes et les paramètres de sécurité.",
+    "items": {
+      "userId": {
+        "title": "ID utilisateur",
+        "desc": "Votre identifiant unique sur cet appareil."
+      },
+      "backup": {
+        "title": "Sauvegarde",
+        "desc": "Exportez vos données afin de pouvoir les restaurer plus tard."
+      },
+      "changePin": {
+        "title": "Modifier le PIN",
+        "desc": "Définissez un nouveau PIN pour cet appareil."
+      },
+      "resetKeys": {
+        "title": "Réinitialiser les clés de sécurité",
+        "desc": "Régénère vos clés et efface l'historique des discussions."
+      },
+      "delete": {
+        "title": "Supprimer l'utilisateur",
+        "desc": "Supprime cet utilisateur et toutes les données locales."
+      }
+    }
+  }
+}
