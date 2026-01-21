@@ -56,6 +56,10 @@ export class NoteService {
     return notes;
   }
 
+  clearNotes(): void {
+    this.notesSignal.set([]);
+  }
+
   navigateToNoteLocation(user: User, note: Note): void {
     const url = `https://www.google.com/maps/dir/${encodeURIComponent(user.location.plusCode)}/${encodeURIComponent(note.location.plusCode)}`;
     window.open(url, '_blank');

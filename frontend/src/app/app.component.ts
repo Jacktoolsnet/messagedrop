@@ -44,6 +44,7 @@ import { UserProfileComponent } from './components/user/user-profile/user-profil
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
+import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
 import { GetGeoStatisticResponse } from './interfaces/get-geo-statistic-response';
 import { LocalDocument } from './interfaces/local-document';
@@ -62,6 +63,7 @@ import { NotificationAction } from './interfaces/notification-action';
 import { Place } from './interfaces/place';
 import { PlusCodeArea } from './interfaces/plus-code-area';
 import { SharedContent } from './interfaces/shared-content';
+import { DEFAULT_SEARCH_SETTINGS, SearchSettings } from './interfaces/search-settings';
 import { ShortNumberPipe } from './pipes/short-number.pipe';
 import { AirQualityService } from './services/air-quality.service';
 import { AppService } from './services/app.service';
@@ -141,6 +143,7 @@ export class AppComponent implements OnInit {
   lastMarkerUpdate = 0;
   locationSubscriptionError = false;
   isPartOfPlace = false;
+  private searchSettings: SearchSettings = structuredClone(DEFAULT_SEARCH_SETTINGS);
   private readonly mapSearchDebounceMs = Math.max(0, environment.mapSearchDebounceMs ?? 0);
   private moveEndDebounceTimer?: ReturnType<typeof setTimeout>;
 
@@ -345,6 +348,7 @@ export class AppComponent implements OnInit {
   async initApp() {
     await this.appService.loadAppSettings();
     await this.userService.preloadVapidPublicKey();
+    await this.loadSearchSettings();
   }
 
   public ngOnInit(): void {
@@ -746,16 +750,54 @@ export class AppComponent implements OnInit {
   private async updateDataForLocation() {
     // Clear markerLocations
     this.markerLocations.clear()
+    const settings = this.normalizeSearchSettings(this.searchSettings);
+    const zoom = this.mapService.getMapZoom();
+    const shouldSearchMessages = settings.publicMessages.enabled && zoom >= settings.publicMessages.minZoom;
+    const shouldSearchNotes = settings.privateNotes.enabled && zoom >= settings.privateNotes.minZoom;
+    const shouldSearchImages = settings.privateImages.enabled && zoom >= settings.privateImages.minZoom;
+    const shouldSearchDocuments = settings.privateDocuments.enabled && zoom >= settings.privateDocuments.minZoom;
     // notes from local device
     if (this.userService.isReady()) {
-      await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      await this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      await this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      if (shouldSearchNotes) {
+        await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      } else {
+        this.noteService.clearNotes();
+      }
+      if (shouldSearchImages) {
+        await this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      } else {
+        this.localImageService.clearImages();
+      }
+      if (shouldSearchDocuments) {
+        await this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox());
+      } else {
+        this.localDocumentService.clearDocuments();
+      }
+    } else {
+      this.noteService.clearNotes();
+      this.localImageService.clearImages();
+      this.localDocumentService.clearDocuments();
     }
     // Messages
-    if (!this.markerMessageListOpen) {
+    if (!shouldSearchMessages) {
+      this.messageService.clearMessages();
+    } else if (!this.markerMessageListOpen) {
       this.messageService.getByVisibleMapBoundingBox();
     }
+  }
+
+  private async loadSearchSettings(): Promise<void> {
+    const stored = await this.indexedDbService.getSetting<SearchSettings>('searchSettings');
+    this.searchSettings = this.normalizeSearchSettings(stored ?? DEFAULT_SEARCH_SETTINGS);
+  }
+
+  private normalizeSearchSettings(settings?: SearchSettings): SearchSettings {
+    return {
+      publicMessages: { ...DEFAULT_SEARCH_SETTINGS.publicMessages, ...(settings?.publicMessages ?? {}) },
+      privateNotes: { ...DEFAULT_SEARCH_SETTINGS.privateNotes, ...(settings?.privateNotes ?? {}) },
+      privateImages: { ...DEFAULT_SEARCH_SETTINGS.privateImages, ...(settings?.privateImages ?? {}) },
+      privateDocuments: { ...DEFAULT_SEARCH_SETTINGS.privateDocuments, ...(settings?.privateDocuments ?? {}) }
+    };
   }
 
   public handleMoveEndEvent() {
@@ -1412,6 +1454,33 @@ export class AppComponent implements OnInit {
       disableClose: false,
     });
 
+  }
+
+  public openSearchSettings(): void {
+    const dialogRef = this.dialog.open(SearchSettingsComponent, {
+      data: {
+        settings: structuredClone(this.searchSettings),
+        location: this.mapService.getMapLocation()
+      },
+      closeOnNavigation: true,
+      maxHeight: '90vh',
+      width: '900px',
+      maxWidth: '95vw',
+      autoFocus: false,
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+    });
+
+    dialogRef.afterClosed().subscribe(async (settings?: SearchSettings) => {
+      if (!settings) {
+        return;
+      }
+      const normalized = this.normalizeSearchSettings(settings);
+      this.searchSettings = normalized;
+      await this.indexedDbService.setSetting('searchSettings', normalized);
+      void this.updateDataForLocation();
+    });
   }
 
   public editExternalContentSettings() {

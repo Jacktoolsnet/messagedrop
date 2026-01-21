@@ -85,6 +85,10 @@ export class LocalDocumentService {
     return docs;
   }
 
+  clearDocuments(): void {
+    this.documentsSignal.set([]);
+  }
+
   async deleteDocument(document: LocalDocument): Promise<void> {
     await this.indexedDbService.deleteDocument(document.id);
     await this.fileCacheService.deleteTileFile(document.id, document.fileName, document.mimeType);

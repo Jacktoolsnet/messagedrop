@@ -213,6 +213,7 @@ export class MessageService {
 
   clearMessages() {
     this.messagesSignal.set([]);
+    this._messageSet.update(trigger => trigger + 1);
   }
 
   clearSelectedMessages() {
@@ -558,6 +559,7 @@ export class MessageService {
       }
     });
   }
+
 
   getByBoundingBox(boundingBox: BoundingBox, showAlways = false): Observable<GetMessageResponse> {
     const url = `${environment.apiUrl}/message/get/boundingbox/${boundingBox.latMin}/${boundingBox.lonMin}/${boundingBox.latMax}/${boundingBox.lonMax}`;

@@ -132,6 +132,15 @@
         <mat-icon>settings_applications</mat-icon>
         <span>{{ 'common.menu.appSettings' | transloco }}</span>
     </button>
+    <button mat-menu-item
+        (click)="!userService.isReady() ? userService.login(openSearchSettings.bind(this)) : openSearchSettings()">
+        @if (!userService.isReady()) {
+        <mat-icon>locked</mat-icon>
+        } @else {
+        <mat-icon>manage_search</mat-icon>
+        }
+        <span>{{ 'common.menu.searchSettings' | transloco }}</span>
+    </button>
     <button mat-menu-item (click)="editExternalContentSettings()">
         <mat-icon>public</mat-icon>
         <span>{{ 'common.menu.externalContentSettings' | transloco }}</span>

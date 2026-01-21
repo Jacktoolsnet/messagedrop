@@ -81,6 +81,7 @@
       "myPlaces": "Mis lugares",
       "myContacts": "Mis contactos",
       "appSettings": "Ajustes de la aplicación",
+      "searchSettings": "Ajustes de búsqueda",
       "externalContentSettings": "Ajustes de contenido externo",
       "restoreBackup": "Restaurar copia de seguridad",
       "termsOfService": "Términos de servicio",
@@ -787,6 +788,18 @@
         "sports": "Deportes",
         "technology": "Tecnología",
         "health": "Salud"
+      }
+    },
+    "searchSettings": {
+      "title": "Ajustes de búsqueda",
+      "toggle": "Activar búsqueda",
+      "zoomLabel": "Buscar a partir del nivel de zoom",
+      "zoomValue": "Zoom",
+      "items": {
+        "publicMessages": "Mensajes públicos",
+        "privateNotes": "Notas privadas",
+        "privateImages": "Imágenes privadas",
+        "privateDocuments": "Documentos privados"
       }
     },
     "place": {

@@ -1,0 +1,54 @@
+<h2 mat-dialog-title class="dialog-title">
+  <mat-icon aria-hidden="true">manage_search</mat-icon>
+  <span class="dialog-title__text">{{ 'common.searchSettings.title' | transloco }}</span>
+</h2>
+
+<mat-dialog-content class="search-settings-content">
+  <div class="search-settings-grid">
+    @for (item of items; track item.key) {
+    <div class="search-settings-tile">
+      <div class="tile-header">
+        <mat-icon aria-hidden="true">{{ item.icon }}</mat-icon>
+        <h3>{{ item.titleKey | transloco }}</h3>
+      </div>
+
+      <mat-slide-toggle color="primary" [checked]="searchSettings[item.key].enabled"
+        (change)="updateEnabled(item.key, $event.checked)">
+        {{ 'common.searchSettings.toggle' | transloco }}
+      </mat-slide-toggle>
+
+      <div class="preview">
+        <app-search-settings-map-preview [center]="location" [zoom]="searchSettings[item.key].minZoom"
+          [disabled]="!searchSettings[item.key].enabled"></app-search-settings-map-preview>
+        <div class="zoom-badge">{{ 'common.searchSettings.zoomValue' | transloco }} {{ searchSettings[item.key].minZoom }}</div>
+      </div>
+
+      <div class="slider">
+        <div class="slider-header">
+          <span>{{ 'common.searchSettings.zoomLabel' | transloco }}</span>
+          <span class="slider-value">{{ searchSettings[item.key].minZoom }}</span>
+        </div>
+        <mat-slider [min]="minZoom" [max]="maxZoom" step="1" thumbLabel tickInterval="2"
+          [disabled]="!searchSettings[item.key].enabled">
+          <input matSliderThumb [ngModel]="searchSettings[item.key].minZoom"
+            (ngModelChange)="updateZoom(item.key, $event)" />
+        </mat-slider>
+      </div>
+    </div>
+    }
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+  <button mat-dialog-close cdkFocusInitial (click)="onCancel()" mat-icon-button
+    [attr.aria-label]="'common.actions.abort' | transloco" class="action-close">
+    <mat-icon>close</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="help.open('searchSettings')"
+    [attr.aria-label]="'common.actions.help' | transloco">
+    <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button color="primary" (click)="onApply()" [attr.aria-label]="'common.actions.apply' | transloco">
+    <mat-icon>check</mat-icon>
+  </button>
+</mat-dialog-actions>

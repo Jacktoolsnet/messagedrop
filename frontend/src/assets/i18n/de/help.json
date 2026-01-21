@@ -302,6 +302,9 @@
   "scanner": {
     "title": "Scanner"
   },
+  "searchSettings": {
+    "title": "Sucheinstellungen"
+  },
   "importMultimedia": {
     "title": "Medien importieren"
   },

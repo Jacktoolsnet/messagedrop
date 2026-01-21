@@ -360,6 +360,10 @@ export class LocalImageService {
     return localImageEntry;
   }
 
+  clearImages(): void {
+    this.imagesSignal.set([]);
+  }
+
   async deleteImage(image: LocalImage): Promise<void> {
     await this.indexedDbService.deleteImage(image.id);
     await this.fileCacheService.deleteImageFile(image.id, image.fileName, image.mimeType);

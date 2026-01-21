@@ -510,6 +510,11 @@ const HELP_TOPICS = {
     introKey: 'common.intros.scan',
     items: ITEMS.scan
   },
+  searchSettings: {
+    titleKey: 'searchSettings.title',
+    introKey: 'common.intros.settings',
+    items: ITEMS.settings
+  },
   importMultimedia: {
     titleKey: 'importMultimedia.title',
     introKey: 'common.intros.editor',

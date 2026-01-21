@@ -81,6 +81,7 @@
       "myPlaces": "My places",
       "myContacts": "My contacts",
       "appSettings": "App settings",
+      "searchSettings": "Search settings",
       "externalContentSettings": "External content settings",
       "restoreBackup": "Restore backup",
       "termsOfService": "Terms of Service",
@@ -787,6 +788,18 @@
         "sports": "Sports",
         "technology": "Technology",
         "health": "Health"
+      }
+    },
+    "searchSettings": {
+      "title": "Search settings",
+      "toggle": "Enable search",
+      "zoomLabel": "Search from zoom level",
+      "zoomValue": "Zoom",
+      "items": {
+        "publicMessages": "Public messages",
+        "privateNotes": "Private notes",
+        "privateImages": "Private images",
+        "privateDocuments": "Private documents"
       }
     },
     "place": {
