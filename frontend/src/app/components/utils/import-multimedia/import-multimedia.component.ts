@@ -14,6 +14,7 @@ import { AppService } from '../../../services/app.service';
 import { OembedService } from '../../../services/oembed.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { ExternalContentComponent } from '../../legal/external-content/external-content.component';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
 @Component({
@@ -51,6 +52,7 @@ export class ImportMultimediaComponent {
   private readonly appService = inject(AppService);
   private readonly translation = inject(TranslationHelperService);
   private readonly snackBar = inject(MatSnackBar);
+  readonly help = inject(HelpDialogService);
   private readonly youtubeHosts = ['youtube.com', 'youtu.be'];
   private readonly spotifyHosts = ['open.spotify.com'];
   private readonly tiktokHosts = ['tiktok.com', 'vm.tiktok.com'];

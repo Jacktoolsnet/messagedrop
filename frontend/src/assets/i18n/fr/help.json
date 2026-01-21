@@ -302,6 +302,9 @@
   "scanner": {
     "title": "Scanner"
   },
+  "importMultimedia": {
+    "title": "Importer des médias"
+  },
   "tenorSearch": {
     "title": "Recherche de GIF"
   },

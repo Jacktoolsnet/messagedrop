@@ -510,6 +510,11 @@ const HELP_TOPICS = {
     introKey: 'common.intros.scan',
     items: ITEMS.scan
   },
+  importMultimedia: {
+    titleKey: 'importMultimedia.title',
+    introKey: 'common.intros.editor',
+    items: ITEMS.editorMedia
+  },
   tenorSearch: {
     titleKey: 'tenorSearch.title',
     introKey: 'common.intros.search',
