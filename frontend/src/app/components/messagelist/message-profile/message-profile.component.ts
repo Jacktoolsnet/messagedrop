@@ -8,6 +8,7 @@ import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { firstValueFrom } from 'rxjs';
 import { AvatarAttribution } from '../../../interfaces/avatar-attribution';
 import { Profile } from '../../../interfaces/profile';
 import { UnsplashPhoto } from '../../../interfaces/unsplash-response';
@@ -205,11 +206,7 @@ export class MessageProfileComponent {
           error: () => undefined
         });
       }
-      const response = await fetch(photo.urls.regular);
-      if (!response.ok) {
-        return null;
-      }
-      const blob = await response.blob();
+      const blob = await firstValueFrom(this.unsplashService.downloadPhoto(photo.urls.regular));
       return new File([blob], `unsplash-${photo.id}.jpg`, { type: blob.type || 'image/jpeg' });
     } catch {
       return null;

@@ -149,6 +149,19 @@ h2[mat-dialog-title].dialog-title {
   white-space: nowrap;
 }
 
+/* === MENUS === */
+.mat-mdc-menu-panel,
+.mat-menu-panel {
+  border-radius: 1.25rem !important;
+  overflow: hidden;
+}
+
+.mat-mdc-menu-panel .mdc-menu-surface,
+.mat-menu-panel .mdc-menu-surface {
+  border-radius: 10.1rem !important;
+  overflow: hidden;
+}
+
 /* === SNACKBAR STYLES === */
 .snack-error {
   --mdc-snackbar-container-color: rgba(233, 64, 64, 0.75);

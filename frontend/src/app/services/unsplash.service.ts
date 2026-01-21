@@ -102,4 +102,23 @@ export class UnsplashService {
         catchError(this.handleError)
       );
   }
+
+  downloadPhoto(photoUrl: string, showAlways = false): Observable<Blob> {
+    this.networkService.setNetworkMessageConfig(photoUrl, {
+      showAlways,
+      title: this.i18n.t('common.unsplash.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.unsplash.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get(photoUrl, { responseType: 'blob' })
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
 }
