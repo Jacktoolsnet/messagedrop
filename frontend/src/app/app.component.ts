@@ -14,6 +14,7 @@ import { Meta, Title } from '@angular/platform-browser';
 import { RouterOutlet } from '@angular/router';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
+import { environment } from '../environments/environment';
 import { AirQualityComponent } from './components/air-quality/air-quality.component';
 import { AppSettingsComponent } from './components/app-settings/app-settings.component';
 import { ContactlistComponent } from './components/contactlist/contactlist.component';
@@ -140,6 +141,8 @@ export class AppComponent implements OnInit {
   lastMarkerUpdate = 0;
   locationSubscriptionError = false;
   isPartOfPlace = false;
+  private readonly mapSearchDebounceMs = Math.max(0, environment.mapSearchDebounceMs ?? 0);
+  private moveEndDebounceTimer?: ReturnType<typeof setTimeout>;
 
   private readonly titleService = inject(Title);
   private readonly metaService = inject(Meta);
@@ -756,8 +759,13 @@ export class AppComponent implements OnInit {
   }
 
   public handleMoveEndEvent() {
-    this.updateDataForLocation();
     this.setIsUserLocation();
+    if (this.moveEndDebounceTimer) {
+      clearTimeout(this.moveEndDebounceTimer);
+    }
+    this.moveEndDebounceTimer = setTimeout(() => {
+      this.updateDataForLocation();
+    }, this.mapSearchDebounceMs);
   }
 
   public handleMarkerClickEvent(event: MarkerLocation) {
