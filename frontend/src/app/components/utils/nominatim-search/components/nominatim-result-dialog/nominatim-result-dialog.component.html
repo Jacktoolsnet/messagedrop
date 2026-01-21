@@ -6,7 +6,8 @@
 </h2>
 
 <mat-dialog-content class="place-dialog-content">
-    <app-nominatim-result-item [place]="data.place" [showAddButton]="data.showAddButton" (add)="onAdd($event)"
+    <app-nominatim-result-item [place]="data.place" [showAddButton]="data.showAddButton"
+        (add)="onAdd($event)"
         (flyTo)="onFlyTo($event)" (navigate)="onNavigate($event)">
     </app-nominatim-result-item>
 </mat-dialog-content>
@@ -18,5 +19,9 @@
     <button mat-icon-button type="button" (click)="help.open('nominatimResult')"
         [attr.aria-label]="'common.actions.help' | transloco">
         <mat-icon>help</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" type="button" (click)="onApply(data.place)"
+        [attr.aria-label]="'common.actions.apply' | transloco">
+        <mat-icon>check</mat-icon>
     </button>
 </mat-dialog-actions>

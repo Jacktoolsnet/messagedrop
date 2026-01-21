@@ -71,6 +71,7 @@ export class NominatimSearchComponent {
   readonly searchTerm = new FormControl('', { nonNullable: true });
 
   nominatimPlaces: NominatimPlace[] = [];
+  selectedPlace?: NominatimPlace;
   viewMode: 'list' | 'map' = 'map';
   currentBounds?: BoundingBox;
   private pendingBounds?: BoundingBox;
@@ -107,6 +108,7 @@ export class NominatimSearchComponent {
   search(): void {
     this.searchInput?.nativeElement.blur();
     this.nominatimPlaces = [];
+    this.selectedPlace = undefined;
     const term = this.searchTerm.value.trim();
     if (!term) {
       return;
@@ -152,7 +154,7 @@ export class NominatimSearchComponent {
   }
 
   onApplyClick(): void {
-    this.dialogRef.close();
+    this.closeWithSelection();
   }
 
   private sortByDistance(latitude: number, longitude: number, places: NominatimPlace[]): NominatimPlace[] {
@@ -182,6 +184,7 @@ export class NominatimSearchComponent {
   }
 
   public flyTo(place: NominatimPlace): void {
+    this.selectedPlace = place;
     this.viewMode = 'map';
     this.focusMapOnPlace(place);
   }
@@ -352,6 +355,7 @@ export class NominatimSearchComponent {
   }
 
   openPlaceDialog(place: NominatimPlace): void {
+    this.selectedPlace = place;
     this.dialog.open(NominatimResultDialogComponent, {
       panelClass: '',
       closeOnNavigation: false,
@@ -361,7 +365,8 @@ export class NominatimSearchComponent {
         actions: {
           add: (selected: NominatimPlace) => this.onAddPlaceClick(selected),
           flyTo: (selected: NominatimPlace) => this.flyTo(selected),
-          navigate: (selected: NominatimPlace) => this.nominatimService.navigateToNominatimPlace(selected)
+          navigate: (selected: NominatimPlace) => this.nominatimService.navigateToNominatimPlace(selected),
+          apply: (selected: NominatimPlace) => this.closeWithSelection(selected)
         }
       },
       maxWidth: '90vw',
@@ -386,6 +391,18 @@ export class NominatimSearchComponent {
       maxHeight: '90vh',
       hasBackdrop,
       autoFocus: false
+    });
+  }
+
+  private closeWithSelection(place?: NominatimPlace): void {
+    const selectedPlace = place ?? this.selectedPlace;
+    this.dialogRef.close({
+      action: 'applySelection',
+      selectedPlace,
+      searchValues: {
+        searchterm: this.searchTerm.value,
+        nominatimPlaces: this.nominatimPlaces
+      }
     });
   }
 }

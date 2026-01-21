@@ -77,6 +77,7 @@ import { LocalImageService } from './services/local-image.service';
 import { MapService } from './services/map.service';
 import { MessageService } from './services/message.service';
 import { NetworkService } from './services/network.service';
+import { NominatimService } from './services/nominatim.service';
 import { NoteService } from './services/note.service';
 import { OembedService } from './services/oembed.service';
 import { PlaceService } from './services/place.service';
@@ -152,6 +153,7 @@ export class AppComponent implements OnInit {
   readonly serverService = inject(ServerService);
   readonly userService = inject(UserService);
   readonly mapService = inject(MapService);
+  private readonly nominatimService = inject(NominatimService);
   readonly noteService = inject(NoteService);
   private readonly oembedService = inject(OembedService);
   readonly placeService = inject(PlaceService);
@@ -1674,24 +1676,32 @@ export class AppComponent implements OnInit {
       autoFocus: false
     });
 
-    dialogRef.afterClosed().subscribe((result: {
+    dialogRef.afterClosed().subscribe((result?: {
       action: string,
-      selectedPlace: NominatimPlace;
+      selectedPlace?: NominatimPlace;
       searchValues: {
         searchterm: string,
         nominatimPlaces: NominatimPlace[]
       }
     }) => {
-      if (result) {
-        this.indexedDbService.setSetting('nominatimSearch', result.searchValues);
-        switch (result.action) {
-          case 'saveSearch':
-            this.indexedDbService.setSetting('nominatimSelectedPlace', result.selectedPlace);
-            break;
+      if (!result) {
+        this.indexedDbService.deleteSetting('nominatimSelectedPlace');
+        this.indexedDbService.deleteSetting('nominatimSearch');
+        return;
+      }
+
+      this.indexedDbService.setSetting('nominatimSearch', result.searchValues);
+      if (result.selectedPlace) {
+        this.indexedDbService.setSetting('nominatimSelectedPlace', result.selectedPlace);
+        const bounds = this.nominatimService.getBoundingBoxFromNominatimPlace(result.selectedPlace);
+        const hasBounds = !(bounds.latMin === 0 && bounds.latMax === 0 && bounds.lonMin === 0 && bounds.lonMax === 0);
+        if (hasBounds) {
+          this.mapService.fitMapToBounds(bounds);
+        } else {
+          this.mapService.flyTo(this.nominatimService.getLocationFromNominatimPlace(result.selectedPlace));
         }
       } else {
-        this.indexedDbService.deleteSetting('nominatimSelectedPlace')
-        this.indexedDbService.deleteSetting('nominatimSearch')
+        this.indexedDbService.deleteSetting('nominatimSelectedPlace');
       }
     });
   }

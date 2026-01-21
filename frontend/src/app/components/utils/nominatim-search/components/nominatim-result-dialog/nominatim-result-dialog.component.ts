@@ -11,6 +11,7 @@ interface NominatimResultDialogActions {
   add: (place: NominatimPlace) => void;
   flyTo: (place: NominatimPlace) => void;
   navigate: (place: NominatimPlace) => void;
+  apply: (place: NominatimPlace) => void;
 }
 
 interface NominatimResultDialogData {
@@ -51,5 +52,10 @@ export class NominatimResultDialogComponent {
 
   onNavigate(place: NominatimPlace): void {
     this.data.actions?.navigate(place);
+  }
+
+  onApply(place: NominatimPlace): void {
+    this.data.actions?.apply(place);
+    this.dialogRef.close();
   }
 }
