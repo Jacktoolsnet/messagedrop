@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
@@ -79,7 +79,7 @@ export class FileTileComponent implements OnChanges {
       maxHeight: '98vh',
       data: { tile },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

@@ -62,7 +62,7 @@ export class ContactSortDialogComponent {
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

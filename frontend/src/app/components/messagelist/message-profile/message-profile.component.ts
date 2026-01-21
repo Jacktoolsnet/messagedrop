@@ -85,7 +85,7 @@ export class MessageProfileComponent {
       panelClass: '',
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -163,7 +163,7 @@ export class MessageProfileComponent {
       maxWidth: '95vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -263,7 +263,7 @@ export class MessageProfileComponent {
       maxWidth: '95vw',
       width: '420px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

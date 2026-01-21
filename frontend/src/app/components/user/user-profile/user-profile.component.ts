@@ -68,7 +68,7 @@ export class UserProfileComponent {
       panelClass: '',
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -129,7 +129,7 @@ export class UserProfileComponent {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -214,7 +214,7 @@ export class UserProfileComponent {
       maxWidth: '95vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -320,7 +320,7 @@ export class UserProfileComponent {
       maxWidth: '95vw',
       width: '420px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

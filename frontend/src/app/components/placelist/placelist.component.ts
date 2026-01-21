@@ -89,7 +89,7 @@ export class PlacelistComponent {
     const dialogRef = this.matDialog.open(DeletePlaceComponent, {
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -126,7 +126,7 @@ export class PlacelistComponent {
       data: { mode: this.mode.EDIT_PLACE, user: this.userService.getUser(), place: place },
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -198,7 +198,7 @@ export class PlacelistComponent {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -234,7 +234,7 @@ export class PlacelistComponent {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

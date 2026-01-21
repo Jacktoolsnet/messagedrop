@@ -1,5 +1,5 @@
-import { Component, computed, effect, inject, OnInit, WritableSignal } from '@angular/core';
 import { DatePipe } from '@angular/common';
+import { Component, computed, effect, inject, OnInit, WritableSignal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
@@ -18,8 +18,8 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { getFileIcon } from '../../utils/file-icon.util';
 import { isQuotaExceededError } from '../../utils/storage-error.util';
-import { DeleteDocumentComponent } from './delete-document/delete-document.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DeleteDocumentComponent } from './delete-document/delete-document.component';
 
 interface DocumentDialogData {
   location: Location;
@@ -111,7 +111,7 @@ export class DocumentlistComponent implements OnInit {
   deleteDocument(document: LocalDocument) {
     const dialogRef = this.dialog.open(DeleteDocumentComponent, {
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true
     });
     dialogRef.afterClosed().subscribe(async result => {

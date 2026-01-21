@@ -118,7 +118,7 @@ export class MessageService {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -159,7 +159,7 @@ export class MessageService {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -190,7 +190,7 @@ export class MessageService {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

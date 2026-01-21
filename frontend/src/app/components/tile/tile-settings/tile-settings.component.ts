@@ -14,14 +14,14 @@ import { ContactService } from '../../../services/contact.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
 import { AnniversaryTileEditComponent } from '../anniversary-tile/anniversary-tile-edit/anniversary-tile-edit.component';
+import { FileTileEditComponent } from '../file-tile/file-tile-edit/file-tile-edit.component';
 import { MigraineTileEditComponent } from '../migraine-tile/migraine-tile-edit/migraine-tile-edit.component';
 import { MultitextTileEditComponent } from '../multitext-tile/multitext-tile-edit/multitext-tile-edit.component';
 import { PollutionTileEditComponent } from '../pollution-tile/pollution-tile-edit/pollution-tile-edit.component';
 import { QuickActionTileEditComponent } from '../quick-action-tile/quick-action-tile-edit/quick-action-tile-edit.component';
 import { TextTileEditComponent } from '../text-tile/text-tile-edit/text-tile-edit.component';
-import { TodoTileEditComponent } from '../todo-tile/todo-tile-edit/todo-tile-edit.component';
-import { FileTileEditComponent } from '../file-tile/file-tile-edit/file-tile-edit.component';
 import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
+import { TodoTileEditComponent } from '../todo-tile/todo-tile-edit/todo-tile-edit.component';
 
 @Component({
   selector: 'app-tile-settings',
@@ -38,7 +38,7 @@ import { TileDeleteComponent } from '../tile-delete/tile-delete.component';
     CdkDropList,
     CdkDragHandle,
     TranslocoPipe
-],
+  ],
   templateUrl: './tile-settings.component.html',
   styleUrl: './tile-settings.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -165,7 +165,7 @@ export class TileSettingsComponent {
         width: '520px',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -180,7 +180,7 @@ export class TileSettingsComponent {
         width: '520px',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -200,7 +200,7 @@ export class TileSettingsComponent {
         autoFocus: false,
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -217,7 +217,7 @@ export class TileSettingsComponent {
         maxHeight: '98vh',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -234,7 +234,7 @@ export class TileSettingsComponent {
         maxHeight: '98vh',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -251,7 +251,7 @@ export class TileSettingsComponent {
         maxHeight: '98vh',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -270,7 +270,7 @@ export class TileSettingsComponent {
         height: 'auto',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -285,7 +285,7 @@ export class TileSettingsComponent {
         width: '520px',
         data: { tile },
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -308,7 +308,7 @@ export class TileSettingsComponent {
     const ref = this.dialog.open(TileDeleteComponent, {
       width: '360px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     ref.afterClosed().subscribe(result => {

@@ -66,7 +66,7 @@ export class LocationPickerTileComponent implements AfterViewInit, OnChanges, On
       height: '95vh',
       autoFocus: false,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, effect, OnInit, signal, inject } from '@angular/core';
+import { Component, effect, inject, OnInit, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatButtonToggleChange, MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatDialog, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
@@ -11,9 +11,9 @@ import { TranslocoPipe } from '@jsverse/transloco';
 import { firstValueFrom } from 'rxjs';
 import { SystemNotification, SystemNotificationFilter } from '../../../interfaces/system-notification';
 import { SystemNotificationService } from '../../../services/system-notification.service';
+import { HelpDialogComponent, HelpDialogData } from '../../utils/help-dialog/help-dialog.component';
 import { DeleteAllSystemNotificationComponent } from '../delete-all-system-notification/delete-all-system-notification.component';
 import { DeleteSystemNotificationComponent } from '../delete-system-notification/delete-system-notification.component';
-import { HelpDialogComponent, HelpDialogData } from '../../utils/help-dialog/help-dialog.component';
 
 @Component({
   selector: 'app-system-message-dialog',
@@ -137,7 +137,7 @@ export class SystemMessageDialogComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteSystemNotificationComponent, {
       width: '320px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -167,7 +167,7 @@ export class SystemMessageDialogComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteAllSystemNotificationComponent, {
       width: '320px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -250,7 +250,7 @@ export class SystemMessageDialogComponent implements OnInit {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

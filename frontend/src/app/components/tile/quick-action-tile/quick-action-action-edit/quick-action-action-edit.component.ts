@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { A11yModule } from '@angular/cdk/a11y';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIcon } from '@angular/material/icon';
-import { A11yModule } from '@angular/cdk/a11y';
-import { TileLinkType, TileQuickAction } from '../../../../interfaces/tile-settings';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { TileLinkType, TileQuickAction } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
-import { MatDialog } from '@angular/material/dialog';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface QuickActionDialogData {
   action: TileQuickAction;
@@ -83,7 +82,7 @@ export class QuickActionActionEditComponent {
       width: '520px',
       data: { current: this.icon() },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

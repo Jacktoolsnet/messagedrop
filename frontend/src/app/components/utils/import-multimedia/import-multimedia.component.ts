@@ -26,7 +26,7 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
     MatFormFieldModule,
     MatInputModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './import-multimedia.component.html',
   styleUrl: './import-multimedia.component.css'
 })
@@ -176,7 +176,7 @@ export class ImportMultimediaComponent {
       height: 'auto',
       autoFocus: false,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

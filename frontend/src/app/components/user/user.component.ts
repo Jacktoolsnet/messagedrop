@@ -6,9 +6,9 @@ import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialo
 import { MatIcon } from '@angular/material/icon';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { HelpDialogComponent, HelpDialogData, HelpItem } from '../utils/help-dialog/help-dialog.component';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
+import { HelpDialogComponent, HelpDialogData, HelpItem } from '../utils/help-dialog/help-dialog.component';
 
 @Component({
   selector: 'app-user',
@@ -93,7 +93,7 @@ export class UserComponent {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

@@ -158,7 +158,7 @@ export class BackupService {
       closeOnNavigation: true,
       data: {},
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     return firstValueFrom(dialogRef.afterClosed());

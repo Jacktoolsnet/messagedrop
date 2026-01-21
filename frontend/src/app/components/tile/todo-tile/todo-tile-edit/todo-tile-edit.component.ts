@@ -1,18 +1,18 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, moveItemInArray } from '@angular/cdk/drag-drop';
 
+import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { A11yModule } from '@angular/cdk/a11y';
+import { MatButtonModule } from '@angular/material/button';
 import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIcon } from '@angular/material/icon';
-import { TileSetting, TileTodoItem } from '../../../../interfaces/tile-settings';
+import { MatInputModule } from '@angular/material/input';
 import { TranslocoPipe } from '@jsverse/transloco';
+import { TileSetting, TileTodoItem } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface TodoTileDialogData {
   tile: TileSetting;
@@ -65,7 +65,7 @@ export class TodoTileEditComponent {
       width: '520px',
       data: { current: this.icon() },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

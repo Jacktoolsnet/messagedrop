@@ -2,11 +2,11 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { Place } from '../../../interfaces/place';
 import { Contact } from '../../../interfaces/contact';
+import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
-import { PlaceService } from '../../../services/place.service';
 import { ContactService } from '../../../services/contact.service';
+import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { AnniversaryTileEditComponent } from './anniversary-tile-edit/anniversary-tile-edit.component';
 
@@ -65,7 +65,7 @@ export class AnniversaryTileComponent implements OnChanges {
       maxHeight: '95vh',
       autoFocus: false,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       data: { tile }
     });

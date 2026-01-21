@@ -106,7 +106,7 @@ export class MigraineTileComponent {
       width: '520px',
       data: { tile },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
@@ -142,7 +142,7 @@ export class MigraineTileComponent {
       height: '90vh',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

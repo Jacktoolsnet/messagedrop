@@ -170,7 +170,7 @@ export class EditMessageComponent implements OnInit {
       closeOnNavigation: true,
       data: { text: this.data.message.message },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: true
     });

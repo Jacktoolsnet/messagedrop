@@ -1,4 +1,5 @@
 
+import { A11yModule } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, ViewChild, inject, signal } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -9,7 +10,6 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDial
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
-import { A11yModule } from '@angular/cdk/a11y';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
@@ -39,7 +39,7 @@ interface AnniversaryTileDialogData {
     MatDatepickerModule,
     A11yModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './anniversary-tile-edit.component.html',
   styleUrl: './anniversary-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -81,7 +81,7 @@ export class AnniversaryTileEditComponent {
       width: '520px',
       data: { current: this.icon() },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

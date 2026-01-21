@@ -69,7 +69,7 @@ export class QuickActionTileComponent implements OnChanges {
       maxHeight: '98vh',
       data: { tile },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

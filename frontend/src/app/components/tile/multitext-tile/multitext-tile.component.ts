@@ -1,13 +1,13 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, inject, signal } from '@angular/core';
 
-import { MatIcon } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
-import { Place } from '../../../interfaces/place';
 import { Contact } from '../../../interfaces/contact';
+import { Place } from '../../../interfaces/place';
 import { TileSetting } from '../../../interfaces/tile-settings';
-import { PlaceService } from '../../../services/place.service';
 import { ContactService } from '../../../services/contact.service';
+import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { MultitextTileEditComponent } from './multitext-tile-edit/multitext-tile-edit.component';
 
@@ -58,7 +58,7 @@ export class MultitextTileComponent implements OnChanges {
       width: '520px',
       data: { tile },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

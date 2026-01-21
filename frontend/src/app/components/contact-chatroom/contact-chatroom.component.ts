@@ -18,13 +18,13 @@ import { SocketioService } from '../../services/socketio.service';
 import { TranslateService } from '../../services/translate.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
-import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ContactEditMessageComponent } from '../contact/contact-edit-message/contact-edit-message.component';
 import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
 import { UserProfileComponent } from '../user/user-profile/user-profile.component';
 import { EmoticonPickerComponent } from '../utils/emoticon-picker/emoticon-picker.component';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteContactMessageComponent } from './delete-contact-message/delete-contact-message.component';
 
 interface ChatroomMessage {
@@ -288,7 +288,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -305,7 +305,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -329,7 +329,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -426,7 +426,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -447,7 +447,7 @@ export class ContactChatroomComponent implements AfterViewInit {
     const dialogRef = this.matDialog.open(DeleteContactMessageComponent, {
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

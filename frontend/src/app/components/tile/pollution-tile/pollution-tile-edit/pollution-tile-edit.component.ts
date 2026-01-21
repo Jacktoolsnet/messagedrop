@@ -1,19 +1,18 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 
+import { A11yModule } from '@angular/cdk/a11y';
 import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogContent, MatDialogModule, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
+import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
+import { MatInputModule } from '@angular/material/input';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { TileSetting } from '../../../../interfaces/tile-settings';
 import { TranslationHelperService } from '../../../../services/translation-helper.service';
-import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
-import { MatDialog } from '@angular/material/dialog';
-import { A11yModule } from '@angular/cdk/a11y';
 import { HelpDialogService } from '../../../utils/help-dialog/help-dialog.service';
+import { MaticonPickerComponent } from '../../../utils/maticon-picker/maticon-picker.component';
 
 interface PollutionTileDialogData {
   tile: TileSetting;
@@ -36,7 +35,7 @@ interface PollutionTileDialogData {
     MatSlideToggleModule,
     A11yModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './pollution-tile-edit.component.html',
   styleUrl: './pollution-tile-edit.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -88,7 +87,7 @@ export class PollutionTileEditComponent {
       width: '520px',
       data: { current: this.icon() },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

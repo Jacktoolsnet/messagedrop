@@ -24,8 +24,8 @@ import { UserService } from '../../services/user.service';
 import { EditNoteComponent } from '../editnote/edit-note.component';
 import { ShowmultimediaComponent } from '../multimedia/showmultimedia/showmultimedia.component';
 import { ShowmessageComponent } from '../showmessage/showmessage.component';
-import { DeleteNoteComponent } from './delete-note/delete-note.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
+import { DeleteNoteComponent } from './delete-note/delete-note.component';
 
 @Component({
   selector: 'app-notelist',
@@ -94,7 +94,7 @@ export class NotelistComponent {
   deleteNote(note: Note) {
     const dialogRef = this.dialog.open(DeleteNoteComponent, {
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true
     });
     dialogRef.afterClosed().subscribe(async result => {
@@ -118,7 +118,7 @@ export class NotelistComponent {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -155,7 +155,7 @@ export class NotelistComponent {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

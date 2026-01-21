@@ -10,8 +10,8 @@ import { BackupEnvelope, BackupLocalImage, BackupMediaFile, BackupPayload, UserS
 import { IndexedDbBackup } from '../interfaces/indexed-db-backup';
 import { LocalImage } from '../interfaces/local-image';
 import { SimpleStatusResponse } from '../interfaces/simple-status-response';
-import { BackupStateService } from './backup-state.service';
 import { AvatarStorageService } from './avatar-storage.service';
+import { BackupStateService } from './backup-state.service';
 import { IndexedDbService } from './indexed-db.service';
 import { NetworkService } from './network.service';
 import { TranslationHelperService } from './translation-helper.service';
@@ -226,7 +226,7 @@ export class RestoreService {
       closeOnNavigation: true,
       data: {},
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
@@ -321,7 +321,7 @@ export class RestoreService {
       },
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

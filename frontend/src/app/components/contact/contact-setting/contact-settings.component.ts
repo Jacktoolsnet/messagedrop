@@ -78,7 +78,7 @@ export class ContactSettingsComponent {
       panelClass: '',
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -99,7 +99,7 @@ export class ContactSettingsComponent {
       panelClass: '',
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false,
       data: {
@@ -233,7 +233,7 @@ export class ContactSettingsComponent {
       maxWidth: '95vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -254,7 +254,7 @@ export class ContactSettingsComponent {
       maxWidth: '95vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -371,7 +371,7 @@ export class ContactSettingsComponent {
       maxWidth: '95vw',
       width: '520px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -464,7 +464,7 @@ export class ContactSettingsComponent {
       maxWidth: '95vw',
       width: '420px',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

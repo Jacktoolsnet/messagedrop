@@ -25,9 +25,9 @@ import { SharedContentService } from '../../services/shared-content.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
 import { isQuotaExceededError } from '../../utils/storage-error.util';
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { DeleteImageComponent } from './delete-image/delete-image.component';
 import { OverrideExifDataComponent } from './override-exif-data/override-exif-data.component';
-import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 
 interface ImageDialogData {
   location: Location;
@@ -147,7 +147,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
   deleteImage(image: LocalImage) {
     const dialogRef = this.dialog.open(DeleteImageComponent, {
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true
     });
     dialogRef.afterClosed().subscribe(async result => {
@@ -225,7 +225,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
             data: { fileName: entry.fileName, previewUrl },
             autoFocus: false,
             hasBackdrop: true,
-            backdropClass: 'dialog-backdrop-transparent',
+            backdropClass: 'dialog-backdrop',
             disableClose: true,
           }).afterClosed()
         );

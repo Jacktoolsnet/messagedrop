@@ -10,8 +10,8 @@ import { Mode } from '../../../interfaces/mode';
 import { Place } from '../../../interfaces/place';
 import { PlaceService } from '../../../services/place.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { PlaceProfileComponent } from '../place-settings/place-settings.component';
 import { HelpDialogService } from '../../utils/help-dialog/help-dialog.service';
+import { PlaceProfileComponent } from '../place-settings/place-settings.component';
 
 interface PlaceSortDialogData {
   places: Place[];
@@ -68,7 +68,7 @@ export class PlaceSortDialogComponent {
       data: { mode: Mode.EDIT_PLACE, place },
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

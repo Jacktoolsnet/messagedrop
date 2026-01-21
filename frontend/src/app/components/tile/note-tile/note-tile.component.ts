@@ -51,7 +51,7 @@ export class NoteTileComponent implements OnInit {
       maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

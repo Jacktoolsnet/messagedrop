@@ -15,7 +15,7 @@ import { ExternalContentComponent } from '../../legal/external-content/external-
   imports: [
     MatButtonModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './showmultimedia.component.html',
   styleUrl: './showmultimedia.component.css'
 })
@@ -99,7 +99,7 @@ export class ShowmultimediaComponent implements OnChanges {
       height: 'auto',
       autoFocus: false,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

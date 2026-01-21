@@ -24,7 +24,7 @@ import { TermsOfServiceComponent } from '../terms-of-service/terms-of-service.co
     MatChipsModule,
     MatSlideToggleModule,
     TranslocoPipe
-],
+  ],
   templateUrl: './consent-gate.component.html',
   styleUrl: './consent-gate.component.css'
 })
@@ -87,7 +87,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
         width: '800px',
         maxWidth: '90vw',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
@@ -100,7 +100,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
         width: '800px',
         maxWidth: '90vw',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
@@ -113,7 +113,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
         width: '800px',
         maxWidth: '90vw',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
@@ -154,7 +154,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       maxWidth: '90vw',
       autoFocus: false,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

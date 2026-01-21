@@ -117,7 +117,7 @@ export class ImageTileComponent implements OnInit, OnDestroy {
       maxHeight: 'none',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });

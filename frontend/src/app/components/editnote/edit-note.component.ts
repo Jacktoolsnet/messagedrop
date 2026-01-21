@@ -156,7 +156,7 @@ export class EditNoteComponent implements OnInit {
       closeOnNavigation: true,
       data: { text: this.data.note.note },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: true
     });

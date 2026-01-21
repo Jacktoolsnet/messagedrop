@@ -126,7 +126,7 @@ export class TileListComponent {
       maxHeight: '90vh',
       data: contact ? { contact } : { place },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 

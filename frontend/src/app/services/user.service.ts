@@ -234,7 +234,7 @@ export class UserService {
               maxWidth: '90vw',
               maxHeight: '90vh',
               hasBackdrop: true,
-              backdropClass: 'dialog-backdrop-transparent',
+              backdropClass: 'dialog-backdrop',
               disableClose: true,
               autoFocus: false
             });
@@ -260,7 +260,7 @@ export class UserService {
               maxWidth: '90vw',
               maxHeight: '90vh',
               hasBackdrop: true,
-              backdropClass: 'dialog-backdrop-transparent',
+              backdropClass: 'dialog-backdrop',
               disableClose: true,
               autoFocus: false
             });
@@ -288,7 +288,7 @@ export class UserService {
             maxWidth: '90vw',
             maxHeight: '90vh',
             hasBackdrop: true,
-            backdropClass: 'dialog-backdrop-transparent',
+            backdropClass: 'dialog-backdrop',
             disableClose: true,
             autoFocus: false
           });
@@ -536,7 +536,7 @@ export class UserService {
             maxWidth: '90vw',
             maxHeight: '90vh',
             hasBackdrop: true,
-            backdropClass: 'dialog-backdrop-transparent',
+            backdropClass: 'dialog-backdrop',
             disableClose: true,
             autoFocus: false
           });
@@ -565,7 +565,7 @@ export class UserService {
           maxWidth: '90vw',
           maxHeight: '90vh',
           hasBackdrop: true,
-          backdropClass: 'dialog-backdrop-transparent',
+          backdropClass: 'dialog-backdrop',
           disableClose: true,
           autoFocus: false
         });
@@ -884,7 +884,7 @@ export class UserService {
         maxWidth: '90vw',
         maxHeight: '90vh',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
         autoFocus: false
       });
@@ -923,7 +923,7 @@ export class UserService {
       },
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -961,7 +961,7 @@ export class UserService {
       maxWidth: '90vw',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -994,7 +994,7 @@ export class UserService {
           maxWidth: '90vw',
           maxHeight: '90vh',
           hasBackdrop: true,
-          backdropClass: 'dialog-backdrop-transparent',
+          backdropClass: 'dialog-backdrop',
           disableClose: true,
           autoFocus: false
         });
@@ -1190,7 +1190,7 @@ export class UserService {
       closeOnNavigation: true,
       data: {},
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
@@ -1227,7 +1227,7 @@ export class UserService {
         maxWidth: '90vw',
         maxHeight: '90vh',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
         autoFocus: false
       });
@@ -1253,7 +1253,7 @@ export class UserService {
         maxWidth: '90vw',
         maxHeight: '90vh',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
         autoFocus: false
       });
@@ -1276,7 +1276,7 @@ export class UserService {
       },
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -1320,7 +1320,7 @@ export class UserService {
         maxWidth: '90vw',
         maxHeight: '90vh',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
         autoFocus: false
       });
@@ -1346,7 +1346,7 @@ export class UserService {
         maxWidth: '90vw',
         maxHeight: '90vh',
         hasBackdrop: true,
-        backdropClass: 'dialog-backdrop-transparent',
+        backdropClass: 'dialog-backdrop',
         disableClose: true,
         autoFocus: false
       });
@@ -1467,7 +1467,7 @@ export class UserService {
       closeOnNavigation: true,
       data: {},
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (pin: string | undefined) => {
@@ -1498,7 +1498,7 @@ export class UserService {
             maxWidth: '90vw',
             maxHeight: '90vh',
             hasBackdrop: true,
-            backdropClass: 'dialog-backdrop-transparent',
+            backdropClass: 'dialog-backdrop',
             disableClose: true,
             autoFocus: false
           });
@@ -1519,7 +1519,7 @@ export class UserService {
       closeOnNavigation: true,
       data: {},
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
@@ -1604,7 +1604,7 @@ export class UserService {
                       maxWidth: '90vw',
                       maxHeight: '90vh',
                       hasBackdrop: true,
-                      backdropClass: 'dialog-backdrop-transparent',
+                      backdropClass: 'dialog-backdrop',
                       disableClose: true,
                       autoFocus: false
                     });
@@ -1629,7 +1629,7 @@ export class UserService {
                             maxWidth: '90vw',
                             maxHeight: '90vh',
                             hasBackdrop: true,
-                            backdropClass: 'dialog-backdrop-transparent',
+                            backdropClass: 'dialog-backdrop',
                             disableClose: true,
                             autoFocus: false
                           });
@@ -1655,7 +1655,7 @@ export class UserService {
                       maxWidth: '90vw',
                       maxHeight: '90vh',
                       hasBackdrop: true,
-                      backdropClass: 'dialog-backdrop-transparent',
+                      backdropClass: 'dialog-backdrop',
                       disableClose: true,
                       autoFocus: false
                     });
@@ -1685,7 +1685,7 @@ export class UserService {
                 maxWidth: '90vw',
                 maxHeight: '90vh',
                 hasBackdrop: true,
-                backdropClass: 'dialog-backdrop-transparent',
+                backdropClass: 'dialog-backdrop',
                 disableClose: true,
                 autoFocus: false
               });
@@ -1710,7 +1710,7 @@ export class UserService {
                       maxWidth: '90vw',
                       maxHeight: '90vh',
                       hasBackdrop: true,
-                      backdropClass: 'dialog-backdrop-transparent',
+                      backdropClass: 'dialog-backdrop',
                       disableClose: true,
                       autoFocus: false
                     });
@@ -1736,7 +1736,7 @@ export class UserService {
                 maxWidth: '90vw',
                 maxHeight: '90vh',
                 hasBackdrop: true,
-                backdropClass: 'dialog-backdrop-transparent',
+                backdropClass: 'dialog-backdrop',
                 disableClose: true,
                 autoFocus: false
               });
@@ -1807,7 +1807,7 @@ export class UserService {
           maxWidth: '90vw',
           maxHeight: '90vh',
           hasBackdrop: true,
-          backdropClass: 'dialog-backdrop-transparent',
+          backdropClass: 'dialog-backdrop',
           disableClose: true,
           autoFocus: false
         });

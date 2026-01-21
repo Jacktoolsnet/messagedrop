@@ -1,17 +1,17 @@
-import { Injectable, inject, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../environments/environment';
 import { ProfileConfirmRequestComponent } from '../components/user/profile-confirm-request/profile-confirm-request.component';
-import { Envelope } from '../interfaces/envelope';
 import { Contact } from '../interfaces/contact';
+import { Envelope } from '../interfaces/envelope';
+import { AvatarStorageService } from './avatar-storage.service';
 import { ContactService } from './contact.service';
 import { CryptoService } from './crypto.service';
 import { SystemNotificationService } from './system-notification.service';
-import { UserService } from './user.service';
 import { TranslationHelperService } from './translation-helper.service';
-import { AvatarStorageService } from './avatar-storage.service';
+import { UserService } from './user.service';
 
 interface UserRoomPayload {
   status: number;
@@ -270,7 +270,7 @@ export class SocketioService {
             data: { contact: payload.contact },
             closeOnNavigation: true,
             hasBackdrop: true,
-            backdropClass: 'dialog-backdrop-transparent',
+            backdropClass: 'dialog-backdrop',
             disableClose: true,
           });
 
@@ -322,9 +322,9 @@ export class SocketioService {
           this.i18n.t('common.contact.profileRequestDeclined'),
           this.i18n.t('common.actions.ok'),
           {
-          panelClass: ['snack-warning'],
-          horizontalPosition: 'center',
-          verticalPosition: 'top',
+            panelClass: ['snack-warning'],
+            horizontalPosition: 'center',
+            verticalPosition: 'top',
           }
         );
       }

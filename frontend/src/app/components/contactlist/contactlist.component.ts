@@ -21,12 +21,12 @@ import { SocketioService } from '../../services/socketio.service';
 import { StyleService } from '../../services/style.service';
 import { TranslationHelperService } from '../../services/translation-helper.service';
 import { UserService } from '../../services/user.service';
-import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { ContactChatroomComponent } from '../contact-chatroom/contact-chatroom.component';
 import { ConnectComponent } from '../contact/connect/connect.component';
 import { ContactSettingsComponent } from '../contact/contact-setting/contact-settings.component';
 import { DeleteContactComponent } from '../contact/delete-contact/delete-contact.component';
 import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
+import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { QrcodeComponent } from '../utils/qrcode/qrcode.component';
 import { ScannerComponent } from '../utils/scanner/scanner.component';
 import { ContactSortDialogComponent } from './contact-sort-dialog/contact-sort-dialog.component';
@@ -162,7 +162,7 @@ export class ContactlistComponent {
       height: 'auto',
       maxHeight: '90vh',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -194,7 +194,7 @@ export class ContactlistComponent {
       closeOnNavigation: true,
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -214,7 +214,7 @@ export class ContactlistComponent {
     const dialogRef = this.matDialog.open(DeleteContactComponent, {
       closeOnNavigation: true,
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -248,7 +248,7 @@ export class ContactlistComponent {
       maxHeight: '90vh',
       maxWidth: '90vw',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
     });
 
@@ -267,7 +267,7 @@ export class ContactlistComponent {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -310,7 +310,7 @@ export class ContactlistComponent {
       maxHeight: '90vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -335,7 +335,7 @@ export class ContactlistComponent {
       maxHeight: '95vh',
       height: 'auto',
       hasBackdrop: true,
-      backdropClass: 'dialog-backdrop-transparent',
+      backdropClass: 'dialog-backdrop',
       disableClose: true,
       autoFocus: false
     });
@@ -445,7 +445,7 @@ export class ContactlistComponent {
                     this.matDialog.open(QrcodeComponent, {
                       closeOnNavigation: true,
                       hasBackdrop: true,
-                      backdropClass: 'dialog-backdrop-transparent',
+                      backdropClass: 'dialog-backdrop',
                       disableClose: true,
                       data: { qrData: createConnectResponse.connectId }
                     });
