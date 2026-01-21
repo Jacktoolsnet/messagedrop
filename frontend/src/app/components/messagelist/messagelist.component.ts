@@ -298,7 +298,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -341,7 +341,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         closeOnNavigation: true,
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -414,7 +414,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -607,7 +607,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }
@@ -640,7 +640,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
 
@@ -665,7 +665,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -687,7 +687,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -759,7 +759,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -853,7 +853,7 @@ export class MessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

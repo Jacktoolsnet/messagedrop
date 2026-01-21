@@ -112,7 +112,7 @@ export class DocumentlistComponent implements OnInit {
     const dialogRef = this.dialog.open(DeleteDocumentComponent, {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true
+      disableClose: false
     });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {

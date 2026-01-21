@@ -297,7 +297,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -340,7 +340,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         closeOnNavigation: true,
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
 
       dialogRef.afterClosed().subscribe(result => {
@@ -413,7 +413,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -606,7 +606,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }
@@ -639,7 +639,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
 
@@ -664,7 +664,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -737,7 +737,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -831,7 +831,7 @@ export class MyMessagelistComponent implements OnInit, OnDestroy {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

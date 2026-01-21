@@ -271,7 +271,7 @@ export class SocketioService {
             closeOnNavigation: true,
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
           });
 
           dialogRef.afterClosed().subscribe(async result => {

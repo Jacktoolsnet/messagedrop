@@ -119,7 +119,7 @@ export class MessageService {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
     this.moderationDialogRef = ref;
@@ -160,7 +160,7 @@ export class MessageService {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
     this.publishDialogRef = ref;
@@ -191,7 +191,7 @@ export class MessageService {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
     this.reviewDialogRef = ref;

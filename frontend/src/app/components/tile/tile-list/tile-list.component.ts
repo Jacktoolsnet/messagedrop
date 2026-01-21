@@ -127,7 +127,7 @@ export class TileListComponent {
       data: contact ? { contact } : { place },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe((updatedSettings?: TileSetting[]) => {

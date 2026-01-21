@@ -107,7 +107,7 @@ export class MigraineTileComponent {
       data: { tile },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
@@ -143,7 +143,7 @@ export class MigraineTileComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

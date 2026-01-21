@@ -163,7 +163,7 @@ export class ContactlistComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -195,7 +195,7 @@ export class ContactlistComponent {
       data: { mode: this.mode.ADD_CONNECT, connectId: "" },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -215,7 +215,7 @@ export class ContactlistComponent {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe((result?: boolean) => {
@@ -249,7 +249,7 @@ export class ContactlistComponent {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -268,7 +268,7 @@ export class ContactlistComponent {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }
@@ -311,7 +311,7 @@ export class ContactlistComponent {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -336,7 +336,7 @@ export class ContactlistComponent {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -446,7 +446,7 @@ export class ContactlistComponent {
                       closeOnNavigation: true,
                       hasBackdrop: true,
                       backdropClass: 'dialog-backdrop',
-                      disableClose: true,
+                      disableClose: false,
                       data: { qrData: createConnectResponse.connectId }
                     });
                   }

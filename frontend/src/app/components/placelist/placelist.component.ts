@@ -90,7 +90,7 @@ export class PlacelistComponent {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -127,7 +127,7 @@ export class PlacelistComponent {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -199,7 +199,7 @@ export class PlacelistComponent {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }
@@ -235,7 +235,7 @@ export class PlacelistComponent {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

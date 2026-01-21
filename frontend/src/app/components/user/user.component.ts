@@ -94,7 +94,7 @@ export class UserComponent {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }

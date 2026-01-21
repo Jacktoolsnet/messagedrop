@@ -10,7 +10,7 @@ const DEFAULT_HELP_DIALOG_CONFIG = {
   height: 'auto',
   hasBackdrop: true,
   backdropClass: 'dialog-backdrop',
-  disableClose: true,
+  disableClose: false,
   autoFocus: false
 } as const;
 

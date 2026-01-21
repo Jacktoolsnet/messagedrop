@@ -67,7 +67,7 @@ export class QuickActionTileEditComponent {
       data: { current: this.icon() },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     ref.afterClosed().subscribe((selected?: string | null) => {
@@ -145,7 +145,7 @@ export class QuickActionTileEditComponent {
       data: { action },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     ref.afterClosed().subscribe((updated?: TileQuickAction) => {

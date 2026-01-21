@@ -138,7 +138,7 @@ export class SystemMessageDialogComponent implements OnInit {
       width: '320px',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -168,7 +168,7 @@ export class SystemMessageDialogComponent implements OnInit {
       width: '320px',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -251,7 +251,7 @@ export class SystemMessageDialogComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }

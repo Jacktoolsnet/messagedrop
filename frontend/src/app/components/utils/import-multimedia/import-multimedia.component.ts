@@ -1,11 +1,12 @@
 
-import { Component, effect, inject } from '@angular/core';
+import { Component, ElementRef, ViewChild, effect, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialog, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
+import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent, MatDialogRef } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Multimedia } from '../../../interfaces/multimedia';
@@ -19,6 +20,8 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
   selector: 'app-pinterest', // (optional) kannst du umbenennen, z.B. 'app-import-multimedia'
   standalone: true,
   imports: [
+    MatDialogActions,
+    MatDialogClose,
     MatDialogContent,
     MatButtonModule,
     MatIcon,
@@ -31,12 +34,15 @@ type PlatformKey = 'youtube' | 'spotify' | 'tiktok' | 'pinterest';
   styleUrl: './import-multimedia.component.css'
 })
 export class ImportMultimediaComponent {
+  @ViewChild('urlInput') private urlInput?: ElementRef<HTMLInputElement>;
+
   multimediaUrl = '';
   multimedia?: Multimedia;
   urlInvalid = true;
   safeHtml?: SafeHtml;
   disabledReason = '';
   showExternalSettingsButton = false;
+  isPasting = false;
 
   readonly dialogRef = inject(MatDialogRef<ImportMultimediaComponent>);
   private readonly dialog = inject(MatDialog);
@@ -44,6 +50,7 @@ export class ImportMultimediaComponent {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly appService = inject(AppService);
   private readonly translation = inject(TranslationHelperService);
+  private readonly snackBar = inject(MatSnackBar);
   private readonly youtubeHosts = ['youtube.com', 'youtu.be'];
   private readonly spotifyHosts = ['open.spotify.com'];
   private readonly tiktokHosts = ['tiktok.com', 'vm.tiktok.com'];
@@ -167,6 +174,38 @@ export class ImportMultimediaComponent {
     }
   }
 
+  async onPasteFromClipboard(event?: MouseEvent): Promise<void> {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+    }
+    if (!navigator?.clipboard) {
+      this.snackBar.open(this.translation.t('common.clipboard.unavailable'), this.translation.t('common.actions.ok'), {
+        panelClass: ['snack-warning'],
+        duration: 3000
+      });
+      return;
+    }
+    if (this.isPasting) return;
+    this.isPasting = true;
+    try {
+      this.urlInput?.nativeElement?.blur();
+      const text = await navigator.clipboard.readText();
+      this.multimediaUrl = text.trim();
+      void this.validateUrl();
+      queueMicrotask(() => this.urlInput?.nativeElement?.focus());
+    } catch (err) {
+      console.error('Failed to read clipboard', err);
+      this.snackBar.open(this.translation.t('common.clipboard.readFailed'), this.translation.t('common.actions.ok'), {
+        panelClass: ['snack-warning'],
+        duration: 3000
+      });
+    } finally {
+      this.isPasting = false;
+    }
+  }
+
   openExternalContentSettings(): void {
     const dialogRef = this.dialog.open(ExternalContentComponent, {
       data: { appSettings: this.appService.getAppSettings() },
@@ -177,7 +216,7 @@ export class ImportMultimediaComponent {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => {

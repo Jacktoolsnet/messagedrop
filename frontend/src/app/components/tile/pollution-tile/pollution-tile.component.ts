@@ -189,7 +189,7 @@ export class PollutionTileComponent {
       data: { tile, availableKeys },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     ref.afterClosed().subscribe((updated?: TileSetting) => {
       if (!updated) return;
@@ -218,7 +218,7 @@ export class PollutionTileComponent {
       maxHeight: '95vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }

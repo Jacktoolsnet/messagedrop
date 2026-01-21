@@ -68,7 +68,7 @@ export class MigraineTileEditComponent {
       data: { current: this.icon() },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     ref.afterClosed().subscribe((selected?: string | null) => {

@@ -227,7 +227,7 @@ export class RestoreService {
       data: {},
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
     return pin;
@@ -322,7 +322,7 @@ export class RestoreService {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     return (await firstValueFrom(dialogRef.afterClosed())) === true;

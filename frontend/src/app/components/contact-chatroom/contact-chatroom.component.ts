@@ -289,7 +289,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -306,7 +306,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -330,7 +330,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -427,7 +427,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -448,7 +448,7 @@ export class ContactChatroomComponent implements AfterViewInit {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

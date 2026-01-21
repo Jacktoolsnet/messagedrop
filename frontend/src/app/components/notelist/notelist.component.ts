@@ -95,7 +95,7 @@ export class NotelistComponent {
     const dialogRef = this.dialog.open(DeleteNoteComponent, {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true
+      disableClose: false
     });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
@@ -119,7 +119,7 @@ export class NotelistComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -156,7 +156,7 @@ export class NotelistComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

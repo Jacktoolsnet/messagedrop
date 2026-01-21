@@ -159,7 +159,7 @@ export class BackupService {
       data: {},
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     return firstValueFrom(dialogRef.afterClosed());
   }

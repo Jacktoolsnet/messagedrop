@@ -148,7 +148,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
     const dialogRef = this.dialog.open(DeleteImageComponent, {
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true
+      disableClose: false
     });
     dialogRef.afterClosed().subscribe(async result => {
       if (result) {
@@ -226,7 +226,7 @@ export class ImagelistComponent implements OnInit, OnDestroy {
             autoFocus: false,
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
           }).afterClosed()
         );
 

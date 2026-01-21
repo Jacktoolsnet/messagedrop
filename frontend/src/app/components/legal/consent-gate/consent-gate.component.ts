@@ -88,7 +88,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
         maxWidth: '90vw',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
@@ -101,7 +101,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
         maxWidth: '90vw',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
@@ -114,7 +114,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
         maxWidth: '90vw',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       }).afterClosed().subscribe(() => this.computeMissing());
       return;
     }
@@ -155,7 +155,7 @@ export class ConsentGateComponent implements OnInit, OnDestroy {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => this.computeMissing());

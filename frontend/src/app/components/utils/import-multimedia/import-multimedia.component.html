@@ -1,14 +1,16 @@
 <div class="url-container">
-    <input type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()"
+    <input #urlInput type="url" [(ngModel)]="multimediaUrl" (input)="validateUrl()"
         [placeholder]="'common.multimedia.importUrlPlaceholder' | transloco" />
 
-    @if (!urlInvalid) {
-    <button mat-icon-button (click)="onApplyClick()">
-        <mat-icon>check</mat-icon>
+    @if (!multimediaUrl.trim()) {
+    <button type="button" class="clipboard-button" (click)="onPasteFromClipboard($event)" [disabled]="isPasting"
+        [attr.aria-label]="'common.clipboard.pasteLabel' | transloco">
+        <mat-icon>content_paste_go</mat-icon>
     </button>
     } @else {
-    <button (click)="onCancelClick()">
-        <mat-icon>cancel</mat-icon>
+    <button type="button" class="clear-button" (click)="onCancelClick()"
+        [attr.aria-label]="'common.actions.delete' | transloco">
+        <mat-icon>delete</mat-icon>
     </button>
     }
 </div>
@@ -30,10 +32,15 @@
 <mat-dialog-content class="full-width">
     @if (safeHtml !== undefined) {
     <div class="multimedia_container" [innerHTML]="safeHtml"></div>
-    <div class="center">
-        <button mat-mini-fab color="primary" class="upload-button" (click)="clearContent()">
-            <mat-icon>delete</mat-icon>
-        </button>
-    </div>
     }
 </mat-dialog-content>
+
+<mat-dialog-actions class="sticky-actions" align="end">
+    <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.close' | transloco">
+        <mat-icon>close</mat-icon>
+    </button>
+    <button mat-icon-button color="primary" type="button" (click)="onApplyClick()" [disabled]="urlInvalid"
+        [attr.aria-label]="'common.actions.apply' | transloco">
+        <mat-icon>check</mat-icon>
+    </button>
+</mat-dialog-actions>

@@ -112,7 +112,7 @@ export class ContactEditMessageComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -163,7 +163,7 @@ export class ContactEditMessageComponent implements OnInit {
       data: { text: this.data.shortMessage.message },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: true
     });
 

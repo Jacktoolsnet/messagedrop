@@ -481,7 +481,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe((result) => {
@@ -538,7 +538,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -635,7 +635,7 @@ export class AppComponent implements OnInit {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
       return;
@@ -657,7 +657,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }
@@ -692,7 +692,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -836,7 +836,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -881,7 +881,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -964,7 +964,7 @@ export class AppComponent implements OnInit {
             autoFocus: false,
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
           }).afterClosed()
         );
 
@@ -1003,7 +1003,7 @@ export class AppComponent implements OnInit {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(() => {
@@ -1030,7 +1030,7 @@ export class AppComponent implements OnInit {
             height: 'auto',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
 
@@ -1057,7 +1057,7 @@ export class AppComponent implements OnInit {
             height: 'auto',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
 
@@ -1087,7 +1087,7 @@ export class AppComponent implements OnInit {
         height: 'auto',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
 
@@ -1117,7 +1117,7 @@ export class AppComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1157,7 +1157,7 @@ export class AppComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1174,7 +1174,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterOpened().subscribe(() => {
@@ -1215,7 +1215,7 @@ export class AppComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1244,7 +1244,7 @@ export class AppComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1275,7 +1275,7 @@ export class AppComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1305,7 +1305,7 @@ export class AppComponent implements OnInit {
       height: 'auto',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1329,7 +1329,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -1343,7 +1343,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -1357,7 +1357,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -1371,7 +1371,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -1385,7 +1385,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -1399,7 +1399,7 @@ export class AppComponent implements OnInit {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
   }
@@ -1414,7 +1414,7 @@ export class AppComponent implements OnInit {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
   }
 
@@ -1430,7 +1430,7 @@ export class AppComponent implements OnInit {
       maxWidth: '90vw',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1444,7 +1444,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -1483,7 +1483,7 @@ export class AppComponent implements OnInit {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -1527,7 +1527,7 @@ export class AppComponent implements OnInit {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
         },
@@ -1546,7 +1546,7 @@ export class AppComponent implements OnInit {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
           });
         }
       });
@@ -1573,7 +1573,7 @@ export class AppComponent implements OnInit {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
         },
@@ -1590,7 +1590,7 @@ export class AppComponent implements OnInit {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
         }
@@ -1618,7 +1618,7 @@ export class AppComponent implements OnInit {
               maxHeight: '90vh',
               hasBackdrop: true,
               backdropClass: 'dialog-backdrop',
-              disableClose: true,
+              disableClose: false,
             });
           } else {
             // Bei Fehlerstatus trotzdem Fehlerdialog zeigen
@@ -1649,7 +1649,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
   }
@@ -1670,7 +1670,7 @@ export class AppComponent implements OnInit {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 

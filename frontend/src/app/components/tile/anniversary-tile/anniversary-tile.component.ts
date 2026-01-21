@@ -66,7 +66,7 @@ export class AnniversaryTileComponent implements OnChanges {
       autoFocus: false,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       data: { tile }
     });
 

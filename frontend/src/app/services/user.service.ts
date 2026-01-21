@@ -235,7 +235,7 @@ export class UserService {
               maxHeight: '90vh',
               hasBackdrop: true,
               backdropClass: 'dialog-backdrop',
-              disableClose: true,
+              disableClose: false,
               autoFocus: false
             });
 
@@ -261,7 +261,7 @@ export class UserService {
               maxHeight: '90vh',
               hasBackdrop: true,
               backdropClass: 'dialog-backdrop',
-              disableClose: true,
+              disableClose: false,
               autoFocus: false
             });
 
@@ -289,7 +289,7 @@ export class UserService {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
 
@@ -537,7 +537,7 @@ export class UserService {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
 
@@ -566,7 +566,7 @@ export class UserService {
           maxHeight: '90vh',
           hasBackdrop: true,
           backdropClass: 'dialog-backdrop',
-          disableClose: true,
+          disableClose: false,
           autoFocus: false
         });
 
@@ -885,7 +885,7 @@ export class UserService {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
 
@@ -924,7 +924,7 @@ export class UserService {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     const result = await firstValueFrom(dialogRef.afterClosed());
@@ -962,7 +962,7 @@ export class UserService {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -995,7 +995,7 @@ export class UserService {
           maxHeight: '90vh',
           hasBackdrop: true,
           backdropClass: 'dialog-backdrop',
-          disableClose: true,
+          disableClose: false,
           autoFocus: false
         });
         errorDialog.afterClosed().subscribe(() => {
@@ -1191,7 +1191,7 @@ export class UserService {
       data: {},
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     const pin = await firstValueFrom(dialogRef.afterClosed());
     if (!pin) {
@@ -1228,7 +1228,7 @@ export class UserService {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
 
@@ -1254,7 +1254,7 @@ export class UserService {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
       errorDialog.afterClosed().subscribe(() => {
@@ -1277,7 +1277,7 @@ export class UserService {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     const confirmed = await firstValueFrom(dialogRef.afterClosed());
@@ -1321,7 +1321,7 @@ export class UserService {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
 
@@ -1347,7 +1347,7 @@ export class UserService {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
       errorDialog.afterClosed().subscribe(() => {
@@ -1468,7 +1468,7 @@ export class UserService {
       data: {},
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     dialogRef.afterClosed().pipe(take(1)).subscribe(async (pin: string | undefined) => {
       if (!pin) {
@@ -1499,7 +1499,7 @@ export class UserService {
             maxHeight: '90vh',
             hasBackdrop: true,
             backdropClass: 'dialog-backdrop',
-            disableClose: true,
+            disableClose: false,
             autoFocus: false
           });
 
@@ -1520,7 +1520,7 @@ export class UserService {
       data: {},
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     dialogRef.afterClosed().subscribe(async (data: string | undefined) => {
       const requireJwt = options?.requireJwt ?? false;
@@ -1605,7 +1605,7 @@ export class UserService {
                       maxHeight: '90vh',
                       hasBackdrop: true,
                       backdropClass: 'dialog-backdrop',
-                      disableClose: true,
+                      disableClose: false,
                       autoFocus: false
                     });
 
@@ -1630,7 +1630,7 @@ export class UserService {
                             maxHeight: '90vh',
                             hasBackdrop: true,
                             backdropClass: 'dialog-backdrop',
-                            disableClose: true,
+                            disableClose: false,
                             autoFocus: false
                           });
                           errorDialog.afterClosed().subscribe(() => {
@@ -1656,7 +1656,7 @@ export class UserService {
                       maxHeight: '90vh',
                       hasBackdrop: true,
                       backdropClass: 'dialog-backdrop',
-                      disableClose: true,
+                      disableClose: false,
                       autoFocus: false
                     });
                     dialogRef.afterClosed().subscribe(() => {
@@ -1686,7 +1686,7 @@ export class UserService {
                 maxHeight: '90vh',
                 hasBackdrop: true,
                 backdropClass: 'dialog-backdrop',
-                disableClose: true,
+                disableClose: false,
                 autoFocus: false
               });
 
@@ -1711,7 +1711,7 @@ export class UserService {
                       maxHeight: '90vh',
                       hasBackdrop: true,
                       backdropClass: 'dialog-backdrop',
-                      disableClose: true,
+                      disableClose: false,
                       autoFocus: false
                     });
                     errorDialog.afterClosed().subscribe(() => {
@@ -1737,7 +1737,7 @@ export class UserService {
                 maxHeight: '90vh',
                 hasBackdrop: true,
                 backdropClass: 'dialog-backdrop',
-                disableClose: true,
+                disableClose: false,
                 autoFocus: false
               });
               dialogRef.afterClosed().subscribe(() => {
@@ -1808,7 +1808,7 @@ export class UserService {
           maxHeight: '90vh',
           hasBackdrop: true,
           backdropClass: 'dialog-backdrop',
-          disableClose: true,
+          disableClose: false,
           autoFocus: false
         });
         dialogRef.afterClosed().subscribe(() => {

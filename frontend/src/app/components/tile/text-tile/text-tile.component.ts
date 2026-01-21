@@ -59,7 +59,7 @@ export class TextTileComponent implements OnChanges {
       data: { tile },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe((updated?: TileSetting) => {

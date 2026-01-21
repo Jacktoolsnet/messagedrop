@@ -166,7 +166,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -181,7 +181,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -201,7 +201,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -218,7 +218,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -235,7 +235,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -252,7 +252,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -271,7 +271,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -286,7 +286,7 @@ export class TileSettingsComponent {
         data: { tile },
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
       });
       ref.afterClosed().subscribe((updated?: TileSetting) => {
         if (!updated) return;
@@ -309,7 +309,7 @@ export class TileSettingsComponent {
       width: '360px',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
     ref.afterClosed().subscribe(result => {
       if (!result) return;

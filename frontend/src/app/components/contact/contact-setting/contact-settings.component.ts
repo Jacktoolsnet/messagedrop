@@ -79,7 +79,7 @@ export class ContactSettingsComponent {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -100,7 +100,7 @@ export class ContactSettingsComponent {
       closeOnNavigation: true,
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false,
       data: {
         titleKey: 'common.backgroundSource.title',
@@ -234,7 +234,7 @@ export class ContactSettingsComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -255,7 +255,7 @@ export class ContactSettingsComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
 
@@ -372,7 +372,7 @@ export class ContactSettingsComponent {
       width: '520px',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {
@@ -465,7 +465,7 @@ export class ContactSettingsComponent {
       width: '420px',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
     });
 
     dialogRef.afterClosed().subscribe(async (croppedImage?: string) => {

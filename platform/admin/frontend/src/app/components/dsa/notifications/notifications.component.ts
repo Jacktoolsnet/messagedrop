@@ -1,32 +1,32 @@
 import { CommonModule, DatePipe } from '@angular/common';
 import { Component, computed, inject, OnDestroy, OnInit, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatButtonToggleModule } from '@angular/material/button-toggle';
 import { MatCardModule } from '@angular/material/card';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatDividerModule } from '@angular/material/divider';
 import { MatTooltipModule } from '@angular/material/tooltip';
-import { MatButtonToggleModule } from '@angular/material/button-toggle';
-import { Subscription, debounceTime, distinctUntilChanged, map } from 'rxjs';
+import { RouterLink } from '@angular/router';
+import { debounceTime, distinctUntilChanged, map, Subscription } from 'rxjs';
 
-import { DsaNotification } from '../../../interfaces/dsa-notification.interface';
-import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
 import { DsaNoticeFilters, DsaNoticeRange } from '../../../interfaces/dsa-notice-filters.interface';
 import { DSA_NOTICE_STATUSES, DsaNoticeStatus } from '../../../interfaces/dsa-notice-status.type';
+import { DsaNotice } from '../../../interfaces/dsa-notice.interface';
+import { DsaNotification } from '../../../interfaces/dsa-notification.interface';
+import { ReportedContentPayload } from '../../../interfaces/reported-content.interface';
 import { DsaService } from '../../../services/dsa/dsa/dsa.service';
 import { NoticeDetailComponent } from '../notice/notice-detail/notice-detail.component';
 import { NotificationDialogComponent } from './notification-dialog/notification-dialog.component';
-import { ReportedContentPayload } from '../../../interfaces/reported-content.interface';
 
 interface NoticeStatusMeta {
   label: string;
@@ -240,7 +240,7 @@ export class NotificationsComponent implements OnInit, OnDestroy {
         notice
       },
       autoFocus: false,
-      disableClose: true,
+      disableClose: false,
       panelClass: 'md-dialog-rounded'
     });
 

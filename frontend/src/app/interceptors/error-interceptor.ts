@@ -106,7 +106,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         maxHeight: '90vh',
         hasBackdrop: true,
         backdropClass: 'dialog-backdrop',
-        disableClose: true,
+        disableClose: false,
         autoFocus: false
       });
       errorDialogRef = ref;

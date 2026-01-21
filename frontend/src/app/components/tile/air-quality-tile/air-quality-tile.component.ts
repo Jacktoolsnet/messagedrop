@@ -261,7 +261,7 @@ export class AirQualityTileComponent {
       maxHeight: '90vh',
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: false
     });
     dialogRef.afterClosed().subscribe();

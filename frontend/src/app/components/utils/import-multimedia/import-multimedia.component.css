@@ -52,17 +52,19 @@
     color: var(--mat-fab-small-foreground-color);
     background-color: var(--mat-fab-small-container-color);
     border: none;
-    width: 3rem;
-    height: 2.6rem;
+    min-height: 2.6rem;
+    width: auto;
     flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 0;
+    gap: 0.5rem;
+    padding: 0 0.9rem;
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
     border-top-right-radius: 1rem;
     border-bottom-right-radius: 1rem;
+    white-space: nowrap;
 }
 
 .content {
@@ -133,4 +135,30 @@
     display: flex;
     justify-content: center;
     padding: 0 0 0.75rem;
+}
+
+.sticky-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 3;
+    background-color: var(--mat-card-filled-container-color);
+    box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+    border-top: 1px solid var(--mat-card-outlined-outline-color);
+    padding: 0.3rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.sticky-actions .action-close {
+    margin-right: auto;
+    margin-inline-end: auto;
+}
+
+.sticky-actions button {
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
 }

@@ -157,7 +157,7 @@ export class EditNoteComponent implements OnInit {
       data: { text: this.data.note.note },
       hasBackdrop: true,
       backdropClass: 'dialog-backdrop',
-      disableClose: true,
+      disableClose: false,
       autoFocus: true
     });
 
