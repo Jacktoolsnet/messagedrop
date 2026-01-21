@@ -101,7 +101,8 @@ h2[mat-dialog-title].dialog-title {
 }
 
 .dialog-backdrop {
-  background-color: #5f97c945;
+  background: rgba(79, 161, 199, 0.0);
+  backdrop-filter: blur(6px);
 }
 
 .unsplash-badge__link {

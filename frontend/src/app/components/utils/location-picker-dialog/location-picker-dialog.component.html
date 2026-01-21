@@ -7,7 +7,15 @@
 </div>
 
 <mat-dialog-content class="location-picker-content">
-  <div class="location-picker-map" [id]="mapId"></div>
+  <div class="location-picker-map" [id]="mapId" [class.is-hidden]="viewMode === 'list'"></div>
+
+  @if (viewMode === 'list') {
+  <div class="location-picker-list">
+    <app-nominatim-results-list [places]="searchResults" [showAddButton]="false" (flyTo)="flyTo($event)"
+      (navigate)="navigate($event)">
+    </app-nominatim-results-list>
+  </div>
+  }
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
@@ -18,6 +26,10 @@
   <button mat-icon-button type="button" (click)="help.open('locationPicker')"
     [attr.aria-label]="'common.actions.help' | transloco">
     <mat-icon>help</mat-icon>
+  </button>
+  <button mat-icon-button type="button" (click)="toggleViewMode()"
+    [attr.aria-label]="viewMode === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
+    <mat-icon>{{ viewMode === 'list' ? 'map' : 'list' }}</mat-icon>
   </button>
   <button mat-icon-button color="primary" type="button" (click)="apply()"
     [attr.aria-label]="'common.actions.apply' | transloco">

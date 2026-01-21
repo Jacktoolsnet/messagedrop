@@ -14,6 +14,7 @@ import { NominatimService } from '../../../services/nominatim.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { NominatimResultsListComponent } from '../nominatim-search/components/nominatim-results-list/nominatim-results-list.component';
 
 type MarkerKind = 'message' | 'note';
 
@@ -44,7 +45,16 @@ const searchMarkerIcon = leaflet.icon({
 @Component({
   selector: 'app-location-picker-dialog',
   standalone: true,
-  imports: [MatDialogContent, MatDialogActions, MatButtonModule, MatIcon, MatInputModule, ReactiveFormsModule, TranslocoPipe],
+  imports: [
+    MatDialogContent,
+    MatDialogActions,
+    MatButtonModule,
+    MatIcon,
+    MatInputModule,
+    ReactiveFormsModule,
+    TranslocoPipe,
+    NominatimResultsListComponent
+  ],
   templateUrl: './location-picker-dialog.component.html',
   styleUrl: './location-picker-dialog.component.css'
 })
@@ -59,6 +69,7 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
 
   readonly searchControl = new FormControl('', { nonNullable: true });
   searchResults: NominatimPlace[] = [];
+  viewMode: 'list' | 'map' = 'map';
 
   readonly mapId = `location-picker-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
@@ -84,6 +95,23 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
 
   apply(): void {
     this.dialogRef.close({ ...this.location });
+  }
+
+  toggleViewMode(): void {
+    this.viewMode = this.viewMode === 'list' ? 'map' : 'list';
+    if (this.viewMode === 'map') {
+      setTimeout(() => this.map?.invalidateSize(), 0);
+    }
+  }
+
+  flyTo(place: NominatimPlace): void {
+    this.viewMode = 'map';
+    this.selectResult(place);
+    setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  navigate(place: NominatimPlace): void {
+    this.nominatimService.navigateToNominatimPlace(place);
   }
 
   searchPlaces(): void {
