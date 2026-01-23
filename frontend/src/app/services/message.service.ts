@@ -408,8 +408,11 @@ export class MessageService {
       autoclose: false
     });
 
+    const messageIdentifier = Number.isFinite(message.id) && message.id > 0
+      ? message.id
+      : message.uuid;
     const body = {
-      'id': message.id,
+      'id': messageIdentifier,
       'message': message.message,
       'style': message.style,
       'multimedia': JSON.stringify(message.multimedia),

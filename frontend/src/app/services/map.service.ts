@@ -70,6 +70,16 @@ export class MapService {
   public initMapEvents(location: Location, clickEvent: EventEmitter<Location>, moveEndEvent: EventEmitter<Location>, markerClickEvent: EventEmitter<MarkerLocation>): void {
     this.markerClickEvent = markerClickEvent;
 
+    if (this.map) {
+      this.map.remove();
+      this.map = undefined;
+    }
+
+    const container = leaflet.DomUtil.get('map') as { _leaflet_id?: number } | null;
+    if (container && container._leaflet_id) {
+      delete container._leaflet_id;
+    }
+
     this.map = leaflet.map('map', {
       center: [location.latitude, location.longitude],
       zoom: 3,
