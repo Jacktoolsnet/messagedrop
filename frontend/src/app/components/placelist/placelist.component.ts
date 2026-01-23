@@ -13,12 +13,12 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarRef, SimpleSnackBar } from '@angular/material/snack-bar';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GetNominatimAddressResponse } from '../../interfaces/get-nominatim-address-response copy';
+import { Location } from '../../interfaces/location';
 import { Mode } from '../../interfaces/mode';
 import { NominatimPlace } from '../../interfaces/nominatim-place';
 import { Place } from '../../interfaces/place';
 import { createDefaultTileSettings } from '../../interfaces/tile-settings';
 import { GeolocationService } from '../../services/geolocation.service';
-import { IndexedDbService } from '../../services/indexed-db.service';
 import { MapService } from '../../services/map.service';
 import { NominatimService } from '../../services/nominatim.service';
 import { PlaceService } from '../../services/place.service';
@@ -26,6 +26,7 @@ import { TranslationHelperService } from '../../services/translation-helper.serv
 import { UserService } from '../../services/user.service';
 import { DeletePlaceComponent } from '../tile/delete-place/delete-place.component';
 import { TileListDialogComponent } from "../tile/tile-list-dialog/tile-list-dialog.component";
+import { LocationPickerDialogComponent } from '../utils/location-picker-dialog/location-picker-dialog.component';
 import { HelpDialogService } from '../utils/help-dialog/help-dialog.service';
 import { PlaceProfileComponent } from './place-settings/place-settings.component';
 import { PlaceSortDialogComponent } from './place-sort-dialog/place-sort-dialog.component';
@@ -53,7 +54,6 @@ interface TimezoneResponse { status: number; timezone: string }
   styleUrl: './placelist.component.css'
 })
 export class PlacelistComponent {
-  private readonly indexedDbService = inject(IndexedDbService);
   private readonly nominatimService = inject(NominatimService);
   private readonly mapService = inject(MapService);
   private readonly geolocationService = inject(GeolocationService);
@@ -260,19 +260,68 @@ export class PlacelistComponent {
     window.open(url, '_blank');
   }
 
-  async addPlace(): Promise<void> {
+  addPlace(): void {
     if (!this.userService.hasJwt()) {
       return;
     }
-    const place: Place = {
+
+    const dialogRef = this.matDialog.open(LocationPickerDialogComponent, {
+      data: { location: this.mapService.getMapLocation(), markerType: 'message' },
+      maxWidth: '95vw',
+      maxHeight: '95vh',
+      width: '95vw',
+      height: '95vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    dialogRef.afterClosed().subscribe((location?: Location) => {
+      if (!location) {
+        return;
+      }
+      this.createPlaceFromLocation(location);
+    });
+  }
+
+  private createPlaceFromLocation(location: Location): void {
+    const place = this.buildNewPlace(location);
+    this.nominatimService.getNominatimPlaceByLocation(place.location, true).subscribe({
+      next: (nominatimAddressResponse: GetNominatimAddressResponse) => {
+        if (nominatimAddressResponse.status !== 200) {
+          return;
+        }
+        const nominatimPlace: NominatimPlace | undefined = nominatimAddressResponse.nominatimPlace;
+        if (!nominatimPlace || nominatimPlace.error) {
+          this.persistPlace(place);
+          return;
+        }
+        place.name = nominatimPlace.name ? nominatimPlace.name : this.nominatimService.getFormattedStreet(nominatimPlace, ' ');
+        place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
+        place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
+        place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
+        this.persistPlace(place);
+      },
+      error: () => {
+        this.snackBar.open(
+          this.translation.t('common.placeList.resolveFailed'),
+          this.translation.t('common.actions.ok'),
+          { duration: 3000 }
+        );
+      }
+    });
+  }
+
+  private buildNewPlace(location: Location): Place {
+    const resolvedLocation = location.plusCode
+      ? { ...location }
+      : { ...location, plusCode: this.geolocationService.getPlusCode(location.latitude, location.longitude) };
+    return {
       id: '',
       userId: this.userService.getUser().id,
       name: '',
-      location: {
-        latitude: 0,
-        longitude: 0,
-        plusCode: ''
-      },
+      location: resolvedLocation,
       base64Avatar: '',
       placeBackgroundImage: '',
       placeBackgroundTransparency: 40,
@@ -280,12 +329,7 @@ export class PlacelistComponent {
       subscribed: false,
       pinned: false,
       sortOrder: this.placeService.getNextSortOrder(),
-      boundingBox: {
-        latMin: 0,
-        lonMin: 0,
-        latMax: 0,
-        lonMax: 0
-      },
+      boundingBox: this.geolocationService.getBoundingBoxFromPlusCodes([resolvedLocation.plusCode]),
       timezone: '',
       tileSettings: createDefaultTileSettings(),
       datasets: {
@@ -299,130 +343,36 @@ export class PlacelistComponent {
         }
       }
     };
-    let nominatimPlace: NominatimPlace | undefined;
-    const selectedPlace = await this.indexedDbService.getSetting<NominatimPlace>('nominatimSelectedPlace');
-    let isNearby = false;
-    if (selectedPlace) {
-      nominatimPlace = selectedPlace;
-      isNearby = this.geolocationService.areLocationsNear(
-        this.mapService.getMapLocation(),
-        this.nominatimService.getLocationFromNominatimPlace(nominatimPlace),
-        50
-      ); // within 50 m
-    }
-    if (!isNearby) {
-      this.nominatimService.getNominatimPlaceByLocation(this.mapService.getMapLocation(), true).subscribe({
-        next: (nominatimAddressResponse: GetNominatimAddressResponse) => {
-          if (nominatimAddressResponse.status === 200) {
-            if (nominatimAddressResponse.nominatimPlace.error) {
-              place.location = this.mapService.getMapLocation()
-              place.boundingBox = this.geolocationService.getBoundingBoxFromPlusCodes([place.location.plusCode]);
-              this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-                next: (timezoneResponse) => {
-                  const response = timezoneResponse as TimezoneResponse;
-                  if (response.status === 200 && response.timezone) {
-                    place.timezone = response.timezone;
-                    this.placeService.createPlace(place).subscribe({
-                      next: createPlaceResponse => {
-                        if (createPlaceResponse.status === 200) {
-                          place.id = createPlaceResponse.placeId;
-                          this.placeService.saveAdditionalPlaceInfos(place);
-                          this.snackBarRef = this.snackBar.open(
-                            this.translation.t('common.placeList.createSuccess'),
-                            '',
-                            { duration: 1000 }
-                          );
-                        }
-                      },
-                      error: err => {
-                        this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-                      }
-                    });
-                  }
-                },
-                error: err => {
-                  this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-                }
-              });
-            } else {
-              nominatimPlace = nominatimAddressResponse.nominatimPlace;
-              place.name = nominatimPlace.name ? nominatimPlace.name : this.nominatimService.getFormattedStreet(nominatimPlace, ' ');
-              place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
-              place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
-              place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
-              this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-                next: (timezoneResponse) => {
-                  const response = timezoneResponse as TimezoneResponse;
-                  if (response.status === 200 && response.timezone) {
-                    place.timezone = response.timezone;
-                    this.placeService.createPlace(place).subscribe({
-                      next: createPlaceResponse => {
-                        if (createPlaceResponse.status === 200) {
-                          place.id = createPlaceResponse.placeId;
-                          this.placeService.saveAdditionalPlaceInfos(place);
-                          this.snackBarRef = this.snackBar.open(
-                            this.translation.t('common.placeList.createSuccess'),
-                            '',
-                            { duration: 1000 }
-                          );
-                        }
-                      },
-                      error: err => {
-                        this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-                      }
-                    });
-                  }
-                },
-                error: err => {
-                  this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-                }
-              });
+  }
+
+  private persistPlace(place: Place): void {
+    this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox)).subscribe({
+      next: (timezoneResponse) => {
+        const response = timezoneResponse as TimezoneResponse;
+        if (response.status === 200 && response.timezone) {
+          place.timezone = response.timezone;
+          this.placeService.createPlace(place).subscribe({
+            next: createPlaceResponse => {
+              if (createPlaceResponse.status === 200) {
+                place.id = createPlaceResponse.placeId;
+                this.placeService.saveAdditionalPlaceInfos(place);
+                this.snackBarRef = this.snackBar.open(
+                  this.translation.t('common.placeList.createSuccess'),
+                  '',
+                  { duration: 1000 }
+                );
+              }
+            },
+            error: err => {
+              this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
             }
-          }
-        },
-        error: () => {
-          this.snackBar.open(
-            this.translation.t('common.placeList.resolveFailed'),
-            this.translation.t('common.actions.ok'),
-            { duration: 3000 }
-          );
+          });
         }
-      });
-    } else {
-      if (nominatimPlace) {
-        place.name = nominatimPlace.name!;
-        place.icon = this.nominatimService.getIconForPlace(nominatimPlace);
-        place.boundingBox = this.nominatimService.getBoundingBoxFromNominatimPlace(nominatimPlace);
-        place.location = this.nominatimService.getLocationFromNominatimPlace(nominatimPlace);
-        this.placeService.getTimezone(this.geolocationService.getCenterOfBoundingBox(place.boundingBox!)).subscribe({
-          next: (timezoneResponse) => {
-            const response = timezoneResponse as TimezoneResponse;
-            if (response.status === 200 && response.timezone) {
-              place.timezone = response.timezone;
-              this.placeService.createPlace(place).subscribe({
-                next: createPlaceResponse => {
-                  if (createPlaceResponse.status === 200) {
-                    place.id = createPlaceResponse.placeId;
-                    this.placeService.saveAdditionalPlaceInfos(place);
-                    this.snackBarRef = this.snackBar.open(
-                      this.translation.t('common.placeList.createSuccess'),
-                      '',
-                      { duration: 1000 }
-                    );
-                  }
-                },
-                error: err => {
-                  this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-                }
-              });
-            }
-          },
-          error: err => {
-            this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
-          }
-        });
+      },
+      error: err => {
+        this.snackBarRef = this.snackBar.open(err.message, this.translation.t('common.actions.ok'));
       }
-    }
+    });
   }
 
   public flyTo(place: Place) {
