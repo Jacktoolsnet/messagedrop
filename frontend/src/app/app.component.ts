@@ -748,29 +748,32 @@ export class AppComponent implements OnInit {
   }
 
   private async updateDataForLocation() {
-    // Clear markerLocations
-    this.markerLocations.clear()
     const settings = this.normalizeSearchSettings(this.searchSettings);
     const zoom = this.mapService.getMapZoom();
-    const shouldSearchMessages = settings.publicMessages.enabled && zoom >= settings.publicMessages.minZoom;
-    const shouldSearchNotes = settings.privateNotes.enabled && zoom >= settings.privateNotes.minZoom;
-    const shouldSearchImages = settings.privateImages.enabled && zoom >= settings.privateImages.minZoom;
-    const shouldSearchDocuments = settings.privateDocuments.enabled && zoom >= settings.privateDocuments.minZoom;
+    const ignoreSearchSettings = !this.userService.isReady();
+    const isMessagesEnabled = ignoreSearchSettings ? true : settings.publicMessages.enabled;
+    const isNotesEnabled = ignoreSearchSettings ? true : settings.privateNotes.enabled;
+    const isImagesEnabled = ignoreSearchSettings ? true : settings.privateImages.enabled;
+    const isDocumentsEnabled = ignoreSearchSettings ? true : settings.privateDocuments.enabled;
+    const canSearchMessages = ignoreSearchSettings ? true : isMessagesEnabled && zoom >= settings.publicMessages.minZoom;
+    const canSearchNotes = isNotesEnabled && zoom >= settings.privateNotes.minZoom;
+    const canSearchImages = isImagesEnabled && zoom >= settings.privateImages.minZoom;
+    const canSearchDocuments = isDocumentsEnabled && zoom >= settings.privateDocuments.minZoom;
     // notes from local device
     if (this.userService.isReady()) {
-      if (shouldSearchNotes) {
+      if (canSearchNotes) {
         await this.noteService.getNotesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      } else {
+      } else if (!isNotesEnabled) {
         this.noteService.clearNotes();
       }
-      if (shouldSearchImages) {
+      if (canSearchImages) {
         await this.localImageService.getImagesInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      } else {
+      } else if (!isImagesEnabled) {
         this.localImageService.clearImages();
       }
-      if (shouldSearchDocuments) {
+      if (canSearchDocuments) {
         await this.localDocumentService.getDocumentsInBoundingBox(this.mapService.getVisibleMapBoundingBox());
-      } else {
+      } else if (!isDocumentsEnabled) {
         this.localDocumentService.clearDocuments();
       }
     } else {
@@ -779,9 +782,9 @@ export class AppComponent implements OnInit {
       this.localDocumentService.clearDocuments();
     }
     // Messages
-    if (!shouldSearchMessages) {
+    if (!isMessagesEnabled) {
       this.messageService.clearMessages();
-    } else if (!this.markerMessageListOpen) {
+    } else if (canSearchMessages && !this.markerMessageListOpen) {
       this.messageService.getByVisibleMapBoundingBox();
     }
   }
