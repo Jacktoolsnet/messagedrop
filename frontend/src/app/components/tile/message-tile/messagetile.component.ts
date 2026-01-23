@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { GetMessageResponse } from '../../../interfaces/get-message-response';
 import { Message } from '../../../interfaces/message';
+import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { Place } from '../../../interfaces/place';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { MessageService } from '../../../services/message.service';
@@ -28,7 +29,7 @@ export class MessageTileComponent implements OnInit, OnDestroy {
 
   readonly placeMessages = computed(() =>
     this.allPlaceMessages()
-      .filter(m => m.message?.trim() !== '')
+      .filter(m => m.message?.trim() !== '' || (m.multimedia?.type && m.multimedia.type !== MultimediaType.UNDEFINED))
       .slice(0, 3)
   );
 

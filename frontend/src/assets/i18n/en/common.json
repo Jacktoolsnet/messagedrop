@@ -513,6 +513,7 @@
       },
       "messages": {
         "title": "Öffentliche Nachrichten",
+        "multimediaOnly": "Multimedia message",
         "empty": "No messages found."
       },
       "notes": {

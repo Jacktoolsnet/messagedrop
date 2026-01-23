@@ -8,7 +8,9 @@
     @if (placeMessages().length > 0) {
     @for (message of placeMessages(); track message.id) {
     <div class="message-card">
-        <span class="message-text" [style]="message.style">{{ message.message }}</span>
+        <span class="message-text" [style]="message.style">
+            {{ message.message.trim() ? message.message : ('common.tiles.messages.multimediaOnly' | transloco) }}
+        </span>
     </div>
     }
     } @else {
