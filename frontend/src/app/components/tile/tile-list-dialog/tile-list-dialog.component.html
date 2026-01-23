@@ -17,7 +17,7 @@
         <img class="tile-dialog-title__image" [src]="place.base64Avatar"
           [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
       } @else {
-        <mat-icon aria-hidden="true">{{ place.icon || 'location' }}</mat-icon>
+        <mat-icon aria-hidden="true">{{ place.icon || 'place' }}</mat-icon>
       }
     </span>
     <span class="tile-dialog-title__text">{{ place.name || ('common.placeList.nameFallback' | transloco) }}</span>

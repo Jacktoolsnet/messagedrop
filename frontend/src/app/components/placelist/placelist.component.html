@@ -22,7 +22,7 @@
                         <img class="avatar" [src]="place.base64Avatar"
                             [attr.alt]="place.name ? ('common.placeList.avatarAltName' | transloco:{ name: place.name }) : ('common.placeList.avatarAltFallback' | transloco)" />
                         } @else {
-                        <mat-icon>{{ place.icon || 'location' }}</mat-icon>
+                        <mat-icon>{{ place.icon || 'place' }}</mat-icon>
                         }
                         @if (place.name) {
                         <span class="name">{{ place.name }}</span>

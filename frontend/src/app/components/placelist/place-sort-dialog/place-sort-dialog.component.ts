@@ -59,7 +59,7 @@ export class PlaceSortDialogComponent {
   }
 
   getPlaceIcon(place: Place): string {
-    return place.icon || 'location';
+    return place.icon || 'place';
   }
 
   openPlaceSettings(place: Place): void {
