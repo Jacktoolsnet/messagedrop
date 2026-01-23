@@ -8,7 +8,9 @@
     @if (placeNotes().length > 0) {
     @for (note of placeNotes(); track note.id) {
     <div class="note-card">
-        <span class="note-text" [style]="note.style">{{ note.note }}</span>
+        <span class="note-text" [style]="note.style">
+            {{ note.note.trim() ? note.note : ('common.tiles.notes.multimediaOnly' | transloco) }}
+        </span>
     </div>
     }
     } @else {

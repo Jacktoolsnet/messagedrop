@@ -6,6 +6,7 @@ import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { Note } from '../../../interfaces/note';
 import { Place } from '../../../interfaces/place';
+import { MultimediaType } from '../../../interfaces/multimedia-type';
 import { GeolocationService } from '../../../services/geolocation.service';
 import { NoteService } from '../../../services/note.service';
 import { NotelistComponent } from '../../notelist/notelist.component';
@@ -26,7 +27,7 @@ export class NoteTileComponent implements OnInit {
 
   readonly placeNotes = computed(() =>
     this.allPlaceNotes()
-      .filter(n => n.note?.trim() !== '')
+      .filter(n => n.note?.trim() !== '' || (n.multimedia?.type && n.multimedia.type !== MultimediaType.UNDEFINED))
       .slice(0, 3)
   );
 

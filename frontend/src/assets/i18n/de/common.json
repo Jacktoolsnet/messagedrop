@@ -518,6 +518,7 @@
       },
       "notes": {
         "title": "Private Notizen",
+        "multimediaOnly": "Multimedia Notiz",
         "empty": "Keine Notizen gefunden."
       },
       "text": {

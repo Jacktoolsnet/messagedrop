@@ -518,6 +518,7 @@
       },
       "notes": {
         "title": "Notes privées",
+        "multimediaOnly": "Note multimédia",
         "empty": "Aucune note trouvée."
       },
       "text": {
