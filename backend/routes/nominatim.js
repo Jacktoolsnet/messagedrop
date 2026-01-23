@@ -51,11 +51,21 @@ function getClientOrError(req, next) {
     return null;
 }
 
+function isTimeoutError(err) {
+    return err?.code === 'ECONNABORTED' || String(err?.message || '').toLowerCase().includes('timeout');
+}
+
 function buildUpstreamError(err) {
-    const status = err?.response?.status || 502;
+    const status = isTimeoutError(err) ? 504 : (err?.response?.status || 502);
     const apiErr = apiError.fromStatus(status);
     apiErr.detail = err?.response?.data || err?.message || null;
     return apiErr;
+}
+
+function sendUpstreamError(req, res, err, context) {
+    const apiErr = buildUpstreamError(err);
+    req.logger?.warn?.(context, { status: apiErr.status, error: apiErr.detail || apiErr.message });
+    return res.status(apiErr.status).json(apiErr);
 }
 
 // GET /nominatim/countryCode/:pluscode/:latitude/:longitude
@@ -82,8 +92,10 @@ router.get('/countryCode/:pluscode/:latitude/:longitude', [
         });
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        req.logger?.error?.('nominatim proxy countryCode upstream error', { error: err?.message || err });
-        return next(buildUpstreamError(err));
+        if (axios.isAxiosError(err)) {
+            return sendUpstreamError(req, res, err, 'nominatim proxy countryCode upstream error');
+        }
+        return next(err);
     }
 });
 
@@ -111,8 +123,10 @@ router.get('/search/:searchTerm/:limit', [
         });
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        req.logger?.error?.('nominatim proxy search upstream error', { error: err?.message || err });
-        return next(buildUpstreamError(err));
+        if (axios.isAxiosError(err)) {
+            return sendUpstreamError(req, res, err, 'nominatim proxy search upstream error');
+        }
+        return next(err);
     }
 });
 
@@ -144,8 +158,10 @@ router.get('/noboundedsearch/:searchTerm/:limit/:viewbox', [
         }
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        req.logger?.error?.('nominatim proxy noboundedsearch upstream error', { error: err?.message || err });
-        return next(buildUpstreamError(err));
+        if (axios.isAxiosError(err)) {
+            return sendUpstreamError(req, res, err, 'nominatim proxy noboundedsearch upstream error');
+        }
+        return next(err);
     }
 });
 
@@ -176,8 +192,10 @@ router.get('/boundedsearch/:searchTerm/:limit/:viewbox', [
         }
         res.status(upstream.status).json(upstream.data);
     } catch (err) {
-        req.logger?.error?.('nominatim proxy boundedsearch upstream error', { error: err?.message || err });
-        return next(buildUpstreamError(err));
+        if (axios.isAxiosError(err)) {
+            return sendUpstreamError(req, res, err, 'nominatim proxy boundedsearch upstream error');
+        }
+        return next(err);
     }
 });
 

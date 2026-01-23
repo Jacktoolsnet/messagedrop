@@ -73,11 +73,17 @@ h2[mat-dialog-title].tile-dialog-title > * {
 .tile-dialog-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 0.5rem;
   padding: 0.35rem 1rem;
   background-color: var(--mat-card-filled-container-color);
   border-top: 1px solid var(--mat-card-outlined-outline-color);
   box-shadow: 0 -2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.tile-dialog-actions .action-close {
+  margin-right: auto;
+  margin-inline-end: auto;
 }
 
 :host ::ng-deep .mat-mdc-dialog-surface {
