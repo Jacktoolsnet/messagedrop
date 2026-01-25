@@ -69,7 +69,7 @@ function sendUpstreamError(req, res, err, context) {
 
 router.use(express.json({ limit: '256kb' }));
 
-router.all('/*', [
+router.use([
   metric.count('viator.proxy', { when: 'always', timezone: 'utc', amount: 1 })
 ], async (req, res, next) => {
   const activeClient = getClientOrError(req, next);
