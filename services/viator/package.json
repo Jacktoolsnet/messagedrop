@@ -1,7 +1,7 @@
 {
-  "name": "messagedrop-nominatim-service",
+  "name": "messagedrop-viator-service",
   "version": "1.0.0",
-  "description": "Backend service for Messagedrop providing Nominatim geocoding functionality.",
+  "description": "Backend service for Messagedrop providing Viator partner API functionality.",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",

@@ -48,5 +48,15 @@
     "x": "zN4NoigX5tWF47XAo97gCTD6qiV2lp6fhFBx3RrNlFkfNqOpT4V4wHbiBVYix6Xy",
     "y": "VzaAWXRUYCVc0wqi7Le41kIHDapmU0JX2zYtJ8yH08bSbLCTSCBCOQ7RFRfct9jY",
     "crv": "P-384"
+  },
+  "service.viator": {
+    "key_ops": [
+      "verify"
+    ],
+    "ext": true,
+    "kty": "EC",
+    "x": "9c-tXgtX5Nqs36kMTzch868r12HlzMkfaYi7Orbb28uEB7MhFn4YTpE9KeqLnam5",
+    "y": "qFbXYFmJtuWruFlDpZojsm5m93JEncoF0erFbtxq4SGdis9ZIKiYaBXgMVJDscKI",
+    "crv": "P-384"
   }
 }

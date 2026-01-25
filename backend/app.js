@@ -25,6 +25,7 @@ const geoStatistic = require('./routes/geostatistic');
 const weather = require('./routes/weather');
 const airQualtiy = require('./routes/air-quality');
 const nominatim = require('./routes/nominatim');
+const viator = require('./routes/viator');
 const tenor = require('./routes/tenor');
 const unsplash = require('./routes/unsplash');
 const digitalServiceAct = require('./routes/digital-service-act');
@@ -297,6 +298,13 @@ const nominatimLimit = rateLimit({
   message: rateLimitMessage('Too many nominatim requests, please try again later.')
 });
 
+const viatorLimit = rateLimit({
+  windowMs: 10 * 60 * 1000,
+  limit: 120,
+  ...rateLimitDefaults,
+  message: rateLimitMessage('Too many viator requests, please try again later.')
+});
+
 const tenorLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 60,
@@ -382,6 +390,7 @@ app.use('/message', messageLimit, message);
 app.use('/moderation', basicLimit, moderation);
 app.use('/notification', notificationLimit, notification);
 app.use('/nominatim', nominatimLimit, nominatim);
+app.use('/viator', viatorLimit, viator);
 app.use('/openai', openAiLimit, openAi);
 app.use('/place', placeLimit, place);
 app.use('/tenor', tenorLimit, tenor);

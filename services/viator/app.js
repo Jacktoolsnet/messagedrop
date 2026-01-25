@@ -15,7 +15,7 @@ const cron = require('node-cron');
 const winston = require('winston');
 const rateLimit = require('express-rate-limit');
 const { generateOrLoadKeypairs } = require('./utils/keyStore');
-const nominatim = require('./routes/nominatim');
+const viator = require('./routes/viator');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
@@ -57,7 +57,7 @@ const warnOnlyFilter = winston.format((info) => (info.level === 'warn' ? info : 
 
 // Transport für Info-Logs
 const infoTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/nominatim-info-%DATE%.log',
+  filename: 'logs/viator-info-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_INFO,
@@ -67,7 +67,7 @@ const infoTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Warn-Logs
 const warnTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/nominatim-warn-%DATE%.log',
+  filename: 'logs/viator-warn-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_WARN,
@@ -77,7 +77,7 @@ const warnTransport = new winston.transports.DailyRotateFile({
 
 // Transport für Error-Logs
 const errorTransport = new winston.transports.DailyRotateFile({
-  filename: 'logs/nominatim-error-%DATE%.log',
+  filename: 'logs/viator-error-%DATE%.log',
   datePattern: 'YYYY-MM-DD',
   zippedArchive: false,
   maxFiles: LOG_RETENTION_ERROR,
@@ -108,7 +108,7 @@ function registerProcessHandlers() {
     const error = err instanceof Error ? err : new Error(typeof err === 'string' ? err : JSON.stringify(err));
     const traceId = err?.traceId;
     logger.error(label, {
-      service: 'nominatim-service',
+      service: 'viator-service',
       traceId,
       message: error.message,
       stack: error.stack
@@ -141,7 +141,7 @@ const adminLogBase = resolveBaseUrl(process.env.ADMIN_BASE_URL, process.env.ADMI
 attachForwarding(logger, {
   baseUrl: adminLogBase,
   audience: process.env.SERVICE_JWT_AUDIENCE_ADMIN || 'service.admin-backend',
-  source: 'nominatim-service'
+  source: 'viator-service'
 });
 
 // Hinweis: Socket.io entfernt. Server startet als klassischer Express-Server.
@@ -189,17 +189,17 @@ const rateLimitMessage = (message) => ({
   error: message
 });
 
-const nominatimLimit = rateLimit({
+const viatorLimit = rateLimit({
   windowMs: 10 * 60 * 1000,
   limit: 120,
   ...rateLimitDefaults,
-  message: rateLimitMessage('Too many nominatim requests, please try again later.')
+  message: rateLimitMessage('Too many viator requests, please try again later.')
 });
 
 // ROUTES
 app.use('/', root);
 app.use('/check', check);
-app.use('/nominatim', nominatimLimit, nominatim);
+app.use('/viator', viatorLimit, viator);
 
 // 404 + Error handler (letzte Middleware)
 app.use(notFoundHandler);
@@ -208,7 +208,7 @@ app.use(errorHandler);
 (async () => {
   try {
     await generateOrLoadKeypairs();
-    const server = app.listen(process.env.NOMINATIM_PORT, () => {
+    const server = app.listen(process.env.VIATOR_PORT, () => {
       const address = server.address();
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);
