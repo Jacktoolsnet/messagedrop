@@ -12,7 +12,7 @@ const init = function (db) {
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );
     `;
-    db.run(sql);
+    db.exec(sql);
 };
 
 function normalizeQuery(query) {
@@ -33,15 +33,21 @@ const setGeoSearchResult = function (db, rawQuery, geoData, callback) {
         (${columnNormalizedQuery}, ${columnGeoData}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));
     `;
-    db.run(sql, [normalized, JSON.stringify(geoData)], callback);
+    try {
+        db.prepare(sql).run(normalized, JSON.stringify(geoData));
+        if (callback) callback(null);
+    } catch (err) {
+        if (callback) return callback(err);
+        throw err;
+    }
 };
 
 
 const getGeoSearchResult = function (db, rawQuery, callback) {
     const normalized = normalizeQuery(rawQuery);
     const sql = `SELECT * FROM ${tableName} WHERE ${columnNormalizedQuery} = ?`;
-    db.get(sql, [normalized], (err, row) => {
-        if (err) return callback(err);
+    try {
+        const row = db.prepare(sql).get(normalized);
         if (!row) return callback(null, null);
         try {
             const parsedData = JSON.parse(row.geoData);
@@ -49,7 +55,9 @@ const getGeoSearchResult = function (db, rawQuery, callback) {
         } catch (parseErr) {
             callback(parseErr);
         }
-    });
+    } catch (err) {
+        return callback(err);
+    }
 };
 
 const cleanExpired = function (db, callback) {
@@ -57,7 +65,13 @@ const cleanExpired = function (db, callback) {
         DELETE FROM ${tableName}
         WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 month');
     `;
-    db.run(sql, callback);
+    try {
+        db.prepare(sql).run();
+        if (callback) callback(null);
+    } catch (err) {
+        if (callback) return callback(err);
+        throw err;
+    }
 };
 
 module.exports = {

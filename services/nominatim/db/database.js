@@ -1,5 +1,5 @@
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+const { DatabaseSync } = require('node:sqlite');
 const tableNominatimCache = require('./tableNominatimCache');
 const tableGeoSearch = require('./tableGeoSearch');
 
@@ -13,36 +13,31 @@ class Database {
 
   init(logger) {
     this.logger = logger ?? console;
-    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'nominatim.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-      if (err) {
-        return;
-      } else {
-        this.db.run('PRAGMA foreign_keys = ON;', [], (pragmaError) => {
-          if (pragmaError) {
-            this.logger.error(pragmaError.message);
-          }
-        });
+    try {
+      this.db = new DatabaseSync(path.join(path.dirname(__filename), 'nominatim.db'));
+      this.db.exec('PRAGMA foreign_keys = ON;');
 
-        tableNominatimCache.init(this.db);
-        tableGeoSearch.init(this.db);
+      tableNominatimCache.init(this.db);
+      tableGeoSearch.init(this.db);
 
-        // Trigger initialisieren
-        this.initTriggers();
+      // Trigger initialisieren
+      this.initTriggers();
 
-        this.initIndexes();
+      this.initIndexes();
 
-        this.logger.info('Connected to the messagedrop SQlite database.');
-      }
-    });
+      this.logger.info('Connected to the messagedrop SQlite database.');
+    } catch (err) {
+      this.logger.error(err?.message || err);
+    }
   };
 
   close() {
-    this.db?.close((err) => {
-      if (err) {
-        return;
-      }
+    try {
+      this.db?.close();
       this.logger.info('Close the database connection.');
-    });
+    } catch (err) {
+      this.logger.error(err?.message || err);
+    }
   };
 
   initTriggers() {

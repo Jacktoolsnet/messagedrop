@@ -11,9 +11,7 @@ const init = function (db) {
             ${columnNominatimPlace} TEXT,
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );`;
-        db.run(sql, (err) => {
-            if (err) throw err;
-        });
+        db.exec(sql);
     } catch (error) {
         throw error;
     }
@@ -25,10 +23,10 @@ const setNominatimCache = function (db, cacheKey, nominatimPlaceJson, callback) 
         INSERT OR REPLACE INTO ${tableName}
         (${columnCacheKey}, ${columnNominatimPlace}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));`;
-        db.run(sql, [cacheKey, nominatimPlaceJson], (err) => {
-            callback(err);
-        });
+        db.prepare(sql).run(cacheKey, nominatimPlaceJson);
+        if (callback) callback(null);
     } catch (error) {
+        if (callback) return callback(error);
         throw error;
     }
 };
@@ -36,10 +34,10 @@ const setNominatimCache = function (db, cacheKey, nominatimPlaceJson, callback) 
 const getNominatimCache = function (db, cacheKey, callback) {
     try {
         const sql = `SELECT * FROM ${tableName} WHERE ${columnCacheKey} = ?;`;
-        db.get(sql, [cacheKey], (err, row) => {
-            callback(err, row);
-        });
+        const row = db.prepare(sql).get(cacheKey);
+        callback(null, row ?? null);
     } catch (error) {
+        if (callback) return callback(error);
         throw error;
     }
 };
@@ -49,7 +47,13 @@ const cleanExpired = function (db, callback) {
         DELETE FROM ${tableName}
         WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-3 month');
     `;
-    db.run(sql, callback);
+    try {
+        db.prepare(sql).run();
+        if (callback) callback(null);
+    } catch (error) {
+        if (callback) return callback(error);
+        throw error;
+    }
 };
 
 module.exports = {
