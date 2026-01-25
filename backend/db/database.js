@@ -1,5 +1,5 @@
 const path = require('path');
-const sqlite3 = require('sqlite3').verbose();
+const { DatabaseSync } = require('node:sqlite');
 const tableUser = require('./tableUser');
 const tableConnect = require('./tableConnect');
 const tableContact = require('./tableContact');
@@ -14,6 +14,147 @@ const tableNotification = require('./tableNotification');
 const tableGeoStatistic = require('./tableGeoStatistic');
 const tableMaintenance = require('./tableMaintenance');
 
+class SqliteCompat {
+  constructor(filePath) {
+    this._db = new DatabaseSync(filePath);
+  }
+
+  exec(sql, callback) {
+    try {
+      this._db.exec(sql);
+      if (callback) callback(null);
+    } catch (err) {
+      if (callback) return callback(err);
+      throw err;
+    }
+  }
+
+  _normalizeParams(params, callback) {
+    if (typeof params === 'function') {
+      return { params: undefined, callback: params };
+    }
+    return { params, callback };
+  }
+
+  _runStatement(stmt, params, callback) {
+    const result = params === undefined
+      ? stmt.run()
+      : Array.isArray(params)
+        ? stmt.run(...params)
+        : stmt.run(params);
+    const ctx = {
+      changes: result?.changes ?? 0,
+      lastID: result?.lastInsertRowid ?? result?.lastID
+    };
+    if (callback) callback.call(ctx, null);
+    return result;
+  }
+
+  run(sql, params, callback) {
+    const normalized = this._normalizeParams(params, callback);
+    try {
+      const stmt = this._db.prepare(sql);
+      this._runStatement(stmt, normalized.params, normalized.callback);
+    } catch (err) {
+      if (normalized.callback) return normalized.callback(err);
+      throw err;
+    }
+  }
+
+  get(sql, params, callback) {
+    const normalized = this._normalizeParams(params, callback);
+    try {
+      const stmt = this._db.prepare(sql);
+      const row = normalized.params === undefined
+        ? stmt.get()
+        : Array.isArray(normalized.params)
+          ? stmt.get(...normalized.params)
+          : stmt.get(normalized.params);
+      if (normalized.callback) return normalized.callback(null, row ?? null);
+      return row ?? null;
+    } catch (err) {
+      if (normalized.callback) return normalized.callback(err);
+      throw err;
+    }
+  }
+
+  all(sql, params, callback) {
+    const normalized = this._normalizeParams(params, callback);
+    try {
+      const stmt = this._db.prepare(sql);
+      const rows = normalized.params === undefined
+        ? stmt.all()
+        : Array.isArray(normalized.params)
+          ? stmt.all(...normalized.params)
+          : stmt.all(normalized.params);
+      if (normalized.callback) return normalized.callback(null, rows ?? []);
+      return rows ?? [];
+    } catch (err) {
+      if (normalized.callback) return normalized.callback(err);
+      throw err;
+    }
+  }
+
+  prepare(sql) {
+    const stmt = this._db.prepare(sql);
+    return {
+      run: (params, callback) => {
+        try {
+          return this._runStatement(stmt, params, callback);
+        } catch (err) {
+          if (callback) return callback(err);
+          throw err;
+        }
+      },
+      get: (params, callback) => {
+        try {
+          const row = params === undefined
+            ? stmt.get()
+            : Array.isArray(params)
+              ? stmt.get(...params)
+              : stmt.get(params);
+          if (callback) return callback(null, row ?? null);
+          return row ?? null;
+        } catch (err) {
+          if (callback) return callback(err);
+          throw err;
+        }
+      },
+      all: (params, callback) => {
+        try {
+          const rows = params === undefined
+            ? stmt.all()
+            : Array.isArray(params)
+              ? stmt.all(...params)
+              : stmt.all(params);
+          if (callback) return callback(null, rows ?? []);
+          return rows ?? [];
+        } catch (err) {
+          if (callback) return callback(err);
+          throw err;
+        }
+      },
+      finalize: (callback) => {
+        if (callback) callback(null);
+      }
+    };
+  }
+
+  serialize(fn) {
+    if (typeof fn === 'function') fn();
+  }
+
+  close(callback) {
+    try {
+      this._db.close();
+      if (callback) callback(null);
+    } catch (err) {
+      if (callback) return callback(err);
+      throw err;
+    }
+  }
+}
+
 class Database {
 
   constructor() {
@@ -24,12 +165,8 @@ class Database {
   init(logger) {
     this.logger = logger ?? this.logger;
     return new Promise((resolve, reject) => {
-      this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'messagedrop.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
-        if (err) {
-          this.logger.error('Failed to open SQLite database.', err);
-          reject(err);
-          return;
-        }
+      try {
+        this.db = new SqliteCompat(path.join(path.dirname(__filename), 'messagedrop.db'));
         this.db.serialize(() => {
           this.db.run('PRAGMA foreign_keys = ON;', [], (pragmaErr) => {
             if (pragmaErr) {
@@ -64,17 +201,24 @@ class Database {
             resolve();
           });
         });
-      });
+      } catch (err) {
+        this.logger.error('Failed to open SQLite database.', err);
+        reject(err);
+      }
     });
   };
 
   close() {
-    this.db.close((err) => {
-      if (err) {
-        return;
-      }
-      this.logger?.info('Close the database connection.');
-    });
+    try {
+      this.db?.close((err) => {
+        if (err) {
+          return;
+        }
+        this.logger?.info('Close the database connection.');
+      });
+    } catch (err) {
+      this.logger?.error?.(err?.message || err);
+    }
   };
 
   initTriggers(logger = this.logger) {
