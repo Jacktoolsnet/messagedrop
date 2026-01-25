@@ -2,6 +2,7 @@
 const webpush = require('web-push');
 const { getEncryptionPrivateKey, getVapidKeys } = require('../utils/keyStore');
 const cryptoUtil = require('../utils/cryptoUtils');
+const tableUser = require('../db/tableUser');
 
 
 const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
@@ -42,7 +43,7 @@ const placeSubscriptions = function (logger, db, lat, lon, userId, message) {
                         };
                         try {
                             const subscription = JSON.parse(row.subscription);
-                            sendNotification(logger, subscription, payload);
+                            sendNotification(logger, db, row.userId, subscription, payload);
                         } catch (parseError) {
                             logger.error('placeSubscriptions: invalid subscription JSON', {
                                 error: parseError?.message,
@@ -98,7 +99,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
                         };
                         try {
                             const subscription = JSON.parse(row.subscription);
-                            sendNotification(logger, subscription, payload);
+                            sendNotification(logger, db, row.userId, subscription, payload);
                         } catch (parseError) {
                             logger.error('contactSubscriptions: invalid subscription JSON', {
                                 error: parseError?.message,
@@ -116,7 +117,7 @@ const contactSubscriptions = function (logger, db, userId, contactUserId, messag
     }
 }
 
-function sendNotification(logger, subscription, payload) {
+function sendNotification(logger, db, userId, subscription, payload) {
     try {
         const { publicKey, privateKey } = getVapidKeys();
         if (!publicKey || !privateKey) {
@@ -134,12 +135,25 @@ function sendNotification(logger, subscription, payload) {
                 logger.info('webpush notification queued', { endpoint: subscription?.endpoint });
             })
             .catch((error) => {
+                const statusCode = error?.statusCode;
                 logger.error('webpush.sendNotification failed', {
                     endpoint: subscription?.endpoint,
-                    statusCode: error?.statusCode,
+                    statusCode,
                     body: error?.body,
                     message: error?.message
                 });
+                if (!db || !userId) {
+                    return;
+                }
+                if ([400, 403, 404, 410].includes(statusCode)) {
+                    tableUser.unsubscribe(db, userId, (err) => {
+                        if (err) {
+                            logger.error('Failed to clear invalid push subscription', { userId, error: err?.message });
+                        } else {
+                            logger.info('Cleared invalid push subscription', { userId, statusCode });
+                        }
+                    });
+                }
             });
     } catch (error) {
         logger.error('sendNotification failed', { error: error?.message, endpoint: subscription?.endpoint });
