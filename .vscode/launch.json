@@ -101,6 +101,20 @@
             "type": "node"
         },
         {
+            "name": "Viator-Service",
+            "program": "${workspaceFolder}/services/viator/app.js",
+            "request": "launch",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "env": {
+                "SERVICE_JWT_ISSUER": "service.viator",
+                "SERVICE_JWT_AUDIENCE": "service.viator",
+                "SERVICE_JWT_TRUSTED_JWKS_PATH": "${workspaceFolder}/services/viator/config/service-jwks.json"
+            },
+            "type": "node"
+        },
+        {
             "name": "Generate Service (T) JWKs",
             "type": "node",
             "request": "launch",

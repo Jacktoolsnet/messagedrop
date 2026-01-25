@@ -1,0 +1,49 @@
+{
+  "name": "messagedrop-nominatim-service",
+  "version": "1.0.0",
+  "description": "Backend service for Messagedrop providing Nominatim geocoding functionality.",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Jacktoolsnet/messagedrop.git"
+  },
+  "keywords": [
+    "messagedrop",
+    "network",
+    "api",
+    "backend"
+  ],
+  "author": "JackTools.Net",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Jacktoolsnet/messagedrop/issues"
+  },
+  "homepage": "https://github.com/Jacktoolsnet/messagedrop#readme",
+  "dependencies": {
+    "axios": "^1.12.2",
+    "bcrypt": "^6.0.0",
+    "body-parser": "^2.2.0",
+    "compression": "^1.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "express-bearer-token": "^3.0.0",
+    "express-rate-limit": "^8.1.0",
+    "geo-tz": "^8.1.4",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "node-cron": "^4.2.1",
+    "sqlite3": "^5.1.7",
+    "winston": "^3.18.3",
+    "winston-daily-rotate-file": "^5.0.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.22.0",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0"
+  }
+}
