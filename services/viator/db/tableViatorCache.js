@@ -17,7 +17,7 @@ const init = function (db) {
       ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
     );
   `;
-  db.run(sql);
+  db.exec(sql);
 };
 
 const setCache = function (db, cacheKey, payload, status, headers, ttlSeconds, callback) {
@@ -27,7 +27,12 @@ const setCache = function (db, cacheKey, payload, status, headers, ttlSeconds, c
     (${columnCacheKey}, ${columnPayload}, ${columnStatus}, ${columnHeaders}, ${columnExpiresAt}, ${columnLastUpdate})
     VALUES (?, ?, ?, ?, ?, datetime('now'));
   `;
-  db.run(sql, [cacheKey, payload, status, headers, expiresAt], callback);
+  try {
+    db.prepare(sql).run(cacheKey, payload, status, headers, expiresAt);
+    if (callback) callback(null);
+  } catch (err) {
+    if (callback) callback(err);
+  }
 };
 
 const getCache = function (db, cacheKey, callback) {
@@ -36,11 +41,13 @@ const getCache = function (db, cacheKey, callback) {
     WHERE ${columnCacheKey} = ?
       AND DATETIME(${columnExpiresAt}) > DATETIME('now');
   `;
-  db.get(sql, [cacheKey], (err, row) => {
-    if (err) return callback(err);
+  try {
+    const row = db.prepare(sql).get(cacheKey);
     if (!row) return callback(null, null);
-    callback(null, row);
-  });
+    return callback(null, row);
+  } catch (err) {
+    return callback(err);
+  }
 };
 
 const cleanExpired = function (db, callback) {
@@ -48,7 +55,12 @@ const cleanExpired = function (db, callback) {
     DELETE FROM ${tableName}
     WHERE DATETIME(${columnExpiresAt}) <= DATETIME('now');
   `;
-  db.run(sql, callback);
+  try {
+    db.prepare(sql).run();
+    if (callback) callback(null);
+  } catch (err) {
+    if (callback) callback(err);
+  }
 };
 
 module.exports = {

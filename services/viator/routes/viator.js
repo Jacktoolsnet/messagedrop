@@ -209,7 +209,7 @@ async function setCachedResponse(db, cacheKey, payload, status, headers, ttlSeco
 router.use(security.checkToken);
 router.use(express.json({ limit: MAX_BODY_BYTES }));
 
-router.all('/*', async (req, res, next) => {
+router.use(async (req, res, next) => {
   const endpoint = getEndpointConfig(req.method, req.path);
   if (!endpoint) {
     return next(buildError(403, 'endpoint_not_allowed'));
