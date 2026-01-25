@@ -83,8 +83,10 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
         const minTemp = Math.min(...temps);
         const maxTemp = Math.max(...temps);
         const { min, max } = this.getHourlyMinMax('temperature');
-        minY = min - min * 0.1;
-        maxY = max + max * 0.1;
+        const minPadding = Math.max(Math.abs(min) * 0.1, 0.5);
+        const maxPadding = Math.max(Math.abs(max) * 0.1, 0.5);
+        minY = min - minPadding;
+        maxY = max + maxPadding;
         dataset = {
           ...dataset,
           data: temps,
