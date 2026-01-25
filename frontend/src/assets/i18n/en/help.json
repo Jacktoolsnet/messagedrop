@@ -26,6 +26,18 @@
         "title": "Action bar",
         "desc": "Use the action bar buttons to close, apply, or confirm."
       },
+      "cancel": {
+        "title": "Cancel",
+        "desc": "Closes the dialog without saving changes."
+      },
+      "apply": {
+        "title": "Apply",
+        "desc": "Closes the dialog and saves your changes."
+      },
+      "help": {
+        "title": "Help",
+        "desc": "Opens the help dialog."
+      },
       "sort": {
         "title": "Sorting",
         "desc": "Drag items to change their order."

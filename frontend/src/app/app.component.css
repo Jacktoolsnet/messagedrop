@@ -84,18 +84,6 @@
     margin-bottom: 2rem;
 }
 
-.person-badge-animate {
-    display: inline-block;
-    animation: person-bounce 0.8s ease-in-out;
-}
-
-@keyframes person-bounce {
-    0% { transform: scale(1) rotate(0deg); }
-    20% { transform: scale(1.08) rotate(-4deg); }
-    45% { transform: scale(0.94) rotate(4deg); }
-    70% { transform: scale(1.04) rotate(-2deg); }
-    100% { transform: scale(1) rotate(0deg); }
-}
 
 .pow-overlay {
     position: fixed;

@@ -26,7 +26,7 @@
 </button>
 } @else {
 <button [matMenuTriggerFor]="userMenu" aria-hidden="false" class="button_profile" mat-fab
-    [attr.aria-label]="'common.aria.userProfile' | transloco" (click)="{}" [@badgePulse]="animateUserBadgeTick()">
+    [attr.aria-label]="'common.aria.userProfile' | transloco" (click)="{}">
     <mat-icon [attr.aria-hidden]="false"
         [matBadge]="userService.isReady() ? (unreadTotalAll() > 0 ? (unreadTotalAll() | shortNumber) : null) : null"
         [matBadgeHidden]="!userService.isReady()" [matBadgeSize]="'medium'" matBadgeColor="primary">person</mat-icon>

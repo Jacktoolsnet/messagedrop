@@ -26,6 +26,18 @@
         "title": "Aktionsleiste",
         "desc": "Nutze die Aktionsleiste zum Schließen, Übernehmen oder Bestätigen."
       },
+      "cancel": {
+        "title": "Abbrechen",
+        "desc": "Schließt den Dialog, ohne Änderungen zu speichern."
+      },
+      "apply": {
+        "title": "Übernehmen",
+        "desc": "Schließt den Dialog und speichert die Änderungen."
+      },
+      "help": {
+        "title": "Hilfe",
+        "desc": "Öffnet den Hilfedialog."
+      },
       "sort": {
         "title": "Sortierung",
         "desc": "Ziehe Einträge, um die Reihenfolge zu ändern."

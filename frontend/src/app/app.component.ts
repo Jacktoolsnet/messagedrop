@@ -1,4 +1,3 @@
-import { animate, keyframes, style, transition, trigger } from '@angular/animations';
 import { formatDate, PlatformLocation } from '@angular/common';
 import { Component, computed, DestroyRef, effect, inject, LOCALE_ID, OnInit, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -110,24 +109,7 @@ import { isQuotaExceededError } from './utils/storage-error.util';
     MatProgressSpinnerModule
   ],
   templateUrl: './app.component.html',
-  styleUrl: './app.component.css',
-  animations: [
-    trigger('badgePulse', [
-      transition('* => *', [
-        animate('1s ease-in-out', keyframes([
-          style({ transform: 'scale(1) rotate(0deg)', offset: 0 }),
-          style({ transform: 'scale(1.18) rotate(-10deg)', offset: 0.1 }),
-          style({ transform: 'scale(0.9) rotate(10deg)', offset: 0.2 }),
-          style({ transform: 'scale(1.16) rotate(-8deg)', offset: 0.3 }),
-          style({ transform: 'scale(0.94) rotate(8deg)', offset: 0.4 }),
-          style({ transform: 'scale(1.1) rotate(-6deg)', offset: 0.55 }),
-          style({ transform: 'scale(0.96) rotate(6deg)', offset: 0.7 }),
-          style({ transform: 'scale(1.04) rotate(-3deg)', offset: 0.85 }),
-          style({ transform: 'scale(1) rotate(0deg)', offset: 1 })
-        ]))
-      ])
-    ])
-  ]
+  styleUrl: './app.component.css'
 })
 
 export class AppComponent implements OnInit {
@@ -197,11 +179,6 @@ export class AppComponent implements OnInit {
   );
   readonly unreadTotalAll = computed(() => this.unreadContactsTotal() + this.unreadSystemNotificationCount());
   readonly maintenanceActive = computed(() => this.networkService.maintenanceInfo()?.enabled ?? false);
-  readonly animateUserBadgeTick = signal<number>(0);
-  private lastUnreadTotal = 0;
-  private badgeAnimationTimer?: ReturnType<typeof setTimeout>;
-  private badgeAnimationRunning = false;
-  private lastLiveMessageId?: string;
   private pendingSharedContent?: SharedContent;
   private lastSharedContentTimestamp?: string;
   private sharedContentDialogOpen = false;
@@ -281,7 +258,6 @@ export class AppComponent implements OnInit {
         this.refreshContactUnreadCounts();
       } else {
         this.unreadContactCounts.set({});
-        this.resetBadgeAnimation();
       }
     });
 
@@ -289,33 +265,6 @@ export class AppComponent implements OnInit {
       const update = this.contactMessageService.unreadCountUpdate();
       if (update) {
         this.unreadContactCounts.update((map) => ({ ...map, [update.contactId]: update.unread }));
-      }
-    });
-
-    effect(() => {
-      if (!this.userService.hasJwt() || !this.appService.isConsentCompleted()) {
-        this.resetBadgeAnimation();
-        this.lastUnreadTotal = 0;
-        return;
-      }
-      const total = this.unreadTotalAll();
-      if (total > this.lastUnreadTotal && !this.badgeAnimationRunning) {
-        this.triggerBadgeAnimation();
-      }
-      this.lastUnreadTotal = total;
-      if (total === 0) {
-        this.resetBadgeAnimation();
-      }
-    });
-
-    effect(() => {
-      const incoming = this.contactMessageService.liveMessages();
-      if (!incoming || !this.userService.hasJwt() || !this.appService.isConsentCompleted()) {
-        return;
-      }
-      if (incoming.id !== this.lastLiveMessageId && incoming.direction === 'contactUser') {
-        this.lastLiveMessageId = incoming.id;
-        this.triggerBadgeAnimation();
       }
     });
 
@@ -395,7 +344,6 @@ export class AppComponent implements OnInit {
     this.contactService.logout();
     this.noteService.logout();
     this.systemNotificationService.reset();
-    this.resetBadgeAnimation();
   }
 
   public connectToBackend(): void {
@@ -446,7 +394,8 @@ export class AppComponent implements OnInit {
       this.exitBackupUnloadInProgress = false;
       this.exitBackupPromptPending = true;
       event.preventDefault();
-      event.returnValue = '';
+      // Required to trigger the native beforeunload prompt in some browsers.
+      (event as BeforeUnloadEvent)['returnValue'] = '';
       if (this.exitBackupPromptTimer) {
         clearTimeout(this.exitBackupPromptTimer);
       }
@@ -1931,23 +1880,4 @@ export class AppComponent implements OnInit {
     this.lastMarkerUpdate = Date.now();
   }
 
-  private resetBadgeAnimation(): void {
-    this.badgeAnimationRunning = false;
-    if (this.badgeAnimationTimer) {
-      clearTimeout(this.badgeAnimationTimer);
-    }
-    this.badgeAnimationTimer = undefined;
-  }
-
-  private triggerBadgeAnimation(): void {
-    if (this.badgeAnimationRunning) {
-      return;
-    }
-    this.badgeAnimationRunning = true;
-    this.animateUserBadgeTick.update((n) => n + 1);
-    this.badgeAnimationTimer = setTimeout(() => {
-      this.badgeAnimationRunning = false;
-      this.badgeAnimationTimer = undefined;
-    }, 1100);
-  }
 }

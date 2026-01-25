@@ -14,6 +14,24 @@ const DEFAULT_HELP_DIALOG_CONFIG = {
   autoFocus: false
 } as const;
 
+const STANDARD_ACTIONS: HelpItem[] = [
+  {
+    icon: 'close',
+    titleKey: 'common.items.cancel.title',
+    descriptionKey: 'common.items.cancel.desc'
+  },
+  {
+    icon: 'check',
+    titleKey: 'common.items.apply.title',
+    descriptionKey: 'common.items.apply.desc'
+  },
+  {
+    icon: 'help',
+    titleKey: 'common.items.help.title',
+    descriptionKey: 'common.items.help.desc'
+  }
+];
+
 const ITEMS = {
   listBasic: [
     {
@@ -21,11 +39,7 @@ const ITEMS = {
       titleKey: 'common.items.selection.title',
       descriptionKey: 'common.items.selection.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   listSort: [
     {
@@ -38,11 +52,7 @@ const ITEMS = {
       titleKey: 'common.items.sort.title',
       descriptionKey: 'common.items.sort.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   sortDialog: [
     {
@@ -50,11 +60,7 @@ const ITEMS = {
       titleKey: 'common.items.sort.title',
       descriptionKey: 'common.items.sort.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   searchList: [
     {
@@ -67,11 +73,7 @@ const ITEMS = {
       titleKey: 'common.items.selection.title',
       descriptionKey: 'common.items.selection.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   searchMap: [
     {
@@ -89,11 +91,7 @@ const ITEMS = {
       titleKey: 'common.items.selection.title',
       descriptionKey: 'common.items.selection.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   editorBasic: [
     {
@@ -101,11 +99,7 @@ const ITEMS = {
       titleKey: 'common.items.content.title',
       descriptionKey: 'common.items.content.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   editorMedia: [
     {
@@ -118,11 +112,7 @@ const ITEMS = {
       titleKey: 'common.items.media.title',
       descriptionKey: 'common.items.media.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   settings: [
     {
@@ -130,11 +120,7 @@ const ITEMS = {
       titleKey: 'common.items.options.title',
       descriptionKey: 'common.items.options.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   info: [
     {
@@ -142,11 +128,7 @@ const ITEMS = {
       titleKey: 'common.items.content.title',
       descriptionKey: 'common.items.content.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   legal: [
     {
@@ -159,11 +141,7 @@ const ITEMS = {
       titleKey: 'common.items.links.title',
       descriptionKey: 'common.items.links.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   chat: [
     {
@@ -171,11 +149,7 @@ const ITEMS = {
       titleKey: 'common.items.chat.title',
       descriptionKey: 'common.items.chat.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   picker: [
     {
@@ -183,11 +157,7 @@ const ITEMS = {
       titleKey: 'common.items.selection.title',
       descriptionKey: 'common.items.selection.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   qr: [
     {
@@ -195,11 +165,7 @@ const ITEMS = {
       titleKey: 'common.items.qr.title',
       descriptionKey: 'common.items.qr.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   scan: [
     {
@@ -207,11 +173,7 @@ const ITEMS = {
       titleKey: 'common.items.scan.title',
       descriptionKey: 'common.items.scan.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   tiles: [
     {
@@ -224,11 +186,7 @@ const ITEMS = {
       titleKey: 'common.items.style.title',
       descriptionKey: 'common.items.style.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ],
   exif: [
     {
@@ -241,11 +199,7 @@ const ITEMS = {
       titleKey: 'common.items.options.title',
       descriptionKey: 'common.items.options.desc'
     },
-    {
-      icon: 'check_circle',
-      titleKey: 'common.items.actions.title',
-      descriptionKey: 'common.items.actions.desc'
-    }
+    ...STANDARD_ACTIONS
   ]
 } as const satisfies Record<string, HelpItem[]>;
 
