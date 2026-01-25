@@ -42,8 +42,12 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedDayIndex'] || changes['selectedHour'] || changes['tile'] || changes['weather']) {
+    if (changes['selectedDayIndex'] || changes['tile'] || changes['weather']) {
       this.updateChart();
+      return;
+    }
+    if (changes['selectedHour'] && !changes['selectedHour'].firstChange) {
+      this.moveSelectedHourAnnotation();
     }
   }
 
@@ -313,6 +317,82 @@ export class WeatherDetailComponent implements OnChanges, AfterViewInit {
       this.chart.options = this.chartOptions;
       this.chart.update();
     }
+  }
+
+  private moveSelectedHourAnnotation(): void {
+    if (!this.chart || !this.tile) {
+      return;
+    }
+
+    const labels = Array.isArray(this.chartData.labels) ? this.chartData.labels : [];
+    if (!labels.length) {
+      return;
+    }
+
+    const selectedHourStr = this.selectedHour.toString().padStart(2, '0');
+    let selectedIndex = labels.findIndex((label) => {
+      return typeof label === 'string' && label.startsWith(`${selectedHourStr}:`);
+    });
+    if (selectedIndex === -1) {
+      selectedIndex = Math.min(this.selectedHour, labels.length - 1);
+    }
+
+    const labelValue = labels[selectedIndex];
+    const label = (typeof labelValue === 'string' ? labelValue : `${selectedHourStr}:00`).toString();
+    const rawValue = this.chartData.datasets?.[0]?.data?.[selectedIndex];
+    const numericValue = typeof rawValue === 'number' ? rawValue : Number(rawValue ?? 0);
+    const color = getWeatherBaseColor(this.tile.type, numericValue);
+
+    const annotations = this.ensureAnnotationConfig();
+    const annotationKey = 'selectedHour';
+    const existing = annotations[annotationKey];
+
+    if (!existing) {
+      annotations[annotationKey] = {
+        type: 'line',
+        xMin: label,
+        xMax: label,
+        yMin: numericValue,
+        yMax: numericValue + 0.01,
+        borderColor: color,
+        borderWidth: 3,
+        label: {
+          display: true,
+          content: `${label}: ${numericValue}${this.getSelectedChartUnit()}`,
+          backgroundColor: color,
+          color: '#000000',
+          position: 'start'
+        }
+      };
+    } else {
+      existing.xMin = label;
+      existing.xMax = label;
+      existing.yMin = numericValue;
+      existing.yMax = numericValue + 0.01;
+      existing.label ??= {
+        display: true,
+        content: '',
+        backgroundColor: color,
+        color: '#000000',
+        position: 'start'
+      };
+      existing.label.content = `${label}: ${numericValue}${this.getSelectedChartUnit()}`;
+      existing.label.backgroundColor = color;
+    }
+
+    this.chart.update('none');
+  }
+
+  private ensureAnnotationConfig(): Record<string, AnnotationOptions<'line'>> {
+    if (!this.chart) {
+      return {};
+    }
+    const plugins = (this.chart.options.plugins ??= {});
+    const annotationOptions = (plugins.annotation ??= { annotations: {} });
+    if (Array.isArray(annotationOptions.annotations) || !annotationOptions.annotations) {
+      annotationOptions.annotations = {};
+    }
+    return annotationOptions.annotations as Record<string, AnnotationOptions<'line'>>;
   }
 
   /*private getHourIndex(time: string): number {

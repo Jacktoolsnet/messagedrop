@@ -68,7 +68,7 @@
         <button mat-mini-fab color="accent" (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
           <mat-icon>chevron_left</mat-icon>
         </button>
-        <button mat-mini-fab color="primary" (click)="selectedTile = null">
+        <button mat-mini-fab color="primary" (click)="clearSelectedTile()">
           <mat-icon>close</mat-icon>
         </button>
         <button mat-mini-fab color="accent" (click)="selectNextTile()" [disabled]="tileIndex === tiles().length - 1">

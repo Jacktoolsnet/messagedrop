@@ -62,7 +62,7 @@
         <button mat-mini-fab (click)="selectPreviousTile()" [disabled]="tileIndex === 0">
             <mat-icon>chevron_left</mat-icon>
         </button>
-        <button mat-mini-fab (click)="selectedTile = null">
+        <button mat-mini-fab (click)="clearSelectedTile()">
             <mat-icon>close</mat-icon>
         </button>
         <button mat-mini-fab (click)="selectNextTile()" [disabled]="tileIndex === allKeys().length - 1">

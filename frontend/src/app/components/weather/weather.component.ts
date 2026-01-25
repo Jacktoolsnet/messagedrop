@@ -125,6 +125,13 @@ export class WeatherComponent implements OnInit {
   }
 
   onHourChange(): void {
+    if (!this.selectedTile) {
+      this.updateTiles();
+    }
+  }
+
+  clearSelectedTile(): void {
+    this.selectedTile = null;
     this.updateTiles();
   }
 
