@@ -208,14 +208,7 @@ export class UserService {
               this.loginUser(this.user.id, challengeResponse.challenge, signature, true)
             );
             this.setUser(this.user, loginResponse.jwt);
-            if (Notification.permission === "granted") {
-              if (this.getUser().subscription !== '') {
-                this.indexedDbService.setSetting('subscription', this.getUser().subscription);
-              } else {
-                this.indexedDbService.deleteSetting('subscription');
-                this.registerSubscription(this.getUser());
-              }
-            }
+            void this.ensurePushSubscription(this.getUser());
 
             const dialogRef = this.displayMessage.open(DisplayMessage, {
               panelClass: '',
@@ -674,7 +667,82 @@ export class UserService {
       );
   }
 
+  private arrayBufferToBase64Url(buffer: ArrayBuffer): string {
+    const bytes = new Uint8Array(buffer);
+    let binary = '';
+    for (const byte of bytes) {
+      binary += String.fromCharCode(byte);
+    }
+    return btoa(binary)
+      .replace(/\+/g, '-')
+      .replace(/\//g, '_')
+      .replace(/=+$/, '');
+  }
+
+  private async ensurePushSubscription(user: User): Promise<void> {
+    if (!this.swPush.isEnabled) {
+      return;
+    }
+
+    const permission = Notification.permission;
+    if (permission === 'denied') {
+      if (user.subscription) {
+        user.subscription = '';
+        void this.saveUser();
+      }
+      this.indexedDbService.deleteSetting('subscription');
+      return;
+    }
+
+    let publicKey: string;
+    try {
+      publicKey = await this.getVapidPublicKey();
+    } catch {
+      return;
+    }
+
+    let currentSubscription: PushSubscription | null = null;
+    try {
+      currentSubscription = await firstValueFrom(this.swPush.subscription.pipe(take(1)));
+    } catch {
+      currentSubscription = null;
+    }
+
+    if (!currentSubscription) {
+      if (permission === 'default' || permission === 'granted') {
+        await this.registerSubscription(user);
+      }
+      return;
+    }
+
+    const serverKey = currentSubscription.options?.applicationServerKey
+      ? this.arrayBufferToBase64Url(currentSubscription.options.applicationServerKey)
+      : '';
+    if (serverKey && serverKey !== publicKey) {
+      try {
+        await currentSubscription.unsubscribe();
+      } catch (err) {
+        console.error('Failed to unsubscribe outdated push subscription', err);
+      }
+      await this.registerSubscription(user);
+      return;
+    }
+
+    const subscriptionJson = JSON.stringify(currentSubscription);
+    user.subscription = subscriptionJson;
+    void this.saveUser();
+    this.indexedDbService.setSetting('subscription', subscriptionJson);
+    this.subscribe(user, subscriptionJson).subscribe({
+      error: (err) => {
+        console.error('Failed to sync push subscription', err);
+      }
+    });
+  }
+
   async registerSubscription(user: User): Promise<void> {
+    if (!this.swPush.isEnabled || Notification.permission === 'denied') {
+      return;
+    }
     let publicKey: string;
     try {
       publicKey = await this.getVapidPublicKey();
@@ -1168,14 +1236,7 @@ export class UserService {
     const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, true));
     await this.restoreServerFromIndexedDb(user, loginResponse.jwt);
     this.setUser(user, loginResponse.jwt);
-    if (Notification.permission === "granted") {
-      if (this.getUser().subscription !== '') {
-        this.indexedDbService.setSetting('subscription', this.getUser().subscription);
-      } else {
-        this.indexedDbService.deleteSetting('subscription');
-        this.registerSubscription(this.getUser());
-      }
-    }
+    void this.ensurePushSubscription(this.getUser());
     if (afterLogin) {
       afterLogin();
     }
@@ -1571,14 +1632,7 @@ export class UserService {
               .subscribe({
                 next: (loginResponse: UserLoginResponse) => {
                   this.setUser(user, loginResponse.jwt);
-                  if (Notification.permission === "granted") {
-                    if (this.getUser().subscription !== '') {
-                      this.indexedDbService.setSetting('subscription', this.getUser().subscription);
-                    } else {
-                      this.indexedDbService.deleteSetting('subscription');
-                      this.registerSubscription(this.getUser());
-                    }
-                  }
+                  void this.ensurePushSubscription(this.getUser());
                   if (requireJwt) {
                     runCallback();
                   }
@@ -1776,14 +1830,7 @@ export class UserService {
       );
       const loginResponse = await firstValueFrom(this.loginUser(user.id, challengeResponse.challenge, signature, showAlways));
       this.setUser(user, loginResponse.jwt);
-      if (Notification.permission === "granted") {
-        if (this.getUser().subscription !== '') {
-          this.indexedDbService.setSetting('subscription', this.getUser().subscription);
-        } else {
-          this.indexedDbService.deleteSetting('subscription');
-          this.registerSubscription(this.getUser());
-        }
-      }
+      void this.ensurePushSubscription(this.getUser());
       if (options?.afterLogin) {
         options.afterLogin();
       }
