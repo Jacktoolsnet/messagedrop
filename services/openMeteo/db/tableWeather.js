@@ -10,19 +10,30 @@ const init = function (db) {
             ${columnWeatherData} TEXT,
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );`;
-    db.run(sql);
+    db.exec(sql);
 };
 
 const setWeatherData = function (db, cacheKey, weatherData, callback) {
     const sql = `
         INSERT OR REPLACE INTO ${tableName} (${columnCacheKey}, ${columnWeatherData}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));`;
-    db.run(sql, [cacheKey, weatherData], callback);
+    try {
+        db.prepare(sql).run(cacheKey, weatherData);
+        if (callback) callback(null);
+    } catch (err) {
+        if (callback) callback(err);
+    }
 };
 
 const getWeatherData = function (db, cacheKey, callback) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnCacheKey} = ?;`;
-    db.get(sql, [cacheKey], callback);
+    try {
+        const row = db.prepare(sql).get(cacheKey);
+        if (!row) return callback(null, null);
+        return callback(null, row);
+    } catch (err) {
+        return callback(err);
+    }
 };
 
 const cleanExpired = function (db, callback) {
@@ -30,7 +41,12 @@ const cleanExpired = function (db, callback) {
         DELETE FROM ${tableName}
         WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-1 hour');
     `;
-    db.run(sql, callback);
+    try {
+        db.prepare(sql).run();
+        if (callback) callback(null);
+    } catch (err) {
+        if (callback) callback(err);
+    }
 };
 
 module.exports = {

@@ -10,19 +10,30 @@ const init = function (db) {
             ${columnHistoryData} TEXT,
             ${columnLastUpdate} DATETIME DEFAULT CURRENT_TIMESTAMP
         );`;
-    db.run(sql);
+    db.exec(sql);
 };
 
 const setHistoryData = function (db, cacheKey, historyData, callback) {
     const sql = `
         INSERT OR REPLACE INTO ${tableName} (${columnCacheKey}, ${columnHistoryData}, ${columnLastUpdate})
         VALUES (?, ?, datetime('now'));`;
-    db.run(sql, [cacheKey, historyData], callback);
+    try {
+        db.prepare(sql).run(cacheKey, historyData);
+        if (callback) callback(null);
+    } catch (err) {
+        if (callback) callback(err);
+    }
 };
 
 const getHistoryData = function (db, cacheKey, callback) {
     const sql = `SELECT * FROM ${tableName} WHERE ${columnCacheKey} = ?;`;
-    db.get(sql, [cacheKey], callback);
+    try {
+        const row = db.prepare(sql).get(cacheKey);
+        if (!row) return callback(null, null);
+        return callback(null, row);
+    } catch (err) {
+        return callback(err);
+    }
 };
 
 const cleanExpired = function (db, callback) {
@@ -30,7 +41,12 @@ const cleanExpired = function (db, callback) {
         DELETE FROM ${tableName}
         WHERE DATETIME(${columnLastUpdate}) < DATETIME('now', '-7 day');
     `;
-    db.run(sql, callback);
+    try {
+        db.prepare(sql).run();
+        if (callback) callback(null);
+    } catch (err) {
+        if (callback) callback(err);
+    }
 };
 
 module.exports = {
