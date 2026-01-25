@@ -23,7 +23,7 @@
     </mat-button-toggle-group>
 
     <!-- TILE GRID -->
-    <div class="tile-scroll">
+    <div class="tile-scroll" [class.detail-open]="selectedTile">
       @if (!selectedTile) {
         <div class="tile-grid">
           @for (tile of tiles(); track tile.type) {

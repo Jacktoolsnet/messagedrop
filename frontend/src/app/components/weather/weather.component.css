@@ -53,6 +53,12 @@
     padding-right: 0.5rem;
 }
 
+.tile-scroll.detail-open {
+    overflow: hidden;
+    max-height: none;
+    display: flex;
+}
+
 .sticky-actions {
     margin-top: auto;
 }
@@ -65,6 +71,11 @@
     .tile-scroll {
         flex: 0 1 auto;
         max-height: 60vh;
+    }
+
+    .tile-scroll.detail-open {
+        flex: 1 1 auto;
+        max-height: none;
     }
 }
 

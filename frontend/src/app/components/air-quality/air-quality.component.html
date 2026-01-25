@@ -21,7 +21,7 @@
         }
     </mat-button-toggle-group>
 
-    <div class="tile-scroll">
+    <div class="tile-scroll" [class.detail-open]="selectedTile">
         @if (!selectedTile) {
         <div class="tile-grid">
             @for (tile of tileValues(); track tile.label) {
