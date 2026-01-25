@@ -45,7 +45,7 @@ function createForwarder({ baseUrl, token, audience, source }) {
   return (level, message) => {
     const file = getCallerFile();
     const body = {
-      source: source || 'nominatim-service',
+      source: source || 'viator-service',
       file,
       message: typeof message === 'string' ? message : JSON.stringify(message),
       createdAt: Date.now()

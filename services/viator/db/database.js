@@ -1,7 +1,6 @@
 const path = require('path');
 const sqlite3 = require('sqlite3').verbose();
-const tableNominatimCache = require('./tableNominatimCache');
-const tableGeoSearch = require('./tableGeoSearch');
+const tableViatorCache = require('./tableViatorCache');
 
 
 class Database {
@@ -13,7 +12,7 @@ class Database {
 
   init(logger) {
     this.logger = logger ?? console;
-    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'nominatim.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
+    this.db = new sqlite3.Database(path.join(path.dirname(__filename), 'viator.db'), sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE, (err) => {
       if (err) {
         return;
       } else {
@@ -23,8 +22,7 @@ class Database {
           }
         });
 
-        tableNominatimCache.init(this.db);
-        tableGeoSearch.init(this.db);
+        tableViatorCache.init(this.db);
 
         // Trigger initialisieren
         this.initTriggers();

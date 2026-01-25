@@ -20,8 +20,7 @@ const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder'
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
 
 // Tables für Cron-Jobs
-const tableNominatimCache = require('./db/tableNominatimCache.js');
-const tableGeoSearch = require('./db/tableGeoSearch');
+const tableViatorCache = require('./db/tableViatorCache');
 
 // ExpressJs
 const express = require('express');
@@ -233,13 +232,7 @@ app.use(errorHandler);
 // * * * * * *
 // Clean long cached data.
 cron.schedule('5 0 * * *', () => {
-  tableNominatimCache.cleanExpired(database.db, function (err) {
-    if (err) {
-      logger.error(err);
-    }
-  });
-
-  tableGeoSearch.cleanExpired(database.db, function (err) {
+  tableViatorCache.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);
     }
