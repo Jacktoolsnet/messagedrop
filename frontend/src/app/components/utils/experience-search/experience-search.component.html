@@ -1,18 +1,21 @@
-<h2 mat-dialog-title class="dialog-title">
-  <mat-icon class="dialog-title__icon" aria-hidden="true">local_activity</mat-icon>
-  <span class="dialog-title__text">{{ 'common.experiences.title' | transloco }}</span>
-</h2>
-
 <mat-dialog-content class="experience-dialog-content">
   <div class="experience-scroll">
-    <div class="experience-layout">
-      <aside class="filters-panel">
-        <div class="filters">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.searchPlaceholder' | transloco }}</mat-label>
-            <input matInput type="search" [formControl]="form.controls.term" />
-          </mat-form-field>
+    <div class="search-bar">
+      <input type="search" enterkeyhint="search" [formControl]="form.controls.term" (keyup.enter)="onSearch()"
+        [placeholder]="'common.experiences.searchPlaceholder' | transloco" />
+      <button type="button" class="filter-button" (click)="toggleFilters()"
+        [attr.aria-label]="'common.actions.more' | transloco">
+        <mat-icon>tune</mat-icon>
+      </button>
+      <button type="button" class="search-button" (click)="onSearch()" [disabled]="loading() || !canSearch()"
+        [attr.aria-label]="'common.experiences.search' | transloco">
+        <mat-icon>search</mat-icon>
+      </button>
+    </div>
 
+    @if (filtersOpen()) {
+      <div class="filters-panel">
+        <div class="filters">
           <mat-form-field appearance="outline">
             <mat-label>{{ 'common.experiences.dateFrom' | transloco }}</mat-label>
             <input matInput type="date" [formControl]="form.controls.startDate" />
@@ -58,73 +61,68 @@
           </mat-form-field>
         </div>
 
-        <div class="actions">
-          <button mat-flat-button color="primary" type="button" (click)="onSearch()" [disabled]="loading() || !canSearch()">
-            <mat-icon>search</mat-icon>
-            {{ 'common.experiences.search' | transloco }}
-          </button>
+        <div class="filters-actions">
           <button mat-stroked-button type="button" (click)="onReset()" [disabled]="loading()">
             {{ 'common.experiences.reset' | transloco }}
           </button>
         </div>
-      </aside>
+      </div>
+    }
 
-      <section class="results-panel">
+    <section class="results-panel">
+      @if (viewMode() === 'map') {
+        <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3">
+        </app-search-settings-map-preview>
+      }
 
-        @if (viewMode() === 'map') {
-          <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3">
-          </app-search-settings-map-preview>
-        }
-
-        @if (viewMode() === 'list') {
-          <div class="results" role="list">
-            @for (result of results(); track result.trackId) {
-              <article class="result-card" role="listitem" [class.result-card--selected]="selectedResult()?.trackId === result.trackId">
-                @if (result.imageUrl) {
-                  <img class="result-image" [src]="result.imageUrl" [alt]="result.title || result.productCode || ''" />
-                }
-                <div class="result-content">
-                  <div class="result-header">
-                    <h3 class="result-title">{{ result.title || result.productCode }}</h3>
-                    @if (result.duration) {
-                      <span class="result-duration">{{ result.duration }}</span>
-                    }
-                  </div>
-                  @if (result.description) {
-                    <p class="result-description">{{ result.description }}</p>
+      @if (viewMode() === 'list') {
+        <div class="results" role="list">
+          @for (result of results(); track result.trackId) {
+            <article class="result-card" role="listitem" [class.result-card--selected]="selectedResult()?.trackId === result.trackId">
+              @if (result.imageUrl) {
+                <img class="result-image" [src]="result.imageUrl" [alt]="result.title || result.productCode || ''" />
+              }
+              <div class="result-content">
+                <div class="result-header">
+                  <h3 class="result-title">{{ result.title || result.productCode }}</h3>
+                  @if (result.duration) {
+                    <span class="result-duration">{{ result.duration }}</span>
                   }
-                  <div class="result-meta">
-                    @if (getRatingLabel(result)) {
-                      <span class="meta-item">★ {{ getRatingLabel(result) }}</span>
-                    }
-                    @if (getPriceLabel(result)) {
-                      <span class="meta-item">{{ getPriceLabel(result) }}</span>
-                    }
-                  </div>
-                  <div class="result-actions">
-                    <button mat-stroked-button type="button" (click)="onOpen(result)" [disabled]="!result.productUrl"
-                      [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
-                      {{ 'common.experiences.openOn' | transloco : { provider: 'Viator' } }}
-                    </button>
-                    <button mat-flat-button color="primary" type="button" (click)="onSelect(result)">
-                      {{ 'common.experiences.select' | transloco }}
-                    </button>
-                  </div>
                 </div>
-              </article>
-            }
-          </div>
-
-          @if (canLoadMore()) {
-            <div class="load-more">
-              <button mat-stroked-button type="button" (click)="onLoadMore()">
-                {{ 'common.experiences.loadMore' | transloco }}
-              </button>
-            </div>
+                @if (result.description) {
+                  <p class="result-description">{{ result.description }}</p>
+                }
+                <div class="result-meta">
+                  @if (getRatingLabel(result)) {
+                    <span class="meta-item">★ {{ getRatingLabel(result) }}</span>
+                  }
+                  @if (getPriceLabel(result)) {
+                    <span class="meta-item">{{ getPriceLabel(result) }}</span>
+                  }
+                </div>
+                <div class="result-actions">
+                  <button mat-stroked-button type="button" (click)="onOpen(result)" [disabled]="!result.productUrl"
+                    [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+                    {{ 'common.experiences.openOn' | transloco : { provider: 'Viator' } }}
+                  </button>
+                  <button mat-flat-button color="primary" type="button" (click)="onSelect(result)">
+                    {{ 'common.experiences.select' | transloco }}
+                  </button>
+                </div>
+              </div>
+            </article>
           }
+        </div>
+
+        @if (canLoadMore()) {
+          <div class="load-more">
+            <button mat-stroked-button type="button" (click)="onLoadMore()">
+              {{ 'common.experiences.loadMore' | transloco }}
+            </button>
+          </div>
         }
-      </section>
-    </div>
+      }
+    </section>
   </div>
 </mat-dialog-content>
 

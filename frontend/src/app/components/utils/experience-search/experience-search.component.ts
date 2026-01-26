@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, outpu
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
+import { MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -68,7 +68,6 @@ export interface ExperienceResult {
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
-    MatDialogTitle,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
@@ -124,6 +123,7 @@ export class ExperienceSearchComponent {
   readonly hasSearched = signal(false);
   readonly viewMode = signal<'map' | 'list'>('map');
   readonly selectedResult = signal<ExperienceResult | null>(null);
+  readonly filtersOpen = signal(false);
   readonly worldCenter: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
   readonly canSearch = computed(() => {
@@ -188,6 +188,10 @@ export class ExperienceSearchComponent {
 
   toggleViewMode(): void {
     this.viewMode.update((mode) => (mode === 'map' ? 'list' : 'map'));
+  }
+
+  toggleFilters(): void {
+    this.filtersOpen.update((open) => !open);
   }
 
   onOpen(result: ExperienceResult): void {
