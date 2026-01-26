@@ -792,6 +792,37 @@
         "health": "Salud"
       }
     },
+    "viator": {
+      "title": "Servicio Viator",
+      "loading": "Buscando en Viator..."
+    },
+    "experiences": {
+      "title": "Experiencias",
+      "provider": "Proveedor",
+      "searchPlaceholder": "¿Qué quieres hacer?",
+      "destinationPlaceholder": "ID de destino",
+      "dateFrom": "Desde",
+      "dateTo": "Hasta",
+      "minPrice": "Precio mínimo",
+      "maxPrice": "Precio máximo",
+      "minDuration": "Duración mínima (h)",
+      "maxDuration": "Duración máxima (h)",
+      "tags": "IDs de etiqueta (separados por comas)",
+      "currency": "Moneda",
+      "sort": "Ordenar",
+      "sortRelevance": "Relevancia",
+      "sortRating": "Valoración",
+      "sortPriceLow": "Precio: menor a mayor",
+      "sortPriceHigh": "Precio: mayor a menor",
+      "search": "Buscar",
+      "reset": "Restablecer",
+      "noResults": "No se encontraron experiencias.",
+      "openOn": "Abrir en {{ provider }}",
+      "select": "Seleccionar",
+      "loadMore": "Cargar más",
+      "searchFailed": "La búsqueda falló. Inténtalo de nuevo.",
+      "providerNotAvailable": "El proveedor seleccionado no está disponible."
+    },
     "searchSettings": {
       "title": "Ajustes de búsqueda",
       "toggle": "Activar búsqueda",

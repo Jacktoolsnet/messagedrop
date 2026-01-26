@@ -792,6 +792,37 @@
         "health": "Health"
       }
     },
+    "viator": {
+      "title": "Viator service",
+      "loading": "Searching Viator..."
+    },
+    "experiences": {
+      "title": "Experiences",
+      "provider": "Provider",
+      "searchPlaceholder": "What do you want to do?",
+      "destinationPlaceholder": "Destination ID",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "minPrice": "Min price",
+      "maxPrice": "Max price",
+      "minDuration": "Min duration (h)",
+      "maxDuration": "Max duration (h)",
+      "tags": "Tag IDs (comma-separated)",
+      "currency": "Currency",
+      "sort": "Sort",
+      "sortRelevance": "Relevance",
+      "sortRating": "Rating",
+      "sortPriceLow": "Price: low to high",
+      "sortPriceHigh": "Price: high to low",
+      "search": "Search",
+      "reset": "Reset",
+      "noResults": "No experiences found.",
+      "openOn": "Open on {{ provider }}",
+      "select": "Select",
+      "loadMore": "Load more",
+      "searchFailed": "Search failed. Please try again.",
+      "providerNotAvailable": "Selected provider is not available."
+    },
     "searchSettings": {
       "title": "Search settings",
       "toggle": "Enable search",

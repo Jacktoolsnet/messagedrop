@@ -1,0 +1,146 @@
+<div class="experience-search">
+  <div class="filters">
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.provider' | transloco }}</mat-label>
+      <mat-select [formControl]="form.controls.provider">
+        <mat-option value="viator">{{ 'common.viator.title' | transloco }}</mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.searchPlaceholder' | transloco }}</mat-label>
+      <input matInput type="search" [formControl]="form.controls.term" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.destinationPlaceholder' | transloco }}</mat-label>
+      <input matInput type="text" [formControl]="form.controls.destination" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.dateFrom' | transloco }}</mat-label>
+      <input matInput type="date" [formControl]="form.controls.startDate" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
+      <input matInput type="date" [formControl]="form.controls.endDate" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.minPrice' | transloco }}</mat-label>
+      <input matInput type="number" min="0" [formControl]="form.controls.minPrice" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.maxPrice' | transloco }}</mat-label>
+      <input matInput type="number" min="0" [formControl]="form.controls.maxPrice" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.minDuration' | transloco }}</mat-label>
+      <input matInput type="number" min="0" [formControl]="form.controls.minDurationHours" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.maxDuration' | transloco }}</mat-label>
+      <input matInput type="number" min="0" [formControl]="form.controls.maxDurationHours" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.tags' | transloco }}</mat-label>
+      <input matInput type="text" [formControl]="form.controls.tagIds" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.currency' | transloco }}</mat-label>
+      <input matInput type="text" [formControl]="form.controls.currency" />
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
+      <mat-label>{{ 'common.experiences.sort' | transloco }}</mat-label>
+      <mat-select [formControl]="form.controls.sort">
+        @for (option of sortOptions; track option.value) {
+          <mat-option [value]="option.value">{{ option.labelKey | transloco }}</mat-option>
+        }
+      </mat-select>
+    </mat-form-field>
+  </div>
+
+  <div class="actions">
+    <button mat-flat-button color="primary" type="button" (click)="onSearch()" [disabled]="loading() || !canSearch()">
+      <mat-icon>search</mat-icon>
+      {{ 'common.experiences.search' | transloco }}
+    </button>
+    <button mat-stroked-button type="button" (click)="onReset()" [disabled]="loading()">
+      {{ 'common.experiences.reset' | transloco }}
+    </button>
+  </div>
+
+  <div class="status">
+    @if (loading()) {
+      <div class="loading">
+        <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+        <span>{{ 'common.viator.loading' | transloco }}</span>
+      </div>
+    }
+
+    @if (!loading() && errorMessage()) {
+      <div class="error" role="alert">
+        {{ errorMessage() }}
+      </div>
+    }
+
+    @if (showEmptyState()) {
+      <div class="empty">
+        {{ 'common.experiences.noResults' | transloco }}
+      </div>
+    }
+  </div>
+
+  <div class="results" role="list">
+    @for (result of results(); track result.trackId) {
+      <article class="result-card" role="listitem">
+        @if (result.imageUrl) {
+          <img class="result-image" [src]="result.imageUrl" [alt]="result.title || result.productCode || ''" />
+        }
+        <div class="result-content">
+          <div class="result-header">
+            <h3 class="result-title">{{ result.title || result.productCode }}</h3>
+            @if (result.duration) {
+              <span class="result-duration">{{ result.duration }}</span>
+            }
+          </div>
+          @if (result.description) {
+            <p class="result-description">{{ result.description }}</p>
+          }
+          <div class="result-meta">
+            @if (getRatingLabel(result)) {
+              <span class="meta-item">★ {{ getRatingLabel(result) }}</span>
+            }
+            @if (getPriceLabel(result)) {
+              <span class="meta-item">{{ getPriceLabel(result) }}</span>
+            }
+          </div>
+          <div class="result-actions">
+            <button mat-stroked-button type="button" (click)="onOpen(result)" [disabled]="!result.productUrl"
+              [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+              {{ 'common.experiences.openOn' | transloco : { provider: 'Viator' } }}
+            </button>
+            <button mat-flat-button color="primary" type="button" (click)="onSelect(result)">
+              {{ 'common.experiences.select' | transloco }}
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </div>
+
+  @if (canLoadMore()) {
+    <div class="load-more">
+      <button mat-stroked-button type="button" (click)="onLoadMore()">
+        {{ 'common.experiences.loadMore' | transloco }}
+      </button>
+    </div>
+  }
+</div>

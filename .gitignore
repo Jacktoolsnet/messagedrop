@@ -153,3 +153,6 @@ services/*/config/service-jwks.json
 
 # admin backend uploads
 platform/admin/backend/uploads/
+
+# local documents (e.g., downloaded API docs)
+documents/

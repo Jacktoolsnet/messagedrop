@@ -26,6 +26,7 @@ const ALLOWED_ENDPOINTS = [
   { method: 'GET', pattern: /^\/products\/tags$/, cacheTtl: CACHE_TTLS.tags },
   { method: 'GET', pattern: /^\/products\/search$/, cacheTtl: CACHE_TTLS.productsSearch },
   { method: 'POST', pattern: /^\/products\/search$/, cacheTtl: CACHE_TTLS.productsSearch },
+  { method: 'POST', pattern: /^\/search\/freetext$/, cacheTtl: CACHE_TTLS.productsSearch },
   { method: 'GET', pattern: /^\/products\/[^/]+$/, cacheTtl: CACHE_TTLS.productDetail },
   { method: 'GET', pattern: /^\/attractions\/search$/, cacheTtl: CACHE_TTLS.attractionsSearch },
   { method: 'POST', pattern: /^\/attractions\/search$/, cacheTtl: CACHE_TTLS.attractionsSearch },
