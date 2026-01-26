@@ -27,45 +27,84 @@
     </mat-menu>
     <mat-menu #filterMenu="matMenu">
       <div class="filter-menu-content" (click)="$event.stopPropagation()">
-        <div class="filters">
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.dateFrom' | transloco }}</mat-label>
-            <input matInput type="date" [formControl]="form.controls.startDate" />
-          </mat-form-field>
+        <div class="filter-tiles">
+          <section class="filter-tile">
+            <div class="tile-header">
+              <mat-icon>event</mat-icon>
+              <span>{{ 'common.experiences.dateFrom' | transloco }} / {{ 'common.experiences.dateTo' | transloco }}</span>
+            </div>
+            <div class="tile-body tile-grid">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'common.experiences.dateFrom' | transloco }}</mat-label>
+                <input matInput [matDatepicker]="startPicker" [formControl]="form.controls.startDate" />
+                <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                <mat-datepicker #startPicker></mat-datepicker>
+              </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
-            <input matInput type="date" [formControl]="form.controls.endDate" />
-          </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
+                <input matInput [matDatepicker]="endPicker" [formControl]="form.controls.endDate" />
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+              </mat-form-field>
+            </div>
+          </section>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.minPrice' | transloco }}</mat-label>
-            <input matInput type="number" min="0" [formControl]="form.controls.minPrice" />
-          </mat-form-field>
+          <section class="filter-tile">
+            <div class="tile-header">
+              <mat-icon>payments</mat-icon>
+              <span>{{ 'common.experiences.minPrice' | transloco }} / {{ 'common.experiences.maxPrice' | transloco }}</span>
+            </div>
+            <div class="tile-body">
+              <div class="slider-block">
+                <mat-slider [min]="priceRange.min" [max]="priceRange.max" [step]="priceRange.step" thumbLabel tickInterval="0">
+                  <input matSliderStartThumb [formControl]="form.controls.minPrice" />
+                  <input matSliderEndThumb [formControl]="form.controls.maxPrice" />
+                </mat-slider>
+                <div class="slider-values">
+                  <span>{{ form.controls.minPrice.value }}</span>
+                  <span>{{ form.controls.maxPrice.value }}</span>
+                </div>
+              </div>
+            </div>
+          </section>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.maxPrice' | transloco }}</mat-label>
-            <input matInput type="number" min="0" [formControl]="form.controls.maxPrice" />
-          </mat-form-field>
+          <section class="filter-tile">
+            <div class="tile-header">
+              <mat-icon>schedule</mat-icon>
+              <span>{{ 'common.experiences.minDuration' | transloco }} / {{ 'common.experiences.maxDuration' | transloco }}</span>
+            </div>
+            <div class="tile-body">
+              <div class="slider-block">
+                <mat-slider [min]="durationRange.min" [max]="durationRange.max" [step]="durationRange.step" thumbLabel tickInterval="0">
+                  <input matSliderStartThumb [formControl]="form.controls.minDurationHours" />
+                  <input matSliderEndThumb [formControl]="form.controls.maxDurationHours" />
+                </mat-slider>
+                <div class="slider-values">
+                  <span>{{ form.controls.minDurationHours.value }} h</span>
+                  <span>{{ form.controls.maxDurationHours.value }} h</span>
+                </div>
+              </div>
+            </div>
+          </section>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.minDuration' | transloco }}</mat-label>
-            <input matInput type="number" min="0" [formControl]="form.controls.minDurationHours" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.maxDuration' | transloco }}</mat-label>
-            <input matInput type="number" min="0" [formControl]="form.controls.maxDurationHours" />
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.currency' | transloco }}</mat-label>
-            <input matInput type="text" [formControl]="form.controls.currency" />
-          </mat-form-field>
+          <section class="filter-tile">
+            <div class="tile-header">
+              <mat-icon>paid</mat-icon>
+              <span>{{ 'common.experiences.currency' | transloco }}</span>
+            </div>
+            <div class="tile-body">
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'common.experiences.currency' | transloco }}</mat-label>
+                <input matInput type="text" [formControl]="form.controls.currency" />
+              </mat-form-field>
+            </div>
+          </section>
         </div>
 
         <div class="filters-actions">
           <button mat-stroked-button type="button" (click)="onReset()" [disabled]="loading()">
+            <mat-icon>restart_alt</mat-icon>
             {{ 'common.experiences.reset' | transloco }}
           </button>
         </div>

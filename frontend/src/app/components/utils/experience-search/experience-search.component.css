@@ -110,9 +110,9 @@
   gap: 0.35rem;
 }
 
-.filters {
+.filter-tiles {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
   gap: 0.75rem;
 }
 
@@ -120,6 +120,51 @@
   display: flex;
   justify-content: flex-end;
   gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.filter-tile {
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  border-radius: 0.9rem;
+  padding: 0.75rem;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 10px var(--mat-card-outlined-outline-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.tile-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.tile-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.tile-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 180px), 1fr));
+  gap: 0.5rem;
+}
+
+.slider-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.slider-values {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;
+  color: var(--mat-card-subtitle-text-color);
 }
 
 .filter-menu-content {

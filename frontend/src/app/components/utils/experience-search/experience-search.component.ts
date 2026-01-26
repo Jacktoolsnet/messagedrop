@@ -9,7 +9,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
-import { MatSelectModule } from '@angular/material/select';
+import { MatSliderModule } from '@angular/material/slider';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { startWith } from 'rxjs';
 import { Location } from '../../../interfaces/location';
@@ -36,15 +38,19 @@ export type ExperienceSortOption = 'relevance' | 'rating' | 'price_low' | 'price
 
 const PAGE_SIZE = 20;
 const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
+const PRICE_RANGE_MIN = 0;
+const PRICE_RANGE_MAX = 5000;
+const DURATION_RANGE_MIN = 0;
+const DURATION_RANGE_MAX = 72;
 
 interface ExperienceSearchForm {
   term: FormControl<string>;
-  startDate: FormControl<string>;
-  endDate: FormControl<string>;
-  minPrice: FormControl<number | null>;
-  maxPrice: FormControl<number | null>;
-  minDurationHours: FormControl<number | null>;
-  maxDurationHours: FormControl<number | null>;
+  startDate: FormControl<Date | null>;
+  endDate: FormControl<Date | null>;
+  minPrice: FormControl<number>;
+  maxPrice: FormControl<number>;
+  minDurationHours: FormControl<number>;
+  maxDurationHours: FormControl<number>;
   currency: FormControl<string>;
   sort: FormControl<ExperienceSortOption>;
 }
@@ -67,6 +73,7 @@ export interface ExperienceResult {
 
 @Component({
   selector: 'app-experience-search',
+  providers: [provideNativeDateAdapter()],
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
@@ -75,9 +82,11 @@ export interface ExperienceResult {
     MatDialogClose,
     MatFormFieldModule,
     MatInputModule,
+    MatNativeDateModule,
+    MatDatepickerModule,
     MatMenuModule,
-    MatSelectModule,
     MatRadioModule,
+    MatSliderModule,
     MatIcon,
     MatProgressSpinnerModule,
     TranslocoPipe,
@@ -104,12 +113,12 @@ export class ExperienceSearchComponent {
 
   readonly form = new FormGroup<ExperienceSearchForm>({
     term: new FormControl('', { nonNullable: true }),
-    startDate: new FormControl('', { nonNullable: true }),
-    endDate: new FormControl('', { nonNullable: true }),
-    minPrice: new FormControl<number | null>(null),
-    maxPrice: new FormControl<number | null>(null),
-    minDurationHours: new FormControl<number | null>(null),
-    maxDurationHours: new FormControl<number | null>(null),
+    startDate: new FormControl<Date | null>(null),
+    endDate: new FormControl<Date | null>(null),
+    minPrice: new FormControl<number>(PRICE_RANGE_MIN, { nonNullable: true }),
+    maxPrice: new FormControl<number>(PRICE_RANGE_MAX, { nonNullable: true }),
+    minDurationHours: new FormControl<number>(DURATION_RANGE_MIN, { nonNullable: true }),
+    maxDurationHours: new FormControl<number>(DURATION_RANGE_MAX, { nonNullable: true }),
     currency: new FormControl(DEFAULT_CURRENCY, { nonNullable: true }),
     sort: new FormControl<ExperienceSortOption>('relevance', { nonNullable: true })
   });
@@ -128,6 +137,8 @@ export class ExperienceSearchComponent {
   readonly viewMode = signal<'map' | 'list'>('map');
   readonly selectedResult = signal<ExperienceResult | null>(null);
   readonly worldCenter: Location = { latitude: 0, longitude: 0, plusCode: '' };
+  readonly priceRange = { min: PRICE_RANGE_MIN, max: PRICE_RANGE_MAX, step: 10 };
+  readonly durationRange = { min: DURATION_RANGE_MIN, max: DURATION_RANGE_MAX, step: 1 };
 
   readonly canSearch = computed(() => {
     const value = this.formValue();
@@ -161,12 +172,12 @@ export class ExperienceSearchComponent {
   onReset(): void {
     this.form.reset({
       term: '',
-      startDate: '',
-      endDate: '',
-      minPrice: null,
-      maxPrice: null,
-      minDurationHours: null,
-      maxDurationHours: null,
+      startDate: null,
+      endDate: null,
+      minPrice: PRICE_RANGE_MIN,
+      maxPrice: PRICE_RANGE_MAX,
+      minDurationHours: DURATION_RANGE_MIN,
+      maxDurationHours: DURATION_RANGE_MAX,
       currency: DEFAULT_CURRENCY,
       sort: 'relevance'
     });
@@ -261,12 +272,15 @@ export class ExperienceSearchComponent {
     const value = this.form.getRawValue();
     const duration = buildDurationRange(value.minDurationHours, value.maxDurationHours);
     const filtering: ViatorProductSearchFiltering = {
-      startDate: value.startDate || undefined,
-      endDate: value.endDate || undefined,
-      lowestPrice: value.minPrice ?? undefined,
-      highestPrice: value.maxPrice ?? undefined,
+      startDate: formatDateInput(value.startDate),
+      endDate: formatDateInput(value.endDate),
       durationInMinutes: duration ?? undefined
     };
+    const priceRange = buildPriceRange(value.minPrice, value.maxPrice);
+    if (priceRange) {
+      filtering.lowestPrice = priceRange.from;
+      filtering.highestPrice = priceRange.to;
+    }
     const sorting = mapProductSorting(value.sort);
     const pagination: ViatorProductSearchPagination = {
       start,
@@ -359,6 +373,11 @@ function mapFreetextSorting(value: ExperienceSortOption): ViatorFreetextProductS
 
 function buildDurationRange(minHours: number | null, maxHours: number | null): ViatorRangeNumber | null {
   if (minHours === null && maxHours === null) return null;
+  const minValue = minHours ?? DURATION_RANGE_MIN;
+  const maxValue = maxHours ?? DURATION_RANGE_MAX;
+  if (minValue <= DURATION_RANGE_MIN && maxValue >= DURATION_RANGE_MAX) {
+    return null;
+  }
   const fromMinutes = minHours !== null ? Math.round(minHours * 60) : undefined;
   const toMinutes = maxHours !== null ? Math.round(maxHours * 60) : undefined;
   return { from: fromMinutes, to: toMinutes };
@@ -366,17 +385,31 @@ function buildDurationRange(minHours: number | null, maxHours: number | null): V
 
 function buildPriceRange(minPrice: number | null, maxPrice: number | null): ViatorRangeNumber | null {
   if (minPrice === null && maxPrice === null) return null;
+  const minValue = minPrice ?? PRICE_RANGE_MIN;
+  const maxValue = maxPrice ?? PRICE_RANGE_MAX;
+  if (minValue <= PRICE_RANGE_MIN && maxValue >= PRICE_RANGE_MAX) {
+    return null;
+  }
   return { from: minPrice ?? undefined, to: maxPrice ?? undefined };
 }
 
-function buildDateRange(startDate: string, endDate: string): ViatorRangeDate | null {
-  const from = startDate?.trim();
-  const to = endDate?.trim();
+function buildDateRange(startDate: Date | string | null, endDate: Date | string | null): ViatorRangeDate | null {
+  const from = formatDateInput(startDate);
+  const to = formatDateInput(endDate);
   if (!from && !to) return null;
-  return {
-    from: from || undefined,
-    to: to || undefined
-  };
+  return { from: from || undefined, to: to || undefined };
+}
+
+function formatDateInput(value: Date | string | null | undefined): string | undefined {
+  if (!value) return undefined;
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    return trimmed ? trimmed : undefined;
+  }
+  const year = value.getFullYear();
+  const month = `${value.getMonth() + 1}`.padStart(2, '0');
+  const day = `${value.getDate()}`.padStart(2, '0');
+  return `${year}-${month}-${day}`;
 }
 
 function normalizeCurrency(input: string): string {

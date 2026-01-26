@@ -843,7 +843,8 @@ h2[mat-dialog-title].dialog-title {
 }
 
 .cdk-overlay-pane .mat-mdc-menu-panel .filter-menu-content {
-  width: min(90vw, 720px);
+  width: auto;
+  min-width: min(90vw, 250px);
   max-width: 90vw;
   box-sizing: border-box;
 }
