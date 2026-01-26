@@ -305,6 +305,9 @@
   "searchSettings": {
     "title": "Paramètres de recherche"
   },
+  "experienceSearch": {
+    "title": "Recherche d'expériences"
+  },
   "importMultimedia": {
     "title": "Importer des médias"
   },

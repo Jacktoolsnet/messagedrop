@@ -469,6 +469,11 @@ const HELP_TOPICS = {
     introKey: 'common.intros.settings',
     items: ITEMS.settings
   },
+  experienceSearch: {
+    titleKey: 'experienceSearch.title',
+    introKey: 'common.intros.searchMap',
+    items: ITEMS.searchMap
+  },
   importMultimedia: {
     titleKey: 'importMultimedia.title',
     introKey: 'common.intros.editor',

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, outpu
 import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDialogActions, MatDialogClose, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -9,6 +10,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSelectModule } from '@angular/material/select';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { startWith } from 'rxjs';
+import { Location } from '../../../interfaces/location';
 import {
   ViatorFreetextProductFiltering,
   ViatorFreetextProductSorting,
@@ -24,6 +26,8 @@ import {
 } from '../../../interfaces/viator';
 import { ViatorService } from '../../../services/viator.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
+import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
+import { HelpDialogService } from '../help-dialog/help-dialog.service';
 
 export type ExperienceProvider = 'viator';
 export type ExperienceSortOption = 'relevance' | 'rating' | 'price_low' | 'price_high';
@@ -67,12 +71,17 @@ export interface ExperienceResult {
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
+    MatDialogTitle,
+    MatDialogContent,
+    MatDialogActions,
+    MatDialogClose,
     MatFormFieldModule,
     MatInputModule,
     MatSelectModule,
     MatIcon,
     MatProgressSpinnerModule,
-    TranslocoPipe
+    TranslocoPipe,
+    SearchSettingsMapPreviewComponent
   ],
   templateUrl: './experience-search.component.html',
   styleUrl: './experience-search.component.css',
@@ -84,6 +93,7 @@ export class ExperienceSearchComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly viatorService = inject(ViatorService);
   private readonly i18n = inject(TranslationHelperService);
+  readonly help = inject(HelpDialogService);
 
   readonly providers: ExperienceProvider[] = ['viator'];
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
@@ -119,6 +129,9 @@ export class ExperienceSearchComponent {
   readonly totalCount = signal<number | null>(null);
   readonly lastPageCount = signal(0);
   readonly hasSearched = signal(false);
+  readonly viewMode = signal<'map' | 'list'>('map');
+  readonly selectedResult = signal<ExperienceResult | null>(null);
+  readonly worldCenter: Location = { latitude: 0, longitude: 0, plusCode: '' };
 
   readonly canSearch = computed(() => {
     const value = this.formValue();
@@ -170,10 +183,22 @@ export class ExperienceSearchComponent {
     this.lastPageCount.set(0);
     this.errorMessage.set(null);
     this.hasSearched.set(false);
+    this.selectedResult.set(null);
   }
 
   onSelect(result: ExperienceResult): void {
-    this.selected.emit(result);
+    this.selectedResult.set(result);
+  }
+
+  onApply(): void {
+    const selected = this.selectedResult();
+    if (selected) {
+      this.selected.emit(selected);
+    }
+  }
+
+  toggleViewMode(): void {
+    this.viewMode.update((mode) => (mode === 'map' ? 'list' : 'map'));
   }
 
   onOpen(result: ExperienceResult): void {
@@ -321,6 +346,9 @@ export class ExperienceSearchComponent {
     const mapped = items.map((item, index) => normalizeExperience(item, index));
     const combined = append ? [...this.results(), ...mapped] : mapped;
     this.results.set(combined);
+    if (!append) {
+      this.selectedResult.set(null);
+    }
     this.lastPageCount.set(mapped.length);
     this.totalCount.set(totalCount);
     this.hasSearched.set(true);

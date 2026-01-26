@@ -317,6 +317,9 @@
   "searchSettings": {
     "title": "Sucheinstellungen"
   },
+  "experienceSearch": {
+    "title": "Erlebnissuche"
+  },
   "importMultimedia": {
     "title": "Medien importieren"
   },
