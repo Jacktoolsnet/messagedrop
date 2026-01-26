@@ -835,3 +835,15 @@ h2[mat-dialog-title].dialog-title {
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Allow filter menu overlays to grow beyond the default menu width. */
+.cdk-overlay-pane .mat-mdc-menu-panel {
+  max-width: none;
+  margin: 0.5rem;
+}
+
+.cdk-overlay-pane .mat-mdc-menu-panel .filter-menu-content {
+  width: min(90vw, 720px);
+  max-width: 90vw;
+  box-sizing: border-box;
+}

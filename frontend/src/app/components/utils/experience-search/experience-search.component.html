@@ -3,18 +3,30 @@
     <div class="search-bar">
       <input type="search" enterkeyhint="search" [formControl]="form.controls.term" (keyup.enter)="onSearch()"
         [placeholder]="'common.experiences.searchPlaceholder' | transloco" />
-      <button type="button" class="filter-button" (click)="toggleFilters()"
+      <button type="button" class="filter-button" [matMenuTriggerFor]="filterMenu"
         [attr.aria-label]="'common.actions.more' | transloco">
         <mat-icon>tune</mat-icon>
+      </button>
+      <button type="button" class="sort-button" [matMenuTriggerFor]="sortMenu"
+        [attr.aria-label]="'common.experiences.sort' | transloco">
+        <mat-icon>sort</mat-icon>
       </button>
       <button type="button" class="search-button" (click)="onSearch()" [disabled]="loading() || !canSearch()"
         [attr.aria-label]="'common.experiences.search' | transloco">
         <mat-icon>search</mat-icon>
       </button>
     </div>
-
-    @if (filtersOpen()) {
-      <div class="filters-panel">
+    <mat-menu #sortMenu="matMenu">
+      <div class="sort-menu-content">
+        <mat-radio-group class="sort-menu-group" [formControl]="form.controls.sort">
+          @for (option of sortOptions; track option.value) {
+            <mat-radio-button [value]="option.value">{{ option.labelKey | transloco }}</mat-radio-button>
+          }
+        </mat-radio-group>
+      </div>
+    </mat-menu>
+    <mat-menu #filterMenu="matMenu">
+      <div class="filter-menu-content" (click)="$event.stopPropagation()">
         <div class="filters">
           <mat-form-field appearance="outline">
             <mat-label>{{ 'common.experiences.dateFrom' | transloco }}</mat-label>
@@ -50,15 +62,6 @@
             <mat-label>{{ 'common.experiences.currency' | transloco }}</mat-label>
             <input matInput type="text" [formControl]="form.controls.currency" />
           </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.sort' | transloco }}</mat-label>
-            <mat-select [formControl]="form.controls.sort">
-              @for (option of sortOptions; track option.value) {
-                <mat-option [value]="option.value">{{ option.labelKey | transloco }}</mat-option>
-              }
-            </mat-select>
-          </mat-form-field>
         </div>
 
         <div class="filters-actions">
@@ -67,7 +70,7 @@
           </button>
         </div>
       </div>
-    }
+    </mat-menu>
 
     <section class="results-panel">
       @if (viewMode() === 'map') {
