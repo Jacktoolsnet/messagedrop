@@ -96,8 +96,9 @@
       "privateDocument": "Document privé",
       "contactsMessage": "Message aux contacts",
       "weather": "Météo",
-      "airQuality": "Qualité de l'air",
-      "searchPlace": "Rechercher un lieu"
+      "airQuality": "Qualité de l’air",
+      "searchPlace": "Rechercher un lieu",
+      "searchExperiences": "Rechercher des expériences"
     },
     "meta": {
       "title": "MessageDrop - Explorer les lieux et les actualités",

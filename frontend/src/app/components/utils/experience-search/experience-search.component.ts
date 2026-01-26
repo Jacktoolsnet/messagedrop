@@ -29,6 +29,7 @@ export type ExperienceProvider = 'viator';
 export type ExperienceSortOption = 'relevance' | 'rating' | 'price_low' | 'price_high';
 
 const PAGE_SIZE = 20;
+const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
 
 interface ExperienceSearchForm {
   provider: FormControl<ExperienceProvider>;
@@ -103,7 +104,7 @@ export class ExperienceSearchComponent {
     minDurationHours: new FormControl<number | null>(null),
     maxDurationHours: new FormControl<number | null>(null),
     tagIds: new FormControl('', { nonNullable: true }),
-    currency: new FormControl('', { nonNullable: true }),
+    currency: new FormControl(DEFAULT_CURRENCY, { nonNullable: true }),
     sort: new FormControl<ExperienceSortOption>('relevance', { nonNullable: true })
   });
 
@@ -161,7 +162,7 @@ export class ExperienceSearchComponent {
       minDurationHours: null,
       maxDurationHours: null,
       tagIds: '',
-      currency: '',
+      currency: DEFAULT_CURRENCY,
       sort: 'relevance'
     });
     this.results.set([]);
@@ -385,25 +386,86 @@ function buildDateRange(startDate: string, endDate: string): ViatorRangeDate | n
 
 function normalizeCurrency(input: string): string {
   const trimmed = input.trim().toUpperCase();
-  return trimmed.length === 3 ? trimmed : 'USD';
+  return trimmed.length === 3 ? trimmed : DEFAULT_CURRENCY;
+}
+
+function resolveCurrencyFromLocale(): string {
+  if (typeof navigator === 'undefined') {
+    return 'USD';
+  }
+
+  const candidate = (navigator.languages?.[0] || navigator.language || '').trim();
+  if (!candidate) {
+    return 'USD';
+  }
+
+  const parts = candidate.replace('_', '-').split('-');
+  const lang = parts[0]?.toLowerCase();
+  const region = parts[1]?.toUpperCase();
+
+  const regionMap: Record<string, string> = {
+    US: 'USD',
+    GB: 'GBP',
+    DE: 'EUR',
+    FR: 'EUR',
+    ES: 'EUR',
+    IT: 'EUR',
+    NL: 'EUR',
+    AT: 'EUR',
+    BE: 'EUR',
+    PT: 'EUR',
+    IE: 'EUR',
+    CH: 'CHF',
+    SE: 'SEK',
+    NO: 'NOK',
+    DK: 'DKK',
+    PL: 'PLN',
+    CZ: 'CZK',
+    HU: 'HUF',
+    RO: 'RON',
+    BG: 'BGN',
+    AU: 'AUD',
+    NZ: 'NZD',
+    CA: 'CAD',
+    BR: 'BRL',
+    MX: 'MXN',
+    JP: 'JPY',
+    KR: 'KRW',
+    IN: 'INR',
+    SG: 'SGD',
+    HK: 'HKD',
+    TW: 'TWD',
+    ZA: 'ZAR',
+    CN: 'CNY'
+  };
+
+  if (region && regionMap[region]) {
+    return regionMap[region];
+  }
+
+  if (lang === 'de' || lang === 'fr' || lang === 'es' || lang === 'it' || lang === 'nl' || lang === 'pt') {
+    return 'EUR';
+  }
+
+  return 'USD';
 }
 
 function normalizeExperience(item: unknown, index: number): ExperienceResult {
   const record = asRecord(item);
   const productCode = firstString(
-    record?.productCode,
-    record?.productId,
-    record?.id,
-    record?.code
+    record?.['productCode'],
+    record?.['productId'],
+    record?.['id'],
+    record?.['code']
   );
-  const title = firstString(record?.title, record?.name, record?.productTitle);
-  const description = firstString(record?.shortDescription, record?.summary, record?.description);
-  const rating = firstNumber(record?.rating, record?.averageRating);
-  const reviewCount = firstNumber(record?.reviewCount, record?.totalReviews, record?.ratingCount);
-  const priceFrom = firstNumber(record?.fromPrice, record?.price, record?.startingPrice, record?.priceFrom);
-  const currency = firstString(record?.currency, record?.currencyCode);
-  const duration = firstString(record?.duration, record?.durationText);
-  const productUrl = firstString(record?.productUrl, record?.url, record?.bookingUrl);
+  const title = firstString(record?.['title'], record?.['name'], record?.['productTitle']);
+  const description = firstString(record?.['shortDescription'], record?.['summary'], record?.['description']);
+  const rating = firstNumber(record?.['rating'], record?.['averageRating']);
+  const reviewCount = firstNumber(record?.['reviewCount'], record?.['totalReviews'], record?.['ratingCount']);
+  const priceFrom = firstNumber(record?.['fromPrice'], record?.['price'], record?.['startingPrice'], record?.['priceFrom']);
+  const currency = firstString(record?.['currency'], record?.['currencyCode']);
+  const duration = firstString(record?.['duration'], record?.['durationText']);
+  const productUrl = firstString(record?.['productUrl'], record?.['url'], record?.['bookingUrl']);
   const imageUrl = resolveImageUrl(record);
 
   return {
@@ -425,17 +487,28 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
 
 function resolveImageUrl(record: Record<string, unknown> | null): string | undefined {
   if (!record) return undefined;
-  const direct = firstString(record.imageUrl, record.image, record.primaryImageUrl, record.heroImageUrl);
+  const direct = firstString(
+    record['imageUrl'],
+    record['image'],
+    record['primaryImageUrl'],
+    record['heroImageUrl']
+  );
   if (direct) return direct;
-  const images = Array.isArray(record.images) ? record.images : [];
+  const images = Array.isArray(record['images']) ? (record['images'] as unknown[]) : [];
   if (images.length === 0) return undefined;
   const imageRecord = asRecord(images[0]);
   if (!imageRecord) return undefined;
-  const nestedDirect = firstString(imageRecord.url, imageRecord.imageUrl, imageRecord.original, imageRecord.medium, imageRecord.small);
+  const nestedDirect = firstString(
+    imageRecord['url'],
+    imageRecord['imageUrl'],
+    imageRecord['original'],
+    imageRecord['medium'],
+    imageRecord['small']
+  );
   if (nestedDirect) return nestedDirect;
-  const variants = Array.isArray(imageRecord.variants) ? imageRecord.variants : [];
+  const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
   const variantRecord = variants.length > 0 ? asRecord(variants[0]) : null;
-  return firstString(variantRecord?.url, variantRecord?.imageUrl);
+  return firstString(variantRecord?.['url'], variantRecord?.['imageUrl']);
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

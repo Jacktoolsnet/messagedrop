@@ -250,6 +250,10 @@
         <mat-icon>travel_explore</mat-icon>
         <span>{{ 'common.menu.searchPlace' | transloco }}</span>
     </button>
+    <button mat-menu-item (click)="showExperienceSearchDialog()">
+        <mat-icon>local_activity</mat-icon>
+        <span>{{ 'common.menu.searchExperiences' | transloco }}</span>
+    </button>
 </mat-menu>
 }
 <router-outlet />

@@ -42,6 +42,7 @@ import { DeleteUserComponent } from './components/user/delete-user/delete-user.c
 import { UserProfileComponent } from './components/user/user-profile/user-profile.component';
 import { UserComponent } from './components/user/user.component';
 import { DisplayMessage } from './components/utils/display-message/display-message.component';
+import { ExperienceSearchComponent, ExperienceResult } from './components/utils/experience-search/experience-search.component';
 import { NominatimSearchComponent } from './components/utils/nominatim-search/nominatim-search.component';
 import { SearchSettingsComponent } from './components/utils/search-settings/search-settings.component';
 import { WeatherComponent } from './components/weather/weather.component';
@@ -1732,6 +1733,30 @@ export class AppComponent implements OnInit {
       } else {
         this.indexedDbService.deleteSetting('nominatimSelectedPlace');
       }
+    });
+  }
+
+  showExperienceSearchDialog(): void {
+    const dialogRef = this.dialog.open(ExperienceSearchComponent, {
+      panelClass: '',
+      closeOnNavigation: true,
+      minWidth: 'min(450px, 95vw)',
+      width: '90vw',
+      maxWidth: '90vw',
+      height: '90vh',
+      maxHeight: '90vh',
+      hasBackdrop: true,
+      backdropClass: 'dialog-backdrop',
+      disableClose: false,
+      autoFocus: false
+    });
+
+    const subscription = dialogRef.componentInstance.selected.subscribe((result: ExperienceResult) => {
+      dialogRef.close(result);
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      subscription.unsubscribe();
     });
   }
 

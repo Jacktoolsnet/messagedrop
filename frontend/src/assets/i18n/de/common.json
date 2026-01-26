@@ -97,7 +97,8 @@
       "contactsMessage": "Kontakt-Nachricht",
       "weather": "Wetter",
       "airQuality": "Luftqualität",
-      "searchPlace": "Ort suchen"
+      "searchPlace": "Ort suchen",
+      "searchExperiences": "Erlebnisse suchen"
     },
     "meta": {
       "title": "MessageDrop - Orte und Nachrichten entdecken",
