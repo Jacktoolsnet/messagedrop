@@ -53,7 +53,7 @@ h2[mat-dialog-title].dialog-title {
 .experience-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
-  padding: 0.5rem 1rem 0.5rem;
+  padding: 0.75rem 1rem;
   min-height: 0;
 }
 
@@ -63,6 +63,7 @@ h2[mat-dialog-title].dialog-title {
   gap: 1rem;
   align-items: stretch;
   min-height: 100%;
+  height: 100%;
 }
 
 .filters-panel {
@@ -94,6 +95,7 @@ h2[mat-dialog-title].dialog-title {
   gap: 1rem;
   min-width: 0;
   min-height: 100%;
+  height: 100%;
 }
 
 .panel-header {
@@ -110,18 +112,16 @@ h2[mat-dialog-title].dialog-title {
   font-weight: 600;
 }
 
-.map-panel {
-  background-color: var(--mat-card-filled-container-color);
-  border: 1px solid var(--mat-card-outlined-outline-color);
-  border-radius: 1rem;
-  padding: 0.75rem;
-  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
-  height: 100%;
-}
-
-:host ::ng-deep .map-panel .map-preview {
+.map-preview-full {
+  display: block;
   height: 100%;
   min-height: 320px;
+}
+
+:host ::ng-deep .map-preview-full .map-preview {
+  height: 100%;
+  min-height: 320px;
+  border-radius: 1rem;
 }
 
 .status {
@@ -270,11 +270,11 @@ h2[mat-dialog-title].dialog-title {
 }
 
 @media (max-width: 600px) {
-  .map-panel {
+  .map-preview-full {
     height: auto;
   }
 
-  :host ::ng-deep .map-panel .map-preview {
+  :host ::ng-deep .map-preview-full .map-preview {
     height: auto;
     aspect-ratio: 4 / 3;
   }

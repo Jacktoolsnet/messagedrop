@@ -36,16 +36,13 @@ const PAGE_SIZE = 20;
 const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
 
 interface ExperienceSearchForm {
-  provider: FormControl<ExperienceProvider>;
   term: FormControl<string>;
-  destination: FormControl<string>;
   startDate: FormControl<string>;
   endDate: FormControl<string>;
   minPrice: FormControl<number | null>;
   maxPrice: FormControl<number | null>;
   minDurationHours: FormControl<number | null>;
   maxDurationHours: FormControl<number | null>;
-  tagIds: FormControl<string>;
   currency: FormControl<string>;
   sort: FormControl<ExperienceSortOption>;
 }
@@ -95,7 +92,6 @@ export class ExperienceSearchComponent {
   private readonly i18n = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
 
-  readonly providers: ExperienceProvider[] = ['viator'];
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
     { value: 'relevance', labelKey: 'common.experiences.sortRelevance' },
     { value: 'rating', labelKey: 'common.experiences.sortRating' },
@@ -104,16 +100,13 @@ export class ExperienceSearchComponent {
   ];
 
   readonly form = new FormGroup<ExperienceSearchForm>({
-    provider: new FormControl<ExperienceProvider>('viator', { nonNullable: true }),
     term: new FormControl('', { nonNullable: true }),
-    destination: new FormControl('', { nonNullable: true }),
     startDate: new FormControl('', { nonNullable: true }),
     endDate: new FormControl('', { nonNullable: true }),
     minPrice: new FormControl<number | null>(null),
     maxPrice: new FormControl<number | null>(null),
     minDurationHours: new FormControl<number | null>(null),
     maxDurationHours: new FormControl<number | null>(null),
-    tagIds: new FormControl('', { nonNullable: true }),
     currency: new FormControl(DEFAULT_CURRENCY, { nonNullable: true }),
     sort: new FormControl<ExperienceSortOption>('relevance', { nonNullable: true })
   });
@@ -136,8 +129,7 @@ export class ExperienceSearchComponent {
   readonly canSearch = computed(() => {
     const value = this.formValue();
     const term = value.term?.trim() ?? '';
-    const destination = value.destination?.trim() ?? '';
-    return term.length > 0 || destination.length > 0;
+    return term.length > 0;
   });
 
   readonly showEmptyState = computed(() => !this.loading() && this.hasSearched() && this.results().length === 0);
@@ -165,16 +157,13 @@ export class ExperienceSearchComponent {
 
   onReset(): void {
     this.form.reset({
-      provider: 'viator',
       term: '',
-      destination: '',
       startDate: '',
       endDate: '',
       minPrice: null,
       maxPrice: null,
       minDurationHours: null,
       maxDurationHours: null,
-      tagIds: '',
       currency: DEFAULT_CURRENCY,
       sort: 'relevance'
     });
@@ -220,12 +209,6 @@ export class ExperienceSearchComponent {
   }
 
   private executeSearch(append: boolean): void {
-    const provider = this.form.getRawValue().provider;
-    if (provider !== 'viator') {
-      this.errorMessage.set(this.i18n.t('common.experiences.providerNotAvailable'));
-      return;
-    }
-
     const value = this.form.getRawValue();
     const term = value.term.trim();
     const start = append ? this.results().length + 1 : 1;
@@ -273,16 +256,13 @@ export class ExperienceSearchComponent {
 
   private buildProductSearchRequest(start: number): ViatorProductSearchRequest {
     const value = this.form.getRawValue();
-    const tagIds = parseTagIds(value.tagIds);
     const duration = buildDurationRange(value.minDurationHours, value.maxDurationHours);
     const filtering: ViatorProductSearchFiltering = {
-      destination: value.destination.trim() || undefined,
       startDate: value.startDate || undefined,
       endDate: value.endDate || undefined,
       lowestPrice: value.minPrice ?? undefined,
       highestPrice: value.maxPrice ?? undefined,
-      durationInMinutes: duration ?? undefined,
-      tags: tagIds.length > 0 ? tagIds : undefined
+      durationInMinutes: duration ?? undefined
     };
     const sorting = mapProductSorting(value.sort);
     const pagination: ViatorProductSearchPagination = {
@@ -300,13 +280,8 @@ export class ExperienceSearchComponent {
 
   private buildFreetextSearchRequest(searchTerm: string, start: number): ViatorFreetextSearchRequest {
     const value = this.form.getRawValue();
-    const tagIds = parseTagIds(value.tagIds);
     const duration = buildDurationRange(value.minDurationHours, value.maxDurationHours);
     const productFiltering: ViatorFreetextProductFiltering = {};
-    const destination = value.destination.trim();
-    if (destination) {
-      productFiltering.destination = destination;
-    }
     const dateRange = buildDateRange(value.startDate, value.endDate);
     if (dateRange) {
       productFiltering.dateRange = dateRange;
@@ -317,9 +292,6 @@ export class ExperienceSearchComponent {
     }
     if (duration) {
       productFiltering.durationInMinutes = duration;
-    }
-    if (tagIds.length > 0) {
-      productFiltering.tags = tagIds;
     }
 
     const productSorting = mapFreetextSorting(value.sort);
@@ -354,14 +326,6 @@ export class ExperienceSearchComponent {
     this.hasSearched.set(true);
     this.loading.set(false);
   }
-}
-
-function parseTagIds(input: string): number[] {
-  if (!input) return [];
-  return input
-    .split(',')
-    .map((value) => Number.parseInt(value.trim(), 10))
-    .filter((value) => Number.isFinite(value));
 }
 
 function mapProductSorting(value: ExperienceSortOption): ViatorProductSearchSorting | null {
