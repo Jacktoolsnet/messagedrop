@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -13,7 +14,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
-import { TranslocoPipe } from '@jsverse/transloco';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { startWith } from 'rxjs';
 import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
@@ -84,6 +85,7 @@ export interface ExperienceResult {
   trackId: string;
   productCode?: string;
   destinationIds?: number[];
+  avatarUrl?: string;
   title?: string;
   description?: string;
   rating?: number;
@@ -109,6 +111,7 @@ interface ExperienceMapMarker {
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
+    MatCardModule,
     MatDialogContent,
     MatDialogActions,
     MatDialogClose,
@@ -135,6 +138,7 @@ export class ExperienceSearchComponent {
   private readonly destroyRef = inject(DestroyRef);
   private readonly viatorService = inject(ViatorService);
   private readonly i18n = inject(TranslationHelperService);
+  private readonly transloco = inject(TranslocoService);
   readonly help = inject(HelpDialogService);
   private readonly dialog = inject(MatDialog);
 
@@ -162,6 +166,9 @@ export class ExperienceSearchComponent {
     this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
     { requireSync: true }
   );
+  private readonly activeLang = toSignal(this.transloco.langChanges$, {
+    initialValue: this.transloco.getActiveLang()
+  });
 
   constructor() {
     this.form.controls.startDate.valueChanges
@@ -187,6 +194,7 @@ export class ExperienceSearchComponent {
   readonly selectedResult = signal<ExperienceResult | null>(null);
   readonly worldCenter: Location = { latitude: 0, longitude: 0, plusCode: '' };
   readonly mapMarkers = signal<ExperienceMapMarker[]>([]);
+  readonly expandedDescriptions = signal<Set<string>>(new Set());
   readonly priceRange = { min: PRICE_RANGE_MIN, max: PRICE_RANGE_MAX, step: 10 };
   readonly durationRange = { min: DURATION_RANGE_MIN, max: DURATION_RANGE_MAX, step: 1 };
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
@@ -264,14 +272,48 @@ export class ExperienceSearchComponent {
 
   getRatingLabel(result: ExperienceResult): string {
     if (!result.rating) return '';
-    if (!result.reviewCount) return `${result.rating}`;
-    return `${result.rating} (${result.reviewCount})`;
+    const locale = this.activeLang() || 'en';
+    let ratingText = '';
+    try {
+      ratingText = new Intl.NumberFormat(locale, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1
+      }).format(result.rating);
+    } catch {
+      ratingText = (Math.round(result.rating * 10) / 10).toFixed(1);
+    }
+    if (!result.reviewCount) return ratingText;
+    return `${ratingText} (${result.reviewCount})`;
   }
 
   getPriceLabel(result: ExperienceResult): string {
     if (result.priceFrom === undefined || result.priceFrom === null) return '';
-    const currency = result.currency ? ` ${result.currency}` : '';
-    return `${result.priceFrom}${currency}`;
+    const currency = normalizeCurrency(
+      result.currency || this.form.controls.currency.value || DEFAULT_CURRENCY
+    );
+    const locale = this.activeLang() || 'en';
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(result.priceFrom);
+    } catch {
+      return `${result.priceFrom} ${currency}`;
+    }
+  }
+
+  getDurationLabel(result: ExperienceResult): string {
+    if (!result.duration) return '';
+    return result.duration;
+  }
+
+  getExperienceIcon(): string {
+    return 'local_activity';
+  }
+
+  getExperienceHeaderBackgroundImage(result: ExperienceResult): string {
+    return result.imageUrl ? `url("${result.imageUrl}")` : 'none';
+  }
+
+  getExperienceHeaderBackgroundOpacity(result: ExperienceResult): string {
+    return result.imageUrl ? '0.9' : '0';
   }
 
   private executeSearch(append: boolean): void {
@@ -388,6 +430,7 @@ export class ExperienceSearchComponent {
     this.results.set(combined);
     if (!append) {
       this.selectedResult.set(null);
+      this.expandedDescriptions.set(new Set());
     }
     this.lastPageCount.set(mapped.length);
     this.totalCount.set(totalCount);
@@ -397,6 +440,20 @@ export class ExperienceSearchComponent {
     if (!append && mapped.length === 0) {
       this.showNoResultsMessage();
     }
+  }
+
+  isDescriptionExpanded(result: ExperienceResult): boolean {
+    return this.expandedDescriptions().has(result.trackId);
+  }
+
+  toggleDescription(result: ExperienceResult): void {
+    const next = new Set(this.expandedDescriptions());
+    if (next.has(result.trackId)) {
+      next.delete(result.trackId);
+    } else {
+      next.add(result.trackId);
+    }
+    this.expandedDescriptions.set(next);
   }
 
   private showNoResultsMessage(): void {
@@ -616,6 +673,7 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
   const { priceFrom, currency } = resolvePricing(record);
   const duration = resolveDuration(record);
   const productUrl = firstString(record?.['productUrl'], record?.['url'], record?.['bookingUrl']);
+  const avatarUrl = resolveAvatarUrl(record);
   const imageUrl = resolveImageUrl(record);
 
   return {
@@ -623,6 +681,7 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
     trackId: productCode ? `viator:${productCode}` : `viator:${index}`,
     productCode: productCode || undefined,
     destinationIds: destinationIds.length ? destinationIds : undefined,
+    avatarUrl: avatarUrl || undefined,
     title: title || undefined,
     description: description || undefined,
     rating: rating ?? undefined,
@@ -766,6 +825,31 @@ function resolveImageUrl(record: Record<string, unknown> | null): string | undef
   return firstString(bestVariant?.['url'], bestVariant?.['imageUrl']);
 }
 
+function resolveAvatarUrl(record: Record<string, unknown> | null): string | undefined {
+  if (!record) return undefined;
+  const images = Array.isArray(record['images']) ? (record['images'] as unknown[]) : [];
+  if (images.length === 0) return undefined;
+  const cover = images.map((entry) => asRecord(entry)).find((entry) => entry?.['isCover'] === true);
+  const imageRecord = cover ?? asRecord(images[0]);
+  if (!imageRecord) return undefined;
+  const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
+  const exact = variants
+    .map((entry) => asRecord(entry))
+    .find((variant) => variant?.['width'] === 75 && variant?.['height'] === 75);
+  const exactUrl = firstString(exact?.['url'], exact?.['imageUrl']);
+  if (exactUrl) return exactUrl;
+  const smallest = pickSmallestVariant(variants);
+  return firstString(
+    smallest?.['url'],
+    smallest?.['imageUrl'],
+    imageRecord['url'],
+    imageRecord['imageUrl'],
+    imageRecord['small'],
+    imageRecord['medium'],
+    imageRecord['original']
+  );
+}
+
 function pickLargestVariant(variants: unknown[]): Record<string, unknown> | null {
   let best: Record<string, unknown> | null = null;
   let bestArea = -1;
@@ -776,6 +860,23 @@ function pickLargestVariant(variants: unknown[]): Record<string, unknown> | null
     const height = typeof record['height'] === 'number' ? record['height'] : Number(record['height']);
     const area = Number.isFinite(width) && Number.isFinite(height) ? width * height : 0;
     if (area > bestArea) {
+      bestArea = area;
+      best = record;
+    }
+  }
+  return best;
+}
+
+function pickSmallestVariant(variants: unknown[]): Record<string, unknown> | null {
+  let best: Record<string, unknown> | null = null;
+  let bestArea = Number.POSITIVE_INFINITY;
+  for (const variant of variants) {
+    const record = asRecord(variant);
+    if (!record) continue;
+    const width = typeof record['width'] === 'number' ? record['width'] : Number(record['width']);
+    const height = typeof record['height'] === 'number' ? record['height'] : Number(record['height']);
+    const area = Number.isFinite(width) && Number.isFinite(height) ? width * height : Number.POSITIVE_INFINITY;
+    if (area < bestArea) {
       bestArea = area;
       best = record;
     }

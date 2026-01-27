@@ -8,11 +8,7 @@ interface MapMarker {
   label?: string;
 }
 
-const markerIcon = leaflet.icon({
-  iconUrl: 'assets/markers/location-marker.svg',
-  iconSize: [28, 36],
-  iconAnchor: [14, 36]
-});
+const DEFAULT_MARKER_ICON_URL = 'assets/markers/location-marker.svg';
 
 @Component({
   selector: 'app-search-settings-map-preview',
@@ -27,11 +23,14 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
   @Input() markers: MapMarker[] = [];
   @Input() fitMarkers = false;
   @Input() interactive = false;
+  @Input() markerIconUrl = DEFAULT_MARKER_ICON_URL;
 
   readonly mapId = `search-settings-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
   private markerLayer?: leaflet.LayerGroup;
   private zoomControl?: leaflet.Control.Zoom;
+  private markerIcon?: leaflet.Icon;
+  private markerIconUrlCache?: string;
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -48,7 +47,8 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
       }
       this.map.setView([this.center.latitude, this.center.longitude], this.zoom);
     }
-    if (changes['markers']) {
+    if (changes['markers'] || changes['markerIconUrl']) {
+      this.markerIcon = undefined;
       this.updateMarkers();
     }
     if (changes['interactive'] || changes['disabled']) {
@@ -132,12 +132,13 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
     if (!this.map || !this.markerLayer) return;
     this.markerLayer.clearLayers();
     const bounds: leaflet.LatLngTuple[] = [];
+    const icon = this.getMarkerIcon();
     this.markers.forEach((marker) => {
       if (!Number.isFinite(marker.latitude) || !Number.isFinite(marker.longitude)) {
         return;
       }
       const latLng: leaflet.LatLngTuple = [marker.latitude, marker.longitude];
-      const leafletMarker = leaflet.marker(latLng, { icon: markerIcon });
+      const leafletMarker = leaflet.marker(latLng, { icon });
       if (marker.label) {
         leafletMarker.bindTooltip(marker.label, { direction: 'top', offset: [0, -6] });
       }
@@ -149,5 +150,18 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
       const fitBounds = leaflet.latLngBounds(bounds);
       this.map.fitBounds(fitBounds, { padding: [24, 24], maxZoom: 8 });
     }
+  }
+
+  private getMarkerIcon(): leaflet.Icon {
+    const url = this.markerIconUrl || DEFAULT_MARKER_ICON_URL;
+    if (!this.markerIcon || this.markerIconUrlCache !== url) {
+      this.markerIconUrlCache = url;
+      this.markerIcon = leaflet.icon({
+        iconUrl: url,
+        iconSize: [28, 36],
+        iconAnchor: [14, 36]
+      });
+    }
+    return this.markerIcon;
   }
 }

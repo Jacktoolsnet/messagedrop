@@ -13,7 +13,7 @@ const MAX_TOTAL_KEYS = 200;
 const MAX_DEPTH = 4;
 const MAX_DESTINATION_IDS = 200;
 
-const DEFAULT_TIMEOUT_MS = 15000;
+const DEFAULT_TIMEOUT_MS = 30000;
 
 function resolveTimeoutMs(rawValue, fallback) {
   const parsed = Number(rawValue);
@@ -188,6 +188,33 @@ function buildError(status, message, detail) {
   return err;
 }
 
+function extractRateLimitHeaders(headers) {
+  if (!headers || typeof headers !== 'object') {
+    return undefined;
+  }
+  const keys = [
+    'x-ratelimit-limit',
+    'x-ratelimit-remaining',
+    'x-ratelimit-reset',
+    'retry-after',
+    'ratelimit-limit',
+    'ratelimit-remaining',
+    'ratelimit-reset'
+  ];
+  const result = {};
+  for (const key of keys) {
+    if (headers[key] !== undefined) {
+      result[key] = headers[key];
+    }
+  }
+  return Object.keys(result).length ? result : undefined;
+}
+
+function logTiming(logger, payload) {
+  if (!logger?.info) return;
+  logger.info('viator_upstream_timing', payload);
+}
+
 function normalizeAcceptLanguage(rawValue) {
   if (!rawValue) return null;
   const first = String(rawValue).split(',')[0]?.split(';')[0]?.trim().replace('_', '-');
@@ -319,6 +346,7 @@ router.use(async (req, res, next) => {
     }
   }
 
+  const startedAt = Date.now();
   try {
     const upstream = await client.request({
       method: req.method,
@@ -330,6 +358,14 @@ router.use(async (req, res, next) => {
         Accept: 'application/json;version=2.0',
         ...extractForwardHeaders(req)
       }
+    });
+    const durationMs = Date.now() - startedAt;
+    logTiming(req.logger, {
+      method: req.method,
+      path: req.path,
+      status: upstream.status,
+      durationMs,
+      rateLimit: extractRateLimitHeaders(upstream.headers)
     });
 
     if (endpoint.cacheTtl && upstream.status >= 200 && upstream.status < 300) {
@@ -346,7 +382,13 @@ router.use(async (req, res, next) => {
 
     return res.status(upstream.status).json(upstream.data);
   } catch (err) {
-    req.logger?.error?.('Viator upstream failed', { error: err?.message || err });
+    const durationMs = Date.now() - startedAt;
+    const isTimeout = err?.code === 'ECONNABORTED' || String(err?.message || '').toLowerCase().includes('timeout');
+    req.logger?.error?.('Viator upstream failed', {
+      error: err?.message || err,
+      timeout: isTimeout,
+      durationMs
+    });
     return next(buildError(502, 'viator_upstream_failed', err?.message || err));
   }
 });

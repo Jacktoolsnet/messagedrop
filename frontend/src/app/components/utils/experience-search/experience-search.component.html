@@ -119,48 +119,77 @@
     <section class="results-panel">
       @if (viewMode() === 'map') {
         <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
-          [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="true">
+          [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="true"
+          [markerIconUrl]="'assets/markers/experience-marker.svg'">
         </app-search-settings-map-preview>
       }
 
       @if (viewMode() === 'list') {
         <div class="results" role="list">
           @for (result of results(); track result.trackId) {
-            <article class="result-card" role="listitem" [class.result-card--selected]="selectedResult()?.trackId === result.trackId"
+            <mat-card class="experience-tile" role="listitem" (click)="onSelect(result)"
+              [class.experience-tile--selected]="selectedResult()?.trackId === result.trackId"
               [attr.title]="result.title || result.productCode || ''">
-              @if (result.imageUrl) {
-                <img class="result-image" [src]="result.imageUrl" [alt]="result.title || result.productCode || ''"
-                  [attr.title]="result.title || result.productCode || ''" />
-              }
-              <div class="result-content">
-                <div class="result-header">
-                  <h3 class="result-title" [attr.title]="result.title || result.productCode || ''">{{ result.title || result.productCode }}</h3>
-                  @if (result.duration) {
-                    <span class="result-duration">{{ result.duration }}</span>
+              <div class="tile-header"
+                [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(result)"
+                [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(result)">
+                <div class="identity-badge">
+                  @if (result.avatarUrl) {
+                    <img class="avatar" [src]="result.avatarUrl" [alt]="result.title || result.productCode || ''" />
+                  } @else {
+                    <mat-icon>{{ getExperienceIcon() }}</mat-icon>
                   }
+                  <div class="identity-text">
+                    <span class="name" [attr.title]="result.title || result.productCode || ''">
+                      {{ result.title || result.productCode }}
+                    </span>
+                    @if (getDurationLabel(result)) {
+                      <span class="subtitle">{{ 'common.experiences.durationPrefix' | transloco }} {{ getDurationLabel(result) }}</span>
+                    }
+                  </div>
                 </div>
+                <div class="viator-badge">
+                  <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
+                  <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link" target="_blank" rel="noopener">
+                    Viator
+                  </a>
+                </div>
+                @if (getRatingLabel(result)) {
+                  <div class="rating-badge">★ {{ getRatingLabel(result) }}</div>
+                }
+              </div>
+              <mat-card-content class="experience-content">
                 @if (result.description) {
-                  <p class="result-description">{{ result.description }}</p>
+                  <p class="result-description" [class.is-expanded]="isDescriptionExpanded(result)">
+                    {{ result.description }}
+                  </p>
+                  <button mat-button type="button" class="toggle-description"
+                    (click)="toggleDescription(result); $event.stopPropagation()">
+                    <mat-icon>{{ isDescriptionExpanded(result) ? 'expand_less' : 'expand_more' }}</mat-icon>
+                    <span>
+                      {{ isDescriptionExpanded(result)
+                        ? ('common.experiences.showLess' | transloco)
+                        : ('common.experiences.showMore' | transloco) }}
+                    </span>
+                  </button>
                 }
                 <div class="result-meta">
-                  @if (getRatingLabel(result)) {
-                    <span class="meta-item">★ {{ getRatingLabel(result) }}</span>
-                  }
-                  @if (getPriceLabel(result)) {
-                    <span class="meta-item">{{ getPriceLabel(result) }}</span>
-                  }
                 </div>
-                <div class="result-actions">
-                  <button mat-stroked-button type="button" (click)="onOpen(result)" [disabled]="!result.productUrl"
+              </mat-card-content>
+              <mat-card-actions class="tile-actions">
+                <div class="tile-actions__right">
+                  <button mat-stroked-button class="open-viator-button" type="button"
+                    (click)="onOpen(result); $event.stopPropagation()"
+                    [disabled]="!result.productUrl"
                     [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
-                    {{ 'common.experiences.openOn' | transloco : { provider: 'Viator' } }}
-                  </button>
-                  <button mat-flat-button color="primary" type="button" (click)="onSelect(result)">
-                    {{ 'common.experiences.select' | transloco }}
+                    <mat-icon>shopping_cart</mat-icon>
+                    <span class="open-viator-label">
+                      {{ getPriceLabel(result) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+                    </span>
                   </button>
                 </div>
-              </div>
-            </article>
+              </mat-card-actions>
+            </mat-card>
           }
         </div>
 
