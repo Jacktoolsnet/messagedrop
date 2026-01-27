@@ -234,6 +234,10 @@ export class LocationPickerDialogComponent implements AfterViewInit, OnDestroy {
         return;
       }
       const marker = leaflet.marker([latitude, longitude], { icon: searchMarkerIcon });
+      const label = (place.name || '').trim();
+      if (label) {
+        marker.bindTooltip(label, { direction: 'top', offset: [0, -6] });
+      }
       marker.on('click', () => this.selectResult(place));
       marker.addTo(this.searchMarkerLayer!);
       this.searchMarkers.set(place.place_id, marker);
