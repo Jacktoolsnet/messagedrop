@@ -794,8 +794,8 @@
       }
     },
     "viator": {
-      "title": "Viator service",
-      "loading": "Searching Viator..."
+      "title": "Experience service",
+      "loading": "Searching experiences..."
     },
     "experiences": {
       "title": "Experiences",

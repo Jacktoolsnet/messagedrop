@@ -74,7 +74,8 @@ const deleteNotRunId = function (db, syncRunId) {
     WHERE syncRunId IS NOT NULL
       AND syncRunId != ?;
   `;
-  db.prepare(sql).run(syncRunId);
+  const result = db.prepare(sql).run(syncRunId);
+  return result?.changes ?? 0;
 };
 
 const getByIds = function (db, destinationIds) {

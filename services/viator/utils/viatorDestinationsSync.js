@@ -80,9 +80,22 @@ function normalizeDestination(entry) {
   };
 }
 
+function formatBytes(bytes) {
+  const num = Number(bytes);
+  if (!Number.isFinite(num) || num <= 0) {
+    return null;
+  }
+  const mb = num / (1024 * 1024);
+  if (mb >= 1) {
+    return `${mb.toFixed(1)} MB`;
+  }
+  const kb = num / 1024;
+  return `${kb.toFixed(1)} KB`;
+}
+
 async function syncDestinations({ db, logger, force = false } = {}) {
   if (syncInProgress) {
-    logger?.info?.('Destination sync already running, skipping.');
+    logger?.warn?.('Destination sync already running, skipping.');
     return { ok: false, skipped: true };
   }
   if (!db) {
@@ -105,6 +118,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
 
     syncInProgress = true;
     logger?.info?.('Destination sync started.');
+    logger?.info?.('Destination sync download started.');
     const response = await client.get('/destinations', {
       headers: {
         'exp-api-key': process.env.VIATOR_API_KEY,
@@ -113,7 +127,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     });
 
     if (response.status < 200 || response.status >= 300) {
-      logger?.error?.('Destination sync failed', { status: response.status, data: response.data });
+      logger?.error?.('Destination sync download failed', { status: response.status, data: response.data });
       return { ok: false, status: response.status };
     }
 
@@ -121,14 +135,23 @@ async function syncDestinations({ db, logger, force = false } = {}) {
       ? response.data.destinations
       : [];
 
+    const contentLengthHeader = response.headers?.['content-length'];
+    const headerBytes = contentLengthHeader ? Number(contentLengthHeader) : null;
+    const payloadBytes = Number.isFinite(headerBytes)
+      ? headerBytes
+      : Buffer.byteLength(JSON.stringify(response.data ?? {}), 'utf8');
+    const payloadLabel = formatBytes(payloadBytes);
+    logger?.info?.(`Destination sync download completed (${payloadLabel || 'size unknown'}).`);
+
     if (destinations.length === 0) {
-      logger?.warn?.('Destination sync returned empty list.');
+      logger?.error?.('Destination sync returned empty list.');
       return { ok: false, count: 0 };
     }
 
     const syncRunId = randomUUID();
     const stmt = tableViatorDestinations.prepareUpsert(db);
 
+    logger?.info?.(`Destination import started (${destinations.length} rows).`);
     db.exec('BEGIN');
     let written = 0;
     for (const entry of destinations) {
@@ -156,7 +179,8 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     }
     db.exec('COMMIT');
 
-    tableViatorDestinations.deleteNotRunId(db, syncRunId);
+    const deleted = tableViatorDestinations.deleteNotRunId(db, syncRunId);
+    logger?.info?.(`Destination cleanup completed (${deleted} rows removed).`);
 
     logger?.info?.(`Destination sync completed (${written} rows).`);
     return { ok: true, count: written };
