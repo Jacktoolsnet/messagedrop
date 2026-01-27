@@ -88,6 +88,10 @@ export class NominatimResultsMapComponent implements AfterViewInit, OnChanges, O
         return;
       }
       const marker = leaflet.marker([latitude, longitude], { icon: markerIcon });
+      const label = (place.name || '').trim();
+      if (label) {
+        marker.bindTooltip(label, { direction: 'top', offset: [0, -6] });
+      }
       marker.on('click', () => this.placeSelected.emit(place));
       marker.addTo(this.markerLayer!);
     });

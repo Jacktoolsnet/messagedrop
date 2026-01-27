@@ -119,20 +119,22 @@
     <section class="results-panel">
       @if (viewMode() === 'map') {
         <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
-          [markers]="mapMarkers()" [fitMarkers]="true">
+          [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="true">
         </app-search-settings-map-preview>
       }
 
       @if (viewMode() === 'list') {
         <div class="results" role="list">
           @for (result of results(); track result.trackId) {
-            <article class="result-card" role="listitem" [class.result-card--selected]="selectedResult()?.trackId === result.trackId">
+            <article class="result-card" role="listitem" [class.result-card--selected]="selectedResult()?.trackId === result.trackId"
+              [attr.title]="result.title || result.productCode || ''">
               @if (result.imageUrl) {
-                <img class="result-image" [src]="result.imageUrl" [alt]="result.title || result.productCode || ''" />
+                <img class="result-image" [src]="result.imageUrl" [alt]="result.title || result.productCode || ''"
+                  [attr.title]="result.title || result.productCode || ''" />
               }
               <div class="result-content">
                 <div class="result-header">
-                  <h3 class="result-title">{{ result.title || result.productCode }}</h3>
+                  <h3 class="result-title" [attr.title]="result.title || result.productCode || ''">{{ result.title || result.productCode }}</h3>
                   @if (result.duration) {
                     <span class="result-duration">{{ result.duration }}</span>
                   }

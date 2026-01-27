@@ -26,10 +26,12 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
   @Input() disabled = false;
   @Input() markers: MapMarker[] = [];
   @Input() fitMarkers = false;
+  @Input() interactive = false;
 
   readonly mapId = `search-settings-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
   private markerLayer?: leaflet.LayerGroup;
+  private zoomControl?: leaflet.Control.Zoom;
 
   ngAfterViewInit(): void {
     this.initMap();
@@ -49,6 +51,9 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
     if (changes['markers']) {
       this.updateMarkers();
     }
+    if (changes['interactive'] || changes['disabled']) {
+      this.updateInteractivity();
+    }
   }
 
   ngOnDestroy(): void {
@@ -60,18 +65,24 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
       return;
     }
 
+    const interactive = this.isInteractive();
     this.map = leaflet.map(this.mapId, {
       center: [this.center.latitude, this.center.longitude],
       zoom: this.zoom,
       attributionControl: false,
       zoomControl: false,
-      dragging: false,
-      scrollWheelZoom: false,
-      doubleClickZoom: false,
-      boxZoom: false,
-      keyboard: false,
-      touchZoom: false
+      dragging: interactive,
+      scrollWheelZoom: interactive,
+      doubleClickZoom: interactive,
+      boxZoom: interactive,
+      keyboard: interactive,
+      touchZoom: interactive
     });
+
+    if (interactive) {
+      this.zoomControl = leaflet.control.zoom();
+      this.zoomControl.addTo(this.map);
+    }
 
     leaflet.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
@@ -83,6 +94,38 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
     this.markerLayer = leaflet.layerGroup().addTo(this.map);
     this.updateMarkers();
     setTimeout(() => this.map?.invalidateSize(), 0);
+  }
+
+  private isInteractive(): boolean {
+    return this.interactive && !this.disabled;
+  }
+
+  private updateInteractivity(): void {
+    if (!this.map) return;
+    const interactive = this.isInteractive();
+    const toggle = (handler?: { enable: () => void; disable: () => void }) => {
+      if (!handler) return;
+      if (interactive) {
+        handler.enable();
+      } else {
+        handler.disable();
+      }
+    };
+    toggle(this.map.dragging);
+    toggle(this.map.scrollWheelZoom);
+    toggle(this.map.doubleClickZoom);
+    toggle(this.map.boxZoom);
+    toggle(this.map.keyboard);
+    toggle(this.map.touchZoom);
+
+    if (interactive) {
+      if (!this.zoomControl) {
+        this.zoomControl = leaflet.control.zoom();
+      }
+      this.zoomControl.addTo(this.map);
+    } else if (this.zoomControl) {
+      this.zoomControl.remove();
+    }
   }
 
   private updateMarkers(): void {

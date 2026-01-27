@@ -1,8 +1,10 @@
 import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, output, signal } from '@angular/core';
-import { toSignal, takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
-import { MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -11,12 +13,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
 import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { TranslocoPipe } from '@jsverse/transloco';
 import { startWith } from 'rxjs';
+import { DisplayMessageConfig } from '../../../interfaces/display-message-config';
 import { Location } from '../../../interfaces/location';
 import {
+  ViatorDestinationLookup,
   ViatorFreetextProductFiltering,
   ViatorFreetextProductSorting,
   ViatorFreetextSearchRequest,
@@ -27,13 +29,13 @@ import {
   ViatorProductSearchResponse,
   ViatorProductSearchSorting,
   ViatorRangeDate,
-  ViatorRangeNumber,
-  ViatorDestinationLookup
+  ViatorRangeNumber
 } from '../../../interfaces/viator';
-import { ViatorService } from '../../../services/viator.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
-import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
+import { ViatorService } from '../../../services/viator.service';
+import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 
 export type ExperienceProvider = 'viator';
 export type ExperienceSortOption = 'relevance' | 'rating' | 'price_low' | 'price_high';
@@ -134,6 +136,7 @@ export class ExperienceSearchComponent {
   private readonly viatorService = inject(ViatorService);
   private readonly i18n = inject(TranslationHelperService);
   readonly help = inject(HelpDialogService);
+  private readonly dialog = inject(MatDialog);
 
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
     { value: 'relevance', labelKey: 'common.experiences.sortRelevance' },
@@ -391,6 +394,32 @@ export class ExperienceSearchComponent {
     this.hasSearched.set(true);
     this.loading.set(false);
     this.refreshDestinationMarkers(combined);
+    if (!append && mapped.length === 0) {
+      this.showNoResultsMessage();
+    }
+  }
+
+  private showNoResultsMessage(): void {
+    const config: DisplayMessageConfig = {
+      showAlways: true,
+      title: this.i18n.t('common.experiences.title'),
+      image: '',
+      icon: 'search_off',
+      message: this.i18n.t('common.experiences.noResults'),
+      button: '',
+      delay: 2000,
+      showSpinner: false,
+      autoclose: true
+    };
+    this.dialog.open(DisplayMessage, {
+      panelClass: '',
+      closeOnNavigation: false,
+      data: config,
+      maxWidth: '90vw',
+      maxHeight: '90vh',
+      hasBackdrop: false,
+      autoFocus: false
+    });
   }
 
   private refreshDestinationMarkers(results: ExperienceResult[]): void {
