@@ -2,6 +2,7 @@ const express = require('express');
 const axios = require('axios');
 const security = require('../middleware/security');
 const tableViatorCache = require('../db/tableViatorCache');
+const tableViatorDestinations = require('../db/tableViatorDestinations');
 
 const router = express.Router();
 
@@ -10,6 +11,7 @@ const MAX_QUERY_PARAMS = 40;
 const MAX_STRING_LEN = 500;
 const MAX_TOTAL_KEYS = 200;
 const MAX_DEPTH = 4;
+const MAX_DESTINATION_IDS = 200;
 
 const DEFAULT_TIMEOUT_MS = 15000;
 
@@ -186,6 +188,35 @@ function buildError(status, message, detail) {
   return err;
 }
 
+function parseDestinationIds(value) {
+  if (value === undefined || value === null) {
+    return [];
+  }
+  const raw = Array.isArray(value) ? value.join(',') : String(value);
+  const parts = raw.split(',').map((entry) => entry.trim()).filter(Boolean);
+  const seen = new Set();
+  const ids = [];
+  for (const part of parts) {
+    if (ids.length >= MAX_DESTINATION_IDS) break;
+    const num = Number(part);
+    if (!Number.isFinite(num)) continue;
+    const intVal = Math.trunc(num);
+    if (intVal <= 0 || seen.has(intVal)) continue;
+    seen.add(intVal);
+    ids.push(intVal);
+  }
+  return ids;
+}
+
+function safeJsonParse(value) {
+  if (!value) return undefined;
+  try {
+    return JSON.parse(value);
+  } catch {
+    return undefined;
+  }
+}
+
 async function getCachedResponse(db, cacheKey) {
   return new Promise((resolve, reject) => {
     tableViatorCache.getCache(db, cacheKey, (err, row) => {
@@ -217,6 +248,36 @@ async function setCachedResponse(db, cacheKey, payload, status, headers, ttlSeco
 
 router.use(security.checkToken);
 router.use(express.json({ limit: MAX_BODY_BYTES }));
+
+router.get('/destinations', (req, res, next) => {
+  const db = req.database?.db;
+  if (!db) {
+    return next(buildError(500, 'database_unavailable'));
+  }
+  const ids = parseDestinationIds(req.query?.ids);
+  if (!ids.length) {
+    return next(buildError(400, 'destination_ids_required'));
+  }
+  const rows = tableViatorDestinations.getByIds(db, ids);
+  const destinations = rows.map((row) => {
+    const hasCenter = Number.isFinite(row.centerLat) && Number.isFinite(row.centerLng);
+    return {
+      destinationId: row.destinationId,
+      name: row.name || undefined,
+      type: row.type || undefined,
+      parentDestinationId: row.parentDestinationId ?? undefined,
+      lookupId: row.lookupId || undefined,
+      destinationUrl: row.destinationUrl || undefined,
+      defaultCurrencyCode: row.defaultCurrencyCode || undefined,
+      timeZone: row.timeZone || undefined,
+      iataCodes: safeJsonParse(row.iataCodes),
+      countryCallingCode: row.countryCallingCode || undefined,
+      languages: safeJsonParse(row.languages),
+      center: hasCenter ? { latitude: row.centerLat, longitude: row.centerLng } : undefined
+    };
+  });
+  return res.status(200).json({ destinations, totalCount: destinations.length });
+});
 
 router.use(async (req, res, next) => {
   const endpoint = getEndpointConfig(req.method, req.path);

@@ -118,7 +118,8 @@
 
     <section class="results-panel">
       @if (viewMode() === 'map') {
-        <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3">
+        <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
+          [markers]="mapMarkers()" [fitMarkers]="true">
         </app-search-settings-map-preview>
       }
 

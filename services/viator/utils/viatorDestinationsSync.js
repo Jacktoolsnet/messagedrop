@@ -57,6 +57,12 @@ function normalizeDestination(entry) {
     return null;
   }
   const center = entry.center && typeof entry.center === 'object' ? entry.center : null;
+  const rawLat = center?.latitude;
+  const rawLng = center?.longitude;
+  const lat = Number.isFinite(rawLat) ? rawLat : Number(rawLat);
+  const lng = Number.isFinite(rawLng) ? rawLng : Number(rawLng);
+  const centerLat = Number.isFinite(lat) ? lat : null;
+  const centerLng = Number.isFinite(lng) ? lng : null;
   return {
     destinationId: Number(entry.destinationId),
     name: entry.name ? String(entry.name) : null,
@@ -69,8 +75,8 @@ function normalizeDestination(entry) {
     iataCodes: Array.isArray(entry.iataCodes) ? JSON.stringify(entry.iataCodes) : null,
     countryCallingCode: entry.countryCallingCode ? String(entry.countryCallingCode) : null,
     languages: Array.isArray(entry.languages) ? JSON.stringify(entry.languages) : null,
-    centerLat: center && typeof center.latitude === 'number' ? center.latitude : null,
-    centerLng: center && typeof center.longitude === 'number' ? center.longitude : null
+    centerLat,
+    centerLng
   };
 }
 

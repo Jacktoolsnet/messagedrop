@@ -1,10 +1,11 @@
-import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable, catchError, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 import {
   ViatorFreetextSearchRequest,
   ViatorFreetextSearchResponse,
+  ViatorDestinationsResponse,
   ViatorProductSearchRequest,
   ViatorProductSearchResponse
 } from '../interfaces/viator';
@@ -117,6 +118,29 @@ export class ViatorService {
     });
 
     return this.http.post<unknown>(url, { destinationId }, this.httpOptions)
+      .pipe(catchError(this.handleError));
+  }
+
+  getDestinations(ids: number[], showAlways = false): Observable<ViatorDestinationsResponse> {
+    const sanitized = Array.isArray(ids)
+      ? Array.from(new Set(ids.filter((id) => Number.isFinite(id) && id > 0)))
+      : [];
+    const url = `${environment.apiUrl}/viator/destinations`;
+    const params = new HttpParams().set('ids', sanitized.join(','));
+
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.viator.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.viator.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.get<ViatorDestinationsResponse>(url, { ...this.httpOptions, params })
       .pipe(catchError(this.handleError));
   }
 }

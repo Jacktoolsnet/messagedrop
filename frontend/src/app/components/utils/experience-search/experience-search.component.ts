@@ -27,7 +27,8 @@ import {
   ViatorProductSearchResponse,
   ViatorProductSearchSorting,
   ViatorRangeDate,
-  ViatorRangeNumber
+  ViatorRangeNumber,
+  ViatorDestinationLookup
 } from '../../../interfaces/viator';
 import { ViatorService } from '../../../services/viator.service';
 import { TranslationHelperService } from '../../../services/translation-helper.service';
@@ -80,6 +81,7 @@ export interface ExperienceResult {
   provider: ExperienceProvider;
   trackId: string;
   productCode?: string;
+  destinationIds?: number[];
   title?: string;
   description?: string;
   rating?: number;
@@ -90,6 +92,13 @@ export interface ExperienceResult {
   imageUrl?: string;
   productUrl?: string;
   raw: unknown;
+}
+
+interface ExperienceMapMarker {
+  destinationId: number;
+  latitude: number;
+  longitude: number;
+  label?: string;
 }
 
 @Component({
@@ -174,8 +183,11 @@ export class ExperienceSearchComponent {
   readonly viewMode = signal<'map' | 'list'>('map');
   readonly selectedResult = signal<ExperienceResult | null>(null);
   readonly worldCenter: Location = { latitude: 0, longitude: 0, plusCode: '' };
+  readonly mapMarkers = signal<ExperienceMapMarker[]>([]);
   readonly priceRange = { min: PRICE_RANGE_MIN, max: PRICE_RANGE_MAX, step: 10 };
   readonly durationRange = { min: DURATION_RANGE_MIN, max: DURATION_RANGE_MAX, step: 1 };
+  private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
+  private lastDestinationIds: number[] = [];
 
   readonly canSearch = computed(() => {
     const value = this.formValue();
@@ -378,6 +390,56 @@ export class ExperienceSearchComponent {
     this.totalCount.set(totalCount);
     this.hasSearched.set(true);
     this.loading.set(false);
+    this.refreshDestinationMarkers(combined);
+  }
+
+  private refreshDestinationMarkers(results: ExperienceResult[]): void {
+    const destinationIds = new Set<number>();
+    results.forEach((result) => {
+      (result.destinationIds ?? []).forEach((id) => destinationIds.add(id));
+    });
+    const uniqueIds = Array.from(destinationIds).slice(0, 200);
+    this.lastDestinationIds = uniqueIds;
+    this.mapMarkers.set(this.buildMarkers(uniqueIds));
+    const missing = uniqueIds.filter((id) => !this.destinationCache.has(id));
+    if (missing.length === 0) {
+      return;
+    }
+    this.viatorService.getDestinations(missing, false)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (response) => {
+          const list = Array.isArray(response.destinations) ? response.destinations : [];
+          list.forEach((destination) => {
+            if (destination && typeof destination.destinationId === 'number') {
+              this.destinationCache.set(destination.destinationId, destination);
+            }
+          });
+          this.mapMarkers.set(this.buildMarkers(this.lastDestinationIds));
+        },
+        error: () => {
+          // No UI error here; markers are optional.
+        }
+      });
+  }
+
+  private buildMarkers(ids: number[]): ExperienceMapMarker[] {
+    const markers: ExperienceMapMarker[] = [];
+    ids.forEach((id) => {
+      const destination = this.destinationCache.get(id);
+      const lat = destination?.center?.latitude;
+      const lng = destination?.center?.longitude;
+      if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+        return;
+      }
+      markers.push({
+        destinationId: id,
+        label: destination?.name,
+        latitude: lat as number,
+        longitude: lng as number
+      });
+    });
+    return markers;
   }
 }
 
@@ -518,6 +580,7 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
     record?.['id'],
     record?.['code']
   );
+  const destinationIds = extractDestinationIds(record);
   const title = firstString(record?.['title'], record?.['name'], record?.['productTitle']);
   const description = firstString(record?.['shortDescription'], record?.['summary'], record?.['description']);
   const { rating, reviewCount } = resolveReviews(record);
@@ -530,6 +593,7 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
     provider: 'viator',
     trackId: productCode ? `viator:${productCode}` : `viator:${index}`,
     productCode: productCode || undefined,
+    destinationIds: destinationIds.length ? destinationIds : undefined,
     title: title || undefined,
     description: description || undefined,
     rating: rating ?? undefined,
@@ -541,6 +605,28 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
     productUrl: productUrl || undefined,
     raw: item
   };
+}
+
+function extractDestinationIds(record: Record<string, unknown> | null): number[] {
+  const ids: number[] = [];
+  const destinations = Array.isArray(record?.['destinations']) ? (record?.['destinations'] as unknown[]) : [];
+  destinations.forEach((entry) => {
+    const dest = asRecord(entry);
+    const id = firstNumber(dest?.['ref'], dest?.['destinationId'], dest?.['id']);
+    if (id === undefined) return;
+    const intVal = Math.trunc(id);
+    if (intVal > 0 && !ids.includes(intVal)) {
+      ids.push(intVal);
+    }
+  });
+  const fallbackId = firstNumber(record?.['destinationId']);
+  if (fallbackId !== undefined) {
+    const intVal = Math.trunc(fallbackId);
+    if (intVal > 0 && !ids.includes(intVal)) {
+      ids.push(intVal);
+    }
+  }
+  return ids;
 }
 
 function extractProductsFromResponse(

@@ -97,3 +97,28 @@ export interface ViatorFreetextSearchResponse {
   destinations?: unknown[];
   attractions?: unknown[];
 }
+
+export interface ViatorDestinationCenter {
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface ViatorDestinationLookup {
+  destinationId: number;
+  name?: string;
+  type?: string;
+  parentDestinationId?: number;
+  lookupId?: string;
+  destinationUrl?: string;
+  defaultCurrencyCode?: string;
+  timeZone?: string;
+  iataCodes?: string[];
+  countryCallingCode?: string;
+  languages?: string[];
+  center?: ViatorDestinationCenter;
+}
+
+export interface ViatorDestinationsResponse {
+  destinations?: ViatorDestinationLookup[];
+  totalCount?: number;
+}
