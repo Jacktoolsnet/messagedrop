@@ -1,6 +1,7 @@
 const path = require('path');
 const { DatabaseSync } = require('node:sqlite');
 const tableViatorCache = require('./tableViatorCache');
+const tableViatorDestinations = require('./tableViatorDestinations');
 
 
 class Database {
@@ -17,6 +18,7 @@ class Database {
       this.db.exec('PRAGMA foreign_keys = ON;');
 
       tableViatorCache.init(this.db);
+      tableViatorDestinations.init(this.db);
 
       // Trigger initialisieren
       this.initTriggers();
@@ -43,7 +45,13 @@ class Database {
   }
 
   initIndexes() {
-
+    try {
+      this.db.exec('CREATE INDEX IF NOT EXISTS idx_viator_dest_parent ON tableViatorDestinations(parentDestinationId);');
+      this.db.exec('CREATE INDEX IF NOT EXISTS idx_viator_dest_type ON tableViatorDestinations(type);');
+      this.db.exec('CREATE INDEX IF NOT EXISTS idx_viator_dest_sync ON tableViatorDestinations(syncRunId);');
+    } catch (err) {
+      this.logger?.warn?.(err?.message || err);
+    }
   }
 
 }

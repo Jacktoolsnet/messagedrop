@@ -18,6 +18,7 @@ const { generateOrLoadKeypairs } = require('./utils/keyStore');
 const viator = require('./routes/viator');
 const { resolveBaseUrl, attachForwarding } = require('./utils/adminLogForwarder');
 const { normalizeErrorResponses, notFoundHandler, errorHandler } = require('./middleware/api-error');
+const { syncDestinations } = require('./utils/viatorDestinationsSync');
 
 // Tables für Cron-Jobs
 const tableViatorCache = require('./db/tableViatorCache');
@@ -212,6 +213,9 @@ app.use(errorHandler);
       const port = typeof address === 'string' ? address : address.port;
       logger.info(`Server läuft auf Port ${port}`);
       database.init(logger);
+      setImmediate(() => {
+        syncDestinations({ db: database.db, logger, force: false });
+      });
     });
   } catch (err) {
     logger.error('Fehler beim Initialisieren des Keystores:', err);
@@ -237,4 +241,11 @@ cron.schedule('5 0 * * *', () => {
       logger.error(err);
     }
   });
+});
+
+// Weekly destination sync (Sunday -> Monday at 00:05)
+cron.schedule('5 0 * * 1', () => {
+  syncDestinations({ db: database.db, logger, force: true });
+}, {
+  timezone: process.env.TZ || 'Europe/Berlin'
 });
