@@ -288,14 +288,13 @@ export class ExperienceSearchComponent {
   }
 
   private handleProductSearchResponse(response: ViatorProductSearchResponse, append: boolean): void {
-    const items = Array.isArray(response.products) ? response.products : [];
-    const totalCount = typeof response.totalCount === 'number' ? response.totalCount : null;
+    const { items, totalCount } = extractProductsFromResponse(response.products, response.totalCount ?? null);
     this.applyResults(items, append, totalCount);
   }
 
   private handleFreetextSearchResponse(response: ViatorFreetextSearchResponse, append: boolean): void {
-    const items = Array.isArray(response.products) ? response.products : [];
-    this.applyResults(items, append, null);
+    const { items, totalCount } = extractProductsFromResponse(response.products, null);
+    this.applyResults(items, append, totalCount);
   }
 
   private handleSearchError(error: unknown): void {
@@ -521,11 +520,9 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
   );
   const title = firstString(record?.['title'], record?.['name'], record?.['productTitle']);
   const description = firstString(record?.['shortDescription'], record?.['summary'], record?.['description']);
-  const rating = firstNumber(record?.['rating'], record?.['averageRating']);
-  const reviewCount = firstNumber(record?.['reviewCount'], record?.['totalReviews'], record?.['ratingCount']);
-  const priceFrom = firstNumber(record?.['fromPrice'], record?.['price'], record?.['startingPrice'], record?.['priceFrom']);
-  const currency = firstString(record?.['currency'], record?.['currencyCode']);
-  const duration = firstString(record?.['duration'], record?.['durationText']);
+  const { rating, reviewCount } = resolveReviews(record);
+  const { priceFrom, currency } = resolvePricing(record);
+  const duration = resolveDuration(record);
   const productUrl = firstString(record?.['productUrl'], record?.['url'], record?.['bookingUrl']);
   const imageUrl = resolveImageUrl(record);
 
@@ -546,6 +543,87 @@ function normalizeExperience(item: unknown, index: number): ExperienceResult {
   };
 }
 
+function extractProductsFromResponse(
+  products: unknown[] | { results?: unknown[]; totalCount?: number } | undefined,
+  fallbackTotalCount: number | null
+): { items: unknown[]; totalCount: number | null } {
+  if (Array.isArray(products)) {
+    return { items: products, totalCount: fallbackTotalCount };
+  }
+  const record = asRecord(products);
+  const items = Array.isArray(record?.['results']) ? (record?.['results'] as unknown[]) : [];
+  const totalCount = typeof record?.['totalCount'] === 'number' ? record['totalCount'] : fallbackTotalCount;
+  return { items, totalCount };
+}
+
+function resolvePricing(record: Record<string, unknown> | null): { priceFrom?: number; currency?: string } {
+  const pricing = asRecord(record?.['pricing']);
+  const summary = asRecord(pricing?.['summary']);
+  const priceFrom = firstNumber(
+    summary?.['fromPrice'],
+    summary?.['fromPriceBeforeDiscount'],
+    record?.['fromPrice'],
+    record?.['price'],
+    record?.['startingPrice'],
+    record?.['priceFrom']
+  );
+  const currency = firstString(pricing?.['currency'], summary?.['currency'], record?.['currency'], record?.['currencyCode']);
+  return { priceFrom: priceFrom ?? undefined, currency: currency || undefined };
+}
+
+function resolveReviews(record: Record<string, unknown> | null): { rating?: number; reviewCount?: number } {
+  const reviews = asRecord(record?.['reviews']);
+  let rating = firstNumber(reviews?.['combinedAverageRating'], reviews?.['averageRating'], record?.['rating']);
+  let reviewCount = firstNumber(reviews?.['totalReviews'], reviews?.['reviewCount'], record?.['reviewCount']);
+  if ((rating === undefined || reviewCount === undefined) && Array.isArray(reviews?.['sources'])) {
+    const sources = reviews?.['sources'] as unknown[];
+    const mapped = sources.map((source) => asRecord(source)).filter(Boolean) as Record<string, unknown>[];
+    if (rating === undefined) {
+      rating = firstNumber(...mapped.map((source) => source['averageRating']));
+    }
+    if (reviewCount === undefined) {
+      reviewCount = firstNumber(...mapped.map((source) => source['totalCount']));
+    }
+  }
+  return { rating: rating ?? undefined, reviewCount: reviewCount ?? undefined };
+}
+
+function resolveDuration(record: Record<string, unknown> | null): string | undefined {
+  const duration = asRecord(record?.['duration']);
+  if (!duration) {
+    return firstString(record?.['duration'], record?.['durationText']);
+  }
+  const fixed = firstNumber(duration['fixedDurationInMinutes']);
+  if (fixed !== undefined) {
+    return formatDurationMinutes(fixed);
+  }
+  const from = firstNumber(duration['variableDurationFromMinutes'], duration['fromMinutes']);
+  const to = firstNumber(duration['variableDurationToMinutes'], duration['toMinutes']);
+  if (from !== undefined && to !== undefined && from !== to) {
+    return `${formatDurationMinutes(from)}–${formatDurationMinutes(to)}`;
+  }
+  if (from !== undefined) {
+    return formatDurationMinutes(from);
+  }
+  if (to !== undefined) {
+    return formatDurationMinutes(to);
+  }
+  return firstString(record?.['duration'], record?.['durationText']);
+}
+
+function formatDurationMinutes(minutes: number): string {
+  const rounded = Math.round(minutes);
+  if (rounded >= 60) {
+    const hours = Math.floor(rounded / 60);
+    const mins = rounded % 60;
+    if (mins === 0) {
+      return `${hours} h`;
+    }
+    return `${hours} h ${mins} min`;
+  }
+  return `${rounded} min`;
+}
+
 function resolveImageUrl(record: Record<string, unknown> | null): string | undefined {
   if (!record) return undefined;
   const direct = firstString(
@@ -557,7 +635,8 @@ function resolveImageUrl(record: Record<string, unknown> | null): string | undef
   if (direct) return direct;
   const images = Array.isArray(record['images']) ? (record['images'] as unknown[]) : [];
   if (images.length === 0) return undefined;
-  const imageRecord = asRecord(images[0]);
+  const cover = images.map((entry) => asRecord(entry)).find((entry) => entry?.['isCover'] === true);
+  const imageRecord = cover ?? asRecord(images[0]);
   if (!imageRecord) return undefined;
   const nestedDirect = firstString(
     imageRecord['url'],
@@ -568,8 +647,25 @@ function resolveImageUrl(record: Record<string, unknown> | null): string | undef
   );
   if (nestedDirect) return nestedDirect;
   const variants = Array.isArray(imageRecord['variants']) ? (imageRecord['variants'] as unknown[]) : [];
-  const variantRecord = variants.length > 0 ? asRecord(variants[0]) : null;
-  return firstString(variantRecord?.['url'], variantRecord?.['imageUrl']);
+  const bestVariant = pickLargestVariant(variants);
+  return firstString(bestVariant?.['url'], bestVariant?.['imageUrl']);
+}
+
+function pickLargestVariant(variants: unknown[]): Record<string, unknown> | null {
+  let best: Record<string, unknown> | null = null;
+  let bestArea = -1;
+  for (const variant of variants) {
+    const record = asRecord(variant);
+    if (!record) continue;
+    const width = typeof record['width'] === 'number' ? record['width'] : Number(record['width']);
+    const height = typeof record['height'] === 'number' ? record['height'] : Number(record['height']);
+    const area = Number.isFinite(width) && Number.isFinite(height) ? width * height : 0;
+    if (area > bestArea) {
+      bestArea = area;
+      best = record;
+    }
+  }
+  return best;
 }
 
 function asRecord(value: unknown): Record<string, unknown> | null {

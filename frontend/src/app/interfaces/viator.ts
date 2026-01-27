@@ -88,12 +88,12 @@ export interface ViatorFreetextSearchRequest {
 }
 
 export interface ViatorProductSearchResponse {
-  products?: unknown[];
+  products?: unknown[] | { results?: unknown[]; totalCount?: number };
   totalCount?: number;
 }
 
 export interface ViatorFreetextSearchResponse {
-  products?: unknown[];
+  products?: unknown[] | { results?: unknown[]; totalCount?: number };
   destinations?: unknown[];
   attractions?: unknown[];
 }

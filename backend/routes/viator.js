@@ -30,9 +30,20 @@ const viatorBase = normalizeBaseUrl(
   resolveBaseUrl(process.env.VIATOR_BASE_URL, process.env.VIATOR_PORT)
 );
 const viatorBaseError = viatorBase ? null : 'VIATOR_BASE_URL is missing or invalid';
+const DEFAULT_PROXY_TIMEOUT_MS = 20000;
+
+function resolveTimeoutMs(rawValue, fallback) {
+  const parsed = Number(rawValue);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return Math.round(parsed);
+}
+
+const PROXY_TIMEOUT_MS = resolveTimeoutMs(process.env.VIATOR_PROXY_TIMEOUT_MS, DEFAULT_PROXY_TIMEOUT_MS);
 const client = viatorBase ? axios.create({
   baseURL: `${viatorBase}/viator`,
-  timeout: 5000,
+  timeout: PROXY_TIMEOUT_MS,
   validateStatus: () => true,
   headers: {
     'content-type': 'application/json'

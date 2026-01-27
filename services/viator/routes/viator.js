@@ -11,7 +11,15 @@ const MAX_STRING_LEN = 500;
 const MAX_TOTAL_KEYS = 200;
 const MAX_DEPTH = 4;
 
-const DEFAULT_TIMEOUT_MS = 6000;
+const DEFAULT_TIMEOUT_MS = 15000;
+
+function resolveTimeoutMs(rawValue, fallback) {
+  const parsed = Number(rawValue);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return fallback;
+  }
+  return Math.round(parsed);
+}
 
 const CACHE_TTLS = {
   tags: 60 * 60 * 24, // 24h
@@ -68,7 +76,7 @@ function buildApiClient() {
   }
   const client = axios.create({
     baseURL: baseUrl,
-    timeout: Number(process.env.VIATOR_API_TIMEOUT_MS) || DEFAULT_TIMEOUT_MS,
+    timeout: resolveTimeoutMs(process.env.VIATOR_API_TIMEOUT_MS, DEFAULT_TIMEOUT_MS),
     validateStatus: () => true,
     headers: {
       'content-type': 'application/json'
