@@ -29,7 +29,7 @@
       <div class="filter-menu-content" (click)="$event.stopPropagation()">
         <div class="filter-tiles">
           <section class="filter-tile">
-            <div class="tile-header">
+            <div class="filter-tile-header">
               <mat-icon>event</mat-icon>
               <span>{{ 'common.experiences.dateFrom' | transloco }} / {{ 'common.experiences.dateTo' | transloco }}</span>
             </div>
@@ -52,7 +52,7 @@
           </section>
 
           <section class="filter-tile">
-            <div class="tile-header">
+            <div class="filter-tile-header">
               <mat-icon>payments</mat-icon>
               <span>{{ 'common.experiences.minPrice' | transloco }} / {{ 'common.experiences.maxPrice' | transloco }}</span>
             </div>
@@ -71,7 +71,7 @@
           </section>
 
           <section class="filter-tile">
-            <div class="tile-header">
+            <div class="filter-tile-header">
               <mat-icon>schedule</mat-icon>
               <span>{{ 'common.experiences.minDuration' | transloco }} / {{ 'common.experiences.maxDuration' | transloco }}</span>
             </div>
@@ -90,13 +90,12 @@
           </section>
 
           <section class="filter-tile">
-            <div class="tile-header">
+            <div class="filter-tile-header">
               <mat-icon>paid</mat-icon>
               <span>{{ 'common.experiences.currency' | transloco }}</span>
             </div>
             <div class="tile-body">
               <mat-form-field appearance="outline">
-                <mat-label>{{ 'common.experiences.currency' | transloco }}</mat-label>
                 <mat-select [formControl]="form.controls.currency">
                   @for (code of currencyOptions; track code) {
                     <mat-option [value]="code">{{ code }}</mat-option>
