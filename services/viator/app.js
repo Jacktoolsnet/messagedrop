@@ -235,7 +235,7 @@ app.use(errorHandler);
 // │ │ │ │ │ │
 // * * * * * *
 // Clean long cached data.
-cron.schedule('5 0 * * *', () => {
+cron.schedule('5 * * * *', () => {
   tableViatorCache.cleanExpired(database.db, function (err) {
     if (err) {
       logger.error(err);

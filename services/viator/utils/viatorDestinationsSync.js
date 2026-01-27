@@ -93,6 +93,13 @@ function formatBytes(bytes) {
   return `${kb.toFixed(1)} KB`;
 }
 
+function normalizeAcceptLanguage(rawValue) {
+  if (!rawValue) return null;
+  const first = String(rawValue).split(',')[0]?.split(';')[0]?.trim().replace('_', '-');
+  if (!first) return null;
+  return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(first) ? first : null;
+}
+
 async function syncDestinations({ db, logger, force = false } = {}) {
   if (syncInProgress) {
     logger?.warn?.('Destination sync already running, skipping.');
@@ -119,10 +126,12 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     syncInProgress = true;
     logger?.info?.('Destination sync started.');
     logger?.info?.('Destination sync download started.');
+    const acceptLanguage = normalizeAcceptLanguage(process.env.VIATOR_ACCEPT_LANGUAGE) || 'en';
     const response = await client.get('/destinations', {
       headers: {
         'exp-api-key': process.env.VIATOR_API_KEY,
-        Accept: 'application/json;version=2.0'
+        Accept: 'application/json;version=2.0',
+        'accept-language': acceptLanguage
       }
     });
 

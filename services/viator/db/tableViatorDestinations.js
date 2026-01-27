@@ -88,7 +88,7 @@ const getByIds = function (db, destinationIds) {
     FROM ${tableName}
     WHERE destinationId IN (${placeholders});
   `;
-  return db.prepare(sql).all(destinationIds);
+  return db.prepare(sql).all(...destinationIds);
 };
 
 module.exports = {

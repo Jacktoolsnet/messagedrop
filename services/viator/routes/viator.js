@@ -174,7 +174,7 @@ function buildCacheKey(method, path, query, body) {
 }
 
 function extractForwardHeaders(req) {
-  const acceptLanguage = req.get('accept-language');
+  const acceptLanguage = normalizeAcceptLanguage(req.get('accept-language') || process.env.VIATOR_ACCEPT_LANGUAGE);
   return acceptLanguage ? { 'accept-language': acceptLanguage } : {};
 }
 
@@ -186,6 +186,13 @@ function buildError(status, message, detail) {
     err.detail = detail;
   }
   return err;
+}
+
+function normalizeAcceptLanguage(rawValue) {
+  if (!rawValue) return null;
+  const first = String(rawValue).split(',')[0]?.split(';')[0]?.trim().replace('_', '-');
+  if (!first) return null;
+  return /^[A-Za-z]{2,3}(-[A-Za-z0-9]{2,8})?$/.test(first) ? first : null;
 }
 
 function parseDestinationIds(value) {
