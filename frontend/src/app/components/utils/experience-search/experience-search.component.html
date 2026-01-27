@@ -41,12 +41,13 @@
                 <mat-datepicker #startPicker></mat-datepicker>
               </mat-form-field>
 
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
-                <input matInput [matDatepicker]="endPicker" [formControl]="form.controls.endDate" />
-                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-                <mat-datepicker #endPicker></mat-datepicker>
-              </mat-form-field>
+          <mat-form-field appearance="outline">
+            <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
+            <input matInput [matDatepicker]="endPicker" [formControl]="form.controls.endDate"
+              [min]="form.controls.startDate.value" [disabled]="!form.controls.startDate.value" />
+            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+            <mat-datepicker #endPicker></mat-datepicker>
+          </mat-form-field>
             </div>
           </section>
 
@@ -62,8 +63,8 @@
                   <input matSliderEndThumb [formControl]="form.controls.maxPrice" />
                 </mat-slider>
                 <div class="slider-values">
-                  <span>{{ form.controls.minPrice.value }}</span>
-                  <span>{{ form.controls.maxPrice.value }}</span>
+                  <span>{{ form.controls.minPrice.value }} {{ form.controls.currency.value }}</span>
+                  <span>{{ form.controls.maxPrice.value }} {{ form.controls.currency.value }}</span>
                 </div>
               </div>
             </div>
@@ -96,7 +97,11 @@
             <div class="tile-body">
               <mat-form-field appearance="outline">
                 <mat-label>{{ 'common.experiences.currency' | transloco }}</mat-label>
-                <input matInput type="text" [formControl]="form.controls.currency" />
+                <mat-select [formControl]="form.controls.currency">
+                  @for (code of currencyOptions; track code) {
+                    <mat-option [value]="code">{{ code }}</mat-option>
+                  }
+                </mat-select>
               </mat-form-field>
             </div>
           </section>

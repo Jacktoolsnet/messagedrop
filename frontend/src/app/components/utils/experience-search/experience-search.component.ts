@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatRadioModule } from '@angular/material/radio';
+import { MatSelectModule } from '@angular/material/select';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
@@ -37,11 +38,31 @@ export type ExperienceProvider = 'viator';
 export type ExperienceSortOption = 'relevance' | 'rating' | 'price_low' | 'price_high';
 
 const PAGE_SIZE = 20;
-const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
 const PRICE_RANGE_MIN = 0;
 const PRICE_RANGE_MAX = 5000;
 const DURATION_RANGE_MIN = 0;
 const DURATION_RANGE_MAX = 72;
+const SUPPORTED_CURRENCIES = [
+  'AUD',
+  'BRL',
+  'CAD',
+  'CHF',
+  'DKK',
+  'EUR',
+  'GBP',
+  'HKD',
+  'INR',
+  'JPY',
+  'NOK',
+  'NZD',
+  'SEK',
+  'SGD',
+  'TWD',
+  'USD',
+  'ZAR'
+] as const;
+const SUPPORTED_CURRENCY_SET = new Set<string>(SUPPORTED_CURRENCIES);
+const DEFAULT_CURRENCY = resolveCurrencyFromLocale();
 
 interface ExperienceSearchForm {
   term: FormControl<string>;
@@ -85,6 +106,7 @@ export interface ExperienceResult {
     MatNativeDateModule,
     MatDatepickerModule,
     MatMenuModule,
+    MatSelectModule,
     MatRadioModule,
     MatSliderModule,
     MatIcon,
@@ -110,6 +132,7 @@ export class ExperienceSearchComponent {
     { value: 'price_low', labelKey: 'common.experiences.sortPriceLow' },
     { value: 'price_high', labelKey: 'common.experiences.sortPriceHigh' }
   ];
+  readonly currencyOptions = SUPPORTED_CURRENCIES;
 
   readonly form = new FormGroup<ExperienceSearchForm>({
     term: new FormControl('', { nonNullable: true }),
@@ -127,6 +150,20 @@ export class ExperienceSearchComponent {
     this.form.valueChanges.pipe(startWith(this.form.getRawValue())),
     { requireSync: true }
   );
+
+  constructor() {
+    this.form.controls.startDate.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((startDate) => {
+        const endDate = this.form.controls.endDate.value;
+        if (startDate && endDate && endDate < startDate) {
+          this.form.controls.endDate.setValue(null);
+        }
+        if (!startDate && endDate) {
+          this.form.controls.endDate.setValue(null);
+        }
+      });
+  }
 
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
@@ -414,7 +451,10 @@ function formatDateInput(value: Date | string | null | undefined): string | unde
 
 function normalizeCurrency(input: string): string {
   const trimmed = input.trim().toUpperCase();
-  return trimmed.length === 3 ? trimmed : DEFAULT_CURRENCY;
+  if (trimmed.length !== 3) {
+    return DEFAULT_CURRENCY;
+  }
+  return SUPPORTED_CURRENCY_SET.has(trimmed) ? trimmed : DEFAULT_CURRENCY;
 }
 
 function resolveCurrencyFromLocale(): string {
@@ -447,32 +487,25 @@ function resolveCurrencyFromLocale(): string {
     SE: 'SEK',
     NO: 'NOK',
     DK: 'DKK',
-    PL: 'PLN',
-    CZ: 'CZK',
-    HU: 'HUF',
-    RO: 'RON',
-    BG: 'BGN',
     AU: 'AUD',
     NZ: 'NZD',
     CA: 'CAD',
     BR: 'BRL',
-    MX: 'MXN',
     JP: 'JPY',
-    KR: 'KRW',
     IN: 'INR',
     SG: 'SGD',
     HK: 'HKD',
     TW: 'TWD',
-    ZA: 'ZAR',
-    CN: 'CNY'
+    ZA: 'ZAR'
   };
 
   if (region && regionMap[region]) {
-    return regionMap[region];
+    const mapped = regionMap[region];
+    return SUPPORTED_CURRENCY_SET.has(mapped) ? mapped : 'USD';
   }
 
   if (lang === 'de' || lang === 'fr' || lang === 'es' || lang === 'it' || lang === 'nl' || lang === 'pt') {
-    return 'EUR';
+    return SUPPORTED_CURRENCY_SET.has('EUR') ? 'EUR' : 'USD';
   }
 
   return 'USD';
