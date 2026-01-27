@@ -87,6 +87,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
   try {
     const existingCount = tableViatorDestinations.countAll(db);
     if (!force && existingCount > 0) {
+      logger?.info?.(`Destination sync skipped (cache filled, ${existingCount} rows).`);
       return { ok: true, skipped: true, count: existingCount };
     }
 
@@ -97,6 +98,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
     }
 
     syncInProgress = true;
+    logger?.info?.('Destination sync started.');
     const response = await client.get('/destinations', {
       headers: {
         'exp-api-key': process.env.VIATOR_API_KEY,
@@ -150,7 +152,7 @@ async function syncDestinations({ db, logger, force = false } = {}) {
 
     tableViatorDestinations.deleteNotRunId(db, syncRunId);
 
-    logger?.info?.('Destination sync completed', { count: written });
+    logger?.info?.(`Destination sync completed (${written} rows).`);
     return { ok: true, count: written };
   } catch (err) {
     try {
