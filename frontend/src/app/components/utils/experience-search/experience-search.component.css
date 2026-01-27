@@ -216,7 +216,7 @@
   align-self: start;
   border-radius: 1.25rem;
   overflow: hidden;
-  height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   border: 1px solid var(--mat-card-outlined-outline-color);

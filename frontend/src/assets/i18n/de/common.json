@@ -813,6 +813,8 @@
       "sort": "Sortierung",
       "sortRelevance": "Relevanz",
       "sortRating": "Bewertung",
+      "sortRatingHigh": "Bewertung: absteigend",
+      "sortRatingLow": "Bewertung: aufsteigend",
       "sortPriceLow": "Preis: aufsteigend",
       "sortPriceHigh": "Preis: absteigend",
       "search": "Suchen",

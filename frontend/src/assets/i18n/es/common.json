@@ -813,6 +813,8 @@
       "sort": "Ordenar",
       "sortRelevance": "Relevancia",
       "sortRating": "Valoración",
+      "sortRatingHigh": "Valoración: de mayor a menor",
+      "sortRatingLow": "Valoración: de menor a mayor",
       "sortPriceLow": "Precio: menor a mayor",
       "sortPriceHigh": "Precio: mayor a menor",
       "search": "Buscar",

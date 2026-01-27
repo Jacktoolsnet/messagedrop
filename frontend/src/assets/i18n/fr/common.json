@@ -813,6 +813,8 @@
       "sort": "Trier",
       "sortRelevance": "Pertinence",
       "sortRating": "Note",
+      "sortRatingHigh": "Note : décroissante",
+      "sortRatingLow": "Note : croissante",
       "sortPriceLow": "Prix : croissant",
       "sortPriceHigh": "Prix : décroissant",
       "search": "Rechercher",

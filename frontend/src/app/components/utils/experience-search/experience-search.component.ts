@@ -39,7 +39,7 @@ import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
 
 export type ExperienceProvider = 'viator';
-export type ExperienceSortOption = 'relevance' | 'rating' | 'price_low' | 'price_high';
+export type ExperienceSortOption = 'relevance' | 'price_low' | 'price_high';
 
 const PAGE_SIZE = 20;
 const PRICE_RANGE_MIN = 0;
@@ -144,7 +144,6 @@ export class ExperienceSearchComponent {
 
   readonly sortOptions: { value: ExperienceSortOption; labelKey: string }[] = [
     { value: 'relevance', labelKey: 'common.experiences.sortRelevance' },
-    { value: 'rating', labelKey: 'common.experiences.sortRating' },
     { value: 'price_low', labelKey: 'common.experiences.sortPriceLow' },
     { value: 'price_high', labelKey: 'common.experiences.sortPriceHigh' }
   ];
@@ -182,6 +181,14 @@ export class ExperienceSearchComponent {
           this.form.controls.endDate.setValue(null);
         }
       });
+
+    this.form.controls.sort.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        if (this.hasSearched()) {
+          this.executeSearch(false, { term: this.lastSearchTerm, mode: this.lastSearchMode });
+        }
+      });
   }
 
   readonly loading = signal(false);
@@ -199,6 +206,8 @@ export class ExperienceSearchComponent {
   readonly durationRange = { min: DURATION_RANGE_MIN, max: DURATION_RANGE_MAX, step: 1 };
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
   private lastDestinationIds: number[] = [];
+  private lastSearchTerm = '';
+  private lastSearchMode: 'freetext' | 'product' = 'product';
 
   readonly canSearch = computed(() => {
     const value = this.formValue();
@@ -316,15 +325,23 @@ export class ExperienceSearchComponent {
     return result.imageUrl ? '0.9' : '0';
   }
 
-  private executeSearch(append: boolean): void {
+  private executeSearch(
+    append: boolean,
+    options?: { term?: string; mode?: 'freetext' | 'product' }
+  ): void {
     const value = this.form.getRawValue();
-    const term = value.term.trim();
+    const rawTerm = options?.term ?? value.term;
+    const term = rawTerm ? rawTerm.trim() : '';
     const start = append ? this.results().length + 1 : 1;
+    const mode = options?.mode ?? (term.length > 0 ? 'freetext' : 'product');
 
     this.loading.set(true);
     this.errorMessage.set(null);
 
-    if (term.length > 0) {
+    this.lastSearchTerm = term;
+    this.lastSearchMode = mode;
+
+    if (mode === 'freetext' && term.length > 0) {
       const request = this.buildFreetextSearchRequest(term, start);
       this.viatorService.searchFreetext(request)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -531,8 +548,6 @@ export class ExperienceSearchComponent {
 
 function mapProductSorting(value: ExperienceSortOption): ViatorProductSearchSorting | null {
   switch (value) {
-    case 'rating':
-      return { sort: 'TRAVELER_RATING', order: 'DESCENDING' };
     case 'price_low':
       return { sort: 'PRICE', order: 'ASCENDING' };
     case 'price_high':
@@ -544,8 +559,6 @@ function mapProductSorting(value: ExperienceSortOption): ViatorProductSearchSort
 
 function mapFreetextSorting(value: ExperienceSortOption): ViatorFreetextProductSorting | null {
   switch (value) {
-    case 'rating':
-      return { sort: 'REVIEW_AVG_RATING', order: 'DESCENDING' };
     case 'price_low':
       return { sort: 'PRICE', order: 'ASCENDING' };
     case 'price_high':
