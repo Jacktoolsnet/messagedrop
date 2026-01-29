@@ -27,6 +27,8 @@ interface LocationItem {
   name?: string;
   address?: string;
   description?: string;
+  latitude?: number;
+  longitude?: number;
 }
 
 interface MapMarker {
@@ -69,6 +71,11 @@ export class ExperienceSearchDetailDialogComponent {
   readonly endItems = computed(() => this.buildPointItems(this.detail()?.logistics?.end));
   readonly redemptionItems = computed(() => this.buildRedemptionItems());
   readonly pickupItems = computed(() => this.buildPickupItems());
+  readonly sameStartEnd = computed(() => {
+    const start = this.firstCenteredLocation(this.detail()?.logistics?.start);
+    const end = this.firstCenteredLocation(this.detail()?.logistics?.end);
+    return Boolean(start && end && this.isSameLocation(start, end));
+  });
 
   constructor(
     @Inject(MAT_DIALOG_DATA) readonly data: ExperienceSearchDetailDialogData,
@@ -177,6 +184,14 @@ export class ExperienceSearchDetailDialogComponent {
       .filter((item): item is LocationItem => Boolean(item));
   }
 
+  getCombinedPointItems(): LocationItem[] {
+    const start = this.startItems();
+    if (start.length) {
+      return start;
+    }
+    return this.endItems();
+  }
+
   private buildRedemptionItems(): LocationItem[] {
     const redemption = this.detail()?.logistics?.redemption;
     if (!redemption?.locations?.length && !redemption?.specialInstructions) {
@@ -228,7 +243,9 @@ export class ExperienceSearchDetailDialogComponent {
       ref,
       name: location?.name,
       address: this.formatLocationAddress(location),
-      description
+      description,
+      latitude: location?.center?.latitude,
+      longitude: location?.center?.longitude
     };
   }
 
@@ -249,14 +266,15 @@ export class ExperienceSearchDetailDialogComponent {
     const markers: MapMarker[] = [];
     const start = this.firstCenteredLocation(this.detail()?.logistics?.start);
     const end = this.firstCenteredLocation(this.detail()?.logistics?.end);
+    const sameLocation = Boolean(start && end && this.isSameLocation(start, end));
     if (start) {
       markers.push({
         latitude: start.center!.latitude!,
         longitude: start.center!.longitude!,
-        label: this.transloco.translate('common.experiences.startPoint')
+        label: this.transloco.translate(sameLocation ? 'common.experiences.startEndPoint' : 'common.experiences.startPoint')
       });
     }
-    if (end && (!start || !this.isSameLocation(start, end))) {
+    if (end && !sameLocation) {
       markers.push({
         latitude: end.center!.latitude!,
         longitude: end.center!.longitude!,
@@ -284,6 +302,41 @@ export class ExperienceSearchDetailDialogComponent {
       const location = this.locationIndex().get(ref);
       if (location?.center?.latitude !== undefined && location?.center?.longitude !== undefined) {
         return location;
+      }
+    }
+    return null;
+  }
+
+  getMapsUrl(item: LocationItem): string | null {
+    const query = this.formatMapsQuery(item);
+    if (!query) {
+      return null;
+    }
+    return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+  }
+
+  openMaps(item: LocationItem): void {
+    const query = this.formatMapsQuery(item);
+    if (!query) {
+      return;
+    }
+    const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+    window.open(url, '_blank');
+  }
+
+  private formatMapsQuery(item: LocationItem): string | null {
+    const lat = item.latitude;
+    const lng = item.longitude;
+    if (Number.isFinite(lat) && Number.isFinite(lng)) {
+      return `${lat},${lng}`;
+    }
+    return item.address || null;
+  }
+
+  getFirstMappableItem(items: LocationItem[]): LocationItem | null {
+    for (const item of items) {
+      if (this.getMapsUrl(item)) {
+        return item;
       }
     }
     return null;

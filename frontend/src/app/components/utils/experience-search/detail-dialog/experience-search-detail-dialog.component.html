@@ -28,8 +28,10 @@
 
     <mat-card class="detail-tile">
       <div class="detail-tile__header">
-        <mat-icon>description</mat-icon>
-        <span class="detail-tile__title">{{ 'common.experiences.description' | transloco }}</span>
+        <div class="detail-tile__header-left">
+          <mat-icon>description</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.description' | transloco }}</span>
+        </div>
       </div>
       <mat-card-content class="detail-body">
         <p class="detail-description">
@@ -38,63 +40,117 @@
       </mat-card-content>
     </mat-card>
 
-    @if (startItems().length) {
-    <mat-card class="detail-tile">
-      <div class="detail-tile__header">
-        <mat-icon>flag</mat-icon>
-        <span class="detail-tile__title">{{ 'common.experiences.startPoint' | transloco }}</span>
-      </div>
-      <mat-card-content class="detail-tile__body">
-        <div class="detail-section__body">
-          @for (item of startItems(); track item.ref) {
-          <div class="detail-location">
-            <div class="detail-location__title">
-              {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
-            </div>
-            @if (item.address) {
-            <div class="detail-location__address">{{ item.address }}</div>
-            }
-            @if (item.description) {
-            <div class="detail-location__desc">{{ item.description }}</div>
-            }
+    @if (sameStartEnd() && getCombinedPointItems().length) {
+      <mat-card class="detail-tile">
+        <div class="detail-tile__header">
+          <div class="detail-tile__header-left">
+            <mat-icon>flag</mat-icon>
+            <span class="detail-tile__title">{{ 'common.experiences.startEndPoint' | transloco }}</span>
           </div>
+          @if (getFirstMappableItem(getCombinedPointItems()); as mapItem) {
+            <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
+              <mat-icon>assistant_direction</mat-icon>
+            </button>
           }
         </div>
-      </mat-card-content>
-    </mat-card>
-    }
+        <mat-card-content class="detail-tile__body">
+          <div class="detail-section__body">
+            @for (item of getCombinedPointItems(); track item.ref) {
+              <div class="detail-location">
+                <div class="detail-location__title">
+                  {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                </div>
+                @if (item.address) {
+                  <div class="detail-location__address">{{ item.address }}</div>
+                }
+                @if (item.description) {
+                  <div class="detail-location__desc">{{ item.description }}</div>
+                }
+              </div>
+            }
+          </div>
+        </mat-card-content>
+      </mat-card>
+    } @else {
+      @if (startItems().length) {
+        <mat-card class="detail-tile">
+          <div class="detail-tile__header">
+            <div class="detail-tile__header-left">
+              <mat-icon>flag</mat-icon>
+              <span class="detail-tile__title">{{ 'common.experiences.startPoint' | transloco }}</span>
+            </div>
+            @if (getFirstMappableItem(startItems()); as mapItem) {
+              <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
+                <mat-icon>assistant_direction</mat-icon>
+              </button>
+            }
+          </div>
+          <mat-card-content class="detail-tile__body">
+            <div class="detail-section__body">
+              @for (item of startItems(); track item.ref) {
+                <div class="detail-location">
+                  <div class="detail-location__title">
+                    {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                  </div>
+                  @if (item.address) {
+                    <div class="detail-location__address">{{ item.address }}</div>
+                  }
+                  @if (item.description) {
+                    <div class="detail-location__desc">{{ item.description }}</div>
+                  }
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
 
-    @if (endItems().length) {
-    <mat-card class="detail-tile">
-      <div class="detail-tile__header">
-        <mat-icon>outlined_flag</mat-icon>
-        <span class="detail-tile__title">{{ 'common.experiences.endPoint' | transloco }}</span>
-      </div>
-      <mat-card-content class="detail-tile__body">
-        <div class="detail-section__body">
-          @for (item of endItems(); track item.ref) {
-          <div class="detail-location">
-            <div class="detail-location__title">
-              {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+      @if (endItems().length) {
+        <mat-card class="detail-tile">
+          <div class="detail-tile__header">
+            <div class="detail-tile__header-left">
+              <mat-icon>outlined_flag</mat-icon>
+              <span class="detail-tile__title">{{ 'common.experiences.endPoint' | transloco }}</span>
             </div>
-            @if (item.address) {
-            <div class="detail-location__address">{{ item.address }}</div>
-            }
-            @if (item.description) {
-            <div class="detail-location__desc">{{ item.description }}</div>
+            @if (getFirstMappableItem(endItems()); as mapItem) {
+              <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
+                <mat-icon>assistant_direction</mat-icon>
+              </button>
             }
           </div>
-          }
-        </div>
-      </mat-card-content>
-    </mat-card>
+          <mat-card-content class="detail-tile__body">
+            <div class="detail-section__body">
+              @for (item of endItems(); track item.ref) {
+                <div class="detail-location">
+                  <div class="detail-location__title">
+                    {{ item.name || (item.address ? item.address : ('common.experiences.locationUnavailable' | transloco)) }}
+                  </div>
+                  @if (item.address) {
+                    <div class="detail-location__address">{{ item.address }}</div>
+                  }
+                  @if (item.description) {
+                    <div class="detail-location__desc">{{ item.description }}</div>
+                  }
+                </div>
+              }
+            </div>
+          </mat-card-content>
+        </mat-card>
+      }
     }
 
     @if (redemptionItems().length) {
     <mat-card class="detail-tile">
       <div class="detail-tile__header">
-        <mat-icon>confirmation_number</mat-icon>
-        <span class="detail-tile__title">{{ 'common.experiences.redemptionPoint' | transloco }}</span>
+        <div class="detail-tile__header-left">
+          <mat-icon>confirmation_number</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.redemptionPoint' | transloco }}</span>
+        </div>
+        @if (getFirstMappableItem(redemptionItems()); as mapItem) {
+          <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
+            <mat-icon>assistant_direction</mat-icon>
+          </button>
+        }
       </div>
       <mat-card-content class="detail-tile__body">
         <div class="detail-section__body">
@@ -119,8 +175,15 @@
     @if (pickupItems().length) {
     <mat-card class="detail-tile">
       <div class="detail-tile__header">
-        <mat-icon>place</mat-icon>
-        <span class="detail-tile__title">{{ 'common.experiences.pickupPoint' | transloco }}</span>
+        <div class="detail-tile__header-left">
+          <mat-icon>place</mat-icon>
+          <span class="detail-tile__title">{{ 'common.experiences.pickupPoint' | transloco }}</span>
+        </div>
+        @if (getFirstMappableItem(pickupItems()); as mapItem) {
+          <button mat-icon-button class="detail-tile__header-action" type="button" (click)="openMaps(mapItem)">
+            <mat-icon>assistant_direction</mat-icon>
+          </button>
+        }
       </div>
       <mat-card-content class="detail-tile__body">
         <div class="detail-section__body">
@@ -149,8 +212,8 @@
         <span class="detail-tile__title">{{ 'common.experiences.map' | transloco }}</span>
       </div>
       <mat-card-content class="detail-tile__body">
-        <app-search-settings-map-preview class="detail-map" [center]="mapCenter()" [zoom]="7" [markers]="mapMarkers()"
-          [fitMarkers]="true" [fitMaxZoom]="12" [interactive]="true"
+        <app-search-settings-map-preview class="detail-map" [center]="mapCenter()" [zoom]="9" [markers]="mapMarkers()"
+          [fitMarkers]="true" [fitMaxZoom]="14" [interactive]="true"
           [markerIconUrl]="'assets/markers/experience-marker.svg'">
         </app-search-settings-map-preview>
       </mat-card-content>
