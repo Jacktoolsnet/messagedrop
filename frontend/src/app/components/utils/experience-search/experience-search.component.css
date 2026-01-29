@@ -1,5 +1,6 @@
 :host {
   color: var(--mat-app-text-color);
+  --experience-actions-height: 3.5rem;
 }
 
 .mat-mdc-dialog-content {
@@ -12,7 +13,7 @@
   padding: 0;
   flex: 1 1 auto;
   min-height: 0;
-  height: 100%;
+  height: calc(100% - var(--experience-actions-height));
 }
 
 .experience-dialog-content {
@@ -53,6 +54,8 @@
   flex-direction: column;
   gap: 1rem;
   min-height: 0;
+  padding-bottom: 0;
+  scroll-padding-bottom: 0;
 }
 
 .search-bar {
@@ -265,6 +268,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(min(320px, 95vw), 1fr));
   gap: 0.75rem;
+  padding-bottom: 1rem;
 }
 
 .experience-tile {
@@ -310,7 +314,7 @@
   z-index: 0;
 }
 
-.tile-header > *:not(.viator-badge):not(.identity-badge):not(.rating-badge) {
+.tile-header>*:not(.viator-badge):not(.identity-badge):not(.rating-badge) {
   position: relative;
   z-index: 1;
 }
