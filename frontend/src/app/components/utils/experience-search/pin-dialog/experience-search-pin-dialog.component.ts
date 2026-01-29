@@ -5,8 +5,8 @@ import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialog
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
-import { ExperienceResult } from '../experience-search.component';
 import { ExperienceSearchDetailDialogComponent } from '../detail-dialog/experience-search-detail-dialog.component';
+import { ExperienceResult } from '../experience-search.component';
 
 export interface ExperienceSearchPinDialogData {
   destinationId: number;
@@ -50,8 +50,8 @@ export class ExperienceSearchPinDialogComponent {
       autoFocus: false,
       backdropClass: 'dialog-backdrop',
       maxWidth: '96vw',
-      width: '1280px',
-      maxHeight: '80vh'
+      width: 'auto',
+      maxHeight: '95vh'
     });
   }
 
