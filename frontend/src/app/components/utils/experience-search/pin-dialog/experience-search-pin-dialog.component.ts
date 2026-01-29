@@ -47,7 +47,11 @@ export class ExperienceSearchPinDialogComponent {
   openDetails(result: ExperienceResult): void {
     this.dialog.open(ExperienceSearchDetailDialogComponent, {
       data: { result },
-      autoFocus: false
+      autoFocus: false,
+      backdropClass: 'dialog-backdrop',
+      maxWidth: '96vw',
+      width: '1280px',
+      maxHeight: '80vh'
     });
   }
 

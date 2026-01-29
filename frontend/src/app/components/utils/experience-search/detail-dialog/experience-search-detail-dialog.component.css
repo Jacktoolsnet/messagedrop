@@ -25,7 +25,6 @@
   flex-direction: column;
   height: auto;
   max-height: 80vh;
-  width: min(900px, 92vw);
 }
 
 .detail-scroll {
@@ -53,10 +52,16 @@
   width: calc(100% + 2rem);
 }
 
+.detail-header mat-icon {
+  flex: 0 0 auto;
+}
+
 .detail-header__text {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .detail-title {
@@ -66,6 +71,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  display: block;
 }
 
 .detail-subtitle {
@@ -146,6 +152,7 @@
 .detail-section__body {
   display: grid;
   gap: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
 }
 
 .detail-location {

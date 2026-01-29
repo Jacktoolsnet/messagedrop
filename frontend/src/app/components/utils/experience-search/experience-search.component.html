@@ -166,16 +166,18 @@
                   <p class="result-description">
                     {{ result.description }}
                   </p>
-                  <button mat-button type="button" class="toggle-description"
-                    (click)="openDetails(result); $event.stopPropagation()">
-                    <mat-icon>open_in_new</mat-icon>
-                    <span>{{ 'common.experiences.showMore' | transloco }}</span>
-                  </button>
                 }
                 <div class="result-meta">
                 </div>
               </mat-card-content>
               <mat-card-actions class="tile-actions">
+                <div class="tile-actions__left">
+                  <button mat-stroked-button class="open-viator-button" type="button"
+                    (click)="openDetails(result); $event.stopPropagation()">
+                    <mat-icon>expand_content</mat-icon>
+                    <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
+                  </button>
+                </div>
                 <div class="tile-actions__right">
                   <button mat-stroked-button class="open-viator-button" type="button"
                     (click)="onOpen(result); $event.stopPropagation()"

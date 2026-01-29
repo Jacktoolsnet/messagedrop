@@ -2,10 +2,10 @@ import { ChangeDetectionStrategy, Component, DestroyRef, computed, inject, outpu
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
+import { MatCardModule } from '@angular/material/card';
 import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
-import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIcon } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
@@ -332,6 +332,7 @@ export class ExperienceSearchComponent {
     this.dialog.open(ExperienceSearchPinDialogComponent, {
       data,
       panelClass: 'pin-dialog',
+      backdropClass: 'dialog-backdrop',
       closeOnNavigation: false,
       maxWidth: '80vw',
       maxHeight: '75vh',
@@ -522,7 +523,11 @@ export class ExperienceSearchComponent {
   openDetails(result: ExperienceResult): void {
     this.dialog.open(ExperienceSearchDetailDialogComponent, {
       data: { result },
-      autoFocus: false
+      autoFocus: false,
+      backdropClass: 'dialog-backdrop',
+      maxWidth: '95vw',
+      width: 'auto',
+      height: '95vh'
     });
   }
 

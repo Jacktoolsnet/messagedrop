@@ -63,6 +63,9 @@
   font-weight: 600;
   font-size: 1.1rem;
   color: var(--mat-app-text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .pin-dialog-subtitle {
@@ -273,6 +276,11 @@
 
 .tile-actions__right {
   margin-left: auto;
+  display: flex;
+  gap: 0.25rem;
+}
+
+.tile-actions__left {
   display: flex;
   gap: 0.25rem;
 }
