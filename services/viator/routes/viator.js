@@ -397,6 +397,13 @@ router.use(async (req, res, next) => {
       }
     });
     const durationMs = Date.now() - startedAt;
+    if (process.env.VIATOR_LOG_UPSTREAM_STATUS === 'true') {
+      req.logger?.info?.('Viator upstream response', {
+        method: req.method,
+        path: req.path,
+        status: upstream.status
+      });
+    }
     logTiming(req.logger, {
       method: req.method,
       path: req.path,
