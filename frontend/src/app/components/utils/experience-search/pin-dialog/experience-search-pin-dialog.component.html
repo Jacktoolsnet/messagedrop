@@ -6,9 +6,6 @@
         <span class="pin-dialog-title">
           {{ data.destinationName || ('common.experiences.title' | transloco) }}
         </span>
-        <span class="pin-dialog-subtitle">
-          {{ data.results.length }}
-        </span>
       </div>
     </div>
 
@@ -65,7 +62,7 @@
                 [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
                 <mat-icon>shopping_cart</mat-icon>
                 <span class="open-viator-label">
-                  {{ 'common.experiences.openOn' | transloco : { provider: 'Viator' } }}
+                  {{ getPriceLabel(result) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
                 </span>
               </button>
             </div>

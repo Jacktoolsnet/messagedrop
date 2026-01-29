@@ -37,7 +37,7 @@ import { ViatorService } from '../../../services/viator.service';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
-import { ExperienceSearchPinDialogComponent, ExperienceSearchPinDialogData } from './experience-search-pin-dialog.component';
+import { ExperienceSearchPinDialogComponent, ExperienceSearchPinDialogData } from './pin-dialog/experience-search-pin-dialog.component';
 
 export type ExperienceProvider = 'viator';
 export type ExperienceSortOption = 'relevance' | 'price_low' | 'price_high';

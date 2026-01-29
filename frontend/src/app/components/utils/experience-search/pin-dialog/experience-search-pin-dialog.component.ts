@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MatDialogActions, MatDialogClose, MatDialogContent, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
-import { TranslocoPipe } from '@jsverse/transloco';
-import { ExperienceResult } from './experience-search.component';
-import { HelpDialogService } from '../help-dialog/help-dialog.service';
+import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
+import { HelpDialogService } from '../../help-dialog/help-dialog.service';
+import { ExperienceResult } from '../experience-search.component';
 
 export interface ExperienceSearchPinDialogData {
   destinationId: number;
@@ -26,7 +26,7 @@ export interface ExperienceSearchPinDialogData {
     TranslocoPipe
   ],
   templateUrl: './experience-search-pin-dialog.component.html',
-  styleUrl: './experience-search.component.css',
+  styleUrl: './experience-search-pin-dialog.component.css',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExperienceSearchPinDialogComponent {
@@ -34,8 +34,9 @@ export class ExperienceSearchPinDialogComponent {
 
   constructor(
     @Inject(MAT_DIALOG_DATA) readonly data: ExperienceSearchPinDialogData,
-    readonly help: HelpDialogService
-  ) {}
+    readonly help: HelpDialogService,
+    private readonly transloco: TranslocoService
+  ) { }
 
   onOpen(result: ExperienceResult): void {
     if (result.productUrl) {
@@ -78,5 +79,16 @@ export class ExperienceSearchPinDialogComponent {
     const rounded = Math.round(result.rating * 10) / 10;
     if (!result.reviewCount) return `${rounded.toFixed(1)}`;
     return `${rounded.toFixed(1)} (${result.reviewCount})`;
+  }
+
+  getPriceLabel(result: ExperienceResult): string {
+    if (result.priceFrom === undefined || result.priceFrom === null) return '';
+    const currency = result.currency || 'USD';
+    const locale = this.transloco.getActiveLang() || 'en';
+    try {
+      return new Intl.NumberFormat(locale, { style: 'currency', currency }).format(result.priceFrom);
+    } catch {
+      return `${result.priceFrom} ${currency}`;
+    }
   }
 }
