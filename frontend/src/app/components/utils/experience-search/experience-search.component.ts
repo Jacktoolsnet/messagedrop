@@ -37,6 +37,7 @@ import { ViatorService } from '../../../services/viator.service';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
+import { ExperienceSearchDetailDialogComponent } from './detail-dialog/experience-search-detail-dialog.component';
 import { ExperienceSearchPinDialogComponent, ExperienceSearchPinDialogData } from './pin-dialog/experience-search-pin-dialog.component';
 
 export type ExperienceProvider = 'viator';
@@ -214,7 +215,6 @@ export class ExperienceSearchComponent {
   readonly selectedResult = signal<ExperienceResult | null>(null);
   readonly worldCenter: Location = { latitude: 0, longitude: 0, plusCode: '' };
   readonly mapMarkers = signal<ExperienceMapMarker[]>([]);
-  readonly expandedDescriptions = signal<Set<string>>(new Set());
   readonly priceRange = { min: PRICE_RANGE_MIN, max: PRICE_RANGE_MAX, step: 10 };
   readonly durationRange = { min: DURATION_RANGE_MIN, max: DURATION_RANGE_MAX, step: 1 };
   private readonly destinationCache = new Map<number, ViatorDestinationLookup>();
@@ -508,7 +508,6 @@ export class ExperienceSearchComponent {
     this.results.set(combined);
     if (!append) {
       this.selectedResult.set(null);
-      this.expandedDescriptions.set(new Set());
     }
     this.lastPageCount.set(mapped.length);
     this.totalCount.set(totalCount);
@@ -520,18 +519,11 @@ export class ExperienceSearchComponent {
     }
   }
 
-  isDescriptionExpanded(result: ExperienceResult): boolean {
-    return this.expandedDescriptions().has(result.trackId);
-  }
-
-  toggleDescription(result: ExperienceResult): void {
-    const next = new Set(this.expandedDescriptions());
-    if (next.has(result.trackId)) {
-      next.delete(result.trackId);
-    } else {
-      next.add(result.trackId);
-    }
-    this.expandedDescriptions.set(next);
+  openDetails(result: ExperienceResult): void {
+    this.dialog.open(ExperienceSearchDetailDialogComponent, {
+      data: { result },
+      autoFocus: false
+    });
   }
 
   private showNoResultsMessage(): void {

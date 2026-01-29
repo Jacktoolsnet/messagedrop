@@ -122,3 +122,79 @@ export interface ViatorDestinationsResponse {
   destinations?: ViatorDestinationLookup[];
   totalCount?: number;
 }
+
+export interface ViatorLocationAddress {
+  street?: string;
+  administrativeArea?: string;
+  state?: string;
+  country?: string;
+  countryCode?: string;
+  postalCode?: string;
+}
+
+export interface ViatorLocationCenter {
+  latitude?: number;
+  longitude?: number;
+}
+
+export interface ViatorLocation {
+  reference: string;
+  provider?: string;
+  name?: string;
+  unstructuredAddress?: string;
+  address?: ViatorLocationAddress;
+  center?: ViatorLocationCenter;
+}
+
+export interface ViatorLocationsResponse {
+  locations: ViatorLocation[];
+}
+
+export interface ViatorLocationReference {
+  ref?: string;
+}
+
+export interface ViatorLogisticsPoint {
+  location?: ViatorLocationReference;
+  description?: string;
+}
+
+export interface ViatorRedemptionInfo {
+  redemptionType?: string;
+  locations?: ViatorLocationReference[];
+  specialInstructions?: string;
+}
+
+export interface ViatorPickupLocation {
+  location?: ViatorLocationReference;
+  pickupType?: string;
+}
+
+export interface ViatorTravelerPickupInfo {
+  pickupOptionType?: string;
+  allowCustomTravelerPickup?: boolean;
+  locations?: ViatorPickupLocation[];
+  minutesBeforeDepartureTimeForPickup?: number;
+  additionalInfo?: string;
+}
+
+export interface ViatorProductLogistics {
+  start?: ViatorLogisticsPoint[];
+  end?: ViatorLogisticsPoint[];
+  redemption?: ViatorRedemptionInfo;
+  travelerPickup?: ViatorTravelerPickupInfo;
+}
+
+export interface ViatorProductDetail {
+  productCode?: string;
+  title?: string;
+  description?: string;
+  images?: Array<{
+    variants?: Array<{
+      height?: number;
+      width?: number;
+      url?: string;
+    }>;
+  }>;
+  logistics?: ViatorProductLogistics;
+}

@@ -28,8 +28,9 @@ const CACHE_TTLS = {
   attractionsSearch: 60 * 60, // 1h
   attractionsDetail: 60 * 60 * 6, // 6h
   productsSearch: 60 * 15, // 15m
-  productDetail: 60 * 60 * 6, // 6h
-  availabilitySchedules: 60 * 30 // 30m
+  productDetail: 60 * 60 * 24, // 1d
+  availabilitySchedules: 60 * 30, // 30m
+  locationsBulk: 60 * 60 * 24 * 30 // 30d
 };
 
 const ALLOWED_ENDPOINTS = [
@@ -41,7 +42,8 @@ const ALLOWED_ENDPOINTS = [
   { method: 'GET', pattern: /^\/attractions\/search$/, cacheTtl: CACHE_TTLS.attractionsSearch },
   { method: 'POST', pattern: /^\/attractions\/search$/, cacheTtl: CACHE_TTLS.attractionsSearch },
   { method: 'GET', pattern: /^\/attractions\/[^/]+$/, cacheTtl: CACHE_TTLS.attractionsDetail },
-  { method: 'GET', pattern: /^\/availability\/schedules\/[^/]+$/, cacheTtl: CACHE_TTLS.availabilitySchedules }
+  { method: 'GET', pattern: /^\/availability\/schedules\/[^/]+$/, cacheTtl: CACHE_TTLS.availabilitySchedules },
+  { method: 'POST', pattern: /^\/locations\/bulk$/, cacheTtl: CACHE_TTLS.locationsBulk }
 ];
 
 function getEndpointConfig(method, path) {

@@ -1,0 +1,225 @@
+:host {
+  color: var(--mat-app-text-color);
+}
+
+.mat-mdc-dialog-content {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: none;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-x: hidden;
+}
+
+.detail-dialog-content {
+  padding: 0;
+}
+
+:host ::ng-deep .mat-mdc-dialog-surface {
+  padding-top: 0;
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  max-height: 80vh;
+  width: min(900px, 92vw);
+}
+
+.detail-scroll {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  min-height: 0;
+  padding: 0 1rem 0.75rem;
+}
+
+.detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  margin: 0 -1rem;
+  width: calc(100% + 2rem);
+}
+
+.detail-header__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.detail-title {
+  font-weight: 600;
+  font-size: 1.15rem;
+  color: var(--mat-app-text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detail-subtitle {
+  font-size: 0.8rem;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.detail-hero {
+  position: relative;
+  min-height: 12rem;
+  border-radius: 1.25rem;
+  overflow: hidden;
+  background-color: var(--mat-card-filled-container-color);
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+}
+
+.detail-hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: var(--detail-hero-bg-image, none);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: var(--detail-hero-bg-opacity, 0);
+  z-index: 0;
+}
+
+.detail-hero > * {
+  position: relative;
+  z-index: 1;
+}
+
+.detail-card {
+  border-radius: 1.25rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+  background: var(--mat-card-filled-container-color);
+}
+
+.detail-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+.detail-actions {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.detail-description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: var(--mat-card-subtitle-text-color);
+}
+
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem 0;
+}
+
+.detail-section__title {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--mat-app-text-color);
+}
+
+.detail-section__body {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.detail-location {
+  padding: 0.75rem 0.9rem;
+  border-radius: 1rem;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+  background: var(--mat-card-filled-container-color);
+  box-shadow: 0 2px 8px var(--mat-card-outlined-outline-color);
+}
+
+.detail-location__title {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.detail-location__address,
+.detail-location__desc {
+  font-size: 0.85rem;
+  color: var(--mat-card-subtitle-text-color);
+  margin-top: 0.2rem;
+}
+
+.detail-map {
+  width: 100%;
+  height: 220px;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--mat-card-outlined-outline-color);
+}
+
+.viator-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+
+.viator-badge__link {
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.rating-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.55);
+  color: #fff;
+}
+
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  background-color: var(--mat-card-filled-container-color);
+  border-top: 1px solid var(--mat-card-outlined-outline-color);
+  z-index: 1000;
+}
+
+.action-close {
+  margin-right: auto;
+}
+
+.open-viator-button {
+  gap: 0.35rem;
+}
+
+.open-viator-label {
+  font-weight: 600;
+}

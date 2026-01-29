@@ -1,11 +1,12 @@
-import { ChangeDetectionStrategy, Component, Inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
-import { MAT_DIALOG_DATA, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
+import { MAT_DIALOG_DATA, MatDialog, MatDialogActions, MatDialogClose, MatDialogContent } from '@angular/material/dialog';
 import { MatIcon } from '@angular/material/icon';
 import { TranslocoPipe, TranslocoService } from '@jsverse/transloco';
 import { HelpDialogService } from '../../help-dialog/help-dialog.service';
 import { ExperienceResult } from '../experience-search.component';
+import { ExperienceSearchDetailDialogComponent } from '../detail-dialog/experience-search-detail-dialog.component';
 
 export interface ExperienceSearchPinDialogData {
   destinationId: number;
@@ -30,12 +31,11 @@ export interface ExperienceSearchPinDialogData {
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ExperienceSearchPinDialogComponent {
-  readonly expandedDescriptions = signal<Set<string>>(new Set());
-
   constructor(
     @Inject(MAT_DIALOG_DATA) readonly data: ExperienceSearchPinDialogData,
     readonly help: HelpDialogService,
-    private readonly transloco: TranslocoService
+    private readonly transloco: TranslocoService,
+    private readonly dialog: MatDialog
   ) { }
 
   onOpen(result: ExperienceResult): void {
@@ -44,18 +44,11 @@ export class ExperienceSearchPinDialogComponent {
     }
   }
 
-  isDescriptionExpanded(result: ExperienceResult): boolean {
-    return this.expandedDescriptions().has(result.trackId);
-  }
-
-  toggleDescription(result: ExperienceResult): void {
-    const next = new Set(this.expandedDescriptions());
-    if (next.has(result.trackId)) {
-      next.delete(result.trackId);
-    } else {
-      next.add(result.trackId);
-    }
-    this.expandedDescriptions.set(next);
+  openDetails(result: ExperienceResult): void {
+    this.dialog.open(ExperienceSearchDetailDialogComponent, {
+      data: { result },
+      autoFocus: false
+    });
   }
 
   getExperienceHeaderBackgroundImage(result: ExperienceResult): string {

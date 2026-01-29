@@ -163,17 +163,13 @@
               </div>
               <mat-card-content class="experience-content">
                 @if (result.description) {
-                  <p class="result-description" [class.is-expanded]="isDescriptionExpanded(result)">
+                  <p class="result-description">
                     {{ result.description }}
                   </p>
                   <button mat-button type="button" class="toggle-description"
-                    (click)="toggleDescription(result); $event.stopPropagation()">
-                    <mat-icon>{{ isDescriptionExpanded(result) ? 'expand_less' : 'expand_more' }}</mat-icon>
-                    <span>
-                      {{ isDescriptionExpanded(result)
-                        ? ('common.experiences.showLess' | transloco)
-                        : ('common.experiences.showMore' | transloco) }}
-                    </span>
+                    (click)="openDetails(result); $event.stopPropagation()">
+                    <mat-icon>open_in_new</mat-icon>
+                    <span>{{ 'common.experiences.showMore' | transloco }}</span>
                   </button>
                 }
                 <div class="result-meta">

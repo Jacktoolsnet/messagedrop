@@ -6,6 +6,8 @@ import {
   ViatorFreetextSearchRequest,
   ViatorFreetextSearchResponse,
   ViatorDestinationsResponse,
+  ViatorLocationsResponse,
+  ViatorProductDetail,
   ViatorProductSearchRequest,
   ViatorProductSearchResponse
 } from '../interfaces/viator';
@@ -85,7 +87,7 @@ export class ViatorService {
       .pipe(catchError(this.handleError));
   }
 
-  getProduct(productCode: string, showAlways = false): Observable<unknown> {
+  getProduct(productCode: string, showAlways = false): Observable<ViatorProductDetail> {
     const url = `${environment.apiUrl}/viator/products/${encodeURIComponent(productCode)}`;
     this.networkService.setNetworkMessageConfig(url, {
       showAlways,
@@ -99,7 +101,7 @@ export class ViatorService {
       autoclose: false
     });
 
-    return this.http.get<unknown>(url, this.httpOptions)
+    return this.http.get<ViatorProductDetail>(url, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 
@@ -141,6 +143,27 @@ export class ViatorService {
     });
 
     return this.http.get<ViatorDestinationsResponse>(url, { ...this.httpOptions, params })
+      .pipe(catchError(this.handleError));
+  }
+
+  getLocationsBulk(references: string[], showAlways = false): Observable<ViatorLocationsResponse> {
+    const locations = Array.isArray(references)
+      ? Array.from(new Set(references.map((ref) => String(ref).trim()).filter(Boolean)))
+      : [];
+    const url = `${environment.apiUrl}/viator/locations/bulk`;
+    this.networkService.setNetworkMessageConfig(url, {
+      showAlways,
+      title: this.i18n.t('common.viator.title'),
+      image: '',
+      icon: '',
+      message: this.i18n.t('common.viator.loading'),
+      button: '',
+      delay: 0,
+      showSpinner: true,
+      autoclose: false
+    });
+
+    return this.http.post<ViatorLocationsResponse>(url, { locations }, this.httpOptions)
       .pipe(catchError(this.handleError));
   }
 }
