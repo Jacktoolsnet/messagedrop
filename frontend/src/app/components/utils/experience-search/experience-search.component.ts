@@ -37,6 +37,7 @@ import { ViatorService } from '../../../services/viator.service';
 import { DisplayMessage } from '../display-message/display-message.component';
 import { HelpDialogService } from '../help-dialog/help-dialog.service';
 import { SearchSettingsMapPreviewComponent } from '../search-settings/search-settings-map-preview.component';
+import { ExperienceSearchPinDialogComponent, ExperienceSearchPinDialogData } from './experience-search-pin-dialog.component';
 
 export type ExperienceProvider = 'viator';
 export type ExperienceSortOption = 'relevance' | 'price_low' | 'price_high';
@@ -80,6 +81,18 @@ interface ExperienceSearchForm {
   sort: FormControl<ExperienceSortOption>;
 }
 
+interface ExperienceSearchFormValue {
+  term: string;
+  startDate: Date | null;
+  endDate: Date | null;
+  minPrice: number;
+  maxPrice: number;
+  minDurationHours: number;
+  maxDurationHours: number;
+  currency: string;
+  sort: ExperienceSortOption;
+}
+
 export interface ExperienceResult {
   provider: ExperienceProvider;
   trackId: string;
@@ -99,7 +112,7 @@ export interface ExperienceResult {
 }
 
 interface ExperienceMapMarker {
-  destinationId: number;
+  destinationId?: number;
   latitude: number;
   longitude: number;
   label?: string;
@@ -208,11 +221,20 @@ export class ExperienceSearchComponent {
   private lastDestinationIds: number[] = [];
   private lastSearchTerm = '';
   private lastSearchMode: 'freetext' | 'product' = 'product';
+  private lastSearchSignature = '';
 
   readonly canSearch = computed(() => {
     const value = this.formValue();
     const term = value.term?.trim() ?? '';
     return term.length > 0;
+  });
+
+  readonly hasSearchChanged = computed(() => {
+    if (!this.hasSearched()) {
+      return false;
+    }
+    const value = this.formValue();
+    return buildSearchSignature(value) !== this.lastSearchSignature;
   });
 
   readonly showEmptyState = computed(() => !this.loading() && this.hasSearched() && this.results().length === 0);
@@ -232,6 +254,17 @@ export class ExperienceSearchComponent {
       return;
     }
     this.executeSearch(false);
+  }
+
+  onSearchButtonClick(): void {
+    if (!this.canSearch()) {
+      return;
+    }
+    if (this.canLoadMore() && !this.hasSearchChanged()) {
+      this.onLoadMore();
+      return;
+    }
+    this.onSearch();
   }
 
   onLoadMore(): void {
@@ -277,6 +310,33 @@ export class ExperienceSearchComponent {
     if (result.productUrl) {
       window.open(result.productUrl, '_blank');
     }
+  }
+
+  onMarkerClick(marker: ExperienceMapMarker): void {
+    if (marker.destinationId === undefined) {
+      return;
+    }
+    const destinationId = marker.destinationId;
+    const matches = this.results().filter((result) =>
+      (result.destinationIds ?? []).includes(destinationId)
+    );
+    if (matches.length === 0) {
+      return;
+    }
+    const destinationName = this.destinationCache.get(marker.destinationId)?.name ?? marker.label ?? '';
+    const data: ExperienceSearchPinDialogData = {
+      destinationId: marker.destinationId,
+      destinationName: destinationName || undefined,
+      results: matches
+    };
+    this.dialog.open(ExperienceSearchPinDialogComponent, {
+      data,
+      panelClass: 'pin-dialog',
+      closeOnNavigation: false,
+      maxWidth: '80vw',
+      maxHeight: '75vh',
+      autoFocus: false
+    });
   }
 
   getRatingLabel(result: ExperienceResult): string {
@@ -340,6 +400,7 @@ export class ExperienceSearchComponent {
 
     this.lastSearchTerm = term;
     this.lastSearchMode = mode;
+    this.lastSearchSignature = buildSearchSignature(value);
 
     if (mode === 'freetext' && term.length > 0) {
       const request = this.buildFreetextSearchRequest(term, start);
@@ -595,6 +656,20 @@ function buildDateRange(startDate: Date | string | null, endDate: Date | string 
   const to = formatDateInput(endDate);
   if (!from && !to) return null;
   return { from: from || undefined, to: to || undefined };
+}
+
+function buildSearchSignature(value: Partial<ExperienceSearchFormValue>): string {
+  return [
+    value.term?.trim() ?? '',
+    formatDateInput(value.startDate) ?? '',
+    formatDateInput(value.endDate) ?? '',
+    value.minPrice ?? '',
+    value.maxPrice ?? '',
+    value.minDurationHours ?? '',
+    value.maxDurationHours ?? '',
+    value.currency ? normalizeCurrency(value.currency) : '',
+    value.sort ?? ''
+  ].join('|');
 }
 
 function formatDateInput(value: Date | string | null | undefined): string | undefined {

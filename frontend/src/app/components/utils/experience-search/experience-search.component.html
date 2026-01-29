@@ -11,9 +11,12 @@
         [attr.aria-label]="'common.experiences.sort' | transloco">
         <mat-icon>sort</mat-icon>
       </button>
-      <button type="button" class="search-button" (click)="onSearch()" [disabled]="loading() || !canSearch()"
-        [attr.aria-label]="'common.experiences.search' | transloco">
-        <mat-icon>search</mat-icon>
+      <button type="button" class="search-button" (click)="onSearchButtonClick()"
+        [disabled]="loading() || !canSearch()"
+        [attr.aria-label]="canLoadMore() && !hasSearchChanged()
+          ? ('common.experiences.loadMore' | transloco)
+          : ('common.experiences.search' | transloco)">
+        <mat-icon>{{ canLoadMore() && !hasSearchChanged() ? 'refresh' : 'search' }}</mat-icon>
       </button>
     </div>
     <mat-menu #sortMenu="matMenu">
@@ -119,7 +122,8 @@
       @if (viewMode() === 'map') {
         <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
           [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="true"
-          [markerIconUrl]="'assets/markers/experience-marker.svg'">
+          [markerIconUrl]="'assets/markers/experience-marker.svg'"
+          (markerClick)="onMarkerClick($event)">
         </app-search-settings-map-preview>
       }
 
@@ -192,13 +196,6 @@
           }
         </div>
 
-        @if (canLoadMore()) {
-          <div class="load-more">
-            <button mat-stroked-button type="button" (click)="onLoadMore()">
-              {{ 'common.experiences.loadMore' | transloco }}
-            </button>
-          </div>
-        }
       }
     </section>
   </div>
@@ -216,9 +213,5 @@
   <button mat-icon-button type="button" (click)="toggleViewMode()"
     [attr.aria-label]="viewMode() === 'list' ? ('common.location.switchToMap' | transloco) : ('common.location.switchToList' | transloco)">
     <mat-icon>{{ viewMode() === 'list' ? 'map' : 'list' }}</mat-icon>
-  </button>
-  <button mat-icon-button color="primary" type="button" (click)="onApply()" [disabled]="!selectedResult()"
-    [attr.aria-label]="'common.actions.apply' | transloco">
-    <mat-icon>check</mat-icon>
   </button>
 </mat-dialog-actions>

@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, Input, OnChanges, OnDestroy, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import * as leaflet from 'leaflet';
 import { Location } from '../../../interfaces/location';
 
@@ -6,6 +6,7 @@ interface MapMarker {
   latitude: number;
   longitude: number;
   label?: string;
+  id?: number;
 }
 
 const DEFAULT_MARKER_ICON_URL = 'assets/markers/location-marker.svg';
@@ -24,6 +25,7 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
   @Input() fitMarkers = false;
   @Input() interactive = false;
   @Input() markerIconUrl = DEFAULT_MARKER_ICON_URL;
+  @Output() markerClick = new EventEmitter<MapMarker>();
 
   readonly mapId = `search-settings-map-${Math.random().toString(36).slice(2)}`;
   private map?: leaflet.Map;
@@ -142,6 +144,7 @@ export class SearchSettingsMapPreviewComponent implements AfterViewInit, OnChang
       if (marker.label) {
         leafletMarker.bindTooltip(marker.label, { direction: 'top', offset: [0, -6] });
       }
+      leafletMarker.on('click', () => this.markerClick.emit(marker));
       leafletMarker.addTo(this.markerLayer!);
       bounds.push(latLng);
     });

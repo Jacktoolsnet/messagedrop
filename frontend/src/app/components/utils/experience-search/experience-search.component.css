@@ -26,6 +26,26 @@
   height: 100%;
 }
 
+.pin-dialog :host ::ng-deep .mat-mdc-dialog-surface {
+  height: auto;
+  max-height: 75vh;
+  width: min(820px, 80vw);
+}
+
+.pin-dialog :host ::ng-deep .mat-mdc-dialog-content {
+  flex: 0 1 auto;
+  padding-bottom: 0;
+}
+
+.pin-dialog .experience-scroll {
+  gap: 0.75rem;
+  padding: 0 1rem 0.75rem;
+}
+
+.pin-dialog .pin-dialog-results {
+  padding-inline: 0.5rem;
+}
+
 .experience-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
@@ -48,6 +68,39 @@
   min-height: 4rem;
   width: 100%;
   padding: 0;
+}
+
+.pin-dialog-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1rem;
+  background-color: var(--mat-card-filled-container-color);
+  box-shadow: 0 4px 12px var(--mat-card-outlined-outline-color);
+}
+
+.pin-dialog .sticky-actions {
+  margin-top: 0.75rem;
+}
+
+.pin-dialog-header__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.pin-dialog-title {
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--mat-app-text-color);
+}
+
+.pin-dialog-subtitle {
+  font-size: 0.8rem;
+  color: var(--mat-card-subtitle-text-color);
 }
 
 .search-bar input[type="search"] {
