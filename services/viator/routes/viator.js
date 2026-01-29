@@ -167,9 +167,46 @@ function stableStringify(value) {
   return `{${parts.join(',')}}`;
 }
 
+function normalizeSearchTerm(term) {
+  if (term === null || term === undefined) return '';
+  return String(term)
+    .toLowerCase()
+    .replace(/[^\w\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function cloneValue(value) {
+  if (value === null || value === undefined) return value;
+  if (Array.isArray(value)) {
+    return value.map((entry) => cloneValue(entry));
+  }
+  if (typeof value === 'object') {
+    const copy = {};
+    for (const [key, entry] of Object.entries(value)) {
+      copy[key] = cloneValue(entry);
+    }
+    return copy;
+  }
+  return value;
+}
+
+function normalizeCacheInputs(query, body) {
+  const normalizedQuery = cloneValue(query);
+  if (normalizedQuery && typeof normalizedQuery === 'object' && normalizedQuery.searchTerm) {
+    normalizedQuery.searchTerm = normalizeSearchTerm(normalizedQuery.searchTerm);
+  }
+  const normalizedBody = cloneValue(body);
+  if (normalizedBody && typeof normalizedBody === 'object' && normalizedBody.searchTerm) {
+    normalizedBody.searchTerm = normalizeSearchTerm(normalizedBody.searchTerm);
+  }
+  return { normalizedQuery, normalizedBody };
+}
+
 function buildCacheKey(method, path, query, body) {
-  const queryString = stableStringify(query);
-  const bodyString = stableStringify(body);
+  const { normalizedQuery, normalizedBody } = normalizeCacheInputs(query, body);
+  const queryString = stableStringify(normalizedQuery);
+  const bodyString = stableStringify(normalizedBody);
   return `${method}:${path}?${queryString}|${bodyString}`;
 }
 
