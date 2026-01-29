@@ -49,8 +49,7 @@ export class ExperienceSearchPinDialogComponent {
       data: { result },
       autoFocus: false,
       backdropClass: 'dialog-backdrop',
-      maxWidth: '96vw',
-      width: 'auto',
+      maxWidth: '95vw',
       maxHeight: '95vh'
     });
   }

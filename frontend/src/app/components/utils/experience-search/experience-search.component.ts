@@ -526,7 +526,6 @@ export class ExperienceSearchComponent {
       autoFocus: false,
       backdropClass: 'dialog-backdrop',
       maxWidth: '95vw',
-      width: 'auto',
       height: '95vh'
     });
   }

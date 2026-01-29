@@ -1,29 +1,28 @@
 <mat-dialog-content class="experience-dialog-content">
-  <div class="experience-scroll">
-    <div class="search-bar">
-      <input type="search" enterkeyhint="search" [formControl]="form.controls.term" (keyup.enter)="onSearch()"
-        [placeholder]="'common.experiences.searchPlaceholder' | transloco" />
-      <button type="button" class="filter-button" [matMenuTriggerFor]="filterMenu"
-        [attr.aria-label]="'common.actions.more' | transloco">
-        <mat-icon>tune</mat-icon>
-      </button>
-      <button type="button" class="sort-button" [matMenuTriggerFor]="sortMenu"
-        [attr.aria-label]="'common.experiences.sort' | transloco">
-        <mat-icon>sort</mat-icon>
-      </button>
-      <button type="button" class="search-button" (click)="onSearchButtonClick()"
-        [disabled]="loading() || !canSearch()"
-        [attr.aria-label]="canLoadMore() && !hasSearchChanged()
+  <div class="search-bar">
+    <input type="search" enterkeyhint="search" [formControl]="form.controls.term" (keyup.enter)="onSearch()"
+      [placeholder]="'common.experiences.searchPlaceholder' | transloco" />
+    <button type="button" class="filter-button" [matMenuTriggerFor]="filterMenu"
+      [attr.aria-label]="'common.actions.more' | transloco">
+      <mat-icon>tune</mat-icon>
+    </button>
+    <button type="button" class="sort-button" [matMenuTriggerFor]="sortMenu"
+      [attr.aria-label]="'common.experiences.sort' | transloco">
+      <mat-icon>sort</mat-icon>
+    </button>
+    <button type="button" class="search-button" (click)="onSearchButtonClick()" [disabled]="loading() || !canSearch()"
+      [attr.aria-label]="canLoadMore() && !hasSearchChanged()
           ? ('common.experiences.loadMore' | transloco)
           : ('common.experiences.search' | transloco)">
-        <mat-icon>{{ canLoadMore() && !hasSearchChanged() ? 'refresh' : 'search' }}</mat-icon>
-      </button>
-    </div>
+      <mat-icon>{{ canLoadMore() && !hasSearchChanged() ? 'refresh' : 'search' }}</mat-icon>
+    </button>
+  </div>
+  <div class="experience-scroll">
     <mat-menu #sortMenu="matMenu">
       <div class="sort-menu-content">
         <mat-radio-group class="sort-menu-group" [formControl]="form.controls.sort">
           @for (option of sortOptions; track option.value) {
-            <mat-radio-button [value]="option.value">{{ option.labelKey | transloco }}</mat-radio-button>
+          <mat-radio-button [value]="option.value">{{ option.labelKey | transloco }}</mat-radio-button>
           }
         </mat-radio-group>
       </div>
@@ -34,7 +33,8 @@
           <section class="filter-tile">
             <div class="filter-tile-header">
               <mat-icon>event</mat-icon>
-              <span>{{ 'common.experiences.dateFrom' | transloco }} / {{ 'common.experiences.dateTo' | transloco }}</span>
+              <span>{{ 'common.experiences.dateFrom' | transloco }} / {{ 'common.experiences.dateTo' | transloco
+                }}</span>
             </div>
             <div class="tile-body tile-grid">
               <mat-form-field appearance="outline">
@@ -44,24 +44,26 @@
                 <mat-datepicker #startPicker></mat-datepicker>
               </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
-            <input matInput [matDatepicker]="endPicker" [formControl]="form.controls.endDate"
-              [min]="form.controls.startDate.value" [disabled]="!form.controls.startDate.value" />
-            <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
-            <mat-datepicker #endPicker></mat-datepicker>
-          </mat-form-field>
+              <mat-form-field appearance="outline">
+                <mat-label>{{ 'common.experiences.dateTo' | transloco }}</mat-label>
+                <input matInput [matDatepicker]="endPicker" [formControl]="form.controls.endDate"
+                  [min]="form.controls.startDate.value" [disabled]="!form.controls.startDate.value" />
+                <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                <mat-datepicker #endPicker></mat-datepicker>
+              </mat-form-field>
             </div>
           </section>
 
           <section class="filter-tile">
             <div class="filter-tile-header">
               <mat-icon>payments</mat-icon>
-              <span>{{ 'common.experiences.minPrice' | transloco }} / {{ 'common.experiences.maxPrice' | transloco }}</span>
+              <span>{{ 'common.experiences.minPrice' | transloco }} / {{ 'common.experiences.maxPrice' | transloco
+                }}</span>
             </div>
             <div class="tile-body">
               <div class="slider-block">
-                <mat-slider [min]="priceRange.min" [max]="priceRange.max" [step]="priceRange.step" thumbLabel tickInterval="0">
+                <mat-slider [min]="priceRange.min" [max]="priceRange.max" [step]="priceRange.step" thumbLabel
+                  tickInterval="0">
                   <input matSliderStartThumb [formControl]="form.controls.minPrice" />
                   <input matSliderEndThumb [formControl]="form.controls.maxPrice" />
                 </mat-slider>
@@ -76,11 +78,13 @@
           <section class="filter-tile">
             <div class="filter-tile-header">
               <mat-icon>schedule</mat-icon>
-              <span>{{ 'common.experiences.minDuration' | transloco }} / {{ 'common.experiences.maxDuration' | transloco }}</span>
+              <span>{{ 'common.experiences.minDuration' | transloco }} / {{ 'common.experiences.maxDuration' | transloco
+                }}</span>
             </div>
             <div class="tile-body">
               <div class="slider-block">
-                <mat-slider [min]="durationRange.min" [max]="durationRange.max" [step]="durationRange.step" thumbLabel tickInterval="0">
+                <mat-slider [min]="durationRange.min" [max]="durationRange.max" [step]="durationRange.step" thumbLabel
+                  tickInterval="0">
                   <input matSliderStartThumb [formControl]="form.controls.minDurationHours" />
                   <input matSliderEndThumb [formControl]="form.controls.maxDurationHours" />
                 </mat-slider>
@@ -101,7 +105,7 @@
               <mat-form-field appearance="outline">
                 <mat-select [formControl]="form.controls.currency">
                   @for (code of currencyOptions; track code) {
-                    <mat-option [value]="code">{{ code }}</mat-option>
+                  <mat-option [value]="code">{{ code }}</mat-option>
                   }
                 </mat-select>
               </mat-form-field>
@@ -120,79 +124,78 @@
 
     <section class="results-panel">
       @if (viewMode() === 'map') {
-        <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
-          [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="true"
-          [markerIconUrl]="'assets/markers/experience-marker.svg'"
-          (markerClick)="onMarkerClick($event)">
-        </app-search-settings-map-preview>
+      <app-search-settings-map-preview class="map-preview-full" [center]="worldCenter" [zoom]="3"
+        [markers]="mapMarkers()" [fitMarkers]="true" [interactive]="true"
+        [markerIconUrl]="'assets/markers/experience-marker.svg'" (markerClick)="onMarkerClick($event)">
+      </app-search-settings-map-preview>
       }
 
       @if (viewMode() === 'list') {
-        <div class="results" role="list">
-          @for (result of results(); track result.trackId) {
-            <mat-card class="experience-tile" role="listitem" (click)="onSelect(result)"
-              [class.experience-tile--selected]="selectedResult()?.trackId === result.trackId"
-              [attr.title]="result.title || result.productCode || ''">
-              <div class="tile-header"
-                [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(result)"
-                [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(result)">
-                <div class="identity-badge">
-                  @if (result.avatarUrl) {
-                    <img class="avatar" [src]="result.avatarUrl" [alt]="result.title || result.productCode || ''" />
-                  } @else {
-                    <mat-icon>{{ getExperienceIcon() }}</mat-icon>
-                  }
-                  <div class="identity-text">
-                    <span class="name" [attr.title]="result.title || result.productCode || ''">
-                      {{ result.title || result.productCode }}
-                    </span>
-                    @if (getDurationLabel(result)) {
-                      <span class="subtitle">{{ 'common.experiences.durationPrefix' | transloco }} {{ getDurationLabel(result) }}</span>
-                    }
-                  </div>
-                </div>
-                <div class="viator-badge">
-                  <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
-                  <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link" target="_blank" rel="noopener">
-                    Viator
-                  </a>
-                </div>
-                @if (getRatingLabel(result)) {
-                  <div class="rating-badge">★ {{ getRatingLabel(result) }}</div>
+      <div class="results" role="list">
+        @for (result of results(); track result.trackId) {
+        <mat-card class="experience-tile" role="listitem" (click)="onSelect(result)"
+          [class.experience-tile--selected]="selectedResult()?.trackId === result.trackId"
+          [attr.title]="result.title || result.productCode || ''">
+          <div class="tile-header" [style.--experience-header-bg-image]="getExperienceHeaderBackgroundImage(result)"
+            [style.--experience-header-bg-opacity]="getExperienceHeaderBackgroundOpacity(result)">
+            <div class="identity-badge">
+              @if (result.avatarUrl) {
+              <img class="avatar" [src]="result.avatarUrl" [alt]="result.title || result.productCode || ''" />
+              } @else {
+              <mat-icon>{{ getExperienceIcon() }}</mat-icon>
+              }
+              <div class="identity-text">
+                <span class="name" [attr.title]="result.title || result.productCode || ''">
+                  {{ result.title || result.productCode }}
+                </span>
+                @if (getDurationLabel(result)) {
+                <span class="subtitle">{{ 'common.experiences.durationPrefix' | transloco }} {{ getDurationLabel(result)
+                  }}</span>
                 }
               </div>
-              <mat-card-content class="experience-content">
-                @if (result.description) {
-                  <p class="result-description">
-                    {{ result.description }}
-                  </p>
-                }
-                <div class="result-meta">
-                </div>
-              </mat-card-content>
-              <mat-card-actions class="tile-actions">
-                <div class="tile-actions__left">
-                  <button mat-stroked-button class="open-viator-button" type="button"
-                    (click)="openDetails(result); $event.stopPropagation()">
-                    <mat-icon>expand_content</mat-icon>
-                    <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
-                  </button>
-                </div>
-                <div class="tile-actions__right">
-                  <button mat-stroked-button class="open-viator-button" type="button"
-                    (click)="onOpen(result); $event.stopPropagation()"
-                    [disabled]="!result.productUrl"
-                    [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
-                    <mat-icon>shopping_cart</mat-icon>
-                    <span class="open-viator-label">
-                      {{ getPriceLabel(result) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
-                    </span>
-                  </button>
-                </div>
-              </mat-card-actions>
-            </mat-card>
-          }
-        </div>
+            </div>
+            <div class="viator-badge">
+              <span class="viator-badge__text">{{ 'common.experiences.sourceViator' | transloco }}</span>
+              <a class="viator-badge__link" href="https://www.viator.com/?pid=P00285785&mcid=42383&medium=link"
+                target="_blank" rel="noopener">
+                Viator
+              </a>
+            </div>
+            @if (getRatingLabel(result)) {
+            <div class="rating-badge">★ {{ getRatingLabel(result) }}</div>
+            }
+          </div>
+          <mat-card-content class="experience-content">
+            @if (result.description) {
+            <p class="result-description">
+              {{ result.description }}
+            </p>
+            }
+            <div class="result-meta">
+            </div>
+          </mat-card-content>
+          <mat-card-actions class="tile-actions">
+            <div class="tile-actions__left">
+              <button mat-stroked-button class="open-viator-button" type="button"
+                (click)="openDetails(result); $event.stopPropagation()">
+                <mat-icon>expand_content</mat-icon>
+                <span class="open-viator-label">{{ 'common.experiences.showMore' | transloco }}</span>
+              </button>
+            </div>
+            <div class="tile-actions__right">
+              <button mat-stroked-button class="open-viator-button" type="button"
+                (click)="onOpen(result); $event.stopPropagation()" [disabled]="!result.productUrl"
+                [attr.aria-label]="'common.experiences.openOn' | transloco : { provider: 'Viator' }">
+                <mat-icon>shopping_cart</mat-icon>
+                <span class="open-viator-label">
+                  {{ getPriceLabel(result) || ('common.experiences.openOn' | transloco : { provider: 'Viator' }) }}
+                </span>
+              </button>
+            </div>
+          </mat-card-actions>
+        </mat-card>
+        }
+      </div>
 
       }
     </section>
@@ -200,8 +203,7 @@
 </mat-dialog-content>
 
 <mat-dialog-actions class="sticky-actions" align="end">
-  <button mat-dialog-close mat-icon-button class="action-close"
-    [attr.aria-label]="'common.actions.abort' | transloco">
+  <button mat-dialog-close mat-icon-button class="action-close" [attr.aria-label]="'common.actions.abort' | transloco">
     <mat-icon>close</mat-icon>
   </button>
   <button mat-icon-button type="button" (click)="help.open('experienceSearch')"
